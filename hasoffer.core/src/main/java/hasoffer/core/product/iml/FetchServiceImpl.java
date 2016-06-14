@@ -1,0 +1,218 @@
+package hasoffer.core.product.iml;
+
+import hasoffer.affiliate.affs.AffiliateFactory;
+import hasoffer.affiliate.affs.IAffiliateProcessor;
+import hasoffer.affiliate.exception.AffiliateAPIException;
+import hasoffer.affiliate.model.AffiliateProduct;
+import hasoffer.base.exception.ContentParseException;
+import hasoffer.base.exception.HttpFetchException;
+import hasoffer.base.model.Website;
+import hasoffer.base.utils.StringUtils;
+import hasoffer.core.product.IFetchService;
+import hasoffer.fetch.core.IProductProcessor;
+import hasoffer.fetch.core.ISummaryProductProcessor;
+import hasoffer.fetch.helper.WebsiteHelper;
+import hasoffer.fetch.helper.WebsiteProcessorFactory;
+import hasoffer.fetch.helper.WebsiteSummaryProductProcessorFactory;
+import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.Product;
+import hasoffer.fetch.model.ProductStatus;
+import hasoffer.fetch.sites.flipkart.FlipkartHelper;
+import hasoffer.fetch.sites.snapdeal.SnapdealHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.net.URLDecoder;
+
+/**
+ * Date : 2015/10/28
+ */
+@Service
+public class FetchServiceImpl implements IFetchService {
+
+    private Logger logger = LoggerFactory.getLogger(FetchServiceImpl.class);
+
+    // 通过url抓取的service方法
+    @Override
+    public Product fetchByUrl(String url) {
+        //获取真实website
+        Website website = WebsiteHelper.getWebSite(url);
+        //根据website获取对应实现
+        IProductProcessor productProcessor = WebsiteProcessorFactory.getProductProcessor(website);
+        //如果得到productProcessor为null，代表该网站暂不支持
+        if (productProcessor == null) {
+            return null;
+        }
+        //
+        Product product = null;
+
+        try {
+            product = productProcessor.parseProduct(url);
+        } catch (Exception e) {
+            logger.debug(e.getMessage());
+        }
+        return product;
+    }
+
+    @Override
+    public FetchedProduct fetchSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException, AffiliateAPIException, IOException, InterruptedException {
+
+        url = URLDecoder.decode(url);
+
+        Website website = WebsiteHelper.getWebSite(url);
+
+        ISummaryProductProcessor summaryProductProcessor = WebsiteSummaryProductProcessorFactory.getSummaryProductProcessor(website);
+
+        if (summaryProductProcessor == null) {
+            return null;
+        }
+
+        //用来标记联盟解析是否成功
+        boolean flag = true;
+        FetchedProduct fetchedProduct = null;
+
+        //如果是flipkart的商品，尝试用联盟解析
+        if (Website.FLIPKART.equals(website) && url.contains("?pid=")) {
+            flag = false;
+            try {
+                String sourceId = FlipkartHelper.getProductIdByUrl(url);
+                fetchedProduct = getAffiliateSummaryProduct(website, sourceId);
+            } catch (Exception e) {
+                flag = true;
+            }
+        }
+
+        //如果是snapdeal的商品，尝试用联盟解析
+        if (Website.SNAPDEAL.equals(website)) {
+            String[] subStr = url.split("#");
+            url = subStr[0];
+            flag = false;
+            try {
+                String sourceId = SnapdealHelper.getProductIdByUrl(url);
+                fetchedProduct = getAffiliateSummaryProduct(website, sourceId);
+            } catch (Exception e) {
+                flag = true;
+            }
+        }
+
+        if (flag) {
+            fetchedProduct = summaryProductProcessor.getSummaryProductByUrl(url);
+        }
+
+        // 暂停使用amazon联盟
+//        if (flag && !Website.AMAZON.equals(website)) {//联盟解析失败或者不适用联盟解析
+//            summaryProduct = summaryProductProcessor.getSummaryProductByUrl(url);
+//        } else if (flag && Website.AMAZON.equals(website)) {
+//
+//            try {
+//                summaryProduct = summaryProductProcessor.getSummaryProductByUrl(url);
+//            } catch (Exception e) {
+//                if (e instanceof AmazonRobotCheckException) {
+//                    logger.debug("AmazonRobotCheckException");
+//                    TimeUnit.MINUTES.sleep(1);
+//                }
+//                String sourceId = AmazonHelper.getProductIdByUrl(url);
+//                summaryProduct = getAffiliateSummaryProduct(website, sourceId, url);
+//            }
+//        }
+        return fetchedProduct;
+    }
+
+    @Override
+    public FetchedProduct udpateSkuInAnyWay(String url, Website website) throws IOException, HttpFetchException, ContentParseException {
+
+        boolean flag = true;
+
+        if (Website.FLIPKART.equals(website) || Website.SNAPDEAL.equals(website)) {
+
+            String sourceSid = WebsiteHelper.getSkuIdFromUrl(website, url);
+
+            if (!StringUtils.isEmpty(sourceSid)) {
+
+                IAffiliateProcessor processor = AffiliateFactory.getAffiliateProductProcessor(website);
+
+                AffiliateProduct affiliateProduct = null;
+                try {
+                    affiliateProduct = processor.getAffiliateProductBySourceId(sourceSid);
+                } catch (AffiliateAPIException e) {
+                    logger.debug("api parse fail for [" + sourceSid + "]" + " website [" + website + "]");
+                    flag = false;
+                }
+
+                if (flag) {
+                    ProductStatus status = null;
+                    if (StringUtils.isEqual("true", affiliateProduct.getProductStatus())) {
+                        status = ProductStatus.ONSALE;
+                    } else if (StringUtils.isEqual("false", affiliateProduct.getProductStatus())) {
+                        status = ProductStatus.OUTSTOCK;
+                    }
+
+                    FetchedProduct fetchedProduct = new FetchedProduct();
+
+                    fetchedProduct.setSourcePid("0");
+                    fetchedProduct.setUrl(WebsiteHelper.getCleanUrl(website, affiliateProduct.getUrl()));
+                    fetchedProduct.setImageUrl(affiliateProduct.getImageUrl());
+                    fetchedProduct.setPrice(affiliateProduct.getPrice());
+                    fetchedProduct.setWebsite(affiliateProduct.getWebsite());
+//                此处要求联盟返回的title字段为空
+//                fetchedProduct.setTitle(affiliateProduct.getTitle());
+//                fetchedProduct.setSubTitle(affiliateProduct.getTitle());
+                    fetchedProduct.setSourceSid(affiliateProduct.getSourceId());
+                    fetchedProduct.setProductStatus(status);
+
+                    return fetchedProduct;
+                }
+            }
+        }
+
+        if (WebsiteHelper.DEFAULT_WEBSITES.contains(website)) {
+
+            ISummaryProductProcessor processor = WebsiteSummaryProductProcessorFactory.getSummaryProductProcessor(website);
+
+            FetchedProduct fetchedProduct = processor.getSummaryProductByUrl(url);
+
+            return fetchedProduct;
+        }
+
+        return null;
+    }
+
+    private FetchedProduct getAffiliateSummaryProduct(Website website, String sourceId) throws AffiliateAPIException, IOException {
+
+        IAffiliateProcessor affiliateProductProcessor = AffiliateFactory.getAffiliateProductProcessor(website);
+        AffiliateProduct affiliateProduct = affiliateProductProcessor.getAffiliateProductBySourceId(sourceId);
+
+        if (affiliateProduct == null) {
+            return null;
+        }
+
+        String imageUrl = affiliateProduct.getImageUrl();
+        float price = affiliateProduct.getPrice();
+        String title = affiliateProduct.getTitle();
+        String productStatus = affiliateProduct.getProductStatus();
+        String url = affiliateProduct.getUrl();
+
+        FetchedProduct fetchedProduct = new FetchedProduct();
+        fetchedProduct.setPrice(price);
+        fetchedProduct.setSourceSid(sourceId);
+        fetchedProduct.setImageUrl(imageUrl);
+        fetchedProduct.setTitle(title);
+        fetchedProduct.setUrl(url);
+
+        //todo 商品状态对于flipkart联盟的解析有一些问题，待改进
+        if ("false".equals(productStatus)) {
+            fetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
+        } else if ("true".equals(productStatus)) {
+            fetchedProduct.setProductStatus(ProductStatus.ONSALE);
+        } else if ("none".equals(productStatus)) {
+            fetchedProduct.setProductStatus(ProductStatus.OFFSALE);
+        } else {
+            fetchedProduct.setProductStatus(null);
+        }
+
+        return fetchedProduct;
+    }
+
+}

@@ -1,0 +1,278 @@
+package hasoffer.task.controller;
+
+import hasoffer.base.model.HttpResponseModel;
+import hasoffer.base.model.Website;
+import hasoffer.base.utils.ArrayUtils;
+import hasoffer.base.utils.http.HttpUtils;
+import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
+import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
+import hasoffer.core.product.ICmpSkuService;
+import hasoffer.core.product.IProductService;
+import hasoffer.core.search.ISearchService;
+import hasoffer.core.worker.ListAndProcessWorkerStatus;
+import hasoffer.fetch.sites.flipkart.FlipkartHelper;
+import hasoffer.task.worker.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * Date : 2016/4/14
+ * Function :
+ */
+@Controller
+@RequestMapping(value = "/fixtask")
+public class FixTaskController {
+    private final static String Q_TITLE_COUNT = "SELECT t.title,COUNT(t.id) FROM PtmProduct t WHERE t.title is not null GROUP BY t.title HAVING COUNT(t.id) > 1 ORDER BY COUNT(*) DESC";
+
+    private final static String Q_PRODUCT_BY_TITLE = "SELECT t FROM PtmProduct t WHERE t.title = ?0 ORDER BY t.id ASC";
+
+    @Resource
+    IDataBaseManager dbm;
+    @Resource
+    IMongoDbManager mdm;
+    @Resource
+    ICmpSkuService cmpSkuService;
+    @Resource
+    ISearchService searchService;
+    @Resource
+    IProductService productService;
+
+    private Logger logger = LoggerFactory.getLogger(FixTaskController.class);
+
+    /**
+     * 修复title相同的product
+     * /fixtask/mergesametitleproduct
+     *
+     * @return
+     */
+    @RequestMapping(value = "/mergesametitleproduct", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String mergesametitleproduct(@RequestParam(defaultValue = "1") String counts) {
+
+        List<Object[]> titleCountMaps = dbm.query(Q_TITLE_COUNT);
+
+        for (Object[] m : titleCountMaps) {
+            String title = (String) m[0];
+            mergeProducts(title);
+
+            if (!"all".equals(counts)) {
+                return "ok";
+            }
+        }
+
+        return "ok";
+    }
+
+    private void mergeProducts(String title) {
+        logger.debug(title);
+        List<PtmProduct> products = dbm.query(Q_PRODUCT_BY_TITLE, Arrays.asList(title));
+
+        if (!ArrayUtils.hasObjs(products) || products.size() <= 1) {
+            return;
+        }
+
+        PtmProduct finalProduct = products.get(0);
+
+        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(finalProduct.getId());
+
+        Map<Website, PtmCmpSku> cmpSkuMap = new HashMap<Website, PtmCmpSku>();
+        for (PtmCmpSku cmpSku : cmpSkus) {
+            if (cmpSku.getWebsite() == null) {
+                // todo 处理
+                continue;
+            }
+            cmpSkuMap.put(cmpSku.getWebsite(), cmpSku);
+        }
+
+        // 处理其他 products
+        // cmpsku 合并
+        int size = products.size();
+        for (int i = 1; i < size; i++) {
+            searchService.mergeProducts(finalProduct, cmpSkuMap, products.get(i));
+        }
+
+    }
+
+    //fixtask/createsptomongo
+    @RequestMapping(value = "/createsptomongo", method = RequestMethod.GET)
+    public String createsptomongo() {
+
+        String queryString = "SELECT t FROM PtmCmpSku t WHERE ( t.website = 'SHOPCLUES' or t.website = 'EBAY' ) AND t.status = 'ONSALE' ";
+
+        ListAndProcessWorkerStatus<PtmCmpSku> ws = new ListAndProcessWorkerStatus<PtmCmpSku>();
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        es.execute(new MysqlListWorker(queryString, ws, dbm));
+        for (int i = 0; i < 10; i++) {
+            es.execute(new MongoSkuInitWorker(ws, mdm, cmpSkuService));
+        }
+
+        while (true) {
+            if (ws.getSdQueue().size() == 0 && ws.isListWorkFinished()) {
+                break;
+            }
+            try {
+                TimeUnit.SECONDS.sleep(5);
+            } catch (InterruptedException e) {
+                break;
+            }
+            continue;
+        }
+
+        logger.debug("work finished." + "ori url null : " + ws.getCount());
+
+        return "ok";
+    }
+
+    @RequestMapping(value = "/fixtitlelikedurex", method = RequestMethod.GET)
+    public String fixtitlelikedurex() {
+
+        String queryString = "SELECT t FROM PtmProduct t WHERE t.title LIKE '%durex%' AND t.createTime > '2016-05-07 21:57:00' ";
+
+        ListAndProcessWorkerStatus<PtmProduct> ws = new ListAndProcessWorkerStatus<PtmProduct>();
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        es.execute(new MysqlListWorker(queryString, ws, dbm));
+
+        for (int i = 0; i < 10; i++) {
+            es.execute(new FixPtmProductWorker(ws, dbm, productService));
+        }
+
+        return "ok";
+    }
+
+    ///fixtask/fixflipkartsourcesidnull
+    @RequestMapping(value = "/fixflipkartsourcesidnull", method = RequestMethod.GET)
+    @ResponseBody
+    public String fixflipkartsourcesidnull() {
+
+        final String Q_FLIPKART_SKU_SOURCESID_ISNULL = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' AND t.sourceSid IS NULL ";
+        final String Q_FLIPKART_SKU_SOURCESID_LIKEITME = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' AND t.sourceSid LIKE '%itm%' ";
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        ListAndProcessWorkerStatus<PtmCmpSku> ws = new ListAndProcessWorkerStatus<PtmCmpSku>();
+
+        es.execute(new MysqlListWorker<PtmCmpSku>(Q_FLIPKART_SKU_SOURCESID_ISNULL, ws, dbm));
+        es.execute(new MysqlListWorker<PtmCmpSku>(Q_FLIPKART_SKU_SOURCESID_LIKEITME, ws, dbm));
+
+        for (int i = 0; i < 10; i++) {
+            es.execute(new FixFlipkartSourceSidWorker(ws, dbm));
+        }
+
+
+        return "ok";
+    }
+
+    ///fixtask/fixflipkarturltocleanurl
+    @RequestMapping(value = "/fixflipkarturltocleanurl", method = RequestMethod.GET)
+    @ResponseBody
+    public String fixflipkarturltocleanurl() {
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        final String Q_FLIPKART_SKU = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' AND t.oriUrl IS NOT NULL ";
+
+        ListAndProcessWorkerStatus<PtmCmpSku> ws = new ListAndProcessWorkerStatus<PtmCmpSku>();
+        es.execute(new MysqlListWorker<PtmCmpSku>(Q_FLIPKART_SKU, ws, dbm));
+
+        for (int i = 0; i < 10; i++) {
+            es.execute(new FixFlipkartCleanUrlWorker(ws, dbm));
+        }
+
+        return "ok";
+    }
+
+    //fixtask/fixflipkarturlwithoutpid
+    @RequestMapping(value = "/fixflipkarturlwithoutpid", method = RequestMethod.GET)
+    @ResponseBody
+    public String fixflipkarturlwithoutpid() {
+
+        final String Q_FLIPKART_WITHOUTPID1 = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' AND t.url LIKE '%?pid' ";
+        final String Q_FLIPKART_WITHOUTPID2 = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' AND t.url NOT LIKE '%?%' ";
+        final String suffix = "itmefw6ygh9d6yhr";
+
+        List<PtmCmpSku> skuList = dbm.query(Q_FLIPKART_WITHOUTPID1);
+
+        for (PtmCmpSku sku : skuList) {
+
+            PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(sku.getId());
+
+            updater.getPo().setUrl(sku.getUrl() + suffix);
+
+            dbm.update(updater);
+
+            logger.debug("result = [" + sku.getUrl() + "=" + suffix + "]");
+        }
+
+        skuList = dbm.query(Q_FLIPKART_WITHOUTPID2);
+
+        for (PtmCmpSku sku : skuList) {
+
+            PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(sku.getId());
+
+            updater.getPo().setUrl(sku.getUrl() + "?pid=" + suffix);
+
+            dbm.update(updater);
+
+            logger.debug("result = [" + sku.getUrl() + "?pid=" + suffix + "]");
+        }
+
+        return "ok";
+    }
+
+    //fixtask/fixflipkarturllikeitm
+    @RequestMapping(value = "/fixflipkarturllikeitm", method = RequestMethod.GET)
+    @ResponseBody
+    public String fixflipkarturllikeitm() {
+
+        final String Q_FLIPKART_URLLIKEITM = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' AND t.url like '%?pid=itm%' ";
+        final String FLIPKART_HEAD = "http://www.flipkart.com";
+
+        List<PtmCmpSku> skuList = dbm.query(Q_FLIPKART_URLLIKEITM);
+
+        for (PtmCmpSku sku : skuList) {
+
+            String url = sku.getUrl();
+
+            url = FlipkartHelper.getUrlByDeeplink(url);
+
+            HttpResponseModel responseModel = HttpUtils.get(url, null);
+            String redirect = responseModel.getRedirect();
+
+            url = FLIPKART_HEAD + redirect;
+
+            PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(sku.getId());
+
+            updater.getPo().setUrl(url);
+            updater.getPo().setOriUrl(url);
+
+            dbm.update(updater);
+
+            logger.debug("id = [" + sku.getId() + "],url = [" + url + "]");
+
+        }
+
+        return "ok";
+    }
+}

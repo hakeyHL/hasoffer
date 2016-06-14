@@ -1,0 +1,80 @@
+package hasoffer.core.test;
+
+import hasoffer.base.model.PageableResult;
+import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
+import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
+import hasoffer.core.task.ListAndProcessTask2;
+import hasoffer.core.task.worker.IList;
+import hasoffer.core.task.worker.IProcess;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import javax.annotation.Resource;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * Date : 2016/5/25
+ * Function :
+ */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "classpath:spring-beans.xml")
+public class AutoSearchResultTest {
+
+    @Resource
+    IMongoDbManager mdm;
+    private Logger logger = LoggerFactory.getLogger(AutoSearchResultTest.class);
+
+    @Test
+    public void f() {
+        final int pageSize = 100;
+
+        final ConcurrentHashMap<Integer, AtomicInteger> countMap = new ConcurrentHashMap<Integer, AtomicInteger>();
+        for (int i = 0; i <= 6; i++) {
+            countMap.put(i, new AtomicInteger(0));
+        }
+
+        ListAndProcessTask2<SrmAutoSearchResult> listAndProcessTask2 = new ListAndProcessTask2<SrmAutoSearchResult>(new IList() {
+            @Override
+            public PageableResult getData(int page) {
+                Query query = Query.query(Criteria.where("relatedProId").gt(0));
+
+                PageableResult<SrmAutoSearchResult> pagedSearchResults = mdm.queryPage(SrmAutoSearchResult.class, query, page, pageSize);
+
+                return pagedSearchResults;
+            }
+
+            @Override
+            public boolean isRunForever() {
+                return false;
+            }
+
+            @Override
+            public void setRunForever(boolean runForever) {
+
+            }
+        }, new IProcess<SrmAutoSearchResult>() {
+            @Override
+            public void process(SrmAutoSearchResult sr) {
+                if (sr.getFinalSkus().size() == 5) {
+                    logger.debug(sr.getId() + "\t" + sr.getTitle());
+                }
+
+                countMap.get(sr.getFinalSkus().size()).addAndGet(1);
+            }
+        });
+
+        listAndProcessTask2.go();
+
+        for (int i = 0; i <= 6; i++) {
+            logger.debug(String.format("%d = %d", i, countMap.get(i).get()));
+        }
+    }
+
+}

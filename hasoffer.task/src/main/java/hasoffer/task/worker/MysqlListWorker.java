@@ -1,0 +1,82 @@
+package hasoffer.task.worker;
+
+import hasoffer.base.model.PageableResult;
+import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.worker.ListAndProcessWorkerStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * Created on 2016/5/3.
+ */
+public class MysqlListWorker<T> implements Runnable {
+
+    private Logger logger = LoggerFactory.getLogger(MysqlListWorker.class);
+    private String queryString;
+    private IDataBaseManager dbm;
+    private ListAndProcessWorkerStatus<T> ws;
+//    创建索引时为了避免，sourceSid重复
+//    private Set<String> sourceSidSet = new HashSet<String>();
+
+    public MysqlListWorker(String queryString, ListAndProcessWorkerStatus<T> ws, IDataBaseManager dbm) {
+        this.queryString = queryString;
+        this.ws = ws;
+        this.dbm = dbm;
+    }
+
+    @Override
+    public void run() {
+
+        int page = 1;
+        int pageSize = 1000;
+
+        PageableResult<T> pagedResults = dbm.queryPage(queryString, page, pageSize);
+        List<T> cmpSkus = pagedResults.getData();
+
+        long pageTotal = pagedResults.getTotalPage();
+        while (page <= pageTotal) {
+            if (ws.getSdQueue().size() > 2000) {
+                try {
+                    TimeUnit.SECONDS.sleep(3);
+                } catch (InterruptedException e) {
+                    break;
+                }
+                continue;
+            }
+
+            logger.debug(String.format("PAGE [%d/%d].", page, pageTotal));
+
+            if (page > 1) {
+                cmpSkus = dbm.query(queryString, page, pageSize);
+            }
+
+//            for (int i = cmpSkus.size() - 1; i >= 0; i--) {
+//
+//                if(cmpSkus.get(i) instanceof PtmCmpSku){
+//
+//                    PtmCmpSku sku = (PtmCmpSku)cmpSkus.get(i);
+//
+//                    String  sourceSid = sku.getSourceSid();
+//
+//                    if(sourceSidSet.contains(sourceSid)){
+//                        cmpSkus.remove(cmpSkus.get(i));
+//                    }else{
+//                        sourceSidSet.add(sku.getSourceSid());
+//                    }
+//                }
+//            }
+
+            ws.getSdQueue().addAll(cmpSkus);
+
+            page++;
+        }
+
+        ws.setListWorkFinished(true);
+
+        logger.debug("work finished.");
+    }
+
+}

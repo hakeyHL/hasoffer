@@ -1,0 +1,94 @@
+package hasoffer.core.product.solr;
+
+import hasoffer.base.model.PageableResult;
+import hasoffer.base.utils.StringUtils;
+import hasoffer.core.CoreConfig;
+import hasoffer.core.solr.*;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+@Service
+public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductModel> {
+    @Override
+    protected String getSolrUrl() {
+        return CoreConfig.get(CoreConfig.SOLR_PRODUCT_URL);
+    }
+
+    public List<Long> simpleSearch(String key, int page, int size) {
+        String q = key;
+
+        FilterQuery[] fqs = null;
+        Sort[] sorts = null;
+        PivotFacet[] pivotFacets = null;
+
+        SearchResult<Long> sr = search(q, fqs, sorts, pivotFacets, page, size);
+
+        return sr.getResult();
+    }
+
+    public PageableResult<ProductModel> searchPro(long cateId, int level, int page, int size) {
+        if (level < 1 || level > 3) {
+            return null;
+        }
+
+        String q = "*:*";
+
+        Sort[] sorts = null;
+        PivotFacet[] pivotFacets = null;
+
+        List<FilterQuery> fqList = new ArrayList<FilterQuery>();
+        fqList.add(new FilterQuery("cate" + level, String.valueOf(cateId)));
+        FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
+
+        SearchResult<ProductModel> sr = searchObjs(q, fqs, sorts, pivotFacets, page, size, true);
+
+        return new PageableResult<ProductModel>(sr.getResult(), sr.getTotalCount(), page, size);
+    }
+
+    public PageableResult<Long> searchPro(long cateId, String title, int page, int size) {
+        return searchPro(0, 0, cateId, title, page, size);
+    }
+
+    public PageableResult searchPro(long cateId, int level, String title, int page, int size) {
+        long cate1 = 0, cate2 = 0, cate3 = 0;
+
+        if (level == 1) {
+            cate1 = cateId;
+        } else if (level == 2) {
+            cate2 = cateId;
+        } else if (level == 3) {
+            cate3 = cateId;
+        }
+
+        return searchPro(cate1, cate2, cate3, title, page, size);
+    }
+
+    public PageableResult searchPro(long category1, long category2, long category3, String title, int page, int size) {
+        String q = title;
+        if (StringUtils.isEmpty(q)) {
+            q = "*:*";
+        }
+
+        List<FilterQuery> fqList = new ArrayList<FilterQuery>();
+        if (category3 > 0) {
+            fqList.add(new FilterQuery("cate3", String.valueOf(category3)));
+        } else if (category2 > 0) {
+            fqList.add(new FilterQuery("cate2", String.valueOf(category2)));
+        } else if (category1 > 0) {
+            fqList.add(new FilterQuery("cate1", String.valueOf(category1)));
+        }
+
+        FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
+        Sort[] sorts = null;
+        PivotFacet[] pivotFacets = null;
+
+        SearchResult<Long> sr = search(q, fqs, sorts, pivotFacets, page, size);
+
+        long totalCount = sr.getTotalCount();
+
+        return new PageableResult<Long>(sr.getResult(), totalCount, page, size);
+    }
+}
