@@ -271,7 +271,7 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
                     query.setParameter("" + i, obj);
                     i++;
                 }
-                System.out.println(query.toString());
+                logger.debug(query.toString());
                 query.executeUpdate();
 
                 return null;
