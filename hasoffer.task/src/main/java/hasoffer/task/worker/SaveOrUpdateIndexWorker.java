@@ -166,7 +166,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
 
                     PtmCmpSkuIndex2 ptmCmpSkuIndex2 = dbm.get(PtmCmpSkuIndex2.class, oldSku.getId());
 
-                    if(ptmCmpSkuIndex2!=null){
+                    if (ptmCmpSkuIndex2 != null) {
                         //更新index
                         PtmCmpSkuIndex2Updater updater1 = new PtmCmpSkuIndex2Updater(oldSku.getId());
 
@@ -178,7 +178,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
                         updater1.getPo().setUpdateTime(TimeUtils.nowDate());
 
                         dbm.update(updater1);
-                    }else{
+                    } else {
                         cmpSkuService.createPtmCmpSkuIndexToMysql(oldSku);
                     }
 
