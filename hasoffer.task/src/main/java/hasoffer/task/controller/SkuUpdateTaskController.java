@@ -68,7 +68,7 @@ public class SkuUpdateTaskController {
 
         es.execute(new SrmSearchLogListWorker(dbm, logQueue));
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 20; i++) {
             es.execute(new CmpSkuVisitUpdateWorker(dbm, fetchService, cmpSkuService, cmpSkuUpdateStatService, logQueue));
         }
 
