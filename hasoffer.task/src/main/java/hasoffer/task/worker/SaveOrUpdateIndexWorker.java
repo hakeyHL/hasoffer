@@ -17,6 +17,7 @@ import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.StatHijackFetch;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.product.ICmpSkuService;
@@ -163,17 +164,23 @@ public class SaveOrUpdateIndexWorker implements Runnable {
 
                     dbm.update(updater);
 
-                    //更新index
-                    PtmCmpSkuIndex2Updater updater1 = new PtmCmpSkuIndex2Updater(oldSku.getId());
+                    PtmCmpSkuIndex2 ptmCmpSkuIndex2 = dbm.get(PtmCmpSkuIndex2.class, oldSku.getId());
 
-                    updater1.getPo().setSkuTitle(sku.getSkuTitle());
-                    updater1.getPo().setSkuTitleIndex(HexDigestUtil.md5(StringUtils.getCleanChars(sku.getSkuTitle())));
-                    updater1.getPo().setUrl(sku.getUrl());
-                    updater1.getPo().setSiteSkuTitleIndex(HexDigestUtil.md5(oldSku.getWebsite().name() + StringUtils.getCleanChars(sku.getSkuTitle())));
-                    updater1.getPo().setSkuUrlIndex(HexDigestUtil.md5(WebsiteHelper.getCleanUrl(oldSku.getWebsite(), sku.getUrl())));
-                    updater1.getPo().setUpdateTime(TimeUtils.nowDate());
+                    if(ptmCmpSkuIndex2!=null){
+                        //更新index
+                        PtmCmpSkuIndex2Updater updater1 = new PtmCmpSkuIndex2Updater(oldSku.getId());
 
-                    dbm.update(updater1);
+                        updater1.getPo().setSkuTitle(sku.getSkuTitle());
+                        updater1.getPo().setSkuTitleIndex(HexDigestUtil.md5(StringUtils.getCleanChars(sku.getSkuTitle())));
+                        updater1.getPo().setUrl(sku.getUrl());
+                        updater1.getPo().setSiteSkuTitleIndex(HexDigestUtil.md5(oldSku.getWebsite().name() + StringUtils.getCleanChars(sku.getSkuTitle())));
+                        updater1.getPo().setSkuUrlIndex(HexDigestUtil.md5(WebsiteHelper.getCleanUrl(oldSku.getWebsite(), sku.getUrl())));
+                        updater1.getPo().setUpdateTime(TimeUtils.nowDate());
+
+                        dbm.update(updater1);
+                    }else{
+                        cmpSkuService.createPtmCmpSkuIndexToMysql(oldSku);
+                    }
 
                     statHijackFetch.getAffectSkuIdList().add(oldSku.getId() + "");
                 }

@@ -24,10 +24,9 @@ public class StringTest {
     @Test
     public void testStr2() {
 
-        String str = "PrixCracker 65 Tempered Glass for Xiaomi Redmi 2";
-        String str0 = "Chef'n Stainless Steel Apple, Strawberry, Watermelon Slicer";
+        String str = "Zdelhi.Com ZRA01 Apple Shape Digital Watch  - For Boys";
 
-        String str1 = HexDigestUtil.md5(StringUtils.getCleanChars(str0));
+        String str1 = HexDigestUtil.md5(StringUtils.getCleanChars(str));
 
         System.out.println(str1);
 
