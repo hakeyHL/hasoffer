@@ -100,6 +100,11 @@ public class CmpSkuVisitUpdateWorker implements Runnable {
             }
 
             PtmProduct ptmProduct = dbm.get(PtmProduct.class, productId);
+
+            if (ptmProduct == null) {
+                continue;
+            }
+
             if (ptmProduct.getUpdateTime() != null) {
 
                 long lastUpdateTime = ptmProduct.getUpdateTime().getTime();
