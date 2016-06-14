@@ -21,6 +21,9 @@ public class OrderStatsAnalysisPO  implements Identifiable<Integer> {
     @Column(length=20,nullable=false)
     private String channel;
 
+    @Column(length = 100)
+    private String userId;
+
     /**
      * 新用户（NEW）还是老用户（OLD）。
      */
@@ -37,6 +40,9 @@ public class OrderStatsAnalysisPO  implements Identifiable<Integer> {
      */
     @Column(length=10)
     private String orderType;
+
+    @Column(length = 20)
+    private String orderStatus;
 
     private BigDecimal saleAmount;
 
@@ -74,6 +80,14 @@ public class OrderStatsAnalysisPO  implements Identifiable<Integer> {
         this.channel = channel;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     public String getUserType() {
         return userType;
     }
@@ -104,6 +118,14 @@ public class OrderStatsAnalysisPO  implements Identifiable<Integer> {
 
     public void setOrderType(String orderType) {
         this.orderType = orderType;
+    }
+
+    public String getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(String orderStatus) {
+        this.orderStatus = orderStatus;
     }
 
     public BigDecimal getSaleAmount() {

@@ -24,7 +24,7 @@ public class FilpkartExport {
 //        String jsonString = processor.sendRequest(url, null);
 //        Gson gson = new Gson();
 //        AffiliateOrderReport report = gson.fromJson(jsonString, AffiliateOrderReport.class);
-        FileOutputStream fileOut = new FileOutputStream("d:/订单报表-05.xlsx");
+        FileOutputStream fileOut = new FileOutputStream("d:/订单报表-tt.xlsx");
         XSSFWorkbook xssfWorkBook = ExcelExportUtil.createXssfWorkBook();
         XSSFSheet xssfSheet = ExcelExportUtil.createXssfSheet(xssfWorkBook, null);
         Map<Integer, ExcelExportUtil.ColumnModel> columnModelMap = new HashMap<Integer, ExcelExportUtil.ColumnModel>();

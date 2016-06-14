@@ -37,10 +37,10 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
 //        Date before24H = new Date(startTime.getTime() - 1000 * 60 * 60 * 24);
 
         Map<String, String> parameterMap = new HashMap<String, String>();
-        parameterMap.put("startDate", DateFormatUtils.format(startTime, "yyyy-MM-dd"));
-        parameterMap.put("endDate", DateFormatUtils.format(endTime, "yyyy-MM-dd"));
-        parameterMap.put("status", "tentative");
-        parameterMap.put("offset", "0");
+        parameterMap.put(FlipkartAffiliateProductProcessor.R_START_DATE, DateFormatUtils.format(startTime, "yyyy-MM-dd"));
+        parameterMap.put(FlipkartAffiliateProductProcessor.R_END_DATE, DateFormatUtils.format(endTime, "yyyy-MM-dd"));
+        parameterMap.put(FlipkartAffiliateProductProcessor.R_ORDER_STATUS, FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE);
+        parameterMap.put(FlipkartAffiliateProductProcessor.R_OFFSET, "0");
         List<AffiliateOrder> orderList = flipProcessor.getAffiliateOrderList(parameterMap);
         Set<String> deviceSet = new HashSet<String>();
         for (AffiliateOrder order : orderList) {
@@ -71,7 +71,12 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
                 e.printStackTrace();
             }
             String deviceId = order.getAffExtParam2();
+
             po.setDeviceId(deviceId);
+
+            po.setUserId(order.getAffExtParam3());
+
+            po.setOrderStatus(order.getStatus());
             // OLD?NEW
             UrmDevice device = deviceRegTime.get(deviceId);
             if (device != null && !"".equals(deviceId)) {
