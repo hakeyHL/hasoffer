@@ -67,7 +67,7 @@ public class CmpSkuVisitUpdateWorker implements Runnable {
                     for (Website website : WebsiteHelper.DEFAULT_WEBSITES) {
 
                         String todayString = TimeUtils.parse(threadStart, "yyyyMMdd");
-//                        String todayString = TimeUtils.parse(TimeUtils.getDayStart(TimeUtils.now()), "yyyyMMdd");
+
                         String id = HexDigestUtil.md5(website.name() + todayString);
 
                         if (needUpdateMap.containsKey(website)) {

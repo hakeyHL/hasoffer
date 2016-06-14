@@ -40,8 +40,8 @@ public class SearchProductHelperTest {
     @Test
     public void testSearch(){
 
-        Website website = Website.AMAZON;
-        String title = "Intel DC S3500 240 GB Laptop Internal Hard Drive SSDSC2BB240G401";
+        Website website = Website.SNAPDEAL;
+        String title = "Samsung Galaxy";
 
         IListProcessor listProcessor = WebsiteProcessorFactory.getListProcessor(website);
 
