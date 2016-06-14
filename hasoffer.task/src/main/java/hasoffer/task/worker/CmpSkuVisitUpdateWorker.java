@@ -5,6 +5,8 @@ import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.ptm.updater.PtmProductUpdater;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.ICmpSkuUpdateStatService;
@@ -95,6 +97,25 @@ public class CmpSkuVisitUpdateWorker implements Runnable {
 
             if (productId == 0) {
                 continue;
+            }
+
+            PtmProduct ptmProduct = dbm.get(PtmProduct.class, productId);
+            if (ptmProduct.getUpdateTime() != null) {
+
+                long lastUpdateTime = ptmProduct.getUpdateTime().getTime();
+
+                if (lastUpdateTime > TimeUtils.now() - TimeUtils.MILLISECONDS_OF_1_DAY) {
+                    continue;
+                }
+
+            } else {
+
+                PtmProductUpdater updater = new PtmProductUpdater(productId);
+
+                updater.getPo().setUpdateTime(TimeUtils.nowDate());
+
+                dbm.update(updater);
+
             }
 
             List<PtmCmpSku> skus = dbm.query(Q_SKU_PRODUCTID, Arrays.asList(productId));
