@@ -27,13 +27,24 @@ import java.util.*;
  */
 public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<AffiliateOrder> {
 
+    private static Logger logger = LoggerFactory.getLogger(FlipkartAffiliateProductProcessor.class);
+
     private static final String TRACKINGID = "affiliate357";
     private static final String AFFILIATE_BASE_URL = "https://affiliate-api.flipkart.net/affiliate/api/" + TRACKINGID + ".json";
     private static final String AFFILIATE_KEYWORDQUERY_URL = "https://affiliate-api.flipkart.net/affiliate/search/json";
     private static final String AFFILIATE_PRODUCTID_URL = "https://affiliate-api.flipkart.net/affiliate/1.0/product.json?id=";
     //    private static final String TOKEN_URL = "https://affiliate.flipkart.com/api/a_generateToken";
     private static String TOKEN = "56e46c994b92488c91e43fad138d5c71";
-    private static Logger logger = LoggerFactory.getLogger(FlipkartAffiliateProductProcessor.class);
+
+    public static final String R_START_DATE = "startDate";
+    public static final String R_END_DATE = "endDate";
+    public static final String R_OFFSET = "offset";
+    public static final String R_ORDER_STATUS = "status";
+    public static final String R_ORDER_STATUS_TENTATIVE = "tentative";
+    public static final String R_ORDER_STATUS_APPROVED = "approved";
+    public static final String R_ORDER_STATUS_CANCELLED = "cancelled";
+    public static final String R_ORDER_STATUS_DISAPPROVED = "disapproved";
+
 
     public static void main(String[] args) throws AffiliateAPIException, IOException {
 
@@ -64,7 +75,16 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
             String respJson = sendRequest(url, null, parameterMap);
             Gson gson = new Gson();
             AffiliateOrderReport report = gson.fromJson(respJson, AffiliateOrderReport.class);
-            return report.getOrderList();
+
+            List<AffiliateOrder> orderList = report.getOrderList();
+            if(orderList!=null){
+                for(AffiliateOrder order:orderList){
+                    if(order.getStatus() == null){
+                        order.setStatus(parameterMap.get(R_ORDER_STATUS));
+                    }
+                }
+            }
+            return orderList;
         } catch (Exception e) {
             e.printStackTrace();
             return new ArrayList<AffiliateOrder>();

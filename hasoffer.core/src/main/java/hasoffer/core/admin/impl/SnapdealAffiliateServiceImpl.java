@@ -19,7 +19,7 @@ import java.util.*;
 @Transactional
 public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
 
-    private IAffiliateProcessor<SnapDealAffiliateOrder> affilicatProcessor = new SnapdealProductProcessor();
+    private IAffiliateProcessor<SnapDealAffiliateOrder> snapDealProcessor = new SnapdealProductProcessor();
 
     @Resource
     private IDeviceService deviceService;
@@ -28,10 +28,10 @@ public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
     public List<OrderStatsAnalysisPO> countOrderList(Date startTime, Date endTime) {
         List<OrderStatsAnalysisPO> orderPOList = new ArrayList<OrderStatsAnalysisPO>();
         Map<String, String> parameterMap = new HashMap<String, String>();
-        parameterMap.put("startDate", DateFormatUtils.format(startTime, "yyyy-MM-dd"));
-        parameterMap.put("endDate", DateFormatUtils.format(endTime, "yyyy-MM-dd"));
-        parameterMap.put("status", "approved");
-        List<SnapDealAffiliateOrder> orderList = affilicatProcessor.getAffiliateOrderList(parameterMap);
+        parameterMap.put(SnapdealProductProcessor.R_START_DATE, DateFormatUtils.format(startTime, "yyyy-MM-dd"));
+        parameterMap.put(SnapdealProductProcessor.R_END_DATE, DateFormatUtils.format(endTime, "yyyy-MM-dd"));
+        parameterMap.put(SnapdealProductProcessor.R_ORDER_STATUS, SnapdealProductProcessor.R_ORDER_STATUS_APPROVED);
+        List<SnapDealAffiliateOrder> orderList = snapDealProcessor.getAffiliateOrderList(parameterMap);
         Set<String> deviceSet = new HashSet<String>();
         if (orderList != null) {
             for (SnapDealAffiliateOrder order : orderList) {
@@ -69,6 +69,7 @@ public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
                 po.setSaleAmount(order.getSale());
                 po.setCommissionRate(order.getCommissionRate());
                 po.setTentativeAmount(order.getCommissionEarned());
+                po.setOrderStatus(order.getStatus());
                 orderPOList.add(po);
             }
         }

@@ -12,6 +12,7 @@ import hasoffer.affiliate.model.AffiliateCategory;
 import hasoffer.affiliate.model.AffiliateProduct;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.base.utils.http.HttpUtils;
 
 import java.io.IOException;
@@ -27,6 +28,14 @@ public class SnapdealProductProcessor implements IAffiliateProcessor<SnapDealAff
     private static final String TOEKN = "cc3aa2059100114e957e7d97cbe0df";
     private static final String AFFILIATE_BASE_URL = "http://affiliate-feeds.snapdeal.com/feed/" + TRACKINGID + ".json";
     private static final String AFFILIATE_PRODUCTDETAIL_URL = "http://affiliate-feeds.snapdeal.com/feed/product?id=";
+
+    public static final String R_START_DATE = "startDate";
+    public static final String R_END_DATE = "endDate";
+    public static final String R_ORDER_STATUS = "status";
+
+    public static final String R_ORDER_STATUS_APPROVED = "approved";
+    public static final String R_ORDER_STATUS_CANCELLED = "cancelled";
+    public static final String R_ORDER_STATUS_TENTATIVE = "cancelled";
 
 
 
@@ -168,7 +177,20 @@ public class SnapdealProductProcessor implements IAffiliateProcessor<SnapDealAff
             System.out.println(respJson);
             Gson gson = new GsonBuilder().setDateFormat("MM/dd/yyyy HH:mm:ss").create();
             SnapdealOrderReport report = gson.fromJson(respJson, SnapdealOrderReport.class);
-            return report.getProductDetails();
+
+            List<SnapDealAffiliateOrder> productDetails = report.getProductDetails();
+            if(productDetails!=null) {
+                for (SnapDealAffiliateOrder order : productDetails) {
+                    if (order.getStatus() == null) {
+                        order.setStatus(parameterMap.get(R_ORDER_STATUS));
+                    }
+                    long x= TimeUtils.MILLISECONDS_OF_1_DAY*30;
+                    if (R_ORDER_STATUS_APPROVED.equals(order.getStatus()) && new Date().getTime() - order.getDateTime().getTime() < x) {
+                        order.setStatus(R_ORDER_STATUS_TENTATIVE);
+                    }
+                }
+            }
+            return productDetails;
         } catch (Exception e) {
             e.printStackTrace();
             return new ArrayList<SnapDealAffiliateOrder>();

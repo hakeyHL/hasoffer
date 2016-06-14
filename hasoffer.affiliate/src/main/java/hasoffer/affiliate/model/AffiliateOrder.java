@@ -11,6 +11,7 @@ public class AffiliateOrder {
     private String commissionRate;
     private String affExtParam1;
     private String affExtParam2;
+    private String affExtParam3;
     private String salesChannel;
     private String customerType;
 
@@ -112,6 +113,14 @@ public class AffiliateOrder {
 
     public void setAffExtParam2(String affExtParam2) {
         this.affExtParam2 = affExtParam2;
+    }
+
+    public String getAffExtParam3() {
+        return affExtParam3;
+    }
+
+    public void setAffExtParam3(String affExtParam3) {
+        this.affExtParam3 = affExtParam3;
     }
 
     public String getSalesChannel() {

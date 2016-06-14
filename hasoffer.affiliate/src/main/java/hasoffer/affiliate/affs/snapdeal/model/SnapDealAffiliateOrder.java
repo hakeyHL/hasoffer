@@ -5,129 +5,158 @@ import java.util.Date;
 
 public class SnapDealAffiliateOrder {
 
-        private String product;
-        private String category;
-        private String orderCode;
-        private BigDecimal quantity;
-        private BigDecimal price;
-        private BigDecimal sale;
-        private BigDecimal commissionRate;
-        private BigDecimal commissionEarned;
-        private Date dateTime;
+    private String product;
+    private String category;
+    private String orderCode;
+    private BigDecimal quantity;
+    private BigDecimal price;
+    private BigDecimal sale;
+    private BigDecimal commissionRate;
+    private BigDecimal commissionEarned;
+    private Date dateTime;
 
-        /**
-         * 渠道
-         */
-        private String affiliateSubId1;
+    /**
+     * 渠道
+     */
+    private String affiliateSubId1;
 
-        /**
-         * 设备ID
-         */
-        private String affiliateSubId2;
-        private String userType;
-        private String deviceType;
+    /**
+     * 设备ID
+     */
+    private String affiliateSubId2;
 
-        public String getProduct() {
-            return product;
-        }
+    /**
+     *  暂定用户ID
+     */
+    private String affiliateSubId3;
 
-        public void setProduct(String product) {
-            this.product = product;
-        }
+    /**
+     * 订单状态
+     */
+    private String status;
 
-        public String getCategory() {
-            return category;
-        }
+    private String userType;
+    private String deviceType;
 
-        public void setCategory(String category) {
-            this.category = category;
-        }
 
-        public String getOrderCode() {
-            return orderCode;
-        }
 
-        public void setOrderCode(String orderCode) {
-            this.orderCode = orderCode;
-        }
+    public String getProduct() {
+        return product;
+    }
 
-        public BigDecimal getQuantity() {
-            return quantity;
-        }
+    public void setProduct(String product) {
+        this.product = product;
+    }
 
-        public void setQuantity(BigDecimal quantity) {
-            this.quantity = quantity;
-        }
+    public String getCategory() {
+        return category;
+    }
 
-        public BigDecimal getPrice() {
-            return price;
-        }
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
-        public void setPrice(BigDecimal price) {
-            this.price = price;
-        }
+    public String getOrderCode() {
+        return orderCode;
+    }
 
-        public BigDecimal getSale() {
-            return sale;
-        }
+    public void setOrderCode(String orderCode) {
+        this.orderCode = orderCode;
+    }
 
-        public void setSale(BigDecimal sale) {
-            this.sale = sale;
-        }
+    public BigDecimal getQuantity() {
+        return quantity;
+    }
 
-        public BigDecimal getCommissionRate() {
-            return commissionRate;
-        }
+    public void setQuantity(BigDecimal quantity) {
+        this.quantity = quantity;
+    }
 
-        public void setCommissionRate(BigDecimal commissionRate) {
-            this.commissionRate = commissionRate;
-        }
+    public BigDecimal getPrice() {
+        return price;
+    }
 
-        public BigDecimal getCommissionEarned() {
-            return commissionEarned;
-        }
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
 
-        public void setCommissionEarned(BigDecimal commissionEarned) {
-            this.commissionEarned = commissionEarned;
-        }
+    public BigDecimal getSale() {
+        return sale;
+    }
 
-        public Date getDateTime() {
-            return dateTime;
-        }
+    public void setSale(BigDecimal sale) {
+        this.sale = sale;
+    }
 
-        public void setDateTime(Date dateTime) {
-            this.dateTime = dateTime;
-        }
+    public BigDecimal getCommissionRate() {
+        return commissionRate;
+    }
 
-        public String getAffiliateSubId1() {
-            return affiliateSubId1;
-        }
+    public void setCommissionRate(BigDecimal commissionRate) {
+        this.commissionRate = commissionRate;
+    }
 
-        public void setAffiliateSubId1(String affiliateSubId1) {
-            this.affiliateSubId1 = affiliateSubId1;
-        }
+    public BigDecimal getCommissionEarned() {
+        return commissionEarned;
+    }
 
-        public String getAffiliateSubId2() {
-            return affiliateSubId2;
-        }
+    public void setCommissionEarned(BigDecimal commissionEarned) {
+        this.commissionEarned = commissionEarned;
+    }
 
-        public void setAffiliateSubId2(String affiliateSubId2) {
-            this.affiliateSubId2 = affiliateSubId2;
-        }
+    public Date getDateTime() {
+        return dateTime;
+    }
 
-        public String getUserType() {
-            return userType;
-        }
+    public void setDateTime(Date dateTime) {
+        this.dateTime = dateTime;
+    }
 
-        public void setUserType(String userType) {
-            this.userType = userType;
-        }
+    public String getAffiliateSubId1() {
+        return affiliateSubId1;
+    }
 
-        public String getDeviceType() {
-            return deviceType;
-        }
+    public void setAffiliateSubId1(String affiliateSubId1) {
+        this.affiliateSubId1 = affiliateSubId1;
+    }
 
-        public void setDeviceType(String deviceType) {
-            this.deviceType = deviceType;
-        }
+    public String getAffiliateSubId2() {
+        return affiliateSubId2;
+    }
+
+    public void setAffiliateSubId2(String affiliateSubId2) {
+        this.affiliateSubId2 = affiliateSubId2;
+    }
+
+    public String getAffiliateSubId3() {
+        return affiliateSubId3;
+    }
+
+    public void setAffiliateSubId3(String affiliateSubId3) {
+        this.affiliateSubId3 = affiliateSubId3;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
+
+    public String getDeviceType() {
+        return deviceType;
+    }
+
+    public void setDeviceType(String deviceType) {
+        this.deviceType = deviceType;
+    }
     }
