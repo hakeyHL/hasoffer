@@ -33,6 +33,7 @@ public class SkuUpdateTaskController {
     private static AtomicBoolean taskRunning2 = new AtomicBoolean(false);
     private static AtomicBoolean taskRunning3 = new AtomicBoolean(false);
     private static AtomicBoolean taskRunning4 = new AtomicBoolean(false);
+    private static AtomicBoolean taskRunning5 = new AtomicBoolean(false);
 
     @Resource
     IDataBaseManager dbm;
@@ -57,17 +58,23 @@ public class SkuUpdateTaskController {
     @ResponseBody
     public String visitUpdate() {
 
+        if (taskRunning5.get()) {
+            return "task running.";
+        }
+
         ConcurrentLinkedQueue<SrmSearchLog> logQueue = new ConcurrentLinkedQueue<SrmSearchLog>();
 
         ExecutorService es = Executors.newCachedThreadPool();
 
         es.execute(new SrmSearchLogListWorker(dbm, logQueue));
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 2; i++) {
             es.execute(new CmpSkuVisitUpdateWorker(dbm, fetchService, cmpSkuService, cmpSkuUpdateStatService, logQueue));
         }
 
-        return "ok";
+        taskRunning5.set(true);
+
+        return "";
     }
 
 

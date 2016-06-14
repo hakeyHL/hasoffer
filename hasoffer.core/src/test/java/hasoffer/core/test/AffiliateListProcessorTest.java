@@ -38,7 +38,7 @@ public class AffiliateListProcessorTest {
         FlipkartAffiliateProductProcessor flipkartAffilicateProductProcessor = new FlipkartAffiliateProductProcessor();
         AffiliateProduct flipkartProduct = null;
         try {
-            flipkartProduct = flipkartAffilicateProductProcessor.getAffiliateProductBySourceId("LSDE8MXGZ92WH3GC");
+            flipkartProduct = flipkartAffilicateProductProcessor.getAffiliateProductBySourceId("MOBEGFZPCHJHAZVU");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -52,7 +52,7 @@ public class AffiliateListProcessorTest {
         SnapdealProductProcessor snapdealAffilicateProductProcessor = new SnapdealProductProcessor();
         AffiliateProduct snapdealProduct = null;
         try {
-            snapdealProduct = snapdealAffilicateProductProcessor.getAffiliateProductBySourceId(sourceId);
+            snapdealProduct = snapdealAffilicateProductProcessor.getAffiliateProductBySourceId("1507228345");
 
         } catch (Exception e) {
             e.printStackTrace();
