@@ -15,6 +15,7 @@ public class PtmProduct implements Identifiable<Long> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Date createTime = TimeUtils.nowDate();
+    private Date updateTime;
 
     private long categoryId;
     private String title;// 标题
@@ -166,40 +167,51 @@ public class PtmProduct implements Identifiable<Long> {
         this.sourceUrl = sourceUrl;
     }
 
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        PtmProduct product = (PtmProduct) o;
+        PtmProduct that = (PtmProduct) o;
 
-        if (categoryId != product.categoryId) return false;
-        if (Float.compare(product.price, price) != 0) return false;
-        if (rating != product.rating) return false;
-        if (id != null ? !id.equals(product.id) : product.id != null) return false;
-        if (createTime != null ? !createTime.equals(product.createTime) : product.createTime != null) return false;
-        if (title != null ? !title.equals(product.title) : product.title != null) return false;
-        if (tag != null ? !tag.equals(product.tag) : product.tag != null) return false;
-        if (description != null ? !description.equals(product.description) : product.description != null) return false;
-        if (color != null ? !color.equals(product.color) : product.color != null) return false;
-        if (size != null ? !size.equals(product.size) : product.size != null) return false;
-        if (sourceSite != null ? !sourceSite.equals(product.sourceSite) : product.sourceSite != null) return false;
-        if (sourceUrl != null ? !sourceUrl.equals(product.sourceUrl) : product.sourceUrl != null) return false;
-        return !(sourceId != null ? !sourceId.equals(product.sourceId) : product.sourceId != null);
+        if (categoryId != that.categoryId) return false;
+        if (Float.compare(that.price, price) != 0) return false;
+        if (rating != that.rating) return false;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (createTime != null ? !createTime.equals(that.createTime) : that.createTime != null) return false;
+        if (updateTime != null ? !updateTime.equals(that.updateTime) : that.updateTime != null) return false;
+        if (title != null ? !title.equals(that.title) : that.title != null) return false;
+        if (tag != null ? !tag.equals(that.tag) : that.tag != null) return false;
+        if (color != null ? !color.equals(that.color) : that.color != null) return false;
+        if (size != null ? !size.equals(that.size) : that.size != null) return false;
+        if (description != null ? !description.equals(that.description) : that.description != null) return false;
+        if (sourceSite != null ? !sourceSite.equals(that.sourceSite) : that.sourceSite != null) return false;
+        if (sourceUrl != null ? !sourceUrl.equals(that.sourceUrl) : that.sourceUrl != null) return false;
+        if (sourceId != null ? !sourceId.equals(that.sourceId) : that.sourceId != null) return false;
 
+        return true;
     }
 
     @Override
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
+        result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
         result = 31 * result + (int) (categoryId ^ (categoryId >>> 32));
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (tag != null ? tag.hashCode() : 0);
         result = 31 * result + (price != +0.0f ? Float.floatToIntBits(price) : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (color != null ? color.hashCode() : 0);
         result = 31 * result + (size != null ? size.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + rating;
         result = 31 * result + (sourceSite != null ? sourceSite.hashCode() : 0);
         result = 31 * result + (sourceUrl != null ? sourceUrl.hashCode() : 0);
