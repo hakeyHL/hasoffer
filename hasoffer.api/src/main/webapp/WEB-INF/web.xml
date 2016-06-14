@@ -29,21 +29,21 @@
     </context-param>
 
     <listener>
-        <listener-class>
-            org.springframework.web.context.ContextLoaderListener
-        </listener-class>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
 
     <listener>
-        <description>web listener</description>
-        <display-name>web_listener</display-name>
-        <listener-class>hasoffer.api.listener.ApplicationListener</listener-class>
-    </listener>
-
-    <listener>
-        <description>application listener</description>
         <display-name>application_listener</display-name>
         <listener-class>hasoffer.webcommon.listener.ApplicationListener</listener-class>
+    </listener>
+    <listener>
+        <display-name>session_listener</display-name>
+        <listener-class>hasoffer.webcommon.listener.ServerSessionListener</listener-class>
+    </listener>
+
+    <listener>
+        <display-name>web_listener</display-name>
+        <listener-class>hasoffer.api.listener.ApplicationListener</listener-class>
     </listener>
 
     <filter>
@@ -125,4 +125,8 @@
         <filter-name>HttpMethodFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+
+    <session-config>
+        <session-timeout>1</session-timeout>
+    </session-config>
 </web-app>

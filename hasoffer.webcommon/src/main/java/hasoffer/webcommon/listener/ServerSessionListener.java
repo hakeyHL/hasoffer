@@ -22,10 +22,9 @@ public class ServerSessionListener implements HttpSessionListener {
 
     private void show() {
         long count = curCount.get();
-        logger.info("current session count : " + count);
-//        if (count % 10 == 0) {
-//            logger.info("current session count : " + count);
-//        }
+        if (count % 50 == 0) {
+            System.out.println("System.out.println - current session count : " + count);
+        }
     }
 
     @Override
