@@ -7,8 +7,8 @@ import hasoffer.base.utils.HtmlUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.exception.amazon.AmazonRobotCheckException;
-import hasoffer.fetch.model.ProductStatus;
 import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.ProductStatus;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.htmlcleaner.TagNode;
 import org.slf4j.Logger;
@@ -39,6 +39,8 @@ public class AmazonSummaryProductProcessor implements ISummaryProductProcessor {
     public FetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
 
         FetchedProduct fetchedProduct = new FetchedProduct();
+
+        url = url.replace("dp", "gp/offer-listing");
 
         String sourceId = AmazonHelper.getProductIdByUrl(url);
         fetchedProduct.setWebsite(Website.AMAZON);
@@ -151,7 +153,7 @@ public class AmazonSummaryProductProcessor implements ISummaryProductProcessor {
                 }
 
                 String priceString = priceNode.getText().toString().trim();
-                priceString = StringUtils.filterAndTrim(priceString, Arrays.asList("&nbsp;",","));
+                priceString = StringUtils.filterAndTrim(priceString, Arrays.asList("&nbsp;", ","));
 
                 if (priceString.contains("-")) {
                     String[] ps = priceString.split("-");
