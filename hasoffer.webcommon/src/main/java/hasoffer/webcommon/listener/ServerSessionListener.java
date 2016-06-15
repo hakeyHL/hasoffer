@@ -1,5 +1,6 @@
 package hasoffer.webcommon.listener;
 
+import hasoffer.base.utils.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +24,7 @@ public class ServerSessionListener implements HttpSessionListener {
     private void show() {
         long count = curCount.get();
         if (count % 50 == 0) {
-            System.out.println("System.out.println - current session count : " + count);
+            System.out.println(String.format("[%s] - current session count : %d.", TimeUtils.parse(TimeUtils.nowDate(), "yyyy/MM/dd HH:mm:ss"), count));
         }
     }
 

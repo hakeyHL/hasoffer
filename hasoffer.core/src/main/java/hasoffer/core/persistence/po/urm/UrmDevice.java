@@ -78,6 +78,7 @@ public class UrmDevice implements Identifiable<String> {
         this.id = id;
         this.mac = mac;
         this.createTime = TimeUtils.nowDate();
+        this.updateTime = this.createTime;
         this.brand = brand;
         this.imeiId = imeiId;
         this.deviceId = deviceId;
