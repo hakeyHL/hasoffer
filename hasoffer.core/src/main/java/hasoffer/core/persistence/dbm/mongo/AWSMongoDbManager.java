@@ -1,10 +1,9 @@
 package hasoffer.core.persistence.dbm.mongo;
 
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.*;
 import hasoffer.base.model.PageableResult;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -22,7 +21,9 @@ import java.util.Map;
 //@Component
 public class AWSMongoDbManager implements IMongoDbManager {
 
-    static AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient(new ProfileCredentialsProvider());
+    static AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient().withEndpoint("http://60.205.57.57:8000");
+
+//    static AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient(new ProfileCredentialsProvider());
 
 //    private DynamoDB dynamoDBClient = getDynamoDBClient();
 //
@@ -40,6 +41,32 @@ public class AWSMongoDbManager implements IMongoDbManager {
 
     private <T> T getById(Class<T> clazz, Object id) throws Exception {
         return getMapper().load(clazz, id);
+    }
+
+    public <T> void createTable(Class<T> clazz) {
+        CreateTableRequest request = getMapper().generateCreateTableRequest(clazz);
+
+        request.withProvisionedThroughput(new ProvisionedThroughput()
+                        .withReadCapacityUnits(5L)
+                        .withWriteCapacityUnits(6L)
+        );
+
+        CreateTableResult createTableResult = dynamoDBClient.createTable(request);
+
+        System.out.println(createTableResult.getTableDescription().toString());
+    }
+
+    public <T> void updateTable(Class<T> clazz, long readUnits, long writeUnits) {
+
+        String className = clazz.getName();
+        String tName = className.substring(className.lastIndexOf(".") + 1);
+
+        UpdateTableResult updateTableResult = dynamoDBClient.updateTable(tName, new ProvisionedThroughput().withReadCapacityUnits(readUnits).withWriteCapacityUnits(writeUnits));
+    }
+
+    public List<String> listTables() {
+        ListTablesResult tables = dynamoDBClient.listTables();
+        return tables.getTableNames();
     }
 
     @Override
