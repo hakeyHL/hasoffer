@@ -1,7 +1,20 @@
+/**
+ * Project Name: hadiths-jobs
+ * Shang De
+ * Copyright (c) 2014-2016 All Rights Reserved.
+ * 2014年6月20日
+ */
 package hasoffer.job.quartz.bean;
 
 import java.util.Date;
 
+/**
+ * 代码描述：
+ *
+ * @author chen
+ * @date 2014年6月20日
+ *
+ */
 public class QuartzJobInfo {
     private String triggerName;
     private String triggerGroup;
@@ -11,17 +24,17 @@ public class QuartzJobInfo {
     private String jobGroup;
 
     /**
-     *
+     * 运行状态
      */
     private String state;
 
     /**
-     *�´�ִ��ʱ��
+     * 下一次运行时间
      */
     private Date nextFireTime;
 
     /**
-     *���ִ��ʱ��
+     * 上一次运行时间
      */
     private Date lastFireTime;
 
@@ -35,7 +48,8 @@ public class QuartzJobInfo {
     }
 
     /**
-     * @param triggerName the triggerName to set
+     * @param triggerName
+     *            the triggerName to set
      */
     public void setTriggerName(String triggerName) {
         this.triggerName = triggerName;
@@ -49,7 +63,8 @@ public class QuartzJobInfo {
     }
 
     /**
-     * @param triggerGroup the triggerGroup to set
+     * @param triggerGroup
+     *            the triggerGroup to set
      */
     public void setTriggerGroup(String triggerGroup) {
         this.triggerGroup = triggerGroup;
@@ -63,7 +78,8 @@ public class QuartzJobInfo {
     }
 
     /**
-     * @param jobClass the jobClass to set
+     * @param jobClass
+     *            the jobClass to set
      */
     public void setJobClass(String jobClass) {
         this.jobClass = jobClass;
@@ -77,7 +93,8 @@ public class QuartzJobInfo {
     }
 
     /**
-     * @param jobName the jobName to set
+     * @param jobName
+     *            the jobName to set
      */
     public void setJobName(String jobName) {
         this.jobName = jobName;
@@ -91,7 +108,8 @@ public class QuartzJobInfo {
     }
 
     /**
-     * @param jobGroup the jobGroup to set
+     * @param jobGroup
+     *            the jobGroup to set
      */
     public void setJobGroup(String jobGroup) {
         this.jobGroup = jobGroup;
@@ -105,7 +123,8 @@ public class QuartzJobInfo {
     }
 
     /**
-     * @param state the state to set
+     * @param state
+     *            the state to set
      */
     public void setState(String state) {
         this.state = state;
@@ -119,7 +138,8 @@ public class QuartzJobInfo {
     }
 
     /**
-     * @param nextFireTime the nextFireTime to set
+     * @param nextFireTime
+     *            the nextFireTime to set
      */
     public void setNextFireTime(Date nextFireTime) {
         this.nextFireTime = nextFireTime;
@@ -133,7 +153,8 @@ public class QuartzJobInfo {
     }
 
     /**
-     * @param lastFireTime the lastFireTime to set
+     * @param lastFireTime
+     *            the lastFireTime to set
      */
     public void setLastFireTime(Date lastFireTime) {
         this.lastFireTime = lastFireTime;
