@@ -2,6 +2,7 @@ package hasoffer.affiliate.test;
 
 import hasoffer.affiliate.affs.flipkart.FlipkartAffiliateProductProcessor;
 import hasoffer.affiliate.exception.AffiliateAPIException;
+import hasoffer.affiliate.model.AffiliateOrder;
 import hasoffer.base.utils.ExcelExportUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
@@ -11,6 +12,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FilpkartExport {
@@ -24,7 +26,7 @@ public class FilpkartExport {
 //        String jsonString = processor.sendRequest(url, null);
 //        Gson gson = new Gson();
 //        AffiliateOrderReport report = gson.fromJson(jsonString, AffiliateOrderReport.class);
-        FileOutputStream fileOut = new FileOutputStream("d:/订单报表-tt.xlsx");
+        FileOutputStream fileOut = new FileOutputStream("d:/订单报表-04.xlsx");
         XSSFWorkbook xssfWorkBook = ExcelExportUtil.createXssfWorkBook();
         XSSFSheet xssfSheet = ExcelExportUtil.createXssfSheet(xssfWorkBook, null);
         Map<Integer, ExcelExportUtil.ColumnModel> columnModelMap = new HashMap<Integer, ExcelExportUtil.ColumnModel>();
@@ -48,11 +50,17 @@ public class FilpkartExport {
         columnModelMap.put(columnIndex, new ExcelExportUtil.ColumnModel("customerType", "customerType"));
 
         Map<String, String> parameterMap = new HashMap<String, String>();
-        parameterMap.put("startDate", "2016-05-01");
-        parameterMap.put("endDate", "2016-05-31");
+        parameterMap.put("startDate", "2016-04-01");
+        parameterMap.put("endDate", "2016-04-30");
         parameterMap.put("status", "approved");
         parameterMap.put("offset", "0");
-        ExcelExportUtil.initXSSFSheetData(xssfSheet, columnModelMap, processor.getAffiliateOrderList(parameterMap));
+        List<AffiliateOrder> affiliateOrderList = processor.getAffiliateOrderList(parameterMap);
+        //parameterMap.put("startDate", "2016-04-01");
+        //parameterMap.put("endDate", "2016-04-30");
+        //parameterMap.put("status", "approved");
+        //parameterMap.put("offset", "501");
+        //affiliateOrderList.addAll(processor.getAffiliateOrderList(parameterMap));
+        ExcelExportUtil.initXSSFSheetData(xssfSheet, columnModelMap, affiliateOrderList);
         xssfWorkBook.write(fileOut);//把Workbook对象输出到文件workbook.xls中
         fileOut.close();
 

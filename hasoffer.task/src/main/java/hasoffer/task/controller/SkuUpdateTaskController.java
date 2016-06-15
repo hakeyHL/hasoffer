@@ -122,8 +122,7 @@ public class SkuUpdateTaskController {
 
         String Q_CMPSKU_AMAZON =
                 "SELECT t FROM PtmCmpSku t " +
-                        "WHERE t.website = 'AMAZON' " +
-                        " ORDER BY t.id ";
+                        "WHERE t.website = 'AMAZON' ";
 
         ExecutorService es = Executors.newCachedThreadPool();
 
