@@ -41,6 +41,7 @@ public class CmpSkuUpdateWorker implements Runnable {
         websiteList.add(Website.FLIPKART);
         websiteList.add(Website.SNAPDEAL);
         websiteList.add(Website.PAYTM);
+        websiteList.add(Website.AMAZON);
 
     }
 
