@@ -131,9 +131,9 @@ public class SkuUpdateTaskController {
         ConcurrentLinkedQueue<PtmCmpSku> skuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
         es.execute(new CmpSkuListWorker(dbm, skuQueue, Q_CMPSKU_AMAZON));
 
-        //amazon改为单线程更新，控制访问时间
-        es.execute(new CmpSkuUpdateWorker(skuQueue, cmpSkuService, fetchService));
-
+        for (int i = 0; i < 20; i++) {
+            es.execute(new CmpSkuUpdateWorker(skuQueue, cmpSkuService, fetchService));
+        }
 
         taskRunning2.set(true);
 
