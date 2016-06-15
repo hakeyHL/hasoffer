@@ -62,6 +62,12 @@ public class AWSMongoDbManager implements IMongoDbManager {
         UpdateTableResult updateTableResult = dynamoDBClient.updateTable(tName, new ProvisionedThroughput().withReadCapacityUnits(readUnits).withWriteCapacityUnits(writeUnits));
     }
 
+    public <T> void deleteTable(Class<T> clazz) {
+        String tName = getTableName(clazz);
+
+        DeleteTableResult deleteTableResult = dynamoDBClient.deleteTable(tName);
+    }
+
     public List<String> listTables() {
         ListTablesResult tables = dynamoDBClient.listTables();
         return tables.getTableNames();
@@ -81,6 +87,10 @@ public class AWSMongoDbManager implements IMongoDbManager {
     @Override
     public <T> void save(T t) {
         getMapper().save(t);
+    }
+
+    public <T> void save(T... ts) {
+        getMapper().save(ts);
     }
 
     @Override
@@ -129,7 +139,7 @@ public class AWSMongoDbManager implements IMongoDbManager {
 
     @Override
     public <T> T queryOne(Class<T> clazz, Object id) {
-        return null;
+        return getMapper().load(clazz, id);
     }
 
     @Override
