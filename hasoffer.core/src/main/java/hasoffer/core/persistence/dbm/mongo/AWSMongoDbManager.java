@@ -47,8 +47,8 @@ public class AWSMongoDbManager implements IMongoDbManager {
         CreateTableRequest request = getMapper().generateCreateTableRequest(clazz);
 
         request.withProvisionedThroughput(new ProvisionedThroughput()
-                        .withReadCapacityUnits(5L)
-                        .withWriteCapacityUnits(6L)
+                        .withReadCapacityUnits(100L)
+                        .withWriteCapacityUnits(10L)
         );
 
         CreateTableResult createTableResult = dynamoDBClient.createTable(request);
@@ -57,9 +57,7 @@ public class AWSMongoDbManager implements IMongoDbManager {
     }
 
     public <T> void updateTable(Class<T> clazz, long readUnits, long writeUnits) {
-
-        String className = clazz.getName();
-        String tName = className.substring(className.lastIndexOf(".") + 1);
+        String tName = getTableName(clazz);
 
         UpdateTableResult updateTableResult = dynamoDBClient.updateTable(tName, new ProvisionedThroughput().withReadCapacityUnits(readUnits).withWriteCapacityUnits(writeUnits));
     }
@@ -67,6 +65,17 @@ public class AWSMongoDbManager implements IMongoDbManager {
     public List<String> listTables() {
         ListTablesResult tables = dynamoDBClient.listTables();
         return tables.getTableNames();
+    }
+
+    public <T> String descTable(Class<T> clazz) {
+        String tName = getTableName(clazz);
+
+        return dynamoDBClient.describeTable(tName).toString();
+    }
+
+    private <T> String getTableName(Class<T> clazz) {
+        String className = clazz.getName();
+        return className.substring(className.lastIndexOf(".") + 1);
     }
 
     @Override

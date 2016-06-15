@@ -16,9 +16,9 @@ public class DynamodbTest {
 
     @Test
     public void test1() {
-//        awsMongoDbManager.createTable(AwsSummaryProduct.class);
+        awsMongoDbManager.createTable(AwsSummaryProduct.class);
 
-        awsMongoDbManager.updateTable(AwsSummaryProduct.class, 2000, 100);
+        System.out.println(awsMongoDbManager.descTable(AwsSummaryProduct.class));
 
 //        AwsSummaryProduct asp = new AwsSummaryProduct();
 //        asp.setId(0);
