@@ -3,6 +3,8 @@ package hasoffer.core.persistence.dbm.mongo;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
+import com.amazonaws.services.dynamodbv2.datamodeling.ScanResultPage;
 import com.amazonaws.services.dynamodbv2.model.*;
 import hasoffer.base.model.PageableResult;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
@@ -91,6 +93,30 @@ public class AWSMongoDbManager implements IMongoDbManager {
 
     public <T> void save(T... ts) {
         getMapper().save(ts);
+    }
+
+    public <T> PageableResult<T> queryPage(Class<T> clazz, String expressionStr, List<Object> params, int page, int size) {
+        Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
+
+        int index = 1;
+        for (Object param : params) {
+            if (param instanceof String) {
+                eav.put(":val" + index, new AttributeValue().withS((String) param));
+            } else if (param instanceof Integer || param instanceof Long) {
+                eav.put(":val" + index, new AttributeValue().withN(param.toString()));
+            }
+
+            index++;
+        }
+
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
+                .withFilterExpression(expressionStr)
+                .withExpressionAttributeValues(eav);
+
+        ScanResultPage<T> resultPage = getMapper().scanPage(clazz, scanExpression);
+
+
+        return new PageableResult<T>(resultPage.getResults(), resultPage.getCount(), 1, 1);
     }
 
     @Override

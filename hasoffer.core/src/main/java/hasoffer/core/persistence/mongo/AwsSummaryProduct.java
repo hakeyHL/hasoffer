@@ -1,10 +1,12 @@
 package hasoffer.core.persistence.mongo;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMarshalling;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.persistence.dbm.mongo.converter.WebsiteTypeConverter;
 import org.springframework.data.annotation.PersistenceConstructor;
 
 import java.util.Date;
@@ -19,7 +21,8 @@ public class AwsSummaryProduct {
     @DynamoDBHashKey(attributeName = "id")
     private long id;
 
-    private String website;
+    @DynamoDBMarshalling(marshallerClass = WebsiteTypeConverter.class)
+    private Website website;
     private String url;
     private String sourceId;// source-sku-id
 
@@ -50,7 +53,7 @@ public class AwsSummaryProduct {
                              SkuStatus skuStatus) {
         this();
         this.id = id;
-        this.website = website.name();
+        this.website = website;
         this.url = url;
         this.sourceId = sourceId;
         this.title = title;
@@ -68,11 +71,11 @@ public class AwsSummaryProduct {
         this.id = id;
     }
 
-    public String getWebsite() {
+    public Website getWebsite() {
         return website;
     }
 
-    public void setWebsite(String website) {
+    public void setWebsite(Website website) {
         this.website = website;
     }
 
@@ -124,10 +127,6 @@ public class AwsSummaryProduct {
         this.imageUrl = imageUrl;
     }
 
-    public void setSkuStatus(String skuStatus) {
-        this.skuStatus = skuStatus;
-    }
-
     public long getlCreateTime() {
         return lCreateTime;
     }
@@ -158,6 +157,14 @@ public class AwsSummaryProduct {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getSkuStatus() {
+        return skuStatus;
+    }
+
+    public void setSkuStatus(String skuStatus) {
+        this.skuStatus = skuStatus;
     }
 
     @Override
