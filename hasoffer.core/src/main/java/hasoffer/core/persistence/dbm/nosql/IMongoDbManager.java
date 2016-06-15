@@ -30,4 +30,7 @@ public interface IMongoDbManager {
     <T> T queryOne(Class<T> clazz, Object id);
 
     <T> AggregationResults<T> aggregate(Class<T> clazz, TypedAggregation<T> agg);
+
+    // table
+
 }
