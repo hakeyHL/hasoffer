@@ -20,6 +20,17 @@ public class DynamodbTest {
     AWSMongoDbManager awsMongoDbManager = new AWSMongoDbManager();
 
     @Test
+    public void testCount() {
+        String queryStr = "1 = 1";
+
+        List params = new ArrayList();
+
+        long count = awsMongoDbManager.count(AwsSummaryProduct.class, queryStr, params);
+
+        System.out.println(count);
+    }
+
+    @Test
     public void testQuery() {
 
         String queryStr = "id > :val1 and website = :val2";
