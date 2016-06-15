@@ -75,13 +75,28 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
             String respJson = sendRequest(url, null, parameterMap);
             Gson gson = new Gson();
             AffiliateOrderReport report = gson.fromJson(respJson, AffiliateOrderReport.class);
-
-            List<AffiliateOrder> orderList = report.getOrderList();
-            if(orderList!=null){
-                for(AffiliateOrder order:orderList){
-                    if(order.getStatus() == null){
-                        order.setStatus(parameterMap.get(R_ORDER_STATUS));
+            List<AffiliateOrder> orderList = new ArrayList<AffiliateOrder>();
+            if (report.getOrderList() != null) {
+                orderList.addAll(report.getOrderList());
+            }
+            while (true) {
+                if (!"".equals(report.getNext()) && parameterMap.get(R_OFFSET) != null) {
+                    parameterMap.put(R_OFFSET, String.valueOf(Integer.valueOf(parameterMap.get(R_OFFSET)) + 500));
+                    respJson = sendRequest(url, null, parameterMap);
+                    report = gson.fromJson(respJson, AffiliateOrderReport.class);
+                    if (report.getOrderList() != null) {
+                        orderList.addAll(report.getOrderList());
                     }
+                }
+                if("".equals(report.getNext())){
+                    break;
+                }
+
+            }
+
+            for (AffiliateOrder order : orderList) {
+                if (order.getStatus() == null) {
+                    order.setStatus(parameterMap.get(R_ORDER_STATUS));
                 }
             }
             return orderList;
