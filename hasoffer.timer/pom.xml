@@ -79,6 +79,13 @@
             <artifactId>spring-web</artifactId>
             <version>${spring.framework.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk</artifactId>
+            <version>1.11.6</version>
+        </dependency>
+
     </dependencies>
 
     <!--<build>
