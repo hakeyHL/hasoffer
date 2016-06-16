@@ -5,10 +5,14 @@ import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.HtmlUtils;
+import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.http.XPathUtils;
+import hasoffer.data.redis.IRedisService;
+import hasoffer.dubbo.api.fetch.common.StringConstant;
 import hasoffer.dubbo.api.fetch.po.FetchResult;
 import hasoffer.dubbo.api.fetch.service.IFetchService;
+import hasoffer.dubbo.api.fetch.service.IKeywordService;
 import hasoffer.fetch.core.IListProcessor;
 import hasoffer.fetch.helper.WebsiteProcessorFactory;
 import hasoffer.fetch.model.ListProduct;
@@ -19,6 +23,8 @@ import org.htmlcleaner.TagNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,6 +34,12 @@ import static hasoffer.base.utils.http.XPathUtils.getSubNodesByXPath;
 
 public class FlipkartFetchServiceImpl extends BaseFetchServiceImpl implements IFetchService{
     private Logger logger = LoggerFactory.getLogger(FlipkartFetchServiceImpl.class);
+
+    @Resource
+    private IRedisService<ListProduct> redisService;
+
+    @Resource
+    private IKeywordService keywordService;
 
     private static final String XPATH_TITLE = "//h1[@itemprop='name']";
     private static final String XPATH_SUBTITLE = "//span[@class='subtitle']";
@@ -39,21 +51,35 @@ public class FlipkartFetchServiceImpl extends BaseFetchServiceImpl implements IF
 
     @Override
     public FetchResult getProductsKeyWord(Website webSite, String keyword, int startIndex, int endIndex) {
-        IListProcessor listProcessor = WebsiteProcessorFactory.getListProcessor(Website.FLIPKART);
-        try {
-            List<ListProduct> listProducts = new ArrayList<ListProduct>();
-            if (listProcessor != null) {
-                listProducts = listProcessor.getProductSetByKeyword(keyword, 10);
-            }
-            logger.debug(String.format("found [%d] products. search[%s] from [%s].", listProducts.size(), keyword, Website.FLIPKART.name()));
-            FetchResult fetchResult = new FetchResult();
-            fetchResult.setTaskStatus(TaskStatus.RUNNING);
-            fetchResult.setListProducts(listProducts);
+        FetchResult fetchResultList = getFetchResultList(webSite, keyword);
+        if (fetchResultList == null) {
+            FetchResult fetchResult = new FetchResult(webSite,keyword);
+            fetchResult.setTaskStatus(TaskStatus.START);
+            addNewFetchResult( fetchResult);
             return fetchResult;
-        } catch (Exception e) {
-            logger.error("error : search {} from {}.Info : {}", keyword, Website.FLIPKART, e.getMessage());
+        } else {
+            return fetchResultList;
         }
-        return null;
+    }
+
+    private void addNewFetchResult( FetchResult fetchResult) {
+        String key = getFetchResultKey(fetchResult.getWebsite(), fetchResult.getKeyword());
+        keywordService.saveKeyword(key);
+        String json = JSONUtil.toJSON(fetchResult);
+        redisService.add(key, json, 1000);
+    }
+
+    private FetchResult getFetchResultList(Website webSite, String keyWord) {
+        String json = redisService.get(getFetchResultKey(webSite, keyWord), 1000);
+        if (json == null || "".equals(json)) {
+            return null;
+        }
+        try {
+            return JSONUtil.toObject(json, FetchResult.class);
+        } catch (IOException e) {
+            logger.debug("getProduct error.");
+            return null;
+        }
     }
 
     @Override
@@ -141,4 +167,52 @@ public class FlipkartFetchServiceImpl extends BaseFetchServiceImpl implements IF
 
         return result;
     }
+
+    @Override
+    public FetchResult fetch(String queryStr) {
+        if (queryStr == null) {
+            return null;
+        }
+        if (!queryStr.contains(StringConstant.FETCH_RESULT_KEY_LIST)) {
+            return null;
+        }
+        queryStr = queryStr.replace(StringConstant.FETCH_RESULT_KEY_LIST, "");
+        String[] strings = queryStr.split("_");
+        if (strings.length != 2) {
+            return null;
+        }
+        String webSiteStr = strings[0];
+        String keywordStr = strings[1];
+
+        Website webSite = Website.valueOf(webSiteStr);
+
+        IListProcessor listProcessor = WebsiteProcessorFactory.getListProcessor(webSite);
+        FetchResult fetchResult = new FetchResult(webSite,keywordStr);
+        try {
+            List<ListProduct> listProducts = new ArrayList<ListProduct>();
+            if (listProcessor != null) {
+                listProducts = listProcessor.getProductSetByKeyword(keywordStr, 10);
+            }
+            logger.debug(String.format("found [%d] products. search[%s] from [%s].", listProducts.size(), keywordStr, Website.FLIPKART.name()));
+            fetchResult.setTaskStatus(TaskStatus.FINSH);
+            fetchResult.setListProducts(listProducts);
+            return fetchResult;
+        } catch (Exception e) {
+            logger.error("error : search {} from {}.Info : {}", keywordStr, Website.FLIPKART, e.getMessage());
+            fetchResult = new FetchResult();
+            fetchResult.setTaskStatus(TaskStatus.EXCEPTION);
+            fetchResult.setListProducts(null);
+            return fetchResult;
+        }
+    }
+
+    @Override
+    public void cache(FetchResult pop) {
+        redisService.add(getFetchResultKey(pop.getWebsite(),pop.getKeyword()), JSONUtil.toJSON(pop), 3000);
+    }
+
+    private String getFetchResultKey(Website webSite, String keyWord) {
+        return StringConstant.FETCH_RESULT_KEY_LIST + webSite + "_" + keyWord;
+    }
+
 }

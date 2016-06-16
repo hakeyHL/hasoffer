@@ -1,10 +1,12 @@
 package hasoffer.job.worker;
 
+import hasoffer.base.model.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.SearchProductService;
+import hasoffer.dubbo.api.fetch.po.FetchResult;
 import hasoffer.dubbo.api.fetch.service.IFetchService;
 import hasoffer.fetch.model.ListProduct;
 import org.slf4j.Logger;
@@ -25,25 +27,22 @@ public class UnmatchedSearchRecordProcessWorker2 implements Runnable {
 
     private Logger logger = LoggerFactory.getLogger(UnmatchedSearchRecordProcessWorker2.class);
 
-    LinkedBlockingQueue<SrmSearchLog> searchLogQueue;
-    ISearchService searchService;
-    SearchProductService searchProductService;
+    private LinkedBlockingQueue<SrmSearchLog> searchLogQueue;
+    private ISearchService searchService;
+    private SearchProductService searchProductService;
+    private IFetchService flipkartFetchService;
 
-
-
-    IFetchService flipkartFetchService;
-
-    public UnmatchedSearchRecordProcessWorker2(SearchProductService searchProductService, ISearchService searchService, IFetchService flipkartFetchService,LinkedBlockingQueue<SrmSearchLog> searchLogQueue) {
+    public UnmatchedSearchRecordProcessWorker2(SearchProductService searchProductService, ISearchService searchService, IFetchService flipkartFetchService, LinkedBlockingQueue<SrmSearchLog> searchLogQueue) {
         this.searchProductService = searchProductService;
         this.searchService = searchService;
         this.searchLogQueue = searchLogQueue;
         this.flipkartFetchService = flipkartFetchService;
     }
 
+    @Override
     public void run() {
-        logger.debug("UnmatchedSearchRecordProcessWorker2 START");
 
-        while(true) {
+        while (true) {
 
             try {
 
@@ -55,6 +54,7 @@ public class UnmatchedSearchRecordProcessWorker2 implements Runnable {
                     continue;
                 }
 
+                logger.debug("UnmatchedSearchRecordProcessWorker2 START");
                 SrmAutoSearchResult autoSearchResult = new SrmAutoSearchResult(searchLog);
 
                 String keyword = autoSearchResult.getTitle();
@@ -67,13 +67,15 @@ public class UnmatchedSearchRecordProcessWorker2 implements Runnable {
                 if (listProducts == null) {
                     listProducts = new ArrayList<ListProduct>();
                 }
-                listProducts.addAll(flipkartFetchService.getProductsKeyWord(logSite, keyword, 0, 10).getListProducts());
-
-                autoSearchResult.setSitePros(listProductMap);
-
-                // fetch
-                searchProductService.searchProductsFromSites(autoSearchResult);
-
+                FetchResult productsKeyWord = flipkartFetchService.getProductsKeyWord(logSite, keyword, 0, 10);
+                if (productsKeyWord.getTaskStatus().equals(TaskStatus.STOPPED) && !productsKeyWord.getTaskStatus().equals(TaskStatus.STOPPED)) {
+                    searchLogQueue.put(searchLog);
+                } else {
+                    List<ListProduct> listProductsResult = productsKeyWord.getListProducts();
+                    listProducts.addAll(listProductsResult);
+                    autoSearchResult.setSitePros(listProductMap);
+                    searchProductService.searchProductsFromSites(autoSearchResult);
+                }
 
             } catch (Exception e) {
                 logger.debug(e.getMessage());

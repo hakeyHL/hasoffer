@@ -41,9 +41,7 @@ public class UnmatchedSearchRecordListWorker2 implements Runnable {
         Date searchTime = startTime;
 
         while (true) {
-
-            logger.debug(String.format("UnmatchedSearchRecordListWorker2 START[%s].Queue size[%d]", TimeUtils.parse(startTime, PATTERN_TIME), searchLogQueue.size()));
-
+                logger.debug("UnmatchedSearchRecordListWorker2 START{}. Queue size{}", TimeUtils.parse(startTime, PATTERN_TIME), searchLogQueue.size());
             try {
                 if (searchLogQueue.size() > 800) {
                     TimeUnit.SECONDS.sleep(10);

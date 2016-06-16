@@ -10,4 +10,8 @@ public interface IFetchService {
     FetchResult getProductsKeyWord(Website webSite, String keyword, int startIndex, int endIndex);
 
     FetchResult getProductsByUrl(String webSite, String url) throws HttpFetchException, ContentParseException;
+
+    FetchResult fetch(String queryStr);
+
+    void cache(FetchResult fetchResult);
 }

@@ -47,6 +47,9 @@ public class UnmatchedSearchRecordListWorker2 implements Runnable {
                     logger.debug("UnmatchedSearchRecordListWorker2 go to sleep!");
                     continue;
                 }
+                if(startTime .compareTo(TimeUtils.nowDate())>0) {
+                    TimeUnit.MINUTES.sleep(10);
+                }
                 Date searchTime = startTime;
                 PageableResult<SrmSearchLog> pagedSearchLog = dbm.queryPage(SQL_SEARCHLOG, 1, 1000, Arrays.asList(searchTime));
                 List<SrmSearchLog> searchLogs = pagedSearchLog.getData();
