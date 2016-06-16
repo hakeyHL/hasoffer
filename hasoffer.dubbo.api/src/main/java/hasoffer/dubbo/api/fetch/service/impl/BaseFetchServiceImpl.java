@@ -16,4 +16,14 @@ public class BaseFetchServiceImpl implements IFetchService {
     public FetchResult getProductsByUrl(String webSite, String url) throws HttpFetchException, ContentParseException {
         return null;
     }
+
+    @Override
+    public FetchResult fetch(String queryStr) {
+        return null;
+    }
+
+    @Override
+    public void cache(FetchResult fetchResult) {
+
+    }
 }

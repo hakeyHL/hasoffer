@@ -93,9 +93,9 @@ public class CmpSkuUpdateWorker implements Runnable {
 
                 FetchedProduct fetchedProduct = null;
 
-
+                logger.debug("parse start");
                 fetchedProduct = fetchService.fetchSummaryProductByUrl(url);
-
+                logger.debug("parse finish");
 
                 //此处是FK、SD正常更新逻辑放弃对title字段的更新，该有另外的task统一维护
                 if (fetchedProduct != null) {
@@ -105,7 +105,9 @@ public class CmpSkuUpdateWorker implements Runnable {
                 }
 
                 try {
+                    logger.debug("start update");
                     cmpSkuService.updateCmpSkuBySummaryProduct(sku.getId(), fetchedProduct);
+                    logger.debug("update finish");
                     logger.debug(sku.getId() + " fetch success " + website);
                 } catch (Exception e) {
                     logger.debug(e.toString());
@@ -114,7 +116,7 @@ public class CmpSkuUpdateWorker implements Runnable {
                     }
                 }
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.debug(e.toString());
             }
         }

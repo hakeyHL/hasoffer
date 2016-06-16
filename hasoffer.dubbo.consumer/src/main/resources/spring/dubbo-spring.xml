@@ -12,5 +12,5 @@
     <!-- 使用zookeeper注册中心暴露服务地址 -->
     <dubbo:registry address="zookeeper://60.205.57.57:2181"/>
     <!-- 要暴露的服务接口 -->
-    <dubbo:reference id="flipkartFetchService" group="flipkart" interface="hasoffer.dubbo.api.fetch.service.IFetchService"/>
+    <dubbo:reference id="flipkartFetchService" group="flipkart" interface="hasoffer.dubbo.api.fetch.service.IFetchService" version="1.0"/>
 </beans>
