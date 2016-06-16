@@ -19,6 +19,7 @@ import org.jboss.logging.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
@@ -42,7 +43,7 @@ public class AppController {
     CmpSkuCacheManager cmpSkuCacheManager;
     private Logger logger = LoggerFactory.logger(AppController.class);
 
-    @RequestMapping(value = "/config", method = RequestMethod.GET)
+    @RequestMapping(value = "/config2", method = RequestMethod.GET)
     public ModelAndView config(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView();
 
@@ -110,6 +111,33 @@ public class AppController {
             } catch (Exception e) {
                 logger.debug(e.getMessage());
             }
+        }
+
+        return new ModelAndView();
+    }
+
+    /**
+     * 客户端回调
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/callback", method = RequestMethod.GET)
+    public ModelAndView callback(HttpServletRequest request,
+                                 @RequestParam CallbackAction action) {
+
+        switch (action) {
+            case FLOWCTRLSUCCESS:
+                // 流量拦截成功
+                try {
+                    String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+                    DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+                    cmpSkuCacheManager.recordFlowControll(deviceId, deviceInfo.getCurShopApp());
+                } catch (Exception e) {
+                    logger.debug(e.getMessage());
+                }
+            default:
+                break;
         }
 
         return new ModelAndView();

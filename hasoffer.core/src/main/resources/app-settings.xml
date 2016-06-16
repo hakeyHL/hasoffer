@@ -10,6 +10,7 @@
         <add key="IMAGE_SITELOGO_PATH" value="http://img.hasoffer.com/sites/"/>
         <add key="WEB_HOST" value="http://www.hasoffer.com"/>
         <add key="API_HOST" value="http://api.hasoffer.com"/>
+        <add key="SESSION_DISPLAY_COUNT" value="1"/>
     </config>
 
     <config stage='dev'>
@@ -22,6 +23,7 @@
         <add key="IMAGE_SITELOGO_PATH" value="http://img.hasoffer.com/sites/"/>
         <add key="WEB_HOST" value="http://www.hasoffer.com"/>
         <add key="API_HOST" value="http://api.hasoffer.com"/>
+        <add key="SESSION_DISPLAY_COUNT" value="1"/>
     </config>
 
     <config stage='test'>
@@ -34,6 +36,7 @@
         <add key="IMAGE_SITELOGO_PATH" value="http://img.hasoffer.com/sites/"/>
         <add key="WEB_HOST" value="http://101.201.196.143:8000"/>
         <add key="API_HOST" value="http://api.hasoffer.com"/>
+        <add key="SESSION_DISPLAY_COUNT" value="1"/>
     </config>
 
     <config stage='product'>
@@ -46,6 +49,7 @@
         <add key="IMAGE_SITELOGO_PATH" value="http://img.hasoffer.com/sites/"/>
         <add key="WEB_HOST" value="http://www.hasoffer.com"/>
         <add key="API_HOST" value="http://api.hasoffer.com"/>
+        <add key="SESSION_DISPLAY_COUNT" value="50"/>
     </config>
 
 </app-settings>

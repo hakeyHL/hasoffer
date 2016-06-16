@@ -6,9 +6,9 @@ package hasoffer.core.bo.match;
  */
 public class HasTag {
 
-    private String tag;
+    private String tag = "";
 
-    private String alias; // 逗号隔开
+    private String alias = ""; // 逗号隔开
 
     public String getTag() {
         return tag;
