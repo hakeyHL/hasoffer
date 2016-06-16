@@ -48,75 +48,75 @@ public class CmpSkuUpdateWorker implements Runnable {
     @Override
     public void run() {
         while (true) {
+            try {
+                PtmCmpSku sku = skuQueue.poll();
 
-            PtmCmpSku sku = skuQueue.poll();
-
-            if (sku == null) {
-                try {
-                    TimeUnit.SECONDS.sleep(3);
-                    logger.debug("task update get null sleep 3 seconds");
-                } catch (InterruptedException e) {
-                    return;
-                }
-                continue;
-            }
-
-            if (!websiteList.contains(sku.getWebsite())) {
-                continue;
-            }
-
-            // 判断，如果该sku 当天更新过价格, 直接跳过
-            Date updateTime = sku.getUpdateTime();
-            if (updateTime != null) {
-                if (updateTime.compareTo(TimeUtils.toDate(TimeUtils.today())) > 0) {
+                if (sku == null) {
+                    try {
+                        TimeUnit.SECONDS.sleep(3);
+                        logger.debug("task update get null sleep 3 seconds");
+                    } catch (InterruptedException e) {
+                        return;
+                    }
                     continue;
                 }
-            }
 
-            // try update sku
-            String url = sku.getUrl();
-            Website website = WebsiteHelper.getWebSite(url);
+                if (!websiteList.contains(sku.getWebsite())) {
+                    continue;
+                }
 
-            if (website == null) {
-                logger.debug(url + " parse website get null");
-            }
-
-            if (Website.FLIPKART.equals(website)) {
-                String oriUrl = sku.getOriUrl();
-                if (!StringUtils.isEmpty(oriUrl)) {
-                    String sourceId = FlipkartHelper.getProductIdByUrl(oriUrl);
-                    if (!StringUtils.isEmpty(sourceId)) {
-                        url = oriUrl;
+                // 判断，如果该sku 当天更新过价格, 直接跳过
+                Date updateTime = sku.getUpdateTime();
+                if (updateTime != null) {
+                    if (updateTime.compareTo(TimeUtils.toDate(TimeUtils.today())) > 0) {
+                        continue;
                     }
                 }
-            }
 
-            FetchedProduct fetchedProduct = null;
+                // try update sku
+                String url = sku.getUrl();
+                Website website = WebsiteHelper.getWebSite(url);
 
-            try {
-                fetchedProduct = fetchService.fetchSummaryProductByUrl(url);
-            } catch (Exception e) {
-
-            }
-
-            //此处是FK、SD正常更新逻辑放弃对title字段的更新，该有另外的task统一维护
-            if (fetchedProduct != null) {
-                if (Website.FLIPKART.equals(fetchedProduct.getWebsite()) || Website.SNAPDEAL.equals(fetchedProduct.getWebsite())) {
-                    fetchedProduct.setTitle(null);
+                if (website == null) {
+                    logger.debug(url + " parse website get null");
                 }
-            }
 
-            try {
-                cmpSkuService.updateCmpSkuBySummaryProduct(sku.getId(), fetchedProduct);
-                logger.debug(sku.getId() + " fetch success " + website);
+                if (Website.FLIPKART.equals(website)) {
+                    String oriUrl = sku.getOriUrl();
+                    if (!StringUtils.isEmpty(oriUrl)) {
+                        String sourceId = FlipkartHelper.getProductIdByUrl(oriUrl);
+                        if (!StringUtils.isEmpty(sourceId)) {
+                            url = oriUrl;
+                        }
+                    }
+                }
+
+                FetchedProduct fetchedProduct = null;
+
+
+                fetchedProduct = fetchService.fetchSummaryProductByUrl(url);
+
+
+                //此处是FK、SD正常更新逻辑放弃对title字段的更新，该有另外的task统一维护
+                if (fetchedProduct != null) {
+                    if (Website.FLIPKART.equals(fetchedProduct.getWebsite()) || Website.SNAPDEAL.equals(fetchedProduct.getWebsite())) {
+                        fetchedProduct.setTitle(null);
+                    }
+                }
+
+                try {
+                    cmpSkuService.updateCmpSkuBySummaryProduct(sku.getId(), fetchedProduct);
+                    logger.debug(sku.getId() + " fetch success " + website);
+                } catch (Exception e) {
+                    logger.debug(e.toString());
+                    if (fetchedProduct != null) {
+                        logger.debug("title:" + fetchedProduct.getTitle());
+                    }
+                }
+
             } catch (Exception e) {
                 logger.debug(e.toString());
-                if (fetchedProduct != null) {
-                    logger.debug("title:" + fetchedProduct.getTitle());
-                }
             }
-
-
         }
 
     }
