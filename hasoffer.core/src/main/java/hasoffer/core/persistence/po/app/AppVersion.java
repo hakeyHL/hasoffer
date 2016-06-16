@@ -1,6 +1,6 @@
 package hasoffer.core.persistence.po.app;
 
-import hasoffer.core.bo.enums.AppType;
+import hasoffer.base.enums.AppType;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 
 import javax.persistence.*;

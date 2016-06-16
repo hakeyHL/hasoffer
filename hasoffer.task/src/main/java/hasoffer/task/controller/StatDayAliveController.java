@@ -1,9 +1,9 @@
 package hasoffer.task.controller;
 
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
-import hasoffer.core.bo.enums.MarketChannel;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.StatDayAlive;
 import hasoffer.core.persistence.mongo.StatDevice;

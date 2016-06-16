@@ -1,8 +1,8 @@
 package hasoffer.core.user;
 
+import hasoffer.base.enums.AppType;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
-import hasoffer.core.bo.enums.AppType;
-import hasoffer.core.bo.enums.MarketChannel;
 import hasoffer.core.bo.user.DayVisitBo;
 import hasoffer.core.bo.user.DeviceRequestBo;
 import hasoffer.core.persistence.mongo.StatDayAlive;
@@ -66,8 +66,6 @@ public interface IDeviceService {
     List<UrmDevice> findDeviceByIdList(List<String> deviceList);
 
     void deviceRequestLogsAnalysis(Date butLogsMaxCreateTime);
-
-    String getDeviceId(String clientId, String imei, String serialNo);
 
     UrmDeviceConfig getDeviceConfig(String deviceId);
 

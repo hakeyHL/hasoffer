@@ -53,16 +53,16 @@ public class FlipkartFetchServiceImpl extends BaseFetchServiceImpl implements IF
     public FetchResult getProductsKeyWord(Website webSite, String keyword, int startIndex, int endIndex) {
         FetchResult fetchResultList = getFetchResultList(webSite, keyword);
         if (fetchResultList == null) {
-            FetchResult fetchResult = new FetchResult(webSite,keyword);
+            FetchResult fetchResult = new FetchResult(webSite, keyword);
             fetchResult.setTaskStatus(TaskStatus.START);
-            addNewFetchResult( fetchResult);
+            addNewFetchResult(fetchResult);
             return fetchResult;
         } else {
             return fetchResultList;
         }
     }
 
-    private void addNewFetchResult( FetchResult fetchResult) {
+    private void addNewFetchResult(FetchResult fetchResult) {
         String key = getFetchResultKey(fetchResult.getWebsite(), fetchResult.getKeyword());
         keywordService.saveKeyword(key);
         String json = JSONUtil.toJSON(fetchResult);
@@ -187,7 +187,7 @@ public class FlipkartFetchServiceImpl extends BaseFetchServiceImpl implements IF
         Website webSite = Website.valueOf(webSiteStr);
 
         IListProcessor listProcessor = WebsiteProcessorFactory.getListProcessor(webSite);
-        FetchResult fetchResult = new FetchResult(webSite,keywordStr);
+        FetchResult fetchResult = new FetchResult(webSite, keywordStr);
         try {
             List<ListProduct> listProducts = new ArrayList<ListProduct>();
             if (listProcessor != null) {
@@ -199,7 +199,6 @@ public class FlipkartFetchServiceImpl extends BaseFetchServiceImpl implements IF
             return fetchResult;
         } catch (Exception e) {
             logger.error("error : search {} from {}.Info : {}", keywordStr, Website.FLIPKART, e.getMessage());
-            fetchResult = new FetchResult();
             fetchResult.setTaskStatus(TaskStatus.EXCEPTION);
             fetchResult.setListProducts(null);
             return fetchResult;
@@ -208,7 +207,7 @@ public class FlipkartFetchServiceImpl extends BaseFetchServiceImpl implements IF
 
     @Override
     public void cache(FetchResult pop) {
-        redisService.add(getFetchResultKey(pop.getWebsite(),pop.getKeyword()), JSONUtil.toJSON(pop), 3000);
+        redisService.add(getFetchResultKey(pop.getWebsite(), pop.getKeyword()), JSONUtil.toJSON(pop), 1000);
     }
 
     private String getFetchResultKey(Website webSite, String keyWord) {

@@ -1,6 +1,7 @@
 package hasoffer.admin.controller.vo;
 
-import hasoffer.core.bo.enums.MarketChannel;
+
+import hasoffer.base.enums.MarketChannel;
 
 import java.util.HashSet;
 import java.util.Set;

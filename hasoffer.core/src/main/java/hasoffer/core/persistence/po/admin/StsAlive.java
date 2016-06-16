@@ -1,6 +1,6 @@
 package hasoffer.core.persistence.po.admin;
 
-import hasoffer.core.bo.enums.MarketChannel;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 
 import javax.persistence.*;
