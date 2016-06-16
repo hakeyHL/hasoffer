@@ -117,7 +117,7 @@ public class AppController {
     }
 
     /**
-     * 流量劫持成功回调
+     * 客户端回调
      *
      * @param request
      * @return
