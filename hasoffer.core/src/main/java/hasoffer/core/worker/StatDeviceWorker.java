@@ -1,7 +1,7 @@
 package hasoffer.core.worker;
 
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.utils.TimeUtils;
-import hasoffer.core.bo.enums.MarketChannel;
 import hasoffer.core.persistence.mongo.StatDevice;
 import hasoffer.core.persistence.po.urm.UrmDevice;
 import hasoffer.core.user.IDeviceService;

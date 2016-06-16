@@ -1,8 +1,8 @@
 package hasoffer.core.persistence.po.urm;
 
+import hasoffer.base.enums.AppType;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.utils.TimeUtils;
-import hasoffer.core.bo.enums.AppType;
-import hasoffer.core.bo.enums.MarketChannel;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 
 import javax.persistence.*;

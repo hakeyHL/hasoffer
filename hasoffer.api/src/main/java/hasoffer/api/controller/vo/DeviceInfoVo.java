@@ -1,8 +1,8 @@
 package hasoffer.api.controller.vo;
 
+import hasoffer.base.enums.AppType;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
-import hasoffer.core.bo.enums.AppType;
-import hasoffer.core.bo.enums.MarketChannel;
 
 /**
  * Date : 2016/1/15

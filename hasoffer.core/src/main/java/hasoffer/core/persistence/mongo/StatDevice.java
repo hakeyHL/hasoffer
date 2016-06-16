@@ -1,7 +1,7 @@
 package hasoffer.core.persistence.mongo;
 
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.utils.HexDigestUtil;
-import hasoffer.core.bo.enums.MarketChannel;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 

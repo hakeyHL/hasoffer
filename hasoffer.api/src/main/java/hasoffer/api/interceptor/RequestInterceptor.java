@@ -5,7 +5,8 @@ import hasoffer.api.controller.vo.DeviceEventVo;
 import hasoffer.api.controller.vo.DeviceInfoVo;
 import hasoffer.api.controller.vo.DeviceRequestVo;
 import hasoffer.api.worker.DeviceRequestQueue;
-import hasoffer.core.bo.enums.MarketChannel;
+import hasoffer.base.enums.MarketChannel;
+import hasoffer.base.utils.DeviceUtils;
 import hasoffer.core.user.IDeviceService;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
@@ -51,7 +52,7 @@ public class RequestInterceptor implements HandlerInterceptor {
             Context.currentContext().set(Context.DEVICE_INFO, deviceInfoVo);
 
             //比价的设备 setContext
-            String deviceId = deviceService.getDeviceId(deviceInfoVo.getDeviceId(), deviceInfoVo.getImeiId(), deviceInfoVo.getSerial());
+            String deviceId = DeviceUtils.getDeviceId(deviceInfoVo.getDeviceId(), deviceInfoVo.getImeiId(), deviceInfoVo.getSerial());
             Context.currentContext().set(StaticContext.DEVICE_ID, deviceId);
         } catch (Exception e) {
             logger.error(String.format("RequestInterceptor Has Error: %s. request = [%s]. query = [%s] .device=[%s]",

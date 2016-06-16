@@ -1,13 +1,13 @@
 package hasoffer.core.user.impl;
 
+import hasoffer.base.enums.AppType;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
-import hasoffer.base.utils.HexDigestUtil;
+import hasoffer.base.utils.DeviceUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
-import hasoffer.core.bo.enums.AppType;
-import hasoffer.core.bo.enums.MarketChannel;
 import hasoffer.core.bo.user.DayVisitBo;
 import hasoffer.core.bo.user.DeviceEventBo;
 import hasoffer.core.bo.user.DeviceInfoBo;
@@ -26,8 +26,8 @@ import hasoffer.core.user.IDeviceService;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.hibernate.annotations.common.util.impl.LoggerFactory;
-import org.jboss.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -47,6 +47,8 @@ import java.util.regex.Pattern;
  */
 @Service
 public class DeviceServiceImpl implements IDeviceService {
+
+    private Logger logger = LoggerFactory.getLogger(DeviceServiceImpl.class);
 
     private static final String Q_DEVICE = " SELECT t FROM UrmDevice t ORDER BY t.createTime DESC ";
     private static final String Q_DEVICE_ASC = " SELECT t FROM UrmDevice t ORDER BY t.createTime ASC ";
@@ -84,7 +86,7 @@ public class DeviceServiceImpl implements IDeviceService {
 
     @Resource
     DeviceCacheManager deviceCM;
-    private Logger logger = LoggerFactory.logger(DeviceServiceImpl.class);
+
 
     @Override
     public PageableResult<StatDayAlive> findAliveStats(String startYmd, String endYmd, String marketChannel, String brand, String osVersion, int page, int size, String order) {
@@ -804,31 +806,7 @@ public class DeviceServiceImpl implements IDeviceService {
         return dbm.get(UrmDeviceConfig.class, deviceId);
     }
 
-    @Override
-    public String getDeviceId(String clientDeviceId, String imeiId, String serialNo) {
-        StringBuffer deviceIdBuf = new StringBuffer();
 
-        /*if (StringUtils.isEmpty(di.getDeviceId()) && StringUtils.isEmpty(di.getImeiId())) {
-            logger.debug("device id is null ! imei id is null ! ");
-            return;
-        }*/
-
-        if (!StringUtils.isEmpty(clientDeviceId)) {
-            deviceIdBuf.append(clientDeviceId);
-        }
-
-        if (!StringUtils.isEmpty(imeiId)) {
-            deviceIdBuf.append(imeiId);
-        }
-
-        String deviceIdBufStr = deviceIdBuf.toString();
-        if (StringUtils.isEmpty(deviceIdBufStr)) {
-            deviceIdBufStr = serialNo;
-            logger.debug(String.format("device id is null ! imei id is null ! Get serial : %s.", deviceIdBufStr));
-        }
-
-        return HexDigestUtil.md5(deviceIdBufStr);
-    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -840,7 +818,7 @@ public class DeviceServiceImpl implements IDeviceService {
                 return;
             }
             DeviceInfoBo di = requestBo.getDeviceInfoBo();
-            String deviceId = getDeviceId(di.getDeviceId(), di.getImeiId(), di.getSerial());
+            String deviceId = DeviceUtils.getDeviceId(di.getDeviceId(), di.getImeiId(), di.getSerial());
             //查询 缓存中 deviceId 是否存在
             UrmDevice urmDevice =  deviceCM.findDeviceById(deviceId);
             if (urmDevice == null) {
@@ -948,7 +926,7 @@ public class DeviceServiceImpl implements IDeviceService {
 
         DeviceInfoBo di = requestBo.getDeviceInfoBo();
 
-        String deviceId = getDeviceId(di.getDeviceId(), di.getImeiId(), di.getSerial());
+        String deviceId = DeviceUtils.getDeviceId(di.getDeviceId(), di.getImeiId(), di.getSerial());
 
         //查询deviceId 是否存在
         UrmDevice urmDevice = deviceCM.findDeviceById(deviceId);

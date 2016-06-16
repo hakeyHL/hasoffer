@@ -1,9 +1,9 @@
 package hasoffer.core.persistence.mongo;
 
+import hasoffer.base.enums.AppType;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
-import hasoffer.core.bo.enums.AppType;
-import hasoffer.core.bo.enums.MarketChannel;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 

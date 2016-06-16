@@ -1,6 +1,6 @@
 package hasoffer.core.system;
 
-import hasoffer.core.bo.enums.AppType;
+import hasoffer.base.enums.AppType;
 import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
 

@@ -1,8 +1,8 @@
 package hasoffer.admin.controller.vo;
 
+import hasoffer.base.enums.AppType;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
-import hasoffer.core.bo.enums.AppType;
-import hasoffer.core.bo.enums.MarketChannel;
 
 import java.util.Date;
 
