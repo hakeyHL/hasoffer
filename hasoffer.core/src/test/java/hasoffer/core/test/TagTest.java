@@ -2,6 +2,9 @@ package hasoffer.core.test;
 
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.bo.match.HasTag;
+import hasoffer.core.bo.match.ITag;
+import hasoffer.core.bo.match.SkuValType;
+import hasoffer.core.bo.match.TitleStruct;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.match.TagBrand;
 import hasoffer.core.persistence.po.match.TagCategory;
@@ -15,7 +18,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.annotation.Resource;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Date : 2016/6/15
@@ -27,6 +32,81 @@ public class TagTest {
 
     @Resource
     IDataBaseManager dbm;
+
+    @Test
+    public void test() {
+        List<TagCategory> tagCategories = dbm.query("select t from TagCategory t");
+        List<TagSkuVal> tagSkuVals = dbm.query("select t from TagSkuVal t");
+        List<TagBrand> tagBrands = dbm.query("select t from TagBrand t");
+
+        Map<String, TagCategory> cateTagMap = new HashMap<String, TagCategory>();
+        Map<String, TagSkuVal> skuValTagMap = new HashMap<String, TagSkuVal>();
+        Map<String, TagBrand> brandTagMap = new HashMap<String, TagBrand>();
+
+        fill(cateTagMap, tagCategories);
+        fill(skuValTagMap, tagSkuVals);
+        fill(brandTagMap, tagBrands);
+
+        System.out.println(tagCategories.size() + "\t" + cateTagMap.size());
+        System.out.println(tagSkuVals.size() + "\t" + skuValTagMap.size());
+        System.out.println(tagBrands.size() + "\t" + brandTagMap.size());
+
+        String title = "BQ S40- Black & Grey 5 Inch HD IPS Screen, 1.3 Ghz Quad Core, Android Kitkat, 1GB RAM, 3G Mobile Phone";
+
+        TitleStruct ts = new TitleStruct(title);
+
+        getStructInfo(ts, cateTagMap, skuValTagMap, brandTagMap);
+
+        System.out.println(ts.getTitle());
+    }
+
+    private void getStructInfo(TitleStruct ts,
+                               Map<String, TagCategory> cateTagMap,
+                               Map<String, TagSkuVal> skuValTagMap,
+                               Map<String, TagBrand> brandTagMap) {
+
+        String title = ts.getTitle().toLowerCase();
+
+        for (Map.Entry<String, TagCategory> kv : cateTagMap.entrySet()) {
+            if (title.contains(kv.getKey())) {
+                ts.getCateTag().add(kv.getKey());
+            }
+        }
+
+        for (Map.Entry<String, TagSkuVal> kv : skuValTagMap.entrySet()) {
+            if (title.contains(kv.getKey())) {
+                if (kv.getValue().getSkuValType() == SkuValType.COLOR) {
+                    ts.getColorTag().add(kv.getKey());
+                } else {
+                    ts.getSizeTag().add(kv.getKey());
+                }
+            }
+        }
+
+        for (Map.Entry<String, TagBrand> kv : brandTagMap.entrySet()) {
+            if (title.contains(kv.getKey())) {
+                ts.getBrandTag().add(kv.getKey());
+            }
+        }
+    }
+
+    private void fill(Map tagMap, List tags) {
+
+        for (Object o : tags) {
+
+            ITag iTag = (ITag) o;
+
+            tagMap.put(iTag.getTag(), o);
+
+            if (!StringUtils.isEmpty(iTag.getAlias())) {
+                String[] alias = iTag.getAlias().split(",");
+                for (String ali : alias) {
+                    tagMap.put(ali, o);
+                }
+            }
+        }
+
+    }
 
     @Test
     public void importSkuValTags() throws Exception {

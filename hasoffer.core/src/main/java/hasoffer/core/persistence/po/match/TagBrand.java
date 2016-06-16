@@ -1,5 +1,6 @@
 package hasoffer.core.persistence.po.match;
 
+import hasoffer.core.bo.match.ITag;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 
 import javax.persistence.*;
@@ -9,7 +10,7 @@ import javax.persistence.*;
  * Function :
  */
 @Entity
-public class TagBrand implements Identifiable<Long> {
+public class TagBrand implements Identifiable<Long>, ITag {
 
     @Id
     @Column(unique = true, nullable = false)
@@ -22,6 +23,9 @@ public class TagBrand implements Identifiable<Long> {
     private String alias; // 别名
 
     private int score; // 打分
+
+    public TagBrand() {
+    }
 
     public TagBrand(String tag, String alias, int score) {
         this.tag = tag;

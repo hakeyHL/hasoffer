@@ -1,5 +1,7 @@
 package hasoffer.core.persistence.po.match;
 
+import hasoffer.core.bo.match.ITag;
+import hasoffer.core.bo.match.SkuValType;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 
 import javax.persistence.*;
@@ -9,7 +11,7 @@ import javax.persistence.*;
  * Function :
  */
 @Entity
-public class TagSkuVal implements Identifiable<Long> {
+public class TagSkuVal implements Identifiable<Long>, ITag {
 
     @Id
     @Column(unique = true, nullable = false)
@@ -22,6 +24,12 @@ public class TagSkuVal implements Identifiable<Long> {
     private String alias; // 别名
 
     private int score; // 打分
+
+    @Enumerated(EnumType.STRING)
+    private SkuValType skuValType;
+
+    public TagSkuVal() {
+    }
 
     public TagSkuVal(String tag, String alias, int score) {
         this.tag = tag;
@@ -63,17 +71,26 @@ public class TagSkuVal implements Identifiable<Long> {
         this.score = score;
     }
 
+    public SkuValType getSkuValType() {
+        return skuValType;
+    }
+
+    public void setSkuValType(SkuValType skuValType) {
+        this.skuValType = skuValType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        TagSkuVal that = (TagSkuVal) o;
+        TagSkuVal tagSkuVal = (TagSkuVal) o;
 
-        if (score != that.score) return false;
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (tag != null ? !tag.equals(that.tag) : that.tag != null) return false;
-        return !(alias != null ? !alias.equals(that.alias) : that.alias != null);
+        if (score != tagSkuVal.score) return false;
+        if (id != null ? !id.equals(tagSkuVal.id) : tagSkuVal.id != null) return false;
+        if (tag != null ? !tag.equals(tagSkuVal.tag) : tagSkuVal.tag != null) return false;
+        if (alias != null ? !alias.equals(tagSkuVal.alias) : tagSkuVal.alias != null) return false;
+        return skuValType == tagSkuVal.skuValType;
 
     }
 
@@ -83,6 +100,7 @@ public class TagSkuVal implements Identifiable<Long> {
         result = 31 * result + (tag != null ? tag.hashCode() : 0);
         result = 31 * result + (alias != null ? alias.hashCode() : 0);
         result = 31 * result + score;
+        result = 31 * result + (skuValType != null ? skuValType.hashCode() : 0);
         return result;
     }
 }
