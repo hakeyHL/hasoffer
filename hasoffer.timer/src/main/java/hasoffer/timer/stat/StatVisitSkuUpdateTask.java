@@ -24,7 +24,8 @@ public class StatVisitSkuUpdateTask {
     @Resource
     ICmpSkuUpdateStatService cmpSkuUpdateStatService;
 
-    private static final String Q_UPDATESUCCESS_SKU_BY_WEBSITE = "SELECT COUNT(*) FROM PtmCmpSku t WHERE t.website = ?0 AND t.updateTime > ?1 AND t.createTime < ?2 ";
+    private static final String Q_UPDATESUCCESS_SKU_BY_WEBSITE1 = "SELECT COUNT(*) FROM PtmCmpSku t WHERE t.website = ?0 AND t.updateTime > ?1 AND t.createTime < ?2 ";
+    private static final String Q_UPDATESUCCESS_SKU_BY_WEBSITE2 = "SELECT COUNT(*) FROM PtmCmpSku t WHERE t.website = ?0 AND t.updateTime > ?1 AND t.createTime IS NULL ";
 
     @Scheduled(cron = "0 30 0/1 * * ?")
     public void visitSkuUpdate() {
@@ -34,7 +35,8 @@ public class StatVisitSkuUpdateTask {
 
         for (Website website : WebsiteHelper.DEFAULT_WEBSITES) {
 
-            Long i = dbm.querySingle(Q_UPDATESUCCESS_SKU_BY_WEBSITE, Arrays.asList(website, date, date));
+            Long i = dbm.querySingle(Q_UPDATESUCCESS_SKU_BY_WEBSITE1, Arrays.asList(website, date, date));
+            i += dbm.querySingle(Q_UPDATESUCCESS_SKU_BY_WEBSITE2, Arrays.asList(website, date));
 
             String id = HexDigestUtil.md5(website.name() + todayString);
 
