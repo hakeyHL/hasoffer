@@ -130,7 +130,7 @@ public class SkuUpdateTaskController {
         ConcurrentLinkedQueue<PtmCmpSku> skuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
         es.execute(new CmpSkuListWorker(dbm, skuQueue, Q_CMPSKU_AMAZON));
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 10; i++) {
             es.execute(new CmpSkuUpdateWorker(skuQueue, cmpSkuService, fetchService));
         }
 
