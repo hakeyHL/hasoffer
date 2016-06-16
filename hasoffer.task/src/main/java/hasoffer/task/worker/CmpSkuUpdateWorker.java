@@ -114,7 +114,7 @@ public class CmpSkuUpdateWorker implements Runnable {
                     }
                 }
 
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.debug(e.toString());
             }
         }

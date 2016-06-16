@@ -8,6 +8,7 @@ import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.fetch.model.FetchedProduct;
 import hasoffer.fetch.model.ProductStatus;
@@ -51,6 +52,10 @@ public class MysqlTest {
     private static final String Q_PTMCMPSKU_BYSID = "SELECT t FROM PtmCmpSku t WHERE t.sourceSid = ?0 ";
 
     private static final String Q_WEBSITE_PTMCMPSKU_ONSALE = "SELECT COUNT(*) FROM PtmCmpSku t WHERE t.website = ?0 AND t.status = 'ONSALE' ";
+
+    private static final String Q_SRMSEARCHLOG_TIMERSET2 = "SELECT t FROM SrmSearchLog t WHERE t.precise = 'TIMERSET2' ";
+
+    private static final String Q_PTMCMPSKU_PRODUCTID = "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ";
 
     private Logger logger = LoggerFactory.getLogger(MysqlTest.class);
 
@@ -242,4 +247,47 @@ public class MysqlTest {
 
     }
 
+    @Test
+    public void testAmount() {
+
+        int count = 0;
+        int curPage = 1;
+        int pageSize = 1000;
+
+        PageableResult<SrmSearchLog> pageableResult = dbm.queryPage(Q_SRMSEARCHLOG_TIMERSET2, curPage, pageSize);
+
+        long totalPage = pageableResult.getTotalPage();
+        List<SrmSearchLog> srmSearchLogList = pageableResult.getData();
+
+        while (curPage <= totalPage) {
+
+            if (curPage > 1) {
+                pageableResult = dbm.queryPage(Q_SRMSEARCHLOG_TIMERSET2, curPage, pageSize);
+                srmSearchLogList = pageableResult.getData();
+            }
+
+            for (SrmSearchLog log : srmSearchLogList) {
+
+                long ptmProductId = log.getPtmProductId();
+
+                List<PtmCmpSku> skuList = dbm.query(Q_PTMCMPSKU_PRODUCTID, Arrays.asList(ptmProductId));
+
+                for (PtmCmpSku sku : skuList) {
+                    if (Website.FLIPKART.equals(sku.getWebsite())) {
+                        count++;
+                        break;
+                    }
+                }
+
+            }
+
+            System.out.println("curpage = " + curPage);
+            System.out.println("totalPage = " + totalPage);
+            System.out.println("count = " + count);
+            System.out.println("-----------------------------");
+            curPage++;
+        }
+
+        System.out.println("count = " + count);
+    }
 }
