@@ -16,7 +16,7 @@ import java.util.List;
 @Component
 public class DynamicIp {
 
-    @Scheduled(cron = "0 0/5 * * * ?")
+    @Scheduled(cron = "0 0/2 * * * ?")
     public void statSkuUpdate() {
 
         //该实例id为web7-task2的实例id
