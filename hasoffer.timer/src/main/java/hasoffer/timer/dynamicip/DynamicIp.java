@@ -4,6 +4,8 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +17,8 @@ import java.util.List;
  */
 @Component
 public class DynamicIp {
+
+    private Logger logger = LoggerFactory.getLogger(DynamicIp.class);
 
     @Scheduled(cron = "0 0/2 * * * ?")
     public void statSkuUpdate() {
@@ -46,6 +50,7 @@ public class DynamicIp {
                 if (!instance.getPublicIpAddress().equals(address.getPublicIp())) {
                     throw new RuntimeException();
                 }
+                logger.debug("origin ip:" + instance.getPublicIpAddress());
 
                 //解绑
                 DisassociateAddressRequest disassociateAddressRequest = new DisassociateAddressRequest();
@@ -67,6 +72,7 @@ public class DynamicIp {
         associateAddressRequest.setInstanceId(instanceId);
         associateAddressRequest.setAllocationId(allocateAddressResult.getAllocationId());
         AssociateAddressResult associateAddressResult = client.associateAddress(associateAddressRequest);
+        logger.debug("new ip:" + associateAddressRequest.getPublicIp());
     }
 
 }
