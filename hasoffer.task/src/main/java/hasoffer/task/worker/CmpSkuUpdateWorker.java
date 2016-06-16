@@ -93,9 +93,9 @@ public class CmpSkuUpdateWorker implements Runnable {
 
                 FetchedProduct fetchedProduct = null;
 
-
+                logger.debug("parse start");
                 fetchedProduct = fetchService.fetchSummaryProductByUrl(url);
-
+                logger.debug("parse finish");
 
                 //此处是FK、SD正常更新逻辑放弃对title字段的更新，该有另外的task统一维护
                 if (fetchedProduct != null) {
