@@ -37,6 +37,10 @@ public class AppServiceImpl implements IAppService {
     private static final String Q_APP_GETUSER =
             "SELECT t FROM urmUser t " +
                     " WHERE t.userToken = ?0 ";
+
+    private static final String Q_APP_ORDER =
+            "SELECT t FROM OrderStatsAnalysisPO t " +
+                    " WHERE t.orderId = ?0 and t.userId=?1";
     @Resource
     IDataBaseManager dbm;
 
@@ -66,5 +70,13 @@ public class AppServiceImpl implements IAppService {
         li.add(userToken);
         urmUser user=dbm.querySingle(Q_APP_GETUSER, li);
         return user;
+    }
+
+    @Override
+    public OrderStatsAnalysisPO getOrderDetail(String orderId,String userId) {
+        List li=new ArrayList();
+        li.add(orderId);
+        li.add(userId);
+        return dbm.querySingle(Q_APP_ORDER,li);
     }
 }

@@ -20,4 +20,6 @@ public interface IAppService {
     List<OrderStatsAnalysisPO>getBackDetails(String userId);
 
     urmUser getUserByUserToken(String userToken);
+
+    OrderStatsAnalysisPO getOrderDetail(String orderId,String  userId);
 }
