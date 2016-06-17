@@ -86,7 +86,7 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
     }
 
     @Override
-    public PageableResult<Map<String, Object>> selectPageableResult(String webSite, String channel, Date startYmd, Date endYmd, int page, int size) {
+    public PageableResult<Map<String, Object>> selectPageableResult(String webSite, String channel, String orderStatus, Date startYmd, Date endYmd, int page, int size) {
         List<Object> param = new ArrayList<Object>();
         endYmd = TimeUtils.addDay(endYmd, 1);
         StringBuilder groupSql = new StringBuilder(" group by DATE_FORMAT(orderTime,'%Y-%m-%d') ");
@@ -101,6 +101,10 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
         if (channel != null && !"".equals(channel) && !"ALL".equals(channel)) {
             whereSql.append(" and channel=? ");
             param.add(channel);
+        }
+        if (orderStatus != null && !"".equals(orderStatus) && "ALL".equals(orderStatus)) {
+            whereSql.append(" and orderStatus=? ");
+            param.add(orderStatus);
         }
         String execSql = sql.append(Q_BASE).append(whereSql).append(groupSql).toString();
         System.out.println(execSql + ":" + param.toArray());
