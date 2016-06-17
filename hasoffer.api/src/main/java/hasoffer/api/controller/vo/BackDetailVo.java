@@ -1,5 +1,6 @@
 package hasoffer.api.controller.vo;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,23 +9,23 @@ import java.util.List;
  * ²é¿´·µÀûvo
  */
 public class BackDetailVo {
-    private Long  PendingCoins;
-    private  Long   verifiedCoins;
+    private BigDecimal PendingCoins;
+    private  BigDecimal   verifiedCoins;
     private List<OrderVo> transcations=new ArrayList<OrderVo>();
 
-    public Long getPendingCoins() {
+    public BigDecimal getPendingCoins() {
         return PendingCoins;
     }
 
-    public void setPendingCoins(Long pendingCoins) {
+    public void setPendingCoins(BigDecimal pendingCoins) {
         PendingCoins = pendingCoins;
     }
 
-    public Long getVericiedCoins() {
+    public BigDecimal getVericiedCoins() {
         return verifiedCoins;
     }
 
-    public void setVericiedCoins(Long vericiedCoins) {
+    public void setVericiedCoins(BigDecimal vericiedCoins) {
         this.verifiedCoins = vericiedCoins;
     }
 
