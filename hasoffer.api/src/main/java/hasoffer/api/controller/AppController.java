@@ -43,7 +43,7 @@ public class AppController {
     CmpSkuCacheManager cmpSkuCacheManager;
     private Logger logger = LoggerFactory.logger(AppController.class);
 
-    @RequestMapping(value = "/config2", method = RequestMethod.GET)
+    @RequestMapping(value = "/newconfig", method = RequestMethod.GET)
     public ModelAndView config(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView();
 
