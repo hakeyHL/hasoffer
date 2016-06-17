@@ -3,12 +3,15 @@ package hasoffer.core.system.impl;
 import hasoffer.base.enums.AppType;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
+import hasoffer.core.persistence.po.urm.urmUser;
 import hasoffer.core.system.IAppService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,6 +30,13 @@ public class AppServiceImpl implements IAppService {
             "SELECT t FROM AppWebsite t " +
                     " WHERE t.appshow = ?0 ";
 
+    private static final String Q_APP_ORDERS =
+            "SELECT t FROM OrderStatsAnalysisPO t " +
+                    " WHERE t.userId = ?0 ";
+
+    private static final String Q_APP_GETUSER =
+            "SELECT t FROM urmUser t " +
+                    " WHERE t.userToken = ?0 ";
     @Resource
     IDataBaseManager dbm;
 
@@ -41,5 +51,20 @@ public class AppServiceImpl implements IAppService {
     @Override
     public List<AppWebsite> getWebsites(boolean appshow) {
         return dbm.query(Q_APP_WEBSITE, Arrays.asList(appshow));
+    }
+
+    @Override
+    public List<OrderStatsAnalysisPO> getBackDetails(String userToken) {
+        List li=new ArrayList();
+        li.add(userToken);
+        return dbm.query(Q_APP_ORDERS,li);
+    }
+
+    @Override
+    public urmUser getUserByUserToken(String userToken) {
+        List li=new ArrayList();
+        li.add(userToken);
+        urmUser user=dbm.querySingle(Q_APP_GETUSER, li);
+        return user;
     }
 }
