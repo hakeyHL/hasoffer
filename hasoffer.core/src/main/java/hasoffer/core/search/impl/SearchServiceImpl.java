@@ -207,6 +207,10 @@ public class SearchServiceImpl implements ISearchService {
             float titleScore = 0;
 
             for (SearchedSku searchedSku : ssku) {
+                if (searchedSku.getTitleScore() < 0.5 || searchedSku.getPriceScore() > 0.5) {
+                    logger.debug(String.format("title/price:[%s/%f].titleScore/priceScore:[%f/%f]", searchedSku.getTitle(), searchedSku.getPrice(), searchedSku.getTitleScore(), searchedSku.getPriceScore()));
+                    continue;
+                }
 
                 String skuUrl = searchedSku.getUrl();
 
@@ -330,7 +334,7 @@ public class SearchServiceImpl implements ISearchService {
             sb.append(" AND t.precise = 'MANUALSET' ");
         } else if ("TIMERSET".equals(precise)) {
             sb.append(" AND t.precise = 'TIMERSET' ");
-        } else if ("TIMERSET2".equals(precise)){
+        } else if ("TIMERSET2".equals(precise)) {
             sb.append(" AND t.precise = 'TIMERSET2' ");
         }
 

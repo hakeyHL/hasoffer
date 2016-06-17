@@ -16,6 +16,7 @@ public class PtmCategory implements Identifiable<Long> {
 	private Long id;
 	private long parentId;
 	private int level;
+	private int rank;
 
 	private String name;
 	private String imageUrl;
@@ -81,19 +82,28 @@ public class PtmCategory implements Identifiable<Long> {
 		this.level = level;
 	}
 
+	public int getRank() {
+		return rank;
+	}
+
+	public void setRank(int rank) {
+		this.rank = rank;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		PtmCategory category = (PtmCategory) o;
+		PtmCategory that = (PtmCategory) o;
 
-		if (parentId != category.parentId) return false;
-		if (level != category.level) return false;
-		if (id != null ? !id.equals(category.id) : category.id != null) return false;
-		if (name != null ? !name.equals(category.name) : category.name != null) return false;
-		if (imageUrl != null ? !imageUrl.equals(category.imageUrl) : category.imageUrl != null) return false;
-		return !(keyword != null ? !keyword.equals(category.keyword) : category.keyword != null);
+		if (parentId != that.parentId) return false;
+		if (level != that.level) return false;
+		if (rank != that.rank) return false;
+		if (id != null ? !id.equals(that.id) : that.id != null) return false;
+		if (name != null ? !name.equals(that.name) : that.name != null) return false;
+		if (imageUrl != null ? !imageUrl.equals(that.imageUrl) : that.imageUrl != null) return false;
+		return !(keyword != null ? !keyword.equals(that.keyword) : that.keyword != null);
 
 	}
 
@@ -102,21 +112,10 @@ public class PtmCategory implements Identifiable<Long> {
 		int result = id != null ? id.hashCode() : 0;
 		result = 31 * result + (int) (parentId ^ (parentId >>> 32));
 		result = 31 * result + level;
+		result = 31 * result + rank;
 		result = 31 * result + (name != null ? name.hashCode() : 0);
 		result = 31 * result + (imageUrl != null ? imageUrl.hashCode() : 0);
 		result = 31 * result + (keyword != null ? keyword.hashCode() : 0);
 		return result;
-	}
-
-	@Override
-	public String toString() {
-		return "PtmCategory{" +
-				"id=" + id +
-				", parentId=" + parentId +
-				", level=" + level +
-				", name='" + name + '\'' +
-				", imageUrl='" + imageUrl + '\'' +
-				", keyword='" + keyword + '\'' +
-				'}';
 	}
 }

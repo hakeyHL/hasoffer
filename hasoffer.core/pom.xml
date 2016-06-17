@@ -165,30 +165,30 @@
             <version>1.7</version>
         </dependency>
 
-
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-dynamodb</artifactId>
             <version>1.11.6</version>
         </dependency>
-        <!--<dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-bom</artifactId>
-            <version>1.11.4</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency>
+
+        <!-- http://mvnrepository.com/artifact/org.apache.lucene/lucene-core -->
         <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-ec2</artifactId>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>5.4.0</version>
         </dependency>
+        <!-- http://mvnrepository.com/artifact/org.apache.lucene/lucene-queryparser -->
         <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-s3</artifactId>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>5.4.0</version>
         </dependency>
+        <!-- http://mvnrepository.com/artifact/org.apache.lucene/lucene-analyzers-common -->
         <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-dynamodb</artifactId>
-        </dependency>-->
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-common</artifactId>
+            <version>5.4.0</version>
+        </dependency>
+
     </dependencies>
 </project>

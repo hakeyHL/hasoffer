@@ -33,14 +33,24 @@ public class StatVisitSkuUpdateTask {
         String todayString = TimeUtils.parse(TimeUtils.now(), "yyyyMMdd");
         Date date = TimeUtils.toDate(TimeUtils.today());
 
+        int count = 0;//用来记录更新的数量
+
         for (Website website : WebsiteHelper.DEFAULT_WEBSITES) {
 
             Long i = dbm.querySingle(Q_UPDATESUCCESS_SKU_BY_WEBSITE1, Arrays.asList(website, date, date));
-            i += dbm.querySingle(Q_UPDATESUCCESS_SKU_BY_WEBSITE2, Arrays.asList(website, date));
+            Long j = dbm.querySingle(Q_UPDATESUCCESS_SKU_BY_WEBSITE2, Arrays.asList(website, date));
+
+            if (i != null) {
+                count += i.intValue();
+            }
+
+            if (j != null) {
+                count += j.intValue();
+            }
 
             String id = HexDigestUtil.md5(website.name() + todayString);
 
-            cmpSkuUpdateStatService.saveOrUpdateSkuUpdateSuccessAmount(id, website, i);
+            cmpSkuUpdateStatService.saveOrUpdateSkuUpdateSuccessAmount(id, website, count);
         }
     }
 

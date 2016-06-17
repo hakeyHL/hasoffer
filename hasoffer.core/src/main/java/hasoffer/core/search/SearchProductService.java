@@ -245,10 +245,10 @@ public class SearchProductService {
                     priceScore = Math.abs(stdPrice - lp.getPrice()) / stdPrice;
                 }
 
-                if (titleScore < 0.5 || priceScore > 0.5) {
-                    logger.debug(String.format("title/price:[%s/%f].titleScore/priceScore:[%f/%f]", lp.getTitle(), lp.getPrice(), titleScore, priceScore));
-                    continue;
-                }
+//                if (titleScore < 0.5 || priceScore > 0.5) {
+//                    logger.debug(String.format("title/price:[%s/%f].titleScore/priceScore:[%f/%f]", lp.getTitle(), lp.getPrice(), titleScore, priceScore));
+//                    continue;
+//                }
 
                 searchedSkus.add(
                         new SearchedSku(lp.getWebsite(), lp.getTitle(),

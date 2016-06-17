@@ -20,13 +20,15 @@ public class AppWebsite implements Identifiable<Long> {
 	@Column(unique = true, nullable = false)
 	private Website website;
 
-	private String logoPath;
+	private String logoPath;//logo图片路径
 
 	// 该网站 android app 包名
 	private String appPackage;
 
 	// display
 	private boolean display;
+
+	private int rebate;//返利额度
 
 	public AppWebsite() {
 	}
@@ -79,6 +81,14 @@ public class AppWebsite implements Identifiable<Long> {
 		this.logoPath = logoPath;
 	}
 
+	public int getRebate() {
+		return rebate;
+	}
+
+	public void setRebate(int rebate) {
+		this.rebate = rebate;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -87,6 +97,7 @@ public class AppWebsite implements Identifiable<Long> {
 		AppWebsite that = (AppWebsite) o;
 
 		if (display != that.display) return false;
+		if (rebate != that.rebate) return false;
 		if (id != null ? !id.equals(that.id) : that.id != null) return false;
 		if (website != that.website) return false;
 		if (logoPath != null ? !logoPath.equals(that.logoPath) : that.logoPath != null) return false;
@@ -101,6 +112,7 @@ public class AppWebsite implements Identifiable<Long> {
 		result = 31 * result + (logoPath != null ? logoPath.hashCode() : 0);
 		result = 31 * result + (appPackage != null ? appPackage.hashCode() : 0);
 		result = 31 * result + (display ? 1 : 0);
+		result = 31 * result + rebate;
 		return result;
 	}
 }
