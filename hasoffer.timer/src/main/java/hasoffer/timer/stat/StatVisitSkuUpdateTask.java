@@ -36,8 +36,7 @@ public class StatVisitSkuUpdateTask {
         for (Website website : WebsiteHelper.DEFAULT_WEBSITES) {
 
             Long i = dbm.querySingle(Q_UPDATESUCCESS_SKU_BY_WEBSITE1, Arrays.asList(website, date, date));
-            Object o = dbm.querySingle(Q_UPDATESUCCESS_SKU_BY_WEBSITE2, Arrays.asList(website, date));
-            i += (o==null?0:Long.valueOf(o.toString()));
+            i += dbm.querySingle(Q_UPDATESUCCESS_SKU_BY_WEBSITE2, Arrays.asList(website, date));
 
             String id = HexDigestUtil.md5(website.name() + todayString);
 

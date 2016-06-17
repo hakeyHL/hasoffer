@@ -233,10 +233,11 @@ public class ShowStatController {
             endTime = DEFAULT_TIME;
         }
         webSite = webSite.toUpperCase();
+        String orderStatus="tentative";
         String YMD_WEB_PATTERN = "yyyy-MM-dd";
         Date startYmd = TimeUtils.stringToDate(startTime, YMD_WEB_PATTERN);
         Date endYmd = TimeUtils.stringToDate(endTime, YMD_WEB_PATTERN);
-        PageableResult<Map<String, Object>> pagedHiJackList = orderStatsAnalysisService.selectPageableResult(webSite, channel, startYmd, endYmd, page, size);
+        PageableResult<Map<String, Object>> pagedHiJackList = orderStatsAnalysisService.selectPageableResult(webSite, channel, orderStatus, startYmd, endYmd, page, size);
         List<OrderStatsAnalysisVO> reportList = new ArrayList<OrderStatsAnalysisVO>();
         for (Map<String, Object> po : pagedHiJackList.getData()) {
             try {

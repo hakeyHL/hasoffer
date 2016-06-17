@@ -14,5 +14,5 @@ public interface IOrderStatsAnalysisService {
 
     void updateOrder(String webSite, Date startTime, Date endTime);
 
-    PageableResult<Map<String, Object>> selectPageableResult(String webSite, String channel, Date startYmd, Date endYmd, int page, int size);
+    PageableResult<Map<String, Object>> selectPageableResult(String webSite, String channel, String orderStatus, Date startYmd, Date endYmd, int page, int size);
 }
