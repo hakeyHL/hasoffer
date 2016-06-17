@@ -51,4 +51,13 @@ public class StringTest {
 
     }
 
+
+    @Test
+    public void md5Str(){
+        String str = "Luckie1985";
+
+        String s = HexDigestUtil.md5(str);
+
+        System.out.println(s);
+    }
 }
