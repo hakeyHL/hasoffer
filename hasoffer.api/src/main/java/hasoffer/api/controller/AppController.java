@@ -7,8 +7,10 @@ import hasoffer.base.enums.AppType;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.core.cache.CmpSkuCacheManager;
+import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
+import hasoffer.core.persistence.po.urm.urmUser;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
 import hasoffer.fetch.helper.WebsiteHelper;
@@ -24,6 +26,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -197,29 +200,32 @@ public class AppController {
     public ModelAndView backDetail(@RequestParam String userToken) {
         ModelAndView mv=new ModelAndView();
         BackDetailVo data =new BackDetailVo();
-        data.setPendingCoins(Long.valueOf(300));
-        data.setVericiedCoins(Long.valueOf(200));
-
         List <OrderVo>transcations=new ArrayList<OrderVo>();
-        OrderVo orderVo=new OrderVo();
-        orderVo.setAccount(Long.valueOf(200));
-        orderVo.setChannel("SEAPDEAL");
-        orderVo.setOrderId("ererer");
-        orderVo.setOrderTime(new Date());
-        orderVo.setRate(Long.valueOf(22));
-        orderVo.setTotal(Long.valueOf(1000));
-        orderVo.setType(0);
-        transcations.add(orderVo);
-
-        OrderVo orderVo1=new OrderVo();
-        orderVo1.setAccount(Long.valueOf(100));
-        orderVo1.setChannel("EBAY");
-        orderVo1.setOrderId("87656");
-        orderVo1.setOrderTime(new Date());
-        orderVo1.setRate(Long.valueOf(50));
-        orderVo1.setTotal(Long.valueOf(200));
-        orderVo1.setType(1);
-        transcations.add(orderVo1);
+        urmUser user=appService.getUserByUserToken(userToken);
+        List<OrderStatsAnalysisPO> orders=appService.getBackDetails(user.getId());
+        BigDecimal PendingCoins=BigDecimal.ZERO;
+        BigDecimal VericiedCoins=BigDecimal.ZERO;
+        for(OrderStatsAnalysisPO orderStatsAnalysisPO:orders){
+            OrderVo orderVo=new OrderVo();
+            orderVo.setAccount(orderStatsAnalysisPO.getSaleAmount());
+            orderVo.setChannel(orderStatsAnalysisPO.getChannel());
+            orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
+            orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
+            //返利比率=tentativeAmount*rate/SaleAmount
+            orderVo.setRate(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.5)).divide(orderStatsAnalysisPO.getSaleAmount(),2,BigDecimal.ROUND_HALF_UP));
+            orderVo.setType(orderStatsAnalysisPO.getOrderStatus().equals("approved")?0:1);
+            transcations.add(orderVo);
+            if(orderStatsAnalysisPO.getOrderStatus()!="cancelled"){
+                PendingCoins=PendingCoins.add(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.5)));
+            }
+            if(orderStatsAnalysisPO.getOrderStatus().equals("approved")){
+                VericiedCoins=VericiedCoins.add(orderStatsAnalysisPO.getTentativeAmount());
+            }
+        }
+        //待定的
+        data.setPendingCoins(PendingCoins);
+        //可以使用的
+        data.setVericiedCoins(VericiedCoins);
 
         data.setTranscations(transcations);
         mv.addObject("data",data);
@@ -234,16 +240,15 @@ public class AppController {
      */
     @RequestMapping(value = "/orderDetail", method = RequestMethod.GET)
     public ModelAndView orderDetail(@RequestParam String orderId,@RequestParam String userToken) {
+
         ModelAndView mv=new ModelAndView();
         OrderVo orderVo=new OrderVo();
-        orderVo.setTotal(Long.valueOf(300));
         orderVo.setType(0);
-        orderVo.setRate(Long.valueOf(22));
+        orderVo.setRate(BigDecimal.valueOf(0.5));
         orderVo.setOrderTime(new Date());
         orderVo.setOrderId("45454");
         orderVo.setChannel("SNEAPDEAL");
-        orderVo.setAccount(Long.valueOf(33));
-
+        orderVo.setAccount(BigDecimal.valueOf(100));
         mv.addObject("data",orderVo);
         return mv;
     }
@@ -476,5 +481,9 @@ public class AppController {
                 "}";
         mv.addObject("data",data);
         return  mv;
+    }
+    public  static  void  main(String []args){
+        BigDecimal ss=BigDecimal.valueOf(20);
+        ss.divide(BigDecimal.valueOf(3));
     }
 }
