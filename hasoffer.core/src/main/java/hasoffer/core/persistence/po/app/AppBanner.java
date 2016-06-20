@@ -20,11 +20,13 @@ public class AppBanner implements Identifiable<Long> {
     private String imageUrl;//图片路径
     private String linkUrl;//跳转路径
 
+    private Date createTime;//创建时间
     private Date deadline;//最大的有效期 默认值：创建时间+7天
+
 
     private BannerFrom from;//banner来源
 
-    private int rank;//用于手工调整该条banner的优先级  此处感觉设计不合理，还没想到比较好的办法
+    private int rank;//用于手工调整该条banner的优先级
 
     @Override
     public Long getId() {
@@ -76,6 +78,14 @@ public class AppBanner implements Identifiable<Long> {
         this.rank = rank;
     }
 
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -87,6 +97,7 @@ public class AppBanner implements Identifiable<Long> {
         if (id != null ? !id.equals(appBanner.id) : appBanner.id != null) return false;
         if (imageUrl != null ? !imageUrl.equals(appBanner.imageUrl) : appBanner.imageUrl != null) return false;
         if (linkUrl != null ? !linkUrl.equals(appBanner.linkUrl) : appBanner.linkUrl != null) return false;
+        if (createTime != null ? !createTime.equals(appBanner.createTime) : appBanner.createTime != null) return false;
         if (deadline != null ? !deadline.equals(appBanner.deadline) : appBanner.deadline != null) return false;
         return from == appBanner.from;
 
@@ -97,6 +108,7 @@ public class AppBanner implements Identifiable<Long> {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (imageUrl != null ? imageUrl.hashCode() : 0);
         result = 31 * result + (linkUrl != null ? linkUrl.hashCode() : 0);
+        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (deadline != null ? deadline.hashCode() : 0);
         result = 31 * result + (from != null ? from.hashCode() : 0);
         result = 31 * result + rank;
