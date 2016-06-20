@@ -216,11 +216,11 @@ public class AppController {
                 orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
                 orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
                 //返利比率=tentativeAmount*rate/SaleAmount
-                orderVo.setRate(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.5)).divide(orderStatsAnalysisPO.getSaleAmount(), 2, BigDecimal.ROUND_HALF_UP));
+                orderVo.setRate(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)).divide(orderStatsAnalysisPO.getSaleAmount(), 2, BigDecimal.ROUND_HALF_UP));
                 orderVo.setType(orderStatsAnalysisPO.getOrderStatus().equals("approved") ? 0 : 1);
                 transcations.add(orderVo);
                 if (orderStatsAnalysisPO.getOrderStatus() != "cancelled") {
-                    PendingCoins = PendingCoins.add(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.5)));
+                    PendingCoins = PendingCoins.add(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)));
                 }
                 if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
                     VericiedCoins = VericiedCoins.add(orderStatsAnalysisPO.getTentativeAmount());
@@ -252,12 +252,12 @@ public class AppController {
         if (orderStatsAnalysisPO != null) {
             OrderVo orderVo = new OrderVo();
             orderVo.setType(orderStatsAnalysisPO.getOrderStatus().equals("approved") ? 0 : 1);
-            orderVo.setRate(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.5)).divide(orderStatsAnalysisPO.getSaleAmount(), 2, BigDecimal.ROUND_HALF_UP));
+            orderVo.setRate(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)).divide(orderStatsAnalysisPO.getSaleAmount(), 2, BigDecimal.ROUND_HALF_UP));
             orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
             orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
             orderVo.setChannel(orderStatsAnalysisPO.getChannel());
             orderVo.setTotal(orderStatsAnalysisPO.getSaleAmount());
-            orderVo.setAccount(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.5)));
+            orderVo.setAccount(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)));
             mv.addObject("data", orderVo);
         }
         return mv;
@@ -271,16 +271,22 @@ public class AppController {
     public ModelAndView banners() {
         ModelAndView mv=new ModelAndView();
         String data="{\n" +
-                "    \"banners\": [\n" +
-                "        {\n" +
-                "            \"sourceurl\": \"http://192.168.1.126/xx.png\",\n" +
-                "            \"link\": \"192.168.1.126:8080/getProduct?id=eerer\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"sourceurl\": \"http://192.168.1.126/xx.png\",\n" +
-                "            \"link\": \"192.168.1.126:8080/getProduct?id=eerer\"\n" +
-                "        }\n" +
-                "    ]\n" +
+                "    \"data\": {\n" +
+                "        \"banners\": [\n" +
+                "            {\n" +
+                "                \"sourceurl\": \"http://192.168.1.126/xx.png\",\n" +
+                "                \"source\": 0,\n" +
+                "                \"rank\": 1,\n" +
+                "                \"link\": \"192.168.1.126:8080/getProduct?id=eerer\"\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"sourceurl\": \"http://192.168.1.126/xx.png\",\n" +
+                "                \"source\": 1,\n" +
+                "                \"rank\": 2,\n" +
+                "                \"link\": \"192.168.1.126:8080/getProduct?id=eerer\"\n" +
+                "            }\n" +
+                "        ]\n" +
+                "    }\n" +
                 "}";
         mv.addObject("data",data);
         return mv;
@@ -294,16 +300,24 @@ public class AppController {
     public ModelAndView deals() {
         ModelAndView mv =new ModelAndView();
         String data="{\n" +
-                "  \"banners\":[\n" +
-                "  {\n" +
-                "     \"sourceurl\":\"http://192.168.1.126/xx.png\",        \n" +
-                "     \"link\":\"192.168.1.126:8080/getProduct?id=eerer\"  \n" +
-                "},  \n" +
-                "{\n" +
-                "\"sourceurl\":\"http://192.168.1.126/xx.png\",\n" +
-                "     \"link\":\"192.168.1.126:8080/getProduct?id=eerer\"\n" +
-                "}\n" +
-                "]\n" +
+                "    \"data\": {\n" +
+                "        \"deals\": [\n" +
+                "            {\n" +
+                "                \"image\": \"http://192.168.1.126/xx.png\",\n" +
+                "                \"title\": \"apple\",\n" +
+                "                \"exp\": \"MMddyyyy HH:mm:ss\",\n" +
+                "                \"extra\": 2.2,\n" +
+                "                \"link\": \"192.168.1.126:8080/getProduct?id=eerer\"\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"image\": \"http://192.168.1.126/xx.png\",\n" +
+                "                \"title\": \"apple\",\n" +
+                "                \"exp\": \"MMddyyyy HH:mm:ss\",\n" +
+                "                \"extra\": 2.2,\n" +
+                "                \"link\": \"192.168.1.126:8080/getProduct?id=eerer\"\n" +
+                "            }\n" +
+                "        ]\n" +
+                "    }\n" +
                 "}";
         mv.addObject("data",data);
         return mv;
@@ -318,16 +332,15 @@ public class AppController {
     public ModelAndView dealInfo(@RequestParam String id) {
         ModelAndView mv =new ModelAndView();
         String data="{\n" +
-                "    \"banners\": [\n" +
-                "        {\n" +
-                "            \"sourceurl\": \"http://192.168.1.126/xx.png\",\n" +
-                "            \"link\": \"192.168.1.126:8080/getProduct?id=eerer\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"sourceurl\": \"http://192.168.1.126/xx.png\",\n" +
-                "            \"link\": \"192.168.1.126:8080/getProduct?id=eerer\"\n" +
-                "        }\n" +
-                "    ]\n" +
+                "    \"data\": {\n" +
+                "        \"image\": \"http://192.168.1.126/xx.png\",\n" +
+                "        \"title\": \"apple\",\n" +
+                "        \"exp\": \"MMddyyyy HH:mm:ss\",\n" +
+                "        \"extra\": \"20.5\",\n" +
+                "        \"description\": \"hello\",\n" +
+                "        \"cashbackInfo\": \"hello\",\n" +
+                "        \"deeplink\": \"https://detail.tmall.com/item.htm?spm=a220m.1000858.1000725.6.ccDpo6&id=522564306073&skuId=3134511781351&areaId=110000&cat_id=2&rn=8c1bc36d77df4d902446186d57ffe73f&user_id=2231547606&is_b=1\"\n" +
+                "    }\n" +
                 "}";
         mv.addObject("data",data);
         return mv ;
@@ -489,6 +502,163 @@ public class AppController {
                 "            ]\n" +
                 "        }\n" +
                 "    ]\n" +
+                "}";
+        mv.addObject("data",data);
+        return  mv;
+    }
+
+    /**
+     * top selling
+     * @return
+     */
+    @RequestMapping(value = "/topSelling", method = RequestMethod.GET)
+    public ModelAndView topSelling() {
+        ModelAndView mv =new ModelAndView();
+        String data="{\n" +
+                "    \"data\": {\n" +
+                "        \"product\": [\n" +
+                "            {\n" +
+                "                \"id\": \"5556465\",\n" +
+                "                \"name\": \"桃花朵朵开\",\n" +
+                "                \"price\": 1000,\n" +
+                "                \"storesNum\": 50,\n" +
+                "                \"commentNum\": 1\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": \"456\",\n" +
+                "                \"name\": \"水牛啊1\",\n" +
+                "                \"price\": 600,\n" +
+                "                \"storesNum\": 10,\n" +
+                "                \"commentNum\": 8\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": \"456\",\n" +
+                "                \"name\": \"水牛啊2\",\n" +
+                "                \"price\": 600,\n" +
+                "                \"storesNum\": 10,\n" +
+                "                \"commentNum\": 8\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": \"456\",\n" +
+                "                \"name\": \"水牛啊3\",\n" +
+                "                \"price\": 600,\n" +
+                "                \"storesNum\": 10,\n" +
+                "                \"commentNum\": 8\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": \"456\",\n" +
+                "                \"name\": \"水牛啊4\",\n" +
+                "                \"price\": 600,\n" +
+                "                \"storesNum\": 10,\n" +
+                "                \"commentNum\": 8\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": \"456\",\n" +
+                "                \"name\": \"水牛啊5\",\n" +
+                "                \"price\": 600,\n" +
+                "                \"storesNum\": 10,\n" +
+                "                \"commentNum\": 8\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": \"456\",\n" +
+                "                \"name\": \"水牛啊6\",\n" +
+                "                \"price\": 600,\n" +
+                "                \"storesNum\": 10,\n" +
+                "                \"commentNum\": 8\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": \"456\",\n" +
+                "                \"name\": \"水牛啊7\",\n" +
+                "                \"price\": 600,\n" +
+                "                \"storesNum\": 10,\n" +
+                "                \"commentNum\": 8\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": \"456\",\n" +
+                "                \"name\": \"水牛啊8\",\n" +
+                "                \"price\": 600,\n" +
+                "                \"storesNum\": 10,\n" +
+                "                \"commentNum\": 8\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": \"456\",\n" +
+                "                \"name\": \"水牛啊9\",\n" +
+                "                \"price\": 600,\n" +
+                "                \"storesNum\": 10,\n" +
+                "                \"commentNum\": 8\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": \"456\",\n" +
+                "                \"name\": \"水牛啊10\",\n" +
+                "                \"price\": 600,\n" +
+                "                \"storesNum\": 10,\n" +
+                "                \"commentNum\": 8\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": \"456\",\n" +
+                "                \"name\": \"水牛啊11\",\n" +
+                "                \"price\": 600,\n" +
+                "                \"storesNum\": 10,\n" +
+                "                \"commentNum\": 8\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": \"456\",\n" +
+                "                \"name\": \"水牛啊12\",\n" +
+                "                \"price\": 600,\n" +
+                "                \"storesNum\": 10,\n" +
+                "                \"commentNum\": 8\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": \"456\",\n" +
+                "                \"name\": \"水牛啊13\",\n" +
+                "                \"price\": 600,\n" +
+                "                \"storesNum\": 10,\n" +
+                "                \"commentNum\": 8\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": \"456\",\n" +
+                "                \"name\": \"水牛啊14\",\n" +
+                "                \"price\": 600,\n" +
+                "                \"storesNum\": 10,\n" +
+                "                \"commentNum\": 8\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": \"456\",\n" +
+                "                \"name\": \"水牛啊15\",\n" +
+                "                \"price\": 600,\n" +
+                "                \"storesNum\": 10,\n" +
+                "                \"commentNum\": 8\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": \"456\",\n" +
+                "                \"name\": \"水牛啊16\",\n" +
+                "                \"price\": 600,\n" +
+                "                \"storesNum\": 10,\n" +
+                "                \"commentNum\": 8\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": \"456\",\n" +
+                "                \"name\": \"水牛啊17\",\n" +
+                "                \"price\": 600,\n" +
+                "                \"storesNum\": 10,\n" +
+                "                \"commentNum\": 8\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": \"456\",\n" +
+                "                \"name\": \"水牛啊18\",\n" +
+                "                \"price\": 600,\n" +
+                "                \"storesNum\": 10,\n" +
+                "                \"commentNum\": 8\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"id\": \"456\",\n" +
+                "                \"name\": \"水牛啊19\",\n" +
+                "                \"price\": 600,\n" +
+                "                \"storesNum\": 10,\n" +
+                "                \"commentNum\": 8\n" +
+                "            }\n" +
+                "        ]\n" +
+                "    }\n" +
                 "}";
         mv.addObject("data",data);
         return  mv;
