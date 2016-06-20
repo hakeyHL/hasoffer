@@ -20,6 +20,7 @@ public class PtmCmpSku implements Identifiable<Long> {
     private Long id;
     private long productId; // PtmProduct # id
 
+    private long categoryId;
     @Enumerated(EnumType.STRING)
     private Website website;
     private String seller;
@@ -59,6 +60,8 @@ public class PtmCmpSku implements Identifiable<Long> {
     private IndexNeed indexNeed = IndexNeed.NO;
     @Enumerated(EnumType.STRING)
     private SkuStatus status = SkuStatus.ONSALE;
+
+    private String jsonDescription;
 
     public PtmCmpSku() {
     }
@@ -300,41 +303,58 @@ public class PtmCmpSku implements Identifiable<Long> {
         this.bigImagePath = bigImagePath;
     }
 
+    public String getJsonDescription() {
+        return jsonDescription;
+    }
+
+    public void setJsonDescription(String jsonDescription) {
+        this.jsonDescription = jsonDescription;
+    }
+
+    public long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(long categoryId) {
+        this.categoryId = categoryId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        PtmCmpSku cmpSku = (PtmCmpSku) o;
+        PtmCmpSku sku = (PtmCmpSku) o;
 
-        if (productId != cmpSku.productId) return false;
-        if (Float.compare(cmpSku.price, price) != 0) return false;
-        if (checked != cmpSku.checked) return false;
-        if (id != null ? !id.equals(cmpSku.id) : cmpSku.id != null) return false;
-        if (website != cmpSku.website) return false;
-        if (seller != null ? !seller.equals(cmpSku.seller) : cmpSku.seller != null) return false;
-        if (skuTitle != null ? !skuTitle.equals(cmpSku.skuTitle) : cmpSku.skuTitle != null) return false;
-        if (title != null ? !title.equals(cmpSku.title) : cmpSku.title != null) return false;
-        if (rating != null ? !rating.equals(cmpSku.rating) : cmpSku.rating != null) return false;
-        if (imagePath != null ? !imagePath.equals(cmpSku.imagePath) : cmpSku.imagePath != null) return false;
-        if (smallImagePath != null ? !smallImagePath.equals(cmpSku.smallImagePath) : cmpSku.smallImagePath != null)
+        if (productId != sku.productId) return false;
+        if (categoryId != sku.categoryId) return false;
+        if (Float.compare(sku.price, price) != 0) return false;
+        if (checked != sku.checked) return false;
+        if (id != null ? !id.equals(sku.id) : sku.id != null) return false;
+        if (website != sku.website) return false;
+        if (seller != null ? !seller.equals(sku.seller) : sku.seller != null) return false;
+        if (skuTitle != null ? !skuTitle.equals(sku.skuTitle) : sku.skuTitle != null) return false;
+        if (title != null ? !title.equals(sku.title) : sku.title != null) return false;
+        if (rating != null ? !rating.equals(sku.rating) : sku.rating != null) return false;
+        if (imagePath != null ? !imagePath.equals(sku.imagePath) : sku.imagePath != null) return false;
+        if (smallImagePath != null ? !smallImagePath.equals(sku.smallImagePath) : sku.smallImagePath != null)
             return false;
-        if (bigImagePath != null ? !bigImagePath.equals(cmpSku.bigImagePath) : cmpSku.bigImagePath != null)
+        if (bigImagePath != null ? !bigImagePath.equals(sku.bigImagePath) : sku.bigImagePath != null) return false;
+        if (oriImageUrl != null ? !oriImageUrl.equals(sku.oriImageUrl) : sku.oriImageUrl != null) return false;
+        if (deeplink != null ? !deeplink.equals(sku.deeplink) : sku.deeplink != null) return false;
+        if (url != null ? !url.equals(sku.url) : sku.url != null) return false;
+        if (oriUrl != null ? !oriUrl.equals(sku.oriUrl) : sku.oriUrl != null) return false;
+        if (color != null ? !color.equals(sku.color) : sku.color != null) return false;
+        if (size != null ? !size.equals(sku.size) : sku.size != null) return false;
+        if (updateTime != null ? !updateTime.equals(sku.updateTime) : sku.updateTime != null) return false;
+        if (createTime != null ? !createTime.equals(sku.createTime) : sku.createTime != null) return false;
+        if (titleUpdateTime != null ? !titleUpdateTime.equals(sku.titleUpdateTime) : sku.titleUpdateTime != null)
             return false;
-        if (oriImageUrl != null ? !oriImageUrl.equals(cmpSku.oriImageUrl) : cmpSku.oriImageUrl != null) return false;
-        if (deeplink != null ? !deeplink.equals(cmpSku.deeplink) : cmpSku.deeplink != null) return false;
-        if (url != null ? !url.equals(cmpSku.url) : cmpSku.url != null) return false;
-        if (oriUrl != null ? !oriUrl.equals(cmpSku.oriUrl) : cmpSku.oriUrl != null) return false;
-        if (color != null ? !color.equals(cmpSku.color) : cmpSku.color != null) return false;
-        if (size != null ? !size.equals(cmpSku.size) : cmpSku.size != null) return false;
-        if (updateTime != null ? !updateTime.equals(cmpSku.updateTime) : cmpSku.updateTime != null) return false;
-        if (createTime != null ? !createTime.equals(cmpSku.createTime) : cmpSku.createTime != null) return false;
-        if (titleUpdateTime != null ? !titleUpdateTime.equals(cmpSku.titleUpdateTime) : cmpSku.titleUpdateTime != null)
-            return false;
-        if (sourcePid != null ? !sourcePid.equals(cmpSku.sourcePid) : cmpSku.sourcePid != null) return false;
-        if (sourceSid != null ? !sourceSid.equals(cmpSku.sourceSid) : cmpSku.sourceSid != null) return false;
-        if (indexNeed != cmpSku.indexNeed) return false;
-        return status == cmpSku.status;
+        if (sourcePid != null ? !sourcePid.equals(sku.sourcePid) : sku.sourcePid != null) return false;
+        if (sourceSid != null ? !sourceSid.equals(sku.sourceSid) : sku.sourceSid != null) return false;
+        if (indexNeed != sku.indexNeed) return false;
+        if (status != sku.status) return false;
+        return !(jsonDescription != null ? !jsonDescription.equals(sku.jsonDescription) : sku.jsonDescription != null);
 
     }
 
@@ -342,6 +362,7 @@ public class PtmCmpSku implements Identifiable<Long> {
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (int) (productId ^ (productId >>> 32));
+        result = 31 * result + (int) (categoryId ^ (categoryId >>> 32));
         result = 31 * result + (website != null ? website.hashCode() : 0);
         result = 31 * result + (seller != null ? seller.hashCode() : 0);
         result = 31 * result + (skuTitle != null ? skuTitle.hashCode() : 0);
@@ -365,6 +386,7 @@ public class PtmCmpSku implements Identifiable<Long> {
         result = 31 * result + (sourceSid != null ? sourceSid.hashCode() : 0);
         result = 31 * result + (indexNeed != null ? indexNeed.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
+        result = 31 * result + (jsonDescription != null ? jsonDescription.hashCode() : 0);
         return result;
     }
 }
