@@ -18,8 +18,6 @@ public class MysqlListWorker<T> implements Runnable {
     private String queryString;
     private IDataBaseManager dbm;
     private ListAndProcessWorkerStatus<T> ws;
-//    创建索引时为了避免，sourceSid重复
-//    private Set<String> sourceSidSet = new HashSet<String>();
 
     public MysqlListWorker(String queryString, ListAndProcessWorkerStatus<T> ws, IDataBaseManager dbm) {
         this.queryString = queryString;
@@ -53,27 +51,11 @@ public class MysqlListWorker<T> implements Runnable {
                 cmpSkus = dbm.query(queryString, page, pageSize);
             }
 
-//            for (int i = cmpSkus.size() - 1; i >= 0; i--) {
-//
-//                if(cmpSkus.get(i) instanceof PtmCmpSku){
-//
-//                    PtmCmpSku sku = (PtmCmpSku)cmpSkus.get(i);
-//
-//                    String  sourceSid = sku.getSourceSid();
-//
-//                    if(sourceSidSet.contains(sourceSid)){
-//                        cmpSkus.remove(cmpSkus.get(i));
-//                    }else{
-//                        sourceSidSet.add(sku.getSourceSid());
-//                    }
-//                }
-//            }
-
             ws.getSdQueue().addAll(cmpSkus);
 
             page++;
             //for test
-            break;
+//            break;
         }
 
         ws.setListWorkFinished(true);

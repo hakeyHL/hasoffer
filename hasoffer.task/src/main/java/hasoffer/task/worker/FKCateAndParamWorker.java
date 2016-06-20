@@ -63,6 +63,9 @@ public class FKCateAndParamWorker implements Runnable {
 
             String url = sku.getUrl();
 
+            //for test
+//            url = "http://www.flipkart.com/ap-pulse-solid-women-s-round-neck-pink-t-shirt/p/itme8arfjjawfkxv?pid=TSHE8ARFKUCKH4EH";
+
             try {
                 createCateAndGetParam(url, sku);
             } catch (Exception e) {
@@ -82,11 +85,12 @@ public class FKCateAndParamWorker implements Runnable {
 
         List<TagNode> catePathList = getSubNodesByXPath(root, CATE_PATH, new ContentParseException("cate path not found for [" + sku.getId() + "]"));
 
-        int cateSize = catePathList.size() - 2;
-        cateSize = 5 > cateSize ? cateSize : 5;
+        int cateSize = catePathList.size();
+
+        cateSize = cateSize > 6 ? 6 : cateSize;
         long parentId = 0;
 
-        for (int i = 0; i < cateSize + 1; i++) {
+        for (int i = 0; i < cateSize; i++) {
 
             if (i == 0) {
                 continue;
