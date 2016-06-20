@@ -7,7 +7,6 @@ import com.amazonaws.services.ec2.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +14,7 @@ import java.util.List;
 /**
  * Created on 2016/6/15.
  */
-@Component
+//@Component
 public class DynamicIp {
 
     private Logger logger = LoggerFactory.getLogger(DynamicIp.class);
