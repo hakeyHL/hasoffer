@@ -1,5 +1,6 @@
 package hasoffer.task.controller;
 
+import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
@@ -32,6 +33,8 @@ public class FlipkartCategoryParamController {
     @Resource
     IDataBaseManager dbm;
     @Resource
+    IMongoDbManager mdm;
+    @Resource
     ICategoryService categoryService;
 
     //flipkart/cateandparam
@@ -51,7 +54,9 @@ public class FlipkartCategoryParamController {
 
         es.execute(new MysqlListWorker<PtmCmpSku>(Q_FLIPKART_CMP, ws, dbm));
 
-        es.execute(new FKCateAndParamWorker(dbm, ws, categoryService));
+        for (int i = 0; i < 10; i++) {
+            es.execute(new FKCateAndParamWorker(dbm, mdm, ws, categoryService));
+        }
 
         taskRunning1.set(true);
 

@@ -5,10 +5,11 @@ import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.utils.HtmlUtils;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.ptm.PtmCategory2;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.worker.ListAndProcessWorkerStatus;
 import org.htmlcleaner.TagNode;
@@ -29,15 +30,17 @@ import static hasoffer.base.utils.http.XPathUtils.getSubNodesByXPath;
  */
 public class FKCateAndParamWorker implements Runnable {
 
-    private Logger logger = LoggerFactory.getLogger(MysqlListWorker.class);
+    private Logger logger = LoggerFactory.getLogger(FKCateAndParamWorker.class);
     private final String Q_CATEGORY_BYNAME = "SELECT t FROM PtmCategory2 t WHERE t.name = ?0 ";
 
     private ListAndProcessWorkerStatus<PtmCmpSku> ws;
     private IDataBaseManager dbm;
+    private IMongoDbManager mdm;
     private ICategoryService categoryService;
 
-    public FKCateAndParamWorker(IDataBaseManager dbm, ListAndProcessWorkerStatus<PtmCmpSku> ws, ICategoryService categoryService) {
+    public FKCateAndParamWorker(IDataBaseManager dbm, IMongoDbManager mdm, ListAndProcessWorkerStatus<PtmCmpSku> ws, ICategoryService categoryService) {
         this.dbm = dbm;
+        this.mdm = mdm;
         this.ws = ws;
         this.categoryService = categoryService;
     }
@@ -129,12 +132,11 @@ public class FKCateAndParamWorker implements Runnable {
 
         String jsonDescription = JSONUtil.toJSON(infoMap);
 
-        PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(sku.getId());
-
-        updater.getPo().setJsonDescription(jsonDescription);
-
-        dbm.update(updater);
-        logger.debug("udpate success for [" + sku.getId() + "]");
+        PtmCmpSkuDescription skuDescription = new PtmCmpSkuDescription();
+        skuDescription.setId(sku.getId());
+        skuDescription.setJsonDescription(jsonDescription);
+        mdm.save(skuDescription);
+        logger.debug("save description success for [" + sku.getId() + "]");
     }
 
     private void getInfo(TagNode node, Map<String, String> infoMap) throws ContentParseException {
