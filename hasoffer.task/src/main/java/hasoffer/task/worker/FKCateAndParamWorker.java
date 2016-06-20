@@ -86,8 +86,12 @@ public class FKCateAndParamWorker implements Runnable {
         List<TagNode> catePathList = getSubNodesByXPath(root, CATE_PATH, new ContentParseException("cate path not found for [" + sku.getId() + "]"));
 
         int cateSize = catePathList.size();
-
         cateSize = cateSize > 6 ? 6 : cateSize;
+
+        if (catePathList.size() == cateSize) {
+            cateSize = cateSize - 1;
+        }
+
         long parentId = 0;
 
         for (int i = 0; i < cateSize; i++) {
