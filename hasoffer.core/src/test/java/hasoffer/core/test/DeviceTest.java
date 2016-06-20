@@ -41,8 +41,8 @@ public class DeviceTest {
 
     @Test
     public void expDevice() {
-        String symd = "20160223";
-        String eymd = "20160601";
+        String symd = "20160331";
+        String eymd = "20160620";
 
         List<String> ymds = new ArrayList<String>();
 
