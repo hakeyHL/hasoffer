@@ -130,7 +130,7 @@ public class FKCateAndParamWorker implements Runnable {
 
         for (TagNode node : infoNodeList) {
 
-            getInfo(node, infoMap);//ex    "name1":"value1"
+            getInfo(node, infoMap, sku);//ex    "name1":"value1"
 
         }
 
@@ -143,18 +143,18 @@ public class FKCateAndParamWorker implements Runnable {
         logger.debug("save description success for [" + sku.getId() + "]");
     }
 
-    private void getInfo(TagNode node, Map<String, String> infoMap) throws ContentParseException {
+    private void getInfo(TagNode node, Map<String, String> infoMap, PtmCmpSku sku) throws ContentParseException {
 
-        List<TagNode> infoNodeList = getSubNodesByXPath(node, "//tbody/tr", new ContentParseException("description not found"));
+        List<TagNode> infoNodeList = getSubNodesByXPath(node, "//tbody/tr", new ContentParseException("description not found for [" + sku.getId() + "]"));
 
         for (int i = 1; i < infoNodeList.size(); i++) {
 
             TagNode tagNode = infoNodeList.get(i);
 
-            List<TagNode> paramNodeList = getSubNodesByXPath(tagNode, "//td", new ContentParseException("info not found"));
+            List<TagNode> paramNodeList = getSubNodesByXPath(tagNode, "//td", new ContentParseException("info not found for [" + sku.getId() + "]"));
 
             if (paramNodeList.size() != 2) {
-                logger.debug("parse error");
+                logger.debug("parse error for [" + sku.getId() + "]");
                 return;
             }
 
