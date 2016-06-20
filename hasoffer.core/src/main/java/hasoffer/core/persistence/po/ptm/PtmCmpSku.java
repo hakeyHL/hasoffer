@@ -61,8 +61,6 @@ public class PtmCmpSku implements Identifiable<Long> {
     @Enumerated(EnumType.STRING)
     private SkuStatus status = SkuStatus.ONSALE;
 
-    private String jsonDescription;
-
     public PtmCmpSku() {
     }
 
@@ -303,14 +301,6 @@ public class PtmCmpSku implements Identifiable<Long> {
         this.bigImagePath = bigImagePath;
     }
 
-    public String getJsonDescription() {
-        return jsonDescription;
-    }
-
-    public void setJsonDescription(String jsonDescription) {
-        this.jsonDescription = jsonDescription;
-    }
-
     public long getCategoryId() {
         return categoryId;
     }
@@ -353,8 +343,7 @@ public class PtmCmpSku implements Identifiable<Long> {
         if (sourcePid != null ? !sourcePid.equals(sku.sourcePid) : sku.sourcePid != null) return false;
         if (sourceSid != null ? !sourceSid.equals(sku.sourceSid) : sku.sourceSid != null) return false;
         if (indexNeed != sku.indexNeed) return false;
-        if (status != sku.status) return false;
-        return !(jsonDescription != null ? !jsonDescription.equals(sku.jsonDescription) : sku.jsonDescription != null);
+        return status == sku.status;
 
     }
 
@@ -386,7 +375,6 @@ public class PtmCmpSku implements Identifiable<Long> {
         result = 31 * result + (sourceSid != null ? sourceSid.hashCode() : 0);
         result = 31 * result + (indexNeed != null ? indexNeed.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
-        result = 31 * result + (jsonDescription != null ? jsonDescription.hashCode() : 0);
         return result;
     }
 }

@@ -9,6 +9,7 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory2;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
+import hasoffer.core.product.ICategoryService;
 import hasoffer.core.worker.ListAndProcessWorkerStatus;
 import org.htmlcleaner.TagNode;
 import org.slf4j.Logger;
@@ -33,10 +34,12 @@ public class FKCateAndParamWorker implements Runnable {
 
     private ListAndProcessWorkerStatus<PtmCmpSku> ws;
     private IDataBaseManager dbm;
+    private ICategoryService categoryService;
 
-    public FKCateAndParamWorker(IDataBaseManager dbm, ListAndProcessWorkerStatus<PtmCmpSku> ws) {
+    public FKCateAndParamWorker(IDataBaseManager dbm, ListAndProcessWorkerStatus<PtmCmpSku> ws, ICategoryService categoryService) {
         this.dbm = dbm;
         this.ws = ws;
+        this.categoryService = categoryService;
     }
 
     @Override
@@ -60,7 +63,7 @@ public class FKCateAndParamWorker implements Runnable {
             try {
                 createCateAndGetParam(url, sku);
             } catch (Exception e) {
-
+                logger.debug(e.toString());
             }
 
 
@@ -76,9 +79,11 @@ public class FKCateAndParamWorker implements Runnable {
 
         List<TagNode> catePathList = getSubNodesByXPath(root, CATE_PATH, new ContentParseException("cate path not found for [" + sku.getId() + "]"));
 
+        int cateSize = catePathList.size() - 2;
+        cateSize = 5 > cateSize ? cateSize : 5;
         long parentId = 0;
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < cateSize + 1; i++) {
 
             if (i == 0) {
                 continue;
@@ -101,8 +106,10 @@ public class FKCateAndParamWorker implements Runnable {
                     category.setLevel(i);
                     category.setParentId(parentId);
 
-                    parentId = dbm.create(category);
+                    category = categoryService.createAppCategory(category);
+                    parentId = category.getId();
                 }
+
             } catch (ContentParseException exception) {
                 break;
             }
@@ -146,7 +153,7 @@ public class FKCateAndParamWorker implements Runnable {
             }
 
             String name = paramNodeList.get(0).getText().toString();
-            String value = paramNodeList.get(1).getText().toString();
+            String value = StringUtils.filterAndTrim(paramNodeList.get(1).getText().toString(), null);
 
             infoMap.put(name, value);
         }

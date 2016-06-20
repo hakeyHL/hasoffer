@@ -3,6 +3,7 @@ package hasoffer.task.controller;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
+import hasoffer.core.product.ICategoryService;
 import hasoffer.core.worker.ListAndProcessWorkerStatus;
 import hasoffer.task.worker.FKCateAndParamWorker;
 import hasoffer.task.worker.MysqlListWorker;
@@ -30,11 +31,13 @@ public class FlipkartCategoryParamController {
 
     @Resource
     IDataBaseManager dbm;
+    @Resource
+    ICategoryService categoryService;
 
     //flipkart/cateandparam
     @RequestMapping(value = "/cateandparam", method = RequestMethod.GET)
     @ResponseBody
-    public String getFKCategoryParam(){
+    public String getFKCategoryParam() {
 
         if (taskRunning1.get()) {
             return "task running.";
@@ -46,9 +49,9 @@ public class FlipkartCategoryParamController {
 
         ListAndProcessWorkerStatus<PtmCmpSku> ws = new ListAndProcessWorkerStatus<PtmCmpSku>();
 
-        es.execute(new MysqlListWorker<PtmCmpSku>(Q_FLIPKART_CMP,ws,dbm));
+        es.execute(new MysqlListWorker<PtmCmpSku>(Q_FLIPKART_CMP, ws, dbm));
 
-        es.execute(new FKCateAndParamWorker(dbm,ws));
+        es.execute(new FKCateAndParamWorker(dbm, ws, categoryService));
 
         taskRunning1.set(true);
 
