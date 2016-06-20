@@ -72,6 +72,8 @@ public class MysqlListWorker<T> implements Runnable {
             ws.getSdQueue().addAll(cmpSkus);
 
             page++;
+            //for test
+            break;
         }
 
         ws.setListWorkFinished(true);
