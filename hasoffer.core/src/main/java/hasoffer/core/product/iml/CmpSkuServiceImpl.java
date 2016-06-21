@@ -417,7 +417,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         //sku创建时，添加创建时间字段
         ptmCmpSku.setCreateTime(TimeUtils.nowDate());
-        ptmCmpSku.setCategoryId(0);
+        ptmCmpSku.setCategoryId(0L);
         long skuid = dbm.create(ptmCmpSku);
 
         //创建sku的时候，将固定网站的商品导入到mongodb中,只导入url、website、id
