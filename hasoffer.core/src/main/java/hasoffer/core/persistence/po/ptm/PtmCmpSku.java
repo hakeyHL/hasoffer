@@ -301,11 +301,11 @@ public class PtmCmpSku implements Identifiable<Long> {
         this.bigImagePath = bigImagePath;
     }
 
-    public long getCategoryId() {
+    public Long getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(long categoryId) {
+    public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
     }
 
@@ -317,10 +317,10 @@ public class PtmCmpSku implements Identifiable<Long> {
         PtmCmpSku sku = (PtmCmpSku) o;
 
         if (productId != sku.productId) return false;
-        if (categoryId != sku.categoryId) return false;
         if (Float.compare(sku.price, price) != 0) return false;
         if (checked != sku.checked) return false;
         if (id != null ? !id.equals(sku.id) : sku.id != null) return false;
+        if (categoryId != null ? !categoryId.equals(sku.categoryId) : sku.categoryId != null) return false;
         if (website != sku.website) return false;
         if (seller != null ? !seller.equals(sku.seller) : sku.seller != null) return false;
         if (skuTitle != null ? !skuTitle.equals(sku.skuTitle) : sku.skuTitle != null) return false;
@@ -351,7 +351,7 @@ public class PtmCmpSku implements Identifiable<Long> {
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (int) (productId ^ (productId >>> 32));
-        result = 31 * result + (int) (categoryId ^ (categoryId >>> 32));
+        result = 31 * result + (categoryId != null ? categoryId.hashCode() : 0);
         result = 31 * result + (website != null ? website.hashCode() : 0);
         result = 31 * result + (seller != null ? seller.hashCode() : 0);
         result = 31 * result + (skuTitle != null ? skuTitle.hashCode() : 0);
