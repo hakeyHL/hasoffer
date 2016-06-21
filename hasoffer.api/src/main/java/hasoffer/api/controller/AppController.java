@@ -358,8 +358,9 @@ public class AppController {
         ModelAndView mv =new ModelAndView();
         Map map = new HashMap();
         String userToken= UUID.randomUUID().toString();
-        urmUser uUser=appService.getUserById(userVO.getThirdId());
+        urmUser uUser=appService.getUserById(userVO.getThirdId()==null?"0":"1");
         if(uUser==null){
+
             logger.debug("user is not exist before");
             urmUser urmUser=new urmUser();
             urmUser.setUserToken(userToken);
