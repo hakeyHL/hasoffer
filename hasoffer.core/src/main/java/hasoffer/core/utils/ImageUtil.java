@@ -8,6 +8,7 @@ import hasoffer.base.utils.IDUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.core.CoreConfig;
+import hasoffer.core.bo.common.ImagePath;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -44,8 +45,51 @@ public class ImageUtil {
         return imageUrl;
     }
 
+
     /**
-     * 将其他网站图片下载后上传到本地服务器
+     * downloadAndUpload2
+     * url对应的图片下载，然后上传到图片服务器，图片服务器返回3个路径：原图、小图、大图
+     * @param imageUrl
+     * @return
+     * @throws ImageDownloadOrUploadException
+     */
+    public static ImagePath downloadAndUpload2(String imageUrl)
+            throws ImageDownloadOrUploadException {
+
+        String dirPath = FileUtils.getTempDirectoryPath();
+        if (!dirPath.endsWith("/")) {
+            dirPath += "/";
+        }
+        File file = new File(dirPath + IDUtil.uuid() + ".jpg");
+        // 下载图片到本地
+        try {
+            //HttpUtilx.getFile(image.getImageUrl(), file);
+            boolean ret = HttpUtils.getImage(imageUrl, file);
+            if (!ret) {
+                throw new ImageDownloadException(imageUrl);
+            }
+
+            // 上传图片
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("file", file);
+            HttpResponseModel httpResponseModel = HttpUtils.uploadFile(CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL), file);
+
+            Map respMap = (Map) JSON.parse(httpResponseModel.getBodyString());
+            Map pathMap = (Map) respMap.get("data");
+
+            return new ImagePath((String) pathMap.get("originalPath"), (String) pathMap.get("smallPath"), (String) pathMap.get("bigPath"));
+
+        } catch (Exception e) {
+            logger.error(e.getMessage() + "[" + imageUrl + "]");
+            throw new ImageDownloadOrUploadException("下载或上传图片时出错");
+        } finally {
+            // 删除图片
+            FileUtils.deleteQuietly(file);
+        }
+    }
+
+    /**
+     * 将其他网站图片下载后上传到本地图片服务器, 图片服务器不对图片进行处理，返回图片路径
      *
      * @return
      */

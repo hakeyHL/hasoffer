@@ -7,6 +7,7 @@ import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.bo.common.ImagePath;
 import hasoffer.core.bo.product.SkuPriceUpdateResultBo;
 import hasoffer.core.exception.CmpSkuUrlNotFoundException;
 import hasoffer.core.exception.MultiUrlException;
@@ -248,6 +249,30 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             String path = ImageUtil.downloadAndUpload(oriImageUrl);
 
             ptmCmpSkuUpdater.getPo().setImagePath(path);
+
+            dbm.update(ptmCmpSkuUpdater);
+
+        } catch (ImageDownloadOrUploadException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void downloadImage2(PtmCmpSku sku) {
+        String oriImageUrl = sku.getOriImageUrl();
+        if (StringUtils.isEmpty(oriImageUrl)) {
+            return;
+        }
+
+        try {
+            ImagePath imagePath = ImageUtil.downloadAndUpload2(oriImageUrl);
+
+            PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(sku.getId());
+
+            ptmCmpSkuUpdater.getPo().setImagePath(imagePath.getOriginalPath());
+            ptmCmpSkuUpdater.getPo().setSmallImagePath(imagePath.getSmallPath());
+            ptmCmpSkuUpdater.getPo().setBigImagePath(imagePath.getBigPath());
 
             dbm.update(ptmCmpSkuUpdater);
 

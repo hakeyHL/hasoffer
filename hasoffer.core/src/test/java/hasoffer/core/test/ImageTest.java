@@ -12,10 +12,11 @@ public class ImageTest {
 
     @Test
     public void f() throws Exception {
-        String url = "http://i3.itc.cn/20160530/370f_871bc5fb_e7ab_5e26_beb7_a5a5cdcea240_1.jpg";
+        String url = "http://d.hiphotos.baidu.com/zhidao/pic/item/e7cd7b899e510fb38cc9205dd833c895d0430c23.jpg";
 
-        System.out.println(ImageUtil.downloadAndUpload(url));
+        String imagePath = ImageUtil.downloadAndUpload(url);
 
+        System.out.println(imagePath.toString());
     }
 
 }
