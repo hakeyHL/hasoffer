@@ -98,6 +98,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
             try {
 
                 skuList = getSku(website, cliQ, sourceId);
+                logger.debug("get sku success nmb");
 
             } catch (HttpFetchException e) {
 
@@ -126,7 +127,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
 
                 IndexHistory history = new IndexHistory("GetSkuSuccess", TimeUtils.nowDate());
                 indexHistoryList.add(history);
-
+                logger.debug("GetSkuSuccess nmb");
                 createOrUpdateIndex(skuList, statHijackFetch);
 
             } else {
@@ -163,7 +164,6 @@ public class SaveOrUpdateIndexWorker implements Runnable {
                     updater.getPo().setUrl(sku.getUrl());
 
                     dbm.update(updater);
-                    logger.debug("update success nmb");
 
                     PtmCmpSkuIndex2 ptmCmpSkuIndex2 = dbm.get(PtmCmpSkuIndex2.class, oldSku.getId());
 
