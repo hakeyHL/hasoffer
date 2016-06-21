@@ -9,7 +9,7 @@
        default-lazy-init="false">
     <dubbo:application name="third-provider"/>
     <!-- 使用zookeeper注册中心暴露服务地址 -->
-    <dubbo:registry address="zookeeper://60.205.57.57:2181" check="false" subscribe="false" register=""/>
+    <dubbo:registry address="zookeeper://zookeeper_server:2181" check="false" subscribe="false" register=""/>
     <dubbo:protocol name="dubbo" port="20880" />
     <dubbo:provider weight="50"/>
     <!-- 要暴露的服务接口 -->
