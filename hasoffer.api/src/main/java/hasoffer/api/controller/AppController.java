@@ -355,7 +355,6 @@ public class AppController {
      */
     @RequestMapping(value = "/bindUserInfo", method = RequestMethod.POST)
     public ModelAndView bindUserInfo(UserVo userVO) {
-
         ModelAndView mv =new ModelAndView();
         String userToken= UUID.randomUUID().toString();
         urmUser uUser=appService.getUserById(userVO.getThirdId());
@@ -383,8 +382,7 @@ public class AppController {
             appService.updateUserInfo(uUser);
             logger.debug("update userInfo over ");
         }
-        userVO=null;
-        mv.addObject("userVo",userVO);
+
         urmUser u=new urmUser();
         u.setUserToken(userToken);
         mv.addObject("data", u);

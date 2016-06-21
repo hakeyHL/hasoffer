@@ -5,6 +5,7 @@ import hasoffer.base.utils.BeanUtil;
 import hasoffer.core.CoreConfig;
 import hasoffer.core.persistence.dbm.osql.exception.OSqlException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -297,4 +298,18 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
     }
 
     protected abstract HibernateTemplate getHibernate4Template();
+
+    @Override
+    public void update(final List<T> array) {
+        getHibernate4Template().execute(
+                new HibernateCallback() {
+                    public Object doInHibernate(Session session) throws HibernateException {
+                        session.update(array.get(0));
+                        session.flush();
+                        session.clear();
+                        session.close();
+                        return null;
+                    }
+                });
+    }
 }

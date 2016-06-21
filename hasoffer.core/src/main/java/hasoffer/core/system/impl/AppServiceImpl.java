@@ -3,11 +3,14 @@ package hasoffer.core.system.impl;
 import hasoffer.base.enums.AppType;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.dbm.osql.Updater;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
+import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.urm.urmUser;
 import hasoffer.core.system.IAppService;
+import javafx.beans.binding.ObjectExpression;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -41,6 +44,14 @@ public class AppServiceImpl implements IAppService {
     private static final String Q_APP_ORDER =
             "SELECT t FROM OrderStatsAnalysisPO t " +
                     " WHERE t.orderId = ?0 and t.userId=?1";
+
+    private static final String Q_APP_CATEGORY =
+            "SELECT t FROM PtmCategory t " +
+                    " order by level ASC,rank ASC";
+
+    private static final String Q_APP_GETUSERBYTHIRDID =
+            "SELECT t FROM urmUser t " +
+                    " where t.thirdId=?0";
     @Resource
     IDataBaseManager dbm;
 
@@ -78,5 +89,30 @@ public class AppServiceImpl implements IAppService {
         li.add(orderId);
         li.add(userId);
         return dbm.querySingle(Q_APP_ORDER,li);
+    }
+
+    @Override
+    public List<PtmCategory> getCategory() {
+      return   dbm.query(Q_APP_CATEGORY);
+    }
+
+    @Override
+    public urmUser getUserById(String thirdId) {
+        List li=Arrays.asList(thirdId);
+        return dbm.querySingle(Q_APP_GETUSERBYTHIRDID,li);
+    }
+
+    @Override
+    public int addUser(urmUser user) {
+        List li=new ArrayList();
+        li.add(user);
+        return dbm.batchSave(li);
+    }
+
+    @Override
+    public void updateUserInfo(urmUser uUser) {
+        List li=new ArrayList();
+        li.add(uUser);
+         dbm.update(li);
     }
 }
