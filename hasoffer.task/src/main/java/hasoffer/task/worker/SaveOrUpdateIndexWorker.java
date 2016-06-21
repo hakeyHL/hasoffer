@@ -149,12 +149,14 @@ public class SaveOrUpdateIndexWorker implements Runnable {
 
         for (PtmCmpSku sku : skuList) {
 
+            logger.debug("result list sql start");
             List<PtmCmpSku> resultList = dbm.query(Q_PTMCMPSKU_SOURCESID, Arrays.asList(sku.getSourceSid(), sku.getWebsite()));
+            logger.debug("result list sql stop");
 
             //如果有结果，将所有结果的url和tltle等字段进行全部的更新
             //如果没有结果，创建sku，新建索引
             if (ArrayUtils.hasObjs(resultList)) {
-
+                logger.debug("hasobject");
                 for (PtmCmpSku oldSku : resultList) {
 
                     //更新sku
