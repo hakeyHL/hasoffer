@@ -1,4 +1,4 @@
-package hasoffer.core.test;
+package hasoffer.admin.controller;
 
 import hasoffer.base.enums.AppType;
 import hasoffer.base.enums.MarketChannel;
@@ -9,12 +9,13 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.urm.UrmDevice;
 import jodd.io.FileUtil;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import java.io.File;
@@ -24,25 +25,26 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Date : 2016/1/21
- * Function :
+ * Created by chevy on 2016/6/21.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:spring-beans.xml")
-public class DeviceTest {
+@Controller
+@RequestMapping(value = "/clientexp")
+public class DeviceExpController {
 
     @Resource
     IDataBaseManager dbm;
-    private Logger logger = LoggerFactory.getLogger(DeviceTest.class);
+
+    private Logger logger = LoggerFactory.getLogger(DeviceExpController.class);
+
     private String Q_DEVICE = "SELECT t from UrmDevice t where t.createTime >= ?0 and t.createTime < ?1 ";
 
-    private String PATH_DIR = "d:/TMP/devices/";
-    //private String PATH_DIR = "/home/work/devices/";
+    private String PATH_DIR = "/home/hasoffer/devices/";
 
-    @Test
-    public void expDevice() {
-        String symd = "20160223";
-        String eymd = "20160621";
+    @RequestMapping(value = "/from/{symd}/to/{eymd}", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String expDevice(@PathVariable String symd,
+                     @PathVariable String eymd) {
 
         List<String> ymds = new ArrayList<String>();
 
@@ -56,6 +58,8 @@ public class DeviceTest {
                 continue;
             }
         }
+
+        return "ok";
     }
 
     private void expDevice(String ymd) {
