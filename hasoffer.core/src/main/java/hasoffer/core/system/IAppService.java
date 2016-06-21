@@ -5,6 +5,7 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.AppBanner;
+import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
@@ -28,7 +29,7 @@ public interface IAppService {
     OrderStatsAnalysisPO getOrderDetail(String orderId,String  userId);
     PageableResult getDeals(Long page,Long pageSize);
     List<PtmCategory> getCategory();
-
+    AppDeal getDealDetail(String id);
     UrmUser getUserById(String thirdId);
     List getProductByCriteria(SearchCriteria criteria);
 
@@ -36,4 +37,6 @@ public interface IAppService {
 
     void updateUserInfo(UrmUser uUser);
     List<AppBanner> getBanners();
+
+    
 }
