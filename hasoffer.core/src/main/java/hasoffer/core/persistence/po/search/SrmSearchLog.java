@@ -212,4 +212,13 @@ public class SrmSearchLog implements Identifiable<String> {
         result = 31 * result + (precise != null ? precise.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "SrmSearchLog{" +
+                "site='" + site + '\'' +
+                ", keyword='" + keyword + '\'' +
+                ", brand='" + brand + '\'' +
+                '}';
+    }
 }

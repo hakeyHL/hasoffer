@@ -134,4 +134,20 @@ public class SrmAutoSearchResult {
     public void setFinalSkus(Map<Website, List<SearchedSku>> finalSkus) {
         this.finalSkus = finalSkus;
     }
+
+    @Override
+    public String toString() {
+        return "SrmAutoSearchResult{" +
+                "id='" + id + '\'' +
+                ", updateTime=" + updateTime +
+                ", lUpdateTime=" + lUpdateTime +
+                ", relatedProId=" + relatedProId +
+                ", fromWebsite='" + fromWebsite + '\'' +
+                ", title='" + title + '\'' +
+                ", price=" + price +
+                ", sitePros=" + sitePros +
+                ", finalSkus=" + finalSkus +
+                ", lRelateTime=" + lRelateTime +
+                '}';
+    }
 }

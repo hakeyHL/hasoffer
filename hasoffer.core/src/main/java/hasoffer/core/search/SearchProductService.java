@@ -272,10 +272,10 @@ public class SearchProductService {
 
     public void searchProductsFromSites(SrmAutoSearchResult searchResult) {
 
-        String keyword = searchResult.getTitle();
-        Website logSite = Website.valueOf(searchResult.getFromWebsite());
+        //String keyword = searchResult.getTitle();
+        //Website logSite = Website.valueOf(searchResult.getFromWebsite());
 
-        Map<Website, List<ListProduct>> listProductMap = new HashMap<Website, List<ListProduct>>();
+        //Map<Website, List<ListProduct>> listProductMap = new HashMap<Website, List<ListProduct>>();
 
         // voodoo - fuck voodoo - return durex
 //        VoodooHelper.getProductsFromVoodoo(listProductMap, keyword);
@@ -284,13 +284,13 @@ public class SearchProductService {
 //        getProductsFromAffiliate(listProductMap, keyword);
 
         // read from html
-        getProductsFromWebsite(listProductMap, keyword);
+        //getProductsFromWebsite(listProductMap, keyword);
 
         // msp
 //        getProductsFromMSP(listProductMap, keyword);
 
-        searchResult.setSitePros(listProductMap);
-
+        //searchResult.setSitePros(listProductMap);
+        logger.info("job result info ：{}",searchResult.toString());
         mdm.save(searchResult);
     }
 }

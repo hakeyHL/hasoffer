@@ -17,16 +17,16 @@ public class AppBanner implements Identifiable<Long> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String imageUrl;//Í¼Æ¬Â·¾¶
-    private String linkUrl;//Ìø×ªÂ·¾¶
+    private String imageUrl;//å›¾ç‰‡è·¯å¾„
+    private String linkUrl;//è·³è½¬è·¯å¾„
 
-    private Date createTime;//´´½¨Ê±¼ä
-    private Date deadline;//×î´óµÄÓĞĞ§ÆÚ Ä¬ÈÏÖµ£º´´½¨Ê±¼ä+7Ìì
+    private Date createTime;//åˆ›å»ºæ—¶é—´
+    private Date deadline;//æœ€å¤§çš„æœ‰æ•ˆæœŸ é»˜è®¤å€¼ï¼šåˆ›å»ºæ—¶é—´+7å¤©
 
     @Enumerated(EnumType.STRING)
-    private BannerFrom bannerFrom;//bannerÀ´Ô´
+    private BannerFrom bannerFrom;//banneræ¥æº
 
-    private long rank;//ÓÃÓÚÊÖ¹¤µ÷Õû¸ÃÌõbannerµÄÓÅÏÈ¼¶
+    private long rank;//ç”¨äºæ‰‹å·¥è°ƒæ•´è¯¥æ¡bannerçš„ä¼˜å…ˆçº§
 
     @Override
     public Long getId() {

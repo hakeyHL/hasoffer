@@ -1,19 +1,8 @@
-/**
- * Project Name: hadiths-jobs
- * Shang De
- * Copyright (c) 2014-2016 All Rights Reserved.
- * 2014年6月25日
- */
 package hasoffer.job.quartz.bean;
 
 import java.util.Date;
 
-/**
- * 代码描述：
- *
- * @author chen
- * @date 2014年6月25日
- */
+
 public class JobExeHistory {
 
     /**

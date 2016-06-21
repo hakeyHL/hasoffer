@@ -68,53 +68,5 @@ public class SrmSearchLogListWorker implements Runnable {
             }
 
         }
-
-
-//        Query query = new Query();
-//        query.addCriteria(Criteria.where("status").is("CHECKED"));
-//        query.addCriteria(Criteria.where("errorMsg").is("no index."));
-//        query.with(new Sort(Sort.Direction.DESC, "lCreateTime"));
-//        query.limit(5);
-//
-//        List<PtmCmpSkuIndexSearchLog> resultList = dbm.query(PtmCmpSkuIndexSearchLog.class, query);
-//
-//        if (ArrayUtils.hasObjs(resultList)) {
-//            startTime = resultList.get(0).getlCreateTime();
-//        }
-//
-//        while (true) {
-//
-//            query = new Query();
-//            query.addCriteria(Criteria.where("lCreateTime").gt(startTime));
-//            query.addCriteria(Criteria.where("errorMsg").is("no index."));
-//            query.addCriteria(Criteria.where("status").is("NEW"));
-//            query.with(new Sort(Sort.Direction.ASC, "lCreateTime"));
-//            query.limit(6000);
-//
-//            List<PtmCmpSkuIndexSearchLog> logList = dbm.query(PtmCmpSkuIndexSearchLog.class, query);
-//
-//            if (logList == null) {
-//                continue;
-//            }
-//
-//            for (PtmCmpSkuIndexSearchLog log : logList) {
-//
-//                queue.add(log);
-//                log.setStatus(IndexSearchLogStatus.CHECKED);
-//                dbm.save(log);
-//                logger.debug("add " + log.getId() + " to queue success");
-//
-//            }
-//
-//            if (ArrayUtils.hasObjs(logList)) {
-//                startTime = logList.get(0).getlCreateTime();
-//            } else {
-//                try {
-//                    TimeUnit.MINUTES.sleep(1);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
     }
 }

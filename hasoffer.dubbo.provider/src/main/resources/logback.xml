@@ -129,21 +129,20 @@
     <!-- code info log -->
     <logger name="hasoffer" level="DEBUG">
         <appender-ref ref="InfoLoggerFileOut"/>
-    </logger>
-
-    <!--code error log -->
-    <logger name="hasoffer" level="ERROR">
         <appender-ref ref="ErrorLoggerFileOut"/>
     </logger>
 
-
     <!-- third part log -->
-    <logger name="org.springframework" level="INFO">
+    <logger name="org" level="INFO">
+        <appender-ref ref="ThirdPartLoggerFileOut"/>
+    </logger>
+
+    <logger name="com" level="INFO">
         <appender-ref ref="ThirdPartLoggerFileOut"/>
     </logger>
 
     <root>
-        <level value="INFO"/>
+        <level value="DEBUG"/>
         <appender-ref ref="stdout"/>
         <appender-ref ref="StdoutFile"/>
     </root>

@@ -69,22 +69,15 @@
     <logger name="ActionAccessLogger" level="info" additivity="false">
         <appender-ref ref="ActionAccessLoggerFileOut"/>
     </logger>
+
+    <logger name="hasoffer" level="INFO"/>
     <!-- code info log -->
-    <logger name="com.joe.job" level="DEBUG">
+    <logger name="hasoffer.job" level="DEBUG">
         <appender-ref ref="InfoLoggerFileOut"/>
-    </logger>
-    <logger name="com.joe.jobBiz" level="DEBUG">
-        <appender-ref ref="InfoLoggerFileOut"/>
+        <appender-ref ref="ErrorLoggerFileOut"/>
     </logger>
 
-    <!--code error log -->
-    <logger name="com.joe.job" level="ERROR">
-        <appender-ref ref="ErrorLoggerFileOut"/>
-    </logger>
-    <logger name="com.joe.jobBiz" level="ERROR">
-        <appender-ref ref="ErrorLoggerFileOut"/>
-    </logger>
-    <logger name="com.job" level="INFO"/>
+
     <logger name="ch.qos.logback" level="INFO"/>
     <logger name="org.mybatis" level="INFO"/>
     <logger name="org" level="INFO"/>

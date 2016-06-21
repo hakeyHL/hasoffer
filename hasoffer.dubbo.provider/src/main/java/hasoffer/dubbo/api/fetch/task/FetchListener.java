@@ -1,8 +1,6 @@
 package hasoffer.dubbo.api.fetch.task;
 
 import hasoffer.base.utils.DaemonThreadFactory;
-import hasoffer.dubbo.api.fetch.service.IFetchService;
-import hasoffer.dubbo.api.fetch.service.IKeywordService;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -20,14 +18,15 @@ public class FetchListener extends ContextLoaderListener {
     public void contextInitialized(ServletContextEvent event) {
         springContext = WebApplicationContextUtils.getWebApplicationContext(event.getServletContext());
 
-        serverInitialized();
+        initThread();
     }
 
-    private void serverInitialized() {
+    private void initThread() {
         ExecutorService es = Executors.newCachedThreadPool();
-        IFetchService fetchService = (IFetchService) springContext.getBean("flipkartFetchService");
-        IKeywordService keywordService = (IKeywordService) springContext.getBean("keywordService");
-        es.execute(DaemonThreadFactory.create(new FetchWorker(keywordService,fetchService)));
+
+        es.execute(DaemonThreadFactory.create(new FetchKeywordWorker(springContext)));
+
+        es.execute(DaemonThreadFactory.create(new FetchUrlWorker(springContext)));
     }
 
     @Override
