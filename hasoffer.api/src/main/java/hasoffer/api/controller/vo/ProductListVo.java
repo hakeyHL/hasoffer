@@ -1,9 +1,7 @@
 package hasoffer.api.controller.vo;
 
-import java.math.BigDecimal;
-
 /**
- * 商品列表Vo
+ * 鍟嗗搧鍒楄〃Vo
  * Created by hs on 2016/6/21.
  */
 public class ProductListVo {
