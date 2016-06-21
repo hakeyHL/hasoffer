@@ -12,7 +12,7 @@ public class PtmCmpSkuDescription {
     @Id
     private long id;//cmpsku Id
 
-    private String jsonDescription;
+    private String jsonDescription;//描述
 
     public long getId() {
         return id;

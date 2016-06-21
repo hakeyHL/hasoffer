@@ -7,7 +7,7 @@
         </encoder>
     </appender>
 
-    <substitutionProperty name="log.base" value="${catalina.base}/logs"/>
+    <substitutionProperty name="log.base" value="${catalina.base}/logs/job-logs"/>
 
     <appender name="rollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/stdout.log</file>
@@ -72,7 +72,7 @@
 
     <logger name="hasoffer" level="INFO"/>
     <!-- code info log -->
-    <logger name="hasoffer.job" level="DEBUG">
+    <logger name="hasoffer.job" level="INFO">
         <appender-ref ref="InfoLoggerFileOut"/>
         <appender-ref ref="ErrorLoggerFileOut"/>
     </logger>
@@ -83,7 +83,7 @@
     <logger name="org" level="INFO"/>
 
     <root>
-        <level value="DEBUG"/>
+        <level value="INFO"/>
         <appender-ref ref="stdout"/>
         <appender-ref ref="rollingFile"/>
     </root>

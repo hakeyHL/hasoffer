@@ -33,7 +33,7 @@ public class StatVisitSkuUpdateTask {
         String todayString = TimeUtils.parse(TimeUtils.now(), "yyyyMMdd");
         Date date = TimeUtils.toDate(TimeUtils.today());
 
-        int count = 0;//ÓÃÀ´¼ÇÂ¼¸üĞÂµÄÊıÁ¿
+        int count = 0;//ç”¨æ¥è®°å½•æ›´æ–°çš„æ•°é‡
 
         for (Website website : WebsiteHelper.DEFAULT_WEBSITES) {
 

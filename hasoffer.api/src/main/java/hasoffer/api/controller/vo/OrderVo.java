@@ -6,7 +6,7 @@ import java.util.Date;
 
 /**
  * Created by hs on 2016/6/16.
- * ¶©µ¥ÏêÇévo
+ * è®¢å•è¯¦æƒ…vo
  */
 public class OrderVo {
     public OrderVo() {

@@ -1,7 +1,7 @@
 package hasoffer.api.controller.vo;
 
 /**
- * 商品类目VO
+ * 鍟嗗搧绫荤洰VO
  * Created by hs on 2016/6/20.
  */
 public class CategoryVo {
