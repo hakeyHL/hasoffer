@@ -83,11 +83,12 @@ public class FKCateAndParamWorker implements Runnable {
 
         TagNode root = HtmlUtils.getUrlRootTagNode(url);
 
+        //获取导航栏
         List<TagNode> catePathList = getSubNodesByXPath(root, CATE_PATH, new ContentParseException("cate path not found for [" + sku.getId() + "]"));
 
+        //获取导航栏中catePath的长度，取前5位或者更小
         int cateSize = catePathList.size();
         cateSize = cateSize > 6 ? 6 : cateSize;
-
         if (catePathList.size() == cateSize) {
             cateSize = cateSize - 1;
         }
@@ -96,7 +97,7 @@ public class FKCateAndParamWorker implements Runnable {
 
         for (int i = 0; i < cateSize; i++) {
 
-            if (i == 0) {
+            if (i == 0) {//排除导航中的第一个home
                 continue;
             }
 
@@ -104,8 +105,10 @@ public class FKCateAndParamWorker implements Runnable {
 
                 TagNode pathNode = getSubNodeByXPath(catePathList.get(i), "/a", new ContentParseException("path not found"));
 
+                //获取类目名称
                 String pathString = StringUtils.filterAndTrim(pathNode.getText().toString(), null);
 
+                //检查类目是否存在
                 PtmCategory2 category = dbm.querySingle(Q_CATEGORY_BYNAME, Arrays.asList(pathString));
 
                 if (category != null) {
@@ -127,19 +130,24 @@ public class FKCateAndParamWorker implements Runnable {
 
         }
 
+        //给sku关联类目信息
         sku.setCategoryId(parentId);
 
+        //获取描述节点
         List<TagNode> infoNodeList = getSubNodesByXPath(root, DESCRIPTION_INFO, new ContentParseException("description section not found for [" + sku.getId() + "]"));
+        //用来封装描述的键值对
         Map<String, String> infoMap = new HashMap<String, String>();
 
         for (TagNode node : infoNodeList) {
 
+            //获取具体的描述信息，填充到map集合中
             getInfo(node, infoMap, sku);//ex    "name1":"value1"
 
         }
 
         String jsonDescription = JSONUtil.toJSON(infoMap);
 
+        //将描述信息持久化到mongodb
         PtmCmpSkuDescription skuDescription = new PtmCmpSkuDescription();
         skuDescription.setId(sku.getId());
         skuDescription.setJsonDescription(jsonDescription);
@@ -149,14 +157,17 @@ public class FKCateAndParamWorker implements Runnable {
 
     private void getInfo(TagNode node, Map<String, String> infoMap, PtmCmpSku sku) throws ContentParseException {
 
+        //描述区域分为多块
         List<TagNode> infoNodeList = getSubNodesByXPath(node, "//tbody/tr", new ContentParseException("description not found for [" + sku.getId() + "]"));
 
+        //获取每块描述区域中的内容
         for (int i = 1; i < infoNodeList.size(); i++) {
 
             TagNode tagNode = infoNodeList.get(i);
 
             List<TagNode> paramNodeList = getSubNodesByXPath(tagNode, "//td", new ContentParseException("info not found for [" + sku.getId() + "]"));
 
+            //如果不是键值对形式的，跳过
             if (paramNodeList.size() != 2) {
                 logger.debug("parse error for [" + sku.getId() + "]");
                 continue;
