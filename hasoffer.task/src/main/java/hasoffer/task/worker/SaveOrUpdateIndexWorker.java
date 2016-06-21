@@ -163,6 +163,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
                     updater.getPo().setUrl(sku.getUrl());
 
                     dbm.update(updater);
+                    logger.debug("update success nmb");
 
                     PtmCmpSkuIndex2 ptmCmpSkuIndex2 = dbm.get(PtmCmpSkuIndex2.class, oldSku.getId());
 
@@ -186,7 +187,9 @@ public class SaveOrUpdateIndexWorker implements Runnable {
                 }
             } else {
 
+                logger.debug("create sku nmb");
                 PtmCmpSku cmpSkuForIndex = cmpSkuService.createCmpSkuForIndex(sku);
+                logger.debug("create sku finish nmb");
                 cmpSkuService.createPtmCmpSkuIndexToMysql(cmpSkuForIndex);
                 statHijackFetch.getAffectSkuIdList().add(cmpSkuForIndex.getId() + "");
             }
