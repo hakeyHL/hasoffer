@@ -56,6 +56,13 @@ public interface ICmpSkuService {
 
     void downloadImage(PtmCmpSku sku);
 
+    /**
+     * 区别 downloadImage 方法：保存图片的原图、大图、小图路径
+     *
+     * @param sku
+     */
+    void downloadImage2(PtmCmpSku sku);
+
     PtmCmpSku getCmpSku(long id, Website website);
 
     PtmCmpSku getCmpSku(String q);
