@@ -16,10 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -46,8 +43,8 @@ public class ExcelImporter {
 		return this;
 	}
 
-	/*public void importExcelFile(MultipartFile multipartFile) throws IOException {
-		File file = this.transferLocal(multipartFile);
+	public void importExcelFile(MultipartFile multipartFile, String realPath) throws IOException {
+		File file = this.transferLocal(multipartFile, realPath);
 		ImportConfig importConfig = this.getImportConfig();
 		if (importConfig == null) throw new RuntimeException("无参数配置，无法执行导入操作");
 		// 根据文件后缀名创建不同版本的excel
@@ -94,8 +91,18 @@ public class ExcelImporter {
 			importConfig.getImportCallBack().postOperation(dao, batchArgs);
 		}
 	}
-*/
 
+    private File transferLocal(MultipartFile multipartFile, String realPath) throws IOException {
+        String today = org.apache.http.client.utils.DateUtils.formatDate(new Date(), "yyyyMMddHHmmss");
+        File dir = new File(realPath);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        //文件命名方式为年月日时分秒+后缀名
+        File file = new File(dir, today + multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().lastIndexOf(".")));
+        multipartFile.transferTo(file);
+        return file;
+    }
 
 	private String getCellFormatValue(Cell cell) {
 		String cellvalue = "";
