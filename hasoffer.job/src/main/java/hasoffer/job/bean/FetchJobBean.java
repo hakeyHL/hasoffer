@@ -21,8 +21,8 @@ public class FetchJobBean extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        logger.info("定时任务执行中…");
-        System.out.println(new Date()+":任务执行。");
+        logger.info("FetchJobBean is run at {}" ,new Date());
+        //System.out.println(new Date()+":任务执行。");
         if (logger.isDebugEnabled()) {
             logger.debug("executeInternal(JobExecutionContext context) - start");
         }

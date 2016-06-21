@@ -10,7 +10,7 @@ import hasoffer.core.search.ISearchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -20,14 +20,14 @@ import java.util.concurrent.TimeUnit;
  * Date : 2016/3/14
  * Function : 旧数据修复
  */
-public class UnmatchedSearchRecordListWorker2 implements Runnable {
-    private static final String SQL_SEARCHLOG = "select t from SrmSearchLog t where t.site='FLIPKART' and t.updateTime >?0 order by t.updateTime ASC ";
+public class SearchRecordListWorker implements Runnable {
+    private static final String SQL_SEARCHLOG = "select t from SrmSearchLog t where t.updateTime >?0 order by t.updateTime ASC ";
     LinkedBlockingQueue<SrmSearchLog> searchLogQueue;
     ISearchService searchService;
     IDataBaseManager dbm;
-    private Logger logger = LoggerFactory.getLogger(UnmatchedSearchRecordListWorker2.class);
+    private Logger logger = LoggerFactory.getLogger(SearchRecordListWorker.class);
 
-    public UnmatchedSearchRecordListWorker2(ISearchService searchService, IDataBaseManager dbm, LinkedBlockingQueue<SrmSearchLog> searchLogQueue) {
+    public SearchRecordListWorker(ISearchService searchService, IDataBaseManager dbm, LinkedBlockingQueue<SrmSearchLog> searchLogQueue) {
         this.dbm = dbm;
         this.searchService = searchService;
         this.searchLogQueue = searchLogQueue;
@@ -39,19 +39,20 @@ public class UnmatchedSearchRecordListWorker2 implements Runnable {
 
         while (true) {
 
-            logger.debug(String.format("UnmatchedSearchRecordListWorker2 START[%s].Queue size[%d]", TimeUtils.parse(startTime, PATTERN_TIME), searchLogQueue.size()));
+            logger.debug("SearchRecordListWorker START {}.Queue size {}", TimeUtils.parse(startTime, PATTERN_TIME), searchLogQueue.size());
 
             try {
                 if (searchLogQueue.size() > 800) {
                     TimeUnit.SECONDS.sleep(10);
-                    logger.debug("UnmatchedSearchRecordListWorker2 go to sleep!");
+                    logger.debug("SearchRecordListWorker go to sleep!");
                     continue;
                 }
-                if(startTime .compareTo(TimeUtils.nowDate())>0) {
+                if (startTime.compareTo(TimeUtils.nowDate()) > 0) {
                     TimeUnit.MINUTES.sleep(10);
                 }
                 Date searchTime = startTime;
-                PageableResult<SrmSearchLog> pagedSearchLog = dbm.queryPage(SQL_SEARCHLOG, 1, 1000, Arrays.asList(searchTime));
+                PageableResult<SrmSearchLog> pagedSearchLog = dbm.queryPage(SQL_SEARCHLOG, 1, 1000, Collections.singletonList(searchTime));
+
                 List<SrmSearchLog> searchLogs = pagedSearchLog.getData();
 
                 if (ArrayUtils.hasObjs(searchLogs)) {

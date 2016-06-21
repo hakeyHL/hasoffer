@@ -1,16 +1,16 @@
 package hasoffer.job.worker;
 
+import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
-import hasoffer.dubbo.api.fetch.po.FetchResult;
-import hasoffer.dubbo.api.fetch.service.IFetchService;
+import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
-import hasoffer.fetch.model.ListProduct;
-import hasoffer.fetch.model.ProductStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
+import hasoffer.spider.model.FetchUrlResult;
+import hasoffer.spider.model.FetchedProduct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,9 +28,9 @@ public class CmpSkuUpdateWorker implements Runnable {
     private static Logger logger = LoggerFactory.getLogger(CmpSkuUpdateWorker.class);
     ConcurrentLinkedQueue<PtmCmpSku> skuQueue;
     ICmpSkuService cmpSkuService;
-    IFetchService fetchService;
+    IFetchDubboService fetchService;
 
-    public CmpSkuUpdateWorker(ConcurrentLinkedQueue<PtmCmpSku> skuQueue, ICmpSkuService cmpSkuService, IFetchService fetchService) {
+    public CmpSkuUpdateWorker(ConcurrentLinkedQueue<PtmCmpSku> skuQueue, ICmpSkuService cmpSkuService, IFetchDubboService fetchService) {
         this.skuQueue = skuQueue;
         this.cmpSkuService = cmpSkuService;
         this.fetchService = fetchService;
@@ -93,14 +93,11 @@ public class CmpSkuUpdateWorker implements Runnable {
             //System.getProperties().setProperty("http.proxyPort", port);
 
 
-            ListProduct fetchedProduct = null;
+            FetchedProduct fetchedProduct = null;
             try {
-                FetchResult productsByUrl = fetchService.getProductsByUrl(null, url);
+                FetchUrlResult productsByUrl = fetchService.getProductsByUrl(null, url);
                 if(productsByUrl != null){
-                    List<ListProduct> listProducts = productsByUrl.getListProducts();
-                    if (listProducts != null) {
-                        fetchedProduct = listProducts.get(0);
-                    }
+                    fetchedProduct = productsByUrl.getFetchProduct();
                 }
             } catch (Exception e) {
 
@@ -115,9 +112,9 @@ public class CmpSkuUpdateWorker implements Runnable {
                 String message = e.getMessage();
                 if (message != null) {
                     if (message.contains("302") || message.contains("404")) {
-                        fetchedProduct = new ListProduct();
+                        fetchedProduct = new FetchedProduct();
                         fetchedProduct.setTitle("url expire");
-                        fetchedProduct.setStatus(ProductStatus.OFFSALE);
+                        fetchedProduct.setSkuStatus(SkuStatus.OFFSALE);
                         fetchedProduct.setWebsite(website);
                         fetchedProduct.setUrl(url);
                     } else {

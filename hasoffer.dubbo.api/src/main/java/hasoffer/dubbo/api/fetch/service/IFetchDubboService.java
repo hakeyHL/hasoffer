@@ -3,15 +3,13 @@ package hasoffer.dubbo.api.fetch.service;
 import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.Website;
-import hasoffer.dubbo.api.fetch.po.FetchResult;
+import hasoffer.spider.model.FetchResult;
+import hasoffer.spider.model.FetchUrlResult;
 
-public interface IFetchService {
+public interface IFetchDubboService {
 
     FetchResult getProductsKeyWord(Website webSite, String keyword, int startIndex, int endIndex);
 
-    FetchResult getProductsByUrl(String webSite, String url) throws HttpFetchException, ContentParseException;
+    FetchUrlResult getProductsByUrl(Website webSite, String url) throws HttpFetchException, ContentParseException;
 
-    FetchResult fetch(String queryStr);
-
-    void cache(FetchResult fetchResult);
 }

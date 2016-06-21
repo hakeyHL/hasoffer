@@ -8,7 +8,7 @@
 <html lang="zh-cn">
 <head>
     <meta charset="UTF-8">
-    <title>Hadiths-Jobs-Monitor</title>
+    <title>Jobs-Monitor</title>
     <link rel="stylesheet" href="<%=contextPath2%>/css/bootstrap3.css">
     <link rel="stylesheet" href="<%=contextPath2%>/css/doctype.css">
     <link rel="stylesheet" href="<%=contextPath2%>/css/font-awesome.min.css">

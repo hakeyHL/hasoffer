@@ -36,8 +36,8 @@ public class DeviceTest {
     private Logger logger = LoggerFactory.getLogger(DeviceTest.class);
     private String Q_DEVICE = "SELECT t from UrmDevice t where t.createTime >= ?0 and t.createTime < ?1 ";
 
-    //    private String PATH_DIR = "d:/TMP/devices/";
-    private String PATH_DIR = "/home/work/devices/";
+    private String PATH_DIR = "d:/TMP/devices/";
+    //private String PATH_DIR = "/home/work/devices/";
 
     @Test
     public void expDevice() {

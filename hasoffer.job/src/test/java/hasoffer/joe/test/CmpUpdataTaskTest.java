@@ -6,7 +6,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.sys.SysTimerTaskLog;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.system.ITimerService;
-import hasoffer.dubbo.api.fetch.service.IFetchService;
+import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.job.worker.CmpSkuUpdateWorker;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +41,7 @@ public class CmpUpdataTaskTest {
     @Resource
     ICmpSkuService cmpSkuService;
     @Resource
-    IFetchService flipkartFetchService;
+    IFetchDubboService flipkartFetchService;
 
     @Test
     public void testCmpUpdateTask() {

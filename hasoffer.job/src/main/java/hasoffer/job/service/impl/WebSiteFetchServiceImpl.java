@@ -5,10 +5,11 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.SearchProductService;
-import hasoffer.dubbo.api.fetch.service.IFetchService;
+import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.job.service.IWebSiteFetchService;
-import hasoffer.job.worker.UnmatchedSearchRecordListWorker2;
-import hasoffer.job.worker.UnmatchedSearchRecordProcessWorker2;
+import hasoffer.job.threadFactory.HasofferThreadFactory;
+import hasoffer.job.worker.SearchRecordListWorker;
+import hasoffer.job.worker.SearchRecordProcessWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -34,16 +35,20 @@ public class WebSiteFetchServiceImpl implements IWebSiteFetchService {
     SearchProductService searchProductService;
 
     @Resource
-    IFetchService flipkartFetchService;
+    IFetchDubboService fetchDubboService;
 
     @Override
     public void fetchProduct2Mongodb() {
         ExecutorService es = Executors.newCachedThreadPool();
 
         LinkedBlockingQueue<SrmSearchLog> searchLogQueue = new LinkedBlockingQueue<SrmSearchLog>();
-        es.execute(DaemonThreadFactory.create(new UnmatchedSearchRecordListWorker2(searchService, dbm, searchLogQueue)));
-        for (int i = 0; i < 20; i++) {
-            es.execute(DaemonThreadFactory.create(new UnmatchedSearchRecordProcessWorker2(searchProductService, searchService,flipkartFetchService, searchLogQueue)));
+        es.execute(DaemonThreadFactory.create(new SearchRecordListWorker(searchService, dbm, searchLogQueue)));
+
+        String threadName = "SearchRecordProcessWorker-Thread";
+        HasofferThreadFactory factory = new HasofferThreadFactory(threadName);
+        es = Executors.newCachedThreadPool(factory);
+        for (int i = 0; i < 10; i++) {
+            es.execute(new SearchRecordProcessWorker(searchProductService, fetchDubboService, searchLogQueue));
         }
 
         while (true) {
