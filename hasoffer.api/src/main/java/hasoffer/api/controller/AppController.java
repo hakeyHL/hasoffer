@@ -4,10 +4,15 @@ import hasoffer.api.controller.vo.*;
 import hasoffer.api.helper.ParseConfigHelper;
 import hasoffer.api.worker.SearchLogQueue;
 import hasoffer.base.enums.AppType;
+import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
+import hasoffer.core.bo.product.Banners;
+import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.cache.CmpSkuCacheManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
+import hasoffer.core.persistence.po.app.AppBanner;
+import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
@@ -20,7 +25,6 @@ import hasoffer.webcommon.context.StaticContext;
 import org.hibernate.annotations.common.util.impl.LoggerFactory;
 import org.jboss.logging.Logger;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -273,25 +277,20 @@ public class AppController {
     @RequestMapping(value = "/banners", method = RequestMethod.GET)
     public ModelAndView banners() {
         ModelAndView mv=new ModelAndView();
-        String data="{\n" +
-                "    \"data\": {\n" +
-                "        \"banners\": [\n" +
-                "            {\n" +
-                "                \"sourceurl\": \"http://192.168.1.126/xx.png\",\n" +
-                "                \"source\": 0,\n" +
-                "                \"rank\": 1,\n" +
-                "                \"link\": \"192.168.1.126:8080/getProduct?id=eerer\"\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"sourceurl\": \"http://192.168.1.126/xx.png\",\n" +
-                "                \"source\": 1,\n" +
-                "                \"rank\": 2,\n" +
-                "                \"link\": \"192.168.1.126:8080/getProduct?id=eerer\"\n" +
-                "            }\n" +
-                "        ]\n" +
-                "    }\n" +
-                "}";
-        mv.addObject("data",data);
+        List banners = new ArrayList();
+        List<AppBanner> list = appService.getBanners();
+        for (AppBanner appBanner : list) {
+            Banners banner = new Banners();
+            banner.setLink(appBanner.getLinkUrl());
+            banner.setRank(appBanner.getRank());
+            banner.setSource(1);
+            banner.setSourceUrl(appBanner.getImageUrl());
+            banner.setExpireDate(appBanner.getDeadline());
+            banners.add(banner);
+        }
+        Map map = new HashMap();
+        map.put("banners", banners);
+        mv.addObject("data", map);
         return mv;
     }
 
@@ -300,29 +299,29 @@ public class AppController {
      * @return
      */
     @RequestMapping(value = "/deals", method = RequestMethod.GET)
-    public ModelAndView deals() {
+    public ModelAndView deals(Long page, Long pageSize) {
         ModelAndView mv =new ModelAndView();
-        String data="{\n" +
-                "    \"data\": {\n" +
-                "        \"deals\": [\n" +
-                "            {\n" +
-                "                \"image\": \"http://192.168.1.126/xx.png\",\n" +
-                "                \"title\": \"apple\",\n" +
-                "                \"exp\": \"MMddyyyy HH:mm:ss\",\n" +
-                "                \"extra\": 2.2,\n" +
-                "                \"link\": \"192.168.1.126:8080/getProduct?id=eerer\"\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"image\": \"http://192.168.1.126/xx.png\",\n" +
-                "                \"title\": \"apple\",\n" +
-                "                \"exp\": \"MMddyyyy HH:mm:ss\",\n" +
-                "                \"extra\": 2.2,\n" +
-                "                \"link\": \"192.168.1.126:8080/getProduct?id=eerer\"\n" +
-                "            }\n" +
-                "        ]\n" +
-                "    }\n" +
-                "}";
-        mv.addObject("data",data);
+        PageableResult Result = appService.getDeals(page, pageSize);
+
+        Map map = new HashMap();
+        List li = new ArrayList();
+        List<AppDeal> deals = Result.getData();
+        for (AppDeal appDeal : deals) {
+            DealVo dealVo = new DealVo();
+            dealVo.setExp(appDeal.getExpireTime());
+            dealVo.setExtra(0.03);
+            dealVo.setImage(appDeal.getImageUrl());
+            dealVo.setLink(appDeal.getLinkUrl());
+            dealVo.setTitle(appDeal.getTitle());
+            li.add(dealVo);
+        }
+        map.put("deals", li);
+        map.put("currentPage", Result.getCurrentPage());
+        map.put("NumFund", Result.getNumFund());
+        map.put("page", Result.getPageSize());
+        map.put("pageSize", Result.getPageSize());
+        map.put("totalPage", Result.getTotalPage());
+        mv.addObject("data", map);
         return mv;
     }
 
@@ -333,6 +332,7 @@ public class AppController {
      */
     @RequestMapping(value = "/dealInfo", method = RequestMethod.GET)
     public ModelAndView dealInfo(@RequestParam String id) {
+
         ModelAndView mv =new ModelAndView();
         String data="{\n" +
                 "    \"data\": {\n" +
@@ -354,8 +354,9 @@ public class AppController {
      * @return
      */
     @RequestMapping(value = "/bindUserInfo", method = RequestMethod.POST)
-    public ModelAndView bindUserInfo(UserVo userVO) {
+    public ModelAndView bindUserInfo(UserVo userVO, HttpServletRequest request) {
         ModelAndView mv =new ModelAndView();
+        Map map = new HashMap();
         String userToken= UUID.randomUUID().toString();
         urmUser uUser=appService.getUserById(userVO.getThirdId());
         if(uUser==null){
@@ -382,10 +383,8 @@ public class AppController {
             appService.updateUserInfo(uUser);
             logger.debug("update userInfo over ");
         }
-
-        urmUser u=new urmUser();
-        u.setUserToken(userToken);
-        mv.addObject("data", u);
+        map.put("userToken", userToken);
+        mv.addObject("data", map);
         return  mv;
     }
 
@@ -394,14 +393,25 @@ public class AppController {
      * @return
      */
     @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
-    public ModelAndView userInfo() {
+    public ModelAndView userInfo(@RequestParam String userToken) {
         ModelAndView mv =new ModelAndView();
-        String data="{\n" +
-                "    \"name\": \"小李\",\n" +
-                "\"coins\": 200,\n" +
-                "    \"userIcon\": \"http://192.168.1.201:8080/test.jpg\"\n" +
-                "}";
-        mv.addObject("data",data);
+        BigDecimal PendingCoins = BigDecimal.ZERO;
+        urmUser user = appService.getUserByUserToken(userToken);
+        if (user != null) {
+            UserVo userVo = new UserVo();
+            userVo.setName(user.getUserName());
+            List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
+            for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
+                if (orderStatsAnalysisPO.getOrderStatus() != "cancelled") {
+                    PendingCoins = PendingCoins.add(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)));
+                }
+            }
+            PendingCoins = PendingCoins.setScale(2, BigDecimal.ROUND_HALF_UP);
+            userVo.setConis(PendingCoins);
+            userVo.setUserIcon(user.getAvatarPath());
+            userVo.setUserId(user.getId());
+            mv.addObject("data", userVo);
+        }
         return  mv;
     }
 
@@ -414,7 +424,6 @@ public class AppController {
         ModelAndView mv =new ModelAndView();
         List<PtmCategory> ptmCategorys=appService.getCategory();
         List  categorys=new ArrayList();
-
         for(PtmCategory ptmCategory:ptmCategorys){
             CategoryVo categoryVo=new CategoryVo();
             categoryVo.setId(ptmCategory.getId());
@@ -435,8 +444,9 @@ public class AppController {
      * @return
      */
     @RequestMapping(value = "/productsList", method = RequestMethod.GET)
-    public ModelAndView productsList() {
+    public ModelAndView productsList(SearchCriteria criteria) {
         ModelAndView mv =new ModelAndView();
+        // List li=appService.getProductByCriteria(criteria);
         String data="{\n" +
                 "    \"product\": [\n" +
                 "        {\n" +
