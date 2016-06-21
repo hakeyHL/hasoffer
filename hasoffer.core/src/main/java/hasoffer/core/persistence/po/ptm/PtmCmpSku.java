@@ -20,7 +20,7 @@ public class PtmCmpSku implements Identifiable<Long> {
     private Long id;
     private long productId; // PtmProduct # id
 
-    private long categoryId;
+    private Long categoryId;
     @Enumerated(EnumType.STRING)
     private Website website;
     private String seller;
