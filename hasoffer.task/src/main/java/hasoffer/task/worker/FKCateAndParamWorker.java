@@ -159,7 +159,7 @@ public class FKCateAndParamWorker implements Runnable {
 
             if (paramNodeList.size() != 2) {
                 logger.debug("parse error for [" + sku.getId() + "]");
-                return;
+                continue;
             }
 
             String name = paramNodeList.get(0).getText().toString();
