@@ -4,23 +4,26 @@ package hasoffer.core.persistence.po.urm;
  * Created by hs on 2016/6/17.
  */
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import hasoffer.core.persistence.dbm.osql.Identifiable;
+
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-public class urmUser {
+public class urmUser implements Identifiable<Long>{
     @Id
     @Column(unique = true, nullable = false)
-    private  String id;
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private  Long id;
+    private String thirdId;
     private  String userToken;
     private  String userName;
     private  String thirdToken;
     private  String thirdPlatform;
     private  String avatarPath;
     private Date createTime;
+    private String Number;
+
 
     @Override
          public int hashCode() {
@@ -31,19 +34,41 @@ public class urmUser {
         result = 31 * result + (thirdPlatform !=null?thirdPlatform.hashCode() : 0);
         result = 31 * result + (avatarPath !=null?avatarPath.hashCode() : 0);
         result = 31 * result + (createTime !=null?createTime.hashCode(): 0);
+        result = 31 * result + (thirdId !=null?thirdId.hashCode(): 0);
         return result;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        urmUser user = (urmUser) o;
+
+        if (id != null ? !id.equals(user.id) : user.id != null) return false;
+        if (userToken != null ? !userToken.equals(user.userToken) : user.userToken != null) return false;
+        if (userName != null ? !userName.equals(user.userName) : user.userName != null) return false;
+        if (createTime != null ? !createTime.equals(user.createTime) : user.createTime != null) return false;
+        if (thirdToken != null ? !thirdToken.equals(user.thirdToken) : user.thirdToken != null) return false;
+        if (avatarPath != null ? !avatarPath.equals(user.avatarPath) : user.avatarPath != null) return false;
+        if (createTime != null ? !createTime.equals(user.createTime) : user.createTime != null) return false;
+        if (thirdId != null ? !thirdId.equals(user.thirdId) : user.thirdId != null) return false;
+        return (Number != null ? !Number.equals(user.Number) : user.Number != null);
     }
 
-    public String getId() {
+    public String getNumber() {
+        return Number;
+    }
+
+    public void setNumber(String number) {
+        Number = number;
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -93,5 +118,13 @@ public class urmUser {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getThirdId() {
+        return thirdId;
+    }
+
+    public void setThirdId(String thridId) {
+        this.thirdId = thridId;
     }
 }

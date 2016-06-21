@@ -1,6 +1,7 @@
 package hasoffer.core.persistence.dbm.osql;
 
 import hasoffer.base.model.PageableResult;
+import org.apache.poi.ss.formula.functions.T;
 
 import java.io.Serializable;
 import java.util.List;
@@ -40,4 +41,7 @@ public interface IDataBaseManager {
     <ID extends Serializable, T extends Identifiable<ID>> void delete(Class<T> tClass, ID id);
 
     List queryByIds(String jpaSql, String[] ids);
+
+    void update(final List<T> array);
+
 }

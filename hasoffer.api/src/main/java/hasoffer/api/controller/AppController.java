@@ -10,6 +10,7 @@ import hasoffer.core.cache.CmpSkuCacheManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
+import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.urm.urmUser;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
@@ -19,18 +20,17 @@ import hasoffer.webcommon.context.StaticContext;
 import org.hibernate.annotations.common.util.impl.LoggerFactory;
 import org.jboss.logging.Logger;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created on 2015/12/21.
@@ -44,6 +44,9 @@ public class AppController {
     IDeviceService deviceService;
     @Resource
     CmpSkuCacheManager cmpSkuCacheManager;
+    @Resource
+    ContentNegotiatingViewResolver jsonViewResolver;
+
     private Logger logger = LoggerFactory.logger(AppController.class);
 
     @RequestMapping(value = "/newconfig", method = RequestMethod.GET)
@@ -208,7 +211,7 @@ public class AppController {
         BigDecimal PendingCoins=BigDecimal.ZERO;
         BigDecimal VericiedCoins=BigDecimal.ZERO;
         if (user != null) {
-            List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId());
+            List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
                 OrderVo orderVo = new OrderVo();
                 orderVo.setAccount(orderStatsAnalysisPO.getSaleAmount());
@@ -248,7 +251,7 @@ public class AppController {
     public ModelAndView orderDetail(@RequestParam String orderId,@RequestParam String userToken) {
         ModelAndView mv=new ModelAndView();
         urmUser user=appService.getUserByUserToken(userToken);
-        OrderStatsAnalysisPO orderStatsAnalysisPO = appService.getOrderDetail(orderId,user.getId());
+        OrderStatsAnalysisPO orderStatsAnalysisPO = appService.getOrderDetail(orderId,user.getId().toString());
         if (orderStatsAnalysisPO != null) {
             OrderVo orderVo = new OrderVo();
             orderVo.setType(orderStatsAnalysisPO.getOrderStatus().equals("approved") ? 0 : 1);
@@ -351,12 +354,38 @@ public class AppController {
      * @return
      */
     @RequestMapping(value = "/bindUserInfo", method = RequestMethod.POST)
-    public ModelAndView bindUserInfo() {
+    public ModelAndView bindUserInfo(UserVo userVO) {
         ModelAndView mv =new ModelAndView();
-        String  data="{\n" +
-                "    \"userToken\": \"erere\"\n" +
-                "}";
-        mv.addObject("data",data);
+        String userToken= UUID.randomUUID().toString();
+        urmUser uUser=appService.getUserById(userVO.getThirdId());
+        if(uUser==null){
+            logger.debug("user is not exist before");
+            urmUser urmUser=new urmUser();
+            urmUser.setUserToken(userToken);
+            urmUser.setAvatarPath(userVO.getUserIcon());
+            urmUser.setCreateTime(new Date());
+            urmUser.setNumber(userVO.getNumber());
+            urmUser.setThirdPlatform(userVO.getPlatform());
+            urmUser.setThirdToken(userVO.getToken());
+            urmUser.setUserName(userVO.getUserName());
+            urmUser.setThirdId(userVO.getThirdId());
+            int result=appService.addUser(urmUser);
+            logger.debug("add user result is :"+result);
+        }else{
+            logger.debug("user exist ,update userInfo");
+            uUser.setUserName(userVO.getUserName());
+            uUser.setThirdPlatform(userVO.getPlatform());
+            uUser.setNumber(uUser.getNumber());
+            uUser.setAvatarPath(uUser.getAvatarPath());
+            uUser.setThirdToken(uUser.getThirdToken());
+            uUser.setUserToken(userToken);
+            appService.updateUserInfo(uUser);
+            logger.debug("update userInfo over ");
+        }
+
+        urmUser u=new urmUser();
+        u.setUserToken(userToken);
+        mv.addObject("data", u);
         return  mv;
     }
 
@@ -383,27 +412,21 @@ public class AppController {
     @RequestMapping(value = "/category", method = RequestMethod.GET)
     public ModelAndView category() {
         ModelAndView mv =new ModelAndView();
+        List<PtmCategory> ptmCategorys=appService.getCategory();
+        List  categorys=new ArrayList();
 
-        String data="{\n" +
-                "    \"refreshTime\":\"05/06/2016 12:12:12\"\n" +
-                "    \"categories\": [\n" +
-                "        {\n" +
-                "            \"name\": \"电器\",\n" +
-                "            \"image\": \"192.168.1.126:8080/getProduct.jpg\",\n" +
-                "            \"id\": \"erer\",\n" +
-                "            \"hasChildren\": 1,\n" +
-                "            \"parentId\": \"0\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"name\": \"家用\",\n" +
-                "            \"image\": \"192.168.1.126:8080/getProduct.jpg\",\n" +
-                "            \"id\": \"3434t\",\n" +
-                "            \"hasChildren\": 0,\n" +
-                "            \"parentId\": \"erer\"\n" +
-                "        }\n" +
-                "    ]\n" +
-                "}";
-        mv.addObject("data",data);
+        for(PtmCategory ptmCategory:ptmCategorys){
+            CategoryVo categoryVo=new CategoryVo();
+            categoryVo.setId(ptmCategory.getId());
+            categoryVo.setHasChildren(ptmCategory.getParentId()==0?0:1);
+            categoryVo.setImage(ptmCategory.getImageUrl());
+            categoryVo.setLevel(ptmCategory.getLevel());
+            categoryVo.setName(ptmCategory.getName());
+            categoryVo.setParentId(ptmCategory.getParentId());
+            categoryVo.setRank(ptmCategory.getRank());
+            categorys.add(categoryVo);
+        }
+        mv.addObject("data",categorys);
         return  mv;
     }
 
