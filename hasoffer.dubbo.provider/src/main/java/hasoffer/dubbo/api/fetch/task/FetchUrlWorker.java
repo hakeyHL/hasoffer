@@ -53,7 +53,7 @@ public class FetchUrlWorker implements Runnable {
         try {
             FetchedProduct product = fetchService.getProductByUrl(fetchResult.getWebsite(), fetchResult.getUrl());
             fetchResult.setFetchProduct(product);
-            fetchResult.setTaskStatus(TaskStatus.FINSH);
+            fetchResult.setTaskStatus(TaskStatus.FINISH);
         } catch (HttpFetchException e) {
             if (fetchResult.getRunCount() < 5) {
                 fetchResult.setRunCount(fetchResult.getRunCount() + 1);

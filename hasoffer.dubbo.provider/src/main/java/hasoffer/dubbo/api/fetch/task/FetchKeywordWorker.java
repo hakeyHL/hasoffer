@@ -66,7 +66,7 @@ public class FetchKeywordWorker implements Runnable {
 
                 List<FetchedProduct> productList = fetchService.getProductSetByKeyword(fetchResult.getWebsite(), keyword, 10);
                 fetchResult.setFetchProducts(productList);
-                fetchResult.setTaskStatus(TaskStatus.FINSH);
+                fetchResult.setTaskStatus(TaskStatus.FINISH);
             //}
         } catch (HttpFetchException e) {
             if (fetchResult.getRunCount() < 5) {
