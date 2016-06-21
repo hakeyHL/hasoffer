@@ -70,7 +70,7 @@ public class TimeUtilTest {
 
     @Test
     public void getDateByLong() {
-        long time = 1465747200000L;
+        long time = 1466425242568L;
         Date date = TimeUtils.toDate(time);
         System.out.println(date);
     }

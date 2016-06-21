@@ -36,7 +36,7 @@ public class StringTest {
     @Test
     public void testStr3() {
 
-        String str = "Layer'r Shot Compact Explode And Impact Body Spray (Pack Of 2) Combo Set (Set of 2)";
+        String str = "Adraxx SM401098 Digital Speedometer (NA X6)";
         Website website = Website.FLIPKART;
 
         System.out.println(HexDigestUtil.md5(website.name() + StringUtils.getCleanChars(str)));
