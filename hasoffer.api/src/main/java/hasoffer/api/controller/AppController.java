@@ -16,7 +16,7 @@ import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
-import hasoffer.core.persistence.po.urm.urmUser;
+import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
 import hasoffer.fetch.helper.WebsiteHelper;
@@ -52,6 +52,11 @@ public class AppController {
     ContentNegotiatingViewResolver jsonViewResolver;
 
     private Logger logger = LoggerFactory.logger(AppController.class);
+
+    public static void main(String[] args) {
+        BigDecimal ss = BigDecimal.valueOf(20);
+        ss.divide(BigDecimal.valueOf(3));
+    }
 
     @RequestMapping(value = "/newconfig", method = RequestMethod.GET)
     public ModelAndView config(HttpServletRequest request) {
@@ -201,6 +206,7 @@ public class AppController {
 
         return mav;
     }
+
     /**
      * 查看返利
      * @param userToken
@@ -211,7 +217,7 @@ public class AppController {
         ModelAndView mv=new ModelAndView();
         BackDetailVo data =new BackDetailVo();
         List <OrderVo>transcations=new ArrayList<OrderVo>();
-        urmUser user=appService.getUserByUserToken(userToken);
+        UrmUser user = appService.getUserByUserToken(userToken);
         BigDecimal PendingCoins=BigDecimal.ZERO;
         BigDecimal VericiedCoins=BigDecimal.ZERO;
         if (user != null) {
@@ -254,8 +260,8 @@ public class AppController {
     @RequestMapping(value = "/orderDetail", method = RequestMethod.GET)
     public ModelAndView orderDetail(@RequestParam String orderId,@RequestParam String userToken) {
         ModelAndView mv=new ModelAndView();
-        urmUser user=appService.getUserByUserToken(userToken);
-        OrderStatsAnalysisPO orderStatsAnalysisPO = appService.getOrderDetail(orderId,user.getId().toString());
+        UrmUser user = appService.getUserByUserToken(userToken);
+        OrderStatsAnalysisPO orderStatsAnalysisPO = appService.getOrderDetail(orderId, user.getId().toString());
         if (orderStatsAnalysisPO != null) {
             OrderVo orderVo = new OrderVo();
             orderVo.setType(orderStatsAnalysisPO.getOrderStatus().equals("approved") ? 0 : 1);
@@ -358,11 +364,11 @@ public class AppController {
         ModelAndView mv =new ModelAndView();
         Map map = new HashMap();
         String userToken= UUID.randomUUID().toString();
-        urmUser uUser=appService.getUserById(userVO.getThirdId()==null?"0":"1");
+        UrmUser uUser = appService.getUserById(userVO.getThirdId() == null ? "0" : "1");
         if(uUser==null){
 
             logger.debug("user is not exist before");
-            urmUser urmUser=new urmUser();
+            UrmUser urmUser = new UrmUser();
             urmUser.setUserToken(userToken);
             urmUser.setAvatarPath(userVO.getUserIcon());
             urmUser.setCreateTime(new Date());
@@ -397,7 +403,7 @@ public class AppController {
     public ModelAndView userInfo(@RequestParam String userToken) {
         ModelAndView mv =new ModelAndView();
         BigDecimal PendingCoins = BigDecimal.ZERO;
-        urmUser user = appService.getUserByUserToken(userToken);
+        UrmUser user = appService.getUserByUserToken(userToken);
         if (user != null) {
             UserVo userVo = new UserVo();
             userVo.setName(user.getUserName());
@@ -694,11 +700,7 @@ public class AppController {
                 "        ]\n" +
                 "    }\n" +
                 "}";
-        mv.addObject("data",data);
+        mv.addObject("data", data);
         return  mv;
-    }
-    public  static  void  main(String []args){
-        BigDecimal ss=BigDecimal.valueOf(20);
-        ss.divide(BigDecimal.valueOf(3));
     }
 }

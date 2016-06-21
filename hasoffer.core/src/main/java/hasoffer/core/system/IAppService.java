@@ -8,7 +8,7 @@ import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
-import hasoffer.core.persistence.po.urm.urmUser;
+import hasoffer.core.persistence.po.urm.UrmUser;
 
 import java.util.List;
 
@@ -23,14 +23,17 @@ public interface IAppService {
 
     List<OrderStatsAnalysisPO>getBackDetails(String userId);
 
-    urmUser getUserByUserToken(String userToken);
+    UrmUser getUserByUserToken(String userToken);
 
     OrderStatsAnalysisPO getOrderDetail(String orderId,String  userId);
     PageableResult getDeals(Long page,Long pageSize);
     List<PtmCategory> getCategory();
-    urmUser getUserById(String thirdId);
+
+    UrmUser getUserById(String thirdId);
     List getProductByCriteria(SearchCriteria criteria);
-    int addUser(urmUser urmUser);
-    void updateUserInfo(urmUser uUser);
+
+    int addUser(UrmUser urmUser);
+
+    void updateUserInfo(UrmUser uUser);
     List<AppBanner> getBanners();
 }
