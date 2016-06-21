@@ -63,11 +63,11 @@ public class HijackStatTestWorker implements Runnable {
             StatHijackFetch statHijackFetch = null;
 
             try {
-
-                StatHijackFetch hijackFetch = mdm.queryOne(StatHijackFetch.class, log.getId());
-                if (hijackFetch != null) {
-                    continue;
-                }
+//                此处屏蔽掉历史数据，要求每天只要被更新了的，都需要进行一次测试
+//                StatHijackFetch hijackFetch = mdm.queryOne(StatHijackFetch.class, log.getId());
+//                if (hijackFetch != null) {
+//                    continue;
+//                }
 
                 cmpSkuIndex2 = cmpSkuService.getCmpSkuIndex2(website, sourceId, cliQ);
 
