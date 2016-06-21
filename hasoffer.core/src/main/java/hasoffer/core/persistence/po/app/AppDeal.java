@@ -19,18 +19,18 @@ public class AppDeal implements Identifiable<Long> {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Website website;//deal来源网站
+    private Website website;//deal鏉ユ簮缃戠珯
 
-    private String title;//deal标题
+    private String title;//deal鏍囬
     @Column(nullable = false)
-    private String linkUrl;//deal跳转地址
+    private String linkUrl;//deal璺宠浆鍦板潃
 
-    private String imageUrl;//本地图片服务器地址
+    private String imageUrl;//鏈湴鍥剧墖鏈嶅姟鍣ㄥ湴鍧�
 
-    private Date createTime;//deal创建时间
-    private Date expireTime;//deal失效时间
+    private Date createTime;//deal鍒涘缓鏃堕棿
+    private Date expireTime;//deal澶辨晥鏃堕棿
 
-    private String description;//deal描述
+    private String description;//deal鎻忚堪
 
     @Override
     public Long getId() {

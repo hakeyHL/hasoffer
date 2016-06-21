@@ -71,8 +71,6 @@ public class FKCateAndParamWorker implements Runnable {
             } catch (Exception e) {
                 logger.debug(e.toString());
             }
-
-
         }
     }
 

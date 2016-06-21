@@ -88,52 +88,6 @@ public class HijackStatTestWorker implements Runnable {
             }
 
             mdm.save(statHijackFetch);
-
-//            List<PtmCmpSku> skuList = new ArrayList<PtmCmpSku>();
-//
-//            if (Website.FLIPKART.equals(website)) {
-//                List<PtmCmpSku> flipkartProduct = getFlipkartProduct(cliQ, sourceId);
-//                skuList.addAll(flipkartProduct);
-//            } else if (Website.SNAPDEAL.equals(website)) {
-//                List<PtmCmpSku> snapdealProduct = getSnapdealProduct(cliQ, sourceId);
-//                skuList.addAll(snapdealProduct);
-//            }
-//
-//            for (PtmCmpSku sku : skuList) {
-//
-//                List<PtmCmpSku> resultList = dbm.query(Q_PTMCMPSKU_BYSID, Arrays.asList(sku.getSourceSid()));
-//                if (resultList != null && resultList.size() != 0) {
-//                    logger.debug(sku.getSourceSid() + " exists");
-//
-//                    for (PtmCmpSku result : resultList) {
-//
-//                        Website resultWebsite = result.getWebsite();
-//
-//                        if (resultWebsite != null) {
-//
-//                            String cleanUrl = WebsiteHelper.getCleanUrl(resultWebsite, result.getUrl());
-//                            String sourceSid = WebsiteHelper.getSkuIdFromUrl(resultWebsite, cleanUrl);
-//
-//                            PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(result.getId());
-//
-//                            updater.getPo().setUrl(cleanUrl);
-//                            updater.getPo().setSourceSid(sourceSid);
-//                            updater.getPo().setTitleUpdateTime(DEFAUTL_UPDATETIME);
-//
-//                            dbm.update(updater);
-//                        }
-//                    }
-//                } else {
-//                    PtmCmpSku cmpSku = cmpSkuService.createCmpSkuForIndex(sku);
-//
-//                    PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(cmpSku.getId());
-//
-//                    updater.getPo().setTitleUpdateTime(DEFAUTL_UPDATETIME);
-//
-//                    dbm.update(updater);
-//                    logger.debug("create cmpsku success website:" + sku.getWebsite() + ";id:" + cmpSku.getId());
-//                }
-//            }
         }
     }
 }
