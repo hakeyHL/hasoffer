@@ -5,7 +5,7 @@ import hasoffer.core.persistence.dbm.osql.Identifiable;
 import javax.persistence.*;
 
 /**
- * ÉÌÆ·Àà±ğĞÅÏ¢±í
+ * å•†å“ç±»åˆ«ä¿¡æ¯è¡¨
  * Created by glx on 2014/7/25.
  */
 @Entity
@@ -19,7 +19,7 @@ public class PtmCategory2 implements Identifiable<Long> {
     private int rank;
 
     @Column(unique = true)
-    private String name;//name²»ÄÜÖØ¸´
+    private String name;//nameä¸èƒ½é‡å¤
     private String imageUrl;
 
     private String keyword;

@@ -10,31 +10,31 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-public class urmUser implements Identifiable<Long>{
+public class UrmUser implements Identifiable<Long> {
     @Id
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  Long id;
+    private Long id;
     private String thirdId;
-    private  String userToken;
-    private  String userName;
-    private  String thirdToken;
-    private  String thirdPlatform;
-    private  String avatarPath;
+    private String userToken;
+    private String userName;
+    private String thirdToken;
+    private String thirdPlatform;
+    private String avatarPath;
     private Date createTime;
     private String Number;
 
 
     @Override
-         public int hashCode() {
+    public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (userToken !=null?userToken.hashCode() : 0);
-        result = 31 * result + (userName !=null?userName.hashCode(): 0);
-        result = 31 * result + (thirdToken !=null?thirdToken.hashCode() : 0);
-        result = 31 * result + (thirdPlatform !=null?thirdPlatform.hashCode() : 0);
-        result = 31 * result + (avatarPath !=null?avatarPath.hashCode() : 0);
-        result = 31 * result + (createTime !=null?createTime.hashCode(): 0);
-        result = 31 * result + (thirdId !=null?thirdId.hashCode(): 0);
+        result = 31 * result + (userToken != null ? userToken.hashCode() : 0);
+        result = 31 * result + (userName != null ? userName.hashCode() : 0);
+        result = 31 * result + (thirdToken != null ? thirdToken.hashCode() : 0);
+        result = 31 * result + (thirdPlatform != null ? thirdPlatform.hashCode() : 0);
+        result = 31 * result + (avatarPath != null ? avatarPath.hashCode() : 0);
+        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
+        result = 31 * result + (thirdId != null ? thirdId.hashCode() : 0);
         return result;
     }
 
@@ -43,7 +43,7 @@ public class urmUser implements Identifiable<Long>{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        urmUser user = (urmUser) o;
+        UrmUser user = (UrmUser) o;
 
         if (id != null ? !id.equals(user.id) : user.id != null) return false;
         if (userToken != null ? !userToken.equals(user.userToken) : user.userToken != null) return false;

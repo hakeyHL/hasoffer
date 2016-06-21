@@ -81,10 +81,10 @@ public class FKCateAndParamWorker implements Runnable {
 
         TagNode root = HtmlUtils.getUrlRootTagNode(url);
 
-        //»ñÈ¡µ¼º½À¸
+        //è·å–å¯¼èˆªæ 
         List<TagNode> catePathList = getSubNodesByXPath(root, CATE_PATH, new ContentParseException("cate path not found for [" + sku.getId() + "]"));
 
-        //»ñÈ¡µ¼º½À¸ÖĞcatePathµÄ³¤¶È£¬È¡Ç°5Î»»òÕß¸üĞ¡
+        //è·å–å¯¼èˆªæ ä¸­catePathçš„é•¿åº¦ï¼Œå–å‰5ä½æˆ–è€…æ›´å°
         int cateSize = catePathList.size();
         cateSize = cateSize > 6 ? 6 : cateSize;
         if (catePathList.size() == cateSize) {
@@ -95,7 +95,7 @@ public class FKCateAndParamWorker implements Runnable {
 
         for (int i = 0; i < cateSize; i++) {
 
-            if (i == 0) {//ÅÅ³ıµ¼º½ÖĞµÄµÚÒ»¸öhome
+            if (i == 0) {//æ’é™¤å¯¼èˆªä¸­çš„ç¬¬ä¸€ä¸ªhome
                 continue;
             }
 
@@ -103,10 +103,10 @@ public class FKCateAndParamWorker implements Runnable {
 
                 TagNode pathNode = getSubNodeByXPath(catePathList.get(i), "/a", new ContentParseException("path not found"));
 
-                //»ñÈ¡ÀàÄ¿Ãû³Æ
+                //è·å–ç±»ç›®åç§°
                 String pathString = StringUtils.filterAndTrim(pathNode.getText().toString(), null);
 
-                //¼ì²éÀàÄ¿ÊÇ·ñ´æÔÚ
+                //æ£€æŸ¥ç±»ç›®æ˜¯å¦å­˜åœ¨
                 PtmCategory2 category = dbm.querySingle(Q_CATEGORY_BYNAME, Arrays.asList(pathString));
 
                 if (category != null) {
@@ -128,24 +128,24 @@ public class FKCateAndParamWorker implements Runnable {
 
         }
 
-        //¸øsku¹ØÁªÀàÄ¿ĞÅÏ¢
+        //ç»™skuå…³è”ç±»ç›®ä¿¡æ¯
         sku.setCategoryId(parentId);
 
-        //»ñÈ¡ÃèÊö½Úµã
+        //è·å–æè¿°èŠ‚ç‚¹
         List<TagNode> infoNodeList = getSubNodesByXPath(root, DESCRIPTION_INFO, new ContentParseException("description section not found for [" + sku.getId() + "]"));
-        //ÓÃÀ´·â×°ÃèÊöµÄ¼üÖµ¶Ô
+        //ç”¨æ¥å°è£…æè¿°çš„é”®å€¼å¯¹
         Map<String, String> infoMap = new HashMap<String, String>();
 
         for (TagNode node : infoNodeList) {
 
-            //»ñÈ¡¾ßÌåµÄÃèÊöĞÅÏ¢£¬Ìî³äµ½map¼¯ºÏÖĞ
+            //è·å–å…·ä½“çš„æè¿°ä¿¡æ¯ï¼Œå¡«å……åˆ°mapé›†åˆä¸­
             getInfo(node, infoMap, sku);//ex    "name1":"value1"
 
         }
 
         String jsonDescription = JSONUtil.toJSON(infoMap);
 
-        //½«ÃèÊöĞÅÏ¢³Ö¾Ã»¯µ½mongodb
+        //å°†æè¿°ä¿¡æ¯æŒä¹…åŒ–åˆ°mongodb
         PtmCmpSkuDescription skuDescription = new PtmCmpSkuDescription();
         skuDescription.setId(sku.getId());
         skuDescription.setJsonDescription(jsonDescription);
@@ -155,17 +155,17 @@ public class FKCateAndParamWorker implements Runnable {
 
     private void getInfo(TagNode node, Map<String, String> infoMap, PtmCmpSku sku) throws ContentParseException {
 
-        //ÃèÊöÇøÓò·ÖÎª¶à¿é
+        //æè¿°åŒºåŸŸåˆ†ä¸ºå¤šå—
         List<TagNode> infoNodeList = getSubNodesByXPath(node, "//tbody/tr", new ContentParseException("description not found for [" + sku.getId() + "]"));
 
-        //»ñÈ¡Ã¿¿éÃèÊöÇøÓòÖĞµÄÄÚÈİ
+        //è·å–æ¯å—æè¿°åŒºåŸŸä¸­çš„å†…å®¹
         for (int i = 1; i < infoNodeList.size(); i++) {
 
             TagNode tagNode = infoNodeList.get(i);
 
             List<TagNode> paramNodeList = getSubNodesByXPath(tagNode, "//td", new ContentParseException("info not found for [" + sku.getId() + "]"));
 
-            //Èç¹û²»ÊÇ¼üÖµ¶ÔĞÎÊ½µÄ£¬Ìø¹ı
+            //å¦‚æœä¸æ˜¯é”®å€¼å¯¹å½¢å¼çš„ï¼Œè·³è¿‡
             if (paramNodeList.size() != 2) {
                 logger.debug("parse error for [" + sku.getId() + "]");
                 continue;

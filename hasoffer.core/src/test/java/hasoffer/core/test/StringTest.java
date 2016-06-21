@@ -24,7 +24,7 @@ public class StringTest {
     @Test
     public void testStr2() {
 
-        String str = "Zdelhi.Com ZRA01 Apple Shape Digital Watch  - For Boys";
+        String str = "Layer'r Shot Compact Explode And Impact Body Spray (Pack Of 2) Combo Set (Set of 2)";
 
         String str1 = HexDigestUtil.md5(StringUtils.getCleanChars(str));
 
@@ -35,8 +35,8 @@ public class StringTest {
 
     @Test
     public void testStr3() {
-//Adcom Thunder A-500(White, 512 MB)                                                  | 2bf8f236340ae154f8c5f73ee9e959d0
-        String str = " Aruba Women's G-string Panty(Pack of 2)";
+
+        String str = "Adraxx SM401098 Digital Speedometer (NA X6)";
         Website website = Website.FLIPKART;
 
         System.out.println(HexDigestUtil.md5(website.name() + StringUtils.getCleanChars(str)));

@@ -5,17 +5,18 @@ import hasoffer.core.persistence.dbm.osql.Identifiable;
 import javax.persistence.*;
 
 /**
- * Éè±¸--ÓÃ»§¹ØÏµ±í
+ * è®¾å¤‡--ç”¨æˆ·å…³ç³»è¡¨
  * Created by hs on 2016/6/20.
  */
 @Entity
-public class urmUserDevice implements Identifiable<Long> {
+public class UrmUserDevice implements Identifiable<Long> {
     @Id
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private  String userId;
+    private String userId;
     private String deviceId;
+
     public Long getId() {
         return id;
     }
@@ -53,10 +54,10 @@ public class urmUserDevice implements Identifiable<Long> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        urmUserDevice userDevice = (urmUserDevice) o;
+        UrmUserDevice userDevice = (UrmUserDevice) o;
 
         if (id != null ? !id.equals(userDevice.id) : userDevice.id != null) return false;
         if (userId != null ? !userId.equals(userDevice.userId) : userDevice.userId != null) return false;
-        return  (deviceId != null ? !deviceId.equals(userDevice.deviceId) : userDevice.deviceId != null);
+        return (deviceId != null ? !deviceId.equals(userDevice.deviceId) : userDevice.deviceId != null);
     }
 }

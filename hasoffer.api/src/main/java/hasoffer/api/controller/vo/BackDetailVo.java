@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * Created by hs on 2016/6/16.
- * ²é¿´·µÀûvo
+ * æŸ¥çœ‹è¿”åˆ©vo
  */
 public class BackDetailVo {
     private BigDecimal PendingCoins;
