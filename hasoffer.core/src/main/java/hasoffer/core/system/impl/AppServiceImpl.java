@@ -7,6 +7,7 @@ import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.AppBanner;
+import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
@@ -58,6 +59,9 @@ public class AppServiceImpl implements IAppService {
             "SELECT t FROM AppDeal t ";
     private static final String Q_APP_GETBANNERS =
             " SELECT t from AppBanner t ORDER BY id desc";
+
+    private static final String Q_APP_GEDEALDETAIL =
+            " SELECT t from AppDeal t where t.id=?0";
     @Resource
     IDataBaseManager dbm;
     private String Q_APP_GETPRODUCTS =
@@ -111,6 +115,13 @@ public class AppServiceImpl implements IAppService {
     @Override
     public List<PtmCategory> getCategory() {
       return   dbm.query(Q_APP_CATEGORY);
+    }
+
+    @Override
+    public AppDeal getDealDetail(String id) {
+        List li=new ArrayList();
+        li.add(Long.valueOf(id));
+       return dbm.querySingle(Q_APP_GEDEALDETAIL,li);
     }
 
     @Override
