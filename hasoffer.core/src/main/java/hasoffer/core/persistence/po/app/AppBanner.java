@@ -23,10 +23,10 @@ public class AppBanner implements Identifiable<Long> {
     private Date createTime;//创建时间
     private Date deadline;//最大的有效期 默认值：创建时间+7天
 
+    @Enumerated(EnumType.STRING)
+    private BannerFrom bannerFrom;//banner来源
 
-    private BannerFrom from;//banner来源
-
-    private int rank;//用于手工调整该条banner的优先级
+    private long rank;//用于手工调整该条banner的优先级
 
     @Override
     public Long getId() {
@@ -46,12 +46,12 @@ public class AppBanner implements Identifiable<Long> {
         this.deadline = deadline;
     }
 
-    public BannerFrom getFrom() {
-        return from;
+    public BannerFrom getBannerFrom() {
+        return bannerFrom;
     }
 
-    public void setFrom(BannerFrom from) {
-        this.from = from;
+    public void setBannerFrom(BannerFrom bannerFrom) {
+        this.bannerFrom = bannerFrom;
     }
 
     public String getImageUrl() {
@@ -70,11 +70,11 @@ public class AppBanner implements Identifiable<Long> {
         this.linkUrl = linkUrl;
     }
 
-    public int getRank() {
+    public long getRank() {
         return rank;
     }
 
-    public void setRank(int rank) {
+    public void setRank(long rank) {
         this.rank = rank;
     }
 
@@ -99,7 +99,7 @@ public class AppBanner implements Identifiable<Long> {
         if (linkUrl != null ? !linkUrl.equals(appBanner.linkUrl) : appBanner.linkUrl != null) return false;
         if (createTime != null ? !createTime.equals(appBanner.createTime) : appBanner.createTime != null) return false;
         if (deadline != null ? !deadline.equals(appBanner.deadline) : appBanner.deadline != null) return false;
-        return from == appBanner.from;
+        return bannerFrom == appBanner.bannerFrom;
 
     }
 
@@ -110,8 +110,8 @@ public class AppBanner implements Identifiable<Long> {
         result = 31 * result + (linkUrl != null ? linkUrl.hashCode() : 0);
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (deadline != null ? deadline.hashCode() : 0);
-        result = 31 * result + (from != null ? from.hashCode() : 0);
-        result = 31 * result + rank;
+        result = 31 * result + (bannerFrom != null ? bannerFrom.hashCode() : 0);
+        result = 31 * result + (int) (rank ^ (rank >>> 32));
         return result;
     }
 }

@@ -57,7 +57,9 @@ public class AmazonSummaryProductProcessor implements ISummaryProductProcessor {
             final String XPATH_NOPRODUCT = "//div[@class='a-section a-spacing-medium a-spacing-top-medium']/h2";
             final Pattern pricePattern = Pattern.compile(".*Rs. ([0-9]+).*");
 
+            logger.debug("before send request");
             TagNode productListRoot = HtmlUtils.getUrlRootTagNode(url);
+            logger.debug("after send request");
 
             TagNode bodyNode = getSubNodeByXPath(productListRoot, "//meta[@http-equiv='refresh']", null);
             if (bodyNode != null) {
