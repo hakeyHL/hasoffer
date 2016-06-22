@@ -15,4 +15,6 @@ public interface IDealService {
     public PageableResult<AppDeal> findDealList(int page, int size);
 
     public Map<String, Object> importExcelFile(MultipartFile multipartFile) throws Exception;
+
+    public AppDeal getDealById(Long dealId);
 }

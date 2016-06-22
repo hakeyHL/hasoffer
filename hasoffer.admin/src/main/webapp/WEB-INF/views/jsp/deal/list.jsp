@@ -74,17 +74,15 @@
                         <td>${data.title}</td>
                         <td>${data.createTime}</td>
                         <td>${data.expireTime}</td>
-                        <td><a href="#">编辑</a></td>
+                        <td><a href="getDealById/${data.id}" >编辑</a></td>
                         <td><a href="#">删除</a></td>
                     </tr>
                 </c:forEach>
                 </tbody>
             </table>
         </div>
+        <jsp:include page="../include/page.jsp"/>
     </div>
-
-    <jsp:include page="../include/page.jsp"/>
-</div>
 
 <script>
     $(function(){
@@ -96,23 +94,28 @@
                     //表单提交前做表单验证
                 },
                 success: function(data) {
-                    console.info(data)
+                    if(data.success){
+                        $("#totalRows").html(data.totalRows);
+                        $("#successRows").html(data.successRows);
+                        $("#failRows").html(data.failRows);
+                        $("#nullRows").html(data._nullRows);
+                        $("#repeatRows").html(data.repeatRows);
+                        $("#otherFailRows").html(data.otherFailRows);
+                        $('#import_result').modal('show');
+                        $("#confirm_button").click(function(){
+                            $('#import_result').modal('hide');
+                            window.location.reload();
+                        });
+                    }else{
+                        alert("导入失败，请检查文件格式之后重新导入！")
+                    }
 
-                    $("#totalRows").html(data.totalRows);
-                    $("#successRows").html(data.successRows);
-                    $("#failRows").html(data.failRows);
-                    $("#nullRows").html(data._nullRows);
-                    $("#repeatRows").html(data.repeatRows);
-                    $("#otherFailRows").html(data.otherFailRows);
-                    $('#import_result').modal('show');
-                    $("#confirm_button").click(function(){
-                        $('#import_result').modal('hide');
-                        window.location.reload();
-                    });
+
                 }
             });
         });
 
     });
+
 </script>
 <jsp:include page="../include/footer.jsp"/>

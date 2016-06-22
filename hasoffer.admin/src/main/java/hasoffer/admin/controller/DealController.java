@@ -5,10 +5,7 @@ import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.webcommon.helper.PageHelper;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -44,7 +41,7 @@ public class DealController {
      */
     @RequestMapping(value = "/import", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> importExcel(MultipartFile multiFile, HttpServletRequest request){
+    public Map<String, Object> importExcel(MultipartFile multiFile){
         Map<String, Object> result = new HashMap<String, Object>();
         try {
             result = dealService.importExcelFile(multiFile);
@@ -54,6 +51,13 @@ public class DealController {
             e.printStackTrace();
         }
         return result;
+    }
+
+    @RequestMapping(value="/getDealById/{id}", method = RequestMethod.GET)
+    public ModelAndView editDeal(@PathVariable(value = "id") Long dealId){
+        ModelAndView mav = new ModelAndView("deal/edit");
+        mav.addObject("deal", dealService.getDealById(dealId));
+        return mav;
     }
 
 }
