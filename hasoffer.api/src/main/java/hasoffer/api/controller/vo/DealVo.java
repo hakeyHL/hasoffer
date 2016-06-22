@@ -7,11 +7,20 @@ import java.util.Date;
  * Created by hs on 2016/6/21.
  */
 public class DealVo {
+    private  Long id;
     private  String image;
     private  String title;
     private  String exp;
     private  Double extra;
     private  String link;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getImage() {
         return image;

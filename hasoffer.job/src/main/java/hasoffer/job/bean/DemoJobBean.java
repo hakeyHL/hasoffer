@@ -8,6 +8,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class DemoJobBean extends QuartzJobBean {
@@ -18,6 +19,13 @@ public class DemoJobBean extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+        logger.info("DemoJobBean is run at {}" ,new Date());
+
+        try {
+            TimeUnit.SECONDS.sleep(30);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         logger.info("DemoJobBean is run at {}" ,new Date());
     }
 

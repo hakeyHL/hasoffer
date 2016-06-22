@@ -54,20 +54,9 @@ public class FetchKeywordWorker implements Runnable {
         //Website website = fetchResult.getWebsite();
         String keyword = fetchResult.getKeyword();
         try {
-            //if (Website.MYNTRA.equals(website)) {
-            //    List<FetchedProduct> list = fetchService.getProductSetByKeyword(fetchResult.getWebsite(), keyword, 10);
-            //    fetchResult.setFetchProducts(list);
-            //    fetchResult.setTaskStatus(TaskStatus.FINSH);
-            //} else if (Website.JABONG.equals(website)) {
-            //    JabongSearchProcessor.searchByKeyword(keyword);
-            //} else if (Website.VOONIK.equals(website)) {
-            //    VoonikSearchProcessor.searchByKeyword(keyword);
-            //} else {
-
-                List<FetchedProduct> productList = fetchService.getProductSetByKeyword(fetchResult.getWebsite(), keyword, 10);
-                fetchResult.setFetchProducts(productList);
-                fetchResult.setTaskStatus(TaskStatus.FINISH);
-            //}
+            List<FetchedProduct> productList = fetchService.getProductSetByKeyword(fetchResult.getWebsite(), keyword, 10);
+            fetchResult.setFetchProducts(productList);
+            fetchResult.setTaskStatus(TaskStatus.FINISH);
         } catch (HttpFetchException e) {
             if (fetchResult.getRunCount() < 5) {
                 fetchResult.setRunCount(fetchResult.getRunCount() + 1);
@@ -76,15 +65,15 @@ public class FetchKeywordWorker implements Runnable {
                 fetchResult.setTaskStatus(TaskStatus.STOPPED);
                 fetchResult.setErrMsg("The task is be ran 5 times.");
             }
-            e.printStackTrace();
+            logger.error(e.getMessage());
         } catch (ContentParseException e) {
             fetchResult.setTaskStatus(TaskStatus.STOPPED);
             fetchResult.setErrMsg("It is error.");
-            e.printStackTrace();
+            logger.error(e.getMessage());
         } catch (UnSupportWebsiteException e) {
             fetchResult.setTaskStatus(TaskStatus.STOPPED);
             fetchResult.setErrMsg("The website is not support.");
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 

@@ -17,11 +17,19 @@ import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.product.solr.CategoryIndexServiceImpl;
+import hasoffer.core.product.solr.ProductIndexServiceImpl;
+import hasoffer.core.product.solr.ProductModel;
+import hasoffer.core.solr.FilterQuery;
+import hasoffer.core.solr.PivotFacet;
+import hasoffer.core.solr.Query;
+import hasoffer.core.solr.Sort;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.common.util.impl.LoggerFactory;
 import org.jboss.logging.Logger;
 import org.springframework.stereotype.Controller;
@@ -35,6 +43,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.logging.Filter;
 
 /**
  * Created on 2015/12/21.
@@ -50,7 +59,10 @@ public class AppController {
     CmpSkuCacheManager cmpSkuCacheManager;
     @Resource
     ContentNegotiatingViewResolver jsonViewResolver;
-
+    @Resource
+    CategoryIndexServiceImpl categoryIndexService;
+    @Resource
+    ProductIndexServiceImpl productIndexServiceImpl;
     private Logger logger = LoggerFactory.logger(AppController.class);
 
     public static void main(String[] args) {
@@ -305,17 +317,23 @@ public class AppController {
      * @return
      */
     @RequestMapping(value = "/deals", method = RequestMethod.GET)
-    public ModelAndView deals(Long page, Long pageSize) {
+    public ModelAndView deals(String page, String pageSize) {
         ModelAndView mv =new ModelAndView();
-        PageableResult Result = appService.getDeals(page, pageSize);
-
+        if(StringUtils.isEmpty(page)){
+            page="0";
+        }
+        if(StringUtils.isEmpty(pageSize)){
+            pageSize="20";
+        }
+        PageableResult Result = appService.getDeals(Long.valueOf(page), Long.valueOf(pageSize));
         Map map = new HashMap();
         List li = new ArrayList();
         List<AppDeal> deals = Result.getData();
         for (AppDeal appDeal : deals) {
             DealVo dealVo = new DealVo();
+            dealVo.setId(appDeal.getId());
             dealVo.setExp(appDeal.getExpireTime());
-            dealVo.setExtra(0.03);
+            dealVo.setExtra(3.0);
             dealVo.setImage(appDeal.getImageUrl());
             dealVo.setLink(appDeal.getLinkUrl());
             dealVo.setTitle(appDeal.getTitle());
@@ -345,7 +363,7 @@ public class AppController {
             map.put("image",appDeal.getImageUrl());
             map.put("title",appDeal.getTitle());
             map.put("exp",appDeal.getExpireTime());
-            map.put("extra",0.03);
+            map.put("extra",3.0);
             map.put("description",appDeal.getDescription());
             map.put("cashbackInfo"," hello ");
             map.put("deeplink",appDeal.getLinkUrl());
@@ -450,28 +468,82 @@ public class AppController {
      * @return
      */
     @RequestMapping(value = "/productsList", method = RequestMethod.GET)
-    public ModelAndView productsList(SearchCriteria criteria) {
+    public ModelAndView productsList(SearchCriteria criteria, String type) {
         ModelAndView mv =new ModelAndView();
-        // List li=appService.getProductByCriteria(criteria);
-        String data="{\n" +
-                "    \"product\": [\n" +
-                "        {\n" +
-                "            \"id\": \"5556465\",\n" +
-                "            \"name\": \"桃花朵朵开\",\n" +
-                "            \"price\": 1000,\n" +
-                "            \"storesNum\": 50,\n" +
-                "            \"commentNum\": 1\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"id\": \"456\",\n" +
-                "            \"name\": \"水牛\",\n" +
-                "            \"price\": 600,\n" +
-                "            \"storesNum\": 10,\n" +
-                "            \"commentNum\": 8\n" +
-                "        }\n" +
-                "    ]\n" +
-                "}";
-        mv.addObject("data",data);
+        int requestType=3;
+       if(StringUtils.isNotBlank(type)){
+           requestType=Integer.valueOf(type);
+        }
+        List li=new ArrayList();
+        Map map=new HashMap();
+        //category level page size
+       // PageableResult <ProductModel> products=productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()),criteria.getLevel(),criteria.getPage(),criteria.getPageSize());
+        PageableResult <ProductModel> products=productIndexServiceImpl.searchPro(Long.valueOf(2),1,1,10);
+        if(products!=null&&products.getData().size()>0){
+            List<ProductModel> productModes=products.getData();
+            for(ProductModel productModel:productModes){
+                ProductListVo productListVo=new ProductListVo();
+                productListVo.setCommentNum(productModel.getRating());
+                productListVo.setId(productModel.getId());
+                productListVo.setImageUrl("http://pic95.nipic.com/file/20160419/7874840_024541265000_2.jpg");
+                productListVo.setName(productModel.getTitle());
+                productListVo.setPrice(productModel.getPrice());
+                productListVo.setStoresNum(5);
+                li.add(productListVo);
+            }
+        }
+        String data="";
+        switch (requestType){
+            case 0:
+                data="{\n" +
+                        "    \"product\": [\n" +
+                        "        {\n" +
+                        "            \"id\": 5556465,\n" +
+                        "            \"name\": \"桃花朵朵开\",\n" +
+                        "            \"price\": 1000,\n" +
+                        "            \"storesNum\": 50,\n" +
+                        "            \"commentNum\": 1\n" +
+                        "        },\n" +
+                        "        {\n" +
+                        "            \"id\": 456,\n" +
+                        "            \"name\": \"水牛啊\",\n" +
+                        "            \"price\": 600,\n" +
+                        "            \"storesNum\": 10,\n" +
+                        "            \"commentNum\": 8\n" +
+                        "        }\n" +
+                        "    ]\n" +
+                        "}";
+                map.put("product",data);
+                break;
+            case 1:
+                data="{\n" +
+                        "    \"product\": [\n" +
+                        "        {\n" +
+                        "            \"id\": 5556465,\n" +
+                        "            \"name\": \"桃花朵朵开\",\n" +
+                        "            \"price\": 1000,\n" +
+                        "            \"storesNum\": 50,\n" +
+                        "            \"commentNum\": 1\n" +
+                        "        },\n" +
+                        "        {\n" +
+                        "            \"id\": 456,\n" +
+                        "            \"name\": \"水牛啊\",\n" +
+                        "            \"price\": 600,\n" +
+                        "            \"storesNum\": 10,\n" +
+                        "            \"commentNum\": 8\n" +
+                        "        }\n" +
+                        "    ]\n" +
+                        "}";
+                map.put("product",data);
+                break;
+            case 2:
+                map.put("product",li);
+                break;
+            default:
+                map.put("product",li);
+        }
+        map.put("product",li);
+        mv.addObject("data",map);
         return  mv;
     }
 
@@ -546,160 +618,12 @@ public class AppController {
         return  mv;
     }
 
-    /**
-     * top selling
-     * @return
-     */
-    @RequestMapping(value = "/topSelling", method = RequestMethod.GET)
-    public ModelAndView topSelling() {
+    @RequestMapping(value = "/solrT", method = RequestMethod.GET)
+    public ModelAndView solrTest(Long id) {
         ModelAndView mv =new ModelAndView();
-        String data="{\n" +
-                "    \"data\": {\n" +
-                "        \"product\": [\n" +
-                "            {\n" +
-                "                \"id\": \"5556465\",\n" +
-                "                \"name\": \"桃花朵朵开\",\n" +
-                "                \"price\": 1000,\n" +
-                "                \"storesNum\": 50,\n" +
-                "                \"commentNum\": 1\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"id\": \"456\",\n" +
-                "                \"name\": \"水牛啊1\",\n" +
-                "                \"price\": 600,\n" +
-                "                \"storesNum\": 10,\n" +
-                "                \"commentNum\": 8\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"id\": \"456\",\n" +
-                "                \"name\": \"水牛啊2\",\n" +
-                "                \"price\": 600,\n" +
-                "                \"storesNum\": 10,\n" +
-                "                \"commentNum\": 8\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"id\": \"456\",\n" +
-                "                \"name\": \"水牛啊3\",\n" +
-                "                \"price\": 600,\n" +
-                "                \"storesNum\": 10,\n" +
-                "                \"commentNum\": 8\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"id\": \"456\",\n" +
-                "                \"name\": \"水牛啊4\",\n" +
-                "                \"price\": 600,\n" +
-                "                \"storesNum\": 10,\n" +
-                "                \"commentNum\": 8\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"id\": \"456\",\n" +
-                "                \"name\": \"水牛啊5\",\n" +
-                "                \"price\": 600,\n" +
-                "                \"storesNum\": 10,\n" +
-                "                \"commentNum\": 8\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"id\": \"456\",\n" +
-                "                \"name\": \"水牛啊6\",\n" +
-                "                \"price\": 600,\n" +
-                "                \"storesNum\": 10,\n" +
-                "                \"commentNum\": 8\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"id\": \"456\",\n" +
-                "                \"name\": \"水牛啊7\",\n" +
-                "                \"price\": 600,\n" +
-                "                \"storesNum\": 10,\n" +
-                "                \"commentNum\": 8\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"id\": \"456\",\n" +
-                "                \"name\": \"水牛啊8\",\n" +
-                "                \"price\": 600,\n" +
-                "                \"storesNum\": 10,\n" +
-                "                \"commentNum\": 8\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"id\": \"456\",\n" +
-                "                \"name\": \"水牛啊9\",\n" +
-                "                \"price\": 600,\n" +
-                "                \"storesNum\": 10,\n" +
-                "                \"commentNum\": 8\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"id\": \"456\",\n" +
-                "                \"name\": \"水牛啊10\",\n" +
-                "                \"price\": 600,\n" +
-                "                \"storesNum\": 10,\n" +
-                "                \"commentNum\": 8\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"id\": \"456\",\n" +
-                "                \"name\": \"水牛啊11\",\n" +
-                "                \"price\": 600,\n" +
-                "                \"storesNum\": 10,\n" +
-                "                \"commentNum\": 8\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"id\": \"456\",\n" +
-                "                \"name\": \"水牛啊12\",\n" +
-                "                \"price\": 600,\n" +
-                "                \"storesNum\": 10,\n" +
-                "                \"commentNum\": 8\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"id\": \"456\",\n" +
-                "                \"name\": \"水牛啊13\",\n" +
-                "                \"price\": 600,\n" +
-                "                \"storesNum\": 10,\n" +
-                "                \"commentNum\": 8\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"id\": \"456\",\n" +
-                "                \"name\": \"水牛啊14\",\n" +
-                "                \"price\": 600,\n" +
-                "                \"storesNum\": 10,\n" +
-                "                \"commentNum\": 8\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"id\": \"456\",\n" +
-                "                \"name\": \"水牛啊15\",\n" +
-                "                \"price\": 600,\n" +
-                "                \"storesNum\": 10,\n" +
-                "                \"commentNum\": 8\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"id\": \"456\",\n" +
-                "                \"name\": \"水牛啊16\",\n" +
-                "                \"price\": 600,\n" +
-                "                \"storesNum\": 10,\n" +
-                "                \"commentNum\": 8\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"id\": \"456\",\n" +
-                "                \"name\": \"水牛啊17\",\n" +
-                "                \"price\": 600,\n" +
-                "                \"storesNum\": 10,\n" +
-                "                \"commentNum\": 8\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"id\": \"456\",\n" +
-                "                \"name\": \"水牛啊18\",\n" +
-                "                \"price\": 600,\n" +
-                "                \"storesNum\": 10,\n" +
-                "                \"commentNum\": 8\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"id\": \"456\",\n" +
-                "                \"name\": \"水牛啊19\",\n" +
-                "                \"price\": 600,\n" +
-                "                \"storesNum\": 10,\n" +
-                "                \"commentNum\": 8\n" +
-                "            }\n" +
-                "        ]\n" +
-                "    }\n" +
-                "}";
-        mv.addObject("data", data);
-        return  mv;
+        List<Long> longs=productIndexServiceImpl.simpleSearch("iphone",1,20);
+        PageableResult result=productIndexServiceImpl.searchPro(id,2,1,2);
+        System.out.println("111");
+        return mv;
     }
 }

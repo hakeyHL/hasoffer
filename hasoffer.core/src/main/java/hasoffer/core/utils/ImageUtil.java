@@ -72,7 +72,7 @@ public class ImageUtil {
             // 上传图片
             Map<String, Object> params = new HashMap<String, Object>();
             params.put("file", file);
-            HttpResponseModel httpResponseModel = HttpUtils.uploadFile(CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL), file);
+            HttpResponseModel httpResponseModel = HttpUtils.uploadFile(CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL2), file);
 
             Map respMap = (Map) JSON.parse(httpResponseModel.getBodyString());
             Map pathMap = (Map) respMap.get("data");
