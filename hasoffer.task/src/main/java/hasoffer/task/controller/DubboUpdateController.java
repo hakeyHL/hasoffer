@@ -28,12 +28,13 @@ public class DubboUpdateController {
     private static final String Q_PTMCMPSKU_FLIPKART = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' ORDER BY t.id ";
 
     @Resource
-    IFetchDubboService fetchDubboService;
+    IFetchDubboService flipkartFetchService;
     @Resource
     ICmpSkuService cmpSkuService;
     @Resource
     IDataBaseManager dbm;
 
+    //dubbofetchtask/flipkartupdatestart
     @RequestMapping(value = "/flipkartupdatestart", method = RequestMethod.GET)
     @ResponseBody
     public String flipkartupdatestart() {
@@ -49,7 +50,7 @@ public class DubboUpdateController {
         es.execute(new MysqlListWorker<PtmCmpSku>(Q_PTMCMPSKU_FLIPKART, ws, dbm));
 
         for (int i = 0; i < 10; i++) {
-            es.execute(new CmpSkuDubboUpdateWorker(ws, cmpSkuService, fetchDubboService));
+            es.execute(new CmpSkuDubboUpdateWorker(ws, cmpSkuService, flipkartFetchService));
         }
 
         taskRunning1.set(true);
