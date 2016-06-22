@@ -153,8 +153,8 @@ public class AppServiceImpl implements IAppService {
         Long maxPrice=criteria.getMaxPrice();
         Long minPrice=criteria.getMinPrice();
 
-        Long page=criteria.getPage();
-        Long pageSize=criteria.getPageSize();
+        int page=criteria.getPage();
+        int pageSize=criteria.getPageSize();
 
 
         Q_APP_GETPRODUCTS=Q_APP_GETPRODUCTS+"ee";
