@@ -1,11 +1,9 @@
 package hasoffer.timer.product;
 
-import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.persistence.po.sys.SysTimerTaskLog;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.system.ITimerService;
 import org.slf4j.Logger;
@@ -15,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Date : 2016/1/13
@@ -27,7 +26,8 @@ public class SkuImageDownloadTask {
      * 取ptmimage 逻辑：未下载下来的图片，按照失败次数从小到大排
      */
     private static final String Q_SKU_IMAGE =
-            "SELECT t FROM PtmCmpSku t ORDER BY t.id ASC ";
+            "SELECT t FROM PtmCmpSku t WHERE t.imagePath IS NULL AND t.oriImageUrl IS NOT NULL AND t.failLoadImage = 0";
+//            "SELECT t FROM PtmCmpSku t ORDER BY t.id ASC ";
 
     @Resource
     ICmpSkuService cmpSkuService;
@@ -39,21 +39,10 @@ public class SkuImageDownloadTask {
 
     @Scheduled(cron = "0 0/10 * * * ?")
     public void f() {
-        SysTimerTaskLog log = timerService.createTaskLog("SkuImageDownloadTask");
+        final int page = 1, PAGE_SIZE = 500;
 
-        int page = 1, PAGE_SIZE = 500;
-        PageableResult<PtmCmpSku> pagedSkus = dbm.queryPage(Q_SKU_IMAGE, page, PAGE_SIZE);
-
-        long totalPage = pagedSkus.getTotalPage();
-
-        while (page <= totalPage) {
-            List<PtmCmpSku> skus = null;
-
-            if (page == 1) {
-                skus = pagedSkus.getData();
-            } else {
-                skus = dbm.query(Q_SKU_IMAGE, page, PAGE_SIZE);
-            }
+        while (true) {
+            List<PtmCmpSku> skus = dbm.query(Q_SKU_IMAGE, page, PAGE_SIZE);
 
             if (ArrayUtils.hasObjs(skus)) {
                 for (PtmCmpSku sku : skus) {
@@ -66,13 +55,14 @@ public class SkuImageDownloadTask {
 
                     cmpSkuService.downloadImage2(sku);
                 }
+            } else {
+                try {
+                    TimeUnit.SECONDS.sleep(60);
+                } catch (Exception e) {
+                    return;
+                }
             }
-
-            page++;
-            logger.debug(String.format("download images. page : %d", page));
         }
-
-        timerService.updateTaskLog(log.getId(), "");
     }
 
 }
