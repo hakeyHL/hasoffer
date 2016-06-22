@@ -12,7 +12,7 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.ICmpSkuUpdateStatService;
 import hasoffer.core.product.IFetchService;
 import hasoffer.fetch.helper.WebsiteHelper;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,16 +138,16 @@ public class CmpSkuVisitUpdateWorker implements Runnable {
 
                 needUpdateMap.put(website, ++count);
 
-                FetchedProduct fetchedProduct = null;
+                OriFetchedProduct oriFetchedProduct = null;
                 try {
 
                     if (TimeUtils.now() - sku.getUpdateTime().getTime() < TimeUtils.MILLISECONDS_OF_1_DAY) {
                         continue;
                     }
 
-                    fetchedProduct = fetchService.udpateSkuInAnyWay(sku.getUrl(), sku.getWebsite());
+                    oriFetchedProduct = fetchService.udpateSkuInAnyWay(sku.getUrl(), sku.getWebsite());
 
-                    cmpSkuService.updateCmpSkuBySummaryProduct(sku.getId(), fetchedProduct);
+                    cmpSkuService.updateCmpSkuByOriFetchedProduct(sku.getId(), oriFetchedProduct);
 
                 } catch (Exception e) {
                     logger.debug("update sku fail for [" + sku.getId() + "]");

@@ -13,6 +13,7 @@ public class CoreConfig implements Serializable {
     public static final String SOLR_PRODUCT_URL = "SOLR_PRODUCT_URL";
     public static final String IMAGE_URL_3RD_PREFIX = "IMAGE_URL_3RD_PREFIX";
     public static final String IMAGE_UPLOAD_URL = "IMAGE_UPLOAD_URL";
+    public static final String IMAGE_UPLOAD_URL2 = "IMAGE_UPLOAD_URL2";
     public static final String IMAGE_HOST = "IMAGE_HOST";
     public static final String WEB_HOST = "WEB_HOST";
     //API_HOST

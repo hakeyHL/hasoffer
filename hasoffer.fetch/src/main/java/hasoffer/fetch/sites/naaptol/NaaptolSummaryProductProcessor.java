@@ -6,7 +6,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.HtmlUtils;
 import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.model.ProductStatus;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import org.htmlcleaner.TagNode;
 
 import java.util.List;
@@ -27,17 +27,17 @@ public class NaaptolSummaryProductProcessor implements ISummaryProductProcessor 
     private static final String XPATH_PRODUCT_IMAGE1 = "//div[@id='main_image']/a/img";
 
     @Override
-    public FetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
+    public OriFetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
 
-        FetchedProduct fetchedProduct = new FetchedProduct();
-        fetchedProduct.setProductStatus(ProductStatus.ONSALE);
+        OriFetchedProduct oriFetchedProduct = new OriFetchedProduct();
+        oriFetchedProduct.setProductStatus(ProductStatus.ONSALE);
 
         TagNode root = HtmlUtils.getUrlRootTagNode(url);
 
         TagNode productStatusNode = getSubNodeByXPath(root, XPATH_PRODUCT_STATUS, null);
         float price = 0.0f;
         if(productStatusNode!=null){
-            fetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
+            oriFetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
         }else{
             TagNode priceNode = getSubNodeByXPath(root, XPATH_PRICE, null);
             if (priceNode == null) {
@@ -62,13 +62,13 @@ public class NaaptolSummaryProductProcessor implements ISummaryProductProcessor 
         }
         imageUrl = imageNode.getAttributeByName("src");
 
-        fetchedProduct.setImageUrl(imageUrl);
-        fetchedProduct.setPrice(price);
-        fetchedProduct.setTitle(title);
-        fetchedProduct.setUrl(url);
-        fetchedProduct.setWebsite(Website.NAAPTOL);
-        fetchedProduct.setSourceSid(sourceId);
+        oriFetchedProduct.setImageUrl(imageUrl);
+        oriFetchedProduct.setPrice(price);
+        oriFetchedProduct.setTitle(title);
+        oriFetchedProduct.setUrl(url);
+        oriFetchedProduct.setWebsite(Website.NAAPTOL);
+        oriFetchedProduct.setSourceSid(sourceId);
 
-        return fetchedProduct;
+        return oriFetchedProduct;
     }
 }

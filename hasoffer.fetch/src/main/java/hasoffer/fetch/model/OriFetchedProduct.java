@@ -6,7 +6,7 @@ import hasoffer.base.model.Website;
  * Date : 2016/2/29
  * Function :
  */
-public class FetchedProduct {
+public class OriFetchedProduct {
 
     private String sourceSid;
     private String sourcePid;
@@ -25,11 +25,11 @@ public class FetchedProduct {
     private String deeplink;
     private String pageHtml;
 
-    public FetchedProduct() {
+    public OriFetchedProduct() {
     }
 
-    public FetchedProduct(String sourceId, Website website, String title, String imageUrl,
-                          ProductStatus productStatus, float price, String url, String deeplink) {
+    public OriFetchedProduct(String sourceId, Website website, String title, String imageUrl,
+                             ProductStatus productStatus, float price, String url, String deeplink) {
         this.sourceSid = sourceId;
         this.website = website;
         this.title = title;

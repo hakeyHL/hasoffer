@@ -7,7 +7,7 @@ import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.helper.WebsiteSummaryProductProcessorFactory;
 import hasoffer.fetch.model.ProductStatus;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.sites.flipkart.FlipkartSummaryProductProcessor;
 import org.junit.Test;
 
@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Created on 2016/3/1.
  */
-public class FetchedProductTest {
+public class OriFetchedProductTest {
 
     @Test
     public void testSummaryProdcut() {
@@ -67,7 +67,7 @@ public class FetchedProductTest {
 
         ISummaryProductProcessor summaryProductProcessor = WebsiteSummaryProductProcessorFactory.getSummaryProductProcessor(webSite);
 
-        FetchedProduct product = null;
+        OriFetchedProduct product = null;
         try {
 
             product = summaryProductProcessor.getSummaryProductByUrl(urlTemplate);
@@ -98,7 +98,7 @@ public class FetchedProductTest {
 
             String message = e.getMessage();
             if(message.contains("302")||message.contains("404")){
-                product = new FetchedProduct();
+                product = new OriFetchedProduct();
                 product.setProductStatus(ProductStatus.OFFSALE);
                 product.setWebsite(webSite);
                 product.setUrl(urlTemplate);
@@ -121,7 +121,7 @@ public class FetchedProductTest {
 
         FlipkartSummaryProductProcessor flipkartSummaryProductProcessor = new FlipkartSummaryProductProcessor();
 
-        List<FetchedProduct> productList = flipkartSummaryProductProcessor.getSkuSummaryProductByUrl(urlTemplate);
+        List<OriFetchedProduct> productList = flipkartSummaryProductProcessor.getSkuSummaryProductByUrl(urlTemplate);
 
         System.out.println(productList);
     }

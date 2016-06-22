@@ -6,7 +6,7 @@ import hasoffer.fetch.core.ICategoryProcessor;
 import hasoffer.fetch.core.IProductProcessor;
 import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.model.Product;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.sites.amazon.AmazonCategoryProcessor;
 import hasoffer.fetch.sites.amazon.AmazonProductProcessor;
 import hasoffer.fetch.sites.amazon.AmazonSummaryProductProcessor;
@@ -28,8 +28,8 @@ public class AmazonProcessorTest {
 	public void f2() throws Exception {
 		String url = "http://www.amazon.in/Reebok-Cotton-Sweatshirts-4055008581583_B89946_A-L_Blue/dp/B017D3KB32";
 		ISummaryProductProcessor productProcessor = new AmazonSummaryProductProcessor();
-		FetchedProduct fetchedProduct = productProcessor.getSummaryProductByUrl(url);
-		System.out.println(fetchedProduct.getPrice());
+		OriFetchedProduct oriFetchedProduct = productProcessor.getSummaryProductByUrl(url);
+		System.out.println(oriFetchedProduct.getPrice());
 	}
 
 	@Test

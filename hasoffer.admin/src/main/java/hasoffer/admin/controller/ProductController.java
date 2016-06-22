@@ -30,7 +30,7 @@ import hasoffer.core.product.exception.ProductNotFoundException;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.thd.IThdService;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import hasoffer.webcommon.helper.PageHelper;
@@ -90,11 +90,11 @@ public class ProductController {
 
         String url = ptmCmpSku.getUrl();
 
-        FetchedProduct fetchedProduct = null;
+        OriFetchedProduct oriFetchedProduct = null;
         try {
-            fetchedProduct = fetchService.fetchSummaryProductByUrl(url);
-            if (fetchedProduct != null) {
-                cmpSkuService.updateCmpSkuBySummaryProduct(id, fetchedProduct);
+            oriFetchedProduct = fetchService.fetchSummaryProductByUrl(url);
+            if (oriFetchedProduct != null) {
+                cmpSkuService.updateCmpSkuByOriFetchedProduct(id, oriFetchedProduct);
                 map.put("status","success");
             }else{
                 map.put("status","fail");

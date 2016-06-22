@@ -8,8 +8,17 @@ public class ProductListVo {
     private  Long id;
     private  String name;
     private double price;
-    private  Long storesNum;
-    private Long commentNum;
+    private  int storesNum;
+    private int commentNum;
+    private  String  imageUrl;
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
     public Long getId() {
         return id;
@@ -35,19 +44,19 @@ public class ProductListVo {
         this.price = price;
     }
 
-    public Long getStoresNum() {
+    public int getStoresNum() {
         return storesNum;
     }
 
-    public void setStoresNum(Long storesNum) {
+    public void setStoresNum(int storesNum) {
         this.storesNum = storesNum;
     }
 
-    public Long getCommentNum() {
+    public int getCommentNum() {
         return commentNum;
     }
 
-    public void setCommentNum(Long commentNum) {
+    public void setCommentNum(int commentNum) {
         this.commentNum = commentNum;
     }
 }

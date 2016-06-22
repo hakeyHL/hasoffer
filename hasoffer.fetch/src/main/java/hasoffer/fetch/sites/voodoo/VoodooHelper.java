@@ -6,7 +6,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.http.HttpUtils;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.ListProduct;
 import hasoffer.fetch.model.ProductStatus;
 
@@ -76,10 +76,10 @@ public class VoodooHelper {
         return new ListProduct(0L, sourceId, vp.getProductUrl(), imageUrl, title, vp.getVoodooPrice(), website, productStatus);
     }
 
-    private static void getSummaryProducts(List<VoodooProduct> vps, Map<Website, FetchedProduct> proMap) {
+    private static void getSummaryProducts(List<VoodooProduct> vps, Map<Website, OriFetchedProduct> proMap) {
         for (VoodooProduct vp : vps) {
             try {
-                FetchedProduct sp = getSummaryProduct(vp);
+                OriFetchedProduct sp = getSummaryProduct(vp);
                 proMap.put(sp.getWebsite(), sp);
             } catch (Exception e) {
                 continue;
@@ -87,7 +87,7 @@ public class VoodooHelper {
         }
     }
 
-    private static FetchedProduct getSummaryProduct(VoodooProduct vp) {
+    private static OriFetchedProduct getSummaryProduct(VoodooProduct vp) {
         String site = vp.getMerchant().toUpperCase();
         Website website = Website.valueOf(site);
 
@@ -99,7 +99,7 @@ public class VoodooHelper {
         boolean inStock = vp.isInStock();
         ProductStatus productStatus = inStock ? ProductStatus.ONSALE : ProductStatus.OUTSTOCK;
 
-        return new FetchedProduct(sourceId, website, title, imageUrl, productStatus, vp.getVoodooPrice(), vp.getProductUrl(), vp.getDeeplinkUrl());
+        return new OriFetchedProduct(sourceId, website, title, imageUrl, productStatus, vp.getVoodooPrice(), vp.getProductUrl(), vp.getDeeplinkUrl());
     }
 
     // voodoo 用于加密的算法

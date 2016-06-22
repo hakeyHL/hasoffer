@@ -6,7 +6,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.HtmlUtils;
 import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.model.ProductStatus;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import org.htmlcleaner.TagNode;
 
 import java.util.List;
@@ -27,9 +27,9 @@ public class AskmebazaarSummaryProductProcessor implements ISummaryProductProces
 
 
     @Override
-    public FetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
+    public OriFetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
 
-        FetchedProduct fetchedProduct = new FetchedProduct();
+        OriFetchedProduct oriFetchedProduct = new OriFetchedProduct();
 
         TagNode root = HtmlUtils.getUrlRootTagNode(url);
 
@@ -58,15 +58,15 @@ public class AskmebazaarSummaryProductProcessor implements ISummaryProductProces
             imageUrl = imageNode.getAttributeByName("src");
         }
 
-        fetchedProduct.setImageUrl(imageUrl);
-        fetchedProduct.setTitle(title);
-        fetchedProduct.setProductStatus(ProductStatus.ONSALE);
-        fetchedProduct.setUrl(url);
-        fetchedProduct.setPrice(price);
-        fetchedProduct.setWebsite(Website.ASKMEBAZAAR);
-        fetchedProduct.setSourceSid(AskmebazaarHelper.getProductIdByUrl(url));
+        oriFetchedProduct.setImageUrl(imageUrl);
+        oriFetchedProduct.setTitle(title);
+        oriFetchedProduct.setProductStatus(ProductStatus.ONSALE);
+        oriFetchedProduct.setUrl(url);
+        oriFetchedProduct.setPrice(price);
+        oriFetchedProduct.setWebsite(Website.ASKMEBAZAAR);
+        oriFetchedProduct.setSourceSid(AskmebazaarHelper.getProductIdByUrl(url));
 
-        return fetchedProduct;
+        return oriFetchedProduct;
     }
 
 
