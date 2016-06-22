@@ -25,6 +25,7 @@ public class AppDeal implements Identifiable<Long> {
     @Column(unique = true, nullable = false)
     private String linkUrl;//deal跳转地址
 
+    @Column(columnDefinition = "text")
     private String imageUrl;//本地图片服务器地址
 
     @Column(nullable = false)
