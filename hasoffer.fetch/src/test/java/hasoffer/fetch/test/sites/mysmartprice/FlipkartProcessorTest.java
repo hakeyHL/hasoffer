@@ -3,7 +3,7 @@ package hasoffer.fetch.test.sites.mysmartprice;
 import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.exception.HttpFetchException;
 import hasoffer.fetch.model.ListProduct;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.sites.flipkart.FlipkartListProcessor;
 import hasoffer.fetch.sites.flipkart.FlipkartProductProcessor;
 import hasoffer.fetch.sites.flipkart.FlipkartSummaryProductProcessor;
@@ -37,7 +37,7 @@ public class FlipkartProcessorTest {
         FlipkartSummaryProductProcessor summaryProductProcessor = new FlipkartSummaryProductProcessor();
 
         try {
-            FetchedProduct sp = summaryProductProcessor.getSummaryProductByUrl(url);
+            OriFetchedProduct sp = summaryProductProcessor.getSummaryProductByUrl(url);
             System.out.println(sp.getPrice());
         } catch (Exception e) {
             e.printStackTrace();

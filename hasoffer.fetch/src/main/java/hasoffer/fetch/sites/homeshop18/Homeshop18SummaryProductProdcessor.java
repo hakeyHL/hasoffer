@@ -7,7 +7,7 @@ import hasoffer.base.utils.HtmlUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.model.ProductStatus;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import org.htmlcleaner.TagNode;
 
 import java.util.Arrays;
@@ -25,15 +25,15 @@ public class Homeshop18SummaryProductProdcessor implements ISummaryProductProces
     public static final String XPATH_PRODUCT_PRICE = "//span[@id='hs18Price']";
 
     @Override
-    public FetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
+    public OriFetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
 
-        FetchedProduct fetchedProduct = new FetchedProduct();
+        OriFetchedProduct oriFetchedProduct = new OriFetchedProduct();
 
-        fetchedProduct.setUrl(url);
-        fetchedProduct.setWebsite(Website.HOMESHOP18);
+        oriFetchedProduct.setUrl(url);
+        oriFetchedProduct.setWebsite(Website.HOMESHOP18);
 
         String sourceId = Homeshop18Helper.getProductIdByUrl(url);
-        fetchedProduct.setSourceSid(sourceId);
+        oriFetchedProduct.setSourceSid(sourceId);
 
         TagNode root = HtmlUtils.getUrlRootTagNode(url);
 
@@ -42,25 +42,25 @@ public class Homeshop18SummaryProductProdcessor implements ISummaryProductProces
             String titleString = statusNode.getParent().getText().toString();
             String[] subStrs = titleString.split("is");
             String title = subStrs[0].trim();
-            fetchedProduct.setTitle(title);
-            fetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
-            return fetchedProduct;
+            oriFetchedProduct.setTitle(title);
+            oriFetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
+            return oriFetchedProduct;
         }
 
         TagNode titleNode = getSubNodeByXPath(root, XPATH_PRODUCT_TITLE, new ContentParseException("[title] not found for [" + url + "]"));
         String title = titleNode.getText().toString().trim();
-        fetchedProduct.setTitle(title);
+        oriFetchedProduct.setTitle(title);
 
         TagNode imageNode = getSubNodeByXPath(root, XPATH_PRODUCT_IMAGE, new ContentParseException("[image] not found for [" + url + "]"));
         String imageUrl = imageNode.getAttributeByName("src");
-        fetchedProduct.setImageUrl("http:"+imageUrl);
+        oriFetchedProduct.setImageUrl("http:"+imageUrl);
 
         TagNode priceNode = getSubNodeByXPath(root, XPATH_PRODUCT_PRICE, new ContentParseException("price not found for [" + url + "]"));
         String priceString = StringUtils.filterAndTrim(priceNode.getText().toString(), Arrays.asList("Rs.", "&nbsp;"));
         float price = Float.parseFloat(priceString);
-        fetchedProduct.setPrice(price);
+        oriFetchedProduct.setPrice(price);
 
-        fetchedProduct.setProductStatus(ProductStatus.ONSALE);
-        return fetchedProduct;
+        oriFetchedProduct.setProductStatus(ProductStatus.ONSALE);
+        return oriFetchedProduct;
     }
 }

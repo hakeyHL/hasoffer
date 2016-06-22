@@ -8,7 +8,7 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IFetchService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.model.ProductStatus;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,9 +119,9 @@ public class CmpSkuUpdateWorker implements Runnable {
             System.getProperties().setProperty("http.proxyPort", port);
 
 
-            FetchedProduct fetchedProduct = null;
+            OriFetchedProduct oriFetchedProduct = null;
             try {
-                fetchedProduct = fetchService.fetchSummaryProductByUrl(url);
+                oriFetchedProduct = fetchService.fetchSummaryProductByUrl(url);
             } catch (Exception e) {
 
                 //亚马逊解析空指针，重新解析
@@ -135,11 +135,11 @@ public class CmpSkuUpdateWorker implements Runnable {
                 String message = e.getMessage();
                 if (message != null) {
                     if (message.contains("302") || message.contains("404")) {
-                        fetchedProduct = new FetchedProduct();
-                        fetchedProduct.setTitle("url expire");
-                        fetchedProduct.setProductStatus(ProductStatus.OFFSALE);
-                        fetchedProduct.setWebsite(website);
-                        fetchedProduct.setUrl(url);
+                        oriFetchedProduct = new OriFetchedProduct();
+                        oriFetchedProduct.setTitle("url expire");
+                        oriFetchedProduct.setProductStatus(ProductStatus.OFFSALE);
+                        oriFetchedProduct.setWebsite(website);
+                        oriFetchedProduct.setUrl(url);
                     } else {
                         logger.error(e.toString() + "\n" + sku.getUrl());
                     }
@@ -150,11 +150,11 @@ public class CmpSkuUpdateWorker implements Runnable {
             }
 
             try {
-                cmpSkuService.updateCmpSkuBySummaryProduct(sku.getId(), fetchedProduct);
+                cmpSkuService.updateCmpSkuByOriFetchedProduct(sku.getId(), oriFetchedProduct);
             } catch (Exception e) {
                 logger.debug(e.toString());
-                if (fetchedProduct != null) {
-                    logger.debug("title:" + fetchedProduct.getTitle());
+                if (oriFetchedProduct != null) {
+                    logger.debug("title:" + oriFetchedProduct.getTitle());
                 }
             }
         }

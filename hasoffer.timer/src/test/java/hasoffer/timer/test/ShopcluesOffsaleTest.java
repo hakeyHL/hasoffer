@@ -8,7 +8,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.fetch.model.ProductStatus;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.sites.shopclues.ShopCluesSummaryProductProcessor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,10 +54,10 @@ public class ShopcluesOffsaleTest {
 
             //判断是否为offsale
             ShopCluesSummaryProductProcessor processor = new ShopCluesSummaryProductProcessor();
-            FetchedProduct fetchedProduct = null;
+            OriFetchedProduct oriFetchedProduct = null;
             try {
-                fetchedProduct = processor.getSummaryProductByUrl(url);
-                if (!ProductStatus.OFFSALE.equals(fetchedProduct.getProductStatus())) {
+                oriFetchedProduct = processor.getSummaryProductByUrl(url);
+                if (!ProductStatus.OFFSALE.equals(oriFetchedProduct.getProductStatus())) {
                     continue;
                 }
             } catch (HttpFetchException e) {
@@ -72,10 +72,10 @@ public class ShopcluesOffsaleTest {
 
             for (String urlString : urlList) {
 
-                FetchedProduct product = null;
+                OriFetchedProduct product = null;
 
                 try {
-                    fetchedProduct = processor.getSummaryProductByUrl(url);
+                    oriFetchedProduct = processor.getSummaryProductByUrl(url);
                 } catch (HttpFetchException e) {
                     logger.debug("httpFetchException exception [" + sku.getId() + "]");
                     continue;

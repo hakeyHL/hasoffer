@@ -10,7 +10,8 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.persistence.po.stat.StatPtmCmpSkuUpdate;
 import hasoffer.core.persistence.po.stat.StatSkuPriceUpdateResult;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
+import hasoffer.spider.model.FetchedProduct;
 
 import java.util.List;
 
@@ -25,7 +26,9 @@ public interface ICmpSkuService {
 
     void createPtmCmpSkuIndexToMysql(PtmCmpSku ptmCmpsku);
 
-    void updateCmpSkuBySummaryProduct(long skuId, FetchedProduct fetchedProduct);
+    void updateCmpSkuByOriFetchedProduct(long skuId, OriFetchedProduct oriFetchedProduct);
+
+    void updateCmpSkuBySpiderFetchedProduct(long skuId, FetchedProduct fetchedProduct);
 
     void updateCmpSku(long id, String url, String color, String size, float price);
 

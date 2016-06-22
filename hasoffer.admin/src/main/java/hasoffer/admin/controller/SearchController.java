@@ -31,7 +31,7 @@ import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.helper.WebsiteProcessorFactory;
 import hasoffer.fetch.helper.WebsiteSummaryProductProcessorFactory;
 import hasoffer.fetch.model.Product;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import hasoffer.webcommon.helper.PageHelper;
@@ -333,10 +333,10 @@ public class SearchController {
             }
             ISummaryProductProcessor summaryProductProcessor = WebsiteSummaryProductProcessorFactory.getSummaryProductProcessor(webSite);
             if (summaryProductProcessor != null && url != null) {
-                FetchedProduct fetchedProduct = null;
+                OriFetchedProduct oriFetchedProduct = null;
                 ProductVo productVo = new ProductVo();
                 try {
-                    fetchedProduct = summaryProductProcessor.getSummaryProductByUrl(url);
+                    oriFetchedProduct = summaryProductProcessor.getSummaryProductByUrl(url);
                 } catch (Exception e) {
                     productVo.setFlag("false");
                     productVo.setWebsite(webSite);
@@ -346,10 +346,10 @@ public class SearchController {
                 }
 
                 productVo.setFlag("true");
-                productVo.setSourceId(fetchedProduct.getSourceSid());
-                productVo.setPrice(fetchedProduct.getPrice());
-                productVo.setTitle(fetchedProduct.getTitle());
-                productVo.setSourceSite(fetchedProduct.getUrl());
+                productVo.setSourceId(oriFetchedProduct.getSourceSid());
+                productVo.setPrice(oriFetchedProduct.getPrice());
+                productVo.setTitle(oriFetchedProduct.getTitle());
+                productVo.setSourceSite(oriFetchedProduct.getUrl());
                 productVo.setWebsite(webSite);
                 productList.add(productVo);
             }
