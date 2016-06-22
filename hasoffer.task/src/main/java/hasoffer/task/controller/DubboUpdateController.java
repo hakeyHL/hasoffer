@@ -2,8 +2,10 @@ package hasoffer.task.controller;
 
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.worker.ListAndProcessWorkerStatus;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
+import hasoffer.task.worker.CmpSkuDubboUpdateWorker;
 import hasoffer.task.worker.MysqlListWorker;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +30,8 @@ public class DubboUpdateController {
     @Resource
     IFetchDubboService fetchDubboService;
     @Resource
+    ICmpSkuService cmpSkuService;
+    @Resource
     IDataBaseManager dbm;
 
     @RequestMapping(value = "/flipkartupdatestart", method = RequestMethod.GET)
@@ -45,7 +49,7 @@ public class DubboUpdateController {
         es.execute(new MysqlListWorker<PtmCmpSku>(Q_PTMCMPSKU_FLIPKART, ws, dbm));
 
         for (int i = 0; i < 10; i++) {
-//            es.execute(new HijackStatTestWorker(queue, cmpSkuService, mdm));
+            es.execute(new CmpSkuDubboUpdateWorker(ws, cmpSkuService, fetchDubboService));
         }
 
         taskRunning1.set(true);

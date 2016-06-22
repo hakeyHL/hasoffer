@@ -4,6 +4,7 @@ import hasoffer.base.model.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
+import hasoffer.core.worker.ListAndProcessWorkerStatus;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchUrlResult;
@@ -11,7 +12,6 @@ import hasoffer.spider.model.FetchedProduct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -20,12 +20,12 @@ import java.util.concurrent.TimeUnit;
 public class CmpSkuDubboUpdateWorker implements Runnable {
 
     private static Logger logger = LoggerFactory.getLogger(CmpSkuDubboUpdateWorker.class);
-    private ConcurrentLinkedQueue<PtmCmpSku> skuQueue;
+    private ListAndProcessWorkerStatus<PtmCmpSku> ws;
     private ICmpSkuService cmpSkuService;
     private IFetchDubboService fetchService;
 
-    public CmpSkuDubboUpdateWorker(ConcurrentLinkedQueue<PtmCmpSku> skuQueue, ICmpSkuService cmpSkuService, IFetchDubboService fetchService) {
-        this.skuQueue = skuQueue;
+    public CmpSkuDubboUpdateWorker(ListAndProcessWorkerStatus<PtmCmpSku> ws, ICmpSkuService cmpSkuService, IFetchDubboService fetchService) {
+        this.ws = ws;
         this.cmpSkuService = cmpSkuService;
         this.fetchService = fetchService;
     }
@@ -34,7 +34,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
     public void run() {
         while (true) {
             try {
-                PtmCmpSku sku = skuQueue.poll();
+                PtmCmpSku sku = ws.getSdQueue().poll();
 
                 if (sku == null) {
                     try {
@@ -76,14 +76,14 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 FetchedProduct fetchedProduct = null;
 
                 //如果返回结果状态为running，那么将sku返回队列
-                if(TaskStatus.RUNNING.equals(taskStatus)||TaskStatus.START.equals(taskStatus)){
-                    skuQueue.add(sku);
+                if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
+                    ws.getSdQueue().add(sku);
                     continue;
-                }else if(TaskStatus.STOPPED.equals(taskStatus)){
+                } else if (TaskStatus.STOPPED.equals(taskStatus)) {
                     //do something
-                }else if (TaskStatus.EXCEPTION.equals(taskStatus)){
+                } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
                     //do something
-                }else {//(TaskStatus.FINISH.equals(taskStatus)))
+                } else {//(TaskStatus.FINISH.equals(taskStatus)))
                     fetchedProduct = fetchedResult.getFetchProduct();
                 }
 

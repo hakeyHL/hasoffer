@@ -663,6 +663,73 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
     @Override
     public void updateCmpSkuBySpiderFetchedProduct(long skuId, FetchedProduct fetchedProduct) {
+
+        //fetchedProduct为null
+        if (fetchedProduct == null) {
+            return;
+        }
+
+        //根据id，获得该商品信息
+        PtmCmpSku cmpSku = dbm.get(PtmCmpSku.class, skuId);
+        if (cmpSku == null) {
+            return;
+        }
+
+//        更新mongodb
+        PtmCmpSkuLog ptmCmpSkuLog = new PtmCmpSkuLog(cmpSku);
+        mdm.save(ptmCmpSkuLog);
+
+        PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(skuId);
+        //获取商品的status
+        if (SkuStatus.OFFSALE.equals(fetchedProduct.getSkuStatus())) {//如果OFFSALE
+
+            ptmCmpSkuUpdater.getPo().setStatus(SkuStatus.OFFSALE);
+
+        } else {
+            //如果售空了修改状态
+            if (SkuStatus.OUTSTOCK.equals(fetchedProduct.getSkuStatus())) {
+
+                ptmCmpSkuUpdater.getPo().setStatus(SkuStatus.OUTSTOCK);
+
+            } else {//修改价格
+
+                float price = fetchedProduct.getPrice();
+                if (price > 0) {
+                    if (cmpSku.getPrice() != fetchedProduct.getPrice()) {
+                        ptmCmpSkuUpdater.getPo().setPrice(price);
+                    }
+                }
+                ptmCmpSkuUpdater.getPo().setStatus(SkuStatus.ONSALE);
+            }
+
+            if (!StringUtils.isEmpty(fetchedProduct.getTitle())) {
+                if (StringUtils.isEmpty(cmpSku.getTitle()) || !StringUtils.isEqual(cmpSku.getTitle(), fetchedProduct.getTitle())) {
+                    ptmCmpSkuUpdater.getPo().setTitle(fetchedProduct.getTitle());
+                }
+            }
+
+            String imageUrl = fetchedProduct.getImageUrl();
+            if (StringUtils.isEmpty(cmpSku.getOriImageUrl()) || !StringUtils.isEqual(imageUrl, cmpSku.getOriImageUrl())) {
+                if (!StringUtils.isEmpty(imageUrl)) {
+                    ptmCmpSkuUpdater.getPo().setOriImageUrl(imageUrl);
+                }
+            }
+        }
+
+        if (cmpSku.getWebsite() == null) {
+            Website website = fetchedProduct.getWebsite();
+            if (website != null) {
+                ptmCmpSkuUpdater.getPo().setWebsite(fetchedProduct.getWebsite());
+            }
+        }
+
+        if (!StringUtils.isEmpty(fetchedProduct.getSubTitle())) {
+            ptmCmpSkuUpdater.getPo().setSkuTitle(fetchedProduct.getTitle() + fetchedProduct.getSubTitle());
+        }
+
+        ptmCmpSkuUpdater.getPo().setUpdateTime(TimeUtils.nowDate());
+        dbm.update(ptmCmpSkuUpdater);
+
         return;
     }
 }
