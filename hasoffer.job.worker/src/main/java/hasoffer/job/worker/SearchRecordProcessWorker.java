@@ -50,7 +50,7 @@ public class SearchRecordProcessWorker implements Runnable {
                     TimeUnit.SECONDS.sleep(5);
                     continue;
                 }
-                logger.debug("SearchRecordProcessWorker. search keyword {}. begin",searchLog);
+                logger.info("SearchRecordProcessWorker. search keyword {}. begin", searchLog);
                 SrmAutoSearchResult autoSearchResult = new SrmAutoSearchResult(searchLog);
 
                 String keyword = autoSearchResult.getTitle();
@@ -89,9 +89,17 @@ public class SearchRecordProcessWorker implements Runnable {
                 } else {
                     searchLogQueue.put(searchLog);
                 }
-
+                logger.info("SearchRecordProcessWorker.run()--keyword is {}: flipkartFetchResult.size() = {}", keyword, flipkartFetchResult.getFetchProducts().size());
+                logger.info("SearchRecordProcessWorker.run()--keyword is {}: amazonFetchResult.size() = {}", keyword, amazonFetchResult.getFetchProducts().size());
+                logger.info("SearchRecordProcessWorker.run()--keyword is {}: snapdealFetchResult.size() = {}", keyword, snapdealFetchResult.getFetchProducts().size());
+                logger.info("SearchRecordProcessWorker.run()--keyword is {}: shopcluesFetchResult.size() = {}", keyword, shopcluesFetchResult.getFetchProducts().size());
+                logger.info("SearchRecordProcessWorker.run()--keyword is {}: paytmFetchResult.size() = {}", keyword, paytmFetchResult.getFetchProducts().size());
+                logger.info("SearchRecordProcessWorker.run()--keyword is {}: ebayFetchResult.size() = {}", keyword, ebayFetchResult.getFetchProducts().size());
+                logger.info("SearchRecordProcessWorker.run()--keyword is {}: myntraFetchResult.size() = {}", keyword, myntraFetchResult.getFetchProducts().size());
+                logger.info("SearchRecordProcessWorker.run()--keyword is {}: jabongFetchResult.size() = {}", keyword, jabongFetchResult.getFetchProducts().size());
+                logger.info("SearchRecordProcessWorker.run()--keyword is {}: voonikFetchResult.size() = {}", keyword, voonikFetchResult.getFetchProducts().size());
             } catch (Exception e) {
-                logger.debug(e.getMessage());
+                logger.error(e.getMessage());
             }
         }
     }
