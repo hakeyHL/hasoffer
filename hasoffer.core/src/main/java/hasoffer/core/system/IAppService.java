@@ -37,6 +37,5 @@ public interface IAppService {
 
     void updateUserInfo(UrmUser uUser);
     List<AppBanner> getBanners();
-
-    
+    List<PtmCategory> getChildCategorys(String categoryId);
 }

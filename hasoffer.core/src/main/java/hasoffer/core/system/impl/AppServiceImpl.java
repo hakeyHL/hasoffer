@@ -49,7 +49,7 @@ public class AppServiceImpl implements IAppService {
                     " WHERE t.orderId = ?0 and t.userId=?1";
 
     private static final String Q_APP_CATEGORY =
-            "SELECT t FROM PtmCategory t " +
+            "SELECT t FROM PtmCategory t where t.parentId=0 " +
                     " order by level ASC,rank ASC";
 
     private static final String Q_APP_GETUSERBYTHIRDID =
@@ -62,6 +62,10 @@ public class AppServiceImpl implements IAppService {
 
     private static final String Q_APP_GEDEALDETAIL =
             " SELECT t from AppDeal t where t.id=?0";
+
+    private static final String Q_APP_GETCHILDCATEGORY =
+            "SELECT t FROM PtmCategory t where t.parentId=?0 " +
+                    " order by level ASC,rank ASC";
     @Resource
     IDataBaseManager dbm;
     private String Q_APP_GETPRODUCTS =
@@ -178,5 +182,12 @@ public class AppServiceImpl implements IAppService {
     @Override
     public List<AppBanner> getBanners() {
        return  dbm.query(Q_APP_GETBANNERS);
+    }
+
+    @Override
+    public List<PtmCategory> getChildCategorys(String categoryId) {
+        List li=new ArrayList();
+        li.add(Long.valueOf(categoryId));
+       return  dbm.query(Q_APP_GETCHILDCATEGORY,li);
     }
 }
