@@ -7,7 +7,6 @@ import org.quartz.listeners.JobListenerSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
 import java.util.Set;
 
 public class HistoryJobListener extends JobListenerSupport {
@@ -47,9 +46,9 @@ public class HistoryJobListener extends JobListenerSupport {
 
         if (jobException != null) {
             history.setResult(jobException.getMessage());
-            logger.error("== Job completed with exception: {},runtime:{},data:{}, result:{}", context.getJobDetail().getKey().getName(), new Date(context.getJobRunTime()), bufBuilder.toString(), jobException);
+            logger.error("== Job completed with exception: {},runtime:{},data:{}, result:{}", context.getJobDetail().getKey().getName(), context.getJobRunTime(), bufBuilder.toString(), jobException);
         } else {
-            logger.info("== Job completed: {},runtime:{},data:{}", context.getJobDetail().getKey().getName(), new Date(context.getJobRunTime()), bufBuilder.toString());
+            logger.info("== Job completed: {},runtime:{},data:{}", context.getJobDetail().getKey().getName(), context.getJobRunTime(), bufBuilder.toString());
         }
 
     }
