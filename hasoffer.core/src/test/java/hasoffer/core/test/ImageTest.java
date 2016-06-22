@@ -1,5 +1,6 @@
 package hasoffer.core.test;
 
+import hasoffer.core.bo.common.ImagePath;
 import hasoffer.core.utils.ImageUtil;
 import org.junit.Test;
 
@@ -14,7 +15,7 @@ public class ImageTest {
     public void f() throws Exception {
         String url = "http://d.hiphotos.baidu.com/zhidao/pic/item/e7cd7b899e510fb38cc9205dd833c895d0430c23.jpg";
 
-        String imagePath = ImageUtil.downloadAndUpload(url);
+        ImagePath imagePath = ImageUtil.downloadAndUpload2(url);
 
         System.out.println(imagePath.toString());
     }
