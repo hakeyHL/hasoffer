@@ -1,6 +1,7 @@
 package hasoffer.core.utils.excel;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.transaction.Transactional;
 
@@ -22,8 +23,9 @@ public interface ImportCallBack {
 	 *            {@link HibernateDao}
 	 * @param data
 	 *            原始Excel中的数据，按行进行分割
+     * @return
 	 */
-	void preOperation(HibernateDao dao, List<Object[]> data);
+	Map<String, Object> preOperation(HibernateDao dao, List<Object[]> data);
 
 	/**
 	 * 导入之后需要进行的数据库操作

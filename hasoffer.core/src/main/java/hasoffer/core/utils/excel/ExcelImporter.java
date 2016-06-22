@@ -1,8 +1,5 @@
 package hasoffer.core.utils.excel;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -10,6 +7,7 @@ import java.util.*;
 
 import javax.annotation.Resource;
 
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.HibernateDao;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -72,9 +70,15 @@ public class ExcelImporter {
         importMap.put("totalRows", preExecution.size());  //总有效行数
 
 		// 导入之前的一些必要操作
-		importConfig.getImportCallBack().preOperation(dao, preExecution);
+		Map<String, Object> handledData =  importConfig.getImportCallBack().preOperation(dao, preExecution);
+
+        int _nullRows = (Integer)handledData.get("_nullRows");
+        importMap.put("_nullRows", _nullRows);
+        int repeatRows = (Integer)handledData.get("repeatRows");
+        importMap.put("repeatRows", repeatRows);
+
 		// 处理Excel中的数据
-		final List<Object[]> batchArgs = importConfig.getImportData(dao, preExecution);
+		final List<Object[]> batchArgs = (List<Object[]>)handledData.get("dataQueue");
 		// 执行导入过程
 		int[] success = jdbcTemplate.batchUpdate(importConfig.getImportSQL(), new BatchPreparedStatementSetter() {
 			@Override
@@ -93,6 +97,9 @@ public class ExcelImporter {
 		if (success.length > 0) {
 			importConfig.getImportCallBack().postOperation(dao, batchArgs);
 		}
+        importMap.put("successRows", success.length);
+        importMap.put("failRows", preExecution.size() - success.length);
+        importMap.put("otherFailRows", preExecution.size() - success.length - _nullRows - repeatRows);
         return importMap;
 	}
 
@@ -103,8 +110,8 @@ public class ExcelImporter {
 				case HSSFCell.CELL_TYPE_NUMERIC: {
 					if (HSSFDateUtil.isCellDateFormatted(cell)) {
 						Date date = cell.getDateCellValue();
-						cellvalue = org.apache.http.client.utils.DateUtils.formatDate(date, "yyyy-MM-dd");
-					} else {
+						cellvalue = TimeUtils.parse(date, "yyyy-MM-dd");
+                    } else {
 						cellvalue = String.valueOf(cell.getNumericCellValue());
 					}
 					break;
@@ -112,7 +119,7 @@ public class ExcelImporter {
 				case HSSFCell.CELL_TYPE_FORMULA: {
 					if (HSSFDateUtil.isCellDateFormatted(cell)) {
 						Date date = cell.getDateCellValue();
-						cellvalue = org.apache.http.client.utils.DateUtils.formatDate(date, "yyyy-MM-dd");
+						cellvalue = TimeUtils.parse(date, "yyyy-MM-dd");
 					} else {
 						cellvalue = String.valueOf(cell.getNumericCellValue());
 					}

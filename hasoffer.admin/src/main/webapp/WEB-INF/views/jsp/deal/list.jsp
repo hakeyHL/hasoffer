@@ -7,6 +7,32 @@
 
 
 <div id="page-wrapper">
+
+    <div class="modal fade in" id="import_result" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" style="display: none;top:20%">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">导入结果</h4>
+                </div>
+                <div class="modal-body">
+                    <ul>
+                        <li>本次导入表格共<span id="totalRows"></span>条</li>
+                        <li>创建deal成功数量<span id="successRows"></span></li>
+                        <li>创建失败数量<span id="failRows"></span></li>
+                        <li>因网站名/deal名称/deal跳转链接为空失败<span id="nullRows"></span>条</li>
+                        <li>因deal链接重复失败<span id="repeatRows"></span>条</li>
+                        <li>其他失败<span id="otherFailRows"></span>条</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button id="confirm_button" type="button" class="btn btn-primary">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div class="row">
         <form action="import" enctype="multipart/form-data" method="post" id="form">
 
@@ -46,7 +72,10 @@
                         <td>${data.imageUrl}</td>
                         <td>否</td>
                         <td>${data.title}</td>
-                        <td>${device.createTime}</td>
+                        <td>${data.createTime}</td>
+                        <td>${data.expireTime}</td>
+                        <td><a href="#">编辑</a></td>
+                        <td><a href="#">删除</a></td>
                     </tr>
                 </c:forEach>
                 </tbody>
@@ -60,14 +89,30 @@
 <script>
     $(function(){
         $('#multiFile').change(function(e){
-            var _this = $(this);
-            if(_this.val() == ''){
-                alert("请选择文件");
-                return false;
-            }
+            $("#form").ajaxSubmit({
+                //定义返回JSON数据，还包括xml和script格式
+                dataType:'json',
+                beforeSend: function() {
+                    //表单提交前做表单验证
+                },
+                success: function(data) {
+                    console.info(data)
 
-           $('#form').submit();
+                    $("#totalRows").html(data.totalRows);
+                    $("#successRows").html(data.successRows);
+                    $("#failRows").html(data.failRows);
+                    $("#nullRows").html(data._nullRows);
+                    $("#repeatRows").html(data.repeatRows);
+                    $("#otherFailRows").html(data.otherFailRows);
+                    $('#import_result').modal('show');
+                    $("#confirm_button").click(function(){
+                        $('#import_result').modal('hide');
+                        window.location.reload();
+                    });
+                }
+            });
         });
+
     });
 </script>
 <jsp:include page="../include/footer.jsp"/>

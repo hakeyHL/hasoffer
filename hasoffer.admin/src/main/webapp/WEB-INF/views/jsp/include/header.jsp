@@ -22,6 +22,7 @@
 	<!-- js-core -->
 	<script src="<%=contextPath%>/static/js/jquery/jquery-2.1.1.min.js"></script>
 	<script src="<%=contextPath%>/static/js/jqueryui/jquery-ui-1.9.2.custom.min.js"></script>
+    <script src="<%=contextPath%>/static/js/jquery/jquery.form.js"></script>
 	<script src="<%=contextPath%>/static/js/bootstrap/bootstrap.min.js"></script>
 	<script src="<%=contextPath%>/static/js/bootstrap/bootstrap-typeahead.min.js"></script>
 

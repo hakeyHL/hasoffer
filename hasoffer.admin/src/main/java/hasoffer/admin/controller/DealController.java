@@ -3,6 +3,7 @@ package hasoffer.admin.controller;
 import hasoffer.base.model.PageableResult;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.po.app.AppDeal;
+import hasoffer.webcommon.helper.PageHelper;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,11 +29,12 @@ public class DealController {
     IDealService dealService;
 
     @RequestMapping(value="/list", method = RequestMethod.GET)
-    public ModelAndView listDealData(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "50") int size){
-        ModelAndView mov = new ModelAndView("deal/list");
+    public ModelAndView listDealData(HttpServletRequest request, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "50") int size){
+        ModelAndView mav = new ModelAndView("deal/list");
         PageableResult<AppDeal> pageableResult = dealService.findDealList(page, size);
-
-        return mov;
+        mav.addObject("page", PageHelper.getPageModel(request, pageableResult));
+        mav.addObject("datas", pageableResult.getData());
+        return mav;
     }
 
     /**
@@ -45,8 +47,10 @@ public class DealController {
     public Map<String, Object> importExcel(MultipartFile multiFile, HttpServletRequest request){
         Map<String, Object> result = new HashMap<String, Object>();
         try {
-            dealService.importExcelFile(multiFile);
+            result = dealService.importExcelFile(multiFile);
+            result.put("success", true);
         } catch (Exception e) {
+            result.put("success", false);
             e.printStackTrace();
         }
         return result;
