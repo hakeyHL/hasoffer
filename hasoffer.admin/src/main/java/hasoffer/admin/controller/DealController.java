@@ -44,9 +44,8 @@ public class DealController {
     @ResponseBody
     public Map<String, Object> importExcel(MultipartFile multiFile, HttpServletRequest request){
         Map<String, Object> result = new HashMap<String, Object>();
-        String realPath = request.getSession().getServletContext().getRealPath("/upload");
         try {
-            dealService.importExcelFile(multiFile, realPath);
+            dealService.importExcelFile(multiFile);
         } catch (Exception e) {
             e.printStackTrace();
         }

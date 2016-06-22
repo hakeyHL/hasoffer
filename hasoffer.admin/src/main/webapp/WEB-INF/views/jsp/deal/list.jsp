@@ -8,11 +8,17 @@
 
 <div id="page-wrapper">
     <div class="row">
-        <form action="deal/import" method="post">
-            <div class="col-lg-2">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">请选择Excel文件</h4>
+        <form action="import" enctype="multipart/form-data" method="post" id="form">
+
+            <div class="col-lg-12" style="margin: 5px"></div>
+
+            <div class="col-lg-12" >
+                <span class="modal-title">请选择Excel文件:</span>
+                <input type="file" name="multiFile" id="multiFile" class="file-loading" style="display: inline;"/>
+
             </div>
+
+            <div class="col-lg-12" style="margin: 5px"></div>
         </form>
 
     </div>
@@ -51,5 +57,17 @@
     <jsp:include page="../include/page.jsp"/>
 </div>
 
+<script>
+    $(function(){
+        $('#multiFile').change(function(e){
+            var _this = $(this);
+            if(_this.val() == ''){
+                alert("请选择文件");
+                return false;
+            }
 
+           $('#form').submit();
+        });
+    });
+</script>
 <jsp:include page="../include/footer.jsp"/>

@@ -9,6 +9,8 @@ import hasoffer.core.utils.excel.ImportCallBack;
 import hasoffer.core.utils.excel.ImportConfig;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -19,6 +21,8 @@ import java.util.Map;
 /**
  * Created by lihongde on 2016/6/21 14:03
  */
+@Service
+@Transactional
 public class DealServiceImpl implements IDealService {
 
 
@@ -37,8 +41,8 @@ public class DealServiceImpl implements IDealService {
     }
 
     @Override
-    public Map<String, Object> importExcelFile(MultipartFile multipartFile, String realPath) throws Exception {
-        importer.setImportConfig(new ImportConfig() {
+    public Map<String, Object> importExcelFile(MultipartFile multipartFile) throws Exception {
+        Map<String, Object> importResult = importer.setImportConfig(new ImportConfig() {
             @Override
             public String validation(Workbook xwb) {
                 return null;
@@ -49,11 +53,11 @@ public class DealServiceImpl implements IDealService {
                 return IMPORT_SQL;
             }
 
-        @Override
-        public List<Object[]> getImportData(HibernateDao dao, List<Object[]> data) {
-            List<Object[]> dataQueue = new LinkedList<Object[]>();
-            for (Object[] temp : data) {
-                Object[] tempData = new Object[66];
+             @Override
+            public List<Object[]> getImportData(HibernateDao dao, List<Object[]> data) {
+                List<Object[]> dataQueue = new LinkedList<Object[]>();
+                for (Object[] temp : data) {
+                Object[] tempData = new Object[4];
                 for (int i = 0; i < tempData.length; i++) {
                     if (i==16 || i == 17 || i == 63 || i == 65) {
                         tempData[i] = StringUtils.isBlank(temp[i] + "") ? null : temp[i];
@@ -62,28 +66,28 @@ public class DealServiceImpl implements IDealService {
                     } else {
                         tempData[i] = temp[i];
                     }
+                 }
+                    dataQueue.add(tempData);
                 }
-                dataQueue.add(tempData);
+                return data;
             }
-            return dataQueue;
-        }
 
-        @Override
-        public ImportCallBack getImportCallBack() {
-            return new ImportCallBack() {
-                @Override
-                public void preOperation(HibernateDao dao, List<Object[]> data) {
+            @Override
+            public ImportCallBack getImportCallBack() {
+                return new ImportCallBack() {
+                    @Override
+                    public void preOperation(HibernateDao dao, List<Object[]> data) {
 
-                }
+                    }
 
-                @Override
-                public void postOperation(HibernateDao dao, List<Object[]> data) {
+                    @Override
+                    public void postOperation(HibernateDao dao, List<Object[]> data) {
 
-                }
-            };
-        }
-    }).importExcelFile(multipartFile, realPath);
+                    }
+                };
+            }
+        }).importExcelFile(multipartFile);
 
-        return null;
+        return importResult;
     }
 }

@@ -1,13 +1,12 @@
 package hasoffer.core.utils.excel;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import javax.annotation.Resource;
 
@@ -43,12 +42,13 @@ public class ExcelImporter {
 		return this;
 	}
 
-	public void importExcelFile(MultipartFile multipartFile, String realPath) throws IOException {
-		File file = this.transferLocal(multipartFile, realPath);
+	public Map<String, Object> importExcelFile(MultipartFile multipartFile) throws IOException {
+        Map<String, Object> importMap = new HashMap<String, Object>();
+
 		ImportConfig importConfig = this.getImportConfig();
 		if (importConfig == null) throw new RuntimeException("无参数配置，无法执行导入操作");
 		// 根据文件后缀名创建不同版本的excel
-		Workbook xwb = file.getName().contains("xlsx") ? new XSSFWorkbook(new FileInputStream(file)) : new HSSFWorkbook(new FileInputStream(file));
+		Workbook xwb = multipartFile.getOriginalFilename().contains("xlsx") ? new XSSFWorkbook(multipartFile.getInputStream()) : new HSSFWorkbook(multipartFile.getInputStream());
 		// 进行excel模版校验
 		String error = importConfig.validation(xwb);
 		if (null != error && !"".equals(error)) throw new RuntimeException(error);
@@ -61,13 +61,16 @@ public class ExcelImporter {
 			Row row = sheet.getRow(i);
 			Object[] tempData = new Object[cells];
 			//判断是否为空，如果为空则不处理
-			if (StringUtils.isNotEmpty(getCellFormatValue(row.getCell(0)).trim())) {
+			if (row != null && row.getCell(0) != null && StringUtils.isNotEmpty(getCellFormatValue(row.getCell(0)).trim())) {
 				for (int j = 0; j < cells; j++) {
 					tempData[j] = getCellFormatValue(row.getCell(j));
 				}
 				preExecution.add(tempData);
 			}
 		}
+
+        importMap.put("totalRows", preExecution.size());  //总有效行数
+
 		// 导入之前的一些必要操作
 		importConfig.getImportCallBack().preOperation(dao, preExecution);
 		// 处理Excel中的数据
@@ -90,19 +93,8 @@ public class ExcelImporter {
 		if (success.length > 0) {
 			importConfig.getImportCallBack().postOperation(dao, batchArgs);
 		}
+        return importMap;
 	}
-
-    private File transferLocal(MultipartFile multipartFile, String realPath) throws IOException {
-        String today = org.apache.http.client.utils.DateUtils.formatDate(new Date(), "yyyyMMddHHmmss");
-        File dir = new File(realPath);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-        //文件命名方式为年月日时分秒+后缀名
-        File file = new File(dir, today + multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().lastIndexOf(".")));
-        multipartFile.transferTo(file);
-        return file;
-    }
 
 	private String getCellFormatValue(Cell cell) {
 		String cellvalue = "";
