@@ -64,7 +64,7 @@ public class TaskTest {
                 }
 
                 oriFetchedProduct = fetchService.udpateSkuInAnyWay(sku.getUrl(), sku.getWebsite());
-                cmpSkuService.updateCmpSkuBySummaryProduct(sku.getId(), oriFetchedProduct);
+                cmpSkuService.updateCmpSkuByOriFetchedProduct(sku.getId(), oriFetchedProduct);
 
             } catch (Exception e) {
                 System.out.println("update sku fail for [" + sku.getId() + "]");

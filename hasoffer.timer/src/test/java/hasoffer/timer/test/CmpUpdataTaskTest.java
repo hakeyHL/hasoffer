@@ -262,6 +262,6 @@ public class CmpUpdataTaskTest {
 
         }
 
-        cmpSkuService.updateCmpSkuBySummaryProduct(id, oriFetchedProduct);
+        cmpSkuService.updateCmpSkuByOriFetchedProduct(id, oriFetchedProduct);
     }
 }
