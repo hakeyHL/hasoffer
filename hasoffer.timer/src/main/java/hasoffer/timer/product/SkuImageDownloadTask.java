@@ -64,7 +64,7 @@ public class SkuImageDownloadTask {
                         continue;
                     }
 
-                    cmpSkuService.downloadImage(sku);
+                    cmpSkuService.downloadImage2(sku);
                 }
             }
 
