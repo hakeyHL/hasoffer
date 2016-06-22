@@ -6,7 +6,8 @@
         <add key="SOLR_CMPSKU_URL" value="http://solrserver:8983/solr/hasoffercmpsku/"/>
         <add key="IMAGE_HOST" value="img.hasoffer.com"/>
         <add key="IMAGE_URL_3RD_PREFIX" value="http://img.hasoffer.com/3rd/"/>
-        <add key="IMAGE_UPLOAD_URL" value="http://54.169.146.198:8080/hasoffer-file/image/"/>
+        <add key="IMAGE_UPLOAD_URL" value="http://60.205.57.68/hasoffer-file/image"/>
+        <add key="IMAGE_UPLOAD_URL2" value="http://60.205.57.68/hasoffer-file/image2"/>
         <add key="IMAGE_SITELOGO_PATH" value="http://img.hasoffer.com/sites/"/>
         <add key="WEB_HOST" value="http://www.hasoffer.com"/>
         <add key="API_HOST" value="http://api.hasoffer.com"/>
@@ -20,6 +21,7 @@
         <add key="IMAGE_HOST" value="img.hasoffer.com"/>
         <add key="IMAGE_URL_3RD_PREFIX" value="http://img.hasoffer.com/3rd/"/>
         <add key="IMAGE_UPLOAD_URL" value="http://web2:8080/hasoffer-file/image/"/>
+        <add key="IMAGE_UPLOAD_URL2" value="http://web2:8080/hasoffer-file/image2/"/>
         <add key="IMAGE_SITELOGO_PATH" value="http://img.hasoffer.com/sites/"/>
         <add key="WEB_HOST" value="http://www.hasoffer.com"/>
         <add key="API_HOST" value="http://api.hasoffer.com"/>
@@ -33,6 +35,7 @@
         <add key="IMAGE_HOST" value="img.hasoffer.com"/>
         <add key="IMAGE_URL_3RD_PREFIX" value="http://img.hasoffer.com/3rd/"/>
         <add key="IMAGE_UPLOAD_URL" value="http://web2:8080/hasoffer-file/image/"/>
+        <add key="IMAGE_UPLOAD_URL2" value="http://web2:8080/hasoffer-file/image2/"/>
         <add key="IMAGE_SITELOGO_PATH" value="http://img.hasoffer.com/sites/"/>
         <add key="WEB_HOST" value="http://101.201.196.143:8000"/>
         <add key="API_HOST" value="http://api.hasoffer.com"/>
@@ -46,6 +49,7 @@
         <add key="IMAGE_HOST" value="img.hasoffer.com"/>
         <add key="IMAGE_URL_3RD_PREFIX" value="http://img.hasoffer.com/3rd/"/>
         <add key="IMAGE_UPLOAD_URL" value="http://web2:8080/hasoffer-file/image/"/>
+        <add key="IMAGE_UPLOAD_URL2" value="http://web2:8080/hasoffer-file/image2/"/>
         <add key="IMAGE_SITELOGO_PATH" value="http://img.hasoffer.com/sites/"/>
         <add key="WEB_HOST" value="http://www.hasoffer.com"/>
         <add key="API_HOST" value="http://api.hasoffer.com"/>

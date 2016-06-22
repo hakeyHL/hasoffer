@@ -98,6 +98,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
             try {
 
                 skuList = getSku(website, cliQ, sourceId);
+                logger.debug("get sku success nmb");
 
             } catch (HttpFetchException e) {
 
@@ -126,7 +127,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
 
                 IndexHistory history = new IndexHistory("GetSkuSuccess", TimeUtils.nowDate());
                 indexHistoryList.add(history);
-
+                logger.debug("GetSkuSuccess nmb");
                 createOrUpdateIndex(skuList, statHijackFetch);
 
             } else {
@@ -148,12 +149,14 @@ public class SaveOrUpdateIndexWorker implements Runnable {
 
         for (PtmCmpSku sku : skuList) {
 
+            logger.debug("result list sql start");
             List<PtmCmpSku> resultList = dbm.query(Q_PTMCMPSKU_SOURCESID, Arrays.asList(sku.getSourceSid(), sku.getWebsite()));
+            logger.debug("result list sql stop");
 
             //如果有结果，将所有结果的url和tltle等字段进行全部的更新
             //如果没有结果，创建sku，新建索引
             if (ArrayUtils.hasObjs(resultList)) {
-
+                logger.debug("hasobject");
                 for (PtmCmpSku oldSku : resultList) {
 
                     //更新sku
@@ -186,7 +189,9 @@ public class SaveOrUpdateIndexWorker implements Runnable {
                 }
             } else {
 
+                logger.debug("create sku nmb");
                 PtmCmpSku cmpSkuForIndex = cmpSkuService.createCmpSkuForIndex(sku);
+                logger.debug("create sku finish nmb");
                 cmpSkuService.createPtmCmpSkuIndexToMysql(cmpSkuForIndex);
                 statHijackFetch.getAffectSkuIdList().add(cmpSkuForIndex.getId() + "");
             }

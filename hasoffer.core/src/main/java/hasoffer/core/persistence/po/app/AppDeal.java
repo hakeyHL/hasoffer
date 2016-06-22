@@ -22,12 +22,14 @@ public class AppDeal implements Identifiable<Long> {
     private Website website;//deal来源网站
 
     private String title;//deal标题
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String linkUrl;//deal跳转地址
 
     private String imageUrl;//本地图片服务器地址
 
+    @Column(nullable = false)
     private Date createTime;//deal创建时间
+    @Column(nullable = false)
     private Date expireTime;//deal失效时间
 
     private String description;//deal描述

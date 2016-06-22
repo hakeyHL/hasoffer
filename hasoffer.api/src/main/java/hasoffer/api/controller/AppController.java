@@ -338,20 +338,19 @@ public class AppController {
      */
     @RequestMapping(value = "/dealInfo", method = RequestMethod.GET)
     public ModelAndView dealInfo(@RequestParam String id) {
-
+        AppDeal appDeal=appService.getDealDetail(id);
         ModelAndView mv =new ModelAndView();
-        String data="{\n" +
-                "    \"data\": {\n" +
-                "        \"image\": \"http://192.168.1.126/xx.png\",\n" +
-                "        \"title\": \"apple\",\n" +
-                "        \"exp\": \"MMddyyyy HH:mm:ss\",\n" +
-                "        \"extra\": \"20.5\",\n" +
-                "        \"description\": \"hello\",\n" +
-                "        \"cashbackInfo\": \"hello\",\n" +
-                "        \"deeplink\": \"https://detail.tmall.com/item.htm?spm=a220m.1000858.1000725.6.ccDpo6&id=522564306073&skuId=3134511781351&areaId=110000&cat_id=2&rn=8c1bc36d77df4d902446186d57ffe73f&user_id=2231547606&is_b=1\"\n" +
-                "    }\n" +
-                "}";
-        mv.addObject("data",data);
+        if(appDeal!=null){
+            Map map=new HashMap();
+            map.put("image",appDeal.getImageUrl());
+            map.put("title",appDeal.getTitle());
+            map.put("exp",appDeal.getExpireTime());
+            map.put("extra",0.03);
+            map.put("description",appDeal.getDescription());
+            map.put("cashbackInfo"," hello ");
+            map.put("deeplink",appDeal.getLinkUrl());
+            mv.addObject("data",map);
+        }
         return mv ;
     }
 
