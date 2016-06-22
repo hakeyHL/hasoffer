@@ -7,7 +7,7 @@ import hasoffer.base.utils.HtmlUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.model.ProductStatus;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import org.htmlcleaner.TagNode;
 
 import java.util.Arrays;
@@ -26,42 +26,42 @@ public class BagittodaySummaryProductProcessor implements ISummaryProductProcess
     private static final String XPATH_PRODUCT_STATUS = "//div[@class='prdErrorMsg']";
 
     @Override
-    public FetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
+    public OriFetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
 
-        FetchedProduct fetchedProduct = new FetchedProduct();
+        OriFetchedProduct oriFetchedProduct = new OriFetchedProduct();
 
-        fetchedProduct.setUrl(url);
-        fetchedProduct.setWebsite(Website.BAGITTODAY);
+        oriFetchedProduct.setUrl(url);
+        oriFetchedProduct.setWebsite(Website.BAGITTODAY);
 
 
         TagNode root = HtmlUtils.getUrlRootTagNode(url);
 
         TagNode statusNode = getSubNodeByXPath(root, XPATH_PRODUCT_STATUS, null);
         if (statusNode != null) {
-            fetchedProduct.setProductStatus(ProductStatus.OFFSALE);
-            return fetchedProduct;
+            oriFetchedProduct.setProductStatus(ProductStatus.OFFSALE);
+            return oriFetchedProduct;
         }
 
         TagNode sourceIdNode = getSubNodeByXPath(root, XPATH_PRODUCT_SOURCEID, new ContentParseException("sourceID not found for [" + url + "]"));
         String sourceId = sourceIdNode.getAttributeByName("value");
-        fetchedProduct.setSourceSid(sourceId);
+        oriFetchedProduct.setSourceSid(sourceId);
 
         TagNode titleNode = getSubNodeByXPath(root, XPATH_PRODUCT_TITLE, new ContentParseException("title not found for [" + url + "]"));
         String title = titleNode.getText().toString();
-        fetchedProduct.setTitle(title);
+        oriFetchedProduct.setTitle(title);
 
         TagNode imageNode = getSubNodeByXPath(root, XPATH_PRODUCT_IMAGE, new ContentParseException("image not found for [" + url + "]"));
         String imageUrl = imageNode.getAttributeByName("content");
-        fetchedProduct.setImageUrl(imageUrl);
+        oriFetchedProduct.setImageUrl(imageUrl);
 
         TagNode priceNode = getSubNodeByXPath(root, XPATH_PRODUCT_PRICE, new ContentParseException("price not found for [" + url + "]"));
         String priceString = priceNode.getText().toString();
         priceString = StringUtils.filterAndTrim(priceString, Arrays.asList("r"));
         float price = Float.parseFloat(priceString);
-        fetchedProduct.setPrice(price);
+        oriFetchedProduct.setPrice(price);
 
-        fetchedProduct.setProductStatus(ProductStatus.ONSALE);
+        oriFetchedProduct.setProductStatus(ProductStatus.ONSALE);
 
-        return fetchedProduct;
+        return oriFetchedProduct;
     }
 }

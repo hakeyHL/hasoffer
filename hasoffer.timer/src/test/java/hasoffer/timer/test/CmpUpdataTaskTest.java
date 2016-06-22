@@ -10,7 +10,7 @@ import hasoffer.core.product.IFetchService;
 import hasoffer.core.system.ITimerService;
 import hasoffer.fetch.exception.amazon.AmazonRobotCheckException;
 import hasoffer.fetch.helper.WebsiteHelper;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.ProductStatus;
 import hasoffer.timer.product.worker.CmpSkuListWorker;
 import hasoffer.timer.product.worker.CmpSkuUpdateWorker;
@@ -234,19 +234,19 @@ public class CmpUpdataTaskTest {
             logger.debug(url + " parse website get null");
         }
 
-        FetchedProduct fetchedProduct = null;
+        OriFetchedProduct oriFetchedProduct = null;
         try {
-            fetchedProduct = fetchService.fetchSummaryProductByUrl(url);
+            oriFetchedProduct = fetchService.fetchSummaryProductByUrl(url);
         } catch (Exception e) {
 
             String message = e.getMessage();
             if (message != null) {
                 if (message.contains("302") || message.contains("404")) {
-                    fetchedProduct = new FetchedProduct();
-                    fetchedProduct.setTitle("url expire");
-                    fetchedProduct.setProductStatus(ProductStatus.OFFSALE);
-                    fetchedProduct.setWebsite(website);
-                    fetchedProduct.setUrl(url);
+                    oriFetchedProduct = new OriFetchedProduct();
+                    oriFetchedProduct.setTitle("url expire");
+                    oriFetchedProduct.setProductStatus(ProductStatus.OFFSALE);
+                    oriFetchedProduct.setWebsite(website);
+                    oriFetchedProduct.setUrl(url);
                 } else {
                     logger.error(e.toString());
                 }
@@ -262,6 +262,6 @@ public class CmpUpdataTaskTest {
 
         }
 
-        cmpSkuService.updateCmpSkuBySummaryProduct(id, fetchedProduct);
+        cmpSkuService.updateCmpSkuBySummaryProduct(id, oriFetchedProduct);
     }
 }

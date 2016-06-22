@@ -6,7 +6,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.HtmlUtils;
 import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.model.ProductStatus;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import org.htmlcleaner.TagNode;
 
 import java.util.List;
@@ -28,20 +28,20 @@ public class EbaySummaryProductProcessor implements ISummaryProductProcessor {
     private static final String XPATH_LISTURL = "//div[@id='LeftPanelInner']";
 
     @Override
-    public FetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
+    public OriFetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
 
-        FetchedProduct fetchedProduct = new FetchedProduct();
+        OriFetchedProduct oriFetchedProduct = new OriFetchedProduct();
         String sourceId = EbayHelper.getProductIdByUrl(url);
 
         TagNode root = HtmlUtils.getUrlRootTagNode(url);
 
         TagNode leftPanelNode = getSubNodeByXPath(root, XPATH_LISTURL, null);
         if (leftPanelNode != null) {
-            fetchedProduct.setTitle("list url");
-            fetchedProduct.setUrl(url);
-            fetchedProduct.setWebsite(Website.EBAY);
-            fetchedProduct.setProductStatus(ProductStatus.OFFSALE);
-            return fetchedProduct;
+            oriFetchedProduct.setTitle("list url");
+            oriFetchedProduct.setUrl(url);
+            oriFetchedProduct.setWebsite(Website.EBAY);
+            oriFetchedProduct.setProductStatus(ProductStatus.OFFSALE);
+            return oriFetchedProduct;
         }
 
         String title = "";
@@ -69,14 +69,14 @@ public class EbaySummaryProductProcessor implements ISummaryProductProcessor {
         }
         String imageUrl = imageNode.getAttributeByName("src");
 
-        fetchedProduct.setImageUrl(imageUrl);
-        fetchedProduct.setPrice(price);
-        fetchedProduct.setProductStatus(ProductStatus.ONSALE);
-        fetchedProduct.setTitle(title);
-        fetchedProduct.setUrl(url);
-        fetchedProduct.setWebsite(Website.EBAY);
-        fetchedProduct.setSourceSid(sourceId);
+        oriFetchedProduct.setImageUrl(imageUrl);
+        oriFetchedProduct.setPrice(price);
+        oriFetchedProduct.setProductStatus(ProductStatus.ONSALE);
+        oriFetchedProduct.setTitle(title);
+        oriFetchedProduct.setUrl(url);
+        oriFetchedProduct.setWebsite(Website.EBAY);
+        oriFetchedProduct.setSourceSid(sourceId);
 
-        return fetchedProduct;
+        return oriFetchedProduct;
     }
 }

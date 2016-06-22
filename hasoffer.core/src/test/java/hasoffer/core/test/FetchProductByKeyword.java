@@ -6,7 +6,7 @@ import hasoffer.affiliate.model.AffiliateProduct;
 import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.exception.HttpFetchException;
 import hasoffer.core.product.iml.FetchServiceImpl;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.ListProduct;
 import hasoffer.fetch.sites.paytm.PaytmListProcessor;
 import hasoffer.fetch.sites.shopclues.ShopcluesListProcessor;
@@ -89,10 +89,10 @@ public class FetchProductByKeyword {
 
         FetchServiceImpl fetchService = new FetchServiceImpl();
 
-        FetchedProduct fetchedProduct = null;
+        OriFetchedProduct oriFetchedProduct = null;
 
         try {
-            fetchedProduct = fetchService.fetchSummaryProductByUrl(url);
+            oriFetchedProduct = fetchService.fetchSummaryProductByUrl(url);
         } catch (HttpFetchException e) {
             e.printStackTrace();
         } catch (ContentParseException e) {
@@ -105,7 +105,7 @@ public class FetchProductByKeyword {
             e.printStackTrace();
         }
 
-        System.out.println(fetchedProduct);
+        System.out.println(oriFetchedProduct);
 
     }
 

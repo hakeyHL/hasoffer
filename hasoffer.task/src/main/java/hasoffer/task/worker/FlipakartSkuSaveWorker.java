@@ -12,7 +12,7 @@ import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.helper.WebsiteSummaryProductProcessorFactory;
 import hasoffer.fetch.model.ProductStatus;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,10 +73,10 @@ public class FlipakartSkuSaveWorker implements Runnable {
 
             ISummaryProductProcessor summaryProductProcessor = WebsiteSummaryProductProcessorFactory.getSummaryProductProcessor(website);
 
-            FetchedProduct fetchedProduct = null;
+            OriFetchedProduct oriFetchedProduct = null;
 
             try {
-                fetchedProduct = summaryProductProcessor.getSummaryProductByUrl(url);
+                oriFetchedProduct = summaryProductProcessor.getSummaryProductByUrl(url);
             } catch (HttpFetchException e) {
                 logger.debug("httpFetchException for [" + sku.getId() + "]");
             } catch (ContentParseException e) {
@@ -85,24 +85,24 @@ public class FlipakartSkuSaveWorker implements Runnable {
                 logger.debug(e.toString()+" for ["+sku.getId()+"]");
             }
 
-            if (fetchedProduct == null) {
+            if (oriFetchedProduct == null) {
                 logger.debug("summaryProductProcessor get product null for [" + sku.getId() + "]");
                 continue;
             }
 
-            PtmCmpSkuFetchResult fetchResult = new PtmCmpSkuFetchResult(sku.getId(), fetchedProduct.getUrl());
-            fetchResult.setSourceId(fetchedProduct.getSourceSid());
-            fetchResult.setSubTitle(fetchedProduct.getSubTitle());
-            fetchResult.setPrice(fetchedProduct.getPrice());
-            fetchResult.setWebsite(fetchedProduct.getWebsite());
-            fetchResult.setTitle(fetchedProduct.getTitle());
-            fetchResult.setImageUrl(fetchedProduct.getImageUrl());
+            PtmCmpSkuFetchResult fetchResult = new PtmCmpSkuFetchResult(sku.getId(), oriFetchedProduct.getUrl());
+            fetchResult.setSourceId(oriFetchedProduct.getSourceSid());
+            fetchResult.setSubTitle(oriFetchedProduct.getSubTitle());
+            fetchResult.setPrice(oriFetchedProduct.getPrice());
+            fetchResult.setWebsite(oriFetchedProduct.getWebsite());
+            fetchResult.setTitle(oriFetchedProduct.getTitle());
+            fetchResult.setImageUrl(oriFetchedProduct.getImageUrl());
 //            fetchResult.setPageHtml(summaryProduct.getPageHtml());
 
             SkuStatus status = null;
-            if (ProductStatus.OFFSALE.equals(fetchedProduct.getProductStatus())) {
+            if (ProductStatus.OFFSALE.equals(oriFetchedProduct.getProductStatus())) {
                 status = SkuStatus.OFFSALE;
-            } else if (ProductStatus.OUTSTOCK.equals(fetchedProduct.getProductStatus())) {
+            } else if (ProductStatus.OUTSTOCK.equals(oriFetchedProduct.getProductStatus())) {
                 status = SkuStatus.OUTSTOCK;
             } else {
                 status = SkuStatus.ONSALE;

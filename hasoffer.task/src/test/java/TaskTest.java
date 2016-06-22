@@ -6,7 +6,7 @@ import hasoffer.core.persistence.mongo.PtmCmpSkuFetchResult;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IFetchService;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.data.domain.Sort;
@@ -56,15 +56,15 @@ public class TaskTest {
 
         for (PtmCmpSku sku : skus) {
 
-            FetchedProduct fetchedProduct = null;
+            OriFetchedProduct oriFetchedProduct = null;
             try {
 
                 if (TimeUtils.now() - sku.getUpdateTime().getTime() < TimeUtils.MILLISECONDS_OF_1_DAY) {
                     continue;
                 }
 
-                fetchedProduct = fetchService.udpateSkuInAnyWay(sku.getUrl(), sku.getWebsite());
-                cmpSkuService.updateCmpSkuBySummaryProduct(sku.getId(), fetchedProduct);
+                oriFetchedProduct = fetchService.udpateSkuInAnyWay(sku.getUrl(), sku.getWebsite());
+                cmpSkuService.updateCmpSkuBySummaryProduct(sku.getId(), oriFetchedProduct);
 
             } catch (Exception e) {
                 System.out.println("update sku fail for [" + sku.getId() + "]");

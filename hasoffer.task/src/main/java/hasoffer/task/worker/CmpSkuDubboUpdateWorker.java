@@ -97,7 +97,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
                 try {
 
-//                    cmpSkuService.updateCmpSkuBySummaryProduct(sku.getId(), fetchedProduct);
+                    cmpSkuService.updateCmpSkuBySpiderFetchedProduct(sku.getId(), fetchedProduct);
                     logger.debug(sku.getId() + " fetch success " + website);
                 } catch (Exception e) {
                     logger.debug(e.toString());

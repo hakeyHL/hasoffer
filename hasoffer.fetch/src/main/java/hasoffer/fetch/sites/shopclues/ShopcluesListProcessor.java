@@ -192,7 +192,7 @@ public class ShopcluesListProcessor implements IListProcessor {
 
                 try {
                     ShopCluesSummaryProductProcessor processor = new ShopCluesSummaryProductProcessor();
-                    FetchedProduct product = processor.getSummaryProductByUrl(url);
+                    OriFetchedProduct product = processor.getSummaryProductByUrl(url);
                     if (product != null) {
                         title = product.getTitle();
                         sourceId = product.getSourceSid();

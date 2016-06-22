@@ -6,7 +6,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.HtmlUtils;
 import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.model.ProductStatus;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import org.htmlcleaner.TagNode;
 
 import java.util.List;
@@ -28,10 +28,10 @@ public class CromaretailSummaryProductProcessor implements ISummaryProductProces
     private static final String XPATH_PRODUCT_STATUS = "//div[@id='outof-stock']";
 
     @Override
-    public FetchedProduct
+    public OriFetchedProduct
     getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
 
-        FetchedProduct fetchedProduct = new FetchedProduct();
+        OriFetchedProduct oriFetchedProduct = new OriFetchedProduct();
 
         TagNode root = HtmlUtils.getUrlRootTagNode(url);
 
@@ -44,7 +44,7 @@ public class CromaretailSummaryProductProcessor implements ISummaryProductProces
         float price = 0.0f;
         TagNode statusNode = getSubNodeByXPath(root, XPATH_PRODUCT_STATUS, null);
         if (statusNode != null) {
-            fetchedProduct.setProductStatus(ProductStatus.OFFSALE);
+            oriFetchedProduct.setProductStatus(ProductStatus.OFFSALE);
         } else {
             TagNode priceNode = getSubNodeByXPath(root, XPATH_PRICE, new ContentParseException("price not found"));
             String priceString = priceNode.getText().toString().trim();
@@ -63,14 +63,14 @@ public class CromaretailSummaryProductProcessor implements ISummaryProductProces
             }
         }
 
-        fetchedProduct.setImageUrl(imageUrl);
-        fetchedProduct.setPrice(price);
-        fetchedProduct.setProductStatus(ProductStatus.ONSALE);
-        fetchedProduct.setTitle(title);
-        fetchedProduct.setUrl(url);
-        fetchedProduct.setWebsite(Website.CROMARETAIL);
-        fetchedProduct.setSourceSid(sourceId);
+        oriFetchedProduct.setImageUrl(imageUrl);
+        oriFetchedProduct.setPrice(price);
+        oriFetchedProduct.setProductStatus(ProductStatus.ONSALE);
+        oriFetchedProduct.setTitle(title);
+        oriFetchedProduct.setUrl(url);
+        oriFetchedProduct.setWebsite(Website.CROMARETAIL);
+        oriFetchedProduct.setSourceSid(sourceId);
 
-        return fetchedProduct;
+        return oriFetchedProduct;
     }
 }

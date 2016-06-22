@@ -10,7 +10,7 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICmpSkuService;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.ProductStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import jodd.io.FileUtil;
@@ -175,25 +175,25 @@ public class MysqlTest {
         String productStatus = flipkartProduct.getProductStatus();
         String url1 = flipkartProduct.getUrl();
 
-        FetchedProduct fetchedProduct = new FetchedProduct();
-        fetchedProduct.setPrice(price);
-        fetchedProduct.setSourceSid(sourceId);
-        fetchedProduct.setImageUrl(imageUrl);
-        fetchedProduct.setTitle(title);
-        fetchedProduct.setUrl(url1);
+        OriFetchedProduct oriFetchedProduct = new OriFetchedProduct();
+        oriFetchedProduct.setPrice(price);
+        oriFetchedProduct.setSourceSid(sourceId);
+        oriFetchedProduct.setImageUrl(imageUrl);
+        oriFetchedProduct.setTitle(title);
+        oriFetchedProduct.setUrl(url1);
 
         //todo 商品状态对于flipkart联盟的解析有一些问题，待改进
         if ("false".equals(productStatus)) {
-            fetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
+            oriFetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
         } else if ("true".equals(productStatus)) {
-            fetchedProduct.setProductStatus(ProductStatus.ONSALE);
+            oriFetchedProduct.setProductStatus(ProductStatus.ONSALE);
         } else if ("none".equals(productStatus)) {
-            fetchedProduct.setProductStatus(ProductStatus.OFFSALE);
+            oriFetchedProduct.setProductStatus(ProductStatus.OFFSALE);
         } else {
-            fetchedProduct.setProductStatus(null);
+            oriFetchedProduct.setProductStatus(null);
         }
 
-        cmpSkuService.updateCmpSkuBySummaryProduct(168542, fetchedProduct);
+        cmpSkuService.updateCmpSkuByOriFetchedProduct(168542, oriFetchedProduct);
 
     }
 
