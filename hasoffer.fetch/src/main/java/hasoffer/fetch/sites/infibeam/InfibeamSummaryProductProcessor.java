@@ -6,7 +6,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.HtmlUtils;
 import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.model.ProductStatus;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import org.htmlcleaner.TagNode;
 
 import java.util.List;
@@ -29,19 +29,19 @@ public class InfibeamSummaryProductProcessor implements ISummaryProductProcessor
     private static final String XPATH_PRODUCT_STATUS = "//div[@id='product_overview']/div[@class='status soldout']";
 
     @Override
-    public FetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
+    public OriFetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
 
-        FetchedProduct fetchedProduct = new FetchedProduct();
+        OriFetchedProduct oriFetchedProduct = new OriFetchedProduct();
 
         TagNode root = HtmlUtils.getUrlRootTagNode(url);
 
         TagNode notFoundNode = getSubNodeByXPath(root, XPATH_NOTFOUNF_PAGE, null);
         if (notFoundNode != null) {
             //todo 404商品已经不存在
-            fetchedProduct.setWebsite(Website.INFIBEAM);
-            fetchedProduct.setUrl(url);
-            fetchedProduct.setProductStatus(ProductStatus.OFFSALE);
-            return fetchedProduct;
+            oriFetchedProduct.setWebsite(Website.INFIBEAM);
+            oriFetchedProduct.setUrl(url);
+            oriFetchedProduct.setProductStatus(ProductStatus.OFFSALE);
+            return oriFetchedProduct;
         }
 
         TagNode titleNode = getSubNodeByXPath(root, XPATH_TITLE, new ContentParseException("title not found"));
@@ -77,18 +77,18 @@ public class InfibeamSummaryProductProcessor implements ISummaryProductProcessor
 
         TagNode statusNode = getSubNodeByXPath(root, XPATH_PRODUCT_STATUS, null);
         if (statusNode != null) {
-            fetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
+            oriFetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
         }else{
-            fetchedProduct.setProductStatus(ProductStatus.ONSALE);
+            oriFetchedProduct.setProductStatus(ProductStatus.ONSALE);
         }
 
-        fetchedProduct.setImageUrl(imageUrl);
-        fetchedProduct.setPrice(price);
-        fetchedProduct.setTitle(title);
-        fetchedProduct.setUrl(url);
-        fetchedProduct.setWebsite(Website.INFIBEAM);
-        fetchedProduct.setSourceSid(sourceId);
+        oriFetchedProduct.setImageUrl(imageUrl);
+        oriFetchedProduct.setPrice(price);
+        oriFetchedProduct.setTitle(title);
+        oriFetchedProduct.setUrl(url);
+        oriFetchedProduct.setWebsite(Website.INFIBEAM);
+        oriFetchedProduct.setSourceSid(sourceId);
 
-        return fetchedProduct;
+        return oriFetchedProduct;
     }
 }

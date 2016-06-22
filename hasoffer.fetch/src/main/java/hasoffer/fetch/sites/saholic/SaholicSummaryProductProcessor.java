@@ -6,7 +6,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.HtmlUtils;
 import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.model.ProductStatus;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import org.htmlcleaner.TagNode;
 
 import static hasoffer.base.utils.http.XPathUtils.getSubNodeByXPath;
@@ -22,9 +22,9 @@ public class SaholicSummaryProductProcessor implements ISummaryProductProcessor 
     private static final String XPATH_PRODUCTID = "//input[@id='product_id']";
 
     @Override
-    public FetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
+    public OriFetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
 
-        FetchedProduct fetchedProduct = new FetchedProduct();
+        OriFetchedProduct oriFetchedProduct = new OriFetchedProduct();
 
         TagNode root = HtmlUtils.getUrlRootTagNode(url);
 
@@ -39,13 +39,13 @@ public class SaholicSummaryProductProcessor implements ISummaryProductProcessor 
         TagNode sourceIdNode = getSubNodeByXPath(root, XPATH_PRODUCTID, new ContentParseException("sourceId not found"));
         String sourceId = sourceIdNode.getAttributeByName("value").toString().trim();
 
-        fetchedProduct.setUrl(url);
-        fetchedProduct.setTitle(title);
-        fetchedProduct.setProductStatus(ProductStatus.ONSALE);
-        fetchedProduct.setPrice(price);
-        fetchedProduct.setWebsite(Website.SAHOLIC);
-        fetchedProduct.setSourceSid(sourceId);
+        oriFetchedProduct.setUrl(url);
+        oriFetchedProduct.setTitle(title);
+        oriFetchedProduct.setProductStatus(ProductStatus.ONSALE);
+        oriFetchedProduct.setPrice(price);
+        oriFetchedProduct.setWebsite(Website.SAHOLIC);
+        oriFetchedProduct.setSourceSid(sourceId);
 
-        return fetchedProduct;
+        return oriFetchedProduct;
     }
 }

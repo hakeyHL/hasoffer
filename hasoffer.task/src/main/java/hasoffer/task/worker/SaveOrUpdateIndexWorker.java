@@ -22,7 +22,7 @@ import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.fetch.helper.WebsiteHelper;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.ListProduct;
 import hasoffer.fetch.model.ProductStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
@@ -329,7 +329,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
             //联盟返回的需要更新title
             FlipkartSummaryProductProcessor productProcessor = new FlipkartSummaryProductProcessor();
 
-            FetchedProduct product = productProcessor.getSummaryProductByUrl(sku.getUrl());
+            OriFetchedProduct product = productProcessor.getSummaryProductByUrl(sku.getUrl());
             String skutitle = product.getTitle() + product.getSubTitle();
             sku.setSkuTitle(skutitle);
 

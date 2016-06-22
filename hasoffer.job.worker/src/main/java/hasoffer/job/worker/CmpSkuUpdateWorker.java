@@ -127,7 +127,7 @@ public class CmpSkuUpdateWorker implements Runnable {
             }
             System.out.println(fetchedProduct);
             //try {
-            //    cmpSkuService.updateCmpSkuBySummaryProduct(sku.getId(), fetchedProduct);
+            //    cmpSkuService.updateCmpSkuByOriFetchedProduct(sku.getId(), fetchedProduct);
             //} catch (Exception e) {
             //    logger.debug(e.toString());
             //    if (fetchedProduct != null) {

@@ -6,7 +6,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.HtmlUtils;
 import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.model.ProductStatus;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import org.htmlcleaner.TagNode;
 
 import static hasoffer.base.utils.http.XPathUtils.getSubNodeByXPath;
@@ -23,9 +23,9 @@ public class ManiacstoreSummaryProductProcessor implements ISummaryProductProces
     private static final String XPATH_PRODUCT_IMAGE = "//img[@id='product_thumbnail']";
 
     @Override
-    public FetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
+    public OriFetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
 
-        FetchedProduct fetchedProduct = new FetchedProduct();
+        OriFetchedProduct oriFetchedProduct = new OriFetchedProduct();
 
         TagNode root = HtmlUtils.getUrlRootTagNode(url);
 
@@ -42,15 +42,15 @@ public class ManiacstoreSummaryProductProcessor implements ISummaryProductProces
         TagNode imageNode = getSubNodeByXPath(root, XPATH_PRODUCT_IMAGE, new ContentParseException("image not found"));
         String imageUrl = imageNode.getAttributeByName("src");
 
-        fetchedProduct.setImageUrl(imageUrl);
-        fetchedProduct.setSourceSid(sourceId);
-        fetchedProduct.setPrice(price);
-        fetchedProduct.setProductStatus(ProductStatus.ONSALE);
-        fetchedProduct.setTitle(title);
-        fetchedProduct.setUrl(url);
-        fetchedProduct.setWebsite(Website.MANIACSTORE);
+        oriFetchedProduct.setImageUrl(imageUrl);
+        oriFetchedProduct.setSourceSid(sourceId);
+        oriFetchedProduct.setPrice(price);
+        oriFetchedProduct.setProductStatus(ProductStatus.ONSALE);
+        oriFetchedProduct.setTitle(title);
+        oriFetchedProduct.setUrl(url);
+        oriFetchedProduct.setWebsite(Website.MANIACSTORE);
 
-        return fetchedProduct;
+        return oriFetchedProduct;
     }
 }
 

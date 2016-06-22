@@ -7,7 +7,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IFetchService;
 import hasoffer.fetch.helper.WebsiteHelper;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,28 +91,28 @@ public class CmpSkuUpdateWorker implements Runnable {
                     }
                 }
 
-                FetchedProduct fetchedProduct = null;
+                OriFetchedProduct oriFetchedProduct = null;
 
                 logger.debug("parse start");
-                fetchedProduct = fetchService.fetchSummaryProductByUrl(url);
+                oriFetchedProduct = fetchService.fetchSummaryProductByUrl(url);
                 logger.debug("parse finish");
 
                 //此处是FK、SD正常更新逻辑放弃对title字段的更新，该有另外的task统一维护
-                if (fetchedProduct != null) {
-                    if (Website.FLIPKART.equals(fetchedProduct.getWebsite()) || Website.SNAPDEAL.equals(fetchedProduct.getWebsite())) {
-                        fetchedProduct.setTitle(null);
+                if (oriFetchedProduct != null) {
+                    if (Website.FLIPKART.equals(oriFetchedProduct.getWebsite()) || Website.SNAPDEAL.equals(oriFetchedProduct.getWebsite())) {
+                        oriFetchedProduct.setTitle(null);
                     }
                 }
 
                 try {
                     logger.debug("start update");
-                    cmpSkuService.updateCmpSkuBySummaryProduct(sku.getId(), fetchedProduct);
+                    cmpSkuService.updateCmpSkuByOriFetchedProduct(sku.getId(), oriFetchedProduct);
                     logger.debug("update finish");
                     logger.debug(sku.getId() + " fetch success " + website);
                 } catch (Exception e) {
                     logger.debug(e.toString());
-                    if (fetchedProduct != null) {
-                        logger.debug("title:" + fetchedProduct.getTitle());
+                    if (oriFetchedProduct != null) {
+                        logger.debug("title:" + oriFetchedProduct.getTitle());
                     }
                 }
 

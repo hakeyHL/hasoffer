@@ -30,10 +30,11 @@ import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.ProductStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import hasoffer.fetch.sites.snapdeal.SnapdealHelper;
+import hasoffer.spider.model.FetchedProduct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -592,10 +593,10 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateCmpSkuBySummaryProduct(long id, FetchedProduct fetchedProduct) {
+    public void updateCmpSkuByOriFetchedProduct(long id, OriFetchedProduct oriFetchedProduct) {
 
         //summaryProduct为null
-        if (fetchedProduct == null) {
+        if (oriFetchedProduct == null) {
             return;
         }
 
@@ -610,13 +611,83 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(id);
         //获取商品的status
-        if (ProductStatus.OFFSALE.equals(fetchedProduct.getProductStatus())) {//如果OFFSALE
+        if (ProductStatus.OFFSALE.equals(oriFetchedProduct.getProductStatus())) {//如果OFFSALE
 
             ptmCmpSkuUpdater.getPo().setStatus(SkuStatus.OFFSALE);
 
         } else {
             //如果售空了修改状态
-            if (ProductStatus.OUTSTOCK.equals(fetchedProduct.getProductStatus())) {
+            if (ProductStatus.OUTSTOCK.equals(oriFetchedProduct.getProductStatus())) {
+
+                ptmCmpSkuUpdater.getPo().setStatus(SkuStatus.OUTSTOCK);
+
+            } else {//修改价格
+
+                float price = oriFetchedProduct.getPrice();
+                if (price > 0) {
+                    if (cmpSku.getPrice() != oriFetchedProduct.getPrice()) {
+                        ptmCmpSkuUpdater.getPo().setPrice(price);
+                    }
+                }
+                ptmCmpSkuUpdater.getPo().setStatus(SkuStatus.ONSALE);
+            }
+
+            if (!StringUtils.isEmpty(oriFetchedProduct.getTitle())) {
+                if (StringUtils.isEmpty(cmpSku.getTitle()) || !StringUtils.isEqual(cmpSku.getTitle(), oriFetchedProduct.getTitle())) {
+                    ptmCmpSkuUpdater.getPo().setTitle(oriFetchedProduct.getTitle());
+                }
+            }
+
+            String imageUrl = oriFetchedProduct.getImageUrl();
+            if (StringUtils.isEmpty(cmpSku.getOriImageUrl()) || !StringUtils.isEqual(imageUrl, cmpSku.getOriImageUrl())) {
+                if (!StringUtils.isEmpty(imageUrl)) {
+                    ptmCmpSkuUpdater.getPo().setOriImageUrl(imageUrl);
+                }
+            }
+        }
+
+        if (cmpSku.getWebsite() == null) {
+            Website website = oriFetchedProduct.getWebsite();
+            if (website != null) {
+                ptmCmpSkuUpdater.getPo().setWebsite(oriFetchedProduct.getWebsite());
+            }
+        }
+
+        if (!StringUtils.isEmpty(oriFetchedProduct.getSubTitle())) {
+            ptmCmpSkuUpdater.getPo().setSkuTitle(oriFetchedProduct.getTitle() + oriFetchedProduct.getSubTitle());
+        }
+
+        ptmCmpSkuUpdater.getPo().setUpdateTime(TimeUtils.nowDate());
+        dbm.update(ptmCmpSkuUpdater);
+    }
+
+    @Override
+    public void updateCmpSkuBySpiderFetchedProduct(long skuId, FetchedProduct fetchedProduct) {
+
+        //fetchedProduct为null
+        if (fetchedProduct == null) {
+            return;
+        }
+
+        //根据id，获得该商品信息
+        PtmCmpSku cmpSku = dbm.get(PtmCmpSku.class, skuId);
+        if (cmpSku == null) {
+            return;
+        }
+
+//        更新mongodb
+        PtmCmpSkuLog ptmCmpSkuLog = new PtmCmpSkuLog(cmpSku);
+        mdm.save(ptmCmpSkuLog);
+
+        PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(skuId);
+        //获取商品的status
+        if (SkuStatus.OFFSALE.equals(fetchedProduct.getSkuStatus())) {//如果OFFSALE
+
+            ptmCmpSkuUpdater.getPo().setStatus(SkuStatus.OFFSALE);
+
+        } else {
+            //如果售空了修改状态
+            if (SkuStatus.OUTSTOCK.equals(fetchedProduct.getSkuStatus())) {
 
                 ptmCmpSkuUpdater.getPo().setStatus(SkuStatus.OUTSTOCK);
 
@@ -658,5 +729,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         ptmCmpSkuUpdater.getPo().setUpdateTime(TimeUtils.nowDate());
         dbm.update(ptmCmpSkuUpdater);
+
+        return;
     }
 }

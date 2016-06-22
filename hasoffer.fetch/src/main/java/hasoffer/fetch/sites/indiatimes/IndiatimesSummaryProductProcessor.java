@@ -6,7 +6,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.HtmlUtils;
 import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.model.ProductStatus;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import org.htmlcleaner.TagNode;
 
 import static hasoffer.base.utils.http.XPathUtils.getSubNodeByXPath;
@@ -24,9 +24,9 @@ public class IndiatimesSummaryProductProcessor implements ISummaryProductProcess
     private static final String XPATH_IMAGE1 = "//div[@class='productimghigh']/table/tbody/tr/td/a/img";
 
     @Override
-    public FetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
+    public OriFetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
 
-        FetchedProduct fetchedProduct = new FetchedProduct();
+        OriFetchedProduct oriFetchedProduct = new OriFetchedProduct();
         String sourceId = IndiatimesHelper.getProductIdByUrl(url);
 
         TagNode root = HtmlUtils.getUrlRootTagNode(url);
@@ -55,14 +55,14 @@ public class IndiatimesSummaryProductProcessor implements ISummaryProductProcess
             imageUrl = imageNode.getAttributeByName("data-original");
         }
 
-            fetchedProduct.setImageUrl(imageUrl);
-        fetchedProduct.setUrl(url);
-        fetchedProduct.setTitle(title);
-        fetchedProduct.setPrice(price);
-        fetchedProduct.setProductStatus(ProductStatus.ONSALE);
-        fetchedProduct.setWebsite(Website.INDIATIMES);
-        fetchedProduct.setSourceSid(sourceId);
+            oriFetchedProduct.setImageUrl(imageUrl);
+        oriFetchedProduct.setUrl(url);
+        oriFetchedProduct.setTitle(title);
+        oriFetchedProduct.setPrice(price);
+        oriFetchedProduct.setProductStatus(ProductStatus.ONSALE);
+        oriFetchedProduct.setWebsite(Website.INDIATIMES);
+        oriFetchedProduct.setSourceSid(sourceId);
 
-        return fetchedProduct;
+        return oriFetchedProduct;
     }
 }

@@ -7,7 +7,7 @@ import hasoffer.base.utils.HtmlUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.model.ProductStatus;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 
@@ -38,9 +38,9 @@ public class FlipkartSummaryProductProcessor implements ISummaryProductProcessor
 
 
     @Override
-    public FetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
+    public OriFetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
 
-        FetchedProduct fetchedProduct = new FetchedProduct();
+        OriFetchedProduct oriFetchedProduct = new OriFetchedProduct();
 
         if (url != null && url.contains("dl.flipkart.com/dl/")) {
             url = FlipkartHelper.getUrlByDeeplink(url);
@@ -93,34 +93,34 @@ public class FlipkartSummaryProductProcessor implements ISummaryProductProcessor
 
         TagNode comingStatusNode = getSubNodeByXPath(root, XPATH_STATUS_COMING, null);
         if (comingStatusNode != null) {
-            fetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
-            fetchedProduct.setWebsite(Website.FLIPKART);
-            fetchedProduct.setTitle(title);
-            fetchedProduct.setImageUrl(imageUrl);
-            fetchedProduct.setUrl(url);
-            fetchedProduct.setPrice(price);
-            fetchedProduct.setSourceSid(sourceId);
-            return fetchedProduct;
+            oriFetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
+            oriFetchedProduct.setWebsite(Website.FLIPKART);
+            oriFetchedProduct.setTitle(title);
+            oriFetchedProduct.setImageUrl(imageUrl);
+            oriFetchedProduct.setUrl(url);
+            oriFetchedProduct.setPrice(price);
+            oriFetchedProduct.setSourceSid(sourceId);
+            return oriFetchedProduct;
         }
 
         TagNode statusNode = getSubNodeByXPath(root, XPATH_STATUS, null);
         if (statusNode != null) {
-            fetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
+            oriFetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
         } else {
-            fetchedProduct.setProductStatus(ProductStatus.ONSALE);
+            oriFetchedProduct.setProductStatus(ProductStatus.ONSALE);
         }
 
-        fetchedProduct.setImageUrl(imageUrl);
-        fetchedProduct.setPrice(price);
-        fetchedProduct.setTitle(title);
-        fetchedProduct.setUrl(FlipkartHelper.getCleanUrl(url));
-        fetchedProduct.setWebsite(Website.FLIPKART);
-        fetchedProduct.setSourceSid(sourceId);
-        fetchedProduct.setSourcePid(FlipkartHelper.getProductIdByUrl(url));
-        fetchedProduct.setSubTitle(subTitle);
+        oriFetchedProduct.setImageUrl(imageUrl);
+        oriFetchedProduct.setPrice(price);
+        oriFetchedProduct.setTitle(title);
+        oriFetchedProduct.setUrl(FlipkartHelper.getCleanUrl(url));
+        oriFetchedProduct.setWebsite(Website.FLIPKART);
+        oriFetchedProduct.setSourceSid(sourceId);
+        oriFetchedProduct.setSourcePid(FlipkartHelper.getProductIdByUrl(url));
+        oriFetchedProduct.setSubTitle(subTitle);
 //        summaryProduct.setPageHtml(pageHtml);
 
-        return fetchedProduct;
+        return oriFetchedProduct;
     }
 
     /**
@@ -130,9 +130,9 @@ public class FlipkartSummaryProductProcessor implements ISummaryProductProcessor
      * @return
      */
     @Deprecated
-    public List<FetchedProduct> getSkuSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
+    public List<OriFetchedProduct> getSkuSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
 
-        List<FetchedProduct> fetchedProductList = new ArrayList<FetchedProduct>();
+        List<OriFetchedProduct> oriFetchedProductList = new ArrayList<OriFetchedProduct>();
 
         //获取sku属性的集合，判断是一个sku属性还是俩个还是没有sku属性
         TagNode root = HtmlUtils.getUrlRootTagNode(url);
@@ -140,9 +140,9 @@ public class FlipkartSummaryProductProcessor implements ISummaryProductProcessor
 
         //如果为null说明没有skuNode，使用summaryProduct解析
         if (skusNode == null) {
-            FetchedProduct fetchedProduct = getSummaryProductByUrl(url);
-            fetchedProductList.add(fetchedProduct);
-            return fetchedProductList;
+            OriFetchedProduct oriFetchedProduct = getSummaryProductByUrl(url);
+            oriFetchedProductList.add(oriFetchedProduct);
+            return oriFetchedProductList;
         } else {//不为null，判断个数
 
             List<TagNode> skuListNode = getSubNodesByXPath(skusNode, "/div", null);
@@ -156,8 +156,8 @@ public class FlipkartSummaryProductProcessor implements ISummaryProductProcessor
                 if (skuListNode.size() > 1) {//如果size大于1，说明有多个sku属性，遍历
 
                     //首先解析当前sku的信息
-                    FetchedProduct fetchedProduct = getSummaryProductByUrl(url);
-                    fetchedProductList.add(fetchedProduct);
+                    OriFetchedProduct oriFetchedProduct = getSummaryProductByUrl(url);
+                    oriFetchedProductList.add(oriFetchedProduct);
                     //当前第一级sku，匹配所有二级属性
                     TagNode anotherSkuNodes = skuListNode.get(1);
                     List<TagNode> anotherSkuNodeList = getSubNodesByXPath(anotherSkuNodes, "/div[@class='multiSelectionWidget-selectors-wrap']/a", new ContentParseException("anotherSkuNodeList fetch fail"));
@@ -165,8 +165,8 @@ public class FlipkartSummaryProductProcessor implements ISummaryProductProcessor
                         for (TagNode anotherSkuNode : anotherSkuNodeList) {
                             String skuUrl = anotherSkuNode.getAttributeByName("href");
                             skuUrl = WEBSITE_URL + skuUrl;
-                            FetchedProduct skuFetchedProduct = getSummaryProductByUrl(skuUrl);
-                            fetchedProductList.add(skuFetchedProduct);
+                            OriFetchedProduct skuOriFetchedProduct = getSummaryProductByUrl(skuUrl);
+                            oriFetchedProductList.add(skuOriFetchedProduct);
                         }
                     }
 
@@ -177,8 +177,8 @@ public class FlipkartSummaryProductProcessor implements ISummaryProductProcessor
                             String otherSameSkuUrl = otherSameSku.getAttributeByName("href");
                             otherSameSkuUrl = WEBSITE_URL + otherSameSkuUrl;
 
-                            FetchedProduct otherSameSkuFetchedProduct = getSummaryProductByUrl(otherSameSkuUrl);
-                            fetchedProductList.add(otherSameSkuFetchedProduct);
+                            OriFetchedProduct otherSameSkuOriFetchedProduct = getSummaryProductByUrl(otherSameSkuUrl);
+                            oriFetchedProductList.add(otherSameSkuOriFetchedProduct);
 
                             TagNode otherSameSkuRootNode = HtmlUtils.getUrlRootTagNode(otherSameSkuUrl);
 
@@ -188,8 +188,8 @@ public class FlipkartSummaryProductProcessor implements ISummaryProductProcessor
                                 for (TagNode anotherSkuNode : anotherSkuList) {
                                     String anotherSkuUrl = anotherSkuNode.getAttributeByName("href");
                                     anotherSkuUrl = WEBSITE_URL + anotherSkuUrl;
-                                    FetchedProduct anotherSkuFetchedProduct = getSummaryProductByUrl(anotherSkuUrl);
-                                    fetchedProductList.add(anotherSkuFetchedProduct);
+                                    OriFetchedProduct anotherSkuOriFetchedProduct = getSummaryProductByUrl(anotherSkuUrl);
+                                    oriFetchedProductList.add(anotherSkuOriFetchedProduct);
                                 }
                             }
                         }
@@ -198,16 +198,16 @@ public class FlipkartSummaryProductProcessor implements ISummaryProductProcessor
                 } else {//如果只有一个sku属性，获取其他同类sku属性，解析
 
                     //首先解析当前sku的信息
-                    FetchedProduct fetchedProduct = getSummaryProductByUrl(url);
-                    fetchedProductList.add(fetchedProduct);
+                    OriFetchedProduct oriFetchedProduct = getSummaryProductByUrl(url);
+                    oriFetchedProductList.add(oriFetchedProduct);
                     //获取第一个sku的全部同类属性
                     List<TagNode> otherSameSkuNodeList = getSubNodesByXPath(firstNode, "/div[@class='multiSelectionWidget-selectors-wrap']/a", null);
                     if (otherSameSkuNodeList != null && otherSameSkuNodeList.size() > 0) {
                         for (TagNode otherSameSkuNode : otherSameSkuNodeList) {
                             String skuUrl = otherSameSkuNode.getAttributeByName("href");
                             skuUrl = WEBSITE_URL + skuUrl;
-                            FetchedProduct skuFetchedProduct = getSummaryProductByUrl(skuUrl);
-                            fetchedProductList.add(skuFetchedProduct);
+                            OriFetchedProduct skuOriFetchedProduct = getSummaryProductByUrl(skuUrl);
+                            oriFetchedProductList.add(skuOriFetchedProduct);
                         }
                     }
 
@@ -215,6 +215,6 @@ public class FlipkartSummaryProductProcessor implements ISummaryProductProcessor
             }
         }
 
-        return fetchedProductList;
+        return oriFetchedProductList;
     }
 }

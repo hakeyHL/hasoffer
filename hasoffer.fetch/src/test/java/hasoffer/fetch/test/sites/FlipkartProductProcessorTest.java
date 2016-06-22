@@ -4,7 +4,7 @@ import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.exception.HttpFetchException;
 import hasoffer.fetch.core.IListProcessor;
 import hasoffer.fetch.model.ListProduct;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.sites.flipkart.FlipkartListProcessor;
 import hasoffer.fetch.sites.flipkart.FlipkartProductProcessor;
 import hasoffer.fetch.sites.flipkart.FlipkartSummaryProductProcessor;
@@ -26,7 +26,7 @@ public class FlipkartProductProcessorTest {
         String url = "http://www.flipkart.com/t-edger-ii-rechargeable-cordless-travel-grooming-kit-d3-trimmer-men/p/itme5ypvsc8zeghq";
         FlipkartSummaryProductProcessor processor = new FlipkartSummaryProductProcessor();
         try{
-            FetchedProduct p = processor.getSummaryProductByUrl(url);
+            OriFetchedProduct p = processor.getSummaryProductByUrl(url);
             System.out.println(p.getImageUrl());
         }catch (Exception e){
             e.printStackTrace();
