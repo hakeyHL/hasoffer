@@ -7,7 +7,7 @@ import hasoffer.base.utils.HtmlUtils;
 import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.model.ProductStatus;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.sites.paytm.model.FetchedProductHelper;
 import org.htmlcleaner.TagNode;
 
@@ -17,9 +17,9 @@ import org.htmlcleaner.TagNode;
 public class PaytmSummaryProductProcessor implements ISummaryProductProcessor {
 
     @Override
-    public FetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException {
+    public OriFetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException {
 
-        FetchedProduct fetchedProduct = new FetchedProduct();
+        OriFetchedProduct oriFetchedProduct = new OriFetchedProduct();
 
         String[] subStrs1 = url.split("\\?");
         url = subStrs1[0];
@@ -33,16 +33,16 @@ public class PaytmSummaryProductProcessor implements ISummaryProductProcessor {
         FetchedProductHelper summaryProductHelper = gson.fromJson(json, FetchedProductHelper.class);
         float price = Float.parseFloat(summaryProductHelper.getOffer_price().trim());
 
-        fetchedProduct.setImageUrl(summaryProductHelper.getImage_url());
-        fetchedProduct.setPrice(price);
-        fetchedProduct.setProductStatus(summaryProductHelper.getInstock() == "true" ? ProductStatus.ONSALE : ProductStatus.OUTSTOCK);
-        fetchedProduct.setTitle(summaryProductHelper.getName());
-        fetchedProduct.setSourceSid(summaryProductHelper.getParent_id());
-        fetchedProduct.setWebsite(WebsiteHelper.getWebSite(url));
-        fetchedProduct.setUrl(url);
-        fetchedProduct.setWebsite(Website.PAYTM);
+        oriFetchedProduct.setImageUrl(summaryProductHelper.getImage_url());
+        oriFetchedProduct.setPrice(price);
+        oriFetchedProduct.setProductStatus(summaryProductHelper.getInstock() == "true" ? ProductStatus.ONSALE : ProductStatus.OUTSTOCK);
+        oriFetchedProduct.setTitle(summaryProductHelper.getName());
+        oriFetchedProduct.setSourceSid(summaryProductHelper.getParent_id());
+        oriFetchedProduct.setWebsite(WebsiteHelper.getWebSite(url));
+        oriFetchedProduct.setUrl(url);
+        oriFetchedProduct.setWebsite(Website.PAYTM);
 
-        return fetchedProduct;
+        return oriFetchedProduct;
     }
 
     private float getPriceByPriceString(String priceString) {

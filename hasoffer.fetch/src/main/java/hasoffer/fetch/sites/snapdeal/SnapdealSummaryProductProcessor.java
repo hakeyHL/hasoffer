@@ -5,7 +5,7 @@ import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.HtmlUtils;
 import hasoffer.fetch.core.ISummaryProductProcessor;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.ProductStatus;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.htmlcleaner.TagNode;
@@ -22,7 +22,7 @@ public class SnapdealSummaryProductProcessor implements ISummaryProductProcessor
     private static final String XPATH_PRODUCT_IMAGE = "//img[@itemprop='image']";
 
     @Override
-    public FetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
+    public OriFetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
 
         if (url.contains("viewAllSellers")) {
             TagNode root = HtmlUtils.getUrlRootTagNode(url);
@@ -30,7 +30,7 @@ public class SnapdealSummaryProductProcessor implements ISummaryProductProcessor
             url = toProductNode.getAttributeByName("href");
         }
 
-        FetchedProduct fetchedProduct = new FetchedProduct();
+        OriFetchedProduct oriFetchedProduct = new OriFetchedProduct();
         String sourceId = SnapdealHelper.getProductIdByUrl(url);
 
         TagNode root = HtmlUtils.getUrlRootTagNode(url);
@@ -46,14 +46,14 @@ public class SnapdealSummaryProductProcessor implements ISummaryProductProcessor
         TagNode imageNode = getSubNodeByXPath(root, XPATH_PRODUCT_IMAGE, new ContentParseException("image not found"));
         String imageUrl = imageNode.getAttributeByName("src");
 
-        fetchedProduct.setImageUrl(imageUrl);
-        fetchedProduct.setUrl(url);
-        fetchedProduct.setTitle(title);
-        fetchedProduct.setPrice(price);
-        fetchedProduct.setProductStatus(ProductStatus.ONSALE);
-        fetchedProduct.setWebsite(Website.SNAPDEAL);
-        fetchedProduct.setSourceSid(sourceId);
+        oriFetchedProduct.setImageUrl(imageUrl);
+        oriFetchedProduct.setUrl(url);
+        oriFetchedProduct.setTitle(title);
+        oriFetchedProduct.setPrice(price);
+        oriFetchedProduct.setProductStatus(ProductStatus.ONSALE);
+        oriFetchedProduct.setWebsite(Website.SNAPDEAL);
+        oriFetchedProduct.setSourceSid(sourceId);
 
-        return fetchedProduct;
+        return oriFetchedProduct;
     }
 }

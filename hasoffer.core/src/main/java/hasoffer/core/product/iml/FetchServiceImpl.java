@@ -14,7 +14,7 @@ import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.helper.WebsiteProcessorFactory;
 import hasoffer.fetch.helper.WebsiteSummaryProductProcessorFactory;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.Product;
 import hasoffer.fetch.model.ProductStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
@@ -57,7 +57,7 @@ public class FetchServiceImpl implements IFetchService {
     }
 
     @Override
-    public FetchedProduct fetchSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException, AffiliateAPIException, IOException, InterruptedException {
+    public OriFetchedProduct fetchSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException, AffiliateAPIException, IOException, InterruptedException {
 
         url = URLDecoder.decode(url);
 
@@ -71,14 +71,14 @@ public class FetchServiceImpl implements IFetchService {
 
         //用来标记联盟解析是否成功
         boolean flag = true;
-        FetchedProduct fetchedProduct = null;
+        OriFetchedProduct oriFetchedProduct = null;
 
         //如果是flipkart的商品，尝试用联盟解析
         if (Website.FLIPKART.equals(website) && url.contains("?pid=")) {
             flag = false;
             try {
                 String sourceId = FlipkartHelper.getProductIdByUrl(url);
-                fetchedProduct = getAffiliateSummaryProduct(website, sourceId);
+                oriFetchedProduct = getAffiliateSummaryProduct(website, sourceId);
             } catch (Exception e) {
                 flag = true;
             }
@@ -91,14 +91,14 @@ public class FetchServiceImpl implements IFetchService {
             flag = false;
             try {
                 String sourceId = SnapdealHelper.getProductIdByUrl(url);
-                fetchedProduct = getAffiliateSummaryProduct(website, sourceId);
+                oriFetchedProduct = getAffiliateSummaryProduct(website, sourceId);
             } catch (Exception e) {
                 flag = true;
             }
         }
 
         if (flag) {
-            fetchedProduct = summaryProductProcessor.getSummaryProductByUrl(url);
+            oriFetchedProduct = summaryProductProcessor.getSummaryProductByUrl(url);
         }
 
         // 暂停使用amazon联盟
@@ -117,11 +117,11 @@ public class FetchServiceImpl implements IFetchService {
 //                summaryProduct = getAffiliateSummaryProduct(website, sourceId, url);
 //            }
 //        }
-        return fetchedProduct;
+        return oriFetchedProduct;
     }
 
     @Override
-    public FetchedProduct udpateSkuInAnyWay(String url, Website website) throws IOException, HttpFetchException, ContentParseException {
+    public OriFetchedProduct udpateSkuInAnyWay(String url, Website website) throws IOException, HttpFetchException, ContentParseException {
 
         boolean flag = true;
 
@@ -149,20 +149,20 @@ public class FetchServiceImpl implements IFetchService {
                         status = ProductStatus.OUTSTOCK;
                     }
 
-                    FetchedProduct fetchedProduct = new FetchedProduct();
+                    OriFetchedProduct oriFetchedProduct = new OriFetchedProduct();
 
-                    fetchedProduct.setSourcePid("0");
-                    fetchedProduct.setUrl(WebsiteHelper.getCleanUrl(website, affiliateProduct.getUrl()));
-                    fetchedProduct.setImageUrl(affiliateProduct.getImageUrl());
-                    fetchedProduct.setPrice(affiliateProduct.getPrice());
-                    fetchedProduct.setWebsite(affiliateProduct.getWebsite());
+                    oriFetchedProduct.setSourcePid("0");
+                    oriFetchedProduct.setUrl(WebsiteHelper.getCleanUrl(website, affiliateProduct.getUrl()));
+                    oriFetchedProduct.setImageUrl(affiliateProduct.getImageUrl());
+                    oriFetchedProduct.setPrice(affiliateProduct.getPrice());
+                    oriFetchedProduct.setWebsite(affiliateProduct.getWebsite());
 //                此处要求联盟返回的title字段为空
 //                fetchedProduct.setTitle(affiliateProduct.getTitle());
 //                fetchedProduct.setSubTitle(affiliateProduct.getTitle());
-                    fetchedProduct.setSourceSid(affiliateProduct.getSourceId());
-                    fetchedProduct.setProductStatus(status);
+                    oriFetchedProduct.setSourceSid(affiliateProduct.getSourceId());
+                    oriFetchedProduct.setProductStatus(status);
 
-                    return fetchedProduct;
+                    return oriFetchedProduct;
                 }
             }
         }
@@ -171,15 +171,15 @@ public class FetchServiceImpl implements IFetchService {
 
             ISummaryProductProcessor processor = WebsiteSummaryProductProcessorFactory.getSummaryProductProcessor(website);
 
-            FetchedProduct fetchedProduct = processor.getSummaryProductByUrl(url);
+            OriFetchedProduct oriFetchedProduct = processor.getSummaryProductByUrl(url);
 
-            return fetchedProduct;
+            return oriFetchedProduct;
         }
 
         return null;
     }
 
-    private FetchedProduct getAffiliateSummaryProduct(Website website, String sourceId) throws AffiliateAPIException, IOException {
+    private OriFetchedProduct getAffiliateSummaryProduct(Website website, String sourceId) throws AffiliateAPIException, IOException {
 
         IAffiliateProcessor affiliateProductProcessor = AffiliateFactory.getAffiliateProductProcessor(website);
         AffiliateProduct affiliateProduct = affiliateProductProcessor.getAffiliateProductBySourceId(sourceId);
@@ -194,25 +194,25 @@ public class FetchServiceImpl implements IFetchService {
         String productStatus = affiliateProduct.getProductStatus();
         String url = affiliateProduct.getUrl();
 
-        FetchedProduct fetchedProduct = new FetchedProduct();
-        fetchedProduct.setPrice(price);
-        fetchedProduct.setSourceSid(sourceId);
-        fetchedProduct.setImageUrl(imageUrl);
-        fetchedProduct.setTitle(title);
-        fetchedProduct.setUrl(url);
+        OriFetchedProduct oriFetchedProduct = new OriFetchedProduct();
+        oriFetchedProduct.setPrice(price);
+        oriFetchedProduct.setSourceSid(sourceId);
+        oriFetchedProduct.setImageUrl(imageUrl);
+        oriFetchedProduct.setTitle(title);
+        oriFetchedProduct.setUrl(url);
 
         //todo 商品状态对于flipkart联盟的解析有一些问题，待改进
         if ("false".equals(productStatus)) {
-            fetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
+            oriFetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
         } else if ("true".equals(productStatus)) {
-            fetchedProduct.setProductStatus(ProductStatus.ONSALE);
+            oriFetchedProduct.setProductStatus(ProductStatus.ONSALE);
         } else if ("none".equals(productStatus)) {
-            fetchedProduct.setProductStatus(ProductStatus.OFFSALE);
+            oriFetchedProduct.setProductStatus(ProductStatus.OFFSALE);
         } else {
-            fetchedProduct.setProductStatus(null);
+            oriFetchedProduct.setProductStatus(null);
         }
 
-        return fetchedProduct;
+        return oriFetchedProduct;
     }
 
 }

@@ -2,7 +2,7 @@ package hasoffer.fetch.test.sites;
 
 import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.exception.HttpFetchException;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.sites.cromaretail.CromaretailSummaryProductProcessor;
 import org.junit.Test;
 
@@ -44,8 +44,8 @@ public class TestGeSouceIdByUrl {
         String url2 = "http://www.cromaretail.com/Canon-EOS-750D-242-MP-Digital-SLR-Camera-(18-55-mm)-(Black)-pc-29370-133.aspx";
         String url = "http://www.cromaretail.com/Lenovo-Miix-2-(8)-8%22-Tablet-(Black)-pc-23595-902.aspx";
         CromaretailSummaryProductProcessor cromaretailSummaryProductProcessor = new CromaretailSummaryProductProcessor();
-        FetchedProduct fetchedProduct = cromaretailSummaryProductProcessor.getSummaryProductByUrl(url);
-        System.out.println(fetchedProduct);
+        OriFetchedProduct oriFetchedProduct = cromaretailSummaryProductProcessor.getSummaryProductByUrl(url);
+        System.out.println(oriFetchedProduct);
 
     }
 

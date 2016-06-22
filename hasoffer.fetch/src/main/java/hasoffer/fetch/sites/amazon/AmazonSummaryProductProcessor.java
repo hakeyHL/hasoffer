@@ -7,7 +7,7 @@ import hasoffer.base.utils.HtmlUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.exception.amazon.AmazonRobotCheckException;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.ProductStatus;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.htmlcleaner.TagNode;
@@ -36,17 +36,17 @@ public class AmazonSummaryProductProcessor implements ISummaryProductProcessor {
     private static Logger logger = LoggerFactory.getLogger(AmazonSummaryProductProcessor.class);
 
     @Override
-    public FetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
+    public OriFetchedProduct getSummaryProductByUrl(String url) throws HttpFetchException, ContentParseException {
 
-        FetchedProduct fetchedProduct = new FetchedProduct();
+        OriFetchedProduct oriFetchedProduct = new OriFetchedProduct();
 
         url = url.replace("dp", "gp/offer-listing");
 
         String sourceId = AmazonHelper.getProductIdByUrl(url);
-        fetchedProduct.setWebsite(Website.AMAZON);
+        oriFetchedProduct.setWebsite(Website.AMAZON);
 
-        fetchedProduct.setUrl(url);
-        fetchedProduct.setSourceSid(sourceId);
+        oriFetchedProduct.setUrl(url);
+        oriFetchedProduct.setSourceSid(sourceId);
 
         if (url.contains("offer-listing")) {
 
@@ -65,9 +65,9 @@ public class AmazonSummaryProductProcessor implements ISummaryProductProcessor {
             if (bodyNode != null) {
                 String contentString = bodyNode.getAttributeByName("content");
                 if (contentString.contains("404")) {
-                    fetchedProduct.setProductStatus(ProductStatus.OFFSALE);
-                    fetchedProduct.setTitle("url expired");
-                    return fetchedProduct;
+                    oriFetchedProduct.setProductStatus(ProductStatus.OFFSALE);
+                    oriFetchedProduct.setTitle("url expired");
+                    return oriFetchedProduct;
                 }
             }
 
@@ -81,21 +81,21 @@ public class AmazonSummaryProductProcessor implements ISummaryProductProcessor {
             if (imageNode != null) {
                 imageUrl = imageNode.getAttributeByName("src");
             }
-            fetchedProduct.setImageUrl(imageUrl);
+            oriFetchedProduct.setImageUrl(imageUrl);
 
             TagNode titleNode = getSubNodeByXPath(productListRoot, XPATH_PRODUCT_TITLE, null);
             if (titleNode == null) {
                 titleNode = getSubNodeByXPath(productListRoot, XPATH_PRODUCT_TITLE1, new ContentParseException("title not found"));
             }
             String title = titleNode.getText().toString().replace("All offers for", "").trim();
-            fetchedProduct.setTitle(title);
+            oriFetchedProduct.setTitle(title);
 
             TagNode noProductNode = getSubNodeByXPath(productListRoot, XPATH_NOPRODUCT, null);
             if (noProductNode != null) {
-                fetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
-                fetchedProduct.setTitle(title);
-                fetchedProduct.setImageUrl(imageUrl);
-                return fetchedProduct;
+                oriFetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
+                oriFetchedProduct.setTitle(title);
+                oriFetchedProduct.setImageUrl(imageUrl);
+                return oriFetchedProduct;
             }
 
             TagNode productListNodes = getSubNodeByXPath(productListRoot, XPATH_PRODUCT_LIST, null);
@@ -109,20 +109,20 @@ public class AmazonSummaryProductProcessor implements ISummaryProductProcessor {
                     priceString = matcher.group(1);
                 }
                 float price = Float.parseFloat(priceString);
-                fetchedProduct.setProductStatus(ProductStatus.ONSALE);
-                fetchedProduct.setPrice(price);
+                oriFetchedProduct.setProductStatus(ProductStatus.ONSALE);
+                oriFetchedProduct.setPrice(price);
             } else {
-                fetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
-                fetchedProduct.setPrice(0.0f);
+                oriFetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
+                oriFetchedProduct.setPrice(0.0f);
             }
         } else {
             TagNode root = HtmlUtils.getUrlRootTagNode(url);
 
             TagNode bodyNode = getSubNodeByXPath(root, "//body", null);
             if (bodyNode == null) {
-                fetchedProduct.setProductStatus(ProductStatus.OFFSALE);
-                fetchedProduct.setTitle("url expired");
-                return fetchedProduct;
+                oriFetchedProduct.setProductStatus(ProductStatus.OFFSALE);
+                oriFetchedProduct.setTitle("url expired");
+                return oriFetchedProduct;
             }
 
             TagNode productNotFoundNode = getSubNodeByXPath(root, XPATH_NOTFOUND, null);
@@ -140,7 +140,7 @@ public class AmazonSummaryProductProcessor implements ISummaryProductProcessor {
             TagNode statusNode = getSubNodeByXPath(root, XPATH_STATUS, null);
             //todo 这里不太确定，暂时先用of来判断，内容是否为out of stock
             if (statusNode != null && statusNode.getText().toString().contains("of")) {
-                fetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
+                oriFetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
             } else {
                 TagNode priceNode = getSubNodeByXPath(root, XPATH_PRICE, null);
                 if (priceNode == null) {
@@ -165,13 +165,13 @@ public class AmazonSummaryProductProcessor implements ISummaryProductProcessor {
                 if (NumberUtils.isNumber(priceString)) {
                     price = Float.parseFloat(priceString);
                 }
-                fetchedProduct.setPrice(price);
-                fetchedProduct.setProductStatus(ProductStatus.ONSALE);
+                oriFetchedProduct.setPrice(price);
+                oriFetchedProduct.setProductStatus(ProductStatus.ONSALE);
             }
 
-            fetchedProduct.setImageUrl(imageUrl);
-            fetchedProduct.setTitle(title);
+            oriFetchedProduct.setImageUrl(imageUrl);
+            oriFetchedProduct.setTitle(title);
         }
-        return fetchedProduct;
+        return oriFetchedProduct;
     }
 }

@@ -7,7 +7,7 @@ import hasoffer.base.utils.HtmlUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.model.ProductStatus;
-import hasoffer.fetch.model.FetchedProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import org.htmlcleaner.TagNode;
 
 import java.util.Arrays;
@@ -28,19 +28,19 @@ public class ShopCluesSummaryProductProcessor implements ISummaryProductProcesso
     private static final String XPATH_PRODUCT_SOLDOUT = "//span[@class='strong out-of-stock']";
 
     @Override
-    public FetchedProduct getSummaryProductByUrl(String url) throws ContentParseException, HttpFetchException {
+    public OriFetchedProduct getSummaryProductByUrl(String url) throws ContentParseException, HttpFetchException {
 
-        FetchedProduct fetchedProduct = new FetchedProduct();
+        OriFetchedProduct oriFetchedProduct = new OriFetchedProduct();
 
         TagNode root = HtmlUtils.getUrlRootTagNode(url);
 
         //该标记已商品详情页的分页导航为准，如果没有认为商品offsale
         TagNode statusNode = getSubNodeByXPath(root, XPATH_PRODUCT_STATUS, null);
         if (statusNode == null) {
-            fetchedProduct.setProductStatus(ProductStatus.OFFSALE);
-            fetchedProduct.setWebsite(Website.SHOPCLUES);
-            fetchedProduct.setUrl(url);
-            return fetchedProduct;
+            oriFetchedProduct.setProductStatus(ProductStatus.OFFSALE);
+            oriFetchedProduct.setWebsite(Website.SHOPCLUES);
+            oriFetchedProduct.setUrl(url);
+            return oriFetchedProduct;
         }
 
         TagNode titleNode = getSubNodeByXPath(root, XPATH_TITLE, new ContentParseException("title not found"));
@@ -69,19 +69,19 @@ public class ShopCluesSummaryProductProcessor implements ISummaryProductProcesso
         //shopclues商品soldout时，还有image，title，
         TagNode soldOutNode = getSubNodeByXPath(root, XPATH_PRODUCT_SOLDOUT, null);
         if (soldOutNode != null) {
-            fetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
+            oriFetchedProduct.setProductStatus(ProductStatus.OUTSTOCK);
         } else {
-            fetchedProduct.setProductStatus(ProductStatus.ONSALE);
+            oriFetchedProduct.setProductStatus(ProductStatus.ONSALE);
         }
 
-        fetchedProduct.setPrice(price);
-        fetchedProduct.setTitle(title);
-        fetchedProduct.setUrl(url);
-        fetchedProduct.setWebsite(Website.SHOPCLUES);
-        fetchedProduct.setSourceSid(sourceId);
-        fetchedProduct.setImageUrl(imageUrl);
+        oriFetchedProduct.setPrice(price);
+        oriFetchedProduct.setTitle(title);
+        oriFetchedProduct.setUrl(url);
+        oriFetchedProduct.setWebsite(Website.SHOPCLUES);
+        oriFetchedProduct.setSourceSid(sourceId);
+        oriFetchedProduct.setImageUrl(imageUrl);
 
-        return fetchedProduct;
+        return oriFetchedProduct;
     }
 
 }
