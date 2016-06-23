@@ -1,5 +1,7 @@
 package hasoffer.api.controller.vo;
 
+import java.util.List;
+
 /**
  * 商品类目VO
  * Created by hs on 2016/6/20.
@@ -13,6 +15,16 @@ public class CategoryVo {
     private  Long  parentId;
     private  int rank;
     private  int  level;
+
+    List<CategoryVo> categorys;
+
+    public List<CategoryVo> getCategorys() {
+        return categorys;
+    }
+
+    public void setCategorys(List<CategoryVo> categorys) {
+        this.categorys = categorys;
+    }
 
     public int getRank() {
         return rank;
