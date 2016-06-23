@@ -18,6 +18,7 @@ public class AppBanner implements Identifiable<Long> {
     private Long id;
 
     private String imageUrl;//图片路径
+    @Column(columnDefinition = "text")
     private String linkUrl;//跳转路径
 
     private Date createTime;//创建时间
