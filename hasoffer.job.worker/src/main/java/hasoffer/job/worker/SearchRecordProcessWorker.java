@@ -86,18 +86,19 @@ public class SearchRecordProcessWorker implements Runnable {
                     initResultMap(listProductMap, voonikFetchResult);
                     autoSearchResult.setSitePros(listProductMap);
                     searchProductService.searchProductsFromSites(autoSearchResult);
+                    logger.info("SearchRecordProcessWorker.flipkartFetchResult  result()--keyword is {} : size() = {}", keyword, flipkartFetchResult.getFetchProducts().size());
+                    logger.info("SearchRecordProcessWorker.amazonFetchResult    result()--keyword is {} : size() = {}", keyword, amazonFetchResult.getFetchProducts().size());
+                    logger.info("SearchRecordProcessWorker.snapdealFetchResult  result()--keyword is {} : size() = {}", keyword, snapdealFetchResult.getFetchProducts().size());
+                    logger.info("SearchRecordProcessWorker.shopcluesFetchResult result()--keyword is {} : size() = {}", keyword, shopcluesFetchResult.getFetchProducts().size());
+                    logger.info("SearchRecordProcessWorker.paytmFetchResult     result()--keyword is {} : size() = {}", keyword, paytmFetchResult.getFetchProducts().size());
+                    logger.info("SearchRecordProcessWorker.ebayFetchResult      result()--keyword is {} : size() = {}", keyword, ebayFetchResult.getFetchProducts().size());
+                    logger.info("SearchRecordProcessWorker.myntraFetchResult    result()--keyword is {} : size() = {}", keyword, myntraFetchResult.getFetchProducts().size());
+                    logger.info("SearchRecordProcessWorker.jabongFetchResult    result()--keyword is {} : size() = {}", keyword, jabongFetchResult.getFetchProducts().size());
+                    logger.info("SearchRecordProcessWorker.voonikFetchResult    result()--keyword is {} : size() = {}", keyword, voonikFetchResult.getFetchProducts().size());
                 } else {
                     searchLogQueue.put(searchLog);
                 }
-                logger.info("SearchRecordProcessWorker.run()--keyword is {}: flipkartFetchResult.size() = {}", keyword, flipkartFetchResult.getFetchProducts().size());
-                logger.info("SearchRecordProcessWorker.run()--keyword is {}: amazonFetchResult.size() = {}", keyword, amazonFetchResult.getFetchProducts().size());
-                logger.info("SearchRecordProcessWorker.run()--keyword is {}: snapdealFetchResult.size() = {}", keyword, snapdealFetchResult.getFetchProducts().size());
-                logger.info("SearchRecordProcessWorker.run()--keyword is {}: shopcluesFetchResult.size() = {}", keyword, shopcluesFetchResult.getFetchProducts().size());
-                logger.info("SearchRecordProcessWorker.run()--keyword is {}: paytmFetchResult.size() = {}", keyword, paytmFetchResult.getFetchProducts().size());
-                logger.info("SearchRecordProcessWorker.run()--keyword is {}: ebayFetchResult.size() = {}", keyword, ebayFetchResult.getFetchProducts().size());
-                logger.info("SearchRecordProcessWorker.run()--keyword is {}: myntraFetchResult.size() = {}", keyword, myntraFetchResult.getFetchProducts().size());
-                logger.info("SearchRecordProcessWorker.run()--keyword is {}: jabongFetchResult.size() = {}", keyword, jabongFetchResult.getFetchProducts().size());
-                logger.info("SearchRecordProcessWorker.run()--keyword is {}: voonikFetchResult.size() = {}", keyword, voonikFetchResult.getFetchProducts().size());
+
             } catch (Exception e) {
                 logger.error(e.getMessage());
             }
