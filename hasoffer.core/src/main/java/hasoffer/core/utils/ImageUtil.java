@@ -70,14 +70,7 @@ public class ImageUtil {
             }
 
             // 上传图片
-            Map<String, Object> params = new HashMap<String, Object>();
-            params.put("file", file);
-            HttpResponseModel httpResponseModel = HttpUtils.uploadFile(CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL2), file);
-
-            Map respMap = (Map) JSON.parse(httpResponseModel.getBodyString());
-            Map pathMap = (Map) respMap.get("data");
-
-            return new ImagePath((String) pathMap.get("originalPath"), (String) pathMap.get("smallPath"), (String) pathMap.get("bigPath"));
+            return uploadImage2(file);
 
         } catch (Exception e) {
             logger.error(e.getMessage() + "[" + imageUrl + "]");
@@ -110,14 +103,7 @@ public class ImageUtil {
             }
 
             // 上传图片
-            Map<String, Object> params = new HashMap<String, Object>();
-            params.put("file", file);
-            HttpResponseModel httpResponseModel = HttpUtils.uploadFile(CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL), file);
-
-            Map respMap = (Map) JSON.parse(httpResponseModel.getBodyString());
-            String path = (String) respMap.get("data");
-
-            return path;
+            return uploadImage(file);
         } catch (Exception e) {
             logger.error(e.getMessage() + "[" + imageUrl + "]");
             throw new ImageDownloadOrUploadException("下载或上传图片时出错");
@@ -125,6 +111,26 @@ public class ImageUtil {
             // 删除图片
             FileUtils.deleteQuietly(file);
         }
+    }
+
+    public static String uploadImage(File file) throws Exception {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("file", file);
+        HttpResponseModel httpResponseModel = HttpUtils.uploadFile(CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL), file);
+
+        Map respMap = (Map) JSON.parse(httpResponseModel.getBodyString());
+        return (String) respMap.get("data");
+    }
+
+    public static ImagePath uploadImage2(File file) throws Exception {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("file", file);
+        HttpResponseModel httpResponseModel = HttpUtils.uploadFile(CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL2), file);
+
+        Map respMap = (Map) JSON.parse(httpResponseModel.getBodyString());
+        Map pathMap = (Map) respMap.get("data");
+
+        return new ImagePath((String) pathMap.get("originalPath"), (String) pathMap.get("smallPath"), (String) pathMap.get("bigPath"));
     }
 
     public static String getImageUrl(final String path) {
