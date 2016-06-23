@@ -50,7 +50,7 @@ public class SearchRecordProcessWorker implements Runnable {
                     TimeUnit.SECONDS.sleep(5);
                     continue;
                 }
-                logger.info("SearchRecordProcessWorker. search keyword {}. begin", searchLog);
+                //logger.info("SearchRecordProcessWorker. search keyword {}. begin", searchLog);
                 SrmAutoSearchResult autoSearchResult = new SrmAutoSearchResult(searchLog);
 
                 String keyword = autoSearchResult.getTitle();
