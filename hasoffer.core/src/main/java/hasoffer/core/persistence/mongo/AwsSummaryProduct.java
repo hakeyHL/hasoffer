@@ -2,6 +2,7 @@ package hasoffer.core.persistence.mongo;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMarshalling;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
@@ -40,6 +41,7 @@ public class AwsSummaryProduct {
     private long lCreateTime;
     private Date createTime;
 
+    @DynamoDBRangeKey
     private long lUpdateTime;
     private Date updateTime;
 
@@ -215,5 +217,24 @@ public class AwsSummaryProduct {
         result = 31 * result + (int) (lUpdateTime ^ (lUpdateTime >>> 32));
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "AwsSummaryProduct{" +
+                "id=" + id +
+                ", website=" + website +
+                ", url='" + url + '\'' +
+                ", sourceId='" + sourceId + '\'' +
+                ", title='" + title + '\'' +
+                ", subTitle='" + subTitle + '\'' +
+                ", price=" + price +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", skuStatus=" + skuStatus +
+                ", lCreateTime=" + lCreateTime +
+                ", createTime=" + createTime +
+                ", lUpdateTime=" + lUpdateTime +
+                ", updateTime=" + updateTime +
+                '}';
     }
 }

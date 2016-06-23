@@ -25,12 +25,13 @@ public class AWSMongoDbManager implements IMongoDbManager {
 //    static AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient().withEndpoint("http://60.205.57.57:8000");
 //static AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient().withEndpoint("http://192.168.1.203:8000");
 
-//    static AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient(new ProfileCredentialsProvider());
+    static DynamoDB dynamoDB = null;
 
     private static AmazonDynamoDBClient dynamoDBClient = getDynamoDBClient();
 
     private static AmazonDynamoDBClient getDynamoDBClient() {
         BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials("AKIAI2KXGSAA6ML4ZSJQ", "vDUeGxdjPeH1ulHark/VhKlAkD4d9L/wVpBINxep");
+
         AmazonDynamoDBClient client = new AmazonDynamoDBClient(basicAWSCredentials)
                 .withRegion(Regions.AP_SOUTHEAST_1);
 
@@ -62,6 +63,14 @@ public class AWSMongoDbManager implements IMongoDbManager {
         String tName = getTableName(clazz);
 
         UpdateTableResult updateTableResult = dynamoDBClient.updateTable(tName, new ProvisionedThroughput().withReadCapacityUnits(readUnits).withWriteCapacityUnits(writeUnits));
+    }
+
+    public <T> void updateTable(Class<T> clazz) {
+        String tName = getTableName(clazz);
+
+        UpdateTableRequest updateTableRequest = new UpdateTableRequest();
+
+        dynamoDBClient.updateTable(updateTableRequest);
     }
 
     public <T> void deleteTable(Class<T> clazz) {
