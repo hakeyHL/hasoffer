@@ -5,6 +5,7 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.dbm.HibernateDao;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.utils.excel.ExcelImporter;
 import hasoffer.core.utils.excel.ImportCallBack;
@@ -124,5 +125,15 @@ public class DealServiceImpl implements IDealService {
     public AppDeal getDealById(Long dealId) {
 
         return dbm.get(AppDeal.class, dealId);
+    }
+
+    @Override
+    public void addAppBanner(AppBanner banner) {
+        dbm.create(banner);
+    }
+
+    @Override
+    public void addAppDeal(AppDeal deal) {
+        dbm.create(deal);
     }
 }

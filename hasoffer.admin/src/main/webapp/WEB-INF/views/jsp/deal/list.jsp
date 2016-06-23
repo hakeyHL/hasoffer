@@ -74,7 +74,7 @@
                         <td>${data.title}</td>
                         <td>${data.createTime}</td>
                         <td>${data.expireTime}</td>
-                        <td><a href="getDealById/${data.id}" >编辑</a></td>
+                        <td><a href="detail/${data.id}" >编辑</a></td>
                         <td><a href="#">删除</a></td>
                     </tr>
                 </c:forEach>
