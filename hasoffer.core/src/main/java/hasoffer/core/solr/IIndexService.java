@@ -8,6 +8,7 @@ public interface IIndexService<M, T extends IIdentifiable<M>> {
 	void createOrUpdate(T... ts);
 
 	void remove(String id);
+	SearchResult<T> searchProducts(String title, FilterQuery[] fqs, Sort[] sorts, PivotFacet[] pivotFacets, int pageNumber, int pageSize) ;
 
 	SearchResult<M> search(Query[] qs, FilterQuery[] fqs, Sort[] sorts, PivotFacet[] pivotFacets,int pageNumber, int pageSize);
 
