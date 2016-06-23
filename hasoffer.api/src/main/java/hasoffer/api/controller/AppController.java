@@ -20,10 +20,7 @@ import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.product.solr.CategoryIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel;
-import hasoffer.core.solr.FilterQuery;
-import hasoffer.core.solr.PivotFacet;
-import hasoffer.core.solr.Query;
-import hasoffer.core.solr.Sort;
+import hasoffer.core.solr.*;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
 import hasoffer.fetch.helper.WebsiteHelper;
@@ -444,20 +441,51 @@ public class AppController {
      * @return
      */
     @RequestMapping(value = "/category", method = RequestMethod.GET)
-    public ModelAndView category() {
+    public ModelAndView category(String categoryId) {
         ModelAndView mv =new ModelAndView();
-        List<PtmCategory> ptmCategorys=appService.getCategory();
+        List<PtmCategory> ptmCategorys=null;
         List  categorys=new ArrayList();
-        for(PtmCategory ptmCategory:ptmCategorys){
-            CategoryVo categoryVo=new CategoryVo();
-            categoryVo.setId(ptmCategory.getId());
-            categoryVo.setHasChildren(ptmCategory.getParentId()==0?0:1);
-            categoryVo.setImage(ptmCategory.getImageUrl());
-            categoryVo.setLevel(ptmCategory.getLevel());
-            categoryVo.setName(ptmCategory.getName());
-            categoryVo.setParentId(ptmCategory.getParentId());
-            categoryVo.setRank(ptmCategory.getRank());
-            categorys.add(categoryVo);
+        if(StringUtils.isBlank(categoryId)){
+            ptmCategorys=appService.getCategory();
+            for(PtmCategory ptmCategory:ptmCategorys){
+                CategoryVo categoryVo=new CategoryVo();
+                categoryVo.setId(ptmCategory.getId());
+                categoryVo.setHasChildren(ptmCategory.getParentId()==0?0:1);
+                categoryVo.setImage(ptmCategory.getImageUrl());
+                categoryVo.setLevel(ptmCategory.getLevel());
+                categoryVo.setName(ptmCategory.getName());
+                categoryVo.setParentId(ptmCategory.getParentId());
+                categoryVo.setRank(ptmCategory.getRank());
+                categorys.add(categoryVo);
+            }
+        }else{
+            //get childs
+            ptmCategorys=appService.getChildCategorys(categoryId);
+            for(PtmCategory ptmCategory:ptmCategorys){
+                CategoryVo categoryVo=new CategoryVo();
+                categoryVo.setId(ptmCategory.getId());
+                categoryVo.setHasChildren(ptmCategory.getParentId()==0?0:1);
+                categoryVo.setImage(ptmCategory.getImageUrl());
+                categoryVo.setLevel(ptmCategory.getLevel());
+                categoryVo.setName(ptmCategory.getName());
+                categoryVo.setParentId(ptmCategory.getParentId());
+                categoryVo.setRank(ptmCategory.getRank());
+                categorys.add(categoryVo);
+                List<PtmCategory>ptmCategorysTemp=appService.getChildCategorys(categoryVo.getId().toString());
+                if(ptmCategorysTemp!=null){
+                    for(PtmCategory cates:ptmCategorysTemp){
+                        CategoryVo cate=new CategoryVo();
+                        cate.setId(cates.getId());
+                        cate.setHasChildren(cates.getParentId() == 0 ? 0 : 1);
+                        cate.setImage(cates.getImageUrl());
+                        cate.setLevel(cates.getLevel());
+                        cate.setName(cates.getName());
+                        cate.setParentId(cates.getParentId());
+                        cate.setRank(cates.getRank());
+                        categorys.add(cate);
+                    }
+                }
+            }
         }
         mv.addObject("data",categorys);
         return  mv;
@@ -476,20 +504,42 @@ public class AppController {
         }
         List li=new ArrayList();
         Map map=new HashMap();
+        PageableResult <ProductModel> products;
+        SearchResult<ProductModel> products1;
         //category level page size
        // PageableResult <ProductModel> products=productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()),criteria.getLevel(),criteria.getPage(),criteria.getPageSize());
-        PageableResult <ProductModel> products=productIndexServiceImpl.searchPro(Long.valueOf(2),1,1,10);
-        if(products!=null&&products.getData().size()>0){
-            List<ProductModel> productModes=products.getData();
-            for(ProductModel productModel:productModes){
-                ProductListVo productListVo=new ProductListVo();
-                productListVo.setCommentNum(productModel.getRating());
-                productListVo.setId(productModel.getId());
-                productListVo.setImageUrl("http://pic95.nipic.com/file/20160419/7874840_024541265000_2.jpg");
-                productListVo.setName(productModel.getTitle());
-                productListVo.setPrice(productModel.getPrice());
-                productListVo.setStoresNum(5);
-                li.add(productListVo);
+        if(!StringUtils.isBlank(criteria.getCategoryId())){
+                //search by category
+            products=productIndexServiceImpl.searchPro(Long.valueOf(2),1,1,10);
+            if(products!=null&&products.getData().size()>0){
+                List<ProductModel> productModes=products.getData();
+                for(ProductModel productModel:productModes){
+                    ProductListVo productListVo=new ProductListVo();
+                    productListVo.setCommentNum(productModel.getRating());
+                    productListVo.setId(productModel.getId());
+                    productListVo.setImageUrl("http://pic95.nipic.com/file/20160419/7874840_024541265000_2.jpg");
+                    productListVo.setName(productModel.getTitle());
+                    productListVo.setPrice(productModel.getPrice());
+                    productListVo.setStoresNum(5);
+                    li.add(productListVo);
+                }
+            }
+        }else{
+            //search by title
+            //productIndexServiceImpl.simpleSearch(criteria.getKeyword(),1,10);
+            products1= productIndexServiceImpl.searchObjs(criteria.getKeyword(),null,null,null,1,10,false);
+            if(products1!=null&&products1.getResult().size()>0){
+                List<ProductModel> productModes=products1.getResult();
+                for(ProductModel productModel:productModes){
+                    ProductListVo productListVo=new ProductListVo();
+                    productListVo.setCommentNum(productModel.getRating());
+                    productListVo.setId(productModel.getId());
+                    productListVo.setImageUrl("http://pic95.nipic.com/file/20160419/7874840_024541265000_2.jpg");
+                    productListVo.setName(productModel.getTitle());
+                    productListVo.setPrice(productModel.getPrice());
+                    productListVo.setStoresNum(5);
+                    li.add(productListVo);
+                }
             }
         }
         String data="";
