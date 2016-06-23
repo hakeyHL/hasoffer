@@ -1,5 +1,6 @@
 package hasoffer.job.service.impl;
 
+import hasoffer.base.thread.HasofferThreadFactory;
 import hasoffer.base.utils.DaemonThreadFactory;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
@@ -7,7 +8,6 @@ import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.SearchProductService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.job.service.IWebSiteFetchService;
-import hasoffer.job.threadFactory.HasofferThreadFactory;
 import hasoffer.job.worker.SearchRecordListWorker;
 import hasoffer.job.worker.SearchRecordProcessWorker;
 import org.slf4j.Logger;
