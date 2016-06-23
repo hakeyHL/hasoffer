@@ -9,6 +9,8 @@ import hasoffer.core.utils.DateEditor;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.webcommon.helper.PageHelper;
 import jodd.io.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +32,8 @@ import java.util.Map;
 @Controller
 @RequestMapping(value="/deal")
 public class DealController {
+
+    private Logger logger = LoggerFactory.getLogger(DealController.class);
 
     @Resource
     IDealService dealService;
@@ -94,7 +98,7 @@ public class DealController {
             try {
                 path = ImageUtil.uploadImage(imageFile);
             } catch (Exception e) {
-
+                logger.debug("image upload fail");
             }
         }
 
