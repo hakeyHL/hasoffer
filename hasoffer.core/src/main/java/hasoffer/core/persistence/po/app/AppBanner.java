@@ -26,6 +26,7 @@ public class AppBanner implements Identifiable<Long> {
     @Enumerated(EnumType.STRING)
     private BannerFrom bannerFrom;//banner来源
 
+    @Column(nullable = false)
     private long rank;//用于手工调整该条banner的优先级
 
     @Override
