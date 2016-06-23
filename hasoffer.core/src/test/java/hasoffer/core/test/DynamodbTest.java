@@ -4,9 +4,15 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.mongo.AWSMongoDbManager;
+import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.AwsSummaryProduct;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -15,9 +21,14 @@ import java.util.concurrent.TimeUnit;
  * Date : 2016/6/15
  * Function :
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "classpath:spring-beans.xml")
 public class DynamodbTest {
 
     AWSMongoDbManager awsMongoDbManager = new AWSMongoDbManager();
+
+    @Resource
+    IDataBaseManager dbm;
 
     @Test
     public void testCount() {
@@ -101,4 +112,22 @@ public class DynamodbTest {
         }
     }
 
+    @Test
+    public void init_datas() {
+        String sql = "select t from PtmCmpSku t";
+
+        List<PtmCmpSku> cmpskus = dbm.query(sql, 1, 2000);
+
+        List<AwsSummaryProduct> awsSummaryProducts = new ArrayList<AwsSummaryProduct>();
+
+        for (PtmCmpSku cmpSku : cmpskus) {
+            System.out.println(cmpSku.toString());
+            AwsSummaryProduct awsSummaryProduct = new AwsSummaryProduct(cmpSku);
+            awsSummaryProducts.add(awsSummaryProduct);
+
+            awsMongoDbManager.save(awsSummaryProduct);
+        }
+
+//        awsMongoDbManager.save(awsSummaryProducts.toArray(new AwsSummaryProduct[0]));
+    }
 }

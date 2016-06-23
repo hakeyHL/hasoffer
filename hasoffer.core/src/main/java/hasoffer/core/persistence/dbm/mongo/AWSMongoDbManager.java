@@ -1,5 +1,7 @@
 package hasoffer.core.persistence.dbm.mongo;
 
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import com.amazonaws.services.dynamodbv2.model.*;
@@ -20,19 +22,20 @@ import java.util.Map;
 //@Component
 public class AWSMongoDbManager implements IMongoDbManager {
 
-    static AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient().withEndpoint("http://60.205.57.57:8000");
+//    static AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient().withEndpoint("http://60.205.57.57:8000");
+//static AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient().withEndpoint("http://192.168.1.203:8000");
 
 //    static AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient(new ProfileCredentialsProvider());
 
-//    private DynamoDB dynamoDBClient = getDynamoDBClient();
-//
-//    private DynamoDB getDynamoDBClient() {
-//        BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials("AKIAI2KXGSAA6ML4ZSJQ", "vDUeGxdjPeH1ulHark/VhKlAkD4d9L/wVpBINxep");
-//        AmazonDynamoDBClient client = new AmazonDynamoDBClient(basicAWSCredentials)
-//                .withRegion(Regions.AP_SOUTHEAST_1);
-//
-//        return new DynamoDB(client);
-//    }
+    private static AmazonDynamoDBClient dynamoDBClient = getDynamoDBClient();
+
+    private static AmazonDynamoDBClient getDynamoDBClient() {
+        BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials("AKIAI2KXGSAA6ML4ZSJQ", "vDUeGxdjPeH1ulHark/VhKlAkD4d9L/wVpBINxep");
+        AmazonDynamoDBClient client = new AmazonDynamoDBClient(basicAWSCredentials)
+                .withRegion(Regions.AP_SOUTHEAST_1);
+
+        return client;
+    }
 
     private static DynamoDBMapper getMapper() {
         return new DynamoDBMapper(dynamoDBClient);
