@@ -33,6 +33,9 @@ public class AppDeal implements Identifiable<Long> {
     @Column(nullable = false)
     private Date expireTime;//deal失效时间
 
+    private boolean push = false;//是否推送到banner,默认false，不推送
+
+    @Column(columnDefinition = "text")
     private String description;//deal描述
 
     @Override
@@ -101,6 +104,14 @@ public class AppDeal implements Identifiable<Long> {
         this.website = website;
     }
 
+    public boolean isPush() {
+        return push;
+    }
+
+    public void setPush(boolean push) {
+        this.push = push;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -108,6 +119,7 @@ public class AppDeal implements Identifiable<Long> {
 
         AppDeal appDeal = (AppDeal) o;
 
+        if (push != appDeal.push) return false;
         if (id != null ? !id.equals(appDeal.id) : appDeal.id != null) return false;
         if (website != appDeal.website) return false;
         if (title != null ? !title.equals(appDeal.title) : appDeal.title != null) return false;
@@ -128,6 +140,7 @@ public class AppDeal implements Identifiable<Long> {
         result = 31 * result + (imageUrl != null ? imageUrl.hashCode() : 0);
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (expireTime != null ? expireTime.hashCode() : 0);
+        result = 31 * result + (push ? 1 : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         return result;
     }
