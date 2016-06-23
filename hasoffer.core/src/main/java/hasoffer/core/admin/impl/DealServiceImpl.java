@@ -128,6 +128,16 @@ public class DealServiceImpl implements IDealService {
     }
 
     @Override
+    public AppBanner getBannerByDealId(Long dealId) {
+        return dbm.get(AppBanner.class, dealId);
+    }
+
+    @Override
+    public void delete(Long dealId) {
+        dbm.delete(AppDeal.class , dealId);
+    }
+
+    @Override
     public void addOrUpdateBanner(AppBanner banner) {
         dbm.create(banner);
     }

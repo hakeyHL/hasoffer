@@ -22,8 +22,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -80,29 +79,48 @@ public class DealController {
     }
 
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
-    public ModelAndView edit(AppDeal deal, Boolean isPushBanner,  MultipartFile file){
+    public ModelAndView edit(AppDeal deal, MultipartFile file) throws IOException{
+
         //上传图片, 暂支持单个
-        String uploadPath = null;
+        String path = null;
         if (!file.isEmpty()) {
-            uploadPath = CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL) + file.getOriginalFilename();
-            File localFile = new File(uploadPath);
-            HttpUtils.uploadFile(CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL), localFile);
+            File newFile = new File(CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL) + File.separator + file.getOriginalFilename());
+            if(!newFile.exists()){
+                newFile.createNewFile();
+            }
+
+            OutputStream output = new FileOutputStream(newFile);
+            BufferedOutputStream bufferedOutput = new BufferedOutputStream(output);
+            bufferedOutput.write(file.getBytes());
+            HttpResponseModel httpResponseModel = HttpUtils.uploadFile(CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL), newFile);
+            Map respMap = (Map) JSON.parse(httpResponseModel.getBodyString());
+             path = (String) respMap.get("data");
         }
 
         //推送至banner展示则点击保存时除deal信息外 创建一条banner数据 banner的生效、失效时间、banner图片与此deal相同 banner的rank为默认值
-        if(isPushBanner){
-            AppBanner banner = new AppBanner();
-            banner.setImageUrl(uploadPath);
+        if(deal.isPush()){
+            AppBanner banner = dealService.getBannerByDealId(deal.getId());
+            if(banner == null){
+                banner = new AppBanner();
+            }
+            banner.setSourceId(String.valueOf(deal.getId()));
+            banner.setImageUrl(path);
             banner.setCreateTime(deal.getCreateTime());
             banner.setLinkUrl(deal.getLinkUrl());
             banner.setBannerFrom(BannerFrom.DEAL);
             banner.setDeadline(deal.getExpireTime());
             banner.setRank(0);
-            dealService.addAppBanner(banner);
+            dealService.addOrUpdateBanner(banner);
         }
 
-        deal.setImageUrl(uploadPath);
-        dealService.addAppDeal(deal);
+        deal.setImageUrl(path);
+        dealService.updateDeal(deal);
+        return new ModelAndView("redirect:/deal/list");
+    }
+
+    @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
+    public ModelAndView delete(@PathVariable(value = "id") Long dealId){
+
         return new ModelAndView("redirect:/deal/list");
     }
 

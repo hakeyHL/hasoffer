@@ -44,10 +44,10 @@
                             <div class="col-sm-7">
 
                                 <label class="radio-inline">
-                                    <input type="radio" name="isPushBanner" id="inlineRadio1" value=true> 展示
+                                    <input type="radio" name="push" id="inlineRadio1" > 展示
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" name="isPushBanner" id="inlineRadio2" value=false> 不展示
+                                    <input type="radio" name="push" id="inlineRadio2" > 不展示
                                 </label>
 
                             </div>
@@ -91,5 +91,19 @@
 
 
 </div>
+
+<script>
+    $(function(){
+        var push = "${deal.push}";
+        var inlineRadio1 = $("#inlineRadio1");
+        var inlineRadio2 = $("#inlineRadio2");
+
+        if(push == true){
+            inlineRadio1.attr("checked", "checked");
+        }else{
+            inlineRadio2.attr("checked", "checked");
+        }
+    });
+</script>
 
 <jsp:include page="../include/footer.jsp"/>
