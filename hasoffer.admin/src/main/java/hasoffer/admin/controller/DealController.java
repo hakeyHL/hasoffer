@@ -11,18 +11,17 @@ import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.utils.DateEditor;
 import hasoffer.webcommon.helper.PageHelper;
+import jodd.io.FileUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -84,15 +83,18 @@ public class DealController {
         //上传图片, 暂支持单个
         String path = null;
         if (!file.isEmpty()) {
-            File newFile = new File(CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL) + File.separator + file.getOriginalFilename());
-            if(!newFile.exists()){
-                newFile.createNewFile();
-            }
+//            File newFile = new File(CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL) + File.separator + file.getOriginalFilename());
+//            if(!newFile.exists()){
+//                newFile.createNewFile();
+//            }
+//
+//            OutputStream output = new FileOutputStream(newFile);
+//            BufferedOutputStream bufferedOutput = new BufferedOutputStream(output);
+//            bufferedOutput.write(file.getBytes());
+            File imageFile = FileUtil.createTempFile();
+            FileUtil.writeBytes(imageFile,file.getBytes());
 
-            OutputStream output = new FileOutputStream(newFile);
-            BufferedOutputStream bufferedOutput = new BufferedOutputStream(output);
-            bufferedOutput.write(file.getBytes());
-            HttpResponseModel httpResponseModel = HttpUtils.uploadFile(CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL), newFile);
+            HttpResponseModel httpResponseModel = HttpUtils.uploadFile(CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL), imageFile);
             Map respMap = (Map) JSON.parse(httpResponseModel.getBodyString());
              path = (String) respMap.get("data");
         }
