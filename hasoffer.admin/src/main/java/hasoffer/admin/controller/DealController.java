@@ -3,6 +3,7 @@ package hasoffer.admin.controller;
 import com.mongodb.util.JSON;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.utils.IDUtil;
 import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.core.CoreConfig;
 import hasoffer.core.admin.IDealService;
@@ -12,6 +13,7 @@ import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.utils.DateEditor;
 import hasoffer.webcommon.helper.PageHelper;
 import jodd.io.FileUtil;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -91,12 +93,13 @@ public class DealController {
 //            OutputStream output = new FileOutputStream(newFile);
 //            BufferedOutputStream bufferedOutput = new BufferedOutputStream(output);
 //            bufferedOutput.write(file.getBytes());
-            File imageFile = FileUtil.createTempFile();
+            File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
             FileUtil.writeBytes(imageFile,file.getBytes());
 
             HttpResponseModel httpResponseModel = HttpUtils.uploadFile(CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL), imageFile);
             Map respMap = (Map) JSON.parse(httpResponseModel.getBodyString());
              path = (String) respMap.get("data");
+            FileUtils.deleteQuietly(imageFile);
         }
 
         //推送至banner展示则点击保存时除deal信息外 创建一条banner数据 banner的生效、失效时间、banner图片与此deal相同 banner的rank为默认值
@@ -122,7 +125,7 @@ public class DealController {
 
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
     public ModelAndView delete(@PathVariable(value = "id") Long dealId){
-
+        dealService.delete(dealId);
         return new ModelAndView("redirect:/deal/list");
     }
 

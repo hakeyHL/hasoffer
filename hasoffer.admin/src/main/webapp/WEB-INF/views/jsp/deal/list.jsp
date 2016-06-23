@@ -110,7 +110,7 @@
                         <td>${data.createTime}</td>
                         <td>${data.expireTime}</td>
                         <td><a href="detail/${data.id}">编辑</a></td>
-                        <td><a href="javascript:void(0)" onclick="deleteById('<%=contextPath%>/deal/delete?id=${data.id}')" data-toggle="modal" data-target="#confirm-delete">删除</a></td>
+                        <td><a href="javascript:void(0)" onclick="deleteById('<%=contextPath%>/deal/delete/${data.id}')" data-toggle="modal" data-target="#confirm-delete">删除</a></td>
                     </tr>
                 </c:forEach>
                 </tbody>
@@ -158,8 +158,14 @@
     }
 
     function urlSubmit(){
-        var url=$.trim($("#url").val());//获取会话中的隐藏属性URL
-        window.location.href=url;
+        var url = $.trim($("#url").val());//获取会话中的隐藏属性URL
+        $.ajax({
+            url: url,
+            type: 'DELETE',
+            success: function(result) {
+                console.info(result);
+            }
+        });
 
     }
 
