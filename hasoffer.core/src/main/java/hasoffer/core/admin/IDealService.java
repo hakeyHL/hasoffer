@@ -1,6 +1,7 @@
 package hasoffer.core.admin;
 
 import hasoffer.base.model.PageableResult;
+import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,4 +18,12 @@ public interface IDealService {
     public Map<String, Object> importExcelFile(MultipartFile multipartFile) throws Exception;
 
     public AppDeal getDealById(Long dealId);
+
+    public AppBanner getBannerByDealId(Long dealId);
+
+    public void addOrUpdateBanner(AppBanner banner);
+
+    public void updateDeal(AppDeal deal);
+
+    public void delete(Long dealId);
 }

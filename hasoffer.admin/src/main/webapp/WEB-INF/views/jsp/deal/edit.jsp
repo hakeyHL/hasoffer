@@ -2,6 +2,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
+<%
+    String contextPath = request.getContextPath();
+%>
+
 <jsp:include page="../include/header.jsp"/>
 <jsp:include page="../include/left.jsp"/>
 
@@ -9,19 +13,21 @@
 <div id="page-wrapper">
 
 
-                    <form class="form-horizontal" action="edit">
+                    <form class="form-horizontal" action="<%=contextPath%>/deal/edit" enctype="multipart/form-data" method="post">
 
+                        <input type="hidden" name="id" value="${deal.id}">
+                        <input type="hidden" name="website" value="${deal.website}">
                         <div class="form-group">
                             <label  class="col-sm-3 control-label">Deal标题：</label>
                             <div class="col-sm-7">
-                                <input type="text" class="form-control" value="${deal.title}" placeholder="Deal标题">
+                                <input type="text" name="title" class="form-control" value="${deal.title}" placeholder="Deal标题">
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label  class="col-sm-3 control-label">Deal跳转链接：</label>
                             <div class="col-sm-7">
-                                <input type="text" class="form-control" value="${deal.linkUrl}"  placeholder="Deal跳转链接">
+                                <input type="text" name="linkUrl" class="form-control" value="${deal.linkUrl}"  placeholder="Deal跳转链接">
                             </div>
                         </div>
 
@@ -29,7 +35,7 @@
                         <div class="form-group">
                             <label  class="col-sm-3 control-label">Deal图片：</label>
                             <div class="col-sm-7">
-                                <input type="file" />
+                                <input type="file" name="file" />
                             </div>
                         </div>
 
@@ -38,10 +44,10 @@
                             <div class="col-sm-7">
 
                                 <label class="radio-inline">
-                                    <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1"> 展示
+                                    <input type="radio" name="push" id="inlineRadio1" > 展示
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2"> 不展示
+                                    <input type="radio" name="push" id="inlineRadio2" > 不展示
                                 </label>
 
                             </div>
@@ -70,7 +76,7 @@
                         <div class="form-group">
                             <label  class="col-sm-3 control-label">deal描述：</label>
                             <div class="col-sm-7">
-                                <textarea class="form-control" rows="5" content="${data.description}"></textarea>
+                                <textarea class="form-control" name="description" rows="5" content="${data.description}"></textarea>
                             </div>
                         </div>
 
@@ -85,5 +91,19 @@
 
 
 </div>
+
+<script>
+    $(function(){
+        var push = "${deal.push}";
+        var inlineRadio1 = $("#inlineRadio1");
+        var inlineRadio2 = $("#inlineRadio2");
+
+        if(push == true){
+            inlineRadio1.attr("checked", "checked");
+        }else{
+            inlineRadio2.attr("checked", "checked");
+        }
+    });
+</script>
 
 <jsp:include page="../include/footer.jsp"/>

@@ -2,6 +2,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
+<%
+    String contextPath = request.getContextPath();
+%>
+
 <jsp:include page="../include/header.jsp"/>
 <jsp:include page="../include/left.jsp"/>
 
@@ -31,6 +35,27 @@
             </div>
         </div>
     </div>
+
+
+    <!-- 信息删除确认 -->
+    <div class="modal fade" id="delcfmModel">
+        <div class="modal-dialog">
+            <div class="modal-content message_align">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title">提示信息</h4>
+                </div>
+                <div class="modal-body">
+                    <p>您确认要删除吗？</p>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" id="url"/>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <a  onclick="urlSubmit()" class="btn btn-success" data-dismiss="modal">确定</a>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
 
     <div class="row">
@@ -70,12 +95,22 @@
                         <td>${data.createTime}</td>
                         <td>${data.website}</td>
                         <td>${data.imageUrl}</td>
-                        <td>否</td>
+                        <td>
+                            <c:choose>
+                            <c:when test="${data.push == 'true'}">
+                                 是
+                            </c:when>
+                                <c:when test="${data.push == 'false'}">
+                                     否
+                                </c:when>
+                            </c:choose>
+                        </td>
+
                         <td>${data.title}</td>
                         <td>${data.createTime}</td>
                         <td>${data.expireTime}</td>
-                        <td><a href="getDealById/${data.id}" >编辑</a></td>
-                        <td><a href="#">删除</a></td>
+                        <td><a href="detail/${data.id}">编辑</a></td>
+                        <td><a href="javascript:void(0)" onclick="deleteById('<%=contextPath%>/deal/delete?id=${data.id}')" data-toggle="modal" data-target="#confirm-delete">删除</a></td>
                     </tr>
                 </c:forEach>
                 </tbody>
@@ -116,6 +151,17 @@
         });
 
     });
+
+    function deleteById(url){
+        $('#url').val(url);//给会话中的隐藏属性URL赋值
+        $('#delcfmModel').modal();
+    }
+
+    function urlSubmit(){
+        var url=$.trim($("#url").val());//获取会话中的隐藏属性URL
+        window.location.href=url;
+
+    }
 
 </script>
 <jsp:include page="../include/footer.jsp"/>
