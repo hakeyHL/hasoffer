@@ -1,15 +1,12 @@
 package hasoffer.admin.controller;
 
-import com.mongodb.util.JSON;
-import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.model.PageableResult;
-import hasoffer.base.utils.http.HttpUtils;
-import hasoffer.core.CoreConfig;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.enums.BannerFrom;
 import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.utils.DateEditor;
+import hasoffer.core.utils.ImageUtil;
 import hasoffer.webcommon.helper.PageHelper;
 import jodd.io.FileUtil;
 import org.springframework.stereotype.Controller;
@@ -94,9 +91,11 @@ public class DealController {
             File imageFile = FileUtil.createTempFile();
             FileUtil.writeBytes(imageFile,file.getBytes());
 
-            HttpResponseModel httpResponseModel = HttpUtils.uploadFile(CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL), imageFile);
-            Map respMap = (Map) JSON.parse(httpResponseModel.getBodyString());
-             path = (String) respMap.get("data");
+            try {
+                path = ImageUtil.uploadImage(imageFile);
+            } catch (Exception e) {
+
+            }
         }
 
         //推送至banner展示则点击保存时除deal信息外 创建一条banner数据 banner的生效、失效时间、banner图片与此deal相同 banner的rank为默认值
