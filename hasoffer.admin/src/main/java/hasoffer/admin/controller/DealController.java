@@ -1,11 +1,7 @@
 package hasoffer.admin.controller;
 
-import com.alibaba.fastjson.JSON;
-import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.IDUtil;
-import hasoffer.base.utils.http.HttpUtils;
-import hasoffer.core.CoreConfig;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.enums.BannerFrom;
 import hasoffer.core.persistence.po.app.AppBanner;
@@ -14,7 +10,6 @@ import hasoffer.core.utils.DateEditor;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.webcommon.helper.PageHelper;
 import jodd.io.FileUtil;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -25,8 +20,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -90,25 +85,12 @@ public class DealController {
         //上传图片, 暂支持单个
         String path = null;
         if (!file.isEmpty()) {
-//            File newFile = new File(CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL) + File.separator + file.getOriginalFilename());
-//            if(!newFile.exists()){
-//                newFile.createNewFile();
-//            }
-//
-//            OutputStream output = new FileOutputStream(newFile);
-//            BufferedOutputStream bufferedOutput = new BufferedOutputStream(output);
-//            bufferedOutput.write(file.getBytes());
             File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
             FileUtil.writeBytes(imageFile,file.getBytes());
-
-            HttpResponseModel httpResponseModel = HttpUtils.uploadFile(CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL), imageFile);
-            Map respMap = (Map) JSON.parse(httpResponseModel.getBodyString());
-             path = (String) respMap.get("data");
-            FileUtils.deleteQuietly(imageFile);
             try {
                 path = ImageUtil.uploadImage(imageFile);
             } catch (Exception e) {
-                logger.debug("image upload fail");
+                logger.error("image upload fail");
             }
         }
 
@@ -133,10 +115,63 @@ public class DealController {
         return new ModelAndView("redirect:/deal/list");
     }
 
-    @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
-    public ModelAndView delete(@PathVariable(value = "id") Long dealId){
+    @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
+    @ResponseBody
+    public Object delete(@PathVariable(value = "id") Long dealId){
         dealService.delete(dealId);
-        return new ModelAndView("redirect:/deal/list");
+        return true;
     }
 
+    @RequestMapping("/download")
+    public void download(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            String fileName = "Deal表格模板.xlsx";
+            String downloadPath = request.getSession().getServletContext().getRealPath("/") + "/download/" + fileName;//获取下载模版路径
+            File file = new File(downloadPath);
+            toDownload(request, response, new FileInputStream(downloadPath), file, fileName);
+        } catch (Exception e) {
+            logger.error("download excel template fail");
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 提供文件下载
+     *
+     * @param inputStream
+     * @param file
+     * @param fileName
+     * @return
+     */
+    public void toDownload(HttpServletRequest request, HttpServletResponse response, FileInputStream inputStream,
+                           File file, String fileName) throws Exception {
+        response.setContentType("text/html;charset=UTF-8");
+        request.setCharacterEncoding("UTF-8");
+        BufferedInputStream in = null;
+        BufferedOutputStream out = null;
+        fileName = new String(fileName.getBytes("GBK"), "ISO8859-1");
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/x-msdownload");
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+        response.setHeader("Content-Length", String.valueOf(file.length()));
+        try {
+            in = new BufferedInputStream(inputStream);
+            out = new BufferedOutputStream(response.getOutputStream());
+            byte[] data = new byte[2048];
+            int len = 0;
+            while (-1 != (len = in.read(data, 0, data.length))) {
+                out.write(data, 0, len);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+            if (out != null) {
+                out.close();
+            }
+        }
+    }
 }
