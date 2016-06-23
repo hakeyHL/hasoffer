@@ -26,6 +26,8 @@ public class AppBanner implements Identifiable<Long> {
 
     @Enumerated(EnumType.STRING)
     private BannerFrom bannerFrom;//banner来源
+    @Column(nullable = false)
+    private String sourceId;//用来记录banner来源的id
 
     @Column(nullable = false)
     private long rank;//用于手工调整该条banner的优先级
@@ -88,6 +90,14 @@ public class AppBanner implements Identifiable<Long> {
         this.createTime = createTime;
     }
 
+    public String getSourceId() {
+        return sourceId;
+    }
+
+    public void setSourceId(String sourceId) {
+        this.sourceId = sourceId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -101,8 +111,10 @@ public class AppBanner implements Identifiable<Long> {
         if (linkUrl != null ? !linkUrl.equals(appBanner.linkUrl) : appBanner.linkUrl != null) return false;
         if (createTime != null ? !createTime.equals(appBanner.createTime) : appBanner.createTime != null) return false;
         if (deadline != null ? !deadline.equals(appBanner.deadline) : appBanner.deadline != null) return false;
-        return bannerFrom == appBanner.bannerFrom;
+        if (bannerFrom != appBanner.bannerFrom) return false;
+        if (sourceId != null ? !sourceId.equals(appBanner.sourceId) : appBanner.sourceId != null) return false;
 
+        return true;
     }
 
     @Override
@@ -113,6 +125,7 @@ public class AppBanner implements Identifiable<Long> {
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (deadline != null ? deadline.hashCode() : 0);
         result = 31 * result + (bannerFrom != null ? bannerFrom.hashCode() : 0);
+        result = 31 * result + (sourceId != null ? sourceId.hashCode() : 0);
         result = 31 * result + (int) (rank ^ (rank >>> 32));
         return result;
     }
