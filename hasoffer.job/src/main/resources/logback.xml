@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <configuration>
+    <substitutionProperty name="log.base" value="${user.home}/logs/job-logs"/>
+    <!--<substitutionProperty name="log.base" value="${catalina.base}/logs/job-logs"/>-->
+
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>%date [%thread][IP:%X{ip}|USER:%X{user}][%-5level %logger{80}] %msg%n</pattern>
         </encoder>
     </appender>
 
-    <substitutionProperty name="log.base" value="${catalina.base}/logs/job-logs"/>
 
     <appender name="rollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/stdout.log</file>

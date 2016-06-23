@@ -8,8 +8,17 @@ public class SearchCriteria {
     private  Long maxPrice;
     private  String keyword;
     private  String categoryId;
-    private  Long page;
-    private  Long pageSize;
+    private  int page;
+    private  int pageSize;
+    private  int level;
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
 
     public int getComment() {
         return comment;
@@ -51,19 +60,19 @@ public class SearchCriteria {
         this.categoryId = categoryId;
     }
 
-    public Long getPage() {
+    public int getPage() {
         return page;
     }
 
-    public void setPage(Long page) {
+    public void setPage(int page) {
         this.page = page;
     }
 
-    public Long getPageSize() {
+    public int getPageSize() {
         return pageSize;
     }
 
-    public void setPageSize(Long pageSize) {
+    public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
     }
 }
