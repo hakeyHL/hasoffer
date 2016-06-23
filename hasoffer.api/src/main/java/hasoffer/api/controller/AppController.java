@@ -39,7 +39,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.logging.Filter;
 
 /**
  * Created on 2015/12/21.
@@ -239,7 +238,7 @@ public class AppController {
                 orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
                 //返利比率=tentativeAmount*rate/SaleAmount
                 orderVo.setRate(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)).divide(orderStatsAnalysisPO.getSaleAmount(), 2, BigDecimal.ROUND_HALF_UP));
-                orderVo.setType(orderStatsAnalysisPO.getOrderStatus().equals("approved") ? 0 : 1);
+                orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
                 transcations.add(orderVo);
                 if (orderStatsAnalysisPO.getOrderStatus() != "cancelled") {
                     PendingCoins = PendingCoins.add(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)));
@@ -274,7 +273,7 @@ public class AppController {
         OrderStatsAnalysisPO orderStatsAnalysisPO = appService.getOrderDetail(orderId, user.getId().toString());
         if (orderStatsAnalysisPO != null) {
             OrderVo orderVo = new OrderVo();
-            orderVo.setType(orderStatsAnalysisPO.getOrderStatus().equals("approved") ? 0 : 1);
+            orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
             orderVo.setRate(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)).divide(orderStatsAnalysisPO.getSaleAmount(), 2, BigDecimal.ROUND_HALF_UP));
             orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
             orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
