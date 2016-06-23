@@ -5,9 +5,6 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
-import hasoffer.core.system.ITimerService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -33,9 +30,6 @@ public class SkuImageDownloadTask {
     ICmpSkuService cmpSkuService;
     @Resource
     IDataBaseManager dbm;
-    @Resource
-    ITimerService timerService;
-    private Logger logger = LoggerFactory.getLogger(SkuImageDownloadTask.class);
 
     @Scheduled(cron = "0 0/10 * * * ?")
     public void f() {
