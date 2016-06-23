@@ -249,6 +249,12 @@ public class HibernateDaoImpl implements HibernateDao {
         return result;
     }
 
+    @Override
+    public void save(Object e)
+    {
+        this.sf.getCurrentSession().saveOrUpdate(e);
+    }
+
     /**
      * Binding named varaible. if value is a array/collection type, binding as collection parameter.
      *

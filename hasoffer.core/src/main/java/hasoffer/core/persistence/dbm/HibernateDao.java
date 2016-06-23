@@ -279,4 +279,6 @@ public interface HibernateDao {
     int updateBySql(String sql, Object... vars);
 
     int deleteBySql(String sql, Object... values);
+
+    void save(Object paramObject);
 }

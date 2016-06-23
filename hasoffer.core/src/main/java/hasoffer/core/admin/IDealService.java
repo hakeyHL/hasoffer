@@ -19,7 +19,7 @@ public interface IDealService {
 
     public AppDeal getDealById(Long dealId);
 
-    public void addAppBanner(AppBanner banner);
+    public void addOrUpdateBanner(AppBanner banner);
 
-    public void addAppDeal(AppDeal deal);
+    public void updateDeal(AppDeal deal);
 }

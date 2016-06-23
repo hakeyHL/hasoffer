@@ -128,12 +128,12 @@ public class DealServiceImpl implements IDealService {
     }
 
     @Override
-    public void addAppBanner(AppBanner banner) {
+    public void addOrUpdateBanner(AppBanner banner) {
         dbm.create(banner);
     }
 
     @Override
-    public void addAppDeal(AppDeal deal) {
-        dbm.create(deal);
+    public void updateDeal(AppDeal deal) {
+        dao.save(deal);
     }
 }
