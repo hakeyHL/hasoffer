@@ -2,12 +2,27 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
+<%
+    String contextPath = request.getContextPath();
+%>
+
 <jsp:include page="../include/header.jsp"/>
 <jsp:include page="../include/left.jsp"/>
 
 
 <div id="page-wrapper">
+    <!-- 删除结果提示 -->
+    <div class="alert alert-success" id="delete_success" role="alert" style="display: none">删除成功</div>
+    <div class="alert alert-warning" id="delete_fail" role="alert" style="display: none">删除失败</div>
 
+    <div class="col-lg-12" style="margin: 10px"></div>
+
+    <!-- 文件下载 -->
+    <div class="row" style="margin: 5px; font-size: 12px">
+        <span>Excel模板下载: <a href="<%=contextPath%>/deal/download">下载链接</a></span>
+    </div>
+
+    <!-- 导入结果提示 -->
     <div class="modal fade in" id="import_result" tabindex="-1" role="dialog"
          aria-labelledby="myModalLabel" style="display: none;top:20%">
         <div class="modal-dialog">
@@ -33,21 +48,38 @@
     </div>
 
 
+    <!-- 信息删除确认 -->
+    <div class="modal fade" id="delcfmModel">
+        <div class="modal-dialog">
+            <div class="modal-content message_align">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title">提示信息</h4>
+                </div>
+                <div class="modal-body">
+                    <p>您确认要删除吗？</p>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" id="url"/>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <a  onclick="urlSubmit()" class="btn btn-success" data-dismiss="modal">确定</a>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div class="col-lg-12" style="margin: 10px"></div>
+
     <div class="row">
         <form action="import" enctype="multipart/form-data" method="post" id="form">
-
-            <div class="col-lg-12" style="margin: 5px"></div>
-
             <div class="col-lg-12" >
                 <span class="modal-title">请选择Excel文件:</span>
                 <input type="file" name="multiFile" id="multiFile" class="file-loading" style="display: inline;"/>
-
             </div>
-
-            <div class="col-lg-12" style="margin: 5px"></div>
         </form>
-
     </div>
+
+    <div class="col-lg-12" style="margin: 10px"></div>
 
     <div class="row">
         <div class="col-lg-12">
@@ -69,13 +101,32 @@
                     <tr>
                         <td>${data.createTime}</td>
                         <td>${data.website}</td>
-                        <td>${data.imageUrl}</td>
-                        <td>否</td>
+                        <td>
+                            <div class="row">
+                                <div class="col-xs-6 col-md-3">
+                                    <a href="#" class="thumbnail">
+                                        <img src="${data.imageUrl}">
+                                    </a>
+                                </div>
+                            </div>
+
+                        </td>
+                        <td>
+                            <c:choose>
+                            <c:when test="${data.push == 'true'}">
+                                 是
+                            </c:when>
+                                <c:when test="${data.push == 'false'}">
+                                     否
+                                </c:when>
+                            </c:choose>
+                        </td>
+
                         <td>${data.title}</td>
                         <td>${data.createTime}</td>
                         <td>${data.expireTime}</td>
-                        <td><a href="getDealById/${data.id}" >编辑</a></td>
-                        <td><a href="#">删除</a></td>
+                        <td><a href="detail/${data.id}">编辑</a></td>
+                        <td><a href="javascript:void(0)" onclick="deleteById('<%=contextPath%>/deal/delete/${data.id}')" data-toggle="modal" data-target="#confirm-delete">删除</a></td>
                     </tr>
                 </c:forEach>
                 </tbody>
@@ -116,6 +167,28 @@
         });
 
     });
+
+    function deleteById(url){
+        $('#url').val(url);//给会话中的隐藏属性URL赋值
+        $('#delcfmModel').modal();
+    }
+
+    function urlSubmit(){
+        var url = $.trim($("#url").val());//获取会话中的隐藏属性URL
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function(result) {
+                console.info(result)
+                if(result){
+                    $("#delete_success").css("display", "block").hide(3000);
+                }else{
+                    $("#delete_fail").css("display", "block").hide(3000);
+                }
+            }
+        });
+
+    }
 
 </script>
 <jsp:include page="../include/footer.jsp"/>

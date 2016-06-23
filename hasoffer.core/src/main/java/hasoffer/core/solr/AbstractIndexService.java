@@ -278,6 +278,11 @@ public abstract class AbstractIndexService<I, M extends IIdentifiable<I>> implem
         return docs;
     }
 
+    @Override
+    public SearchResult<M> searchProducts(String title, FilterQuery[] fqs, Sort[] sorts, PivotFacet[] pivotFacets, int pageNumber, int pageSize) {
+        return null;
+    }
+
     public void removeAll() throws SolrServerException, IOException {
         UpdateResponse response = solrServer.deleteByQuery("*");
         System.out.println(response.toString());

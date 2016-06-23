@@ -28,7 +28,17 @@ public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductM
 
         return sr.getResult();
     }
+    public PageableResult<ProductModel> SearchProductsByKey(String title, int page, int size) {
+        Sort[] sorts = null;
+        PivotFacet[] pivotFacets = null;
 
+        List<FilterQuery> fqList = new ArrayList<FilterQuery>();
+        FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
+
+        SearchResult<ProductModel> sr = searchObjs(title, fqs, sorts, pivotFacets, page, size, true);
+
+        return new PageableResult<ProductModel>(sr.getResult(), sr.getTotalCount(), page, size);
+    }
     public PageableResult<ProductModel> searchPro(long cateId, int level, int page, int size) {
         if (level < 1 || level > 3) {
             return null;
