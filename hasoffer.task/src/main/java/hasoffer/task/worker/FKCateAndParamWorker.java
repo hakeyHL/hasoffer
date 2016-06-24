@@ -85,6 +85,11 @@ public class FKCateAndParamWorker implements Runnable {
         //获取导航栏
         List<TagNode> catePathList = getSubNodesByXPath(root, CATE_PATH, new ContentParseException("cate path not found for [" + sku.getId() + "]"));
 
+        if (catePathList.size() == 0) {//获取当行个数为0，任务抓取失败
+            this.ws.getSdQueue().add(sku);
+            return;
+        }
+
         //获取导航栏中catePath的长度，取前5位或者更小
         int cateSize = catePathList.size();
         cateSize = cateSize > 6 ? 6 : cateSize;

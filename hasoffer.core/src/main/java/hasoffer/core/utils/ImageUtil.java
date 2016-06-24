@@ -116,7 +116,10 @@ public class ImageUtil {
     public static String uploadImage(File file) throws Exception {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("file", file);
-        HttpResponseModel httpResponseModel = HttpUtils.uploadFile(AppConfig.get(AppConfig.IMAGE_UPLOAD_URL), file);
+
+        String uploadUrl = AppConfig.get(AppConfig.IMAGE_UPLOAD_URL);
+//        uploadUrl = "http://54.169.146.198:8080/hasoffer-file/s3/image";
+        HttpResponseModel httpResponseModel = HttpUtils.uploadFile(uploadUrl, file);
 
         Map respMap = (Map) JSON.parse(httpResponseModel.getBodyString());
         return (String) respMap.get("data");
@@ -125,7 +128,10 @@ public class ImageUtil {
     public static ImagePath uploadImage2(File file) throws Exception {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("file", file);
-        HttpResponseModel httpResponseModel = HttpUtils.uploadFile(AppConfig.get(AppConfig.IMAGE_UPLOAD_URL2), file);
+
+        String uploadUrl = AppConfig.get(AppConfig.IMAGE_UPLOAD_URL2);
+//        uploadUrl = "http://54.169.146.198:8080/hasoffer-file/s3/image2";
+        HttpResponseModel httpResponseModel = HttpUtils.uploadFile(uploadUrl, file);
 
         Map respMap = (Map) JSON.parse(httpResponseModel.getBodyString());
         Map pathMap = (Map) respMap.get("data");

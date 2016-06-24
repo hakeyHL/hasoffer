@@ -1,7 +1,6 @@
 package hasoffer.core.test;
 
 import hasoffer.base.model.PageableResult;
-import hasoffer.core.bo.common.ImagePath;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.utils.ImageUtil;
@@ -29,9 +28,11 @@ public class ImageTest {
     public void f() throws Exception {
         String url = "http://d.hiphotos.baidu.com/zhidao/pic/item/e7cd7b899e510fb38cc9205dd833c895d0430c23.jpg";
 
-        ImagePath imagePath = ImageUtil.downloadAndUpload2(url);
+//        ImagePath imagePath = ImageUtil.downloadAndUpload2(url);
+//        System.out.println(imagePath.toString());
 
-        System.out.println(imagePath.toString());
+        String imagePath = ImageUtil.downloadAndUpload(url);
+        System.out.println(imagePath);
     }
 
     @Test

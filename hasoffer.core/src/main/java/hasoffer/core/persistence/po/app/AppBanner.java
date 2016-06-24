@@ -17,6 +17,7 @@ public class AppBanner implements Identifiable<Long> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String imageUrl;//图片路径
     @Column(columnDefinition = "text")
     private String linkUrl;//跳转路径
