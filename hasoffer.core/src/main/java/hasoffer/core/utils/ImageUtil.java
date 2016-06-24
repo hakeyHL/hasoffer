@@ -1,13 +1,13 @@
 package hasoffer.core.utils;
 
 import com.mongodb.util.JSON;
+import hasoffer.base.config.AppConfig;
 import hasoffer.base.exception.ImageDownloadException;
 import hasoffer.base.exception.ImageDownloadOrUploadException;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.utils.IDUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.http.HttpUtils;
-import hasoffer.core.CoreConfig;
 import hasoffer.core.bo.common.ImagePath;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import org.apache.commons.io.FileUtils;
@@ -116,7 +116,7 @@ public class ImageUtil {
     public static String uploadImage(File file) throws Exception {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("file", file);
-        HttpResponseModel httpResponseModel = HttpUtils.uploadFile(CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL), file);
+        HttpResponseModel httpResponseModel = HttpUtils.uploadFile(AppConfig.get(AppConfig.IMAGE_UPLOAD_URL), file);
 
         Map respMap = (Map) JSON.parse(httpResponseModel.getBodyString());
         return (String) respMap.get("data");
@@ -125,7 +125,7 @@ public class ImageUtil {
     public static ImagePath uploadImage2(File file) throws Exception {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("file", file);
-        HttpResponseModel httpResponseModel = HttpUtils.uploadFile(CoreConfig.get(CoreConfig.IMAGE_UPLOAD_URL2), file);
+        HttpResponseModel httpResponseModel = HttpUtils.uploadFile(AppConfig.get(AppConfig.IMAGE_UPLOAD_URL2), file);
 
         Map respMap = (Map) JSON.parse(httpResponseModel.getBodyString());
         Map pathMap = (Map) respMap.get("data");
@@ -134,7 +134,7 @@ public class ImageUtil {
     }
 
     public static String getImageUrl(final String path) {
-        return "http://" + CoreConfig.get(CoreConfig.IMAGE_HOST) + path;
+        return "http://" + AppConfig.get(AppConfig.IMAGE_HOST) + path;
     }
 
     public static String getImage3rdUrl(final String url) {
@@ -143,7 +143,7 @@ public class ImageUtil {
         }
 
         String _url = url.replaceAll("https??://", "");
-        return CoreConfig.get(CoreConfig.IMAGE_URL_3RD_PREFIX) + _url;
+        return AppConfig.get(AppConfig.IMAGE_URL_3RD_PREFIX) + _url;
     }
 
     public static ImageSize getImageSize(File imgFile) throws IOException {

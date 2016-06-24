@@ -1,8 +1,8 @@
 package hasoffer.core.product.solr;
 
+import hasoffer.base.config.AppConfig;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.StringUtils;
-import hasoffer.core.CoreConfig;
 import hasoffer.core.solr.*;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ import java.util.List;
 public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductModel> {
     @Override
     protected String getSolrUrl() {
-        return CoreConfig.get(CoreConfig.SOLR_PRODUCT_URL);
+        return AppConfig.get(AppConfig.SOLR_PRODUCT_URL);
     }
 
     public List<Long> simpleSearch(String key, int page, int size) {

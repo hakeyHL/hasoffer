@@ -1,8 +1,8 @@
 package hasoffer.core.product.solr;
 
+import hasoffer.base.config.AppConfig;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.StringUtils;
-import hasoffer.core.CoreConfig;
 import hasoffer.core.solr.*;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class CmpskuIndexServiceImpl extends AbstractIndexService<Long, CmpSkuModel> {
     @Override
     protected String getSolrUrl() {
-        return CoreConfig.get(CoreConfig.SOLR_CMPSKU_URL);
+        return AppConfig.get(AppConfig.SOLR_CMPSKU_URL);
     }
 
     public PageableResult<CmpSkuModel> searchSku(String key, int page, int size) {

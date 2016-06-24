@@ -1,8 +1,8 @@
 package hasoffer.core.persistence.dbm.osql;
 
+import hasoffer.base.config.AppConfig;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.BeanUtil;
-import hasoffer.core.CoreConfig;
 import hasoffer.core.persistence.dbm.osql.exception.OSqlException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.formula.functions.T;
@@ -142,7 +142,7 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
                         for (int i = 0; i < array.size(); i++) {
                             session.save(array.get(i));
                             //强制提交
-                            if ((i+1) % CoreConfig.BATCH_MAX_ROW == 0) {
+                            if ((i+1) % AppConfig.BATCH_MAX_ROW == 0) {
                                 session.flush();
                                 session.clear();
                             }

@@ -10,6 +10,7 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.ptm.PtmCategory2;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.worker.ListAndProcessWorkerStatus;
 import org.htmlcleaner.TagNode;
@@ -129,7 +130,9 @@ public class FKCateAndParamWorker implements Runnable {
         }
 
         //给sku关联类目信息
-        sku.setCategoryId(parentId);
+        PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(sku.getId());
+        updater.getPo().setCategoryId(parentId);
+        dbm.update(updater);
 
         //获取描述节点
         List<TagNode> infoNodeList = getSubNodesByXPath(root, DESCRIPTION_INFO, new ContentParseException("description section not found for [" + sku.getId() + "]"));

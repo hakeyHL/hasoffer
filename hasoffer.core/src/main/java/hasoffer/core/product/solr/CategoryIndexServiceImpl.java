@@ -1,7 +1,7 @@
 package hasoffer.core.product.solr;
 
+import hasoffer.base.config.AppConfig;
 import hasoffer.base.utils.StringUtils;
-import hasoffer.core.CoreConfig;
 import hasoffer.core.solr.*;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +12,7 @@ import java.util.List;
 public class CategoryIndexServiceImpl extends AbstractIndexService<Long, CategoryModel> {
     @Override
     protected String getSolrUrl() {
-        return CoreConfig.get(CoreConfig.SOLR_CATEGORY_URL);
+        return AppConfig.get(AppConfig.SOLR_CATEGORY_URL);
     }
 
     public List<CategoryModel> simpleSearch(String key) {

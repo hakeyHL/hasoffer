@@ -2,11 +2,14 @@ package hasoffer.core.persistence.mongo;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMarshalling;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.persistence.dbm.mongo.converter.SkuStatusTypeConverter;
 import hasoffer.core.persistence.dbm.mongo.converter.WebsiteTypeConverter;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import org.springframework.data.annotation.PersistenceConstructor;
 
 import java.util.Date;
@@ -32,11 +35,13 @@ public class AwsSummaryProduct {
     private float price;
 
     private String imageUrl;
-    private String skuStatus;
+    @DynamoDBMarshalling(marshallerClass = SkuStatusTypeConverter.class)
+    private SkuStatus skuStatus;
 
     private long lCreateTime;
     private Date createTime;
 
+    @DynamoDBRangeKey
     private long lUpdateTime;
     private Date updateTime;
 
@@ -60,7 +65,13 @@ public class AwsSummaryProduct {
         this.price = price;
         this.subTitle = subTitle;
         this.imageUrl = imageUrl;
-        this.skuStatus = skuStatus.name();
+        this.skuStatus = skuStatus;
+    }
+
+    public AwsSummaryProduct(PtmCmpSku cmpSku) {
+        this(cmpSku.getId(), cmpSku.getWebsite(), cmpSku.getUrl(),
+                cmpSku.getSourcePid(), cmpSku.getTitle(), cmpSku.getSkuTitle(),
+                cmpSku.getPrice(), cmpSku.getOriImageUrl(), cmpSku.getStatus());
     }
 
     public long getId() {
@@ -159,11 +170,11 @@ public class AwsSummaryProduct {
         this.updateTime = updateTime;
     }
 
-    public String getSkuStatus() {
+    public SkuStatus getSkuStatus() {
         return skuStatus;
     }
 
-    public void setSkuStatus(String skuStatus) {
+    public void setSkuStatus(SkuStatus skuStatus) {
         this.skuStatus = skuStatus;
     }
 
@@ -206,5 +217,24 @@ public class AwsSummaryProduct {
         result = 31 * result + (int) (lUpdateTime ^ (lUpdateTime >>> 32));
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "AwsSummaryProduct{" +
+                "id=" + id +
+                ", website=" + website +
+                ", url='" + url + '\'' +
+                ", sourceId='" + sourceId + '\'' +
+                ", title='" + title + '\'' +
+                ", subTitle='" + subTitle + '\'' +
+                ", price=" + price +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", skuStatus=" + skuStatus +
+                ", lCreateTime=" + lCreateTime +
+                ", createTime=" + createTime +
+                ", lUpdateTime=" + lUpdateTime +
+                ", updateTime=" + updateTime +
+                '}';
     }
 }
