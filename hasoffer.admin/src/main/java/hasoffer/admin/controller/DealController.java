@@ -66,6 +66,7 @@ public class DealController {
             result = dealService.importExcelFile(multiFile);
             result.put("success", true);
         } catch (Exception e) {
+            logger.error("导入失败");
             result.put("success", false);
             e.printStackTrace();
         }

@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <%
     String contextPath = request.getContextPath();
@@ -64,9 +65,9 @@
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                     <a  onclick="urlSubmit()" class="btn btn-success" data-dismiss="modal">确定</a>
                 </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+            </div>
+        </div>
+    </div>`
 
     <div class="col-lg-12" style="margin: 10px"></div>
 
@@ -123,8 +124,8 @@
                         </td>
 
                         <td>${data.title}</td>
-                        <td>${data.createTime}</td>
-                        <td>${data.expireTime}</td>
+                        <td>${fn:substring(data.createTime, 0, 10)}</td>
+                        <td>${fn:substring(data.expireTime, 0, 10)}</td>
                         <td><a href="detail/${data.id}">编辑</a></td>
                         <td><a href="javascript:void(0)" onclick="deleteById('<%=contextPath%>/deal/delete/${data.id}')" data-toggle="modal" data-target="#confirm-delete">删除</a></td>
                     </tr>
@@ -158,7 +159,10 @@
                             window.location.reload();
                         });
                     }else{
-                        alert("导入失败，请检查文件格式之后重新导入！")
+                        BootstrapDialog.show({
+                            title: '导入失败',
+                            message: '请检查Excel格式，重新导入!'
+                        });
                     }
 
 
@@ -179,12 +183,13 @@
             url: url,
             type: 'GET',
             success: function(result) {
-                console.info(result)
                 if(result){
                     $("#delete_success").css("display", "block").hide(3000);
-                }else{
-                    $("#delete_fail").css("display", "block").hide(3000);
+                    window.location.reload();
                 }
+            },
+            error: function(xhr, textStatus, errorThrown){
+                $("#delete_fail").css("display", "block").hide(3000);
             }
         });
 

@@ -156,7 +156,7 @@
                     </c:if>
                     <c:if test="${adminUser.type != 'TEMP_ADMIN'}">
                         <li>
-                            <a href="/deal/list"><i class="fa fa-wrench fa-fw"></i> 运营<span class="fa arrow"></span></a>
+                            <a href="/deal/list"><i class="fa fa-tasks fa-fw"></i> 运营<span class="fa arrow"></span></a>
                         </li>
                     </c:if>
 
