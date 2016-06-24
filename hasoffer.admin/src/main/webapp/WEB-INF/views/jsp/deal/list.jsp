@@ -67,9 +67,9 @@
                 </div>
             </div>
         </div>
-    </div>`
+    </div>
 
-    <div class="col-lg-12" style="margin: 10px"></div>
+    <div class="col-lg-12" style="margin: 5px"></div>
 
     <div class="row">
         <form action="import" enctype="multipart/form-data" method="post" id="form">
