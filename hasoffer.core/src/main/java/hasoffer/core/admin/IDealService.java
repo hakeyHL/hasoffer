@@ -13,17 +13,17 @@ import java.util.Map;
  */
 public interface IDealService {
 
-    public PageableResult<AppDeal> findDealList(int page, int size);
+    PageableResult<AppDeal> findDealList(int page, int size);
 
-    public Map<String, Object> importExcelFile(MultipartFile multipartFile) throws Exception;
+    Map<String, Object> importExcelFile(MultipartFile multipartFile) throws Exception;
 
-    public AppDeal getDealById(Long dealId);
+    AppDeal getDealById(Long dealId);
 
-    public AppBanner getBannerByDealId(Long dealId);
+    AppBanner getBannerByDealId(Long dealId);
 
-    public void addOrUpdateBanner(AppBanner banner);
+    void addOrUpdateBanner(AppBanner banner);
 
-    public void updateDeal(AppDeal deal);
+    void updateDeal(AppDeal deal);
 
     public void delete(Long dealId);
 }
