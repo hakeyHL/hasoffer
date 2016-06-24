@@ -276,7 +276,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             ptmCmpSkuUpdater.getPo().setBigImagePath(imagePath.getBigPath());
 
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage() + ", sku id = " + sku.getId());
 
             // 下载图片失败
             ptmCmpSkuUpdater.getPo().setFailLoadImage(true);
