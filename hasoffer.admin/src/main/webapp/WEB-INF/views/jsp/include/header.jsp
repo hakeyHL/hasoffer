@@ -30,6 +30,8 @@
     <script src="<%=contextPath%>/static/js/bootstrap/bootstrap-fileupload.js"></script>
     <script src="<%=contextPath%>/static/js/bootstrap/bootstrap-dialog.js"></script>
 
+    <script src="<%=contextPath%>/static/js/jquery/validate/jquery.validate.min.js"></script>
+
 	<%--<script src="<%=contextPath%>/static/js/datetime-picker/bootstrap-datetimepicker.min.js"></script>--%>
 	<%--<script src="<%=contextPath%>/static/js/datetime-picker/bootstrap-datetimepicker.zh-CN.js"></script>--%>
 

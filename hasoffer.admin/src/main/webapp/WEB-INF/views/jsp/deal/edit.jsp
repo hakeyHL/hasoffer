@@ -15,7 +15,7 @@
 
     <div class="col-lg-12" style="margin: 20px"></div>
 
-            <form class="form-horizontal" action="<%=contextPath%>/deal/edit" enctype="multipart/form-data" method="post" onsubmit="return dosubmit()">
+            <form class="form-horizontal" action="<%=contextPath%>/deal/edit" enctype="multipart/form-data" id="form_edit" method="post" onsubmit="return dosubmit()">
 
                 <input type="hidden" name="id" value="${deal.id}">
                 <input type="hidden" name="website" value="${deal.website}">
@@ -34,24 +34,26 @@
                 </div>
 
 
-                <<div class="form-group">
+                <div class="form-group">
                     <label  class="col-sm-3 control-label">Deal图片：</label>
                     <div class="col-sm-7">
                         <div class="control-group">
-                            <div class="controls">
+                            <div class="controls" style="width: 300px">
                                 <div class="fileupload fileupload-new" data-provides="fileupload"><input type="hidden" value="" name="">
-                                    <div class="fileupload-new thumbnail" style="width: 200px; height: 150px;">
-                                        <img src="http://www.placehold.it/200x150/EFEFEF/AAAAAA&amp;text=没有图片" alt="" id="image_url">
+                                    <div  class="fileupload-new thumbnail" style="width: 200px; height: 150px;">
+                                        <img src="<%=contextPath%>/static/image/no-image.png" alt="" id="image_url">
+
                                     </div>
                                     <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 200px; max-height: 150px; line-height: 20px;"></div>
                                     <div>
                                 <span class="btn btn-file"><span class="fileupload-new">选择图片</span>
                                     <span class="fileupload-exists">更换</span>
-                                    <input type="file" class="default" name="file"></span>
-                                        <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">删除</a>
+                                    <input type="file" class="default" id="upload_img" name="file"></span>
+                                        <%--<a href="#" class="btn fileupload-exists" data-dismiss="fileupload">删除</a>--%>
                                     </div>
                                 </div>
                             </div>
+                            <div id="tip_div" style="margin: 10px; width: 200px; color: rgb(255, 0, 0); display: none; position:absolute;top:60px;left:226px">请选择图片</div>
                         </div>
                     </div>
                 </div>
@@ -111,14 +113,12 @@
 
 <script>
 
-
-
-    $(function(){
+    $().ready(function(){
         var push = "${deal.push}";
         var inlineRadio1 = $("#inlineRadio1");
         var inlineRadio2 = $("#inlineRadio2");
 
-        if(push == true){
+        if(push == "true"){
             inlineRadio1.attr("checked", "checked");
         }else{
             inlineRadio2.attr("checked", "checked");
@@ -129,11 +129,31 @@
         if(imgUrl != ""){
             img.attr("src", imgUrl);
         }
-        console.info(img)
+
+        inlineRadio2.on("click", function(){
+            inlineRadio1.attr("checked", false);
+            inlineRadio2.attr("checked", "checked");
+            $("#tip_div").hide();
+        });
+
+        inlineRadio1.on("click", function(){
+            inlineRadio2.attr("checked", false);
+            inlineRadio1.attr("checked", "checked");
+        });
 
     });
 
     function dosubmit(){
+        var inlineRadio1 = $("#inlineRadio1");
+        var checked = inlineRadio1.attr("checked");
+        if(checked == "checked"){
+           var img = $("#upload_img").val();
+            if(img == ""){
+                $("#tip_div").show();
+                return false;
+            }
+        }
+
         var button_submit = $("#button_submit");
         button_submit.attr("disabled", true);
         return true;
