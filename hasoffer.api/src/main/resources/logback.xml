@@ -2,7 +2,7 @@
 
 <configuration>
 
-    <substitutionProperty name="log.base" value="${user.home}/logs"/>
+    <substitutionProperty name="log.base" value="${user.home}/logs/api"/>
 
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
