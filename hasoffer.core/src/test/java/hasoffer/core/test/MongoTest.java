@@ -1,9 +1,11 @@
 package hasoffer.core.test;
 
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
+import hasoffer.core.persistence.enums.IndexStat;
 import hasoffer.core.persistence.mongo.*;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.user.IDeviceService;
@@ -215,6 +217,25 @@ public class MongoTest {
 
         StatHijackFetch fetch = mdm.queryOne(StatHijackFetch.class, "aifhawofheowajfeafw");
         System.out.println();
+
+    }
+
+    @Test
+    public void createTimeSave(){
+
+        StatHijackFetch statHijackFetch = mdm.queryOne(StatHijackFetch.class, "2198d324acebf2a0490dd0023559de6e");
+
+        String id = statHijackFetch.getId();
+        Website website = statHijackFetch.getWebsite();
+        String sourceId = statHijackFetch.getSourceId();
+        String cliQ = statHijackFetch.getCliQ();
+        Date createTime = TimeUtils.nowDate();
+        long lCreateTime = TimeUtils.now();
+        IndexStat status = IndexStat.DIFFERENT_URL;
+
+        statHijackFetch = new StatHijackFetch(id,website,sourceId,cliQ,createTime,lCreateTime,status,null);
+
+        mdm.save(statHijackFetch);
 
     }
 }
