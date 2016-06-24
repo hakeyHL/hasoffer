@@ -22,7 +22,7 @@ public class AppDeal implements Identifiable<Long> {
     private Website website;//deal来源网站
 
     private String title;//deal标题
-    @Column(unique = true, nullable = false)
+    @Column(columnDefinition = "text", nullable = false)
     private String linkUrl;//deal跳转地址
 
     @Column(columnDefinition = "text")
