@@ -7,7 +7,6 @@ import hasoffer.core.worker.ListAndProcessWorkerStatus;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.task.worker.CmpSkuDubboUpdateWorker;
 import hasoffer.task.worker.MysqlListWorker;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -20,8 +19,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created on 2016/6/22.
  */
-@Controller
-@RequestMapping(value = "/dubbofetchtask")
+//@Controller
+//@RequestMapping(value = "/dubbofetchtask")
 public class DubboUpdateController {
 
     private static AtomicBoolean taskRunning1 = new AtomicBoolean(false);
