@@ -20,7 +20,6 @@ import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.product.solr.CategoryIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel;
-import hasoffer.core.solr.*;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
 import hasoffer.fetch.helper.WebsiteHelper;
@@ -40,7 +39,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.logging.Filter;
 
 /**
  * Created on 2015/12/21.
@@ -218,17 +216,18 @@ public class AppController {
 
     /**
      * 查看返利
+     *
      * @param userToken
      * @return
      */
     @RequestMapping(value = "/backDetail", method = RequestMethod.GET)
     public ModelAndView backDetail(@RequestParam String userToken) {
-        ModelAndView mv=new ModelAndView();
-        BackDetailVo data =new BackDetailVo();
-        List <OrderVo>transcations=new ArrayList<OrderVo>();
+        ModelAndView mv = new ModelAndView();
+        BackDetailVo data = new BackDetailVo();
+        List<OrderVo> transcations = new ArrayList<OrderVo>();
         UrmUser user = appService.getUserByUserToken(userToken);
-        BigDecimal PendingCoins=BigDecimal.ZERO;
-        BigDecimal VericiedCoins=BigDecimal.ZERO;
+        BigDecimal PendingCoins = BigDecimal.ZERO;
+        BigDecimal VericiedCoins = BigDecimal.ZERO;
         if (user != null) {
             List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
@@ -239,7 +238,7 @@ public class AppController {
                 orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
                 //返利比率=tentativeAmount*rate/SaleAmount
                 orderVo.setRate(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)).divide(orderStatsAnalysisPO.getSaleAmount(), 2, BigDecimal.ROUND_HALF_UP));
-                orderVo.setType(orderStatsAnalysisPO.getOrderStatus().equals("approved") ? 0 : 1);
+                orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
                 transcations.add(orderVo);
                 if (orderStatsAnalysisPO.getOrderStatus() != "cancelled") {
                     PendingCoins = PendingCoins.add(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)));
@@ -256,24 +255,25 @@ public class AppController {
         data.setVericiedCoins(VericiedCoins);
 
         data.setTranscations(transcations);
-        mv.addObject("data",data);
+        mv.addObject("data", data);
         return mv;
     }
 
     /**
      * 订单详情
+     *
      * @param orderId
      * @param userToken
      * @return
      */
     @RequestMapping(value = "/orderDetail", method = RequestMethod.GET)
-    public ModelAndView orderDetail(@RequestParam String orderId,@RequestParam String userToken) {
-        ModelAndView mv=new ModelAndView();
+    public ModelAndView orderDetail(@RequestParam String orderId, @RequestParam String userToken) {
+        ModelAndView mv = new ModelAndView();
         UrmUser user = appService.getUserByUserToken(userToken);
         OrderStatsAnalysisPO orderStatsAnalysisPO = appService.getOrderDetail(orderId, user.getId().toString());
         if (orderStatsAnalysisPO != null) {
             OrderVo orderVo = new OrderVo();
-            orderVo.setType(orderStatsAnalysisPO.getOrderStatus().equals("approved") ? 0 : 1);
+            orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
             orderVo.setRate(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)).divide(orderStatsAnalysisPO.getSaleAmount(), 2, BigDecimal.ROUND_HALF_UP));
             orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
             orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
@@ -287,11 +287,12 @@ public class AppController {
 
     /**
      * banners列表
+     *
      * @return
      */
     @RequestMapping(value = "/banners", method = RequestMethod.GET)
     public ModelAndView banners() {
-        ModelAndView mv=new ModelAndView();
+        ModelAndView mv = new ModelAndView();
         List banners = new ArrayList();
         List<AppBanner> list = appService.getBanners();
         for (AppBanner appBanner : list) {
@@ -311,16 +312,17 @@ public class AppController {
 
     /**
      * deal列表
+     *
      * @return
      */
     @RequestMapping(value = "/deals", method = RequestMethod.GET)
     public ModelAndView deals(String page, String pageSize) {
-        ModelAndView mv =new ModelAndView();
-        if(StringUtils.isEmpty(page)){
-            page="0";
+        ModelAndView mv = new ModelAndView();
+        if (StringUtils.isEmpty(page)) {
+            page = "0";
         }
-        if(StringUtils.isEmpty(pageSize)){
-            pageSize="20";
+        if (StringUtils.isEmpty(pageSize)) {
+            pageSize = "20";
         }
         PageableResult Result = appService.getDeals(Long.valueOf(page), Long.valueOf(pageSize));
         Map map = new HashMap();
@@ -348,38 +350,40 @@ public class AppController {
 
     /**
      * deal详情
+     *
      * @param id
      * @return
      */
     @RequestMapping(value = "/dealInfo", method = RequestMethod.GET)
     public ModelAndView dealInfo(@RequestParam String id) {
-        AppDeal appDeal=appService.getDealDetail(id);
-        ModelAndView mv =new ModelAndView();
-        if(appDeal!=null){
-            Map map=new HashMap();
-            map.put("image",appDeal.getImageUrl());
-            map.put("title",appDeal.getTitle());
-            map.put("exp",appDeal.getExpireTime());
-            map.put("extra",3.0);
-            map.put("description",appDeal.getDescription());
-            map.put("cashbackInfo"," hello ");
-            map.put("deeplink",appDeal.getLinkUrl());
-            mv.addObject("data",map);
+        AppDeal appDeal = appService.getDealDetail(id);
+        ModelAndView mv = new ModelAndView();
+        if (appDeal != null) {
+            Map map = new HashMap();
+            map.put("image", appDeal.getImageUrl());
+            map.put("title", appDeal.getTitle());
+            map.put("exp", appDeal.getExpireTime());
+            map.put("extra", 3.0);
+            map.put("description", appDeal.getDescription());
+            map.put("cashbackInfo", " hello ");
+            map.put("deeplink", appDeal.getLinkUrl());
+            mv.addObject("data", map);
         }
-        return mv ;
+        return mv;
     }
 
     /**
      * 用户信息绑定
+     *
      * @return
      */
     @RequestMapping(value = "/bindUserInfo", method = RequestMethod.POST)
     public ModelAndView bindUserInfo(UserVo userVO, HttpServletRequest request) {
-        ModelAndView mv =new ModelAndView();
+        ModelAndView mv = new ModelAndView();
         Map map = new HashMap();
-        String userToken= UUID.randomUUID().toString();
+        String userToken = UUID.randomUUID().toString();
         UrmUser uUser = appService.getUserById(userVO.getThirdId() == null ? "0" : "1");
-        if(uUser==null){
+        if (uUser == null) {
 
             logger.debug("user is not exist before");
             UrmUser urmUser = new UrmUser();
@@ -391,9 +395,9 @@ public class AppController {
             urmUser.setThirdToken(userVO.getToken());
             urmUser.setUserName(userVO.getUserName());
             urmUser.setThirdId(userVO.getThirdId());
-            int result=appService.addUser(urmUser);
-            logger.debug("add user result is :"+result);
-        }else{
+            int result = appService.addUser(urmUser);
+            logger.debug("add user result is :" + result);
+        } else {
             logger.debug("user exist ,update userInfo");
             uUser.setUserName(userVO.getUserName());
             uUser.setThirdPlatform(userVO.getPlatform());
@@ -406,16 +410,17 @@ public class AppController {
         }
         map.put("userToken", userToken);
         mv.addObject("data", map);
-        return  mv;
+        return mv;
     }
 
     /**
      * 用户信息获取
+     *
      * @return
      */
     @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
     public ModelAndView userInfo(@RequestParam String userToken) {
-        ModelAndView mv =new ModelAndView();
+        ModelAndView mv = new ModelAndView();
         BigDecimal PendingCoins = BigDecimal.ZERO;
         UrmUser user = appService.getUserByUserToken(userToken);
         if (user != null) {
@@ -433,24 +438,25 @@ public class AppController {
             userVo.setUserId(user.getId());
             mv.addObject("data", userVo);
         }
-        return  mv;
+        return mv;
     }
 
     /**
      * 商品类目
+     *
      * @return
      */
     @RequestMapping(value = "/category", method = RequestMethod.GET)
     public ModelAndView category(String categoryId) {
-        ModelAndView mv =new ModelAndView();
-        List<PtmCategory> ptmCategorys=null;
-        List  categorys=new ArrayList();
-        if(StringUtils.isBlank(categoryId)){
-            ptmCategorys=appService.getCategory();
-            for(PtmCategory ptmCategory:ptmCategorys){
-                CategoryVo categoryVo=new CategoryVo();
+        ModelAndView mv = new ModelAndView();
+        List<PtmCategory> ptmCategorys = null;
+        List categorys = new ArrayList();
+        if (StringUtils.isBlank(categoryId)) {
+            ptmCategorys = appService.getCategory();
+            for (PtmCategory ptmCategory : ptmCategorys) {
+                CategoryVo categoryVo = new CategoryVo();
                 categoryVo.setId(ptmCategory.getId());
-                categoryVo.setHasChildren(ptmCategory.getParentId()==0?0:1);
+                categoryVo.setHasChildren(ptmCategory.getParentId() == 0 ? 0 : 1);
                 categoryVo.setImage(ptmCategory.getImageUrl());
                 categoryVo.setLevel(ptmCategory.getLevel());
                 categoryVo.setName(ptmCategory.getName());
@@ -458,63 +464,68 @@ public class AppController {
                 categoryVo.setRank(ptmCategory.getRank());
                 categorys.add(categoryVo);
             }
-        }else{
+        } else {
             //get childs
-            ptmCategorys=appService.getChildCategorys(categoryId);
-            for(PtmCategory ptmCategory:ptmCategorys){
-                CategoryVo categoryVo=new CategoryVo();
+            ptmCategorys = appService.getChildCategorys(categoryId);
+            List childCategory = null;
+            for (PtmCategory ptmCategory : ptmCategorys) {
+                CategoryVo categoryVo = new CategoryVo();
                 categoryVo.setId(ptmCategory.getId());
-                categoryVo.setHasChildren(ptmCategory.getParentId()==0?0:1);
+                categoryVo.setHasChildren(ptmCategory.getParentId() == 0 ? 0 : 1);
                 categoryVo.setImage(ptmCategory.getImageUrl());
                 categoryVo.setLevel(ptmCategory.getLevel());
                 categoryVo.setName(ptmCategory.getName());
                 categoryVo.setParentId(ptmCategory.getParentId());
                 categoryVo.setRank(ptmCategory.getRank());
-                categorys.add(categoryVo);
-                List<PtmCategory>ptmCategorysTemp=appService.getChildCategorys(categoryVo.getId().toString());
-                if(ptmCategorysTemp!=null){
-                    for(PtmCategory cates:ptmCategorysTemp){
-                        CategoryVo cate=new CategoryVo();
+                List<PtmCategory> ptmCategorysTemp = appService.getChildCategorys(categoryVo.getId().toString());
+                if (ptmCategorysTemp != null) {
+                    categoryVo.setHasChildren(1);
+                    childCategory = new ArrayList();
+                    for (PtmCategory cates : ptmCategorysTemp) {
+                        CategoryVo cate = new CategoryVo();
                         cate.setId(cates.getId());
-                        cate.setHasChildren(cates.getParentId() == 0 ? 0 : 1);
+                        cate.setHasChildren(0);
                         cate.setImage(cates.getImageUrl());
                         cate.setLevel(cates.getLevel());
                         cate.setName(cates.getName());
                         cate.setParentId(cates.getParentId());
                         cate.setRank(cates.getRank());
-                        categorys.add(cate);
+                        childCategory.add(cate);
                     }
                 }
+                categoryVo.setCategorys(childCategory);
+                categorys.add(categoryVo);
             }
         }
-        mv.addObject("data",categorys);
-        return  mv;
+        mv.addObject("data", categorys);
+        return mv;
     }
 
     /**
      * 商品列表
+     *
      * @return
      */
     @RequestMapping(value = "/productsList", method = RequestMethod.GET)
     public ModelAndView productsList(SearchCriteria criteria, String type) {
-        ModelAndView mv =new ModelAndView();
-        int requestType=3;
-       if(StringUtils.isNotBlank(type)){
-           requestType=Integer.valueOf(type);
+        ModelAndView mv = new ModelAndView();
+        int requestType = 3;
+        if (StringUtils.isNotBlank(type)) {
+            requestType = Integer.valueOf(type);
         }
-        List li=new ArrayList();
-        Map map=new HashMap();
-        PageableResult <ProductModel> products;
-        SearchResult<ProductModel> products1;
+        List li = new ArrayList();
+        Map map = new HashMap();
+        PageableResult<ProductModel> products;
+        List<ProductModel> products1;
         //category level page size
-       // PageableResult <ProductModel> products=productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()),criteria.getLevel(),criteria.getPage(),criteria.getPageSize());
-        if(!StringUtils.isBlank(criteria.getCategoryId())){
-                //search by category
-            products=productIndexServiceImpl.searchPro(Long.valueOf(2),1,1,10);
-            if(products!=null&&products.getData().size()>0){
-                List<ProductModel> productModes=products.getData();
-                for(ProductModel productModel:productModes){
-                    ProductListVo productListVo=new ProductListVo();
+        // PageableResult <ProductModel> products=productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()),criteria.getLevel(),criteria.getPage(),criteria.getPageSize());
+        if (!StringUtils.isBlank(criteria.getCategoryId())) {
+            //search by category
+            products = productIndexServiceImpl.searchPro(Long.valueOf(2), 1, 1, 10);
+            if (products != null && products.getData().size() > 0) {
+                List<ProductModel> productModes = products.getData();
+                for (ProductModel productModel : productModes) {
+                    ProductListVo productListVo = new ProductListVo();
                     productListVo.setCommentNum(productModel.getRating());
                     productListVo.setId(productModel.getId());
                     productListVo.setImageUrl("http://pic95.nipic.com/file/20160419/7874840_024541265000_2.jpg");
@@ -524,14 +535,14 @@ public class AppController {
                     li.add(productListVo);
                 }
             }
-        }else{
+        } else {
             //search by title
             //productIndexServiceImpl.simpleSearch(criteria.getKeyword(),1,10);
-            products1= productIndexServiceImpl.searchObjs(criteria.getKeyword(),null,null,null,1,10,false);
-            if(products1!=null&&products1.getResult().size()>0){
-                List<ProductModel> productModes=products1.getResult();
-                for(ProductModel productModel:productModes){
-                    ProductListVo productListVo=new ProductListVo();
+            PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), 1, 10);
+            if (p != null && p.getData().size() > 0) {
+                List<ProductModel> productModes = p.getData();
+                for (ProductModel productModel : productModes) {
+                    ProductListVo productListVo = new ProductListVo();
                     productListVo.setCommentNum(productModel.getRating());
                     productListVo.setId(productModel.getId());
                     productListVo.setImageUrl("http://pic95.nipic.com/file/20160419/7874840_024541265000_2.jpg");
@@ -542,137 +553,210 @@ public class AppController {
                 }
             }
         }
-        String data="";
-        switch (requestType){
+        String data = "";
+        switch (requestType) {
             case 0:
-                data="{\n" +
-                        "    \"product\": [\n" +
-                        "        {\n" +
-                        "            \"id\": 5556465,\n" +
-                        "            \"name\": \"桃花朵朵开\",\n" +
-                        "            \"price\": 1000,\n" +
-                        "            \"storesNum\": 50,\n" +
-                        "            \"commentNum\": 1\n" +
-                        "        },\n" +
-                        "        {\n" +
-                        "            \"id\": 456,\n" +
-                        "            \"name\": \"水牛啊\",\n" +
-                        "            \"price\": 600,\n" +
-                        "            \"storesNum\": 10,\n" +
-                        "            \"commentNum\": 8\n" +
-                        "        }\n" +
-                        "    ]\n" +
+                data = "{\n" +
+                        "    \"data\": {\n" +
+                        "        \"product\": [\n" +
+                        "            {\n" +
+                        "                \"id\": \"5556465\",\n" +
+                        "                \"imageUrl\": \"http://pic95.nipic.com/file/20160420/20721554_193636830000_2.jpg\",\n" +
+                        "                \"name\": \"桃花朵朵开\",\n" +
+                        "                \"price\": 1000,\n" +
+                        "                \"storesNum\": 50,\n" +
+                        "                \"commentNum\": 1\n" +
+                        "            },\n" +
+                        "            {\n" +
+                        "                \"id\": \"456\",\n" +
+                        "                \"imageUrl\": \"http://pic8.huitu.com/res/20130502/198139_20130502150539969200_1.jpg\",\n" +
+                        "                \"name\": \"水牛啊\",\n" +
+                        "                \"price\": 600,\n" +
+                        "                \"storesNum\": 10,\n" +
+                        "                \"commentNum\": 8\n" +
+                        "            },\n" +
+                        "            {\n" +
+                        "                \"id\": \"456\",\n" +
+                        "                \"imageUrl\": \"http://pic101.nipic.com/file/20160518/7874840_213142978000_2.jpg\",\n" +
+                        "                \"name\": \"方便面\",\n" +
+                        "                \"price\": 600,\n" +
+                        "                \"storesNum\": 10,\n" +
+                        "                \"commentNum\": 8\n" +
+                        "            },\n" +
+                        "            {\n" +
+                        "                \"id\": \"456\",\n" +
+                        "                \"imageUrl\": \"http://pic101.nipic.com/file/20160518/7874840_213054341000_2.jpg\",\n" +
+                        "                \"name\": \"夏雨荷\",\n" +
+                        "                \"price\": 600,\n" +
+                        "                \"storesNum\": 10,\n" +
+                        "                \"commentNum\": 8\n" +
+                        "            },\n" +
+                        "            {\n" +
+                        "                \"id\": \"456\",\n" +
+                        "                \"imageUrl\": \"http://pic101.nipic.com/file/20160518/7874840_213000186000_2.jpg\",\n" +
+                        "                \"name\": \"宁采荷\",\n" +
+                        "                \"price\": 600,\n" +
+                        "                \"storesNum\": 10,\n" +
+                        "                \"commentNum\": 8\n" +
+                        "            },\n" +
+                        "            {\n" +
+                        "                \"id\": \"456\",\n" +
+                        "                \"imageUrl\": \"http://pic68.huitu.com/res/20160427/644246_20160427223158348200_1.jpg\",\n" +
+                        "                \"name\": \"美猴王\",\n" +
+                        "                \"price\": 600,\n" +
+                        "                \"storesNum\": 10,\n" +
+                        "                \"commentNum\": 8\n" +
+                        "            }\n" +
+                        "        ]\n" +
+                        "    }\n" +
                         "}";
-                map.put("product",data);
+                map.put("product", data);
                 break;
             case 1:
-                data="{\n" +
-                        "    \"product\": [\n" +
-                        "        {\n" +
-                        "            \"id\": 5556465,\n" +
-                        "            \"name\": \"桃花朵朵开\",\n" +
-                        "            \"price\": 1000,\n" +
-                        "            \"storesNum\": 50,\n" +
-                        "            \"commentNum\": 1\n" +
-                        "        },\n" +
-                        "        {\n" +
-                        "            \"id\": 456,\n" +
-                        "            \"name\": \"水牛啊\",\n" +
-                        "            \"price\": 600,\n" +
-                        "            \"storesNum\": 10,\n" +
-                        "            \"commentNum\": 8\n" +
-                        "        }\n" +
-                        "    ]\n" +
+                data = "{\n" +
+                        "    \"data\": {\n" +
+                        "        \"product\": [\n" +
+                        "            {\n" +
+                        "                \"id\": \"5556465\",\n" +
+                        "                \"imageUrl\": \"http://pic95.nipic.com/file/20160420/20721554_193636830000_2.jpg\",\n" +
+                        "                \"name\": \"桃花朵朵开\",\n" +
+                        "                \"price\": 1000,\n" +
+                        "                \"storesNum\": 50,\n" +
+                        "                \"commentNum\": 1\n" +
+                        "            },\n" +
+                        "            {\n" +
+                        "                \"id\": \"456\",\n" +
+                        "                \"imageUrl\": \"http://pic8.huitu.com/res/20130502/198139_20130502150539969200_1.jpg\",\n" +
+                        "                \"name\": \"水牛啊\",\n" +
+                        "                \"price\": 600,\n" +
+                        "                \"storesNum\": 10,\n" +
+                        "                \"commentNum\": 8\n" +
+                        "            },\n" +
+                        "            {\n" +
+                        "                \"id\": \"456\",\n" +
+                        "                \"imageUrl\": \"http://pic101.nipic.com/file/20160518/7874840_213142978000_2.jpg\",\n" +
+                        "                \"name\": \"方便面\",\n" +
+                        "                \"price\": 600,\n" +
+                        "                \"storesNum\": 10,\n" +
+                        "                \"commentNum\": 8\n" +
+                        "            },\n" +
+                        "            {\n" +
+                        "                \"id\": \"456\",\n" +
+                        "                \"imageUrl\": \"http://pic101.nipic.com/file/20160518/7874840_213054341000_2.jpg\",\n" +
+                        "                \"name\": \"夏雨荷\",\n" +
+                        "                \"price\": 600,\n" +
+                        "                \"storesNum\": 10,\n" +
+                        "                \"commentNum\": 8\n" +
+                        "            },\n" +
+                        "            {\n" +
+                        "                \"id\": \"456\",\n" +
+                        "                \"imageUrl\": \"http://pic101.nipic.com/file/20160518/7874840_213000186000_2.jpg\",\n" +
+                        "                \"name\": \"宁采荷\",\n" +
+                        "                \"price\": 600,\n" +
+                        "                \"storesNum\": 10,\n" +
+                        "                \"commentNum\": 8\n" +
+                        "            },\n" +
+                        "            {\n" +
+                        "                \"id\": \"456\",\n" +
+                        "                \"imageUrl\": \"http://pic68.huitu.com/res/20160427/644246_20160427223158348200_1.jpg\",\n" +
+                        "                \"name\": \"美猴王\",\n" +
+                        "                \"price\": 600,\n" +
+                        "                \"storesNum\": 10,\n" +
+                        "                \"commentNum\": 8\n" +
+                        "            }\n" +
+                        "        ]\n" +
+                        "    }\n" +
                         "}";
-                map.put("product",data);
+                map.put("product", data);
                 break;
             case 2:
-                map.put("product",li);
+                PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), 1, 10);
+                if (p != null && p.getData().size() > 0) {
+                    List<ProductModel> productModes = p.getData();
+                    for (ProductModel productModel : productModes) {
+                        ProductListVo productListVo = new ProductListVo();
+                        productListVo.setCommentNum(productModel.getRating());
+                        productListVo.setId(productModel.getId());
+                        productListVo.setImageUrl("http://pic95.nipic.com/file/20160419/7874840_024541265000_2.jpg");
+                        productListVo.setName(productModel.getTitle());
+                        productListVo.setPrice(productModel.getPrice());
+                        productListVo.setStoresNum(5);
+                        li.add(productListVo);
+                    }
+                }
+                map.put("product", li);
                 break;
             default:
-                map.put("product",li);
+                map.put("product", li);
         }
-        map.put("product",li);
-        mv.addObject("data",map);
-        return  mv;
+        if (li != null && li.size() > 0) {
+            map.put("product", li);
+        }
+        mv.addObject("data", map);
+        return mv;
     }
 
     /**
      * 商品详情
+     *
      * @return
      */
-    @RequestMapping(value = "/produceInfo", method = RequestMethod.GET)
-    public ModelAndView produceInfo() {
-        ModelAndView mv =new ModelAndView();
-        String data="{\n" +
-                "    \"ratingsNum\": 4,\n" +
-                "    \"images\": [\n" +
-                "        \"192.168.1.126:8080/getProduct.jpg\",\n" +
-                "        \"192.168.1.126:8080/getProduct.jpg\"\n" +
-                "    ],\n" +
-                "    \"name\": \"小牛\",\n" +
-                "    \"bestPrice\": 200,\n" +
-                "    \"totalRatingsNum\": 4,\n" +
-                "    \"plats\": [\n" +
-                "        {\n" +
-                "            \"price\": 200,\n" +
-                "            \"deepLink\": \"\",\n" +
-                "            \"freight\": 20,\n" +
-                "            \"suppor\": [\n" +
-                "                \"COD\",\n" +
-                "                \"EMI\"\n" +
-                "            ],\n" +
-                "            \"distributionTime\": \"05/06/2016 20:20:52\",\n" +
-                "            \"postage\": \"\",\n" +
-                "            \"returnGuarantee\": \"\",\n" +
-                "            \"rebateInfor\": [\n" +
-                "                {\n" +
-                "                    \"coins\": 10,\n" +
-                "                    \"note\": \"545\",\n" +
-                "                    \"title\": \"dfdf\"\n" +
-                "                },\n" +
-                "                {\n" +
-                "                    \"coins\": 2,\n" +
-                "                    \"note\": \"yty\",\n" +
-                "                    \"title\": \"iuiui\"\n" +
-                "                }\n" +
-                "            ]\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"price\": 200,\n" +
-                "            \"deepLink\": \"\",\n" +
-                "            \"\": 20,\n" +
-                "            \"suppor\": [\n" +
-                "                \"COD\",\n" +
-                "                \"EMI\"\n" +
-                "            ],\n" +
-                "            \"distributionTime\": \"\",\n" +
-                "            \"postage\": \"\",\n" +
-                "            \"returnGuarantee\": \"\",\n" +
-                "            \"rebateInfor\": [\n" +
-                "                {\n" +
-                "                    \"coins\": 10,\n" +
-                "                    \"note\": \"787\",\n" +
-                "                    \"title\": \"090\"\n" +
-                "                },\n" +
-                "                {\n" +
-                "                    \"coins\": 2,\n" +
-                "                    \"note\": \"098\",\n" +
-                "                    \"title\": \"fgtrt\"\n" +
-                "                }\n" +
-                "            ]\n" +
-                "        }\n" +
-                "    ]\n" +
-                "}";
-        mv.addObject("data",data);
-        return  mv;
+    @RequestMapping(value = "/productInfo", method = RequestMethod.GET)
+    public ModelAndView produceInfo(@RequestParam String id) {
+        ModelAndView mv = new ModelAndView();
+        String data = "\"images\": [\n" +
+                "            \"http://pic95.nipic.com/file/20160420/20511871_130248344000_2.jpg\",\n" +
+                "            \"http://pic96.nipic.com/file/20160423/20511871_234151961000_2.jpg\"\n" +
+                "        ],\n" +
+                "        \"bestPrice\": 100,\n" +
+                "        \"name\": \"iphone 6s \",\n" +
+                "        \"totalRatingsNum\": 10000,\n" +
+                "        \"ratingNum\": 4.5,\n" +
+                "        \"priceList\": [\n" +
+                "            {\n" +
+                "                \"image\": \"http://img.hasoffer.com/sites/FLIPKART.jpg\",\n" +
+                "                \"ratingNum\": 5,\n" +
+                "                \"totalRatingsNum\": 2000,\n" +
+                "                \"price\": null,\n" +
+                "                \"freight\": 0,\n" +
+                "                \"distributionTime\": 2,\n" +
+                "                \"coins\": 22,\n" +
+                "		\"backRate\":3.5,\n" +
+                "                \"returnGuarantee\": 20,\n" +
+                "                \"suppor\": [\n" +
+                "                    \"COD\",\n" +
+                "                    \"EMI\"\n" +
+                "                ]\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"image\": \"http://img.hasoffer.com/sites/FLIPKART.jpg\",\n" +
+                "                \"ratingNum\": 4,\n" +
+                "                \"totalRatingsNum\": 1000,\n" +
+                "                \"price\": 300,\n" +
+                "                \"freight\": 20,\n" +
+                "                \"distributionTime\": 0,\n" +
+                "                \"coins\": 30,\n" +
+                "		\"backRate\":2.2,\n" +
+                "                \"returnGuarantee\": 10,\n" +
+                "                \"suppor\": [\n" +
+                "                    \"COD\"\n" +
+                "                ]\n" +
+                "            }\n" +
+                "        ],\n" +
+                "        \"specs\": {\n" +
+                "                \"Service Provider\": \"not specilfied\",\n" +
+                "                \"Technology\": \"WCDMA/GSM\",\n" +
+                "                \"Weight\": \"539oz\"\n" +
+                "        }";
+        mv.addObject("data", data);
+        return mv;
     }
 
     @RequestMapping(value = "/solrT", method = RequestMethod.GET)
     public ModelAndView solrTest(Long id) {
-        ModelAndView mv =new ModelAndView();
-        List<Long> longs=productIndexServiceImpl.simpleSearch("iphone",1,20);
-        PageableResult result=productIndexServiceImpl.searchPro(id,2,1,2);
+        ModelAndView mv = new ModelAndView();
+        List<Long> longs = productIndexServiceImpl.simpleSearch("iphone", 1, 20);
+        PageableResult result = productIndexServiceImpl.searchPro(id, 2, 1, 2);
         System.out.println("111");
         return mv;
     }

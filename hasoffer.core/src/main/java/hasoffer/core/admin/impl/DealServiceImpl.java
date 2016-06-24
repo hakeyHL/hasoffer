@@ -37,7 +37,7 @@ public class DealServiceImpl implements IDealService {
     @Resource
     ExcelImporter importer;
 
-    private static final String IMPORT_SQL = "insert into appdeal(website, title, linkUrl, expireTime, imageUrl, createTime, description) values(?, ?, ?, ?, ?, ? ,?)";
+    private static final String IMPORT_SQL = "insert into appdeal(website, title, linkUrl, expireTime, imageUrl, createTime, description, push) values(?, ?, ?, ?, ?, ? ,?, ?)";
 
     @Override
     public PageableResult<AppDeal> findDealList(int page, int size) {
@@ -73,7 +73,7 @@ public class DealServiceImpl implements IDealService {
                         int repeatRows = 0;
                         List<Object[]> dataQueue = new LinkedList<Object[]>();
                         for (int i = 0; i < data.size(); i++) {
-                            Object[] tempData = new Object[7];
+                            Object[] tempData = new Object[8];
                             for (int j = 0; j < tempData.length; j++) {
                                 //TODO  网站名/deal名称/deal跳转链接为空 记录日志
                                 if(StringUtils.isBlank(data.get(i)[0] + "") || StringUtils.isBlank(data.get(i)[1] + "") || StringUtils.isBlank(data.get(i)[2] + "")){
@@ -88,6 +88,10 @@ public class DealServiceImpl implements IDealService {
 
                                 if(tempData[5] == null || StringUtils.isBlank(tempData[5] + "")){
                                     tempData[5] = new Date(TimeUtils.now());
+                                }
+
+                                if(tempData[7] == null || StringUtils.isBlank(tempData[7] + "")){
+                                    tempData[7] = 0;
                                 }
 
 

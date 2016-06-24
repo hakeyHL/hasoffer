@@ -11,7 +11,18 @@
 
 
 <div id="page-wrapper">
+    <!-- 删除结果提示 -->
+    <div class="alert alert-success" id="delete_success" role="alert" style="display: none">删除成功</div>
+    <div class="alert alert-warning" id="delete_fail" role="alert" style="display: none">删除失败</div>
 
+    <div class="col-lg-12" style="margin: 10px"></div>
+
+    <!-- 文件下载 -->
+    <div class="row" style="margin: 5px; font-size: 12px">
+        <span>Excel模板下载: <a href="<%=contextPath%>/deal/download">下载链接</a></span>
+    </div>
+
+    <!-- 导入结果提示 -->
     <div class="modal fade in" id="import_result" tabindex="-1" role="dialog"
          aria-labelledby="myModalLabel" style="display: none;top:20%">
         <div class="modal-dialog">
@@ -57,22 +68,18 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
+    <div class="col-lg-12" style="margin: 10px"></div>
 
     <div class="row">
         <form action="import" enctype="multipart/form-data" method="post" id="form">
-
-            <div class="col-lg-12" style="margin: 5px"></div>
-
             <div class="col-lg-12" >
                 <span class="modal-title">请选择Excel文件:</span>
                 <input type="file" name="multiFile" id="multiFile" class="file-loading" style="display: inline;"/>
-
             </div>
-
-            <div class="col-lg-12" style="margin: 5px"></div>
         </form>
-
     </div>
+
+    <div class="col-lg-12" style="margin: 10px"></div>
 
     <div class="row">
         <div class="col-lg-12">
@@ -94,7 +101,16 @@
                     <tr>
                         <td>${data.createTime}</td>
                         <td>${data.website}</td>
-                        <td>${data.imageUrl}</td>
+                        <td>
+                            <div class="row">
+                                <div class="col-xs-6 col-md-3">
+                                    <a href="#" class="thumbnail">
+                                        <img src="${data.imageUrl}">
+                                    </a>
+                                </div>
+                            </div>
+
+                        </td>
                         <td>
                             <c:choose>
                             <c:when test="${data.push == 'true'}">
@@ -110,7 +126,7 @@
                         <td>${data.createTime}</td>
                         <td>${data.expireTime}</td>
                         <td><a href="detail/${data.id}">编辑</a></td>
-                        <td><a href="javascript:void(0)" onclick="deleteById('<%=contextPath%>/deal/delete?id=${data.id}')" data-toggle="modal" data-target="#confirm-delete">删除</a></td>
+                        <td><a href="javascript:void(0)" onclick="deleteById('<%=contextPath%>/deal/delete/${data.id}')" data-toggle="modal" data-target="#confirm-delete">删除</a></td>
                     </tr>
                 </c:forEach>
                 </tbody>
@@ -158,8 +174,19 @@
     }
 
     function urlSubmit(){
-        var url=$.trim($("#url").val());//获取会话中的隐藏属性URL
-        window.location.href=url;
+        var url = $.trim($("#url").val());//获取会话中的隐藏属性URL
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function(result) {
+                console.info(result)
+                if(result){
+                    $("#delete_success").css("display", "block").hide(3000);
+                }else{
+                    $("#delete_fail").css("display", "block").hide(3000);
+                }
+            }
+        });
 
     }
 

@@ -14,7 +14,7 @@ public class OrderVo {
     private  String channel;
     private  String orderId;
     private  BigDecimal rate;
-    private  int type;
+    private String status;
     private BigDecimal account;
 
     private BigDecimal total;
@@ -71,12 +71,12 @@ public class OrderVo {
         this.rate = rate;
     }
 
-    public int getType() {
-        return type;
+    public String getStatus() {
+        return status;
     }
 
-    public void setType(int type) {
-        this.type = type;
+    public void setStatus(String status) {
+        this.status = status;
     }
     @Override
     public String toString() {
@@ -85,15 +85,15 @@ public class OrderVo {
                 ", channel='" + channel + '\'' +
                 ", orderId='" + orderId + '\'' +
                 ", rate=" + rate +
-                ", type=" + type +
+                ", status=" + status +
                 '}';
     }
-    public OrderVo(BigDecimal account, String channel, String orderId, BigDecimal rate, int type) {
+    public OrderVo(BigDecimal account, String channel, String orderId, BigDecimal rate, String status) {
         this.account = account;
         this.channel = channel;
         this.orderId = orderId;
         this.rate = rate;
-        this.type = type;
+        this.status = status;
     }
 
 }

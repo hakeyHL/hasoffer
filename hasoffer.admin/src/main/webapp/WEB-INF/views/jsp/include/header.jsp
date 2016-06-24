@@ -11,6 +11,7 @@
 	<link rel="shortcut icon" href="/static/image/favicon.ico">
 	<!-- css -->
 	<link rel="stylesheet" href="<%=contextPath%>/static/css/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="<%=contextPath%>/static/css/bootstrap/bootstrap-fileupload.css">
 	<link rel="stylesheet" href="<%=contextPath%>/static/css/smart/timeline.css" rel="stylesheet">
 	<link rel="stylesheet" href="<%=contextPath%>/static/css/smart/sb-admin-2.css" rel="stylesheet">
 	<link rel="stylesheet" href="<%=contextPath%>/static/css/font-awesome/css/font-awesome.min.css" rel="stylesheet">
@@ -19,12 +20,14 @@
 	<link rel="stylesheet" href="<%=contextPath%>/static/js/morrisjs/morris.css" rel="stylesheet">
 	<link rel="stylesheet" href="<%=contextPath%>/static/js/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
 
+
 	<!-- js-core -->
 	<script src="<%=contextPath%>/static/js/jquery/jquery-2.1.1.min.js"></script>
 	<script src="<%=contextPath%>/static/js/jqueryui/jquery-ui-1.9.2.custom.min.js"></script>
     <script src="<%=contextPath%>/static/js/jquery/jquery.form.js"></script>
 	<script src="<%=contextPath%>/static/js/bootstrap/bootstrap.min.js"></script>
 	<script src="<%=contextPath%>/static/js/bootstrap/bootstrap-typeahead.min.js"></script>
+    <script src="<%=contextPath%>/static/js/bootstrap/bootstrap-fileupload.js"></script>
 
 	<%--<script src="<%=contextPath%>/static/js/datetime-picker/bootstrap-datetimepicker.min.js"></script>--%>
 	<%--<script src="<%=contextPath%>/static/js/datetime-picker/bootstrap-datetimepicker.zh-CN.js"></script>--%>

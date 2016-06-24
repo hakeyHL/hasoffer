@@ -390,4 +390,37 @@ public class PtmCmpSku implements Identifiable<Long> {
         result = 31 * result + (status != null ? status.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "PtmCmpSku{" +
+                "id=" + id +
+                ", productId=" + productId +
+                ", categoryId=" + categoryId +
+                ", website=" + website +
+                ", seller='" + seller + '\'' +
+                ", skuTitle='" + skuTitle + '\'' +
+                ", title='" + title + '\'' +
+                ", price=" + price +
+                ", rating='" + rating + '\'' +
+                ", imagePath='" + imagePath + '\'' +
+                ", smallImagePath='" + smallImagePath + '\'' +
+                ", bigImagePath='" + bigImagePath + '\'' +
+                ", oriImageUrl='" + oriImageUrl + '\'' +
+                ", deeplink='" + deeplink + '\'' +
+                ", url='" + url + '\'' +
+                ", oriUrl='" + oriUrl + '\'' +
+                ", color='" + color + '\'' +
+                ", size='" + size + '\'' +
+                ", updateTime=" + updateTime +
+                ", createTime=" + createTime +
+                ", titleUpdateTime=" + titleUpdateTime +
+                ", checked=" + checked +
+                ", failLoadImage=" + failLoadImage +
+                ", sourcePid='" + sourcePid + '\'' +
+                ", sourceSid='" + sourceSid + '\'' +
+                ", indexNeed=" + indexNeed +
+                ", status=" + status +
+                '}';
+    }
 }
