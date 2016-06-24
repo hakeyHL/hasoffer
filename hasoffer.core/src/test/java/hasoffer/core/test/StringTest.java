@@ -3,6 +3,7 @@ package hasoffer.core.test;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.base.utils.TimeUtils;
 import org.junit.Test;
 
 /**
@@ -59,5 +60,21 @@ public class StringTest {
         String s = HexDigestUtil.md5(str);
 
         System.out.println(s);
+    }
+
+    @Test
+    public void test5(){
+        Long aLong = new Long(TimeUtils.now());
+        int i = aLong.intValue();
+        int i1 = i % 30;
+        System.out.println();
+    }
+
+    @Test
+    public void test6(){
+        Long aLong = new Long(TimeUtils.now());
+        long i = aLong.longValue();
+        long i1 = i % 30;
+        System.out.println();
     }
 }
