@@ -118,7 +118,7 @@ public class ImageUtil {
         params.put("file", file);
 
         String uploadUrl = AppConfig.get(AppConfig.IMAGE_UPLOAD_URL);
-//        uploadUrl = "http://54.169.146.198:8080/hasoffer-file/s3/image";
+        uploadUrl = "http://54.169.146.198:8080/hasoffer-file/s3/image";
         HttpResponseModel httpResponseModel = HttpUtils.uploadFile(uploadUrl, file);
 
         Map respMap = (Map) JSON.parse(httpResponseModel.getBodyString());

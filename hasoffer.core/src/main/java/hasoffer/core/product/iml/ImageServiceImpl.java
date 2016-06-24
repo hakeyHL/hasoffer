@@ -36,12 +36,13 @@ public class ImageServiceImpl implements IImageService {
         } catch (ImageDownloadOrUploadException e) {
             try {
                 String url = image.getImageUrl();
+
                 url = url.replaceFirst("-\\d+", "-1");
 
                 path = ImageUtil.downloadAndUpload(image.getImageUrl());
 
                 ptmImageUpdater.getPo().setImageUrl2(url);
-            } catch (ImageDownloadOrUploadException e2) {
+            } catch (Exception e2) {
                 ptmImageUpdater.getPo().setErrTimes(image.getErrTimes() + 1);
                 dbm.update(ptmImageUpdater);
                 return false;
