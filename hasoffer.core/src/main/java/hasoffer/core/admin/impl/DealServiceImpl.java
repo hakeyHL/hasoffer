@@ -82,7 +82,7 @@ public class DealServiceImpl implements IDealService {
                                     System.arraycopy(data.get(i), 0, tempData, 0, data.get(i).length);
                                 }
 
-                                if(StringUtils.isBlank(tempData[0] + "")){
+                                if(!StringUtils.isBlank(tempData[0] + "")){
                                     tempData[0] = tempData[0].toString().toUpperCase();
                                 }
 
