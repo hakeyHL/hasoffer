@@ -129,12 +129,12 @@ public class Compare2Controller {
         PtmCmpSkuIndex2 cmpSkuIndex = null;
 
         try {
-            if (Website.FLIPKART.equals(sio.getCliSite())
-                    || Website.SNAPDEAL.equals(sio.getCliSite())
-                    || Website.SHOPCLUES.equals(sio.getCliSite())) {
-                // match sku
-                cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
-            }
+            //if (Website.FLIPKART.equals(sio.getCliSite())
+            //        || Website.SNAPDEAL.equals(sio.getCliSite())
+            //        || Website.SHOPCLUES.equals(sio.getCliSite())) {
+            //    // match sku
+            //    cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
+            //}
             getSioBySearch(sio);
             cr = getCmpProducts(sio, cmpSkuIndex);
         } catch (Exception e) {
