@@ -1,5 +1,6 @@
 package hasoffer.job.worker;
 
+import hasoffer.base.config.AppConfig;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.TaskStatus;
 import hasoffer.base.model.Website;
@@ -31,12 +32,12 @@ public class SearchRecordProcessWorker implements Runnable {
 
     private LinkedBlockingQueue<SrmSearchLog> searchLogQueue;
     private SearchProductService searchProductService;
-    private IFetchDubboService flipkartFetchService;
+    private IFetchDubboService fetchService;
 
     public SearchRecordProcessWorker(SearchProductService searchProductService, IFetchDubboService flipkartFetchService, LinkedBlockingQueue<SrmSearchLog> searchLogQueue) {
         this.searchProductService = searchProductService;
         this.searchLogQueue = searchLogQueue;
-        this.flipkartFetchService = flipkartFetchService;
+        this.fetchService = flipkartFetchService;
     }
 
     @Override
@@ -54,49 +55,90 @@ public class SearchRecordProcessWorker implements Runnable {
                 SrmAutoSearchResult autoSearchResult = new SrmAutoSearchResult(searchLog);
 
                 String keyword = autoSearchResult.getTitle();
-
+                String serRegion = AppConfig.get(AppConfig.SER_REGION);
                 Map<Website, List<ListProduct>> listProductMap = new HashMap<Website, List<ListProduct>>();
-                FetchResult flipkartFetchResult = flipkartFetchService.getProductsKeyWord(Website.FLIPKART, keyword, 0, 10);
-                FetchResult amazonFetchResult = flipkartFetchService.getProductsKeyWord(Website.AMAZON, keyword, 0, 10);
-                FetchResult snapdealFetchResult = flipkartFetchService.getProductsKeyWord(Website.SNAPDEAL, keyword, 0, 10);
-                FetchResult shopcluesFetchResult = flipkartFetchService.getProductsKeyWord(Website.SHOPCLUES, keyword, 0, 10);
-                FetchResult paytmFetchResult = flipkartFetchService.getProductsKeyWord(Website.PAYTM, keyword, 0, 10);
-                FetchResult ebayFetchResult = flipkartFetchService.getProductsKeyWord(Website.EBAY, keyword, 0, 10);
-                FetchResult myntraFetchResult = flipkartFetchService.getProductsKeyWord(Website.MYNTRA, keyword, 0, 10);
-                FetchResult jabongFetchResult = flipkartFetchService.getProductsKeyWord(Website.JABONG, keyword, 0, 10);
-                FetchResult voonikFetchResult = flipkartFetchService.getProductsKeyWord(Website.VOONIK, keyword, 0, 10);
-                Boolean isFinish = isFinish(flipkartFetchResult);
-                isFinish = isFinish && isFinish(amazonFetchResult);
-                isFinish = isFinish && isFinish(snapdealFetchResult);
-                isFinish = isFinish && isFinish(shopcluesFetchResult);
-                isFinish = isFinish && isFinish(paytmFetchResult);
-                isFinish = isFinish && isFinish(ebayFetchResult);
-                isFinish = isFinish && isFinish(myntraFetchResult);
-                isFinish = isFinish && isFinish(jabongFetchResult);
-                isFinish = isFinish && isFinish(voonikFetchResult);
-                if (isFinish) {
-                    initResultMap(listProductMap, flipkartFetchResult);
-                    initResultMap(listProductMap, amazonFetchResult);
-                    initResultMap(listProductMap, snapdealFetchResult);
-                    initResultMap(listProductMap, shopcluesFetchResult);
-                    initResultMap(listProductMap, paytmFetchResult);
-                    initResultMap(listProductMap, ebayFetchResult);
-                    initResultMap(listProductMap, myntraFetchResult);
-                    initResultMap(listProductMap, jabongFetchResult);
-                    initResultMap(listProductMap, voonikFetchResult);
-                    autoSearchResult.setSitePros(listProductMap);
-                    searchProductService.searchProductsFromSites(autoSearchResult);
-                    logger.info("SearchRecordProcessWorker.flipkartFetchResult  result()--keyword is {} : size() = {}", keyword, flipkartFetchResult.getFetchProducts().size());
-                    logger.info("SearchRecordProcessWorker.amazonFetchResult    result()--keyword is {} : size() = {}", keyword, amazonFetchResult.getFetchProducts().size());
-                    logger.info("SearchRecordProcessWorker.snapdealFetchResult  result()--keyword is {} : size() = {}", keyword, snapdealFetchResult.getFetchProducts().size());
-                    logger.info("SearchRecordProcessWorker.shopcluesFetchResult result()--keyword is {} : size() = {}", keyword, shopcluesFetchResult.getFetchProducts().size());
-                    logger.info("SearchRecordProcessWorker.paytmFetchResult     result()--keyword is {} : size() = {}", keyword, paytmFetchResult.getFetchProducts().size());
-                    logger.info("SearchRecordProcessWorker.ebayFetchResult      result()--keyword is {} : size() = {}", keyword, ebayFetchResult.getFetchProducts().size());
-                    logger.info("SearchRecordProcessWorker.myntraFetchResult    result()--keyword is {} : size() = {}", keyword, myntraFetchResult.getFetchProducts().size());
-                    logger.info("SearchRecordProcessWorker.jabongFetchResult    result()--keyword is {} : size() = {}", keyword, jabongFetchResult.getFetchProducts().size());
-                    logger.info("SearchRecordProcessWorker.voonikFetchResult    result()--keyword is {} : size() = {}", keyword, voonikFetchResult.getFetchProducts().size());
-                } else {
-                    searchLogQueue.put(searchLog);
+                if(AppConfig.SerRegion.INDIA.toString().equals(serRegion)) {
+                    FetchResult flipkartFetchResult = fetchService.getProductsKeyWord(Website.FLIPKART, keyword, 0, 10);
+                    FetchResult amazonFetchResult = fetchService.getProductsKeyWord(Website.AMAZON, keyword, 0, 10);
+                    FetchResult snapdealFetchResult = fetchService.getProductsKeyWord(Website.SNAPDEAL, keyword, 0, 10);
+                    FetchResult shopcluesFetchResult = fetchService.getProductsKeyWord(Website.SHOPCLUES, keyword, 0, 10);
+                    FetchResult paytmFetchResult = fetchService.getProductsKeyWord(Website.PAYTM, keyword, 0, 10);
+                    FetchResult ebayFetchResult = fetchService.getProductsKeyWord(Website.EBAY, keyword, 0, 10);
+                    FetchResult myntraFetchResult = fetchService.getProductsKeyWord(Website.MYNTRA, keyword, 0, 10);
+                    FetchResult jabongFetchResult = fetchService.getProductsKeyWord(Website.JABONG, keyword, 0, 10);
+                    FetchResult voonikFetchResult = fetchService.getProductsKeyWord(Website.VOONIK, keyword, 0, 10);
+                    FetchResult homeShopResult = fetchService.getProductsKeyWord(Website.HOMESHOP18, keyword, 0, 10);
+                    FetchResult limeRoadResult = fetchService.getProductsKeyWord(Website.LIMEROAD, keyword, 0, 10);
+                    Boolean isFinish = isFinish(flipkartFetchResult);
+                    isFinish = isFinish && isFinish(amazonFetchResult);
+                    isFinish = isFinish && isFinish(snapdealFetchResult);
+                    isFinish = isFinish && isFinish(shopcluesFetchResult);
+                    isFinish = isFinish && isFinish(paytmFetchResult);
+                    isFinish = isFinish && isFinish(ebayFetchResult);
+                    isFinish = isFinish && isFinish(myntraFetchResult);
+                    isFinish = isFinish && isFinish(jabongFetchResult);
+                    isFinish = isFinish && isFinish(voonikFetchResult);
+                    isFinish = isFinish && isFinish(homeShopResult);
+                    isFinish = isFinish && isFinish(limeRoadResult);
+                    if (isFinish) {
+                        initResultMap(listProductMap, flipkartFetchResult);
+                        initResultMap(listProductMap, amazonFetchResult);
+                        initResultMap(listProductMap, snapdealFetchResult);
+                        initResultMap(listProductMap, shopcluesFetchResult);
+                        initResultMap(listProductMap, paytmFetchResult);
+                        initResultMap(listProductMap, ebayFetchResult);
+                        initResultMap(listProductMap, myntraFetchResult);
+                        initResultMap(listProductMap, jabongFetchResult);
+                        initResultMap(listProductMap, voonikFetchResult);
+                        initResultMap(listProductMap, homeShopResult);
+                        initResultMap(listProductMap, limeRoadResult);
+                        autoSearchResult.setSitePros(listProductMap);
+                        searchProductService.searchProductsFromSites(autoSearchResult);
+                        logger.info("SearchRecordProcessWorker.flipkartFetchResult  result()--keyword is {} : size() = {}", keyword, flipkartFetchResult.getFetchProducts().size());
+                        logger.info("SearchRecordProcessWorker.amazonFetchResult    result()--keyword is {} : size() = {}", keyword, amazonFetchResult.getFetchProducts().size());
+                        logger.info("SearchRecordProcessWorker.snapdealFetchResult  result()--keyword is {} : size() = {}", keyword, snapdealFetchResult.getFetchProducts().size());
+                        logger.info("SearchRecordProcessWorker.shopcluesFetchResult result()--keyword is {} : size() = {}", keyword, shopcluesFetchResult.getFetchProducts().size());
+                        logger.info("SearchRecordProcessWorker.paytmFetchResult     result()--keyword is {} : size() = {}", keyword, paytmFetchResult.getFetchProducts().size());
+                        logger.info("SearchRecordProcessWorker.ebayFetchResult      result()--keyword is {} : size() = {}", keyword, ebayFetchResult.getFetchProducts().size());
+                        logger.info("SearchRecordProcessWorker.myntraFetchResult    result()--keyword is {} : size() = {}", keyword, myntraFetchResult.getFetchProducts().size());
+                        logger.info("SearchRecordProcessWorker.jabongFetchResult    result()--keyword is {} : size() = {}", keyword, jabongFetchResult.getFetchProducts().size());
+                        logger.info("SearchRecordProcessWorker.voonikFetchResult    result()--keyword is {} : size() = {}", keyword, voonikFetchResult.getFetchProducts().size());
+                        logger.info("SearchRecordProcessWorker.homeShopResult       result()--keyword is {} : size() = {}", keyword, homeShopResult.getFetchProducts().size());
+                        logger.info("SearchRecordProcessWorker.limeRoadResult       result()--keyword is {} : size() = {}", keyword, limeRoadResult.getFetchProducts().size());
+                    } else {
+                        searchLogQueue.put(searchLog);
+                    }
+                }else if(AppConfig.SerRegion.USA.toString().equals(serRegion)) {
+                    FetchResult amazonFetchResult = fetchService.getProductsKeyWord(Website.AMAZON, keyword, 0, 10);
+                    FetchResult ebayFetchResult = fetchService.getProductsKeyWord(Website.EBAY, keyword, 0, 10);
+                    FetchResult walmartFetchResult = fetchService.getProductsKeyWord(Website.WALMART, keyword, 0, 10);
+                    FetchResult geekFetchResult = fetchService.getProductsKeyWord(Website.GEEK, keyword, 0, 10);
+                    FetchResult newEggFetchResult = fetchService.getProductsKeyWord(Website.NEWEGG, keyword, 0, 10);
+                    FetchResult bestbuyFetchResult = fetchService.getProductsKeyWord(Website.BESTBUY, keyword, 0, 10);
+                    Boolean isFinish = isFinish(amazonFetchResult);
+                    isFinish = isFinish && isFinish(ebayFetchResult);
+                    isFinish = isFinish && isFinish(walmartFetchResult);
+                    isFinish = isFinish && isFinish(geekFetchResult);
+                    isFinish = isFinish && isFinish(newEggFetchResult);
+                    isFinish = isFinish && isFinish(bestbuyFetchResult);
+                    if (isFinish) {
+                        initResultMap(listProductMap, amazonFetchResult);
+                        initResultMap(listProductMap, ebayFetchResult);
+                        initResultMap(listProductMap, walmartFetchResult);
+                        initResultMap(listProductMap, geekFetchResult);
+                        initResultMap(listProductMap, newEggFetchResult);
+                        initResultMap(listProductMap, bestbuyFetchResult);
+                        autoSearchResult.setSitePros(listProductMap);
+                        searchProductService.searchProductsFromSites(autoSearchResult);
+                        logger.info("SearchRecordProcessWorker.amazonFetchResult    result()--keyword is {} : size() = {}", keyword, amazonFetchResult.getFetchProducts().size());
+                        logger.info("SearchRecordProcessWorker.ebayFetchResult      result()--keyword is {} : size() = {}", keyword, ebayFetchResult.getFetchProducts().size());
+                        logger.info("SearchRecordProcessWorker.walmartFetchResult   result()--keyword is {} : size() = {}", keyword, walmartFetchResult.getFetchProducts().size());
+                        logger.info("SearchRecordProcessWorker.geekFetchResult      result()--keyword is {} : size() = {}", keyword, geekFetchResult.getFetchProducts().size());
+                        logger.info("SearchRecordProcessWorker.newEggFetchResult    result()--keyword is {} : size() = {}", keyword, newEggFetchResult.getFetchProducts().size());
+                        logger.info("SearchRecordProcessWorker.bestbuyFetchResult   result()--keyword is {} : size() = {}", keyword, bestbuyFetchResult.getFetchProducts().size());
+                    } else {
+                        searchLogQueue.put(searchLog);
+                    }
                 }
 
             } catch (Exception e) {
