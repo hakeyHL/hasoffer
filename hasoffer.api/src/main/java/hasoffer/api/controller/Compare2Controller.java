@@ -4,7 +4,6 @@ import hasoffer.api.controller.vo.*;
 import hasoffer.api.helper.SearchHelper;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
-import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.StringUtils;
@@ -87,12 +86,9 @@ public class Compare2Controller {
         PtmCmpSkuIndex2 cmpSkuIndex = null;
 
         try {
-            if (Website.FLIPKART.equals(sio.getCliSite())
-                    || Website.SNAPDEAL.equals(sio.getCliSite())
-                    || Website.SHOPCLUES.equals(sio.getCliSite())) {
-                // 先去匹配sku
-                cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
-            }
+            // 先去匹配sku
+            cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
+
             getSioBySearch(sio);
             cr = getCmpResult(sio, cmpSkuIndex);
         } catch (Exception e) {
