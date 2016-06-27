@@ -62,6 +62,8 @@ public class PtmCmpSku implements Identifiable<Long> {
     @Enumerated(EnumType.STRING)
     private SkuStatus status = SkuStatus.ONSALE;
 
+
+
     public PtmCmpSku() {
     }
 
