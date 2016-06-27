@@ -26,6 +26,18 @@ public class CacheServiceImpl<T extends Identifiable> implements ICacheService<T
     RedisTemplate redisTemplate;
 
     @Override
+    public boolean expire(final String key, final long seconds) {
+//        return redisTemplate.expire(key, seconds, TimeUnit.SECONDS);
+        return (Boolean) redisTemplate.execute(new RedisCallback() {
+            @Override
+            public Object doInRedis(RedisConnection redisConnection) throws DataAccessException {
+                redisConnection.expire(key.getBytes(), seconds);
+                return true;
+            }
+        });
+    }
+
+    @Override
     public String mapGet(final String mName, final String key) {
         return (String) redisTemplate.execute(new RedisCallback() {
             @Override
@@ -132,7 +144,24 @@ public class CacheServiceImpl<T extends Identifiable> implements ICacheService<T
 
     @Override
     public void del(final String key) {
-        redisTemplate.delete(key);
+//        redisTemplate.delete(key);
+        redisTemplate.execute(new RedisCallback() {
+            @Override
+            public Object doInRedis(RedisConnection connection) throws DataAccessException {
+                connection.del(key.getBytes());
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public boolean exists(final String key) {
+        return (Boolean) redisTemplate.execute(new RedisCallback() {
+            @Override
+            public Boolean doInRedis(RedisConnection connection) throws DataAccessException {
+                return connection.exists(key.getBytes());
+            }
+        });
     }
 
     @Override

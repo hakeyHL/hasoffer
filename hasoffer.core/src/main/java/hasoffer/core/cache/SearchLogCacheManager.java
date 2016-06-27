@@ -1,5 +1,6 @@
 package hasoffer.core.cache;
 
+import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.redis.ICacheService;
@@ -7,6 +8,7 @@ import hasoffer.core.search.ISearchService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 /**
  * Date : 2016/5/7
@@ -46,6 +48,7 @@ public class SearchLogCacheManager {
     }
 
     public SrmSearchLog findSrmSearchLog(String logId) {
+        countSrmSearchLog(logId);
 
         String key = CACHE_KEY_PRE + logId;
 
@@ -67,5 +70,20 @@ public class SearchLogCacheManager {
         }
 
         return searchLog;
+    }
+
+    public void countSrmSearchLog(String logId) {
+        Date date = TimeUtils.nowDate();
+
+        String logCountMap = "LOG_COUNT_" + TimeUtils.parse(date, "yyyyMMdd");
+
+        String countStr = cacheService.mapGet(logCountMap, logId);
+
+        if (StringUtils.isEmpty(countStr)) {
+            cacheService.mapPut(logCountMap, logId, "1");
+        } else {
+            long count = Long.valueOf(countStr);
+            cacheService.mapPut(logCountMap, logId, String.valueOf(count + 1));
+        }
     }
 }

@@ -1,7 +1,11 @@
 package hasoffer.core.test;
 
+import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
+import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
+import hasoffer.core.persistence.po.search.SrmSearchLog;
+import hasoffer.core.redis.impl.CacheServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.dao.DataAccessException;
@@ -13,6 +17,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Date : 2016/2/18
@@ -25,7 +30,36 @@ public class RedisTest {
     @Resource
     IMongoDbManager mdm;
     @Resource
+    IDataBaseManager dbm;
+    @Resource
+    SearchLogCacheManager logCacheManager;
+    @Resource
+    CacheServiceImpl cacheService;
+    @Resource
     private RedisTemplate<Serializable, Serializable> redisTemplate;
+
+    @Test
+    public void exits() {
+        boolean exists = cacheService.exists("LOG_COUNT_20160627");
+
+        System.out.println(exists);
+    }
+
+    @Test
+    public void delMap() {
+        cacheService.del("LOG_COUNT_20160627");
+    }
+
+    @Test
+    public void countTest() {
+        List<SrmSearchLog> logs = dbm.query("select t from SrmSearchLog t", 1, 100);
+
+        for (SrmSearchLog log : logs) {
+            logCacheManager.countSrmSearchLog(log.getId());
+        }
+
+        cacheService.expire("LOG_COUNT_20160627", 200);
+    }
 
     @Test
     public void set() {
