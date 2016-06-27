@@ -85,13 +85,14 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             //如果返回结果状态为running，那么将sku返回队列
             if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
                 ws.getSdQueue().add(sku);
-                logger.debug("taskstatus start for [" + sku.getId() + "]");
+                logger.debug("taskstatus RUNNING for [" + sku.getId() + "]");
                 continue;
             } else if (TaskStatus.STOPPED.equals(taskStatus)) {
-                logger.debug("taskstatus stopped for [" + sku.getId() + "]");
+                logger.debug("taskstatus STOPPED for [" + sku.getId() + "]");
             } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
-                logger.debug("taskstatus exception for [" + sku.getId() + "]");
+                logger.debug("taskstatus EXCEPTION for [" + sku.getId() + "]");
             } else {//(TaskStatus.FINISH.equals(taskStatus)))
+                logger.debug("taskstatus FINISH for [" + sku.getId() + "]");
                 fetchedProduct = fetchedResult.getFetchProduct();
             }
 
@@ -106,7 +107,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             try {
 
                 cmpSkuService.updateCmpSkuBySpiderFetchedProduct(sku.getId(), fetchedProduct);
-                logger.debug(sku.getId() + " fetch success " + website);
+                logger.debug("fetch success for [" + sku.getId() + "]");
             } catch (Exception e) {
                 logger.debug(e.toString());
                 if (fetchedProduct != null) {
