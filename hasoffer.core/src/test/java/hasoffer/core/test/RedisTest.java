@@ -48,11 +48,11 @@ public class RedisTest {
     public void save() {
         String ymd = "20160627";
 
-        Map<String, Long> countMap = logCacheManager.getSearchLogCount(ymd);
+        Map<Long, Long> countMap = logCacheManager.getProductCount(ymd);
 
         List<SrmSearchCount> sscs = new ArrayList<SrmSearchCount>();
 
-        for (Map.Entry<String, Long> countKv : countMap.entrySet()) {
+        for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
             SrmSearchCount ssc = new SrmSearchCount(ymd, countKv.getKey(), countKv.getValue());
             sscs.add(ssc);
         }
@@ -62,8 +62,8 @@ public class RedisTest {
 
     @Test
     public void stat() {
-        Map<String, Long> countMap = logCacheManager.getSearchLogCount("20160627");
-        for (Map.Entry<String, Long> countKv : countMap.entrySet()) {
+        Map<Long, Long> countMap = logCacheManager.getProductCount("20160627");
+        for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
             System.out.println(countKv.getKey() + "\t" + countKv.getValue());
         }
     }
@@ -82,10 +82,11 @@ public class RedisTest {
 
     @Test
     public void countTest() {
-        List<SrmSearchLog> logs = dbm.query("select t from SrmSearchLog t", 1, 100);
+        List<SrmSearchLog> logs = dbm.query("select t from SrmSearchLog t", 10, 100);
 
         for (SrmSearchLog log : logs) {
-            logCacheManager.countSrmSearchLog(log.getId());
+            SrmSearchLog srmSearchLog = dbm.get(SrmSearchLog.class, log.getId());
+            logCacheManager.countSearchedProduct(srmSearchLog.getPtmProductId());
         }
 
 //        cacheService.expire("LOG_COUNT_20160627", 200);

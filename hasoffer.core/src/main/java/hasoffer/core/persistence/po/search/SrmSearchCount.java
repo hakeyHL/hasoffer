@@ -16,15 +16,15 @@ public class SrmSearchCount implements Identifiable<Long> {
     private Long id;
 
     private String ymd;
-    private String searchLogId;
+    private long productId;
     private Long count;
 
     public SrmSearchCount() {
     }
 
-    public SrmSearchCount(String ymd, String searchLogId, Long count) {
+    public SrmSearchCount(String ymd, long productId, Long count) {
         this.ymd = ymd;
-        this.searchLogId = searchLogId;
+        this.productId = productId;
         this.count = count;
     }
 
@@ -46,12 +46,12 @@ public class SrmSearchCount implements Identifiable<Long> {
         this.ymd = ymd;
     }
 
-    public String getSearchLogId() {
-        return searchLogId;
+    public long getProductId() {
+        return productId;
     }
 
-    public void setSearchLogId(String searchLogId) {
-        this.searchLogId = searchLogId;
+    public void setProductId(long productId) {
+        this.productId = productId;
     }
 
     public Long getCount() {
@@ -69,9 +69,9 @@ public class SrmSearchCount implements Identifiable<Long> {
 
         SrmSearchCount that = (SrmSearchCount) o;
 
+        if (productId != that.productId) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (ymd != null ? !ymd.equals(that.ymd) : that.ymd != null) return false;
-        if (searchLogId != null ? !searchLogId.equals(that.searchLogId) : that.searchLogId != null) return false;
         return !(count != null ? !count.equals(that.count) : that.count != null);
 
     }
@@ -80,7 +80,7 @@ public class SrmSearchCount implements Identifiable<Long> {
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (ymd != null ? ymd.hashCode() : 0);
-        result = 31 * result + (searchLogId != null ? searchLogId.hashCode() : 0);
+        result = 31 * result + (int) (productId ^ (productId >>> 32));
         result = 31 * result + (count != null ? count.hashCode() : 0);
         return result;
     }

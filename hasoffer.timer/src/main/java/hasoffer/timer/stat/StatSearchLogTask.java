@@ -28,11 +28,11 @@ public class StatSearchLogTask {
 
         String ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
 
-        Map<String, Long> countMap = logCacheManager.getSearchLogCount(ymd);
+        Map<Long, Long> countMap = logCacheManager.getProductCount(ymd);
 
         List<SrmSearchCount> sscs = new ArrayList<SrmSearchCount>();
 
-        for (Map.Entry<String, Long> countKv : countMap.entrySet()) {
+        for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
             SrmSearchCount ssc = new SrmSearchCount(ymd, countKv.getKey(), countKv.getValue());
             sscs.add(ssc);
         }
