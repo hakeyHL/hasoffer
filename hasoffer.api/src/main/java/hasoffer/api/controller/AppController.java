@@ -231,20 +231,22 @@ public class AppController {
         if (user != null) {
             List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
-                OrderVo orderVo = new OrderVo();
-                orderVo.setAccount(orderStatsAnalysisPO.getSaleAmount());
-                orderVo.setChannel(orderStatsAnalysisPO.getChannel());
-                orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
-                orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
-                //返利比率=tentativeAmount*rate/SaleAmount
-                orderVo.setRate(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)).divide(orderStatsAnalysisPO.getSaleAmount(), 2, BigDecimal.ROUND_HALF_UP));
-                orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
-                transcations.add(orderVo);
-                if (orderStatsAnalysisPO.getOrderStatus() != "cancelled") {
-                    PendingCoins = PendingCoins.add(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)));
-                }
-                if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
-                    VericiedCoins = VericiedCoins.add(orderStatsAnalysisPO.getTentativeAmount());
+                if (orderStatsAnalysisPO.getWebSite() == Website.SHOPCLUES.name() || orderStatsAnalysisPO.getWebSite() == Website.FLIPKART.name()) {
+                    OrderVo orderVo = new OrderVo();
+                    orderVo.setAccount(orderStatsAnalysisPO.getSaleAmount());
+                    orderVo.setChannel(orderStatsAnalysisPO.getChannel());
+                    orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
+                    orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
+                    //返利比率=tentativeAmount*rate/SaleAmount
+                    orderVo.setRate(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)).divide(orderStatsAnalysisPO.getSaleAmount(), 2, BigDecimal.ROUND_HALF_UP));
+                    orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
+                    transcations.add(orderVo);
+                    if (orderStatsAnalysisPO.getOrderStatus() != "cancelled") {
+                        PendingCoins = PendingCoins.add(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)));
+                    }
+                    if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
+                        VericiedCoins = VericiedCoins.add(orderStatsAnalysisPO.getTentativeAmount());
+                    }
                 }
             }
         }
@@ -435,7 +437,6 @@ public class AppController {
             PendingCoins = PendingCoins.setScale(2, BigDecimal.ROUND_HALF_UP);
             userVo.setConis(PendingCoins);
             userVo.setUserIcon(user.getAvatarPath());
-            userVo.setUserId(user.getId());
             mv.addObject("data", userVo);
         }
         return mv;
@@ -691,6 +692,7 @@ public class AppController {
         mv.addObject("data", map);
         return mv;
     }
+
     @RequestMapping(value = "/solrT", method = RequestMethod.GET)
     public ModelAndView solrTest(Long id) {
         ModelAndView mv = new ModelAndView();
