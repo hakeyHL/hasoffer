@@ -136,8 +136,6 @@ public class CmpSkuCacheManager {
     /**
      * @param deviceId
      * @param cliSite
-     * @param cliSourceId
-     * @param cliQ
      * @return
      */
     public boolean isFlowControlled(String deviceId, Website cliSite) {

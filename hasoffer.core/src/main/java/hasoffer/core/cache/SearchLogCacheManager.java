@@ -45,7 +45,7 @@ public class SearchLogCacheManager {
         return searchLog;
     }
 
-    public SrmSearchLog updateSrmSearchLog(String logId) {
+    public SrmSearchLog findSrmSearchLog(String logId) {
 
         String key = CACHE_KEY_PRE + logId;
 
@@ -57,7 +57,13 @@ public class SearchLogCacheManager {
 
         if (searchLog != null) {
             searchLog.setCount(searchLog.getCount() + 1);
-            cacheService.add(key, searchLog, CACHE_EXPIRE_TIME);
+
+            // 如果商品ID大于0，则缓存1天
+            if (searchLog.getPtmProductId() > 0) {
+                cacheService.add(key, searchLog, TimeUtils.SECONDS_OF_1_HOUR * 24);
+            } else {
+                cacheService.add(key, searchLog, CACHE_EXPIRE_TIME);
+            }
         }
 
         return searchLog;

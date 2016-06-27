@@ -45,8 +45,6 @@ import java.util.*;
 @Controller
 @RequestMapping(value = "/cmp")
 public class Compare2Controller {
-    private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
-
     @Resource
     CmpskuIndexServiceImpl cmpskuIndexService;
     @Resource
@@ -59,10 +57,9 @@ public class Compare2Controller {
     CmpSkuCacheManager cmpSkuCacheManager;
     @Resource
     SearchLogCacheManager searchLogCacheManager;
-
     @Resource
     ISearchService searchService;
-
+    private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
 
     // @Cacheable(value = "compare", key = "'getcmpskus_'+#q+'_'+#site+'_'+#price+'_'+#page+'_'+#size")
     // Model And View 不是可序列化的 会抛出  java.io.NotSerializableException 异常
@@ -256,7 +253,7 @@ public class Compare2Controller {
         String q = sio.getCliQ();
 
         String logId = HexDigestUtil.md5(q + "-" + sio.getCliSite().name()); // 这个值作为log表的id
-        SrmSearchLog srmSearchLog = searchLogCacheManager.updateSrmSearchLog(logId);
+        SrmSearchLog srmSearchLog = searchLogCacheManager.findSrmSearchLog(logId);
 
         if (srmSearchLog != null
                 && (srmSearchLog.getPrecise() == SearchPrecise.TIMERSET2

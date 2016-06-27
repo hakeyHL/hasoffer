@@ -3,6 +3,7 @@ package hasoffer.core.persistence.po.search;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 import hasoffer.core.persistence.enums.SearchPrecise;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -31,7 +32,9 @@ public class SrmSearchLog implements Identifiable<String> {
 
     private Date createTime = TimeUtils.nowDate();
     private Date updateTime = TimeUtils.nowDate();
-    private long lUpdateTime = 0L;
+
+    @ColumnDefault(value = "0")
+    private long lUpdateTime = 0L;// 默认值设为0
     private Date manualSetTime;
 
     @Enumerated(EnumType.STRING)
