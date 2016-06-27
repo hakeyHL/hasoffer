@@ -5,10 +5,14 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.search.ISearchService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Date : 2016/5/7
@@ -23,6 +27,8 @@ public class SearchLogCacheManager {
     ICacheService<SrmSearchLog> cacheService;
     @Resource
     ISearchService searchService;
+
+    private Logger logger = LoggerFactory.getLogger(SearchLogCacheManager.class);
 
     /**
      * 根据id查询搜索日志
@@ -48,8 +54,6 @@ public class SearchLogCacheManager {
     }
 
     public SrmSearchLog findSrmSearchLog(String logId) {
-        countSrmSearchLog(logId);
-
         String key = CACHE_KEY_PRE + logId;
 
         SrmSearchLog searchLog = cacheService.get(SrmSearchLog.class, key, 0);
@@ -67,23 +71,62 @@ public class SearchLogCacheManager {
             } else {
                 cacheService.add(key, searchLog, CACHE_EXPIRE_TIME);
             }
+
+            countSearchedProduct(searchLog.getPtmProductId());
         }
 
         return searchLog;
     }
 
-    public void countSrmSearchLog(String logId) {
+    public void countSearchedProduct(long proId) {
+        logger.debug("product id = " + proId);
+        if (proId <= 0) {
+            return;
+        }
         Date date = TimeUtils.nowDate();
 
         String logCountMap = "LOG_COUNT_" + TimeUtils.parse(date, "yyyyMMdd");
 
-        String countStr = cacheService.mapGet(logCountMap, logId);
+        String key = String.valueOf(proId);
+
+        boolean exist = cacheService.exists(logCountMap);
+        if (!exist) {
+            cacheService.mapPut(logCountMap, key, "1");
+            cacheService.expire(logCountMap, TimeUtils.SECONDS_OF_1_DAY);
+            return;
+        }
+
+        String countStr = cacheService.mapGet(logCountMap, key);
 
         if (StringUtils.isEmpty(countStr)) {
-            cacheService.mapPut(logCountMap, logId, "1");
+            cacheService.mapPut(logCountMap, key, "1");
         } else {
             long count = Long.valueOf(countStr);
-            cacheService.mapPut(logCountMap, logId, String.valueOf(count + 1));
+            cacheService.mapPut(logCountMap, key, String.valueOf(count + 1));
         }
+    }
+
+    public Map<Long, Long> getProductCount(String ymd) {
+
+        Map<Long, Long> countMap = new HashMap<Long, Long>();
+
+        String logCountMap = "LOG_COUNT_" + ymd;
+
+        boolean exist = cacheService.exists(logCountMap);
+        if (!exist) {
+            return countMap;
+        }
+
+        Map<String, String> countStrMap = cacheService.mapGetAll(logCountMap);
+
+        for (Map.Entry<String, String> kv : countStrMap.entrySet()) {
+            String proIdStr = kv.getKey();
+            String countStr = kv.getValue();
+            long proId = Long.valueOf(proIdStr);
+            long count = Long.valueOf(countStr);
+            countMap.put(proId, count);
+        }
+
+        return countMap;
     }
 }
