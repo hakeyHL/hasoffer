@@ -24,8 +24,8 @@ public class CmpProductListVo {
 
     public CmpProductListVo() {
     }
-    public CmpProductListVo(PtmCmpSku cmpSku,String image) {
-        this.image = cmpSku.getBigImagePath();
+    public CmpProductListVo(PtmCmpSku cmpSku,String LogoImage) {
+        this.image = LogoImage;
         this.ratingNum =Long.valueOf(cmpSku.getRating()==null?"0":cmpSku.getRating());
         this.price = cmpSku.getPrice();
         this.freight = 20;
