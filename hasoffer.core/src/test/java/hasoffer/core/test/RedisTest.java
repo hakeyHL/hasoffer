@@ -4,8 +4,10 @@ import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
+import hasoffer.core.persistence.po.search.SrmSearchCount;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.redis.impl.CacheServiceImpl;
+import hasoffer.core.search.ISearchService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.dao.DataAccessException;
@@ -17,7 +19,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Date : 2016/2/18
@@ -36,7 +40,33 @@ public class RedisTest {
     @Resource
     CacheServiceImpl cacheService;
     @Resource
+    ISearchService searchService;
+    @Resource
     private RedisTemplate<Serializable, Serializable> redisTemplate;
+
+    @Test
+    public void save() {
+        String ymd = "20160627";
+
+        Map<String, Long> countMap = logCacheManager.getSearchLogCount(ymd);
+
+        List<SrmSearchCount> sscs = new ArrayList<SrmSearchCount>();
+
+        for (Map.Entry<String, Long> countKv : countMap.entrySet()) {
+            SrmSearchCount ssc = new SrmSearchCount(ymd, countKv.getKey(), countKv.getValue());
+            sscs.add(ssc);
+        }
+
+        searchService.saveLogCount(sscs);
+    }
+
+    @Test
+    public void stat() {
+        Map<String, Long> countMap = logCacheManager.getSearchLogCount("20160627");
+        for (Map.Entry<String, Long> countKv : countMap.entrySet()) {
+            System.out.println(countKv.getKey() + "\t" + countKv.getValue());
+        }
+    }
 
     @Test
     public void exits() {
@@ -58,7 +88,7 @@ public class RedisTest {
             logCacheManager.countSrmSearchLog(log.getId());
         }
 
-        cacheService.expire("LOG_COUNT_20160627", 200);
+//        cacheService.expire("LOG_COUNT_20160627", 200);
     }
 
     @Test
