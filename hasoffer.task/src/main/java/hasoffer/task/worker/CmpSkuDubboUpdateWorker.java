@@ -85,11 +85,12 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             //如果返回结果状态为running，那么将sku返回队列
             if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
                 ws.getSdQueue().add(sku);
+                logger.debug("taskstatus start for [" + sku.getId() + "]");
                 continue;
             } else if (TaskStatus.STOPPED.equals(taskStatus)) {
-                logger.debug("taskstatus stopped");
+                logger.debug("taskstatus stopped for [" + sku.getId() + "]");
             } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
-                logger.debug("taskstatus exception");
+                logger.debug("taskstatus exception for [" + sku.getId() + "]");
             } else {//(TaskStatus.FINISH.equals(taskStatus)))
                 fetchedProduct = fetchedResult.getFetchProduct();
             }
