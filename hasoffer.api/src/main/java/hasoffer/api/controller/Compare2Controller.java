@@ -4,6 +4,7 @@ import hasoffer.api.controller.vo.*;
 import hasoffer.api.helper.SearchHelper;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
+import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.StringUtils;
@@ -123,19 +124,16 @@ public class Compare2Controller {
 
         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-
         SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, size);
         CmpResult cr = null;
-
         PtmCmpSkuIndex2 cmpSkuIndex = null;
-
         try {
-            //if (Website.FLIPKART.equals(sio.getCliSite())
-            //        || Website.SNAPDEAL.equals(sio.getCliSite())
-            //        || Website.SHOPCLUES.equals(sio.getCliSite())) {
-            //    // match sku
-            //    cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
-            //}
+            if (Website.FLIPKART.equals(sio.getCliSite())
+                   || Website.SNAPDEAL.equals(sio.getCliSite())
+                   || Website.SHOPCLUES.equals(sio.getCliSite())) {
+               // match sku
+               cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
+            }
             getSioBySearch(sio);
             cr = getCmpProducts(sio, cmpSkuIndex);
         } catch (Exception e) {
@@ -432,31 +430,40 @@ public class Compare2Controller {
      * @return
      */
     private CmpResult getCmpProducts(SearchIO sio, PtmCmpSkuIndex2 cmpSkuIndex) {
+        //初始化一个空的用于存放比价商品列表的List
 
         List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
+        //初始化skuId=0
         long cmpSkuId = 0L;
+        //从ptmCmpSku表获取 productId为指定值、且状态为ONSALE 按照价格升序排列
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(sio.getHsProId(), sio.getPage(), sio.getSize());
         List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
 
         PtmCmpSku clientCmpSku = null;
-
+        //初始化price为客户端传输的price
         float cliPrice = sio.getCliPrice();
         if (ArrayUtils.hasObjs(cmpSkus)) {
-
+            //如果有查询结果,遍历之
             for (PtmCmpSku cmpSku : cmpSkus) {
                 if (sio.getCliSite().equals(cmpSku.getWebsite())) {
+                    //如果查询结果的site与客户端传送的site一致则将此查询结果赋值给新的PtmCmpSku  clientCmpSku
                     clientCmpSku = cmpSku;
                     break;
                 }
             }
+            //已经有匹配对象
             if (clientCmpSku != null) {
+                //给cmpSkuId赋值
                 cmpSkuId = clientCmpSku.getId();
                 if (cliPrice <= 0) {
+                    //如果客户端传输价格小于等于0
                     cliPrice = clientCmpSku.getPrice();
                 } else {
+                    //否则将价格设置为客户端传输的价格
                     clientCmpSku.setPrice(cliPrice);
                 }
             } else {
+                //无匹配对象
                 // 如果比价列表中没有找到该网站的 sku， 则把客户端传上来的商品返回
                 //
                 comparedSkuVos.add(new CmpProductListVo());
@@ -481,7 +488,7 @@ public class Compare2Controller {
                 cplv.setSupport(Arrays.asList("COD"));
                 cplv.setFreight(10);
                 cplv.setDistributionTime(2);
-                addVo(comparedSkuVos, cplv);
+                comparedSkuVos.add(cplv);
             }
             if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", sio.getCliQ(), sio.getCliPrice());
@@ -525,7 +532,11 @@ public class Compare2Controller {
         cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
         cmpResult.setPriceList(priceList);
         cmpResult.setRatingNum(Long.valueOf(clientCmpSku.getRating()));
-        cmpResult.setSpecs("");
+        cmpResult.setSpecs("{\n" +
+                "            \"Service Provider\": \"not specilfied\",\n" +
+                "            \"Technology\": \"WCDMA/GSM\",\n" +
+                "            \"Weight\": \"539oz\"\n" +
+                " }");
         cmpResult.setTotalRatingsNum(Long.valueOf(clientCmpSku.getRating()));
         return cmpResult;
     }
