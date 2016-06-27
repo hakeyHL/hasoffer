@@ -84,7 +84,7 @@ public class DealController {
     public ModelAndView edit(AppDeal deal, MultipartFile file) throws IOException{
 
         //上传图片, 暂支持单个
-        String path = null;
+        String path = "";
         if (!file.isEmpty()) {
             File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
             FileUtil.writeBytes(imageFile,file.getBytes());

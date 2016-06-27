@@ -129,7 +129,7 @@
                 <c:forEach items="${datas}" var="data">
                     <tr>
                         <td><input type="checkbox" name="subBox" value="${data.id}"/></td>
-                        <td>${data.createTime}</td>
+                        <td>${fn:substring(data.createTime, 0, 10)}</td>
                         <td>${data.website}</td>
                         <td>
                             <div class="row">
