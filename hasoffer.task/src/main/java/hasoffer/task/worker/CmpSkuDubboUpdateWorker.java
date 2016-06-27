@@ -1,5 +1,7 @@
 package hasoffer.task.worker;
 
+import hasoffer.base.exception.ContentParseException;
+import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
@@ -24,7 +26,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
     private ICmpSkuService cmpSkuService;
     private IFetchDubboService fetchService;
 
-    public CmpSkuDubboUpdateWorker(ListAndProcessWorkerStatus<PtmCmpSku> ws, ICmpSkuService cmpSkuService , IFetchDubboService fetchService) {
+    public CmpSkuDubboUpdateWorker(ListAndProcessWorkerStatus<PtmCmpSku> ws, ICmpSkuService cmpSkuService, IFetchDubboService fetchService) {
         this.ws = ws;
         this.cmpSkuService = cmpSkuService;
         this.fetchService = fetchService;
@@ -62,19 +64,19 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             Website website = WebsiteHelper.getWebSite(url);
 
             if (website == null) {
-                logger.debug(url + " parse website get null");
+                logger.debug(" parse website get null for [" + sku.getId() + "]");
                 continue;
             }
 
             FetchUrlResult fetchedResult = null;
 
-//            try {
-//                fetchedResult = fetchService.getProductsByUrl(website, url);
-//            } catch (HttpFetchException e) {
-//                e.printStackTrace();
-//            } catch (ContentParseException e) {
-//                e.printStackTrace();
-//            }
+            try {
+                fetchedResult = fetchService.getProductsByUrl(website, url);
+            } catch (HttpFetchException e) {
+                logger.debug("HttpFetchException for [" + sku.getId() + "]");
+            } catch (ContentParseException e) {
+                logger.debug("ContentParseException for [" + sku.getId() + "]");
+            }
 
             TaskStatus taskStatus = fetchedResult.getTaskStatus();
 
@@ -85,9 +87,9 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 ws.getSdQueue().add(sku);
                 continue;
             } else if (TaskStatus.STOPPED.equals(taskStatus)) {
-                //do something
+                logger.debug("taskstatus stopped");
             } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
-                //do something
+                logger.debug("taskstatus exception");
             } else {//(TaskStatus.FINISH.equals(taskStatus)))
                 fetchedProduct = fetchedResult.getFetchProduct();
             }
