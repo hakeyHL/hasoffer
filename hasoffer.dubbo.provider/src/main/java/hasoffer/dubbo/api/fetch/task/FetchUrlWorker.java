@@ -44,7 +44,7 @@ public class FetchUrlWorker implements Runnable {
                     fetchCacheService.cacheResult(FetchUrlResult.getCacheKey(fetchResult), fetchResult);
                 }
             } catch (Exception e) {
-                logger.error("FetchKeywordWorker is error. Error Msg: ", e.getMessage());
+                logger.error("FetchKeywordWorker is error. Error Msg: ", e);
             }
         }
     }
@@ -57,19 +57,19 @@ public class FetchUrlWorker implements Runnable {
         } catch (HttpFetchException e) {
             if (fetchResult.getRunCount() < 5) {
                 fetchResult.setRunCount(fetchResult.getRunCount() + 1);
-                fetchCacheService.saveKeyword(StringConstant.WAIT_KEY_LIST, JSONUtil.toJSON(fetchResult));
+                fetchCacheService.saveKeyword(StringConstant.WAIT_URL_LIST, JSONUtil.toJSON(fetchResult));
             } else {
                 fetchResult.setTaskStatus(TaskStatus.STOPPED);
-                fetchResult.setErrMsg("尝试抓取5次没有成功，放弃该任务。");
+                fetchResult.setErrMsg("Run over 5 times. And stop it.");
             }
             e.printStackTrace();
         } catch (ContentParseException e) {
             fetchResult.setTaskStatus(TaskStatus.STOPPED);
-            fetchResult.setErrMsg("内容解析失败，请修正。");
+            fetchResult.setErrMsg("Parse Content Exception.");
             e.printStackTrace();
         } catch (UnSupportWebsiteException e) {
             fetchResult.setTaskStatus(TaskStatus.STOPPED);
-            fetchResult.setErrMsg("暂不支持该网站抓取。");
+            fetchResult.setErrMsg("un able support website.");
             e.printStackTrace();
         }
     }
