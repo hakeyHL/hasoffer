@@ -14,6 +14,7 @@ public class UserVo {
     private String Number;
     private  String name;
     private BigDecimal conis;
+
     public String getName() {
         return name;
     }
@@ -29,6 +30,7 @@ public class UserVo {
     public void setConis(BigDecimal conis) {
         this.conis = conis;
     }
+
     public String getThirdId() {
         return thirdId;
     }
