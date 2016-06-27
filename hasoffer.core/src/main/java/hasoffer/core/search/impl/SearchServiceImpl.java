@@ -481,9 +481,11 @@ public class SearchServiceImpl implements ISearchService {
             searchLog = new SrmSearchLog(keywordMd5, site, sourceId, keyword, brand, price, category, productId, ptmCmpSkuId);
             dbm.create(searchLog);
         } else {
+            Date updateTime = TimeUtils.nowDate();
             // 如果存在（有人搜索过的）,对该log计数器+1，同时记录关键字+1
             SrmSearchLogUpdater srmSearchLogUpdater = new SrmSearchLogUpdater(searchLog.getId());
-            srmSearchLogUpdater.getPo().setUpdateTime(TimeUtils.nowDate());
+            srmSearchLogUpdater.getPo().setUpdateTime(updateTime);
+            srmSearchLogUpdater.getPo().setlUpdateTime(updateTime.getTime());
             srmSearchLogUpdater.getPo().setCount(searchLog.getCount() + 1);
 
             if (StringUtils.isEmpty(searchLog.getBrand()) && !StringUtils.isEmpty(brand)) {

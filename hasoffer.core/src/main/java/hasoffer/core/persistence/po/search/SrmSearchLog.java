@@ -31,6 +31,7 @@ public class SrmSearchLog implements Identifiable<String> {
 
     private Date createTime = TimeUtils.nowDate();
     private Date updateTime = TimeUtils.nowDate();
+    private long lUpdateTime = 0L;
     private Date manualSetTime;
 
     @Enumerated(EnumType.STRING)
@@ -169,28 +170,37 @@ public class SrmSearchLog implements Identifiable<String> {
         this.sourceId = sourceId;
     }
 
+    public long getlUpdateTime() {
+        return lUpdateTime;
+    }
+
+    public void setlUpdateTime(long lUpdateTime) {
+        this.lUpdateTime = lUpdateTime;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        SrmSearchLog searchLog = (SrmSearchLog) o;
+        SrmSearchLog that = (SrmSearchLog) o;
 
-        if (Float.compare(searchLog.price, price) != 0) return false;
-        if (count != searchLog.count) return false;
-        if (category != searchLog.category) return false;
-        if (ptmProductId != searchLog.ptmProductId) return false;
-        if (ptmCmpSkuId != searchLog.ptmCmpSkuId) return false;
-        if (id != null ? !id.equals(searchLog.id) : searchLog.id != null) return false;
-        if (site != null ? !site.equals(searchLog.site) : searchLog.site != null) return false;
-        if (keyword != null ? !keyword.equals(searchLog.keyword) : searchLog.keyword != null) return false;
-        if (brand != null ? !brand.equals(searchLog.brand) : searchLog.brand != null) return false;
-        if (sourceId != null ? !sourceId.equals(searchLog.sourceId) : searchLog.sourceId != null) return false;
-        if (createTime != null ? !createTime.equals(searchLog.createTime) : searchLog.createTime != null) return false;
-        if (updateTime != null ? !updateTime.equals(searchLog.updateTime) : searchLog.updateTime != null) return false;
-        if (manualSetTime != null ? !manualSetTime.equals(searchLog.manualSetTime) : searchLog.manualSetTime != null)
+        if (Float.compare(that.price, price) != 0) return false;
+        if (count != that.count) return false;
+        if (category != that.category) return false;
+        if (ptmProductId != that.ptmProductId) return false;
+        if (ptmCmpSkuId != that.ptmCmpSkuId) return false;
+        if (lUpdateTime != that.lUpdateTime) return false;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (site != null ? !site.equals(that.site) : that.site != null) return false;
+        if (keyword != null ? !keyword.equals(that.keyword) : that.keyword != null) return false;
+        if (brand != null ? !brand.equals(that.brand) : that.brand != null) return false;
+        if (sourceId != null ? !sourceId.equals(that.sourceId) : that.sourceId != null) return false;
+        if (createTime != null ? !createTime.equals(that.createTime) : that.createTime != null) return false;
+        if (updateTime != null ? !updateTime.equals(that.updateTime) : that.updateTime != null) return false;
+        if (manualSetTime != null ? !manualSetTime.equals(that.manualSetTime) : that.manualSetTime != null)
             return false;
-        return precise == searchLog.precise;
+        return precise == that.precise;
 
     }
 
@@ -208,6 +218,7 @@ public class SrmSearchLog implements Identifiable<String> {
         result = 31 * result + (sourceId != null ? sourceId.hashCode() : 0);
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
+        result = 31 * result + (int) (lUpdateTime ^ (lUpdateTime >>> 32));
         result = 31 * result + (manualSetTime != null ? manualSetTime.hashCode() : 0);
         result = 31 * result + (precise != null ? precise.hashCode() : 0);
         return result;
