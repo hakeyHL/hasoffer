@@ -557,7 +557,6 @@ public class AppController {
         switch (requestType) {
             case 0:
                 data = "{\n" +
-                        "    \"data\": {\n" +
                         "        \"product\": [\n" +
                         "            {\n" +
                         "                \"id\": \"5556465\",\n" +
@@ -608,13 +607,11 @@ public class AppController {
                         "                \"commentNum\": 8\n" +
                         "            }\n" +
                         "        ]\n" +
-                        "    }\n" +
                         "}";
                 map.put("product", data);
                 break;
             case 1:
                 data = "{\n" +
-                        "    \"data\": {\n" +
                         "        \"product\": [\n" +
                         "            {\n" +
                         "                \"id\": \"5556465\",\n" +
@@ -664,7 +661,6 @@ public class AppController {
                         "                \"storesNum\": 10,\n" +
                         "                \"commentNum\": 8\n" +
                         "            }\n" +
-                        "        ]\n" +
                         "    }\n" +
                         "}";
                 map.put("product", data);
