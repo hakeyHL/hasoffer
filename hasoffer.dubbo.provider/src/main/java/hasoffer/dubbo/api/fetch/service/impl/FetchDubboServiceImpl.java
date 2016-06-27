@@ -70,7 +70,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     }
 
     private FetchUrlResult getFetchUrlResult(Website webSite, String url) {
-        String fetchResultKey = new FetchUrlResult(webSite,url).getCacheKey();
+        String fetchResultKey = FetchUrlResult.getCacheKey(webSite,url);
         return fetchCacheService.getProductByUrl(fetchResultKey);
     }
 

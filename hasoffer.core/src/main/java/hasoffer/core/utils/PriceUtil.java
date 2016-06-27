@@ -36,7 +36,7 @@ public class PriceUtil {
             return Float.valueOf(priceStr);
         }
         priceStr = StringUtils.filterAndTrim(priceStr, Arrays.asList(","));
-        Pattern pattern = Pattern.compile("[R|r]s\\.??\\s*?(\\d+\\.??\\d+)");
+        Pattern pattern = Pattern.compile("[Rs|rs|$]\\.??\\s*?(\\d+\\.??\\d+)");
         Matcher m = pattern.matcher(priceStr);
         if (m.find()) {
             String p = m.group(1);
@@ -47,6 +47,8 @@ public class PriceUtil {
 
     public static void main(String[] args) {
         String price = "rs. 569.23";//Rs.56.2 Rs. 8974.22
+        System.out.println(getPrice(price));
+        price = "$569.23";
         System.out.println(getPrice(price));
     }
 }
