@@ -17,6 +17,7 @@ import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
+import hasoffer.core.persistence.po.search.SrmSearchCount;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.search.SrmSearchUpdateLog;
 import hasoffer.core.persistence.po.search.updater.SrmSearchLogUpdater;
@@ -527,6 +528,12 @@ public class SearchServiceImpl implements ISearchService {
         srmSearchLogUpdater.getPo().setPtmProductId(productId);
 
         dbm.update(srmSearchLogUpdater);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveLogCount(List<SrmSearchCount> srmSearchCounts) {
+        dbm.batchSave(srmSearchCounts);
     }
 
     @Override

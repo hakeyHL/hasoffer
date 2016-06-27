@@ -231,20 +231,22 @@ public class AppController {
         if (user != null) {
             List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
-                OrderVo orderVo = new OrderVo();
-                orderVo.setAccount(orderStatsAnalysisPO.getSaleAmount());
-                orderVo.setChannel(orderStatsAnalysisPO.getChannel());
-                orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
-                orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
-                //返利比率=tentativeAmount*rate/SaleAmount
-                orderVo.setRate(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)).divide(orderStatsAnalysisPO.getSaleAmount(), 2, BigDecimal.ROUND_HALF_UP));
-                orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
-                transcations.add(orderVo);
-                if (orderStatsAnalysisPO.getOrderStatus() != "cancelled") {
-                    PendingCoins = PendingCoins.add(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)));
-                }
-                if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
-                    VericiedCoins = VericiedCoins.add(orderStatsAnalysisPO.getTentativeAmount());
+                if (orderStatsAnalysisPO.getWebSite() == Website.SHOPCLUES.name() || orderStatsAnalysisPO.getWebSite() == Website.FLIPKART.name()) {
+                    OrderVo orderVo = new OrderVo();
+                    orderVo.setAccount(orderStatsAnalysisPO.getSaleAmount());
+                    orderVo.setChannel(orderStatsAnalysisPO.getChannel());
+                    orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
+                    orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
+                    //返利比率=tentativeAmount*rate/SaleAmount
+                    orderVo.setRate(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)).divide(orderStatsAnalysisPO.getSaleAmount(), 2, BigDecimal.ROUND_HALF_UP));
+                    orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
+                    transcations.add(orderVo);
+                    if (orderStatsAnalysisPO.getOrderStatus() != "cancelled") {
+                        PendingCoins = PendingCoins.add(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)));
+                    }
+                    if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
+                        VericiedCoins = VericiedCoins.add(orderStatsAnalysisPO.getTentativeAmount());
+                    }
                 }
             }
         }
@@ -435,7 +437,6 @@ public class AppController {
             PendingCoins = PendingCoins.setScale(2, BigDecimal.ROUND_HALF_UP);
             userVo.setConis(PendingCoins);
             userVo.setUserIcon(user.getAvatarPath());
-            userVo.setUserId(user.getId());
             mv.addObject("data", userVo);
         }
         return mv;
@@ -689,62 +690,6 @@ public class AppController {
             map.put("product", li);
         }
         mv.addObject("data", map);
-        return mv;
-    }
-
-    /**
-     * 商品详情
-     *
-     * @return
-     */
-    @RequestMapping(value = "/productInfo", method = RequestMethod.GET)
-    public ModelAndView produceInfo(@RequestParam String id) {
-        ModelAndView mv = new ModelAndView();
-        String data = "\"images\": [\n" +
-                "            \"http://pic95.nipic.com/file/20160420/20511871_130248344000_2.jpg\",\n" +
-                "            \"http://pic96.nipic.com/file/20160423/20511871_234151961000_2.jpg\"\n" +
-                "        ],\n" +
-                "        \"bestPrice\": 100,\n" +
-                "        \"name\": \"iphone 6s \",\n" +
-                "        \"totalRatingsNum\": 10000,\n" +
-                "        \"ratingNum\": 4.5,\n" +
-                "        \"priceList\": [\n" +
-                "            {\n" +
-                "                \"image\": \"http://img.hasoffer.com/sites/FLIPKART.jpg\",\n" +
-                "                \"ratingNum\": 5,\n" +
-                "                \"totalRatingsNum\": 2000,\n" +
-                "                \"price\": null,\n" +
-                "                \"freight\": 0,\n" +
-                "                \"distributionTime\": 2,\n" +
-                "                \"coins\": 22,\n" +
-                "		\"backRate\":3.5,\n" +
-                "                \"returnGuarantee\": 20,\n" +
-                "                \"suppor\": [\n" +
-                "                    \"COD\",\n" +
-                "                    \"EMI\"\n" +
-                "                ]\n" +
-                "            },\n" +
-                "            {\n" +
-                "                \"image\": \"http://img.hasoffer.com/sites/FLIPKART.jpg\",\n" +
-                "                \"ratingNum\": 4,\n" +
-                "                \"totalRatingsNum\": 1000,\n" +
-                "                \"price\": 300,\n" +
-                "                \"freight\": 20,\n" +
-                "                \"distributionTime\": 0,\n" +
-                "                \"coins\": 30,\n" +
-                "		\"backRate\":2.2,\n" +
-                "                \"returnGuarantee\": 10,\n" +
-                "                \"suppor\": [\n" +
-                "                    \"COD\"\n" +
-                "                ]\n" +
-                "            }\n" +
-                "        ],\n" +
-                "        \"specs\": {\n" +
-                "                \"Service Provider\": \"not specilfied\",\n" +
-                "                \"Technology\": \"WCDMA/GSM\",\n" +
-                "                \"Weight\": \"539oz\"\n" +
-                "        }";
-        mv.addObject("data", data);
         return mv;
     }
 

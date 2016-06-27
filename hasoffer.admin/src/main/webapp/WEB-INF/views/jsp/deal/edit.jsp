@@ -48,7 +48,7 @@
                                     <div>
                                 <span class="btn btn-file"><span class="fileupload-new">选择图片</span>
                                     <span class="fileupload-exists">更换</span>
-                                    <input type="file" class="default" id="upload_img" name="file"></span>
+                                    <input type="file" class="default" id="upload_img" name="file" img_url="false"></span>
                                         <%--<a href="#" class="btn fileupload-exists" data-dismiss="fileupload">删除</a>--%>
                                     </div>
                                 </div>
@@ -127,6 +127,7 @@
         var img = $("#image_url");
         var imgUrl = "${deal.imageUrl}";
         if(imgUrl != ""){
+            $("#upload_img").attr("img_url", true);
             img.attr("src", imgUrl);
         }
 
@@ -147,8 +148,8 @@
         var inlineRadio1 = $("#inlineRadio1");
         var checked = inlineRadio1.attr("checked");
         if(checked == "checked"){
-           var img = $("#upload_img").val();
-            if(img == ""){
+           var img = $("#upload_img").attr("img_url");
+            if(img == "false"){
                 $("#tip_div").show();
                 return false;
             }

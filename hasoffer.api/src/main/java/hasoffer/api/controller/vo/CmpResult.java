@@ -17,25 +17,25 @@ public class CmpResult {
     private  Long totalRatingsNum;
     //comment star number
     private  float ratingNum;
-    PageableResult<CmpProductListVo> priceList;
+    List <CmpProductListVo> priceList;
     //product specification
     private  String specs;
     float priceOff;
     ProductVo productVo;
     PageableResult<ComparedSkuVo> pagedComparedSkuVos;
-    private String [] images;
+    private String  image;
     public CmpResult(float priceOff, ProductVo productVo, PageableResult<ComparedSkuVo> pagedComparedSkuVos) {
         this.priceOff = priceOff;
         this.productVo = productVo;
         this.pagedComparedSkuVos = pagedComparedSkuVos;
     }
 
-    public String[] getImages() {
-        return images;
+    public String getImage() {
+        return image;
     }
 
-    public void setImages(String[] images) {
-        this.images = images;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public float getPriceOff() {
@@ -94,11 +94,11 @@ public class CmpResult {
         this.ratingNum = ratingNum;
     }
 
-    public PageableResult<CmpProductListVo> getPriceList() {
+    public List<CmpProductListVo> getPriceList() {
         return priceList;
     }
 
-    public void setPriceList(PageableResult<CmpProductListVo> priceList) {
+    public void setPriceList(List<CmpProductListVo> priceList) {
         this.priceList = priceList;
     }
 

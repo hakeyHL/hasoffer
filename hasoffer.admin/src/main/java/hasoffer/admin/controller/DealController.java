@@ -84,7 +84,7 @@ public class DealController {
     public ModelAndView edit(AppDeal deal, MultipartFile file) throws IOException{
 
         //上传图片, 暂支持单个
-        String path = null;
+        String path = "";
         if (!file.isEmpty()) {
             File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
             FileUtil.writeBytes(imageFile,file.getBytes());
@@ -120,6 +120,13 @@ public class DealController {
     @ResponseBody
     public Object delete(@PathVariable(value = "id") Long dealId){
         dealService.delete(dealId);
+        return true;
+    }
+
+    @RequestMapping(value = "/batchDelete", method = RequestMethod.GET)
+    @ResponseBody
+    public Object batchDelete(@RequestParam(value = "ids[]") Long[] ids){
+        dealService.batchDelete(ids);
         return true;
     }
 

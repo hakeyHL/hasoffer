@@ -24,5 +24,9 @@ public interface ICacheService<T> {
 
     String mapGet(final String mName, final String key);
 
+    boolean expire(String key, long seconds);
+
+    boolean exists(String key);
+
     Map<String, String> mapGetAll(final String mName);
 }

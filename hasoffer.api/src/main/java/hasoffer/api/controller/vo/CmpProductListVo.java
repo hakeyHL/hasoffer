@@ -18,11 +18,22 @@ public class CmpProductListVo {
     private Long coins;
     private float backRate;
     private int returnGuarantee;
+    private  String deepLink;
+    private  String deepLinkUrl;
     List<String> support = new ArrayList<String>();
 
     public CmpProductListVo() {
     }
-    public CmpProductListVo(PtmCmpSku cmpSku) {
+    public CmpProductListVo(PtmCmpSku cmpSku,String image) {
+        this.image = cmpSku.getBigImagePath();
+        this.ratingNum =Long.valueOf(cmpSku.getRating()==null?"0":cmpSku.getRating());
+        this.price = cmpSku.getPrice();
+        this.freight = 20;
+        this.distributionTime = 10;
+        this.coins =Long.valueOf(20);
+        this.backRate = 0.015f;
+        this.returnGuarantee = 5;
+        this.support = null;
         this.image = cmpSku.getBigImagePath();
     }
     public CmpProductListVo(String image, float ratingNum, Long totalRatingsNum, float price, int freight, int distributionTime, Long coins, float backRate, int returnGuarantee, List<String> support) {
@@ -41,6 +52,22 @@ public class CmpProductListVo {
     public String getImage() {
 
         return image;
+    }
+
+    public String getDeepLinkUrl() {
+        return deepLinkUrl;
+    }
+
+    public void setDeepLinkUrl(String deepLinkUrl) {
+        this.deepLinkUrl = deepLinkUrl;
+    }
+
+    public String getDeepLink() {
+        return deepLink;
+    }
+
+    public void setDeepLink(String deepLink) {
+        this.deepLink = deepLink;
     }
 
     public void setImage(String image) {
