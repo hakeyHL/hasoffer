@@ -5,6 +5,7 @@ import hasoffer.base.model.Website;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.worker.ListAndProcessWorkerStatus;
+import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchUrlResult;
 import hasoffer.spider.model.FetchedProduct;
@@ -21,13 +22,12 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
     private static Logger logger = LoggerFactory.getLogger(CmpSkuDubboUpdateWorker.class);
     private ListAndProcessWorkerStatus<PtmCmpSku> ws;
     private ICmpSkuService cmpSkuService;
-//    private IFetchDubboService fetchService;
+    private IFetchDubboService fetchService;
 
-    //, IFetchDubboService fetchService
-    public CmpSkuDubboUpdateWorker(ListAndProcessWorkerStatus<PtmCmpSku> ws, ICmpSkuService cmpSkuService) {
+    public CmpSkuDubboUpdateWorker(ListAndProcessWorkerStatus<PtmCmpSku> ws, ICmpSkuService cmpSkuService , IFetchDubboService fetchService) {
         this.ws = ws;
         this.cmpSkuService = cmpSkuService;
-//        this.fetchService = fetchService;
+        this.fetchService = fetchService;
     }
 
     @Override
