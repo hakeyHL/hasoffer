@@ -26,6 +26,7 @@ public class DubboUpdateController {
 
     private static AtomicBoolean taskRunning1 = new AtomicBoolean(false);
     private static final String Q_PTMCMPSKU_FLIPKART = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' ORDER BY t.id ";
+    private static final String Q_PTMCMPSKU_EBAY = "SELECT t FROM PtmCmpSku t WHERE t.website = 'EBAY' ORDER BY t.id ";
 
     @Resource
     IFetchDubboService flipkartFetchService;
@@ -47,11 +48,11 @@ public class DubboUpdateController {
 
         ListAndProcessWorkerStatus<PtmCmpSku> ws = new ListAndProcessWorkerStatus<PtmCmpSku>();
 
-        es.execute(new MysqlListWorker<PtmCmpSku>(Q_PTMCMPSKU_FLIPKART, ws, dbm));
+        es.execute(new MysqlListWorker<PtmCmpSku>(Q_PTMCMPSKU_EBAY, ws, dbm));
 
-        for (int i = 0; i < 10; i++) {
-            es.execute(new CmpSkuDubboUpdateWorker(ws, cmpSkuService, flipkartFetchService));
-        }
+//        for (int i = 0; i < 10; i++) {
+        es.execute(new CmpSkuDubboUpdateWorker(ws, cmpSkuService, flipkartFetchService));
+//        }
 
         taskRunning1.set(true);
 
