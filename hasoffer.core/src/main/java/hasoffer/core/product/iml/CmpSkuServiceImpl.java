@@ -99,9 +99,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             String qIndex = HexDigestUtil.md5(website.name() + sourceId);
             cmpSkuIndexs = dbm.query(Q_CMPSKU_INDEX_BY_SOURCESID, Arrays.asList(qIndex));
         }
-
         // todo fix bug
-
         PtmCmpSkuIndex2 finalIndex = null;
         if (ArrayUtils.hasObjs(cmpSkuIndexs)) {
 

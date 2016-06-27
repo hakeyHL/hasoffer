@@ -1,10 +1,13 @@
 package hasoffer.task.worker;
 
+import hasoffer.base.exception.ContentParseException;
+import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.worker.ListAndProcessWorkerStatus;
+import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchUrlResult;
 import hasoffer.spider.model.FetchedProduct;
@@ -21,13 +24,12 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
     private static Logger logger = LoggerFactory.getLogger(CmpSkuDubboUpdateWorker.class);
     private ListAndProcessWorkerStatus<PtmCmpSku> ws;
     private ICmpSkuService cmpSkuService;
-//    private IFetchDubboService fetchService;
+    private IFetchDubboService fetchService;
 
-    //, IFetchDubboService fetchService
-    public CmpSkuDubboUpdateWorker(ListAndProcessWorkerStatus<PtmCmpSku> ws, ICmpSkuService cmpSkuService) {
+    public CmpSkuDubboUpdateWorker(ListAndProcessWorkerStatus<PtmCmpSku> ws, ICmpSkuService cmpSkuService, IFetchDubboService fetchService) {
         this.ws = ws;
         this.cmpSkuService = cmpSkuService;
-//        this.fetchService = fetchService;
+        this.fetchService = fetchService;
     }
 
     @Override
@@ -62,19 +64,19 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             Website website = WebsiteHelper.getWebSite(url);
 
             if (website == null) {
-                logger.debug(url + " parse website get null");
+                logger.debug(" parse website get null for [" + sku.getId() + "]");
                 continue;
             }
 
             FetchUrlResult fetchedResult = null;
 
-//            try {
-//                fetchedResult = fetchService.getProductsByUrl(website, url);
-//            } catch (HttpFetchException e) {
-//                e.printStackTrace();
-//            } catch (ContentParseException e) {
-//                e.printStackTrace();
-//            }
+            try {
+                fetchedResult = fetchService.getProductsByUrl(website, url);
+            } catch (HttpFetchException e) {
+                logger.debug("HttpFetchException for [" + sku.getId() + "]");
+            } catch (ContentParseException e) {
+                logger.debug("ContentParseException for [" + sku.getId() + "]");
+            }
 
             TaskStatus taskStatus = fetchedResult.getTaskStatus();
 
@@ -83,11 +85,12 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             //如果返回结果状态为running，那么将sku返回队列
             if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
                 ws.getSdQueue().add(sku);
+                logger.debug("taskstatus start for [" + sku.getId() + "]");
                 continue;
             } else if (TaskStatus.STOPPED.equals(taskStatus)) {
-                //do something
+                logger.debug("taskstatus stopped for [" + sku.getId() + "]");
             } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
-                //do something
+                logger.debug("taskstatus exception for [" + sku.getId() + "]");
             } else {//(TaskStatus.FINISH.equals(taskStatus)))
                 fetchedProduct = fetchedResult.getFetchProduct();
             }
