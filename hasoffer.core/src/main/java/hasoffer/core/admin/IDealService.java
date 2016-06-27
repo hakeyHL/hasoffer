@@ -26,4 +26,6 @@ public interface IDealService {
     void updateDeal(AppDeal deal);
 
     public void delete(Long dealId);
+
+    public void batchDelete(Long[] ids);
 }

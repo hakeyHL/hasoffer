@@ -146,6 +146,12 @@ public class DealServiceImpl implements IDealService {
     }
 
     @Override
+    public void batchDelete(Long[] ids) {
+
+        dao.updateBySql("delete from appdeal where id in(?)",  Arrays.asList(ids));
+    }
+
+    @Override
     public void addOrUpdateBanner(AppBanner banner) {
         dbm.create(banner);
     }

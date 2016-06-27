@@ -123,6 +123,13 @@ public class DealController {
         return true;
     }
 
+    @RequestMapping(value = "/batchDelete", method = RequestMethod.GET)
+    @ResponseBody
+    public Object batchDelete(@RequestParam(value = "ids[]") Long[] ids){
+        dealService.batchDelete(ids);
+        return true;
+    }
+
     @RequestMapping("/download")
     public void download(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {

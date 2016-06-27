@@ -50,7 +50,7 @@
 
 
     <!-- 信息删除确认 -->
-    <div class="modal fade" id="delcfmModel">
+    <div class="modal fade" id="deleteModel">
         <div class="modal-dialog">
             <div class="modal-content message_align">
                 <div class="modal-header">
@@ -69,6 +69,27 @@
         </div>
     </div>
 
+    <!-- 批量删除确认 -->
+    <div class="modal fade" id="batchDeleteModel">
+        <div class="modal-dialog">
+            <div class="modal-content message_align">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title">提示信息</h4>
+                </div>
+                <div class="modal-body">
+                    <p>您确认要删除选中记录吗？</p>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" id="batchUrl"/>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <a  onclick="batchUrlSubmit()" class="btn btn-success" data-dismiss="modal">确定</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div class="col-lg-12" style="margin: 5px"></div>
 
     <div class="row">
@@ -83,10 +104,17 @@
     <div class="col-lg-12" style="margin: 10px"></div>
 
     <div class="row">
+        <div class="col-lg-12" >
+            <button type="button" class="btn btn-primary" onclick="batchDelete('<%=contextPath%>/deal/batchDelete')" data-toggle="modal" data-target="#confirm-delete">批量删除</button>
+        </div>
+    </div>
+
+    <div class="row">
         <div class="col-lg-12">
             <table class="table table-bordered table-hover table-condensed" style="font-size:12px;">
                 <thead>
                 <tr>
+                    <td><input type="checkbox" id="checkAll"/>全选</td>
                     <td>创建时间</td>
                     <td>Deal来源网站</td>
                     <td>Deal图片</td>
@@ -100,6 +128,7 @@
                 <tbody>
                 <c:forEach items="${datas}" var="data">
                     <tr>
+                        <td><input type="checkbox" name="subBox" value="${data.id}"/></td>
                         <td>${data.createTime}</td>
                         <td>${data.website}</td>
                         <td>
@@ -117,9 +146,9 @@
                             <c:when test="${data.push == 'true'}">
                                  是
                             </c:when>
-                                <c:when test="${data.push == 'false'}">
-                                     否
-                                </c:when>
+                            <c:when test="${data.push == 'false'}">
+                                 否
+                            </c:when>
                             </c:choose>
                         </td>
 
@@ -138,7 +167,7 @@
 
 <script>
     $(function(){
-        $('#multiFile').change(function(e){
+        $('#multiFile').change(function(){
             $("#form").ajaxSubmit({
                 //定义返回JSON数据，还包括xml和script格式
                 dataType:'json',
@@ -170,11 +199,21 @@
             });
         });
 
+
+        //全选/全不选
+        $("#checkAll").click(function() {
+            $("input[name='subBox']:checkbox").prop("checked", this.checked);
+        });
+        var $subBox = $("input[name='subBox']");
+        $subBox.click(function(){
+            $("#checkAll").prop("checked",$subBox.length == $("input[name='subBox']:checked").length ? true : false);
+        });
+
     });
 
     function deleteById(url){
         $('#url').val(url);//给会话中的隐藏属性URL赋值
-        $('#delcfmModel').modal();
+        $('#deleteModel').modal();
     }
 
     function urlSubmit(){
@@ -192,8 +231,55 @@
                 $("#delete_fail").css("display", "block").hide(3000);
             }
         });
-
     }
+
+    function batchDelete(batchUrl){
+
+        var arr = new Array();
+        $("input[name='subBox']:checked").each(function(){
+            arr.push($(this).val());
+        });
+
+        if(arr.length == 0){
+            BootstrapDialog.show({
+                title: '提示',
+                message: '请选择要删除的记录!'
+            });
+
+            return false;
+        }
+
+        $('#batchUrl').val(batchUrl);//给会话中的隐藏属性URL赋值
+        $('#batchDeleteModel').modal();
+    }
+
+    function batchUrlSubmit(){
+        var url = $.trim($("#batchUrl").val());//获取会话中的隐藏属性URL
+
+        var arr = new Array();
+        $("input[name='subBox']:checked").each(function(){
+            arr.push($(this).val());
+        });
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: {"ids" : arr},
+            dataType: "json",
+            contentType : 'application/json;charset=utf-8', //设置请求头信息
+            success: function(result) {
+                if(result){
+                    $("#delete_success").css("display", "block").hide(3000);
+                    window.location.reload();
+                }
+            },
+            error: function(xhr, textStatus, errorThrown){
+                $("#delete_fail").css("display", "block").hide(3000);
+            }
+        });
+    }
+
+
 
 </script>
 <jsp:include page="../include/footer.jsp"/>
