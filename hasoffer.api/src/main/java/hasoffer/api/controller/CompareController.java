@@ -191,7 +191,7 @@ public class CompareController {
         }
 
         String logId = HexDigestUtil.md5(q + "-" + sio.getCliSite().name()); // 这个值作为log表的id
-        SrmSearchLog srmSearchLog = searchLogCacheManager.findSrmSearchLog(logId);
+        SrmSearchLog srmSearchLog = searchLogCacheManager.findSrmSearchLog(logId, true);
 
         if (srmSearchLog == null) {
             sio.setFirstSearch(true);

@@ -53,7 +53,7 @@ public class SearchLogCacheManager {
         return searchLog;
     }
 
-    public SrmSearchLog findSrmSearchLog(String logId) {
+    public SrmSearchLog findSrmSearchLog(String logId, boolean addCount) {
         String key = CACHE_KEY_PRE + logId;
 
         SrmSearchLog searchLog = cacheService.get(SrmSearchLog.class, key, 0);
@@ -72,7 +72,9 @@ public class SearchLogCacheManager {
                 cacheService.add(key, searchLog, CACHE_EXPIRE_TIME);
             }
 
-            countSearchedProduct(searchLog.getPtmProductId());
+            if (addCount) {
+                countSearchedProduct(searchLog.getPtmProductId());
+            }
         }
 
         return searchLog;

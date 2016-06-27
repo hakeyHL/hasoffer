@@ -45,6 +45,8 @@ import java.util.*;
 @Controller
 @RequestMapping(value = "/cmp")
 public class Compare2Controller {
+    private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
+
     @Resource
     CmpskuIndexServiceImpl cmpskuIndexService;
     @Resource
@@ -57,9 +59,10 @@ public class Compare2Controller {
     CmpSkuCacheManager cmpSkuCacheManager;
     @Resource
     SearchLogCacheManager searchLogCacheManager;
+
     @Resource
     ISearchService searchService;
-    private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
+
 
     // @Cacheable(value = "compare", key = "'getcmpskus_'+#q+'_'+#site+'_'+#price+'_'+#page+'_'+#size")
     // Model And View 不是可序列化的 会抛出  java.io.NotSerializableException 异常
@@ -126,10 +129,10 @@ public class Compare2Controller {
         PtmCmpSkuIndex2 cmpSkuIndex = null;
         try {
             if (Website.FLIPKART.equals(sio.getCliSite())
-                   || Website.SNAPDEAL.equals(sio.getCliSite())
-                   || Website.SHOPCLUES.equals(sio.getCliSite())) {
-               // match sku
-               cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
+                    || Website.SNAPDEAL.equals(sio.getCliSite())
+                    || Website.SHOPCLUES.equals(sio.getCliSite())) {
+                // match sku
+                cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
             }
             getSioBySearch(sio);
             cr = getCmpProducts(sio, cmpSkuIndex);
@@ -142,7 +145,7 @@ public class Compare2Controller {
         SearchHelper.addToLog(sio);
 
         ModelAndView mav = new ModelAndView();
-        mav.addObject("data",cr);
+        mav.addObject("data", cr);
         logger.debug(sio.toString());
 
         return mav;
@@ -253,7 +256,7 @@ public class Compare2Controller {
         String q = sio.getCliQ();
 
         String logId = HexDigestUtil.md5(q + "-" + sio.getCliSite().name()); // 这个值作为log表的id
-        SrmSearchLog srmSearchLog = searchLogCacheManager.findSrmSearchLog(logId);
+        SrmSearchLog srmSearchLog = searchLogCacheManager.findSrmSearchLog(logId,true);
 
         if (srmSearchLog != null
                 && (srmSearchLog.getPrecise() == SearchPrecise.TIMERSET2
@@ -463,7 +466,7 @@ public class Compare2Controller {
                 //无匹配对象
                 // 如果比价列表中没有找到该网站的 sku， 则把客户端传上来的商品返回
                 //
-                comparedSkuVos.add(new CmpProductListVo());
+                comparedSkuVos.add(new CmpProductListVo(clientCmpSku, WebsiteHelper.getLogoUrl(clientCmpSku.getWebsite())));
             }
 
             // 获取vo list
@@ -474,17 +477,20 @@ public class Compare2Controller {
                     continue;
                 }
                 // 忽略前台返回的价格
-                CmpProductListVo cplv = new CmpProductListVo(cmpSku);
-                cplv.setTotalRatingsNum(Long.valueOf(1000));
+                CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
+                cplv.setPrice(cmpSku.getPrice());
+                cplv.setTotalRatingsNum(Long.valueOf(cmpSku.getRating() == null ? "0" : cmpSku.getRating()));
                 cplv.setRatingNum(5);
-                cplv.setBackRate(3.3f);
-                cplv.setCoins(22L);
+                cplv.setBackRate(0.015f);
+                cplv.setCoins(Math.round(0.015 * cmpSku.getPrice()));
                 cplv.setFreight(20);
-                cplv.setImage("");
+                cplv.setImage(WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
                 cplv.setReturnGuarantee(10);
                 cplv.setSupport(Arrays.asList("COD"));
                 cplv.setFreight(10);
                 cplv.setDistributionTime(2);
+                cplv.setDeepLinkUrl(WebsiteHelper.getUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
+                cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                 comparedSkuVos.add(cplv);
             }
             if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {
@@ -508,26 +514,13 @@ public class Compare2Controller {
             throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
         }
         sio.setHsSkuId(cmpSkuId);
-        String currentDeeplink = "";
-        if (cmpSkuIndex != null && cmpSkuIndex.getId() > 0) {
-            PtmCmpSku cmpSku = cmpSkuCacheManager.getCmpSkuById(cmpSkuIndex.getId());
-            if (cmpSku.getWebsite().equals(sio.getCliSite())) {
-                currentDeeplink = WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
-            }
-        } else if (clientCmpSku != null) {
-            if (!cmpSkuCacheManager.isFlowControlled(sio.getDeviceId(), sio.getCliSite())) {
-                if (StringUtils.isEqual(clientCmpSku.getSkuTitle(), sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
-                    currentDeeplink = WebsiteHelper.getDeeplinkWithAff(clientCmpSku.getWebsite(), clientCmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
-                }
-            }
-        }
-        String imageUrl = productCacheManager.getProductMasterImageUrl(sio.getHsProId());//productService.getProductMasterImageUrl(sio.getHsProId());
+        String imageUrl = productCacheManager.getProductMasterImageUrl(sio.getHsProId());
         CmpResult cmpResult = new CmpResult();
-        cmpResult.setImages(new String[]{"http://pic95.nipic.com/file/20160420/20511871_130248344000_2.jpg", "http://pic96.nipic.com/file/20160423/20511871_234151961000_2.jpg"});
+        cmpResult.setImage(imageUrl);
         cmpResult.setName(sio.getCliQ());
         PageableResult<CmpProductListVo> priceList = new PageableResult<CmpProductListVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize());
         cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
-        cmpResult.setPriceList(priceList);
+        cmpResult.setPriceList(priceList.getData());
         cmpResult.setRatingNum(Long.valueOf(clientCmpSku.getRating()));
         cmpResult.setSpecs("{\n" +
                 "            \"Service Provider\": \"not specilfied\",\n" +
@@ -543,12 +536,5 @@ public class Compare2Controller {
             return;
         }
         comparedSkuVos.add(comparedSkuVo);
-    }
-
-    private void addVo(List<CmpProductListVo> list, CmpProductListVo cmpProductListVo) {
-        if (cmpProductListVo == null || cmpProductListVo.getPrice() <= 0) {
-            return;
-        }
-        list.add(cmpProductListVo);
     }
 }
