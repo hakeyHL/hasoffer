@@ -1,14 +1,13 @@
-package hasoffer.core.persistence.mongo;
+package hasoffer.core.persistence.aws;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMarshalling;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
-import hasoffer.core.persistence.dbm.mongo.converter.SkuStatusTypeConverter;
-import hasoffer.core.persistence.dbm.mongo.converter.WebsiteTypeConverter;
+import hasoffer.core.persistence.dbm.aws.converter.SkuStatusTypeConverter;
+import hasoffer.core.persistence.dbm.aws.converter.WebsiteTypeConverter;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import org.springframework.data.annotation.PersistenceConstructor;
 
@@ -41,7 +40,6 @@ public class AwsSummaryProduct {
     private long lCreateTime;
     private Date createTime;
 
-    @DynamoDBRangeKey
     private long lUpdateTime;
     private Date updateTime;
 
