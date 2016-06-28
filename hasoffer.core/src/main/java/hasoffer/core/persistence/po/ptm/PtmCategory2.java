@@ -18,7 +18,7 @@ public class PtmCategory2 implements Identifiable<Long> {
     private int level;
     private int rank;
 
-    private String name;//name不能重复
+    private String name;
     private String imageUrl;
 
     private String keyword;
