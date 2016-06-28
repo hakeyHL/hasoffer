@@ -25,7 +25,6 @@ import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
-import hasoffer.core.utils.ImageServerUtil;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
@@ -43,7 +42,6 @@ import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
