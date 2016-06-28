@@ -29,10 +29,12 @@ public class DynamodbTest {
     IDataBaseManager dbm;
 
     @Test
-    public void testCount() {
-        String queryStr = "1 = 1";
+    public void testCount2() {
+        String queryStr = "id > :v1 and price < :v2";
 
         List params = new ArrayList();
+        params.add(32);
+        params.add(8090);
 
         long count = awsDynamoDbService.count(AwsSummaryProduct.class, queryStr, params);
 
@@ -40,9 +42,16 @@ public class DynamodbTest {
     }
 
     @Test
+    public void testCount() {
+        long count = awsDynamoDbService.count(AwsSummaryProduct.class);
+
+        System.out.println(count);
+    }
+
+    @Test
     public void testQuery() {
 
-        String queryStr = " id = :val1 and price > :val2 ";
+        String queryStr = " id > :v1 and price > :v2 ";
 
         List params = new ArrayList();
         params.add(20);
@@ -51,7 +60,7 @@ public class DynamodbTest {
         long count = awsDynamoDbService.count(AwsSummaryProduct.class, queryStr, params);
         System.out.println(count);
 
-        PageableResult<AwsSummaryProduct> pageableResult = awsDynamoDbService.scanPage(AwsSummaryProduct.class, queryStr, params, 1, 1);
+        PageableResult<AwsSummaryProduct> pageableResult = awsDynamoDbService.scan(AwsSummaryProduct.class, queryStr, params);
 
         System.out.println(pageableResult.getNumFund());
         for (AwsSummaryProduct asp : pageableResult.getData()) {
@@ -68,7 +77,7 @@ public class DynamodbTest {
         params.add(20);
         params.add(Website.FLIPKART.name());
 
-        PageableResult<AwsSummaryProduct> pageableResult = awsDynamoDbService.queryPage(AwsSummaryProduct.class, queryStr, params, 1, 1);
+        PageableResult<AwsSummaryProduct> pageableResult = awsDynamoDbService.scan(AwsSummaryProduct.class, queryStr, params);
 
         System.out.println(pageableResult.getNumFund());
         for (AwsSummaryProduct asp : pageableResult.getData()) {
@@ -128,14 +137,8 @@ public class DynamodbTest {
             AwsSummaryProduct awsSummaryProduct = new AwsSummaryProduct(cmpSku);
             awsSummaryProducts.add(awsSummaryProduct);
 
-//            awsDynamoDbService.save(awsSummaryProduct);
+            awsDynamoDbService.save(awsSummaryProduct);
 
         }
-
-        awsSummaryProducts1 = awsSummaryProducts.toArray(awsSummaryProducts1);
-
-        awsDynamoDbService.save(awsSummaryProducts1);
-
-//        awsDynamoDbService.save(awsSummaryProducts.toArray(new AwsSummaryProduct[0]));
     }
 }

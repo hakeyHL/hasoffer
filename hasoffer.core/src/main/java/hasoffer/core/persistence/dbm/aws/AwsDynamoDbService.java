@@ -3,7 +3,10 @@ package hasoffer.core.persistence.dbm.aws;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
-import com.amazonaws.services.dynamodbv2.datamodeling.*;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDB;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
+import com.amazonaws.services.dynamodbv2.datamodeling.ScanResultPage;
 import com.amazonaws.services.dynamodbv2.model.*;
 import hasoffer.base.model.PageableResult;
 
@@ -93,9 +96,10 @@ public class AwsDynamoDbService {
         getMapper().save(t);
     }
 
-    public <T> void save(T... ts) {
-        getMapper().save(ts);
-    }
+    // 不是简单的保存整个数组，数组本身要定义为DynamoDBTable
+//    public <T> void save(T... ts) {
+//        getMapper().save(ts);
+//    }
 
     private Map<String, AttributeValue> getParamMap(List<Object> params) {
         Map<String, AttributeValue> eav = new HashMap<String, AttributeValue>();
@@ -114,41 +118,31 @@ public class AwsDynamoDbService {
         return eav;
     }
 
+    public <T> long count(Class<T> clazz) {
+
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+
+        return getMapper().count(clazz, scanExpression);
+    }
+
     public <T> long count(Class<T> clazz, String expressionStr, List<Object> params) {
-
-        Map<String, AttributeValue> eav = getParamMap(params);
-
-//        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
-//                .withFilterExpression(expressionStr)
-//                .withExpressionAttributeValues(eav);
-
-        DynamoDBQueryExpression queryExpression = new DynamoDBQueryExpression()
-                .withFilterExpression(expressionStr)
-                .withExpressionAttributeValues(eav);
-
-        return getMapper().count(clazz, queryExpression);
-    }
-
-    public <T> PageableResult<T> queryPage(Class<T> clazz, String expressionStr, List<Object> params, int page, int size) {
-
-        Map<String, AttributeValue> eav = getParamMap(params);
-
-        DynamoDBQueryExpression queryExpression = new DynamoDBQueryExpression()
-                .withFilterExpression(expressionStr)
-                .withExpressionAttributeValues(eav);
-
-        QueryResultPage<T> resultPage = getMapper().queryPage(clazz, queryExpression);
-
-        return new PageableResult<T>(resultPage.getResults(), resultPage.getCount(), 1, 1);
-    }
-
-    public <T> PageableResult<T> scanPage(Class<T> clazz, String expressionStr, List<Object> params, int page, int size) {
 
         Map<String, AttributeValue> eav = getParamMap(params);
 
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
                 .withFilterExpression(expressionStr)
                 .withExpressionAttributeValues(eav);
+
+        return getMapper().count(clazz, scanExpression);
+    }
+
+    public <T> PageableResult<T> scan(Class<T> clazz, String expressionStr, List<Object> params) {
+
+        Map<String, AttributeValue> eav = getParamMap(params);
+
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
+                .withFilterExpression(expressionStr)
+                .withExpressionAttributeValues(eav).withLimit(1000);
 
         ScanResultPage<T> resultPage = getMapper().scanPage(clazz, scanExpression);
 
