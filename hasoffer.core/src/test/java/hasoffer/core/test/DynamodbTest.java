@@ -2,10 +2,11 @@ package hasoffer.core.test;
 
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
-import hasoffer.core.persistence.dbm.mongo.AWSMongoDbManager;
+import hasoffer.core.persistence.aws.AwsSummaryProduct;
+import hasoffer.core.persistence.dbm.aws.AwsDynamoDbService;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.mongo.AwsSummaryProduct;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.task.worker.IProcess;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -23,18 +24,27 @@ import java.util.List;
 @ContextConfiguration(locations = "classpath:spring-beans.xml")
 public class DynamodbTest {
 
-    AWSMongoDbManager awsMongoDbManager = new AWSMongoDbManager();
+    AwsDynamoDbService awsDynamoDbService = new AwsDynamoDbService();
 
     @Resource
     IDataBaseManager dbm;
 
     @Test
-    public void testCount() {
-        String queryStr = "1 = 1";
+    public void testCount2() {
+        String queryStr = "id > :v1 and price < :v2";
 
         List params = new ArrayList();
+        params.add(32);
+        params.add(8090);
 
-        long count = awsMongoDbManager.count(AwsSummaryProduct.class, queryStr, params);
+        long count = awsDynamoDbService.count(AwsSummaryProduct.class, queryStr, params);
+
+        System.out.println(count);
+    }
+
+    @Test
+    public void testCount() {
+        long count = awsDynamoDbService.count(AwsSummaryProduct.class);
 
         System.out.println(count);
     }
@@ -42,16 +52,16 @@ public class DynamodbTest {
     @Test
     public void testQuery() {
 
-        String queryStr = " id = :val1 and price > :val2 ";
+        String queryStr = " id > :v1 and price > :v2 ";
 
         List params = new ArrayList();
         params.add(20);
         params.add(500);
 
-        long count = awsMongoDbManager.count(AwsSummaryProduct.class, queryStr, params);
+        long count = awsDynamoDbService.count(AwsSummaryProduct.class, queryStr, params);
         System.out.println(count);
 
-        PageableResult<AwsSummaryProduct> pageableResult = awsMongoDbManager.scanPage(AwsSummaryProduct.class, queryStr, params, 1, 1);
+        PageableResult<AwsSummaryProduct> pageableResult = awsDynamoDbService.scan(AwsSummaryProduct.class, queryStr, params);
 
         System.out.println(pageableResult.getNumFund());
         for (AwsSummaryProduct asp : pageableResult.getData()) {
@@ -68,7 +78,7 @@ public class DynamodbTest {
         params.add(20);
         params.add(Website.FLIPKART.name());
 
-        PageableResult<AwsSummaryProduct> pageableResult = awsMongoDbManager.queryPage(AwsSummaryProduct.class, queryStr, params, 1, 1);
+        PageableResult<AwsSummaryProduct> pageableResult = awsDynamoDbService.scan(AwsSummaryProduct.class, queryStr, params);
 
         System.out.println(pageableResult.getNumFund());
         for (AwsSummaryProduct asp : pageableResult.getData()) {
@@ -77,23 +87,40 @@ public class DynamodbTest {
     }
 
     @Test
+    public void testQuery2() {
+
+        String queryStr = "id > :v1 and website = :v2";
+
+        List params = new ArrayList();
+        params.add(20);
+        params.add(Website.FLIPKART.name());
+
+        awsDynamoDbService.scanAll(AwsSummaryProduct.class, queryStr, params, new IProcess<AwsSummaryProduct>() {
+            @Override
+            public void process(AwsSummaryProduct asp) {
+                System.out.println(asp.getId() + "\t" + asp.getPrice());
+            }
+        });
+    }
+
+    @Test
     public void testDel() {
-        awsMongoDbManager.deleteTable(AwsSummaryProduct.class);
+        awsDynamoDbService.deleteTable(AwsSummaryProduct.class);
     }
 
     @Test
     public void testUpdate() {
-        awsMongoDbManager.updateTable(AwsSummaryProduct.class, 10, 10);
+        awsDynamoDbService.updateTable(AwsSummaryProduct.class, 10, 10);
     }
 
     @Test
     public void testCreate() {
-        awsMongoDbManager.createTable(AwsSummaryProduct.class);
+        awsDynamoDbService.createTable(AwsSummaryProduct.class);
 //
-//        System.out.println(awsMongoDbManager.descTable(AwsSummaryProduct.class));
+//        System.out.println(awsDynamoDbService.descTable(AwsSummaryProduct.class));
 
         System.out.println("show tables...");
-        List<String> tableNames = awsMongoDbManager.listTables();
+        List<String> tableNames = awsDynamoDbService.listTables();
         for (String tname : tableNames) {
             System.out.println(tname);
         }
@@ -101,13 +128,13 @@ public class DynamodbTest {
 
     @Test
     public void testLoad() {
-        AwsSummaryProduct asp = awsMongoDbManager.queryOne(AwsSummaryProduct.class, 4L);
+        AwsSummaryProduct asp = awsDynamoDbService.get(AwsSummaryProduct.class, 1163);
         System.out.println(asp.toString());
     }
 
     @Test
     public void test2() {
-        List<String> tableNames = awsMongoDbManager.listTables();
+        List<String> tableNames = awsDynamoDbService.listTables();
         for (String tname : tableNames) {
             System.out.println(tname);
         }
@@ -117,18 +144,19 @@ public class DynamodbTest {
     public void init_datas() {
         String sql = "select t from PtmCmpSku t";
 
-        List<PtmCmpSku> cmpskus = dbm.query(sql, 1, 2000);
+        List<PtmCmpSku> cmpskus = dbm.query(sql, 2, 2000);
 
         List<AwsSummaryProduct> awsSummaryProducts = new ArrayList<AwsSummaryProduct>();
+
+        AwsSummaryProduct[] awsSummaryProducts1 = new AwsSummaryProduct[0];
 
         for (PtmCmpSku cmpSku : cmpskus) {
             System.out.println(cmpSku.toString());
             AwsSummaryProduct awsSummaryProduct = new AwsSummaryProduct(cmpSku);
             awsSummaryProducts.add(awsSummaryProduct);
 
-            awsMongoDbManager.save(awsSummaryProduct);
-        }
+            awsDynamoDbService.save(awsSummaryProduct);
 
-//        awsMongoDbManager.save(awsSummaryProducts.toArray(new AwsSummaryProduct[0]));
+        }
     }
 }

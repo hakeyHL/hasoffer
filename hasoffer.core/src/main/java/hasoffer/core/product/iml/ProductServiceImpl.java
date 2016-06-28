@@ -65,6 +65,10 @@ public class ProductServiceImpl implements IProductService {
             "SELECT t FROM PtmBasicAttribute t " +
                     " WHERE t.productId = ?0 ";
 
+    private static final String Q_PTM_GETTOPPRODUCTS =
+            "SELECT t from PtmProduct t where t.id in (SELECT srm.productId from SrmSearchCount srm " +
+                    " where srm.ymd=?0 ORDER BY srm.count DESC)";
+
     private final static String CACHE_KEY = "product";
     @Resource
     ProductIndexServiceImpl productIndexService;
@@ -237,6 +241,11 @@ public class ProductServiceImpl implements IProductService {
         }
 
         return products;
+    }
+
+    @Override
+    public List<PtmProduct> getTopSellingProductsByDate(String date,int page,int size) {
+        return dbm.query(Q_PTM_GETTOPPRODUCTS,page,size,Arrays.asList(date));
     }
 
     @Override

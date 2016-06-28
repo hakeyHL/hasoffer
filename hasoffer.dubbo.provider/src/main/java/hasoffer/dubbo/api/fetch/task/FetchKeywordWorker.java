@@ -34,24 +34,26 @@ public class FetchKeywordWorker implements Runnable {
     @Override
     public void run() {
         while (true) {
+            Object pop = fetchCacheService.popKeyword(StringConstant.WAIT_KEY_LIST);
             try {
-                logger.info("FetchKeywordWorker is alive at {} ", new Date());
-                Object pop = fetchCacheService.popKeyword(StringConstant.WAIT_KEY_LIST);
+                logger.info("FetchKeywordWorker at {} , pop word: {}", new Date(), pop);
                 if (pop == null) {
                     TimeUnit.SECONDS.sleep(60);
                 } else {
                     FetchResult fetchResult = JSONUtil.toObject(pop.toString(), FetchResult.class);
                     fetch(fetchResult);
-                    fetchCacheService.cacheResult(FetchResult.getCacheKey(fetchResult), fetchResult);
                 }
             } catch (Exception e) {
-                logger.error("FetchKeywordWorker is error. Error Msg: {}", e.getMessage());
+                logger.error("FetchKeywordWorker is error. pop word: {}", pop);
+                logger.error("Error Msg: {}", e.getMessage());
             }
         }
     }
 
     public void fetch(FetchResult fetchResult) {
         //Website website = fetchResult.getWebsite();
+        fetchResult.setTaskStatus(TaskStatus.RUNNING);
+        fetchCacheService.cacheResult(FetchResult.getCacheKey(fetchResult), fetchResult);
         String keyword = fetchResult.getKeyword();
         try {
             List<FetchedProduct> productList = fetchService.getProductSetByKeyword(fetchResult.getWebsite(), keyword, 10);
@@ -75,6 +77,7 @@ public class FetchKeywordWorker implements Runnable {
             fetchResult.setErrMsg("The website is not support.");
             logger.error(e.getMessage());
         }
+        fetchCacheService.cacheResult(FetchResult.getCacheKey(fetchResult), fetchResult);
     }
 
 }
