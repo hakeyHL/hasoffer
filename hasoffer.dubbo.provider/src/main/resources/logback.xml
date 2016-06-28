@@ -2,7 +2,7 @@
 
 <configuration>
 
-    <substitutionProperty name="log.base" value="${user.home}/logs/dubbo_provider"/>
+    <substitutionProperty name="log.base" value="${user.home}/logs/fetch-logs"/>
 
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
