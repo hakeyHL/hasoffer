@@ -2,14 +2,15 @@ package hasoffer.core.test;
 
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
-import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.enums.IndexStat;
-import hasoffer.core.persistence.mongo.*;
+import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
+import hasoffer.core.persistence.mongo.StatHijackFetch;
+import hasoffer.core.persistence.mongo.UrmDeviceBuyLog;
+import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.user.IDeviceService;
-import jodd.io.FileUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.data.domain.Sort;
@@ -20,7 +21,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
-import java.io.File;
 import java.util.Date;
 import java.util.List;
 
@@ -38,7 +38,7 @@ public class MongoTest {
 
     @Test
     public void expWords() {
-        StringBuffer sb = new StringBuffer();
+        /*StringBuffer sb = new StringBuffer();
 
         File file = new File(String.format("d:/TMP/words_1_%d.csv", 0));
 
@@ -72,47 +72,7 @@ public class MongoTest {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    @Test
-    public void testSave() {
-        SummaryProduct sp = new SummaryProduct();
-        mdm.save(sp);
-    }
-
-    @Test
-    public void testGet() {
-
-        List<SummaryProduct> query = mdm.query(SummaryProduct.class, new Query(Criteria.where("website").is("SHOPCLUES")));
-
-        for (SummaryProduct sp : query) {
-            String subTitle = sp.getSubTitle();
-            System.out.print(subTitle);
-        }
-
-
-    }
-
-    @Test
-    public void test() {
-
-        Query query = new Query(Criteria.where("longUpdateTime").gt(TimeUtils.today() - 24 * 60 * 60 * 1000));
-        query.with(new Sort(Sort.Direction.ASC, "longUpdateTime"));
-
-        PageableResult<PtmCmpSkuFetchResult> pageableResult = mdm.queryPage(PtmCmpSkuFetchResult.class, query, 1, 1000);
-
-        System.out.println(pageableResult);
-    }
-
-    @Test
-    public void testUpdate1() {
-//        PtmCmpSkuFetchResult r = new PtmCmpSkuFetchResult(100L, "333");
-//        mdm.save(r);
-        Update update = new Update();
-        update.set("url", "111");
-        int count = mdm.update(PtmCmpSkuFetchResult.class, 100, update);
-        System.out.println(count);
+        }*/
     }
 
     @Test
@@ -213,7 +173,7 @@ public class MongoTest {
     }
 
     @Test
-    public void find4(){
+    public void find4() {
 
         StatHijackFetch fetch = mdm.queryOne(StatHijackFetch.class, "aifhawofheowajfeafw");
         System.out.println();
@@ -221,7 +181,7 @@ public class MongoTest {
     }
 
     @Test
-    public void createTimeSave(){
+    public void createTimeSave() {
 
         StatHijackFetch statHijackFetch = mdm.queryOne(StatHijackFetch.class, "2198d324acebf2a0490dd0023559de6e");
 
@@ -233,7 +193,7 @@ public class MongoTest {
         long lCreateTime = TimeUtils.now();
         IndexStat status = IndexStat.DIFFERENT_URL;
 
-        statHijackFetch = new StatHijackFetch(id,website,sourceId,cliQ,createTime,lCreateTime,status,null);
+        statHijackFetch = new StatHijackFetch(id, website, sourceId, cliQ, createTime, lCreateTime, status, null);
 
         mdm.save(statHijackFetch);
 

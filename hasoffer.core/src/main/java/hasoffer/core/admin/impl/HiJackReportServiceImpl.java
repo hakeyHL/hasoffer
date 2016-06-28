@@ -7,7 +7,6 @@ import hasoffer.core.admin.IHiJackReportService;
 import hasoffer.core.persistence.dbm.HibernateDao;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.mongo.PtmCmpSkuIndexSearchLog;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
 import hasoffer.core.persistence.po.admin.HiJackReportPo;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -16,15 +15,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
 public class HiJackReportServiceImpl implements IHiJackReportService {
 
-//SELECT webSite, DATE_FORMAT(calStartTime, '%y-%m-%d') AS calStartTime, SUM(pricelistCount) AS pricelistCount, SUM(rediToAffiliateUrlCount) AS rediToAffiliateUrlCount, SUM(captureMultipleSuccess) AS captureMultipleSuccess, SUM(captureSingleSuccess) as captureSingleSuccess, SUM(deeplinkCount) as deeplinkCount, SUM(deeplinkDoubleCount) as deeplinkDoubleCount, SUM(deeplinkNullCount) as deeplinkNullCount FROM report_hijack GROUP BY webSite, DATE_FORMAT(calStartTime, '%y-%m-%d')
+    //SELECT webSite, DATE_FORMAT(calStartTime, '%y-%m-%d') AS calStartTime, SUM(pricelistCount) AS pricelistCount, SUM(rediToAffiliateUrlCount) AS rediToAffiliateUrlCount, SUM(captureMultipleSuccess) AS captureMultipleSuccess, SUM(captureSingleSuccess) as captureSingleSuccess, SUM(deeplinkCount) as deeplinkCount, SUM(deeplinkDoubleCount) as deeplinkDoubleCount, SUM(deeplinkNullCount) as deeplinkNullCount FROM report_hijack GROUP BY webSite, DATE_FORMAT(calStartTime, '%y-%m-%d')
     private static final String Q_BY_DATE_WEBSITE =
-        "SELECT webSite, DATE_FORMAT(calStartTime, '%Y-%m-%d') AS calStartTime, SUM(cmpSkuCount) as cmpSkuCount, SUM(pricelistCount) AS pricelistCount, SUM(rediToAffiliateUrlCount) AS rediToAffiliateUrlCount, SUM(captureFail) as captureFail,SUM(captureMultipleSuccess) AS captureMultipleSuccess, SUM(captureSingleSuccess) as captureSingleSuccess, SUM(deeplinkCount) as deeplinkCount, SUM(deeplinkDoubleCount) as deeplinkDoubleCount, SUM(deeplinkNullCount) as deeplinkNullCount, SUM(deeplinkExceptionCount) as deeplinkExceptionCount FROM report_hijack  WHERE calStartTime >= ? and calEndTime<?  AND webSite = ?  GROUP BY webSite, DATE_FORMAT(calStartTime, '%Y-%m-%d')";
+            "SELECT webSite, DATE_FORMAT(calStartTime, '%Y-%m-%d') AS calStartTime, SUM(cmpSkuCount) as cmpSkuCount, SUM(pricelistCount) AS pricelistCount, SUM(rediToAffiliateUrlCount) AS rediToAffiliateUrlCount, SUM(captureFail) as captureFail,SUM(captureMultipleSuccess) AS captureMultipleSuccess, SUM(captureSingleSuccess) as captureSingleSuccess, SUM(deeplinkCount) as deeplinkCount, SUM(deeplinkDoubleCount) as deeplinkDoubleCount, SUM(deeplinkNullCount) as deeplinkNullCount, SUM(deeplinkExceptionCount) as deeplinkExceptionCount FROM report_hijack  WHERE calStartTime >= ? and calEndTime<?  AND webSite = ?  GROUP BY webSite, DATE_FORMAT(calStartTime, '%Y-%m-%d')";
 
     private static final String Q_BY_DATE =
             "SELECT webSite, DATE_FORMAT(calStartTime, '%Y-%m-%d') AS calStartTime, SUM(cmpSkuCount) as cmpSkuCount, SUM(pricelistCount) AS pricelistCount, SUM(rediToAffiliateUrlCount) AS rediToAffiliateUrlCount,SUM(captureFail) as captureFail, SUM(captureMultipleSuccess) AS captureMultipleSuccess, SUM(captureSingleSuccess) as captureSingleSuccess, SUM(deeplinkCount) as deeplinkCount, SUM(deeplinkDoubleCount) as deeplinkDoubleCount, SUM(deeplinkNullCount) as deeplinkNullCount, SUM(deeplinkExceptionCount) as deeplinkExceptionCount FROM report_hijack  WHERE calStartTime >= ? and calEndTime<? GROUP BY webSite, DATE_FORMAT(calStartTime, '%Y-%m-%d')";
@@ -71,20 +72,20 @@ public class HiJackReportServiceImpl implements IHiJackReportService {
 
     @Override
     public PageableResult<Map<String, Object>> selectPageableResult(String webSite, Date startYmd, Date endYmd, int page, int size) {
-        PageableResult<Map<String, Object>> resultMap ;
+        PageableResult<Map<String, Object>> resultMap;
         endYmd = TimeUtils.addDay(endYmd, 1);
-        if (webSite == null ||"ALL".equals(webSite) ||"".equals(webSite)) {
+        if (webSite == null || "ALL".equals(webSite) || "".equals(webSite)) {
             resultMap = hdao.findPageOfMapBySql(Q_BY_DATE, page, size, startYmd, endYmd);
         } else {
             resultMap = hdao.findPageOfMapBySql(Q_BY_DATE_WEBSITE, page, size, startYmd, endYmd, webSite);
         }
 
-       return resultMap;
+        return resultMap;
     }
 
     @Override
     public void countHiJack(Date startTime, Date endTime) throws Exception {
-        try {
+        /*try {
 
 
             Map<String, HiJackReportPo> jackReportMap = new HashMap<String, HiJackReportPo>();
@@ -113,7 +114,7 @@ public class HiJackReportServiceImpl implements IHiJackReportService {
             }
         } catch (Exception e) {
             throw new Exception(e);
-        }
+        }*/
     }
 
     private void countCmpSkuList(Map<String, HiJackReportPo> jackReportMap, Date startTime, Date endTime) {
@@ -147,6 +148,7 @@ public class HiJackReportServiceImpl implements IHiJackReportService {
 
     /**
      * 查询小球点击次数
+     *
      * @param countPriceMap
      */
     private void countPriceList(Map<String, HiJackReportPo> countPriceMap, Date startTime, Date endTime) {
@@ -204,7 +206,7 @@ public class HiJackReportServiceImpl implements IHiJackReportService {
     /**
      * 查询劫持失败次数，未收录失败次数，重复失败次数
      */
-    private void countFail(Map<String, HiJackReportPo> countPriceMap, Date startTime, Date endTime) {
+    /*private void countFail(Map<String, HiJackReportPo> countPriceMap, Date startTime, Date endTime) {
         Query query = new Query();
         query.addCriteria(Criteria.where("createTime").gte(startTime).lt(endTime));
         query.addCriteria(Criteria.where("errorMsg").in("no index.","different urls.","no url."));
@@ -231,5 +233,5 @@ public class HiJackReportServiceImpl implements IHiJackReportService {
             }
             temp.setDeeplinkCount(temp.getDeeplinkCount() + 1);
         }
-    }
+    }*/
 }
