@@ -41,6 +41,8 @@ public interface IProductService {
 
     List<PtmProduct> getProducts(List<Long> proIds);
 
+    List<PtmProduct> getTopSellingProductsByDate(String date,int page,int size);
+
     List<String> getProductFeatures(long id);
 
     String getProductMasterImageUrl(Long id);
