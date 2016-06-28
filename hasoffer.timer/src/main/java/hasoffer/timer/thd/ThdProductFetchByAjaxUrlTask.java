@@ -17,7 +17,6 @@ import hasoffer.timer.thd.worker.ThdProductFetchByAjaxUrlWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -31,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created on 2016/2/25.
  */
-@Component
+//@Component
 public class ThdProductFetchByAjaxUrlTask {
 
     private final static String THDFETCHTASKS = "SELECT t FROM ThdFetchTask";

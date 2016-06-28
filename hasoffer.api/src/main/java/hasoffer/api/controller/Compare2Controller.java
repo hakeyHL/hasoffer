@@ -46,8 +46,6 @@ import java.util.*;
 @Controller
 @RequestMapping(value = "/cmp")
 public class Compare2Controller {
-    private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
-
     @Resource
     CmpskuIndexServiceImpl cmpskuIndexService;
     @Resource
@@ -60,13 +58,11 @@ public class Compare2Controller {
     CmpSkuCacheManager cmpSkuCacheManager;
     @Resource
     SearchLogCacheManager searchLogCacheManager;
-
     @Resource
     ISearchService searchService;
-
     @Resource
     ProductServiceImpl productService;
-
+    private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
 
     // @Cacheable(value = "compare", key = "'getcmpskus_'+#q+'_'+#site+'_'+#price+'_'+#page+'_'+#size")
     // Model And View 不是可序列化的 会抛出  java.io.NotSerializableException 异常
@@ -79,7 +75,7 @@ public class Compare2Controller {
                                    @RequestParam(defaultValue = "0") String price,
                                    @RequestParam(defaultValue = "1") int page,
                                    @RequestParam(defaultValue = "10") int size) {
-        System.out.println("getcmpskus is run.");
+//        System.out.println("getcmpskus is run.");
         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
 

@@ -37,7 +37,7 @@ public class FetchUrlWorker implements Runnable {
                 logger.info("FetchUrlWorker is alive at {}", new Date());
                 Object pop = fetchCacheService.popKeyword(StringConstant.WAIT_URL_LIST);
                 if (pop == null) {
-                    TimeUnit.SECONDS.sleep(60);
+                    TimeUnit.MINUTES.sleep(1);
                 } else {
                     FetchUrlResult fetchResult = JSONUtil.toObject(pop.toString(), FetchUrlResult.class);
                     fetch(fetchResult);

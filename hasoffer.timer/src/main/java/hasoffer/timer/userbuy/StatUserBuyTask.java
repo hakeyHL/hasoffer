@@ -13,7 +13,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -24,14 +23,12 @@ import java.util.Map;
 /**
  * Created on 2016/4/11.
  */
-@Component
+//@Component
 public class StatUserBuyTask {
-
-    private static Logger logger = LoggerFactory.getLogger(StatUserBuyTask.class);
 
     private static final String Q_MAX_LASTBUYTIME =
             "SELECT MAX(t.lastBuyTime) FROM StatUserBuy t ";
-
+    private static Logger logger = LoggerFactory.getLogger(StatUserBuyTask.class);
     @Resource
     IDataBaseManager dbm;
     @Resource

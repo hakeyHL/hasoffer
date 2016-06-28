@@ -1,13 +1,13 @@
 package hasoffer.core.product.iml;
 
 import hasoffer.base.exception.ImageDownloadOrUploadException;
+import hasoffer.base.model.ImagePath;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
-import hasoffer.core.bo.common.ImagePath;
 import hasoffer.core.bo.product.SkuPriceUpdateResultBo;
 import hasoffer.core.exception.CmpSkuUrlNotFoundException;
 import hasoffer.core.exception.MultiUrlException;

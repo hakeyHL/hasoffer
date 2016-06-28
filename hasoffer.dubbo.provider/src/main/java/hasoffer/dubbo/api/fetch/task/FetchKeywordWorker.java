@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -35,22 +36,31 @@ public class FetchKeywordWorker implements Runnable {
     public void run() {
         while (true) {
             Object pop = fetchCacheService.popKeyword(StringConstant.WAIT_KEY_LIST);
-            try {
-                logger.info("FetchKeywordWorker at {} , pop word: {}", new Date(), pop);
-                if (pop == null) {
-                    TimeUnit.SECONDS.sleep(60);
-                } else {
-                    FetchResult fetchResult = JSONUtil.toObject(pop.toString(), FetchResult.class);
-                    fetch(fetchResult);
+            if (pop == null) {
+                try {
+                    TimeUnit.MINUTES.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                logger.error("FetchKeywordWorker is error. pop word: {}", pop);
-                logger.error("Error Msg: {}", e.getMessage());
+            } else {
+                logger.info("FetchKeywordWorker at {} , pop word: {}", new Date(), pop);
+                FetchResult fetchResult = null;
+                try {
+                    fetchResult = JSONUtil.toObject(pop.toString(), FetchResult.class);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                fetch(fetchResult);
             }
+
+
         }
     }
 
     public void fetch(FetchResult fetchResult) {
+        if (fetchResult == null) {
+            return;
+        }
         //Website website = fetchResult.getWebsite();
         fetchResult.setTaskStatus(TaskStatus.RUNNING);
         fetchCacheService.cacheResult(FetchResult.getCacheKey(fetchResult), fetchResult);
@@ -65,17 +75,20 @@ public class FetchKeywordWorker implements Runnable {
                 fetchCacheService.saveKeyword(StringConstant.WAIT_KEY_LIST, JSONUtil.toJSON(fetchResult));
             } else {
                 fetchResult.setTaskStatus(TaskStatus.STOPPED);
-                fetchResult.setErrMsg("The task is be ran 5 times.");
+                fetchResult.setErrMsg("The task is failed: run over 5 times. ");
             }
             logger.error(e.getMessage());
         } catch (ContentParseException e) {
             fetchResult.setTaskStatus(TaskStatus.STOPPED);
-            fetchResult.setErrMsg("It is error.");
+            fetchResult.setErrMsg("The task is failed: content parse failed.");
             logger.error(e.getMessage());
         } catch (UnSupportWebsiteException e) {
             fetchResult.setTaskStatus(TaskStatus.STOPPED);
-            fetchResult.setErrMsg("The website is not support.");
+            fetchResult.setErrMsg("The task is failed: The website is not support.");
             logger.error(e.getMessage());
+        } catch (Exception e) {
+            fetchResult.setTaskStatus(TaskStatus.STOPPED);
+            fetchResult.setErrMsg("The task is failed: Other exception. " + e.toString());
         }
         fetchCacheService.cacheResult(FetchResult.getCacheKey(fetchResult), fetchResult);
     }
