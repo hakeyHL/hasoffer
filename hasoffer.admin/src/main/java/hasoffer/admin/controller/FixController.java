@@ -11,7 +11,6 @@ import hasoffer.base.utils.*;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.HijackLog;
-import hasoffer.core.persistence.mongo.PtmCmpSkuIndex;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
@@ -36,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -443,28 +441,6 @@ public class FixController {
 
         for (int i = 0; i < 10; i++) {
             es.execute(new FixSkuErrorInPriceWorker(idQueue, dbm));
-        }
-
-        return "ok";
-    }
-
-    //fixdata/fixflipkarttest
-    @RequestMapping(value = "/fixflipkarttest", method = RequestMethod.GET)
-    @ResponseBody
-    public String fixflipkarttest() {
-
-        Query query = new Query();
-
-        query.addCriteria(Criteria.where("skuTitle").is("Apple iPhone 5S(Space Grey, 32 GB)"));
-
-        List<PtmCmpSkuIndex> indexList = mdm.query(PtmCmpSkuIndex.class, query);
-
-        for (PtmCmpSkuIndex index : indexList) {
-
-            Update update = new Update();
-            update.set("url", "http://www.flipkart.com/apple-iphone-5s/p/itme8ms8gvttwhev?pid=MOBDPPZZXGKPFZN3");
-            mdm.update(PtmCmpSkuIndex.class, index.getId(), update);
-
         }
 
         return "ok";

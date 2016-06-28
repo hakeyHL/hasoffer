@@ -1,17 +1,12 @@
-import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.mongo.PtmCmpSkuFetchResult;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IFetchService;
 import hasoffer.fetch.model.OriFetchedProduct;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -35,17 +30,6 @@ public class TaskTest {
     ICmpSkuService cmpSkuService;
     @Resource
     IMongoDbManager mongoDbManager;
-
-    @Test
-    public void testMongoRead() {
-
-        Query query = new Query(Criteria.where("longUpdateTime").gt(TimeUtils.today() - 24 * 60 * 60 * 1000));
-        query.with(new Sort(Sort.Direction.ASC, "longUpdateTime"));
-
-        PageableResult<PtmCmpSkuFetchResult> pageableResult = mongoDbManager.queryPage(PtmCmpSkuFetchResult.class, query, 1, 1000);
-
-        System.out.println(pageableResult);
-    }
 
     @Test
     public void test2() {

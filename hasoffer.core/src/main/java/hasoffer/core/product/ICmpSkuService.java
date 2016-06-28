@@ -3,7 +3,6 @@ package hasoffer.core.product;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.core.bo.product.SkuPriceUpdateResultBo;
-import hasoffer.core.persistence.mongo.PtmCmpSkuIndex;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
@@ -21,8 +20,6 @@ import java.util.List;
 public interface ICmpSkuService {
 
     PtmCmpSku createCmpSkuForIndex(PtmCmpSku ptmCmpSku);
-
-    void createPtmCmpSkuIndexToMongo(PtmCmpSku ptmCmpSku);
 
     void createPtmCmpSkuIndexToMysql(PtmCmpSku ptmCmpsku);
 
@@ -73,10 +70,6 @@ public interface ICmpSkuService {
     void updateCmpSku(Long id, String newTitle);
 
     void fixUrls(long id, String url, String dl);
-
-    PtmCmpSkuIndex getCmpSkuIndex(Website website, String sourceId, String cliQ);
-
-    PtmCmpSkuIndex getCmpSkuIndex(String url);
 
     void updateCmpSku(PtmCmpSkuUpdater updater);
 
