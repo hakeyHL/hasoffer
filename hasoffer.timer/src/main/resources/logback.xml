@@ -146,7 +146,7 @@
     </logger>
 
     <!--code error log -->
-    <logger name="hasoffer" level="ERROR">
+    <logger name="hasoffer" level="DEBUG">
         <appender-ref ref="ErrorLoggerFileOut"/>
     </logger>
 
