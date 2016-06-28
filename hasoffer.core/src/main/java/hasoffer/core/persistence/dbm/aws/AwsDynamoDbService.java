@@ -142,7 +142,7 @@ public class AwsDynamoDbService {
 
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
                 .withFilterExpression(expressionStr)
-                .withExpressionAttributeValues(eav).withLimit(1000);
+                .withExpressionAttributeValues(eav);
 
         ScanResultPage<T> resultPage = getMapper().scanPage(clazz, scanExpression);
 
