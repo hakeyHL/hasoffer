@@ -146,4 +146,8 @@ public class ProductCacheManager {
     }
 
 
+    public List<PtmProduct> getTopSellingProductsByDate(String date, int page, int size) {
+
+        return productService.getTopSellingProductsByDate(date,page,size);
+    }
 }

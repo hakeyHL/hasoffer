@@ -1,6 +1,5 @@
 package hasoffer.core.test;
 
-import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.core.persistence.aws.AwsSummaryProduct;
 import hasoffer.core.persistence.dbm.aws.AwsDynamoDbService;
@@ -61,12 +60,12 @@ public class DynamodbTest {
         long count = awsDynamoDbService.count(AwsSummaryProduct.class, queryStr, params);
         System.out.println(count);
 
-        PageableResult<AwsSummaryProduct> pageableResult = awsDynamoDbService.scan(AwsSummaryProduct.class, queryStr, params);
-
-        System.out.println(pageableResult.getNumFund());
-        for (AwsSummaryProduct asp : pageableResult.getData()) {
-            System.out.println(asp.getId() + "\t" + asp.getWebsite() + "\t" + asp.getlCreateTime());
-        }
+//        PageableResult<AwsSummaryProduct> pageableResult = awsDynamoDbService.scan(AwsSummaryProduct.class, queryStr, params);
+//
+//        System.out.println(pageableResult.getNumFund());
+//        for (AwsSummaryProduct asp : pageableResult.getData()) {
+//            System.out.println(asp.getId() + "\t" + asp.getWebsite() + "\t" + asp.getlCreateTime());
+//        }
     }
 
     @Test
@@ -78,12 +77,12 @@ public class DynamodbTest {
         params.add(20);
         params.add(Website.FLIPKART.name());
 
-        PageableResult<AwsSummaryProduct> pageableResult = awsDynamoDbService.scan(AwsSummaryProduct.class, queryStr, params);
-
-        System.out.println(pageableResult.getNumFund());
-        for (AwsSummaryProduct asp : pageableResult.getData()) {
-            System.out.println(asp.getId() + "\t" + asp.getWebsite() + "\t" + asp.getlCreateTime());
-        }
+//        PageableResult<AwsSummaryProduct> pageableResult = awsDynamoDbService.scan(AwsSummaryProduct.class, queryStr, params);
+//
+//        System.out.println(pageableResult.getNumFund());
+//        for (AwsSummaryProduct asp : pageableResult.getData()) {
+//            System.out.println(asp.getId() + "\t" + asp.getWebsite() + "\t" + asp.getlCreateTime());
+//        }
     }
 
     @Test
