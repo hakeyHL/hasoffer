@@ -541,6 +541,7 @@ public class AppController {
                     productListVo.setName(productModel.getTitle());
                     productListVo.setPrice(productModel.getPrice());
                     productListVo.setStoresNum(5);
+                    productListVo.setRatingNum(3.5f);
                     li.add(productListVo);
                 }
             }
@@ -558,6 +559,7 @@ public class AppController {
                     productListVo.setName(productModel.getTitle());
                     productListVo.setPrice(productModel.getPrice());
                     productListVo.setStoresNum(5);
+                    productListVo.setRatingNum(3.5f);
                     li.add(productListVo);
                 }
             }
@@ -578,6 +580,7 @@ public class AppController {
                             productListVo.setName(ptmProduct.getTitle());
                             productListVo.setPrice(ptmProduct.getPrice());
                             productListVo.setStoresNum(5);
+                            productListVo.setRatingNum(3.5f);
                             li.add(productListVo);
                             i++;
                         }
@@ -595,6 +598,7 @@ public class AppController {
                         productListVo.setName(ptmProduct.getTitle());
                         productListVo.setPrice(ptmProduct.getPrice());
                         productListVo.setStoresNum(5);
+                        productListVo.setRatingNum(3.5f);
                         li.add(productListVo);
                     }
                 }
@@ -612,6 +616,7 @@ public class AppController {
                         productListVo.setName(productModel.getTitle());
                         productListVo.setPrice(productModel.getPrice());
                         productListVo.setStoresNum(5);
+                        productListVo.setRatingNum(3.5f);
                         li.add(productListVo);
                     }
                 }

@@ -11,6 +11,15 @@ public class ProductListVo {
     private  int storesNum;
     private int commentNum;
     private  String  imageUrl;
+    private  float ratingNum;
+
+    public float getRatingNum() {
+        return ratingNum;
+    }
+
+    public void setRatingNum(float ratingNum) {
+        this.ratingNum = ratingNum;
+    }
 
     public String getImageUrl() {
         return imageUrl;
