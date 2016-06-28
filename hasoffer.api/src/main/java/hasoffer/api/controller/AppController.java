@@ -10,6 +10,7 @@ import hasoffer.base.utils.ArrayUtils;
 import hasoffer.core.bo.product.Banners;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.cache.CmpSkuCacheManager;
+import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
@@ -55,6 +56,8 @@ public class AppController {
     IDeviceService deviceService;
     @Resource
     CmpSkuCacheManager cmpSkuCacheManager;
+    @Resource
+    ProductCacheManager productCacheManager;
     @Resource
     ContentNegotiatingViewResolver jsonViewResolver;
     @Resource
@@ -515,7 +518,7 @@ public class AppController {
     @RequestMapping(value = "/productsList", method = RequestMethod.GET)
     public ModelAndView productsList(SearchCriteria criteria, String type) {
         ModelAndView mv = new ModelAndView();
-        int requestType = 3;
+        int requestType =2 ;
         if (StringUtils.isNotBlank(type)) {
             requestType = Integer.valueOf(type);
         }
@@ -561,7 +564,7 @@ public class AppController {
         }
         String data = "";
         //查询热卖商品
-        List<PtmProduct> products2s = productService.getTopSellingProductsByDate("20160627", 1, 20);
+        List<PtmProduct> products2s=productCacheManager.getTopSellingProductsByDate("20160627", 1, 20);
         switch (requestType) {
             case 0:
                 if (products2s != null && products2s.size() > 0) {
@@ -621,15 +624,6 @@ public class AppController {
             map.put("product", li);
         }
         mv.addObject("data", map);
-        return mv;
-    }
-
-    @RequestMapping(value = "/solrT", method = RequestMethod.GET)
-    public ModelAndView solrTest(Long id) {
-        ModelAndView mv = new ModelAndView();
-        List<Long> longs = productIndexServiceImpl.simpleSearch("iphone", 1, 20);
-        PageableResult result = productIndexServiceImpl.searchPro(id, 2, 1, 2);
-        System.out.println("111");
         return mv;
     }
 }
