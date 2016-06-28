@@ -17,6 +17,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
+import hasoffer.core.product.iml.ProductServiceImpl;
 import hasoffer.core.product.solr.CategoryIndexServiceImpl;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
@@ -62,6 +63,9 @@ public class Compare2Controller {
 
     @Resource
     ISearchService searchService;
+
+    @Resource
+    ProductServiceImpl productService;
 
 
     // @Cacheable(value = "compare", key = "'getcmpskus_'+#q+'_'+#site+'_'+#price+'_'+#page+'_'+#size")
@@ -114,17 +118,14 @@ public class Compare2Controller {
 
     @RequestMapping(value = "/cmpsku", method = RequestMethod.GET)
     public ModelAndView cmpsku(HttpServletRequest request,
-                               @RequestParam(defaultValue = "") final String q,
-                               @RequestParam(defaultValue = "") final String brand,
-                               @RequestParam(defaultValue = "") final String sourceId,
-                               @RequestParam(defaultValue = "") String site,
-                               @RequestParam(defaultValue = "0") String price,
+                               @RequestParam(defaultValue = "") final String id,
                                @RequestParam(defaultValue = "1") int page,
-                               @RequestParam(defaultValue = "10") int size) {
-
+                               @RequestParam(defaultValue = "10") int size
+    ) {
+        PtmProduct product = productService.getProduct(Long.valueOf(id));
         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-        SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, size);
+        SearchIO sio = new SearchIO(product.getSourceId(), product.getTitle(), "", product.getSourceSite(), product.getPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, size);
         CmpResult cr = null;
         PtmCmpSkuIndex2 cmpSkuIndex = null;
         try {
@@ -137,9 +138,9 @@ public class Compare2Controller {
             getSioBySearch(sio);
             cr = getCmpProducts(sio, cmpSkuIndex);
         } catch (Exception e) {
-            logger.debug(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
+            logger.debug(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, size));
             //if exception occured ,get default cmpResult
-            cr = getDefaultCmpResult(sio, cmpSkuIndex);
+            cr = getDefaultCmpSku(sio,product);
         }
         // 速度优化
         SearchHelper.addToLog(sio);
@@ -169,6 +170,38 @@ public class Compare2Controller {
                 new ProductVo(0L, sio.getCliQ(), "", sio.getCliPrice(), currentDeeplink),
                 new PageableResult<ComparedSkuVo>(comparedSkuVos, 0, 1, 10)
         );
+    }
+
+    private CmpResult getDefaultCmpSku(SearchIO sio,PtmProduct product) {
+        CmpResult cmpResult = new CmpResult();
+        cmpResult.setTotalRatingsNum(Long.valueOf(product.getRating()));
+        cmpResult.setSpecs("{\n" +
+                "            \"Service Provider\": \"not specilfied\",\n" +
+                "            \"Technology\": \"WCDMA/GSM\",\n" +
+                "            \"Weight\": \"539oz\"\n" +
+                " }");
+        cmpResult.setRatingNum(5);
+        String imageUrl = productCacheManager.getProductMasterImageUrl(sio.getHsProId());
+        List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
+        CmpProductListVo cplv = new CmpProductListVo();
+        cplv.setPrice(product.getPrice());
+        cplv.setTotalRatingsNum(Long.valueOf(product.getRating()));
+        cplv.setRatingNum(5);
+        cplv.setBackRate(0.015f);
+        cplv.setCoins(Math.round(0.015 * product.getPrice()));
+        cplv.setFreight(20);
+        cplv.setImage(WebsiteHelper.getLogoUrl(Website.valueOf(product.getSourceSite())));
+        cplv.setReturnGuarantee(10);
+        cplv.setSupport(Arrays.asList("COD"));
+        cplv.setFreight(10);
+        cplv.setDistributionTime(2);
+        cplv.setDeepLinkUrl(WebsiteHelper.getUrlWithAff(Website.valueOf(product.getSourceSite()), product.getSourceUrl(), new String[]{sio.getMarketChannel().name()}));
+        cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(Website.valueOf(product.getSourceSite()), product.getSourceUrl(), new String[]{sio.getMarketChannel().name()}));
+        cmpResult.setImage(imageUrl);
+        cmpResult.setName(product.getSourceUrl());
+        cmpResult.setBestPrice(cplv.getPrice());
+        comparedSkuVos.add(cplv);
+        return cmpResult;
     }
 
     /**
@@ -256,7 +289,7 @@ public class Compare2Controller {
         String q = sio.getCliQ();
 
         String logId = HexDigestUtil.md5(q + "-" + sio.getCliSite().name()); // 这个值作为log表的id
-        SrmSearchLog srmSearchLog = searchLogCacheManager.findSrmSearchLog(logId,true);
+        SrmSearchLog srmSearchLog = searchLogCacheManager.findSrmSearchLog(logId, true);
 
         if (srmSearchLog != null
                 && (srmSearchLog.getPrecise() == SearchPrecise.TIMERSET2
