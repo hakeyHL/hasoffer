@@ -6,6 +6,7 @@ import hasoffer.core.persistence.aws.AwsSummaryProduct;
 import hasoffer.core.persistence.dbm.aws.AwsDynamoDbService;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.task.worker.IProcess;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -83,6 +84,23 @@ public class DynamodbTest {
         for (AwsSummaryProduct asp : pageableResult.getData()) {
             System.out.println(asp.getId() + "\t" + asp.getWebsite() + "\t" + asp.getlCreateTime());
         }
+    }
+
+    @Test
+    public void testQuery2() {
+
+        String queryStr = "id > :v1 and website = :v2";
+
+        List params = new ArrayList();
+        params.add(20);
+        params.add(Website.FLIPKART.name());
+
+        awsDynamoDbService.scanAll(AwsSummaryProduct.class, queryStr, params, new IProcess<AwsSummaryProduct>() {
+            @Override
+            public void process(AwsSummaryProduct asp) {
+                System.out.println(asp.getId() + "\t" + asp.getPrice());
+            }
+        });
     }
 
     @Test

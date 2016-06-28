@@ -8,7 +8,9 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.ScanResultPage;
 import com.amazonaws.services.dynamodbv2.model.*;
-import hasoffer.base.model.PageableResult;
+import hasoffer.core.task.worker.IProcess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,8 +25,8 @@ public class AwsDynamoDbService {
 //static AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient().withEndpoint("http://192.168.1.203:8000");
 
     static DynamoDB dynamoDB = null;
-
     private static AmazonDynamoDBClient dynamoDBClient = getDynamoDBClient();
+    private Logger logger = LoggerFactory.getLogger(AwsDynamoDbService.class);
 
     private static AmazonDynamoDBClient getDynamoDBClient() {
         BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials("AKIAI2KXGSAA6ML4ZSJQ", "vDUeGxdjPeH1ulHark/VhKlAkD4d9L/wVpBINxep");
@@ -136,7 +138,14 @@ public class AwsDynamoDbService {
         return getMapper().count(clazz, scanExpression);
     }
 
-    public <T> PageableResult<T> scan(Class<T> clazz, String expressionStr, List<Object> params) {
+    /**
+     * @param clazz
+     * @param expressionStr
+     * @param params
+     * @param <T>
+     * @return
+     */
+    public <T> List<T> scan(Class<T> clazz, String expressionStr, List<Object> params) {
 
         Map<String, AttributeValue> eav = getParamMap(params);
 
@@ -146,36 +155,36 @@ public class AwsDynamoDbService {
 
         ScanResultPage<T> resultPage = getMapper().scanPage(clazz, scanExpression);
 
-        return new PageableResult<T>(resultPage.getResults(), resultPage.getCount(), 1, 1);
+        return resultPage.getResults();
     }
-    /** PAGE PAGE PAGE */
-    /**
-     * Map<String, AttributeValue> lastKeyEvaluated = null;
-     do {
-     Map<String, AttributeValue> valueMap = new HashMap<String, AttributeValue>();
-     valueMap.put(":lUpdateTime", new AttributeValue().withN("1466678341936"));
-     valueMap.put(":website", new AttributeValue().withS("FLIPKART"));
 
-     ScanRequest scanRequest = new ScanRequest();
-     scanRequest.setTableName("AwsSummaryProduct");
-     scanRequest.setIndexName("id-lUpdateTime-index_1");
+    public <T> boolean scanAll(Class<T> clazz, String expressionStr, List<Object> params, IProcess process) {
 
-     scanRequest.withFilterExpression("lUpdateTime  > :lUpdateTime AND website=:website ").withExpressionAttributeValues(valueMap);
-     scanRequest.withLimit(2);
-     scanRequest.withExclusiveStartKey(lastKeyEvaluated);
-     scanRequest.withProjectionExpression("updateTime, price, website");
-     ScanResult scanResult = client.scan(scanRequest);
+        Map<String, AttributeValue> eav = getParamMap(params);
 
-     System.out.println(scanResult.getScannedCount());
-     List<Map<String, AttributeValue>> queryItems = scanResult.getItems();
-     for (Map<String, AttributeValue> item : queryItems) {
-     System.out.println(item.get("updateTime") + ": "
-     + item.get("price")
-     + ": "
-     + item.get("website"));
-     }
-     lastKeyEvaluated = scanResult.getLastEvaluatedKey();
-     } while (lastKeyEvaluated != null);
+        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression()
+                .withFilterExpression(expressionStr)
+                .withExpressionAttributeValues(eav)
+                .withLimit(1000);
 
-     */
+        Map<String, AttributeValue> lastEvalKey = null;
+
+        int page = 1;
+
+        do {
+            logger.debug("page = " + page++);
+            ScanResultPage<T> resultPage = getMapper().scanPage(clazz, scanExpression);
+
+            List<T> objs = resultPage.getResults();
+            for (T t : objs) {
+                process.process(t);
+            }
+
+            lastEvalKey = resultPage.getLastEvaluatedKey();
+            scanExpression.withExclusiveStartKey(lastEvalKey);
+
+        } while (lastEvalKey != null);
+
+        return true;
+    }
 }
