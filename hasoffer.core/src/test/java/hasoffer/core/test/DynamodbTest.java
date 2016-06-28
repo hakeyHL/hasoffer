@@ -2,9 +2,9 @@ package hasoffer.core.test;
 
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
-import hasoffer.core.persistence.dbm.mongo.AWSMongoDbManager;
+import hasoffer.core.persistence.aws.AwsSummaryProduct;
+import hasoffer.core.persistence.dbm.aws.AwsDynamoDbService;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.mongo.AwsSummaryProduct;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +23,7 @@ import java.util.List;
 @ContextConfiguration(locations = "classpath:spring-beans.xml")
 public class DynamodbTest {
 
-    AWSMongoDbManager awsMongoDbManager = new AWSMongoDbManager();
+    AwsDynamoDbService awsDynamoDbService = new AwsDynamoDbService();
 
     @Resource
     IDataBaseManager dbm;
@@ -34,7 +34,7 @@ public class DynamodbTest {
 
         List params = new ArrayList();
 
-        long count = awsMongoDbManager.count(AwsSummaryProduct.class, queryStr, params);
+        long count = awsDynamoDbService.count(AwsSummaryProduct.class, queryStr, params);
 
         System.out.println(count);
     }
@@ -48,10 +48,10 @@ public class DynamodbTest {
         params.add(20);
         params.add(500);
 
-        long count = awsMongoDbManager.count(AwsSummaryProduct.class, queryStr, params);
+        long count = awsDynamoDbService.count(AwsSummaryProduct.class, queryStr, params);
         System.out.println(count);
 
-        PageableResult<AwsSummaryProduct> pageableResult = awsMongoDbManager.scanPage(AwsSummaryProduct.class, queryStr, params, 1, 1);
+        PageableResult<AwsSummaryProduct> pageableResult = awsDynamoDbService.scanPage(AwsSummaryProduct.class, queryStr, params, 1, 1);
 
         System.out.println(pageableResult.getNumFund());
         for (AwsSummaryProduct asp : pageableResult.getData()) {
@@ -68,7 +68,7 @@ public class DynamodbTest {
         params.add(20);
         params.add(Website.FLIPKART.name());
 
-        PageableResult<AwsSummaryProduct> pageableResult = awsMongoDbManager.queryPage(AwsSummaryProduct.class, queryStr, params, 1, 1);
+        PageableResult<AwsSummaryProduct> pageableResult = awsDynamoDbService.queryPage(AwsSummaryProduct.class, queryStr, params, 1, 1);
 
         System.out.println(pageableResult.getNumFund());
         for (AwsSummaryProduct asp : pageableResult.getData()) {
@@ -78,22 +78,22 @@ public class DynamodbTest {
 
     @Test
     public void testDel() {
-        awsMongoDbManager.deleteTable(AwsSummaryProduct.class);
+        awsDynamoDbService.deleteTable(AwsSummaryProduct.class);
     }
 
     @Test
     public void testUpdate() {
-        awsMongoDbManager.updateTable(AwsSummaryProduct.class, 10, 10);
+        awsDynamoDbService.updateTable(AwsSummaryProduct.class, 10, 10);
     }
 
     @Test
     public void testCreate() {
-        awsMongoDbManager.createTable(AwsSummaryProduct.class);
+        awsDynamoDbService.createTable(AwsSummaryProduct.class);
 //
-//        System.out.println(awsMongoDbManager.descTable(AwsSummaryProduct.class));
+//        System.out.println(awsDynamoDbService.descTable(AwsSummaryProduct.class));
 
         System.out.println("show tables...");
-        List<String> tableNames = awsMongoDbManager.listTables();
+        List<String> tableNames = awsDynamoDbService.listTables();
         for (String tname : tableNames) {
             System.out.println(tname);
         }
@@ -101,13 +101,13 @@ public class DynamodbTest {
 
     @Test
     public void testLoad() {
-        AwsSummaryProduct asp = awsMongoDbManager.queryOne(AwsSummaryProduct.class, 4L);
+        AwsSummaryProduct asp = awsDynamoDbService.get(AwsSummaryProduct.class, 1163);
         System.out.println(asp.toString());
     }
 
     @Test
     public void test2() {
-        List<String> tableNames = awsMongoDbManager.listTables();
+        List<String> tableNames = awsDynamoDbService.listTables();
         for (String tname : tableNames) {
             System.out.println(tname);
         }
@@ -117,18 +117,25 @@ public class DynamodbTest {
     public void init_datas() {
         String sql = "select t from PtmCmpSku t";
 
-        List<PtmCmpSku> cmpskus = dbm.query(sql, 1, 2000);
+        List<PtmCmpSku> cmpskus = dbm.query(sql, 2, 2000);
 
         List<AwsSummaryProduct> awsSummaryProducts = new ArrayList<AwsSummaryProduct>();
+
+        AwsSummaryProduct[] awsSummaryProducts1 = new AwsSummaryProduct[0];
 
         for (PtmCmpSku cmpSku : cmpskus) {
             System.out.println(cmpSku.toString());
             AwsSummaryProduct awsSummaryProduct = new AwsSummaryProduct(cmpSku);
             awsSummaryProducts.add(awsSummaryProduct);
 
-            awsMongoDbManager.save(awsSummaryProduct);
+//            awsDynamoDbService.save(awsSummaryProduct);
+
         }
 
-//        awsMongoDbManager.save(awsSummaryProducts.toArray(new AwsSummaryProduct[0]));
+        awsSummaryProducts1 = awsSummaryProducts.toArray(awsSummaryProducts1);
+
+        awsDynamoDbService.save(awsSummaryProducts1);
+
+//        awsDynamoDbService.save(awsSummaryProducts.toArray(new AwsSummaryProduct[0]));
     }
 }

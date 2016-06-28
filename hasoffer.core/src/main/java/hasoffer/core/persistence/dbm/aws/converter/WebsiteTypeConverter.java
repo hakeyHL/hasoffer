@@ -1,4 +1,4 @@
-package hasoffer.core.persistence.dbm.mongo.converter;
+package hasoffer.core.persistence.dbm.aws.converter;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMarshaller;
 import hasoffer.base.model.Website;
