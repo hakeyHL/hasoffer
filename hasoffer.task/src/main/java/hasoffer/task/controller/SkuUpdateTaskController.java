@@ -2,12 +2,17 @@ package hasoffer.task.controller;
 
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.mongo.SummaryProduct;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
-import hasoffer.core.product.*;
+import hasoffer.core.product.ICmpSkuService;
+import hasoffer.core.product.ICmpSkuUpdateStatService;
+import hasoffer.core.product.IFetchService;
+import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
-import hasoffer.task.worker.*;
+import hasoffer.task.worker.CmpSkuListWorker;
+import hasoffer.task.worker.CmpSkuUpdateWorker;
+import hasoffer.task.worker.CmpSkuVisitUpdateWorker;
+import hasoffer.task.worker.SrmSearchLogListWorker;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,7 +24,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Date : 2016/4/11
@@ -41,8 +45,6 @@ public class SkuUpdateTaskController {
     IMongoDbManager mdm;
     @Resource
     ICmpSkuService cmpSkuService;
-    @Resource
-    ISummaryProductService summaryProductService;
     @Resource
     IProductService productService;
     @Resource
@@ -138,75 +140,4 @@ public class SkuUpdateTaskController {
 
         return "";
     }
-
-    @RequestMapping(value = "/startflipkartfetch", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String f3() {
-        if (taskRunning3.get()) {
-            return "task running.";
-        }
-
-        String Q_CMPSKU_FLIPKART =
-                "SELECT t FROM PtmCmpSku t " +
-//                        "WHERE t.website = 'FLIPKART' " +
-                        " ORDER BY t.id ";
-
-        ExecutorService es = Executors.newCachedThreadPool();
-
-        // flipkart sku fetch and save mongo
-        ConcurrentLinkedQueue<PtmCmpSku> skuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
-        es.execute(new CmpSkuListWorker(dbm, skuQueue, Q_CMPSKU_FLIPKART));
-        for (int i = 0; i < 100; i++) {
-            es.execute(new FlipakartSkuSaveWorker(skuQueue, mdm));
-        }
-
-        taskRunning3.set(true);
-
-        return "";
-    }
-
-    //skuupdatetask/startseimitupdate
-    @RequestMapping(value = "/startseimitupdate", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String f4() {
-
-        if (taskRunning4.get()) {
-            return "task running.";
-        }
-
-        ExecutorService es = Executors.newCachedThreadPool();
-
-        ConcurrentLinkedQueue<SummaryProduct> skuQueue = new ConcurrentLinkedQueue<SummaryProduct>();
-
-        AtomicLong listCount = new AtomicLong(0);
-        AtomicLong updateCount = new AtomicLong(0);
-
-        es.execute(new PtmCmpSkuFetchResultListWorker(summaryProductService, skuQueue, listCount));
-        for (int i = 0; i < 30; i++) {
-            es.execute(new PtmCmpSkuFetchResultUpdateWorker(skuQueue, summaryProductService, updateCount, dbm));
-        }
-
-        taskRunning4.set(true);
-
-        return "";
-    }
-
-//    @RequestMapping(value = "/seimi", method = RequestMethod.GETpa)
-//    @ResponseBody
-//    public String seimiupdateamazon() {
-//
-//        Seimi s = new Seimi();
-//
-//        s.start("FlipkartSkuDocFetch");
-//
-//        ExecutorService es = Executors.newCachedThreadPool();
-//
-//        for (int i = 0; i < 10; i++) {
-//            es.execute(new FlipkartSkuDocSaveWorker(mdm));
-//        }
-//
-//        return "";
-//    }
 }

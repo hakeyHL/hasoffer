@@ -5,7 +5,6 @@ import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.cache.DeviceFlowControllRecord;
-import hasoffer.core.persistence.mongo.PtmCmpSkuIndex;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.product.ICmpSkuService;
@@ -53,42 +52,6 @@ public class CmpSkuCacheManager {
         }
 
         return cmpSku;
-    }
-
-    /**
-     * cmpsku的索引
-     * todo 更新sku时要更新
-     *
-     * @param cliSite
-     * @param sourceId
-     * @param keyword
-     * @return
-     */
-    public PtmCmpSkuIndex getCmpSkuIndex(Website cliSite, String sourceId, String keyword) {
-
-        String key = CACHE_KEY_PRE + "_getCmpSkuIndex_" + cliSite.name() + "_" + sourceId + "_" + keyword;
-
-        String cmpSkuIndexJson = cacheService.get(key, 0);
-
-        try {
-            PtmCmpSkuIndex cmpSkuIndex = null;
-
-            if (StringUtils.isEmpty(cmpSkuIndexJson)) {
-                cmpSkuIndex = cmpSkuService.getCmpSkuIndex(cliSite, sourceId, keyword);
-                if (cmpSkuIndex == null) {
-                    cmpSkuIndex = new PtmCmpSkuIndex();
-                    cacheService.add(key, JSONUtil.toJSON(cmpSkuIndex), CACHE_EXPIRE_TIME);
-                }
-            } else {
-                cmpSkuIndex = JSONUtil.toObject(cmpSkuIndexJson, PtmCmpSkuIndex.class);
-            }
-
-            return cmpSkuIndex;
-        } catch (Exception e) {
-            logger.debug(e.getMessage());
-            return null;
-        }
-
     }
 
     /**

@@ -43,7 +43,7 @@ public class SearchRecordListWorker implements Runnable {
 
             try {
                 if (searchLogQueue.size() > 1000) {
-                    TimeUnit.SECONDS.sleep(10);
+                    TimeUnit.MINUTES.sleep(2);
                     logger.debug("SearchRecordListWorker go to sleep!");
                     continue;
                 }

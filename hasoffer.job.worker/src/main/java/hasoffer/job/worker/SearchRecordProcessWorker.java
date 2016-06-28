@@ -46,11 +46,11 @@ public class SearchRecordProcessWorker implements Runnable {
         while (true) {
             try {
                 SrmSearchLog searchLog = searchLogQueue.poll();
-                if (searchLog == null) {
+                if (searchLog == null || "".equals(searchLog.getKeyword())) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("SearchRecordProcessWorker. search-log-queue is null. go to sleep!");
                     }
-                    TimeUnit.SECONDS.sleep(5);
+                    TimeUnit.MINUTES.sleep(1);
                     continue;
                 }
                 if (logger.isDebugEnabled()) {
@@ -61,7 +61,7 @@ public class SearchRecordProcessWorker implements Runnable {
                 String keyword = autoSearchResult.getTitle();
                 String serRegion = AppConfig.get(AppConfig.SER_REGION);
                 Map<Website, List<ListProduct>> listProductMap = new HashMap<Website, List<ListProduct>>();
-                if(AppConfig.SerRegion.INDIA.toString().equals(serRegion)) {
+                if (AppConfig.SerRegion.INDIA.toString().equals(serRegion)) {
                     FetchResult flipkartFetchResult = fetchService.getProductsKeyWord(Website.FLIPKART, keyword, 0, 10);
                     FetchResult amazonFetchResult = fetchService.getProductsKeyWord(Website.AMAZON, keyword, 0, 10);
                     FetchResult snapdealFetchResult = fetchService.getProductsKeyWord(Website.SNAPDEAL, keyword, 0, 10);
@@ -114,7 +114,7 @@ public class SearchRecordProcessWorker implements Runnable {
                     } else {
                         searchLogQueue.put(searchLog);
                     }
-                }else if(AppConfig.SerRegion.USA.toString().equals(serRegion)) {
+                } else if (AppConfig.SerRegion.USA.toString().equals(serRegion)) {
                     FetchResult amazonFetchResult = fetchService.getProductsKeyWord(Website.AMAZON, keyword, 0, 10);
                     FetchResult ebayFetchResult = fetchService.getProductsKeyWord(Website.EBAY, keyword, 0, 10);
                     FetchResult walmartFetchResult = fetchService.getProductsKeyWord(Website.WALMART, keyword, 0, 10);
@@ -155,11 +155,11 @@ public class SearchRecordProcessWorker implements Runnable {
         }
     }
 
-    private boolean isFinish(FetchResult fetchResult){
-        return TaskStatus.FINISH.equals(fetchResult.getTaskStatus())||TaskStatus.STOPPED.equals(fetchResult.getTaskStatus());
+    private boolean isFinish(FetchResult fetchResult) {
+        return TaskStatus.FINISH.equals(fetchResult.getTaskStatus()) || TaskStatus.STOPPED.equals(fetchResult.getTaskStatus());
     }
 
-    private void initResultMap(Map<Website, List<ListProduct>> listProductMap,FetchResult fetchResult ){
+    private void initResultMap(Map<Website, List<ListProduct>> listProductMap, FetchResult fetchResult) {
         List<FetchedProduct> listProductsResult = fetchResult.getFetchProducts();
         List<ListProduct> listProducts = new ArrayList<ListProduct>();
         for (FetchedProduct product : listProductsResult) {

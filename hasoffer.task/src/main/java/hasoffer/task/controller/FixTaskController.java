@@ -14,7 +14,10 @@ import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.worker.ListAndProcessWorkerStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
-import hasoffer.task.worker.*;
+import hasoffer.task.worker.FixFlipkartCleanUrlWorker;
+import hasoffer.task.worker.FixFlipkartSourceSidWorker;
+import hasoffer.task.worker.FixPtmProductWorker;
+import hasoffer.task.worker.MysqlListWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -30,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Date : 2016/4/14
@@ -109,38 +111,6 @@ public class FixTaskController {
             searchService.mergeProducts(finalProduct, cmpSkuMap, products.get(i));
         }
 
-    }
-
-    //fixtask/createsptomongo
-    @RequestMapping(value = "/createsptomongo", method = RequestMethod.GET)
-    public String createsptomongo() {
-
-        String queryString = "SELECT t FROM PtmCmpSku t WHERE ( t.website = 'SHOPCLUES' or t.website = 'EBAY' ) AND t.status = 'ONSALE' ";
-
-        ListAndProcessWorkerStatus<PtmCmpSku> ws = new ListAndProcessWorkerStatus<PtmCmpSku>();
-
-        ExecutorService es = Executors.newCachedThreadPool();
-
-        es.execute(new MysqlListWorker(queryString, ws, dbm));
-        for (int i = 0; i < 10; i++) {
-            es.execute(new MongoSkuInitWorker(ws, mdm, cmpSkuService));
-        }
-
-        while (true) {
-            if (ws.getSdQueue().size() == 0 && ws.isListWorkFinished()) {
-                break;
-            }
-            try {
-                TimeUnit.SECONDS.sleep(5);
-            } catch (InterruptedException e) {
-                break;
-            }
-            continue;
-        }
-
-        logger.debug("work finished." + "ori url null : " + ws.getCount());
-
-        return "ok";
     }
 
     @RequestMapping(value = "/fixtitlelikedurex", method = RequestMethod.GET)

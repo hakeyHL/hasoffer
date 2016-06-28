@@ -13,10 +13,7 @@ import hasoffer.core.exception.CmpSkuUrlNotFoundException;
 import hasoffer.core.exception.MultiUrlException;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.mongo.PtmCmpSkuIndex;
-import hasoffer.core.persistence.mongo.PtmCmpSkuIndexSearchLog;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
-import hasoffer.core.persistence.mongo.SummaryProduct;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
@@ -82,13 +79,6 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     }
 
     @Override
-    public PtmCmpSkuIndex getCmpSkuIndex(String url) {
-        String qIndex = HexDigestUtil.md5(url);
-        Query query = new Query(Criteria.where("skuUrlIndex").is(qIndex));
-        return mdm.queryOne(PtmCmpSkuIndex.class, query);
-    }
-
-    @Override
     public PtmCmpSkuIndex2 getCmpSkuIndex2(Website website, String sourceId, String cliQ) {
 
         List<PtmCmpSkuIndex2> cmpSkuIndexs = null;
@@ -151,51 +141,6 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         dbm.update(updater);
 
-    }
-
-    @Override
-    public PtmCmpSkuIndex getCmpSkuIndex(Website website, String sourceId, String cliQ) {
-        PtmCmpSkuIndexSearchLog indexSearchLog = new PtmCmpSkuIndexSearchLog(website, sourceId, cliQ);
-
-        String qIndex = HexDigestUtil.md5(StringUtils.getCleanChars(cliQ));
-
-        Query query = new Query();
-        if (StringUtils.isEmpty(sourceId)) {
-            query.addCriteria(Criteria.where("skuTitleIndex").is(qIndex));
-        } else {
-            query.addCriteria(Criteria.where("sourceSid").is(sourceId));
-        }
-
-        List<PtmCmpSkuIndex> pcsis = mdm.query(PtmCmpSkuIndex.class, query);
-        PtmCmpSkuIndex finalIndex = null;
-
-        if (ArrayUtils.isNullOrEmpty(pcsis)) {
-            indexSearchLog.setErrorMsg("no index.");
-        } else {
-            finalIndex = pcsis.get(0);
-
-            if (StringUtils.isEmpty(sourceId) && pcsis.size() != 1) {
-                if (finalIndex.getUrl() == null) {
-                    // todo 这种情况是一种临时的,不跳转
-                    indexSearchLog.setErrorMsg("no url.");
-                } else {
-                    for (int i = 1; i < pcsis.size(); i++) {
-                        PtmCmpSkuIndex index = pcsis.get(i);
-                        if (!finalIndex.getUrl().equals(index.getUrl())) {
-                            indexSearchLog.setErrorMsg("different urls.");
-                        }
-                    }
-                }
-            }
-        }
-
-        mdm.save(indexSearchLog);
-
-        if (indexSearchLog.isHasExcept()) {
-            return null;
-        }
-
-        return finalIndex;
     }
 
     @Override
@@ -394,7 +339,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         //创建sku的时候，将固定网站的商品导入到mongodb中,只导入url、website、id
 
-        if (WebsiteHelper.DEFAULT_WEBSITES.contains(ptmCmpSku.getWebsite())) {
+        /*if (WebsiteHelper.DEFAULT_WEBSITES.contains(ptmCmpSku.getWebsite())) {
 
             SummaryProduct summaryProduct = new SummaryProduct();
 
@@ -403,7 +348,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             summaryProduct.setUrl(ptmCmpSku.getUrl());
 
             mdm.save(summaryProduct);
-        }
+        }*/
 
 //        createPtmCmpSkuIndexToMongo(ptmCmpSku);
 //        createPtmCmpSkuIndexToMysql(ptmCmpSku);
@@ -423,7 +368,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         long skuid = dbm.create(ptmCmpSku);
 
         //创建sku的时候，将固定网站的商品导入到mongodb中,只导入url、website、id
-        if (WebsiteHelper.DEFAULT_WEBSITES.contains(ptmCmpSku.getWebsite())) {
+        /*if (WebsiteHelper.DEFAULT_WEBSITES.contains(ptmCmpSku.getWebsite())) {
 
             SummaryProduct summaryProduct = new SummaryProduct();
 
@@ -432,7 +377,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             summaryProduct.setUrl(ptmCmpSku.getUrl());
 
             mdm.save(summaryProduct);
-        }
+        }*/
 
         return ptmCmpSku;
     }
@@ -491,56 +436,6 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         ptmCmpSkuUpdater.getPo().setDeeplink(deeplink);
 
         dbm.update(ptmCmpSkuUpdater);
-    }
-
-    @Override
-    public void createPtmCmpSkuIndexToMongo(PtmCmpSku ptmCmpSku) {
-
-        if (!SkuStatus.ONSALE.equals(ptmCmpSku.getStatus())) {
-            return;
-        }
-
-        if (ptmCmpSku.getWebsite() == null) {
-            return;
-        }
-
-        Website website = ptmCmpSku.getWebsite();
-        if (WebsiteHelper.DEFAULT_WEBSITES.contains(website)) {
-
-            Long id = ptmCmpSku.getId();
-            long productId = ptmCmpSku.getProductId();
-            String sourcePid = ptmCmpSku.getSourcePid();
-            String sourceSid = ptmCmpSku.getSourceSid();
-            float price = ptmCmpSku.getPrice();
-            String oriUrl = ptmCmpSku.getOriUrl();
-            if (StringUtils.isEmpty(oriUrl)) {
-                oriUrl = ptmCmpSku.getUrl();
-            }
-            String url = WebsiteHelper.getCleanUrl(website, oriUrl);
-            String title = ptmCmpSku.getTitle();
-            String skuTitle = StringUtils.isEmpty(ptmCmpSku.getSkuTitle()) ? title : ptmCmpSku.getSkuTitle();
-
-            if (Website.SNAPDEAL.equals(website)) {
-                sourceSid = SnapdealHelper.getSkuIdByUrl(oriUrl);
-            } else if (Website.FLIPKART.equals(website)) {
-                sourceSid = FlipkartHelper.getSkuIdByUrl(oriUrl);
-                sourcePid = FlipkartHelper.getProductIdByUrl(oriUrl);
-                url = FlipkartHelper.getUrlByDeeplink(url);
-                url = FlipkartHelper.getCleanUrl(url);
-            }
-
-            if (!StringUtils.isEmpty(sourceSid)) {
-
-                if (StringUtils.isEmpty(sourceSid) && StringUtils.isEmpty(skuTitle)) {
-                    return;
-                }
-
-                PtmCmpSkuIndex index = new PtmCmpSkuIndex(id, productId, website, sourcePid, sourceSid, title, skuTitle, price, url);
-
-                mdm.save(index);
-                logger.debug(index.toString());
-            }
-        }
     }
 
     @Override
