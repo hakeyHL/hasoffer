@@ -47,11 +47,15 @@ public class SearchRecordProcessWorker implements Runnable {
             try {
                 SrmSearchLog searchLog = searchLogQueue.poll();
                 if (searchLog == null) {
-                    logger.debug("SearchRecordProcessWorker. search-log-queue is null. go to sleep!");
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("SearchRecordProcessWorker. search-log-queue is null. go to sleep!");
+                    }
                     TimeUnit.SECONDS.sleep(5);
                     continue;
                 }
-                //logger.info("SearchRecordProcessWorker. search keyword {}. begin", searchLog);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("SearchRecordProcessWorker. search keyword {}. begin", searchLog);
+                }
                 SrmAutoSearchResult autoSearchResult = new SrmAutoSearchResult(searchLog);
 
                 String keyword = autoSearchResult.getTitle();
@@ -94,17 +98,19 @@ public class SearchRecordProcessWorker implements Runnable {
                         initResultMap(listProductMap, limeRoadResult);
                         autoSearchResult.setSitePros(listProductMap);
                         searchProductService.searchProductsFromSites(autoSearchResult);
-                        logger.info("SearchRecordProcessWorker.flipkartFetchResult  result()--keyword is {} : size() = {}", keyword, flipkartFetchResult.getFetchProducts().size());
-                        logger.info("SearchRecordProcessWorker.amazonFetchResult    result()--keyword is {} : size() = {}", keyword, amazonFetchResult.getFetchProducts().size());
-                        logger.info("SearchRecordProcessWorker.snapdealFetchResult  result()--keyword is {} : size() = {}", keyword, snapdealFetchResult.getFetchProducts().size());
-                        logger.info("SearchRecordProcessWorker.shopcluesFetchResult result()--keyword is {} : size() = {}", keyword, shopcluesFetchResult.getFetchProducts().size());
-                        logger.info("SearchRecordProcessWorker.paytmFetchResult     result()--keyword is {} : size() = {}", keyword, paytmFetchResult.getFetchProducts().size());
-                        logger.info("SearchRecordProcessWorker.ebayFetchResult      result()--keyword is {} : size() = {}", keyword, ebayFetchResult.getFetchProducts().size());
-                        logger.info("SearchRecordProcessWorker.myntraFetchResult    result()--keyword is {} : size() = {}", keyword, myntraFetchResult.getFetchProducts().size());
-                        logger.info("SearchRecordProcessWorker.jabongFetchResult    result()--keyword is {} : size() = {}", keyword, jabongFetchResult.getFetchProducts().size());
-                        logger.info("SearchRecordProcessWorker.voonikFetchResult    result()--keyword is {} : size() = {}", keyword, voonikFetchResult.getFetchProducts().size());
-                        logger.info("SearchRecordProcessWorker.homeShopResult       result()--keyword is {} : size() = {}", keyword, homeShopResult.getFetchProducts().size());
-                        logger.info("SearchRecordProcessWorker.limeRoadResult       result()--keyword is {} : size() = {}", keyword, limeRoadResult.getFetchProducts().size());
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("SearchRecordProcessWorker.flipkartFetchResult  result()--keyword is {} : size() = {}", keyword, flipkartFetchResult.getFetchProducts().size());
+                            logger.debug("SearchRecordProcessWorker.amazonFetchResult    result()--keyword is {} : size() = {}", keyword, amazonFetchResult.getFetchProducts().size());
+                            logger.debug("SearchRecordProcessWorker.snapdealFetchResult  result()--keyword is {} : size() = {}", keyword, snapdealFetchResult.getFetchProducts().size());
+                            logger.debug("SearchRecordProcessWorker.shopcluesFetchResult result()--keyword is {} : size() = {}", keyword, shopcluesFetchResult.getFetchProducts().size());
+                            logger.debug("SearchRecordProcessWorker.paytmFetchResult     result()--keyword is {} : size() = {}", keyword, paytmFetchResult.getFetchProducts().size());
+                            logger.debug("SearchRecordProcessWorker.ebayFetchResult      result()--keyword is {} : size() = {}", keyword, ebayFetchResult.getFetchProducts().size());
+                            logger.debug("SearchRecordProcessWorker.myntraFetchResult    result()--keyword is {} : size() = {}", keyword, myntraFetchResult.getFetchProducts().size());
+                            logger.debug("SearchRecordProcessWorker.jabongFetchResult    result()--keyword is {} : size() = {}", keyword, jabongFetchResult.getFetchProducts().size());
+                            logger.debug("SearchRecordProcessWorker.voonikFetchResult    result()--keyword is {} : size() = {}", keyword, voonikFetchResult.getFetchProducts().size());
+                            logger.debug("SearchRecordProcessWorker.homeShopResult       result()--keyword is {} : size() = {}", keyword, homeShopResult.getFetchProducts().size());
+                            logger.debug("SearchRecordProcessWorker.limeRoadResult       result()--keyword is {} : size() = {}", keyword, limeRoadResult.getFetchProducts().size());
+                        }
                     } else {
                         searchLogQueue.put(searchLog);
                     }
@@ -130,12 +136,14 @@ public class SearchRecordProcessWorker implements Runnable {
                         initResultMap(listProductMap, bestbuyFetchResult);
                         autoSearchResult.setSitePros(listProductMap);
                         searchProductService.searchProductsFromSites(autoSearchResult);
-                        logger.info("SearchRecordProcessWorker.amazonFetchResult    result()--keyword is {} : size() = {}", keyword, amazonFetchResult.getFetchProducts().size());
-                        logger.info("SearchRecordProcessWorker.ebayFetchResult      result()--keyword is {} : size() = {}", keyword, ebayFetchResult.getFetchProducts().size());
-                        logger.info("SearchRecordProcessWorker.walmartFetchResult   result()--keyword is {} : size() = {}", keyword, walmartFetchResult.getFetchProducts().size());
-                        logger.info("SearchRecordProcessWorker.geekFetchResult      result()--keyword is {} : size() = {}", keyword, geekFetchResult.getFetchProducts().size());
-                        logger.info("SearchRecordProcessWorker.newEggFetchResult    result()--keyword is {} : size() = {}", keyword, newEggFetchResult.getFetchProducts().size());
-                        logger.info("SearchRecordProcessWorker.bestbuyFetchResult   result()--keyword is {} : size() = {}", keyword, bestbuyFetchResult.getFetchProducts().size());
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("SearchRecordProcessWorker.amazonFetchResult    result()--keyword is {} : size() = {}", keyword, amazonFetchResult.getFetchProducts().size());
+                            logger.debug("SearchRecordProcessWorker.ebayFetchResult      result()--keyword is {} : size() = {}", keyword, ebayFetchResult.getFetchProducts().size());
+                            logger.debug("SearchRecordProcessWorker.walmartFetchResult   result()--keyword is {} : size() = {}", keyword, walmartFetchResult.getFetchProducts().size());
+                            logger.debug("SearchRecordProcessWorker.geekFetchResult      result()--keyword is {} : size() = {}", keyword, geekFetchResult.getFetchProducts().size());
+                            logger.debug("SearchRecordProcessWorker.newEggFetchResult    result()--keyword is {} : size() = {}", keyword, newEggFetchResult.getFetchProducts().size());
+                            logger.debug("SearchRecordProcessWorker.bestbuyFetchResult   result()--keyword is {} : size() = {}", keyword, bestbuyFetchResult.getFetchProducts().size());
+                        }
                     } else {
                         searchLogQueue.put(searchLog);
                     }

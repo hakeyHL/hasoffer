@@ -16,7 +16,9 @@ import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.product.iml.ProductServiceImpl;
 import hasoffer.core.product.solr.CategoryIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel;
@@ -38,6 +40,7 @@ import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -58,6 +61,8 @@ public class AppController {
     CategoryIndexServiceImpl categoryIndexService;
     @Resource
     ProductIndexServiceImpl productIndexServiceImpl;
+    @Resource
+    ProductServiceImpl productService;
     private Logger logger = LoggerFactory.logger(AppController.class);
 
     public static void main(String[] args) {
@@ -555,116 +560,42 @@ public class AppController {
             }
         }
         String data = "";
+        //查询热卖商品
+        List<PtmProduct> products2s = productService.getTopSellingProductsByDate("20160627", 1, 20);
         switch (requestType) {
             case 0:
-                data = "{\n" +
-                        "        \"product\": [\n" +
-                        "            {\n" +
-                        "                \"id\": \"5556465\",\n" +
-                        "                \"imageUrl\": \"http://pic95.nipic.com/file/20160420/20721554_193636830000_2.jpg\",\n" +
-                        "                \"name\": \"桃花朵朵开\",\n" +
-                        "                \"price\": 1000,\n" +
-                        "                \"storesNum\": 50,\n" +
-                        "                \"commentNum\": 1\n" +
-                        "            },\n" +
-                        "            {\n" +
-                        "                \"id\": \"456\",\n" +
-                        "                \"imageUrl\": \"http://pic8.huitu.com/res/20130502/198139_20130502150539969200_1.jpg\",\n" +
-                        "                \"name\": \"水牛啊\",\n" +
-                        "                \"price\": 600,\n" +
-                        "                \"storesNum\": 10,\n" +
-                        "                \"commentNum\": 8\n" +
-                        "            },\n" +
-                        "            {\n" +
-                        "                \"id\": \"456\",\n" +
-                        "                \"imageUrl\": \"http://pic101.nipic.com/file/20160518/7874840_213142978000_2.jpg\",\n" +
-                        "                \"name\": \"方便面\",\n" +
-                        "                \"price\": 600,\n" +
-                        "                \"storesNum\": 10,\n" +
-                        "                \"commentNum\": 8\n" +
-                        "            },\n" +
-                        "            {\n" +
-                        "                \"id\": \"456\",\n" +
-                        "                \"imageUrl\": \"http://pic101.nipic.com/file/20160518/7874840_213054341000_2.jpg\",\n" +
-                        "                \"name\": \"夏雨荷\",\n" +
-                        "                \"price\": 600,\n" +
-                        "                \"storesNum\": 10,\n" +
-                        "                \"commentNum\": 8\n" +
-                        "            },\n" +
-                        "            {\n" +
-                        "                \"id\": \"456\",\n" +
-                        "                \"imageUrl\": \"http://pic101.nipic.com/file/20160518/7874840_213000186000_2.jpg\",\n" +
-                        "                \"name\": \"宁采荷\",\n" +
-                        "                \"price\": 600,\n" +
-                        "                \"storesNum\": 10,\n" +
-                        "                \"commentNum\": 8\n" +
-                        "            },\n" +
-                        "            {\n" +
-                        "                \"id\": \"456\",\n" +
-                        "                \"imageUrl\": \"http://pic68.huitu.com/res/20160427/644246_20160427223158348200_1.jpg\",\n" +
-                        "                \"name\": \"美猴王\",\n" +
-                        "                \"price\": 600,\n" +
-                        "                \"storesNum\": 10,\n" +
-                        "                \"commentNum\": 8\n" +
-                        "            }\n" +
-                        "        ]\n" +
-                        "}";
-                map.put("product", data);
+                if (products2s != null && products2s.size() > 0) {
+                    int i = 0;
+                    for (PtmProduct ptmProduct : products2s) {
+                        if (i < 5) {
+                            ProductListVo productListVo = new ProductListVo();
+                            productListVo.setCommentNum(ptmProduct.getRating());
+                            productListVo.setId(ptmProduct.getId());
+                            productListVo.setImageUrl("http://pic101.nipic.com/file/20160606/23332452_170901893000_2.jpg");
+                            productListVo.setName(ptmProduct.getTitle());
+                            productListVo.setPrice(ptmProduct.getPrice());
+                            productListVo.setStoresNum(5);
+                            li.add(productListVo);
+                            i++;
+                        }
+                    }
+                }
+                map.put("product", li);
                 break;
             case 1:
-                data = "{\n" +
-                        "        \"product\": [\n" +
-                        "            {\n" +
-                        "                \"id\": \"5556465\",\n" +
-                        "                \"imageUrl\": \"http://pic95.nipic.com/file/20160420/20721554_193636830000_2.jpg\",\n" +
-                        "                \"name\": \"桃花朵朵开\",\n" +
-                        "                \"price\": 1000,\n" +
-                        "                \"storesNum\": 50,\n" +
-                        "                \"commentNum\": 1\n" +
-                        "            },\n" +
-                        "            {\n" +
-                        "                \"id\": \"456\",\n" +
-                        "                \"imageUrl\": \"http://pic8.huitu.com/res/20130502/198139_20130502150539969200_1.jpg\",\n" +
-                        "                \"name\": \"水牛啊\",\n" +
-                        "                \"price\": 600,\n" +
-                        "                \"storesNum\": 10,\n" +
-                        "                \"commentNum\": 8\n" +
-                        "            },\n" +
-                        "            {\n" +
-                        "                \"id\": \"456\",\n" +
-                        "                \"imageUrl\": \"http://pic101.nipic.com/file/20160518/7874840_213142978000_2.jpg\",\n" +
-                        "                \"name\": \"方便面\",\n" +
-                        "                \"price\": 600,\n" +
-                        "                \"storesNum\": 10,\n" +
-                        "                \"commentNum\": 8\n" +
-                        "            },\n" +
-                        "            {\n" +
-                        "                \"id\": \"456\",\n" +
-                        "                \"imageUrl\": \"http://pic101.nipic.com/file/20160518/7874840_213054341000_2.jpg\",\n" +
-                        "                \"name\": \"夏雨荷\",\n" +
-                        "                \"price\": 600,\n" +
-                        "                \"storesNum\": 10,\n" +
-                        "                \"commentNum\": 8\n" +
-                        "            },\n" +
-                        "            {\n" +
-                        "                \"id\": \"456\",\n" +
-                        "                \"imageUrl\": \"http://pic101.nipic.com/file/20160518/7874840_213000186000_2.jpg\",\n" +
-                        "                \"name\": \"宁采荷\",\n" +
-                        "                \"price\": 600,\n" +
-                        "                \"storesNum\": 10,\n" +
-                        "                \"commentNum\": 8\n" +
-                        "            },\n" +
-                        "            {\n" +
-                        "                \"id\": \"456\",\n" +
-                        "                \"imageUrl\": \"http://pic68.huitu.com/res/20160427/644246_20160427223158348200_1.jpg\",\n" +
-                        "                \"name\": \"美猴王\",\n" +
-                        "                \"price\": 600,\n" +
-                        "                \"storesNum\": 10,\n" +
-                        "                \"commentNum\": 8\n" +
-                        "            }\n" +
-                        "    }\n" +
-                        "}";
-                map.put("product", data);
+                if (products2s != null && products2s.size() > 0) {
+                    for (PtmProduct ptmProduct : products2s) {
+                        ProductListVo productListVo = new ProductListVo();
+                        productListVo.setCommentNum(ptmProduct.getRating());
+                        productListVo.setId(ptmProduct.getId());
+                        productListVo.setImageUrl("http://pic101.nipic.com/file/20160606/23332452_170901893000_2.jpg");
+                        productListVo.setName(ptmProduct.getTitle());
+                        productListVo.setPrice(ptmProduct.getPrice());
+                        productListVo.setStoresNum(5);
+                        li.add(productListVo);
+                    }
+                }
+                map.put("product", li);
                 break;
             case 2:
                 PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), 1, 10);
@@ -674,7 +605,7 @@ public class AppController {
                         ProductListVo productListVo = new ProductListVo();
                         productListVo.setCommentNum(productModel.getRating());
                         productListVo.setId(productModel.getId());
-                        productListVo.setImageUrl("http://pic95.nipic.com/file/20160419/7874840_024541265000_2.jpg");
+                        productListVo.setImageUrl("http://pic101.nipic.com/file/20160606/23332452_170901893000_2.jpg");
                         productListVo.setName(productModel.getTitle());
                         productListVo.setPrice(productModel.getPrice());
                         productListVo.setStoresNum(5);
