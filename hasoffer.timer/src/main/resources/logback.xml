@@ -141,12 +141,12 @@
     </appender>
 
     <!-- code info log -->
-    <logger name="hasoffer" level="DEBUG">
+    <logger name="hasoffer" level="INFO">
         <appender-ref ref="InfoLoggerFileOut"/>
     </logger>
 
     <!--code error log -->
-    <logger name="hasoffer" level="DEBUG">
+    <logger name="hasoffer" level="INFO">
         <appender-ref ref="ErrorLoggerFileOut"/>
     </logger>
 
@@ -178,7 +178,7 @@
     </logger>
 
     <root>
-        <level value="DEBUG"/>
+        <level value="INFO"/>
         <appender-ref ref="stdout"/>
         <appender-ref ref="StdoutFile"/>
     </root>

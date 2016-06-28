@@ -81,12 +81,12 @@ public class SkuImageDownloadTask {
             }
 
             if (cmpSkuQueue.size() > 0) {
-                logger.debug("queue size = " + cmpSkuQueue.size());
+                logger.info("queue size = " + cmpSkuQueue.size());
                 continue;
             }
 
             if (processorCount.get() > 0) {
-                logger.debug("processorCount = " + processorCount.get());
+                logger.info("processorCount = " + processorCount.get());
                 continue;
             }
 
@@ -119,6 +119,7 @@ public class SkuImageDownloadTask {
 
     private boolean processImage(PtmCmpSku sku) {
         try {
+            logger.info("processImage : " + sku.getId());
             String oriImageUrl = sku.getOriImageUrl();
             String imagePath = sku.getImagePath();
 
