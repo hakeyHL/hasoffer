@@ -25,6 +25,8 @@ import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
+import hasoffer.core.utils.ImageServerUtil;
+import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
@@ -343,7 +345,7 @@ public class AppController {
             dealVo.setId(appDeal.getId());
             dealVo.setExp(appDeal.getExpireTime());
             dealVo.setExtra(3.0);
-            dealVo.setImage(appDeal.getImageUrl());
+            dealVo.setImage(ImageUtil.getImageUrl(appDeal.getImageUrl()));
             dealVo.setLink(appDeal.getLinkUrl());
             dealVo.setTitle(appDeal.getTitle());
             li.add(dealVo);
@@ -518,7 +520,7 @@ public class AppController {
     @RequestMapping(value = "/productsList", method = RequestMethod.GET)
     public ModelAndView productsList(SearchCriteria criteria, String type) {
         ModelAndView mv = new ModelAndView();
-        int requestType =2 ;
+        int requestType = 2;
         if (StringUtils.isNotBlank(type)) {
             requestType = Integer.valueOf(type);
         }
@@ -566,7 +568,7 @@ public class AppController {
         }
         String data = "";
         //查询热卖商品
-        List<PtmProduct> products2s=productCacheManager.getTopSellingProductsByDate("20160627", 1, 20);
+        List<PtmProduct> products2s = productCacheManager.getTopSellingProductsByDate("20160627", 1, 20);
         switch (requestType) {
             case 0:
                 if (products2s != null && products2s.size() > 0) {
