@@ -2,6 +2,7 @@ package hasoffer.core.test;
 
 import hasoffer.base.model.Website;
 import hasoffer.core.bo.product.SearchedSku;
+import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
@@ -29,6 +30,8 @@ public class SearchProductHelperTest2 {
 
     @Resource
     IDataBaseManager dbm;
+    @Resource
+    IMongoDbManager mdm;
     @Resource
     ISearchService searchService;
     @Resource
@@ -80,6 +83,24 @@ public class SearchProductHelperTest2 {
             searchProductService.searchProductsFromSites(autoSearchResult);
             searchProductService.cleanProducts(autoSearchResult);
             searchService.relateUnmatchedSearchLogx(autoSearchResult);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void saveTest2() {
+        try {
+            String logId = "142d3861501ba9b943edd60352a22ff8";
+
+            SrmAutoSearchResult autoSearchResult = mdm.queryOne(SrmAutoSearchResult.class, logId);
+
+//            searchProductService.searchProductsFromSites(autoSearchResult);
+            boolean isCleaned = searchProductService.cleanProducts(autoSearchResult);
+            if (isCleaned) {
+                searchService.relateUnmatchedSearchLogx(autoSearchResult);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

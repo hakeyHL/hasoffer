@@ -200,9 +200,10 @@ public class AutoSearchMatchController {
                     public void process(SrmAutoSearchResult asr) {
                         try {
                             // 清洗要更新的商品。
-                            searchProductService.cleanProducts(asr);
-                            //
-                            searchService.relateUnmatchedSearchLogx(asr);
+                            boolean isCleaned = searchProductService.cleanProducts(asr);
+                            if (isCleaned) {
+                                searchService.relateUnmatchedSearchLogx(asr);
+                            }
                         } catch (Exception e) {
                             logger.debug("[" + asr.getId() + "]" + e.getMessage());
                         }

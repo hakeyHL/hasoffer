@@ -19,6 +19,7 @@ import hasoffer.core.persistence.po.app.AppWebsite;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.iml.ProductServiceImpl;
 import hasoffer.core.product.solr.CategoryIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
@@ -42,6 +43,7 @@ import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -66,6 +68,8 @@ public class AppController {
     ProductIndexServiceImpl productIndexServiceImpl;
     @Resource
     ProductServiceImpl productService;
+    @Resource
+    ICmpSkuService cmpSkuService;
     private Logger logger = LoggerFactory.logger(AppController.class);
 
     public static void main(String[] args) {
@@ -246,11 +250,11 @@ public class AppController {
                     orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
                     orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
                     //返利比率=tentativeAmount*rate/SaleAmount
-                    orderVo.setRate(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)).divide(orderStatsAnalysisPO.getSaleAmount(), 2, BigDecimal.ROUND_HALF_UP));
+                    orderVo.setRate(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.015)).divide(orderStatsAnalysisPO.getSaleAmount(), 2, BigDecimal.ROUND_HALF_UP));
                     orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
                     transcations.add(orderVo);
                     if (orderStatsAnalysisPO.getOrderStatus() != "cancelled") {
-                        PendingCoins = PendingCoins.add(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)));
+                        PendingCoins = PendingCoins.add(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.015)));
                     }
                     if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
                         VericiedCoins = VericiedCoins.add(orderStatsAnalysisPO.getTentativeAmount());
@@ -284,12 +288,12 @@ public class AppController {
         if (orderStatsAnalysisPO != null) {
             OrderVo orderVo = new OrderVo();
             orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
-            orderVo.setRate(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)).divide(orderStatsAnalysisPO.getSaleAmount(), 2, BigDecimal.ROUND_HALF_UP));
+            orderVo.setRate(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.015)).divide(orderStatsAnalysisPO.getSaleAmount(), 2, BigDecimal.ROUND_HALF_UP));
             orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
             orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
             orderVo.setChannel(orderStatsAnalysisPO.getChannel());
             orderVo.setTotal(orderStatsAnalysisPO.getSaleAmount());
-            orderVo.setAccount(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)));
+            orderVo.setAccount(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.015)));
             mv.addObject("data", orderVo);
         }
         return mv;
@@ -310,7 +314,7 @@ public class AppController {
             banner.setLink(appBanner.getLinkUrl());
             banner.setRank(appBanner.getRank());
             banner.setSource(1);
-            banner.setSourceUrl(appBanner.getImageUrl());
+            banner.setSourceUrl(appBanner.getImageUrl() == null ? "" : ImageUtil.getImageUrl(appBanner.getImageUrl()));
             banner.setExpireDate(appBanner.getDeadline());
             banners.add(banner);
         }
@@ -342,7 +346,10 @@ public class AppController {
             DealVo dealVo = new DealVo();
             dealVo.setId(appDeal.getId());
             dealVo.setExp(appDeal.getExpireTime());
-            dealVo.setExtra(3.0);
+            dealVo.setExtra(0.0);
+            if (appDeal.getWebsite() == Website.FLIPKART || appDeal.getWebsite() == Website.SHOPCLUES) {
+                dealVo.setExtra(1.5);
+            }
             dealVo.setImage(ImageUtil.getImageUrl(appDeal.getImageUrl()));
             dealVo.setLink(appDeal.getLinkUrl());
             dealVo.setTitle(appDeal.getTitle());
@@ -370,12 +377,18 @@ public class AppController {
         ModelAndView mv = new ModelAndView();
         if (appDeal != null) {
             Map map = new HashMap();
-            map.put("image", appDeal.getImageUrl());
+            map.put("image", ImageUtil.getImageUrl(appDeal.getImageUrl()));
             map.put("title", appDeal.getTitle());
-            map.put("exp", appDeal.getExpireTime());
-            map.put("extra", 3.0);
+            map.put("exp", new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(appDeal.getExpireTime()));
+            map.put("extra", 1.5);
             map.put("description", appDeal.getDescription());
-            map.put("cashbackInfo", " hello ");
+            if (appDeal.getWebsite() == Website.FLIPKART || appDeal.getWebsite() == Website.SHOPCLUES) {
+                map.put("cashbackInfo", "1. Offer valid for a limited time only while stocks last\n" +
+                        "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +
+                        "3. Rewards may not paid on purchases made using store credits/gift vouchers\n" +
+                        "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
+                        "5. Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
+            }
             map.put("deeplink", appDeal.getLinkUrl());
             mv.addObject("data", map);
         }
@@ -466,7 +479,7 @@ public class AppController {
                 CategoryVo categoryVo = new CategoryVo();
                 categoryVo.setId(ptmCategory.getId());
                 categoryVo.setHasChildren(ptmCategory.getParentId() == 0 ? 0 : 1);
-                categoryVo.setImage(ptmCategory.getImageUrl());
+                categoryVo.setImage(ptmCategory.getImageUrl() == null ? "" : ImageUtil.getImageUrl(ptmCategory.getImageUrl()));
                 categoryVo.setLevel(ptmCategory.getLevel());
                 categoryVo.setName(ptmCategory.getName());
                 categoryVo.setParentId(ptmCategory.getParentId());
@@ -481,7 +494,7 @@ public class AppController {
                 CategoryVo categoryVo = new CategoryVo();
                 categoryVo.setId(ptmCategory.getId());
                 categoryVo.setHasChildren(ptmCategory.getParentId() == 0 ? 0 : 1);
-                categoryVo.setImage(ptmCategory.getImageUrl());
+                categoryVo.setImage(ImageUtil.getImageUrl(ptmCategory.getImageUrl()));
                 categoryVo.setLevel(ptmCategory.getLevel());
                 categoryVo.setName(ptmCategory.getName());
                 categoryVo.setParentId(ptmCategory.getParentId());
@@ -494,7 +507,7 @@ public class AppController {
                         CategoryVo cate = new CategoryVo();
                         cate.setId(cates.getId());
                         cate.setHasChildren(0);
-                        cate.setImage(cates.getImageUrl());
+                        cate.setImage(ImageUtil.getImageUrl(cates.getImageUrl()));
                         cate.setLevel(cates.getLevel());
                         cate.setName(cates.getName());
                         cate.setParentId(cates.getParentId());
@@ -535,13 +548,14 @@ public class AppController {
                 List<ProductModel> productModes = products.getData();
                 for (ProductModel productModel : productModes) {
                     ProductListVo productListVo = new ProductListVo();
-                    productListVo.setCommentNum(productModel.getRating());
+                    productListVo.setCommentNum(0);
                     productListVo.setId(productModel.getId());
-                    productListVo.setImageUrl("http://pic95.nipic.com/file/20160419/7874840_024541265000_2.jpg");
+                    productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
                     productListVo.setName(productModel.getTitle());
                     productListVo.setPrice(productModel.getPrice());
-                    productListVo.setStoresNum(5);
-                    productListVo.setRatingNum(3.5f);
+                    int count = cmpSkuService.getSkuSoldStoreNum(productModel.getId());
+                    productListVo.setStoresNum(count);
+                    productListVo.setRatingNum(0);
                     li.add(productListVo);
                 }
             }
@@ -553,20 +567,23 @@ public class AppController {
                 List<ProductModel> productModes = p.getData();
                 for (ProductModel productModel : productModes) {
                     ProductListVo productListVo = new ProductListVo();
-                    productListVo.setCommentNum(productModel.getRating());
+                    productListVo.setCommentNum(0);
                     productListVo.setId(productModel.getId());
-                    productListVo.setImageUrl("http://pic95.nipic.com/file/20160419/7874840_024541265000_2.jpg");
+                    productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
                     productListVo.setName(productModel.getTitle());
                     productListVo.setPrice(productModel.getPrice());
-                    productListVo.setStoresNum(5);
-                    productListVo.setRatingNum(3.5f);
+                    int count = cmpSkuService.getSkuSoldStoreNum(productModel.getId());
+                    productListVo.setStoresNum(count);
+                    productListVo.setRatingNum(0);
                     li.add(productListVo);
                 }
             }
         }
         String data = "";
         //查询热卖商品
-        List<PtmProduct> products2s = productCacheManager.getTopSellingProductsByDate("20160627", 1, 20);
+        Date date = new Date();
+        date.setTime(date.getTime() - 1 * 60 * 60 * 1000);
+        List<PtmProduct> products2s = productCacheManager.getTopSellingProductsByDate(new SimpleDateFormat("yyyyMMdd").format(date), 1, 20);
         switch (requestType) {
             case 0:
                 if (products2s != null && products2s.size() > 0) {
@@ -574,13 +591,14 @@ public class AppController {
                     for (PtmProduct ptmProduct : products2s) {
                         if (i < 5) {
                             ProductListVo productListVo = new ProductListVo();
-                            productListVo.setCommentNum(ptmProduct.getRating());
+                            productListVo.setCommentNum(0);
                             productListVo.setId(ptmProduct.getId());
-                            productListVo.setImageUrl("http://pic101.nipic.com/file/20160606/23332452_170901893000_2.jpg");
+                            productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
                             productListVo.setName(ptmProduct.getTitle());
                             productListVo.setPrice(ptmProduct.getPrice());
-                            productListVo.setStoresNum(5);
-                            productListVo.setRatingNum(3.5f);
+                            int count = cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
+                            productListVo.setStoresNum(count);
+                            productListVo.setRatingNum(0);
                             li.add(productListVo);
                             i++;
                         }
@@ -592,13 +610,14 @@ public class AppController {
                 if (products2s != null && products2s.size() > 0) {
                     for (PtmProduct ptmProduct : products2s) {
                         ProductListVo productListVo = new ProductListVo();
-                        productListVo.setCommentNum(ptmProduct.getRating());
+                        productListVo.setCommentNum(0);
                         productListVo.setId(ptmProduct.getId());
-                        productListVo.setImageUrl("http://pic101.nipic.com/file/20160606/23332452_170901893000_2.jpg");
+                        productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
                         productListVo.setName(ptmProduct.getTitle());
                         productListVo.setPrice(ptmProduct.getPrice());
-                        productListVo.setStoresNum(5);
-                        productListVo.setRatingNum(3.5f);
+                        int count = cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
+                        productListVo.setStoresNum(count);
+                        productListVo.setRatingNum(0);
                         li.add(productListVo);
                     }
                 }
@@ -610,13 +629,14 @@ public class AppController {
                     List<ProductModel> productModes = p.getData();
                     for (ProductModel productModel : productModes) {
                         ProductListVo productListVo = new ProductListVo();
-                        productListVo.setCommentNum(productModel.getRating());
+                        productListVo.setCommentNum(0);
                         productListVo.setId(productModel.getId());
-                        productListVo.setImageUrl("http://pic101.nipic.com/file/20160606/23332452_170901893000_2.jpg");
+                        productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
                         productListVo.setName(productModel.getTitle());
                         productListVo.setPrice(productModel.getPrice());
-                        productListVo.setStoresNum(5);
-                        productListVo.setRatingNum(3.5f);
+                        int count = cmpSkuService.getSkuSoldStoreNum(productModel.getId());
+                        productListVo.setStoresNum(count);
+                        productListVo.setRatingNum(0);
                         li.add(productListVo);
                     }
                 }

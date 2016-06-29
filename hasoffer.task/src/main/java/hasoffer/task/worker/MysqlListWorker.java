@@ -55,7 +55,7 @@ public class MysqlListWorker<T> implements Runnable {
 
             page++;
 //            for test
-            break;
+//            break;
         }
 
         ws.setListWorkFinished(true);
