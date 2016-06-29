@@ -98,7 +98,7 @@ public class AwsDynamoDbService {
         getMapper().save(t);
     }
 
-    // 不是简单的保存整个数组，数组本身要定义为DynamoDBTable
+    // 涓嶆槸绠�鍗曠殑淇濆瓨鏁翠釜鏁扮粍锛屾暟缁勬湰韬瀹氫箟涓篋ynamoDBTable
 //    public <T> void save(T... ts) {
 //        getMapper().save(ts);
 //    }

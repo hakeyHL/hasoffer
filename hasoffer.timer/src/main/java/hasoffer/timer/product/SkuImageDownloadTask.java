@@ -1,6 +1,5 @@
 package hasoffer.timer.product;
 
-import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
@@ -65,7 +64,7 @@ public class SkuImageDownloadTask {
                             break;
                         }
 
-                        processImage(t);
+                        cmpSkuService.downloadImage2(t);
                     }
 
                     processorCount.addAndGet(-1);
@@ -93,46 +92,7 @@ public class SkuImageDownloadTask {
             break;
         }
 
-        logger.info("All images downloaded.");
-    }
-
-    //    @Scheduled(cron = "0 0/10 * * * ?")
-//    public void f() {
-//        final int page = 1, PAGE_SIZE = 1000;
-//
-//        while (true) {
-//            List<PtmCmpSku> skus = dbm.query(Q_SKU_IMAGE, page, PAGE_SIZE);
-//
-//            if (ArrayUtils.hasObjs(skus)) {
-//                for (PtmCmpSku sku : skus) {
-//                    processImage(sku);
-//                }
-//            } else {
-//                try {
-//                    TimeUnit.SECONDS.sleep(60);
-//                } catch (Exception e) {
-//                    return;
-//                }
-//            }
-//        }
-//    }
-
-    private boolean processImage(PtmCmpSku sku) {
-        try {
-            logger.info("processImage : " + sku.getId());
-            String oriImageUrl = sku.getOriImageUrl();
-            String imagePath = sku.getImagePath();
-
-            if (!StringUtils.isEmpty(imagePath) || StringUtils.isEmpty(oriImageUrl)) {
-                return false;
-            }
-
-            cmpSkuService.downloadImage2(sku);
-            return true;
-        } catch (Exception e) {
-            logger.error(e.getMessage() + " - " + sku.getId() + " ---" + sku.getOriImageUrl());
-            return false;
-        }
+        logger.info("All jobs finished.");
     }
 
 }

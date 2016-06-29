@@ -107,14 +107,16 @@ public class ImageUtil {
     }
 
     public static String uploadImage(File file) throws Exception {
-        return s3Storage.save(file);
+        return "/s3" + s3Storage.save(file);
     }
 
     public static ImagePath convertAndUploadImage(File file) throws Exception {
-        return s3Storage.saveAndConvert(file);
+        ImagePath imagePath = s3Storage.saveAndConvert(file);
+
+        return new ImagePath("/s3" + imagePath.getOriginalPath(), "/s3" + imagePath.getSmallPath(), "/s3" + imagePath.getBigPath());
     }
 
-   /* public static String uploadImage(File file) throws Exception {
+    /*public static String uploadImage(File file) throws Exception {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("file", file);
 

@@ -176,7 +176,10 @@ public class SearchProductService {
         return StringUtils.wordsMatchD(ss1, ss2);
     }
 
-    public void cleanProducts(SrmAutoSearchResult searchResult) {
+    public boolean cleanProducts(SrmAutoSearchResult searchResult) {
+        if (searchResult == null) {
+            return false;
+        }
         Map<Website, List<SearchedSku>> searchedSkusMap = new LinkedHashMap<Website, List<SearchedSku>>();
 
         Comparator comparator = new Comparator<SearchedSku>() {
@@ -226,12 +229,12 @@ public class SearchProductService {
             }
         }
 
-        if (maxTitleScore != 1) {
-            // 源网站如果没找到完全匹配的，不抓
-            searchResult.setFinalSkus(searchedSkusMap);
-            mdm.save(searchResult);
-            return;
-        }
+        // 源网站如果没找到完全匹配的，不抓
+//        if (maxTitleScore != 1) {
+//            searchResult.setFinalSkus(searchedSkusMap);
+//            mdm.save(searchResult);
+//            return false;
+//        }
 
         for (Map.Entry<Website, List<ListProduct>> kv : listProductMap.entrySet()) {
             Website website = kv.getKey();
@@ -268,6 +271,8 @@ public class SearchProductService {
         searchResult.setFinalSkus(searchedSkusMap);
 
         mdm.save(searchResult);
+
+        return true;
     }
 
     public void searchProductsFromSites(SrmAutoSearchResult searchResult) {

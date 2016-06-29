@@ -61,6 +61,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     private final String Q_CMPSKU_INDEX_BY_TITLEINDEX = "select t from PtmCmpSkuIndex2 t where t.siteSkuTitleIndex = ?0 ";
 
     private final String Q_CMPSKU_INDEX_BY_SOURCESID = "select t from PtmCmpSkuIndex2 t where t.siteSourceSidIndex = ?0 ";
+    private final String Q_CMPSKU_STORES_BY_PRODUCTID = "SELECT  DISTINCT t.website  from PtmCmpSku t where t.productId=?0";
 
     @Resource
     IFetchService fetchService;
@@ -144,6 +145,12 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     }
 
     @Override
+    public int getSkuSoldStoreNum(Long id) {
+        List li = dbm.query(Q_CMPSKU_STORES_BY_PRODUCTID, Arrays.asList(id));
+        return li.size();
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void fixUrls(long id, String url, String dl) {
         PtmCmpSkuUpdater cmpSkuUpdater = new PtmCmpSkuUpdater(id);
@@ -204,28 +211,32 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void downloadImage2(PtmCmpSku sku) {
-        String oriImageUrl = sku.getOriImageUrl();
-        if (StringUtils.isEmpty(oriImageUrl)) {
-            return;
-        }
-
         PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(sku.getId());
 
+        String oriImageUrl = sku.getOriImageUrl();
+
         try {
+            if (StringUtils.isEmpty(oriImageUrl)) {
+                throw new ImageDownloadOrUploadException();
+            }
+
             ImagePath imagePath = ImageUtil.downloadAndUpload2(oriImageUrl);
+
+            logger.info(imagePath.getOriginalPath() + "\t" + imagePath.getBigPath() + "\t" + imagePath.getSmallPath());
 
             ptmCmpSkuUpdater.getPo().setImagePath(imagePath.getOriginalPath());
             ptmCmpSkuUpdater.getPo().setSmallImagePath(imagePath.getSmallPath());
             ptmCmpSkuUpdater.getPo().setBigImagePath(imagePath.getBigPath());
 
         } catch (Exception e) {
-            logger.error(e.getMessage() + ", sku id = " + sku.getId());
+            logger.error("download image or upload error, sku id = " + sku.getId() + ", oriImageUrl = " + oriImageUrl);
 
             // 下载图片失败
             ptmCmpSkuUpdater.getPo().setFailLoadImage(true);
+        } finally {
+            dbm.update(ptmCmpSkuUpdater);
+            logger.info(String.format("update sku [%d]..........OK ! ", sku.getId()));
         }
-
-        dbm.update(ptmCmpSkuUpdater);
     }
 
     @Override

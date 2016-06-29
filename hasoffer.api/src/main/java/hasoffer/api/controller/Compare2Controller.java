@@ -7,15 +7,19 @@ import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.HexDigestUtil;
+import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.cache.CmpSkuCacheManager;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.exception.ERROR_CODE;
+import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.enums.SearchPrecise;
+import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.ptm.PtmSkuBasicAttribute;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.iml.ProductServiceImpl;
 import hasoffer.core.product.solr.CategoryIndexServiceImpl;
@@ -62,6 +66,8 @@ public class Compare2Controller {
     ISearchService searchService;
     @Resource
     ProductServiceImpl productService;
+    @Resource
+    IMongoDbManager mongoDbManager;
     private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
 
     // @Cacheable(value = "compare", key = "'getcmpskus_'+#q+'_'+#site+'_'+#price+'_'+#page+'_'+#size")
@@ -132,7 +138,7 @@ public class Compare2Controller {
                 cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
             }
             getSioBySearch(sio);
-            cr = getCmpProducts(sio, cmpSkuIndex);
+            cr = getCmpProducts(sio, cmpSkuIndex,Long.valueOf(id));
         } catch (Exception e) {
             logger.debug(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, size));
             //if exception occured ,get default cmpResult
@@ -171,30 +177,31 @@ public class Compare2Controller {
     private CmpResult getDefaultCmpSku(SearchIO sio,PtmProduct product) {
         CmpResult cmpResult = new CmpResult();
         cmpResult.setTotalRatingsNum(Long.valueOf(product.getRating()));
-        cmpResult.setSpecs("{\n" +
-                "            \"Service Provider\": \"not specilfied\",\n" +
-                "            \"Technology\": \"WCDMA/GSM\",\n" +
-                "            \"Weight\": \"539oz\"\n" +
-                " }");
-        cmpResult.setRatingNum(5);
+        PtmCmpSkuDescription ptmCmpSkuDescription=mongoDbManager.queryOne(PtmCmpSkuDescription.class,product.getId());
+        String specs="";
+        if(ptmCmpSkuDescription!=null){
+            specs=ptmCmpSkuDescription.getJsonDescription();
+        }
+        cmpResult.setSpecs(specs);
+        cmpResult.setRatingNum(0);
         String imageUrl = productCacheManager.getProductMasterImageUrl(sio.getHsProId());
         List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
         CmpProductListVo cplv = new CmpProductListVo();
         cplv.setPrice(product.getPrice());
-        cplv.setTotalRatingsNum(Long.valueOf(product.getRating()));
-        cplv.setRatingNum(5);
+        cplv.setTotalRatingsNum(Long.valueOf(0));
+        cplv.setRatingNum(0);
         cplv.setBackRate(0.015f);
         cplv.setCoins(Math.round(0.015 * product.getPrice()));
-        cplv.setFreight(20);
+        cplv.setFreight(0);
         cplv.setImage(WebsiteHelper.getLogoUrl(Website.valueOf(product.getSourceSite())));
-        cplv.setReturnGuarantee(10);
-        cplv.setSupport(Arrays.asList("COD"));
-        cplv.setFreight(10);
-        cplv.setDistributionTime(2);
+        cplv.setReturnGuarantee(0);
+        cplv.setSupport(null);
+        cplv.setFreight(0);
+        cplv.setDistributionTime(0);
         cplv.setDeepLinkUrl(WebsiteHelper.getUrlWithAff(Website.valueOf(product.getSourceSite()), product.getSourceUrl(), new String[]{sio.getMarketChannel().name()}));
         cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(Website.valueOf(product.getSourceSite()), product.getSourceUrl(), new String[]{sio.getMarketChannel().name()}));
         cmpResult.setImage(imageUrl);
-        cmpResult.setName(product.getSourceUrl());
+        cmpResult.setName(product.getTitle());
         cmpResult.setBestPrice(cplv.getPrice());
         comparedSkuVos.add(cplv);
         return cmpResult;
@@ -458,7 +465,7 @@ public class Compare2Controller {
      * @param cmpSkuIndex
      * @return
      */
-    private CmpResult getCmpProducts(SearchIO sio, PtmCmpSkuIndex2 cmpSkuIndex) {
+    private CmpResult getCmpProducts(SearchIO sio, PtmCmpSkuIndex2 cmpSkuIndex,Long id) {
         //初始化一个空的用于存放比价商品列表的List
 
         List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
@@ -508,16 +515,15 @@ public class Compare2Controller {
                 // 忽略前台返回的价格
                 CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
                 cplv.setPrice(cmpSku.getPrice());
-                cplv.setTotalRatingsNum(Long.valueOf(cmpSku.getRating() == null ? "0" : cmpSku.getRating()));
-                cplv.setRatingNum(5);
+                cplv.setTotalRatingsNum(Long.valueOf(0));
+                cplv.setRatingNum(0);
                 cplv.setBackRate(0.015f);
                 cplv.setCoins(Math.round(0.015 * cmpSku.getPrice()));
-                cplv.setFreight(20);
+                cplv.setFreight(0);
                 cplv.setImage(WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
-                cplv.setReturnGuarantee(10);
-                cplv.setSupport(Arrays.asList("COD"));
-                cplv.setFreight(10);
-                cplv.setDistributionTime(2);
+                cplv.setReturnGuarantee(0);
+                cplv.setSupport(null);
+                cplv.setDistributionTime(0);
                 cplv.setDeepLinkUrl(WebsiteHelper.getUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                 cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                 comparedSkuVos.add(cplv);
@@ -551,11 +557,12 @@ public class Compare2Controller {
         cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
         cmpResult.setPriceList(priceList.getData());
         cmpResult.setRatingNum(Long.valueOf(clientCmpSku.getRating()));
-        cmpResult.setSpecs("{\n" +
-                "            \"Service Provider\": \"not specilfied\",\n" +
-                "            \"Technology\": \"WCDMA/GSM\",\n" +
-                "            \"Weight\": \"539oz\"\n" +
-                " }");
+        PtmCmpSkuDescription ptmCmpSkuDescription=mongoDbManager.queryOne(PtmCmpSkuDescription.class,id);
+        String specs="";
+        if(ptmCmpSkuDescription!=null){
+            specs=ptmCmpSkuDescription.getJsonDescription();
+        }
+        cmpResult.setSpecs(specs);
         cmpResult.setTotalRatingsNum(Long.valueOf(clientCmpSku.getRating()));
         return cmpResult;
     }
