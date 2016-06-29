@@ -11,12 +11,14 @@ import hasoffer.base.utils.*;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.HijackLog;
+import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
+import hasoffer.core.persistence.po.ptm.updater.PtmProductUpdater;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IDataFixService;
 import hasoffer.core.product.IFetchService;
@@ -35,14 +37,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -61,6 +63,9 @@ public class FixController {
 
     private static final String Q_PTMCMPSKU = "SELECT t FROM PtmCmpSku t WHERE t.productId < 100000";
     private static final String Q_INDEX = "SELECT t FROM PtmCmpSkuIndex2 t ORDER BY t.id ASC";
+
+    private static final String Q_FLIPKART = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' ORDER BY t.id";
+    private static final String Q_PRODUCT_BYID = "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0";
 
     private static Logger logger = LoggerFactory.getLogger(FixController.class);
     @Resource
@@ -492,6 +497,82 @@ public class FixController {
             logger.debug(curPage + " page success ; left " + (totalPage - curPage) + "page");
             curPage++;
         }
+
+        return "ok";
+    }
+
+    @RequestMapping(value = "/fixProductCategory", method = RequestMethod.GET)
+    public @ResponseBody String fixProductCategory(){
+        List<PtmCmpSku> skus = dbm.query(Q_FLIPKART);
+        final ConcurrentLinkedQueue<PtmCmpSku> quene = new ConcurrentLinkedQueue<PtmCmpSku>();
+        ExecutorService es = Executors.newCachedThreadPool();
+       for(PtmCmpSku sku : skus){
+            if(sku.getCategoryId() == null){
+                logger.debug("categoryId is null, skuid : " + sku.getId());
+                continue;
+            }
+            if(sku.getProductId() == 0){
+                logger.debug("productId is null, skuid : " + sku.getId());
+                continue;
+            }
+
+           PtmProduct product = dbm.querySingle(Q_PRODUCT_BYID, Arrays.asList(sku.getProductId()));
+            if(product == null){
+                continue;
+            }
+
+           quene.add(sku);
+
+       }
+
+        for(int i = 0 ; i < 5; i++){
+            es.execute(new Runnable() {
+                @Override
+                public void run() {
+                    while (quene.peek() != null) {
+                        PtmCmpSku skuQ = quene.poll();
+                        PtmProductUpdater updater = new PtmProductUpdater(skuQ.getProductId());
+                        updater.getPo().setCategoryId(skuQ.getCategoryId());
+                        dbm.update(updater);
+                    }
+                }
+            });
+        }
+
+        return "ok";
+    }
+
+    @RequestMapping(value = "/fixSkuDescription", method = RequestMethod.GET)
+    public @ResponseBody String fixSkuDescriptionId(){
+        List<PtmProduct> products = dbm.query("select t from PtmProduct t");
+        List<Map<Long, Long>> list = new ArrayList<Map<Long, Long>>();
+        for(PtmProduct product : products){
+            List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ", Arrays.asList(product.getId()));
+            if (skus == null) {
+                continue;
+            }
+            for(PtmCmpSku sku : skus){
+                if(product.getTitle().equals(sku.getTitle())){
+                    Map<Long, Long> map = new HashMap<Long, Long>();
+                    map.put(sku.getId(), product.getId());
+                    list.add(map);
+                }
+            }
+        }
+
+        List<PtmCmpSkuDescription> skudes = mdm.query(PtmCmpSkuDescription.class, new Query());
+        for(PtmCmpSkuDescription description : skudes){
+            for(Map<Long, Long> m : list){
+                for(Map.Entry<Long, Long> entry : m.entrySet()){
+                    if(entry.getKey() == description.getId()){
+                        Update update = new Update();
+                        update.set("id", entry.getValue());
+                        mdm.update(PtmCmpSkuDescription.class, description.getId(), update);
+                    }
+                }
+            }
+        }
+
 
         return "ok";
     }
