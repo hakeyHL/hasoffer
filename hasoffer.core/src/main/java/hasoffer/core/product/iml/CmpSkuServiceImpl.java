@@ -204,14 +204,15 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void downloadImage2(PtmCmpSku sku) {
-        String oriImageUrl = sku.getOriImageUrl();
-        if (StringUtils.isEmpty(oriImageUrl)) {
-            return;
-        }
-
         PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(sku.getId());
 
+        String oriImageUrl = sku.getOriImageUrl();
+
         try {
+            if (StringUtils.isEmpty(oriImageUrl)) {
+                throw new ImageDownloadOrUploadException();
+            }
+
             logger.info(oriImageUrl);
 
             ImagePath imagePath = ImageUtil.downloadAndUpload2(oriImageUrl);
