@@ -66,6 +66,9 @@ public class AppServiceImpl implements IAppService {
     private static final String Q_APP_GETCHILDCATEGORY =
             "SELECT t FROM PtmCategory t where t.parentId=?0 " +
                     " order by level ASC,rank ASC";
+
+    private static final String Q_APP_CATEGORY_ISHASCHILDNODE =
+            "SELECT t FROM PtmCategory t where t.parentId=?0 ";
     @Resource
     IDataBaseManager dbm;
     private String Q_APP_GETPRODUCTS =
@@ -189,5 +192,16 @@ public class AppServiceImpl implements IAppService {
         List li=new ArrayList();
         li.add(Long.valueOf(categoryId));
        return  dbm.query(Q_APP_GETCHILDCATEGORY,li);
+    }
+
+    @Override
+    public int isHasChildNode(Long id) {
+        List li=new ArrayList();
+        li.add(id);
+        List<PtmCategory> category=(List)dbm.query(Q_APP_CATEGORY_ISHASCHILDNODE, li);
+        if(category==null||category.size()<1){
+            return 0;
+        }
+        return 1;
     }
 }
