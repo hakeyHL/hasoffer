@@ -2,8 +2,8 @@ package hasoffer.api.controller.vo;
 
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.PriceUtil;
 import hasoffer.base.utils.StringUtils;
-import hasoffer.core.utils.PriceUtil;
 
 /**
  * Date : 2016/5/27
