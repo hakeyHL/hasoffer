@@ -541,7 +541,7 @@ public class AppController {
                     ProductListVo productListVo = new ProductListVo();
                     productListVo.setCommentNum(0);
                     productListVo.setId(productModel.getId());
-                    productListVo.setImageUrl("http://pic95.nipic.com/file/20160419/7874840_024541265000_2.jpg");
+                    productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
                     productListVo.setName(productModel.getTitle());
                     productListVo.setPrice(productModel.getPrice());
                     int count=cmpSkuService.getSkuSoldStoreNum(productModel.getId());
@@ -560,7 +560,7 @@ public class AppController {
                     ProductListVo productListVo = new ProductListVo();
                     productListVo.setCommentNum(0);
                     productListVo.setId(productModel.getId());
-                    productListVo.setImageUrl("http://pic95.nipic.com/file/20160419/7874840_024541265000_2.jpg");
+                    productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
                     productListVo.setName(productModel.getTitle());
                     productListVo.setPrice(productModel.getPrice());
                     int count=cmpSkuService.getSkuSoldStoreNum(productModel.getId());
@@ -584,7 +584,7 @@ public class AppController {
                             ProductListVo productListVo = new ProductListVo();
                             productListVo.setCommentNum(0);
                             productListVo.setId(ptmProduct.getId());
-                            productListVo.setImageUrl("http://pic101.nipic.com/file/20160606/23332452_170901893000_2.jpg");
+                            productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
                             productListVo.setName(ptmProduct.getTitle());
                             productListVo.setPrice(ptmProduct.getPrice());
                             int count=cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
@@ -603,7 +603,7 @@ public class AppController {
                         ProductListVo productListVo = new ProductListVo();
                         productListVo.setCommentNum(0);
                         productListVo.setId(ptmProduct.getId());
-                        productListVo.setImageUrl("http://pic101.nipic.com/file/20160606/23332452_170901893000_2.jpg");
+                        productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
                         productListVo.setName(ptmProduct.getTitle());
                         productListVo.setPrice(ptmProduct.getPrice());
                         int count=cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
@@ -622,7 +622,7 @@ public class AppController {
                         ProductListVo productListVo = new ProductListVo();
                         productListVo.setCommentNum(0);
                         productListVo.setId(productModel.getId());
-                        productListVo.setImageUrl("http://pic101.nipic.com/file/20160606/23332452_170901893000_2.jpg");
+                        productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
                         productListVo.setName(productModel.getTitle());
                         productListVo.setPrice(productModel.getPrice());
                         int count=cmpSkuService.getSkuSoldStoreNum(productModel.getId());
