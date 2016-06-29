@@ -74,7 +74,8 @@ public class FKCateAndParamWorker implements Runnable {
     private void createCateAndGetParam(String url, PtmCmpSku sku) throws HttpFetchException, ContentParseException {
 
         final String CATE_PATH = "//div[@data-tracking-id='product_breadCrumbs']/ul/li";
-        final String DESCRIPTION_INFO = "//div[@class='productSpecs specSection']/table";
+        final String DESCRIPTION_INFO1 = "//div[@class='productSpecs specSection']/table";
+        final String DESCRIPTION_INFO2 = "//div[@id='veiwMoreSpecifications']/table";
 
         TagNode root = HtmlUtils.getUrlRootTagNode(url);
 
@@ -135,18 +136,23 @@ public class FKCateAndParamWorker implements Runnable {
 //        updater.getPo().setCategoryId(parentId);
 //        dbm.update(updater);
 
-        //获取描述节点
-        List<TagNode> infoNodeList = getSubNodesByXPath(root, DESCRIPTION_INFO, new ContentParseException("description section not found for [" + sku.getId() + "]"));
         //用来封装描述的键值对
         Map<String, String> infoMap = new HashMap<String, String>();
 
+        //获取描述节点
+        List<TagNode> infoNodeList = getSubNodesByXPath(root, DESCRIPTION_INFO1, new ContentParseException("description section not found for [" + sku.getId() + "]"));
         for (TagNode node : infoNodeList) {
-
             //获取具体的描述信息，填充到map集合中
-            getInfo(node, infoMap, sku);//ex    "name1":"value1"
-
+            getInfo1(node, infoMap, sku);//ex    "name1":"value1"
         }
 
+        if (infoNodeList.size() == 0) {
+            List<TagNode> descNodeList = getSubNodesByXPath(root, DESCRIPTION_INFO2, new ContentParseException("description section not found for [" + sku.getId() + "]"));
+            for (TagNode descNode : descNodeList) {
+                getInfo1(descNode, infoMap, sku);
+            }
+        }
+        
         String jsonDescription = JSONUtil.toJSON(infoMap);
 
         //将描述信息持久化到mongodb
@@ -154,10 +160,10 @@ public class FKCateAndParamWorker implements Runnable {
         skuDescription.setId(sku.getProductId());
         skuDescription.setJsonDescription(jsonDescription);
         mdm.save(skuDescription);
-        logger.debug("save description success for [" + sku.getId() + "]");
+        logger.debug("save description success for [" + sku.getProductId() + "]");
     }
 
-    private void getInfo(TagNode node, Map<String, String> infoMap, PtmCmpSku sku) throws ContentParseException {
+    private void getInfo1(TagNode node, Map<String, String> infoMap, PtmCmpSku sku) throws ContentParseException {
 
         //描述区域分为多块
         List<TagNode> infoNodeList = getSubNodesByXPath(node, "//tbody/tr", new ContentParseException("description not found for [" + sku.getId() + "]"));
