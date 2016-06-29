@@ -314,7 +314,7 @@ public class AppController {
             banner.setLink(appBanner.getLinkUrl());
             banner.setRank(appBanner.getRank());
             banner.setSource(1);
-            banner.setSourceUrl(ImageUtil.getImageUrl(appBanner.getImageUrl()));
+            banner.setSourceUrl(appBanner.getImageUrl() == null ? "" : ImageUtil.getImageUrl(appBanner.getImageUrl()));
             banner.setExpireDate(appBanner.getDeadline());
             banners.add(banner);
         }
@@ -377,9 +377,15 @@ public class AppController {
             map.put("image", ImageUtil.getImageUrl(appDeal.getImageUrl()));
             map.put("title", appDeal.getTitle());
             map.put("exp", new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(appDeal.getExpireTime()));
-            map.put("extra", 3.0);
+            map.put("extra", 1.5);
             map.put("description", appDeal.getDescription());
-            map.put("cashbackInfo", " hello ");
+            if (appDeal.getWebsite() == Website.FLIPKART || appDeal.getWebsite() == Website.SHOPCLUES) {
+                map.put("cashbackInfo", "1. Offer valid for a limited time only while stocks last\n" +
+                        "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +
+                        "3. Rewards may not paid on purchases made using store credits/gift vouchers\n" +
+                        "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
+                        "5. Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
+            }
             map.put("deeplink", appDeal.getLinkUrl());
             mv.addObject("data", map);
         }
@@ -470,7 +476,7 @@ public class AppController {
                 CategoryVo categoryVo = new CategoryVo();
                 categoryVo.setId(ptmCategory.getId());
                 categoryVo.setHasChildren(ptmCategory.getParentId() == 0 ? 0 : 1);
-                categoryVo.setImage(ImageUtil.getImageUrl(ptmCategory.getImageUrl()));
+                categoryVo.setImage(ptmCategory.getImageUrl() == null ? "" : ImageUtil.getImageUrl(ptmCategory.getImageUrl()));
                 categoryVo.setLevel(ptmCategory.getLevel());
                 categoryVo.setName(ptmCategory.getName());
                 categoryVo.setParentId(ptmCategory.getParentId());
@@ -544,7 +550,7 @@ public class AppController {
                     productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
                     productListVo.setName(productModel.getTitle());
                     productListVo.setPrice(productModel.getPrice());
-                    int count=cmpSkuService.getSkuSoldStoreNum(productModel.getId());
+                    int count = cmpSkuService.getSkuSoldStoreNum(productModel.getId());
                     productListVo.setStoresNum(count);
                     productListVo.setRatingNum(0);
                     li.add(productListVo);
@@ -563,7 +569,7 @@ public class AppController {
                     productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
                     productListVo.setName(productModel.getTitle());
                     productListVo.setPrice(productModel.getPrice());
-                    int count=cmpSkuService.getSkuSoldStoreNum(productModel.getId());
+                    int count = cmpSkuService.getSkuSoldStoreNum(productModel.getId());
                     productListVo.setStoresNum(count);
                     productListVo.setRatingNum(0);
                     li.add(productListVo);
@@ -572,8 +578,8 @@ public class AppController {
         }
         String data = "";
         //查询热卖商品
-        Date date=new Date();
-        date.setTime(date.getTime()-1*60*60*1000);
+        Date date = new Date();
+        date.setTime(date.getTime() - 1 * 60 * 60 * 1000);
         List<PtmProduct> products2s = productCacheManager.getTopSellingProductsByDate(new SimpleDateFormat("yyyyMMdd").format(date), 1, 20);
         switch (requestType) {
             case 0:
@@ -587,7 +593,7 @@ public class AppController {
                             productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
                             productListVo.setName(ptmProduct.getTitle());
                             productListVo.setPrice(ptmProduct.getPrice());
-                            int count=cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
+                            int count = cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
                             productListVo.setStoresNum(count);
                             productListVo.setRatingNum(0);
                             li.add(productListVo);
@@ -606,7 +612,7 @@ public class AppController {
                         productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
                         productListVo.setName(ptmProduct.getTitle());
                         productListVo.setPrice(ptmProduct.getPrice());
-                        int count=cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
+                        int count = cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
                         productListVo.setStoresNum(count);
                         productListVo.setRatingNum(0);
                         li.add(productListVo);
@@ -625,7 +631,7 @@ public class AppController {
                         productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
                         productListVo.setName(productModel.getTitle());
                         productListVo.setPrice(productModel.getPrice());
-                        int count=cmpSkuService.getSkuSoldStoreNum(productModel.getId());
+                        int count = cmpSkuService.getSkuSoldStoreNum(productModel.getId());
                         productListVo.setStoresNum(count);
                         productListVo.setRatingNum(0);
                         li.add(productListVo);
