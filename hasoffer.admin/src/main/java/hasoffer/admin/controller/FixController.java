@@ -502,30 +502,56 @@ public class FixController {
     }
 
     @RequestMapping(value = "/fixProductCategory", method = RequestMethod.GET)
-    public @ResponseBody String fixProductCategory(){
-        List<PtmCmpSku> skus = dbm.query(Q_FLIPKART);
+    public
+    @ResponseBody
+    String fixProductCategory() {
+
         final ConcurrentLinkedQueue<PtmCmpSku> quene = new ConcurrentLinkedQueue<PtmCmpSku>();
+
         ExecutorService es = Executors.newCachedThreadPool();
-       for(PtmCmpSku sku : skus){
-            if(sku.getCategoryId() == null){
-                logger.debug("categoryId is null, skuid : " + sku.getId());
-                continue;
+
+        es.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                int pageSize = 1000;
+                int curPage = 1;
+
+                PageableResult<PtmCmpSku> pageableResult = dbm.queryPage(Q_FLIPKART, curPage, pageSize);
+
+                long totalPage = pageableResult.getTotalPage();
+
+                while (curPage < totalPage) {
+
+                    pageableResult = dbm.queryPage(Q_FLIPKART, curPage, pageSize);
+
+                    List<PtmCmpSku> skus = pageableResult.getData();
+
+                    for (PtmCmpSku sku : skus) {
+                        if (sku.getCategoryId() == null) {
+                            logger.debug("categoryId is null, skuid : " + sku.getId());
+                            continue;
+                        }
+                        if (sku.getProductId() == 0) {
+                            logger.debug("productId is null, skuid : " + sku.getId());
+                            continue;
+                        }
+
+                        PtmProduct product = dbm.querySingle(Q_PRODUCT_BYID, Arrays.asList(sku.getProductId()));
+                        if (product == null) {
+                            continue;
+                        }
+
+                        quene.add(sku);
+                    }
+
+                    curPage++;
+                    logger.debug("fix category list worker : curPage :" + curPage);
+                }
             }
-            if(sku.getProductId() == 0){
-                logger.debug("productId is null, skuid : " + sku.getId());
-                continue;
-            }
+        });
 
-           PtmProduct product = dbm.querySingle(Q_PRODUCT_BYID, Arrays.asList(sku.getProductId()));
-            if(product == null){
-                continue;
-            }
-
-           quene.add(sku);
-
-       }
-
-        for(int i = 0 ; i < 5; i++){
+        for (int i = 0; i < 10; i++) {
             es.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -534,6 +560,7 @@ public class FixController {
                         PtmProductUpdater updater = new PtmProductUpdater(skuQ.getProductId());
                         updater.getPo().setCategoryId(skuQ.getCategoryId());
                         dbm.update(updater);
+                        logger.debug("update category worker : id = " + skuQ.getProductId());
                     }
                 }
             });
@@ -543,16 +570,18 @@ public class FixController {
     }
 
     @RequestMapping(value = "/fixSkuDescription", method = RequestMethod.GET)
-    public @ResponseBody String fixSkuDescriptionId(){
+    public
+    @ResponseBody
+    String fixSkuDescriptionId() {
         List<PtmProduct> products = dbm.query("select t from PtmProduct t");
         List<Map<Long, Long>> list = new ArrayList<Map<Long, Long>>();
-        for(PtmProduct product : products){
+        for (PtmProduct product : products) {
             List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ", Arrays.asList(product.getId()));
             if (skus == null) {
                 continue;
             }
-            for(PtmCmpSku sku : skus){
-                if(product.getTitle().equals(sku.getTitle())){
+            for (PtmCmpSku sku : skus) {
+                if (product.getTitle().equals(sku.getTitle())) {
                     Map<Long, Long> map = new HashMap<Long, Long>();
                     map.put(sku.getId(), product.getId());
                     list.add(map);
@@ -561,10 +590,10 @@ public class FixController {
         }
 
         List<PtmCmpSkuDescription> skudes = mdm.query(PtmCmpSkuDescription.class, new Query());
-        for(PtmCmpSkuDescription description : skudes){
-            for(Map<Long, Long> m : list){
-                for(Map.Entry<Long, Long> entry : m.entrySet()){
-                    if(entry.getKey() == description.getId()){
+        for (PtmCmpSkuDescription description : skudes) {
+            for (Map<Long, Long> m : list) {
+                for (Map.Entry<Long, Long> entry : m.entrySet()) {
+                    if (entry.getKey() == description.getId()) {
                         Update update = new Update();
                         update.set("id", entry.getValue());
                         mdm.update(PtmCmpSkuDescription.class, description.getId(), update);
