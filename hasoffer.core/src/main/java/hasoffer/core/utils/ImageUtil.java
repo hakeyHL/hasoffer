@@ -114,7 +114,7 @@ public class ImageUtil {
         return s3Storage.saveAndConvert(file);
     }
 
-   /* public static String uploadImage(File file) throws Exception {
+    /*public static String uploadImage(File file) throws Exception {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("file", file);
 

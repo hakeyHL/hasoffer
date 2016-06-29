@@ -40,7 +40,7 @@ public class ImageDownloadTask {
     public void f() {
         SysTimerTaskLog log = timerService.createTaskLog("ImageDownloadTask");
 
-        int page = 1, PAGE_SIZE = 500;
+        int page = 1, PAGE_SIZE = 1000;
         PageableResult<PtmImage> pagedImages = dbm.queryPage(Q_PTM_IMAGE, page, PAGE_SIZE);
 
         long totalPage = pagedImages.getTotalPage();
