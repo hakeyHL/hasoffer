@@ -346,7 +346,10 @@ public class AppController {
             DealVo dealVo = new DealVo();
             dealVo.setId(appDeal.getId());
             dealVo.setExp(appDeal.getExpireTime());
-            dealVo.setExtra(3.0);
+            dealVo.setExtra(0.0);
+            if (appDeal.getWebsite() == Website.FLIPKART || appDeal.getWebsite() == Website.SHOPCLUES) {
+                dealVo.setExtra(1.5);
+            }
             dealVo.setImage(ImageUtil.getImageUrl(appDeal.getImageUrl()));
             dealVo.setLink(appDeal.getLinkUrl());
             dealVo.setTitle(appDeal.getTitle());
