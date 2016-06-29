@@ -212,7 +212,11 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(sku.getId());
 
         try {
+            logger.info(oriImageUrl);
+
             ImagePath imagePath = ImageUtil.downloadAndUpload2(oriImageUrl);
+
+            logger.info(imagePath.getOriginalPath() + "\t" + imagePath.getBigPath() + "\t" + imagePath.getSmallPath());
 
             ptmCmpSkuUpdater.getPo().setImagePath(imagePath.getOriginalPath());
             ptmCmpSkuUpdater.getPo().setSmallImagePath(imagePath.getSmallPath());
@@ -224,7 +228,9 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             // 下载图片失败
             ptmCmpSkuUpdater.getPo().setFailLoadImage(true);
         } finally {
+            logger.info(String.format("update sku [%d]..........", sku.getId()));
             dbm.update(ptmCmpSkuUpdater);
+            logger.info(String.format("update sku [%d]..........OK ! ", sku.getId()));
         }
     }
 
