@@ -26,7 +26,7 @@ public class ImageTest {
 
     @Test
     public void f() throws Exception {
-        String url = "http://d.hiphotos.baidu.com/zhidao/pic/item/e7cd7b899e510fb38cc9205dd833c895d0430c23.jpg";
+        String url = "http://img20.360buyimg.com/da/jfs/t2752/14/2642732614/92420/3092a687/576c9acbNcb1a36b0.jpg";
 
 //        ImagePath imagePath = ImageUtil.downloadAndUpload2(url);
 //        System.out.println(imagePath.toString());
