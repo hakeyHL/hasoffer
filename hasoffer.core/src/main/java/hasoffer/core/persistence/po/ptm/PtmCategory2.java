@@ -18,8 +18,7 @@ public class PtmCategory2 implements Identifiable<Long> {
     private int level;
     private int rank;
 
-    @Column(unique = true)
-    private String name;//name不能重复
+    private String name;
     private String imageUrl;
 
     private String keyword;
