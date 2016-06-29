@@ -220,8 +220,6 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
                 throw new ImageDownloadOrUploadException();
             }
 
-            logger.info(oriImageUrl);
-
             ImagePath imagePath = ImageUtil.downloadAndUpload2(oriImageUrl);
 
             logger.info(imagePath.getOriginalPath() + "\t" + imagePath.getBigPath() + "\t" + imagePath.getSmallPath());
