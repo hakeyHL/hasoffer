@@ -155,7 +155,7 @@ public class FKCateAndParamWorker implements Runnable {
 
         //将描述信息持久化到mongodb
         PtmCmpSkuDescription skuDescription = new PtmCmpSkuDescription();
-        skuDescription.setId(sku.getId());
+        skuDescription.setId(sku.getProductId());
         skuDescription.setJsonDescription(jsonDescription);
         mdm.save(skuDescription);
         logger.debug("save description success for [" + sku.getId() + "]");
