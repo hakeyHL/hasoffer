@@ -1,10 +1,13 @@
 package hasoffer.api.controller.vo;
 
+import hasoffer.base.config.AppConfig;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
+
+import java.text.NumberFormat;
 
 /**
  * Created on 2015/12/17.
@@ -38,7 +41,7 @@ public class ComparedSkuVo {
     public ComparedSkuVo(Website website, String title, double price) {
         this.website = website;
         this.title = title;
-        this.price = new Float(price).intValue();
+        this.price = price;
         this.websiteLogoUrl = WebsiteHelper.getLogoUrl(website);
     }
 
@@ -168,10 +171,15 @@ public class ComparedSkuVo {
     }
 
     public String getPriceStr() {
-        if(price==0) {
+        if (price == 0) {
             return "";
-        }else{
-            return price+"";
+        } else {
+            NumberFormat ddf1 = NumberFormat.getNumberInstance();
+            ddf1.setMaximumFractionDigits(2);
+            if (AppConfig.SerRegion.INDIA.equals(AppConfig.getSerRegion())) {
+                ddf1.setMaximumFractionDigits(0);
+            }
+            return ddf1.format(price);
         }
     }
 
