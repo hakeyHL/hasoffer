@@ -92,7 +92,7 @@ public class SkuImageDownloadTask {
             break;
         }
 
-        logger.info("All images downloaded.");
+        logger.info("All jobs finished.");
     }
 
 }

@@ -146,7 +146,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
     @Override
     public int getSkuSoldStoreNum(Long id) {
-        List li= dbm.query(Q_CMPSKU_STORES_BY_PRODUCTID,Arrays.asList(id));
+        List li = dbm.query(Q_CMPSKU_STORES_BY_PRODUCTID, Arrays.asList(id));
         return li.size();
     }
 
@@ -231,12 +231,11 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             ptmCmpSkuUpdater.getPo().setBigImagePath(imagePath.getBigPath());
 
         } catch (Exception e) {
-            logger.error(e.getMessage() + ", sku id = " + sku.getId());
+            logger.error("download image or upload error, sku id = " + sku.getId() + ", oriImageUrl = " + oriImageUrl);
 
             // 下载图片失败
             ptmCmpSkuUpdater.getPo().setFailLoadImage(true);
         } finally {
-            logger.info(String.format("update sku [%d]..........", sku.getId()));
             dbm.update(ptmCmpSkuUpdater);
             logger.info(String.format("update sku [%d]..........OK ! ", sku.getId()));
         }
