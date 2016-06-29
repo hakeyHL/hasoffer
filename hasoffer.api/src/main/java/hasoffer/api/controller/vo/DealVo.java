@@ -43,7 +43,7 @@ public class DealVo {
     }
 
     public void setExp(Date time) {
-        this.exp=new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(time);
+        this.exp=new SimpleDateFormat("MM/dd/yyyy").format(time);
     }
 
     public Double getExtra() {
