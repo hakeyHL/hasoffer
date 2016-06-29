@@ -31,7 +31,7 @@ public class AwsSummaryProduct {
     private String title;
     private String subTitle;
 
-    private float price;
+    private double price;
 
     private String imageUrl;
     @DynamoDBMarshalling(marshallerClass = SkuStatusTypeConverter.class)
@@ -52,7 +52,7 @@ public class AwsSummaryProduct {
     }
 
     public AwsSummaryProduct(long id, Website website, String url, String sourceId,
-                             String title, String subTitle, float price, String imageUrl,
+                             String title, String subTitle, double price, String imageUrl,
                              SkuStatus skuStatus) {
         this();
         this.id = id;
@@ -120,7 +120,7 @@ public class AwsSummaryProduct {
         this.subTitle = subTitle;
     }
 
-    public float getPrice() {
+    public double getPrice() {
         return price;
     }
 
@@ -184,7 +184,7 @@ public class AwsSummaryProduct {
         AwsSummaryProduct that = (AwsSummaryProduct) o;
 
         if (id != that.id) return false;
-        if (Float.compare(that.price, price) != 0) return false;
+        if (Double.compare(that.price, price) != 0) return false;
         if (lCreateTime != that.lCreateTime) return false;
         if (lUpdateTime != that.lUpdateTime) return false;
         if (website != that.website) return false;
@@ -201,13 +201,16 @@ public class AwsSummaryProduct {
 
     @Override
     public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
+        int result;
+        long temp;
+        result = (int) (id ^ (id >>> 32));
         result = 31 * result + (website != null ? website.hashCode() : 0);
         result = 31 * result + (url != null ? url.hashCode() : 0);
         result = 31 * result + (sourceId != null ? sourceId.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (subTitle != null ? subTitle.hashCode() : 0);
-        result = 31 * result + (price != +0.0f ? Float.floatToIntBits(price) : 0);
+        temp = Double.doubleToLongBits(price);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (imageUrl != null ? imageUrl.hashCode() : 0);
         result = 31 * result + (skuStatus != null ? skuStatus.hashCode() : 0);
         result = 31 * result + (int) (lCreateTime ^ (lCreateTime >>> 32));

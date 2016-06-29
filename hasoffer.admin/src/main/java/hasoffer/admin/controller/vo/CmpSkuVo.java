@@ -21,7 +21,7 @@ public class CmpSkuVo {
     private String rating;
 
     private String title;
-    private float price;
+    private double price;
 
     private String url;
     private String imageUrl;
@@ -114,11 +114,11 @@ public class CmpSkuVo {
         this.rating = rating;
     }
 
-    public float getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 

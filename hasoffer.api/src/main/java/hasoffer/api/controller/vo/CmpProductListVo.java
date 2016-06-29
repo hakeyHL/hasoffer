@@ -12,7 +12,7 @@ public class CmpProductListVo {
     private String image;
     private float ratingNum;
     private Long totalRatingsNum;
-    private float price;
+    private double price;
     private int freight;
     private int distributionTime;
     private Long coins;
@@ -90,11 +90,11 @@ public class CmpProductListVo {
         this.totalRatingsNum = totalRatingsNum;
     }
 
-    public float getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 

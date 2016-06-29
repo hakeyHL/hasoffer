@@ -20,7 +20,7 @@ public class PtmProduct implements Identifiable<Long> {
     private long categoryId;
     private String title;// 标题
     private String tag;
-    private float price;
+    private double price;
 
     private String color;
     private String size;
@@ -36,7 +36,7 @@ public class PtmProduct implements Identifiable<Long> {
     public PtmProduct() {
     }
 
-    public PtmProduct(long categoryId, String title, float price,
+    public PtmProduct(long categoryId, String title, double price,
                       String sourceSite, String sourceUrl, String sourceId) {
         this.categoryId = categoryId;
         this.title = title;
@@ -95,7 +95,7 @@ public class PtmProduct implements Identifiable<Long> {
         this.title = title;
     }
 
-    public float getPrice() {
+    public double getPrice() {
         return price;
     }
 
@@ -183,7 +183,7 @@ public class PtmProduct implements Identifiable<Long> {
         PtmProduct that = (PtmProduct) o;
 
         if (categoryId != that.categoryId) return false;
-        if (Float.compare(that.price, price) != 0) return false;
+        if (Double.compare(that.price, price) != 0) return false;
         if (rating != that.rating) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (createTime != null ? !createTime.equals(that.createTime) : that.createTime != null) return false;
@@ -195,20 +195,22 @@ public class PtmProduct implements Identifiable<Long> {
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
         if (sourceSite != null ? !sourceSite.equals(that.sourceSite) : that.sourceSite != null) return false;
         if (sourceUrl != null ? !sourceUrl.equals(that.sourceUrl) : that.sourceUrl != null) return false;
-        if (sourceId != null ? !sourceId.equals(that.sourceId) : that.sourceId != null) return false;
+        return !(sourceId != null ? !sourceId.equals(that.sourceId) : that.sourceId != null);
 
-        return true;
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
+        int result;
+        long temp;
+        result = id != null ? id.hashCode() : 0;
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
         result = 31 * result + (int) (categoryId ^ (categoryId >>> 32));
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (tag != null ? tag.hashCode() : 0);
-        result = 31 * result + (price != +0.0f ? Float.floatToIntBits(price) : 0);
+        temp = Double.doubleToLongBits(price);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (color != null ? color.hashCode() : 0);
         result = 31 * result + (size != null ? size.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);

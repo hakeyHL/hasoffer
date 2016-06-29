@@ -20,7 +20,7 @@ public class ProductBo {
     private long categoryId;
     private String title;// 标题
     private String tag;
-    private float price;
+    private double price;
 
     private String sourceSite;
     private String sourceUrl;
@@ -83,7 +83,7 @@ public class ProductBo {
         this.tag = tag;
     }
 
-    public float getPrice() {
+    public double getPrice() {
         return price;
     }
 

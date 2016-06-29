@@ -231,10 +231,10 @@ public class SearchController {
             }
 
             int skuCount = cmpSkus.size();
-            float min = cmpSkus.get(0).getPrice(), max = min;
+            double min = cmpSkus.get(0).getPrice(), max = min;
 
             for (PtmCmpSku cmpSku : cmpSkus) {
-                float price = cmpSku.getPrice();
+                double price = cmpSku.getPrice();
                 if (price < min) {
                     min = price;
                 }
@@ -247,7 +247,7 @@ public class SearchController {
         return productVos;
     }
 
-    private ProductVo getProductVo(PtmProduct p, float min, float max, int skuCount) {
+    private ProductVo getProductVo(PtmProduct p, double min, double max, int skuCount) {
         ProductVo vo = new ProductVo();
 
         vo.setId(p.getId());

@@ -41,7 +41,7 @@ public class SearchLogManager {
                 long proId = srmSearchLog.getPtmProductId();
 
                 int skuCount = 0;
-                float min = 0, max = 0;
+                double min = 0, max = 0;
 
                 if (proId > 0) {
                     PtmProduct ptmProduct = dbm.get(PtmProduct.class, srmSearchLog.getPtmProductId());
@@ -54,7 +54,7 @@ public class SearchLogManager {
                     skuCount = cmpSkus.size();
 
                     for (PtmCmpSku cmpSku : cmpSkus) {
-                        float price = cmpSku.getPrice();
+                        double price = cmpSku.getPrice();
 
                         if (min <= 0 || price < min) {
                             min = price;

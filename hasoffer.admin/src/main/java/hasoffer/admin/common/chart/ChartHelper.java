@@ -13,7 +13,7 @@ import java.util.Map;
 public class ChartHelper {
 
 
-    public static List<Chartd> getChartData(Map<Website, List<Float>> priceMap) {
+    public static List<Chartd> getChartData(Map<Website, List<Double>> priceMap) {
 
         List<Chartd> chartds = new ArrayList<Chartd>();
 
@@ -21,7 +21,7 @@ public class ChartHelper {
             return chartds;
         }
 
-        for (Map.Entry<Website, List<Float>> kv : priceMap.entrySet()) {
+        for (Map.Entry<Website, List<Double>> kv : priceMap.entrySet()) {
             Website website = kv.getKey();
             chartds.add(new Chartd(website.name(), kv.getValue()));
         }

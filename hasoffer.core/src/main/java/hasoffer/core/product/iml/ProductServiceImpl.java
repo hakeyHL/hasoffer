@@ -316,7 +316,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public ProductBo createProduct(long cateId, String title, float price,
+    public ProductBo createProduct(long cateId, String title, double price,
                                    Website website, String sourceUrl, String sourceId, String imageUrl) {
         logger.debug(String.format("create product : %s", title));
 

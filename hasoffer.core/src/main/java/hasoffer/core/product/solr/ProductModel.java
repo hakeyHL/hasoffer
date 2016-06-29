@@ -14,7 +14,7 @@ public class ProductModel implements IIdentifiable<Long> {
 
     private long cateId;
     private String category;
-    private float price;
+    private double price;
 
     private String feature;
     private String description;
@@ -30,7 +30,7 @@ public class ProductModel implements IIdentifiable<Long> {
     private String key1;// title word 3+
 
     public ProductModel(Long id, String title, String tag, long cateId, String category,
-                        float price, String feature, String description,
+                        double price, String feature, String description,
                         String color, String size, int rating,
                         long cate1, long cate2, long cate3) {
         this.id = id;
@@ -95,7 +95,7 @@ public class ProductModel implements IIdentifiable<Long> {
         this.title = title;
     }
 
-    public float getPrice() {
+    public double getPrice() {
         return price;
     }
 

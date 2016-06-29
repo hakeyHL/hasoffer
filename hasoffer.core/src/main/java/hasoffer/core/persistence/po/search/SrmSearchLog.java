@@ -21,7 +21,7 @@ public class SrmSearchLog implements Identifiable<String> {
     private String site;
     private String keyword;
     private String brand;
-    private float price;
+    private double price;
 
     private int count = 1;// 被搜索次数
     private long category = 0;
@@ -44,7 +44,7 @@ public class SrmSearchLog implements Identifiable<String> {
     }
 
     public SrmSearchLog(String id, String site, String sourceId,
-                        String keyword, String brand, float price, long category,
+                        String keyword, String brand, double price, long category,
                         long ptmProductId, long ptmCmpSkuId) {
         this.id = id;
         this.site = site;
@@ -84,7 +84,7 @@ public class SrmSearchLog implements Identifiable<String> {
         this.keyword = keyword;
     }
 
-    public float getPrice() {
+    public double getPrice() {
         return price;
     }
 
@@ -188,7 +188,7 @@ public class SrmSearchLog implements Identifiable<String> {
 
         SrmSearchLog that = (SrmSearchLog) o;
 
-        if (Float.compare(that.price, price) != 0) return false;
+        if (Double.compare(that.price, price) != 0) return false;
         if (count != that.count) return false;
         if (category != that.category) return false;
         if (ptmProductId != that.ptmProductId) return false;
@@ -209,11 +209,14 @@ public class SrmSearchLog implements Identifiable<String> {
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
+        int result;
+        long temp;
+        result = id != null ? id.hashCode() : 0;
         result = 31 * result + (site != null ? site.hashCode() : 0);
         result = 31 * result + (keyword != null ? keyword.hashCode() : 0);
         result = 31 * result + (brand != null ? brand.hashCode() : 0);
-        result = 31 * result + (price != +0.0f ? Float.floatToIntBits(price) : 0);
+        temp = Double.doubleToLongBits(price);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + count;
         result = 31 * result + (int) (category ^ (category >>> 32));
         result = 31 * result + (int) (ptmProductId ^ (ptmProductId >>> 32));
