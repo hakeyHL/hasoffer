@@ -49,7 +49,7 @@ public class SkuImageDownloadTask {
 
         ExecutorService es = Executors.newCachedThreadPool();
 
-        int processCount = 20;
+        int processCount = 1;
         final AtomicInteger processorCount = new AtomicInteger(0);
 
         for (int i = 0; i < processCount; i++) {
