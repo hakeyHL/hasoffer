@@ -176,7 +176,7 @@ public class ProductController {
         mav.addObject("skuSizes", JSONUtil.toJSON(sizes));
 
         List<String> days = new ArrayList<String>();
-        Map<Website, List<Float>> priceMap = new HashMap<Website, List<Float>>();
+        Map<Website, List<Double>> priceMap = new HashMap<Website, List<Double>>();
         getPriceLogs(priceLogMap, days, priceMap);
         mav.addObject("priceMap", JSONUtil.toJSON(ChartHelper.getChartData(priceMap)));
         mav.addObject("priceDays", JSONUtil.toJSON(days));
@@ -185,7 +185,7 @@ public class ProductController {
         return mav;
     }
 
-    private void getPriceLogs(Map<PtmCmpSku, List<PtmCmpSkuLog>> priceLogMap, List<String> days, Map<Website, List<Float>> priceMap) {
+    private void getPriceLogs(Map<PtmCmpSku, List<PtmCmpSkuLog>> priceLogMap, List<String> days, Map<Website, List<Double>> priceMap) {
 
         if (priceLogMap == null || priceLogMap.size() <= 0) {
             return;
@@ -195,13 +195,13 @@ public class ProductController {
         final String DATE_PATTERN = "yyyyMMdd";
         String startDay = "30000000", endDay = "00000000";
 
-        Map<Website, Map<String, Float>> priceLogMap2 = new HashMap<Website, Map<String, Float>>();
+        Map<Website, Map<String, Double>> priceLogMap2 = new HashMap<Website, Map<String, Double>>();
 
         for (Map.Entry<PtmCmpSku, List<PtmCmpSkuLog>> kv : priceLogMap.entrySet()) {
             PtmCmpSku cmpSku = kv.getKey();
             List<PtmCmpSkuLog> logs = kv.getValue();
 
-            Map<String, Float> subMap = new HashMap<String, Float>();
+            Map<String, Double> subMap = new HashMap<String, Double>();
 
             for (PtmCmpSkuLog log : logs) {
                 String ymd = TimeUtils.parse(log.getPriceTime(), DATE_PATTERN);
@@ -231,21 +231,21 @@ public class ProductController {
         fillPriceMap(priceLogMap2, priceMap, days);
     }
 
-    private void fillPriceMap(Map<Website, Map<String, Float>> priceLogMap, Map<Website, List<Float>> priceMap, List<String> days) {
-        for (Map.Entry<Website, Map<String, Float>> kv : priceLogMap.entrySet()) {
+    private void fillPriceMap(Map<Website, Map<String, Double>> priceLogMap, Map<Website, List<Double>> priceMap, List<String> days) {
+        for (Map.Entry<Website, Map<String, Double>> kv : priceLogMap.entrySet()) {
             Website website = kv.getKey();
 
             if (website == null){
                 continue;
             }
 
-            Map<String, Float> logMap = kv.getValue();
-            List<Float> prices = new ArrayList<Float>();
+            Map<String, Double> logMap = kv.getValue();
+            List<Double> prices = new ArrayList<Double>();
 
             for (String ymd : days) {
-                Float price = logMap.get(ymd);
+                Double price = logMap.get(ymd);
                 if (price == null) {
-                    price = 0.0F;
+                    price = 0.0;
                 }
                 prices.add(price);
             }

@@ -12,10 +12,10 @@ public class ProductVo {
 
     private String masterImageUrl;
 
-    private float currentLowestPrice;
+    private double currentLowestPrice;
     private String currentDeeplink;
 
-    public ProductVo(long id, String title, String masterImageUrl, float currentLowestPrice, String currentDeeplink) {
+    public ProductVo(long id, String title, String masterImageUrl, double currentLowestPrice, String currentDeeplink) {
         this.id = id;
         this.title = title;
         this.masterImageUrl = masterImageUrl;
@@ -55,7 +55,7 @@ public class ProductVo {
         this.masterImageUrl = masterImageUrl;
     }
 
-    public float getCurrentLowestPrice() {
+    public double getCurrentLowestPrice() {
         return currentLowestPrice;
     }
 

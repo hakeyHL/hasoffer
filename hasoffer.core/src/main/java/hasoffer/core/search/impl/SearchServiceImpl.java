@@ -466,7 +466,7 @@ public class SearchServiceImpl implements ISearchService {
         String keyword = searchLogBo.getKeyword();
         String brand = searchLogBo.getBrand();
         String site = searchLogBo.getSite();
-        float price = searchLogBo.getPrice();
+        double price = searchLogBo.getPrice();
         long productId = searchLogBo.getProductId();
         long ptmCmpSkuId = searchLogBo.getCmpSkuId();
         long category = searchLogBo.getCategory();
@@ -544,7 +544,7 @@ public class SearchServiceImpl implements ISearchService {
             String keyword = searchLogBo.getKeyword();
             String brand = searchLogBo.getBrand();
             String site = searchLogBo.getSite();
-            float price = searchLogBo.getPrice();
+            double price = searchLogBo.getPrice();
             long productId = searchLogBo.getProductId();
             long ptmCmpSkuId = searchLogBo.getCmpSkuId();
             long category = searchLogBo.getCategory();

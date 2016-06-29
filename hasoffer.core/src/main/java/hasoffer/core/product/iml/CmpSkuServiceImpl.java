@@ -464,7 +464,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             long productId = ptmCmpSku.getProductId();
             String sourcePid = ptmCmpSku.getSourcePid();
             String sourceSid = ptmCmpSku.getSourceSid();
-            float price = ptmCmpSku.getPrice();
+            double price = ptmCmpSku.getPrice();
             String oriUrl = ptmCmpSku.getOriUrl();
             if (StringUtils.isEmpty(oriUrl)) {
                 oriUrl = ptmCmpSku.getUrl();

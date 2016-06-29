@@ -8,9 +8,9 @@ import java.util.List;
  */
 class Chartd {
 	String name;
-	List<Float> data;
+	List<Double> data;
 
-	public Chartd(String name, List<Float> data) {
+	public Chartd(String name, List<Double> data) {
 		this.name = name;
 		this.data = data;
 	}
@@ -23,11 +23,11 @@ class Chartd {
 		this.name = name;
 	}
 
-	public List<Float> getData() {
+	public List<Double> getData() {
 		return data;
 	}
 
-	public void setData(List<Float> data) {
+	public void setData(List<Double> data) {
 		this.data = data;
 	}
 }

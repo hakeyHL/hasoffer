@@ -17,7 +17,7 @@ public class CmpSkuModel implements IIdentifiable<Long> {
 
     private String skuTitle;// 带商品的color，size属性的
     private String title;
-    private float price;
+    private double price;
 
     private String imagePath; // 下载后的图片路径
     private String oriImageUrl;// 原图片url
@@ -97,11 +97,11 @@ public class CmpSkuModel implements IIdentifiable<Long> {
         this.title = title;
     }
 
-    public float getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 

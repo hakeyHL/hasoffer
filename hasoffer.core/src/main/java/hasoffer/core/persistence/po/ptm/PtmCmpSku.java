@@ -27,7 +27,7 @@ public class PtmCmpSku implements Identifiable<Long> {
 
     private String skuTitle;// 带商品的color，size属性的
     private String title;
-    private float price;
+    private double price;
 
     private String rating;
 
@@ -67,7 +67,7 @@ public class PtmCmpSku implements Identifiable<Long> {
     public PtmCmpSku() {
     }
 
-    public PtmCmpSku(long productId, float price, String url) {
+    public PtmCmpSku(long productId, double price, String url) {
         this.productId = productId;
         this.price = price;
         this.oriUrl = url;
@@ -144,11 +144,11 @@ public class PtmCmpSku implements Identifiable<Long> {
         this.rating = rating;
     }
 
-    public float getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 
@@ -328,7 +328,7 @@ public class PtmCmpSku implements Identifiable<Long> {
         PtmCmpSku ptmCmpSku = (PtmCmpSku) o;
 
         if (productId != ptmCmpSku.productId) return false;
-        if (Float.compare(ptmCmpSku.price, price) != 0) return false;
+        if (Double.compare(ptmCmpSku.price, price) != 0) return false;
         if (checked != ptmCmpSku.checked) return false;
         if (failLoadImage != ptmCmpSku.failLoadImage) return false;
         if (id != null ? !id.equals(ptmCmpSku.id) : ptmCmpSku.id != null) return false;
@@ -363,14 +363,17 @@ public class PtmCmpSku implements Identifiable<Long> {
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
+        int result;
+        long temp;
+        result = id != null ? id.hashCode() : 0;
         result = 31 * result + (int) (productId ^ (productId >>> 32));
         result = 31 * result + (categoryId != null ? categoryId.hashCode() : 0);
         result = 31 * result + (website != null ? website.hashCode() : 0);
         result = 31 * result + (seller != null ? seller.hashCode() : 0);
         result = 31 * result + (skuTitle != null ? skuTitle.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
-        result = 31 * result + (price != +0.0f ? Float.floatToIntBits(price) : 0);
+        temp = Double.doubleToLongBits(price);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (rating != null ? rating.hashCode() : 0);
         result = 31 * result + (imagePath != null ? imagePath.hashCode() : 0);
         result = 31 * result + (smallImagePath != null ? smallImagePath.hashCode() : 0);

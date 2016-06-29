@@ -2,8 +2,8 @@ package hasoffer.api.controller.vo;
 
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.PriceUtil;
 import hasoffer.base.utils.StringUtils;
-import hasoffer.core.utils.PriceUtil;
 
 /**
  * Date : 2016/5/27
@@ -14,7 +14,7 @@ public class SearchIO {
     final String cliQ;//客户端传上来的字符串
     final Website cliSite;
     final String cliQBrand;
-    final float cliPrice;
+    final double cliPrice;
     final String cliSourceId;
     // hs 开头的都是搜到的结果 hs - hasoffer
     long hsCateId;
@@ -130,7 +130,7 @@ public class SearchIO {
         return cliSite;
     }
 
-    public float getCliPrice() {
+    public double getCliPrice() {
         return cliPrice;
     }
 

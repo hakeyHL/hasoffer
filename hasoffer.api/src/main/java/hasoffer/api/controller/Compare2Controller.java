@@ -7,7 +7,6 @@ import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.HexDigestUtil;
-import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.cache.CmpSkuCacheManager;
 import hasoffer.core.cache.ProductCacheManager;
@@ -19,7 +18,6 @@ import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.ptm.PtmSkuBasicAttribute;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.iml.ProductServiceImpl;
 import hasoffer.core.product.solr.CategoryIndexServiceImpl;
@@ -42,7 +40,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Created on 2015/12/21.
@@ -345,14 +346,14 @@ public class Compare2Controller {
          * 如果没有匹配到，或比价列表不含该网站，则相应变量值为0
          */
         long cmpSkuId = 0L;
-        float minPrice = sio.getCliPrice(), maxPrice = sio.getCliPrice();
+        double minPrice = sio.getCliPrice(), maxPrice = sio.getCliPrice();
 
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(sio.getHsProId(), sio.getPage(), sio.getSize());
         List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
 
         PtmCmpSku clientCmpSku = null;
 
-        float cliPrice = sio.getCliPrice(), priceOff = 0.0f;
+        double cliPrice = sio.getCliPrice(), priceOff = 0.0;
         if (ArrayUtils.hasObjs(cmpSkus)) {
 
             for (PtmCmpSku cmpSku : cmpSkus) {
@@ -402,7 +403,7 @@ public class Compare2Controller {
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", sio.getCliQ(), sio.getCliPrice());
             }
 
-            float standPrice = maxPrice;
+            double standPrice = maxPrice;
             if (cliPrice <= 0) {
                 // 取一个标准价格，如果client sku 为null，则取maxPrice
                 if (clientCmpSku != null) {
@@ -477,7 +478,7 @@ public class Compare2Controller {
 
         PtmCmpSku clientCmpSku = null;
         //初始化price为客户端传输的price
-        float cliPrice = sio.getCliPrice();
+        double cliPrice = sio.getCliPrice();
         if (ArrayUtils.hasObjs(cmpSkus)) {
             //如果有查询结果,遍历之
             for (PtmCmpSku cmpSku : cmpSkus) {
