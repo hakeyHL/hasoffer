@@ -21,6 +21,9 @@ public class ComparedSkuVo {
     private String rating = "";
     private String title = "";
     private double price;
+
+    private String priceStr;
+
     private double priceOff;// 省了多少钱
 
     private String url = "";
@@ -163,6 +166,15 @@ public class ComparedSkuVo {
     public void setSize(String size) {
         this.size = size;
     }
+
+    public String getPriceStr() {
+        if(price==0) {
+            return "";
+        }else{
+            return price+"";
+        }
+    }
+
 
     public double getPriceOff() {
         return priceOff;
