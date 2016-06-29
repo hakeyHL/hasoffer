@@ -15,9 +15,11 @@ import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.exception.ERROR_CODE;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.enums.SearchPrecise;
+import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.ptm.PtmSkuBasicAttribute;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.iml.ProductServiceImpl;
 import hasoffer.core.product.solr.CategoryIndexServiceImpl;
@@ -175,8 +177,12 @@ public class Compare2Controller {
     private CmpResult getDefaultCmpSku(SearchIO sio,PtmProduct product) {
         CmpResult cmpResult = new CmpResult();
         cmpResult.setTotalRatingsNum(Long.valueOf(product.getRating()));
-        Object object=mongoDbManager.queryOne(Object.class,product.getId());
-        cmpResult.setSpecs(JSONUtil.toJSON(object));
+        PtmCmpSkuDescription ptmCmpSkuDescription=mongoDbManager.queryOne(PtmCmpSkuDescription.class,product.getId());
+        String specs="";
+        if(ptmCmpSkuDescription!=null){
+            specs=ptmCmpSkuDescription.getJsonDescription();
+        }
+        cmpResult.setSpecs(specs);
         cmpResult.setRatingNum(0);
         String imageUrl = productCacheManager.getProductMasterImageUrl(sio.getHsProId());
         List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
@@ -195,7 +201,7 @@ public class Compare2Controller {
         cplv.setDeepLinkUrl(WebsiteHelper.getUrlWithAff(Website.valueOf(product.getSourceSite()), product.getSourceUrl(), new String[]{sio.getMarketChannel().name()}));
         cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(Website.valueOf(product.getSourceSite()), product.getSourceUrl(), new String[]{sio.getMarketChannel().name()}));
         cmpResult.setImage(imageUrl);
-        cmpResult.setName(product.getSourceUrl());
+        cmpResult.setName(product.getTitle());
         cmpResult.setBestPrice(cplv.getPrice());
         comparedSkuVos.add(cplv);
         return cmpResult;
@@ -551,8 +557,12 @@ public class Compare2Controller {
         cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
         cmpResult.setPriceList(priceList.getData());
         cmpResult.setRatingNum(Long.valueOf(clientCmpSku.getRating()));
-        Object object=mongoDbManager.queryOne(Object.class,id);
-        cmpResult.setSpecs(JSONUtil.toJSON(object));
+        PtmCmpSkuDescription ptmCmpSkuDescription=mongoDbManager.queryOne(PtmCmpSkuDescription.class,id);
+        String specs="";
+        if(ptmCmpSkuDescription!=null){
+            specs=ptmCmpSkuDescription.getJsonDescription();
+        }
+        cmpResult.setSpecs(specs);
         cmpResult.setTotalRatingsNum(Long.valueOf(clientCmpSku.getRating()));
         return cmpResult;
     }
