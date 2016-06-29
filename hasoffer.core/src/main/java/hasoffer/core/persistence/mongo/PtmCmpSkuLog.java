@@ -20,7 +20,7 @@ public class PtmCmpSkuLog {
 
 	private Date priceTime;
 
-	private float price;
+	private double price;
 	private String rating;
 
 	@PersistenceConstructor
@@ -58,7 +58,7 @@ public class PtmCmpSkuLog {
 		this.priceTime = priceTime;
 	}
 
-	public float getPrice() {
+	public double getPrice() {
 		return price;
 	}
 
@@ -76,25 +76,28 @@ public class PtmCmpSkuLog {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) { return true; }
-		if (o == null || getClass() != o.getClass()) { return false; }
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
 
 		PtmCmpSkuLog that = (PtmCmpSkuLog) o;
 
-		if (pcsId != that.pcsId) { return false; }
-		if (Float.compare(that.price, price) != 0) { return false; }
-		if (id != null ? !id.equals(that.id) : that.id != null) { return false; }
-		if (priceTime != null ? !priceTime.equals(that.priceTime) : that.priceTime != null) { return false; }
+		if (pcsId != that.pcsId) return false;
+		if (Double.compare(that.price, price) != 0) return false;
+		if (id != null ? !id.equals(that.id) : that.id != null) return false;
+		if (priceTime != null ? !priceTime.equals(that.priceTime) : that.priceTime != null) return false;
 		return !(rating != null ? !rating.equals(that.rating) : that.rating != null);
 
 	}
 
 	@Override
 	public int hashCode() {
-		int result = id != null ? id.hashCode() : 0;
+		int result;
+		long temp;
+		result = id != null ? id.hashCode() : 0;
 		result = 31 * result + (int) (pcsId ^ (pcsId >>> 32));
 		result = 31 * result + (priceTime != null ? priceTime.hashCode() : 0);
-		result = 31 * result + (price != +0.0f ? Float.floatToIntBits(price) : 0);
+		temp = Double.doubleToLongBits(price);
+		result = 31 * result + (int) (temp ^ (temp >>> 32));
 		result = 31 * result + (rating != null ? rating.hashCode() : 0);
 		return result;
 	}

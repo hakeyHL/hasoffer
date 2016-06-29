@@ -36,7 +36,7 @@ public class PtmCmpSkuIndex2 implements Identifiable<Long> {
     private String siteSourceSidIndex;
     private String siteSkuTitleIndex;
 
-    private float price;
+    private double price;
 
     private String url;
 
@@ -48,7 +48,7 @@ public class PtmCmpSkuIndex2 implements Identifiable<Long> {
     }
 
     public PtmCmpSkuIndex2(long id, long productId, Website website, String sourcePid, String sourceSid,
-                           String title, String skuTitle, float price, String url) {
+                           String title, String skuTitle, double price, String url) {
         this.id = id;
         this.productId = productId;
         this.website = website;
@@ -75,7 +75,7 @@ public class PtmCmpSkuIndex2 implements Identifiable<Long> {
         this.id = id;
     }
 
-    public float getPrice() {
+    public double getPrice() {
         return price;
     }
 
@@ -189,14 +189,13 @@ public class PtmCmpSkuIndex2 implements Identifiable<Long> {
 
     @Override
     public boolean equals(Object o) {
-
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
         PtmCmpSkuIndex2 that = (PtmCmpSkuIndex2) o;
 
         if (productId != that.productId) return false;
-        if (Float.compare(that.price, price) != 0) return false;
+        if (Double.compare(that.price, price) != 0) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (website != that.website) return false;
         if (sourcePid != null ? !sourcePid.equals(that.sourcePid) : that.sourcePid != null) return false;
@@ -218,7 +217,9 @@ public class PtmCmpSkuIndex2 implements Identifiable<Long> {
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
+        int result;
+        long temp;
+        result = id != null ? id.hashCode() : 0;
         result = 31 * result + (int) (productId ^ (productId >>> 32));
         result = 31 * result + (website != null ? website.hashCode() : 0);
         result = 31 * result + (sourcePid != null ? sourcePid.hashCode() : 0);
@@ -229,7 +230,8 @@ public class PtmCmpSkuIndex2 implements Identifiable<Long> {
         result = 31 * result + (skuUrlIndex != null ? skuUrlIndex.hashCode() : 0);
         result = 31 * result + (siteSourceSidIndex != null ? siteSourceSidIndex.hashCode() : 0);
         result = 31 * result + (siteSkuTitleIndex != null ? siteSkuTitleIndex.hashCode() : 0);
-        result = 31 * result + (price != +0.0f ? Float.floatToIntBits(price) : 0);
+        temp = Double.doubleToLongBits(price);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (url != null ? url.hashCode() : 0);
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);

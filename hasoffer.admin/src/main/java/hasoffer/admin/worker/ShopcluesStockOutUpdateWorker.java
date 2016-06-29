@@ -85,7 +85,7 @@ public class ShopcluesStockOutUpdateWorker implements Runnable {
                 Map<ListProduct, Float> resultMap = new HashMap<ListProduct, Float>();
 
                 // 匹配价格
-                float priceOrigin = sku.getPrice();
+                double priceOrigin = sku.getPrice();
 
                 //过滤结果
                 if (ArrayUtils.hasObjs(productList)) {

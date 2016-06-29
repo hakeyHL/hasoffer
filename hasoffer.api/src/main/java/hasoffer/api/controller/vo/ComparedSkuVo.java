@@ -20,8 +20,8 @@ public class ComparedSkuVo {
 
     private String rating = "";
     private String title = "";
-    private float price;
-    private float priceOff;// 省了多少钱
+    private double price;
+    private double priceOff;// 省了多少钱
 
     private String url = "";
     private String deeplink = "";
@@ -32,7 +32,7 @@ public class ComparedSkuVo {
     private String imageUrl = "";
     private boolean hasImgTitle;
 
-    public ComparedSkuVo(Website website, String title, float price) {
+    public ComparedSkuVo(Website website, String title, double price) {
         this.website = website;
         this.title = title;
         this.price = new Float(price).intValue();
@@ -132,11 +132,11 @@ public class ComparedSkuVo {
         this.rating = rating;
     }
 
-    public float getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 
@@ -164,11 +164,11 @@ public class ComparedSkuVo {
         this.size = size;
     }
 
-    public float getPriceOff() {
+    public double getPriceOff() {
         return priceOff;
     }
 
-    public void setPriceOff(float priceOff) {
+    public void setPriceOff(double priceOff) {
         this.priceOff = priceOff;
     }
 

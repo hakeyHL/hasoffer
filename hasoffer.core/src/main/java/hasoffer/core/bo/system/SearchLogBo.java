@@ -10,13 +10,13 @@ public class SearchLogBo {
     String site;
     long productId;
     long cmpSkuId;
-    float price;
+    double price;
     long category;
     String brand;
     String sourceId;
 
     public SearchLogBo(String sourceId, String keyword, String brand, String site,
-                       long category, long productId, long cmpSkuId, float price) {
+                       long category, long productId, long cmpSkuId, double price) {
         this.sourceId = sourceId;
         this.keyword = keyword;
         this.site = site;
@@ -75,11 +75,11 @@ public class SearchLogBo {
         this.productId = productId;
     }
 
-    public float getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 
