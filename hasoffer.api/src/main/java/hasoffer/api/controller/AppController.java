@@ -379,7 +379,7 @@ public class AppController {
             Map map = new HashMap();
             map.put("image", ImageUtil.getImageUrl(appDeal.getImageUrl()));
             map.put("title", appDeal.getTitle());
-            map.put("exp", new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(appDeal.getExpireTime()));
+            map.put("exp", new SimpleDateFormat("MM/dd/yyyy").format(appDeal.getExpireTime()));
             map.put("extra", 1.5);
             map.put("description", appDeal.getDescription());
             if (appDeal.getWebsite() == Website.FLIPKART || appDeal.getWebsite() == Website.SHOPCLUES) {
@@ -478,7 +478,7 @@ public class AppController {
             for (PtmCategory ptmCategory : ptmCategorys) {
                 CategoryVo categoryVo = new CategoryVo();
                 categoryVo.setId(ptmCategory.getId());
-                categoryVo.setHasChildren(ptmCategory.getParentId() == 0 ? 0 : 1);
+                categoryVo.setHasChildren(1);
                 categoryVo.setImage(ptmCategory.getImageUrl() == null ? "" : ImageUtil.getImageUrl(ptmCategory.getImageUrl()));
                 categoryVo.setLevel(ptmCategory.getLevel());
                 categoryVo.setName(ptmCategory.getName());
@@ -493,7 +493,7 @@ public class AppController {
             for (PtmCategory ptmCategory : ptmCategorys) {
                 CategoryVo categoryVo = new CategoryVo();
                 categoryVo.setId(ptmCategory.getId());
-                categoryVo.setHasChildren(ptmCategory.getParentId() == 0 ? 0 : 1);
+                categoryVo.setHasChildren(1);
                 categoryVo.setImage(ImageUtil.getImageUrl(ptmCategory.getImageUrl()));
                 categoryVo.setLevel(ptmCategory.getLevel());
                 categoryVo.setName(ptmCategory.getName());
@@ -506,7 +506,7 @@ public class AppController {
                     for (PtmCategory cates : ptmCategorysTemp) {
                         CategoryVo cate = new CategoryVo();
                         cate.setId(cates.getId());
-                        cate.setHasChildren(0);
+                        cate.setHasChildren(1);
                         cate.setImage(ImageUtil.getImageUrl(cates.getImageUrl()));
                         cate.setLevel(cates.getLevel());
                         cate.setName(cates.getName());
@@ -582,7 +582,7 @@ public class AppController {
         String data = "";
         //查询热卖商品
         Date date = new Date();
-        date.setTime(date.getTime() - 1 * 60 * 60 * 1000);
+        date.setTime(date.getTime() - 1 *24* 60 * 60 * 1000);
         List<PtmProduct> products2s = productCacheManager.getTopSellingProductsByDate(new SimpleDateFormat("yyyyMMdd").format(date), 1, 20);
         switch (requestType) {
             case 0:

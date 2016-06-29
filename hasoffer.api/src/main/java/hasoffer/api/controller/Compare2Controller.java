@@ -139,11 +139,11 @@ public class Compare2Controller {
                 cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
             }
             getSioBySearch(sio);
-            cr = getCmpProducts(sio, cmpSkuIndex,Long.valueOf(id));
+            cr = getCmpProducts(sio, cmpSkuIndex, Long.valueOf(id));
         } catch (Exception e) {
             logger.debug(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, size));
             //if exception occured ,get default cmpResult
-            cr = getDefaultCmpSku(sio,product);
+            cr = getDefaultCmpSku(sio, product);
         }
         // 速度优化
         SearchHelper.addToLog(sio);
@@ -175,13 +175,13 @@ public class Compare2Controller {
         );
     }
 
-    private CmpResult getDefaultCmpSku(SearchIO sio,PtmProduct product) {
+    private CmpResult getDefaultCmpSku(SearchIO sio, PtmProduct product) {
         CmpResult cmpResult = new CmpResult();
-        cmpResult.setTotalRatingsNum(Long.valueOf(product.getRating()));
-        PtmCmpSkuDescription ptmCmpSkuDescription=mongoDbManager.queryOne(PtmCmpSkuDescription.class,product.getId());
-        String specs="";
-        if(ptmCmpSkuDescription!=null){
-            specs=ptmCmpSkuDescription.getJsonDescription();
+        cmpResult.setTotalRatingsNum(Long.valueOf(0));
+        PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, product.getId());
+        String specs = "";
+        if (ptmCmpSkuDescription != null) {
+            specs = ptmCmpSkuDescription.getJsonDescription();
         }
         cmpResult.setSpecs(specs);
         cmpResult.setRatingNum(0);
@@ -191,7 +191,7 @@ public class Compare2Controller {
         cplv.setPrice(product.getPrice());
         cplv.setTotalRatingsNum(Long.valueOf(0));
         cplv.setRatingNum(0);
-        cplv.setBackRate(0.015f);
+        cplv.setBackRate(1.5f);
         cplv.setCoins(Math.round(0.015 * product.getPrice()));
         cplv.setFreight(0);
         cplv.setImage(WebsiteHelper.getLogoUrl(Website.valueOf(product.getSourceSite())));
@@ -466,7 +466,7 @@ public class Compare2Controller {
      * @param cmpSkuIndex
      * @return
      */
-    private CmpResult getCmpProducts(SearchIO sio, PtmCmpSkuIndex2 cmpSkuIndex,Long id) {
+    private CmpResult getCmpProducts(SearchIO sio, PtmCmpSkuIndex2 cmpSkuIndex, Long id) {
         //初始化一个空的用于存放比价商品列表的List
 
         List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
@@ -518,7 +518,7 @@ public class Compare2Controller {
                 cplv.setPrice(cmpSku.getPrice());
                 cplv.setTotalRatingsNum(Long.valueOf(0));
                 cplv.setRatingNum(0);
-                cplv.setBackRate(0.015f);
+                cplv.setBackRate(1.5f);
                 cplv.setCoins(Math.round(0.015 * cmpSku.getPrice()));
                 cplv.setFreight(0);
                 cplv.setImage(WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
@@ -557,14 +557,14 @@ public class Compare2Controller {
         PageableResult<CmpProductListVo> priceList = new PageableResult<CmpProductListVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize());
         cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
         cmpResult.setPriceList(priceList.getData());
-        cmpResult.setRatingNum(Long.valueOf(clientCmpSku.getRating()));
-        PtmCmpSkuDescription ptmCmpSkuDescription=mongoDbManager.queryOne(PtmCmpSkuDescription.class,id);
-        String specs="";
-        if(ptmCmpSkuDescription!=null){
-            specs=ptmCmpSkuDescription.getJsonDescription();
+        cmpResult.setRatingNum(Long.valueOf(0));
+        PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, id);
+        String specs = "";
+        if (ptmCmpSkuDescription != null) {
+            specs = ptmCmpSkuDescription.getJsonDescription();
         }
         cmpResult.setSpecs(specs);
-        cmpResult.setTotalRatingsNum(Long.valueOf(clientCmpSku.getRating()));
+        cmpResult.setTotalRatingsNum(Long.valueOf(0));
         return cmpResult;
     }
 
