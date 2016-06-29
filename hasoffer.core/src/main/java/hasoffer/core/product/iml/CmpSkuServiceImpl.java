@@ -223,9 +223,9 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
             // 下载图片失败
             ptmCmpSkuUpdater.getPo().setFailLoadImage(true);
+        } finally {
+            dbm.update(ptmCmpSkuUpdater);
         }
-
-        dbm.update(ptmCmpSkuUpdater);
     }
 
     @Override
