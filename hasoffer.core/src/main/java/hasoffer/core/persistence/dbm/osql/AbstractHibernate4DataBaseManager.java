@@ -144,7 +144,7 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
                             //强制提交
                             if ((i+1) % AppConfig.BATCH_MAX_ROW == 0) {
                                 session.flush();
-                                session.clear();
+//                                session.clear();
                             }
                         }
 //                        tx.commit();
@@ -163,7 +163,7 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
                 query.setParameterList("ids", ids);
                 int i= query.executeUpdate();
                 session.flush();
-                session.clear();
+//                session.clear();
                 session.close();
                 return i;
             }
@@ -306,7 +306,7 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
                     public Object doInHibernate(Session session) throws HibernateException {
                         session.update(array.get(0));
                         session.flush();
-                        session.clear();
+//                        session.clear();
                         session.close();
                         return null;
                     }
