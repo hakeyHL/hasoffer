@@ -61,6 +61,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     private final String Q_CMPSKU_INDEX_BY_TITLEINDEX = "select t from PtmCmpSkuIndex2 t where t.siteSkuTitleIndex = ?0 ";
 
     private final String Q_CMPSKU_INDEX_BY_SOURCESID = "select t from PtmCmpSkuIndex2 t where t.siteSourceSidIndex = ?0 ";
+    private final String Q_CMPSKU_STORES_BY_PRODUCTID = "SELECT  DISTINCT t.website  from PtmCmpSku t where t.productId=?0";
 
     @Resource
     IFetchService fetchService;
@@ -141,6 +142,12 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         dbm.update(updater);
 
+    }
+
+    @Override
+    public int getSkuSoldStoreNum(Long id) {
+        List li= dbm.query(Q_CMPSKU_STORES_BY_PRODUCTID,Arrays.asList(id));
+        return li.size();
     }
 
     @Override
