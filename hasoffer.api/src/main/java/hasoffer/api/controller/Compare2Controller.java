@@ -393,7 +393,8 @@ public class Compare2Controller {
                 }
 
                 // 忽略前台返回的价格
-                ComparedSkuVo csv = new ComparedSkuVo(cmpSku, new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
+                List<String> affs = getAffs(sio);
+                ComparedSkuVo csv = new ComparedSkuVo(cmpSku, affs.toArray(new String[0]));
                 csv.setPriceOff(cliPrice - cmpSku.getPrice());
 
                 addVo(comparedSkuVos, csv);
@@ -457,6 +458,17 @@ public class Compare2Controller {
         ProductVo productVo = new ProductVo(sio.getHsProId(), sio.getCliQ(), imageUrl, minPrice, currentDeeplink);
 
         return new CmpResult(priceOff, productVo, new PageableResult<ComparedSkuVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize()));
+    }
+
+    private List<String> getAffs(SearchIO sio) {
+        List<String> affs = new ArrayList<String>();
+        affs.add(sio.getMarketChannel().name());
+        affs.add(sio.getDeviceId());
+        Object userIdObj = Context.currentContext().get(StaticContext.USER_ID);
+        if (userIdObj != null) {
+            affs.add(userIdObj.toString());
+        }
+        return affs;
     }
 
     /**
