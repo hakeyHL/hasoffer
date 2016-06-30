@@ -87,6 +87,10 @@ public class WebsiteHelper {
 //        return getMgsvcUrl(urlId, dl);
 //    }
 
+    public static String getUrlWithAff(String url) {
+        return url;
+    }
+
     public static String getUrlWithAff(Website website, String url, String[] affs) {
 
         if (StringUtils.isEmpty(url)) {
