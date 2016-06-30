@@ -243,23 +243,25 @@ public class AutoSearchMatchController {
                  @RequestParam(defaultValue = "0") String rebuild) {
         try {
 
-            SrmSearchLog searchLog = dbm.get(SrmSearchLog.class, logId);
+//            SrmSearchLog searchLog = dbm.get(SrmSearchLog.class, logId);
 
-            String keyword = searchLog.getKeyword().trim();
-            if (keyword.charAt(keyword.length() - 1) != ')') {
-                long count = searchService.findKeywordCount(searchLog.getSite(), keyword);
-                if (count > 1) {
-                    return "count > 1";
-                }
-            }
+//            String keyword = searchLog.getKeyword().trim();
+//            if (keyword.charAt(keyword.length() - 1) != ')') {
+//                long count = searchService.findKeywordCount(searchLog.getSite(), keyword);
+//                if (count > 1) {
+//                    return "count > 1";
+//                }
+//            }
+//
+//            SrmAutoSearchResult autoSearchResult = new SrmAutoSearchResult(searchLog);
+//
+//            if ("1".equals(rebuild)) {
+//                autoSearchResult.setRelatedProId(0);
+//            }
+//
+//            searchProductService.searchProductsFromSites(autoSearchResult);
 
-            SrmAutoSearchResult autoSearchResult = new SrmAutoSearchResult(searchLog);
-
-            if ("1".equals(rebuild)) {
-                autoSearchResult.setRelatedProId(0);
-            }
-
-            searchProductService.searchProductsFromSites(autoSearchResult);
+            SrmAutoSearchResult autoSearchResult = mdm.queryOne(SrmAutoSearchResult.class, logId);
 
             searchProductService.cleanProducts(autoSearchResult);
 
