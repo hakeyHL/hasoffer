@@ -170,6 +170,7 @@ public class AppController {
                 } catch (Exception e) {
                     logger.debug(e.getMessage());
                 }
+                break;
             default:
                 break;
         }
@@ -484,6 +485,10 @@ public class AppController {
                 categoryVo.setName(ptmCategory.getName());
                 categoryVo.setParentId(ptmCategory.getParentId());
                 categoryVo.setRank(ptmCategory.getRank());
+                List<PtmCategory> ptmCategorysTemp = appService.getChildCategorys(categoryVo.getId().toString());
+                if (ptmCategorysTemp == null&&ptmCategorysTemp.size()>0) {
+                    categoryVo.setHasChildren(0);
+                }
                 categorys.add(categoryVo);
             }
         } else {
@@ -493,20 +498,19 @@ public class AppController {
             for (PtmCategory ptmCategory : ptmCategorys) {
                 CategoryVo categoryVo = new CategoryVo();
                 categoryVo.setId(ptmCategory.getId());
-                categoryVo.setHasChildren(1);
                 categoryVo.setImage(ImageUtil.getImageUrl(ptmCategory.getImageUrl()));
                 categoryVo.setLevel(ptmCategory.getLevel());
                 categoryVo.setName(ptmCategory.getName());
                 categoryVo.setParentId(ptmCategory.getParentId());
                 categoryVo.setRank(ptmCategory.getRank());
                 List<PtmCategory> ptmCategorysTemp = appService.getChildCategorys(categoryVo.getId().toString());
-                if (ptmCategorysTemp != null) {
+                if (ptmCategorysTemp != null&&ptmCategorysTemp.size()>0) {
                     categoryVo.setHasChildren(1);
                     childCategory = new ArrayList();
                     for (PtmCategory cates : ptmCategorysTemp) {
                         CategoryVo cate = new CategoryVo();
                         cate.setId(cates.getId());
-                        cate.setHasChildren(1);
+                        cate.setHasChildren(0);
                         cate.setImage(ImageUtil.getImageUrl(cates.getImageUrl()));
                         cate.setLevel(cates.getLevel());
                         cate.setName(cates.getName());
@@ -514,6 +518,8 @@ public class AppController {
                         cate.setRank(cates.getRank());
                         childCategory.add(cate);
                     }
+                } else {
+                    categoryVo.setHasChildren(0);
                 }
                 categoryVo.setCategorys(childCategory);
                 categorys.add(categoryVo);
@@ -582,7 +588,7 @@ public class AppController {
         String data = "";
         //查询热卖商品
         Date date = new Date();
-        date.setTime(date.getTime() - 1 *24* 60 * 60 * 1000);
+        date.setTime(date.getTime() - 1 * 24 * 60 * 60 * 1000);
         List<PtmProduct> products2s = productCacheManager.getTopSellingProductsByDate(new SimpleDateFormat("yyyyMMdd").format(date), 1, 20);
         switch (requestType) {
             case 0:
