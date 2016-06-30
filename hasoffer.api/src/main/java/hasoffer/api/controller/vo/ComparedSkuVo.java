@@ -194,7 +194,8 @@ public class ComparedSkuVo {
             if (AppConfig.SerRegion.INDIA.equals(AppConfig.getSerRegion())) {
                 ddf1.setMaximumFractionDigits(0);
             }
-            return ddf1.format(priceOff);
+            Float temp = Math.abs(priceOff);
+            return ddf1.format(temp);
         }
     }
 
