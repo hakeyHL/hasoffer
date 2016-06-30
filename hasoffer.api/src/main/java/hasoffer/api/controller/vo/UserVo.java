@@ -11,7 +11,7 @@ public class UserVo {
     private  String userIcon;
     private String token;
     private String platform;
-    private String Number;
+    private String telephone;
     private  String name;
     private BigDecimal conis;
 
@@ -71,11 +71,11 @@ public class UserVo {
         this.platform = platform;
     }
 
-    public String getNumber() {
-        return Number;
+    public String getTelephone() {
+        return telephone;
     }
 
-    public void setNumber(String number) {
-        Number = number;
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
     }
 }
