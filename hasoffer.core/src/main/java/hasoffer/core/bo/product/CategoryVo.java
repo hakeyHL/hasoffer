@@ -1,4 +1,4 @@
-package hasoffer.api.controller.vo;
+package hasoffer.core.bo.product;
 
 import java.util.List;
 
