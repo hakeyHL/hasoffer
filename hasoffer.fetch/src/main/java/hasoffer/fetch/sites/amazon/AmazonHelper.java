@@ -1,5 +1,7 @@
 package hasoffer.fetch.sites.amazon;
 
+import hasoffer.base.config.AppConfig;
+import hasoffer.base.enums.HasofferRegion;
 import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.fetch.exception.PriceNotFoundException;
@@ -97,15 +99,33 @@ public class AmazonHelper {
     }
 
     public static String getUrlWithAff(String url) {
-        //http://www.amazon.in/gp/product/B00FXLC9V4/ref=as_li_tl?ie=UTF8&camp=3626&creative=24790&creativeASIN=B00FXLC9V4&linkCode=as2&tag=hasoffer-21
-        String pid = AmazonHelper.getProductIdByUrl(url);
-        if (StringUtils.isEmpty(pid)) {
-            return "";
-        }
-
         int win = url.indexOf("?");
         if (win > 0) {
             url = url.substring(0, win);
+        }
+
+        String region = AppConfig.get(AppConfig.SER_REGION);
+
+        HasofferRegion hr = HasofferRegion.valueOf(region);
+
+        switch (hr) {
+            case INDIA:
+                return getUrlWithAff_IN(url);
+            case USA:
+                return getUrlWithAff_US(url);
+            default:
+                return url;
+        }
+    }
+
+    private static String getUrlWithAff_US(String url) {
+        return url + "?tag=hasoffer02-20";
+    }
+
+    private static String getUrlWithAff_IN(String url) {
+        String pid = AmazonHelper.getProductIdByUrl(url);
+        if (StringUtils.isEmpty(pid)) {
+            return "";
         }
 
         if (!url.endsWith("/")) {
