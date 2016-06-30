@@ -25,11 +25,11 @@ public class ComparedSkuVo {
     private String title = "";
     private float price;
 
-    private double priceD;
-
     private String priceStr;
 
-    private double priceOff;// 省了多少钱
+    private float priceOff;// 省了多少钱
+
+    private String priceOffStr;
 
     private String url = "";
     private String deeplink = "";
@@ -140,7 +140,7 @@ public class ComparedSkuVo {
         this.rating = rating;
     }
 
-    public double getPrice() {
+    public float getPrice() {
         return price;
     }
 
@@ -185,12 +185,24 @@ public class ComparedSkuVo {
         }
     }
 
+    public String getPriceOffStr() {
+        if (priceOff == 0) {
+            return "";
+        } else {
+            NumberFormat ddf1 = NumberFormat.getNumberInstance();
+            ddf1.setMaximumFractionDigits(2);
+            if (AppConfig.SerRegion.INDIA.equals(AppConfig.getSerRegion())) {
+                ddf1.setMaximumFractionDigits(0);
+            }
+            return ddf1.format(priceOff);
+        }
+    }
 
-    public double getPriceOff() {
+    public float getPriceOff() {
         return priceOff;
     }
 
-    public void setPriceOff(double priceOff) {
+    public void setPriceOff(float priceOff) {
         this.priceOff = priceOff;
     }
 
