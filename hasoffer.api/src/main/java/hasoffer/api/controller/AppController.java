@@ -8,7 +8,9 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.core.bo.product.Banners;
+import hasoffer.core.bo.product.CategoryVo;
 import hasoffer.core.bo.system.SearchCriteria;
+import hasoffer.core.cache.AppCacheManager;
 import hasoffer.core.cache.CmpSkuCacheManager;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
@@ -70,6 +72,8 @@ public class AppController {
     ProductServiceImpl productService;
     @Resource
     ICmpSkuService cmpSkuService;
+    @Resource
+    AppCacheManager appCacheManager;
     private Logger logger = LoggerFactory.logger(AppController.class);
 
     public static void main(String[] args) {
@@ -416,7 +420,7 @@ public class AppController {
             urmUser.setUserToken(userToken);
             urmUser.setAvatarPath(userVO.getUserIcon());
             urmUser.setCreateTime(new Date());
-            urmUser.setNumber(userVO.getNumber());
+            urmUser.setTelephone(userVO.getTelephone());
             urmUser.setThirdPlatform(userVO.getPlatform());
             urmUser.setThirdToken(userVO.getToken());
             urmUser.setUserName(userVO.getUserName());
@@ -427,7 +431,7 @@ public class AppController {
             logger.debug("user exist ,update userInfo");
             uUser.setUserName(userVO.getUserName());
             uUser.setThirdPlatform(userVO.getPlatform());
-            uUser.setNumber(uUser.getNumber());
+            uUser.setTelephone(uUser.getTelephone());
             uUser.setAvatarPath(uUser.getAvatarPath());
             uUser.setThirdToken(uUser.getThirdToken());
             uUser.setUserToken(userToken);
@@ -474,59 +478,8 @@ public class AppController {
     @RequestMapping(value = "/category", method = RequestMethod.GET)
     public ModelAndView category(String categoryId) {
         ModelAndView mv = new ModelAndView();
-        List<PtmCategory> ptmCategorys = null;
-        List categorys = new ArrayList();
-        if (StringUtils.isBlank(categoryId)) {
-            ptmCategorys = appService.getCategory();
-            for (PtmCategory ptmCategory : ptmCategorys) {
-                CategoryVo categoryVo = new CategoryVo();
-                categoryVo.setId(ptmCategory.getId());
-                categoryVo.setHasChildren(1);
-                categoryVo.setImage(ptmCategory.getImageUrl() == null ? "" : ImageUtil.getImageUrl(ptmCategory.getImageUrl()));
-                categoryVo.setLevel(ptmCategory.getLevel());
-                categoryVo.setName(ptmCategory.getName());
-                categoryVo.setParentId(ptmCategory.getParentId());
-                categoryVo.setRank(ptmCategory.getRank());
-                List<PtmCategory> ptmCategorysTemp = appService.getChildCategorys(categoryVo.getId().toString());
-                if (ptmCategorysTemp == null&&ptmCategorysTemp.size()>0) {
-                    categoryVo.setHasChildren(0);
-                }
-                categorys.add(categoryVo);
-            }
-        } else {
-            //get childs
-            ptmCategorys = appService.getChildCategorys(categoryId);
-            List childCategory = null;
-            for (PtmCategory ptmCategory : ptmCategorys) {
-                CategoryVo categoryVo = new CategoryVo();
-                categoryVo.setId(ptmCategory.getId());
-                categoryVo.setImage(ImageUtil.getImageUrl(ptmCategory.getImageUrl()));
-                categoryVo.setLevel(ptmCategory.getLevel());
-                categoryVo.setName(ptmCategory.getName());
-                categoryVo.setParentId(ptmCategory.getParentId());
-                categoryVo.setRank(ptmCategory.getRank());
-                List<PtmCategory> ptmCategorysTemp = appService.getChildCategorys(categoryVo.getId().toString());
-                if (ptmCategorysTemp != null&&ptmCategorysTemp.size()>0) {
-                    categoryVo.setHasChildren(1);
-                    childCategory = new ArrayList();
-                    for (PtmCategory cates : ptmCategorysTemp) {
-                        CategoryVo cate = new CategoryVo();
-                        cate.setId(cates.getId());
-                        cate.setHasChildren(0);
-                        cate.setImage(ImageUtil.getImageUrl(cates.getImageUrl()));
-                        cate.setLevel(cates.getLevel());
-                        cate.setName(cates.getName());
-                        cate.setParentId(cates.getParentId());
-                        cate.setRank(cates.getRank());
-                        childCategory.add(cate);
-                    }
-                } else {
-                    categoryVo.setHasChildren(0);
-                }
-                categoryVo.setCategorys(childCategory);
-                categorys.add(categoryVo);
-            }
-        }
+        List categorys = null;
+        categorys = appCacheManager.getCategorys(categoryId);
         mv.addObject("data", categorys);
         return mv;
     }
