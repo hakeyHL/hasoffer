@@ -202,6 +202,7 @@ public class SearchServiceImpl implements ISearchService {
             }
         }
 
+        // todo - 如果同一个网站，两次抓取结果不同，第二次抓取的更准确，则要把第一次的结果更新为更准确的sku
         for (Map.Entry<Website, List<SearchedSku>> kv : searchedSkuMap.entrySet()) {
 
             List<SearchedSku> ssku = kv.getValue();
