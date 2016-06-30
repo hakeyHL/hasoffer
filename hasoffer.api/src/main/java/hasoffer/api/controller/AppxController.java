@@ -21,11 +21,11 @@ import javax.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping(value = "/appexc")
-public class AppexcController {
+public class AppxController {
 
     @Resource
     IMongoDbManager mdm;
-    private Logger logger = LoggerFactory.getLogger(AppexcController.class);
+    private Logger logger = LoggerFactory.getLogger(AppxController.class);
 
     //www.allbuy.com/api/callback/adjust/intall
     // ?idfa={idfa}&android_id={android_id}&deviceName={device_name}&osName={os_name}&osVersion={os_version}&country={country}&language={language}&timezone={timezone}&userAgent={user_agent}&deviceIp={ip_address}&appName={app_name}
