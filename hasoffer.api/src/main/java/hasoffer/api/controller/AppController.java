@@ -497,12 +497,12 @@ public class AppController {
         List li = new ArrayList();
         Map map = new HashMap();
         PageableResult<ProductModel> products;
-        List<ProductModel> products1;
         //category level page size
         // PageableResult <ProductModel> products=productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()),criteria.getLevel(),criteria.getPage(),criteria.getPageSize());
         if (!StringUtils.isBlank(criteria.getCategoryId())) {
             //search by category
-            products = productIndexServiceImpl.searchPro(Long.valueOf(2), 1, 1, 10);
+            products = productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
+            //products = productIndexServiceImpl.searchPro(Long.valueOf(2), 2, 1, 10);
             if (products != null && products.getData().size() > 0) {
                 List<ProductModel> productModes = products.getData();
                 for (ProductModel productModel : productModes) {
@@ -521,7 +521,7 @@ public class AppController {
         } else {
             //search by title
             //productIndexServiceImpl.simpleSearch(criteria.getKeyword(),1,10);
-            PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), 1, 10);
+            PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
             if (p != null && p.getData().size() > 0) {
                 List<ProductModel> productModes = p.getData();
                 for (ProductModel productModel : productModes) {
@@ -583,7 +583,7 @@ public class AppController {
                 map.put("product", li);
                 break;
             case 2:
-                PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), 1, 10);
+                PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
                 if (p != null && p.getData().size() > 0) {
                     List<ProductModel> productModes = p.getData();
                     for (ProductModel productModel : productModes) {
