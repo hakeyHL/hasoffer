@@ -1,7 +1,7 @@
 package hasoffer.core.product.solr;
 
 import hasoffer.base.utils.StringUtils;
-import hasoffer.core.solr.IIdentifiable;
+import hasoffer.data.solr.IIdentifiable;
 
 public class ProductModel implements IIdentifiable<Long> {
     private Long id;

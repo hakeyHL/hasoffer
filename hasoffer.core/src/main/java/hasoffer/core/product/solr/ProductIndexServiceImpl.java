@@ -3,7 +3,7 @@ package hasoffer.core.product.solr;
 import hasoffer.base.config.AppConfig;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.StringUtils;
-import hasoffer.core.solr.*;
+import hasoffer.data.solr.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

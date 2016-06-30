@@ -1,7 +1,7 @@
 package hasoffer.core.product.solr;
 
 import hasoffer.core.persistence.po.ptm.PtmCategory;
-import hasoffer.core.solr.IIdentifiable;
+import hasoffer.data.solr.IIdentifiable;
 
 /**
  * Date : 2016/1/18
