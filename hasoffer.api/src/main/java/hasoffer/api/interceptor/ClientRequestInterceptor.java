@@ -1,6 +1,5 @@
 package hasoffer.api.interceptor;
 
-import com.google.gson.Gson;
 import hasoffer.api.controller.vo.DeviceInfoVo;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.base.utils.StringUtils;
@@ -49,7 +48,6 @@ public class ClientRequestInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        Gson gson = new Gson();
         DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
 
         String uri = httpServletRequest.getRequestURI();

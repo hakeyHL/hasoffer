@@ -7,9 +7,12 @@ import hasoffer.api.controller.vo.DeviceRequestVo;
 import hasoffer.api.worker.DeviceRequestQueue;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.utils.DeviceUtils;
+import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -25,11 +28,14 @@ public class RequestInterceptor implements HandlerInterceptor {
     private static Logger logger = LoggerFactory.getLogger(RequestInterceptor.class);
     @Resource
     IDeviceService deviceService;
+    @Resource
+    IAppService appService;
 
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
         Gson gson = new Gson();
 
         String deviceInfoStr = Context.currentContext().getHeader("deviceinfo");
+        String userToken = Context.currentContext().getHeader("usertoken");
         String requestUri = httpServletRequest.getRequestURI();
         String queryStr = httpServletRequest.getQueryString();
         try {
@@ -54,6 +60,17 @@ public class RequestInterceptor implements HandlerInterceptor {
             //比价的设备 setContext
             String deviceId = DeviceUtils.getDeviceId(deviceInfoVo.getDeviceId(), deviceInfoVo.getImeiId(), deviceInfoVo.getSerial());
             Context.currentContext().set(StaticContext.DEVICE_ID, deviceId);
+
+            if (!StringUtils.isEmpty(userToken)) {
+                Context.currentContext().set(StaticContext.USER_TOKEN, userToken);
+
+                //todo add cache
+                UrmUser user = appService.getUserByUserToken(userToken);
+                if (user != null) {
+                    Context.currentContext().set(StaticContext.USER_ID, user.getId());
+                }
+            }
+
         } catch (Exception e) {
             logger.error(String.format("RequestInterceptor Has Error: %s. request = [%s]. query = [%s] .device=[%s]",
                     e.getMessage(), requestUri, queryStr, deviceInfoStr));
