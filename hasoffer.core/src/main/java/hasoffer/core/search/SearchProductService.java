@@ -97,7 +97,7 @@ public class SearchProductService {
         keyword = StringUtils.getCleanWordString(keyword);
         //遍历websiteList，添加比较列表
         for (Website website : websites) {
-            //todo shopclues反爬，先不跳过
+            //todo shopclues反爬，先不抓，跳过
             if (website == Website.SHOPCLUES) {
                 continue;
             }

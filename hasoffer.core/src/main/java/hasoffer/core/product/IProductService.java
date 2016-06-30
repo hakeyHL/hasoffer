@@ -22,7 +22,7 @@ public interface IProductService {
                              String description, String colors, String sizes,
                              int rating, String website, String sourceId);
 
-    ProductBo createProduct(long cateId, String title, double price, Website website,
+    ProductBo createProduct(long cateId, String title, float price, Website website,
                             String sourceUrl, String sourceId, String imageUrl);
 
     ProductBo createProductByListProducts(Map<Website, ListProduct> listProductMap);

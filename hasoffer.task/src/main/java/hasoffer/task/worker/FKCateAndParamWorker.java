@@ -58,10 +58,13 @@ public class FKCateAndParamWorker implements Runnable {
             }
 
             PtmCmpSkuDescription ptmCmpSkuDescription = mdm.queryOne(PtmCmpSkuDescription.class, sku.getProductId());
-            String jsonDescription = ptmCmpSkuDescription.getJsonDescription();
-            if (!StringUtils.isEmpty(jsonDescription)) {
-                continue;
+            if (ptmCmpSkuDescription != null) {
+                String jsonDescription = ptmCmpSkuDescription.getJsonDescription();
+                if (!StringUtils.isEmpty(jsonDescription)) {
+                    continue;
+                }
             }
+
 
             String url = sku.getUrl();
 

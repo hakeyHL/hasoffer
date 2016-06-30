@@ -185,8 +185,8 @@ public class DataFixServiceImpl implements IDataFixService {
             }
         });
 
-        double maxPrice = skuBoList.get(skuBoList.size() - 1).getPrice();
-        double minPrice = skuBoList.get(0).getPrice();
+        float maxPrice = skuBoList.get(skuBoList.size() - 1).getPrice();
+        float minPrice = skuBoList.get(0).getPrice();
 
         if (maxPrice / minPrice < 5) {
             return null;
