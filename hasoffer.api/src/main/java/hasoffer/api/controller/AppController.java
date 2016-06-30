@@ -161,6 +161,8 @@ public class AppController {
                                  @RequestParam CallbackAction action) {
 
         switch (action) {
+            case LOAD:
+                break;
             case FLOWCTRLSUCCESS:
                 // 流量拦截成功
                 try {
@@ -170,6 +172,7 @@ public class AppController {
                 } catch (Exception e) {
                     logger.debug(e.getMessage());
                 }
+                break;
             default:
                 break;
         }

@@ -6,6 +6,7 @@ package hasoffer.api.controller.vo;
  */
 public enum CallbackAction {
 
-    FLOWCTRLSUCCESS
+    LOAD, //加载Hasoffer
+    FLOWCTRLSUCCESS //流量控制成功
 
 }
