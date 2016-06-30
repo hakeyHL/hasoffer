@@ -169,8 +169,8 @@ public class AutoSearchMatchController {
                     public PageableResult getData(int page) {
                         Query query = new Query(
                                 Criteria.where("lUpdateTime").gt(startTime)
-                                        .andOperator(Criteria.where("relatedProId").is(0)
-                                                .andOperator(Criteria.where("lRelateTime").is(0)))
+//                                        .andOperator(Criteria.where("relatedProId").is(0)
+//                                                .andOperator(Criteria.where("lRelateTime").is(0)))
                         );
 
                         query.with(new Sort(Sort.Direction.ASC, "lUpdateTime"));

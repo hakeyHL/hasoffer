@@ -78,7 +78,7 @@ public class ShopcluesHelper {
     public static String getUrlWithAff(String url, String[] affs) {
 
         String market = "";
-        if (affs.length > 1) {
+        if(affs.length > 1){
             market = affs[0];
         }
 
