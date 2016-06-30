@@ -27,6 +27,11 @@
             <artifactId>hasoffer.spider.api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>hasoffer</groupId>
+            <artifactId>hasoffer.data.solr</artifactId>
+            <version>${hasoffer.version}</version>
+        </dependency>
 
         <!-- <dependency>
 			 <groupId>com.wcohen</groupId>
@@ -38,18 +43,6 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>${httpclient.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-solrj</artifactId>
-            <version>${solr-solrj.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.httpcomponents</groupId>
-                    <artifactId>httpclient</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>

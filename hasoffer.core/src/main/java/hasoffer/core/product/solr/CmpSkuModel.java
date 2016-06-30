@@ -2,7 +2,7 @@ package hasoffer.core.product.solr;
 
 import hasoffer.base.model.SkuStatus;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.solr.IIdentifiable;
+import hasoffer.data.solr.IIdentifiable;
 
 /**
  * Date : 2016/5/19
