@@ -316,7 +316,7 @@ public class AppController {
         List<AppBanner> list = appService.getBanners();
         for (AppBanner appBanner : list) {
             Banners banner = new Banners();
-            banner.setLink(appBanner.getLinkUrl());
+            banner.setLink(WebsiteHelper.getUrlWithAff(appBanner.getLinkUrl()));
             banner.setRank(appBanner.getRank());
             banner.setSource(1);
             banner.setSourceUrl(appBanner.getImageUrl() == null ? "" : ImageUtil.getImageUrl(appBanner.getImageUrl()));
@@ -356,7 +356,7 @@ public class AppController {
                 dealVo.setExtra(1.5);
             }
             dealVo.setImage(ImageUtil.getImageUrl(appDeal.getImageUrl()));
-            dealVo.setLink(appDeal.getLinkUrl());
+            dealVo.setLink(WebsiteHelper.getUrlWithAff(appDeal.getLinkUrl()));
             dealVo.setTitle(appDeal.getTitle());
             li.add(dealVo);
         }
@@ -394,7 +394,7 @@ public class AppController {
                         "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
                         "5. Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
             }
-            map.put("deeplink", appDeal.getLinkUrl());
+            map.put("deeplink", WebsiteHelper.getUrlWithAff(appDeal.getLinkUrl()));
             mv.addObject("data", map);
         }
         return mv;
