@@ -36,7 +36,7 @@ public class PtmCmpSkuIndex2 implements Identifiable<Long> {
     private String siteSourceSidIndex;
     private String siteSkuTitleIndex;
 
-    private double price;
+    private float price;
 
     private String url;
 
@@ -48,7 +48,7 @@ public class PtmCmpSkuIndex2 implements Identifiable<Long> {
     }
 
     public PtmCmpSkuIndex2(long id, long productId, Website website, String sourcePid, String sourceSid,
-                           String title, String skuTitle, double price, String url) {
+                           String title, String skuTitle, float price, String url) {
         this.id = id;
         this.productId = productId;
         this.website = website;
@@ -75,7 +75,7 @@ public class PtmCmpSkuIndex2 implements Identifiable<Long> {
         this.id = id;
     }
 
-    public double getPrice() {
+    public float getPrice() {
         return price;
     }
 

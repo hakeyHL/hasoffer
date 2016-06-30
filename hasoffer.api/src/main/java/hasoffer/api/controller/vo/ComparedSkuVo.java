@@ -23,7 +23,9 @@ public class ComparedSkuVo {
 
     private String rating = "";
     private String title = "";
-    private double price;
+    private float price;
+
+    private double priceD;
 
     private String priceStr;
 
@@ -41,7 +43,7 @@ public class ComparedSkuVo {
     public ComparedSkuVo(Website website, String title, double price) {
         this.website = website;
         this.title = title;
-        this.price = price;
+        this.price = (float) price;
         this.websiteLogoUrl = WebsiteHelper.getLogoUrl(website);
     }
 
@@ -142,7 +144,7 @@ public class ComparedSkuVo {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(float price) {
         this.price = price;
     }
 

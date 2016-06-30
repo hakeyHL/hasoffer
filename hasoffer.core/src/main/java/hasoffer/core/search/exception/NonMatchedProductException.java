@@ -9,13 +9,13 @@ import hasoffer.core.exception.ERROR_CODE;
 public class NonMatchedProductException extends BaseException {
     private String q;
     private String title;
-    private double mc;
+    private float mc;
 
     public NonMatchedProductException(ERROR_CODE errorCode) {
         super(errorCode);
     }
 
-    public NonMatchedProductException(ERROR_CODE errorCode, String q, String title, double mc) {
+    public NonMatchedProductException(ERROR_CODE errorCode, String q, String title, float mc) {
         super(errorCode);
         this.q = q;
         this.title = title;

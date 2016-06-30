@@ -29,7 +29,7 @@ public class SrmAutoSearchResult {
     private long relatedProId;
     private String fromWebsite;
     private String title;
-    private double price;
+    private float price;
 
     private Map<Website, List<ListProduct>> sitePros;
     private Map<Website, List<SearchedSku>> finalSkus;
@@ -87,11 +87,11 @@ public class SrmAutoSearchResult {
         this.title = title;
     }
 
-    public double getPrice() {
+    public float getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(float price) {
         this.price = price;
     }
 
