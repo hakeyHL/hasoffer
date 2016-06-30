@@ -161,8 +161,6 @@ public class AppController {
                                  @RequestParam CallbackAction action) {
 
         switch (action) {
-            case LOAD:
-                break;
             case FLOWCTRLSUCCESS:
                 // 流量拦截成功
                 try {
