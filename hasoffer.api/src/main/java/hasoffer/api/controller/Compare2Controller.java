@@ -205,6 +205,7 @@ public class Compare2Controller {
         cmpResult.setName(product.getTitle());
         cmpResult.setBestPrice(cplv.getPrice());
         comparedSkuVos.add(cplv);
+        cmpResult.setPriceList(comparedSkuVos);
         return cmpResult;
     }
 
