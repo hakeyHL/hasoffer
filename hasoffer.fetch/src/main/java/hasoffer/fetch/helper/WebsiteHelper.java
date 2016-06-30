@@ -88,6 +88,37 @@ public class WebsiteHelper {
 //    }
 
     public static String getUrlWithAff(String url) {
+        Website website = getWebSite(url);
+
+        String[] affs = new String[0];
+
+        switch (website) {
+            case FLIPKART:
+                return FlipkartHelper.getUrlWithAff(url, affs);
+            case PAYTM:
+                return PaytmHelper.getUrlWithAff(url);
+            case AMAZON:
+                return AmazonHelper.getUrlWithAff(url);
+            case SNAPDEAL:
+//                url = SnapdealHelper.getCleanUrl(url);
+//                return getMgsvcUrl(String.valueOf(skuId), url);
+                return SnapdealHelper.appendAff(SnapdealHelper.getDeeplink(url), affs);
+            case SHOPCLUES:
+                return ShopcluesHelper.getUrlWithAff(url, affs);
+            case EBAY:
+                return EbayHelper.getUrlWithAff(url);
+            case INFIBEAM:
+                return InfibeamHelper.getUrlWithAff(url, affs);
+            case INDIATIMES:
+                return IndiatimesHelper.getUrlWithAff(url);
+            case CROMARETAIL:
+            case THEITDEPOT:
+            case ASKMEBAZAAR:
+                break;
+            default:
+                break;
+        }
+
         return url;
     }
 
