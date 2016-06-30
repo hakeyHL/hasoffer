@@ -13,7 +13,7 @@ public class SearchCriteria {
     private  int level;
 
     public int getLevel() {
-        return level;
+        return level==0?2:level;
     }
 
     public void setLevel(int level) {
@@ -53,7 +53,7 @@ public class SearchCriteria {
     }
 
     public String getCategoryId() {
-        return categoryId;
+        return categoryId==null?"4":categoryId;
     }
 
     public void setCategoryId(String categoryId) {
@@ -61,7 +61,7 @@ public class SearchCriteria {
     }
 
     public int getPage() {
-        return page;
+        return page==0?1:page;
     }
 
     public void setPage(int page) {
@@ -69,7 +69,7 @@ public class SearchCriteria {
     }
 
     public int getPageSize() {
-        return pageSize;
+        return pageSize==0?20:pageSize;
     }
 
     public void setPageSize(int pageSize) {

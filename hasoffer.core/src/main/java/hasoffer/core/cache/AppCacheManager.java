@@ -33,11 +33,12 @@ public class AppCacheManager {
         String key = null;
         List categorys = new ArrayList();
         if (StringUtils.isBlank(categoryId)) {
-            key = CACHE_KEY_PRE + "LEVEL1";
+            key = CACHE_KEY_PRE + "_LEVEL1";
             CategoryBo categoryBo = cacheService.get(CategoryBo.class, key, 0);
             if (categoryBo != null) {
                 categorys = categoryBo.getCategorys();
             } else {
+                categoryBo = new CategoryBo();
                 categorys = new ArrayList();
                 List<PtmCategory> ptmCategorys = appService.getCategory();
                 for (PtmCategory ptmCategory : ptmCategorys) {
@@ -56,6 +57,8 @@ public class AppCacheManager {
                     categorys.add(categoryVo);
                 }
             }
+            categoryBo.setCategorys(categorys);
+            cacheService.add(key, categoryBo, CACHE_EXPIRE_TIME);
         } else {
             key = CACHE_KEY_PRE + categoryId;
             CategoryBo categoryBo = cacheService.get(CategoryBo.class, key, 0);

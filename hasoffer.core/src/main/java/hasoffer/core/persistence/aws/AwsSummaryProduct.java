@@ -31,7 +31,7 @@ public class AwsSummaryProduct {
     private String title;
     private String subTitle;
 
-    private double price;
+    private float price;
 
     private String imageUrl;
     @DynamoDBMarshalling(marshallerClass = SkuStatusTypeConverter.class)
@@ -52,7 +52,7 @@ public class AwsSummaryProduct {
     }
 
     public AwsSummaryProduct(long id, Website website, String url, String sourceId,
-                             String title, String subTitle, double price, String imageUrl,
+                             String title, String subTitle, float price, String imageUrl,
                              SkuStatus skuStatus) {
         this();
         this.id = id;
@@ -120,7 +120,7 @@ public class AwsSummaryProduct {
         this.subTitle = subTitle;
     }
 
-    public double getPrice() {
+    public float getPrice() {
         return price;
     }
 

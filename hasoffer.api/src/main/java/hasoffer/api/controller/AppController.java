@@ -316,7 +316,7 @@ public class AppController {
         List<AppBanner> list = appService.getBanners();
         for (AppBanner appBanner : list) {
             Banners banner = new Banners();
-            banner.setLink(appBanner.getLinkUrl());
+            banner.setLink(WebsiteHelper.getUrlWithAff(appBanner.getLinkUrl()));
             banner.setRank(appBanner.getRank());
             banner.setSource(1);
             banner.setSourceUrl(appBanner.getImageUrl() == null ? "" : ImageUtil.getImageUrl(appBanner.getImageUrl()));
@@ -356,7 +356,7 @@ public class AppController {
                 dealVo.setExtra(1.5);
             }
             dealVo.setImage(ImageUtil.getImageUrl(appDeal.getImageUrl()));
-            dealVo.setLink(appDeal.getLinkUrl());
+            dealVo.setLink(WebsiteHelper.getUrlWithAff(appDeal.getLinkUrl()));
             dealVo.setTitle(appDeal.getTitle());
             li.add(dealVo);
         }
@@ -394,7 +394,7 @@ public class AppController {
                         "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
                         "5. Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
             }
-            map.put("deeplink", appDeal.getLinkUrl());
+            map.put("deeplink", WebsiteHelper.getUrlWithAff(appDeal.getLinkUrl()));
             mv.addObject("data", map);
         }
         return mv;
@@ -497,12 +497,12 @@ public class AppController {
         List li = new ArrayList();
         Map map = new HashMap();
         PageableResult<ProductModel> products;
-        List<ProductModel> products1;
         //category level page size
         // PageableResult <ProductModel> products=productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()),criteria.getLevel(),criteria.getPage(),criteria.getPageSize());
         if (!StringUtils.isBlank(criteria.getCategoryId())) {
             //search by category
-            products = productIndexServiceImpl.searchPro(Long.valueOf(2), 1, 1, 10);
+            products = productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
+            //products = productIndexServiceImpl.searchPro(Long.valueOf(2), 2, 1, 10);
             if (products != null && products.getData().size() > 0) {
                 List<ProductModel> productModes = products.getData();
                 for (ProductModel productModel : productModes) {
@@ -521,7 +521,7 @@ public class AppController {
         } else {
             //search by title
             //productIndexServiceImpl.simpleSearch(criteria.getKeyword(),1,10);
-            PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), 1, 10);
+            PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
             if (p != null && p.getData().size() > 0) {
                 List<ProductModel> productModes = p.getData();
                 for (ProductModel productModel : productModes) {
@@ -583,7 +583,7 @@ public class AppController {
                 map.put("product", li);
                 break;
             case 2:
-                PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), 1, 10);
+                PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
                 if (p != null && p.getData().size() > 0) {
                     List<ProductModel> productModes = p.getData();
                     for (ProductModel productModel : productModes) {

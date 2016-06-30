@@ -20,7 +20,7 @@ public class PtmCmpSkuLog {
 
 	private Date priceTime;
 
-	private double price;
+	private float price;
 	private String rating;
 
 	@PersistenceConstructor
@@ -58,7 +58,7 @@ public class PtmCmpSkuLog {
 		this.priceTime = priceTime;
 	}
 
-	public double getPrice() {
+	public float getPrice() {
 		return price;
 	}
 

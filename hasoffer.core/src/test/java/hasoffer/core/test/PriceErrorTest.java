@@ -44,7 +44,7 @@ public class PriceErrorTest {
                 stringBuilder.append(id + "\t");
             }
 
-            double basePrice = -5.5;
+            float basePrice = -5.5f;
 
             for (int i = skus.size()-1; i >= 0; i--) {
 
