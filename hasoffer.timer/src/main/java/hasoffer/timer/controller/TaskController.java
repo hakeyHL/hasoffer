@@ -3,8 +3,6 @@ package hasoffer.timer.controller;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
-import hasoffer.base.utils.TimeUtils;
-import hasoffer.core.admin.IAdminCountService;
 import hasoffer.core.persistence.dbm.HibernateDao;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.search.ISearchService;
@@ -19,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -35,52 +32,8 @@ public class TaskController {
     @Resource
     ISearchService searchService;
     @Resource
-    IAdminCountService deviceService;
-    @Resource
     HibernateDao dao;
     private Logger logger = LoggerFactory.getLogger(TaskController.class);
-
-    @RequestMapping(value = "/aggregationDayAlive", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String aggregationDayAlive() {
-
-        final String DATE_PATTERN_FROM_DB= "yyyy-MM-dd";
-
-        List<String> alives = dao.findBySql("SHOW TABLES LIKE 'stsalive20%';");
-
-        //03-01是起始时间
-        Date DayaliveLogsMaxCreateTime = TimeUtils.stringToDate("2016-03-01", DATE_PATTERN_FROM_DB);
-
-        for (String alive : alives) {
-            List<Map<String, Object>> dayAlive = dao.findMapBySql("select * from " + alive + " order by wakeupTime desc limit 1");
-            if(dayAlive.size()>0) {
-                String wakeupTime = dayAlive.get(0).get("wakeupTime").toString();
-                if (TimeUtils.stringToDate(wakeupTime, DATE_PATTERN_FROM_DB).getTime() > DayaliveLogsMaxCreateTime.getTime()) {
-                    DayaliveLogsMaxCreateTime = TimeUtils.stringToDate(wakeupTime, DATE_PATTERN_FROM_DB);
-                }
-            }
-        }
-
-        deviceService.deviceRequestLogsToAlive(DayaliveLogsMaxCreateTime);
-        logger.info("success insert mongodb data into stsAlive ...");
-
-        deviceService.deviceRequestLogsAliveUpdate(DayaliveLogsMaxCreateTime);
-        logger.info("success update stsAlive ...");
-
-        List<Map<String,Object>> dayAlive = dao.findMapBySql("select * from StsDayAlive order by date desc limit 1");
-
-        if (dayAlive!= null && dayAlive.size() > 0) {
-            DayaliveLogsMaxCreateTime = TimeUtils.stringToDate(dayAlive.get(0).get("date").toString(),DATE_PATTERN_FROM_DB);
-        }
-
-        deviceService.cntFromAliveToDayAlive(DayaliveLogsMaxCreateTime);
-        logger.info("success insert or update stsDayAlive data...");
-
-        deviceService.cntFromAliveUpdateDayAlive(DayaliveLogsMaxCreateTime);
-        logger.info("success  update stsDayAlive data... ");
-        return "ok";
-    }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public

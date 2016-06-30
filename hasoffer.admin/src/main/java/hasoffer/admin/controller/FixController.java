@@ -1,9 +1,6 @@
 package hasoffer.admin.controller;
 
-import hasoffer.admin.worker.FixSkuErrorInPriceWorker;
-import hasoffer.admin.worker.ShopcluesOffsaleUpdateWorker;
-import hasoffer.admin.worker.ShopcluesStockOutUpdateWorker;
-import hasoffer.admin.worker.ShopcluesUrlFixListWorker;
+import hasoffer.admin.worker.*;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
@@ -18,7 +15,6 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
-import hasoffer.core.persistence.po.ptm.updater.PtmProductUpdater;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IDataFixService;
 import hasoffer.core.product.IFetchService;
@@ -63,9 +59,6 @@ public class FixController {
 
     private static final String Q_PTMCMPSKU = "SELECT t FROM PtmCmpSku t WHERE t.productId < 100000";
     private static final String Q_INDEX = "SELECT t FROM PtmCmpSkuIndex2 t ORDER BY t.id ASC";
-
-    private static final String Q_FLIPKART = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' ORDER BY t.id";
-    private static final String Q_PRODUCT_BYID = "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0";
 
     private static Logger logger = LoggerFactory.getLogger(FixController.class);
     @Resource
@@ -501,6 +494,7 @@ public class FixController {
         return "ok";
     }
 
+    //fixdata/fixProductCategory
     @RequestMapping(value = "/fixProductCategory", method = RequestMethod.GET)
     public
     @ResponseBody
@@ -510,60 +504,10 @@ public class FixController {
 
         ExecutorService es = Executors.newCachedThreadPool();
 
-        es.execute(new Runnable() {
-            @Override
-            public void run() {
-
-                int pageSize = 1000;
-                int curPage = 1;
-
-                PageableResult<PtmCmpSku> pageableResult = dbm.queryPage(Q_FLIPKART, curPage, pageSize);
-
-                long totalPage = pageableResult.getTotalPage();
-
-                while (curPage < totalPage) {
-
-                    pageableResult = dbm.queryPage(Q_FLIPKART, curPage, pageSize);
-
-                    List<PtmCmpSku> skus = pageableResult.getData();
-
-                    for (PtmCmpSku sku : skus) {
-                        if (sku.getCategoryId() == null) {
-                            logger.debug("categoryId is null, skuid : " + sku.getId());
-                            continue;
-                        }
-                        if (sku.getProductId() == 0) {
-                            logger.debug("productId is null, skuid : " + sku.getId());
-                            continue;
-                        }
-
-                        PtmProduct product = dbm.querySingle(Q_PRODUCT_BYID, Arrays.asList(sku.getProductId()));
-                        if (product == null) {
-                            continue;
-                        }
-
-                        quene.add(sku);
-                    }
-
-                    curPage++;
-                    logger.debug("fix category list worker : curPage :" + curPage);
-                }
-            }
-        });
+        es.execute(new FixPtmProductCategoryListWorker(dbm, quene));
 
         for (int i = 0; i < 10; i++) {
-            es.execute(new Runnable() {
-                @Override
-                public void run() {
-                    while (quene.peek() != null) {
-                        PtmCmpSku skuQ = quene.poll();
-                        PtmProductUpdater updater = new PtmProductUpdater(skuQ.getProductId());
-                        updater.getPo().setCategoryId(skuQ.getCategoryId());
-                        dbm.update(updater);
-                        logger.debug("update category worker : id = " + skuQ.getProductId());
-                    }
-                }
-            });
+            es.execute(new FixPtmProductCategoryUpdateWorker(quene, dbm));
         }
 
         return "ok";
