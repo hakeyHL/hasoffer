@@ -14,7 +14,7 @@ public class SearchIO {
     final String cliQ;//客户端传上来的字符串
     final Website cliSite;
     final String cliQBrand;
-    final double cliPrice;
+    final float cliPrice;
     final String cliSourceId;
     // hs 开头的都是搜到的结果 hs - hasoffer
     long hsCateId;
@@ -36,7 +36,7 @@ public class SearchIO {
         this.cliSourceId = sourceId;
         this.cliQ = q.trim();
         this.cliSite = Website.valueOf(site);
-        this.cliPrice = PriceUtil.getPrice(price);
+        this.cliPrice = (float) PriceUtil.getPrice(price);
         this.cliQBrand = brand;
 
         this.keyword = StringUtils.getCleanWordString(q);
@@ -130,7 +130,7 @@ public class SearchIO {
         return cliSite;
     }
 
-    public double getCliPrice() {
+    public float getCliPrice() {
         return cliPrice;
     }
 

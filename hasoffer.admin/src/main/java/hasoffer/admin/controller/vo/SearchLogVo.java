@@ -20,7 +20,7 @@ public class SearchLogVo {
     private String site;
     private String keyword;
     private String searchUrl;
-    private double price;
+    private float price;
     private int count = 1;// 被搜索次数
 
     private long ptmProductId;
@@ -32,13 +32,13 @@ public class SearchLogVo {
     private Date createTime = TimeUtils.nowDate();
     private Date updateTime = TimeUtils.nowDate();
 
-    private double skuMinPrice;
-    private double skuMaxPrice;
+    private float skuMinPrice;
+    private float skuMaxPrice;
     private int skuCount;
 
     private Date manualSetTime;
 
-    public SearchLogVo(SrmSearchLog srmSearchLog, String title, List<CategoryVo> categories, double minPrice, double maxPrice, int skuCount) {
+    public SearchLogVo(SrmSearchLog srmSearchLog, String title, List<CategoryVo> categories, float minPrice, float maxPrice, int skuCount) {
         this.id = srmSearchLog.getId();
         this.site = srmSearchLog.getSite();
         this.keyword = srmSearchLog.getKeyword();
@@ -92,7 +92,7 @@ public class SearchLogVo {
         this.keyword = keyword;
     }
 
-    public double getPrice() {
+    public float getPrice() {
         return price;
     }
 
@@ -164,19 +164,19 @@ public class SearchLogVo {
         this.updateTime = updateTime;
     }
 
-    public double getSkuMinPrice() {
+    public float getSkuMinPrice() {
         return skuMinPrice;
     }
 
-    public void setSkuMinPrice(double skuMinPrice) {
+    public void setSkuMinPrice(float skuMinPrice) {
         this.skuMinPrice = skuMinPrice;
     }
 
-    public double getSkuMaxPrice() {
+    public float getSkuMaxPrice() {
         return skuMaxPrice;
     }
 
-    public void setSkuMaxPrice(double skuMaxPrice) {
+    public void setSkuMaxPrice(float skuMaxPrice) {
         this.skuMaxPrice = skuMaxPrice;
     }
 

@@ -85,7 +85,7 @@ public class ShopcluesOffsaleUpdateWorker implements Runnable {
                 Map<ListProduct, Float> resultMap = new HashMap<ListProduct, Float>();
 
                 // 匹配价格
-                double priceOrigin = sku.getPrice();
+                float priceOrigin = sku.getPrice();
 
                 //过滤结果
                 if (ArrayUtils.hasObjs(productList)) {

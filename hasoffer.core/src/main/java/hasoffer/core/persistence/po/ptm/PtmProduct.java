@@ -20,7 +20,7 @@ public class PtmProduct implements Identifiable<Long> {
     private long categoryId;
     private String title;// 标题
     private String tag;
-    private double price;
+    private float price;
 
     private String color;
     private String size;
@@ -36,7 +36,7 @@ public class PtmProduct implements Identifiable<Long> {
     public PtmProduct() {
     }
 
-    public PtmProduct(long categoryId, String title, double price,
+    public PtmProduct(long categoryId, String title, float price,
                       String sourceSite, String sourceUrl, String sourceId) {
         this.categoryId = categoryId;
         this.title = title;
@@ -95,7 +95,7 @@ public class PtmProduct implements Identifiable<Long> {
         this.title = title;
     }
 
-    public double getPrice() {
+    public float getPrice() {
         return price;
     }
 
