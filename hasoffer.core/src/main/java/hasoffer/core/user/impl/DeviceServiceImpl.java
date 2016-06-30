@@ -19,7 +19,9 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.*;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.urm.*;
+import hasoffer.core.persistence.po.urm.UrmDayVisit;
+import hasoffer.core.persistence.po.urm.UrmDevice;
+import hasoffer.core.persistence.po.urm.UrmDeviceConfig;
 import hasoffer.core.persistence.po.urm.updater.UrmDayVisitUpdater;
 import hasoffer.core.persistence.po.urm.updater.UrmDeviceUpdater;
 import hasoffer.core.user.IDeviceService;
@@ -48,8 +50,6 @@ import java.util.regex.Pattern;
 @Service
 public class DeviceServiceImpl implements IDeviceService {
 
-    private Logger logger = LoggerFactory.getLogger(DeviceServiceImpl.class);
-
     private static final String Q_DEVICE = " SELECT t FROM UrmDevice t ORDER BY t.createTime DESC ";
     private static final String Q_DEVICE_ASC = " SELECT t FROM UrmDevice t ORDER BY t.createTime ASC ";
     private static final String Q_DEVICE_BY_TIME =
@@ -77,16 +77,13 @@ public class DeviceServiceImpl implements IDeviceService {
     private static final String Q_DEVICE_BY_IDS = "SELECT t FROM UrmDevice t where t.id in (:ids)";
     @Resource
     IDataBaseManager dbm;
-
     @Resource
     IMongoDbManager mdm;
-
     @Resource
     HibernateDao hdao;
-
     @Resource
     DeviceCacheManager deviceCM;
-
+    private Logger logger = LoggerFactory.getLogger(DeviceServiceImpl.class);
 
     @Override
     public PageableResult<StatDayAlive> findAliveStats(String startYmd, String endYmd, String marketChannel, String brand, String osVersion, int page, int size, String order) {
@@ -198,16 +195,6 @@ public class DeviceServiceImpl implements IDeviceService {
         Query query = Query.query(Criteria.where("deviceId").is(deviceId));
         return mdm.query(StatDevice.class, query);
 //        return dbm.query(Q_DEVICE_STATRESULT, Arrays.asList(deviceId));
-    }
-
-    @Override
-    public List<UrmBrand> listAllDeviceBrands() {
-        return dbm.query(Q_DEVICEBRAND);
-    }
-
-    @Override
-    public List<UrmVersions> listAllDeviceVersions() {
-        return dbm.query(Q_DEVICEVERSIONS);
     }
 
     @Override
@@ -409,7 +396,7 @@ public class DeviceServiceImpl implements IDeviceService {
     @Override
     public List<UrmDevice> findDeviceByIdList(List<String> deviceList) {
 //        hdao.findBySql(Q_DEVICE_BY_IDS);
-        if(deviceList == null||deviceList.size()==0) {
+        if (deviceList == null || deviceList.size() == 0) {
             return new ArrayList<UrmDevice>();
         }
         return dbm.queryByIds(Q_DEVICE_BY_IDS, deviceList.toArray(new String[deviceList.size()]));
@@ -807,11 +794,10 @@ public class DeviceServiceImpl implements IDeviceService {
     }
 
 
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchSaveDeviceRequest(List<DeviceRequestBo> requestBoList) {
-        Map<String,UrmDevice> insertMap = new HashMap<String, UrmDevice>();
+        Map<String, UrmDevice> insertMap = new HashMap<String, UrmDevice>();
         Set<String> delSet = new HashSet<String>();
         for (DeviceRequestBo requestBo : requestBoList) {
             if (requestBo == null) {
@@ -820,7 +806,7 @@ public class DeviceServiceImpl implements IDeviceService {
             DeviceInfoBo di = requestBo.getDeviceInfoBo();
             String deviceId = DeviceUtils.getDeviceId(di.getDeviceId(), di.getImeiId(), di.getSerial());
             //查询 缓存中 deviceId 是否存在
-            UrmDevice urmDevice =  deviceCM.findDeviceById(deviceId);
+            UrmDevice urmDevice = deviceCM.findDeviceById(deviceId);
             if (urmDevice == null) {
                 //创建
                 urmDevice = new UrmDevice(deviceId, di.getMac(), di.getBrand(), di.getImeiId(), di.getDeviceId(),
@@ -893,7 +879,7 @@ public class DeviceServiceImpl implements IDeviceService {
                 if (doUpdate) {
                     urmDevice.setUpdateTime(TimeUtils.nowDate());
                     delSet.add(urmDevice.getId());
-                    insertMap.put(urmDevice.getId(),urmDevice);
+                    insertMap.put(urmDevice.getId(), urmDevice);
                 }
             }
 
@@ -908,10 +894,10 @@ public class DeviceServiceImpl implements IDeviceService {
                 mdm.save(urmDeviceEventLog);
             }
         }
-        if(delSet.size()>0){
+        if (delSet.size() > 0) {
             dbm.batchDelete(D_DEVICE_LOG, delSet.toArray(new String[delSet.size()]));
         }
-        if(insertMap.size()>0) {
+        if (insertMap.size() > 0) {
             dbm.batchSave(new ArrayList<Object>(insertMap.values()));
         }
 
