@@ -12,13 +12,9 @@ import java.util.Date;
  * Date : 2016/1/15
  * Function :
  * <p>
- * {"brand":"generic",
- * "imeiId":"000000000000000",
- * "deviceName":"Genymotion Google Galaxy Nexus - 4.3 - API 18 - 720x1280 vbox86p",
- * "appVersion":"1",
- * "serial":"unknown",
- * "osversion":"4.3",
- * "deviceId":"729bd2f84f0c6dca"}
+ * id, createTime, mac, brand, imei, deviceId, serial, deviceName,
+ * osVersion, appVersion, screen, shopApp, otherApp, appType, marketChannel
+ * ramSize, appCount, gcmToken
  */
 @Entity
 public class UrmDevice implements Identifiable<String> {
