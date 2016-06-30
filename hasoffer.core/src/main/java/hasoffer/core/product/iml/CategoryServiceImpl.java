@@ -86,6 +86,12 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public void tempDeleteCategoryForCategoryUpdate(long id) {
+        dbm.delete(PtmCategory.class, id);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateCategoryLevel(long cateId, int level) {
         PtmCategoryUpdater ptmCategoryUpdater = new PtmCategoryUpdater(cateId);
         ptmCategoryUpdater.getPo().setLevel(level);

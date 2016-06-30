@@ -4,6 +4,7 @@ import hasoffer.base.config.AppConfig;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.TaskStatus;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.search.SearchProductService;
@@ -59,6 +60,7 @@ public class SearchRecordProcessWorker implements Runnable {
                 SrmAutoSearchResult autoSearchResult = new SrmAutoSearchResult(searchLog);
 
                 String keyword = autoSearchResult.getTitle();
+                keyword = StringUtils.getCleanWordString(keyword);
                 String serRegion = AppConfig.get(AppConfig.SER_REGION);
                 Map<Website, List<ListProduct>> listProductMap = new HashMap<Website, List<ListProduct>>();
                 if (AppConfig.SerRegion.INDIA.toString().equals(serRegion)) {

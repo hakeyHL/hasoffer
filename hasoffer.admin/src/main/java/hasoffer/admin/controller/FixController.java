@@ -10,15 +10,13 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.HijackLog;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
+import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
-import hasoffer.core.product.ICmpSkuService;
-import hasoffer.core.product.IDataFixService;
-import hasoffer.core.product.IFetchService;
-import hasoffer.core.product.IProductService;
+import hasoffer.core.product.*;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
@@ -57,8 +55,12 @@ public class FixController {
     private static final String Q_SHOPCLUES_OFFSALE = "SELECT t FROM PtmCmpSku t WHERE t.website = 'SHOPCLUES' AND t.status = 'OFFSALE' ORDER BY t.id";
     private static final String Q_SHOPCLUES_STOCKOUT = "SELECT t FROM PtmCmpSku t WHERE t.website = 'SHOPCLUES' AND t.status = 'OUTSTOCK' ORDER BY t.id";
 
+    private static final String Q_PTMCATEGORY_BYPARENTID = "SELECT t FROM PtmCategory t WHERE t.parentId = ?0 ";
+    private static final String Q_PTMCMPSKU_BYCATEGORYID = "SELECT t FROM PtmCmpSku t WHERE t.categoryId = ?0 ";
+
     private static final String Q_PTMCMPSKU = "SELECT t FROM PtmCmpSku t WHERE t.productId < 100000";
     private static final String Q_INDEX = "SELECT t FROM PtmCmpSkuIndex2 t ORDER BY t.id ASC";
+
 
     private static Logger logger = LoggerFactory.getLogger(FixController.class);
     @Resource
@@ -79,6 +81,8 @@ public class FixController {
     IMongoDbManager mdm;
     @Resource
     CmpskuIndexServiceImpl cmpskuIndexService;
+    @Resource
+    ICategoryService categoryservice;
 
     @RequestMapping(value = "/createskuindex", method = RequestMethod.GET)
     public
@@ -500,7 +504,7 @@ public class FixController {
     @ResponseBody
     String fixProductCategory() {
 
-        final ConcurrentLinkedQueue<PtmCmpSku> quene = new ConcurrentLinkedQueue<PtmCmpSku>();
+        ConcurrentLinkedQueue<PtmCmpSku> quene = new ConcurrentLinkedQueue<PtmCmpSku>();
 
         ExecutorService es = Executors.newCachedThreadPool();
 
@@ -510,6 +514,49 @@ public class FixController {
             es.execute(new FixPtmProductCategoryUpdateWorker(quene, dbm));
         }
 
+        return "ok";
+    }
+
+    /*
+        该方法用来合并类目太多的情况
+     */
+    //fixdata/fixPtmcategory
+    @RequestMapping(value = "/fixPtmcategory", method = RequestMethod.GET)
+    @ResponseBody
+    public String fixPtmcategory() {
+
+        long[] idArray = {4, 56, 4561, 4568};
+
+        for (long id : idArray) {
+
+            //get all child category
+            List<PtmCategory> ptmcategoryList = dbm.query(Q_PTMCATEGORY_BYPARENTID, Arrays.asList(id));
+
+            //merge other category to first category
+            PtmCategory firstChildCategory = ptmcategoryList.get(0);
+
+            for (int i = 1; i < ptmcategoryList.size(); i++) {
+
+                PtmCategory needUpdateCategory = ptmcategoryList.get(i);
+
+                List<PtmCmpSku> skus = dbm.query(Q_PTMCMPSKU_BYCATEGORYID, Arrays.asList(needUpdateCategory.getId()));
+
+                System.out.println("need update " + skus.size());
+                for (PtmCmpSku sku : skus) {
+
+                    PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(sku.getId());
+
+                    updater.getPo().setCategoryId(firstChildCategory.getId());
+
+                    dbm.update(updater);
+
+                    System.out.println("update success for [" + sku.getId() + "] from [" + needUpdateCategory.getId() + "] to [" + firstChildCategory.getId() + "]");
+                }
+
+                categoryservice.tempDeleteCategoryForCategoryUpdate(needUpdateCategory.getId());
+                System.out.println("category delete [" + needUpdateCategory.getId() + "]");
+            }
+        }
         return "ok";
     }
 
