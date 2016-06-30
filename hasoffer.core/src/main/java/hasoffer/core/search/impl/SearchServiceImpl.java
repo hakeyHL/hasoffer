@@ -224,7 +224,7 @@ public class SearchServiceImpl implements ISearchService {
                 if (titleScore == 0) {
                     titleScore = searchedSku.getTitleScore();
                 } else if (titleScore != searchedSku.getTitleScore()) {
-                    continue;
+                    break;
                 }
 
                 PtmCmpSku cmpSku = productService.createCmpsku(ptmProductId, searchedSku.getPrice(),
