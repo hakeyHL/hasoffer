@@ -233,16 +233,15 @@ public class AppController {
 
     /**
      * 查看返利
-     *
-     * @param userToken
      * @return
      */
     @RequestMapping(value = "/backDetail", method = RequestMethod.GET)
-    public ModelAndView backDetail(@RequestParam String userToken) {
+    public ModelAndView backDetail() {
         ModelAndView mv = new ModelAndView();
         BackDetailVo data = new BackDetailVo();
         List<OrderVo> transcations = new ArrayList<OrderVo>();
-        UrmUser user = appService.getUserByUserToken(userToken);
+        DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        UrmUser user = appService.getUserByUserToken(deviceInfo.getUserToken());
         BigDecimal PendingCoins = BigDecimal.ZERO;
         BigDecimal VericiedCoins = BigDecimal.ZERO;
         if (user != null) {
@@ -358,6 +357,7 @@ public class AppController {
             dealVo.setImage(ImageUtil.getImageUrl(appDeal.getImageUrl()));
             dealVo.setLink(WebsiteHelper.getUrlWithAff(appDeal.getLinkUrl()==null?"":appDeal.getLinkUrl()));
             dealVo.setTitle(appDeal.getTitle());
+            dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
             li.add(dealVo);
         }
         map.put("deals", li);
@@ -385,6 +385,7 @@ public class AppController {
             map.put("image", ImageUtil.getImageUrl(appDeal.getImageUrl()));
             map.put("title", appDeal.getTitle());
             map.put("exp", new SimpleDateFormat("MM/dd/yyyy").format(appDeal.getExpireTime()));
+            map.put("logoUrl", WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
             map.put("extra", 1.5);
             map.put("description", appDeal.getDescription());
             if (appDeal.getWebsite() == Website.FLIPKART || appDeal.getWebsite() == Website.SHOPCLUES) {
@@ -412,13 +413,12 @@ public class AppController {
         String userToken = UUID.randomUUID().toString();
         UrmUser uUser = appService.getUserById(userVO.getThirdId() == null ? "0" : "1");
         if (uUser == null) {
-
             logger.debug("user is not exist before");
             UrmUser urmUser = new UrmUser();
             urmUser.setUserToken(userToken);
             urmUser.setAvatarPath(userVO.getUserIcon());
             urmUser.setCreateTime(new Date());
-            urmUser.setTelephone(userVO.getTelephone());
+            urmUser.setTelephone(userVO.getTelephone()==null?"-": userVO.getTelephone());
             urmUser.setThirdPlatform(userVO.getPlatform());
             urmUser.setThirdToken(userVO.getToken());
             urmUser.setUserName(userVO.getUserName());
@@ -447,10 +447,11 @@ public class AppController {
      * @return
      */
     @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
-    public ModelAndView userInfo(@RequestParam String userToken) {
+    public ModelAndView userInfo() {
         ModelAndView mv = new ModelAndView();
         BigDecimal PendingCoins = BigDecimal.ZERO;
-        UrmUser user = appService.getUserByUserToken(userToken);
+        DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        UrmUser user = appService.getUserByUserToken(deviceInfo.getUserToken());
         if (user != null) {
             UserVo userVo = new UserVo();
             userVo.setName(user.getUserName());
