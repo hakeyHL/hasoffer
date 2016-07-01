@@ -61,6 +61,7 @@ public class SearchRecordProcessWorker implements Runnable {
                 SrmAutoSearchResult autoSearchResult = new SrmAutoSearchResult(searchLog);
 
                 String keyword = autoSearchResult.getTitle();
+                String webSite = autoSearchResult.getFromWebsite();
                 keyword = StringUtils.getCleanWordString(keyword);
                 String serRegion = AppConfig.get(AppConfig.SER_REGION);
                 Map<Website, List<ListProduct>> listProductMap = new HashMap<Website, List<ListProduct>>();
@@ -118,12 +119,14 @@ public class SearchRecordProcessWorker implements Runnable {
                         searchLogQueue.put(searchLog);
                     }
                 } else if (HasofferRegion.USA.toString().equals(serRegion)) {
+
                     FetchResult amazonFetchResult = fetchService.getProductsKeyWord(Website.AMAZON, keyword, 0, 10);
                     FetchResult ebayFetchResult = fetchService.getProductsKeyWord(Website.EBAY, keyword, 0, 10);
                     FetchResult walmartFetchResult = fetchService.getProductsKeyWord(Website.WALMART, keyword, 0, 10);
                     FetchResult geekFetchResult = fetchService.getProductsKeyWord(Website.GEEK, keyword, 0, 10);
                     FetchResult newEggFetchResult = fetchService.getProductsKeyWord(Website.NEWEGG, keyword, 0, 10);
                     FetchResult bestbuyFetchResult = fetchService.getProductsKeyWord(Website.BESTBUY, keyword, 0, 10);
+
                     Boolean isFinish = isFinish(amazonFetchResult);
                     isFinish = isFinish && isFinish(ebayFetchResult);
                     isFinish = isFinish && isFinish(walmartFetchResult);
@@ -131,6 +134,30 @@ public class SearchRecordProcessWorker implements Runnable {
                     isFinish = isFinish && isFinish(newEggFetchResult);
                     isFinish = isFinish && isFinish(bestbuyFetchResult);
                     if (isFinish) {
+                        while (Website.AMAZON.toString().equals(webSite) && amazonFetchResult.getFetchProducts().size() == 0) {
+                            TimeUnit.SECONDS.sleep(30);
+                            amazonFetchResult = fetchService.getProductsKeyWord(Website.AMAZON, keyword, 0, 10);
+                        }
+                        while (Website.EBAY.toString().equals(webSite) && amazonFetchResult.getFetchProducts().size() == 0) {
+                            TimeUnit.SECONDS.sleep(30);
+                            amazonFetchResult = fetchService.getProductsKeyWord(Website.EBAY, keyword, 0, 10);
+                        }
+                        while (Website.WALMART.toString().equals(webSite) && amazonFetchResult.getFetchProducts().size() == 0) {
+                            TimeUnit.SECONDS.sleep(30);
+                            amazonFetchResult = fetchService.getProductsKeyWord(Website.WALMART, keyword, 0, 10);
+                        }
+                        while (Website.GEEK.toString().equals(webSite) && amazonFetchResult.getFetchProducts().size() == 0) {
+                            TimeUnit.SECONDS.sleep(30);
+                            amazonFetchResult = fetchService.getProductsKeyWord(Website.GEEK, keyword, 0, 10);
+                        }
+                        while (Website.NEWEGG.toString().equals(webSite) && amazonFetchResult.getFetchProducts().size() == 0) {
+                            TimeUnit.SECONDS.sleep(30);
+                            amazonFetchResult = fetchService.getProductsKeyWord(Website.NEWEGG, keyword, 0, 10);
+                        }
+                        while (Website.BESTBUY.toString().equals(webSite) && amazonFetchResult.getFetchProducts().size() == 0) {
+                            TimeUnit.SECONDS.sleep(30);
+                            amazonFetchResult = fetchService.getProductsKeyWord(Website.BESTBUY, keyword, 0, 10);
+                        }
                         initResultMap(listProductMap, amazonFetchResult);
                         initResultMap(listProductMap, ebayFetchResult);
                         initResultMap(listProductMap, walmartFetchResult);
@@ -178,7 +205,6 @@ public class SearchRecordProcessWorker implements Runnable {
             } else if (SkuStatus.OUTSTOCK.equals(skuStatus)) {
                 listProduct.setStatus(ProductStatus.OUTSTOCK);
             }
-
             listProduct.setSubTitle(product.getSubTitle());
             listProduct.setTitle(product.getTitle());
             listProduct.setUrl(product.getUrl());
