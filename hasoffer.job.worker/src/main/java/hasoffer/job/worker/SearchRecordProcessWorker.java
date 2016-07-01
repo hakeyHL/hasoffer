@@ -1,6 +1,7 @@
 package hasoffer.job.worker;
 
 import hasoffer.base.config.AppConfig;
+import hasoffer.base.enums.HasofferRegion;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.TaskStatus;
 import hasoffer.base.model.Website;
@@ -63,7 +64,7 @@ public class SearchRecordProcessWorker implements Runnable {
                 keyword = StringUtils.getCleanWordString(keyword);
                 String serRegion = AppConfig.get(AppConfig.SER_REGION);
                 Map<Website, List<ListProduct>> listProductMap = new HashMap<Website, List<ListProduct>>();
-                if (AppConfig.SerRegion.INDIA.toString().equals(serRegion)) {
+                if (HasofferRegion.INDIA.toString().equals(serRegion)) {
                     FetchResult flipkartFetchResult = fetchService.getProductsKeyWord(Website.FLIPKART, keyword, 0, 10);
                     FetchResult amazonFetchResult = fetchService.getProductsKeyWord(Website.AMAZON, keyword, 0, 10);
                     FetchResult snapdealFetchResult = fetchService.getProductsKeyWord(Website.SNAPDEAL, keyword, 0, 10);
@@ -116,7 +117,7 @@ public class SearchRecordProcessWorker implements Runnable {
                     } else {
                         searchLogQueue.put(searchLog);
                     }
-                } else if (AppConfig.SerRegion.USA.toString().equals(serRegion)) {
+                } else if (HasofferRegion.USA.toString().equals(serRegion)) {
                     FetchResult amazonFetchResult = fetchService.getProductsKeyWord(Website.AMAZON, keyword, 0, 10);
                     FetchResult ebayFetchResult = fetchService.getProductsKeyWord(Website.EBAY, keyword, 0, 10);
                     FetchResult walmartFetchResult = fetchService.getProductsKeyWord(Website.WALMART, keyword, 0, 10);
