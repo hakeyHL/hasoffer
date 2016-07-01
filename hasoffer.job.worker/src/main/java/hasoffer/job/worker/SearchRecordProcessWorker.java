@@ -136,6 +136,9 @@ public class SearchRecordProcessWorker implements Runnable {
                     if (isFinish) {
                         while (Website.AMAZON.toString().equals(webSite) && amazonFetchResult.getFetchProducts().size() == 0) {
                             TimeUnit.SECONDS.sleep(30);
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("SearchRecordProcessWorker.amazonFetchResult    result()--keyword is {} : size() = {}", keyword, amazonFetchResult.getFetchProducts().size());
+                            }
                             amazonFetchResult = fetchService.getProductsKeyWord(Website.AMAZON, keyword, 0, 10);
                         }
                         while (Website.EBAY.toString().equals(webSite) && ebayFetchResult.getFetchProducts().size() == 0) {
