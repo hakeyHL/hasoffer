@@ -20,9 +20,9 @@ public class ProductAnalysisService {
 
     private static Logger logger = LoggerFactory.getLogger(ProductAnalysisService.class);
 
-    public static boolean analysisProducts(SrmAutoSearchResult searchResult, ProductBo productBo) {
+    public static void analysisProducts(SrmAutoSearchResult searchResult, ProductBo productBo) {
         if (searchResult == null) {
-            return false;
+            return;
         }
         Map<Website, List<SearchedSku>> searchedSkusMap = new LinkedHashMap<Website, List<SearchedSku>>();
 
@@ -134,8 +134,6 @@ public class ProductAnalysisService {
         }
 
         searchResult.setFinalSkus(searchedSkusMap);
-
-        return true;
     }
 
     public static float stringMatch(String s1, String s2) {

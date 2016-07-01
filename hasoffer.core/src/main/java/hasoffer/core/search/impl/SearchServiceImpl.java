@@ -85,11 +85,9 @@ public class SearchServiceImpl implements ISearchService {
             productBo = productService.getProductBo(proId);
         }
 
-        boolean analysis = ProductAnalysisService.analysisProducts(asr, productBo);
+        ProductAnalysisService.analysisProducts(asr, productBo);
 
-        if (analysis) {
-            relateUnmatchedSearchLogx(asr);
-        }
+        relateUnmatchedSearchLogx(asr);
     }
 
     @Override
@@ -172,6 +170,10 @@ public class SearchServiceImpl implements ISearchService {
     @Override
     @Transactional
     public void relateUnmatchedSearchLogx(SrmAutoSearchResult autoSearchResult) {
+        if (autoSearchResult == null) {
+            return;
+        }
+
         autoSearchResult.setlRelateTime(TimeUtils.now());
 
         SrmSearchLogUpdater srmSearchLogUpdater = new SrmSearchLogUpdater(autoSearchResult.getId());
