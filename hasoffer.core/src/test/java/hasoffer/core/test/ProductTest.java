@@ -1,7 +1,6 @@
 package hasoffer.core.test;
 
 import hasoffer.base.model.PageableResult;
-import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
@@ -9,7 +8,6 @@ import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.thd.ThdProduct;
 import hasoffer.core.persistence.po.thd.flipkart.ThdBProduct;
 import hasoffer.core.product.ICategoryService;
@@ -20,9 +18,7 @@ import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
-import hasoffer.core.search.SearchProductHelper;
 import hasoffer.core.thd.IThdService;
-import hasoffer.fetch.model.ListProduct;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -71,31 +67,6 @@ public class ProductTest {
         List<CmpSkuModel> cmpSkuModels = pagedResults.getData();
         for (CmpSkuModel cmpSkuModel : cmpSkuModels) {
             System.out.println(cmpSkuModel.getTitle());
-        }
-    }
-
-    @Test
-    public void ralateBySearch() {
-        final int page = 1, size = 100;
-
-        PageableResult<SrmSearchLog> pagedSearchLog = searchService.listNoresultSearchLogs(page, size);
-
-        long total = pagedSearchLog.getTotalPage();
-
-        for (int i = 0; i < total; i++) {
-            if (i > 0) {
-                pagedSearchLog = searchService.listNoresultSearchLogs(page, size);
-            }
-
-            List<SrmSearchLog> searchLogs = pagedSearchLog.getData();
-
-            if (ArrayUtils.hasObjs(searchLogs)) {
-                for (SrmSearchLog log : searchLogs) {
-                    Map<Website, ListProduct> listProductMap = SearchProductHelper.getProducts(log);
-
-                    searchService.relateUnmatchedSearchLog(log, listProductMap);
-                }
-            }
         }
     }
 

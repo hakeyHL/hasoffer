@@ -2,7 +2,6 @@ package hasoffer.task.worker;
 
 import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
-import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.SearchProductService;
 import org.slf4j.Logger;
@@ -18,14 +17,13 @@ import java.util.concurrent.TimeUnit;
 public class UnmatchedSearchRecordProcessWorker implements Runnable {
 
     LinkedBlockingQueue<SrmSearchLog> searchLogQueue;
-    IProductService productService;
     ISearchService searchService;
     SearchProductService searchProductService;
     private Logger logger = LoggerFactory.getLogger(UnmatchedSearchRecordProcessWorker.class);
 
-    public UnmatchedSearchRecordProcessWorker(IProductService productService, ISearchService searchService,
+    public UnmatchedSearchRecordProcessWorker(SearchProductService searchProductService, ISearchService searchService,
                                               LinkedBlockingQueue<SrmSearchLog> searchLogQueue) {
-        this.productService = productService;
+        this.searchProductService = searchProductService;
         this.searchService = searchService;
         this.searchLogQueue = searchLogQueue;
     }
@@ -45,25 +43,16 @@ public class UnmatchedSearchRecordProcessWorker implements Runnable {
                     continue;
                 }
 
-//                Map<Website, ListProduct> listProductMap = SearchProductHelper.getProducts(searchLog);
-//                searchService.relateUnmatchedSearchLog(searchLog, listProductMap);
-
-//                String keyword = searchLog.getKeyword().trim();
-//
-//                if (keyword.charAt(keyword.length() - 1) != ')') {
-//                    long count = searchService.findKeywordCount(searchLog.getSite(), keyword);
-//                    if (count > 0) {
-//                        logger.debug("count = " + count + "\t, next.");
-//                        return;
-//                    }
-//                }
-//
                 SrmAutoSearchResult autoSearchResult = new SrmAutoSearchResult(searchLog);
 
+                // fetch
                 searchProductService.searchProductsFromSites(autoSearchResult);
+
+                /*// clean
                 searchProductService.analysisProducts(autoSearchResult);
 
-                searchService.relateUnmatchedSearchLogx(autoSearchResult);
+                // relate
+                searchService.relateUnmatchedSearchLogx(autoSearchResult);*/
 
             } catch (Exception e) {
                 logger.debug(e.getMessage());

@@ -8,7 +8,6 @@ import hasoffer.base.utils.*;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.HijackLog;
-import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
@@ -31,14 +30,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -520,10 +520,10 @@ public class FixController {
     /*
         该方法用来合并类目太多的情况
      */
-    //fixdata/fixPtmcategory
-    @RequestMapping(value = "/fixPtmcategory", method = RequestMethod.GET)
+    //fixdata/fixPtmcategory1
+    @RequestMapping(value = "/fixPtmcategory1", method = RequestMethod.GET)
     @ResponseBody
-    public String fixPtmcategory() {
+    public String fixPtmcategory1() {
 
         long[] idArray = {4, 56, 4561, 4568};
 
@@ -560,40 +560,4 @@ public class FixController {
         return "ok";
     }
 
-    @RequestMapping(value = "/fixSkuDescription", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String fixSkuDescriptionId() {
-        List<PtmProduct> products = dbm.query("select t from PtmProduct t");
-        List<Map<Long, Long>> list = new ArrayList<Map<Long, Long>>();
-        for (PtmProduct product : products) {
-            List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ", Arrays.asList(product.getId()));
-            if (skus == null) {
-                continue;
-            }
-            for (PtmCmpSku sku : skus) {
-                if (product.getTitle().equals(sku.getTitle())) {
-                    Map<Long, Long> map = new HashMap<Long, Long>();
-                    map.put(sku.getId(), product.getId());
-                    list.add(map);
-                }
-            }
-        }
-
-        List<PtmCmpSkuDescription> skudes = mdm.query(PtmCmpSkuDescription.class, new Query());
-        for (PtmCmpSkuDescription description : skudes) {
-            for (Map<Long, Long> m : list) {
-                for (Map.Entry<Long, Long> entry : m.entrySet()) {
-                    if (entry.getKey() == description.getId()) {
-                        Update update = new Update();
-                        update.set("id", entry.getValue());
-                        mdm.update(PtmCmpSkuDescription.class, description.getId(), update);
-                    }
-                }
-            }
-        }
-
-
-        return "ok";
-    }
 }
