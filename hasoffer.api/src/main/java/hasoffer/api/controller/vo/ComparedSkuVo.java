@@ -1,6 +1,7 @@
 package hasoffer.api.controller.vo;
 
 import hasoffer.base.config.AppConfig;
+import hasoffer.base.enums.HasofferRegion;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
@@ -178,7 +179,7 @@ public class ComparedSkuVo {
         } else {
             NumberFormat ddf1 = NumberFormat.getNumberInstance();
             ddf1.setMaximumFractionDigits(2);
-            if (AppConfig.SerRegion.INDIA.equals(AppConfig.getSerRegion())) {
+            if (HasofferRegion.INDIA.equals(AppConfig.getSerRegion())) {
                 ddf1.setMaximumFractionDigits(0);
             }
             return ddf1.format(price);
@@ -191,7 +192,7 @@ public class ComparedSkuVo {
         } else {
             NumberFormat ddf1 = NumberFormat.getNumberInstance();
             ddf1.setMaximumFractionDigits(2);
-            if (AppConfig.SerRegion.INDIA.equals(AppConfig.getSerRegion())) {
+            if (HasofferRegion.INDIA.equals(AppConfig.getSerRegion())) {
                 ddf1.setMaximumFractionDigits(0);
             }
             Float temp = Math.abs(priceOff);
