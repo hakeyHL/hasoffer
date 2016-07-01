@@ -13,6 +13,15 @@ public class DealVo {
     private  String exp;
     private  Double extra;
     private  String link;
+    private  String logoUrl;
+
+    public String getLogoUrl() {
+        return logoUrl;
+    }
+
+    public void setLogoUrl(String logoUrl) {
+        this.logoUrl = logoUrl;
+    }
 
     public Long getId() {
         return id;

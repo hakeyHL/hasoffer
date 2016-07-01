@@ -33,6 +33,7 @@ public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductM
         PivotFacet[] pivotFacets = null;
 
         List<FilterQuery> fqList = new ArrayList<FilterQuery>();
+        fqList.add(new FilterQuery("price", "[1 TO *]"));
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
 
         SearchResult<ProductModel> sr = searchObjs(title, fqs, sorts, pivotFacets, page, size, true);
@@ -51,6 +52,7 @@ public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductM
 
         List<FilterQuery> fqList = new ArrayList<FilterQuery>();
         fqList.add(new FilterQuery("cate" + level, String.valueOf(cateId)));
+        fqList.add(new FilterQuery("price", "[1 TO *]"));
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
 
         SearchResult<ProductModel> sr = searchObjs(q, fqs, sorts, pivotFacets, page, size, true);
