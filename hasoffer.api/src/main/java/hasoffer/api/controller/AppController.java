@@ -239,8 +239,8 @@ public class AppController {
         ModelAndView mv = new ModelAndView();
         BackDetailVo data = new BackDetailVo();
         List<OrderVo> transcations = new ArrayList<OrderVo>();
-        DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-        UrmUser user = appService.getUserByUserToken(deviceInfo.getUserToken());
+        String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
+        UrmUser user = appService.getUserByUserToken(userToken);
         BigDecimal PendingCoins = BigDecimal.ZERO;
         BigDecimal VericiedCoins = BigDecimal.ZERO;
         if (user != null) {
@@ -452,8 +452,8 @@ public class AppController {
     public ModelAndView userInfo() {
         ModelAndView mv = new ModelAndView();
         BigDecimal PendingCoins = BigDecimal.ZERO;
-        DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-        UrmUser user = appService.getUserByUserToken(deviceInfo.getUserToken());
+        String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
+        UrmUser user = appService.getUserByUserToken(userToken);
         if (user != null) {
             UserVo userVo = new UserVo();
             userVo.setName(user.getUserName());
