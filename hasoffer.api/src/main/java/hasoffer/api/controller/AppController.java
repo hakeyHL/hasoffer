@@ -411,14 +411,14 @@ public class AppController {
         ModelAndView mv = new ModelAndView();
         Map map = new HashMap();
         String userToken = UUID.randomUUID().toString();
-        UrmUser uUser = appService.getUserById(userVO.getThirdId() == null ? "0" : "1");
+        UrmUser uUser = appService.getUserById(userVO.getThirdId() == null ? "-" : userVO.getThirdId());
         if (uUser == null) {
             logger.debug("user is not exist before");
             UrmUser urmUser = new UrmUser();
             urmUser.setUserToken(userToken);
             urmUser.setAvatarPath(userVO.getUserIcon());
             urmUser.setCreateTime(new Date());
-            urmUser.setTelephone(userVO.getTelephone()==null?"-": userVO.getTelephone());
+            urmUser.setTelephone(userVO.getTelephone()==null?"": userVO.getTelephone());
             urmUser.setThirdPlatform(userVO.getPlatform());
             urmUser.setThirdToken(userVO.getToken());
             urmUser.setUserName(userVO.getUserName());
