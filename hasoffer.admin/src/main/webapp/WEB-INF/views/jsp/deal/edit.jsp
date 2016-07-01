@@ -42,14 +42,12 @@
                                 <div class="fileupload fileupload-new" data-provides="fileupload"><input type="hidden" value="" name="">
                                     <div  class="fileupload-new thumbnail" style="width: 200px; height: 150px;">
                                         <img src="<%=contextPath%>/static/image/no-image.png" alt="" id="image_url">
-
                                     </div>
                                     <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 200px; max-height: 150px; line-height: 20px;"></div>
                                     <div>
-                                <span class="btn btn-file"><span class="fileupload-new">选择图片</span>
-                                    <span class="fileupload-exists">更换</span>
-                                    <input type="file" class="default" id="upload_img" name="file" img_url="false"></span>
-                                        <%--<a href="#" class="btn fileupload-exists" data-dismiss="fileupload">删除</a>--%>
+                                        <span class="btn btn-file"><span class="fileupload-new">选择图片</span>
+                                        <span class="fileupload-exists">更换</span>
+                                        <input type="file" class="default" id="upload_img" name="file" img_url="false"></span>
                                     </div>
                                 </div>
                             </div>
@@ -124,6 +122,7 @@
             inlineRadio2.attr("checked", "checked");
         }
 
+
         var img = $("#image_url");
         var imgUrl = "${deal.imageUrl}";
         if(imgUrl != ""){
@@ -148,8 +147,9 @@
         var inlineRadio1 = $("#inlineRadio1");
         var checked = inlineRadio1.attr("checked");
         if(checked == "checked"){
+            var imgLen = $(".controls img").length;
            var img = $("#upload_img").attr("img_url");
-            if(img == "false"){
+            if(img == "false" && imgLen != 2){
                 $("#tip_div").show();
                 return false;
             }
