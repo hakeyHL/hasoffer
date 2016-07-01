@@ -387,7 +387,7 @@ public class AppController {
             map.put("exp", new SimpleDateFormat("MM/dd/yyyy").format(appDeal.getExpireTime()));
             map.put("logoUrl", WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
             map.put("extra", 1.5);
-            map.put("description", appDeal.getDescription());
+            map.put("description",new StringBuilder().append(appDeal.getWebsite().name()).append(" is offering ").append(appDeal.getTitle()).append(" .\n").append(appDeal.getDescription()));
             if (appDeal.getWebsite() == Website.FLIPKART || appDeal.getWebsite() == Website.SHOPCLUES) {
                 map.put("cashbackInfo", "1. Offer valid for a limited time only while stocks last\n" +
                         "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +
