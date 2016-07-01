@@ -138,25 +138,25 @@ public class SearchRecordProcessWorker implements Runnable {
                             TimeUnit.SECONDS.sleep(30);
                             amazonFetchResult = fetchService.getProductsKeyWord(Website.AMAZON, keyword, 0, 10);
                         }
-                        while (Website.EBAY.toString().equals(webSite) && amazonFetchResult.getFetchProducts().size() == 0) {
+                        while (Website.EBAY.toString().equals(webSite) && ebayFetchResult.getFetchProducts().size() == 0) {
                             TimeUnit.SECONDS.sleep(30);
-                            amazonFetchResult = fetchService.getProductsKeyWord(Website.EBAY, keyword, 0, 10);
+                            ebayFetchResult = fetchService.getProductsKeyWord(Website.EBAY, keyword, 0, 10);
                         }
-                        while (Website.WALMART.toString().equals(webSite) && amazonFetchResult.getFetchProducts().size() == 0) {
+                        while (Website.WALMART.toString().equals(webSite) && walmartFetchResult.getFetchProducts().size() == 0) {
                             TimeUnit.SECONDS.sleep(30);
-                            amazonFetchResult = fetchService.getProductsKeyWord(Website.WALMART, keyword, 0, 10);
+                            walmartFetchResult = fetchService.getProductsKeyWord(Website.WALMART, keyword, 0, 10);
                         }
-                        while (Website.GEEK.toString().equals(webSite) && amazonFetchResult.getFetchProducts().size() == 0) {
+                        while (Website.GEEK.toString().equals(webSite) && geekFetchResult.getFetchProducts().size() == 0) {
                             TimeUnit.SECONDS.sleep(30);
-                            amazonFetchResult = fetchService.getProductsKeyWord(Website.GEEK, keyword, 0, 10);
+                            geekFetchResult = fetchService.getProductsKeyWord(Website.GEEK, keyword, 0, 10);
                         }
-                        while (Website.NEWEGG.toString().equals(webSite) && amazonFetchResult.getFetchProducts().size() == 0) {
+                        while (Website.NEWEGG.toString().equals(webSite) && newEggFetchResult.getFetchProducts().size() == 0) {
                             TimeUnit.SECONDS.sleep(30);
-                            amazonFetchResult = fetchService.getProductsKeyWord(Website.NEWEGG, keyword, 0, 10);
+                            newEggFetchResult = fetchService.getProductsKeyWord(Website.NEWEGG, keyword, 0, 10);
                         }
-                        while (Website.BESTBUY.toString().equals(webSite) && amazonFetchResult.getFetchProducts().size() == 0) {
+                        while (Website.BESTBUY.toString().equals(webSite) && bestbuyFetchResult.getFetchProducts().size() == 0) {
                             TimeUnit.SECONDS.sleep(30);
-                            amazonFetchResult = fetchService.getProductsKeyWord(Website.BESTBUY, keyword, 0, 10);
+                            bestbuyFetchResult = fetchService.getProductsKeyWord(Website.BESTBUY, keyword, 0, 10);
                         }
                         initResultMap(listProductMap, amazonFetchResult);
                         initResultMap(listProductMap, ebayFetchResult);
