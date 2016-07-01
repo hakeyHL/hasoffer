@@ -185,7 +185,7 @@ public class Compare2Controller {
         }
         cmpResult.setSpecs(specs);
         cmpResult.setRatingNum(0);
-        String imageUrl = productCacheManager.getProductMasterImageUrl(sio.getHsProId());
+        String imageUrl = productCacheManager.getProductMasterImageUrl(product.getId());
         List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
         CmpProductListVo cplv = new CmpProductListVo();
         cplv.setPrice(product.getPrice());
@@ -563,7 +563,7 @@ public class Compare2Controller {
             throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
         }
         sio.setHsSkuId(cmpSkuId);
-        String imageUrl = productCacheManager.getProductMasterImageUrl(sio.getHsProId());
+        String imageUrl = productCacheManager.getProductMasterImageUrl(id);
         CmpResult cmpResult = new CmpResult();
         cmpResult.setImage(imageUrl);
         cmpResult.setName(sio.getCliQ());

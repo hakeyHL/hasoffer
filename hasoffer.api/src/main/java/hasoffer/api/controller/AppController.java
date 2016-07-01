@@ -8,7 +8,6 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.core.bo.product.Banners;
-import hasoffer.core.bo.product.CategoryVo;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.cache.AppCacheManager;
 import hasoffer.core.cache.CmpSkuCacheManager;
@@ -18,7 +17,6 @@ import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
-import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.product.ICmpSkuService;
@@ -265,13 +263,16 @@ public class AppController {
                     }
                 }
             }
+        } else {
+            mv.addObject("result", new StringBuilder().append("{\n" +
+                    "    \"errorCode\": \"10010\",\n" +
+                    "    \"msg\": \"login expired \"\n" +
+                    "}"));
         }
-
         //待定的
         data.setPendingCoins(PendingCoins);
         //可以使用的
         data.setVericiedCoins(VericiedCoins);
-
         data.setTranscations(transcations);
         mv.addObject("data", data);
         return mv;
@@ -387,7 +388,7 @@ public class AppController {
             map.put("exp", new SimpleDateFormat("MM/dd/yyyy").format(appDeal.getExpireTime()));
             map.put("logoUrl", WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
             map.put("extra", 1.5);
-            map.put("description",new StringBuilder().append(appDeal.getWebsite().name()).append(" is offering ").append(appDeal.getTitle()).append(" .\n").append(appDeal.getDescription()));
+            map.put("description", new StringBuilder().append(appDeal.getWebsite().name()).append(" is offering ").append(appDeal.getTitle()).append(" .\n").append(appDeal.getDescription() == null ? "" : appDeal.getDescription()));
             if (appDeal.getWebsite() == Website.FLIPKART || appDeal.getWebsite() == Website.SHOPCLUES) {
                 map.put("cashbackInfo", "1. Offer valid for a limited time only while stocks last\n" +
                         "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +
