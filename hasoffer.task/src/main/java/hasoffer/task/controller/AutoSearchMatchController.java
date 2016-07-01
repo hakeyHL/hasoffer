@@ -133,7 +133,7 @@ public class AutoSearchMatchController {
                 if (ArrayUtils.hasObjs(autoSearchResults)) {
 
                     for (SrmAutoSearchResult autoSearchResult : autoSearchResults) {
-                        searchProductService.cleanProducts(autoSearchResult);
+                        searchProductService.analysisProducts(autoSearchResult);
                         searchService.relateUnmatchedSearchLogx(autoSearchResult);
                     }
 
@@ -200,7 +200,7 @@ public class AutoSearchMatchController {
                     public void process(SrmAutoSearchResult asr) {
                         try {
                             // 清洗要更新的商品。
-                            boolean isCleaned = searchProductService.cleanProducts(asr);
+                            boolean isCleaned = searchProductService.analysisProducts2(asr);
                             if (isCleaned) {
                                 searchService.relateUnmatchedSearchLogx(asr);
                             }
@@ -263,7 +263,7 @@ public class AutoSearchMatchController {
 
             SrmAutoSearchResult autoSearchResult = mdm.queryOne(SrmAutoSearchResult.class, logId);
 
-            searchProductService.cleanProducts(autoSearchResult);
+            searchProductService.analysisProducts(autoSearchResult);
 
             searchService.relateUnmatchedSearchLogx(autoSearchResult);
 

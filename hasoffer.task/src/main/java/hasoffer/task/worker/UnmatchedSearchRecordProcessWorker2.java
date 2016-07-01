@@ -49,7 +49,7 @@ public class UnmatchedSearchRecordProcessWorker2 implements Runnable {
                 searchProductService.searchProductsFromSites(autoSearchResult);
 
                 /*// clean
-                searchProductService.cleanProducts(autoSearchResult);
+                searchProductService.analysisProducts(autoSearchResult);
 
                 // relate
                 searchService.relateUnmatchedSearchLogx(autoSearchResult);*/

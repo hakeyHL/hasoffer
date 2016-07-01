@@ -171,7 +171,8 @@ public class SearchServiceImpl implements ISearchService {
 
         Map<String, PtmCmpSku> skuMap = new HashMap<String, PtmCmpSku>();
 
-        long ptmProductId = autoSearchResult.getRelatedProId();
+        long ptmProductId = 0;//autoSearchResult.getRelatedProId();
+
         if (ptmProductId == 0) {
             logger.debug("build product...");
             SearchedSku stdSku = null;
