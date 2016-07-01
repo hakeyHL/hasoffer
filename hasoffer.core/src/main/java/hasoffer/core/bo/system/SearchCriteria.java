@@ -13,7 +13,7 @@ public class SearchCriteria {
     private  int level;
 
     public int getLevel() {
-        return level==0?2:level;
+        return level;
     }
 
     public void setLevel(int level) {
@@ -53,7 +53,7 @@ public class SearchCriteria {
     }
 
     public String getCategoryId() {
-        return categoryId==null?"4":categoryId;
+        return categoryId;
     }
 
     public void setCategoryId(String categoryId) {
