@@ -74,7 +74,7 @@ public class SearchController {
     @Resource
     SearchLogCacheManager logCacheManager;
 
-    @RequestMapping(value = "/stat", method = RequestMethod.POST)
+    @RequestMapping(value = "/stat", method = RequestMethod.GET)
     public
     @ResponseBody
     String statSearchCount(@RequestParam String ymd) {
