@@ -69,16 +69,35 @@ public class ProductServiceImpl implements IProductService {
             "SELECT t from PtmProduct t where t.id in (SELECT srm.productId from SrmSearchCount srm " +
                     " where srm.ymd=?0 ORDER BY srm.count DESC)";
 
-    private final static String CACHE_KEY = "product";
     @Resource
     ProductIndexServiceImpl productIndexService;
     @Resource
     ICategoryService categoryService;
-    private Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
     @Resource
     private IDataBaseManager dbm;
     @Resource
     private ICmpSkuService cmpSkuService;
+
+    private Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
+
+    @Override
+    public ProductBo getProductBo(long proId) {
+
+        if (proId > 0) {
+
+            PtmProduct product = getProduct(proId);
+
+            if (product == null) {
+                return null;
+            }
+
+            PtmImage image = getProductMasterImage(proId);
+
+            return new ProductBo(product, cmpSkuService.listCmpSkus(proId), image);
+        }
+
+        return null;
+    }
 
     @Override
     public PageableResult<PtmProduct> listProductsByCreateTime(Date fromDate, int page, int size) {
@@ -216,10 +235,15 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-//    @Cacheable(value = CACHE_KEY, key = "#root.methodName + '_' + #root.args[0]")
+    public PtmImage getProductMasterImage(Long id) {
+        List<PtmImage> images = dbm.query(Q_PTM_IMAGE, Arrays.asList(id));
+        return ArrayUtils.hasObjs(images) ? images.get(0) : null;
+    }
+
+    @Override
     public String getProductMasterImageUrl(Long id) {
-        List<String> imageUrls = getProductImageUrls(id);
-        return ArrayUtils.hasObjs(imageUrls) ? imageUrls.get(0) : "";
+        PtmImage image = getProductMasterImage(id);
+        return image == null ? "" : image.getImageUrl2();
     }
 
     @Override
@@ -244,8 +268,8 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public List<PtmProduct> getTopSellingProductsByDate(String date,int page,int size) {
-        return dbm.query(Q_PTM_GETTOPPRODUCTS,page,size,Arrays.asList(date));
+    public List<PtmProduct> getTopSellingProductsByDate(String date, int page, int size) {
+        return dbm.query(Q_PTM_GETTOPPRODUCTS, page, size, Arrays.asList(date));
     }
 
     @Override

@@ -91,4 +91,6 @@ public interface ISearchService {
     void updateSrmSearchLogStatus(String id, long productId, SearchPrecise precise);
 
     void saveLogCount(List<SrmSearchCount> srmSearchCount);
+
+    void analysisAndRelate(SrmAutoSearchResult asr);
 }

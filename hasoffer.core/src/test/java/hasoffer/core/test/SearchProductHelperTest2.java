@@ -61,35 +61,6 @@ public class SearchProductHelperTest2 {
     }
 
     @Test
-    public void saveTest() {
-        String sql = "select count(t.id) from SrmSearchLog t where t.keyword=?0";
-        try {
-            String logId = "00001c0a00f9914cc8a3ee52fd84c59b";
-
-            SrmSearchLog searchLog = dbm.get(SrmSearchLog.class, logId);
-
-            String keyword = "JBL T250SI On-the-ear Headphone (On the Ear)";
-            searchLog.setKeyword(keyword);
-
-            if (keyword.charAt(keyword.length() - 1) != ')') {
-                long count = searchService.findKeywordCount(searchLog.getSite(), keyword);
-                if (count > 1) {
-                    return;
-                }
-            }
-
-            SrmAutoSearchResult autoSearchResult = new SrmAutoSearchResult(searchLog);
-            autoSearchResult.setRelatedProId(0L);
-            searchProductService.searchProductsFromSites(autoSearchResult);
-            searchProductService.analysisProducts(autoSearchResult);
-            searchService.relateUnmatchedSearchLogx(autoSearchResult);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
     public void saveTest2() {
         try {
             String logId = "4a0aa34fd0fcd740f4720a9be98cf83c";

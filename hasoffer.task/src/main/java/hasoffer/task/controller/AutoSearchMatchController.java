@@ -1,11 +1,11 @@
 package hasoffer.task.controller;
 
 import hasoffer.base.model.PageableResult;
-import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.DaemonThreadFactory;
-import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.analysis.ProductAnalysisService;
+import hasoffer.core.bo.product.ProductBo;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.enums.SearchPrecise;
@@ -13,17 +13,15 @@ import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
-import hasoffer.core.search.SearchProductHelper;
 import hasoffer.core.search.SearchProductService;
 import hasoffer.core.task.ListAndProcessTask2;
 import hasoffer.core.task.worker.IList;
 import hasoffer.core.task.worker.IProcess;
-import hasoffer.fetch.model.ListProduct;
-import hasoffer.fetch.sites.voodoo.VoodooHelper;
 import hasoffer.task.worker.UnmatchedSearchRecordListWorker;
 import hasoffer.task.worker.UnmatchedSearchRecordListWorker2;
 import hasoffer.task.worker.UnmatchedSearchRecordProcessWorker;
 import hasoffer.task.worker.UnmatchedSearchRecordProcessWorker2;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -33,9 +31,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -133,7 +129,17 @@ public class AutoSearchMatchController {
                 if (ArrayUtils.hasObjs(autoSearchResults)) {
 
                     for (SrmAutoSearchResult autoSearchResult : autoSearchResults) {
-                        searchProductService.analysisProducts(autoSearchResult);
+
+                        ProductBo productBo = null;
+
+                        String proIdStr = autoSearchResult.getId();
+
+                        if (NumberUtils.isNumber(proIdStr)) {
+                            long proId = Long.valueOf(proIdStr);
+                            productBo = productService.getProductBo(proId);
+                        }
+
+                        ProductAnalysisService.analysisProducts(autoSearchResult, productBo);
                         searchService.relateUnmatchedSearchLogx(autoSearchResult);
                     }
 
@@ -199,16 +205,13 @@ public class AutoSearchMatchController {
                     @Override
                     public void process(SrmAutoSearchResult asr) {
                         try {
-                            // 清洗要更新的商品。
-                            boolean isCleaned = searchProductService.analysisProducts2(asr);
-                            if (isCleaned) {
-                                searchService.relateUnmatchedSearchLogx(asr);
-                            }
+                            searchService.analysisAndRelate(asr);
                         } catch (Exception e) {
                             logger.debug("[" + asr.getId() + "]" + e.getMessage());
                         }
                     }
-                });
+                }
+        );
 
         listAndProcessTask2.go();
 
@@ -243,82 +246,14 @@ public class AutoSearchMatchController {
                  @RequestParam(defaultValue = "0") String rebuild) {
         try {
 
-//            SrmSearchLog searchLog = dbm.get(SrmSearchLog.class, logId);
-
-//            String keyword = searchLog.getKeyword().trim();
-//            if (keyword.charAt(keyword.length() - 1) != ')') {
-//                long count = searchService.findKeywordCount(searchLog.getSite(), keyword);
-//                if (count > 1) {
-//                    return "count > 1";
-//                }
-//            }
-//
-//            SrmAutoSearchResult autoSearchResult = new SrmAutoSearchResult(searchLog);
-//
-//            if ("1".equals(rebuild)) {
-//                autoSearchResult.setRelatedProId(0);
-//            }
-//
-//            searchProductService.searchProductsFromSites(autoSearchResult);
-
             SrmAutoSearchResult autoSearchResult = mdm.queryOne(SrmAutoSearchResult.class, logId);
 
-            searchProductService.analysisProducts(autoSearchResult);
-
-            searchService.relateUnmatchedSearchLogx(autoSearchResult);
+            searchService.analysisAndRelate(autoSearchResult);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return "ok";
-    }
-
-    @RequestMapping(value = "/voodoo", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String testVoodoo(@RequestParam String keyword) {
-
-        Map<Website, ListProduct> productMap = new HashMap<Website, ListProduct>();
-
-        VoodooHelper.getProductsFromVoodoo(productMap, keyword);
-
-        return JSONUtil.toJSON(productMap);
-    }
-
-    @RequestMapping(value = "/msp", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String testMsp(@RequestParam String keyword) {
-
-        Map<Website, ListProduct> productMap = new HashMap<Website, ListProduct>();
-
-        SearchProductHelper.getProductsFromMSP(productMap, keyword, 0.0f);
-
-        return JSONUtil.toJSON(productMap);
-    }
-
-    @RequestMapping(value = "/sites", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String testWebsites(@RequestParam String keyword) {
-
-        Map<Website, ListProduct> productMap = new HashMap<Website, ListProduct>();
-
-        SearchProductHelper.getProductsFromWebsite(productMap, keyword, 0.0f);
-
-        return JSONUtil.toJSON(productMap);
-    }
-
-    @RequestMapping(value = "/affiliate", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String testAff(@RequestParam String keyword) {
-
-        Map<Website, ListProduct> productMap = new HashMap<Website, ListProduct>();
-
-        SearchProductHelper.getProductsFromAffiliate(productMap, keyword, 0.0f);
-
-        return JSONUtil.toJSON(productMap);
     }
 }

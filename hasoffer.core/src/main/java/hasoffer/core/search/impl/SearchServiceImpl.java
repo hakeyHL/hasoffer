@@ -6,6 +6,7 @@ import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.analysis.ProductAnalysisService;
 import hasoffer.core.bo.product.ProductBo;
 import hasoffer.core.bo.product.SearchedSku;
 import hasoffer.core.bo.system.SearchLogBo;
@@ -25,6 +26,7 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
 import hasoffer.fetch.model.ListProduct;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -62,8 +64,6 @@ public class SearchServiceImpl implements ISearchService {
     private static final String D_SEARCH_LOG = "delete FROM SrmSearchLog t where t.id in (:ids) ";
     @Resource
     IDataBaseManager dbm;
-
-    //    private static final String CACHE_KEY = "searchlog";
     @Resource
     IMongoDbManager mdm;
     @Resource
@@ -72,7 +72,25 @@ public class SearchServiceImpl implements ISearchService {
     ICmpSkuService cmpSkuService;
     @Resource
     SearchLogCacheManager searchLogCacheManager;
+
     private Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
+
+    @Override
+    public void analysisAndRelate(SrmAutoSearchResult asr) {
+        ProductBo productBo = null;
+
+        String proIdStr = asr.getId();
+        if (NumberUtils.isNumber(proIdStr)) {
+            long proId = Long.valueOf(proIdStr);
+            productBo = productService.getProductBo(proId);
+        }
+
+        boolean analysis = ProductAnalysisService.analysisProducts(asr, productBo);
+
+        if (analysis) {
+            relateUnmatchedSearchLogx(asr);
+        }
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
