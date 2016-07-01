@@ -133,7 +133,7 @@ public class AutoSearchMatchController {
                 if (ArrayUtils.hasObjs(autoSearchResults)) {
 
                     for (SrmAutoSearchResult autoSearchResult : autoSearchResults) {
-                        searchProductService.cleanProducts(autoSearchResult);
+                        searchProductService.analysisProducts(autoSearchResult);
                         searchService.relateUnmatchedSearchLogx(autoSearchResult);
                     }
 
@@ -169,8 +169,8 @@ public class AutoSearchMatchController {
                     public PageableResult getData(int page) {
                         Query query = new Query(
                                 Criteria.where("lUpdateTime").gt(startTime)
-                                        .andOperator(Criteria.where("relatedProId").is(0)
-                                                .andOperator(Criteria.where("lRelateTime").is(0)))
+//                                        .andOperator(Criteria.where("relatedProId").is(0)
+//                                                .andOperator(Criteria.where("lRelateTime").is(0)))
                         );
 
                         query.with(new Sort(Sort.Direction.ASC, "lUpdateTime"));
@@ -200,7 +200,7 @@ public class AutoSearchMatchController {
                     public void process(SrmAutoSearchResult asr) {
                         try {
                             // 清洗要更新的商品。
-                            boolean isCleaned = searchProductService.cleanProducts(asr);
+                            boolean isCleaned = searchProductService.analysisProducts2(asr);
                             if (isCleaned) {
                                 searchService.relateUnmatchedSearchLogx(asr);
                             }
@@ -243,25 +243,27 @@ public class AutoSearchMatchController {
                  @RequestParam(defaultValue = "0") String rebuild) {
         try {
 
-            SrmSearchLog searchLog = dbm.get(SrmSearchLog.class, logId);
+//            SrmSearchLog searchLog = dbm.get(SrmSearchLog.class, logId);
 
-            String keyword = searchLog.getKeyword().trim();
-            if (keyword.charAt(keyword.length() - 1) != ')') {
-                long count = searchService.findKeywordCount(searchLog.getSite(), keyword);
-                if (count > 1) {
-                    return "count > 1";
-                }
-            }
+//            String keyword = searchLog.getKeyword().trim();
+//            if (keyword.charAt(keyword.length() - 1) != ')') {
+//                long count = searchService.findKeywordCount(searchLog.getSite(), keyword);
+//                if (count > 1) {
+//                    return "count > 1";
+//                }
+//            }
+//
+//            SrmAutoSearchResult autoSearchResult = new SrmAutoSearchResult(searchLog);
+//
+//            if ("1".equals(rebuild)) {
+//                autoSearchResult.setRelatedProId(0);
+//            }
+//
+//            searchProductService.searchProductsFromSites(autoSearchResult);
 
-            SrmAutoSearchResult autoSearchResult = new SrmAutoSearchResult(searchLog);
+            SrmAutoSearchResult autoSearchResult = mdm.queryOne(SrmAutoSearchResult.class, logId);
 
-            if ("1".equals(rebuild)) {
-                autoSearchResult.setRelatedProId(0);
-            }
-
-            searchProductService.searchProductsFromSites(autoSearchResult);
-
-            searchProductService.cleanProducts(autoSearchResult);
+            searchProductService.analysisProducts(autoSearchResult);
 
             searchService.relateUnmatchedSearchLogx(autoSearchResult);
 

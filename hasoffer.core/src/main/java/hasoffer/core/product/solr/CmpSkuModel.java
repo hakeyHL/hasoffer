@@ -2,7 +2,7 @@ package hasoffer.core.product.solr;
 
 import hasoffer.base.model.SkuStatus;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.solr.IIdentifiable;
+import hasoffer.data.solr.IIdentifiable;
 
 /**
  * Date : 2016/5/19
@@ -17,7 +17,7 @@ public class CmpSkuModel implements IIdentifiable<Long> {
 
     private String skuTitle;// 带商品的color，size属性的
     private String title;
-    private double price;
+    private float price;
 
     private String imagePath; // 下载后的图片路径
     private String oriImageUrl;// 原图片url
@@ -97,11 +97,11 @@ public class CmpSkuModel implements IIdentifiable<Long> {
         this.title = title;
     }
 
-    public double getPrice() {
+    public float getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(float price) {
         this.price = price;
     }
 

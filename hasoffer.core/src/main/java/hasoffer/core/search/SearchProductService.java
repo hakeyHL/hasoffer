@@ -8,6 +8,10 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.core.bo.product.SearchedSku;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.product.ICmpSkuService;
+import hasoffer.core.product.IProductService;
 import hasoffer.fetch.core.IListProcessor;
 import hasoffer.fetch.helper.WebsiteProcessorFactory;
 import hasoffer.fetch.model.ListProduct;
@@ -33,6 +37,10 @@ public class SearchProductService {
     private static List<Website> websites = Arrays.asList(Website.FLIPKART, Website.SNAPDEAL, Website.SHOPCLUES, Website.PAYTM, Website.EBAY, Website.AMAZON);
     @Resource
     IMongoDbManager mdm;
+    @Resource
+    IProductService productService;
+    @Resource
+    ICmpSkuService cmpSkuService;
 
     public static void getProductsFromAffiliate(Map<Website, List<ListProduct>> listProductMap, String keyword) {
         try {
@@ -97,7 +105,7 @@ public class SearchProductService {
         keyword = StringUtils.getCleanWordString(keyword);
         //遍历websiteList，添加比较列表
         for (Website website : websites) {
-            //todo shopclues反爬，先不跳过
+            //todo shopclues反爬，先不抓，跳过
             if (website == Website.SHOPCLUES) {
                 continue;
             }
@@ -176,7 +184,7 @@ public class SearchProductService {
         return StringUtils.wordsMatchD(ss1, ss2);
     }
 
-    public boolean cleanProducts(SrmAutoSearchResult searchResult) {
+    public boolean analysisProducts(SrmAutoSearchResult searchResult) {
         if (searchResult == null) {
             return false;
         }
@@ -275,6 +283,131 @@ public class SearchProductService {
         return true;
     }
 
+    public boolean analysisProducts2(SrmAutoSearchResult searchResult) {
+        if (searchResult == null) {
+            return false;
+        }
+        Map<Website, List<SearchedSku>> searchedSkusMap = new LinkedHashMap<Website, List<SearchedSku>>();
+
+        Comparator comparator = new Comparator<SearchedSku>() {
+            @Override
+            public int compare(SearchedSku p1, SearchedSku p2) {
+                float score1 = p1.getTitleScore();
+                float score2 = p2.getTitleScore();
+
+                if (score1 > score2) {
+                    return -1;
+                } else if (score1 < score2) {
+                    return 1;
+                } else if (score1 == score2) {
+                    float priceScore1 = p1.getPriceScore();
+                    float priceScore2 = p2.getPriceScore();
+
+                    if (priceScore1 == 0 && priceScore2 == 0) {
+                        return 0;
+                    } else {
+                        if (priceScore1 > priceScore2) {
+                            return 1;
+                        } else {
+                            return -1;
+                        }
+                    }
+                }
+                return 0;
+            }
+        };
+
+        Map<Website, List<ListProduct>> listProductMap = searchResult.getSitePros();
+
+        String keyword = searchResult.getTitle();
+        Website logSite = Website.valueOf(searchResult.getFromWebsite());
+
+        float stdPrice = 0;//searchResult.getPrice();
+        float maxTitleScore = 0;
+
+        if (searchResult.getRelatedProId() > 0) {
+            PtmProduct product = productService.getProduct(searchResult.getRelatedProId());
+
+            keyword = product.getTitle();
+
+            List<PtmCmpSku> relatedCmpSkus = cmpSkuService.listCmpSkus(product.getId());
+
+            float minPrice = -1, maxPrice = -1;
+            for (PtmCmpSku cmpSku : relatedCmpSkus) {
+                if (logSite == cmpSku.getWebsite()) {
+                    stdPrice = cmpSku.getPrice();
+                    break;
+                }
+
+                if (minPrice == -1) {
+                    minPrice = cmpSku.getPrice();
+                    maxPrice = cmpSku.getPrice();
+                    continue;
+                }
+
+                if (minPrice > cmpSku.getPrice()) {
+                    minPrice = cmpSku.getPrice();
+                }
+                if (maxPrice < cmpSku.getPrice()) {
+                    maxPrice = cmpSku.getPrice();
+                }
+            }
+
+            if (stdPrice <= 0) {
+                stdPrice = (maxPrice + minPrice) / 2;
+            }
+        } else {
+            List<ListProduct> logPros = listProductMap.get(logSite);
+            if (ArrayUtils.hasObjs(logPros)) {
+                for (ListProduct lp : logPros) {
+                    float titleScore = stringMatch(lp.getTitle(), keyword);
+                    if (maxTitleScore < titleScore) {
+                        maxTitleScore = titleScore;
+                        stdPrice = lp.getPrice();
+                    }
+                }
+            }
+        }
+
+        for (Map.Entry<Website, List<ListProduct>> kv : listProductMap.entrySet()) {
+            Website website = kv.getKey();
+            List<ListProduct> products = kv.getValue();
+            List<SearchedSku> searchedSkus = new ArrayList<SearchedSku>();
+
+            for (ListProduct lp : products) {
+                float titleScore = stringMatch(lp.getTitle(), keyword);
+                float priceScore = 0.0f;
+                if (stdPrice > 0) {
+                    priceScore = Math.abs(stdPrice - lp.getPrice()) / stdPrice;
+                }
+
+//                if (titleScore < 0.5 || priceScore > 0.5) {
+//                    logger.debug(String.format("title/price:[%s/%f].titleScore/priceScore:[%f/%f]", lp.getTitle(), lp.getPrice(), titleScore, priceScore));
+//                    continue;
+//                }
+
+                searchedSkus.add(
+                        new SearchedSku(lp.getWebsite(), lp.getTitle(),
+                                titleScore, lp.getPrice(), priceScore,
+                                lp.getSourceId(), lp.getUrl(),
+                                lp.getImageUrl(), lp.getStatus())
+                );
+            }
+
+            if (ArrayUtils.hasObjs(searchedSkus)) {
+                logger.debug(String.format("Get [%d] skus from [%s]", searchedSkus.size(), website.name()));
+                Collections.sort(searchedSkus, comparator);
+                searchedSkusMap.put(website, searchedSkus);
+            }
+        }
+
+        searchResult.setFinalSkus(searchedSkusMap);
+
+        mdm.save(searchResult);
+
+        return true;
+    }
+
     public void searchProductsFromSites(SrmAutoSearchResult searchResult) {
 
         //String keyword = searchResult.getTitle();
@@ -295,7 +428,7 @@ public class SearchProductService {
 //        getProductsFromMSP(listProductMap, keyword);
 
         //searchResult.setSitePros(listProductMap);
-        logger.info("job result info ：{}",searchResult.toString());
+        logger.info("job result info ：{}", searchResult.toString());
         mdm.save(searchResult);
     }
 }

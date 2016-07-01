@@ -12,10 +12,12 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.enums.SrmSearchLogUpdate;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.search.SrmSearchCount;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.search.SrmSearchUpdateLog;
 import hasoffer.core.persistence.po.sys.SysAdmin;
@@ -30,8 +32,8 @@ import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.helper.WebsiteProcessorFactory;
 import hasoffer.fetch.helper.WebsiteSummaryProductProcessorFactory;
-import hasoffer.fetch.model.Product;
 import hasoffer.fetch.model.OriFetchedProduct;
+import hasoffer.fetch.model.Product;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import hasoffer.webcommon.helper.PageHelper;
@@ -43,10 +45,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -72,6 +71,30 @@ public class SearchController {
     IFetchService fetchService;
     @Resource
     ICmpSkuService cmpSkuService;
+    @Resource
+    SearchLogCacheManager logCacheManager;
+
+    @RequestMapping(value = "/stat", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String statSearchCount(@RequestParam String ymd) {
+        if (StringUtils.isEmpty(ymd)) {
+            ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
+        }
+
+        Map<Long, Long> countMap = logCacheManager.getProductCount(ymd);
+
+        List<SrmSearchCount> sscs = new ArrayList<SrmSearchCount>();
+
+        for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
+            SrmSearchCount ssc = new SrmSearchCount(ymd, countKv.getKey(), countKv.getValue());
+            sscs.add(ssc);
+        }
+
+        searchService.saveLogCount(sscs);
+
+        return "ok";
+    }
 
     @RequestMapping(value = "/result/ok", method = RequestMethod.POST)
     public ModelAndView resultOk(HttpServletRequest request) {
@@ -231,10 +254,10 @@ public class SearchController {
             }
 
             int skuCount = cmpSkus.size();
-            double min = cmpSkus.get(0).getPrice(), max = min;
+            float min = cmpSkus.get(0).getPrice(), max = min;
 
             for (PtmCmpSku cmpSku : cmpSkus) {
-                double price = cmpSku.getPrice();
+                float price = cmpSku.getPrice();
                 if (price < min) {
                     min = price;
                 }
@@ -247,7 +270,7 @@ public class SearchController {
         return productVos;
     }
 
-    private ProductVo getProductVo(PtmProduct p, double min, double max, int skuCount) {
+    private ProductVo getProductVo(PtmProduct p, float min, float max, int skuCount) {
         ProductVo vo = new ProductVo();
 
         vo.setId(p.getId());

@@ -27,9 +27,8 @@ import static hasoffer.base.utils.http.XPathUtils.getSubNodesByXPath;
  */
 public class FKCateAndParamWorker implements Runnable {
 
-    private Logger logger = LoggerFactory.getLogger(FKCateAndParamWorker.class);
     private final String Q_CATEGORY_BYNAME = "SELECT t FROM PtmCategory2 t WHERE t.name = ?0 ";
-
+    private Logger logger = LoggerFactory.getLogger(FKCateAndParamWorker.class);
     private ListAndProcessWorkerStatus<PtmCmpSku> ws;
     private IDataBaseManager dbm;
     private IMongoDbManager mdm;
@@ -57,6 +56,15 @@ public class FKCateAndParamWorker implements Runnable {
                 }
                 continue;
             }
+
+            PtmCmpSkuDescription ptmCmpSkuDescription = mdm.queryOne(PtmCmpSkuDescription.class, sku.getProductId());
+            if (ptmCmpSkuDescription != null) {
+                String jsonDescription = ptmCmpSkuDescription.getJsonDescription();
+                if (!StringUtils.isEmpty(jsonDescription)) {
+                    continue;
+                }
+            }
+
 
             String url = sku.getUrl();
 
@@ -152,7 +160,7 @@ public class FKCateAndParamWorker implements Runnable {
                 getInfo1(descNode, infoMap, sku);
             }
         }
-        
+
         String jsonDescription = JSONUtil.toJSON(infoMap);
 
         //将描述信息持久化到mongodb

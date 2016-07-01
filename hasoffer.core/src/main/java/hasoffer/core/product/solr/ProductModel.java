@@ -1,7 +1,7 @@
 package hasoffer.core.product.solr;
 
 import hasoffer.base.utils.StringUtils;
-import hasoffer.core.solr.IIdentifiable;
+import hasoffer.data.solr.IIdentifiable;
 
 public class ProductModel implements IIdentifiable<Long> {
     private Long id;
@@ -14,7 +14,7 @@ public class ProductModel implements IIdentifiable<Long> {
 
     private long cateId;
     private String category;
-    private double price;
+    private float price;
 
     private String feature;
     private String description;
@@ -30,7 +30,7 @@ public class ProductModel implements IIdentifiable<Long> {
     private String key1;// title word 3+
 
     public ProductModel(Long id, String title, String tag, long cateId, String category,
-                        double price, String feature, String description,
+                        float price, String feature, String description,
                         String color, String size, int rating,
                         long cate1, long cate2, long cate3) {
         this.id = id;
@@ -95,7 +95,7 @@ public class ProductModel implements IIdentifiable<Long> {
         this.title = title;
     }
 
-    public double getPrice() {
+    public float getPrice() {
         return price;
     }
 

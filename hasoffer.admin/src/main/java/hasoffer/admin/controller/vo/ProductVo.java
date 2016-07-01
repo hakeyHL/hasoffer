@@ -19,7 +19,7 @@ public class ProductVo {
 
 	private String title;// 标题
 	private String tag;
-	private double price;
+	private float price;
 
 	private String masterImageUrl;
 	private String description;
@@ -34,23 +34,23 @@ public class ProductVo {
 	private Website website;
 	private String flag;
 
-	private double minPrice;
-	private double maxPrice;
+	private float minPrice;
+	private float maxPrice;
 	private int skuCount;
 
-	public double getMinPrice() {
+	public float getMinPrice() {
 		return minPrice;
 	}
 
-	public void setMinPrice(double minPrice) {
+	public void setMinPrice(float minPrice) {
 		this.minPrice = minPrice;
 	}
 
-	public double getMaxPrice() {
+	public float getMaxPrice() {
 		return maxPrice;
 	}
 
-	public void setMaxPrice(double maxPrice) {
+	public void setMaxPrice(float maxPrice) {
 		this.maxPrice = maxPrice;
 	}
 
@@ -126,11 +126,11 @@ public class ProductVo {
 		this.title = title;
 	}
 
-	public double getPrice() {
+	public float getPrice() {
 		return price;
 	}
 
-	public void setPrice(double price) {
+	public void setPrice(float price) {
 		this.price = price;
 	}
 

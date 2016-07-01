@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class CmpResult {
     //the lowest price
-    private  double bestPrice;
+    private float bestPrice;
     //productname
     private  String name;
     //total comment number
@@ -20,11 +20,11 @@ public class CmpResult {
     List <CmpProductListVo> priceList;
     //product specification
     private  String specs;
-    double priceOff;
+    float priceOff;
     ProductVo productVo;
     PageableResult<ComparedSkuVo> pagedComparedSkuVos;
     private String  image;
-    public CmpResult(double priceOff, ProductVo productVo, PageableResult<ComparedSkuVo> pagedComparedSkuVos) {
+    public CmpResult(float priceOff, ProductVo productVo, PageableResult<ComparedSkuVo> pagedComparedSkuVos) {
         this.priceOff = priceOff;
         this.productVo = productVo;
         this.pagedComparedSkuVos = pagedComparedSkuVos;
@@ -62,11 +62,11 @@ public class CmpResult {
         this.pagedComparedSkuVos = pagedComparedSkuVos;
     }
 
-    public double getBestPrice() {
+    public float getBestPrice() {
         return bestPrice;
     }
 
-    public void setBestPrice(double bestPrice) {
+    public void setBestPrice(float bestPrice) {
         this.bestPrice = bestPrice;
     }
 

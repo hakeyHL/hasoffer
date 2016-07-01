@@ -14,8 +14,8 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel;
-import hasoffer.core.solr.*;
 import hasoffer.core.utils.ImageUtil;
+import hasoffer.data.solr.*;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.model.ListProduct;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -316,7 +316,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public ProductBo createProduct(long cateId, String title, double price,
+    public ProductBo createProduct(long cateId, String title, float price,
                                    Website website, String sourceUrl, String sourceId, String imageUrl) {
         logger.debug(String.format("create product : %s", title));
 

@@ -7,7 +7,7 @@ public class SkuBo {
 
     private long id;
     private String title;
-    private double price;
+    private float price;
 
 
     public long getId() {
@@ -18,11 +18,11 @@ public class SkuBo {
         this.id = id;
     }
 
-    public double getPrice() {
+    public float getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(float price) {
         this.price = price;
     }
 

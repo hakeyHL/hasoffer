@@ -76,7 +76,13 @@ public class ShopcluesHelper {
     }
 
     public static String getUrlWithAff(String url, String[] affs) {
-        return String.format(SHOPCLUES_LOCAL_AFF_TEMP, affs[0], StringUtils.urlEncode(url));
+
+        String market = "";
+        if(affs.length > 1){
+            market = affs[0];
+        }
+
+        return String.format(SHOPCLUES_LOCAL_AFF_TEMP, market, StringUtils.urlEncode(url));
     }
 
     public static String getDeeplinkWithAff(String url, String[] affs) {

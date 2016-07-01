@@ -61,7 +61,7 @@ public class SearchCriteria {
     }
 
     public int getPage() {
-        return page;
+        return page==0?1:page;
     }
 
     public void setPage(int page) {
@@ -69,7 +69,7 @@ public class SearchCriteria {
     }
 
     public int getPageSize() {
-        return pageSize;
+        return pageSize==0?20:pageSize;
     }
 
     public void setPageSize(int pageSize) {

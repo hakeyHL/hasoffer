@@ -11,6 +11,7 @@ import hasoffer.base.model.Website;
 public class DeviceInfoVo {
 
     private String brand;
+    private String userToken;
     private String imeiId;
     private String deviceId;
     private String serial;
@@ -35,6 +36,14 @@ public class DeviceInfoVo {
     private MarketChannel marketChannel;
 
     private String gcmToken;
+
+    public String getUserToken() {
+        return userToken;
+    }
+
+    public void setUserToken(String userToken) {
+        this.userToken = userToken;
+    }
 
     public String getGcmToken() {
         return gcmToken;

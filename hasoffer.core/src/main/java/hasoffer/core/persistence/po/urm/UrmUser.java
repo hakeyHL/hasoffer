@@ -22,7 +22,7 @@ public class UrmUser implements Identifiable<Long> {
     private String thirdPlatform;
     private String avatarPath;
     private Date createTime;
-    private String Number;
+    private String telephone;
 
 
     @Override
@@ -53,15 +53,15 @@ public class UrmUser implements Identifiable<Long> {
         if (avatarPath != null ? !avatarPath.equals(user.avatarPath) : user.avatarPath != null) return false;
         if (createTime != null ? !createTime.equals(user.createTime) : user.createTime != null) return false;
         if (thirdId != null ? !thirdId.equals(user.thirdId) : user.thirdId != null) return false;
-        return (Number != null ? !Number.equals(user.Number) : user.Number != null);
+        return (telephone != null ? !telephone.equals(user.telephone) : user.telephone != null);
     }
 
-    public String getNumber() {
-        return Number;
+    public String getTelephone() {
+        return telephone;
     }
 
-    public void setNumber(String number) {
-        Number = number;
+    public void setTelephone(String telephone) {
+        telephone = telephone;
     }
 
     public Long getId() {

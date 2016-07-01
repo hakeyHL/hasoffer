@@ -27,7 +27,7 @@ public class PtmCmpSku implements Identifiable<Long> {
 
     private String skuTitle;// 带商品的color，size属性的
     private String title;
-    private double price;
+    private float price;
 
     private String rating;
 
@@ -67,7 +67,7 @@ public class PtmCmpSku implements Identifiable<Long> {
     public PtmCmpSku() {
     }
 
-    public PtmCmpSku(long productId, double price, String url) {
+    public PtmCmpSku(long productId, float price, String url) {
         this.productId = productId;
         this.price = price;
         this.oriUrl = url;
@@ -144,11 +144,11 @@ public class PtmCmpSku implements Identifiable<Long> {
         this.rating = rating;
     }
 
-    public double getPrice() {
+    public float getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(float price) {
         this.price = price;
     }
 

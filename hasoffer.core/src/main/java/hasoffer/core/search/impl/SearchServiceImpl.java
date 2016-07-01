@@ -171,7 +171,8 @@ public class SearchServiceImpl implements ISearchService {
 
         Map<String, PtmCmpSku> skuMap = new HashMap<String, PtmCmpSku>();
 
-        long ptmProductId = autoSearchResult.getRelatedProId();
+        long ptmProductId = 0;//autoSearchResult.getRelatedProId();
+
         if (ptmProductId == 0) {
             logger.debug("build product...");
             SearchedSku stdSku = null;
@@ -202,6 +203,7 @@ public class SearchServiceImpl implements ISearchService {
             }
         }
 
+        // todo - 如果同一个网站，两次抓取结果不同，第二次抓取的更准确，则要把第一次的结果更新为更准确的sku
         for (Map.Entry<Website, List<SearchedSku>> kv : searchedSkuMap.entrySet()) {
 
             List<SearchedSku> ssku = kv.getValue();
@@ -224,7 +226,7 @@ public class SearchServiceImpl implements ISearchService {
                 if (titleScore == 0) {
                     titleScore = searchedSku.getTitleScore();
                 } else if (titleScore != searchedSku.getTitleScore()) {
-                    continue;
+                    break;
                 }
 
                 PtmCmpSku cmpSku = productService.createCmpsku(ptmProductId, searchedSku.getPrice(),
@@ -466,7 +468,7 @@ public class SearchServiceImpl implements ISearchService {
         String keyword = searchLogBo.getKeyword();
         String brand = searchLogBo.getBrand();
         String site = searchLogBo.getSite();
-        double price = searchLogBo.getPrice();
+        float price = searchLogBo.getPrice();
         long productId = searchLogBo.getProductId();
         long ptmCmpSkuId = searchLogBo.getCmpSkuId();
         long category = searchLogBo.getCategory();
@@ -544,7 +546,7 @@ public class SearchServiceImpl implements ISearchService {
             String keyword = searchLogBo.getKeyword();
             String brand = searchLogBo.getBrand();
             String site = searchLogBo.getSite();
-            double price = searchLogBo.getPrice();
+            float price = searchLogBo.getPrice();
             long productId = searchLogBo.getProductId();
             long ptmCmpSkuId = searchLogBo.getCmpSkuId();
             long category = searchLogBo.getCategory();

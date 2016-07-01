@@ -34,7 +34,7 @@ public class SearchProductHelper {
     public static Map<Website, ListProduct> getProducts(SrmSearchLog searchLog) {
 
         String keyword = searchLog.getKeyword();
-        double stdPrice = searchLog.getPrice();
+        float stdPrice = searchLog.getPrice();
 
         Map<Website, ListProduct> listProductMap = new HashMap<Website, ListProduct>();
 
@@ -53,7 +53,7 @@ public class SearchProductHelper {
         return listProductMap;
     }
 
-    public static void getProductsFromAffiliate(Map<Website, ListProduct> listProductMap, String keyword, double stdPrice) {
+    public static void getProductsFromAffiliate(Map<Website, ListProduct> listProductMap, String keyword, float stdPrice) {
         try {
             getProductFromFlipkart(listProductMap, keyword, stdPrice);
         } catch (Exception e) {
@@ -134,7 +134,7 @@ public class SearchProductHelper {
         }
     }
 
-    public static void getProductFromFlipkart(Map<Website, ListProduct> listProductMap, String keyword, double stdPrice) throws Exception {
+    public static void getProductFromFlipkart(Map<Website, ListProduct> listProductMap, String keyword, float stdPrice) throws Exception {
         Website website = Website.FLIPKART;
 
         FlipkartAffiliateProductProcessor affProcessor = new FlipkartAffiliateProductProcessor();

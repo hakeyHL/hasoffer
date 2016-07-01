@@ -81,7 +81,7 @@ public class SearchProductHelperTest2 {
             SrmAutoSearchResult autoSearchResult = new SrmAutoSearchResult(searchLog);
             autoSearchResult.setRelatedProId(0L);
             searchProductService.searchProductsFromSites(autoSearchResult);
-            searchProductService.cleanProducts(autoSearchResult);
+            searchProductService.analysisProducts(autoSearchResult);
             searchService.relateUnmatchedSearchLogx(autoSearchResult);
 
         } catch (Exception e) {
@@ -92,12 +92,10 @@ public class SearchProductHelperTest2 {
     @Test
     public void saveTest2() {
         try {
-            String logId = "142d3861501ba9b943edd60352a22ff8";
+            String logId = "4a0aa34fd0fcd740f4720a9be98cf83c";
 
             SrmAutoSearchResult autoSearchResult = mdm.queryOne(SrmAutoSearchResult.class, logId);
-
-//            searchProductService.searchProductsFromSites(autoSearchResult);
-            boolean isCleaned = searchProductService.cleanProducts(autoSearchResult);
+            boolean isCleaned = true;// searchProductService.analysisProducts(autoSearchResult);
             if (isCleaned) {
                 searchService.relateUnmatchedSearchLogx(autoSearchResult);
             }

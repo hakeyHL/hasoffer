@@ -9,7 +9,9 @@ import hasoffer.core.persistence.mongo.StatDayAlive;
 import hasoffer.core.persistence.mongo.StatDevice;
 import hasoffer.core.persistence.mongo.UrmDeviceBuyLog;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
-import hasoffer.core.persistence.po.urm.*;
+import hasoffer.core.persistence.po.urm.UrmDayVisit;
+import hasoffer.core.persistence.po.urm.UrmDevice;
+import hasoffer.core.persistence.po.urm.UrmDeviceConfig;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -21,8 +23,6 @@ import java.util.Map;
  * Function :
  */
 public interface IDeviceService {
-
-
 
     PageableResult<UrmDeviceRequestLog> findDeviceLogs(String deviceId, Date start, Date end, int page, int size);
 
@@ -80,10 +80,6 @@ public interface IDeviceService {
     void saveDayAlive(StatDayAlive sda);
 
     void saveDeviceStatResult(StatDevice sd);
-
-    List<UrmBrand> listAllDeviceBrands();
-
-    List<UrmVersions> listAllDeviceVersions();
 
     List<StatDevice> listDeviceStats(String deviceId);
 

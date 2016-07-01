@@ -8,7 +8,9 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.core.bo.product.Banners;
+import hasoffer.core.bo.product.CategoryVo;
 import hasoffer.core.bo.system.SearchCriteria;
+import hasoffer.core.cache.AppCacheManager;
 import hasoffer.core.cache.CmpSkuCacheManager;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
@@ -70,6 +72,8 @@ public class AppController {
     ProductServiceImpl productService;
     @Resource
     ICmpSkuService cmpSkuService;
+    @Resource
+    AppCacheManager appCacheManager;
     private Logger logger = LoggerFactory.logger(AppController.class);
 
     public static void main(String[] args) {
@@ -161,8 +165,6 @@ public class AppController {
                                  @RequestParam CallbackAction action) {
 
         switch (action) {
-            case LOAD:
-                break;
             case FLOWCTRLSUCCESS:
                 // 流量拦截成功
                 try {
@@ -231,16 +233,15 @@ public class AppController {
 
     /**
      * 查看返利
-     *
-     * @param userToken
      * @return
      */
     @RequestMapping(value = "/backDetail", method = RequestMethod.GET)
-    public ModelAndView backDetail(@RequestParam String userToken) {
+    public ModelAndView backDetail() {
         ModelAndView mv = new ModelAndView();
         BackDetailVo data = new BackDetailVo();
         List<OrderVo> transcations = new ArrayList<OrderVo>();
-        UrmUser user = appService.getUserByUserToken(userToken);
+        DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        UrmUser user = appService.getUserByUserToken(deviceInfo.getUserToken());
         BigDecimal PendingCoins = BigDecimal.ZERO;
         BigDecimal VericiedCoins = BigDecimal.ZERO;
         if (user != null) {
@@ -314,7 +315,7 @@ public class AppController {
         List<AppBanner> list = appService.getBanners();
         for (AppBanner appBanner : list) {
             Banners banner = new Banners();
-            banner.setLink(appBanner.getLinkUrl());
+            banner.setLink(WebsiteHelper.getUrlWithAff(appBanner.getLinkUrl()));
             banner.setRank(appBanner.getRank());
             banner.setSource(1);
             banner.setSourceUrl(appBanner.getImageUrl() == null ? "" : ImageUtil.getImageUrl(appBanner.getImageUrl()));
@@ -354,8 +355,9 @@ public class AppController {
                 dealVo.setExtra(1.5);
             }
             dealVo.setImage(ImageUtil.getImageUrl(appDeal.getImageUrl()));
-            dealVo.setLink(appDeal.getLinkUrl());
+            dealVo.setLink(WebsiteHelper.getUrlWithAff(appDeal.getLinkUrl()==null?"":appDeal.getLinkUrl()));
             dealVo.setTitle(appDeal.getTitle());
+            dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
             li.add(dealVo);
         }
         map.put("deals", li);
@@ -383,8 +385,9 @@ public class AppController {
             map.put("image", ImageUtil.getImageUrl(appDeal.getImageUrl()));
             map.put("title", appDeal.getTitle());
             map.put("exp", new SimpleDateFormat("MM/dd/yyyy").format(appDeal.getExpireTime()));
+            map.put("logoUrl", WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
             map.put("extra", 1.5);
-            map.put("description", appDeal.getDescription());
+            map.put("description",new StringBuilder().append(appDeal.getWebsite().name()).append(" is offering ").append(appDeal.getTitle()).append(" .\n").append(appDeal.getDescription()));
             if (appDeal.getWebsite() == Website.FLIPKART || appDeal.getWebsite() == Website.SHOPCLUES) {
                 map.put("cashbackInfo", "1. Offer valid for a limited time only while stocks last\n" +
                         "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +
@@ -392,7 +395,7 @@ public class AppController {
                         "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
                         "5. Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
             }
-            map.put("deeplink", appDeal.getLinkUrl());
+            map.put("deeplink", WebsiteHelper.getUrlWithAff(appDeal.getLinkUrl()==null?"":appDeal.getLinkUrl()));
             mv.addObject("data", map);
         }
         return mv;
@@ -408,15 +411,14 @@ public class AppController {
         ModelAndView mv = new ModelAndView();
         Map map = new HashMap();
         String userToken = UUID.randomUUID().toString();
-        UrmUser uUser = appService.getUserById(userVO.getThirdId() == null ? "0" : "1");
+        UrmUser uUser = appService.getUserById(userVO.getThirdId() == null ? "-" : userVO.getThirdId());
         if (uUser == null) {
-
             logger.debug("user is not exist before");
             UrmUser urmUser = new UrmUser();
             urmUser.setUserToken(userToken);
             urmUser.setAvatarPath(userVO.getUserIcon());
             urmUser.setCreateTime(new Date());
-            urmUser.setNumber(userVO.getNumber());
+            urmUser.setTelephone(userVO.getTelephone()==null?"": userVO.getTelephone());
             urmUser.setThirdPlatform(userVO.getPlatform());
             urmUser.setThirdToken(userVO.getToken());
             urmUser.setUserName(userVO.getUserName());
@@ -427,7 +429,7 @@ public class AppController {
             logger.debug("user exist ,update userInfo");
             uUser.setUserName(userVO.getUserName());
             uUser.setThirdPlatform(userVO.getPlatform());
-            uUser.setNumber(uUser.getNumber());
+            uUser.setTelephone(uUser.getTelephone());
             uUser.setAvatarPath(uUser.getAvatarPath());
             uUser.setThirdToken(uUser.getThirdToken());
             uUser.setUserToken(userToken);
@@ -445,10 +447,11 @@ public class AppController {
      * @return
      */
     @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
-    public ModelAndView userInfo(@RequestParam String userToken) {
+    public ModelAndView userInfo() {
         ModelAndView mv = new ModelAndView();
         BigDecimal PendingCoins = BigDecimal.ZERO;
-        UrmUser user = appService.getUserByUserToken(userToken);
+        DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        UrmUser user = appService.getUserByUserToken(deviceInfo.getUserToken());
         if (user != null) {
             UserVo userVo = new UserVo();
             userVo.setName(user.getUserName());
@@ -474,54 +477,8 @@ public class AppController {
     @RequestMapping(value = "/category", method = RequestMethod.GET)
     public ModelAndView category(String categoryId) {
         ModelAndView mv = new ModelAndView();
-        List<PtmCategory> ptmCategorys = null;
-        List categorys = new ArrayList();
-        if (StringUtils.isBlank(categoryId)) {
-            ptmCategorys = appService.getCategory();
-            for (PtmCategory ptmCategory : ptmCategorys) {
-                CategoryVo categoryVo = new CategoryVo();
-                categoryVo.setId(ptmCategory.getId());
-                categoryVo.setHasChildren(1);
-                categoryVo.setImage(ptmCategory.getImageUrl() == null ? "" : ImageUtil.getImageUrl(ptmCategory.getImageUrl()));
-                categoryVo.setLevel(ptmCategory.getLevel());
-                categoryVo.setName(ptmCategory.getName());
-                categoryVo.setParentId(ptmCategory.getParentId());
-                categoryVo.setRank(ptmCategory.getRank());
-                categorys.add(categoryVo);
-            }
-        } else {
-            //get childs
-            ptmCategorys = appService.getChildCategorys(categoryId);
-            List childCategory = null;
-            for (PtmCategory ptmCategory : ptmCategorys) {
-                CategoryVo categoryVo = new CategoryVo();
-                categoryVo.setId(ptmCategory.getId());
-                categoryVo.setHasChildren(1);
-                categoryVo.setImage(ImageUtil.getImageUrl(ptmCategory.getImageUrl()));
-                categoryVo.setLevel(ptmCategory.getLevel());
-                categoryVo.setName(ptmCategory.getName());
-                categoryVo.setParentId(ptmCategory.getParentId());
-                categoryVo.setRank(ptmCategory.getRank());
-                List<PtmCategory> ptmCategorysTemp = appService.getChildCategorys(categoryVo.getId().toString());
-                if (ptmCategorysTemp != null) {
-                    categoryVo.setHasChildren(1);
-                    childCategory = new ArrayList();
-                    for (PtmCategory cates : ptmCategorysTemp) {
-                        CategoryVo cate = new CategoryVo();
-                        cate.setId(cates.getId());
-                        cate.setHasChildren(1);
-                        cate.setImage(ImageUtil.getImageUrl(cates.getImageUrl()));
-                        cate.setLevel(cates.getLevel());
-                        cate.setName(cates.getName());
-                        cate.setParentId(cates.getParentId());
-                        cate.setRank(cates.getRank());
-                        childCategory.add(cate);
-                    }
-                }
-                categoryVo.setCategorys(childCategory);
-                categorys.add(categoryVo);
-            }
-        }
+        List categorys = null;
+        categorys = appCacheManager.getCategorys(categoryId);
         mv.addObject("data", categorys);
         return mv;
     }
@@ -541,12 +498,12 @@ public class AppController {
         List li = new ArrayList();
         Map map = new HashMap();
         PageableResult<ProductModel> products;
-        List<ProductModel> products1;
         //category level page size
         // PageableResult <ProductModel> products=productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()),criteria.getLevel(),criteria.getPage(),criteria.getPageSize());
         if (!StringUtils.isBlank(criteria.getCategoryId())) {
             //search by category
-            products = productIndexServiceImpl.searchPro(Long.valueOf(2), 1, 1, 10);
+            products = productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
+            //products = productIndexServiceImpl.searchPro(Long.valueOf(2), 2, 1, 10);
             if (products != null && products.getData().size() > 0) {
                 List<ProductModel> productModes = products.getData();
                 for (ProductModel productModel : productModes) {
@@ -565,7 +522,7 @@ public class AppController {
         } else {
             //search by title
             //productIndexServiceImpl.simpleSearch(criteria.getKeyword(),1,10);
-            PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), 1, 10);
+            PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
             if (p != null && p.getData().size() > 0) {
                 List<ProductModel> productModes = p.getData();
                 for (ProductModel productModel : productModes) {
@@ -585,7 +542,7 @@ public class AppController {
         String data = "";
         //查询热卖商品
         Date date = new Date();
-        date.setTime(date.getTime() - 1 *24* 60 * 60 * 1000);
+        date.setTime(date.getTime() - 1 * 24 * 60 * 60 * 1000);
         List<PtmProduct> products2s = productCacheManager.getTopSellingProductsByDate(new SimpleDateFormat("yyyyMMdd").format(date), 1, 20);
         switch (requestType) {
             case 0:
@@ -627,7 +584,7 @@ public class AppController {
                 map.put("product", li);
                 break;
             case 2:
-                PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), 1, 10);
+                PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
                 if (p != null && p.getData().size() > 0) {
                     List<ProductModel> productModes = p.getData();
                     for (ProductModel productModel : productModes) {

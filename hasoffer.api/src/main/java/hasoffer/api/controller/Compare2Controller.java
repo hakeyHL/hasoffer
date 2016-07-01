@@ -205,6 +205,7 @@ public class Compare2Controller {
         cmpResult.setName(product.getTitle());
         cmpResult.setBestPrice(cplv.getPrice());
         comparedSkuVos.add(cplv);
+        cmpResult.setPriceList(comparedSkuVos);
         return cmpResult;
     }
 
@@ -346,14 +347,14 @@ public class Compare2Controller {
          * 如果没有匹配到，或比价列表不含该网站，则相应变量值为0
          */
         long cmpSkuId = 0L;
-        double minPrice = sio.getCliPrice(), maxPrice = sio.getCliPrice();
+        float minPrice = sio.getCliPrice(), maxPrice = sio.getCliPrice();
 
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(sio.getHsProId(), sio.getPage(), sio.getSize());
         List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
 
         PtmCmpSku clientCmpSku = null;
 
-        double cliPrice = sio.getCliPrice(), priceOff = 0.0;
+        float cliPrice = sio.getCliPrice(), priceOff = 0.0f;
         if (ArrayUtils.hasObjs(cmpSkus)) {
 
             for (PtmCmpSku cmpSku : cmpSkus) {
@@ -393,7 +394,8 @@ public class Compare2Controller {
                 }
 
                 // 忽略前台返回的价格
-                ComparedSkuVo csv = new ComparedSkuVo(cmpSku, new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
+                List<String> affs = getAffs(sio);
+                ComparedSkuVo csv = new ComparedSkuVo(cmpSku, affs.toArray(new String[0]));
                 csv.setPriceOff(cliPrice - cmpSku.getPrice());
 
                 addVo(comparedSkuVos, csv);
@@ -403,7 +405,7 @@ public class Compare2Controller {
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", sio.getCliQ(), sio.getCliPrice());
             }
 
-            double standPrice = maxPrice;
+            float standPrice = maxPrice;
             if (cliPrice <= 0) {
                 // 取一个标准价格，如果client sku 为null，则取maxPrice
                 if (clientCmpSku != null) {
@@ -459,6 +461,17 @@ public class Compare2Controller {
         return new CmpResult(priceOff, productVo, new PageableResult<ComparedSkuVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize()));
     }
 
+    private List<String> getAffs(SearchIO sio) {
+        List<String> affs = new ArrayList<String>();
+        affs.add(sio.getMarketChannel().name());
+        affs.add(sio.getDeviceId());
+        Object userIdObj = Context.currentContext().get(StaticContext.USER_ID);
+        if (userIdObj != null) {
+            affs.add(userIdObj.toString());
+        }
+        return affs;
+    }
+
     /**
      * get cmp product results
      *
@@ -478,7 +491,7 @@ public class Compare2Controller {
 
         PtmCmpSku clientCmpSku = null;
         //初始化price为客户端传输的price
-        double cliPrice = sio.getCliPrice();
+        float cliPrice = sio.getCliPrice();
         if (ArrayUtils.hasObjs(cmpSkus)) {
             //如果有查询结果,遍历之
             for (PtmCmpSku cmpSku : cmpSkus) {

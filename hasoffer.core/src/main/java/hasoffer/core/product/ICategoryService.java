@@ -31,4 +31,7 @@ public interface ICategoryService {
 	void deleteCategory(long id);
 
 	PtmCategory2 createAppCategory(PtmCategory2 category);
+
+	//使用完成记得删除
+	void tempDeleteCategoryForCategoryUpdate(long id);
 }
