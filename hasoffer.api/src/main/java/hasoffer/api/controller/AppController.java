@@ -231,6 +231,7 @@ public class AppController {
 
     /**
      * 查看返利
+     *
      * @return
      */
     @RequestMapping(value = "/backDetail", method = RequestMethod.GET)
@@ -356,7 +357,7 @@ public class AppController {
                 dealVo.setExtra(1.5);
             }
             dealVo.setImage(ImageUtil.getImageUrl(appDeal.getImageUrl()));
-            dealVo.setLink(WebsiteHelper.getUrlWithAff(appDeal.getLinkUrl()==null?"":appDeal.getLinkUrl()));
+            dealVo.setLink(WebsiteHelper.getUrlWithAff(appDeal.getLinkUrl() == null ? "" : appDeal.getLinkUrl()));
             dealVo.setTitle(appDeal.getTitle());
             dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
             li.add(dealVo);
@@ -396,7 +397,7 @@ public class AppController {
                         "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
                         "5. Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
             }
-            map.put("deeplink", WebsiteHelper.getUrlWithAff(appDeal.getLinkUrl()==null?"":appDeal.getLinkUrl()));
+            map.put("deeplink", WebsiteHelper.getUrlWithAff(appDeal.getLinkUrl() == null ? "" : appDeal.getLinkUrl()));
             mv.addObject("data", map);
         }
         return mv;
@@ -419,7 +420,7 @@ public class AppController {
             urmUser.setUserToken(userToken);
             urmUser.setAvatarPath(userVO.getUserIcon());
             urmUser.setCreateTime(new Date());
-            urmUser.setTelephone(userVO.getTelephone()==null?"": userVO.getTelephone());
+            urmUser.setTelephone(userVO.getTelephone() == null ? "" : userVO.getTelephone());
             urmUser.setThirdPlatform(userVO.getPlatform());
             urmUser.setThirdToken(userVO.getToken());
             urmUser.setUserName(userVO.getUserName());
