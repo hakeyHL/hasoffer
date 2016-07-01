@@ -18,9 +18,7 @@ import hasoffer.core.task.ListAndProcessTask2;
 import hasoffer.core.task.worker.IList;
 import hasoffer.core.task.worker.IProcess;
 import hasoffer.task.worker.UnmatchedSearchRecordListWorker;
-import hasoffer.task.worker.UnmatchedSearchRecordListWorker2;
 import hasoffer.task.worker.UnmatchedSearchRecordProcessWorker;
-import hasoffer.task.worker.UnmatchedSearchRecordProcessWorker2;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,29 +55,6 @@ public class AutoSearchMatchController {
     IMongoDbManager mdm;
     private Logger logger = LoggerFactory.getLogger(AutoSearchMatchController.class);
 
-    //autosearch/start
-    @RequestMapping(value = "/start", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String autosearch(@RequestParam(defaultValue = "1") String counts) {
-        ExecutorService es = Executors.newCachedThreadPool();
-
-        LinkedBlockingQueue<SrmSearchLog> searchLogQueue = new LinkedBlockingQueue<SrmSearchLog>();
-        es.execute(DaemonThreadFactory.create(new UnmatchedSearchRecordListWorker(productService, searchService, searchLogQueue)));
-        for (int i = 0; i < 50; i++) {
-            es.execute(DaemonThreadFactory.create(new UnmatchedSearchRecordProcessWorker(productService, searchService, searchLogQueue)));
-        }
-
-        while (true) {
-            try {
-                TimeUnit.MINUTES.sleep(30);
-                logger.debug("AutoSearchMatchController");
-            } catch (Exception e) {
-                logger.debug(e.getMessage());
-            }
-        }
-    }
-
     @RequestMapping(value = "/start2", method = RequestMethod.GET)
     @ResponseBody
     public String start2() {
@@ -88,9 +63,9 @@ public class AutoSearchMatchController {
         ExecutorService es = Executors.newCachedThreadPool();
 
         LinkedBlockingQueue<SrmSearchLog> searchLogQueue = new LinkedBlockingQueue<SrmSearchLog>();
-        es.execute(DaemonThreadFactory.create(new UnmatchedSearchRecordListWorker2(searchService, dbm, searchLogQueue)));
+        es.execute(DaemonThreadFactory.create(new UnmatchedSearchRecordListWorker(searchService, dbm, searchLogQueue)));
         for (int i = 0; i < 20; i++) {
-            es.execute(DaemonThreadFactory.create(new UnmatchedSearchRecordProcessWorker2(searchProductService, searchService, searchLogQueue)));
+            es.execute(DaemonThreadFactory.create(new UnmatchedSearchRecordProcessWorker(searchProductService, searchService, searchLogQueue)));
         }
 
         while (true) {

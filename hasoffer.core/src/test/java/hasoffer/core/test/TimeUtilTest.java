@@ -41,7 +41,7 @@ public class TimeUtilTest {
 
     @Test
     public void testTimeUtil() {
-        final Date DEFAUTL_UPDATETIME = TimeUtils.stringToDate("2016-07-01 13:00:00", "yyyy-MM-dd HH:mm:ss");
+        final Date DEFAUTL_UPDATETIME = TimeUtils.stringToDate("2016-07-01 15:00:00", "yyyy-MM-dd HH:mm:ss");
         System.out.println(TimeUtils.parse(DEFAUTL_UPDATETIME, "yyyy-MM-dd HH:mm:ss"));
         String todayString = TimeUtils.parse(TimeUtils.today(), "yyyyMMdd");
         System.out.println(todayString);
