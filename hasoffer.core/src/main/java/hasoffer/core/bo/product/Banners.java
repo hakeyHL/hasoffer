@@ -12,6 +12,15 @@ public class Banners {
     private  Long rank;
     private String link;
     private  String expireDate;
+    private Long dealId;
+
+    public Long getDealId() {
+        return dealId;
+    }
+
+    public void setDealId(Long dealId) {
+        this.dealId = dealId;
+    }
 
     public String getExpireDate() {
         return expireDate;
