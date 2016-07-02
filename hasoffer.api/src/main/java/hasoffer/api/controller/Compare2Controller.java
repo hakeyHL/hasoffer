@@ -147,7 +147,6 @@ public class Compare2Controller {
         }
         // 速度优化
         SearchHelper.addToLog(sio);
-
         ModelAndView mav = new ModelAndView();
         mav.addObject("data", cr);
         logger.debug(sio.toString());
@@ -185,7 +184,7 @@ public class Compare2Controller {
         }
         cmpResult.setSpecs(specs);
         cmpResult.setRatingNum(0);
-        String imageUrl = productCacheManager.getProductMasterImageUrl(sio.getHsProId());
+        String imageUrl = productCacheManager.getProductMasterImageUrl(product.getId());
         List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
         CmpProductListVo cplv = new CmpProductListVo();
         cplv.setPrice(product.getPrice());
@@ -198,7 +197,7 @@ public class Compare2Controller {
         cplv.setReturnGuarantee(0);
         cplv.setSupport(null);
         cplv.setFreight(0);
-        cplv.setDistributionTime(0);
+        cplv.setDistributionTime("");
         cplv.setDeepLinkUrl(WebsiteHelper.getUrlWithAff(Website.valueOf(product.getSourceSite()), product.getSourceUrl(), new String[]{sio.getMarketChannel().name()}));
         cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(Website.valueOf(product.getSourceSite()), product.getSourceUrl(), new String[]{sio.getMarketChannel().name()}));
         cmpResult.setImage(imageUrl);
@@ -518,7 +517,6 @@ public class Compare2Controller {
                 //
                 comparedSkuVos.add(new CmpProductListVo(clientCmpSku, WebsiteHelper.getLogoUrl(clientCmpSku.getWebsite())));
             }
-
             // 获取vo list
             for (PtmCmpSku cmpSku : cmpSkus) {
                 if (cmpSku.getWebsite() == null
@@ -528,16 +526,6 @@ public class Compare2Controller {
                 }
                 // 忽略前台返回的价格
                 CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
-                cplv.setPrice(cmpSku.getPrice());
-                cplv.setTotalRatingsNum(Long.valueOf(0));
-                cplv.setRatingNum(0);
-                cplv.setBackRate(1.5f);
-                cplv.setCoins(Math.round(0.015 * cmpSku.getPrice()));
-                cplv.setFreight(0);
-                cplv.setImage(WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
-                cplv.setReturnGuarantee(0);
-                cplv.setSupport(null);
-                cplv.setDistributionTime(0);
                 cplv.setDeepLinkUrl(WebsiteHelper.getUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                 cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                 comparedSkuVos.add(cplv);
@@ -563,7 +551,7 @@ public class Compare2Controller {
             throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
         }
         sio.setHsSkuId(cmpSkuId);
-        String imageUrl = productCacheManager.getProductMasterImageUrl(sio.getHsProId());
+        String imageUrl = productCacheManager.getProductMasterImageUrl(id);
         CmpResult cmpResult = new CmpResult();
         cmpResult.setImage(imageUrl);
         cmpResult.setName(sio.getCliQ());
