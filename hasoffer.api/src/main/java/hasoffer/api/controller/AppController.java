@@ -317,6 +317,7 @@ public class AppController {
             banner.setSource(1);
             banner.setSourceUrl(appBanner.getImageUrl() == null ? "" : ImageUtil.getImageUrl(appBanner.getImageUrl()));
             banner.setExpireDate(appBanner.getDeadline());
+            banner.setDealId(Long.valueOf(appBanner.getSourceId()));
             banners.add(banner);
         }
         Map map = new HashMap();
@@ -351,10 +352,11 @@ public class AppController {
             if (appDeal.getWebsite() == Website.FLIPKART || appDeal.getWebsite() == Website.SHOPCLUES) {
                 dealVo.setExtra(1.5);
             }
-            dealVo.setImage(ImageUtil.getImageUrl(appDeal.getImageUrl()));
+            dealVo.setImage(appDeal.getImageUrl() == null ? "" : ImageUtil.getImageUrl(appDeal.getImageUrl()));
             dealVo.setLink(WebsiteHelper.getUrlWithAff(appDeal.getLinkUrl() == null ? "" : appDeal.getLinkUrl()));
             dealVo.setTitle(appDeal.getTitle());
             dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+            dealVo.setWebsite(appDeal.getWebsite());
             li.add(dealVo);
         }
         map.put("deals", li);
@@ -497,9 +499,17 @@ public class AppController {
         PageableResult<ProductModel> products;
         //category level page size
         // PageableResult <ProductModel> products=productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()),criteria.getLevel(),criteria.getPage(),criteria.getPageSize());
-        if (!StringUtils.isBlank(criteria.getCategoryId())) {
+        if (StringUtils.isNotBlank(criteria.getCategoryId())) {
             //search by category
             products = productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
+            logger.error("start print criteria info ,category");
+            logger.error("keyword  " + criteria.getKeyword());
+            logger.error("comment " + criteria.getComment());
+            logger.error("categoryid  " + criteria.getCategoryId());
+            logger.error("level  " + criteria.getLevel());
+            logger.error("page   " + criteria.getPage());
+            logger.error("pageSize " + criteria.getPageSize());
+
             //products = productIndexServiceImpl.searchPro(Long.valueOf(2), 2, 1, 10);
             if (products != null && products.getData().size() > 0) {
                 List<ProductModel> productModes = products.getData();
@@ -521,7 +531,14 @@ public class AppController {
             //search by title
             //productIndexServiceImpl.simpleSearch(criteria.getKeyword(),1,10);
             PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
-            logger.error("============getKeyword==================getKeyword=======  " + criteria.getKeyword() + "        =======================");
+            logger.error("============getKeyword=======" + p.getData().size() + "===========getKeyword=======  " + criteria.getKeyword() + "        =======================");
+            logger.error("start print criteria info ,product");
+            logger.error("keyword  " + criteria.getKeyword());
+            logger.error("comment " + criteria.getComment());
+            logger.error("categoryid  " + criteria.getCategoryId());
+            logger.error("level  " + criteria.getLevel());
+            logger.error("page   " + criteria.getPage());
+            logger.error("pageSize " + criteria.getPageSize());
             if (p != null && p.getData().size() > 0) {
                 List<ProductModel> productModes = p.getData();
                 for (ProductModel productModel : productModes) {
