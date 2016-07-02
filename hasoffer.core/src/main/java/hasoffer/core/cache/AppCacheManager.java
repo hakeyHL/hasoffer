@@ -68,8 +68,8 @@ public class AppCacheManager {
                 categoryBo = new CategoryBo();
                 List<PtmCategory> ptmCategorys = null;
                 ptmCategorys = appService.getChildCategorys(categoryId);
-                List childCategory = null;
                 for (PtmCategory ptmCategory : ptmCategorys) {
+                    List childCategory = new ArrayList();
                     CategoryVo categoryVo = new CategoryVo();
                     categoryVo.setId(ptmCategory.getId());
                     categoryVo.setImage(ImageUtil.getImageUrl(ptmCategory.getImageUrl()));
@@ -80,7 +80,6 @@ public class AppCacheManager {
                     List<PtmCategory> ptmCategorysTemp = appService.getChildCategorys(categoryVo.getId().toString());
                     if (ptmCategorysTemp != null && ptmCategorysTemp.size() > 0) {
                         categoryVo.setHasChildren(1);
-                        childCategory = new ArrayList();
                         for (PtmCategory ptmCates : ptmCategorysTemp) {
                             CategoryVo cate = new CategoryVo();
                             cate.setId(ptmCates.getId());
