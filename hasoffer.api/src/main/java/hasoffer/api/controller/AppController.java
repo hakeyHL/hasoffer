@@ -527,7 +527,7 @@ public class AppController {
                 }
             }
             logger.error("============category==================list=======  " + li.size() + "        =======================");
-        } else {
+        } else if (StringUtils.isNotEmpty(criteria.getKeyword())) {
             //search by title
             //productIndexServiceImpl.simpleSearch(criteria.getKeyword(),1,10);
             PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
@@ -582,7 +582,7 @@ public class AppController {
                         }
                     }
                 }
-                logger.error("==============================list=======  " + li.size() + "        =======================");
+                logger.error("=============case0=================list=======  " + li.size() + "        =======================");
                 map.put("product", li);
                 break;
             case 1:
@@ -600,6 +600,7 @@ public class AppController {
                         li.add(productListVo);
                     }
                 }
+                logger.error("=============case1=================list=======  " + li.size() + "        =======================");
                 map.put("product", li);
                 break;
             case 2:
@@ -619,10 +620,11 @@ public class AppController {
                         li.add(productListVo);
                     }
                 }
+                logger.error("=============case2=================list=======  " + li.size() + "        =======================");
                 map.put("product", li);
                 break;
             default:
-                map.put("product", li);
+                map.put("product", null);
         }
         if (li != null && li.size() > 0) {
             map.put("product", li);
