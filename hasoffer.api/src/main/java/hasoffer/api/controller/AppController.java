@@ -490,7 +490,7 @@ public class AppController {
     @RequestMapping(value = "/productsList", method = RequestMethod.GET)
     public ModelAndView productsList(SearchCriteria criteria, String type) {
         ModelAndView mv = new ModelAndView();
-        int requestType = 2;
+        int requestType = 3;
         if (StringUtils.isNotBlank(type)) {
             requestType = Integer.valueOf(type);
         }
@@ -502,14 +502,6 @@ public class AppController {
         if (StringUtils.isNotBlank(criteria.getCategoryId())) {
             //search by category
             products = productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
-            logger.error("start print criteria info ,category");
-            logger.error("keyword  " + criteria.getKeyword());
-            logger.error("comment " + criteria.getComment());
-            logger.error("categoryid  " + criteria.getCategoryId());
-            logger.error("level  " + criteria.getLevel());
-            logger.error("page   " + criteria.getPage());
-            logger.error("pageSize " + criteria.getPageSize());
-
             //products = productIndexServiceImpl.searchPro(Long.valueOf(2), 2, 1, 10);
             if (products != null && products.getData().size() > 0) {
                 List<ProductModel> productModes = products.getData();
@@ -526,19 +518,10 @@ public class AppController {
                     li.add(productListVo);
                 }
             }
-            logger.error("============category==================list=======  " + li.size() + "        =======================");
         } else if (StringUtils.isNotEmpty(criteria.getKeyword())) {
             //search by title
             //productIndexServiceImpl.simpleSearch(criteria.getKeyword(),1,10);
             PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
-            logger.error("============getKeyword=======" + p.getData().size() + "===========getKeyword=======  " + criteria.getKeyword() + "        =======================");
-            logger.error("start print criteria info ,product");
-            logger.error("keyword  " + criteria.getKeyword());
-            logger.error("comment " + criteria.getComment());
-            logger.error("categoryid  " + criteria.getCategoryId());
-            logger.error("level  " + criteria.getLevel());
-            logger.error("page   " + criteria.getPage());
-            logger.error("pageSize " + criteria.getPageSize());
             if (p != null && p.getData().size() > 0) {
                 List<ProductModel> productModes = p.getData();
                 for (ProductModel productModel : productModes) {
@@ -554,7 +537,6 @@ public class AppController {
                     li.add(productListVo);
                 }
             }
-            logger.error("===========product===================list=======  " + li.size() + "        =======================");
         }
         String data = "";
         //查询热卖商品
@@ -565,7 +547,6 @@ public class AppController {
             case 0:
                 if (products2s != null && products2s.size() > 0) {
                     int i = 0;
-                    logger.error("============0==================list=======  " + li.size() + "        =======================");
                     for (PtmProduct ptmProduct : products2s) {
                         if (i < 5) {
                             ProductListVo productListVo = new ProductListVo();
@@ -582,7 +563,6 @@ public class AppController {
                         }
                     }
                 }
-                logger.error("=============case0=================list=======  " + li.size() + "        =======================");
                 map.put("product", li);
                 break;
             case 1:
@@ -600,7 +580,6 @@ public class AppController {
                         li.add(productListVo);
                     }
                 }
-                logger.error("=============case1=================list=======  " + li.size() + "        =======================");
                 map.put("product", li);
                 break;
             case 2:
@@ -620,7 +599,6 @@ public class AppController {
                         li.add(productListVo);
                     }
                 }
-                logger.error("=============case2=================list=======  " + li.size() + "        =======================");
                 map.put("product", li);
                 break;
             default:
@@ -629,7 +607,6 @@ public class AppController {
         if (li != null && li.size() > 0) {
             map.put("product", li);
         }
-        logger.error("==============result================list=======  " + li.size() + "        =======================");
         mv.addObject("data", map);
         return mv;
     }
