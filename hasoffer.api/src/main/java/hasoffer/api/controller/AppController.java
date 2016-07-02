@@ -521,6 +521,7 @@ public class AppController {
             //search by title
             //productIndexServiceImpl.simpleSearch(criteria.getKeyword(),1,10);
             PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
+            logger.error("============getKeyword==================getKeyword=======  " + criteria.getKeyword() + "        =======================");
             if (p != null && p.getData().size() > 0) {
                 List<ProductModel> productModes = p.getData();
                 for (ProductModel productModel : productModes) {
@@ -609,6 +610,7 @@ public class AppController {
         if (li != null && li.size() > 0) {
             map.put("product", li);
         }
+        logger.error("==============result================list=======  " + li.size() + "        =======================");
         mv.addObject("data", map);
         return mv;
     }
