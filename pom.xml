@@ -25,6 +25,7 @@
         <module>hasoffer.dubbo.api</module>
         <module>hasoffer.dubbo.provider</module>
         <module>hasoffer.dubbo.consumer</module>
+        <module>hasoffer.analysis.api</module>
     </modules>
 
     <properties>

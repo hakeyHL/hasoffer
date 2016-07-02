@@ -164,6 +164,12 @@
         </dependency>
 
         <dependency>
+            <groupId>de.julielab</groupId>
+            <artifactId>aliasi-lingpipe</artifactId>
+            <version>4.1.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-dynamodb</artifactId>
             <version>1.11.6</version>
