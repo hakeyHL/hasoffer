@@ -1,5 +1,7 @@
 package hasoffer.api.controller.vo;
 
+import hasoffer.base.model.Website;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -14,6 +16,15 @@ public class DealVo {
     private  Double extra;
     private  String link;
     private  String logoUrl;
+    private Website website;
+
+    public Website getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(Website website) {
+        this.website = website;
+    }
 
     public String getLogoUrl() {
         return logoUrl;
