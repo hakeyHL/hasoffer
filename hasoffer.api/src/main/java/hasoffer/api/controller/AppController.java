@@ -516,6 +516,7 @@ public class AppController {
                     li.add(productListVo);
                 }
             }
+            logger.error("============category==================list=======  " + li.size() + "        =======================");
         } else {
             //search by title
             //productIndexServiceImpl.simpleSearch(criteria.getKeyword(),1,10);
@@ -535,6 +536,7 @@ public class AppController {
                     li.add(productListVo);
                 }
             }
+            logger.error("===========product===================list=======  " + li.size() + "        =======================");
         }
         String data = "";
         //查询热卖商品
@@ -545,7 +547,7 @@ public class AppController {
             case 0:
                 if (products2s != null && products2s.size() > 0) {
                     int i = 0;
-                    logger.error("==============================list=======  " + li.size() + "        =======================");
+                    logger.error("============0==================list=======  " + li.size() + "        =======================");
                     for (PtmProduct ptmProduct : products2s) {
                         if (i < 5) {
                             ProductListVo productListVo = new ProductListVo();
