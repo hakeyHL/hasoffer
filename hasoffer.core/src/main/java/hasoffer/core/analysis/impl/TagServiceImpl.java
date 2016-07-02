@@ -7,6 +7,7 @@ import hasoffer.core.analysis.LingHelper;
 import hasoffer.core.bo.match.TagType;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.match.TagBrand;
+import hasoffer.core.persistence.po.match.TagMatched;
 import hasoffer.core.persistence.po.match.TagModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,14 +29,21 @@ public class TagServiceImpl implements ITagService {
     private Logger logger = LoggerFactory.getLogger(TagServiceImpl.class);
 
     @Override
+    @Transactional
+    public void saveTagMatched(TagMatched tm) {
+        dbm.create(tm);
+    }
+
+    @Override
     public void loadWordDicts() {
         // todo 从缓存、序列化中查询词库是否存在，如果存在则直接加载
         // 如果不存在，则读取数据库进行创建
         buildWordDicts();
+
+        LingHelper.createDictionaryChunker();
     }
 
-    @Override
-    public void buildWordDicts() {
+    private void buildWordDicts() {
         // 清除词典内容
         logger.info("clear dictionary...");
         LingHelper.clearDict();
@@ -81,7 +89,7 @@ public class TagServiceImpl implements ITagService {
             if (ArrayUtils.hasObjs(tagModels)) {
                 for (TagModel tagModel : tagModels) {
                     // todo 处理别名情况
-                    LingHelper.addToDict(tagModel.getTag(), TagType.BRAND, tagModel.getScore());
+                    LingHelper.addToDict(tagModel.getTag(), TagType.MODEL, tagModel.getScore());
                 }
             }
 

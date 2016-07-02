@@ -5,17 +5,13 @@ import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.analysis.ITagService;
-import hasoffer.core.bo.match.HasTag;
-import hasoffer.core.bo.match.ITag;
-import hasoffer.core.bo.match.SkuValType;
-import hasoffer.core.bo.match.TitleStruct;
+import hasoffer.core.analysis.LingHelper;
+import hasoffer.core.bo.match.*;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
-import hasoffer.core.persistence.po.match.TagBrand;
-import hasoffer.core.persistence.po.match.TagCategory;
-import hasoffer.core.persistence.po.match.TagModel;
-import hasoffer.core.persistence.po.match.TagSkuVal;
+import hasoffer.core.persistence.po.match.*;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.task.ListAndProcessTask2;
 import hasoffer.core.task.worker.IList;
 import hasoffer.core.task.worker.IProcess;
@@ -23,6 +19,8 @@ import jodd.io.FileUtil;
 import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -48,14 +46,79 @@ public class TagTest {
     IMongoDbManager mdm;
     @Resource
     ITagService tagService;
-
     ConcurrentHashMap<String, TagCategory> cateTagMap = new ConcurrentHashMap<String, TagCategory>();
     ConcurrentHashMap<String, TagSkuVal> skuValTagMap = new ConcurrentHashMap<String, TagSkuVal>();
     ConcurrentHashMap<String, TagBrand> brandTagMap = new ConcurrentHashMap<String, TagBrand>();
     ConcurrentHashMap<String, TagModel> modelTagMap = new ConcurrentHashMap<String, TagModel>();
-
     ConcurrentHashSet<String> newBrandSet = new ConcurrentHashSet<String>();
     ConcurrentHashSet<String> newModelSet = new ConcurrentHashSet<String>();
+    private Logger logger = LoggerFactory.getLogger(TagTest.class);
+
+    @Test
+    public void matchSkuTitles() {
+        tagService.loadWordDicts();
+
+        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<PtmProduct>(new IList() {
+            @Override
+            public PageableResult getData(int page) {
+//                return dbm.queryPage("select t from PtmCmpSku t where t.title is not null", page, 2000);
+                return dbm.queryPage("select t from PtmProduct t where t.title is not null", page, 2000);
+            }
+
+            @Override
+            public boolean isRunForever() {
+                return false;
+            }
+
+            @Override
+            public void setRunForever(boolean runForever) {
+
+            }
+        }, new IProcess<PtmProduct>() {
+            @Override
+            public void process(PtmProduct o) {
+                String title = o.getTitle();
+                if (StringUtils.isEmpty(title)) {
+                    return;
+                }
+
+                Map<String, List<String>> tagMap = LingHelper.analysis(title);
+
+                List<String> brands = tagMap.get(TagType.BRAND.name());
+                String brandStr = StringUtils.arrayToString(brands);
+
+                List<String> models = tagMap.get(TagType.MODEL.name());
+                String modelStr = StringUtils.arrayToString(models);
+
+                TagMatched tm = new TagMatched(o.getId(), title, brandStr, modelStr);
+                tagService.saveTagMatched(tm);
+            }
+        });
+
+        listAndProcessTask2.go();
+    }
+
+    @Test
+    public void matchTest() {
+        tagService.loadWordDicts();
+
+        String title = "BQ S 40 Dual Sim 1 GB (Grey)";
+
+        logger.info("start to analysis...");
+        Map<String, List<String>> tagMap = LingHelper.analysis(title);
+
+        List<String> brands = tagMap.get(TagType.BRAND.name());
+        String brandStr = StringUtils.arrayToString(brands);
+
+        List<String> models = tagMap.get(TagType.MODEL.name());
+        String modelStr = StringUtils.arrayToString(models);
+
+        logger.debug(brandStr);
+        logger.debug(modelStr);
+
+
+        logger.info("ok.");
+    }
 
     @Test
     public void getTags() {

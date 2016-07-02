@@ -2,6 +2,7 @@ package hasoffer.core.analysis;
 
 import hasoffer.base.model.PageableResult;
 import hasoffer.core.persistence.po.match.TagBrand;
+import hasoffer.core.persistence.po.match.TagMatched;
 import hasoffer.core.persistence.po.match.TagModel;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public interface ITagService {
 
     List<TagModel> listModelTags(int page, int size);
 
-    void buildWordDicts();
-
     void loadWordDicts();
+
+    void saveTagMatched(TagMatched tm);
 }
