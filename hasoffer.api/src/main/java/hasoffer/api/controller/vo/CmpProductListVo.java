@@ -1,5 +1,6 @@
 package hasoffer.api.controller.vo;
 
+import hasoffer.base.model.Website;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class CmpProductListVo {
     private int returnGuarantee;
     private  String deepLink;
     private  String deepLinkUrl;
+    private Website website;
 
     public CmpProductListVo() {
     }
@@ -32,6 +34,7 @@ public class CmpProductListVo {
         this.image = LogoImage;
         this.ratingNum =Long.valueOf(cmpSku.getRating()==null?"0":cmpSku.getRating());
         this.price = cmpSku.getPrice();
+        this.website = cmpSku.getWebsite();
         this.freight = cmpSku.getShipping();
         this.distributionTime = cmpSku.getDeliveryTime();
         this.backRate = 1.5f;
@@ -63,6 +66,14 @@ public class CmpProductListVo {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public Website getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(Website website) {
+        this.website = website;
     }
 
     public String getDeepLinkUrl() {

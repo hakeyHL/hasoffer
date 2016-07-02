@@ -264,11 +264,6 @@ public class AppController {
                     }
                 }
             }
-        } else {
-            mv.addObject("result", new StringBuilder().append("{\n" +
-                    "    \"errorCode\": \"10010\",\n" +
-                    "    \"msg\": \"login expired \"\n" +
-                    "}"));
         }
         //待定的
         data.setPendingCoins(PendingCoins);
@@ -322,6 +317,7 @@ public class AppController {
             banner.setSource(1);
             banner.setSourceUrl(appBanner.getImageUrl() == null ? "" : ImageUtil.getImageUrl(appBanner.getImageUrl()));
             banner.setExpireDate(appBanner.getDeadline());
+            banner.setDealId(Long.valueOf(appBanner.getSourceId()));
             banners.add(banner);
         }
         Map map = new HashMap();
@@ -356,10 +352,11 @@ public class AppController {
             if (appDeal.getWebsite() == Website.FLIPKART || appDeal.getWebsite() == Website.SHOPCLUES) {
                 dealVo.setExtra(1.5);
             }
-            dealVo.setImage(ImageUtil.getImageUrl(appDeal.getImageUrl()));
+            dealVo.setImage(appDeal.getImageUrl() == null ? "" : ImageUtil.getImageUrl(appDeal.getImageUrl()));
             dealVo.setLink(WebsiteHelper.getUrlWithAff(appDeal.getLinkUrl() == null ? "" : appDeal.getLinkUrl()));
             dealVo.setTitle(appDeal.getTitle());
             dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+            dealVo.setWebsite(appDeal.getWebsite());
             li.add(dealVo);
         }
         map.put("deals", li);
@@ -493,7 +490,7 @@ public class AppController {
     @RequestMapping(value = "/productsList", method = RequestMethod.GET)
     public ModelAndView productsList(SearchCriteria criteria, String type) {
         ModelAndView mv = new ModelAndView();
-        int requestType = 2;
+        int requestType = 3;
         if (StringUtils.isNotBlank(type)) {
             requestType = Integer.valueOf(type);
         }
@@ -502,7 +499,7 @@ public class AppController {
         PageableResult<ProductModel> products;
         //category level page size
         // PageableResult <ProductModel> products=productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()),criteria.getLevel(),criteria.getPage(),criteria.getPageSize());
-        if (!StringUtils.isBlank(criteria.getCategoryId())) {
+        if (StringUtils.isNotBlank(criteria.getCategoryId())) {
             //search by category
             products = productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
             //products = productIndexServiceImpl.searchPro(Long.valueOf(2), 2, 1, 10);
@@ -521,7 +518,7 @@ public class AppController {
                     li.add(productListVo);
                 }
             }
-        } else {
+        } else if (StringUtils.isNotEmpty(criteria.getKeyword())) {
             //search by title
             //productIndexServiceImpl.simpleSearch(criteria.getKeyword(),1,10);
             PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
@@ -605,7 +602,7 @@ public class AppController {
                 map.put("product", li);
                 break;
             default:
-                map.put("product", li);
+                map.put("product", null);
         }
         if (li != null && li.size() > 0) {
             map.put("product", li);
