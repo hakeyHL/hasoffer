@@ -264,11 +264,6 @@ public class AppController {
                     }
                 }
             }
-        } else {
-            mv.addObject("result", new StringBuilder().append("{\n" +
-                    "    \"errorCode\": \"10010\",\n" +
-                    "    \"msg\": \"login expired \"\n" +
-                    "}"));
         }
         //待定的
         data.setPendingCoins(PendingCoins);
@@ -550,6 +545,7 @@ public class AppController {
             case 0:
                 if (products2s != null && products2s.size() > 0) {
                     int i = 0;
+                    logger.error("==============================list=======  " + li.size() + "        =======================");
                     for (PtmProduct ptmProduct : products2s) {
                         if (i < 5) {
                             ProductListVo productListVo = new ProductListVo();
@@ -566,6 +562,7 @@ public class AppController {
                         }
                     }
                 }
+                logger.error("==============================list=======  " + li.size() + "        =======================");
                 map.put("product", li);
                 break;
             case 1:
