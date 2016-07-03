@@ -10,8 +10,10 @@ import hasoffer.core.bo.match.*;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
-import hasoffer.core.persistence.po.match.*;
-import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.match.TagBrand;
+import hasoffer.core.persistence.po.match.TagCategory;
+import hasoffer.core.persistence.po.match.TagModel;
+import hasoffer.core.persistence.po.match.TagSkuVal;
 import hasoffer.core.task.ListAndProcessTask2;
 import hasoffer.core.task.worker.IList;
 import hasoffer.core.task.worker.IProcess;
@@ -54,49 +56,6 @@ public class TagTest {
     ConcurrentHashSet<String> newModelSet = new ConcurrentHashSet<String>();
     private Logger logger = LoggerFactory.getLogger(TagTest.class);
 
-    @Test
-    public void matchSkuTitles() {
-        tagService.loadWordDicts();
-
-        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<PtmProduct>(new IList() {
-            @Override
-            public PageableResult getData(int page) {
-//                return dbm.queryPage("select t from PtmCmpSku t where t.title is not null", page, 2000);
-                return dbm.queryPage("select t from PtmProduct t where t.title is not null", page, 2000);
-            }
-
-            @Override
-            public boolean isRunForever() {
-                return false;
-            }
-
-            @Override
-            public void setRunForever(boolean runForever) {
-
-            }
-        }, new IProcess<PtmProduct>() {
-            @Override
-            public void process(PtmProduct o) {
-                String title = o.getTitle();
-                if (StringUtils.isEmpty(title)) {
-                    return;
-                }
-
-                Map<String, List<String>> tagMap = LingHelper.analysis(title);
-
-                List<String> brands = tagMap.get(TagType.BRAND.name());
-                String brandStr = StringUtils.arrayToString(brands);
-
-                List<String> models = tagMap.get(TagType.MODEL.name());
-                String modelStr = StringUtils.arrayToString(models);
-
-                TagMatched tm = new TagMatched(o.getId(), title, brandStr, modelStr);
-                tagService.saveTagMatched(tm);
-            }
-        });
-
-        listAndProcessTask2.go();
-    }
 
     @Test
     public void matchTest() {

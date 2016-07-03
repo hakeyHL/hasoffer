@@ -1,5 +1,7 @@
 package hasoffer.core.test;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.base.utils.http.MyHttpUtils;
@@ -31,12 +33,14 @@ public class HttpTest {
         String url = "http://60.205.57.68:8888/analysis/t";
 
         Map<String, Object> formMap = new HashMap<String, Object>();
-        formMap.put("title", "");
+        formMap.put("title", "MapmyIndia ICENAV 301 IN-Dash AVN-Universal GPS Navigation Device");
 
         Map<String, String> headerMap = new HashMap<String, String>();
         headerMap.put("Accept", "application/json, text/javascript, */*; q=0.01");
 
         HttpResponseModel responseModel = HttpUtils.post(url, formMap, headerMap);
+
+        JSONObject jsObj = JSON.parseObject(responseModel.getBodyString());
 
         System.out.println(responseModel.getBodyString());
     }
