@@ -112,15 +112,6 @@ public class SearchRecordProcessWorker implements Runnable {
 
     }
 
-    private boolean isReFetch(FetchResult... fetchResultList) {
-        for (FetchResult result : fetchResultList) {
-            if (result != null && (!TaskStatus.FINISH.equals(result.getTaskStatus()) || !TaskStatus.STOPPED.equals(result.getTaskStatus()))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * 1.判断是否需要更新该网站（website）的该商品（keyword）<br>
      * 2.需要的话，则加入更新队列。并返回一个实体。如果不需要，则返回空。
@@ -198,6 +189,15 @@ public class SearchRecordProcessWorker implements Runnable {
         return isUpdate;
     }
 
+    private boolean isReFetch(FetchResult... fetchResultList) {
+        for (FetchResult result : fetchResultList) {
+            if (result != null && !isClose(result)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * 判断是否更新到mongodb。
      *
@@ -207,14 +207,18 @@ public class SearchRecordProcessWorker implements Runnable {
     private boolean isUpdate(FetchResult... fetchResultList) {
         boolean b = false;
         for (FetchResult fetchResult : fetchResultList) {
-            b = b || (fetchResult != null && TaskStatus.FINISH.equals(fetchResult.getTaskStatus()));
+            b = b || isClose(fetchResult);
         }
         return b;
     }
 
+    private boolean isClose(FetchResult result) {
+        return result != null && (TaskStatus.FINISH.equals(result.getTaskStatus()) || TaskStatus.STOPPED.equals(result.getTaskStatus()));
+    }
+
     private void initResultMap(SrmAutoSearchResult autoSearchResult, FetchResult fetchResult) {
         //1 判断抓取有没有返回商品，没有的话直接退出。
-        if (fetchResult == null || !TaskStatus.FINISH.equals(fetchResult.getTaskStatus())) {
+        if (fetchResult == null || isClose(fetchResult)) {
             return;
         }
         Map<Website, WebFetchResult> fetchResultMap = autoSearchResult.getSitePros();
@@ -224,6 +228,7 @@ public class SearchRecordProcessWorker implements Runnable {
             fetchResultMap.put(fetchResult.getWebsite(), webFetchResult);
         }
         webFetchResult.setUpdateDate(new Date());
+        webFetchResult.setTaskStatus(fetchResult.getTaskStatus());
         List<ListProduct> listProducts = webFetchResult.getProductList();
         List<FetchedProduct> listProductsResult = fetchResult.getFetchProducts();
         for (FetchedProduct product : listProductsResult) {

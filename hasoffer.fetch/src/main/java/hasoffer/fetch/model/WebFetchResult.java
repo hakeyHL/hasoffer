@@ -1,5 +1,6 @@
 package hasoffer.fetch.model;
 
+import hasoffer.base.model.TaskStatus;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.util.ArrayList;
@@ -8,9 +9,19 @@ import java.util.List;
 
 public class WebFetchResult {
 
+    private TaskStatus taskStatus;
+
     private Date updateDate;
 
     private List<ListProduct> productList = new ArrayList<ListProduct>();
+
+    public TaskStatus getTaskStatus() {
+        return taskStatus;
+    }
+
+    public void setTaskStatus(TaskStatus taskStatus) {
+        this.taskStatus = taskStatus;
+    }
 
     public Date getUpdateDate() {
         return updateDate;
