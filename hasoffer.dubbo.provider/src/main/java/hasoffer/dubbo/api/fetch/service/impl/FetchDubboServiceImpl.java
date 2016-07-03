@@ -29,10 +29,6 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
             fetchResult.setTaskStatus(TaskStatus.START);
             addFetchTask(fetchResult);
         }
-        if (TaskStatus.STOPPED.equals(fetchResult.getTaskStatus())) {
-            fetchResult.setTaskStatus(TaskStatus.START);
-            addFetchTask(fetchResult);
-        }
         return fetchResult;
     }
 
