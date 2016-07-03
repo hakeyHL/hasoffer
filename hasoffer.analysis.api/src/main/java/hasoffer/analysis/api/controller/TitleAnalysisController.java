@@ -1,6 +1,7 @@
 package hasoffer.analysis.api.controller;
 
 import hasoffer.core.analysis.LingHelper;
+import hasoffer.core.bo.match.TagMatchResult;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,7 +23,9 @@ public class TitleAnalysisController {
 
         String title = request.getParameter("title");
 
-        Map<String, List<String>> tagMap = LingHelper.analysis(title);
+//        Map<String, List<String>> tagMap = LingHelper.analysis(title);
+
+        Map<String, List<TagMatchResult>> tagMap = LingHelper.analysis2(title);
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("tagMap", tagMap);

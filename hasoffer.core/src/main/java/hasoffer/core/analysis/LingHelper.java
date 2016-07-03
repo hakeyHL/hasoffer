@@ -6,6 +6,7 @@ import com.aliasi.dict.DictionaryEntry;
 import com.aliasi.dict.ExactDictionaryChunker;
 import com.aliasi.dict.MapDictionary;
 import com.aliasi.tokenizer.IndoEuropeanTokenizerFactory;
+import hasoffer.core.bo.match.TagMatchResult;
 import hasoffer.core.bo.match.TagType;
 
 import java.util.ArrayList;
@@ -60,6 +61,38 @@ public class LingHelper {
             }
 
             tags.add(phrase);
+        }
+
+        return tagMap;
+    }
+
+    public static Map<String, List<TagMatchResult>> analysis2(String text) {
+        Chunking chunking = dictionaryChunkerFF.chunk(text);
+
+        Map<String, List<TagMatchResult>> tagMap = new LinkedHashMap<String, List<TagMatchResult>>();
+
+        for (Chunk chunk : chunking.chunkSet()) {
+            int start = chunk.start();
+            int end = chunk.end();
+            String type = chunk.type();
+            double score = chunk.score();
+            String phrase = text.substring(start, end);
+//            System.out.println(text +
+//                    "  phrase=|" + phrase + "|"
+//                    + " start=" + start
+//                    + " end=" + end
+//                    + " type=" + type
+//                    + " score=" + score);
+            List<TagMatchResult> tags = tagMap.get(type);
+
+            if (tags == null) {
+                tags = new ArrayList<TagMatchResult>();
+                tagMap.put(type, tags);
+            }
+
+            String tag = phrase.toLowerCase();
+
+            tags.add(new TagMatchResult(phrase, TagMapHelper.get(TagType.valueOf(type), tag)));
         }
 
         return tagMap;

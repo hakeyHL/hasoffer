@@ -28,7 +28,7 @@ public class HttpTest {
 
     @Test
     public void testHttp2() throws Exception {
-        String url = "http://localhost:8080/analysis/t";
+        String url = "http://60.205.57.68:8888/analysis/t";
 
         Map<String, Object> formMap = new HashMap<String, Object>();
         formMap.put("title", "");

@@ -2,8 +2,11 @@ package hasoffer.core.analysis.impl;
 
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.ArrayUtils;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.core.analysis.ITagService;
 import hasoffer.core.analysis.LingHelper;
+import hasoffer.core.analysis.TagMapHelper;
+import hasoffer.core.bo.match.ITag;
 import hasoffer.core.bo.match.TagType;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.match.TagBrand;
@@ -66,8 +69,7 @@ public class TagServiceImpl implements ITagService {
 
             if (ArrayUtils.hasObjs(tagBrands)) {
                 for (TagBrand tagBrand : tagBrands) {
-                    // todo 处理别名情况
-                    LingHelper.addToDict(tagBrand.getTag(), TagType.BRAND, tagBrand.getScore());
+                    addTag(tagBrand, TagType.BRAND);
                 }
             }
 
@@ -88,8 +90,7 @@ public class TagServiceImpl implements ITagService {
 
             if (ArrayUtils.hasObjs(tagModels)) {
                 for (TagModel tagModel : tagModels) {
-                    // todo 处理别名情况
-                    LingHelper.addToDict(tagModel.getTag(), TagType.MODEL, tagModel.getScore());
+                    addTag(tagModel, TagType.MODEL);
                 }
             }
 
@@ -101,6 +102,34 @@ public class TagServiceImpl implements ITagService {
         int dictSize = LingHelper.getDictSize();
         logger.info("dict size = " + dictSize);
     }
+
+    private void addTag(ITag tag, TagType type) {
+        LingHelper.addToDict(tag.getTag(), type, tag.getScore());
+        TagMapHelper.addToMap(type, tag.getTag(), tag);
+
+        String alias = tag.getAlias();
+        if (!StringUtils.isEmpty(alias)) {
+            String[] alis = alias.split(",");
+            for (String ali : alis) {
+                LingHelper.addToDict(ali, type, tag.getScore());
+                TagMapHelper.addToMap(type, ali, tag);
+            }
+        }
+    }
+
+    /*private void addBrand(TagBrand tagBrand) {
+        LingHelper.addToDict(tagBrand.getTag(), TagType.BRAND, tagBrand.getScore());
+        TagMapHelper.addToMap(TagType.BRAND, tagBrand.getTag(), tagBrand);
+
+        String alias = tagBrand.getAlias();
+        if (!StringUtils.isEmpty(alias)) {
+            String[] alis = alias.split(",");
+            for (String ali : alis) {
+                LingHelper.addToDict(ali, TagType.BRAND, tagBrand.getScore());
+                TagMapHelper.addToMap(TagType.BRAND, ali, tagBrand);
+            }
+        }
+    }*/
 
     @Override
     public List<TagBrand> listBrandTags(int page, int size) {

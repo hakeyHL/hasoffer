@@ -6,6 +6,8 @@ package hasoffer.core.bo.match;
  */
 public interface ITag {
 
+    Long getId();
+
     String getTag();
 
     String getAlias();
