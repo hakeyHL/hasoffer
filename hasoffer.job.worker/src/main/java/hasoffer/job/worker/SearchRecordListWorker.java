@@ -35,7 +35,7 @@ public class SearchRecordListWorker implements Runnable {
     }
 
     public void run() {
-        String PATTERN_TIME = "yyyy-MM-dd HH:mm:ss";
+        //String PATTERN_TIME = "yyyy-MM-dd HH:mm:ss";
         Date startTime = new Date(TimeUtils.now() - TimeUtils.MILLISECONDS_OF_1_HOUR);
 
         while (true) {
@@ -43,13 +43,13 @@ public class SearchRecordListWorker implements Runnable {
             //logger.debug("SearchRecordListWorker START {}.Queue size {}", TimeUtils.parse(startTime, PATTERN_TIME), searchLogQueue.size());
 
             try {
-                if (searchLogQueue.size() > 1000) {
+                if (searchLogQueue.size() > 5000) {
                     TimeUnit.MINUTES.sleep(1);
                     logger.debug("SearchRecordListWorker go to sleep!");
                     continue;
                 }
                 if (startTime.compareTo(TimeUtils.nowDate()) >= 0) {
-                    TimeUnit.MINUTES.sleep(1);
+                    TimeUnit.MINUTES.sleep(10);
                 }
                 Date searchTime = startTime;
                 PageableResult<SrmSearchLog> pagedSearchLog = dbm.queryPage(SQL_SEARCHLOG, 1, 1000, Collections.singletonList(searchTime));
