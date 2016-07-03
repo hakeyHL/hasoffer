@@ -3,7 +3,7 @@ package hasoffer.job.service.impl;
 import hasoffer.base.thread.HasofferThreadFactory;
 import hasoffer.base.utils.DaemonThreadFactory;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.po.search.SrmSearchLog;
+import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.SearchProductService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
@@ -23,26 +23,23 @@ import java.util.concurrent.TimeUnit;
 @Service("webSiteFetchService")
 public class WebSiteFetchServiceImpl implements IWebSiteFetchService {
 
-    private Logger logger = LoggerFactory.getLogger(WebSiteFetchServiceImpl.class);
-
     @Resource
     ISearchService searchService;
-
     @Resource
     IDataBaseManager dbm;
-
     @Resource
     SearchProductService searchProductService;
-
     @Resource
     IFetchDubboService fetchDubboService;
+    private Logger logger = LoggerFactory.getLogger(WebSiteFetchServiceImpl.class);
 
     @Override
     public void fetchProduct2Mongodb() {
         ExecutorService es = Executors.newCachedThreadPool();
 
-        LinkedBlockingQueue<SrmSearchLog> searchLogQueue = new LinkedBlockingQueue<SrmSearchLog>();
-        es.execute(DaemonThreadFactory.create(new SearchRecordListWorker(searchService, dbm, searchLogQueue)));
+        LinkedBlockingQueue<SrmAutoSearchResult> searchLogQueue = new LinkedBlockingQueue<SrmAutoSearchResult>();
+
+        es.execute(DaemonThreadFactory.create(new SearchRecordListWorker(searchProductService, dbm, searchLogQueue)));
 
         String threadName = "SearchRecordProcessWorker-Thread";
         HasofferThreadFactory factory = new HasofferThreadFactory(threadName);

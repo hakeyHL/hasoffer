@@ -4,12 +4,14 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.product.SearchedSku;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
-import hasoffer.fetch.model.ListProduct;
+import hasoffer.fetch.model.WebFetchResult;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +20,7 @@ import java.util.Map;
  * Function :
  */
 @Document(collection = "SrmAutoSearchResult")
-public class SrmAutoSearchResult {
+public class SrmAutoSearchResult implements Serializable {
 
     @Id
     private String id;
@@ -31,7 +33,7 @@ public class SrmAutoSearchResult {
     private String title;
     private float price;
 
-    private Map<Website, List<ListProduct>> sitePros;
+    private Map<Website, WebFetchResult> sitePros = new HashMap<Website, WebFetchResult>();
     private Map<Website, List<SearchedSku>> finalSkus;
 
     private long lRelateTime = 0;
@@ -112,18 +114,21 @@ public class SrmAutoSearchResult {
     }
 
     public long getlUpdateTime() {
-        return lUpdateTime;
+        if (updateTime == null) {
+            updateTime = new Date();
+        }
+        return updateTime.getTime();
     }
 
-    public void setlUpdateTime(long lUpdateTime) {
-        this.lUpdateTime = lUpdateTime;
-    }
+    //public void setlUpdateTime(long lUpdateTime) {
+    //    this.lUpdateTime = lUpdateTime;
+    //}
 
-    public Map<Website, List<ListProduct>> getSitePros() {
+    public Map<Website, WebFetchResult> getSitePros() {
         return sitePros;
     }
 
-    public void setSitePros(Map<Website, List<ListProduct>> sitePros) {
+    public void setSitePros(Map<Website, WebFetchResult> sitePros) {
         this.sitePros = sitePros;
     }
 
@@ -133,6 +138,25 @@ public class SrmAutoSearchResult {
 
     public void setFinalSkus(Map<Website, List<SearchedSku>> finalSkus) {
         this.finalSkus = finalSkus;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SrmAutoSearchResult that = (SrmAutoSearchResult) o;
+
+        if (fromWebsite != null ? !fromWebsite.equals(that.fromWebsite) : that.fromWebsite != null) return false;
+        return !(title != null ? !title.equals(that.title) : that.title != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = fromWebsite != null ? fromWebsite.hashCode() : 0;
+        result = 31 * result + (title != null ? title.hashCode() : 0);
+        return result;
     }
 
     @Override

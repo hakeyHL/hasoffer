@@ -70,7 +70,7 @@ public class FetchKeywordWorker implements Runnable {
             fetchResult.setFetchProducts(productList);
             fetchResult.setTaskStatus(TaskStatus.FINISH);
         } catch (HttpFetchException e) {
-            if (fetchResult.getRunCount() < 5) {
+            if (fetchResult.getRunCount() < 10) {
                 fetchResult.setRunCount(fetchResult.getRunCount() + 1);
                 fetchCacheService.saveKeyword(StringConstant.WAIT_KEY_LIST, JSONUtil.toJSON(fetchResult));
             } else {

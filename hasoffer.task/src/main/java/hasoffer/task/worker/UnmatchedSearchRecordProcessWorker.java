@@ -46,7 +46,7 @@ public class UnmatchedSearchRecordProcessWorker implements Runnable {
                 SrmAutoSearchResult autoSearchResult = new SrmAutoSearchResult(searchLog);
 
                 // fetch
-                searchProductService.searchProductsFromSites(autoSearchResult);
+                searchProductService.saveSearchProducts(autoSearchResult);
 
                 /*// clean
                 searchProductService.analysisProducts(autoSearchResult);

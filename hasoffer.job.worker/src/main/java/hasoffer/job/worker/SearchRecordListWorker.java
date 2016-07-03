@@ -5,8 +5,9 @@ import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.enums.SearchPrecise;
+import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
-import hasoffer.core.search.ISearchService;
+import hasoffer.core.search.SearchProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,15 +23,15 @@ import java.util.concurrent.TimeUnit;
  */
 public class SearchRecordListWorker implements Runnable {
     private static final String SQL_SEARCHLOG = "select t from SrmSearchLog t where t.updateTime >?0 order by t.updateTime ASC ";
-    LinkedBlockingQueue<SrmSearchLog> searchLogQueue;
-    ISearchService searchService;
-    IDataBaseManager dbm;
+    private LinkedBlockingQueue<SrmAutoSearchResult> searchLogQueue;
+    private SearchProductService searchProductService;
+    private IDataBaseManager dbm;
     private Logger logger = LoggerFactory.getLogger(SearchRecordListWorker.class);
 
-    public SearchRecordListWorker(ISearchService searchService, IDataBaseManager dbm, LinkedBlockingQueue<SrmSearchLog> searchLogQueue) {
+    public SearchRecordListWorker(SearchProductService searchProductService, IDataBaseManager dbm, LinkedBlockingQueue<SrmAutoSearchResult> searchLogQueue) {
         this.dbm = dbm;
-        this.searchService = searchService;
         this.searchLogQueue = searchLogQueue;
+        this.searchProductService = searchProductService;
     }
 
     public void run() {
@@ -39,16 +40,16 @@ public class SearchRecordListWorker implements Runnable {
 
         while (true) {
 
-            logger.debug("SearchRecordListWorker START {}.Queue size {}", TimeUtils.parse(startTime, PATTERN_TIME), searchLogQueue.size());
+            //logger.debug("SearchRecordListWorker START {}.Queue size {}", TimeUtils.parse(startTime, PATTERN_TIME), searchLogQueue.size());
 
             try {
                 if (searchLogQueue.size() > 1000) {
-                    TimeUnit.MINUTES.sleep(2);
+                    TimeUnit.MINUTES.sleep(1);
                     logger.debug("SearchRecordListWorker go to sleep!");
                     continue;
                 }
-                if (startTime.compareTo(TimeUtils.nowDate()) > 0) {
-                    TimeUnit.MINUTES.sleep(10);
+                if (startTime.compareTo(TimeUtils.nowDate()) >= 0) {
+                    TimeUnit.MINUTES.sleep(1);
                 }
                 Date searchTime = startTime;
                 PageableResult<SrmSearchLog> pagedSearchLog = dbm.queryPage(SQL_SEARCHLOG, 1, 1000, Collections.singletonList(searchTime));
@@ -65,8 +66,7 @@ public class SearchRecordListWorker implements Runnable {
                             searchLog.setPtmProductId(0);
                         }
 
-                        searchLogQueue.add(searchLog);
-
+                        searchLogQueue.add(getHistoryData(searchLog));
                         startTime = searchLog.getUpdateTime();
                     }
                 }
@@ -81,4 +81,13 @@ public class SearchRecordListWorker implements Runnable {
 
         }
     }
+
+    private SrmAutoSearchResult getHistoryData(SrmSearchLog searchLog) {
+        SrmAutoSearchResult autoSearchResult = searchProductService.getSearchResult(searchLog);
+        if (autoSearchResult == null) {
+            autoSearchResult = new SrmAutoSearchResult(searchLog);
+        }
+        return autoSearchResult;
+    }
+
 }

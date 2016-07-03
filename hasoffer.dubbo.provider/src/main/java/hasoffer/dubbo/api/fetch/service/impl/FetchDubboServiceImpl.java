@@ -29,6 +29,10 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
             fetchResult.setTaskStatus(TaskStatus.START);
             addFetchTask(fetchResult);
         }
+        if (TaskStatus.STOPPED.equals(fetchResult.getTaskStatus())) {
+            fetchResult.setTaskStatus(TaskStatus.START);
+            addFetchTask(fetchResult);
+        }
         return fetchResult;
     }
 
@@ -48,7 +52,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
 
     private void addFetchTask(FetchResult fetchResult) {
         String key = FetchResult.getCacheKey(fetchResult);
-        fetchCacheService.saveKeyword(StringConstant.WAIT_KEY_LIST,JSONUtil.toJSON(fetchResult));
+        fetchCacheService.saveKeyword(StringConstant.WAIT_KEY_LIST, JSONUtil.toJSON(fetchResult));
         fetchCacheService.cacheResult(key, fetchResult);
     }
 
@@ -60,7 +64,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
 
     private void addFetchUrlTask(FetchUrlResult fetchUrlResult) {
         String key = FetchUrlResult.getCacheKey(fetchUrlResult);
-        if(key == null){
+        if (key == null) {
             return;
         }
 
@@ -70,10 +74,9 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     }
 
     private FetchUrlResult getFetchUrlResult(Website webSite, String url) {
-        String fetchResultKey = FetchUrlResult.getCacheKey(webSite,url);
+        String fetchResultKey = FetchUrlResult.getCacheKey(webSite, url);
         return fetchCacheService.getProductByUrl(fetchResultKey);
     }
-
 
 
 }

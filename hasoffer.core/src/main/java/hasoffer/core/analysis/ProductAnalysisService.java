@@ -8,6 +8,7 @@ import hasoffer.core.bo.product.SearchedSku;
 import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.fetch.model.ListProduct;
+import hasoffer.fetch.model.WebFetchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +55,7 @@ public class ProductAnalysisService {
             }
         };
 
-        Map<Website, List<ListProduct>> listProductMap = searchResult.getSitePros();
+        Map<Website, WebFetchResult> listProductMap = searchResult.getSitePros();
 
         String keyword = searchResult.getTitle();
         Website logSite = Website.valueOf(searchResult.getFromWebsite());
@@ -94,7 +95,8 @@ public class ProductAnalysisService {
                 stdPrice = (maxPrice + minPrice) / 2;
             }
         } else {
-            List<ListProduct> logPros = listProductMap.get(logSite);
+            WebFetchResult webFetchResult = listProductMap.get(logSite);
+            List<ListProduct> logPros = webFetchResult.getProductList();
             if (ArrayUtils.hasObjs(logPros)) {
                 for (ListProduct lp : logPros) {
                     float titleScore = stringMatch(lp.getTitle(), keyword);
@@ -106,9 +108,9 @@ public class ProductAnalysisService {
             }
         }
 
-        for (Map.Entry<Website, List<ListProduct>> kv : listProductMap.entrySet()) {
+        for (Map.Entry<Website, WebFetchResult> kv : listProductMap.entrySet()) {
             Website website = kv.getKey();
-            List<ListProduct> products = kv.getValue();
+            List<ListProduct> products = kv.getValue().getProductList();
             List<SearchedSku> searchedSkus = new ArrayList<SearchedSku>();
 
             for (ListProduct lp : products) {
