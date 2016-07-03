@@ -52,7 +52,7 @@ public class SearchRecordProcessWorker implements Runnable {
                     if (logger.isDebugEnabled()) {
                         logger.debug("SearchRecordProcessWorker. search-log-queue is null. go to sleep!");
                     }
-                    TimeUnit.SECONDS.sleep(30);
+                    TimeUnit.MILLISECONDS.sleep(1);
                     continue;
                 }
                 //if (logger.isDebugEnabled()) {
@@ -60,17 +60,17 @@ public class SearchRecordProcessWorker implements Runnable {
                 //}
 
                 // 获取mongo 中存储的数据并转换成java对象。
-                boolean isUpdate = false;
+                boolean isFetch = false;
                 String serRegion = AppConfig.get(AppConfig.SER_REGION);
                 if (HasofferRegion.INDIA.toString().equals(serRegion)) {
-                    isUpdate = fetchForIndia(autoSearchResult);
+                    isFetch = fetchForIndia(autoSearchResult);
                 } else if (HasofferRegion.USA.toString().equals(serRegion)) {
-                    isUpdate = fetchForUsa(autoSearchResult);
+                    isFetch = fetchForUsa(autoSearchResult);
                 }
 
-                if (isUpdate) {
-                    autoSearchResult.setUpdateTime(new Date());
-                    searchProductService.saveSearchProducts(autoSearchResult);
+                //是否需要重新抓取
+                if (isFetch) {
+                    searchLogQueue.add(autoSearchResult);
                 }
 
             } catch (Exception e) {
@@ -104,11 +104,11 @@ public class SearchRecordProcessWorker implements Runnable {
         initResultMap(autoSearchResult, bestbuyFetchResult);
 
         //判断是否需要重新抓取，如果需要，这放回队列中。
-        if (isReFetch(amazonFetchResult, ebayFetchResult, walmartFetchResult, geekFetchResult, newEggFetchResult, bestbuyFetchResult)) {
-            searchLogQueue.add(autoSearchResult);
+        if (isUpdate(amazonFetchResult, ebayFetchResult, walmartFetchResult, geekFetchResult, newEggFetchResult, bestbuyFetchResult)) {
+            updateMongo(autoSearchResult);
         }
 
-        return isUpdate(amazonFetchResult, ebayFetchResult, walmartFetchResult, geekFetchResult, newEggFetchResult, bestbuyFetchResult);
+        return isReFetch(amazonFetchResult, ebayFetchResult, walmartFetchResult, geekFetchResult, newEggFetchResult, bestbuyFetchResult);
 
     }
 
@@ -140,7 +140,6 @@ public class SearchRecordProcessWorker implements Runnable {
     }
 
     private boolean fetchForIndia(SrmAutoSearchResult autoSearchResult) {
-
         String keyword = StringUtils.getCleanWordString(autoSearchResult.getTitle());
         Map<Website, WebFetchResult> sitePros = autoSearchResult.getSitePros();
         FetchResult flipkartFetchResult = getFetchResult(Website.FLIPKART, keyword, sitePros);
@@ -166,12 +165,10 @@ public class SearchRecordProcessWorker implements Runnable {
         initResultMap(autoSearchResult, homeShopResult);
         initResultMap(autoSearchResult, limeRoadResult);
 
-        if (isReFetch(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, myntraFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult)) {
-            searchLogQueue.add(autoSearchResult);
-        }
-
         Boolean isUpdate = isUpdate(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, myntraFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
-
+        if (isUpdate) {
+            updateMongo(autoSearchResult);
+        }
         if (isUpdate && logger.isDebugEnabled()) {
             logger.debug("SearchRecordProcessWorker.flipkartFetchResult  result()--keyword is {} : size() = {}", keyword, flipkartFetchResult == null ? "" : flipkartFetchResult.getFetchProducts().size());
             logger.debug("SearchRecordProcessWorker.amazonFetchResult    result()--keyword is {} : size() = {}", keyword, amazonFetchResult == null ? "" : amazonFetchResult.getFetchProducts().size());
@@ -186,7 +183,7 @@ public class SearchRecordProcessWorker implements Runnable {
             logger.debug("SearchRecordProcessWorker.limeRoadResult       result()--keyword is {} : size() = {}", keyword, limeRoadResult == null ? "" : limeRoadResult.getFetchProducts().size());
         }
 
-        return isUpdate;
+        return isReFetch(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, myntraFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
     }
 
     private boolean isReFetch(FetchResult... fetchResultList) {
@@ -212,13 +209,18 @@ public class SearchRecordProcessWorker implements Runnable {
         return b;
     }
 
+    private void updateMongo(SrmAutoSearchResult autoSearchResult) {
+        autoSearchResult.setUpdateTime(new Date());
+        searchProductService.saveSearchProducts(autoSearchResult);
+    }
+
     private boolean isClose(FetchResult result) {
         return result != null && (TaskStatus.FINISH.equals(result.getTaskStatus()) || TaskStatus.STOPPED.equals(result.getTaskStatus()));
     }
 
     private void initResultMap(SrmAutoSearchResult autoSearchResult, FetchResult fetchResult) {
         //1 判断抓取有没有返回商品，没有的话直接退出。
-        if (fetchResult == null || isClose(fetchResult)) {
+        if (fetchResult == null || !isClose(fetchResult)) {
             return;
         }
         Map<Website, WebFetchResult> fetchResultMap = autoSearchResult.getSitePros();
