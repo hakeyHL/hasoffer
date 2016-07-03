@@ -116,7 +116,6 @@ public class TagTest {
         logger.debug(brandStr);
         logger.debug(modelStr);
 
-
         logger.info("ok.");
     }
 

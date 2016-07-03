@@ -1,4 +1,4 @@
-package hasoffer.analysis.listener;
+package hasoffer.analysis.api.listener;
 
 import hasoffer.core.analysis.ITagService;
 import hasoffer.core.analysis.impl.TagServiceImpl;
