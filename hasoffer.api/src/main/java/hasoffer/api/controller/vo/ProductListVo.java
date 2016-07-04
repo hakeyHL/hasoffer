@@ -9,7 +9,7 @@ public class ProductListVo {
     private  String name;
     private double price;
     private  int storesNum;
-    private int commentNum;
+    private Long commentNum;
     private  String  imageUrl;
     private  float ratingNum;
 
@@ -61,11 +61,11 @@ public class ProductListVo {
         this.storesNum = storesNum;
     }
 
-    public int getCommentNum() {
+    public Long getCommentNum() {
         return commentNum;
     }
 
-    public void setCommentNum(int commentNum) {
+    public void setCommentNum(Long commentNum) {
         this.commentNum = commentNum;
     }
 }
