@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class CmpSkuDubboUpdateWorker implements Runnable {
 
-    private static final String Q_PTMCMPSKU_BYPRODUCTID = "SELECT t FROM PtmCmpSku t WHERE t.productid = ?0 ";
+    private static final String Q_PTMCMPSKU_BYPRODUCTID = "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ";
     private static Logger logger = LoggerFactory.getLogger(CmpSkuDubboUpdateWorker.class);
     private IDataBaseManager dbm;
     private ConcurrentLinkedQueue<SrmSearchLog> queue;
@@ -63,6 +63,10 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 //                }
 
             long productId = searchLog.getPtmProductId();
+            if (productId == 0) {
+                continue;
+            }
+
             List<PtmCmpSku> skuList = dbm.query(Q_PTMCMPSKU_BYPRODUCTID, Arrays.asList(productId));
 
             for (PtmCmpSku sku : skuList) {
