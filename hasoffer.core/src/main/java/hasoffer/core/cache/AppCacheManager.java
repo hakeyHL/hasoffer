@@ -51,14 +51,16 @@ public class AppCacheManager {
                     categoryVo.setParentId(ptmCategory.getParentId());
                     categoryVo.setRank(ptmCategory.getRank());
                     List<PtmCategory> ptmCategorysTemp = appService.getChildCategorys(categoryVo.getId().toString());
-                    if (ptmCategorysTemp == null && ptmCategorysTemp.size() > 0) {
+                    if (ptmCategorysTemp == null && ptmCategorysTemp.size() < 1) {
                         categoryVo.setHasChildren(0);
                     }
                     categorys.add(categoryVo);
                 }
             }
             categoryBo.setCategorys(categorys);
-            cacheService.add(key, categoryBo, CACHE_EXPIRE_TIME);
+            if (categoryBo.getCategorys().size() > 0) {
+                cacheService.add(key, categoryBo, CACHE_EXPIRE_TIME);
+            }
         } else {
             key = CACHE_KEY_PRE + categoryId;
             CategoryBo categoryBo = cacheService.get(CategoryBo.class, key, 0);
@@ -68,24 +70,27 @@ public class AppCacheManager {
                 categoryBo = new CategoryBo();
                 List<PtmCategory> ptmCategorys = null;
                 ptmCategorys = appService.getChildCategorys(categoryId);
-                List childCategory = null;
                 for (PtmCategory ptmCategory : ptmCategorys) {
+                    List childCategory = new ArrayList();
                     CategoryVo categoryVo = new CategoryVo();
                     categoryVo.setId(ptmCategory.getId());
-                    categoryVo.setImage(ImageUtil.getImageUrl(ptmCategory.getImageUrl()));
+                    categoryVo.setImage(ptmCategory.getImageUrl() == null ? "" : ImageUtil.getImageUrl(ptmCategory.getImageUrl()));
                     categoryVo.setLevel(ptmCategory.getLevel());
                     categoryVo.setName(ptmCategory.getName());
                     categoryVo.setParentId(ptmCategory.getParentId());
                     categoryVo.setRank(ptmCategory.getRank());
-                    List<PtmCategory> ptmCategorysTemp = appService.getChildCategorys(categoryVo.getId().toString());
+                    categoryVo.setHasChildren(1);
+                    List<PtmCategory> ptmCategorysTemp = appService.getChildCategorys(ptmCategory.getId().toString());
                     if (ptmCategorysTemp != null && ptmCategorysTemp.size() > 0) {
-                        categoryVo.setHasChildren(1);
-                        childCategory = new ArrayList();
                         for (PtmCategory ptmCates : ptmCategorysTemp) {
                             CategoryVo cate = new CategoryVo();
                             cate.setId(ptmCates.getId());
                             cate.setHasChildren(0);
-                            cate.setImage(ImageUtil.getImageUrl(ptmCates.getImageUrl()));
+//                            List li=appService.getChildCategorys(ptmCates.getId().toString());
+//                            if(li!=null&&li.size()>0){
+//                                cate.setHasChildren(1);
+//                            }
+                            cate.setImage(ptmCates.getImageUrl() == null ? "" : ImageUtil.getImageUrl(ptmCates.getImageUrl()));
                             cate.setLevel(ptmCates.getLevel());
                             cate.setName(ptmCates.getName());
                             cate.setParentId(ptmCates.getParentId());
@@ -99,7 +104,9 @@ public class AppCacheManager {
                     categorys.add(categoryVo);
                 }
                 categoryBo.setCategorys(categorys);
-                cacheService.add(key, categoryBo, CACHE_EXPIRE_TIME);
+                if (categoryBo.getCategorys().size() > 0) {
+                    cacheService.add(key, categoryBo, CACHE_EXPIRE_TIME);
+                }
             }
         }
         return categorys;

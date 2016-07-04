@@ -13,7 +13,7 @@ import java.util.Date;
 public class UrmUser implements Identifiable<Long> {
     @Id
     @Column(unique = true, nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String thirdId;
     private String userToken;

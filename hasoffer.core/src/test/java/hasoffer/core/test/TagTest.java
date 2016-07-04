@@ -1,26 +1,40 @@
 package hasoffer.core.test;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.StringUtils;
-import hasoffer.core.bo.match.HasTag;
-import hasoffer.core.bo.match.ITag;
+import hasoffer.core.analysis.ITagService;
+import hasoffer.core.analysis.LingHelper;
 import hasoffer.core.bo.match.SkuValType;
+import hasoffer.core.bo.match.TagType;
 import hasoffer.core.bo.match.TitleStruct;
+import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.match.TagBrand;
 import hasoffer.core.persistence.po.match.TagCategory;
+import hasoffer.core.persistence.po.match.TagModel;
 import hasoffer.core.persistence.po.match.TagSkuVal;
+import hasoffer.core.task.ListAndProcessTask2;
+import hasoffer.core.task.worker.IList;
+import hasoffer.core.task.worker.IProcess;
 import jodd.io.FileUtil;
+import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Date : 2016/6/15
@@ -32,32 +46,189 @@ public class TagTest {
 
     @Resource
     IDataBaseManager dbm;
+    @Resource
+    IMongoDbManager mdm;
+    @Resource
+    ITagService tagService;
+    ConcurrentHashMap<String, TagCategory> cateTagMap = new ConcurrentHashMap<String, TagCategory>();
+    ConcurrentHashMap<String, TagSkuVal> skuValTagMap = new ConcurrentHashMap<String, TagSkuVal>();
+    ConcurrentHashMap<String, TagBrand> brandTagMap = new ConcurrentHashMap<String, TagBrand>();
+    ConcurrentHashMap<String, TagModel> modelTagMap = new ConcurrentHashMap<String, TagModel>();
+    ConcurrentHashSet<String> newBrandSet = new ConcurrentHashSet<String>();
+    ConcurrentHashSet<String> newModelSet = new ConcurrentHashSet<String>();
+    private Logger logger = LoggerFactory.getLogger(TagTest.class);
+
 
     @Test
-    public void test() {
+    public void matchTest() {
+        tagService.loadWordDicts();
+
+        String title = "BQ S 40 Dual Sim 1 GB (Grey)";
+
+        logger.info("start to analysis...");
+        Map<String, List<String>> tagMap = LingHelper.analysis(title);
+
+        List<String> brands = tagMap.get(TagType.BRAND.name());
+        String brandStr = StringUtils.arrayToString(brands);
+
+        List<String> models = tagMap.get(TagType.MODEL.name());
+        String modelStr = StringUtils.arrayToString(models);
+
+        logger.debug(brandStr);
+        logger.debug(modelStr);
+
+        logger.info("ok.");
+    }
+
+    @Test
+    public void getTags() {
+        fillMaps();
+
+        ListAndProcessTask2<PtmCmpSkuDescription> listAndProcessTask2 = new ListAndProcessTask2<PtmCmpSkuDescription>(
+                new IList<PtmCmpSkuDescription>() {
+                    @Override
+                    public PageableResult<PtmCmpSkuDescription> getData(int page) {
+                        return mdm.queryPage(PtmCmpSkuDescription.class, new Query(), page, 100);
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcess<PtmCmpSkuDescription>() {
+                    @Override
+                    public void process(PtmCmpSkuDescription o) {
+//                        getBrandSet(o);
+                        getModelSet(o);
+                    }
+                }
+        );
+
+        listAndProcessTask2.go();
+
+//        saveBrands();
+        saveModels();
+
+        System.out.println("saved brands ok!");
+    }
+
+    private void saveModels() {
+        System.out.println(String.format("find %d models", newModelSet.size()));
+
+        for (String model : newModelSet) {
+            if (modelTagMap.containsKey(model)) {
+                System.out.println(model + "\t exists...");
+            } else {
+                try {
+                    TagModel tagModel = tagService.createTagModel(model);
+                    modelTagMap.put(model, tagModel);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage() + "_error_!!!");
+                }
+            }
+        }
+    }
+
+    private void getModelSet(PtmCmpSkuDescription o) {
+        JSONObject json = JSON.parseObject(o.getJsonDescription());
+        for (Map.Entry<String, Object> kv : json.entrySet()) {
+            String name = kv.getKey().trim();
+            String value = kv.getValue().toString().trim();
+
+            if (StringUtils.isEmpty(name) || StringUtils.isEmpty(value)) {
+                continue;
+            }
+
+            name = name.toLowerCase();
+            value = value.toLowerCase();
+
+            if (name.contains("model")) {
+                newModelSet.add(value);
+                return;
+            }
+        }
+    }
+
+    private void saveBrands() {
+
+        System.out.println(String.format("find %d brands", newBrandSet.size()));
+
+        for (String brand : newBrandSet) {
+            if (brandTagMap.containsKey(brand)) {
+                System.out.println(brand + "\t exists...");
+            } else {
+                try {
+                    TagBrand tagBrand = tagService.createTagBrand(brand);
+                    brandTagMap.put(brand, tagBrand);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage() + "_error_!!!");
+                }
+            }
+        }
+
+    }
+
+    private void getBrandSet(PtmCmpSkuDescription cmpSkuDescription) {
+        JSONObject json = JSON.parseObject(cmpSkuDescription.getJsonDescription());
+        for (Map.Entry<String, Object> kv : json.entrySet()) {
+            String name = kv.getKey().trim();
+            String value = kv.getValue().toString().trim();
+
+            if (StringUtils.isEmpty(name) || StringUtils.isEmpty(value)) {
+                continue;
+            }
+
+            name = name.toLowerCase();
+            value = value.toLowerCase();
+
+            if (name.contains("brand")) {
+                newBrandSet.add(value);
+                return;
+            }
+        }
+    }
+
+    private void getAttrs(PtmCmpSkuDescription cmpSkuDescription) {
+        JSONObject json = JSON.parseObject(cmpSkuDescription.getJsonDescription());
+        for (Map.Entry<String, Object> kv : json.entrySet()) {
+            String name = kv.getKey().trim();
+            String value = kv.getValue().toString().trim();
+
+            if (StringUtils.isEmpty(name) || StringUtils.isEmpty(value)) {
+                continue;
+            }
+
+            name = name.toLowerCase();
+            value = value.toLowerCase();
+
+            if (name.contains("brand") || name.contains("model")) {
+                if (brandTagMap.containsKey(value)) {
+                    System.out.println(String.format("brand[%s] exists...............................", value));
+                } else {
+                    TagBrand tagBrand = tagService.createTagBrand(value);
+                    brandTagMap.put(value, tagBrand);
+                }
+            }
+        }
+    }
+
+    @Test
+    public void fillMaps() {
         List<TagCategory> tagCategories = dbm.query("select t from TagCategory t");
         List<TagSkuVal> tagSkuVals = dbm.query("select t from TagSkuVal t");
         List<TagBrand> tagBrands = dbm.query("select t from TagBrand t");
-
-        Map<String, TagCategory> cateTagMap = new HashMap<String, TagCategory>();
-        Map<String, TagSkuVal> skuValTagMap = new HashMap<String, TagSkuVal>();
-        Map<String, TagBrand> brandTagMap = new HashMap<String, TagBrand>();
+        List<TagBrand> tagModels = dbm.query("select t from TagModel t");
 
         fill(cateTagMap, tagCategories);
         fill(skuValTagMap, tagSkuVals);
         fill(brandTagMap, tagBrands);
-
-        System.out.println(tagCategories.size() + "\t" + cateTagMap.size());
-        System.out.println(tagSkuVals.size() + "\t" + skuValTagMap.size());
-        System.out.println(tagBrands.size() + "\t" + brandTagMap.size());
-
-        String title = "BQ S40- Black & Grey 5 Inch HD IPS Screen, 1.3 Ghz Quad Core, Android Kitkat, 1GB RAM, 3G Mobile Phone";
-
-        TitleStruct ts = new TitleStruct(title);
-
-        getStructInfo(ts, cateTagMap, skuValTagMap, brandTagMap);
-
-        System.out.println(ts.getTitle());
+        fill(modelTagMap, tagModels);
     }
 
     private void getStructInfo(TitleStruct ts,
@@ -94,7 +265,7 @@ public class TagTest {
 
         for (Object o : tags) {
 
-            ITag iTag = (ITag) o;
+            HasTag iTag = (HasTag) o;
 
             tagMap.put(iTag.getTag(), o);
 

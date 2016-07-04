@@ -10,7 +10,7 @@ import javax.persistence.*;
  * Function :
  */
 @Entity
-public class TagCategory extends HasTag implements Identifiable<Long> {
+public class TagModel extends HasTag implements Identifiable<Long> {
 
     @Id
     @Column(unique = true, nullable = false)
@@ -24,10 +24,10 @@ public class TagCategory extends HasTag implements Identifiable<Long> {
 
     private int score; // 打分
 
-    public TagCategory() {
+    public TagModel() {
     }
 
-    public TagCategory(String tag, String alias, int score) {
+    public TagModel(String tag, String alias, int score) {
         this.tag = tag;
         this.alias = alias;
         this.score = score;
@@ -69,11 +69,10 @@ public class TagCategory extends HasTag implements Identifiable<Long> {
 
     @Override
     public boolean equals(Object o) {
-
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        TagCategory that = (TagCategory) o;
+        TagModel that = (TagModel) o;
 
         if (score != that.score) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;

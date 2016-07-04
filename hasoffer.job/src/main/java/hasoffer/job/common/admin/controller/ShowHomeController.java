@@ -19,11 +19,9 @@ import java.util.Map;
 @RequestMapping("/layout")
 public class ShowHomeController {
 
+    private static final String GROUP = "DEFAULT";
     @Autowired
     private SchedulerServiceImpl schedulerService;
-
-    private static final String GROUP = "DEFAULT";
-
 
     @RequestMapping("/showHome")
     public ModelAndView showHome() {
@@ -51,6 +49,15 @@ public class ShowHomeController {
         return "redirect:/layout/showHome";
     }
 
+    //@RequestMapping("/shutDownNow")
+    //public String breakTrigger(@RequestParam(defaultValue = "") String triggerName) {
+    //    if(triggerName.contains("fetchTrigger")){
+    //        webSiteFetchService.shutDown();
+    //    }
+    //    return "redirect:/layout/showHome";
+    //}
+    //
+    //
     @RequestMapping("/runNow")
     public String runNow(@RequestParam(defaultValue = "") String triggerName, @RequestParam(defaultValue = "") String targetBizDate, @RequestParam(defaultValue = "") String officeId) {
         Map<String, Object> data = new HashMap<String, Object>();

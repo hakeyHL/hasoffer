@@ -1,4 +1,4 @@
-package hasoffer.core.bo.match;
+package hasoffer.core.test;
 
 /**
  * Date : 2016/6/15

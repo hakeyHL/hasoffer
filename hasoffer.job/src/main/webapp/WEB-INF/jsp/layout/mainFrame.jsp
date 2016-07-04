@@ -29,12 +29,12 @@
 
             $("#pause").click(function () {
                 var triggerName = $("input[type=radio]:checked").parent().parent().find(".triggerClass").html();
-                $(this).attr("href", "${ctx}/layout/pause.action?triggerName=" + triggerName);
+                $(this).attr("href", "${ctx}/layout/pause?triggerName=" + triggerName);
             });
 
             $("#resume").click(function () {
                 var triggerName = $("input[type=radio]:checked").parent().parent().find(".triggerClass").html();
-                $(this).attr("href", "${ctx}/layout/resumeTrigger.action?triggerName=" + triggerName);
+                $(this).attr("href", "${ctx}/layout/resumeTrigger?triggerName=" + triggerName);
             });
 
             $("#goback").click(function () {
@@ -58,6 +58,11 @@
                     }
                 });
             });
+
+            <%--$("#shutDownNow").click(function () {--%>
+            <%--var triggerName = $("input[type=radio]:checked").parent().parent().find(".triggerClass").html();--%>
+            <%--$(this).attr("href", "${ctx}/layout/shutDownNow?triggerName=" + triggerName);--%>
+            <%--});--%>
             /*  var triggerName =  $("input[type=radio]:checked").parent().parent().find(".triggerClass").html();
              var targetBizDate= prompt("请输入时间");
              var officeId =prompt("请输入机构ID");
@@ -117,9 +122,10 @@
             </tbody>
         <tr>
             <td colspan="10" style="vertical-align: middle; text-align: center; ">
+                <a href="#" class="btn btn-danger" id="runNow">立即执行</a>
                 <a href="#" class="btn btn-info" id="pause">暂停</a>
                 <a href="#" class="btn btn-warning" id="resume">恢复</a>
-                <a href="#" class="btn btn-danger" id="runNow">立即执行</a>
+                <%--<a href="#" class="btn btn-warning" id="shutDownNow">关闭任务</a>--%>
             </td>
         </tr>
     </table>

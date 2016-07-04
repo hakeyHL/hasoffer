@@ -1,5 +1,6 @@
 package hasoffer.api.controller.vo;
 
+import hasoffer.base.model.Website;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 
 import java.util.ArrayList;
@@ -9,34 +10,43 @@ import java.util.List;
  * Created by hs on 2016/6/25.
  */
 public class CmpProductListVo {
+    List<String> support = new ArrayList<String>();
     private String image;
     private float ratingNum;
     private Long totalRatingsNum;
     private float price;
-    private int freight;
-    private int distributionTime;
+    private float freight;
+    private String distributionTime;
     private Long coins;
     private float backRate;
     private int returnGuarantee;
     private  String deepLink;
     private  String deepLinkUrl;
-    List<String> support = new ArrayList<String>();
+    private Website website;
 
     public CmpProductListVo() {
     }
     public CmpProductListVo(PtmCmpSku cmpSku,String LogoImage) {
+        this.coins = Math.round(0.015 * cmpSku.getPrice());
+        this.ratingNum = cmpSku.getRatings();
+        this.price = cmpSku.getPrice();
+        this.totalRatingsNum = cmpSku.getCommentsNumber();
         this.image = LogoImage;
         this.ratingNum =Long.valueOf(cmpSku.getRating()==null?"0":cmpSku.getRating());
         this.price = cmpSku.getPrice();
-        this.freight = 20;
-        this.distributionTime = 10;
-        this.coins =Long.valueOf(20);
-        this.backRate = 0.015f;
-        this.returnGuarantee = 5;
-        this.support = null;
+        this.website = cmpSku.getWebsite();
+        this.freight = cmpSku.getShipping();
+        this.distributionTime = cmpSku.getDeliveryTime();
+        this.backRate = 1.5f;
+        this.returnGuarantee = cmpSku.getReturnDays();
+        String[] temps = cmpSku.getSupportPayMethod().split(",");
+        for (String str : temps) {
+            this.support.add(str);
+        }
         this.image = cmpSku.getBigImagePath();
     }
-    public CmpProductListVo(String image, float ratingNum, Long totalRatingsNum, float price, int freight, int distributionTime, Long coins, float backRate, int returnGuarantee, List<String> support) {
+
+    public CmpProductListVo(String image, float ratingNum, Long totalRatingsNum, float price, int freight, String distributionTime, Long coins, float backRate, int returnGuarantee, List<String> support) {
         this.image = image;
         this.ratingNum = ratingNum;
         this.totalRatingsNum = totalRatingsNum;
@@ -54,6 +64,18 @@ public class CmpProductListVo {
         return image;
     }
 
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public Website getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(Website website) {
+        this.website = website;
+    }
+
     public String getDeepLinkUrl() {
         return deepLinkUrl;
     }
@@ -68,10 +90,6 @@ public class CmpProductListVo {
 
     public void setDeepLink(String deepLink) {
         this.deepLink = deepLink;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
     }
 
     public float getRatingNum() {
@@ -98,7 +116,11 @@ public class CmpProductListVo {
         this.price = price;
     }
 
-    public int getFreight() {
+    public void setFreight(float freight) {
+        this.freight = freight;
+    }
+
+    public float getFreight() {
         return freight;
     }
 
@@ -106,11 +128,11 @@ public class CmpProductListVo {
         this.freight = freight;
     }
 
-    public int getDistributionTime() {
+    public String getDistributionTime() {
         return distributionTime;
     }
 
-    public void setDistributionTime(int distributionTime) {
+    public void setDistributionTime(String distributionTime) {
         this.distributionTime = distributionTime;
     }
 

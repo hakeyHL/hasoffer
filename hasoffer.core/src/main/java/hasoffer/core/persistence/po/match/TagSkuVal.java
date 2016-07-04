@@ -1,8 +1,8 @@
 package hasoffer.core.persistence.po.match;
 
-import hasoffer.core.bo.match.ITag;
 import hasoffer.core.bo.match.SkuValType;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
+import hasoffer.nlp.core.model.HasTag;
 
 import javax.persistence.*;
 
@@ -11,7 +11,7 @@ import javax.persistence.*;
  * Function :
  */
 @Entity
-public class TagSkuVal implements Identifiable<Long>, ITag {
+public class TagSkuVal extends HasTag implements Identifiable<Long> {
 
     @Id
     @Column(unique = true, nullable = false)

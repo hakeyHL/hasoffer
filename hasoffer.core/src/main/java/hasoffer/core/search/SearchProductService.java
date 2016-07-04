@@ -8,6 +8,7 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.core.analysis.ProductAnalysisService;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
+import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.fetch.core.IListProcessor;
@@ -161,7 +162,7 @@ public class SearchProductService {
         }
     }
 
-    public void searchProductsFromSites(SrmAutoSearchResult searchResult) {
+    public void saveSearchProducts(SrmAutoSearchResult searchResult) {
 
         //String keyword = searchResult.getTitle();
         //Website logSite = Website.valueOf(searchResult.getFromWebsite());
@@ -183,5 +184,9 @@ public class SearchProductService {
         //searchResult.setSitePros(listProductMap);
         logger.info("job result info ：{}", searchResult.toString());
         mdm.save(searchResult);
+    }
+
+    public SrmAutoSearchResult getSearchResult(SrmSearchLog searchLog) {
+        return mdm.queryOne(SrmAutoSearchResult.class, searchLog.getId());
     }
 }

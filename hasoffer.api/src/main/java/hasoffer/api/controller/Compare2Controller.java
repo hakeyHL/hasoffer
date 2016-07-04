@@ -120,8 +120,7 @@ public class Compare2Controller {
 
 
     @RequestMapping(value = "/cmpsku", method = RequestMethod.GET)
-    public ModelAndView cmpsku(HttpServletRequest request,
-                               @RequestParam(defaultValue = "") final String id,
+    public ModelAndView cmpsku(@RequestParam(defaultValue = "") final String id,
                                @RequestParam(defaultValue = "1") int page,
                                @RequestParam(defaultValue = "10") int size
     ) {
@@ -130,16 +129,9 @@ public class Compare2Controller {
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         SearchIO sio = new SearchIO(product.getSourceId(), product.getTitle(), "", product.getSourceSite(), product.getPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, size);
         CmpResult cr = null;
-        PtmCmpSkuIndex2 cmpSkuIndex = null;
         try {
-            if (Website.FLIPKART.equals(sio.getCliSite())
-                    || Website.SNAPDEAL.equals(sio.getCliSite())
-                    || Website.SHOPCLUES.equals(sio.getCliSite())) {
-                // match sku
-                cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
-            }
             getSioBySearch(sio);
-            cr = getCmpProducts(sio, cmpSkuIndex, Long.valueOf(id));
+            cr = getCmpProducts(sio, product);
         } catch (Exception e) {
             logger.debug(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, size));
             //if exception occured ,get default cmpResult
@@ -147,7 +139,6 @@ public class Compare2Controller {
         }
         // 速度优化
         SearchHelper.addToLog(sio);
-
         ModelAndView mav = new ModelAndView();
         mav.addObject("data", cr);
         logger.debug(sio.toString());
@@ -198,7 +189,7 @@ public class Compare2Controller {
         cplv.setReturnGuarantee(0);
         cplv.setSupport(null);
         cplv.setFreight(0);
-        cplv.setDistributionTime(0);
+        cplv.setDistributionTime("");
         cplv.setDeepLinkUrl(WebsiteHelper.getUrlWithAff(Website.valueOf(product.getSourceSite()), product.getSourceUrl(), new String[]{sio.getMarketChannel().name()}));
         cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(Website.valueOf(product.getSourceSite()), product.getSourceUrl(), new String[]{sio.getMarketChannel().name()}));
         cmpResult.setImage(imageUrl);
@@ -476,49 +467,19 @@ public class Compare2Controller {
      * get cmp product results
      *
      * @param sio
-     * @param cmpSkuIndex
      * @return
      */
-    private CmpResult getCmpProducts(SearchIO sio, PtmCmpSkuIndex2 cmpSkuIndex, Long id) {
+    private CmpResult getCmpProducts(SearchIO sio, PtmProduct product) {
         //初始化一个空的用于存放比价商品列表的List
-
         List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
-        //初始化skuId=0
-        long cmpSkuId = 0L;
         //从ptmCmpSku表获取 productId为指定值、且状态为ONSALE 按照价格升序排列
-        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(sio.getHsProId(), sio.getPage(), sio.getSize());
+        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(product.getId(), sio.getPage(), sio.getSize());
         List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
-
-        PtmCmpSku clientCmpSku = null;
+        Long tempTotalComments = Long.valueOf(0);
+        int tempRatins = 0;
+        int tempCount = 0;
         //初始化price为客户端传输的price
-        float cliPrice = sio.getCliPrice();
         if (ArrayUtils.hasObjs(cmpSkus)) {
-            //如果有查询结果,遍历之
-            for (PtmCmpSku cmpSku : cmpSkus) {
-                if (sio.getCliSite().equals(cmpSku.getWebsite())) {
-                    //如果查询结果的site与客户端传送的site一致则将此查询结果赋值给新的PtmCmpSku  clientCmpSku
-                    clientCmpSku = cmpSku;
-                    break;
-                }
-            }
-            //已经有匹配对象
-            if (clientCmpSku != null) {
-                //给cmpSkuId赋值
-                cmpSkuId = clientCmpSku.getId();
-                if (cliPrice <= 0) {
-                    //如果客户端传输价格小于等于0
-                    cliPrice = clientCmpSku.getPrice();
-                } else {
-                    //否则将价格设置为客户端传输的价格
-                    clientCmpSku.setPrice(cliPrice);
-                }
-            } else {
-                //无匹配对象
-                // 如果比价列表中没有找到该网站的 sku， 则把客户端传上来的商品返回
-                //
-                comparedSkuVos.add(new CmpProductListVo(clientCmpSku, WebsiteHelper.getLogoUrl(clientCmpSku.getWebsite())));
-            }
-
             // 获取vo list
             for (PtmCmpSku cmpSku : cmpSkus) {
                 if (cmpSku.getWebsite() == null
@@ -526,24 +487,17 @@ public class Compare2Controller {
                         || cmpSku.getStatus() != SkuStatus.ONSALE) { // 临时过滤掉不能更新价格的商品
                     continue;
                 }
+                tempCount += 1;
                 // 忽略前台返回的价格
+                tempTotalComments += cmpSku.getCommentsNumber();
+                tempRatins += cmpSku.getRatings();
                 CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
-                cplv.setPrice(cmpSku.getPrice());
-                cplv.setTotalRatingsNum(Long.valueOf(0));
-                cplv.setRatingNum(0);
-                cplv.setBackRate(1.5f);
-                cplv.setCoins(Math.round(0.015 * cmpSku.getPrice()));
-                cplv.setFreight(0);
-                cplv.setImage(WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
-                cplv.setReturnGuarantee(0);
-                cplv.setSupport(null);
-                cplv.setDistributionTime(0);
                 cplv.setDeepLinkUrl(WebsiteHelper.getUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                 cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                 comparedSkuVos.add(cplv);
             }
             if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {
-                throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", sio.getCliQ(), sio.getCliPrice());
+                throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", product.getTitle(), product.getPrice());
             }
             //根据价格排序
             Collections.sort(comparedSkuVos, new Comparator<CmpProductListVo>() {
@@ -562,22 +516,21 @@ public class Compare2Controller {
             logger.debug("Found skus size is 0 .");
             throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
         }
-        sio.setHsSkuId(cmpSkuId);
-        String imageUrl = productCacheManager.getProductMasterImageUrl(id);
+        String imageUrl = productCacheManager.getProductMasterImageUrl(product.getId());
         CmpResult cmpResult = new CmpResult();
         cmpResult.setImage(imageUrl);
-        cmpResult.setName(sio.getCliQ());
+        cmpResult.setName(product.getTitle());
         PageableResult<CmpProductListVo> priceList = new PageableResult<CmpProductListVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize());
         cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
         cmpResult.setPriceList(priceList.getData());
-        cmpResult.setRatingNum(Long.valueOf(0));
-        PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, id);
+        cmpResult.setRatingNum(tempRatins / tempCount);
+        PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, product.getId());
         String specs = "";
         if (ptmCmpSkuDescription != null) {
             specs = ptmCmpSkuDescription.getJsonDescription();
         }
         cmpResult.setSpecs(specs);
-        cmpResult.setTotalRatingsNum(Long.valueOf(0));
+        cmpResult.setTotalRatingsNum(tempTotalComments / tempCount);
         return cmpResult;
     }
 
