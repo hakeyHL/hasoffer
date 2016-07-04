@@ -4,8 +4,6 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,8 +14,6 @@ import java.util.concurrent.TimeUnit;
  * Created on 2016/6/30.
  */
 public class FixPtmProductCategoryListWorker implements Runnable {
-
-    private static Logger logger = LoggerFactory.getLogger(FixPtmProductCategoryListWorker.class);
 
     private static final String Q_FLIPKART = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' ORDER BY t.id";
     private static final String Q_PRODUCT_BYID = "SELECT t FROM PtmProduct t WHERE t.id = ?0";
@@ -62,9 +58,11 @@ public class FixPtmProductCategoryListWorker implements Runnable {
                 if (product == null) {
                     continue;
                 }
-                if (product.getCategoryId() != 0) {
-                    continue;
-                }
+
+//              在二次修复ptmproduct的类目数据时，需要注释掉以下部分
+//                if (product.getCategoryId() != 0) {
+//                    continue;
+//                }
 
                 quene.add(sku);
 
@@ -78,6 +76,7 @@ public class FixPtmProductCategoryListWorker implements Runnable {
             }
 
             curPage++;
+            System.out.println("FixPtmProductCategoryListWorker curpage:" + curPage + ",totalpage:" + totalPage);
         }
     }
 }
