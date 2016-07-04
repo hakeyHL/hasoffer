@@ -8,11 +8,9 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.search.SrmSearchCount;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.redis.ICacheService;
-import hasoffer.core.utils.MyDateConverter;
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -157,16 +155,15 @@ public class ProductCacheManager {
         List<PtmProduct> products = new ArrayList<PtmProduct>();
         try {
             if (StringUtils.isEmpty(ptmProductJson)) {
-                products = productService.getTopSellingProductsByDate(date, page, size);
+                List<SrmSearchCount> srmSearchCounts = productService.getTopSellingProductsByDate(date, page, size);
+                for (SrmSearchCount srmSearchCount : srmSearchCounts) {
+                    products.add(productService.getProduct(srmSearchCount.getProductId()));
+                }
                 cacheService.add(key, JSONUtil.toJSON(products), TimeUtils.SECONDS_OF_1_HOUR * 2);
             } else {
                 List<Map> datas = JSONUtil.toObject(ptmProductJson, List.class);
                 for (Map map : datas) {
                     PtmProduct ptmProduct = new PtmProduct();
-//                    ConvertUtilsBean converterUtils=new ConvertUtilsBean();
-//                    converterUtils.register(new MyDateConverter(),PtmProduct.class);
-//                    BeanUtils.copyProperties(ptmProduct, map);
-//                    products.add(ptmProduct);
                     String website = (String) map.get("sourceSite");
                     Double price = (Double) map.get("price");
                     if (StringUtils.isEmpty(website) || price == null) {
@@ -178,18 +175,16 @@ public class ProductCacheManager {
                     ptmProduct.setRating((Integer) map.get("rating"));
                     ptmProduct.setColor((String) map.get("color"));
                     ptmProduct.setSize((String) map.get("size"));
-                    ptmProduct.setSourceId((String) map.get("color"));
                     ptmProduct.setSourceUrl((String) map.get("sourceUrl"));
                     ptmProduct.setSourceSite((String) map.get("sourceSite"));
                     ptmProduct.setCategoryId(((Integer) map.get("categoryId")).longValue());
                     ptmProduct.setTag((String) map.get("tag"));
                     products.add(ptmProduct);
-                    System.out.println(products.size());
                 }
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        return productService.getTopSellingProductsByDate(date, page, size);
+        return products;
     }
 }
