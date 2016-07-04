@@ -27,11 +27,13 @@
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/**"/>
+            <mvc:exclude-mapping path="/third/**"/>
             <bean class="hasoffer.webcommon.interceptor.ContextInterceptor"/>
         </mvc:interceptor>
 
         <mvc:interceptor>
             <mvc:mapping path="/**"/>
+            <mvc:exclude-mapping path="/third/**"/>
             <bean class="hasoffer.webcommon.interceptor.HttpExpiresInterceptor"/>
         </mvc:interceptor>
 
@@ -39,11 +41,13 @@
             <mvc:mapping path="/**"/>
             <mvc:exclude-mapping path="/appexc/**"/>
             <mvc:exclude-mapping path="/static/**"/>
+            <mvc:exclude-mapping path="/third/**"/>
             <bean class="hasoffer.api.interceptor.RequestInterceptor"/>
         </mvc:interceptor>
 
         <mvc:interceptor>
             <mvc:mapping path="/cmp/getcmpskus"/>
+            <mvc:exclude-mapping path="/third/**"/>
             <bean class="hasoffer.api.interceptor.ClientRequestInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>
