@@ -130,7 +130,7 @@ public class Compare2Controller {
         SearchIO sio = new SearchIO(product.getSourceId(), product.getTitle(), "", product.getSourceSite(), product.getPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, size);
         CmpResult cr = null;
         try {
-            getSioBySearch(sio);
+//            getSioBySearch(sio);
             cr = getCmpProducts(sio, product);
         } catch (Exception e) {
             logger.debug(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, size));

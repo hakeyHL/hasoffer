@@ -1,6 +1,7 @@
 package hasoffer.api.controller.vo;
 
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 
 import java.util.ArrayList;
@@ -20,28 +21,32 @@ public class CmpProductListVo {
     private Long coins;
     private float backRate;
     private int returnGuarantee;
-    private  String deepLink;
-    private  String deepLinkUrl;
+    private String deepLink;
+    private String deepLinkUrl;
     private Website website;
 
     public CmpProductListVo() {
     }
-    public CmpProductListVo(PtmCmpSku cmpSku,String LogoImage) {
+
+    public CmpProductListVo(PtmCmpSku cmpSku, String LogoImage) {
         this.coins = Math.round(0.015 * cmpSku.getPrice());
         this.ratingNum = cmpSku.getRatings();
         this.price = cmpSku.getPrice();
         this.totalRatingsNum = cmpSku.getCommentsNumber();
         this.image = LogoImage;
-        this.ratingNum =Long.valueOf(cmpSku.getRating()==null?"0":cmpSku.getRating());
+        this.ratingNum = Long.valueOf(cmpSku.getRating() == null ? "0" : cmpSku.getRating());
         this.price = cmpSku.getPrice();
         this.website = cmpSku.getWebsite();
         this.freight = cmpSku.getShipping();
         this.distributionTime = cmpSku.getDeliveryTime();
         this.backRate = 1.5f;
         this.returnGuarantee = cmpSku.getReturnDays();
-        String[] temps = cmpSku.getSupportPayMethod().split(",");
-        for (String str : temps) {
-            this.support.add(str);
+        String payMethod = cmpSku.getSupportPayMethod();
+        if (!StringUtils.isEmpty(payMethod)) {
+            String[] temps = payMethod.split(",");
+            for (String str : temps) {
+                this.support.add(str);
+            }
         }
         this.image = cmpSku.getBigImagePath();
     }
