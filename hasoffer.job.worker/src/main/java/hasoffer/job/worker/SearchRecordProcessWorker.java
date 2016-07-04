@@ -52,7 +52,7 @@ public class SearchRecordProcessWorker implements Runnable {
                     if (logger.isDebugEnabled()) {
                         logger.debug("SearchRecordProcessWorker. search-log-queue is null. go to sleep!");
                     }
-                    TimeUnit.MILLISECONDS.sleep(1);
+                    TimeUnit.MILLISECONDS.sleep(5);
                     continue;
                 }
                 //if (logger.isDebugEnabled()) {
@@ -169,19 +169,19 @@ public class SearchRecordProcessWorker implements Runnable {
         if (isUpdate) {
             updateMongo(autoSearchResult);
         }
-        if (isUpdate && logger.isDebugEnabled()) {
-            logger.debug("SearchRecordProcessWorker.flipkartFetchResult  result()--keyword is {} : size() = {}", keyword, flipkartFetchResult == null ? "" : flipkartFetchResult.getFetchProducts().size());
-            logger.debug("SearchRecordProcessWorker.amazonFetchResult    result()--keyword is {} : size() = {}", keyword, amazonFetchResult == null ? "" : amazonFetchResult.getFetchProducts().size());
-            logger.debug("SearchRecordProcessWorker.snapdealFetchResult  result()--keyword is {} : size() = {}", keyword, snapdealFetchResult == null ? "" : snapdealFetchResult.getFetchProducts().size());
-            logger.debug("SearchRecordProcessWorker.shopcluesFetchResult result()--keyword is {} : size() = {}", keyword, shopcluesFetchResult == null ? "" : shopcluesFetchResult.getFetchProducts().size());
-            logger.debug("SearchRecordProcessWorker.paytmFetchResult     result()--keyword is {} : size() = {}", keyword, paytmFetchResult == null ? "" : paytmFetchResult.getFetchProducts().size());
-            logger.debug("SearchRecordProcessWorker.ebayFetchResult      result()--keyword is {} : size() = {}", keyword, ebayFetchResult == null ? "" : ebayFetchResult.getFetchProducts().size());
-            logger.debug("SearchRecordProcessWorker.myntraFetchResult    result()--keyword is {} : size() = {}", keyword, myntraFetchResult == null ? "" : myntraFetchResult.getFetchProducts().size());
-            logger.debug("SearchRecordProcessWorker.jabongFetchResult    result()--keyword is {} : size() = {}", keyword, jabongFetchResult == null ? "" : jabongFetchResult.getFetchProducts().size());
-            logger.debug("SearchRecordProcessWorker.voonikFetchResult    result()--keyword is {} : size() = {}", keyword, voonikFetchResult == null ? "" : voonikFetchResult.getFetchProducts().size());
-            logger.debug("SearchRecordProcessWorker.homeShopResult       result()--keyword is {} : size() = {}", keyword, homeShopResult == null ? "" : homeShopResult.getFetchProducts().size());
-            logger.debug("SearchRecordProcessWorker.limeRoadResult       result()--keyword is {} : size() = {}", keyword, limeRoadResult == null ? "" : limeRoadResult.getFetchProducts().size());
-        }
+        //if (isUpdate && logger.isDebugEnabled()) {
+        //    logger.debug("SearchRecordProcessWorker.flipkartFetchResult  result()--keyword is {} : size() = {}", keyword, flipkartFetchResult == null ? "" : flipkartFetchResult.getFetchProducts().size());
+        //    logger.debug("SearchRecordProcessWorker.amazonFetchResult    result()--keyword is {} : size() = {}", keyword, amazonFetchResult == null ? "" : amazonFetchResult.getFetchProducts().size());
+        //    logger.debug("SearchRecordProcessWorker.snapdealFetchResult  result()--keyword is {} : size() = {}", keyword, snapdealFetchResult == null ? "" : snapdealFetchResult.getFetchProducts().size());
+        //    logger.debug("SearchRecordProcessWorker.shopcluesFetchResult result()--keyword is {} : size() = {}", keyword, shopcluesFetchResult == null ? "" : shopcluesFetchResult.getFetchProducts().size());
+        //    logger.debug("SearchRecordProcessWorker.paytmFetchResult     result()--keyword is {} : size() = {}", keyword, paytmFetchResult == null ? "" : paytmFetchResult.getFetchProducts().size());
+        //    logger.debug("SearchRecordProcessWorker.ebayFetchResult      result()--keyword is {} : size() = {}", keyword, ebayFetchResult == null ? "" : ebayFetchResult.getFetchProducts().size());
+        //    logger.debug("SearchRecordProcessWorker.myntraFetchResult    result()--keyword is {} : size() = {}", keyword, myntraFetchResult == null ? "" : myntraFetchResult.getFetchProducts().size());
+        //    logger.debug("SearchRecordProcessWorker.jabongFetchResult    result()--keyword is {} : size() = {}", keyword, jabongFetchResult == null ? "" : jabongFetchResult.getFetchProducts().size());
+        //    logger.debug("SearchRecordProcessWorker.voonikFetchResult    result()--keyword is {} : size() = {}", keyword, voonikFetchResult == null ? "" : voonikFetchResult.getFetchProducts().size());
+        //    logger.debug("SearchRecordProcessWorker.homeShopResult       result()--keyword is {} : size() = {}", keyword, homeShopResult == null ? "" : homeShopResult.getFetchProducts().size());
+        //    logger.debug("SearchRecordProcessWorker.limeRoadResult       result()--keyword is {} : size() = {}", keyword, limeRoadResult == null ? "" : limeRoadResult.getFetchProducts().size());
+        //}
 
         return isReFetch(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, myntraFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
     }
