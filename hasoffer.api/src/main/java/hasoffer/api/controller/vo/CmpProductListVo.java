@@ -48,7 +48,6 @@ public class CmpProductListVo {
                 this.support.add(str);
             }
         }
-        this.image = cmpSku.getBigImagePath();
     }
 
     public CmpProductListVo(String image, float ratingNum, Long totalRatingsNum, float price, int freight, String distributionTime, Long coins, float backRate, int returnGuarantee, List<String> support) {
