@@ -38,6 +38,8 @@ import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import hasoffer.webcommon.helper.PageHelper;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -74,6 +76,8 @@ public class SearchController {
     @Resource
     SearchLogCacheManager logCacheManager;
 
+    Logger logger = LoggerFactory.getLogger(SearchController.class);
+
     @RequestMapping(value = "/stat", method = RequestMethod.GET)
     public
     @ResponseBody
@@ -88,6 +92,9 @@ public class SearchController {
 
         for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
             SrmSearchCount ssc = new SrmSearchCount(ymd, countKv.getKey(), countKv.getValue());
+
+            logger.debug(ssc.toString());
+
             sscs.add(ssc);
         }
 
