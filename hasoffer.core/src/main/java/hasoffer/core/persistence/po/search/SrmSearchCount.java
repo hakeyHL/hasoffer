@@ -84,4 +84,14 @@ public class SrmSearchCount implements Identifiable<Long> {
         result = 31 * result + (count != null ? count.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "SrmSearchCount{" +
+                "id=" + id +
+                ", ymd='" + ymd + '\'' +
+                ", productId=" + productId +
+                ", count=" + count +
+                '}';
+    }
 }

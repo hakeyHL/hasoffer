@@ -1,9 +1,9 @@
 package hasoffer.core.analysis;
 
-import hasoffer.core.bo.match.ITag;
 import hasoffer.core.bo.match.TagType;
 import hasoffer.core.persistence.po.match.TagBrand;
 import hasoffer.core.persistence.po.match.TagModel;
+import hasoffer.nlp.core.model.HasTag;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,7 +29,7 @@ public class TagMapHelper {
         }
     }
 
-    public static ITag get(TagType tagType, String tag) {
+    public static HasTag get(TagType tagType, String tag) {
         switch (tagType) {
             case BRAND:
                 return brandMap.get(tag);
