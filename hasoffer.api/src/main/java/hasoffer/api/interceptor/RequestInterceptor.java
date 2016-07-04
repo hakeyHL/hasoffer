@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import hasoffer.api.controller.vo.DeviceEventVo;
 import hasoffer.api.controller.vo.DeviceInfoVo;
 import hasoffer.api.controller.vo.DeviceRequestVo;
+import hasoffer.api.controller.vo.ResultVo;
 import hasoffer.api.worker.DeviceRequestQueue;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.utils.DeviceUtils;
