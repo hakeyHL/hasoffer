@@ -7,6 +7,7 @@ import hasoffer.core.persistence.po.ptm.PtmBasicAttribute;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.search.SrmSearchCount;
 import hasoffer.fetch.model.ListProduct;
 
 import java.util.Date;
@@ -42,7 +43,7 @@ public interface IProductService {
 
     List<PtmProduct> getProducts(List<Long> proIds);
 
-    List<PtmProduct> getTopSellingProductsByDate(String date, int page, int size);
+    List<SrmSearchCount> getTopSellingProductsByDate(String date, int page, int size);
 
     List<String> getProductFeatures(long id);
 
