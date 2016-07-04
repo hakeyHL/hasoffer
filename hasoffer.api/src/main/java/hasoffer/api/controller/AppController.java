@@ -17,7 +17,6 @@ import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
-import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.product.ICmpSkuService;
@@ -508,16 +507,6 @@ public class AppController {
                 List<ProductModel> productModes = products.getData();
                 for (ProductModel productModel : productModes) {
                     ProductListVo productListVo = new ProductListVo();
-                    PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productModel.getId(), 1, 20);
-                    int tempRatins = 0;
-                    Long tempCommentsNum = Long.valueOf(0);
-                    List<PtmCmpSku> skus = pagedCmpskus.getData();
-                    for (PtmCmpSku ptmCmpSku : skus) {
-                        tempRatins += ptmCmpSku.getRatings();
-                        tempCommentsNum += ptmCmpSku.getCommentsNumber();
-                    }
-                    productListVo.setCommentNum(tempCommentsNum / Long.valueOf(skus.size()));
-                    productListVo.setRatingNum(tempRatins / skus.size());
                     productListVo.setId(productModel.getId());
                     productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
                     productListVo.setName(productModel.getTitle());
@@ -535,16 +524,6 @@ public class AppController {
                 List<ProductModel> productModes = p.getData();
                 for (ProductModel productModel : productModes) {
                     ProductListVo productListVo = new ProductListVo();
-                    PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productModel.getId(), 1, 20);
-                    int tempRatins = 0;
-                    Long tempCommentsNum = Long.valueOf(0);
-                    List<PtmCmpSku> skus = pagedCmpskus.getData();
-                    for (PtmCmpSku ptmCmpSku : skus) {
-                        tempRatins += ptmCmpSku.getRatings();
-                        tempCommentsNum += ptmCmpSku.getCommentsNumber();
-                    }
-                    productListVo.setCommentNum(tempCommentsNum / Long.valueOf(skus.size()));
-                    productListVo.setRatingNum(tempRatins / skus.size());
                     productListVo.setId(productModel.getId());
                     productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
                     productListVo.setName(productModel.getTitle());
@@ -567,16 +546,6 @@ public class AppController {
                     for (PtmProduct ptmProduct : products2s) {
                         if (i < 5) {
                             ProductListVo productListVo = new ProductListVo();
-                            PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(ptmProduct.getId(), 1, 20);
-                            int tempRatins = 0;
-                            Long tempCommentsNum = Long.valueOf(0);
-                            List<PtmCmpSku> skus = pagedCmpskus.getData();
-                            for (PtmCmpSku ptmCmpSku : skus) {
-                                tempRatins += ptmCmpSku.getRatings();
-                                tempCommentsNum += ptmCmpSku.getCommentsNumber();
-                            }
-                            productListVo.setCommentNum(tempCommentsNum / Long.valueOf(skus.size()));
-                            productListVo.setRatingNum(tempRatins / skus.size());
                             productListVo.setId(ptmProduct.getId());
                             productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
                             productListVo.setName(ptmProduct.getTitle());
@@ -594,16 +563,6 @@ public class AppController {
                 if (products2s != null && products2s.size() > 0) {
                     for (PtmProduct ptmProduct : products2s) {
                         ProductListVo productListVo = new ProductListVo();
-                        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(ptmProduct.getId(), 1, 20);
-                        int tempRatins = 0;
-                        Long tempCommentsNum = Long.valueOf(0);
-                        List<PtmCmpSku> skus = pagedCmpskus.getData();
-                        for (PtmCmpSku ptmCmpSku : skus) {
-                            tempRatins += ptmCmpSku.getRatings();
-                            tempCommentsNum += ptmCmpSku.getCommentsNumber();
-                        }
-                        productListVo.setCommentNum(tempCommentsNum / Long.valueOf(skus.size()));
-                        productListVo.setRatingNum(tempRatins / skus.size());
                         productListVo.setId(ptmProduct.getId());
                         productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
                         productListVo.setName(ptmProduct.getTitle());
@@ -621,16 +580,6 @@ public class AppController {
                     List<ProductModel> productModes = p.getData();
                     for (ProductModel productModel : productModes) {
                         ProductListVo productListVo = new ProductListVo();
-                        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productModel.getId(), 1, 20);
-                        int tempRatins = 0;
-                        Long tempCommentsNum = Long.valueOf(0);
-                        List<PtmCmpSku> skus = pagedCmpskus.getData();
-                        for (PtmCmpSku ptmCmpSku : skus) {
-                            tempRatins += ptmCmpSku.getRatings();
-                            tempCommentsNum += ptmCmpSku.getCommentsNumber();
-                        }
-                        productListVo.setRatingNum(tempRatins / skus.size());
-                        productListVo.setCommentNum(tempCommentsNum / Long.valueOf(skus.size()));
                         productListVo.setId(productModel.getId());
                         productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
                         productListVo.setName(productModel.getTitle());
