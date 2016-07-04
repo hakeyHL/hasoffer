@@ -11,6 +11,9 @@ public class TagMatchResult {
 
     private HasTag hasTag;
 
+    public TagMatchResult() {
+    }
+
     public TagMatchResult(String tag, HasTag hasTag) {
         this.tag = tag;
         this.hasTag = hasTag;
