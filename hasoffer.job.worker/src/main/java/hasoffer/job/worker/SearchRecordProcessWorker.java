@@ -52,7 +52,7 @@ public class SearchRecordProcessWorker implements Runnable {
                     if (logger.isDebugEnabled()) {
                         logger.debug("SearchRecordProcessWorker. search-log-queue is null. go to sleep!");
                     }
-                    TimeUnit.MILLISECONDS.sleep(5);
+                    TimeUnit.MINUTES.sleep(5);
                     continue;
                 }
                 //if (logger.isDebugEnabled()) {
