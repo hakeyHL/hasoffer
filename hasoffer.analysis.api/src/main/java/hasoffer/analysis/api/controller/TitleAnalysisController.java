@@ -144,7 +144,12 @@ public class TitleAnalysisController {
                 String modelStr = StringUtils.arrayToString(models);
 
                 TagMatched tm = new TagMatched(o.getId(), title, brandStr, modelStr);
-                tagService.saveTagMatched(tm);
+                try {
+                    tagService.saveTagMatched(tm);
+                } catch (Exception e) {
+                    logger.debug(e.getMessage());
+                    return;
+                }
             }
         });
 

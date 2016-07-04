@@ -6,12 +6,12 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.core.analysis.ITagService;
 import hasoffer.core.analysis.LingHelper;
 import hasoffer.core.analysis.TagMapHelper;
-import hasoffer.core.bo.match.ITag;
 import hasoffer.core.bo.match.TagType;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.match.TagBrand;
 import hasoffer.core.persistence.po.match.TagMatched;
 import hasoffer.core.persistence.po.match.TagModel;
+import hasoffer.nlp.core.model.HasTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -103,7 +103,7 @@ public class TagServiceImpl implements ITagService {
         logger.info("dict size = " + dictSize);
     }
 
-    private void addTag(ITag tag, TagType type) {
+    private void addTag(HasTag tag, TagType type) {
         LingHelper.addToDict(tag.getTag(), type, tag.getScore());
         TagMapHelper.addToMap(type, tag.getTag(), tag);
 

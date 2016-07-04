@@ -6,7 +6,9 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.analysis.ITagService;
 import hasoffer.core.analysis.LingHelper;
-import hasoffer.core.bo.match.*;
+import hasoffer.core.bo.match.SkuValType;
+import hasoffer.core.bo.match.TagType;
+import hasoffer.core.bo.match.TitleStruct;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
@@ -263,7 +265,7 @@ public class TagTest {
 
         for (Object o : tags) {
 
-            ITag iTag = (ITag) o;
+            HasTag iTag = (HasTag) o;
 
             tagMap.put(iTag.getTag(), o);
 
