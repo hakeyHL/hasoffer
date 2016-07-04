@@ -1,11 +1,16 @@
 package hasoffer.core.analysis.impl;
 
+import hasoffer.base.config.AppConfig;
+import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.ArrayUtils;
+import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.core.analysis.ITagService;
 import hasoffer.core.analysis.LingHelper;
 import hasoffer.core.analysis.TagMapHelper;
+import hasoffer.core.bo.match.AnalysisResult;
 import hasoffer.core.bo.match.TagType;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.match.TagBrand;
@@ -18,7 +23,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created on 2016/7/1.
@@ -30,6 +37,27 @@ public class TagServiceImpl implements ITagService {
     @Resource
     IDataBaseManager dbm;
     private Logger logger = LoggerFactory.getLogger(TagServiceImpl.class);
+
+    @Override
+    public AnalysisResult analysis(String title) {
+        Map<String, Object> formMap = new HashMap<String, Object>();
+        formMap.put("title", title);
+
+        Map<String, String> headerMap = new HashMap<String, String>();
+        formMap.put("Accept", "application/json, text/javascript, */*; q=0.01");
+
+        try {
+            String url = AppConfig.get(AppConfig.ANALYSIS_TITLE_URL);
+            HttpResponseModel responseModel = HttpUtils.post(url, formMap, headerMap);
+
+            AnalysisResult ar = JSONUtil.toObject(responseModel.getBodyString(), AnalysisResult.class);
+
+            return ar;
+        } catch (Exception e) {
+            logger.debug(e.getMessage());
+            return null;
+        }
+    }
 
     @Override
     @Transactional

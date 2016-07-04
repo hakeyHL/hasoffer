@@ -1,6 +1,7 @@
 package hasoffer.core.analysis;
 
 import hasoffer.base.model.PageableResult;
+import hasoffer.core.bo.match.AnalysisResult;
 import hasoffer.core.persistence.po.match.TagBrand;
 import hasoffer.core.persistence.po.match.TagMatched;
 import hasoffer.core.persistence.po.match.TagModel;
@@ -27,4 +28,6 @@ public interface ITagService {
     void loadWordDicts();
 
     void saveTagMatched(TagMatched tm);
+
+    AnalysisResult analysis(String title);
 }
