@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import hasoffer.api.controller.vo.DeviceEventVo;
 import hasoffer.api.controller.vo.DeviceInfoVo;
 import hasoffer.api.controller.vo.DeviceRequestVo;
-import hasoffer.api.controller.vo.ResultVo;
 import hasoffer.api.worker.DeviceRequestQueue;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.utils.DeviceUtils;
@@ -101,6 +100,18 @@ public class RequestInterceptor implements HandlerInterceptor {
 
     public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o,
                            ModelAndView modelAndView) throws Exception {
+//       UrmUser urmUser= appService.getUserByUserToken( (String) Context.currentContext().get(StaticContext.USER_TOKEN));
+//        if(urmUser==null){
+//            modelAndView.addObject("result", new StringBuilder().append("{\n" +
+//                    "    \"errorCode\": \"10010\",\n" +
+//                    "    \"msg\": \"login expired \"\n" +
+//                    "}"));
+//        }else{
+//            modelAndView.addObject("result", new StringBuilder().append("{\n" +
+//                    "    \"errorCode\": \"00000\",\n" +
+//                    "    \"msg\": \"ok \"\n" +
+//                    "}"));
+//        }
         UrmUser urmUser = appService.getUserByUserToken((String) Context.currentContext().get(StaticContext.USER_TOKEN));
         if (urmUser == null) {
             modelAndView.addObject("result", new ResultVo("10010", "login expired"));
