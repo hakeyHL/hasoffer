@@ -28,12 +28,12 @@ public class CmpProductListVo {
     public CmpProductListVo() {
     }
 
-    public CmpProductListVo(PtmCmpSku cmpSku, String LogoImage) {
+    public CmpProductListVo(PtmCmpSku cmpSku, String logoImage) {
         this.coins = Math.round(0.015 * cmpSku.getPrice());
         this.ratingNum = cmpSku.getRatings();
         this.price = cmpSku.getPrice();
         this.totalRatingsNum = cmpSku.getCommentsNumber();
-        this.image = LogoImage;
+        this.image = logoImage;
         this.ratingNum = Long.valueOf(cmpSku.getRating() == null ? "0" : cmpSku.getRating());
         this.price = cmpSku.getPrice();
         this.website = cmpSku.getWebsite();
