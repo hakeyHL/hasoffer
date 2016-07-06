@@ -47,7 +47,12 @@ public class StatSearchLogTask {
             }
         });
 
-        searchService.saveLogCount(sscs.subList(0, 20));
+        int size = 20;
+        if (sscs.size() < size) {
+            size = sscs.size();
+        }
+
+        searchService.saveLogCount(sscs.subList(0, size));
     }
 
 }
