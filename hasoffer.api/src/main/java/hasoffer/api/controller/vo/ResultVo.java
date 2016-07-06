@@ -1,5 +1,8 @@
 package hasoffer.api.controller.vo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by chevy on 2016/7/4.
  */
@@ -9,6 +12,7 @@ public class ResultVo {
 
     private String msg;
 
+    private List ataList = new ArrayList();
     public ResultVo() {
     }
 
@@ -31,5 +35,13 @@ public class ResultVo {
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    public List getAtaList() {
+        return ataList;
+    }
+
+    public void setAtaList(List ataList) {
+        this.ataList = ataList;
     }
 }
