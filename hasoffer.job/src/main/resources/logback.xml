@@ -68,13 +68,13 @@
     </appender>
 
     <!-- logger -->
-    <logger name="ActionAccessLogger" level="info" additivity="false">
+    <logger name="ActionAccessLogger" level="INFO" additivity="false">
         <appender-ref ref="ActionAccessLoggerFileOut"/>
     </logger>
 
     <logger name="hasoffer" level="INFO"/>
     <!-- code info log -->
-    <logger name="hasoffer.job" level="DEBUG">
+    <logger name="hasoffer.job" level="INFO">
         <appender-ref ref="InfoLoggerFileOut"/>
         <appender-ref ref="ErrorLoggerFileOut"/>
     </logger>
