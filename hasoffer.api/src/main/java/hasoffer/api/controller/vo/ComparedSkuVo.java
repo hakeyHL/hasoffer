@@ -8,6 +8,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 /**
@@ -142,7 +143,12 @@ public class ComparedSkuVo {
     }
 
     public float getPrice() {
-        return price;
+        if (HasofferRegion.INDIA.equals(AppConfig.getSerRegion())) {
+            return Float.valueOf(new DecimalFormat("#").format(price));
+        } else {
+            return price;
+
+        }
     }
 
     public void setPrice(float price) {

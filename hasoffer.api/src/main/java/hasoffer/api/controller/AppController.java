@@ -588,8 +588,13 @@ public class AppController {
                 totalCommentNum += ptmCmpSku.getCommentsNumber();
                 totalRating += ptmCmpSku.getRatings();
             }
-            productListVo.setCommentNum(totalCommentNum / Long.valueOf(pagedCmpskus.getData().size() == 0 ? 1 : pagedCmpskus.getData().size()));
-            productListVo.setRatingNum(totalRating / pagedCmpskus.getData().size() == 0 ? 1 : pagedCmpskus.getData().size());
+            if (totalCommentNum == 0 || pagedCmpskus.getData().size() == 0 || totalRating == 0) {
+                productListVo.setCommentNum(Long.valueOf(0));
+                productListVo.setRatingNum(0);
+            } else {
+                productListVo.setCommentNum(totalCommentNum / Long.valueOf(pagedCmpskus.getData().size()));
+                productListVo.setRatingNum(totalRating / pagedCmpskus.getData().size());
+            }
         }
     }
 }
