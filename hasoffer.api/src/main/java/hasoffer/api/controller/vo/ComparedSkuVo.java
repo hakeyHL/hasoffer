@@ -8,7 +8,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
 
-import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 /**
@@ -144,7 +144,7 @@ public class ComparedSkuVo {
 
     public float getPrice() {
         if (HasofferRegion.INDIA.equals(AppConfig.getSerRegion())) {
-            return BigDecimal.valueOf(price).setScale(0, BigDecimal.ROUND_DOWN).floatValue();
+            return Float.valueOf(new DecimalFormat("#").format(price));
         } else {
             return price;
 
