@@ -515,12 +515,16 @@ public class AppController {
         Date date = new Date();
         date.setTime(date.getTime() - 1 * 24 * 60 * 60 * 1000);
         List<PtmProduct> products2s = productCacheManager.getTopSellingProductsByDate(new SimpleDateFormat("yyyyMMdd").format(date), 1, 20);
+        logger.error("========remai====" + products2s.size() + "======================================");
+        logger.error("========li====" + li.size() + "======================================");
         switch (type) {
             case 0:
+                logger.error("========0====" + products2s.size() + "======================================");
                 addProductVo2List(li, products2s);
                 if (products2s != null && products2s.size() > 0) {
                     li = li.subList(0, 5);
                 }
+                logger.error("========remai====" + li.size() + "======================================");
                 map.put("product", li);
                 break;
             case 1:
