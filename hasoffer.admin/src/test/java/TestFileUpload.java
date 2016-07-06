@@ -1,29 +1,22 @@
 import hasoffer.base.utils.IDUtil;
+import hasoffer.core.persistence.po.search.SrmSearchCount;
 import hasoffer.core.utils.ImageUtil;
 import jodd.io.FileUtil;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Created by lihongde on 2016/6/24 14:22
  */
 public class TestFileUpload {
-
-    @Test
-    public void upload(){
-        String fileName = "D:\\Capture001.png";
-        File file = new File(fileName);
-        try {
-            File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
-            FileUtil.writeBytes(imageFile,getBytesFromFile(file));
-            String path = ImageUtil.uploadImage(imageFile);
-            System.out.println(path);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
 
     public static byte[] getBytesFromFile(File file) throws IOException {
         FileInputStream stream = new FileInputStream(file);
@@ -31,9 +24,49 @@ public class TestFileUpload {
         byte[] b = new byte[1000];
         int n;
         while ((n = stream.read(b)) != -1)
-        out.write(b, 0, n);
+            out.write(b, 0, n);
         stream.close();
         out.close();
         return out.toByteArray();
+    }
+
+    @Test
+    public void f() {
+        List<SrmSearchCount> sscs = new ArrayList<SrmSearchCount>();
+
+        sscs.add(new SrmSearchCount("123456", 30, 20L));
+        sscs.add(new SrmSearchCount("123456", 31, 19L));
+        sscs.add(new SrmSearchCount("123456", 32, 23L));
+        sscs.add(new SrmSearchCount("123456", 33, 21L));
+        sscs.add(new SrmSearchCount("123456", 34, 5L));
+
+        Collections.sort(sscs, new Comparator<SrmSearchCount>() {
+            @Override
+            public int compare(SrmSearchCount o1, SrmSearchCount o2) {
+                if (o1.getCount() > o2.getCount()) {
+                    return -1;
+                } else if (o1.getCount() < o2.getCount()) {
+                    return 1;
+                }
+                return 0;
+            }
+        });
+
+        System.out.println(sscs.size());
+    }
+
+    @Test
+    public void upload() {
+        String fileName = "D:\\Capture001.png";
+        File file = new File(fileName);
+        try {
+            File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
+            FileUtil.writeBytes(imageFile, getBytesFromFile(file));
+            String path = ImageUtil.uploadImage(imageFile);
+            System.out.println(path);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }
