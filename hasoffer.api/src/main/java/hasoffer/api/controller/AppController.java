@@ -584,14 +584,17 @@ public class AppController {
         if (pagedCmpskus != null) {
             Long totalCommentNum = Long.valueOf(0);
             int totalRating = 0;
-            int tempCount = 0;
             for (PtmCmpSku ptmCmpSku : pagedCmpskus.getData()) {
                 totalCommentNum += ptmCmpSku.getCommentsNumber();
                 totalRating += ptmCmpSku.getRatings();
-                tempCount++;
             }
-            productListVo.setCommentNum(totalCommentNum == 0 ? 1 : totalCommentNum / Long.valueOf(tempCount == 0 ? 1 : tempCount));
-            productListVo.setRatingNum(totalRating == 0 ? 1 : totalRating / tempCount == 0 ? 1 : tempCount);
+            if (totalCommentNum == 0 || pagedCmpskus.getData().size() == 0 || totalRating == 0) {
+                productListVo.setCommentNum(Long.valueOf(0));
+                productListVo.setRatingNum(0);
+            } else {
+                productListVo.setCommentNum(totalCommentNum / Long.valueOf(pagedCmpskus.getData().size()));
+                productListVo.setRatingNum(totalRating / pagedCmpskus.getData().size());
+            }
         }
     }
 }
