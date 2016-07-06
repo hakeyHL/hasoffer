@@ -17,6 +17,7 @@ import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.product.ICmpSkuService;
@@ -557,6 +558,7 @@ public class AppController {
                     productListVo.setPrice(productModel.getPrice());
                     int count = cmpSkuService.getSkuSoldStoreNum(productModel.getId());
                     productListVo.setStoresNum(count);
+                    getCommentNumAndRatins(productListVo);
                     desList.add(productListVo);
                 }
             } else if (PtmProduct.class.isInstance(sourceList.get(0))) {
@@ -570,9 +572,24 @@ public class AppController {
                     productListVo.setPrice(ptmProduct.getPrice());
                     int count = cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
                     productListVo.setStoresNum(count);
+                    getCommentNumAndRatins(productListVo);
                     desList.add(productListVo);
                 }
             }
+        }
+    }
+
+    public void getCommentNumAndRatins(ProductListVo productListVo) {
+        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productListVo.getId(), 1, 10);
+        if (pagedCmpskus != null) {
+            Long totalCommentNum = Long.valueOf(0);
+            int totalRating = 0;
+            for (PtmCmpSku ptmCmpSku : pagedCmpskus.getData()) {
+                totalCommentNum += ptmCmpSku.getCommentsNumber();
+                totalRating += ptmCmpSku.getRatings();
+            }
+            productListVo.setCommentNum(totalCommentNum / pagedCmpskus.getData().size());
+            productListVo.setRatingNum(totalRating / pagedCmpskus.getData().size());
         }
     }
 }
