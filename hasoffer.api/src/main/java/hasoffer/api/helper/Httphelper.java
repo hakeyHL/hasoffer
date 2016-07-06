@@ -66,7 +66,7 @@ public class Httphelper {
         String responseText = null;
         CloseableHttpClient closeableHttpClient = createHttpsClient();
         HttpPost method = new HttpPost(url);
-        StringEntity entity = new StringEntity(json, "utf-8");// 解决中文乱码问题
+        StringEntity entity = new StringEntity(json, "utf-8");// 瑙ｅ喅涓枃涔辩爜闂
         entity.setContentEncoding("UTF-8");
         entity.setContentType("application/json");
         method.setEntity(entity);

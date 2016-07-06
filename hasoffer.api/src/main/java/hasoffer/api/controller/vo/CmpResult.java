@@ -9,6 +9,10 @@ import java.util.List;
  * Function :
  */
 public class CmpResult {
+    List<CmpProductListVo> priceList;
+    float priceOff;
+    ProductVo productVo;
+    PageableResult<ComparedSkuVo> pagedComparedSkuVos;
     //the lowest price
     private float bestPrice;
     //productname
@@ -16,18 +20,17 @@ public class CmpResult {
     //total comment number
     private  Long totalRatingsNum;
     //comment star number
-    private  float ratingNum;
-    List <CmpProductListVo> priceList;
+    private int ratingNum;
     //product specification
     private  String specs;
-    float priceOff;
-    ProductVo productVo;
-    PageableResult<ComparedSkuVo> pagedComparedSkuVos;
     private String  image;
     public CmpResult(float priceOff, ProductVo productVo, PageableResult<ComparedSkuVo> pagedComparedSkuVos) {
         this.priceOff = priceOff;
         this.productVo = productVo;
         this.pagedComparedSkuVos = pagedComparedSkuVos;
+    }
+
+    public CmpResult() {
     }
 
     public String getImage() {
@@ -86,11 +89,11 @@ public class CmpResult {
         this.totalRatingsNum = totalRatingsNum;
     }
 
-    public float getRatingNum() {
+    public int getRatingNum() {
         return ratingNum;
     }
 
-    public void setRatingNum(float ratingNum) {
+    public void setRatingNum(int ratingNum) {
         this.ratingNum = ratingNum;
     }
 
@@ -108,8 +111,5 @@ public class CmpResult {
 
     public void setSpecs(String specs) {
         this.specs = specs;
-    }
-
-    public CmpResult() {
     }
 }

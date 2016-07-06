@@ -11,6 +11,8 @@ import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.search.SrmSearchCount;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.redis.ICacheService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -34,7 +36,7 @@ public class ProductCacheManager {
     ICacheService<PtmProduct> cacheService;
     @Resource
     IProductService productService;
-
+    Logger logger = LoggerFactory.getLogger(ProductCacheManager.class);
     /**
      * 根据商品ID查询商品
      *
@@ -159,7 +161,9 @@ public class ProductCacheManager {
                 for (SrmSearchCount srmSearchCount : srmSearchCounts) {
                     products.add(productService.getProduct(srmSearchCount.getProductId()));
                 }
-                cacheService.add(key, JSONUtil.toJSON(products), TimeUtils.SECONDS_OF_1_HOUR * 2);
+                if (products != null && products.size() > 0) {
+                    cacheService.add(key, JSONUtil.toJSON(products), TimeUtils.SECONDS_OF_1_HOUR * 2);
+                }
             } else {
                 List<Map> datas = JSONUtil.toObject(ptmProductJson, List.class);
                 for (Map map : datas) {

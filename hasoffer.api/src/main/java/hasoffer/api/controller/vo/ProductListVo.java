@@ -11,13 +11,13 @@ public class ProductListVo {
     private  int storesNum;
     private Long commentNum;
     private  String  imageUrl;
-    private  float ratingNum;
+    private int ratingNum;
 
-    public float getRatingNum() {
+    public int getRatingNum() {
         return ratingNum;
     }
 
-    public void setRatingNum(float ratingNum) {
+    public void setRatingNum(int ratingNum) {
         this.ratingNum = ratingNum;
     }
 

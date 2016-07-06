@@ -44,7 +44,7 @@ public class TagServiceImpl implements ITagService {
         formMap.put("title", title);
 
         Map<String, String> headerMap = new HashMap<String, String>();
-        formMap.put("Accept", "application/json, text/javascript, */*; q=0.01");
+        headerMap.put("Accept", "application/json, text/javascript, */*; q=0.01");
 
         try {
             String url = AppConfig.get(AppConfig.ANALYSIS_TITLE_URL);

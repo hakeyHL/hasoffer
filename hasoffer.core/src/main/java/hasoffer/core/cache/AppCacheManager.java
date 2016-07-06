@@ -58,7 +58,7 @@ public class AppCacheManager {
                 }
             }
             categoryBo.setCategorys(categorys);
-            if (categoryBo.getCategorys().size() > 0) {
+            if (categoryBo.getCategorys() != null && categoryBo.getCategorys().size() > 0) {
                 cacheService.add(key, categoryBo, CACHE_EXPIRE_TIME);
             }
         } else {
@@ -104,7 +104,7 @@ public class AppCacheManager {
                     categorys.add(categoryVo);
                 }
                 categoryBo.setCategorys(categorys);
-                if (categoryBo.getCategorys().size() > 0) {
+                if (categoryBo.getCategorys() != null && categoryBo.getCategorys().size() > 0) {
                     cacheService.add(key, categoryBo, CACHE_EXPIRE_TIME);
                 }
             }

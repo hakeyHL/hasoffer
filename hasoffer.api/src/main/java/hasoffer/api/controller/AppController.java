@@ -17,6 +17,7 @@ import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.product.ICmpSkuService;
@@ -278,11 +279,11 @@ public class AppController {
      * 订单详情
      *
      * @param orderId
-     * @param userToken
      * @return
      */
     @RequestMapping(value = "/orderDetail", method = RequestMethod.GET)
-    public ModelAndView orderDetail(@RequestParam String orderId, @RequestParam String userToken) {
+    public ModelAndView orderDetail(@RequestParam String orderId) {
+        String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
         ModelAndView mv = new ModelAndView();
         UrmUser user = appService.getUserByUserToken(userToken);
         OrderStatsAnalysisPO orderStatsAnalysisPO = appService.getOrderDetail(orderId, user.getId().toString());
@@ -488,12 +489,8 @@ public class AppController {
      * @return
      */
     @RequestMapping(value = "/productsList", method = RequestMethod.GET)
-    public ModelAndView productsList(SearchCriteria criteria, String type) {
+    public ModelAndView productsList(SearchCriteria criteria, @RequestParam(defaultValue = "3") int type) {
         ModelAndView mv = new ModelAndView();
-        int requestType = 3;
-        if (StringUtils.isNotBlank(type)) {
-            requestType = Integer.valueOf(type);
-        }
         List li = new ArrayList();
         Map map = new HashMap();
         PageableResult<ProductModel> products;
@@ -504,34 +501,14 @@ public class AppController {
             products = productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
             //products = productIndexServiceImpl.searchPro(Long.valueOf(2), 2, 1, 10);
             if (products != null && products.getData().size() > 0) {
-                List<ProductModel> productModes = products.getData();
-                for (ProductModel productModel : productModes) {
-                    ProductListVo productListVo = new ProductListVo();
-                    productListVo.setId(productModel.getId());
-                    productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
-                    productListVo.setName(productModel.getTitle());
-                    productListVo.setPrice(productModel.getPrice());
-                    int count = cmpSkuService.getSkuSoldStoreNum(productModel.getId());
-                    productListVo.setStoresNum(count);
-                    li.add(productListVo);
-                }
+                addProductVo2List(li, products.getData());
             }
         } else if (StringUtils.isNotEmpty(criteria.getKeyword())) {
             //search by title
             //productIndexServiceImpl.simpleSearch(criteria.getKeyword(),1,10);
             PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
             if (p != null && p.getData().size() > 0) {
-                List<ProductModel> productModes = p.getData();
-                for (ProductModel productModel : productModes) {
-                    ProductListVo productListVo = new ProductListVo();
-                    productListVo.setId(productModel.getId());
-                    productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
-                    productListVo.setName(productModel.getTitle());
-                    productListVo.setPrice(productModel.getPrice());
-                    int count = cmpSkuService.getSkuSoldStoreNum(productModel.getId());
-                    productListVo.setStoresNum(count);
-                    li.add(productListVo);
-                }
+                addProductVo2List(li, p.getData());
             }
         }
         String data = "";
@@ -539,55 +516,22 @@ public class AppController {
         Date date = new Date();
         date.setTime(date.getTime() - 1 * 24 * 60 * 60 * 1000);
         List<PtmProduct> products2s = productCacheManager.getTopSellingProductsByDate(new SimpleDateFormat("yyyyMMdd").format(date), 1, 20);
-        switch (requestType) {
+        switch (type) {
             case 0:
-                if (products2s != null && products2s.size() > 0) {
-                    int i = 0;
-                    for (PtmProduct ptmProduct : products2s) {
-                        if (i < 5) {
-                            ProductListVo productListVo = new ProductListVo();
-                            productListVo.setId(ptmProduct.getId());
-                            productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
-                            productListVo.setName(ptmProduct.getTitle());
-                            productListVo.setPrice(ptmProduct.getPrice());
-                            int count = cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
-                            productListVo.setStoresNum(count);
-                            li.add(productListVo);
-                            i++;
-                        }
-                    }
+                addProductVo2List(li, products2s);
+                if (products2s != null && products2s.size() > 4) {
+                    li = li.subList(0, 5);
                 }
                 map.put("product", li);
                 break;
             case 1:
-                if (products2s != null && products2s.size() > 0) {
-                    for (PtmProduct ptmProduct : products2s) {
-                        ProductListVo productListVo = new ProductListVo();
-                        productListVo.setId(ptmProduct.getId());
-                        productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
-                        productListVo.setName(ptmProduct.getTitle());
-                        productListVo.setPrice(ptmProduct.getPrice());
-                        int count = cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
-                        productListVo.setStoresNum(count);
-                        li.add(productListVo);
-                    }
-                }
+                addProductVo2List(li, products2s);
                 map.put("product", li);
                 break;
             case 2:
                 PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
                 if (p != null && p.getData().size() > 0) {
-                    List<ProductModel> productModes = p.getData();
-                    for (ProductModel productModel : productModes) {
-                        ProductListVo productListVo = new ProductListVo();
-                        productListVo.setId(productModel.getId());
-                        productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
-                        productListVo.setName(productModel.getTitle());
-                        productListVo.setPrice(productModel.getPrice());
-                        int count = cmpSkuService.getSkuSoldStoreNum(productModel.getId());
-                        productListVo.setStoresNum(count);
-                        li.add(productListVo);
-                    }
+                    addProductVo2List(li, p.getData());
                 }
                 map.put("product", li);
                 break;
@@ -599,5 +543,53 @@ public class AppController {
         }
         mv.addObject("data", map);
         return mv;
+    }
+
+    public void addProductVo2List(List desList, List sourceList) {
+        if (sourceList != null && sourceList.size() > 0) {
+            if (ProductModel.class.isInstance(sourceList.get(0))) {
+                Iterator<ProductModel> modelList = sourceList.iterator();
+                while (modelList.hasNext()) {
+                    ProductModel productModel = modelList.next();
+                    ProductListVo productListVo = new ProductListVo();
+                    productListVo.setId(productModel.getId());
+                    productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
+                    productListVo.setName(productModel.getTitle());
+                    productListVo.setPrice(productModel.getPrice());
+                    int count = cmpSkuService.getSkuSoldStoreNum(productModel.getId());
+                    productListVo.setStoresNum(count);
+                    getCommentNumAndRatins(productListVo);
+                    desList.add(productListVo);
+                }
+            } else if (PtmProduct.class.isInstance(sourceList.get(0))) {
+                Iterator<PtmProduct> ptmList = sourceList.iterator();
+                while (ptmList.hasNext()) {
+                    PtmProduct ptmProduct = ptmList.next();
+                    ProductListVo productListVo = new ProductListVo();
+                    productListVo.setId(ptmProduct.getId());
+                    productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
+                    productListVo.setName(ptmProduct.getTitle());
+                    productListVo.setPrice(ptmProduct.getPrice());
+                    int count = cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
+                    productListVo.setStoresNum(count);
+                    getCommentNumAndRatins(productListVo);
+                    desList.add(productListVo);
+                }
+            }
+        }
+    }
+
+    public void getCommentNumAndRatins(ProductListVo productListVo) {
+        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productListVo.getId(), 1, 10);
+        if (pagedCmpskus != null) {
+            Long totalCommentNum = Long.valueOf(0);
+            int totalRating = 0;
+            for (PtmCmpSku ptmCmpSku : pagedCmpskus.getData()) {
+                totalCommentNum += ptmCmpSku.getCommentsNumber();
+                totalRating += ptmCmpSku.getRatings();
+            }
+            productListVo.setCommentNum(totalCommentNum / Long.valueOf(pagedCmpskus.getData().size() == 0 ? 1 : pagedCmpskus.getData().size()));
+            productListVo.setRatingNum(totalRating / pagedCmpskus.getData().size() == 0 ? 1 : pagedCmpskus.getData().size());
+        }
     }
 }
