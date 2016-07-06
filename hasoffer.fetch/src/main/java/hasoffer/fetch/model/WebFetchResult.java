@@ -3,11 +3,12 @@ package hasoffer.fetch.model;
 import hasoffer.base.model.TaskStatus;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class WebFetchResult {
+public class WebFetchResult implements Serializable {
 
     private TaskStatus taskStatus;
 
