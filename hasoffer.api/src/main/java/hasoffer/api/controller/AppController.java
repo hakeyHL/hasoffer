@@ -488,12 +488,8 @@ public class AppController {
      * @return
      */
     @RequestMapping(value = "/productsList", method = RequestMethod.GET)
-    public ModelAndView productsList(SearchCriteria criteria, String type) {
+    public ModelAndView productsList(SearchCriteria criteria, @RequestParam(defaultValue = "3") int type) {
         ModelAndView mv = new ModelAndView();
-        int requestType = 3;
-        if (StringUtils.isNotBlank(type)) {
-            requestType = Integer.valueOf(type);
-        }
         List li = new ArrayList();
         Map map = new HashMap();
         PageableResult<ProductModel> products;
@@ -519,7 +515,7 @@ public class AppController {
         Date date = new Date();
         date.setTime(date.getTime() - 1 * 24 * 60 * 60 * 1000);
         List<PtmProduct> products2s = productCacheManager.getTopSellingProductsByDate(new SimpleDateFormat("yyyyMMdd").format(date), 1, 20);
-        switch (requestType) {
+        switch (type) {
             case 0:
                 addProductVo2List(li, products2s);
                 if (products2s != null && products2s.size() > 0) {
