@@ -15,7 +15,7 @@ public class SrmSearchCount implements Identifiable<Long> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String ymd;
+    private String ymd;//日期
     private long productId;
     private Long count;
 

@@ -8,6 +8,8 @@ import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmImage;
+import hasoffer.core.persistence.po.ptm.updater.PtmImageUpdater;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.fetch.model.OriFetchedProduct;
@@ -56,14 +58,11 @@ public class MysqlTest {
     private static final String Q_SRMSEARCHLOG_TIMERSET2 = "SELECT t FROM SrmSearchLog t WHERE t.precise = 'TIMERSET2' ";
 
     private static final String Q_PTMCMPSKU_PRODUCTID = "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ";
-
-    private Logger logger = LoggerFactory.getLogger(MysqlTest.class);
-
     @Resource
     IDataBaseManager dbm;
     @Resource
     ICmpSkuService cmpSkuService;
-
+    private Logger logger = LoggerFactory.getLogger(MysqlTest.class);
     private ConcurrentLinkedQueue<PtmCmpSku> skuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
 
     @Test
@@ -289,5 +288,16 @@ public class MysqlTest {
         }
 
         System.out.println("count = " + count);
+    }
+
+    @Test
+    public void testUpdate() {
+
+        PtmImageUpdater updater = new PtmImageUpdater(15684854848L);
+
+        PtmImage po = updater.getPo();
+
+        System.out.println();
+
     }
 }

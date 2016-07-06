@@ -54,6 +54,7 @@ public class ImageServiceImpl implements IImageService {
 
         return true;
     }
+
     /*public boolean downloadImage(PtmImage image) {
 
         PtmImageUpdater ptmImageUpdater = new PtmImageUpdater(image.getId());
@@ -96,4 +97,25 @@ public class ImageServiceImpl implements IImageService {
             FileUtils.deleteQuietly(file);
         }
     }*/
+
+
+    /**
+     * 注意使用此方法直接对ptmproduct的图片进行更新，参数imageUrl需要输入全路径
+     *
+     * @param ptmimageid
+     * @param imageUrl
+     */
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public void updatePtmProductImage(long ptmimageid, String imageUrl) {
+
+        PtmImageUpdater updater = new PtmImageUpdater(ptmimageid);
+        if (updater == null) {
+            return;
+        }
+        //todo 此处需要确定图片的全路径如何处理
+        updater.getPo().setImageUrl2(imageUrl);
+        dbm.update(updater);
+
+    }
 }
