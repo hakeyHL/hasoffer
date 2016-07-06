@@ -588,8 +588,8 @@ public class AppController {
                 totalCommentNum += ptmCmpSku.getCommentsNumber();
                 totalRating += ptmCmpSku.getRatings();
             }
-            productListVo.setCommentNum(totalCommentNum / pagedCmpskus.getData().size());
-            productListVo.setRatingNum(totalRating / pagedCmpskus.getData().size());
+            productListVo.setCommentNum(totalCommentNum / Long.valueOf(pagedCmpskus.getData().size() == 0 ? 1 : pagedCmpskus.getData().size()));
+            productListVo.setRatingNum(totalRating / pagedCmpskus.getData().size() == 0 ? 1 : pagedCmpskus.getData().size());
         }
     }
 }
