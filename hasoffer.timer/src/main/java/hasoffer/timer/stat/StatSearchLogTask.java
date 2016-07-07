@@ -21,7 +21,7 @@ public class StatSearchLogTask {
     @Resource
     ISearchService searchService;
 
-    @Scheduled(cron = "0 20 0 * * ?")
+    @Scheduled(cron = "0 20 5 * * ?")
     public void f() {
 
         String ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
