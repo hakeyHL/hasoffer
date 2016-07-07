@@ -553,9 +553,7 @@ public class AppController {
                     ProductModel productModel = modelList.next();
                     ProductListVo productListVo = new ProductListVo();
                     productListVo.setId(productModel.getId());
-                    logger.error("商品id  =========================" + productModel.getId());
                     productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
-                    logger.error("图片路径为  =========================" + productListVo.getImageUrl());
                     productListVo.setName(productModel.getTitle());
                     productListVo.setPrice(productModel.getPrice());
                     int count = cmpSkuService.getSkuSoldStoreNum(productModel.getId());
