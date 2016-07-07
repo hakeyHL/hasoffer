@@ -251,7 +251,7 @@ public class ProductServiceImpl implements IProductService {
             if (StringUtils.isEmpty(image.getPath2())) {
                 return ImageUtil.getImage3rdUrl(image.getImageUrl2());
             } else {
-                return ImageUtil.getImage3rdUrl(image.getPath2());
+                return ImageUtil.getImageUrl(image.getPath2());
             }
         }
     }
