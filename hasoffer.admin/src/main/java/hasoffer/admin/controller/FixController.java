@@ -581,7 +581,11 @@ public class FixController {
                 "Feeding&Nursing",
                 "Health & Safety",
                 "Body and Skin Care",
-                "",
+                "Combos and Kits",
+                "Hair Care",
+                " Men's Grooming",
+                "Televisions",
+                "Home Audio",
         };
 
         for (String categoryKeyword : categoryKeywordArray) {
@@ -597,7 +601,7 @@ public class FixController {
 
             for (PtmCategory ptmCategory : categoryList) {
 
-                if (ptmCategory.getLevel() < 3) {
+                if (ptmCategory.getLevel() != 3) {
                     continue;
                 }
 
