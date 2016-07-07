@@ -471,65 +471,69 @@ public class Compare2Controller {
     private CmpResult getCmpProducts(SearchIO sio, PtmProduct product) {
         //初始化一个空的用于存放比价商品列表的List
         List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
+        CmpResult cmpResult = new CmpResult();
         //从ptmCmpSku表获取 productId为指定值、且状态为ONSALE 按照价格升序排列
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(product.getId(), sio.getPage(), sio.getSize());
-        List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
-        Long tempTotalComments = Long.valueOf(0);
-        int tempRatins = 0;
-        int tempCount = 0;
-        //初始化price为客户端传输的price
-        if (ArrayUtils.hasObjs(cmpSkus)) {
-            // 获取vo list
-            for (PtmCmpSku cmpSku : cmpSkus) {
-                if (cmpSku.getWebsite() == null
-                        || cmpSku.getPrice() <= 0
-                        || cmpSku.getStatus() != SkuStatus.ONSALE) { // 临时过滤掉不能更新价格的商品
-                    continue;
-                }
-                tempCount += 1;
-                // 忽略前台返回的价格
-                tempTotalComments += cmpSku.getCommentsNumber();
-                tempRatins += cmpSku.getRatings();
-                CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
-                cplv.setDeepLinkUrl(WebsiteHelper.getUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
-                cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
-                comparedSkuVos.add(cplv);
-            }
-            if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {
-                throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", product.getTitle(), product.getPrice());
-            }
-            //根据价格排序
-            Collections.sort(comparedSkuVos, new Comparator<CmpProductListVo>() {
-                @Override
-                public int compare(CmpProductListVo o1, CmpProductListVo o2) {
-                    if (o1.getPrice() > o2.getPrice()) {
-                        return 1;
-                    } else if (o1.getPrice() < o2.getPrice()) {
-                        return -1;
-                    }
-                    return 0;
-                }
-            });
+        if (pagedCmpskus != null && pagedCmpskus.getPageSize() > 0) {
 
-        } else {
-            logger.debug("Found skus size is 0 .");
-            throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
+            List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
+            Long tempTotalComments = Long.valueOf(0);
+            int tempRatins = 0;
+            int tempCount = 0;
+            //初始化price为客户端传输的price
+            if (ArrayUtils.hasObjs(cmpSkus)) {
+                // 获取vo list
+                for (PtmCmpSku cmpSku : cmpSkus) {
+                    if (cmpSku.getWebsite() == null
+                            || cmpSku.getPrice() <= 0
+                            || cmpSku.getStatus() != SkuStatus.ONSALE) { // 临时过滤掉不能更新价格的商品
+                        continue;
+                    }
+                    tempCount += 1;
+                    // 忽略前台返回的价格
+                    tempTotalComments += cmpSku.getCommentsNumber();
+                    tempRatins += cmpSku.getRatings();
+                    CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
+                    cplv.setDeepLinkUrl(WebsiteHelper.getUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
+                    cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
+                    comparedSkuVos.add(cplv);
+                }
+                if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {
+                    throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", product.getTitle(), product.getPrice());
+                }
+                //根据价格排序
+                Collections.sort(comparedSkuVos, new Comparator<CmpProductListVo>() {
+                    @Override
+                    public int compare(CmpProductListVo o1, CmpProductListVo o2) {
+                        if (o1.getPrice() > o2.getPrice()) {
+                            return 1;
+                        } else if (o1.getPrice() < o2.getPrice()) {
+                            return -1;
+                        }
+                        return 0;
+                    }
+                });
+
+            } else {
+                logger.debug("Found skus size is 0 .");
+                throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
+            }
+            String imageUrl = productCacheManager.getProductMasterImageUrl(product.getId());
+            cmpResult.setImage(imageUrl);
+            cmpResult.setName(product.getTitle());
+            PageableResult<CmpProductListVo> priceList = new PageableResult<CmpProductListVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize());
+            cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
+            cmpResult.setPriceList(priceList.getData());
+            cmpResult.setRatingNum(tempRatins / tempCount == 0 ? 1 : tempCount);
+            PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, product.getId());
+            String specs = "";
+            if (ptmCmpSkuDescription != null) {
+                specs = ptmCmpSkuDescription.getJsonDescription();
+            }
+            cmpResult.setSpecs(specs);
+            cmpResult.setTotalRatingsNum(tempTotalComments / Long.valueOf(tempCount == 0 ? 1 : tempCount));
+            return cmpResult;
         }
-        String imageUrl = productCacheManager.getProductMasterImageUrl(product.getId());
-        CmpResult cmpResult = new CmpResult();
-        cmpResult.setImage(imageUrl);
-        cmpResult.setName(product.getTitle());
-        PageableResult<CmpProductListVo> priceList = new PageableResult<CmpProductListVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize());
-        cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
-        cmpResult.setPriceList(priceList.getData());
-        cmpResult.setRatingNum(tempRatins / tempCount == 0 ? 1 : tempCount);
-        PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, product.getId());
-        String specs = "";
-        if (ptmCmpSkuDescription != null) {
-            specs = ptmCmpSkuDescription.getJsonDescription();
-        }
-        cmpResult.setSpecs(specs);
-        cmpResult.setTotalRatingsNum(tempTotalComments / Long.valueOf(tempCount == 0 ? 1 : tempCount));
         return cmpResult;
     }
 
