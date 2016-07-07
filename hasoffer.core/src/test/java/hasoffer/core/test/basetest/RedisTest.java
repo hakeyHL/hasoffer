@@ -1,4 +1,4 @@
-package hasoffer.core.test;
+package hasoffer.core.test.basetest;
 
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;

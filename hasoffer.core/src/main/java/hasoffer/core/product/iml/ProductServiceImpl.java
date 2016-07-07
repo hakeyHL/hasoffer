@@ -333,7 +333,8 @@ public class ProductServiceImpl implements IProductService {
 
         if (ArrayUtils.hasObjs(cmpSkus)) {
             for (PtmCmpSku cmpSku : cmpSkus) {
-                dbm.delete(PtmCmpSku.class, cmpSku.getId());
+//                dbm.delete(PtmCmpSku.class, cmpSku.getId());
+                cmpSkuService.deleteCmpSku(cmpSku.getId());
             }
         }
 

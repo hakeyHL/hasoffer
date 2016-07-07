@@ -1,4 +1,4 @@
-package hasoffer.core.test;
+package hasoffer.core.test.basetest;
 
 /**
  * Date : 2016/6/15
