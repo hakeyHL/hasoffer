@@ -6,8 +6,6 @@ import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.updater.PtmImageUpdater;
 import hasoffer.core.product.IImageService;
 import hasoffer.core.utils.ImageUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -21,7 +19,6 @@ import javax.transaction.Transactional;
 public class ImageServiceImpl implements IImageService {
     @Resource
     IDataBaseManager dbm;
-    private Logger logger = LoggerFactory.getLogger(ImageServiceImpl.class);
 
     @Override
     @Transactional(rollbackOn = Exception.class)
@@ -38,7 +35,6 @@ public class ImageServiceImpl implements IImageService {
                 String url = image.getImageUrl();
 
                 url = url.replaceFirst("-\\d+", "-1");
-
                 path = ImageUtil.downloadAndUpload(image.getImageUrl());
 
                 ptmImageUpdater.getPo().setImageUrl(url);
@@ -110,12 +106,9 @@ public class ImageServiceImpl implements IImageService {
     public void updatePtmProductImage(long ptmimageid, String imageUrl) {
 
         PtmImageUpdater updater = new PtmImageUpdater(ptmimageid);
-        if (updater == null) {
-            return;
-        }
-        //todo 此处需要确定图片的全路径如何处理
-        updater.getPo().setImageUrl(imageUrl);
-        dbm.update(updater);
 
+        updater.getPo().setImageUrl(imageUrl);
+
+        dbm.update(updater);
     }
 }
