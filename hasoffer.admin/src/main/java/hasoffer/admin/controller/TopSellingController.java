@@ -100,11 +100,12 @@ public class TopSellingController {
         modelAndView.addObject("title", title);
 
         PtmImage ptmImage = productService.getProductMasterImage(productId);
-        String oriImageUrl = "";
-        if (ptmImage != null) {
-            oriImageUrl = ptmImage.getImageUrl();
+
+        if (ptmImage == null) {
+            return new ModelAndView("system/error");
         }
 
+        String oriImageUrl = ptmImage.getImageUrl();
         modelAndView.addObject("oriImageUrl", oriImageUrl);
         modelAndView.addObject("ptmimageid", ptmImage.getId());
 
