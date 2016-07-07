@@ -62,7 +62,7 @@ public class AutoMatchController {
                         List<SrmAutoSearchResult> datas = pageableResult.getData();
                         if (ArrayUtils.hasObjs(datas)) {
                             startTime = datas.get(datas.size() - 1).getlUpdateTime();
-                            logger.debug(startTime + "\t-\t" + TimeUtils.parse(startTime, "yyyy-MM-dd HH:mm:ss"));
+                            logger.info(startTime + "\t-\t" + TimeUtils.parse(startTime, "yyyy-MM-dd HH:mm:ss"));
                         }
 
                         return pageableResult;
