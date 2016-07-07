@@ -99,15 +99,15 @@ public class ImageServiceImpl implements IImageService {
      * 注意使用此方法直接对ptmproduct的图片进行更新，参数imageUrl需要输入全路径
      *
      * @param ptmimageid
-     * @param imageUrl
+     * @param imagePath
      */
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void updatePtmProductImage(long ptmimageid, String imageUrl) {
+    public void updatePtmProductImagePath(long ptmimageid, String imagePath) {
 
         PtmImageUpdater updater = new PtmImageUpdater(ptmimageid);
 
-        updater.getPo().setImageUrl(imageUrl);
+        updater.getPo().setPath(imagePath);
 
         dbm.update(updater);
     }

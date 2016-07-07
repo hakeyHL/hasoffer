@@ -105,7 +105,7 @@ public class TopSellingController {
             return new ModelAndView("system/error");
         }
 
-        String oriImageUrl = ptmImage.getImageUrl();
+        String oriImageUrl = productService.getProductMasterImageUrl(ptmImage.getId());
         modelAndView.addObject("oriImageUrl", oriImageUrl);
         modelAndView.addObject("ptmimageid", ptmImage.getId());
 
@@ -120,15 +120,14 @@ public class TopSellingController {
 
             File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
             FileUtil.writeBytes(imageFile, file.getBytes());
-            String imageUrl = ImageUtil.uploadImage(imageFile);
-            //todo 确定要保存的图片的全路径
-            imageUrl = IMAGE_PREFIX + imageUrl;
-            imageService.updatePtmProductImage(ptmimageid, imageUrl);
+            String imagePath = ImageUtil.uploadImage(imageFile);
 
-            //编辑的时候注意更新图片清除缓存
-            String PTMPRODUCT_IMAGE_CACHE_KEY = CACHE_KEY_PRE + "_getProductMasterImageUrl_" + ptmimageid;
+            imageService.updatePtmProductImagePath(ptmimageid, imagePath);
 
-            cacheService.del(PTMPRODUCT_IMAGE_CACHE_KEY);
+//            //编辑的时候注意更新图片清除缓存
+//            String PTMPRODUCT_IMAGE_CACHE_KEY = CACHE_KEY_PRE + "_getProductMasterImageUrl_" + ptmimageid;
+//
+//            cacheService.del(PTMPRODUCT_IMAGE_CACHE_KEY);
         } catch (Exception e) {
             logger.error("image upload fail");
         }
