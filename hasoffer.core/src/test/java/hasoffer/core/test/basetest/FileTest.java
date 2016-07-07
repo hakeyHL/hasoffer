@@ -1,4 +1,4 @@
-package hasoffer.core.test;
+package hasoffer.core.test.basetest;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
