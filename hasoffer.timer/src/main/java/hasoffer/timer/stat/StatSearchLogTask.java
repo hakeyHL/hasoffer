@@ -8,9 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created on 2016/6/27.
@@ -37,7 +35,24 @@ public class StatSearchLogTask {
             sscs.add(ssc);
         }
 
-        searchService.saveLogCount(sscs);
+        Collections.sort(sscs, new Comparator<SrmSearchCount>() {
+            @Override
+            public int compare(SrmSearchCount o1, SrmSearchCount o2) {
+                if (o1.getCount() > o2.getCount()) {
+                    return -1;
+                } else if (o1.getCount() < o2.getCount()) {
+                    return 1;
+                }
+                return 0;
+            }
+        });
+
+        int size = 20;
+        if (sscs.size() < size) {
+            size = sscs.size();
+        }
+
+        searchService.saveLogCount(sscs.subList(0, size));
     }
 
 }

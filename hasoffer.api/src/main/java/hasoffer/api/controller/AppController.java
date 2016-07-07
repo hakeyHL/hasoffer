@@ -506,7 +506,7 @@ public class AppController {
         } else if (StringUtils.isNotEmpty(criteria.getKeyword())) {
             //search by title
             //productIndexServiceImpl.simpleSearch(criteria.getKeyword(),1,10);
-            PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
+            PageableResult p = productIndexServiceImpl.searchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
             if (p != null && p.getData().size() > 0) {
                 addProductVo2List(li, p.getData());
             }
@@ -529,7 +529,7 @@ public class AppController {
                 map.put("product", li);
                 break;
             case 2:
-                PageableResult p = productIndexServiceImpl.SearchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
+                PageableResult p = productIndexServiceImpl.searchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
                 if (p != null && p.getData().size() > 0) {
                     addProductVo2List(li, p.getData());
                 }

@@ -41,7 +41,7 @@ public class ImageServiceImpl implements IImageService {
 
                 path = ImageUtil.downloadAndUpload(image.getImageUrl());
 
-                ptmImageUpdater.getPo().setImageUrl2(url);
+                ptmImageUpdater.getPo().setImageUrl(url);
             } catch (Exception e2) {
                 ptmImageUpdater.getPo().setErrTimes(image.getErrTimes() + 1);
                 dbm.update(ptmImageUpdater);
@@ -49,7 +49,7 @@ public class ImageServiceImpl implements IImageService {
             }
         }
 
-        ptmImageUpdater.getPo().setPath2(path);
+        ptmImageUpdater.getPo().setPath(path);
         dbm.update(ptmImageUpdater);
 
         return true;
@@ -114,7 +114,7 @@ public class ImageServiceImpl implements IImageService {
             return;
         }
         //todo 此处需要确定图片的全路径如何处理
-        updater.getPo().setImageUrl2(imageUrl);
+        updater.getPo().setImageUrl(imageUrl);
         dbm.update(updater);
 
     }

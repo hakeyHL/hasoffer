@@ -14,9 +14,6 @@ import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.SearchProductService;
-import hasoffer.core.task.ListAndProcessTask2;
-import hasoffer.core.task.worker.IList;
-import hasoffer.core.task.worker.IProcess;
 import hasoffer.task.worker.UnmatchedSearchRecordListWorker;
 import hasoffer.task.worker.UnmatchedSearchRecordProcessWorker;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -128,67 +125,6 @@ public class AutoSearchMatchController {
             }
 
         }
-
-        return "ok";
-    }
-
-    @RequestMapping(value = "/start4", method = RequestMethod.GET)
-
-    @ResponseBody
-    public String start4() {
-        logger.debug("start4");
-
-        final long stime = TimeUtils.now() - TimeUtils.MILLISECONDS_OF_1_HOUR;
-
-        ListAndProcessTask2<SrmAutoSearchResult> listAndProcessTask2 = new ListAndProcessTask2<SrmAutoSearchResult>(
-                new IList() {
-
-                    long startTime = stime;
-                    boolean runForever = true;
-
-                    @Override
-                    public PageableResult getData(int page) {
-                        Query query = new Query(
-                                Criteria.where("lUpdateTime").gt(startTime)
-//                                        .andOperator(Criteria.where("relatedProId").is(0)
-//                                                .andOperator(Criteria.where("lRelateTime").is(0)))
-                        );
-
-                        query.with(new Sort(Sort.Direction.ASC, "lUpdateTime"));
-
-                        PageableResult<SrmAutoSearchResult> pageableResult = mdm.queryPage(SrmAutoSearchResult.class, query, 1, 500);
-                        List<SrmAutoSearchResult> datas = pageableResult.getData();
-                        if (ArrayUtils.hasObjs(datas)) {
-                            startTime = datas.get(datas.size() - 1).getlUpdateTime();
-                        }
-
-                        return pageableResult;
-                    }
-
-                    @Override
-                    public boolean isRunForever() {
-                        return runForever;
-                    }
-
-                    @Override
-                    public void setRunForever(boolean runForever) {
-                        this.runForever = runForever;
-                    }
-
-                },
-                new IProcess<SrmAutoSearchResult>() {
-                    @Override
-                    public void process(SrmAutoSearchResult asr) {
-                        try {
-                            searchService.analysisAndRelate(asr);
-                        } catch (Exception e) {
-                            logger.debug("[" + asr.getId() + "]" + e.getMessage());
-                        }
-                    }
-                }
-        );
-
-        listAndProcessTask2.go();
 
         return "ok";
     }

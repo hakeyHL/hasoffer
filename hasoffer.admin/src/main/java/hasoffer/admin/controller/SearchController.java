@@ -92,13 +92,27 @@ public class SearchController {
 
         for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
             SrmSearchCount ssc = new SrmSearchCount(ymd, countKv.getKey(), countKv.getValue());
-
-            logger.debug(ssc.toString());
-
             sscs.add(ssc);
         }
 
-        searchService.saveLogCount(sscs);
+        Collections.sort(sscs, new Comparator<SrmSearchCount>() {
+            @Override
+            public int compare(SrmSearchCount o1, SrmSearchCount o2) {
+                if (o1.getCount() > o2.getCount()) {
+                    return -1;
+                } else if (o1.getCount() < o2.getCount()) {
+                    return 1;
+                }
+                return 0;
+            }
+        });
+
+        int size = 20;
+        if (sscs.size() < size) {
+            size = sscs.size();
+        }
+
+        searchService.saveLogCount(sscs.subList(0, size));
 
         return "ok";
     }
