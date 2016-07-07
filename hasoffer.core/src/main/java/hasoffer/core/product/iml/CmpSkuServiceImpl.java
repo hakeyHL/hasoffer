@@ -301,6 +301,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteCmpSku(long id) {
         dbm.delete(PtmCmpSku.class, id);
+        cmpskuIndexService.remove(String.valueOf(id));
     }
 
     @Override
