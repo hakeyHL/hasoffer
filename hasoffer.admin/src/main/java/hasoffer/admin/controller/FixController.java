@@ -121,6 +121,7 @@ public class FixController {
         return "ok";
     }
 
+    //fixdata/products
     @RequestMapping(value = "/products", method = RequestMethod.GET)
     public
     @ResponseBody
@@ -578,14 +579,23 @@ public class FixController {
                 "Landline Phones",
                 "Mobile Accessories",
                 "Tablet Accessories",
-                "Feeding&Nursing",
-                "Health & Safety",
-                "Body and Skin Care",
-                "Combos and Kits",
                 "Hair Care",
-                " Men's Grooming",
-                "Televisions",
                 "Home Audio",
+                "Gaming Consoles",
+                "Hair Accessories",
+                "Learning & Educational Toys",
+                "Tricycles",
+                "Dolls & Doll Houses",
+                "Puppets",
+                "Home Appliances",
+                "Coffee Mugs",
+//                "Bags",
+                "Kids' Clothing",
+                "Home Automation & Safety",
+//                "Hardware",
+//                "Tools",
+//                "musical instruments",
+                "Printers & Inks"
         };
 
         for (String categoryKeyword : categoryKeywordArray) {
