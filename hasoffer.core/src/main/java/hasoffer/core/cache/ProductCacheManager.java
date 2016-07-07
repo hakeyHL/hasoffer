@@ -165,7 +165,7 @@ public class ProductCacheManager {
                     if (pageableResult != null && pageableResult.getData() != null && pageableResult.getData().size() > 0) {
                         PtmProduct product = productService.getProduct(srmSearchCount.getProductId());
                         if (product != null && product.getPrice() > 0) {
-                            products.add(productService.getProduct(srmSearchCount.getProductId()));
+                            products.add(product);
                         }
                     }
                 }
