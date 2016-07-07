@@ -28,7 +28,8 @@ public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductM
 
         return sr.getResult();
     }
-    public PageableResult<ProductModel> SearchProductsByKey(String title, int page, int size) {
+
+    public PageableResult<ProductModel> searchProductsByKey(String title, int page, int size) {
         Sort[] sorts = null;
         PivotFacet[] pivotFacets = null;
 
