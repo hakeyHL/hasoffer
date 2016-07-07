@@ -163,7 +163,10 @@ public class ProductCacheManager {
                 for (SrmSearchCount srmSearchCount : srmSearchCounts) {
                     PageableResult<PtmCmpSku> pageableResult = productCacheManager.listPagedCmpSkus(srmSearchCount.getProductId(), 1, 20);
                     if (pageableResult != null && pageableResult.getData() != null && pageableResult.getData().size() > 0) {
-                        products.add(productService.getProduct(srmSearchCount.getProductId()));
+                        PtmProduct product = productService.getProduct(srmSearchCount.getProductId());
+                        if (product != null && product.getPrice() > 0) {
+                            products.add(productService.getProduct(srmSearchCount.getProductId()));
+                        }
                     }
                 }
                 if (products != null && products.size() > 0) {
