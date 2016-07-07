@@ -1,4 +1,4 @@
-package hasoffer.core.test;
+package hasoffer.core.test.basetest;
 
 import hasoffer.base.model.PageableResult;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
