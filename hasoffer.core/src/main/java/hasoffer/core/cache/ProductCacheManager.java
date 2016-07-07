@@ -69,12 +69,8 @@ public class ProductCacheManager {
         String key = CACHE_KEY_PRE + "_getProductMasterImageUrl_" + id;
 
         String imageUrl = cacheService.get(key, 0);
-        logger.error("从缓存中取   图片为  =======================" + imageUrl);
         if (imageUrl == null) {
-            logger.error("缓存中不存在  ===========================");
-            logger.error("id  =======  " + id + "  ====================");
             imageUrl = productService.getProductMasterImageUrl(id);
-            logger.error("url  =======  " + imageUrl + "  ====================");
             if (imageUrl != null) {
                 cacheService.add(key, imageUrl, CACHE_EXPIRE_TIME);
             }
@@ -161,18 +157,14 @@ public class ProductCacheManager {
         List<PtmProduct> products = new ArrayList<PtmProduct>();
         try {
             if (StringUtils.isEmpty(ptmProductJson)) {
-                logger.error("缓存中不存在热卖缓存....");
                 List<SrmSearchCount> srmSearchCounts = productService.getTopSellingProductsByDate(date, page, size);
-                logger.error("从库中获取热卖商品 " + date + "   size  " + srmSearchCounts.size());
                 for (SrmSearchCount srmSearchCount : srmSearchCounts) {
                     products.add(productService.getProduct(srmSearchCount.getProductId()));
-                    logger.error("srm中....商品id  " + srmSearchCount.getProductId() + "  添加 " + products.size());
                 }
                 if (products != null && products.size() > 0) {
                     cacheService.add(key, JSONUtil.toJSON(products), TimeUtils.SECONDS_OF_1_HOUR * 2);
                 }
             } else {
-                logger.error("缓存中存在热卖缓存....");
                 List<Map> datas = JSONUtil.toObject(ptmProductJson, List.class);
                 for (Map map : datas) {
                     PtmProduct ptmProduct = new PtmProduct();
@@ -197,7 +189,6 @@ public class ProductCacheManager {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        logger.error("最后热卖列表大小...." + products.size());
         return products;
     }
 }
