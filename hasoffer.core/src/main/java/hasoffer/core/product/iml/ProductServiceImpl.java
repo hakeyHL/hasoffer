@@ -244,7 +244,16 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public String getProductMasterImageUrl(Long id) {
         PtmImage image = getProductMasterImage(id);
-        return image == null ? "" : image.getImageUrl2();
+
+        if (image == null) {
+            return "";
+        } else {
+            if (StringUtils.isEmpty(image.getPath2())) {
+                return image.getImageUrl2();
+            } else {
+                return image.getPath2();
+            }
+        }
     }
 
     @Override
