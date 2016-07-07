@@ -26,6 +26,7 @@ import hasoffer.core.user.IDeviceService;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import hasoffer.fetch.sites.paytm.PaytmHelper;
 import hasoffer.fetch.sites.shopclues.ShopcluesHelper;
+import jodd.io.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -36,6 +37,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -60,7 +63,6 @@ public class FixController {
 
     private static final String Q_PTMCMPSKU = "SELECT t FROM PtmCmpSku t WHERE t.productId < 100000";
     private static final String Q_INDEX = "SELECT t FROM PtmCmpSkuIndex2 t ORDER BY t.id ASC";
-
 
     private static Logger logger = LoggerFactory.getLogger(FixController.class);
     @Resource
@@ -560,4 +562,65 @@ public class FixController {
         return "ok";
     }
 
+    /**
+     * 类目优化
+     * 用来合并三级类目
+     */
+    //fixdata/mergeAndRenameCategroy
+    @RequestMapping(value = "/mergeAndRenameCategroy", method = RequestMethod.GET)
+    @ResponseBody
+    public String mergeAndRenameCategroy() throws IOException {
+
+        File file = new File("C:/Users/wing/Desktop/OptimizeCategory.sql");
+
+
+        String[] categoryKeywordArray = {
+                "Landline Phones",
+                "Mobile Accessories",
+                "Tablet Accessories",
+                "Feeding&Nursing",
+                "Health & Safety",
+                "Body and Skin Care",
+                "",
+        };
+
+        for (String categoryKeyword : categoryKeywordArray) {
+
+            FileUtil.appendString(file, "-- 合并" + categoryKeyword + "\r\n");
+
+            String Q_CATEGORY_BYKEYWORD = "SELECT t FROM PtmCategory t WHERE t.name LIKE '%" + categoryKeyword + "%'";
+
+            List<PtmCategory> categoryList = dbm.query(Q_CATEGORY_BYKEYWORD);
+
+            boolean flag = true;
+            long tempCategoryId = 0;
+
+            for (PtmCategory ptmCategory : categoryList) {
+
+                if (ptmCategory.getLevel() < 3) {
+                    continue;
+                }
+
+                //对其下面的第一个子类目进行名称修改
+                if (flag) {
+                    categoryservice.updateCategoryName(ptmCategory.getId(), "Brand " + categoryKeyword);
+                    tempCategoryId = ptmCategory.getId();
+                    flag = false;
+                    continue;
+                }
+
+                //拼接俩条sql，一条update，一条delete
+                //UPDATE ptmcmpsku SET categoryid = 157 WHERE categoryid = 158;
+                StringBuilder stringBuilder = new StringBuilder();
+
+                stringBuilder.append("UPDATE PtmCmpSku SET categoryid = " + tempCategoryId + " WHERE categoryid = " + ptmCategory.getId() + ";\r\n");
+                stringBuilder.append("DELETE FROM PtmCategory WHERE categoryid = " + ptmCategory.getId() + ";\r\n");
+
+                FileUtil.appendString(file, stringBuilder.toString());
+            }
+
+        }
+
+        return "ok";
+    }
 }
