@@ -26,7 +26,7 @@ public class ImageDownloadTask {
      * 取ptmimage 逻辑：未下载下来的图片，按照失败次数从小到大排
      */
     private static final String Q_PTM_IMAGE =
-            "SELECT t FROM PtmImage t WHERE t.path2 IS NULL ORDER BY t.errTimes ASC,t.id ASC";
+            "SELECT t FROM PtmImage t WHERE t.path IS NULL ORDER BY t.errTimes ASC,t.id ASC";
 
     @Resource
     IImageService imageService;
