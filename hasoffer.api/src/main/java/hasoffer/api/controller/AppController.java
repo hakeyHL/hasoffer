@@ -555,8 +555,8 @@ public class AppController {
                     if (count > 0) {
                         ProductListVo productListVo = new ProductListVo();
                         productListVo.setStoresNum(count);
-                        getCommentNumAndRatins(productListVo);
                         productListVo.setId(productModel.getId());
+                        getCommentNumAndRatins(productListVo);
                         productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
                         productListVo.setName(productModel.getTitle());
                         productListVo.setPrice(productModel.getPrice());
