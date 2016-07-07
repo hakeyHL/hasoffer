@@ -3,6 +3,7 @@ package hasoffer.core.test;
 import hasoffer.base.model.PageableResult;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
+import hasoffer.core.search.ISearchService;
 import hasoffer.core.task.ListAndProcessTask2;
 import hasoffer.core.task.worker.IList;
 import hasoffer.core.task.worker.IProcess;
@@ -29,7 +30,19 @@ public class AutoSearchResultTest {
 
     @Resource
     IMongoDbManager mdm;
+    @Resource
+    ISearchService searchService;
     private Logger logger = LoggerFactory.getLogger(AutoSearchResultTest.class);
+
+    @Test
+    public void ts3() {
+        SrmAutoSearchResult asr = mdm.queryOne(SrmAutoSearchResult.class, "09fb82519bb66ee0473d0cf40aa7fe40");
+        try {
+            searchService.analysisAndRelate(asr);
+        } catch (Exception e) {
+            logger.debug("[" + asr.getId() + "]" + e.getMessage());
+        }
+    }
 
     @Test
     public void f() {
