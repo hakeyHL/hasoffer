@@ -5,8 +5,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.PropertyFilter;
 import hasoffer.base.model.Website;
+import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.dbm.Hibernate4DataBaseManager;
 import hasoffer.core.persistence.po.app.AppDeal;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.product.iml.CmpSkuServiceImpl;
 import hasoffer.core.third.ThirdService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -16,9 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by hs on 2016/7/4.
@@ -28,6 +29,10 @@ public class ThirdServiceImple implements ThirdService {
     private static String THIRD_GMOBI_DEALS = "SELECT t from AppDeal t where t.createTime <=?0  ";
     @Resource
     Hibernate4DataBaseManager hdm;
+    @Resource
+    ProductCacheManager productCacheManager;
+    @Resource
+    CmpSkuServiceImpl cmpSkuService;
     Logger logger = LoggerFactory.getLogger(ThirdServiceImple.class);
 
     @Override
@@ -37,9 +42,8 @@ public class ThirdServiceImple implements ThirdService {
         sb.append(THIRD_GMOBI_DEALS);
         JSONObject jsonObject = JSONObject.parseObject(acceptJson);
         SimpleDateFormat sf = new SimpleDateFormat("yyyyMMddHHmmss");
-        Date createTime = null;
+        Date createTime = new Date();
         try {
-            createTime = new Date();
             if (StringUtils.isNotEmpty(jsonObject.getString("createTime"))) {
                 createTime = sf.parse(jsonObject.getString("createTime"));
             }
@@ -70,6 +74,31 @@ public class ThirdServiceImple implements ThirdService {
                 if (deals != null && deals.size() > 0) {
                     dataList.addAll(deals);
                 }
+            }
+        } else {
+            List<AppDeal> deals = hdm.query(sb.toString(), Arrays.asList(createTime));
+            if (deals != null && deals.size() > 0) {
+                dataList.addAll(deals);
+            }
+        }
+        //add topSelling to list
+        List<PtmProduct> products = productCacheManager.getTopSellingProductsByDate(new SimpleDateFormat("yyyyMMdd").format(createTime), 1, 20);
+        for (PtmProduct product : products) {
+            int count = cmpSkuService.getSkuSoldStoreNum(product.getId());
+            if (count > 0) {
+                AppDeal appDeal = new AppDeal();
+                appDeal.setTitle(product.getTitle());
+                appDeal.setWebsite(Website.valueOf(product.getSourceSite()));
+                appDeal.setCreateTime(product.getCreateTime());
+                appDeal.setDescription(product.getDescription());
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(createTime);
+                calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH) + 2, 0, 0, 0);
+                appDeal.setExpireTime(calendar.getTime());
+                appDeal.setId(product.getId());
+                appDeal.setImageUrl(productCacheManager.getProductMasterImageUrl(product.getId()));
+                appDeal.setLinkUrl(product.getSourceUrl() == null ? "" : product.getSourceUrl());
+                dataList.add(appDeal);
             }
         }
         PropertyFilter propertyFilter = new PropertyFilter() {
