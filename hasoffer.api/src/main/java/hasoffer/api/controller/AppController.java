@@ -551,29 +551,33 @@ public class AppController {
                 Iterator<ProductModel> modelList = sourceList.iterator();
                 while (modelList.hasNext()) {
                     ProductModel productModel = modelList.next();
-                    ProductListVo productListVo = new ProductListVo();
-                    productListVo.setId(productModel.getId());
-                    productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
-                    productListVo.setName(productModel.getTitle());
-                    productListVo.setPrice(productModel.getPrice());
                     int count = cmpSkuService.getSkuSoldStoreNum(productModel.getId());
-                    productListVo.setStoresNum(count);
-                    getCommentNumAndRatins(productListVo);
-                    desList.add(productListVo);
+                    if (count > 0) {
+                        ProductListVo productListVo = new ProductListVo();
+                        productListVo.setStoresNum(count);
+                        getCommentNumAndRatins(productListVo);
+                        productListVo.setId(productModel.getId());
+                        productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
+                        productListVo.setName(productModel.getTitle());
+                        productListVo.setPrice(productModel.getPrice());
+                        desList.add(productListVo);
+                    }
                 }
             } else if (PtmProduct.class.isInstance(sourceList.get(0))) {
                 Iterator<PtmProduct> ptmList = sourceList.iterator();
                 while (ptmList.hasNext()) {
                     PtmProduct ptmProduct = ptmList.next();
-                    ProductListVo productListVo = new ProductListVo();
-                    productListVo.setId(ptmProduct.getId());
-                    productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
-                    productListVo.setName(ptmProduct.getTitle());
-                    productListVo.setPrice(ptmProduct.getPrice());
                     int count = cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
-                    productListVo.setStoresNum(count);
-                    getCommentNumAndRatins(productListVo);
-                    desList.add(productListVo);
+                    if (count > 0) {
+                        ProductListVo productListVo = new ProductListVo();
+                        productListVo.setId(ptmProduct.getId());
+                        productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
+                        productListVo.setName(ptmProduct.getTitle());
+                        productListVo.setPrice(ptmProduct.getPrice());
+                        productListVo.setStoresNum(count);
+                        getCommentNumAndRatins(productListVo);
+                        desList.add(productListVo);
+                    }
                 }
             }
         }
