@@ -19,10 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by hs on 2016/7/4.
@@ -79,7 +76,7 @@ public class ThirdServiceImple implements ThirdService {
                 }
             }
         } else {
-            List<AppDeal> deals = hdm.query(sb.toString());
+            List<AppDeal> deals = hdm.query(sb.toString(), Arrays.asList(createTime));
             if (deals != null && deals.size() > 0) {
                 dataList.addAll(deals);
             }
@@ -95,7 +92,8 @@ public class ThirdServiceImple implements ThirdService {
                 appDeal.setCreateTime(product.getCreateTime());
                 appDeal.setDescription(product.getDescription());
                 Calendar calendar = Calendar.getInstance();
-                calendar.set(Calendar.YEAR, Calendar.MONTH, Calendar.DAY_OF_MONTH + 1, 0, 0, 0);
+                calendar.setTime(createTime);
+                calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH) + 2, 0, 0, 0);
                 appDeal.setExpireTime(calendar.getTime());
                 appDeal.setId(product.getId());
                 appDeal.setImageUrl(productCacheManager.getProductMasterImageUrl(product.getId()));
