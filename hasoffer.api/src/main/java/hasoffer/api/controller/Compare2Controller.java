@@ -474,8 +474,7 @@ public class Compare2Controller {
         CmpResult cmpResult = new CmpResult();
         //从ptmCmpSku表获取 productId为指定值、且状态为ONSALE 按照价格升序排列
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(product.getId(), sio.getPage(), sio.getSize());
-        if (pagedCmpskus != null && pagedCmpskus.getPageSize() > 0) {
-
+        if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
             List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
             Long tempTotalComments = Long.valueOf(0);
             int tempRatins = 0;
