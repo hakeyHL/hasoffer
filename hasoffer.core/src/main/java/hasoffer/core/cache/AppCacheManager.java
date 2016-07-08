@@ -72,40 +72,32 @@ public class AppCacheManager {
                 ptmCategorys = appService.getChildCategorys(categoryId);
                 for (PtmCategory ptmCategory : ptmCategorys) {
                     List childCategory = new ArrayList();
-                    if (ptmCategory.getLevel() <= 3) {
-                        CategoryVo categoryVo = new CategoryVo();
-                        categoryVo.setId(ptmCategory.getId());
-                        categoryVo.setImage(ptmCategory.getImageUrl() == null ? "" : ImageUtil.getImageUrl(ptmCategory.getImageUrl()));
-                        categoryVo.setLevel(ptmCategory.getLevel());
-                        categoryVo.setName(ptmCategory.getName());
-                        categoryVo.setParentId(ptmCategory.getParentId());
-                        categoryVo.setRank(ptmCategory.getRank());
-                        categoryVo.setHasChildren(1);
-                        List<PtmCategory> ptmCategorysTemp = appService.getChildCategorys(ptmCategory.getId().toString());
-                        if (ptmCategorysTemp != null && ptmCategorysTemp.size() > 0) {
-                            for (PtmCategory ptmCates : ptmCategorysTemp) {
-                                if (ptmCates.getLevel() <= 3) {
-                                    CategoryVo cate = new CategoryVo();
-                                    cate.setId(ptmCates.getId());
-                                    cate.setHasChildren(0);
-//                            List li=appService.getChildCategorys(ptmCates.getId().toString());
-//                            if(li!=null&&li.size()>0){
-//                                cate.setHasChildren(1);
-//                            }
-                                    cate.setImage(ptmCates.getImageUrl() == null ? "" : ImageUtil.getImageUrl(ptmCates.getImageUrl()));
-                                    cate.setLevel(ptmCates.getLevel());
-                                    cate.setName(ptmCates.getName());
-                                    cate.setParentId(ptmCates.getParentId());
-                                    cate.setRank(ptmCates.getRank());
-                                    childCategory.add(cate);
-                                }
-                            }
-                        } else {
-                            categoryVo.setHasChildren(0);
+                    CategoryVo categoryVo = new CategoryVo();
+                    categoryVo.setId(ptmCategory.getId());
+                    categoryVo.setImage(ptmCategory.getImageUrl() == null ? "" : ImageUtil.getImageUrl(ptmCategory.getImageUrl()));
+                    categoryVo.setLevel(ptmCategory.getLevel());
+                    categoryVo.setName(ptmCategory.getName());
+                    categoryVo.setParentId(ptmCategory.getParentId());
+                    categoryVo.setRank(ptmCategory.getRank());
+                    categoryVo.setHasChildren(1);
+                    List<PtmCategory> ptmCategorysTemp = appService.getChildCategorys(ptmCategory.getId().toString());
+                    if (ptmCategorysTemp != null && ptmCategorysTemp.size() > 0) {
+                        for (PtmCategory ptmCates : ptmCategorysTemp) {
+                            CategoryVo cate = new CategoryVo();
+                            cate.setId(ptmCates.getId());
+                            cate.setHasChildren(0);
+                            cate.setImage(ptmCates.getImageUrl() == null ? "" : ImageUtil.getImageUrl(ptmCates.getImageUrl()));
+                            cate.setLevel(ptmCates.getLevel());
+                            cate.setName(ptmCates.getName());
+                            cate.setParentId(ptmCates.getParentId());
+                            cate.setRank(ptmCates.getRank());
+                            childCategory.add(cate);
                         }
-                        categoryVo.setCategorys(childCategory);
-                        categorys.add(categoryVo);
+                    } else {
+                        categoryVo.setHasChildren(0);
                     }
+                    categoryVo.setCategorys(childCategory);
+                    categorys.add(categoryVo);
                 }
                 categoryBo.setCategorys(categorys);
                 if (categoryBo.getCategorys() != null && categoryBo.getCategorys().size() > 0) {
