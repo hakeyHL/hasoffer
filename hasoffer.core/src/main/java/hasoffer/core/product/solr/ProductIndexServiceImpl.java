@@ -37,7 +37,7 @@ public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductM
         fqList.add(new FilterQuery("price", "[1 TO *]"));
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
 
-        SearchResult<ProductModel> sr = searchObjs(title, fqs, sorts, pivotFacets, page, size, true);
+        SearchResult<ProductModel> sr = searchObjs(title, fqs, sorts, pivotFacets, page + 1, size, true);
 
         return new PageableResult<ProductModel>(sr.getResult(), sr.getTotalCount(), page, size);
     }
@@ -56,7 +56,7 @@ public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductM
         fqList.add(new FilterQuery("price", "[1 TO *]"));
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
 
-        SearchResult<ProductModel> sr = searchObjs(q, fqs, sorts, pivotFacets, page, size, true);
+        SearchResult<ProductModel> sr = searchObjs(q, fqs, sorts, pivotFacets, page + 1, size, true);
 
         return new PageableResult<ProductModel>(sr.getResult(), sr.getTotalCount(), page, size);
     }
