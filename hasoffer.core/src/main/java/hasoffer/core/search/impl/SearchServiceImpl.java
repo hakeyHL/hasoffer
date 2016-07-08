@@ -3,6 +3,7 @@ package hasoffer.core.search.impl;
 import hasoffer.base.config.AppConfig;
 import hasoffer.base.enums.HasofferRegion;
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.HexDigestUtil;
@@ -76,6 +77,51 @@ public class SearchServiceImpl implements ISearchService {
     SearchLogCacheManager searchLogCacheManager;
 
     private Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
+
+    @Override
+    public void saveSearchCount(String ymd) {
+        Map<Long, Long> countMap = searchLogCacheManager.getProductCount(ymd);
+
+        List<SrmProductSearchCount> spscs = new ArrayList<SrmProductSearchCount>();
+
+        int count = 0;
+
+        for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
+            count++;
+
+            long productId = countKv.getKey();
+
+            List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId, SkuStatus.ONSALE);
+            int size = 0;
+            if (ArrayUtils.hasObjs(cmpSkus)) {
+                size = cmpSkus.size();
+            }
+
+            spscs.add(new SrmProductSearchCount(ymd, productId, countKv.getValue(), size));
+
+            if (count % 2000 == 0) {
+                saveLogCount(spscs);
+                count = 0;
+                spscs.clear();
+            }
+        }
+
+        if (ArrayUtils.hasObjs(spscs)) {
+            saveLogCount(spscs);
+        }
+
+        /*Collections.sort(spsc, new Comparator<SrmProductSearchCount>() {
+            @Override
+            public int compare(SrmProductSearchCount o1, SrmProductSearchCount o2) {
+                if (o1.getCount() > o2.getCount()) {
+                    return -1;
+                } else if (o1.getCount() < o2.getCount()) {
+                    return 1;
+                }
+                return 0;
+            }
+        });*/
+    }
 
     @Override
     public void analysisAndRelate(SrmAutoSearchResult asr) {

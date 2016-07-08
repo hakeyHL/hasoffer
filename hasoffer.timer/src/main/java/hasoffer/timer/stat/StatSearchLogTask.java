@@ -24,6 +24,7 @@ public class StatSearchLogTask {
 
         String ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
 
+        searchService.saveSearchCount(ymd);
 
     }
 

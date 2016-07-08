@@ -4,7 +4,6 @@ import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
-import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.redis.impl.CacheServiceImpl;
 import hasoffer.core.search.ISearchService;
@@ -19,7 +18,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -43,22 +41,6 @@ public class RedisTest {
     ISearchService searchService;
     @Resource
     private RedisTemplate<Serializable, Serializable> redisTemplate;
-
-    @Test
-    public void save() {
-        String ymd = "20160627";
-
-        Map<Long, Long> countMap = logCacheManager.getProductCount(ymd);
-
-        List<PtmTopSelling> sscs = new ArrayList<PtmTopSelling>();
-
-        for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
-            PtmTopSelling ssc = new PtmTopSelling(ymd, countKv.getKey(), countKv.getValue());
-            sscs.add(ssc);
-        }
-
-        searchService.saveLogCount(sscs);
-    }
 
     @Test
     public void stat() {

@@ -2,14 +2,12 @@ package hasoffer.admin.manager;
 
 import hasoffer.admin.common.CategoryHelper;
 import hasoffer.admin.controller.vo.SearchLogVo;
-import hasoffer.base.model.SkuStatus;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
@@ -19,7 +17,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Date : 2016/4/20
@@ -89,49 +86,5 @@ public class SearchLogManager {
         }
 
         return searchLogVos;
-    }
-
-    public void saveSearchCount(String ymd) {
-        Map<Long, Long> countMap = searchLogCacheManager.getProductCount(ymd);
-
-        List<SrmProductSearchCount> spscs = new ArrayList<SrmProductSearchCount>();
-
-        int count = 0;
-
-        for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
-            count++;
-
-            long productId = countKv.getKey();
-
-            List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId, SkuStatus.ONSALE);
-            int size = 0;
-            if (ArrayUtils.hasObjs(cmpSkus)) {
-                size = cmpSkus.size();
-            }
-
-            spscs.add(new SrmProductSearchCount(ymd, productId, countKv.getValue(), size));
-
-            if (count % 2000 == 0) {
-                searchService.saveLogCount(spscs);
-                count = 0;
-                spscs.clear();
-            }
-        }
-
-        if (ArrayUtils.hasObjs(spscs)) {
-            searchService.saveLogCount(spscs);
-        }
-
-        /*Collections.sort(spsc, new Comparator<SrmProductSearchCount>() {
-            @Override
-            public int compare(SrmProductSearchCount o1, SrmProductSearchCount o2) {
-                if (o1.getCount() > o2.getCount()) {
-                    return -1;
-                } else if (o1.getCount() < o2.getCount()) {
-                    return 1;
-                }
-                return 0;
-            }
-        });*/
     }
 }

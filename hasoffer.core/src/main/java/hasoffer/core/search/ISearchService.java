@@ -23,6 +23,8 @@ import java.util.Map;
 
 public interface ISearchService {
 
+    void saveSearchCount(String ymd);
+
     void mergeProducts(PtmProduct finalProduct, Map<Website, PtmCmpSku> cmpSkuMap, PtmProduct product);
 
     void relateUnmatchedSearchLog(SrmSearchLog searchLog, Map<Website, ListProduct> listProductMap);

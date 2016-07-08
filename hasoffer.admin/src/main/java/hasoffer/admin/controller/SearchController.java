@@ -88,7 +88,7 @@ public class SearchController {
             ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
         }
 
-        searchLogManager.saveSearchCount(ymd);
+        searchService.saveSearchCount(ymd);
 
         return "ok";
     }
