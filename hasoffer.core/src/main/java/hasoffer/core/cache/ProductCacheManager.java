@@ -161,7 +161,7 @@ public class ProductCacheManager {
             if (StringUtils.isEmpty(ptmProductJson)) {
                 List<PtmTopSelling> ptmTopSellings = productService.getTopSellingProductsByDate(date, page, size);
                 for (PtmTopSelling ptmTopSelling : ptmTopSellings) {
-                    PageableResult<PtmCmpSku> pageableResult = productCacheManager.listPagedCmpSkus(ptmTopSelling.getProductId(), 1, 20);
+                    PageableResult<PtmCmpSku> pageableResult = productCacheManager.listPagedCmpSkus(ptmTopSelling.getProductId(), 0, 20);
                     if (pageableResult != null && pageableResult.getData() != null && pageableResult.getData().size() > 0) {
                         PtmProduct product = productService.getProduct(ptmTopSelling.getProductId());
                         if (product != null && product.getPrice() > 0) {
