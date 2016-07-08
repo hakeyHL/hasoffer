@@ -90,6 +90,8 @@ public class SearchController {
 
         searchService.saveSearchCount(ymd);
 
+        productService.expTopSellingsFromSearchCount(ymd);
+
         return "ok";
     }
 

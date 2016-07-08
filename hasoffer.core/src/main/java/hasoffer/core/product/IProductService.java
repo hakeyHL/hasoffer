@@ -70,4 +70,6 @@ public interface IProductService {
     ProductBo getProductBo(long proId);
 
     PtmImage getProductMasterImage(Long id);
+
+    void expTopSellingsFromSearchCount(String ymd);
 }
