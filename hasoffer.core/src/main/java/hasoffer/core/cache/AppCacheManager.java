@@ -84,7 +84,7 @@ public class AppCacheManager {
                         List<PtmCategory> ptmCategorysTemp = appService.getChildCategorys(ptmCategory.getId().toString());
                         if (ptmCategorysTemp != null && ptmCategorysTemp.size() > 0) {
                             for (PtmCategory ptmCates : ptmCategorysTemp) {
-                                if (ptmCategory.getLevel() <= 3) {
+                                if (ptmCates.getLevel() <= 3) {
                                     CategoryVo cate = new CategoryVo();
                                     cate.setId(ptmCates.getId());
                                     cate.setHasChildren(0);
