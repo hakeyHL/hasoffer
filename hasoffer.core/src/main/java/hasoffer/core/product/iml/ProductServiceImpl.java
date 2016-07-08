@@ -279,7 +279,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public List<SrmSearchCount> getTopSellingProductsByDate(String date, int page, int size) {
-        return dbm.query(Q_PTM_SRMSEARCHCOUNT, page, size, Arrays.asList(date));
+        return dbm.query(Q_PTM_SRMSEARCHCOUNT, page==0?0:page*size, size==0?20:size, Arrays.asList(date));
     }
 
     @Override
