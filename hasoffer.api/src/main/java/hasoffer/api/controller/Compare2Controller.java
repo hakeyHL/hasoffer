@@ -19,6 +19,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
+import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.product.iml.ProductServiceImpl;
 import hasoffer.core.product.solr.CategoryIndexServiceImpl;
 import hasoffer.core.product.solr.CmpSkuModel;
@@ -26,6 +27,7 @@ import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.exception.NonMatchedProductException;
+import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
@@ -69,6 +71,8 @@ public class Compare2Controller {
     ProductServiceImpl productService;
     @Resource
     IMongoDbManager mongoDbManager;
+    @Resource
+    AppServiceImpl appService;
     private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
 
     // @Cacheable(value = "compare", key = "'getcmpskus_'+#q+'_'+#site+'_'+#price+'_'+#page+'_'+#size")
@@ -455,9 +459,9 @@ public class Compare2Controller {
         List<String> affs = new ArrayList<String>();
         affs.add(sio.getMarketChannel().name());
         affs.add(sio.getDeviceId());
-        Object userIdObj = Context.currentContext().get(StaticContext.USER_ID);
-        if (userIdObj != null) {
-            affs.add(userIdObj.toString());
+        UrmUser urmUser = appService.getUserByUserToken((String) Context.currentContext().get(StaticContext.USER_TOKEN));
+        if (urmUser != null) {
+            affs.add(urmUser.getId().toString());
         }
         return affs;
     }
