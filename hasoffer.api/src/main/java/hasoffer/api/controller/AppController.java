@@ -559,7 +559,7 @@ public class AppController {
                         setCommentNumAndRatins(productListVo);
                         productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
                         productListVo.setName(productModel.getTitle());
-                        productListVo.setPrice(productModel.getPrice());
+                        productListVo.setPrice(Math.round(productModel.getPrice()));
                         desList.add(productListVo);
                     }
                 }
@@ -573,7 +573,7 @@ public class AppController {
                         productListVo.setId(ptmProduct.getId());
                         productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
                         productListVo.setName(ptmProduct.getTitle());
-                        productListVo.setPrice(ptmProduct.getPrice());
+                        productListVo.setPrice(Math.round(ptmProduct.getPrice()));
                         productListVo.setStoresNum(count);
                         setCommentNumAndRatins(productListVo);
                         desList.add(productListVo);
