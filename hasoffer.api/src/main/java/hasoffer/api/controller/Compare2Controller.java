@@ -179,7 +179,7 @@ public class Compare2Controller {
         String imageUrl = productCacheManager.getProductMasterImageUrl(product.getId());
         List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
         CmpProductListVo cplv = new CmpProductListVo();
-        cplv.setPrice(product.getPrice());
+        cplv.setPrice(Math.round(product.getPrice()));
         cplv.setTotalRatingsNum(Long.valueOf(0));
         cplv.setRatingNum(0);
         cplv.setBackRate(1.5f);

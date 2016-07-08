@@ -1,5 +1,6 @@
 package hasoffer.fetch.helper;
 
+import hasoffer.base.config.AppConfig;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.UrlUtils;
@@ -202,19 +203,13 @@ public class WebsiteHelper {
     }
 
     public static String getLogoUrl(Website website) {
-        String url = "http://img.hasoffer.com/sites/";
-//        String url = "http://api.hasoffer.com/static/image/sites/";
+        String path = "";
         if (website == null) {
-            return url + "NULL.png";
+            path = path + "NULL.png";
+        } else {
+            path = path + website.name() + ".jpg";
         }
-        return url + website.name() + ".jpg";
-    }
-
-    public static String getLogoUrl1(String url, Website website) {
-        if (website == null) {
-            return url + "/static/image/sites/NULL.jpg";
-        }
-        return url + website.name() + ".jpg";
+        return AppConfig.get(AppConfig.IMAGE_SITELOGO_PATH) + path;
     }
 
     public static String getRealUrl(String oriUrl) {

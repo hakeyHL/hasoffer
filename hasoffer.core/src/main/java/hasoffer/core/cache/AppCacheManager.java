@@ -86,10 +86,6 @@ public class AppCacheManager {
                             CategoryVo cate = new CategoryVo();
                             cate.setId(ptmCates.getId());
                             cate.setHasChildren(0);
-//                            List li=appService.getChildCategorys(ptmCates.getId().toString());
-//                            if(li!=null&&li.size()>0){
-//                                cate.setHasChildren(1);
-//                            }
                             cate.setImage(ptmCates.getImageUrl() == null ? "" : ImageUtil.getImageUrl(ptmCates.getImageUrl()));
                             cate.setLevel(ptmCates.getLevel());
                             cate.setName(ptmCates.getName());

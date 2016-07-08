@@ -15,7 +15,7 @@ public class CmpProductListVo {
     private String image;
     private float ratingNum;
     private Long totalRatingsNum;
-    private float price;
+    private int price;
     private float freight;
     private String distributionTime;
     private Long coins;
@@ -31,11 +31,10 @@ public class CmpProductListVo {
     public CmpProductListVo(PtmCmpSku cmpSku, String logoImage) {
         this.coins = Math.round(0.015 * cmpSku.getPrice());
         this.ratingNum = cmpSku.getRatings();
-        this.price = cmpSku.getPrice();
         this.totalRatingsNum = cmpSku.getCommentsNumber();
         this.image = logoImage;
         this.ratingNum = Long.valueOf(cmpSku.getRating() == null ? "0" : cmpSku.getRating());
-        this.price = cmpSku.getPrice();
+        this.price = Math.round(cmpSku.getPrice());
         this.website = cmpSku.getWebsite();
         this.freight = cmpSku.getShipping();
         this.distributionTime = cmpSku.getDeliveryTime();
@@ -50,7 +49,7 @@ public class CmpProductListVo {
         }
     }
 
-    public CmpProductListVo(String image, float ratingNum, Long totalRatingsNum, float price, int freight, String distributionTime, Long coins, float backRate, int returnGuarantee, List<String> support) {
+    public CmpProductListVo(String image, float ratingNum, Long totalRatingsNum, int price, int freight, String distributionTime, Long coins, float backRate, int returnGuarantee, List<String> support) {
         this.image = image;
         this.ratingNum = ratingNum;
         this.totalRatingsNum = totalRatingsNum;
@@ -112,11 +111,11 @@ public class CmpProductListVo {
         this.totalRatingsNum = totalRatingsNum;
     }
 
-    public float getPrice() {
+    public int getPrice() {
         return price;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(int price) {
         this.price = price;
     }
 

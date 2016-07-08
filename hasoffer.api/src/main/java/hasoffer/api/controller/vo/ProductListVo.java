@@ -7,7 +7,7 @@ package hasoffer.api.controller.vo;
 public class ProductListVo {
     private  Long id;
     private  String name;
-    private double price;
+    private int price;
     private  int storesNum;
     private Long commentNum;
     private  String  imageUrl;
@@ -45,11 +45,11 @@ public class ProductListVo {
         this.name = name;
     }
 
-    public double getPrice() {
+    public int getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(int price) {
         this.price = price;
     }
 

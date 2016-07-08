@@ -1,4 +1,5 @@
 package hasoffer.core.bo.system;
+
 /**
  * Created by hs on 2016/6/21.
  */
@@ -61,7 +62,7 @@ public class SearchCriteria {
     }
 
     public int getPage() {
-        return page==0?1:page;
+        return page==0?0:page;
     }
 
     public void setPage(int page) {

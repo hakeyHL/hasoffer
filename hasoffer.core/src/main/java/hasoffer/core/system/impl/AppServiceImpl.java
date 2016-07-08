@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -56,7 +57,7 @@ public class AppServiceImpl implements IAppService {
             "SELECT t FROM UrmUser t " +
                     " where t.thirdId=?0";
     private static final String Q_APP_GETDEALS =
-            "SELECT t FROM AppDeal t ";
+            "SELECT t FROM AppDeal t where t.expireTime >= ?0 order by createTime desc   ";
     private static final String Q_APP_GETBANNERS =
             " SELECT t from AppBanner t ORDER BY id desc";
 
@@ -64,7 +65,7 @@ public class AppServiceImpl implements IAppService {
             " SELECT t from AppDeal t where t.id=?0";
 
     private static final String Q_APP_GETCHILDCATEGORY =
-            "SELECT t FROM PtmCategory t where t.parentId=?0 " +
+            "SELECT t FROM PtmCategory t where t.parentId=?0 and level<=3 " +
                     " order by level ASC,rank ASC";
 
     private static final String Q_APP_CATEGORY_ISHASCHILDNODE =
@@ -116,7 +117,7 @@ public class AppServiceImpl implements IAppService {
         if(pageSize==0){
             pageSize=Long.valueOf(20);
         }
-        return dbm.queryPage(Q_APP_GETDEALS, page.intValue(), pageSize.intValue());
+        return dbm.queryPage(Q_APP_GETDEALS, page.intValue()*pageSize.intValue(), pageSize.intValue(),Arrays.asList(new Date()));
     }
 
     @Override

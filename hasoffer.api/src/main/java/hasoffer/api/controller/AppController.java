@@ -393,7 +393,7 @@ public class AppController {
                         "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +
                         "3. Rewards may not paid on purchases made using store credits/gift vouchers\n" +
                         "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
-                        "5 urm. Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
+                        "5  Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
             }
             map.put("deeplink", WebsiteHelper.getUrlWithAff(appDeal.getLinkUrl() == null ? "" : appDeal.getLinkUrl()));
             mv.addObject("data", map);
@@ -515,7 +515,7 @@ public class AppController {
         //查询热卖商品
         Date date = new Date();
         date.setTime(date.getTime() - 1 * 24 * 60 * 60 * 1000);
-        List<PtmProduct> products2s = productCacheManager.getTopSellingProductsByDate(new SimpleDateFormat("yyyyMMdd").format(date), 1, 20);
+        List<PtmProduct> products2s = productCacheManager.getTopSellingProductsByDate(new SimpleDateFormat("yyyyMMdd").format(date), criteria.getPage(), criteria.getPageSize());
         switch (type) {
             case 0:
                 addProductVo2List(li, products2s);
@@ -556,10 +556,10 @@ public class AppController {
                         ProductListVo productListVo = new ProductListVo();
                         productListVo.setStoresNum(count);
                         productListVo.setId(productModel.getId());
-                        getCommentNumAndRatins(productListVo);
+                        setCommentNumAndRatins(productListVo);
                         productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
                         productListVo.setName(productModel.getTitle());
-                        productListVo.setPrice(productModel.getPrice());
+                        productListVo.setPrice(Math.round(productModel.getPrice()));
                         desList.add(productListVo);
                     }
                 }
@@ -573,9 +573,9 @@ public class AppController {
                         productListVo.setId(ptmProduct.getId());
                         productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
                         productListVo.setName(ptmProduct.getTitle());
-                        productListVo.setPrice(ptmProduct.getPrice());
+                        productListVo.setPrice(Math.round(ptmProduct.getPrice()));
                         productListVo.setStoresNum(count);
-                        getCommentNumAndRatins(productListVo);
+                        setCommentNumAndRatins(productListVo);
                         desList.add(productListVo);
                     }
                 }
@@ -583,7 +583,7 @@ public class AppController {
         }
     }
 
-    public void getCommentNumAndRatins(ProductListVo productListVo) {
+    public void setCommentNumAndRatins(ProductListVo productListVo) {
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productListVo.getId(), 1, 10);
         if (pagedCmpskus != null) {
             Long totalCommentNum = Long.valueOf(0);
