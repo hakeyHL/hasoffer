@@ -94,7 +94,7 @@
                 <div class="form-group">
                     <label  class="col-sm-3 control-label">deal描述：</label>
                     <div class="col-sm-7">
-                        <textarea class="form-control" name="description" rows="5" content="${deal.description}"></textarea>
+                        <textarea class="form-control" name="description" rows="5" content="${deal.description}">Click "Activate Deal" button.Add the product of your choice to cart.And no coupon code required.</textarea>
                     </div>
                 </div>
 

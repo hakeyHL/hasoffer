@@ -73,7 +73,7 @@ public class FetchKeywordWorker implements Runnable {
         } catch (HttpFetchException e) {
             if (fetchResult.getRunCount() < 5) {
                 fetchResult.setRunCount(fetchResult.getRunCount() + 1);
-                fetchCacheService.saveKeyword(StringConstant.WAIT_KEY_LIST, JSONUtil.toJSON(fetchResult));
+                fetchCacheService.saveKeywordList(StringConstant.WAIT_KEY_LIST, JSONUtil.toJSON(fetchResult));
             } else {
                 fetchResult.setTaskStatus(TaskStatus.STOPPED);
                 fetchResult.setErrMsg("The task is failed: run over 5 times. ");

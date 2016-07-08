@@ -32,7 +32,7 @@
         <!-- maven settings -->
         <hasoffer.version>1.0-SNAPSHOT</hasoffer.version>
 
-        <project.bui.sourceEncoding>UTF-8</project.bui.sourceEncoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.framework.version>4.1.6.RELEASE</spring.framework.version>
         <springdata.mongodb.version>1.8.2.RELEASE</springdata.mongodb.version>
         <sprintdata.redis.version>1.6.2.RELEASE</sprintdata.redis.version>

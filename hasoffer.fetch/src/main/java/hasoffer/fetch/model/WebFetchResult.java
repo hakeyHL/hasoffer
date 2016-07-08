@@ -55,4 +55,12 @@ public class WebFetchResult implements Serializable {
     public void setProductList(List<ListProduct> productList) {
         this.productList = productList;
     }
+
+    @Override
+    public String toString() {
+        return "WebFetchResult{" +
+                "updateDate=" + updateDate +
+                ", productList.size=" + productList.size() +
+                '}';
+    }
 }

@@ -48,7 +48,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
 
     private void addFetchTask(FetchResult fetchResult) {
         String key = FetchResult.getCacheKey(fetchResult);
-        fetchCacheService.saveKeyword(StringConstant.WAIT_KEY_LIST, JSONUtil.toJSON(fetchResult));
+        fetchCacheService.saveKeywordList(StringConstant.WAIT_KEY_LIST, JSONUtil.toJSON(fetchResult));
         fetchCacheService.cacheResult(key, fetchResult);
     }
 
@@ -63,8 +63,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
         if (key == null) {
             return;
         }
-
-        fetchCacheService.saveKeyword(StringConstant.WAIT_URL_LIST, JSONUtil.toJSON(fetchUrlResult));
+        fetchCacheService.saveKeywordList(StringConstant.WAIT_URL_LIST, JSONUtil.toJSON(fetchUrlResult));
         fetchCacheService.cacheResult(key, fetchUrlResult);
 
     }

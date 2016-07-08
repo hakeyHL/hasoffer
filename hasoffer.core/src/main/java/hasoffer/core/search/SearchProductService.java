@@ -189,4 +189,8 @@ public class SearchProductService {
     public SrmAutoSearchResult getSearchResult(SrmSearchLog searchLog) {
         return mdm.queryOne(SrmAutoSearchResult.class, searchLog.getId());
     }
+
+    public SrmAutoSearchResult getSearchResultById(String id) {
+        return mdm.queryOne(SrmAutoSearchResult.class, id);
+    }
 }
