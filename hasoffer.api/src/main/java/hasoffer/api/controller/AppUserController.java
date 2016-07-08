@@ -24,7 +24,7 @@ public class AppUserController {
     AppServiceImpl appService;
 
     @RequestMapping("/addUserId2DeepLink")
-    public String get(@RequestParam String affUrl, String website) {
+    public String get(@RequestParam String deepLink, String website) {
         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         SearchIO sio = new SearchIO("", "", "", website, "", deviceInfo.getMarketChannel(), deviceId, 0, 0);
@@ -35,7 +35,7 @@ public class AppUserController {
         } else {
             affs = new String[]{sio.getMarketChannel().name(), sio.getDeviceId()};
         }
-        String affsUrl = WebsiteHelper.getUrlWithAff(Website.valueOf(website), affUrl, affs);
+        String affsUrl = WebsiteHelper.getUrlWithAff(Website.valueOf(website), deepLink, affs);
         return affsUrl;
     }
 }
