@@ -145,7 +145,7 @@
                         <td>日期</td>
                         <td>渠道</td>
                         <td>设备</td>
-                        <%--<td>存活设备（All/New）</td>--%>
+                        <td>存活设备（All/New）</td>
                         <td>存活带电商设备（All/Old/New）</td>
                         <td>绑定辅助功能</td>
                         <td>WakeUp（All/New）</td>
@@ -162,7 +162,7 @@
                             <td>${alive.date}</td>
                             <td>${alive.marketChannel}</td>
                             <td>${alive.brand}__${alive.osVersion}</td>
-                                <%--<td>${alive.allAlive} / ${alive.newAlive}</td>--%>
+                            <td>${alive.allAlive} / ${alive.newAlive}</td>
                             <td>${alive.eCommerceAll}/${alive.eCommerceAll - alive.eCommerceNew}/${alive.eCommerceNew}</td>
                             <td>${alive.bindAssist}</td>
                             <td>${alive.wakeUpAll}/${alive.wakeUpNew}</td>
