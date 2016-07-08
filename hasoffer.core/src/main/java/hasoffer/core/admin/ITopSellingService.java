@@ -1,8 +1,7 @@
 package hasoffer.core.admin;
 
+import hasoffer.base.model.PageableResult;
 import hasoffer.core.persistence.po.ptm.PtmTopSelling;
-
-import java.util.List;
 
 /**
  * Created on 2016/7/6.
@@ -16,6 +15,6 @@ public interface ITopSellingService {
      * @param longEndTime
      * @return
      */
-    List<PtmTopSelling> findTopSellingListByDate(long longStartTime, Long longEndTime);
+    PageableResult<PtmTopSelling> findTopSellingListByDate(long longStartTime, Long longEndTime, int page, int size);
 
 }
