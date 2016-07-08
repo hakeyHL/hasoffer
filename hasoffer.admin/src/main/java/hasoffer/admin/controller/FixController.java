@@ -514,7 +514,7 @@ public class FixController {
         es.execute(new FixPtmProductCategoryListWorker(dbm, quene));
 
         for (int i = 0; i < 10; i++) {
-            es.execute(new FixPtmProductCategoryUpdateWorker(quene, dbm));
+            es.execute(new FixPtmProductCategoryUpdateWorker(quene, dbm, productService));
         }
 
         return "ok";
@@ -602,38 +602,38 @@ public class FixController {
 
         String categoryKeyword = "Pencil Boxes";
 
-            FileUtil.appendString(file, "-- 合并" + categoryKeyword + "\r\n");
+        FileUtil.appendString(file, "-- 合并" + categoryKeyword + "\r\n");
 
-            String Q_CATEGORY_BYKEYWORD = "SELECT t FROM PtmCategory t WHERE t.name LIKE '%" + categoryKeyword + "%'";
+        String Q_CATEGORY_BYKEYWORD = "SELECT t FROM PtmCategory t WHERE t.name LIKE '%" + categoryKeyword + "%'";
 
-            List<PtmCategory> categoryList = dbm.query(Q_CATEGORY_BYKEYWORD);
+        List<PtmCategory> categoryList = dbm.query(Q_CATEGORY_BYKEYWORD);
 
-            boolean flag = true;
-            long tempCategoryId = 0;
+        boolean flag = true;
+        long tempCategoryId = 0;
 
-            for (PtmCategory ptmCategory : categoryList) {
+        for (PtmCategory ptmCategory : categoryList) {
 
-                if (ptmCategory.getLevel() != 3) {
-                    continue;
-                }
-
-                //对其下面的第一个子类目进行名称修改
-                if (flag) {
-                    categoryservice.updateCategoryName(ptmCategory.getId(), "Brand " + categoryKeyword);
-                    tempCategoryId = ptmCategory.getId();
-                    flag = false;
-                    continue;
-                }
-
-                //拼接俩条sql，一条update，一条delete
-                //UPDATE ptmcmpsku SET categoryid = 157 WHERE categoryid = 158;
-                StringBuilder stringBuilder = new StringBuilder();
-
-                stringBuilder.append("UPDATE PtmCmpSku SET categoryid = " + tempCategoryId + " WHERE categoryid = " + ptmCategory.getId() + ";\r\n");
-                stringBuilder.append("DELETE FROM PtmCategory WHERE id = " + ptmCategory.getId() + ";\r\n");
-
-                FileUtil.appendString(file, stringBuilder.toString());
+            if (ptmCategory.getLevel() != 3) {
+                continue;
             }
+
+            //对其下面的第一个子类目进行名称修改
+            if (flag) {
+                categoryservice.updateCategoryName(ptmCategory.getId(), "Brand " + categoryKeyword);
+                tempCategoryId = ptmCategory.getId();
+                flag = false;
+                continue;
+            }
+
+            //拼接俩条sql，一条update，一条delete
+            //UPDATE ptmcmpsku SET categoryid = 157 WHERE categoryid = 158;
+            StringBuilder stringBuilder = new StringBuilder();
+
+            stringBuilder.append("UPDATE PtmCmpSku SET categoryid = " + tempCategoryId + " WHERE categoryid = " + ptmCategory.getId() + ";\r\n");
+            stringBuilder.append("DELETE FROM PtmCategory WHERE id = " + ptmCategory.getId() + ";\r\n");
+
+            FileUtil.appendString(file, stringBuilder.toString());
+        }
 
 //        }
 
