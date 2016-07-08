@@ -65,7 +65,7 @@ public class AppServiceImpl implements IAppService {
             " SELECT t from AppDeal t where t.id=?0";
 
     private static final String Q_APP_GETCHILDCATEGORY =
-            "SELECT t FROM PtmCategory t where t.parentId=?0 " +
+            "SELECT t FROM PtmCategory t where t.parentId=?0 and level<=3 " +
                     " order by level ASC,rank ASC";
 
     private static final String Q_APP_CATEGORY_ISHASCHILDNODE =
