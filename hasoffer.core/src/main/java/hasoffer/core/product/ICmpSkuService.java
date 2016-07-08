@@ -80,4 +80,6 @@ public interface ICmpSkuService {
     void updateStatPtmCmpSkuUpdate(String id, long onSaleAmount, long soldOutAmount, long offsaleAmount, long allAmount, long updateSuccessAmount, long alwaysFailAmount, long newSkuAmount, long indexAmount, long newIndexAmount);
 
     int getSkuSoldStoreNum(Long id);
+
+    List<PtmCmpSku> listCmpSkus(long productId, SkuStatus onsale);
 }

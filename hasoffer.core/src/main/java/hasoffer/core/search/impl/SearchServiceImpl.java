@@ -19,8 +19,8 @@ import hasoffer.core.persistence.enums.SearchPrecise;
 import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
+import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.search.SrmSearchUpdateLog;
 import hasoffer.core.persistence.po.search.updater.SrmSearchLogUpdater;
@@ -563,8 +563,8 @@ public class SearchServiceImpl implements ISearchService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveLogCount(List<PtmTopSelling> ptmTopSellings) {
-        dbm.batchSave(ptmTopSellings);
+    public void saveLogCount(List<SrmProductSearchCount> searchCounts) {
+        dbm.batchSave(searchCounts);
     }
 
     @Override

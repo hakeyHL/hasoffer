@@ -6,10 +6,12 @@ import javax.persistence.*;
 
 /**
  * Created on 2015/12/29.
- * 用于每天的topselling
+ * 1 记录每天被搜索到的商品
+ * 2 统计匹配比价数量
+ * 3 保存每天被搜索次数最多的20个商品 - top selling
  */
 @Entity
-public class SrmSearchProductLog implements Identifiable<Long> {
+public class SrmProductSearchCount implements Identifiable<Long> {
 
     @Id
     @Column(unique = true, nullable = false)
@@ -21,10 +23,10 @@ public class SrmSearchProductLog implements Identifiable<Long> {
     private Long count;
     private int skuCount;//sku 的数量
 
-    public SrmSearchProductLog() {
+    public SrmProductSearchCount() {
     }
 
-    public SrmSearchProductLog(String ymd, long productId, Long count, int skuCount) {
+    public SrmProductSearchCount(String ymd, long productId, Long count, int skuCount) {
         this.ymd = ymd;
         this.productId = productId;
         this.count = count;
@@ -78,7 +80,7 @@ public class SrmSearchProductLog implements Identifiable<Long> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        SrmSearchProductLog that = (SrmSearchProductLog) o;
+        SrmProductSearchCount that = (SrmProductSearchCount) o;
 
         if (productId != that.productId) return false;
         if (skuCount != that.skuCount) return false;

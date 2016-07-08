@@ -17,7 +17,6 @@ import hasoffer.core.persistence.enums.SrmSearchLogUpdate;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.search.SrmSearchUpdateLog;
 import hasoffer.core.persistence.po.sys.SysAdmin;
@@ -47,7 +46,10 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.security.InvalidParameterException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -86,33 +88,7 @@ public class SearchController {
             ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
         }
 
-        Map<Long, Long> countMap = logCacheManager.getProductCount(ymd);
-
-        List<PtmTopSelling> sscs = new ArrayList<PtmTopSelling>();
-
-        for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
-            PtmTopSelling ssc = new PtmTopSelling(ymd, countKv.getKey(), countKv.getValue());
-            sscs.add(ssc);
-        }
-
-        Collections.sort(sscs, new Comparator<PtmTopSelling>() {
-            @Override
-            public int compare(PtmTopSelling o1, PtmTopSelling o2) {
-                if (o1.getCount() > o2.getCount()) {
-                    return -1;
-                } else if (o1.getCount() < o2.getCount()) {
-                    return 1;
-                }
-                return 0;
-            }
-        });
-
-        int size = 20;
-        if (sscs.size() < size) {
-            size = sscs.size();
-        }
-
-        searchService.saveLogCount(sscs.subList(0, size));
+        searchLogManager.saveSearchCount(ymd);
 
         return "ok";
     }

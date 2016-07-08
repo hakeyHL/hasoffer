@@ -57,6 +57,8 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 AND t.website = ?1 ";
     private static final String Q_CMPSKU_BY_TITLE =
             "SELECT t FROM PtmCmpSku t WHERE t.skuTitle = ?0 ";
+    private static final java.lang.String Q_CMPSKU_BY_PRODUCTID_AND_STATUS =
+            "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 AND t.status = ?1 ";
 
     private final String Q_CMPSKU_INDEX_BY_TITLEINDEX = "select t from PtmCmpSkuIndex2 t where t.siteSkuTitleIndex = ?0 ";
 
@@ -253,6 +255,11 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     @Override
     public List<PtmCmpSku> listCmpSkus(long productId) {
         return dbm.query(Q_CMPSKU_BY_PRODUCTID, Arrays.asList(productId));
+    }
+
+    @Override
+    public List<PtmCmpSku> listCmpSkus(long productId, SkuStatus onsale) {
+        return dbm.query(Q_CMPSKU_BY_PRODUCTID_AND_STATUS, Arrays.asList(productId));
     }
 
     @Override
