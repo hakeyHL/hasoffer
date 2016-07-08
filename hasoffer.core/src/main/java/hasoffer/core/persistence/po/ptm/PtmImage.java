@@ -19,6 +19,8 @@ public class PtmImage implements Identifiable<Long> {
 	private String imageUrl;
 	private String path;
 
+	private String path2;
+
 	private int errTimes;
 
 	public PtmImage() {}
@@ -68,6 +70,14 @@ public class PtmImage implements Identifiable<Long> {
 
 	public void setErrTimes(int errTimes) {
 		this.errTimes = errTimes;
+	}
+
+	public String getPath2() {
+		return path2;
+	}
+
+	public void setPath2(String path2) {
+		this.path2 = path2;
 	}
 
 	@Override

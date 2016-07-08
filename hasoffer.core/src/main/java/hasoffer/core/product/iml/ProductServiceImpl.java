@@ -248,11 +248,15 @@ public class ProductServiceImpl implements IProductService {
         if (image == null) {
             return "";
         } else {
-            if (StringUtils.isEmpty(image.getPath())) {
-                return ImageUtil.getImage3rdUrl(image.getImageUrl());
-            } else {
+            if (!StringUtils.isEmpty(image.getPath2())) {
+                return ImageUtil.getImageUrl(image.getPath2());
+            }
+
+            if (!StringUtils.isEmpty(image.getPath())) {
                 return ImageUtil.getImageUrl(image.getPath());
             }
+
+            return ImageUtil.getImage3rdUrl(image.getImageUrl());
         }
     }
 
@@ -279,7 +283,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public List<SrmSearchCount> getTopSellingProductsByDate(String date, int page, int size) {
-        return dbm.query(Q_PTM_SRMSEARCHCOUNT, page==0?0:page*size, size==0?20:size, Arrays.asList(date));
+        return dbm.query(Q_PTM_SRMSEARCHCOUNT, page == 0 ? 0 : page * size, size == 0 ? 20 : size, Arrays.asList(date));
     }
 
     @Override
