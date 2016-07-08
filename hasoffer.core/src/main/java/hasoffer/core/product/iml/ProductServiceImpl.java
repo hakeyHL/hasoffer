@@ -9,11 +9,13 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.persistence.po.ptm.updater.PtmProductUpdater;
+import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel;
+import hasoffer.core.search.ISearchService;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.data.solr.*;
 import hasoffer.fetch.helper.WebsiteHelper;
@@ -70,6 +72,9 @@ public class ProductServiceImpl implements IProductService {
                     " where t.ymd=?0 ORDER BY t.count DESC)";
 
     @Resource
+    ISearchService searchService;
+
+    @Resource
     ProductIndexServiceImpl productIndexService;
     @Resource
     ICategoryService categoryService;
@@ -79,6 +84,23 @@ public class ProductServiceImpl implements IProductService {
     private ICmpSkuService cmpSkuService;
 
     private Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void expTopSellingsFromSearchCount(String ymd) {
+        // 查询
+        int page = 1, size = 40;
+        PageableResult<SrmProductSearchCount> pagedSearchCounts = searchService.findSearchCountsByYmd(ymd, page, size);
+
+        List<SrmProductSearchCount> searchCounts = pagedSearchCounts.getData();
+
+        List<PtmTopSelling> topSellings = new ArrayList<PtmTopSelling>();
+        for (SrmProductSearchCount searchCount : searchCounts) {
+            topSellings.add(new PtmTopSelling(searchCount.getYmd(), searchCount.getProductId(), searchCount.getCount()));
+        }
+
+        dbm.batchSave(topSellings);
+    }
 
     @Override
     public ProductBo getProductBo(long proId) {

@@ -65,6 +65,8 @@ public class SearchServiceImpl implements ISearchService {
     private static final String Q_SEARCH_LOG_BY_PRODUCTID = "SELECT t FROM SrmSearchLog t WHERE t.ptmProductId = ?0 ";
     private static final String C_KEYWORD = "select count(t.id) from SrmSearchLog t where t.site=?0 and t.keyword=?1";
     private static final String D_SEARCH_LOG = "delete FROM SrmSearchLog t where t.id in (:ids) ";
+
+    private static final String Q_SEARCH_COUNT = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd=?0 ORDER BY t.count DESC";
     @Resource
     IDataBaseManager dbm;
     @Resource
@@ -77,6 +79,11 @@ public class SearchServiceImpl implements ISearchService {
     SearchLogCacheManager searchLogCacheManager;
 
     private Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
+
+    @Override
+    public PageableResult<SrmProductSearchCount> findSearchCountsByYmd(String ymd, int page, int size) {
+        return dbm.queryPage(Q_SEARCH_COUNT, page, size, Arrays.asList(ymd));
+    }
 
     @Override
     public void saveSearchCount(String ymd) {

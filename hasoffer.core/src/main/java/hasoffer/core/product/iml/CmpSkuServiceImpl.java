@@ -258,8 +258,8 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     }
 
     @Override
-    public List<PtmCmpSku> listCmpSkus(long productId, SkuStatus onsale) {
-        return dbm.query(Q_CMPSKU_BY_PRODUCTID_AND_STATUS, Arrays.asList(productId));
+    public List<PtmCmpSku> listCmpSkus(long productId, SkuStatus status) {
+        return dbm.query(Q_CMPSKU_BY_PRODUCTID_AND_STATUS, Arrays.asList(productId, status));
     }
 
     @Override

@@ -2,6 +2,7 @@ package hasoffer.timer.stat;
 
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.cache.SearchLogCacheManager;
+import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -18,14 +19,19 @@ public class StatSearchLogTask {
     SearchLogCacheManager logCacheManager;
     @Resource
     ISearchService searchService;
+    @Resource
+    IProductService productService;
 
     @Scheduled(cron = "0 20 5 * * ?")
     public void f() {
 
         String ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
 
+        // 保存所有被搜索过的商品
         searchService.saveSearchCount(ymd);
 
+        // top selling
+        productService.expTopSellingsFromSearchCount(ymd);
     }
 
 }

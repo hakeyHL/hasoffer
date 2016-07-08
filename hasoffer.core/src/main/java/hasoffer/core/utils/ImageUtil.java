@@ -143,6 +143,9 @@ public class ImageUtil {
     }*/
 
     public static String getImageUrl(final String path) {
+        if (path == null || path.equals("")) {
+            return null;
+        }
         String newPath = path;
         if (path.startsWith("/s3")) {
             newPath = path.replaceFirst("/s3", "");
