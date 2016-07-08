@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 
@@ -22,13 +23,17 @@ public class TimerController {
     IProductService productService;
 
     @RequestMapping(value = "/statsearchlog/{ymd}", method = RequestMethod.GET)
-    public void f(@PathVariable String ymd) {
+    public
+    @ResponseBody
+    String f(@PathVariable String ymd) {
 
         // 保存所有被搜索过的商品
         searchService.saveSearchCount(ymd);
 
         // top selling
         productService.expTopSellingsFromSearchCount(ymd);
+
+        return "ok";
     }
 
 }
