@@ -44,7 +44,7 @@ public class StringTest {
     }
 
     @Test
-    public void testStr4(){
+    public void testStr4() {
 
         String str = "545";
 
@@ -54,7 +54,7 @@ public class StringTest {
 
 
     @Test
-    public void md5Str(){
+    public void md5Str() {
         String str = "Luckie1985";
 
         String s = HexDigestUtil.md5(str);
@@ -63,7 +63,7 @@ public class StringTest {
     }
 
     @Test
-    public void test5(){
+    public void test5() {
         Long aLong = new Long(TimeUtils.now());
         int i = aLong.intValue();
         int i1 = i % 30;
@@ -71,10 +71,23 @@ public class StringTest {
     }
 
     @Test
-    public void test6(){
+    public void test6() {
         Long aLong = new Long(TimeUtils.now());
         long i = aLong.longValue();
         long i1 = i % 30;
         System.out.println();
+    }
+
+    @Test
+    public void test7() {
+
+        String url = "http://www.amazon.in/XOLO-Q1000s-Plus-Xolo-White/dp/B00PUCPQGQ";
+
+        String[] substr = url.split("/dp/");
+
+        String result = "http://www.amazon.in/gp/offer-listing/" + substr[1];
+        System.out.println(substr[0]);
+        System.out.println(substr[1]);
+        System.out.println(result);
     }
 }

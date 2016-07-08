@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created on 2016/7/6.
@@ -17,14 +16,14 @@ import java.util.List;
 @Service
 public class TopSellingServiceImpl implements ITopSellingService {
 
-    private static final String Q_TOPSELLING_BYDATE1 = "SELECT t FROM PtmTopSelling t WHERE t.ymd > ?0 ";
+    private static final String Q_TOPSELLING_BYDATE1 = "SELECT t FROM PtmTopSelling t WHERE t.ymd >= ?0 ";
     private static final String Q_TOPSELLING_BYDATE2 = "SELECT t FROM PtmTopSelling t WHERE t.ymd > ?0 AND t.ymd < ?1";
 
     @Resource
     IDataBaseManager dbm;
 
     @Override
-    public List<PtmTopSelling> findTopSellingListByDate(long longStartTime, Long longEndTime) {
+    public PageableResult<PtmTopSelling> findTopSellingListByDate(long longStartTime, Long longEndTime, int page, int size) {
 
         String startTimeString = TimeUtils.parse(longStartTime, "yyyyMMdd");
         String endTimeString = longEndTime == null ? "" : TimeUtils.parse(longEndTime, "yyyymmdd");
@@ -32,13 +31,11 @@ public class TopSellingServiceImpl implements ITopSellingService {
         PageableResult<PtmTopSelling> pageableResult;
 
         if (longEndTime == null) {
-            pageableResult = dbm.queryPage(Q_TOPSELLING_BYDATE1, 1, 20, Arrays.asList(startTimeString));
+            pageableResult = dbm.queryPage(Q_TOPSELLING_BYDATE1, page, size, Arrays.asList(startTimeString));
         } else {
-            pageableResult = dbm.queryPage(Q_TOPSELLING_BYDATE2, 1, 20, Arrays.asList(startTimeString, endTimeString));
+            pageableResult = dbm.queryPage(Q_TOPSELLING_BYDATE2, page, size, Arrays.asList(startTimeString, endTimeString));
         }
 
-        List<PtmTopSelling> topSellingList = pageableResult.getData();
-
-        return topSellingList;
+        return pageableResult;
     }
 }
