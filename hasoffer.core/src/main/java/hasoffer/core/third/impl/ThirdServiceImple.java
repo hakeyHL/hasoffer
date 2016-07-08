@@ -43,7 +43,7 @@ public class ThirdServiceImple implements ThirdService {
         if (StringUtils.isEmpty(acceptJson)) {
             logger.error(String.format("json parseException , %s is not a json String", acceptJson));
             resJson.put("errorCode", "10001");
-            resJson.put("msg", "you should send a json String ,start with { and end with } ");
+            resJson.put("msg", "you should send a json String ,start with '{' and end with '}' ");
             return resJson.toJSONString();
         }
         JSONObject jsonObject = JSONObject.parseObject(acceptJson);
