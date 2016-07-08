@@ -94,7 +94,7 @@ public class SearchLogCacheManager {
         boolean exist = cacheService.exists(logCountMap);
         if (!exist) {
             cacheService.mapPut(logCountMap, key, "1");
-            cacheService.expire(logCountMap, TimeUtils.SECONDS_OF_1_DAY);
+            cacheService.expire(logCountMap, TimeUtils.SECONDS_OF_1_DAY * 2);
             return;
         }
 
