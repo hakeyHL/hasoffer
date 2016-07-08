@@ -4,7 +4,7 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.ITopSellingService;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.po.search.SrmSearchCount;
+import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -17,19 +17,19 @@ import java.util.List;
 @Service
 public class TopSellingServiceImpl implements ITopSellingService {
 
-    private static final String Q_TOPSELLING_BYDATE1 = "SELECT t FROM SrmSearchCount t WHERE t.ymd > ?0 ";
-    private static final String Q_TOPSELLING_BYDATE2 = "SELECT t FROM SrmSearchCount t WHERE t.ymd > ?0 AND t.ymd < ?1";
+    private static final String Q_TOPSELLING_BYDATE1 = "SELECT t FROM PtmTopSelling t WHERE t.ymd > ?0 ";
+    private static final String Q_TOPSELLING_BYDATE2 = "SELECT t FROM PtmTopSelling t WHERE t.ymd > ?0 AND t.ymd < ?1";
 
     @Resource
     IDataBaseManager dbm;
 
     @Override
-    public List<SrmSearchCount> findTopSellingListByDate(long longStartTime, Long longEndTime) {
+    public List<PtmTopSelling> findTopSellingListByDate(long longStartTime, Long longEndTime) {
 
         String startTimeString = TimeUtils.parse(longStartTime, "yyyyMMdd");
         String endTimeString = longEndTime == null ? "" : TimeUtils.parse(longEndTime, "yyyymmdd");
 
-        PageableResult<SrmSearchCount> pageableResult;
+        PageableResult<PtmTopSelling> pageableResult;
 
         if (longEndTime == null) {
             pageableResult = dbm.queryPage(Q_TOPSELLING_BYDATE1, 1, 20, Arrays.asList(startTimeString));
@@ -37,7 +37,7 @@ public class TopSellingServiceImpl implements ITopSellingService {
             pageableResult = dbm.queryPage(Q_TOPSELLING_BYDATE2, 1, 20, Arrays.asList(startTimeString, endTimeString));
         }
 
-        List<SrmSearchCount> topSellingList = pageableResult.getData();
+        List<PtmTopSelling> topSellingList = pageableResult.getData();
 
         return topSellingList;
     }

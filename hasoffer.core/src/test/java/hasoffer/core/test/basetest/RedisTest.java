@@ -4,7 +4,7 @@ import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
-import hasoffer.core.persistence.po.search.SrmSearchCount;
+import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.redis.impl.CacheServiceImpl;
 import hasoffer.core.search.ISearchService;
@@ -50,10 +50,10 @@ public class RedisTest {
 
         Map<Long, Long> countMap = logCacheManager.getProductCount(ymd);
 
-        List<SrmSearchCount> sscs = new ArrayList<SrmSearchCount>();
+        List<PtmTopSelling> sscs = new ArrayList<PtmTopSelling>();
 
         for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
-            SrmSearchCount ssc = new SrmSearchCount(ymd, countKv.getKey(), countKv.getValue());
+            PtmTopSelling ssc = new PtmTopSelling(ymd, countKv.getKey(), countKv.getValue());
             sscs.add(ssc);
         }
 

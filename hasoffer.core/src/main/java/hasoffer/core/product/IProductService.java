@@ -3,11 +3,7 @@ package hasoffer.core.product;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.core.bo.product.ProductBo;
-import hasoffer.core.persistence.po.ptm.PtmBasicAttribute;
-import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.persistence.po.ptm.PtmImage;
-import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.search.SrmSearchCount;
+import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.fetch.model.ListProduct;
 
 import java.util.Date;
@@ -43,7 +39,7 @@ public interface IProductService {
 
     List<PtmProduct> getProducts(List<Long> proIds);
 
-    List<SrmSearchCount> getTopSellingProductsByDate(String date, int page, int size);
+    List<PtmTopSelling> getTopSellingProductsByDate(String date, int page, int size);
 
     List<String> getProductFeatures(long id);
 

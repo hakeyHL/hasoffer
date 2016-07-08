@@ -1,5 +1,5 @@
 import hasoffer.base.utils.IDUtil;
-import hasoffer.core.persistence.po.search.SrmSearchCount;
+import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.utils.ImageUtil;
 import jodd.io.FileUtil;
 import org.junit.Test;
@@ -32,17 +32,17 @@ public class TestFileUpload {
 
     @Test
     public void f() {
-        List<SrmSearchCount> sscs = new ArrayList<SrmSearchCount>();
+        List<PtmTopSelling> sscs = new ArrayList<PtmTopSelling>();
 
-        sscs.add(new SrmSearchCount("123456", 30, 20L));
-        sscs.add(new SrmSearchCount("123456", 31, 19L));
-        sscs.add(new SrmSearchCount("123456", 32, 23L));
-        sscs.add(new SrmSearchCount("123456", 33, 21L));
-        sscs.add(new SrmSearchCount("123456", 34, 5L));
+        sscs.add(new PtmTopSelling("123456", 30, 20L));
+        sscs.add(new PtmTopSelling("123456", 31, 19L));
+        sscs.add(new PtmTopSelling("123456", 32, 23L));
+        sscs.add(new PtmTopSelling("123456", 33, 21L));
+        sscs.add(new PtmTopSelling("123456", 34, 5L));
 
-        Collections.sort(sscs, new Comparator<SrmSearchCount>() {
+        Collections.sort(sscs, new Comparator<PtmTopSelling>() {
             @Override
-            public int compare(SrmSearchCount o1, SrmSearchCount o2) {
+            public int compare(PtmTopSelling o1, PtmTopSelling o2) {
                 if (o1.getCount() > o2.getCount()) {
                     return -1;
                 } else if (o1.getCount() < o2.getCount()) {

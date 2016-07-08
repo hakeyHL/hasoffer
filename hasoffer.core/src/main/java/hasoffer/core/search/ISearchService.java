@@ -7,7 +7,7 @@ import hasoffer.core.persistence.enums.SearchPrecise;
 import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.search.SrmSearchCount;
+import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.search.SrmSearchUpdateLog;
 import hasoffer.fetch.model.ListProduct;
@@ -90,7 +90,7 @@ public interface ISearchService {
 
     void updateSrmSearchLogStatus(String id, long productId, SearchPrecise precise);
 
-    void saveLogCount(List<SrmSearchCount> srmSearchCount);
+    void saveLogCount(List<PtmTopSelling> ptmTopSelling);
 
     void analysisAndRelate(SrmAutoSearchResult asr);
 }

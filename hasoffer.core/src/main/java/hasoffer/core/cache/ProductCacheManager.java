@@ -8,7 +8,7 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.search.SrmSearchCount;
+import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.redis.ICacheService;
 import org.slf4j.Logger;
@@ -159,11 +159,11 @@ public class ProductCacheManager {
         List<PtmProduct> products = new ArrayList<PtmProduct>();
         try {
             if (StringUtils.isEmpty(ptmProductJson)) {
-                List<SrmSearchCount> srmSearchCounts = productService.getTopSellingProductsByDate(date, page, size);
-                for (SrmSearchCount srmSearchCount : srmSearchCounts) {
-                    PageableResult<PtmCmpSku> pageableResult = productCacheManager.listPagedCmpSkus(srmSearchCount.getProductId(), 1, 20);
+                List<PtmTopSelling> ptmTopSellings = productService.getTopSellingProductsByDate(date, page, size);
+                for (PtmTopSelling ptmTopSelling : ptmTopSellings) {
+                    PageableResult<PtmCmpSku> pageableResult = productCacheManager.listPagedCmpSkus(ptmTopSelling.getProductId(), 1, 20);
                     if (pageableResult != null && pageableResult.getData() != null && pageableResult.getData().size() > 0) {
-                        PtmProduct product = productService.getProduct(srmSearchCount.getProductId());
+                        PtmProduct product = productService.getProduct(ptmTopSelling.getProductId());
                         if (product != null && product.getPrice() > 0) {
                             products.add(product);
                         }

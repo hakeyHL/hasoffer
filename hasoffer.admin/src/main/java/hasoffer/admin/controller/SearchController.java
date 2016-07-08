@@ -17,7 +17,7 @@ import hasoffer.core.persistence.enums.SrmSearchLogUpdate;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.search.SrmSearchCount;
+import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.search.SrmSearchUpdateLog;
 import hasoffer.core.persistence.po.sys.SysAdmin;
@@ -88,16 +88,16 @@ public class SearchController {
 
         Map<Long, Long> countMap = logCacheManager.getProductCount(ymd);
 
-        List<SrmSearchCount> sscs = new ArrayList<SrmSearchCount>();
+        List<PtmTopSelling> sscs = new ArrayList<PtmTopSelling>();
 
         for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
-            SrmSearchCount ssc = new SrmSearchCount(ymd, countKv.getKey(), countKv.getValue());
+            PtmTopSelling ssc = new PtmTopSelling(ymd, countKv.getKey(), countKv.getValue());
             sscs.add(ssc);
         }
 
-        Collections.sort(sscs, new Comparator<SrmSearchCount>() {
+        Collections.sort(sscs, new Comparator<PtmTopSelling>() {
             @Override
-            public int compare(SrmSearchCount o1, SrmSearchCount o2) {
+            public int compare(PtmTopSelling o1, PtmTopSelling o2) {
                 if (o1.getCount() > o2.getCount()) {
                     return -1;
                 } else if (o1.getCount() < o2.getCount()) {

@@ -1,6 +1,6 @@
 package hasoffer.core.admin;
 
-import hasoffer.core.persistence.po.search.SrmSearchCount;
+import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 
 import java.util.List;
 
@@ -16,6 +16,6 @@ public interface ITopSellingService {
      * @param longEndTime
      * @return
      */
-    List<SrmSearchCount> findTopSellingListByDate(long longStartTime, Long longEndTime);
+    List<PtmTopSelling> findTopSellingListByDate(long longStartTime, Long longEndTime);
 
 }

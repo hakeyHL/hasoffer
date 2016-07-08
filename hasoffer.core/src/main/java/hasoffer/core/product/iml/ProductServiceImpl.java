@@ -9,7 +9,6 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.persistence.po.ptm.updater.PtmProductUpdater;
-import hasoffer.core.persistence.po.search.SrmSearchCount;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
@@ -67,7 +66,7 @@ public class ProductServiceImpl implements IProductService {
                     " WHERE t.productId = ?0 ";
 
     private static final String Q_PTM_SRMSEARCHCOUNT =
-            "SELECT t from SrmSearchCount t " +
+            "SELECT t from PtmTopSelling t " +
                     " where t.ymd=?0 ORDER BY t.count DESC)";
 
     @Resource
@@ -282,7 +281,7 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public List<SrmSearchCount> getTopSellingProductsByDate(String date, int page, int size) {
+    public List<PtmTopSelling> getTopSellingProductsByDate(String date, int page, int size) {
         return dbm.query(Q_PTM_SRMSEARCHCOUNT, page == 0 ? 0 : page * size, size == 0 ? 20 : size, Arrays.asList(date));
     }
 

@@ -2,7 +2,7 @@ package hasoffer.timer.stat;
 
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.cache.SearchLogCacheManager;
-import hasoffer.core.persistence.po.search.SrmSearchCount;
+import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.search.ISearchService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -28,16 +28,16 @@ public class StatSearchLogTask {
 
         Map<Long, Long> countMap = logCacheManager.getProductCount(ymd);
 
-        List<SrmSearchCount> sscs = new ArrayList<SrmSearchCount>();
+        List<PtmTopSelling> sscs = new ArrayList<PtmTopSelling>();
 
         for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
-            SrmSearchCount ssc = new SrmSearchCount(ymd, countKv.getKey(), countKv.getValue());
+            PtmTopSelling ssc = new PtmTopSelling(ymd, countKv.getKey(), countKv.getValue());
             sscs.add(ssc);
         }
 
-        Collections.sort(sscs, new Comparator<SrmSearchCount>() {
+        Collections.sort(sscs, new Comparator<PtmTopSelling>() {
             @Override
-            public int compare(SrmSearchCount o1, SrmSearchCount o2) {
+            public int compare(PtmTopSelling o1, PtmTopSelling o2) {
                 if (o1.getCount() > o2.getCount()) {
                     return -1;
                 } else if (o1.getCount() < o2.getCount()) {

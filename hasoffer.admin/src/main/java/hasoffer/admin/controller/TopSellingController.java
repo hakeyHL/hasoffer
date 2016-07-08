@@ -6,7 +6,7 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.ITopSellingService;
 import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.search.SrmSearchCount;
+import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.product.IImageService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.redis.ICacheService;
@@ -57,16 +57,16 @@ public class TopSellingController {
 
         long startLongTime = TimeUtils.now() - TimeUtils.MILLISECONDS_OF_1_DAY;
 
-        List<SrmSearchCount> srmSearchCountList = topSellingService.findTopSellingListByDate(startLongTime, null);
+        List<PtmTopSelling> ptmTopSellingList = topSellingService.findTopSellingListByDate(startLongTime, null);
 
         //此处需要对productid进行去重操作
         Set<Long> ptmproductIdSet = new HashSet<Long>();
 
-        for (SrmSearchCount srmSearchCount : srmSearchCountList) {
+        for (PtmTopSelling ptmTopSelling : ptmTopSellingList) {
 
             TopSellingVo topSellingVo = new TopSellingVo();
 
-            long productId = srmSearchCount.getProductId();
+            long productId = ptmTopSelling.getProductId();
             if (ptmproductIdSet.contains(productId)) {
                 continue;
             } else {
@@ -78,7 +78,7 @@ public class TopSellingController {
                 continue;
             }
 
-            topSellingVo.setId(srmSearchCount.getId());
+            topSellingVo.setId(ptmTopSelling.getId());
             topSellingVo.setName(ptmProduct.getTitle());
             topSellingVo.setProductId(productId);
             topSellingVoList.add(topSellingVo);

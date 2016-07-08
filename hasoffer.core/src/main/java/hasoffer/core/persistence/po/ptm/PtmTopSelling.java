@@ -1,4 +1,4 @@
-package hasoffer.core.persistence.po.search;
+package hasoffer.core.persistence.po.ptm;
 
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 
@@ -6,9 +6,10 @@ import javax.persistence.*;
 
 /**
  * Created on 2015/12/29.
+ * 用于每天的topselling
  */
 @Entity
-public class SrmSearchCount implements Identifiable<Long> {
+public class PtmTopSelling implements Identifiable<Long> {
 
     @Id
     @Column(unique = true, nullable = false)
@@ -19,10 +20,10 @@ public class SrmSearchCount implements Identifiable<Long> {
     private long productId;
     private Long count;
 
-    public SrmSearchCount() {
+    public PtmTopSelling() {
     }
 
-    public SrmSearchCount(String ymd, long productId, Long count) {
+    public PtmTopSelling(String ymd, long productId, Long count) {
         this.ymd = ymd;
         this.productId = productId;
         this.count = count;
@@ -67,7 +68,7 @@ public class SrmSearchCount implements Identifiable<Long> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        SrmSearchCount that = (SrmSearchCount) o;
+        PtmTopSelling that = (PtmTopSelling) o;
 
         if (productId != that.productId) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
@@ -87,7 +88,7 @@ public class SrmSearchCount implements Identifiable<Long> {
 
     @Override
     public String toString() {
-        return "SrmSearchCount{" +
+        return "PtmTopSelling{" +
                 "id=" + id +
                 ", ymd='" + ymd + '\'' +
                 ", productId=" + productId +
