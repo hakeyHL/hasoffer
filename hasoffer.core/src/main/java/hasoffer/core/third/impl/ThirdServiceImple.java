@@ -40,6 +40,12 @@ public class ThirdServiceImple implements ThirdService {
         JSONObject resJson = new JSONObject();
         StringBuilder sb = new StringBuilder();
         sb.append(THIRD_GMOBI_DEALS);
+        if (StringUtils.isEmpty(acceptJson)) {
+            logger.error(String.format("json parseException , %s is not a json String", acceptJson));
+            resJson.put("errorCode", "10001");
+            resJson.put("msg", "you should send a json String ,start with { and end with } ");
+            return resJson.toJSONString();
+        }
         JSONObject jsonObject = JSONObject.parseObject(acceptJson);
         SimpleDateFormat sf = new SimpleDateFormat("yyyyMMddHHmmss");
         Date createTime = new Date();
