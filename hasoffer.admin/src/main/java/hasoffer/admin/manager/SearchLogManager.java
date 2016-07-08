@@ -96,7 +96,11 @@ public class SearchLogManager {
 
         List<SrmProductSearchCount> spscs = new ArrayList<SrmProductSearchCount>();
 
+        int count = 0;
+
         for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
+            count++;
+
             long productId = countKv.getKey();
 
             List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId, SkuStatus.ONSALE);
@@ -106,6 +110,16 @@ public class SearchLogManager {
             }
 
             spscs.add(new SrmProductSearchCount(ymd, productId, countKv.getValue(), size));
+
+            if (count % 2000 == 0) {
+                searchService.saveLogCount(spscs);
+                count = 0;
+                spscs.clear();
+            }
+        }
+
+        if (ArrayUtils.hasObjs(spscs)) {
+            searchService.saveLogCount(spscs);
         }
 
         /*Collections.sort(spsc, new Comparator<SrmProductSearchCount>() {
@@ -119,7 +133,5 @@ public class SearchLogManager {
                 return 0;
             }
         });*/
-
-        searchService.saveLogCount(spscs);
     }
 }
