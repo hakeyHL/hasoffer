@@ -152,6 +152,7 @@ public class ProductCacheManager {
 
 
     public List<PtmProduct> getTopSellingProductsByDate(String date, int page, int size) {
+        date = "20160707";
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_" + date + "_" + page + "_" + size;
 
         String ptmProductJson = cacheService.get(key, 0);
