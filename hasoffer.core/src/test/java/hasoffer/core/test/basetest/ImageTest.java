@@ -5,23 +5,18 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.utils.ImageUtil;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import javax.annotation.Resource;
 
 /**
  * Date : 2016/5/30
  * Function :
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:spring-beans.xml")
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration(locations = "classpath:spring-beans.xml")
 public class ImageTest {
 
     private static final String Q_SKU_IMAGE =
             "SELECT t FROM PtmCmpSku t WHERE t.imagePath IS NULL AND t.oriImageUrl IS NOT NULL AND t.failLoadImage = 0";
-    @Resource
+    //    @Resource
     IDataBaseManager dbm;
 
     @Test
@@ -34,7 +29,12 @@ public class ImageTest {
         String imagePath = ImageUtil.downloadAndUpload(url);
         System.out.println(imagePath);
 
+    }
 
+    @Test
+    public void fff() {
+        String path = "/2016/kk/s.jpg";
+        System.out.println(ImageUtil.getImageUrl(path));
     }
 
     @Test

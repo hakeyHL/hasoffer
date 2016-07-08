@@ -107,13 +107,13 @@ public class ImageUtil {
     }
 
     public static String uploadImage(File file) throws Exception {
-        return "/s3" + s3Storage.save(file);
+        return s3Storage.save(file);
     }
 
     public static ImagePath convertAndUploadImage(File file) throws Exception {
         ImagePath imagePath = s3Storage.saveAndConvert(file);
 
-        return new ImagePath("/s3" + imagePath.getOriginalPath(), "/s3" + imagePath.getSmallPath(), "/s3" + imagePath.getBigPath());
+        return new ImagePath(imagePath.getOriginalPath(), imagePath.getSmallPath(), imagePath.getBigPath());
     }
 
     /*public static String uploadImage(File file) throws Exception {
@@ -143,16 +143,24 @@ public class ImageUtil {
     }*/
 
     public static String getImageUrl(final String path) {
-        return "http://" + AppConfig.get(AppConfig.IMAGE_HOST) + path;
+        String newPath = path;
+        if (path.startsWith("/s3")) {
+            newPath = path.replaceFirst("/s3", "");
+        } else if (path.startsWith("/p2")) {
+            newPath = path.replaceFirst("/p2", "");
+        }
+
+        return "http://" + AppConfig.get(AppConfig.IMAGE_HOST) + newPath;
     }
 
     public static String getImage3rdUrl(final String url) {
-        if (StringUtils.isEmpty(url)) {
-            return "";
-        }
-
-        String _url = url.replaceAll("https??://", "");
-        return AppConfig.get(AppConfig.IMAGE_URL_3RD_PREFIX) + _url;
+        return url;
+//        if (StringUtils.isEmpty(url)) {
+//            return "";
+//        }
+//
+//        String _url = url.replaceAll("https??://", "");
+//        return AppConfig.get(AppConfig.IMAGE_URL_3RD_PREFIX) + _url;
     }
 
 }
