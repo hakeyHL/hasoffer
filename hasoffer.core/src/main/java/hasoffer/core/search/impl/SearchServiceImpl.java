@@ -1,5 +1,7 @@
 package hasoffer.core.search.impl;
 
+import hasoffer.base.config.AppConfig;
+import hasoffer.base.enums.HasofferRegion;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
@@ -230,7 +232,14 @@ public class SearchServiceImpl implements ISearchService {
             float titleScore = 0;
 
             for (SearchedSku searchedSku : ssku) {
-                if (searchedSku.getTitleScore() < 0.5 || searchedSku.getPriceScore() > 0.5) {
+                float thd_title_score = 0.5f, thd_price_score = 0.5f;
+
+                if (AppConfig.get(AppConfig.SER_REGION).equals(HasofferRegion.USA)) {
+                    thd_title_score = 0.3f;
+                    thd_price_score = 0.8f;
+                }
+
+                if (searchedSku.getTitleScore() < thd_title_score || searchedSku.getPriceScore() > thd_price_score) {
                     logger.debug(String.format("title/price:[%s/%f].titleScore/priceScore:[%f/%f]", searchedSku.getTitle(), searchedSku.getPrice(), searchedSku.getTitleScore(), searchedSku.getPriceScore()));
                     continue;
                 }
