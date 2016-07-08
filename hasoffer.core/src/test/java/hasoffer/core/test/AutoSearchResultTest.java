@@ -1,6 +1,7 @@
 package hasoffer.core.test;
 
 import hasoffer.base.model.PageableResult;
+import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.search.ISearchService;
@@ -17,6 +18,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,7 +34,27 @@ public class AutoSearchResultTest {
     IMongoDbManager mdm;
     @Resource
     ISearchService searchService;
+    @Resource
+    SearchLogCacheManager cacheManager;
     private Logger logger = LoggerFactory.getLogger(AutoSearchResultTest.class);
+
+    @Test
+    public void ts5() {
+        Map<Long, Long> map = cacheManager.getProductCount("20160708");
+
+        for (Map.Entry<Long, Long> kv : map.entrySet()) {
+            System.out.println(kv.getKey() + "\t " + kv.getValue());
+        }
+    }
+
+    @Test
+    public void ts4() {
+        long[] ids = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+        for (long id : ids) {
+            cacheManager.countSearchedProduct(id);
+        }
+    }
 
     @Test
     public void ts3() {
