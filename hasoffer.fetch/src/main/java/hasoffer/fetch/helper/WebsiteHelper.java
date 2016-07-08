@@ -209,14 +209,7 @@ public class WebsiteHelper {
         } else {
             path = path + website.name() + ".jpg";
         }
-        return AppConfig.get(AppConfig.get("IMAGE_SITELOGO_PATH")) + path;
-    }
-
-    public static String getLogoUrl1(String url, Website website) {
-        if (website == null) {
-            return url + "/static/image/sites/NULL.jpg";
-        }
-        return url + website.name() + ".jpg";
+        return AppConfig.get(AppConfig.IMAGE_SITELOGO_PATH) + path;
     }
 
     public static String getRealUrl(String oriUrl) {
