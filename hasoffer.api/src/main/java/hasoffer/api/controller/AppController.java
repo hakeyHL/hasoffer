@@ -515,7 +515,7 @@ public class AppController {
         //查询热卖商品
         Date date = new Date();
         date.setTime(date.getTime() - 1 * 24 * 60 * 60 * 1000);
-        List<PtmProduct> products2s = productCacheManager.getTopSellingProductsByDate(new SimpleDateFormat("yyyyMMdd").format(date), 1, 20);
+        List<PtmProduct> products2s = productCacheManager.getTopSellingProductsByDate(new SimpleDateFormat("yyyyMMdd").format(date), criteria.getPage(), criteria.getPageSize());
         switch (type) {
             case 0:
                 addProductVo2List(li, products2s);
@@ -556,7 +556,7 @@ public class AppController {
                         ProductListVo productListVo = new ProductListVo();
                         productListVo.setStoresNum(count);
                         productListVo.setId(productModel.getId());
-                        getCommentNumAndRatins(productListVo);
+                        setCommentNumAndRatins(productListVo);
                         productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
                         productListVo.setName(productModel.getTitle());
                         productListVo.setPrice(productModel.getPrice());
@@ -575,7 +575,7 @@ public class AppController {
                         productListVo.setName(ptmProduct.getTitle());
                         productListVo.setPrice(ptmProduct.getPrice());
                         productListVo.setStoresNum(count);
-                        getCommentNumAndRatins(productListVo);
+                        setCommentNumAndRatins(productListVo);
                         desList.add(productListVo);
                     }
                 }
@@ -583,7 +583,7 @@ public class AppController {
         }
     }
 
-    public void getCommentNumAndRatins(ProductListVo productListVo) {
+    public void setCommentNumAndRatins(ProductListVo productListVo) {
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productListVo.getId(), 1, 10);
         if (pagedCmpskus != null) {
             Long totalCommentNum = Long.valueOf(0);
