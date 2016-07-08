@@ -202,12 +202,13 @@ public class WebsiteHelper {
     }
 
     public static String getLogoUrl(Website website) {
-        String url = "http://img.hasoffer.com/sites/";
-//        String url = "http://api.hasoffer.com/static/image/sites/";
+        String path = "/sites/";
         if (website == null) {
-            return url + "NULL.png";
+            path = path + "NULL.png";
+        } else {
+            path = path + website.name() + ".jpg";
         }
-        return url + website.name() + ".jpg";
+        return "http://img1.hasofferimage.com" + path;
     }
 
     public static String getLogoUrl1(String url, Website website) {
