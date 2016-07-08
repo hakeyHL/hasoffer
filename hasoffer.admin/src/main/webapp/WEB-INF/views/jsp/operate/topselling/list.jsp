@@ -27,6 +27,7 @@
                             <td>${topSellingVo.id}</td>
                             <td>${topSellingVo.name}</td>
                             <td><a href="detail/${topSellingVo.productId}">编辑</a></td>
+                            <td><a href="delete/">删除</a></td>
                         </tr>
                     </c:forEach>
                     </tbody>

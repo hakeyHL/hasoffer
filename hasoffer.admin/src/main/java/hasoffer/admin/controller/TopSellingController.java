@@ -36,8 +36,6 @@ import java.util.Set;
 @RequestMapping(value = "/topselling")
 public class TopSellingController {
 
-    private static final String CACHE_KEY_PRE = "PRODUCT_";
-    private static final String IMAGE_PREFIX = "http://img.hasoffer.com";
     @Resource
     ITopSellingService topSellingService;
     @Resource

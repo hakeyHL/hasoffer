@@ -565,7 +565,7 @@ public class FixController {
 
     /**
      * 类目优化
-     * 用来合并三级类目
+     * 用来合并三级类目,只适用于关键字只出现在同一个父级目录下
      */
     //fixdata/mergeAndRenameCategroy
     @RequestMapping(value = "/mergeAndRenameCategroy", method = RequestMethod.GET)
@@ -574,31 +574,33 @@ public class FixController {
 
         File file = new File("C:/Users/wing/Desktop/OptimizeCategory.sql");
 
+//        String[] categoryKeywordArray = {
+//                "Landline Phones",
+//                "Mobile Accessories",
+//                "Tablet Accessories",
+//                "Hair Care",
+//                "Home Audio",
+//                "Gaming Consoles",
+//                "Hair Accessories",
+//                "Learning & Educational Toys",
+//                "Tricycles",
+//                "Dolls & Doll Houses",
+//                "Puppets",
+//                "Home Appliances",
+//                "Coffee Mugs",
+////                "Bags",
+//                "Kids__Clothing",
+//                "Home Automation & Safety",
+////                "Hardware",
+////                "Tools",
+////                "musical instruments",
+//                "Printers & Inks"
+//        };
 
-        String[] categoryKeywordArray = {
-                "Landline Phones",
-                "Mobile Accessories",
-                "Tablet Accessories",
-                "Hair Care",
-                "Home Audio",
-                "Gaming Consoles",
-                "Hair Accessories",
-                "Learning & Educational Toys",
-                "Tricycles",
-                "Dolls & Doll Houses",
-                "Puppets",
-                "Home Appliances",
-                "Coffee Mugs",
-//                "Bags",
-                "Kids' Clothing",
-                "Home Automation & Safety",
-//                "Hardware",
-//                "Tools",
-//                "musical instruments",
-                "Printers & Inks"
-        };
 
-        for (String categoryKeyword : categoryKeywordArray) {
+//        for (String categoryKeyword : categoryKeywordArray) {
+
+        String categoryKeyword = "Pencil Boxes";
 
             FileUtil.appendString(file, "-- 合并" + categoryKeyword + "\r\n");
 
@@ -628,12 +630,12 @@ public class FixController {
                 StringBuilder stringBuilder = new StringBuilder();
 
                 stringBuilder.append("UPDATE PtmCmpSku SET categoryid = " + tempCategoryId + " WHERE categoryid = " + ptmCategory.getId() + ";\r\n");
-                stringBuilder.append("DELETE FROM PtmCategory WHERE categoryid = " + ptmCategory.getId() + ";\r\n");
+                stringBuilder.append("DELETE FROM PtmCategory WHERE id = " + ptmCategory.getId() + ";\r\n");
 
                 FileUtil.appendString(file, stringBuilder.toString());
             }
 
-        }
+//        }
 
         return "ok";
     }
