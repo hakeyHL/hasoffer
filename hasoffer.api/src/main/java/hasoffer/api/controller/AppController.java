@@ -393,7 +393,7 @@ public class AppController {
                         "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +
                         "3. Rewards may not paid on purchases made using store credits/gift vouchers\n" +
                         "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
-                        "5 urm. Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
+                        "5  Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
             }
             map.put("deeplink", WebsiteHelper.getUrlWithAff(appDeal.getLinkUrl() == null ? "" : appDeal.getLinkUrl()));
             mv.addObject("data", map);
