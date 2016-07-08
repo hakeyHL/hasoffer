@@ -171,7 +171,7 @@ public class ProductCacheManager {
                     }
                 }
                 if (products != null && products.size() > 0) {
-                    cacheService.add(key, JSONUtil.toJSON(products), TimeUtils.SECONDS_OF_1_HOUR * 2);
+                    cacheService.add(key, JSONUtil.toJSON(products), TimeUtils.SECONDS_OF_1_DAY * 7);
                 }
             } else {
                 List<Map> datas = JSONUtil.toObject(ptmProductJson, List.class);
