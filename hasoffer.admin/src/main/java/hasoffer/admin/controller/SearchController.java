@@ -92,6 +92,8 @@ public class SearchController {
 
         productService.expTopSellingsFromSearchCount(ymd);
 
+        searchService.statSearchCount(ymd);
+
         return "ok";
     }
 

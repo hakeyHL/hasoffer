@@ -22,18 +22,37 @@ public class TimerController {
     @Resource
     IProductService productService;
 
-    @RequestMapping(value = "/statsearchlog/{ymd}", method = RequestMethod.GET)
+    @RequestMapping(value = "/statsearchlog1/{ymd}", method = RequestMethod.GET)
     public
     @ResponseBody
-    String f(@PathVariable String ymd) {
+    String f1(@PathVariable String ymd) {
 
         // 保存所有被搜索过的商品
         searchService.saveSearchCount(ymd);
 
+        return "ok";
+    }
+
+    @RequestMapping(value = "/statsearchlog2/{ymd}", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String f2(@PathVariable String ymd) {
+
         // top selling
-//        productService.expTopSellingsFromSearchCount(ymd);
+        productService.expTopSellingsFromSearchCount(ymd);
 
         return "ok";
     }
+
+    @RequestMapping(value = "/statsearchlog3/{ymd}", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String f3(@PathVariable String ymd) {
+
+        searchService.statSearchCount(ymd);
+
+        return "ok";
+    }
+
 
 }
