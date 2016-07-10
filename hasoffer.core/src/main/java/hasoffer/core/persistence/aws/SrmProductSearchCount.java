@@ -9,33 +9,33 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
  * 2 统计匹配比价数量
  * 3 保存每天被搜索次数最多的20个商品 - top selling
  */
-@DynamoDBTable(tableName = "AwsSummaryProduct")
+@DynamoDBTable(tableName = "SrmProductSearchCount")
 public class SrmProductSearchCount {
 
-    @DynamoDBHashKey(attributeName = "id")
-    private String id;
+    @DynamoDBHashKey(attributeName = "proId")
+    private long proId;
 
     private String ymd;//日期
-    private long productId;
+
     private Long count;
     private int skuCount;//sku 的数量
 
     public SrmProductSearchCount() {
     }
 
-    public SrmProductSearchCount(String ymd, long productId, Long count, int skuCount) {
+    public SrmProductSearchCount(long productId, String ymd, Long count, int skuCount) {
+        this.proId = productId;
         this.ymd = ymd;
-        this.productId = productId;
         this.count = count;
         this.skuCount = skuCount;
     }
 
-    public String getId() {
-        return id;
+    public long getProId() {
+        return proId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setProId(long proId) {
+        this.proId = proId;
     }
 
     public String getYmd() {
@@ -44,14 +44,6 @@ public class SrmProductSearchCount {
 
     public void setYmd(String ymd) {
         this.ymd = ymd;
-    }
-
-    public long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(long productId) {
-        this.productId = productId;
     }
 
     public Long getCount() {
@@ -77,9 +69,8 @@ public class SrmProductSearchCount {
 
         SrmProductSearchCount that = (SrmProductSearchCount) o;
 
-        if (productId != that.productId) return false;
+        if (proId != that.proId) return false;
         if (skuCount != that.skuCount) return false;
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (ymd != null ? !ymd.equals(that.ymd) : that.ymd != null) return false;
         return !(count != null ? !count.equals(that.count) : that.count != null);
 
@@ -87,9 +78,8 @@ public class SrmProductSearchCount {
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
+        int result = (int) (proId ^ (proId >>> 32));
         result = 31 * result + (ymd != null ? ymd.hashCode() : 0);
-        result = 31 * result + (int) (productId ^ (productId >>> 32));
         result = 31 * result + (count != null ? count.hashCode() : 0);
         result = 31 * result + skuCount;
         return result;

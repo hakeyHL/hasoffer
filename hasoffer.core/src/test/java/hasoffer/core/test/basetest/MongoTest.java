@@ -1,8 +1,12 @@
 package hasoffer.core.test.basetest;
 
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.persistence.aws.SrmProductSearchCount;
+import hasoffer.core.persistence.dbm.aws.AwsDynamoDbService;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.enums.IndexStat;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
@@ -10,6 +14,7 @@ import hasoffer.core.persistence.mongo.StatHijackFetch;
 import hasoffer.core.persistence.mongo.UrmDeviceBuyLog;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.user.IDeviceService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,7 +27,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created on 2016/1/4.
@@ -35,6 +42,39 @@ public class MongoTest {
     IMongoDbManager mdm;
     @Resource
     IDeviceService deviceService;
+    @Resource
+    ICmpSkuService cmpSkuService;
+
+
+    @Test
+    public void table() {
+        AwsDynamoDbService.getInstance().createTable(SrmProductSearchCount.class);
+//        AwsDynamoDbService.getInstance().deleteTable(SrmProductSearchCount.class);
+    }
+
+    @Test
+    public void ts() {
+
+        Map<Long, Long> countMap = new HashMap<Long, Long>();
+        for (long i = 1; i < 100; i++) {
+            countMap.put(i, i + 100);
+        }
+
+        for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
+
+            long productId = countKv.getKey();
+            System.out.println(productId);
+
+            List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId, SkuStatus.ONSALE);
+            int size = 0;
+            if (ArrayUtils.hasObjs(cmpSkus)) {
+                size = cmpSkus.size();
+            }
+
+            SrmProductSearchCount productSearchCount = new SrmProductSearchCount(productId, "20160707", countKv.getValue(), size);
+            AwsDynamoDbService.getInstance().save(productSearchCount);
+        }
+    }
 
     @Test
     public void expWords() {
