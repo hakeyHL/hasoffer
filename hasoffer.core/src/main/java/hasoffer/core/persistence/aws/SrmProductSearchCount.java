@@ -1,8 +1,7 @@
-package hasoffer.core.persistence.po.search;
+package hasoffer.core.persistence.aws;
 
-import hasoffer.core.persistence.dbm.osql.Identifiable;
-
-import javax.persistence.*;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 /**
  * Created on 2015/12/29.
@@ -10,13 +9,11 @@ import javax.persistence.*;
  * 2 统计匹配比价数量
  * 3 保存每天被搜索次数最多的20个商品 - top selling
  */
-@Entity
-public class SrmProductSearchCount implements Identifiable<Long> {
+@DynamoDBTable(tableName = "AwsSummaryProduct")
+public class SrmProductSearchCount {
 
-    @Id
-    @Column(unique = true, nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @DynamoDBHashKey(attributeName = "id")
+    private String id;
 
     private String ymd;//日期
     private long productId;
@@ -33,13 +30,11 @@ public class SrmProductSearchCount implements Identifiable<Long> {
         this.skuCount = skuCount;
     }
 
-    @Override
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    @Override
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

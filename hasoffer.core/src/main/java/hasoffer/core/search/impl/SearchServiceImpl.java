@@ -14,6 +14,8 @@ import hasoffer.core.bo.product.ProductBo;
 import hasoffer.core.bo.product.SearchedSku;
 import hasoffer.core.bo.system.SearchLogBo;
 import hasoffer.core.cache.SearchLogCacheManager;
+import hasoffer.core.persistence.aws.SrmProductSearchCount;
+import hasoffer.core.persistence.dbm.aws.AwsDynamoDbService;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.enums.SearchPrecise;
@@ -21,7 +23,6 @@ import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
-import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.search.SrmSearchUpdateLog;
 import hasoffer.core.persistence.po.search.updater.SrmSearchLogUpdater;
@@ -87,6 +88,8 @@ public class SearchServiceImpl implements ISearchService {
 
     @Override
     public void saveSearchCount(String ymd) {
+        logger.debug(String.format("save search count [%s]", ymd));
+
         Map<Long, Long> countMap = searchLogCacheManager.getProductCount(ymd);
 
         List<SrmProductSearchCount> spscs = new ArrayList<SrmProductSearchCount>();
@@ -104,17 +107,8 @@ public class SearchServiceImpl implements ISearchService {
                 size = cmpSkus.size();
             }
 
-            spscs.add(new SrmProductSearchCount(ymd, productId, countKv.getValue(), size));
-
-            if (count % 2000 == 0) {
-                saveLogCount(spscs);
-                count = 0;
-                spscs.clear();
-            }
-        }
-
-        if (ArrayUtils.hasObjs(spscs)) {
-            saveLogCount(spscs);
+            SrmProductSearchCount productSearchCount = new SrmProductSearchCount(ymd, productId, countKv.getValue(), size);
+            AwsDynamoDbService.getInstance().save(productSearchCount);
         }
 
         /*Collections.sort(spsc, new Comparator<SrmProductSearchCount>() {

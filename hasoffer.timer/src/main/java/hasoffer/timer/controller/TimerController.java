@@ -31,7 +31,7 @@ public class TimerController {
         searchService.saveSearchCount(ymd);
 
         // top selling
-        productService.expTopSellingsFromSearchCount(ymd);
+//        productService.expTopSellingsFromSearchCount(ymd);
 
         return "ok";
     }
