@@ -8,6 +8,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.ScanResultPage;
 import com.amazonaws.services.dynamodbv2.model.*;
+import hasoffer.base.config.AppConfig;
 import hasoffer.core.task.worker.IProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,7 @@ public class AwsDynamoDbService {
     static DynamoDB dynamoDB = null;
     private static AwsDynamoDbService awsDynamoDbService;
 
-//    static AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient().withEndpoint("http://60.205.57.57:8000");
+    //    static AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient().withEndpoint("http://60.205.57.57:8000");
 //static AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient().withEndpoint("http://192.168.1.203:8000");
     private static AmazonDynamoDBClient dynamoDBClient = getDynamoDBClient();
     private Logger logger = LoggerFactory.getLogger(AwsDynamoDbService.class);
@@ -37,7 +38,12 @@ public class AwsDynamoDbService {
     }
 
     private static AmazonDynamoDBClient getDynamoDBClient() {
-        BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials("AKIAI2KXGSAA6ML4ZSJQ", "vDUeGxdjPeH1ulHark/VhKlAkD4d9L/wVpBINxep");
+        BasicAWSCredentials basicAWSCredentials = null;
+
+        // todo 临时处理，日后对开发和测试环境做相应的配置
+        if (AppConfig.get(AppConfig.APP_ENV).equalsIgnoreCase("product")) {
+            basicAWSCredentials = new BasicAWSCredentials("AKIAI2KXGSAA6ML4ZSJQ", "vDUeGxdjPeH1ulHark/VhKlAkD4d9L/wVpBINxep");
+        }
 
         AmazonDynamoDBClient client = new AmazonDynamoDBClient(basicAWSCredentials)
                 .withRegion(Regions.AP_SOUTHEAST_1);
