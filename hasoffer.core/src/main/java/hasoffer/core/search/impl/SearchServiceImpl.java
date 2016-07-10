@@ -73,6 +73,7 @@ public class SearchServiceImpl implements ISearchService {
     private static final String STAT_SEARCH_COUNT2 = "SELECT COUNT(t.id) FROM SrmProductSearchCount t WHERE t.ymd=?0 AND t.skuCount>=?1 ";
 
     private static final String STAT_SEARCH_COUNT3 = "SELECT COUNT(t.id) FROM SrmSearchLog t WHERE t.lUpdateTime>?0 AND t.lUpdateTime<?1 AND t.ptmProductId=0 ";
+    private static final String STAT_SEARCH_COUNT4 = "SELECT COUNT(t.id) FROM SrmSearchLog t WHERE t.lUpdateTime>?0 AND t.lUpdateTime<?1 AND t.ptmProductId>0 ";
 
     @Resource
     IDataBaseManager dbm;
@@ -94,7 +95,8 @@ public class SearchServiceImpl implements ISearchService {
         long etime = stime + TimeUtils.MILLISECONDS_OF_1_DAY;
 
         // 统计没有匹配到结果的数量
-        long countx = dbm.querySingle(STAT_SEARCH_COUNT3, Arrays.asList(stime, etime));
+        long count_no_matched = dbm.querySingle(STAT_SEARCH_COUNT3, Arrays.asList(stime, etime));
+        long count_matched = dbm.querySingle(STAT_SEARCH_COUNT4, Arrays.asList(stime, etime));
 
         long count0 = dbm.querySingle(STAT_SEARCH_COUNT, Arrays.asList(ymd, 0));
 
@@ -106,9 +108,14 @@ public class SearchServiceImpl implements ISearchService {
 
         long count4 = dbm.querySingle(STAT_SEARCH_COUNT2, Arrays.asList(ymd, 4));
 
-        SrmProductSearchStat productSearchStat = new SrmProductSearchStat(ymd, (int) countx, (int) count0, (int) count1, (int) count2, (int) count3, (int) count4);
+        SrmProductSearchStat productSearchStat = new SrmProductSearchStat(ymd, (int) count_no_matched, (int) count_matched, (int) count0, (int) count1, (int) count2, (int) count3, (int) count4);
 
         dbm.create(productSearchStat);
+    }
+
+    @Override
+    public List<SrmProductSearchStat> findSearchCountStats() {
+        return dbm.query("select t from SrmProductSearchStat t order by t.id desc");
     }
 
     @Override

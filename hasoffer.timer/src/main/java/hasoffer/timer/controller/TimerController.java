@@ -22,6 +22,8 @@ public class TimerController {
     @Resource
     IProductService productService;
 
+    // http://web3:8020/timer/statsearchlog3/20160710
+
     @RequestMapping(value = "/statsearchlog1/{ymd}", method = RequestMethod.GET)
     public
     @ResponseBody

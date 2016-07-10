@@ -20,7 +20,9 @@ public class SrmProductSearchStat implements Identifiable<String> {
     private String id;
     private Date createTime = TimeUtils.nowDate();
 
-    private int skuCountx;// 没有匹配到sku的日志
+    private int noMatchedCount;// 没有匹配到sku的日志
+    private int matchedCount;// 没有匹配到sku的日志
+
     private int skuCount0;// 比价数量是1个
     private int skuCount1;// 比价数量是1个
     private int skuCount2;// 比价数量是2个
@@ -30,9 +32,12 @@ public class SrmProductSearchStat implements Identifiable<String> {
     public SrmProductSearchStat() {
     }
 
-    public SrmProductSearchStat(String id, int skuCountx, int skuCount0, int skuCount1, int skuCount2, int skuCount3, int skuCount4) {
+    public SrmProductSearchStat(String id, int noMatchedCount, int matchedCount, int skuCount0, int skuCount1, int skuCount2, int skuCount3, int skuCount4) {
         this.id = id;
-        this.skuCountx = skuCountx;
+
+        this.noMatchedCount = noMatchedCount;
+        this.matchedCount = matchedCount;
+
         this.skuCount0 = skuCount0;
         this.skuCount1 = skuCount1;
         this.skuCount2 = skuCount2;
@@ -98,12 +103,20 @@ public class SrmProductSearchStat implements Identifiable<String> {
         this.skuCount4 = skuCount4;
     }
 
-    public int getSkuCountx() {
-        return skuCountx;
+    public int getNoMatchedCount() {
+        return noMatchedCount;
     }
 
-    public void setSkuCountx(int skuCountx) {
-        this.skuCountx = skuCountx;
+    public void setNoMatchedCount(int noMatchedCount) {
+        this.noMatchedCount = noMatchedCount;
+    }
+
+    public int getMatchedCount() {
+        return matchedCount;
+    }
+
+    public void setMatchedCount(int matchedCount) {
+        this.matchedCount = matchedCount;
     }
 
     @Override
@@ -113,7 +126,8 @@ public class SrmProductSearchStat implements Identifiable<String> {
 
         SrmProductSearchStat that = (SrmProductSearchStat) o;
 
-        if (skuCountx != that.skuCountx) return false;
+        if (noMatchedCount != that.noMatchedCount) return false;
+        if (matchedCount != that.matchedCount) return false;
         if (skuCount0 != that.skuCount0) return false;
         if (skuCount1 != that.skuCount1) return false;
         if (skuCount2 != that.skuCount2) return false;
@@ -128,7 +142,8 @@ public class SrmProductSearchStat implements Identifiable<String> {
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
-        result = 31 * result + skuCountx;
+        result = 31 * result + noMatchedCount;
+        result = 31 * result + matchedCount;
         result = 31 * result + skuCount0;
         result = 31 * result + skuCount1;
         result = 31 * result + skuCount2;
