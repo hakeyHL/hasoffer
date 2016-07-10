@@ -92,12 +92,7 @@ public class SearchServiceImpl implements ISearchService {
 
         Map<Long, Long> countMap = searchLogCacheManager.getProductCount(ymd);
 
-        List<SrmProductSearchCount> spscs = new ArrayList<SrmProductSearchCount>();
-
-        int count = 0;
-
         for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
-            count++;
 
             long productId = countKv.getKey();
 
