@@ -23,6 +23,8 @@ import java.util.Map;
 
 public interface ISearchService {
 
+    void statSearchCount(String ymd);
+
     void saveSearchCount(String ymd);
 
     void mergeProducts(PtmProduct finalProduct, Map<Website, PtmCmpSku> cmpSkuMap, PtmProduct product);

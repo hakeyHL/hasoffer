@@ -12,6 +12,7 @@ import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.updater.PtmImageUpdater;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICmpSkuService;
+import hasoffer.core.search.ISearchService;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.ProductStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
@@ -62,8 +63,18 @@ public class MysqlTest {
     IDataBaseManager dbm;
     @Resource
     ICmpSkuService cmpSkuService;
+    @Resource
+    ISearchService searchService;
     private Logger logger = LoggerFactory.getLogger(MysqlTest.class);
     private ConcurrentLinkedQueue<PtmCmpSku> skuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
+
+    @Test
+    public void testV() {
+//        searchService.statSearchCount("20160306");//stime = 1457193600000
+//        etime = 1457280000000
+        System.out.println(TimeUtils.parse(1457193600000L, "yyyy-MM-dd HH:mm:ss"));
+        System.out.println(TimeUtils.parse(1457280000000L, "yyyy-MM-dd HH:mm:ss"));
+    }
 
     @Test
     public void testLinkedQueue() {

@@ -22,6 +22,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
+import hasoffer.core.persistence.po.search.SrmProductSearchStat;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.search.SrmSearchUpdateLog;
 import hasoffer.core.persistence.po.search.updater.SrmSearchLogUpdater;
@@ -67,6 +68,12 @@ public class SearchServiceImpl implements ISearchService {
     private static final String D_SEARCH_LOG = "delete FROM SrmSearchLog t where t.id in (:ids) ";
 
     private static final String Q_SEARCH_COUNT = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd=?0 ORDER BY t.count DESC";
+
+    private static final String STAT_SEARCH_COUNT = "SELECT COUNT(t.id) FROM SrmProductSearchCount t WHERE t.ymd=?0 AND t.skuCount=?1 ";
+    private static final String STAT_SEARCH_COUNT2 = "SELECT COUNT(t.id) FROM SrmProductSearchCount t WHERE t.ymd=?0 AND t.skuCount>=?1 ";
+
+    private static final String STAT_SEARCH_COUNT3 = "SELECT COUNT(t.id) FROM SrmSearchLog t WHERE t.lUpdateTime>?0 AND t.lUpdateTime<?1 AND t.ptmProductId=0 ";
+
     @Resource
     IDataBaseManager dbm;
     @Resource
@@ -79,6 +86,30 @@ public class SearchServiceImpl implements ISearchService {
     SearchLogCacheManager searchLogCacheManager;
 
     private Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
+
+    @Override
+    @Transactional
+    public void statSearchCount(String ymd) {
+        long stime = TimeUtils.stringToDate(ymd, "yyyyMMdd").getTime();
+        long etime = stime + TimeUtils.MILLISECONDS_OF_1_DAY;
+
+        // 统计没有匹配到结果的数量
+        long countx = dbm.querySingle(STAT_SEARCH_COUNT3, Arrays.asList(stime, etime));
+
+        long count0 = dbm.querySingle(STAT_SEARCH_COUNT, Arrays.asList(ymd, 0));
+
+        long count1 = dbm.querySingle(STAT_SEARCH_COUNT, Arrays.asList(ymd, 1));
+
+        long count2 = dbm.querySingle(STAT_SEARCH_COUNT, Arrays.asList(ymd, 2));
+
+        long count3 = dbm.querySingle(STAT_SEARCH_COUNT, Arrays.asList(ymd, 3));
+
+        long count4 = dbm.querySingle(STAT_SEARCH_COUNT2, Arrays.asList(ymd, 4));
+
+        SrmProductSearchStat productSearchStat = new SrmProductSearchStat(ymd, (int) countx, (int) count0, (int) count1, (int) count2, (int) count3, (int) count4);
+
+        dbm.create(productSearchStat);
+    }
 
     @Override
     public PageableResult<SrmProductSearchCount> findSearchCountsByYmd(String ymd, int page, int size) {
