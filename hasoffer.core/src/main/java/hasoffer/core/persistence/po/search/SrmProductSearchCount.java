@@ -1,7 +1,6 @@
-package hasoffer.core.persistence.aws;
+package hasoffer.core.persistence.po.search;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+import javax.persistence.*;
 
 /**
  * Created on 2015/12/29.
@@ -9,11 +8,14 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
  * 2 统计匹配比价数量
  * 3 保存每天被搜索次数最多的20个商品 - top selling
  */
-@DynamoDBTable(tableName = "SrmProductSearchCount")
+@Entity
 public class SrmProductSearchCount {
+    @Id
+    @Column(unique = true, nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @DynamoDBHashKey(attributeName = "proId")
-    private long proId;
+    private long productId;
 
     private String ymd;//日期
 
@@ -23,19 +25,27 @@ public class SrmProductSearchCount {
     public SrmProductSearchCount() {
     }
 
-    public SrmProductSearchCount(long productId, String ymd, Long count, int skuCount) {
-        this.proId = productId;
+    public SrmProductSearchCount(String ymd, long productId, Long count, int skuCount) {
+        this.productId = productId;
         this.ymd = ymd;
         this.count = count;
         this.skuCount = skuCount;
     }
 
-    public long getProId() {
-        return proId;
+    public Long getId() {
+        return id;
     }
 
-    public void setProId(long proId) {
-        this.proId = proId;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(long productId) {
+        this.productId = productId;
     }
 
     public String getYmd() {
@@ -69,8 +79,9 @@ public class SrmProductSearchCount {
 
         SrmProductSearchCount that = (SrmProductSearchCount) o;
 
-        if (proId != that.proId) return false;
+        if (productId != that.productId) return false;
         if (skuCount != that.skuCount) return false;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (ymd != null ? !ymd.equals(that.ymd) : that.ymd != null) return false;
         return !(count != null ? !count.equals(that.count) : that.count != null);
 
@@ -78,7 +89,8 @@ public class SrmProductSearchCount {
 
     @Override
     public int hashCode() {
-        int result = (int) (proId ^ (proId >>> 32));
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (int) (productId ^ (productId >>> 32));
         result = 31 * result + (ymd != null ? ymd.hashCode() : 0);
         result = 31 * result + (count != null ? count.hashCode() : 0);
         result = 31 * result + skuCount;

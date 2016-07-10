@@ -5,11 +5,11 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.bo.product.ProductBo;
-import hasoffer.core.persistence.aws.SrmProductSearchCount;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.persistence.po.ptm.updater.PtmProductUpdater;
+import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
@@ -96,7 +96,7 @@ public class ProductServiceImpl implements IProductService {
 
         List<PtmTopSelling> topSellings = new ArrayList<PtmTopSelling>();
         for (SrmProductSearchCount searchCount : searchCounts) {
-            topSellings.add(new PtmTopSelling(searchCount.getYmd(), searchCount.getProId(), searchCount.getCount()));
+            topSellings.add(new PtmTopSelling(searchCount.getYmd(), searchCount.getProductId(), searchCount.getCount()));
         }
 
         dbm.batchSave(topSellings);
