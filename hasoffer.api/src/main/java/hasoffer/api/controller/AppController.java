@@ -384,7 +384,7 @@ public class AppController {
             Map map = new HashMap();
             map.put("image", appDeal.getImageUrl() == null ? "" : ImageUtil.getImageUrl(appDeal.getImageUrl()));
             map.put("title", appDeal.getTitle());
-            map.put("webSite", appDeal.getWebsite());
+            map.put("website", appDeal.getWebsite());
             map.put("exp", new SimpleDateFormat("MM/dd/yyyy").format(appDeal.getExpireTime()));
             map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
             map.put("extra", 1.5);
