@@ -11,6 +11,12 @@ public enum AppMsgClickType {
     DEEPLINK,
     WEBVIEW,
     GOOGLEPLAY,
+<<<<<<< HEAD
     DEAL,
     PRODUCT
+=======
+    PRODUCT,
+    DEAL
+
+>>>>>>> dev
 }

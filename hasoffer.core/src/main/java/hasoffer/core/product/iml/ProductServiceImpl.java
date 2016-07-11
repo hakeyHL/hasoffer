@@ -4,11 +4,13 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.product.ProductBo;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.persistence.po.ptm.updater.PtmProductUpdater;
+import hasoffer.core.persistence.po.ptm.updater.PtmTopSellingUpdater;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
@@ -69,7 +71,7 @@ public class ProductServiceImpl implements IProductService {
 
     private static final String Q_PTM_TOPSEELLING =
             "SELECT t from PtmTopSelling t " +
-                    " where t.ymd=?0 ORDER BY t.count DESC)";
+                    " where status='ONLIN' ORDER BY t.count DESC,t.lUpdateTimet DESC)";
 
     @Resource
     ISearchService searchService;
@@ -96,10 +98,35 @@ public class ProductServiceImpl implements IProductService {
 
         List<PtmTopSelling> topSellings = new ArrayList<PtmTopSelling>();
         for (SrmProductSearchCount searchCount : searchCounts) {
-            topSellings.add(new PtmTopSelling(searchCount.getYmd(), searchCount.getProductId(), searchCount.getCount()));
+            Long productId = searchCount.getProductId();
+
+            PtmTopSelling topSelling = dbm.get(PtmTopSelling.class, productId);
+
+            if (topSelling != null) {
+                // 更新
+                PtmTopSellingUpdater topSellingUpdater = new PtmTopSellingUpdater(productId);
+                topSellingUpdater.getPo().setlUpdateTime(TimeUtils.now());
+                topSellingUpdater.getPo().setCount(searchCount.getCount());
+                dbm.update(topSellingUpdater);
+                continue;
+            }
+
+            // 创建
+            topSellings.add(new PtmTopSelling(productId, searchCount.getCount()));
         }
 
         dbm.batchSave(topSellings);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updatePtmProductCategoryId(long ptmProductId, long categoryId) {
+
+        PtmProductUpdater updater = new PtmProductUpdater(ptmProductId);
+
+        updater.getPo().setCategoryId(categoryId);
+
+        dbm.update(updater);
     }
 
     @Override
@@ -303,8 +330,8 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public List<PtmTopSelling> getTopSellingProductsByDate(String date, int page, int size) {
-        return dbm.query(Q_PTM_TOPSEELLING, page == 0 ? 0 : page * size, size == 0 ? 20 : size, Arrays.asList(date));
+    public List<PtmTopSelling> getTopSellings(int page, int size) {
+        return dbm.query(Q_PTM_TOPSEELLING, page == 0 ? 0 : page * size, size == 0 ? 20 : size);
     }
 
     @Override
