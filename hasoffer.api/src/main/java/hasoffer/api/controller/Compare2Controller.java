@@ -169,7 +169,11 @@ public class Compare2Controller {
         );
     }
 
+<<<<<<< HEAD
     /*private CmpResult getDefaultCmpSku(SearchIO sio, PtmProduct product) {
+=======
+   /* private CmpResult getDefaultCmpSku(SearchIO sio, PtmProduct product) {
+>>>>>>> cf4d63a323c7de5d5a970fc92aa7fb0103d9628f
         CmpResult cmpResult = new CmpResult();
         cmpResult.setTotalRatingsNum(Long.valueOf(0));
         PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, product.getId());
@@ -188,7 +192,7 @@ public class Compare2Controller {
         cplv.setBackRate(1.5f);
         cplv.setCoins(Math.round(0.015 * product.getPrice()));
         cplv.setFreight(0);
-        cplv.setImage(WebsiteHelper.getLogoUrl(Website.valueOf(product.getSourceSite())));
+        cplv.setImage(null);
         cplv.setReturnGuarantee(0);
         cplv.setSupport(null);
         cplv.setDistributionTime("");

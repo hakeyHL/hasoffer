@@ -71,7 +71,11 @@ public class ProductServiceImpl implements IProductService {
 
     private static final String Q_PTM_TOPSEELLING =
             "SELECT t from PtmTopSelling t " +
+<<<<<<< HEAD
                     " where status='ONLIN' ORDER BY t.count DESC,t.lUpdateTimet DESC)";
+=======
+                    " where t.ymd=?0 ORDER BY t.count DESC";
+>>>>>>> cf4d63a323c7de5d5a970fc92aa7fb0103d9628f
 
     @Resource
     ISearchService searchService;

@@ -151,8 +151,14 @@ public class ProductCacheManager {
     }
 
 
+<<<<<<< HEAD
     public List<PtmProduct> getTopSellins(int page, int size) {
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_TopSelling" + "_" + page + "_" + size;
+=======
+    public List<PtmProduct> getTopSellingProductsByDate(String date, int page, int size) {
+        String key = CACHE_KEY_PRE + "_listPagedCmpSkus_" + date + "_" + page + "_" + size;
+
+>>>>>>> cf4d63a323c7de5d5a970fc92aa7fb0103d9628f
         String ptmProductJson = cacheService.get(key, 0);
 
         List<PtmProduct> products = new ArrayList<PtmProduct>();
@@ -169,7 +175,11 @@ public class ProductCacheManager {
                     }
                 }
                 if (products != null && products.size() > 0) {
+<<<<<<< HEAD
                     cacheService.add(key, JSONUtil.toJSON(products), TimeUtils.SECONDS_OF_1_HOUR * 8);
+=======
+                    cacheService.add(key, JSONUtil.toJSON(products), TimeUtils.SECONDS_OF_1_DAY * 1);
+>>>>>>> cf4d63a323c7de5d5a970fc92aa7fb0103d9628f
                 }
             } else {
                 List<Map> datas = JSONUtil.toObject(ptmProductJson, List.class);

@@ -76,8 +76,7 @@ public class AppController {
     private Logger logger = LoggerFactory.logger(AppController.class);
 
     public static void main(String[] args) {
-        BigDecimal ss = BigDecimal.valueOf(20);
-        ss.divide(BigDecimal.valueOf(3));
+        System.out.println(WebsiteHelper.getUrlWithAff("http://dl.flipkart.com/dl/all/~intex-speakers/pr?sid=all&p%5B%5D=facets.filter_standard%255B%255D%3D1"));
     }
 
     @RequestMapping(value = "/newconfig", method = RequestMethod.GET)
