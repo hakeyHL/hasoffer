@@ -33,7 +33,7 @@
                             <td><a href="detail/${topSellingVo.productId}">修改图片</a></td>
                                 <%--todo--%>
                             <td><a href="/s/reSearchByLogKeyword/${topSellingVo.logid}">手工关联</a></td>
-                            <td><a href="delete/${topSellingVo.id}}">删除</a></td>
+                            <td><a href="delete/${topSellingVo.id}">删除</a></td>
                         </tr>
                     </c:forEach>
                     </tbody>
