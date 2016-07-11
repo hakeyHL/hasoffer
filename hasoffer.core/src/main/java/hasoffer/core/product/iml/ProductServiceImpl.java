@@ -69,7 +69,7 @@ public class ProductServiceImpl implements IProductService {
 
     private static final String Q_PTM_TOPSEELLING =
             "SELECT t from PtmTopSelling t " +
-                    " where t.ymd=?0 ORDER BY t.count DESC)";
+                    " where status='ONLIN' ORDER BY t.count DESC,t.lUpdateTimet DESC)";
 
     @Resource
     ISearchService searchService;
@@ -302,8 +302,8 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public List<PtmTopSelling> getTopSellingProductsByDate(String date, int page, int size) {
-        return dbm.query(Q_PTM_TOPSEELLING, page == 0 ? 0 : page * size, size == 0 ? 20 : size, Arrays.asList(date));
+    public List<PtmTopSelling> getTopSellings(int page, int size) {
+        return dbm.query(Q_PTM_TOPSEELLING, page == 0 ? 0 : page * size, size == 0 ? 20 : size);
     }
 
     @Override
