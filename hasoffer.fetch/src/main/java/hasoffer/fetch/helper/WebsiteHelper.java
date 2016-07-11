@@ -139,7 +139,9 @@ public class WebsiteHelper {
             case PAYTM:
             case AMAZON:
             case SNAPDEAL:
+                return getUrlWithAff(website, url, affs);
             case SHOPCLUES:
+                return getUrlWithAff(website, url, affs);
             case EBAY:
             case INFIBEAM:
             case INDIATIMES:

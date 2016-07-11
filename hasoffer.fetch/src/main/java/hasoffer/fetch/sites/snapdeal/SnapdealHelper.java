@@ -59,19 +59,23 @@ public class SnapdealHelper {
         StringBuffer sb = new StringBuffer(url);
         sb.append(aff_query);
 
-        /*if (affs != null && affs.length > 0) {
+        if (affs != null && affs.length > 0) {
             int index = 1;
             for (String aff : affs) {
-                sb.append("&Sub-ID").append(index++).append("=").append(aff);
+                sb.append("&aff_sub");
+                if (index == 1) {
+                    sb.append(index);
+                }
+                sb.append("=").append(aff);
                 index++;
             }
-        }*/
+        }
 
         return sb.toString();
     }
 
     public static String getCleanUrl(String url) {
-        if(StringUtils.isEmpty(url)){
+        if (StringUtils.isEmpty(url)) {
             return "";
         }
         if (url.startsWith("http://")) {
