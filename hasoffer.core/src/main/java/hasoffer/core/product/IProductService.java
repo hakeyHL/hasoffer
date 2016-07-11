@@ -72,4 +72,6 @@ public interface IProductService {
     PtmImage getProductMasterImage(Long id);
 
     void expTopSellingsFromSearchCount(String ymd);
+
+    void updatePtmProductCategoryId(long ptmProductId, long categoryId);
 }

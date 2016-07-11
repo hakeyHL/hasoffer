@@ -639,4 +639,71 @@ public class FixController {
 
         return "ok";
     }
+
+    //fixdata/fixShitCategory
+    //对类目数据进行二次维护,将4级，5级子类目关联的商品，关联到3级类目上
+    @RequestMapping(value = "/fixShitCategory")
+    @ResponseBody
+    public String fixShitCategory() {
+
+        //找到level为3的类目id
+        List<PtmCategory> categoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.level = 3 ");
+
+        for (PtmCategory ptmCategory : categoryList) {
+            //找到3级类目对应的子类目
+            List<PtmCategory> childCategoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.parentId = ?0 ", Arrays.asList(ptmCategory.getId()));
+
+            for (PtmCategory childCategory : childCategoryList) {
+                //找到3级对应的4级子类目对应的sku
+                List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.categoryId = ?0 ", Arrays.asList(childCategory.getId()));
+
+                System.out.println("update " + ptmCategory.getName());
+                System.out.println("3 child category " + childCategory.getName());
+
+                for (PtmCmpSku sku : skus) {
+
+                    //更新sku的categoryId
+                    cmpSkuService.updateCategoryid(sku.getId(), ptmCategory.getId());
+                    PtmProduct product = productService.getProduct(sku.getProductId());
+                    if (product == null) {
+                        continue;
+                    }
+                    //更新对应product的categoryId
+                    productService.updateProductCategory(product, ptmCategory.getId());
+
+                    System.out.println("skus " + sku.getId());
+                    System.out.println("product" + product.getId());
+
+                }
+
+                //找到4级对应的5级子类目对应的sku
+                List<PtmCategory> grandChildCategoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.parentId = ?0 ", Arrays.asList(childCategory.getId()));
+
+                for (PtmCategory grandChildPtmCategory : grandChildCategoryList) {
+
+                    List<PtmCmpSku> grandChildSkus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.categoryId = ?0 ", Arrays.asList(grandChildPtmCategory.getId()));
+
+                    System.out.println("childCategory " + childCategory.getName());
+                    System.out.println("4 child category " + grandChildPtmCategory.getName());
+
+                    for (PtmCmpSku sku : grandChildSkus) {
+
+                        //更新sku的categoryId
+                        cmpSkuService.updateCategoryid(sku.getId(), ptmCategory.getId());
+                        PtmProduct product = productService.getProduct(sku.getProductId());
+                        if (product == null) {
+                            continue;
+                        }
+                        //更新对应product的categoryId
+                        productService.updateProductCategory(product, ptmCategory.getId());
+
+                        System.out.println("skus " + sku.getId());
+                        System.out.println("product" + product.getId());
+                    }
+                }
+            }
+        }
+
+        return "ok";
+    }
 }

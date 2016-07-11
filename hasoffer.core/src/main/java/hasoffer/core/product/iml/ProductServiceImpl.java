@@ -103,6 +103,17 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updatePtmProductCategoryId(long ptmProductId, long categoryId) {
+
+        PtmProductUpdater updater = new PtmProductUpdater(ptmProductId);
+
+        updater.getPo().setCategoryId(categoryId);
+
+        dbm.update(updater);
+    }
+
+    @Override
     public ProductBo getProductBo(long proId) {
 
         if (proId > 0) {

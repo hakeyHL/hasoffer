@@ -108,6 +108,7 @@ public class ImageServiceImpl implements IImageService {
         PtmImageUpdater updater = new PtmImageUpdater(ptmimageid);
 
         updater.getPo().setPath(imagePath);
+        updater.getPo().setPath2(imagePath);
 
         dbm.update(updater);
     }

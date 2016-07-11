@@ -82,4 +82,6 @@ public interface ICmpSkuService {
     int getSkuSoldStoreNum(Long id);
 
     List<PtmCmpSku> listCmpSkus(long productId, SkuStatus onsale);
+
+    void updateCategoryid(long ptmcmpskuid, long categoryid);
 }
