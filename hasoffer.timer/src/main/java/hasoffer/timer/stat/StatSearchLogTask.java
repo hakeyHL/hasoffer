@@ -22,16 +22,19 @@ public class StatSearchLogTask {
     @Resource
     IProductService productService;
 
-    @Scheduled(cron = "0 20 5 * * ?")
+    @Scheduled(cron = "0 20 21 * * ?")
     public void f() {
 
-        String ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
+        String ymd = TimeUtils.parse(TimeUtils.today(), "yyyyMMdd");
 
         // 保存所有被搜索过的商品
         searchService.saveSearchCount(ymd);
 
         // top selling
         productService.expTopSellingsFromSearchCount(ymd);
+
+        // 统计比价质量
+        searchService.statSearchCount(ymd);
     }
 
 }

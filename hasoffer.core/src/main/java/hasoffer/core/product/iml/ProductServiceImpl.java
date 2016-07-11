@@ -70,8 +70,7 @@ public class ProductServiceImpl implements IProductService {
                     " WHERE t.productId = ?0 ";
 
     private static final String Q_PTM_TOPSEELLING =
-            "SELECT t from PtmTopSelling t " +
-                    " where status='ONLIN' ORDER BY t.count DESC,t.lUpdateTimet DESC)";
+            "select t from PtmTopSelling where t.status='ONLINE' order by t.count desc, t.lUpdateTime desc;";
 
     @Resource
     ISearchService searchService;

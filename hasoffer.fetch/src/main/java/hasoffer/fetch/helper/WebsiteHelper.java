@@ -123,6 +123,39 @@ public class WebsiteHelper {
         return url;
     }
 
+    public static String getDealUrlWithAff(Website website, String url, String[] affs) {
+
+        if (StringUtils.isEmpty(url)) {
+            return StringUtils.EMPTY_STRING;
+        }
+
+        if (website == null) {
+            website = getWebSite(url);
+        }
+
+        switch (website) {
+            case FLIPKART:
+                return FlipkartHelper.getDealUrlWithAff(url, affs);
+            case PAYTM:
+            case AMAZON:
+            case SNAPDEAL:
+                return getUrlWithAff(website, url, affs);
+            case SHOPCLUES:
+                return getUrlWithAff(website, url, affs);
+            case EBAY:
+            case INFIBEAM:
+            case INDIATIMES:
+            case CROMARETAIL:
+            case THEITDEPOT:
+            case ASKMEBAZAAR:
+                break;
+            default:
+                break;
+        }
+
+        return url;
+    }
+
     public static String getUrlWithAff(Website website, String url, String[] affs) {
 
         if (StringUtils.isEmpty(url)) {

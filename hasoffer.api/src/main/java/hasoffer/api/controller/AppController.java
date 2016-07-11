@@ -76,8 +76,7 @@ public class AppController {
     private Logger logger = LoggerFactory.logger(AppController.class);
 
     public static void main(String[] args) {
-        BigDecimal ss = BigDecimal.valueOf(20);
-        ss.divide(BigDecimal.valueOf(3));
+        System.out.println(WebsiteHelper.getUrlWithAff("http://dl.flipkart.com/dl/all/~intex-speakers/pr?sid=all&p%5B%5D=facets.filter_standard%255B%255D%3D1"));
     }
 
     @RequestMapping(value = "/newconfig", method = RequestMethod.GET)
@@ -354,7 +353,9 @@ public class AppController {
                 dealVo.setExtra(1.5);
             }
             dealVo.setImage(appDeal.getImageUrl() == null ? "" : ImageUtil.getImageUrl(appDeal.getImageUrl()));
-            dealVo.setLink(appDeal.getLinkUrl() == null ? "" : appDeal.getLinkUrl());
+            String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+            DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+            dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
             dealVo.setTitle(appDeal.getTitle());
             dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
             dealVo.setWebsite(appDeal.getWebsite());
@@ -396,7 +397,9 @@ public class AppController {
                         "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
                         "5  Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
             }
-            map.put("deeplink", appDeal.getLinkUrl() == null ? "" : appDeal.getLinkUrl());
+            String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+            DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+            map.put("deeplink", appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
             mv.addObject("data", map);
         }
         return mv;
