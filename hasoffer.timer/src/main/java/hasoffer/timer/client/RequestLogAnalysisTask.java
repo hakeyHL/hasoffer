@@ -44,7 +44,6 @@ public class RequestLogAnalysisTask {
 
         if (result != null && result.getData().size() > 0) {
             buyLogsMaxCreateTime = result.getData().get(0).getCreateTime();
-
         }
 
         logger.debug("analysis requestlog get startTime" + buyLogsMaxCreateTime.toString());

@@ -385,7 +385,7 @@ public class AppController {
             map.put("image", appDeal.getImageUrl() == null ? "" : ImageUtil.getImageUrl(appDeal.getImageUrl()));
             map.put("title", appDeal.getTitle());
             map.put("website", appDeal.getWebsite());
-            map.put("exp", new SimpleDateFormat("MM/dd/yyyy").format(appDeal.getExpireTime()));
+            map.put("exp", new SimpleDateFormat("MM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
             map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
             map.put("extra", 1.5);
             map.put("description", new StringBuilder().append(appDeal.getWebsite().name()).append(" is offering ").append(appDeal.getTitle()).append(" .\n").append(appDeal.getDescription() == null ? "" : appDeal.getDescription()));

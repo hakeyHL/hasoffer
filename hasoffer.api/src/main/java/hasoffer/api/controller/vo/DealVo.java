@@ -4,18 +4,19 @@ import hasoffer.base.model.Website;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by hs on 2016/6/21.
  */
 public class DealVo {
-    private  Long id;
-    private  String image;
-    private  String title;
-    private  String exp;
-    private  Double extra;
-    private  String link;
-    private  String logoUrl;
+    private Long id;
+    private String image;
+    private String title;
+    private String exp;
+    private Double extra;
+    private String link;
+    private String logoUrl;
     private Website website;
 
     public Website getWebsite() {
@@ -63,7 +64,7 @@ public class DealVo {
     }
 
     public void setExp(Date time) {
-        this.exp=new SimpleDateFormat("MM/dd/yyyy").format(time);
+        this.exp = new SimpleDateFormat("MM dd,yyyy", Locale.ENGLISH).format(time);
     }
 
     public Double getExtra() {

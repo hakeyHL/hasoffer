@@ -130,7 +130,7 @@ public class TopSellingController {
             return new ModelAndView("system/error");
         }
 
-        String oriImageUrl = productService.getProductMasterImageUrl(ptmImage.getId());
+        String oriImageUrl = productService.getProductMasterImageUrl(productId);
         modelAndView.addObject("oriImageUrl", oriImageUrl);
         modelAndView.addObject("ptmimageid", ptmImage.getId());
 
@@ -160,4 +160,11 @@ public class TopSellingController {
         return new ModelAndView("redirect:/topselling/list");
     }
 
+    @RequestMapping(value = "/delete/{topsellingid}", method = RequestMethod.GET)
+    public ModelAndView edit(@PathVariable long topsellingid) {
+
+        topSellingService.deleteTopSellingById(topsellingid);
+
+        return new ModelAndView("redirect:/topselling/list");
+    }
 }
