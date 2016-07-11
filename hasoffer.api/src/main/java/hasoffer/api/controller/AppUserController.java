@@ -29,6 +29,14 @@ public class AppUserController {
     @Resource
     AppServiceImpl appService;
 
+    public static void main(String[] args) {
+        String affs[] = null;
+        affs = new String[]{"GOOGLEPLAY", "12112", "4"};
+        String affsUrl = WebsiteHelper.getDealUrlWithAff(Website.FLIPKART,
+                "http://dl.flipkart.com/dl/mobiles/pr?sid=tyy,4io&offer=nb:mp:0517071430", affs);
+        System.out.println(affsUrl);
+    }
+
     @RequestMapping("/addUserId2DeepLink")
     public ModelAndView get(@RequestParam String deepLink, @RequestParam String website) {
         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
