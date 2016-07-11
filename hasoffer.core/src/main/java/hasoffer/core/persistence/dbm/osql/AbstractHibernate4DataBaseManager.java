@@ -142,7 +142,7 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
                         for (int i = 0; i < array.size(); i++) {
                             session.save(array.get(i));
                             //强制提交
-                            if ((i+1) % AppConfig.BATCH_MAX_ROW == 0) {
+                            if ((i + 1) % AppConfig.BATCH_MAX_ROW == 0) {
                                 session.flush();
 //                                session.clear();
                             }
@@ -161,7 +161,7 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
             public Object doInHibernate(Session session) throws HibernateException {
                 Query query = session.createQuery(jpaSql);
                 query.setParameterList("ids", ids);
-                int i= query.executeUpdate();
+                int i = query.executeUpdate();
                 session.flush();
 //                session.clear();
                 session.close();
@@ -311,5 +311,19 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
                         return null;
                     }
                 });
+    }
+
+    @Override
+    public void deleteBySQL(final String sql) {
+        getHibernate4Template().execute(new HibernateCallback<Object>() {
+            @Override
+            public Object doInHibernate(Session session) throws HibernateException {
+                Query query = session.createQuery(sql);
+                query.executeUpdate();
+                session.flush();
+                session.close();
+                return null;
+            }
+        });
     }
 }

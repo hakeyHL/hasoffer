@@ -131,6 +131,10 @@ public class SearchServiceImpl implements ISearchService {
 
         Map<Long, Long> countMap = searchLogCacheManager.getProductCount(ymd);
 
+        if (countMap.size() > 0) {
+            delSearchCount(ymd);
+        }
+
         int count = 0;
         for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
 
@@ -657,6 +661,11 @@ public class SearchServiceImpl implements ISearchService {
     @Transactional(rollbackFor = Exception.class)
     public void saveLogCount(List<SrmProductSearchCount> searchCounts) {
         dbm.batchSave(searchCounts);
+    }
+
+    private void delSearchCount(String ymd) {
+        String sql = "delete from SrmProductSearchCount t where t.ymd='" + ymd + "'";
+        dbm.deleteBySQL(sql);
     }
 
     @Override
