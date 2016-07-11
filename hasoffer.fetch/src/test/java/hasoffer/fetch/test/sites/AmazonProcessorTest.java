@@ -5,11 +5,11 @@ import hasoffer.base.exception.HttpFetchException;
 import hasoffer.fetch.core.ICategoryProcessor;
 import hasoffer.fetch.core.IProductProcessor;
 import hasoffer.fetch.core.ISummaryProductProcessor;
-import hasoffer.fetch.model.Product;
 import hasoffer.fetch.model.OriFetchedProduct;
+import hasoffer.fetch.model.Product;
 import hasoffer.fetch.sites.amazon.AmazonCategoryProcessor;
 import hasoffer.fetch.sites.amazon.AmazonProductProcessor;
-import hasoffer.fetch.sites.amazon.AmazonSummaryProductProcessor;
+import hasoffer.fetch.sites.shopclues.ShopCluesSummaryProductProcessor;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.htmlcleaner.XPatherException;
 import org.junit.Test;
@@ -26,8 +26,8 @@ public class AmazonProcessorTest {
 
 	@Test
 	public void f2() throws Exception {
-		String url = "http://www.amazon.in/Reebok-Cotton-Sweatshirts-4055008581583_B89946_A-L_Blue/dp/B017D3KB32";
-		ISummaryProductProcessor productProcessor = new AmazonSummaryProductProcessor();
+		String url = "http://www.shopclues.com/apple-iphone-5-ear-phones-5844.html";
+		ISummaryProductProcessor productProcessor = new ShopCluesSummaryProductProcessor();
 		OriFetchedProduct oriFetchedProduct = productProcessor.getSummaryProductByUrl(url);
 		System.out.println(oriFetchedProduct.getPrice());
 	}
