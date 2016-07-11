@@ -50,8 +50,8 @@ public class FilpkartExport {
         columnModelMap.put(columnIndex, new ExcelExportUtil.ColumnModel("customerType", "customerType"));
 
         Map<String, String> parameterMap = new HashMap<String, String>();
-        parameterMap.put("startDate", "2016-04-01");
-        parameterMap.put("endDate", "2016-04-30");
+        parameterMap.put("startDate", "2016-06-01");
+        parameterMap.put("endDate", "2016-06-30");
         parameterMap.put("status", "approved");
         parameterMap.put("offset", "0");
         List<AffiliateOrder> affiliateOrderList = processor.getAffiliateOrderList(parameterMap);
