@@ -29,7 +29,7 @@ public class CmpProductListVo {
     }
 
     public CmpProductListVo(PtmCmpSku cmpSku, String logoImage) {
-        this.coins = Math.round(0.015 * cmpSku.getPrice());
+        this.coins = cmpSku.getWebsite() == Website.SHOPCLUES || cmpSku.getWebsite() == Website.FLIPKART ? Math.round(0.015 * cmpSku.getPrice()) : 0;
         this.ratingNum = cmpSku.getRatings();
         this.totalRatingsNum = cmpSku.getCommentsNumber();
         this.image = logoImage;
@@ -38,7 +38,7 @@ public class CmpProductListVo {
         this.website = cmpSku.getWebsite();
         this.freight = cmpSku.getShipping();
         this.distributionTime = cmpSku.getDeliveryTime();
-        this.backRate = 1.5f;
+        this.backRate = cmpSku.getWebsite() == Website.SHOPCLUES || cmpSku.getWebsite() == Website.FLIPKART ? 1.5f : 0;
         this.returnGuarantee = cmpSku.getReturnDays();
         String payMethod = cmpSku.getSupportPayMethod();
         if (!StringUtils.isEmpty(payMethod)) {
