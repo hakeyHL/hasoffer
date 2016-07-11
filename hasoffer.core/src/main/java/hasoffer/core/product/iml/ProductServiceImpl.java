@@ -69,7 +69,7 @@ public class ProductServiceImpl implements IProductService {
 
     private static final String Q_PTM_TOPSEELLING =
             "SELECT t from PtmTopSelling t " +
-                    " where t.ymd=?0 ORDER BY t.count DESC)";
+                    " where t.ymd=?0 ORDER BY t.count DESC";
 
     @Resource
     ISearchService searchService;
