@@ -407,8 +407,8 @@ public class DeviceServiceImpl implements IDeviceService {
 
         Pattern pattern1 = Pattern.compile(".*(action=shop)$");
         Pattern pattern2 = Pattern.compile(".*(action=shop)&.*");
-        Pattern pattern3 = Pattern.compile(".*(action=rediToAffiliateUrl)$");
-        Pattern pattern4 = Pattern.compile(".*(action=rediToAffiliateUrl)&.*");
+//        Pattern pattern3 = Pattern.compile(".*(action=rediToAffiliateUrl)$");
+//        Pattern pattern4 = Pattern.compile(".*(action=rediToAffiliateUrl)&.*");
 
         List<String> websiteList = new ArrayList<String>();
 
@@ -433,12 +433,12 @@ public class DeviceServiceImpl implements IDeviceService {
 
                     Matcher matcher1 = pattern1.matcher(query);
                     Matcher matcher2 = pattern2.matcher(query);
-                    Matcher matcher3 = pattern3.matcher(query);
-                    Matcher matcher4 = pattern4.matcher(query);
+//                    Matcher matcher3 = pattern3.matcher(query);
+//                    Matcher matcher4 = pattern4.matcher(query);
                     boolean b1 = matcher1.matches();
                     boolean b2 = matcher2.matches();
-                    boolean b3 = matcher3.matches();
-                    boolean b4 = matcher4.matches();
+//                    boolean b3 = matcher3.matches();
+//                    boolean b4 = matcher4.matches();
 
 
                     //如果满足b1或者b2进行buylog转化，如果满足b3或者b4进行hijackLog转化
@@ -463,21 +463,21 @@ public class DeviceServiceImpl implements IDeviceService {
 
     /**
      * 直接将requestlog中curApp拿出来存储进行转化
-     *
+     * 该功能切换至分析日志
      * @param urmDeviceRequestLog
      */
-    private void parseHijackLog(UrmDeviceRequestLog urmDeviceRequestLog) {
-
-        //被劫持网站的名称
-        Website website = urmDeviceRequestLog.getCurShopApp();
-
-        HijackLog hijackLog = new HijackLog();
-        hijackLog.setId(urmDeviceRequestLog.getId());
-        hijackLog.setWebsite(website);
-        hijackLog.setCreateTime(urmDeviceRequestLog.getCreateTime());
-
-        mdm.save(hijackLog);
-    }
+//    private void parseHijackLog(UrmDeviceRequestLog urmDeviceRequestLog) {
+//
+//        //被劫持网站的名称
+//        Website website = urmDeviceRequestLog.getCurShopApp();
+//
+//        HijackLog hijackLog = new HijackLog();
+//        hijackLog.setId(urmDeviceRequestLog.getId());
+//        hijackLog.setWebsite(website);
+//        hijackLog.setCreateTime(urmDeviceRequestLog.getCreateTime());
+//
+//        mdm.save(hijackLog);
+//    }
 
     private void parseBuyLog(List<String> websiteList, UrmDeviceRequestLog urmDeviceRequestLog, String query) {
         String[] params = query.split("&");
@@ -538,7 +538,6 @@ public class DeviceServiceImpl implements IDeviceService {
             urmDeviceBuyLog.setPtmProductId(proId);
             urmDeviceBuyLog.setTitle(product.getTitle());
             urmDeviceBuyLog.setShopApp(urmDeviceRequestLog.getShopApp());
-
             mdm.save(urmDeviceBuyLog);
         }
     }
