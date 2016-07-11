@@ -99,7 +99,7 @@ public class TopSellingController {
             topSellingVo.setId(ptmTopSelling.getId());
             topSellingVo.setName(ptmProduct.getTitle());
             topSellingVo.setProductId(productId);
-            topSellingVo.setYmd(ptmTopSelling.getYmd());
+//            topSellingVo.setYmd(ptmTopSelling.getYmd());
             topSellingVo.setImageurl(productService.getProductMasterImageUrl(productId));
             topSellingVo.setSkuNumber(skuNumber);
             topSellingVo.setLogid(logid);
