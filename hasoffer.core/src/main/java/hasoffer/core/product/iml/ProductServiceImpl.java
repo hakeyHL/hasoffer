@@ -96,7 +96,7 @@ public class ProductServiceImpl implements IProductService {
 
         List<PtmTopSelling> topSellings = new ArrayList<PtmTopSelling>();
         for (SrmProductSearchCount searchCount : searchCounts) {
-            topSellings.add(new PtmTopSelling(searchCount.getYmd(), searchCount.getProductId(), searchCount.getCount()));
+            topSellings.add(new PtmTopSelling(searchCount.getProductId(), searchCount.getCount()));
         }
 
         dbm.batchSave(topSellings);
