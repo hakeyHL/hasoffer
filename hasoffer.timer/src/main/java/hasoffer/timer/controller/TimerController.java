@@ -1,5 +1,6 @@
 package hasoffer.timer.controller;
 
+import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
 import org.springframework.stereotype.Controller;
@@ -21,6 +22,8 @@ public class TimerController {
     ISearchService searchService;
     @Resource
     IProductService productService;
+    @Resource
+    SearchLogCacheManager searchLogCacheManager;
 
     // http://web3:8020/timer/statsearchlog3/20160710
 
@@ -28,6 +31,10 @@ public class TimerController {
     public
     @ResponseBody
     String f1(@PathVariable String ymd) {
+
+        for (int i = 0; i < 100; i++) {
+            searchLogCacheManager.countSearchedProduct(i);
+        }
 
         // 保存所有被搜索过的商品
         searchService.saveSearchCount(ymd);
