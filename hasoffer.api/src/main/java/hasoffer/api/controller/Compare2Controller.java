@@ -4,7 +4,6 @@ import hasoffer.api.controller.vo.*;
 import hasoffer.api.helper.SearchHelper;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
-import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.StringUtils;
@@ -139,7 +138,7 @@ public class Compare2Controller {
         } catch (Exception e) {
             logger.debug(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, size));
             //if exception occured ,get default cmpResult
-            cr = getDefaultCmpSku(sio, product);
+            return null;
         }
         // 速度优化
         SearchHelper.addToLog(sio);
@@ -170,7 +169,7 @@ public class Compare2Controller {
         );
     }
 
-    private CmpResult getDefaultCmpSku(SearchIO sio, PtmProduct product) {
+    /*private CmpResult getDefaultCmpSku(SearchIO sio, PtmProduct product) {
         CmpResult cmpResult = new CmpResult();
         cmpResult.setTotalRatingsNum(Long.valueOf(0));
         PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, product.getId());
@@ -201,7 +200,7 @@ public class Compare2Controller {
         comparedSkuVos.add(cplv);
         cmpResult.setPriceList(comparedSkuVos);
         return cmpResult;
-    }
+    }*/
 
     /**
      * 从solr中搜索

@@ -108,8 +108,13 @@ public class SearchServiceImpl implements ISearchService {
 
         long count4 = dbm.querySingle(STAT_SEARCH_COUNT2, Arrays.asList(ymd, 4));
 
-        SrmProductSearchStat productSearchStat = new SrmProductSearchStat(ymd, (int) count_no_matched, (int) count_matched, (int) count0, (int) count1, (int) count2, (int) count3, (int) count4);
 
+        SrmProductSearchStat productSearchStat = dbm.get(SrmProductSearchStat.class, ymd);
+        if (productSearchStat != null) {
+            dbm.delete(SrmProductSearchStat.class, ymd);
+        }
+
+        productSearchStat = new SrmProductSearchStat(ymd, (int) count_no_matched, (int) count_matched, (int) count0, (int) count1, (int) count2, (int) count3, (int) count4);
         dbm.create(productSearchStat);
     }
 

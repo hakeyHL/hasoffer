@@ -313,7 +313,7 @@ public class AppController {
         List<AppBanner> list = appService.getBanners();
         for (AppBanner appBanner : list) {
             Banners banner = new Banners();
-            banner.setLink(WebsiteHelper.getUrlWithAff(appBanner.getLinkUrl()));
+            banner.setLink(appBanner.getLinkUrl() == null ? "" : appBanner.getLinkUrl());
             banner.setRank(appBanner.getRank());
             banner.setSource(1);
             banner.setSourceUrl(appBanner.getImageUrl() == null ? "" : ImageUtil.getImageUrl(appBanner.getImageUrl()));
@@ -354,7 +354,7 @@ public class AppController {
                 dealVo.setExtra(1.5);
             }
             dealVo.setImage(appDeal.getImageUrl() == null ? "" : ImageUtil.getImageUrl(appDeal.getImageUrl()));
-            dealVo.setLink(WebsiteHelper.getUrlWithAff(appDeal.getLinkUrl() == null ? "" : appDeal.getLinkUrl()));
+            dealVo.setLink(appDeal.getLinkUrl() == null ? "" : appDeal.getLinkUrl());
             dealVo.setTitle(appDeal.getTitle());
             dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
             dealVo.setWebsite(appDeal.getWebsite());
@@ -385,7 +385,7 @@ public class AppController {
             map.put("image", appDeal.getImageUrl() == null ? "" : ImageUtil.getImageUrl(appDeal.getImageUrl()));
             map.put("title", appDeal.getTitle());
             map.put("website", appDeal.getWebsite());
-            map.put("exp", new SimpleDateFormat("MM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
+            map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
             map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
             map.put("extra", 1.5);
             map.put("description", new StringBuilder().append(appDeal.getWebsite().name()).append(" is offering ").append(appDeal.getTitle()).append(" .\n").append(appDeal.getDescription() == null ? "" : appDeal.getDescription()));
@@ -396,7 +396,7 @@ public class AppController {
                         "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
                         "5  Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
             }
-            map.put("deeplink", WebsiteHelper.getUrlWithAff(appDeal.getLinkUrl() == null ? "" : appDeal.getLinkUrl()));
+            map.put("deeplink", appDeal.getLinkUrl() == null ? "" : appDeal.getLinkUrl());
             mv.addObject("data", map);
         }
         return mv;
@@ -514,9 +514,7 @@ public class AppController {
         }
         String data = "";
         //查询热卖商品
-        Date date = new Date();
-        date.setTime(date.getTime() - 1 * 24 * 60 * 60 * 1000);
-        List<PtmProduct> products2s = productCacheManager.getTopSellingProductsByDate(new SimpleDateFormat("yyyyMMdd").format(date), criteria.getPage(), criteria.getPageSize());
+        List<PtmProduct> products2s = productCacheManager.getTopSellins(criteria.getPage(), criteria.getPageSize());
         switch (type) {
             case 0:
                 addProductVo2List(li, products2s);
