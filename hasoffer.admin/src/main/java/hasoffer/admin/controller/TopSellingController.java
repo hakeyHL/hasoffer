@@ -91,7 +91,7 @@ public class TopSellingController {
             List<SrmSearchLog> loglist = dbm.query(Q_SRMSEARCHLOG_BYPRODUCTID, Arrays.asList(productId));
 
             if (loglist == null || loglist.size() == 0) {
-                return new ModelAndView("system/error");
+                continue;
             }
 
             String logid = loglist.get(0).getId();
