@@ -34,11 +34,11 @@ public class TestFileUpload {
     public void f() {
         List<PtmTopSelling> sscs = new ArrayList<PtmTopSelling>();
 
-        sscs.add(new PtmTopSelling("123456", 30, 20L));
-        sscs.add(new PtmTopSelling("123456", 31, 19L));
-        sscs.add(new PtmTopSelling("123456", 32, 23L));
-        sscs.add(new PtmTopSelling("123456", 33, 21L));
-        sscs.add(new PtmTopSelling("123456", 34, 5L));
+//        sscs.add(new PtmTopSelling("123456", 30, 20L));
+//        sscs.add(new PtmTopSelling("123456", 31, 19L));
+//        sscs.add(new PtmTopSelling("123456", 32, 23L));
+//        sscs.add(new PtmTopSelling("123456", 33, 21L));
+//        sscs.add(new PtmTopSelling("123456", 34, 5L));
 
         Collections.sort(sscs, new Comparator<PtmTopSelling>() {
             @Override
