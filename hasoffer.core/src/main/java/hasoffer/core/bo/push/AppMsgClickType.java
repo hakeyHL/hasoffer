@@ -13,5 +13,4 @@ public enum AppMsgClickType {
     GOOGLEPLAY,
     PRODUCT,
     DEAL
-
 }
