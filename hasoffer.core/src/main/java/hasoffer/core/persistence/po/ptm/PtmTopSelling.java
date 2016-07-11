@@ -17,7 +17,7 @@ public class PtmTopSelling implements Identifiable<Long> {
 
     @Id
     @Column(unique = true, nullable = false)
-    private Long id;
+    private Long id; // 商品ID , 对应 PtmProduct - id
 
     private Long count;
     private TopSellStatus status = TopSellStatus.WAIT;
