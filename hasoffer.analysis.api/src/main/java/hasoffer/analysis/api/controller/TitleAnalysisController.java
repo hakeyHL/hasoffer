@@ -106,6 +106,11 @@ public class TitleAnalysisController {
         return "ok";
     }
 
+    /**
+     * curl http://localhost:8888/analysis/test2
+     *
+     * @return
+     */
     @RequestMapping(value = "/test2", method = RequestMethod.GET)
     public
     @ResponseBody

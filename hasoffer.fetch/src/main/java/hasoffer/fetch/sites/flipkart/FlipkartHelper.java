@@ -114,4 +114,25 @@ public class FlipkartHelper {
         System.out.println(deeplink);
 
     }
+
+    public static String getDealUrlWithAff(String url, String[] affs) {
+        StringBuffer sb = new StringBuffer(url);
+
+        String affid = "affiliate357";
+
+        if (sb.indexOf("?") > 0) {
+            sb.append("&affid=").append(affid);
+        } else {
+            sb.append("?affid=").append(affid);
+        }
+
+        if (affs != null) {
+            int i = 1;
+            for (String aff : affs) {
+                sb.append("&affExtParam").append(i++).append("=").append(aff);
+            }
+        }
+
+        return sb.toString();
+    }
 }
