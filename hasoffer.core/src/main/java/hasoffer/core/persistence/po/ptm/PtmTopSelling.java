@@ -23,6 +23,9 @@ public class PtmTopSelling implements Identifiable<Long> {
     private TopSellStatus status = TopSellStatus.WAIT;
     private long lUpdateTime = TimeUtils.now();
 
+    public PtmTopSelling() {
+    }
+
     public PtmTopSelling(long productId, Long count) {
         this.id = productId;
         this.count = count;
