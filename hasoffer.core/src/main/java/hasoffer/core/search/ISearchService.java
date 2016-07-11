@@ -8,6 +8,7 @@ import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
+import hasoffer.core.persistence.po.search.SrmProductSearchStat;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.search.SrmSearchUpdateLog;
 import hasoffer.fetch.model.ListProduct;
@@ -22,6 +23,8 @@ import java.util.Map;
  */
 
 public interface ISearchService {
+
+    void statSearchCount(String ymd);
 
     void saveSearchCount(String ymd);
 
@@ -97,4 +100,6 @@ public interface ISearchService {
     void analysisAndRelate(SrmAutoSearchResult asr);
 
     PageableResult<SrmProductSearchCount> findSearchCountsByYmd(String ymd, int page, int size);
+
+    List<SrmProductSearchStat> findSearchCountStats();
 }

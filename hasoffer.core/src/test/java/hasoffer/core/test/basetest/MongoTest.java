@@ -3,6 +3,7 @@ package hasoffer.core.test.basetest;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.persistence.dbm.aws.AwsDynamoDbService;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.enums.IndexStat;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
@@ -10,6 +11,8 @@ import hasoffer.core.persistence.mongo.StatHijackFetch;
 import hasoffer.core.persistence.mongo.UrmDeviceBuyLog;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.search.SrmProductSearchCount;
+import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.user.IDeviceService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +38,19 @@ public class MongoTest {
     IMongoDbManager mdm;
     @Resource
     IDeviceService deviceService;
+    @Resource
+    ICmpSkuService cmpSkuService;
+
+
+    @Test
+    public void table() {
+        AwsDynamoDbService.getInstance().createTable(SrmProductSearchCount.class);
+//        AwsDynamoDbService.getInstance().deleteTable(SrmProductSearchCount.class);
+    }
+
+    @Test
+    public void ts() {
+    }
 
     @Test
     public void expWords() {

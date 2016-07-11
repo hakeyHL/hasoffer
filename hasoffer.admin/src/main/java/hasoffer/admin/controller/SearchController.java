@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import hasoffer.admin.controller.vo.CategoryVo;
 import hasoffer.admin.controller.vo.CmpSkuVo;
 import hasoffer.admin.controller.vo.ProductVo;
+import hasoffer.admin.controller.vo.SearchResultCountVo;
 import hasoffer.admin.manager.SearchLogManager;
 import hasoffer.base.model.PageModel;
 import hasoffer.base.model.PageableResult;
@@ -17,6 +18,7 @@ import hasoffer.core.persistence.enums.SrmSearchLogUpdate;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.search.SrmProductSearchStat;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.search.SrmSearchUpdateLog;
 import hasoffer.core.persistence.po.sys.SysAdmin;
@@ -37,8 +39,6 @@ import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import hasoffer.webcommon.helper.PageHelper;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -78,7 +78,21 @@ public class SearchController {
     @Resource
     SearchLogCacheManager logCacheManager;
 
-    Logger logger = LoggerFactory.getLogger(SearchController.class);
+    @RequestMapping(value = "/showstat", method = RequestMethod.GET)
+    public ModelAndView showstat() {
+        ModelAndView mav = new ModelAndView("showstat/cmpresult");
+
+        List<SrmProductSearchStat> searchStats = searchService.findSearchCountStats();
+
+        List<SearchResultCountVo> searchResultCountVos = new ArrayList<SearchResultCountVo>();
+        for (SrmProductSearchStat searchStat : searchStats) {
+            searchResultCountVos.add(new SearchResultCountVo(searchStat));
+        }
+
+        mav.addObject("stats", searchResultCountVos);
+
+        return mav;
+    }
 
     @RequestMapping(value = "/stat", method = RequestMethod.GET)
     public
@@ -91,6 +105,8 @@ public class SearchController {
         searchService.saveSearchCount(ymd);
 
         productService.expTopSellingsFromSearchCount(ymd);
+
+        searchService.statSearchCount(ymd);
 
         return "ok";
     }

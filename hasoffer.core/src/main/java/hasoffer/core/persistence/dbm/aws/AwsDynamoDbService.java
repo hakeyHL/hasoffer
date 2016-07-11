@@ -21,15 +21,30 @@ import java.util.Map;
  */
 public class AwsDynamoDbService {
 
-//    static AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient().withEndpoint("http://60.205.57.57:8000");
-//static AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient().withEndpoint("http://192.168.1.203:8000");
-
     static DynamoDB dynamoDB = null;
+    private static AwsDynamoDbService awsDynamoDbService;
+
+    //    static AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient().withEndpoint("http://60.205.57.57:8000");
+//static AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient().withEndpoint("http://192.168.1.203:8000");
     private static AmazonDynamoDBClient dynamoDBClient = getDynamoDBClient();
     private Logger logger = LoggerFactory.getLogger(AwsDynamoDbService.class);
 
+    public static AwsDynamoDbService getInstance() {
+        if (awsDynamoDbService == null) {
+            awsDynamoDbService = new AwsDynamoDbService();
+        }
+        return awsDynamoDbService;
+    }
+
     private static AmazonDynamoDBClient getDynamoDBClient() {
-        BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials("AKIAI2KXGSAA6ML4ZSJQ", "vDUeGxdjPeH1ulHark/VhKlAkD4d9L/wVpBINxep");
+        BasicAWSCredentials basicAWSCredentials = null;
+
+        basicAWSCredentials = new BasicAWSCredentials("AKIAI2KXGSAA6ML4ZSJQ", "vDUeGxdjPeH1ulHark/VhKlAkD4d9L/wVpBINxep");
+
+        // todo 临时处理，日后对开发和测试环境做相应的配置
+//        if (AppConfig.get(AppConfig.APP_ENV).equalsIgnoreCase("product")) {
+//            basicAWSCredentials = new BasicAWSCredentials("AKIAI2KXGSAA6ML4ZSJQ", "vDUeGxdjPeH1ulHark/VhKlAkD4d9L/wVpBINxep");
+//        }
 
         AmazonDynamoDBClient client = new AmazonDynamoDBClient(basicAWSCredentials)
                 .withRegion(Regions.AP_SOUTHEAST_1);
