@@ -108,8 +108,13 @@ public class SearchServiceImpl implements ISearchService {
 
         long count4 = dbm.querySingle(STAT_SEARCH_COUNT2, Arrays.asList(ymd, 4));
 
-        SrmProductSearchStat productSearchStat = new SrmProductSearchStat(ymd, (int) count_no_matched, (int) count_matched, (int) count0, (int) count1, (int) count2, (int) count3, (int) count4);
 
+        SrmProductSearchStat productSearchStat = dbm.get(SrmProductSearchStat.class, ymd);
+        if (productSearchStat != null) {
+            dbm.delete(SrmProductSearchStat.class, ymd);
+        }
+
+        productSearchStat = new SrmProductSearchStat(ymd, (int) count_no_matched, (int) count_matched, (int) count0, (int) count1, (int) count2, (int) count3, (int) count4);
         dbm.create(productSearchStat);
     }
 
@@ -130,6 +135,10 @@ public class SearchServiceImpl implements ISearchService {
         List<SrmProductSearchCount> spscs = new ArrayList<SrmProductSearchCount>();
 
         Map<Long, Long> countMap = searchLogCacheManager.getProductCount(ymd);
+
+        if (countMap.size() > 0) {
+            delSearchCount(ymd);
+        }
 
         int count = 0;
         for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
@@ -657,6 +666,11 @@ public class SearchServiceImpl implements ISearchService {
     @Transactional(rollbackFor = Exception.class)
     public void saveLogCount(List<SrmProductSearchCount> searchCounts) {
         dbm.batchSave(searchCounts);
+    }
+
+    private void delSearchCount(String ymd) {
+        String sql = "delete from SrmProductSearchCount t where t.ymd='" + ymd + "'";
+        dbm.deleteBySQL(sql);
     }
 
     @Override

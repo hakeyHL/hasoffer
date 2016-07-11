@@ -6,6 +6,7 @@ import hasoffer.core.admin.ITopSellingService;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -37,5 +38,11 @@ public class TopSellingServiceImpl implements ITopSellingService {
         }
 
         return pageableResult;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteTopSellingById(long id) {
+        dbm.delete(PtmTopSelling.class, id);
     }
 }

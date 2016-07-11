@@ -44,4 +44,5 @@ public interface IDataBaseManager {
 
     void update(final List<T> array);
 
+    void deleteBySQL(final String sql);
 }
