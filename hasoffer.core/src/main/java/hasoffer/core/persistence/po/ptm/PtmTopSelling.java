@@ -4,9 +4,7 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.enums.TopSellStatus;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * Created on 2015/12/29.
@@ -20,6 +18,8 @@ public class PtmTopSelling implements Identifiable<Long> {
     private Long id; // 商品ID , 对应 PtmProduct - id
 
     private Long count;
+
+    @Enumerated(EnumType.STRING)
     private TopSellStatus status = TopSellStatus.WAIT;
     private long lUpdateTime = TimeUtils.now();
 
