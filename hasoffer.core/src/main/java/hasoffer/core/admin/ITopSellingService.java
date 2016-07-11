@@ -17,4 +17,6 @@ public interface ITopSellingService {
      */
     PageableResult<PtmTopSelling> findTopSellingListByDate(long longStartTime, Long longEndTime, int page, int size);
 
+    void deleteTopSellingById(long id);
+
 }

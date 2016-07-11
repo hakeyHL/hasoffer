@@ -160,4 +160,11 @@ public class TopSellingController {
         return new ModelAndView("redirect:/topselling/list");
     }
 
+    @RequestMapping(value = "/delete/{topsellingid}", method = RequestMethod.POST)
+    public ModelAndView edit(@PathVariable long topsellingid) {
+
+        topSellingService.deleteTopSellingById(topsellingid);
+
+        return new ModelAndView("redirect:/topselling/list");
+    }
 }
