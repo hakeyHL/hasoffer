@@ -169,11 +169,7 @@ public class Compare2Controller {
         );
     }
 
-<<<<<<< HEAD
-    /*private CmpResult getDefaultCmpSku(SearchIO sio, PtmProduct product) {
-=======
    /* private CmpResult getDefaultCmpSku(SearchIO sio, PtmProduct product) {
->>>>>>> cf4d63a323c7de5d5a970fc92aa7fb0103d9628f
         CmpResult cmpResult = new CmpResult();
         cmpResult.setTotalRatingsNum(Long.valueOf(0));
         PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, product.getId());
