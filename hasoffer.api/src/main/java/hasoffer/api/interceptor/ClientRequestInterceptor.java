@@ -7,8 +7,6 @@ import hasoffer.base.utils.UrlUtils;
 import hasoffer.core.user.IDeviceService;
 import hasoffer.webcommon.context.Context;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -20,7 +18,7 @@ import java.util.Map;
 
 @Component
 public class ClientRequestInterceptor implements HandlerInterceptor {
-    private static Logger logger = LoggerFactory.getLogger(ClientRequestInterceptor.class);
+
     @Resource
     IDeviceService deviceService;
 
@@ -58,12 +56,6 @@ public class ClientRequestInterceptor implements HandlerInterceptor {
         if (!requestToken.equals(client_key)) {
             return false;
         }
-
-//        UrmDevice urmDevice = deviceService.findDevice(deviceId);
-//
-//        if (urmDevice != null) {
-//
-//        }
 
         return true;
     }
