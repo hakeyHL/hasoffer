@@ -161,9 +161,9 @@
                                 <li class="active">
                                     <a href="/deal/list">deal</a>
                                 </li>
-                                <li class="active">
-                                    <a href="/topselling/list">top selling</a>
-                                </li>
+                                    <%--<li class="active">--%>
+                                    <%--<a href="/topselling/list">top selling</a>--%>
+                                    <%--</li>--%>
                             </ul>
                         </li>
                     </c:if>
