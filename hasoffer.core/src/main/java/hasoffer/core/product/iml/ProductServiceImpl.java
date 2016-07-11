@@ -4,11 +4,13 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.product.ProductBo;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.persistence.po.ptm.updater.PtmProductUpdater;
+import hasoffer.core.persistence.po.ptm.updater.PtmTopSellingUpdater;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
@@ -96,9 +98,24 @@ public class ProductServiceImpl implements IProductService {
 
         List<PtmTopSelling> topSellings = new ArrayList<PtmTopSelling>();
         for (SrmProductSearchCount searchCount : searchCounts) {
+            Long productId = searchCount.getProductId();
 
-            topSellings.add(new PtmTopSelling(searchCount.getProductId(), searchCount.getCount()));
+            PtmTopSelling topSelling = dbm.get(PtmTopSelling.class, productId);
+
+            if (topSelling != null) {
+                // 更新
+                PtmTopSellingUpdater topSellingUpdater = new PtmTopSellingUpdater(productId);
+                topSellingUpdater.getPo().setlUpdateTime(TimeUtils.now());
+                topSellingUpdater.getPo().setCount(searchCount.getCount());
+                dbm.update(topSellingUpdater);
+                continue;
+            }
+
+            // 创建
+            topSellings.add(new PtmTopSelling(productId, searchCount.getCount()));
         }
+
+        dbm.batchSave(topSellings);
     }
 
     @Override

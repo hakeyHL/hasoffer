@@ -74,7 +74,7 @@ public class TopSellingController {
 
             TopSellingVo topSellingVo = new TopSellingVo();
 
-            long productId = ptmTopSelling.getProductId();
+            long productId = ptmTopSelling.getId();
             if (ptmproductIdSet.contains(productId)) {
                 continue;
             } else {
