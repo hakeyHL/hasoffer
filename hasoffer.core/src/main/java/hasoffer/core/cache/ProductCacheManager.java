@@ -152,7 +152,6 @@ public class ProductCacheManager {
 
 
     public List<PtmProduct> getTopSellingProductsByDate(String date, int page, int size) {
-        date = "20160707";
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_" + date + "_" + page + "_" + size;
 
         String ptmProductJson = cacheService.get(key, 0);
@@ -171,7 +170,7 @@ public class ProductCacheManager {
                     }
                 }
                 if (products != null && products.size() > 0) {
-                    cacheService.add(key, JSONUtil.toJSON(products), TimeUtils.SECONDS_OF_1_DAY * 7);
+                    cacheService.add(key, JSONUtil.toJSON(products), TimeUtils.SECONDS_OF_1_DAY * 1);
                 }
             } else {
                 List<Map> datas = JSONUtil.toObject(ptmProductJson, List.class);
