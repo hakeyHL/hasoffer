@@ -64,7 +64,7 @@ public class DealVo {
     }
 
     public void setExp(Date time) {
-        this.exp = new SimpleDateFormat("MM dd,yyyy", Locale.ENGLISH).format(time);
+        this.exp = new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(time);
     }
 
     public Double getExtra() {
