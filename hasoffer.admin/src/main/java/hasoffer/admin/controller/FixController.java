@@ -698,7 +698,7 @@ public class FixController {
                         productService.updateProductCategory(product, ptmCategory.getId());
 
                         System.out.println("skus " + sku.getId());
-                        System.out.println("product" + product.getId());
+                        System.out.println("product " + product.getId());
                     }
                 }
             }
