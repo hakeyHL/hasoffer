@@ -85,37 +85,14 @@ public class FlipkartHelper {
 
         url = getCleanUrl(url);
 
-        StringBuffer sb = new StringBuffer(url);
-
-        String affid = "affiliate357";
-
-        if (sb.indexOf("?") > 0) {
-            sb.append("&affid=").append(affid);
-        } else {
-            sb.append("?affid=").append(affid);
-        }
-
-        if (affs != null) {
-            int i = 1;
-            for (String aff : affs) {
-                sb.append("&affExtParam").append(i++).append("=").append(aff);
-            }
-        }
-
-        return sb.toString();
-    }
-
-    public static void main(String[] args) {
-
-        String oriUrl = "http://www.flipkart.com/samsung-galaxy-s6-edge/p/itmeafbedcanutsm?pid=MOBEAFBEBZNE7CUF";
-
-        String deeplink = getDeeplink(oriUrl);
-
-        System.out.println(deeplink);
-
+        return appendAff(url, affs);
     }
 
     public static String getDealUrlWithAff(String url, String[] affs) {
+        return appendAff(url, affs);
+    }
+
+    private static String appendAff(String url, String[] affs) {
         StringBuffer sb = new StringBuffer(url);
 
         String affid = "affiliate357";
@@ -128,9 +105,16 @@ public class FlipkartHelper {
 
         if (affs != null) {
             int i = 1;
-            for (String aff : affs) {
-                sb.append("&affExtParam").append(i++).append("=").append(aff);
+//            for (String aff : affs) {
+//                sb.append("&affExtParam").append(i++).append("=").append(aff);
+//            }
+            sb.append("&affExtParam1=").append(affs[0]);
+
+            String deviceUser = affs[1];
+            if (affs.length == 3) {
+                deviceUser += "_" + affs[2];
             }
+            sb.append("&affExtParam2=").append(deviceUser);
         }
 
         return sb.toString();
