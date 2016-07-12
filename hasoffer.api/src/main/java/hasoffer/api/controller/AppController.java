@@ -349,7 +349,7 @@ public class AppController {
             dealVo.setId(appDeal.getId());
             dealVo.setExp(appDeal.getExpireTime());
             dealVo.setExtra(0.0);
-            if (appDeal.getWebsite() == Website.FLIPKART || appDeal.getWebsite() == Website.SHOPCLUES) {
+            if (appDeal.getWebsite() == Website.FLIPKART || appDeal.getWebsite() == Website.SHOPCLUES || appDeal.getWebsite() == Website.SNAPDEAL) {
                 dealVo.setExtra(1.5);
             }
             dealVo.setImage(appDeal.getImageUrl() == null ? "" : ImageUtil.getImageUrl(appDeal.getImageUrl()));
@@ -388,9 +388,10 @@ public class AppController {
             map.put("website", appDeal.getWebsite());
             map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
             map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-            map.put("extra", 1.5);
             map.put("description", new StringBuilder().append(appDeal.getWebsite().name()).append(" is offering ").append(appDeal.getTitle()).append(" .\n").append(appDeal.getDescription() == null ? "" : appDeal.getDescription()));
-            if (appDeal.getWebsite() == Website.FLIPKART || appDeal.getWebsite() == Website.SHOPCLUES) {
+            map.put("extra", 0);
+            if (appDeal.getWebsite() == Website.FLIPKART || appDeal.getWebsite() == Website.SHOPCLUES || appDeal.getWebsite() == Website.SNAPDEAL) {
+                map.put("extra", 1.5);
                 map.put("cashbackInfo", "1. Offer valid for a limited time only while stocks last\n" +
                         "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +
                         "3. Rewards may not paid on purchases made using store credits/gift vouchers\n" +
