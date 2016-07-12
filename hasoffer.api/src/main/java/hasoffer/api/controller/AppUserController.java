@@ -66,7 +66,7 @@ public class AppUserController {
             return modelAndView;
         }
         String affsUrl = WebsiteHelper.getDealUrlWithAff(Website.valueOf(website), deepLink, affs);
-        logger.info(String.format(" success ,time : %s userId :%s ,sourceLink : %s ,result : %s"), currentTime, urmUser.getId(), deepLink, affsUrl);
+        logger.info(String.format(" success ,time : %s userId :%s ,sourceLink : %s ,result : %s"), currentTime, urmUser.getId() + "", deepLink, affsUrl);
         map.put("deeplink", affsUrl);
         modelAndView.addObject("data", map);
         return modelAndView;
