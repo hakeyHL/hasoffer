@@ -57,10 +57,10 @@ public class OrderStatsAnalysisTaskTest {
 //        //头一天
 //        Date day1AgoTime = new Date(cycleIndex * cycleTime - cycleTime);
 //        orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day1AgoTime, day1AgoTime);
-        orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), day1AgoTime, day1AgoTime);
+//        orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day1AgoTime, day1AgoTime);
 
 //        Date todayTime = new Date(cycleIndex * cycleTime);
-//        orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), todayTime, todayTime);
+        orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), todayTime, todayTime);
 //        orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), todayTime, todayTime);
 
     }

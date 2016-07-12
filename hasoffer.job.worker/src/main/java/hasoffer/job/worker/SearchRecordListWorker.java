@@ -22,11 +22,12 @@ import java.util.concurrent.TimeUnit;
  * Function : 旧数据修复
  */
 public class SearchRecordListWorker implements Runnable {
+
     private static final String SQL_SEARCHLOG = "select t from SrmSearchLog t where t.updateTime >?0 order by t.updateTime ASC ";
+    private Logger logger = LoggerFactory.getLogger(SearchRecordListWorker.class);
     private LinkedBlockingQueue<SrmAutoSearchResult> searchLogQueue;
     private SearchProductService searchProductService;
     private IDataBaseManager dbm;
-    private Logger logger = LoggerFactory.getLogger(SearchRecordListWorker.class);
 
     public SearchRecordListWorker(SearchProductService searchProductService, IDataBaseManager dbm, LinkedBlockingQueue<SrmAutoSearchResult> searchLogQueue) {
         this.dbm = dbm;
