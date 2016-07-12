@@ -311,4 +311,13 @@ public class MysqlTest {
         System.out.println();
 
     }
+
+    @Test
+    public void testFind() {
+
+        long number = dbm.querySingle("SELECT COUNT(*) FROM PtmProduct t WHERE t.categoryId = ?0 ", Arrays.asList(999999L));
+
+        System.out.println(number);
+
+    }
 }
