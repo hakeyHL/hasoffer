@@ -6,6 +6,7 @@ import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
@@ -14,10 +15,7 @@ import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.worker.ListAndProcessWorkerStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
-import hasoffer.task.worker.FixFlipkartCleanUrlWorker;
-import hasoffer.task.worker.FixFlipkartSourceSidWorker;
-import hasoffer.task.worker.FixPtmProductWorker;
-import hasoffer.task.worker.MysqlListWorker;
+import hasoffer.task.worker.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -31,6 +29,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -241,6 +240,29 @@ public class FixTaskController {
 
             logger.debug("id = [" + sku.getId() + "],url = [" + url + "]");
 
+        }
+
+        return "ok";
+    }
+
+
+    //fixtask/getNoProductCategory
+    @RequestMapping(value = "/getNoProductCategory")
+    @ResponseBody
+    public String getNoProductCategory() {
+
+        final String Q_SECOND_CATEGORY = "SELECT t FROM PtmCategory t WHERE t.level = 2 ";
+        final String Q_THIRD_CATEGORY = "SELECT t FROM PtmCategory t WHERE t.level = 3 ";
+
+        ConcurrentLinkedQueue<PtmCategory> categoryQueue = new ConcurrentLinkedQueue<PtmCategory>();
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        es.execute(new CategoryListWorker(Q_SECOND_CATEGORY, dbm, categoryQueue));
+        es.execute(new CategoryListWorker(Q_THIRD_CATEGORY, dbm, categoryQueue));
+
+        for (int i = 0; i < 5; i++) {
+            es.execute(new CategoryTestWorker(dbm, categoryQueue));
         }
 
         return "ok";

@@ -1,4 +1,4 @@
-package hasoffer.admin.worker;
+package hasoffer.task.worker;
 
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
