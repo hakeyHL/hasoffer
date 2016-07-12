@@ -83,7 +83,7 @@
         url = "/topselling/changeStatus/" + topSellingId;
         http.doGet(url);
 
-        window.location.href = "/topselling/list?topSellingStatusString=${selectstatus}";
+        window.location.href = "/topselling/list?topSellingStatusString=${selectstatus}&tmp=" + Math.random() * 10000;
     }
 
 </script>
