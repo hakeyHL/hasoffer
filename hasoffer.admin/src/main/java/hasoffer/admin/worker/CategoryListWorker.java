@@ -31,7 +31,7 @@ public class CategoryListWorker implements Runnable {
 
             for (PtmCategory category : categoryList) {
 
-                //如果是二级类目，查询是否由子类目，如果有跳过，没有没有加入队列
+                //如果是二级类目，查询是否由子类目，如果有跳过，没有加入队列
                 if (category.getLevel() == 2) {
 
                     List<PtmCategory> childCategoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.parentId = ?0 ", Arrays.asList(category.getId()));

@@ -728,7 +728,7 @@ public class FixController {
         es.execute(new CategoryListWorker(Q_SECOND_CATEGORY, dbm, categoryQueue));
         es.execute(new CategoryListWorker(Q_THIRD_CATEGORY, dbm, categoryQueue));
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             es.execute(new CategoryTestWorker(dbm, categoryQueue));
         }
 
