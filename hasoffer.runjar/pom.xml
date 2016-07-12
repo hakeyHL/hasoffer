@@ -23,23 +23,7 @@
     </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <targetPath>${project.build.directory}/classes</targetPath>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/*.xml</include>
-                </includes>
-            </resource>
-        </resources>
         <plugins>
-
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -64,11 +48,11 @@
                             <transformers>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>hasoffer.runjar.run.TestRun</mainClass>
+                                    <mainClass>hasoffer.runjar.run.RunTaskMain</mainClass>
                                 </transformer>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                                    <resource>applicationContext.xml</resource>
+                                    <resource>spring-beans.xml</resource>
                                 </transformer>
                             </transformers>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
@@ -79,4 +63,8 @@
             </plugin>
         </plugins>
     </build>
+
+    <properties>
+        <property.location>classpath:</property.location>
+    </properties>
 </project>
