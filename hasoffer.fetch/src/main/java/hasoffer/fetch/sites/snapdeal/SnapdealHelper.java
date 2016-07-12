@@ -63,7 +63,7 @@ public class SnapdealHelper {
             int index = 1;
             for (String aff : affs) {
                 sb.append("&aff_sub");
-                if (index == 1) {
+                if (index != 1) {
                     sb.append(index);
                 }
                 sb.append("=").append(aff);
