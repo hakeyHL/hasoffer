@@ -155,7 +155,7 @@ public class FixController {
 
                     date = product.getCreateTime();
 
-                    logger.debug(product.getId() + " - " + TimeUtils.parse(date, "yyyy-MM-dd HH:mm:ss"));
+                    System.out.println(product.getId() + " - " + TimeUtils.parse(date, "yyyy-MM-dd HH:mm:ss"));
                 }
             }
         }
