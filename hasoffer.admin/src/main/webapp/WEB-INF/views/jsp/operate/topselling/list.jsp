@@ -58,7 +58,7 @@
                                 <a href="/p/cmp/${topSellingVo.id}">${topSellingVo.name} ${topSellingVo.skuNumber}个比价</a>
                             </td>
                             <td>
-                                <button id="changeStatus" onclick="change(${topSellingVo.id},document)">切换状态</button>
+                                <button id="changeStatus" onclick="change(${topSellingVo.id})">切换状态</button>
                             </td>
                             <td><a href="detail/${topSellingVo.id}">修改图片</a></td>
                             <td><a href="/p/cmp/${topSellingVo.id}">手工关联</a></td>
@@ -78,7 +78,7 @@
 <script>
 
     //状态切换
-    function change(topSellingId, document) {
+    function change(topSellingId) {
 
         url = "/topselling/changeStatus/" + topSellingId;
         http.doGet(url);
