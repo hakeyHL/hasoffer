@@ -138,9 +138,10 @@ public class Compare2Controller {
 //            getSioBySearch(sio);
                 cr = getCmpProducts(sio, product);
             } catch (Exception e) {
-                logger.debug(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, size));
+                logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, size));
                 //if exception occured ,get default cmpResult
-                return null;
+                mav.addObject("data", cr);
+                return mav;
             }
             // 速度优化
             SearchHelper.addToLog(sio);
