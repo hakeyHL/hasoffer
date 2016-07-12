@@ -113,19 +113,21 @@ public class RequestInterceptor implements HandlerInterceptor {
 //                    "    \"msg\": \"ok \"\n" +
 //                    "}"));
 //        }
-        UrmUser urmUser = appService.getUserByUserToken((String) Context.currentContext().get(StaticContext.USER_TOKEN));
-        if (urmUser == null) {
-            modelAndView.addObject("result", new ResultVo("10010", "login expired"));
+        if (modelAndView != null) {
+            UrmUser urmUser = appService.getUserByUserToken((String) Context.currentContext().get(StaticContext.USER_TOKEN));
+            if (urmUser == null) {
+                modelAndView.addObject("result", new ResultVo("10010", "login expired"));
 //            new StringBuilder().append("{\n" +
 //                    "    \"errorCode\": \"10010\",\n" +
 //                    "    \"msg\": \"login expired \"\n" +
 //                    "}"));
-        } else {
-            modelAndView.addObject("result", new ResultVo("00000", "ok"));
+            } else {
+                modelAndView.addObject("result", new ResultVo("00000", "ok"));
 //            modelAndView.addObject("result", new StringBuilder().append("{\n" +
 //                    "    \"errorCode\": \"00000\",\n" +
 //                    "    \"msg\": \"ok \"\n" +
 //                    "}"));
+            }
         }
     }
 
