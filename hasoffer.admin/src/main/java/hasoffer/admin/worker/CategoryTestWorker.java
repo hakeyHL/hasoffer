@@ -42,6 +42,7 @@ public class CategoryTestWorker implements Runnable {
             if (number == 0) {
                 System.out.println("id:" + ptmCategory.getId());
                 System.out.println("name:" + ptmCategory.getName());
+                System.out.println("level:" + ptmCategory.getLevel());
             }
         }
     }
