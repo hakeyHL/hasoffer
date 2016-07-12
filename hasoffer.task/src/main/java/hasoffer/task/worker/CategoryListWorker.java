@@ -25,28 +25,26 @@ public class CategoryListWorker implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
 
-            List<PtmCategory> categoryList = dbm.query(queryString);
+        List<PtmCategory> categoryList = dbm.query(queryString);
 
-            for (PtmCategory category : categoryList) {
+        for (PtmCategory category : categoryList) {
 
-                //如果是二级类目，查询是否由子类目，如果有跳过，没有加入队列
-                if (category.getLevel() == 2) {
+            //如果是二级类目，查询是否由子类目，如果有跳过，没有加入队列
+            if (category.getLevel() == 2) {
 
-                    List<PtmCategory> childCategoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.parentId = ?0 ", Arrays.asList(category.getId()));
+                List<PtmCategory> childCategoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.parentId = ?0 ", Arrays.asList(category.getId()));
 
-                    if (childCategoryList == null || childCategoryList.size() == 0) {
-                        categoryQueue.add(category);
-                    } else {
-                        continue;
-                    }
-
-                }
-
-                if (category.getLevel() == 3) {
+                if (childCategoryList == null || childCategoryList.size() == 0) {
                     categoryQueue.add(category);
+                } else {
+                    continue;
                 }
+
+            }
+
+            if (category.getLevel() == 3) {
+                categoryQueue.add(category);
             }
         }
     }
