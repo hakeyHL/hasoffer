@@ -713,6 +713,7 @@ public class FixController {
     }
 
 
+    //fixdata/getNoProductCategory
     @RequestMapping(value = "/getNoProductCategory")
     @ResponseBody
     public String getNoProductCategory() {

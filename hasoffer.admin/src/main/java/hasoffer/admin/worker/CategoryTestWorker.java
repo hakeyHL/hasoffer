@@ -32,6 +32,7 @@ public class CategoryTestWorker implements Runnable {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                continue;
             }
 
             Long categoryId = ptmCategory.getId();
