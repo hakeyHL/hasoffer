@@ -151,11 +151,10 @@ public class FixController {
 
                     if (count == 0) {
                         productService.deleteProduct(product.getId());
+                        System.out.println("delete product : " + product.getId() + " - " + TimeUtils.parse(date, "yyyy-MM-dd HH:mm:ss"));
                     }
 
                     date = product.getCreateTime();
-
-                    System.out.println(product.getId() + " - " + TimeUtils.parse(date, "yyyy-MM-dd HH:mm:ss"));
                 }
             }
         }
