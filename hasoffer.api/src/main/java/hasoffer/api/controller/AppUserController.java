@@ -47,14 +47,7 @@ public class AppUserController {
         Map map = new HashMap();
         DeviceInfoVo deviceInfo = null;
         String currentTime = new SimpleDateFormat("MMM dd,yyyy ", Locale.ENGLISH).format(new Date());
-        try {
-            deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-        } catch (Exception e) {
-            logger.error("usertoken  parameter is not sent ");
-            map.put("deeplink", deepLink);
-            modelAndView.addObject("data", map);
-            return modelAndView;
-        }
+        deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         SearchIO sio = new SearchIO("", "", "", website, "", deviceInfo.getMarketChannel(), deviceId, 0, 0);
         UrmUser urmUser = appService.getUserByUserToken((String) Context.currentContext().get(StaticContext.USER_TOKEN));
         String affs[] = null;
@@ -66,7 +59,9 @@ public class AppUserController {
             return modelAndView;
         }
         String affsUrl = WebsiteHelper.getDealUrlWithAff(Website.valueOf(website), deepLink, affs);
-        logger.info(" success ,time : " + currentTime + "  userId : " + urmUser.getId() + " ,sourceLink : " + deepLink + " ,result : " + affsUrl);
+        logger.error(" success ,time : " + currentTime + "  userId : " + urmUser.getId() + " ,sourceLink : " + deepLink + " ,result : " + affsUrl);
+        logger.warn(" success ,time : " + currentTime + "  userId : " + urmUser.getId() + " ,sourceLink : " + deepLink + " ,result : " + affsUrl);
+        logger.debug(" success ,time : " + currentTime + "  userId : " + urmUser.getId() + " ,sourceLink : " + deepLink + " ,result : " + affsUrl);
         map.put("deeplink", affsUrl);
         modelAndView.addObject("data", map);
         return modelAndView;
