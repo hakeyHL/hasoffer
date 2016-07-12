@@ -649,7 +649,11 @@ public class FixController {
         //找到level为3的类目id
         List<PtmCategory> categoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.level = 3 ");
 
-        for (PtmCategory ptmCategory : categoryList) {
+
+        for (int i = 0; i < categoryList.size(); i++) {
+
+            PtmCategory ptmCategory = categoryList.get(i);
+
             //找到3级类目对应的子类目
             List<PtmCategory> childCategoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.parentId = ?0 ", Arrays.asList(ptmCategory.getId()));
 
@@ -702,6 +706,7 @@ public class FixController {
                     }
                 }
             }
+            System.out.println(i + "---" + categoryList.size());
         }
 
         return "ok";
