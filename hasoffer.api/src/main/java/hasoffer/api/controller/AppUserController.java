@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -43,6 +46,7 @@ public class AppUserController {
         ModelAndView modelAndView = new ModelAndView();
         Map map = new HashMap();
         DeviceInfoVo deviceInfo = null;
+        String currentTime = new SimpleDateFormat("MMM dd,yyyy ", Locale.ENGLISH).format(new Date());
         try {
             deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         } catch (Exception e) {
@@ -62,6 +66,7 @@ public class AppUserController {
             return modelAndView;
         }
         String affsUrl = WebsiteHelper.getDealUrlWithAff(Website.valueOf(website), deepLink, affs);
+        logger.info(String.format(" success ,time : %s userId :%s ,sourceLink : %s ,result : %s"), currentTime, urmUser.getId(), deepLink, affsUrl);
         map.put("deeplink", affsUrl);
         modelAndView.addObject("data", map);
         return modelAndView;
