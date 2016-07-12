@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -43,14 +46,8 @@ public class AppUserController {
         ModelAndView modelAndView = new ModelAndView();
         Map map = new HashMap();
         DeviceInfoVo deviceInfo = null;
-        try {
-            deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-        } catch (Exception e) {
-            logger.error("usertoken  parameter is not sent ");
-            map.put("deeplink", deepLink);
-            modelAndView.addObject("data", map);
-            return modelAndView;
-        }
+        String currentTime = new SimpleDateFormat("MMM dd,yyyy ", Locale.ENGLISH).format(new Date());
+        deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         SearchIO sio = new SearchIO("", "", "", website, "", deviceInfo.getMarketChannel(), deviceId, 0, 0);
         UrmUser urmUser = appService.getUserByUserToken((String) Context.currentContext().get(StaticContext.USER_TOKEN));
         String affs[] = null;
@@ -62,6 +59,7 @@ public class AppUserController {
             return modelAndView;
         }
         String affsUrl = WebsiteHelper.getDealUrlWithAff(Website.valueOf(website), deepLink, affs);
+        logger.info(" success ,time : " + currentTime + "  userId : " + urmUser.getId() + " ,sourceLink : " + deepLink + " ,result : " + affsUrl);
         map.put("deeplink", affsUrl);
         modelAndView.addObject("data", map);
         return modelAndView;
