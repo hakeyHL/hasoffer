@@ -13,7 +13,7 @@
 
         <div class="col-lg-12" style="margin: 20px"></div>
 
-        <form class="form-horizontal" action="/topselling/edit/${ptmimageid}" enctype="multipart/form-data"
+        <form class="form-horizontal" action="/topselling/edit/${topSellingId}" enctype="multipart/form-data"
               id="form_edit" method="post">
 
             <div class="form-group">
@@ -30,8 +30,7 @@
                 <div class="col-sm-7">
                     <div class="control-group">
                         <div class="controls" style="width: 300px">
-                            <div class="fileupload fileupload-new" data-provides="fileupload"><input type="hidden"
-                                                                                                     value="" name="">
+                            <div class="fileupload fileupload-new" data-provides="fileupload">
 
                                 <div class="fileupload-new thumbnail" style="width: 200px; height: 150px;">
                                     <img src="${oriImageUrl}" alt="" id="image_url">

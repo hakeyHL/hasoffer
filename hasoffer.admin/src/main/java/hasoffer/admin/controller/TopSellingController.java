@@ -4,8 +4,9 @@ import hasoffer.admin.controller.vo.TopSellingVo;
 import hasoffer.base.model.PageModel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.IDUtil;
-import hasoffer.base.utils.TimeUtils;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.core.admin.ITopSellingService;
+import hasoffer.core.bo.enums.TopSellStatus;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
@@ -27,7 +28,9 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created on 2016/7/6.
@@ -55,31 +58,29 @@ public class TopSellingController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ResponseBody
     public ModelAndView list(HttpServletRequest request,
+                             @RequestParam(defaultValue = "") String topSellingStatusString,
                              @RequestParam(defaultValue = "1") int page,
                              @RequestParam(defaultValue = "20") int size) {
         ModelAndView modelAndView = new ModelAndView("operate/topselling/list");
 
         List<TopSellingVo> topSellingVoList = new ArrayList<TopSellingVo>();
 
-        long startLongTime = TimeUtils.now() - TimeUtils.MILLISECONDS_OF_1_DAY;
+        if (StringUtils.isEmpty(topSellingStatusString)) {
+            topSellingStatusString = TopSellStatus.ONLINE.toString();
+            modelAndView.addObject("selectstatus", "");
+        }
 
-        PageableResult<PtmTopSelling> pageableResult = topSellingService.findTopSellingListByDate(startLongTime, null, page, size);
+        TopSellStatus selectstatus = TopSellStatus.valueOf(topSellingStatusString);
+
+        PageableResult<PtmTopSelling> pageableResult = topSellingService.findTopSellingList(selectstatus, page, size);
 
         List<PtmTopSelling> ptmTopSellingList = pageableResult.getData();
-
-        //此处需要对productid进行去重操作
-        Set<Long> ptmproductIdSet = new HashSet<Long>();
 
         for (PtmTopSelling ptmTopSelling : ptmTopSellingList) {
 
             TopSellingVo topSellingVo = new TopSellingVo();
 
             long productId = ptmTopSelling.getId();
-            if (ptmproductIdSet.contains(productId)) {
-                continue;
-            } else {
-                ptmproductIdSet.add(productId);
-            }
 
             PtmProduct ptmProduct = productService.getProduct(productId);
             if (ptmProduct == null) {
@@ -98,8 +99,6 @@ public class TopSellingController {
 
             topSellingVo.setId(ptmTopSelling.getId());
             topSellingVo.setName(ptmProduct.getTitle());
-            topSellingVo.setProductId(productId);
-//            topSellingVo.setYmd(ptmTopSelling.getYmd());
             topSellingVo.setImageurl(productService.getProductMasterImageUrl(productId));
             topSellingVo.setSkuNumber(skuNumber);
             topSellingVo.setLogid(logid);
@@ -111,35 +110,40 @@ public class TopSellingController {
         modelAndView.addObject("page", pageModel);
         modelAndView.addObject("topSellingVoList", topSellingVoList);
 
+        List<TopSellStatus> statusList = Arrays.asList(TopSellStatus.values());
+        modelAndView.addObject("statusList", statusList);
+
+        modelAndView.addObject("selectstatus", selectstatus);
+
         return modelAndView;
     }
 
-    @RequestMapping(value = "detail/{productId}", method = RequestMethod.GET)
-    public ModelAndView detail(@PathVariable long productId) {
+    @RequestMapping(value = "detail/{topSellingId}", method = RequestMethod.GET)
+    public ModelAndView detail(@PathVariable long topSellingId) {
 
         ModelAndView modelAndView = new ModelAndView("operate/topselling/edit");
 
-        PtmProduct ptmProduct = productService.getProduct(productId);
+        PtmProduct ptmProduct = productService.getProduct(topSellingId);
 
         String title = ptmProduct.getTitle();
         modelAndView.addObject("title", title);
 
-        PtmImage ptmImage = productService.getProductMasterImage(productId);
+        PtmImage ptmImage = productService.getProductMasterImage(topSellingId);
 
         if (ptmImage == null) {
             return new ModelAndView("system/error");
         }
 
-        String oriImageUrl = productService.getProductMasterImageUrl(productId);
+        String oriImageUrl = productService.getProductMasterImageUrl(topSellingId);
         modelAndView.addObject("oriImageUrl", oriImageUrl);
-        modelAndView.addObject("ptmimageid", ptmImage.getId());
+        modelAndView.addObject("topSellingId", topSellingId);
 
         return modelAndView;
     }
 
 
-    @RequestMapping(value = "/edit/{ptmimageid}", method = RequestMethod.POST)
-    public ModelAndView edit(@PathVariable long ptmimageid, MultipartFile file) {
+    @RequestMapping(value = "/edit/{topSellingId}", method = RequestMethod.POST)
+    public ModelAndView edit(@PathVariable long topSellingId, MultipartFile file) {
 
         try {
 
@@ -147,7 +151,10 @@ public class TopSellingController {
             FileUtil.writeBytes(imageFile, file.getBytes());
             String imagePath = ImageUtil.uploadImage(imageFile);
 
-            imageService.updatePtmProductImagePath(ptmimageid, imagePath);
+            //此处topsellingid就是productid
+            imageService.updatePtmProductImagePath(topSellingId, imagePath);
+            //更新后需要更新topselling状态
+            topSellingService.updateTopSellingStatus(topSellingId, TopSellStatus.ONLINE);
 
 //            //编辑的时候注意更新图片清除缓存
 //            String PTMPRODUCT_IMAGE_CACHE_KEY = CACHE_KEY_PRE + "_getProductMasterImageUrl_" + ptmimageid;
@@ -163,7 +170,7 @@ public class TopSellingController {
     @RequestMapping(value = "/delete/{topsellingid}", method = RequestMethod.GET)
     public ModelAndView edit(@PathVariable long topsellingid) {
 
-        topSellingService.deleteTopSellingById(topsellingid);
+        topSellingService.updateTopSellingStatus(topsellingid, TopSellStatus.OFFLINE);
 
         return new ModelAndView("redirect:/topselling/list");
     }
