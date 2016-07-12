@@ -9,6 +9,7 @@ import hasoffer.core.bo.product.ProductBo;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
+import hasoffer.core.persistence.po.ptm.updater.PtmImageUpdater;
 import hasoffer.core.persistence.po.ptm.updater.PtmProductUpdater;
 import hasoffer.core.persistence.po.ptm.updater.PtmTopSellingUpdater;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
@@ -85,6 +86,23 @@ public class ProductServiceImpl implements IProductService {
     private ICmpSkuService cmpSkuService;
 
     private Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
+
+    @Override
+    @Transactional
+    public void updateProductImage2(Long productId, String oriImageUrl) {
+        // 更新 image url 2
+        PtmImage image = getProductMasterImage(productId);
+        if (image == null) {
+            // 图片为null时，创建
+            image = new PtmImage(productId, oriImageUrl, oriImageUrl);
+            dbm.create(image);
+            return;
+        } else {
+            PtmImageUpdater imageUpdater = new PtmImageUpdater(image.getId());
+            imageUpdater.getPo().setImageUrl2(oriImageUrl);
+            dbm.update(imageUpdater);
+        }
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
