@@ -12,7 +12,7 @@
         </property>
         <property name="schedulerName" value="qrtz_scheduler"/>
         <!-- 发现添加dataSource之后无法正常执行调度任务，原因不知道。 -->
-        <!--<property name="dataSource" ref="dataSource_crm"/>-->
+        <!--<property name="dataSource" ref="druidDataSource"/>-->
         <!--<property name="configLocation" value="classpath:quartz.properties"/>-->
         <!--applicationContextSchedulerContextKey： 是org.springframework.scheduling.quartz.SchedulerFactoryBean这个类中
             把spring上下 文以key/value的方式存放在了quartz的上下文中了， 可以用applicationContextSchedulerContextKey所定义的key得到对应的spring上下文 -->
@@ -22,6 +22,7 @@
                 <ref bean="demoTrigger"/>
                 <ref bean="fetchTrigger"/>
                 <ref bean="dealozTrigger"/>
+                <ref bean="orderSATrigger"/>
             </list>
         </property>
 
@@ -41,7 +42,7 @@
 
     <bean id="demoTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="demoJob"/>
-        <property name="cronExpression" value="0 0/1 * * * ? "/>
+        <property name="cronExpression" value="0 0/10 * * * ? "/>
     </bean>
 
 
@@ -53,7 +54,7 @@
 
     <bean id="fetchTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="fetchJob"/>
-        <property name="cronExpression" value="0 0 2 * * ? "/>
+        <property name="cronExpression" value="0 0 1 1 1 ? 2030 "/>
     </bean>
 
 
@@ -63,7 +64,16 @@
     </bean>
     <bean id="dealozTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="dealozJob"/>
-        <property name="cronExpression" value="0 0 2 * * ? "/>
+        <property name="cronExpression" value="0 0 1 1 1 ? 2030 "/>
+    </bean>
+
+    <bean name="orderSAJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.OrderSAsisJobBean"/>
+        <!--<property name="beanName" value="fetchJobBean"/>-->
+    </bean>
+    <bean id="orderSATrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="orderSAJob"/>
+        <property name="cronExpression" value="0 0 0/2 * * ? "/>
     </bean>
 
 

@@ -8,13 +8,16 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
+import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.SearchProductService;
+import hasoffer.core.search.impl.SearchServiceImpl;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.model.ListProduct;
 import hasoffer.fetch.model.ProductStatus;
 import hasoffer.fetch.model.WebFetchResult;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchedProduct;
+import hasoffer.spring.context.SpringContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,11 +39,13 @@ public class SearchRecordProcessWorker implements Runnable {
     private LinkedBlockingQueue<SrmAutoSearchResult> searchLogQueue;
     private SearchProductService searchProductService;
     private IFetchDubboService fetchService;
+    private ISearchService searchService;
 
     public SearchRecordProcessWorker(SearchProductService searchProductService, IFetchDubboService flipkartFetchService, LinkedBlockingQueue<SrmAutoSearchResult> searchLogQueue) {
         this.searchProductService = searchProductService;
         this.searchLogQueue = searchLogQueue;
         this.fetchService = flipkartFetchService;
+        this.searchService = SpringContextHolder.getBean(SearchServiceImpl.class);
     }
 
     @Override
@@ -107,6 +112,7 @@ public class SearchRecordProcessWorker implements Runnable {
         //判断是否需要重新抓取，如果需要，这放回队列中。
         if (isUpdate(amazonFetchResult, ebayFetchResult, walmartFetchResult, geekFetchResult, newEggFetchResult, bestbuyFetchResult)) {
             updateMongo(autoSearchResult);
+            analysisAndRelate(autoSearchResult);
         }
 
         return isReFetch(amazonFetchResult, ebayFetchResult, walmartFetchResult, geekFetchResult, newEggFetchResult, bestbuyFetchResult);
@@ -169,6 +175,7 @@ public class SearchRecordProcessWorker implements Runnable {
         Boolean isUpdate = isUpdate(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, myntraFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
         if (isUpdate) {
             updateMongo(autoSearchResult);
+            analysisAndRelate(autoSearchResult);
         }
         //if (isUpdate && logger.isDebugEnabled()) {
         //    logger.debug("SearchRecordProcessWorker.flipkartFetchResult  result()--keyword is {} : size() = {}", keyword, flipkartFetchResult == null ? "" : flipkartFetchResult.getFetchProducts().size());
@@ -213,6 +220,15 @@ public class SearchRecordProcessWorker implements Runnable {
     private void updateMongo(SrmAutoSearchResult autoSearchResult) {
         autoSearchResult.setUpdateTime(new Date());
         searchProductService.saveSearchProducts(autoSearchResult);
+    }
+
+    private void analysisAndRelate(SrmAutoSearchResult autoSearchResult) {
+        try {
+            searchService.analysisAndRelate(autoSearchResult);
+        } catch (Exception e) {
+            logger.debug("[" + autoSearchResult.getId() + "]" + e.getMessage());
+        }
+
     }
 
     private boolean isClose(FetchResult result) {
