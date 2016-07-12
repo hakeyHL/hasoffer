@@ -103,7 +103,7 @@ public class FlipkartHelper {
             sb.append("?affid=").append(affid);
         }
 
-        if (affs != null) {
+        if (affs != null && affs.length >= 1) {
 //            int i = 1;
 //            for (String aff : affs) {
 //                sb.append("&affExtParam").append(i++).append("=").append(aff);

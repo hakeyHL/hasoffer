@@ -69,7 +69,7 @@ public class SnapdealHelper {
 //                sb.append("=").append(aff);
 //                index++;
 //            }
-            if (affs != null) {
+            if (affs != null && affs.length >= 1) {
                 sb.append("&aff_sub=").append(affs[0]);
 
                 if (affs.length >= 2) {
