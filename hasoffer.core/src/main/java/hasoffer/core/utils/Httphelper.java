@@ -1,4 +1,4 @@
-package hasoffer.api.helper;
+package hasoffer.core.utils;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -17,12 +17,6 @@ import org.apache.http.util.EntityUtils;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.net.URLDecoder;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
@@ -30,21 +24,6 @@ import java.util.*;
  * Created by hs on 2016/7/4.
  */
 public class Httphelper {
-    public static String getJsonFromRequest(HttpServletRequest request) {
-        StringBuffer info = new java.lang.StringBuffer();
-        try {
-            InputStream in = request.getInputStream();
-            BufferedInputStream buf = new BufferedInputStream(in);
-            byte[] buffer = new byte[1024];
-            int iRead;
-            while ((iRead = buf.read(buffer)) != -1) {
-                info.append(new String(buffer, 0, iRead, "UTF-8"));
-            }
-        } catch (Exception ee) {
-        }
-        return URLDecoder.decode(info.toString());
-    }
-
     public static void main(String[] args) {
         try {
 //            Map<String, String> map = new HashMap<String, String>();
@@ -173,19 +152,6 @@ public class Httphelper {
         SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext,
                 SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
         return HttpClients.custom().setSSLSocketFactory(sslsf).build();
-    }
-
-    public static void sendJsonMessage(String message, HttpServletResponse response) {
-        PrintWriter out = null;
-        response.setCharacterEncoding("utf-8");
-        response.setContentType("application/json");
-        try {
-            out = response.getWriter();
-            out.println(message);
-        } catch (Exception ee) {
-        } finally {
-            out.close();
-        }
     }
 
     public static void addHeaders2Meethod(HttpRequestBase httpRequestBase, Map<String, String> headers) {

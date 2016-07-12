@@ -7,10 +7,13 @@ import hasoffer.affiliate.affs.shopclues.model.ShopcluesOrder;
 import hasoffer.affiliate.exception.AffiliateAPIException;
 import hasoffer.affiliate.model.AffiliateCategory;
 import hasoffer.affiliate.model.AffiliateProduct;
+import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.base.utils.http.HttpUtils;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -19,21 +22,44 @@ import java.util.Map;
 public class ShopcluesProductProcessor implements IAffiliateProcessor<ShopcluesOrder> {
 
     private static final String AFFILIATE_PRODUCTID_URL = "http://developer.shopclues.com/api/v1/product/";
-    private static String AffiliateID = "2892";
-    private static String APIKey = "nVqV7Uh2Aj9Vw033EnmoXA";
     private static final String AUTHORIZATUIB = "Bearer bc1f461de4f193";
     private static final String CONTENT_TYPE = "application/json";
-
+    private static String AffiliateID = "2892";
+    private static String APIKey = "nVqV7Uh2Aj9Vw033EnmoXA";
 
     @Override
     public String sendRequest(String url, Map<String, String> headerMap, Map<String, String> parameterMap) throws AffiliateAPIException, IOException {
         if (headerMap == null) {
             headerMap = new HashMap<String, String>();
         }
-        headerMap.put("api_key", APIKey);
-        headerMap.put("affiliate_id", AffiliateID);
+        //headerMap.put("api_key", APIKey);
+        //headerMap.put("affiliate_id", AffiliateID);
+        HttpResponseModel responseModel = HttpUtils.get(url, headerMap, parameterMap);
 
-        return null;
+        int status = responseModel.getStatusCode();
+
+        switch (status) {
+
+            case HttpURLConnection.HTTP_GONE:
+                // The timestamp is expired.
+                throw new AffiliateAPIException("URL expired " + url);
+
+            case HttpURLConnection.HTTP_UNAUTHORIZED:
+                // The API Token or the Tracking ID is invalid.
+                throw new AffiliateAPIException("API Token or Affiliate Tracking ID invalid.");
+
+            case HttpURLConnection.HTTP_FORBIDDEN:
+                // Tampered URL, i.e., there is a signature mismatch.
+                // The URL contents are modified from the originally returned value.
+                throw new AffiliateAPIException("Tampered URL - The URL contents are modified from the originally returned value");
+
+            case HttpURLConnection.HTTP_OK:
+                return responseModel.getBodyString();
+
+            default:
+                throw new AffiliateAPIException("Connection error with the Affiliate API service: HTTP/" + status);
+        }
+
     }
 
     @Override
