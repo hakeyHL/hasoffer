@@ -711,4 +711,26 @@ public class FixController {
 
         return "ok";
     }
+
+
+    @RequestMapping(value = "/getNoProductCategory")
+    @ResponseBody
+    public String getNoProductCategory() {
+
+        final String Q_SECOND_CATEGORY = "SELECT t FROM PtmCategory t WHERE t.level = 2 ";
+        final String Q_THIRD_CATEGORY = "SELECT t FROM PtmCategory t WHERE t.level = 3 ";
+
+        ConcurrentLinkedQueue<PtmCategory> categoryQueue = new ConcurrentLinkedQueue<PtmCategory>();
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        es.execute(new CategoryListWorker(Q_SECOND_CATEGORY, dbm, categoryQueue));
+        es.execute(new CategoryListWorker(Q_THIRD_CATEGORY, dbm, categoryQueue));
+
+        for (int i = 0; i < 10; i++) {
+            es.execute(new CategoryTestWorker(dbm, categoryQueue));
+        }
+
+        return "ok";
+    }
 }
