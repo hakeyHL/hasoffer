@@ -11,12 +11,38 @@
             <h1 class="page-header">top selling 列表</h1>
         </div>
 
+        <div class="row" style="margin-bottom: 10px">
+
+            <form action="/topselling/list" method="get">
+
+                <div class="col-lg-2">
+                    <div class="input-group">
+                        <span class="input-group-addon">topSelling状态</span>
+                        <select id="topSellingStatusString" class="form-control" name="topSellingStatusString">
+                            <option value="">选择状态</option>
+                            <c:forEach items="${statusList}" var="status">
+                                <option value="${status}" <c:if test="${selectstatus==status}">selected</c:if>>
+                                    <c:if test="${'WAIT'==status}">等待编辑</c:if>
+                                    <c:if test="${'ONLINE'==status}">已经编辑</c:if>
+                                    <c:if test="${'OFFLINE'==status}">已经失效</c:if>
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-lg-2">
+                    <button type="submit" class="btn btn-primary">查询</button>
+                </div>
+            </form>
+        </div>
+
         <div class="row">
             <div class="col-lg-12">
                 <table class="table table-bordered table-hover table-condensed" style="font-size:12px;">
                     <thead>
                     <tr>
-                        <td>日期</td>
+                        <td>商品ID</td>
                         <td>图片</td>
                         <td>标题</td>
                         <td colspan="3">操作</td>
@@ -25,13 +51,12 @@
                     <tbody>
                     <c:forEach items="${topSellingVoList}" var="topSellingVo">
                         <tr>
-                            <td>${topSellingVo.ymd}</td>
+                            <td>${topSellingVo.id}</td>
                             <td><img src="${topSellingVo.imageurl}" height="130" width="100"/></td>
                             <td>
-                                <a href="/p/cmp/${topSellingVo.productId}">${topSellingVo.name} ${topSellingVo.skuNumber}个比价</a>
+                                <a href="/p/cmp/${topSellingVo.id}">${topSellingVo.name} ${topSellingVo.skuNumber}个比价</a>
                             </td>
-                            <td><a href="detail/${topSellingVo.productId}">修改图片</a></td>
-                                <%--todo--%>
+                            <td><a href="detail/${topSellingVo.id}">修改图片</a></td>
                             <td><a href="/s/reSearchByLogKeyword/${topSellingVo.logid}">手工关联</a></td>
                             <td><a href="delete/${topSellingVo.id}">删除</a></td>
                         </tr>

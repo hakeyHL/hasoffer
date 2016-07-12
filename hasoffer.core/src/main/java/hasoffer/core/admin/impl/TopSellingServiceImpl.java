@@ -1,10 +1,11 @@
 package hasoffer.core.admin.impl;
 
 import hasoffer.base.model.PageableResult;
-import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.ITopSellingService;
+import hasoffer.core.bo.enums.TopSellStatus;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmTopSelling;
+import hasoffer.core.persistence.po.ptm.updater.PtmTopSellingUpdater;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,25 +18,14 @@ import java.util.Arrays;
 @Service
 public class TopSellingServiceImpl implements ITopSellingService {
 
-    private static final String Q_TOPSELLING_BYDATE1 = "SELECT t FROM PtmTopSelling t WHERE t.ymd >= ?0 ";
-    private static final String Q_TOPSELLING_BYDATE2 = "SELECT t FROM PtmTopSelling t WHERE t.ymd > ?0 AND t.ymd < ?1";
+    private static final String Q_TOPSELLINGLIST_BYSTATUS = "SELECT t FROM PtmTopSelling t WHERE t.status = ?0 ORDER BY t.count DESC";
 
     @Resource
     IDataBaseManager dbm;
 
     @Override
-    public PageableResult<PtmTopSelling> findTopSellingListByDate(long longStartTime, Long longEndTime, int page, int size) {
-
-        String startTimeString = TimeUtils.parse(longStartTime, "yyyyMMdd");
-        String endTimeString = longEndTime == null ? "" : TimeUtils.parse(longEndTime, "yyyymmdd");
-
-        PageableResult<PtmTopSelling> pageableResult;
-
-        if (longEndTime == null) {
-            pageableResult = dbm.queryPage(Q_TOPSELLING_BYDATE1, page, size, Arrays.asList(startTimeString));
-        } else {
-            pageableResult = dbm.queryPage(Q_TOPSELLING_BYDATE2, page, size, Arrays.asList(startTimeString, endTimeString));
-        }
+    public PageableResult<PtmTopSelling> findTopSellingList(TopSellStatus status, int page, int size) {
+        PageableResult<PtmTopSelling> pageableResult = dbm.queryPage(Q_TOPSELLINGLIST_BYSTATUS, page, size, Arrays.asList(status));
 
         return pageableResult;
     }
@@ -44,5 +34,16 @@ public class TopSellingServiceImpl implements ITopSellingService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteTopSellingById(long id) {
         dbm.delete(PtmTopSelling.class, id);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateTopSellingStatus(long topSellingId, TopSellStatus status) {
+
+        PtmTopSellingUpdater updater = new PtmTopSellingUpdater(topSellingId);
+
+        updater.getPo().setStatus(status);
+
+        dbm.update(updater);
     }
 }

@@ -6,6 +6,9 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import org.junit.Test;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Created on 2016/5/16.
  */
@@ -89,5 +92,18 @@ public class StringTest {
         System.out.println(substr[0]);
         System.out.println(substr[1]);
         System.out.println(result);
+    }
+
+    @Test
+    public void test8() {
+
+        Pattern pattern = Pattern.compile("[0-9,+,-]*");
+
+        String phone = "0351-+5486468";
+
+        Matcher matcher = pattern.matcher(phone);
+
+        System.out.println(matcher.matches());
+
     }
 }

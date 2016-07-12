@@ -7,8 +7,6 @@ public class TopSellingVo {
 
     private long id;
     private String name;
-    private long productId;
-    private String ymd;
     private String imageurl;
     private long skuNumber;
     private String logid;
@@ -21,28 +19,12 @@ public class TopSellingVo {
         this.id = id;
     }
 
-    public long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(long productId) {
-        this.productId = productId;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getYmd() {
-        return ymd;
-    }
-
-    public void setYmd(String ymd) {
-        this.ymd = ymd;
     }
 
     public String getImageurl() {
