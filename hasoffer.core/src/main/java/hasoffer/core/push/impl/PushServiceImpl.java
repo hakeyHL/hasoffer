@@ -1,10 +1,8 @@
 package hasoffer.core.push.impl;
-
-import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.utils.JSONUtil;
-import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.core.bo.push.AppPushBo;
 import hasoffer.core.push.IPushService;
+import hasoffer.core.utils.Httphelper;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -36,8 +34,13 @@ public class PushServiceImpl implements IPushService {
 //        body.put("", datasJson);
 //        body.put("data", JSONUtil.toJSON(pushBo));
 
-        HttpResponseModel responseModel = HttpUtils.postByRaw("https://gcm-http.googleapis.com/gcm/send", datasJson, header);
-
-        System.out.println(responseModel.getBodyString());
+        //HttpResponseModel responseModel = HttpUtils.postByRaw("https://gcm-http.googleapis.com/gcm/send", datasJson, header);
+        String postResult = "";
+        try {
+            postResult = Httphelper.doPostJsonWithHeader("https://gcm-http.googleapis.com/gcm/send", datasJson, header);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        System.out.println(postResult);
     }
 }
