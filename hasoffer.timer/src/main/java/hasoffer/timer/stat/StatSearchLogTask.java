@@ -22,7 +22,7 @@ public class StatSearchLogTask {
     @Resource
     IProductService productService;
 
-    @Scheduled(cron = "0 45 22 * * ?")
+    @Scheduled(cron = "0 45 4 * * ?")
     public void f() {
 
         String ymd = TimeUtils.parse(TimeUtils.today(), "yyyyMMdd");
