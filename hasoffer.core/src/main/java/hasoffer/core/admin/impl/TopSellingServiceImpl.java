@@ -26,14 +26,12 @@ public class TopSellingServiceImpl implements ITopSellingService {
     @Override
     public PageableResult<PtmTopSelling> findTopSellingList(TopSellStatus status, int page, int size) {
         PageableResult<PtmTopSelling> pageableResult = dbm.queryPage(Q_TOPSELLINGLIST_BYSTATUS, page, size, Arrays.asList(status));
-
         return pageableResult;
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void deleteTopSellingById(long id) {
-        dbm.delete(PtmTopSelling.class, id);
+    public PtmTopSelling findTopSellingById(long id) {
+        return dbm.get(PtmTopSelling.class, id);
     }
 
     @Override

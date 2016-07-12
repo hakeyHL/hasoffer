@@ -12,7 +12,7 @@ public interface ITopSellingService {
 
     PageableResult<PtmTopSelling> findTopSellingList(TopSellStatus status, int page, int size);
 
-    void deleteTopSellingById(long id);
+    PtmTopSelling findTopSellingById(long id);
 
     void updateTopSellingStatus(long topSellingId, TopSellStatus status);
 

@@ -45,6 +45,7 @@
                         <td>商品ID</td>
                         <td>图片</td>
                         <td>标题</td>
+                        <td>切换状态</td>
                         <td colspan="3">操作</td>
                     </tr>
                     </thead>
@@ -56,8 +57,11 @@
                             <td>
                                 <a href="/p/cmp/${topSellingVo.id}">${topSellingVo.name} ${topSellingVo.skuNumber}个比价</a>
                             </td>
+                            <td>
+                                <button id="changeStatus" onclick="change(${topSellingVo.id},document)">切换状态</button>
+                            </td>
                             <td><a href="detail/${topSellingVo.id}">修改图片</a></td>
-                            <td><a href="/s/reSearchByLogKeyword/${topSellingVo.logid}">手工关联</a></td>
+                            <td><a href="/p/cmp/${topSellingVo.id}">手工关联</a></td>
                             <td><a href="delete/${topSellingVo.id}">删除</a></td>
                         </tr>
                     </c:forEach>
@@ -69,5 +73,17 @@
         <%--<jsp:include page="../include/page.jsp"/>--%>
         <jsp:include page="../../include/page.jsp"/>
     </div>
-
+</div>
 <jsp:include page="../../include/footer.jsp"/>
+<script>
+
+    //状态切换
+    function change(topSellingId, document) {
+
+        url = "/topselling/changeStatus/" + topSellingId;
+        http.doGet(url);
+
+        window.location.href = "/topselling/list?topSellingStatusString=${selectstatus}";
+    }
+
+</script>

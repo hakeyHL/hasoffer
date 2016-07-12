@@ -11,7 +11,6 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.PtmTopSelling;
-import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.IImageService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.redis.ICacheService;
@@ -89,19 +88,10 @@ public class TopSellingController {
 
             long skuNumber = dbm.querySingle(Q_COUNT_SKU, Arrays.asList(productId));
 
-            List<SrmSearchLog> loglist = dbm.query(Q_SRMSEARCHLOG_BYPRODUCTID, Arrays.asList(productId));
-
-            if (loglist == null || loglist.size() == 0) {
-                continue;
-            }
-
-            String logid = loglist.get(0).getId();
-
             topSellingVo.setId(ptmTopSelling.getId());
             topSellingVo.setName(ptmProduct.getTitle());
             topSellingVo.setImageurl(productService.getProductMasterImageUrl(productId));
             topSellingVo.setSkuNumber(skuNumber);
-            topSellingVo.setLogid(logid);
 
             topSellingVoList.add(topSellingVo);
         }
@@ -153,8 +143,8 @@ public class TopSellingController {
 
             //此处topsellingid就是productid
             imageService.updatePtmProductImagePath(topSellingId, imagePath);
-            //更新后需要更新topselling状态
-            topSellingService.updateTopSellingStatus(topSellingId, TopSellStatus.ONLINE);
+//            //更新后需要更新topselling状态
+//            topSellingService.updateTopSellingStatus(topSellingId, TopSellStatus.ONLINE);
 
 //            //编辑的时候注意更新图片清除缓存
 //            String PTMPRODUCT_IMAGE_CACHE_KEY = CACHE_KEY_PRE + "_getProductMasterImageUrl_" + ptmimageid;
@@ -173,5 +163,19 @@ public class TopSellingController {
         topSellingService.updateTopSellingStatus(topsellingid, TopSellStatus.OFFLINE);
 
         return new ModelAndView("redirect:/topselling/list");
+    }
+
+    @RequestMapping(value = "/changeStatus/{topsellingid}", method = RequestMethod.GET)
+    public void changeStatus(@PathVariable long topsellingid) {
+
+        PtmTopSelling topSelling = topSellingService.findTopSellingById(topsellingid);
+
+        TopSellStatus status = topSelling.getStatus();
+
+        if (TopSellStatus.WAIT.equals(status)) {
+            topSellingService.updateTopSellingStatus(topsellingid, TopSellStatus.ONLINE);
+        } else {
+            topSellingService.updateTopSellingStatus(topsellingid, TopSellStatus.WAIT);
+        }
     }
 }
