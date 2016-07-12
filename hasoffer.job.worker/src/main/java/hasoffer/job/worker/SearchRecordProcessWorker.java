@@ -18,6 +18,7 @@ import hasoffer.spider.model.FetchedProduct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -231,7 +232,8 @@ public class SearchRecordProcessWorker implements Runnable {
         }
         webFetchResult.setUpdateDate(new Date());
         webFetchResult.setTaskStatus(fetchResult.getTaskStatus());
-        List<ListProduct> listProducts = webFetchResult.getProductList();
+        //List<ListProduct> listProducts = webFetchResult.getProductList();
+        List<ListProduct> listProducts = new ArrayList<ListProduct>();
         List<FetchedProduct> listProductsResult = fetchResult.getFetchProducts();
         for (FetchedProduct product : listProductsResult) {
             ListProduct listProduct = new ListProduct();
@@ -251,8 +253,11 @@ public class SearchRecordProcessWorker implements Runnable {
             listProduct.setUrl(product.getUrl());
             listProduct.setWebsite(product.getWebsite());
             listProducts.add(listProduct);
-
+            //String id=HexDigestUtil.md5(listProduct.getTitle()+"_"+listProduct.getWebsite());
+            //tempProductMap.put(id, listProduct);
         }
+
         webFetchResult.setProductList(listProducts);
+
     }
 }
