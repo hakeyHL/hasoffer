@@ -1,8 +1,17 @@
 package hasoffer.timer.controller;
 
+import hasoffer.base.model.PageableResult;
 import hasoffer.core.cache.SearchLogCacheManager;
+import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.product.IFetchService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
+import hasoffer.core.task.ListAndProcessTask2;
+import hasoffer.core.task.worker.IList;
+import hasoffer.core.task.worker.IProcess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,8 +33,60 @@ public class TimerController {
     IProductService productService;
     @Resource
     SearchLogCacheManager searchLogCacheManager;
+    @Resource
+    IDataBaseManager dbm;
+    @Resource
+    IFetchService fetchService;
+
+    private Logger logger = LoggerFactory.getLogger(TimerController.class);
 
     // http://web3:8020/timer/statsearchlog3/20160710
+    @RequestMapping(value = "/fixImage", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String fixImage() {
+        final String Q_PRODUCT_WEBSITE =
+                "SELECT t FROM PtmProduct t WHERE t.sourceSite='FLIPKART'";
+
+        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<PtmProduct>(
+                new IList<PtmProduct>() {
+                    @Override
+                    public PageableResult getData(int page) {
+                        return dbm.queryPage(Q_PRODUCT_WEBSITE, page, 500);
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcess<PtmProduct>() {
+                    @Override
+                    public void process(PtmProduct o) {
+                        try {
+                            // update image for product
+                            String sourceUrl = o.getSourceUrl();
+                            // visit flipkart page to get image url
+                            String oriImageUrl = fetchService.fetchFlipkartImageUrl(sourceUrl);
+
+                            productService.updateProductImage2(o.getId(), oriImageUrl);
+
+                        } catch (Exception e) {
+                            logger.debug(e.getMessage() + "\t" + o.getId());
+                        }
+                    }
+                }
+        );
+
+        listAndProcessTask2.go();
+
+        return "ok";
+    }
 
     @RequestMapping(value = "/statsearchlog1/{ymd}", method = RequestMethod.GET)
     public
