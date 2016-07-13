@@ -5,7 +5,6 @@ import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -13,7 +12,7 @@ import java.util.Date;
 /**
  * Created on 2016/3/30.
  */
-@Component
+//@Component
 public class HiJackReportTask {
 
     private static Logger logger = LoggerFactory.getLogger(HiJackReportTask.class);
