@@ -14,7 +14,9 @@ import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.cache.SearchLogCacheManager;
+import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.enums.SrmSearchLogUpdate;
+import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
@@ -77,6 +79,19 @@ public class SearchController {
     ICmpSkuService cmpSkuService;
     @Resource
     SearchLogCacheManager logCacheManager;
+    @Resource
+    IMongoDbManager mdm;
+
+    @RequestMapping(value = "/showmatch/{logId}", method = RequestMethod.GET)
+    public ModelAndView showmatch(@PathVariable String logId) {
+        ModelAndView mav = new ModelAndView("search/match_result");
+
+        SrmAutoSearchResult autoSearchResult = mdm.queryOne(SrmAutoSearchResult.class, logId);
+
+        mav.addObject("result", autoSearchResult);
+
+        return mav;
+    }
 
     @RequestMapping(value = "/showstat", method = RequestMethod.GET)
     public ModelAndView showstat() {
