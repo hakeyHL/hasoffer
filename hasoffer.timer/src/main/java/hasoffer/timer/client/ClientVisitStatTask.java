@@ -7,7 +7,6 @@ import hasoffer.core.user.IDeviceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
@@ -15,7 +14,7 @@ import javax.annotation.Resource;
  * Date : 2016/1/13
  * Function :
  */
-@Component
+//@Component
 public class ClientVisitStatTask {
 
     @Resource
