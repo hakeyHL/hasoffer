@@ -138,20 +138,10 @@
                                 <li class="active">
                                     <a href="/showstat/listsearchloghijacktest"> 流量劫持抓取统计</a>
                                 </li>
-                                <%--<li class="active">--%>
-                                    <%--<a href="/showstat/listCmpskuStat"> 临时统计</a>--%>
-                                <%--</li>--%>
-                                <%--<li class="active">--%>
-                                    <%--<a href="/showstat/skuvisitupdate"> sku更新统计</a>--%>
-                                <%--</li>--%>
-                                <%--<li class="active">
-                                    <a href="/showstat/distribution"> 日活分布</a>
-                                </li>
                                 <li class="active">
-                                    <a href="/showstat/retained"> 留存分析</a>
-                                </li>--%>
+                                    <a href="/s/showstat"> 比价质量统计</a>
+                                </li>
                             </ul>
-                            <!-- /.nav-second-level -->
                         </li>
                     </c:if>
                     <c:if test="${adminUser.type != 'TEMP_ADMIN'}">

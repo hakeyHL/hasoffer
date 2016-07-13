@@ -49,11 +49,31 @@
                 <ul class="nav nav-pills">
                     <c:forEach items="${result.sitePros}" var="sitePro">
                         <li role="presentation">
-                            <a href="#" <c:if test="${sitePro.value.productList.size() > 0}">style="color: red" </c:if>>
+                            <a href="javascript:void(0);"
+                               onclick="click_skus_btn('${sitePro.key}')"
+                               <c:if test="${sitePro.value.productList.size() > 0}">style="color: red" </c:if>>
                                     ${sitePro.key}(${sitePro.value.productList.size()})</a>
                         </li>
                     </c:forEach>
                 </ul>
+
+                <c:forEach items="${result.sitePros}" var="sitePro">
+                    <table id="table1_${sitePro.key}" name="siteskutable" class="table table-bordered table-condensed"
+                           style="display: none">
+                        <tr>
+                            <td>SourceID</td>
+                            <td>Title</td>
+                            <td>Price</td>
+                        </tr>
+                        <c:forEach items="${sitePro.value.productList}" var="sku">
+                            <tr>
+                                <td><a href="${sku.url}">${sku.sourceId}</a></td>
+                                <td>${sku.title}</td>
+                                <td>${sku.price}</td>
+                            </tr>
+                        </c:forEach>
+                    </table>
+                </c:forEach>
             </div>
         </div>
     </div>
@@ -73,7 +93,7 @@
                 </ul>
 
                 <c:forEach items="${result.finalSkus}" var="finalSku">
-                    <table id="table_${finalSku.key}" name="finalskutable" class="table table-bordered table-condensed"
+                    <table id="table2_${finalSku.key}" name="finalskutable" class="table table-bordered table-condensed"
                            style="display: none">
                         <tr>
                             <td>SourceID</td>
@@ -100,7 +120,13 @@
     <script>
         function click_final_skus_btn(site) {
             $("table[name='finalskutable']").css("display", "none");
-            var tb = "#table_" + site;
+            var tb = "#table2_" + site;
+            $(tb).css("display", "block");
+        }
+
+        function click_skus_btn(site) {
+            $("table[name='siteskutable']").css("display", "none");
+            var tb = "#table1_" + site;
             $(tb).css("display", "block");
         }
     </script>
