@@ -88,7 +88,7 @@ public class ProductServiceImpl implements IProductService {
     private Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void updateProductImage2(Long productId, String oriImageUrl) {
         // 更新 image url 2
         PtmImage image = getProductMasterImage(productId);
