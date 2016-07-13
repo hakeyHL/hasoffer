@@ -46,16 +46,21 @@
             <div class="panel-heading">搜索到的SKU</div>
 
             <div class="panel-body">
-                <ul class="nav nav-pills">
-                    <c:forEach items="${result.sitePros}" var="sitePro">
-                        <li role="presentation">
-                            <a href="javascript:void(0);"
-                               onclick="click_skus_btn('${sitePro.key}')"
-                               <c:if test="${sitePro.value.productList.size() > 0}">style="color: red" </c:if>>
-                                    ${sitePro.key}(${sitePro.value.productList.size()})</a>
-                        </li>
-                    </c:forEach>
-                </ul>
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <ul class="nav nav-pills">
+                            <c:forEach items="${result.sitePros}" var="sitePro">
+                                <li role="presentation" id="btn1_${sitePro.key}" name="btn1">
+                                    <a href="javascript:void(0);"
+                                       onclick="click_skus_btn('${sitePro.key}')"
+                                       <c:if test="${sitePro.value.productList.size() > 0}">style="color: red" </c:if>>
+                                            ${sitePro.key}(${sitePro.value.productList.size()})</a>
+                                </li>
+                            </c:forEach>
+                        </ul>
+                    </div>
+                </div>
 
                 <c:forEach items="${result.sitePros}" var="sitePro">
                     <table id="table1_${sitePro.key}" name="siteskutable" class="table table-bordered table-condensed"
@@ -82,15 +87,20 @@
         <div class="panel panel-default">
 
             <div class="panel-heading">分析结果</div>
-
             <div class="panel-body">
-                <ul class="nav nav-pills">
-                    <c:forEach items="${result.finalSkus}" var="finalSku">
-                        <li role="presentation"><a href="javascript:void(0);"
-                                                   onclick="click_final_skus_btn('${finalSku.key}')">${finalSku.key}(${finalSku.value.size()})</a>
-                        </li>
-                    </c:forEach>
-                </ul>
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <ul class="nav nav-pills">
+                            <c:forEach items="${result.finalSkus}" var="finalSku">
+                                <li role="presentation" id="btn2_${finalSku.key}" name="btn2">
+                                    <a href="javascript:void(0);"
+                                       onclick="click_final_skus_btn('${finalSku.key}')">${finalSku.key}(${finalSku.value.size()})</a>
+                                </li>
+                            </c:forEach>
+                        </ul>
+                    </div>
+                </div>
 
                 <c:forEach items="${result.finalSkus}" var="finalSku">
                     <table id="table2_${finalSku.key}" name="finalskutable" class="table table-bordered table-condensed"
@@ -120,14 +130,24 @@
     <script>
         function click_final_skus_btn(site) {
             $("table[name='finalskutable']").css("display", "none");
+            $("li[name='btn2']").removeClass("active");
+
             var tb = "#table2_" + site;
             $(tb).css("display", "block");
+
+            var btn = "#btn2_" + site;
+            $(btn).addClass("active");
         }
 
         function click_skus_btn(site) {
             $("table[name='siteskutable']").css("display", "none");
+            $("li[name='btn1']").removeClass("active");
+
             var tb = "#table1_" + site;
             $(tb).css("display", "block");
+
+            var btn = "#btn1_" + site;
+            $(btn).addClass("active");
         }
     </script>
 

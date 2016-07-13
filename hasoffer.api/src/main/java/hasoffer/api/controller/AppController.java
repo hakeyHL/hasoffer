@@ -246,14 +246,13 @@ public class AppController {
         if (user != null) {
             List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
-                if (orderStatsAnalysisPO.getWebSite() == Website.SHOPCLUES.name() || orderStatsAnalysisPO.getWebSite() == Website.FLIPKART.name()) {
+                if (orderStatsAnalysisPO.getWebSite().equals(Website.SHOPCLUES.name()) || orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name()) || orderStatsAnalysisPO.getWebSite().equals(Website.SNAPDEAL.name())) {
                     OrderVo orderVo = new OrderVo();
-                    orderVo.setAccount(orderStatsAnalysisPO.getSaleAmount());
+                    orderVo.setAccount(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.015)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
                     orderVo.setChannel(orderStatsAnalysisPO.getChannel());
                     orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
                     orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
                     //返利比率=tentativeAmount*rate/SaleAmount
-                    orderVo.setRate(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.015)).divide(orderStatsAnalysisPO.getSaleAmount(), 2, BigDecimal.ROUND_HALF_UP));
                     orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
                     transcations.add(orderVo);
                     if (orderStatsAnalysisPO.getOrderStatus() != "cancelled") {
@@ -266,9 +265,9 @@ public class AppController {
             }
         }
         //待定的
-        data.setPendingCoins(PendingCoins);
+        data.setPendingCoins(PendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         //可以使用的
-        data.setVericiedCoins(VericiedCoins);
+        data.setVericiedCoins(VericiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
         mv.addObject("data", data);
         return mv;
@@ -280,7 +279,7 @@ public class AppController {
      * @param orderId
      * @return
      */
-    @RequestMapping(value = "/orderDetail", method = RequestMethod.GET)
+    /*@RequestMapping(value = "/orderDetail", method = RequestMethod.GET)
     public ModelAndView orderDetail(@RequestParam String orderId) {
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
         ModelAndView mv = new ModelAndView();
@@ -298,7 +297,7 @@ public class AppController {
             mv.addObject("data", orderVo);
         }
         return mv;
-    }
+    }*/
 
     /**
      * banners列表

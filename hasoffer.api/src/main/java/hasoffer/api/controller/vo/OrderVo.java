@@ -9,19 +9,23 @@ import java.util.Date;
  * 订单详情vo
  */
 public class OrderVo {
-    public OrderVo() {
-    }
     private  String channel;
     private  String orderId;
-    private  BigDecimal rate;
     private String status;
     private BigDecimal account;
-
     private BigDecimal total;
-
     private Date orderTime;
-
     private  String createTime;
+
+    public OrderVo() {
+    }
+
+    public OrderVo(BigDecimal account, String channel, String orderId, BigDecimal rate, String status) {
+        this.account = account;
+        this.channel = channel;
+        this.orderId = orderId;
+        this.status = status;
+    }
 
     public BigDecimal getTotal() {
         return total;
@@ -34,6 +38,7 @@ public class OrderVo {
     public String getCreateTime() {
         return new SimpleDateFormat("MM/dd/YYYY HH:mm:ss").format(this.orderTime);
     }
+
     public void setOrderTime(Date orderTime) {
         this.orderTime = orderTime;
     }
@@ -62,15 +67,6 @@ public class OrderVo {
         this.orderId = orderId;
     }
 
-
-    public BigDecimal getRate() {
-        return rate;
-    }
-
-    public void setRate(BigDecimal rate) {
-        this.rate = rate;
-    }
-
     public String getStatus() {
         return status;
     }
@@ -78,22 +74,15 @@ public class OrderVo {
     public void setStatus(String status) {
         this.status = status;
     }
+
     @Override
     public String toString() {
         return "OrderVo{" +
                 "account=" + account +
                 ", channel='" + channel + '\'' +
                 ", orderId='" + orderId + '\'' +
-                ", rate=" + rate +
                 ", status=" + status +
                 '}';
-    }
-    public OrderVo(BigDecimal account, String channel, String orderId, BigDecimal rate, String status) {
-        this.account = account;
-        this.channel = channel;
-        this.orderId = orderId;
-        this.rate = rate;
-        this.status = status;
     }
 
 }
