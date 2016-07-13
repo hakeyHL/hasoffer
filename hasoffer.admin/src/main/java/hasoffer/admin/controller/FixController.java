@@ -711,4 +711,43 @@ public class FixController {
         return "ok";
     }
 
+    /**
+     * 该类用于
+     * 类目数据正确也能匹配到商品，但是由于类目的level变化，导致查询不返回，解决办法，将商品重新导入一遍
+     *
+     * @return
+     */
+    @RequestMapping(value = "/fixcategorychange")
+    @ResponseBody
+    public String fixcategorychange() {
+
+        int[] array = {5, 57, 157};
+
+        for (int i = 0; i < array.length; i++) {
+
+            Long ptmcategoryId = Long.valueOf(array[i]);
+
+            List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.categoryId = ?0 ", Arrays.asList(Long.valueOf(array[i])));
+
+            for (PtmCmpSku sku : skus) {
+
+                //更新sku的categoryId
+//                cmpSkuService.updateCategoryid(sku.getId(), ptmcategoryId);
+                PtmProduct product = productService.getProduct(sku.getProductId());
+                if (product == null) {
+                    continue;
+                }
+                //更新对应product的categoryId
+                productService.updateProductCategory(product, ptmcategoryId);
+
+                System.out.println("skus " + sku.getId());
+                System.out.println("product" + product.getId());
+
+            }
+
+        }
+
+        return "";
+    }
+
 }

@@ -123,7 +123,7 @@ public class Compare2Controller {
 
 
     @RequestMapping(value = "/cmpsku", method = RequestMethod.GET)
-    public ModelAndView cmpsku(@RequestParam(defaultValue = "") final String id,
+    public ModelAndView cmpsku(@RequestParam(defaultValue = "0") final String id,
                                @RequestParam(defaultValue = "1") int page,
                                @RequestParam(defaultValue = "10") int size
     ) {

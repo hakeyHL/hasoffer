@@ -10,10 +10,7 @@ import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.thd.ThdProduct;
 import hasoffer.core.persistence.po.thd.flipkart.ThdBProduct;
-import hasoffer.core.product.ICategoryService;
-import hasoffer.core.product.ICmpSkuService;
-import hasoffer.core.product.IImageService;
-import hasoffer.core.product.IProductService;
+import hasoffer.core.product.*;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
@@ -63,6 +60,8 @@ public class ProductTest {
     ICmpSkuService cmpSkuService;
     @Resource
     ISearchService searchService;
+    @Resource
+    IFetchService fetchService;
     private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
 
     private Logger logger = LoggerFactory.getLogger(ProductTest.class);
@@ -97,7 +96,7 @@ public class ProductTest {
                             // update image for product
                             String sourceUrl = o.getSourceUrl();
                             // visit flipkart page to get image url
-                            String oriImageUrl = "";//
+                            String oriImageUrl = fetchService.fetchFlipkartImageUrl(sourceUrl);
 
                             productService.updateProductImage2(o.getId(), oriImageUrl);
 

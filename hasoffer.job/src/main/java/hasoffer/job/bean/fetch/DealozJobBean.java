@@ -1,6 +1,8 @@
-package hasoffer.job.bean;
+package hasoffer.job.bean.fetch;
 
-import hasoffer.job.service.IWebSiteFetchService;
+import hasoffer.base.config.AppConfig;
+import hasoffer.base.enums.HasofferRegion;
+import hasoffer.job.service.IDealozFetchService;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
@@ -8,26 +10,26 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import javax.annotation.Resource;
-import java.util.Date;
 
-public class FetchJobBean extends QuartzJobBean {
+public class DealozJobBean extends QuartzJobBean {
     /**
      * Logger for this class
      */
-    private static final Logger logger = LoggerFactory.getLogger(FetchJobBean.class);
+    private static final Logger logger = LoggerFactory.getLogger(DealozJobBean.class);
 
     @Resource
-    private IWebSiteFetchService webSiteFetchService;
+    private IDealozFetchService dealozFetchService;
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        logger.info("FetchJobBean is run at {}" ,new Date());
-        //System.out.println(new Date()+":任务执行。");
         if (logger.isDebugEnabled()) {
             logger.debug("executeInternal(JobExecutionContext context) - start");
         }
-
-        webSiteFetchService.fetchProduct2Mongodb();
+        if (HasofferRegion.USA.equals(AppConfig.getSerRegion())) {
+            dealozFetchService.fetchAllSite();
+        } else {
+            logger.info("It not in use. Don't execute this job.");
+        }
 
         if (logger.isDebugEnabled()) {
             logger.debug("executeInternal(JobExecutionContext context={}) - end", context);

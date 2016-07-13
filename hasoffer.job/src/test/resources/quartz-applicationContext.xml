@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
 ">
 
@@ -46,7 +46,7 @@
 
     <!-- fetch job -->
     <bean name="fetchJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="hasoffer.job.bean.FetchJobBean"/>
+        <property name="jobClass" value="hasoffer.job.bean.fetch.FetchJobBean"/>
         <!--<property name="beanName" value="fetchJobBean"/>-->
     </bean>
 

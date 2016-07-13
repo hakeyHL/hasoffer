@@ -16,7 +16,7 @@ public class OrderVo {
     private BigDecimal total;
     private Date orderTime;
     private  String createTime;
-
+    private String website;
     public OrderVo() {
     }
 
@@ -25,6 +25,14 @@ public class OrderVo {
         this.channel = channel;
         this.orderId = orderId;
         this.status = status;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
     }
 
     public BigDecimal getTotal() {
