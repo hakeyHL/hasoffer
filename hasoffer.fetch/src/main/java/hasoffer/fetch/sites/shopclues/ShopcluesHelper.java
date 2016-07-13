@@ -53,14 +53,8 @@ public class ShopcluesHelper {
 
     public static String getCleanUrl(String oriUrl) {
 
-        if (oriUrl.contains("?utm_")) {
-            String[] subStr = oriUrl.split("\\?utm_");
-            return subStr[0];
-        }
-
-        if (oriUrl.contains("?gclid")) {
-            String[] subStr = oriUrl.split("\\?gclid");
-            return subStr[0];
+        if (oriUrl.contains("?")) {
+            return oriUrl.substring(0, oriUrl.indexOf("?"));
         }
 
         return oriUrl;
