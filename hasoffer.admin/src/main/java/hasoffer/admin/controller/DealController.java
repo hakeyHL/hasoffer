@@ -31,21 +31,20 @@ import java.util.Map;
  */
 
 @Controller
-@RequestMapping(value="/deal")
+@RequestMapping(value = "/deal")
 public class DealController {
-
-    private Logger logger = LoggerFactory.getLogger(DealController.class);
 
     @Resource
     IDealService dealService;
+    private Logger logger = LoggerFactory.getLogger(DealController.class);
 
     @InitBinder
     public void initBinder(WebDataBinder binder) throws Exception {
         binder.registerCustomEditor(Date.class, new DateEditor());
     }
 
-    @RequestMapping(value="/list", method = RequestMethod.GET)
-    public ModelAndView listDealData(HttpServletRequest request, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "50") int size){
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public ModelAndView listDealData(HttpServletRequest request, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "50") int size) {
         ModelAndView mav = new ModelAndView("deal/list");
         PageableResult<AppDeal> pageableResult = dealService.findDealList(page, size);
         mav.addObject("page", PageHelper.getPageModel(request, pageableResult));
@@ -55,12 +54,13 @@ public class DealController {
 
     /**
      * excel导入
+     *
      * @param multiFile
      * @return
      */
     @RequestMapping(value = "/import", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> importExcel(MultipartFile multiFile){
+    public Map<String, Object> importExcel(MultipartFile multiFile) {
         Map<String, Object> result = new HashMap<String, Object>();
         try {
             result = dealService.importExcelFile(multiFile);
@@ -73,21 +73,26 @@ public class DealController {
         return result;
     }
 
-    @RequestMapping(value="/detail/{id}", method = RequestMethod.GET)
-    public ModelAndView detail(@PathVariable(value = "id") Long dealId){
+    @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
+    public ModelAndView detail(@PathVariable(value = "id") Long dealId) {
+
+        final String IMAGE_URL_PREFIX = "http://img1.hasofferimage.com";
+
         ModelAndView mav = new ModelAndView("deal/edit");
-        mav.addObject("deal", dealService.getDealById(dealId));
+        AppDeal deal = dealService.getDealById(dealId);
+        deal.setImageUrl(IMAGE_URL_PREFIX + deal.getImageUrl());
+        mav.addObject("deal", deal);
         return mav;
     }
 
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
-    public ModelAndView edit(AppDeal deal, MultipartFile file) throws IOException{
+    public ModelAndView edit(AppDeal deal, MultipartFile file) throws IOException {
 
         //上传图片, 暂支持单个
         String path = "";
         if (!file.isEmpty()) {
             File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
-            FileUtil.writeBytes(imageFile,file.getBytes());
+            FileUtil.writeBytes(imageFile, file.getBytes());
             try {
                 path = ImageUtil.uploadImage(imageFile);
             } catch (Exception e) {
@@ -96,9 +101,9 @@ public class DealController {
         }
 
         //推送至banner展示则点击保存时除deal信息外 创建一条banner数据 banner的生效、失效时间、banner图片与此deal相同 banner的rank为默认值
-        if(deal.isPush()){
+        if (deal.isPush()) {
             AppBanner banner = dealService.getBannerByDealId(deal.getId());
-            if(banner == null){
+            if (banner == null) {
                 banner = new AppBanner();
             }
             banner.setSourceId(String.valueOf(deal.getId()));
@@ -118,14 +123,14 @@ public class DealController {
 
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
     @ResponseBody
-    public Object delete(@PathVariable(value = "id") Long dealId){
+    public Object delete(@PathVariable(value = "id") Long dealId) {
         dealService.delete(dealId);
         return true;
     }
 
     @RequestMapping(value = "/batchDelete", method = RequestMethod.GET)
     @ResponseBody
-    public Object batchDelete(@RequestParam(value = "ids[]") Long[] ids){
+    public Object batchDelete(@RequestParam(value = "ids[]") Long[] ids) {
         dealService.batchDelete(ids);
         return true;
     }
