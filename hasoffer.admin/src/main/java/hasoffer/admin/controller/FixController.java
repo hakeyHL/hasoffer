@@ -13,6 +13,7 @@ import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.ptm.updater.PtmCategoryUpdater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.product.*;
@@ -727,6 +728,9 @@ public class FixController {
     public String fixcategorychange() {
 
         int[] array = {
+                5,
+                57,
+                157,
                 4689,
                 4848,
                 4870,
@@ -1081,29 +1085,55 @@ public class FixController {
                 102706,
         };
 
+        final ConcurrentLinkedQueue<Long> logQueue = new ConcurrentLinkedQueue<Long>();
+
         for (int i = 0; i < array.length; i++) {
-
-            Long ptmcategoryId = Long.valueOf(array[i]);
-
-            List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.categoryId = ?0 ", Arrays.asList(Long.valueOf(array[i])));
-
-            for (PtmCmpSku sku : skus) {
-
-                //更新sku的categoryId
-//                cmpSkuService.updateCategoryid(sku.getId(), ptmcategoryId);
-                PtmProduct product = productService.getProduct(sku.getProductId());
-                if (product == null) {
-                    continue;
-                }
-                //更新对应product的categoryId
-                productService.updateProductCategory(product, ptmcategoryId);
-
-                System.out.println("skus " + sku.getId());
-                System.out.println("product" + product.getId());
-
-            }
-
+            logQueue.add(Long.valueOf(array[i]));
         }
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        es.execute(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+
+                    Long ptmcategoryId = logQueue.poll();
+
+                    List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.categoryId = ?0 ", Arrays.asList(ptmcategoryId));
+
+                    for (PtmCmpSku sku : skus) {
+                        //更新sku的categoryId
+//                cmpSkuService.updateCategoryid(sku.getId(), ptmcategoryId);
+                        PtmProduct product = productService.getProduct(sku.getProductId());
+                        if (product == null) {
+                            continue;
+                        }
+                        //更新对应product的categoryId
+                        productService.updateProductCategory(product, ptmcategoryId);
+
+                        System.out.println("skus " + sku.getId());
+                        System.out.println("product" + product.getId());
+                    }
+
+                    //todo 更新完一个后需要将类目释放出来
+
+                    PtmCategory category = dbm.querySingle("SELECT t FROM PtmCategory t WHERE t.id = ?0 ", Arrays.asList(ptmcategoryId));
+
+                    PtmCategoryUpdater updater = new PtmCategoryUpdater(ptmcategoryId);
+
+                    if (category.getLevel() == 20) {
+                        updater.getPo().setLevel(2);
+                    } else if (category.getLevel() == 30) {
+                        updater.getPo().setLevel(3);
+                    } else {
+                        System.out.println("level error for" + ptmcategoryId);
+                    }
+
+                    dbm.update(updater);
+                }
+            }
+        });
 
         return "";
     }
