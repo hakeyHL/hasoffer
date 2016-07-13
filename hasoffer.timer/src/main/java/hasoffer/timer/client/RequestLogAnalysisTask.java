@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -18,7 +17,7 @@ import java.util.Date;
 /**
  * Created on 2016/3/30.
  */
-@Component
+//@Component
 public class RequestLogAnalysisTask {
 
     private static Logger logger = LoggerFactory.getLogger(RequestLogAnalysisTask.class);

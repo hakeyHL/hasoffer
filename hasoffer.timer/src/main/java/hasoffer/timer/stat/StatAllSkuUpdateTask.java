@@ -8,7 +8,6 @@ import hasoffer.core.persistence.po.stat.StatPtmCmpSkuUpdate;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -16,7 +15,7 @@ import java.util.Arrays;
 /**
  * Created on 2016/5/30.
  */
-@Component
+//@Component
 public class StatAllSkuUpdateTask {
 
     private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";

@@ -62,10 +62,10 @@
                     <div class="col-sm-7">
 
                         <label class="radio-inline">
-                            <input type="radio" name="push" id="inlineRadio1" > 展示
+                            <input type="radio" name="push" value="true" id="inlineRadio1"> 展示
                         </label>
                         <label class="radio-inline">
-                            <input type="radio" name="push" id="inlineRadio2" > 不展示
+                            <input type="radio" name="push" value="false" id="inlineRadio2"> 不展示
                         </label>
 
                     </div>
