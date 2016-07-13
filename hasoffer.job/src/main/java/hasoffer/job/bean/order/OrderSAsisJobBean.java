@@ -1,4 +1,4 @@
-package hasoffer.job.bean;
+package hasoffer.job.bean.order;
 
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
