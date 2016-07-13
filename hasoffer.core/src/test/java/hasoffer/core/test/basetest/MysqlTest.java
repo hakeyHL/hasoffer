@@ -315,9 +315,9 @@ public class MysqlTest {
     @Test
     public void testFind() {
 
-        long number = dbm.querySingle("SELECT COUNT(*) FROM PtmProduct t WHERE t.categoryId = ?0 ", Arrays.asList(999999L));
+        List<SrmSearchLog> logList = dbm.query("SELECT t FROM SrmSearchLog t WHERE t.ptmProductId = ?0  ", Arrays.asList(999999L));
 
-        System.out.println(number);
+        System.out.println(logList);
 
     }
 }

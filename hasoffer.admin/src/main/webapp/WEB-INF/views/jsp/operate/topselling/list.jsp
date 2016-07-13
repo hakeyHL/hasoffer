@@ -61,7 +61,13 @@
                                 <button id="changeStatus" onclick="change(${topSellingVo.id})">切换状态</button>
                             </td>
                             <td><a href="detail/${topSellingVo.id}">修改图片</a></td>
-                            <td><a href="/p/cmp/${topSellingVo.id}">手工关联</a></td>
+                            <td>
+                                <a href="/p/cmp/${topSellingVo.id}">商品关联</a>/
+                                <a href="
+                                    <c:if test="${''==topSellingVo.logid}">#</c:if>
+                                    <c:if test="${''!=topSellingVo.logid}">/s/reSearchByLogKeyword/${topSellingVo.logid}</c:if>
+                                    ">日志关联</a>
+                            </td>
                             <td><a href="delete/${topSellingVo.id}">删除</a></td>
                         </tr>
                     </c:forEach>
