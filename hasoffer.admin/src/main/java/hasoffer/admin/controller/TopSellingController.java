@@ -11,6 +11,7 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.PtmTopSelling;
+import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.IImageService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.redis.ICacheService;
@@ -86,12 +87,23 @@ public class TopSellingController {
                 continue;
             }
 
+            List<SrmSearchLog> logList = dbm.query(Q_SRMSEARCHLOG_BYPRODUCTID, Arrays.asList(ptmProduct.getId()));
+
+            String logId = "";
+            if (logList == null || logList.size() == 0) {
+
+            } else {
+                logId = logList.get(0).getId();
+            }
+
             long skuNumber = dbm.querySingle(Q_COUNT_SKU, Arrays.asList(productId));
 
             topSellingVo.setId(ptmTopSelling.getId());
             topSellingVo.setName(ptmProduct.getTitle());
             topSellingVo.setImageurl(productService.getProductMasterImageUrl(productId));
             topSellingVo.setSkuNumber(skuNumber);
+            topSellingVo.setLogid(logId);
+            topSellingVo.setCount(ptmTopSelling.getCount());
 
             topSellingVoList.add(topSellingVo);
         }

@@ -61,4 +61,32 @@ public class FileTest {
         }
 
     }
+
+    @Test
+    public void test1() throws IOException {
+
+        String[] lines = FileUtil.readLines(new File("C:/Users/wing/Desktop/haha.log"), "UTF-8");
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        String destlevel = "";
+        String destId = "";
+
+        for (int i = 0; i < lines.length; i++) {
+
+            String line = lines[i];
+
+            String[] subStr = line.split(":");
+
+            if (i % 3 == 0) {
+                destId = subStr[1];
+            } else if (i % 3 == 2) {
+                destlevel = subStr[1] + "0";
+                stringBuilder.append("update ptmcategory set level = " + destlevel + " where id = " + destId + " ;\n");
+                FileUtil.appendString(new File("C:/Users/wing/Desktop/heihei.sql"), stringBuilder.toString());
+                stringBuilder = new StringBuilder();
+            }
+
+        }
+    }
 }

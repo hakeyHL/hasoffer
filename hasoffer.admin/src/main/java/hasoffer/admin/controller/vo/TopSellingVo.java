@@ -10,6 +10,15 @@ public class TopSellingVo {
     private String imageurl;
     private long skuNumber;
     private String logid;
+    private long count;
+
+    public long getCount() {
+        return count;
+    }
+
+    public void setCount(long count) {
+        this.count = count;
+    }
 
     public long getId() {
         return id;

@@ -33,7 +33,7 @@ public class CmpProductListVo {
         this.ratingNum = cmpSku.getRatings();
         this.totalRatingsNum = cmpSku.getCommentsNumber();
         this.image = logoImage;
-        this.ratingNum = Integer.valueOf(cmpSku.getRating() == null || cmpSku.getRating().equals("") ? "0" : cmpSku.getRating());
+        this.ratingNum = cmpSku.getRatings();
         this.price = Math.round(cmpSku.getPrice());
         this.website = cmpSku.getWebsite();
         this.freight = cmpSku.getShipping();
