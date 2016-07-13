@@ -47,7 +47,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             if (searchLog == null) {
                 try {
                     TimeUnit.SECONDS.sleep(3);
-                    logger.debug("task update get null sleep 3 seconds");
+                    logger.info("task update get null sleep 3 seconds");
                 } catch (InterruptedException e) {
                     return;
                 }
@@ -81,7 +81,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         Website website = WebsiteHelper.getWebSite(url);
 
         if (website == null) {
-            logger.debug(" parse website get null for [" + sku.getId() + "]");
+            logger.info(" parse website get null for [" + sku.getId() + "]");
             return;
         }
 
@@ -90,9 +90,9 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         try {
             fetchedResult = fetchService.getProductsByUrl(website, url);
         } catch (HttpFetchException e) {
-            logger.debug("HttpFetchException for [" + sku.getId() + "]");
+            logger.info("HttpFetchException for [" + sku.getId() + "]");
         } catch (ContentParseException e) {
-            logger.debug("ContentParseException for [" + sku.getId() + "]");
+            logger.info("ContentParseException for [" + sku.getId() + "]");
         }
 
         TaskStatus taskStatus = fetchedResult.getTaskStatus();
@@ -102,14 +102,14 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         //如果返回结果状态为running，那么将sku返回队列
         if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
             queue.add(searchLog);
-            logger.debug("taskstatus RUNNING for [" + sku.getId() + "]");
+            logger.info("taskstatus RUNNING for [" + sku.getId() + "]");
             return;
         } else if (TaskStatus.STOPPED.equals(taskStatus)) {
-            logger.debug("taskstatus STOPPED for [" + sku.getId() + "]");
+            logger.info("taskstatus STOPPED for [" + sku.getId() + "]");
         } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
-            logger.debug("taskstatus EXCEPTION for [" + sku.getId() + "]");
+            logger.info("taskstatus EXCEPTION for [" + sku.getId() + "]");
         } else {//(TaskStatus.FINISH.equals(taskStatus)))
-            logger.debug("taskstatus FINISH for [" + sku.getId() + "]");
+            logger.info("taskstatus FINISH for [" + sku.getId() + "]");
             fetchedProduct = fetchedResult.getFetchProduct();
         }
 
@@ -123,11 +123,11 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
         try {
             cmpSkuService.updateCmpSkuBySpiderFetchedProduct(sku.getId(), fetchedProduct);
-            logger.debug("fetch success for [" + sku.getId() + "]");
+            logger.info("fetch success for [" + sku.getId() + "]");
         } catch (Exception e) {
-            logger.debug(e.toString());
+            logger.info(e.toString());
             if (fetchedProduct != null) {
-                logger.debug("title:" + fetchedProduct.getTitle());
+                logger.info("title:" + fetchedProduct.getTitle());
             }
         }
     }
