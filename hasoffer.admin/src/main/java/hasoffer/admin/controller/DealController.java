@@ -2,6 +2,7 @@ package hasoffer.admin.controller;
 
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.IDUtil;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.enums.BannerFrom;
 import hasoffer.core.persistence.po.app.AppBanner;
@@ -80,7 +81,11 @@ public class DealController {
 
         ModelAndView mav = new ModelAndView("deal/edit");
         AppDeal deal = dealService.getDealById(dealId);
-        deal.setImageUrl(IMAGE_URL_PREFIX + deal.getImageUrl());
+
+        if (!StringUtils.isEmpty(deal.getImageUrl())) {
+            deal.setImageUrl(IMAGE_URL_PREFIX + deal.getImageUrl());
+        }
+
         mav.addObject("deal", deal);
         return mav;
     }
