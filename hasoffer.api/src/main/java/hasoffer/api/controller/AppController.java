@@ -246,7 +246,7 @@ public class AppController {
         if (user != null) {
             List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
-                if (orderStatsAnalysisPO.getWebSite().equals(Website.SHOPCLUES.name()) || orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
+                if (orderStatsAnalysisPO.getWebSite().equals(Website.SHOPCLUES.name()) || orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name()) || orderStatsAnalysisPO.getWebSite().equals(Website.SNAPDEAL.name())) {
                     OrderVo orderVo = new OrderVo();
                     orderVo.setAccount(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.015)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
                     orderVo.setChannel(orderStatsAnalysisPO.getChannel());
