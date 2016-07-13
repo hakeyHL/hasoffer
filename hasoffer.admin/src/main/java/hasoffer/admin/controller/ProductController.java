@@ -163,7 +163,7 @@ public class ProductController {
                     sizes.add(cmpSku.getSize());
                 }
 
-                List<PtmCmpSkuLog> logs = cmpSkuService.listByPcsId(cmpSku.getId());
+                List<PtmCmpSkuLog> logs = null;//cmpSkuService.listByPcsId(cmpSku.getId());
                 if (ArrayUtils.hasObjs(logs)) {
                     priceLogMap.put(cmpSku, logs);
                 }
