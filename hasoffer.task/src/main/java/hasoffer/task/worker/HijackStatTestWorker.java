@@ -10,8 +10,6 @@ import hasoffer.core.persistence.mongo.StatHijackFetch;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICmpSkuService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
@@ -20,8 +18,6 @@ import java.util.concurrent.TimeUnit;
  * Created on 2016/5/13.
  */
 public class HijackStatTestWorker implements Runnable {
-
-    private static Logger logger = LoggerFactory.getLogger(HijackStatTestWorker.class);
 
     private ConcurrentLinkedQueue<SrmSearchLog> queue;
     private ICmpSkuService cmpSkuService;

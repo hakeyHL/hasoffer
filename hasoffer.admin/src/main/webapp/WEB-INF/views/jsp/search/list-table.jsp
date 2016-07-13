@@ -43,7 +43,7 @@
                         </c:if>
                     </td>
                     <td>${log.count}</td>
-                    <td>${log.updateTime}</td>
+                    <td><a type="button" href="/s/showmatch/${log.id}" target="_blank">${log.updateTime}</a></td>
                     <td>${log.manualSetTime}</td>
                     <td width="80px">
                         <c:if test="${log.precise == 'MANUALSET'}">
