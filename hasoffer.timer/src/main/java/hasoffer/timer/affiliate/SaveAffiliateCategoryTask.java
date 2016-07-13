@@ -9,14 +9,13 @@ import hasoffer.core.thd.IThdService;
 import hasoffer.core.thd.ThdHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /**
  * Created on 2016/3/7.
  */
-@Component
+//@Component
 public class SaveAffiliateCategoryTask {
 
     private static Logger logger = LoggerFactory.getLogger(SaveAffiliateCategoryTask.class);

@@ -252,6 +252,7 @@ public class AppController {
                     orderVo.setChannel(orderStatsAnalysisPO.getChannel());
                     orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
                     orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
+                    orderVo.setWebsite(orderStatsAnalysisPO.getWebSite());
                     //返利比率=tentativeAmount*rate/SaleAmount
                     orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
                     transcations.add(orderVo);
