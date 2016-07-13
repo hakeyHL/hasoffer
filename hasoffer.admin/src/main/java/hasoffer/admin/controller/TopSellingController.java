@@ -103,6 +103,7 @@ public class TopSellingController {
             topSellingVo.setImageurl(productService.getProductMasterImageUrl(productId));
             topSellingVo.setSkuNumber(skuNumber);
             topSellingVo.setLogid(logId);
+            topSellingVo.setCount(ptmTopSelling.getCount());
 
             topSellingVoList.add(topSellingVo);
         }

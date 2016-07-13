@@ -67,6 +67,7 @@ public class ProductTest {
 
     private Logger logger = LoggerFactory.getLogger(ProductTest.class);
 
+    //todo
     @Test
     public void fixImage() {
         final String Q_PRODUCT_WEBSITE =
