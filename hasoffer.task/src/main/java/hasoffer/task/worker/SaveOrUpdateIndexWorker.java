@@ -22,8 +22,8 @@ import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.fetch.helper.WebsiteHelper;
-import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.ListProduct;
+import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.ProductStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import hasoffer.fetch.sites.flipkart.FlipkartListProcessor;
@@ -47,9 +47,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class SaveOrUpdateIndexWorker implements Runnable {
 
-    private static Logger logger = LoggerFactory.getLogger(SaveOrUpdateIndexWorker.class);
     private static final String Q_PTMCMPSKU_SOURCESID = "SELECT t FROM PtmCmpSku t WHERE t.sourceSid = ?0 AND t.website = ?1";
-
+    private static Logger logger = LoggerFactory.getLogger(SaveOrUpdateIndexWorker.class);
     private ConcurrentLinkedQueue<StatHijackFetch> queue;
     private IDataBaseManager dbm;
     private IMongoDbManager mdm;
@@ -72,7 +71,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
             if (statHijackFetch == null) {
                 try {
                     TimeUnit.SECONDS.sleep(3);
-                    logger.debug("update flipkartSkuTitle worker get null sleep 3 seconds");
+                    logger.info("update flipkartSkuTitle worker get null sleep 3 seconds");
                 } catch (InterruptedException e) {
                     return;
                 }
@@ -98,7 +97,6 @@ public class SaveOrUpdateIndexWorker implements Runnable {
             try {
 
                 skuList = getSku(website, cliQ, sourceId);
-                logger.debug("get sku success nmb");
 
             } catch (HttpFetchException e) {
 
@@ -127,7 +125,6 @@ public class SaveOrUpdateIndexWorker implements Runnable {
 
                 IndexHistory history = new IndexHistory("GetSkuSuccess", TimeUtils.nowDate());
                 indexHistoryList.add(history);
-                logger.debug("GetSkuSuccess nmb");
                 createOrUpdateIndex(skuList, statHijackFetch);
 
             } else {
@@ -149,14 +146,11 @@ public class SaveOrUpdateIndexWorker implements Runnable {
 
         for (PtmCmpSku sku : skuList) {
 
-            logger.debug("result list sql start");
             List<PtmCmpSku> resultList = dbm.query(Q_PTMCMPSKU_SOURCESID, Arrays.asList(sku.getSourceSid(), sku.getWebsite()));
-            logger.debug("result list sql stop");
 
             //如果有结果，将所有结果的url和tltle等字段进行全部的更新
             //如果没有结果，创建sku，新建索引
             if (ArrayUtils.hasObjs(resultList)) {
-                logger.debug("hasobject");
                 for (PtmCmpSku oldSku : resultList) {
 
                     //更新sku
@@ -189,9 +183,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
                 }
             } else {
 
-                logger.debug("create sku nmb");
                 PtmCmpSku cmpSkuForIndex = cmpSkuService.createCmpSkuForIndex(sku);
-                logger.debug("create sku finish nmb");
                 cmpSkuService.createPtmCmpSkuIndexToMysql(cmpSkuForIndex);
                 statHijackFetch.getAffectSkuIdList().add(cmpSkuForIndex.getId() + "");
             }
@@ -298,7 +290,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
                     skuList.add(sku);
                 }
             }
-            logger.debug("flipkart page parse get " + skuList.size() + " sku for [" + cliQ + "]");
+            logger.info("flipkart page parse get " + skuList.size() + " sku for [" + cliQ + "]");
 
         } else {
 
@@ -335,7 +327,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
 
             skuList.add(sku);
 
-            logger.debug("flipkart affiliate get sku success [" + sourceId + "]");
+            logger.info("flipkart affiliate get sku success [" + sourceId + "]");
         }
 
         return skuList;
@@ -382,10 +374,10 @@ public class SaveOrUpdateIndexWorker implements Runnable {
                         skuList.add(sku);
                     }
                 }
-                logger.debug("snapdeal page parse get " + productList.size() + " sku for [" + cliQ + "]");
+                logger.info("snapdeal page parse get " + productList.size() + " sku for [" + cliQ + "]");
             } catch (Exception e) {
-                logger.debug("snapdeal page parse get sku fail for [" + cliQ + "]");
-                logger.debug(e.toString());
+                logger.info("snapdeal page parse get sku fail for [" + cliQ + "]");
+                logger.info(e.toString());
             }
         } else {
             SnapdealProductProcessor processor = new SnapdealProductProcessor();
@@ -414,9 +406,9 @@ public class SaveOrUpdateIndexWorker implements Runnable {
 
                 skuList.add(sku);
 
-                logger.debug("snapdeal affiliate get sku success [" + sourceId + "]");
+                logger.info("snapdeal affiliate get sku success [" + sourceId + "]");
             } catch (Exception e) {
-                logger.debug("snapdeal affiliate create sku fail for [" + sourceId + "]");
+                logger.info("snapdeal affiliate create sku fail for [" + sourceId + "]");
             }
         }
 
