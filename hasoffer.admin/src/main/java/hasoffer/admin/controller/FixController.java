@@ -711,6 +711,12 @@ public class FixController {
         return "ok";
     }
 
+    /**
+     * 该类用于
+     * 类目数据正确也能匹配到商品，但是由于类目的level变化，导致查询不返回，解决办法，将商品重新导入一遍
+     *
+     * @return
+     */
     @RequestMapping(value = "/fixcategorychange")
     @ResponseBody
     public String fixcategorychange() {
