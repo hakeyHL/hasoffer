@@ -127,25 +127,29 @@ public class Compare2Controller {
                                @RequestParam(defaultValue = "1") int page,
                                @RequestParam(defaultValue = "10") int size
     ) {
-        PtmProduct product = productService.getProduct(Long.valueOf(id));
-        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-        DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-        SearchIO sio = new SearchIO(product.getSourceId(), product.getTitle(), "", product.getSourceSite(), product.getPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, size);
-        CmpResult cr = null;
-        try {
-//            getSioBySearch(sio);
-            cr = getCmpProducts(sio, product);
-        } catch (Exception e) {
-            logger.debug(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, size));
-            //if exception occured ,get default cmpResult
-            return null;
-        }
-        // 速度优化
-        SearchHelper.addToLog(sio);
         ModelAndView mav = new ModelAndView();
+        CmpResult cr = null;
+        PtmProduct product = productService.getProduct(Long.valueOf(id));
+        if (product != null) {
+            String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+            DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+            SearchIO sio = new SearchIO(product.getSourceId(), product.getTitle(), "", product.getSourceSite(), product.getPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, size);
+            try {
+//            getSioBySearch(sio);
+                cr = getCmpProducts(sio, product);
+            } catch (Exception e) {
+                logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, size));
+                //if exception occured ,get default cmpResult
+                mav.addObject("data", cr);
+                return mav;
+            }
+            // 速度优化
+            SearchHelper.addToLog(sio);
+            logger.debug(sio.toString());
+            mav.addObject("data", cr);
+            return mav;
+        }
         mav.addObject("data", cr);
-        logger.debug(sio.toString());
-
         return mav;
     }
 

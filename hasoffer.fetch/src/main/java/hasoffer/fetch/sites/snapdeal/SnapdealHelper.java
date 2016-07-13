@@ -69,14 +69,16 @@ public class SnapdealHelper {
 //                sb.append("=").append(aff);
 //                index++;
 //            }
-            if (affs != null) {
+            if (affs != null && affs.length >= 1) {
                 sb.append("&aff_sub=").append(affs[0]);
 
-                String deviceUser = affs[1];
-                if (affs.length == 3) {
-                    deviceUser += "_" + affs[2];
+                if (affs.length >= 2) {
+                    String deviceUser = affs[1];
+                    if (affs.length == 3) {
+                        deviceUser += "_" + affs[2];
+                    }
+                    sb.append("&aff_sub2=").append(deviceUser);
                 }
-                sb.append("&aff_sub2=").append(deviceUser);
             }
         }
 

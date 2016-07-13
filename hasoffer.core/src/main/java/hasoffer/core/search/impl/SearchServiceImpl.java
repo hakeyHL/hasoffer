@@ -66,15 +66,11 @@ public class SearchServiceImpl implements ISearchService {
     private static final String Q_SEARCH_LOG_BY_PRODUCTID = "SELECT t FROM SrmSearchLog t WHERE t.ptmProductId = ?0 ";
     private static final String C_KEYWORD = "select count(t.id) from SrmSearchLog t where t.site=?0 and t.keyword=?1";
     private static final String D_SEARCH_LOG = "delete FROM SrmSearchLog t where t.id in (:ids) ";
-
     private static final String Q_SEARCH_COUNT = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd=?0 ORDER BY t.count DESC";
-
     private static final String STAT_SEARCH_COUNT = "SELECT COUNT(t.id) FROM SrmProductSearchCount t WHERE t.ymd=?0 AND t.skuCount=?1 ";
     private static final String STAT_SEARCH_COUNT2 = "SELECT COUNT(t.id) FROM SrmProductSearchCount t WHERE t.ymd=?0 AND t.skuCount>=?1 ";
-
     private static final String STAT_SEARCH_COUNT3 = "SELECT COUNT(t.id) FROM SrmSearchLog t WHERE t.lUpdateTime>?0 AND t.lUpdateTime<?1 AND t.ptmProductId=0 ";
     private static final String STAT_SEARCH_COUNT4 = "SELECT COUNT(t.id) FROM SrmSearchLog t WHERE t.lUpdateTime>?0 AND t.lUpdateTime<?1 AND t.ptmProductId>0 ";
-
     @Resource
     IDataBaseManager dbm;
     @Resource
@@ -85,7 +81,6 @@ public class SearchServiceImpl implements ISearchService {
     ICmpSkuService cmpSkuService;
     @Resource
     SearchLogCacheManager searchLogCacheManager;
-
     private Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
 
     @Override

@@ -19,11 +19,18 @@ public class PtmImage implements Identifiable<Long> {
 	private String imageUrl;
 	private String path;
 
+	private String imageUrl2;
 	private String path2;
 
-	private int errTimes;
+	private int errTimes = 0;
 
 	public PtmImage() {}
+
+	public PtmImage(long productId, String imageUrl, String imageUrl2) {
+		this.productId = productId;
+		this.imageUrl = imageUrl;
+		this.imageUrl2 = imageUrl2;
+	}
 
 	public PtmImage(long productId, String imageUrl) {
 		this.productId = productId;
@@ -80,6 +87,14 @@ public class PtmImage implements Identifiable<Long> {
 		this.path2 = path2;
 	}
 
+	public String getImageUrl2() {
+		return imageUrl2;
+	}
+
+	public void setImageUrl2(String imageUrl2) {
+		this.imageUrl2 = imageUrl2;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -91,7 +106,9 @@ public class PtmImage implements Identifiable<Long> {
 		if (errTimes != image.errTimes) return false;
 		if (id != null ? !id.equals(image.id) : image.id != null) return false;
 		if (imageUrl != null ? !imageUrl.equals(image.imageUrl) : image.imageUrl != null) return false;
-		return !(path != null ? !path.equals(image.path) : image.path != null);
+		if (path != null ? !path.equals(image.path) : image.path != null) return false;
+		if (imageUrl2 != null ? !imageUrl2.equals(image.imageUrl2) : image.imageUrl2 != null) return false;
+		return !(path2 != null ? !path2.equals(image.path2) : image.path2 != null);
 
 	}
 
@@ -101,6 +118,8 @@ public class PtmImage implements Identifiable<Long> {
 		result = 31 * result + (int) (productId ^ (productId >>> 32));
 		result = 31 * result + (imageUrl != null ? imageUrl.hashCode() : 0);
 		result = 31 * result + (path != null ? path.hashCode() : 0);
+		result = 31 * result + (imageUrl2 != null ? imageUrl2.hashCode() : 0);
+		result = 31 * result + (path2 != null ? path2.hashCode() : 0);
 		result = 31 * result + errTimes;
 		return result;
 	}

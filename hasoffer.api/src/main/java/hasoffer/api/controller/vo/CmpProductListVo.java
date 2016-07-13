@@ -13,7 +13,7 @@ import java.util.List;
 public class CmpProductListVo {
     List<String> support = new ArrayList<String>();
     private String image;
-    private float ratingNum;
+    private int ratingNum;
     private Long totalRatingsNum;
     private int price;
     private float freight;
@@ -33,7 +33,7 @@ public class CmpProductListVo {
         this.ratingNum = cmpSku.getRatings();
         this.totalRatingsNum = cmpSku.getCommentsNumber();
         this.image = logoImage;
-        this.ratingNum = Long.valueOf(cmpSku.getRating() == null ? "0" : cmpSku.getRating());
+        this.ratingNum = Integer.valueOf(cmpSku.getRating() == null || cmpSku.getRating().equals("") ? "0" : cmpSku.getRating());
         this.price = Math.round(cmpSku.getPrice());
         this.website = cmpSku.getWebsite();
         this.freight = cmpSku.getShipping();
@@ -49,7 +49,7 @@ public class CmpProductListVo {
         }
     }
 
-    public CmpProductListVo(String image, float ratingNum, Long totalRatingsNum, int price, int freight, String distributionTime, Long coins, float backRate, int returnGuarantee, List<String> support) {
+    public CmpProductListVo(String image, int ratingNum, Long totalRatingsNum, int price, int freight, String distributionTime, Long coins, float backRate, int returnGuarantee, List<String> support) {
         this.image = image;
         this.ratingNum = ratingNum;
         this.totalRatingsNum = totalRatingsNum;
@@ -99,7 +99,7 @@ public class CmpProductListVo {
         return ratingNum;
     }
 
-    public void setRatingNum(float ratingNum) {
+    public void setRatingNum(int ratingNum) {
         this.ratingNum = ratingNum;
     }
 

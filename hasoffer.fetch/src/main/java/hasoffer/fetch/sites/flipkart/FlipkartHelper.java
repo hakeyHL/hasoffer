@@ -103,18 +103,20 @@ public class FlipkartHelper {
             sb.append("?affid=").append(affid);
         }
 
-        if (affs != null) {
-            int i = 1;
+        if (affs != null && affs.length >= 1) {
+//            int i = 1;
 //            for (String aff : affs) {
 //                sb.append("&affExtParam").append(i++).append("=").append(aff);
 //            }
             sb.append("&affExtParam1=").append(affs[0]);
 
-            String deviceUser = affs[1];
-            if (affs.length == 3) {
-                deviceUser += "_" + affs[2];
+            if (affs.length >= 2) {
+                String deviceUser = affs[1];
+                if (affs.length == 3) {
+                    deviceUser += "_" + affs[2];
+                }
+                sb.append("&affExtParam2=").append(deviceUser);
             }
-            sb.append("&affExtParam2=").append(deviceUser);
         }
 
         return sb.toString();

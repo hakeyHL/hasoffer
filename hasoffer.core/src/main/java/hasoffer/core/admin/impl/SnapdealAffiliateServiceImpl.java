@@ -55,10 +55,22 @@ public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
                 String channel = order.getAffiliateSubId1();
                 po.setChannel(channel == null || "".equals(channel) ? "NONE" : channel);
                 po.setOrderTime(order.getDateTime());
-                String deviceId = order.getAffiliateSubId2();
-
+                String deviceId_userId = order.getAffiliateSubId2();
+                if (deviceId_userId != null) {
+                    String[] tempArray = deviceId_userId.split("_");
+                    if (tempArray.length == 2) {
+                        po.setDeviceId(tempArray[0]);
+                        po.setUserId(tempArray[1]);
+                    } else {
+                        po.setDeviceId(tempArray[0]);
+                    }
+                }
                 // OLD?NEW
-                UrmDevice device = deviceRegTime.get(deviceId);
+                String deviceId = po.getDeviceId();
+                UrmDevice device = null;
+                if (deviceId != null) {
+                    device = deviceRegTime.get(deviceId);
+                }
                 po.setUserType("NONE");
                 if (device != null && device.getCreateTime().compareTo(startTime) > 0) {
                     po.setUserType("NEW");

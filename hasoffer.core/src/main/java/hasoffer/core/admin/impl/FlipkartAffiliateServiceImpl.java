@@ -70,15 +70,23 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            String deviceId = order.getAffExtParam2();
-
-            po.setDeviceId(deviceId);
-
-            po.setUserId(order.getAffExtParam3());
-
+            String deviceId_userId = order.getAffExtParam2();
+            if (deviceId_userId != null) {
+                String[] tempArray = deviceId_userId.split("_");
+                if (tempArray.length == 2) {
+                    po.setDeviceId(tempArray[0]);
+                    po.setUserId(tempArray[1]);
+                } else {
+                    po.setDeviceId(tempArray[0]);
+                }
+            }
             po.setOrderStatus(order.getStatus());
             // OLD?NEW
-            UrmDevice device = deviceRegTime.get(deviceId);
+            String deviceId = po.getDeviceId();
+            UrmDevice device = null;
+            if (deviceId != null) {
+                device = deviceRegTime.get(deviceId);
+            }
             if (device != null && !"".equals(deviceId)) {
                 po.setDeviceRegTime(device.getCreateTime());
             }

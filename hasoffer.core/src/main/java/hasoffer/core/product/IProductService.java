@@ -74,4 +74,6 @@ public interface IProductService {
     void expTopSellingsFromSearchCount(String ymd);
 
     void updatePtmProductCategoryId(long ptmProductId, long categoryId);
+
+    void updateProductImage2(Long id, String oriImageUrl);
 }
