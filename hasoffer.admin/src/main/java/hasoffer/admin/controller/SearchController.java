@@ -82,6 +82,25 @@ public class SearchController {
     @Resource
     IMongoDbManager mdm;
 
+    @RequestMapping(value = "/rematch/{logId}", method = RequestMethod.GET)
+    public ModelAndView rematch(@PathVariable String logId) {
+        ModelAndView mav = new ModelAndView();
+
+        try {
+
+            SrmAutoSearchResult autoSearchResult = mdm.queryOne(SrmAutoSearchResult.class, logId);
+
+            searchService.analysisAndRelate(autoSearchResult);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        mav.addObject("result", "ok");
+
+        return mav;
+    }
+
     @RequestMapping(value = "/showmatch/{logId}", method = RequestMethod.GET)
     public ModelAndView showmatch(@PathVariable String logId) {
         ModelAndView mav = new ModelAndView("search/match_result");
