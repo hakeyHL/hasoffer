@@ -40,7 +40,15 @@ public class AmazonSummaryProductProcessor implements ISummaryProductProcessor {
 
         OriFetchedProduct oriFetchedProduct = new OriFetchedProduct();
 
-        String[] substr = url.split("/dp/");
+        String[] substr = null;
+        if (url.contains("/dp/")) {
+            substr = url.split("/dp/");
+            url = "http://www.amazon.in/dp/offer-listing/" + substr[1];
+        } else if (url.contains("/gp/")) {
+            substr = url.split("/gp/");
+            url = "http://www.amazon.in/gp/offer-listing/" + substr[1];
+        }
+
         url = "http://www.amazon.in/gp/offer-listing/" + substr[1];
 
         String sourceId = AmazonHelper.getProductIdByUrl(url);
