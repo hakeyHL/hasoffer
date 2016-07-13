@@ -28,7 +28,7 @@ public class MysqlListWorker<T> implements Runnable {
     @Override
     public void run() {
 
-        int page = 20;
+        int page = 1;
         int pageSize = 1000;
 
         PageableResult<T> pagedResults = dbm.queryPage(queryString, page, pageSize);

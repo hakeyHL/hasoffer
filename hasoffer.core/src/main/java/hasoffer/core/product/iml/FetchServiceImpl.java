@@ -18,6 +18,7 @@ import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.Product;
 import hasoffer.fetch.model.ProductStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
+import hasoffer.fetch.sites.flipkart.FlipkartSummaryProductProcessor;
 import hasoffer.fetch.sites.snapdeal.SnapdealHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -177,6 +178,16 @@ public class FetchServiceImpl implements IFetchService {
         }
 
         return null;
+    }
+
+    @Override
+    public String fetchFlipkartImageUrl(String url) throws HttpFetchException, ContentParseException {
+
+        FlipkartSummaryProductProcessor productProcessor = new FlipkartSummaryProductProcessor();
+
+        OriFetchedProduct fetchedProduct = productProcessor.getSummaryProductByUrl(url);
+
+        return fetchedProduct.getImageUrl();
     }
 
     private OriFetchedProduct getAffiliateSummaryProduct(Website website, String sourceId) throws AffiliateAPIException, IOException {
