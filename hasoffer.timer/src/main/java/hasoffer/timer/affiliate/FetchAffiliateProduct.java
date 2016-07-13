@@ -3,14 +3,13 @@ package hasoffer.timer.affiliate;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
 /**
  * Created on 2016/3/8.
  */
-@Component
+//@Component
 public class FetchAffiliateProduct implements Runnable {
 
     private static Logger logger = LoggerFactory.getLogger(FetchAffiliateProduct.class);
