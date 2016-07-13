@@ -1,6 +1,7 @@
 package hasoffer.fetch.sites.shopclues;
 
 import hasoffer.base.utils.StringUtils;
+import hasoffer.base.utils.UrlUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -70,15 +71,20 @@ public class ShopcluesHelper {
         String url = "http://www.shopclues.com/apple-iphone-5s-16gb-44.html";
         String target = "http://tracking.vcommission.com/aff_c?offer_id=122&aff_id=48424&url=http%3A%2F%2Faffiliateshopclues.com%2F%3Fa%3D9%26c%3D19%26p%3Dr%26s1%3D%7Baffiliate_id%7D%26s2%3D%7Btransaction_id%7D%26ckmrdr%3Dhttp%3A%2F%2Fwww.shopclues.com%2Fmtech-v4-black-16gb-java-enabled-preloaded-whats-app-mobile-phone.html%3Futm_source%3Dvcommission%26utm_medium%3DCPS%26s2%3Dhomepage";
 
-        String deeplinkWithAff = getDeeplinkWithAff(url, null);
+        String deeplinkWithAff = getUrlWithAff(getUrlWithAff(url, null), null);
         System.out.println(deeplinkWithAff);
         System.out.println(getKeywordFromSkuUrl(url));
     }
 
     public static String getUrlWithAff(String url, String[] affs) {
 
+        if (url.contains("affiliateshopclues")) {
+            url = UrlUtils.getParam(url, "ckmrdr");
+            url = StringUtils.urlDecode(url);
+        }
+
         String market = "";
-        if(affs.length > 1){
+        if (affs != null && affs.length > 1) {
             market = affs[0];
         }
 
