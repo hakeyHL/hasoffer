@@ -755,6 +755,7 @@ public class FixController {
         return "";
     }
 
+    //fixdata/testcategoryresult
     @RequestMapping("/testcategoryresult")
     @ResponseBody
     public String testcategoryresult() {
@@ -763,7 +764,7 @@ public class FixController {
 
         for (PtmCategory category : secondCategoryList) {
 
-            List<Object> thirdCategoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.parentid = ?0 ", Arrays.asList(category.getId()));
+            List<Object> thirdCategoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.parentId = ?0 ", Arrays.asList(category.getId()));
 
             if (thirdCategoryList == null || thirdCategoryList.size() == 0) {
                 PageableResult<ProductModel> pageableResult = productIndexServiceImpl.searchPro(category.getId(), 2, 1, 20);
