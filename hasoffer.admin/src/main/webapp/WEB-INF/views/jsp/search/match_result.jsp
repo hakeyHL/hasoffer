@@ -43,7 +43,9 @@
     <div class="row">
         <div class="panel panel-default">
 
-            <div class="panel-heading">搜索到的SKU</div>
+            <div class="panel-heading">搜索到的SKU
+                <button onclick="rematch('${result.id}')">Rematch</button>
+            </div>
 
             <div class="panel-body">
 
@@ -128,6 +130,16 @@
     </div>
 
     <script>
+        function rematch(logId) {
+            var url = "/s/rematch/" + logId;
+
+            http.doGet(url, function (data) {
+                if (data.result == "ok") {
+                    window.location.reload();
+                }
+            });
+        }
+
         function click_final_skus_btn(site) {
             $("table[name='finalskutable']").css("display", "none");
             $("li[name='btn2']").removeClass("active");
