@@ -27,6 +27,7 @@
                 <ref bean="skuImageDownLoadTrigger"/>
                 <ref bean="statHijackFetchTrigger"/>
                 <ref bean="statSearchLogTrigger"/>
+                <ref bean="statVisitSkuUpdateTrigger"/>
             </list>
         </property>
 
