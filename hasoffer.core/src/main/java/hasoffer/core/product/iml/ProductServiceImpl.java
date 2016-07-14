@@ -457,11 +457,19 @@ public class ProductServiceImpl implements IProductService {
         long cate1 = 0L, cate2 = 0L, cate3 = 0L;
         String cate3name = "";
 
-        if (ArrayUtils.hasObjs(categories) && categories.size() == 3) {
+        // 目前仅支持3级类目
+        if (ArrayUtils.hasObjs(categories)) {
             cate1 = categories.get(0).getId();
-            cate2 = categories.get(1).getId();
-            PtmCategory category = categories.get(2);
-            cate3 = category.getId();
+
+            int cateSize = categories.size();
+
+            if (cateSize > 1) {
+                cate2 = categories.get(1).getId();
+            }
+
+            if (cateSize > 2) {
+                cate3 = categories.get(2).getId();
+            }
         }
 
         ProductModel productModel = new ProductModel(product.getId(),
