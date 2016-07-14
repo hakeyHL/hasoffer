@@ -24,6 +24,7 @@
                 <ref bean="dealozTrigger"/>
                 <ref bean="orderSATrigger"/>
                 <ref bean="imageDownLoadTrigger"/>
+                <ref bean="imageDownLoadTrigger2"/>
                 <ref bean="skuImageDownLoadTrigger"/>
                 <ref bean="statHijackFetchTrigger"/>
                 <ref bean="statSearchLogTrigger"/>
