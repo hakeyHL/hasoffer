@@ -132,7 +132,7 @@ public class FixController {
     @ResponseBody
     String fixdataproducts() {
 
-        Date date = TimeUtils.stringToDate("2016-03-23 19:00:00", "yyyy-MM-dd HH:mm:ss");
+        Date date = TimeUtils.stringToDate("2016-05-28 02:37:11", "yyyy-MM-dd HH:mm:ss");
 
         final int page = 1, size = 200;
 
