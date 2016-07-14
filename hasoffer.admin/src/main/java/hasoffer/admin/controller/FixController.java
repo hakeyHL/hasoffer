@@ -91,6 +91,53 @@ public class FixController {
     @Resource
     ProductIndexServiceImpl productIndexServiceImpl;
 
+    @RequestMapping(value = "/fixImage", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String fixImage() {
+        final String Q_PRODUCT_WEBSITE =
+                "SELECT t FROM PtmProduct t WHERE t.sourceSite='FLIPKART'";
+
+        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<PtmProduct>(
+                new IList<PtmProduct>() {
+                    @Override
+                    public PageableResult getData(int page) {
+                        return dbm.queryPage(Q_PRODUCT_WEBSITE, page, 500);
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcess<PtmProduct>() {
+                    @Override
+                    public void process(PtmProduct o) {
+                        try {
+                            // update image for product
+                            String sourceUrl = o.getSourceUrl();
+                            // visit flipkart page to get image url
+                            String oriImageUrl = fetchService.fetchFlipkartImageUrl(sourceUrl);
+
+                            productService.updateProductImage2(o.getId(), oriImageUrl);
+
+                        } catch (Exception e) {
+                            logger.debug(e.getMessage() + "\t" + o.getId());
+                        }
+                    }
+                }
+        );
+
+        listAndProcessTask2.go();
+
+        return "ok";
+    }
+
     @RequestMapping(value = "/createskuindex", method = RequestMethod.GET)
     public
     @ResponseBody

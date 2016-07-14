@@ -40,7 +40,7 @@ import java.util.concurrent.Executors;
 @Controller
 @RequestMapping(value = "/fixtask")
 public class FixTaskController {
-    private final static String Q_TITLE_COUNT = "SELECT t.title,COUNT(t.id) FROM PtmProduct t WHERE t.title is not null GROUP BY t.title HAVING COUNT(t.id) > 1 ORDER BY COUNT(*) DESC";
+    private final static String Q_TITLE_COUNT = "SELECT t.title,COUNT(t.id) FROM PtmProduct t WHERE t.title is not null GROUP BY t.title HAVING COUNT(t.id) > 1 ORDER BY COUNT(t.id) DESC";
 
     private final static String Q_PRODUCT_BY_TITLE = "SELECT t FROM PtmProduct t WHERE t.title = ?0 ORDER BY t.id ASC";
 
@@ -72,6 +72,8 @@ public class FixTaskController {
 
         for (Object[] m : titleCountMaps) {
             String title = (String) m[0];
+            logger.debug(m[1] + "\t:\t" + title);
+
             mergeProducts(title);
 
             if (!"all".equals(counts)) {
@@ -83,7 +85,7 @@ public class FixTaskController {
     }
 
     private void mergeProducts(String title) {
-        logger.debug(title);
+
         List<PtmProduct> products = dbm.query(Q_PRODUCT_BY_TITLE, Arrays.asList(title));
 
         if (!ArrayUtils.hasObjs(products) || products.size() <= 1) {
