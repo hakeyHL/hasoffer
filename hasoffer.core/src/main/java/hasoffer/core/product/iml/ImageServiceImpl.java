@@ -6,6 +6,8 @@ import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.updater.PtmImageUpdater;
 import hasoffer.core.product.IImageService;
 import hasoffer.core.utils.ImageUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -19,6 +21,25 @@ import javax.transaction.Transactional;
 public class ImageServiceImpl implements IImageService {
     @Resource
     IDataBaseManager dbm;
+
+    private Logger logger = LoggerFactory.getLogger(ImageServiceImpl.class);
+
+    @Override
+    public void downloadImage2(PtmImage image) {
+        PtmImageUpdater ptmImageUpdater = new PtmImageUpdater(image.getId());
+
+        try {
+
+            String path = ImageUtil.downloadAndUpload(image.getImageUrl2());
+            ptmImageUpdater.getPo().setPath2(path);
+
+        } catch (Exception e) {
+            logger.error(e.getMessage() + "\t[Image download error]\t" + image.getImageUrl2());
+            ptmImageUpdater.getPo().setErrTimes(image.getErrTimes() + 1);
+        } finally {
+            dbm.update(ptmImageUpdater);
+        }
+    }
 
     @Override
     @Transactional(rollbackOn = Exception.class)
@@ -39,6 +60,7 @@ public class ImageServiceImpl implements IImageService {
 
                 ptmImageUpdater.getPo().setImageUrl(url);
             } catch (Exception e2) {
+                logger.error(e.getMessage() + "\t[Image download error]\t" + image.getImageUrl());
                 ptmImageUpdater.getPo().setErrTimes(image.getErrTimes() + 1);
                 dbm.update(ptmImageUpdater);
                 return false;

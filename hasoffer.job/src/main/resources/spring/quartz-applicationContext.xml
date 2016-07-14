@@ -87,6 +87,14 @@
         <property name="cronExpression" value="0 0/20 * * * ?"/>
     </bean>
 
+    <bean name="imageDownLoadJob2" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.image.Image2DownloadJobBean"/>
+    </bean>
+    <bean id="imageDownLoadTrigger2" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="imageDownLoadJob2"/>
+        <property name="cronExpression" value="0 0/20 * * * ?"/>
+    </bean>
+
     <bean name="skuImageDownLoadJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="hasoffer.job.bean.image.SkuImageDownloadJobBean"/>
     </bean>

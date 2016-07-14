@@ -13,6 +13,7 @@ public interface IImageService {
      */
     boolean downloadImage(PtmImage image);
 
-    void updatePtmProductImagePath(long ptmproductId, String imagePath);
+    void downloadImage2(PtmImage image);
 
+    void updatePtmProductImagePath(long ptmproductId, String imagePath);
 }
