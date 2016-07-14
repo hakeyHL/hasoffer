@@ -15,9 +15,6 @@ import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
-import hasoffer.core.task.ListAndProcessTask2;
-import hasoffer.core.task.worker.IList;
-import hasoffer.core.task.worker.IProcess;
 import hasoffer.core.thd.IThdService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -65,48 +62,6 @@ public class ProductTest {
     private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
 
     private Logger logger = LoggerFactory.getLogger(ProductTest.class);
-
-    //todo
-    @Test
-    public void fixImage() {
-        final String Q_PRODUCT_WEBSITE =
-                "SELECT t FROM PtmProduct t WHERE t.sourceSite='FLIPKART'";
-
-        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<PtmProduct>(
-                new IList<PtmProduct>() {
-                    @Override
-                    public PageableResult getData(int page) {
-                        return dbm.queryPage(Q_PRODUCT_WEBSITE, page, 500);
-                    }
-
-                    @Override
-                    public boolean isRunForever() {
-                        return false;
-                    }
-
-                    @Override
-                    public void setRunForever(boolean runForever) {
-
-                    }
-                },
-                new IProcess<PtmProduct>() {
-                    @Override
-                    public void process(PtmProduct o) {
-                        try {
-                            // update image for product
-                            String sourceUrl = o.getSourceUrl();
-                            // visit flipkart page to get image url
-                            String oriImageUrl = fetchService.fetchFlipkartImageUrl(sourceUrl);
-
-                            productService.updateProductImage2(o.getId(), oriImageUrl);
-
-                        } catch (Exception e) {
-                            logger.debug(e.getMessage() + "\t" + o.getId());
-                        }
-                    }
-                }
-        );
-    }
 
     @Test
     public void testCmpskuSolr() {

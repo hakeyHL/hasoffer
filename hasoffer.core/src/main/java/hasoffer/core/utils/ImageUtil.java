@@ -9,6 +9,7 @@ import hasoffer.base.utils.IDUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmImage;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -166,4 +167,24 @@ public class ImageUtil {
 //        return AppConfig.get(AppConfig.IMAGE_URL_3RD_PREFIX) + _url;
     }
 
+    public static String getImageUrl(PtmImage image) {
+        if (image == null) {
+            return "";
+        } else {
+            // 优先级 - path2 -> imageUrl2 -> path -> imageUrl
+            if (!StringUtils.isEmpty(image.getPath2())) {
+                return getImageUrl(image.getPath2());
+            }
+
+            if (!StringUtils.isEmpty(image.getImageUrl2())) {
+                return getImage3rdUrl(image.getImageUrl2());
+            }
+
+            if (!StringUtils.isEmpty(image.getPath())) {
+                return getImageUrl(image.getPath());
+            }
+
+            return ImageUtil.getImage3rdUrl(image.getImageUrl());
+        }
+    }
 }

@@ -2,6 +2,7 @@ package hasoffer.core.product.iml;
 
 import hasoffer.affiliate.affs.AffiliateFactory;
 import hasoffer.affiliate.affs.IAffiliateProcessor;
+import hasoffer.affiliate.affs.flipkart.FlipkartAffiliateProductProcessor;
 import hasoffer.affiliate.exception.AffiliateAPIException;
 import hasoffer.affiliate.model.AffiliateProduct;
 import hasoffer.base.exception.ContentParseException;
@@ -18,7 +19,7 @@ import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.Product;
 import hasoffer.fetch.model.ProductStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
-import hasoffer.fetch.sites.flipkart.FlipkartSummaryProductProcessor;
+import hasoffer.fetch.sites.flipkart.FlipkartImageProcessor;
 import hasoffer.fetch.sites.snapdeal.SnapdealHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -183,11 +184,22 @@ public class FetchServiceImpl implements IFetchService {
     @Override
     public String fetchFlipkartImageUrl(String url) throws HttpFetchException, ContentParseException {
 
-        FlipkartSummaryProductProcessor productProcessor = new FlipkartSummaryProductProcessor();
+        String sourceId = FlipkartHelper.getSkuIdByUrl(url);
 
-        OriFetchedProduct fetchedProduct = productProcessor.getSummaryProductByUrl(url);
+        FlipkartAffiliateProductProcessor productProcessor = new FlipkartAffiliateProductProcessor();
 
-        return fetchedProduct.getImageUrl();
+        try {
+
+            AffiliateProduct affiliateProduct = productProcessor.getAffiliateProductBySourceId(sourceId);
+
+            return affiliateProduct.getImageUrl();
+
+        } catch (Exception e) {
+
+            return FlipkartImageProcessor.getFlipkartImageUrl(url);
+
+        }
+
     }
 
     private OriFetchedProduct getAffiliateSummaryProduct(Website website, String sourceId) throws AffiliateAPIException, IOException {

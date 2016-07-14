@@ -289,11 +289,7 @@ public class ProductServiceImpl implements IProductService {
         if (ArrayUtils.hasObjs(images)) {
             // 优先从服务器取图片
             for (PtmImage image : images) {
-                if (StringUtils.isEmpty(image.getPath())) {
-                    imageUrls.add(ImageUtil.getImage3rdUrl(image.getImageUrl()));
-                } else {
-                    imageUrls.add(ImageUtil.getImageUrl(image.getPath()));
-                }
+                imageUrls.add(ImageUtil.getImageUrl(image));
             }
         }
 
@@ -310,19 +306,7 @@ public class ProductServiceImpl implements IProductService {
     public String getProductMasterImageUrl(Long id) {
         PtmImage image = getProductMasterImage(id);
 
-        if (image == null) {
-            return "";
-        } else {
-            if (!StringUtils.isEmpty(image.getPath2())) {
-                return ImageUtil.getImageUrl(image.getPath2());
-            }
-
-            if (!StringUtils.isEmpty(image.getPath())) {
-                return ImageUtil.getImageUrl(image.getPath());
-            }
-
-            return ImageUtil.getImage3rdUrl(image.getImageUrl());
-        }
+        return ImageUtil.getImageUrl(image);
     }
 
     @Override
