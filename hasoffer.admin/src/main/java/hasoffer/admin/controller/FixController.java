@@ -119,6 +119,7 @@ public class FixController {
                     @Override
                     public void process(PtmProduct o) {
                         try {
+                            System.out.println(o.getId() + "\t [re load image] " + TimeUtils.now());
                             // update image for product
                             String sourceUrl = o.getSourceUrl();
                             // visit flipkart page to get image url
