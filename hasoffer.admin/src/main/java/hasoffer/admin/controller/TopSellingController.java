@@ -158,10 +158,10 @@ public class TopSellingController {
 //            //更新后需要更新topselling状态
 //            topSellingService.updateTopSellingStatus(topSellingId, TopSellStatus.ONLINE);
 
-//            //编辑的时候注意更新图片清除缓存
-//            String PTMPRODUCT_IMAGE_CACHE_KEY = CACHE_KEY_PRE + "_getProductMasterImageUrl_" + ptmimageid;
-//
-//            cacheService.del(PTMPRODUCT_IMAGE_CACHE_KEY);
+            //编辑的时候注意更新图片清除缓存
+            String PTMPRODUCT_IMAGE_CACHE_KEY = "PRODUCT__listPagedCmpSkus_TopSelling_0 _20";
+
+            cacheService.del(PTMPRODUCT_IMAGE_CACHE_KEY);
         } catch (Exception e) {
             logger.error("image upload fail");
         }
