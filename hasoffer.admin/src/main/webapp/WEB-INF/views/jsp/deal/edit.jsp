@@ -78,7 +78,7 @@
                     </div>
                 </div>
                 <script>
-                    $("#createTime").datepicker({ dateFormat: 'yy-mm-dd' });
+                    $("#createTime").datetimepicker();
                 </script>
 
                 <div class="form-group">
@@ -88,7 +88,7 @@
                     </div>
                 </div>
                 <script>
-                    $("#expireTime").datepicker({ dateFormat: 'yy-mm-dd' });
+                    $("#expireTime").datetimepicker();
                 </script>
 
                 <div class="form-group">
