@@ -37,14 +37,13 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -66,6 +65,9 @@ public class FixController {
 
     private static final String Q_PTMCMPSKU = "SELECT t FROM PtmCmpSku t WHERE t.productId < 100000";
     private static final String Q_INDEX = "SELECT t FROM PtmCmpSkuIndex2 t ORDER BY t.id ASC";
+
+    private final static String Q_TITLE_COUNT = "SELECT t.title,COUNT(t.id) FROM PtmProduct t WHERE t.title is not null GROUP BY t.title HAVING COUNT(t.id) > 1 ORDER BY COUNT(t.id) DESC";
+    private final static String Q_PRODUCT_BY_TITLE = "SELECT t FROM PtmProduct t WHERE t.title = ?0 ORDER BY t.id ASC";
 
     private static Logger logger = LoggerFactory.getLogger(FixController.class);
     @Resource
@@ -90,6 +92,66 @@ public class FixController {
     ICategoryService categoryservice;
     @Resource
     ProductIndexServiceImpl productIndexServiceImpl;
+
+    /**
+     * 修复title相同的product
+     * /fixtask/mergesametitleproduct
+     *
+     * @return
+     */
+    @RequestMapping(value = "/mergesametitleproduct", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String mergesametitleproduct(@RequestParam(defaultValue = "1") String counts) {
+
+        List<Object[]> titleCountMaps = dbm.query(Q_TITLE_COUNT);
+
+        for (Object[] m : titleCountMaps) {
+            String title = (String) m[0];
+            System.out.println(m[1] + "\t:\t" + title);
+
+            mergeProducts(title);
+
+            if (!"all".equals(counts)) {
+                break;
+            }
+        }
+
+        System.out.println("finished.");
+
+        return "ok";
+    }
+
+    private void mergeProducts(String title) {
+
+        List<PtmProduct> products = dbm.query(Q_PRODUCT_BY_TITLE, Arrays.asList(title));
+
+        if (!ArrayUtils.hasObjs(products) || products.size() <= 1) {
+            return;
+        }
+
+        PtmProduct finalProduct = products.get(0);
+
+        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(finalProduct.getId());
+
+        Map<String, PtmCmpSku> cmpSkuMap = new HashMap<String, PtmCmpSku>();
+        for (PtmCmpSku cmpSku : cmpSkus) {
+            if (cmpSku.getWebsite() == null) {
+                // todo 处理
+                continue;
+            }
+            cmpSkuMap.put(cmpSku.getUrl(), cmpSku);
+        }
+
+        // 处理其他 products
+        // cmpsku 合并
+        int size = products.size();
+        System.out.println(String.format("[%s] products would be merged into product[%d].", size, finalProduct.getId()));
+        for (int i = 1; i < size; i++) {
+            searchService.mergeProducts(finalProduct, cmpSkuMap, products.get(i));
+        }
+
+    }
 
     @RequestMapping(value = "/fixImage", method = RequestMethod.GET)
     public
@@ -180,7 +242,7 @@ public class FixController {
     @ResponseBody
     String fixdataproducts() {
 
-        Date date = TimeUtils.stringToDate("2016-05-28 02:37:11", "yyyy-MM-dd HH:mm:ss");
+        Date date = TimeUtils.stringToDate("2016-07-01 21:40:35", "yyyy-MM-dd HH:mm:ss");
 
         final int page = 1, size = 200;
 
