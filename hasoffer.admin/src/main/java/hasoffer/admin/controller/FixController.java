@@ -1302,7 +1302,7 @@ public class FixController {
 
         for (long ptmcategoryId : arrays) {
 
-            System.out.println("start: from [" + ptmcategoryId + "] to" + descPtmcategoryId);
+            System.out.println("start: from [" + ptmcategoryId + "] to [" + descPtmcategoryId + "]");
 
             List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.categoryId = ?0 ", Arrays.asList(ptmcategoryId));
 
@@ -1345,7 +1345,7 @@ public class FixController {
 
         for (long ptmcategoryId : arrays) {
 
-            System.out.println("start: from [" + ptmcategoryId + "] to" + descPtmcategoryId);
+            System.out.println("start: from [" + ptmcategoryId + "] to [" + descPtmcategoryId + "]");
 
             List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.categoryId = ?0 ", Arrays.asList(ptmcategoryId));
 
@@ -1383,11 +1383,11 @@ public class FixController {
 
         long descPtmcategoryId = 233L;
 
-        long[] arrays = {6211L, 38942L, 89041L, 54281L, 3255L, 5371L, 252L, 266L, 14264L, 32928L, 26061L, 8073L, 10715L, 8249L, 12012L, 5083L, 5028L, 11227L, 7753L, 8565L, 32549L, 3128L, 4437L, 25456L, 1117L, 6592L, 6238L, 4593L, 34081L, 58496L, 14453L, 34784L, 8730L};
+        long[] arrays = {280L, 669L, 3301L, 7714L, 13708L, 24412L, 33231L, 40427L, 68735L, 78762L};
 
         for (long ptmcategoryId : arrays) {
 
-            System.out.println("start: from [" + ptmcategoryId + "] to" + descPtmcategoryId);
+            System.out.println("start: from [" + ptmcategoryId + "] to [" + descPtmcategoryId + "]");
 
             List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.categoryId = ?0 ", Arrays.asList(ptmcategoryId));
 
