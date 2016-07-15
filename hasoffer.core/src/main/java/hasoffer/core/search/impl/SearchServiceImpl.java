@@ -201,8 +201,10 @@ public class SearchServiceImpl implements ISearchService {
 
                 float titleScore = ProductAnalysisService.stringMatch(searchLog.getKeyword(), finalProduct.getTitle());
                 if (titleScore < 0.5) {
+                    System.out.println(String.format("delete search log [%s] !!! ", searchLog.getId()));
                     dbm.delete(SrmSearchLog.class, searchLog.getId());
                 } else {
+                    System.out.println(String.format("update search log [%s] ~~~", searchLog.getId()));
                     SrmSearchLogUpdater updater = new SrmSearchLogUpdater(searchLog.getId());
                     updater.getPo().setPtmProductId(finalProduct.getId());
                     dbm.update(updater);
@@ -222,6 +224,8 @@ public class SearchServiceImpl implements ISearchService {
                 if (titleScore < 0.5) {
                     continue;
                 }
+
+                System.out.println(String.format("matched sku [%d] ", cmpSku.getId()));
 
                 PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(cmpSku.getId());
                 updater.getPo().setProductId(finalProduct.getId());
