@@ -1374,4 +1374,44 @@ public class FixController {
 
         return "";
     }
+
+    //fixdata/fixshitcategory497L
+    @RequestMapping(value = "/fixshitcategory497L")
+    @ResponseBody
+    public String fixshitcategory497L() {
+
+        long descPtmcategoryId = 497L;
+
+        long[] arrays = {517L, 558L, 13984L, 25355L, 36633L, 78417L, 98266L, 24047L};
+
+        for (long ptmcategoryId : arrays) {
+
+            List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.categoryId = ?0 ", Arrays.asList(ptmcategoryId));
+
+            for (PtmCmpSku sku : skus) {
+//            更新sku的categoryId
+                cmpSkuService.updateCategoryid(sku.getId(), descPtmcategoryId);
+                PtmProduct product = productService.getProduct(sku.getProductId());
+                if (product == null) {
+                    continue;
+                }
+                //更新对应product的categoryId
+                productService.updateProductCategory(product, descPtmcategoryId);
+
+                System.out.println("skus " + sku.getId());
+                System.out.println("product" + product.getId());
+            }
+
+            PtmCategory category = dbm.querySingle("SELECT t FROM PtmCategory t WHERE t.id = ?0 ", Arrays.asList(ptmcategoryId));
+
+            PtmCategoryUpdater updater = new PtmCategoryUpdater(ptmcategoryId);
+
+            //请这些类目从类目结构中屏蔽掉
+            updater.getPo().setLevel(category.getLevel() + 10);
+
+            dbm.update(updater);
+        }
+
+        return "";
+    }
 }
