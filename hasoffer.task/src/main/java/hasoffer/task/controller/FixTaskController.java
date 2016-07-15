@@ -1,7 +1,6 @@
 package hasoffer.task.controller;
 
 import hasoffer.base.model.HttpResponseModel;
-import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
@@ -96,13 +95,13 @@ public class FixTaskController {
 
         List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(finalProduct.getId());
 
-        Map<Website, PtmCmpSku> cmpSkuMap = new HashMap<Website, PtmCmpSku>();
+        Map<String, PtmCmpSku> cmpSkuMap = new HashMap<String, PtmCmpSku>();
         for (PtmCmpSku cmpSku : cmpSkus) {
             if (cmpSku.getWebsite() == null) {
                 // todo 处理
                 continue;
             }
-            cmpSkuMap.put(cmpSku.getWebsite(), cmpSku);
+            cmpSkuMap.put(cmpSku.getUrl(), cmpSku);
         }
 
         // 处理其他 products
