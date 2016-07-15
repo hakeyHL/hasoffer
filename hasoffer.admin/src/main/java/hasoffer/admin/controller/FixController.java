@@ -1291,11 +1291,54 @@ public class FixController {
         return "";
     }
 
-    @RequestMapping(value = "/fixshitcategory")
+    //fixdata/fixshitcategory4580L
+    @RequestMapping(value = "/fixshitcategory4580L")
     @ResponseBody
-    public String fixshitcategory() {
+    public String fixshitcategory4580L() {
 
-        long ptmcategoryId = 5L;
+        long ptmcategoryId = 4580L;
+
+        List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.categoryId = ?0 ", Arrays.asList(ptmcategoryId));
+
+        for (PtmCmpSku sku : skus) {
+//            更新sku的categoryId
+            cmpSkuService.updateCategoryid(sku.getId(), ptmcategoryId);
+            PtmProduct product = productService.getProduct(sku.getProductId());
+            if (product == null) {
+                continue;
+            }
+            //更新对应product的categoryId
+            productService.updateProductCategory(product, ptmcategoryId);
+
+            System.out.println("skus " + sku.getId());
+            System.out.println("product" + product.getId());
+        }
+
+        //todo 更新完一个后需要将类目释放出来
+
+        PtmCategory category = dbm.querySingle("SELECT t FROM PtmCategory t WHERE t.id = ?0 ", Arrays.asList(ptmcategoryId));
+
+        PtmCategoryUpdater updater = new PtmCategoryUpdater(ptmcategoryId);
+
+        if (category.getLevel() == 20) {
+            updater.getPo().setLevel(2);
+        } else if (category.getLevel() == 30) {
+            updater.getPo().setLevel(3);
+        } else {
+            System.out.println("level error for" + ptmcategoryId);
+        }
+
+        dbm.update(updater);
+
+        return "";
+    }
+
+    //fixdata/fixshitcategory270L
+    @RequestMapping(value = "/fixshitcategory270L")
+    @ResponseBody
+    public String fixshitcategory270L() {
+
+        long ptmcategoryId = 270L;
 
         List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.categoryId = ?0 ", Arrays.asList(ptmcategoryId));
 
