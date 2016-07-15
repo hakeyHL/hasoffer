@@ -77,9 +77,9 @@
                         <input type="text" name="createTime" id="createTime" value="${fn:substring(deal.createTime, 0, 10)}" class="form-control form_datetime"  >
                     </div>
                 </div>
-                <script>
-                    $("#createTime").datetimepicker();
-                </script>
+                <%--<script>--%>
+                <%--$("#createTime").datetimepicker();--%>
+                <%--</script>--%>
 
                 <div class="form-group">
                     <label class="col-sm-3 control-label">失效时间：</label>
@@ -87,9 +87,9 @@
                         <input type="text" name="expireTime" id="expireTime" value="${fn:substring(deal.expireTime, 0, 10)}" class="form-control form_datetime"  >
                     </div>
                 </div>
-                <script>
-                    $("#expireTime").datetimepicker();
-                </script>
+                <%--<script>--%>
+                <%--$("#expireTime").datetimepicker();--%>
+                <%--</script>--%>
 
                 <div class="form-group">
                     <label  class="col-sm-3 control-label">deal描述：</label>
