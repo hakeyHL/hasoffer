@@ -30,6 +30,7 @@ import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import hasoffer.fetch.sites.paytm.PaytmHelper;
 import hasoffer.fetch.sites.shopclues.ShopcluesHelper;
 import jodd.io.FileUtil;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -106,6 +107,8 @@ public class FixController {
 
         List<Object[]> titleCountMaps = dbm.query(Q_TITLE_COUNT);
 
+        int count = 1;
+
         for (Object[] m : titleCountMaps) {
             String title = (String) m[0];
             System.out.println(m[1] + "\t:\t" + title);
@@ -114,7 +117,13 @@ public class FixController {
 
             if (!"all".equals(counts)) {
                 break;
+            } else if (NumberUtils.isNumber(counts)) {
+                int countsInt = Integer.parseInt(counts);
+                if (count >= countsInt) {
+                    break;
+                }
             }
+            count++;
         }
 
         System.out.println("finished.");
