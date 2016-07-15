@@ -158,7 +158,7 @@ public class FixController {
     @ResponseBody
     String fixImage() {
         final String Q_PRODUCT_WEBSITE =
-                "SELECT t FROM PtmProduct t WHERE t.sourceSite='FLIPKART'";
+                "SELECT t FROM PtmProduct t WHERE t.sourceSite='FLIPKART' where t.id > 1740208";
 
         ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<PtmProduct>(
                 new IList<PtmProduct>() {

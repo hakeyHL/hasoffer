@@ -198,9 +198,15 @@ public class SearchServiceImpl implements ISearchService {
         // 所有的searchlog 合并
         if (ArrayUtils.hasObjs(searchLogs)) {
             for (SrmSearchLog searchLog : searchLogs) {
-                SrmSearchLogUpdater updater = new SrmSearchLogUpdater(searchLog.getId());
-                updater.getPo().setPtmProductId(finalProduct.getId());
-                dbm.update(updater);
+
+                float titleScore = ProductAnalysisService.stringMatch(searchLog.getKeyword(), finalProduct.getTitle());
+                if (titleScore < 0.5) {
+                    dbm.delete(SrmSearchLog.class, searchLog.getId());
+                } else {
+                    SrmSearchLogUpdater updater = new SrmSearchLogUpdater(searchLog.getId());
+                    updater.getPo().setPtmProductId(finalProduct.getId());
+                    dbm.update(updater);
+                }
             }
         }
 
@@ -210,6 +216,13 @@ public class SearchServiceImpl implements ISearchService {
             Website website = cmpSku.getWebsite();
             String skuUrl = cmpSku.getUrl();
             if (website != null && !cmpSkuMap.containsKey(skuUrl)) {
+
+                // 对title和price打分
+                float titleScore = ProductAnalysisService.stringMatch(cmpSku.getTitle(), finalProduct.getTitle());
+                if (titleScore < 0.5) {
+                    continue;
+                }
+
                 PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(cmpSku.getId());
                 updater.getPo().setProductId(finalProduct.getId());
                 dbm.update(updater);
