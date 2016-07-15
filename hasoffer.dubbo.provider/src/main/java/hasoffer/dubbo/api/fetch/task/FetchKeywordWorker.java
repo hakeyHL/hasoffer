@@ -69,7 +69,7 @@ public class FetchKeywordWorker implements Runnable {
             List<FetchedProduct> productList = fetchService.getProductSetByKeyword(fetchResult.getWebsite(), keyword, 10);
             fetchResult.setFetchProducts(productList);
             fetchResult.setTaskStatus(TaskStatus.FINISH);
-            logger.info("Fetch Success:website:{}, Key :{}, errMsg:{}", fetchResult.getWebsite(), fetchResult.getKeyword(), fetchResult.getFetchProducts().size());
+            logger.info("Fetch Success:website:{}, Key :{}, success:{}", fetchResult.getWebsite(), fetchResult.getKeyword(), fetchResult.getFetchProducts().size());
         } catch (HttpFetchException e) {
             if (fetchResult.getRunCount() < 5) {
                 fetchResult.setRunCount(fetchResult.getRunCount() + 1);
@@ -78,21 +78,20 @@ public class FetchKeywordWorker implements Runnable {
                 fetchResult.setTaskStatus(TaskStatus.STOPPED);
                 fetchResult.setErrMsg("The task is failed: run over 5 times. ");
                 e.printStackTrace();
-                logger.info("Fetch Fail:website:{}, Key :{}, errMsg:{}", fetchResult.getWebsite(), fetchResult.getKeyword(), fetchResult.getErrMsg());
+                logger.info("Fetch Fail:website:{}, Key :{}, errMsg:{}", fetchResult.getWebsite(), fetchResult.getKeyword(), e);
             }
         } catch (ContentParseException e) {
             fetchResult.setTaskStatus(TaskStatus.STOPPED);
             fetchResult.setErrMsg("The task is failed: content parse failed.");
-            logger.info("Fetch Fail:website:{}, Key :{}, errMsg:{}", fetchResult.getWebsite(), fetchResult.getKeyword(), fetchResult.getErrMsg());
+            logger.info("Fetch Fail:website:{}, Key :{}, errMsg:{}", fetchResult.getWebsite(), fetchResult.getKeyword(), e);
         } catch (UnSupportWebsiteException e) {
             fetchResult.setTaskStatus(TaskStatus.STOPPED);
             fetchResult.setErrMsg("The task is failed: The website is not support.");
-            logger.info("Fetch Fail:website:{}, Key :{}, errMsg:{}", fetchResult.getWebsite(), fetchResult.getKeyword(), fetchResult.getErrMsg());
+            logger.info("Fetch Fail:website:{}, Key :{}, errMsg:{}", fetchResult.getWebsite(), fetchResult.getKeyword(), e);
         } catch (Exception e) {
             fetchResult.setTaskStatus(TaskStatus.STOPPED);
             fetchResult.setErrMsg("Other question.");
-            logger.info("Fetch Fail:website:{}, Key :{}, errMsg:{}", fetchResult.getWebsite(), fetchResult.getKeyword(), fetchResult.getErrMsg());
-            e.printStackTrace();
+            logger.info("Fetch Fail:website:{}, Key :{}, errMsg:{}", fetchResult.getWebsite(), fetchResult.getKeyword(), e);
         }
         fetchCacheService.cacheResult(FetchResult.getCacheKey(fetchResult), fetchResult);
     }
