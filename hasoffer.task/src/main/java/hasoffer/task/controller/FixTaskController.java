@@ -1,8 +1,6 @@
 package hasoffer.task.controller;
 
 import hasoffer.base.model.HttpResponseModel;
-import hasoffer.base.model.Website;
-import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
@@ -21,14 +19,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,9 +34,6 @@ import java.util.concurrent.Executors;
 @Controller
 @RequestMapping(value = "/fixtask")
 public class FixTaskController {
-    private final static String Q_TITLE_COUNT = "SELECT t.title,COUNT(t.id) FROM PtmProduct t WHERE t.title is not null GROUP BY t.title HAVING COUNT(t.id) > 1 ORDER BY COUNT(t.id) DESC";
-
-    private final static String Q_PRODUCT_BY_TITLE = "SELECT t FROM PtmProduct t WHERE t.title = ?0 ORDER BY t.id ASC";
 
     @Resource
     IDataBaseManager dbm;
@@ -56,63 +47,6 @@ public class FixTaskController {
     IProductService productService;
 
     private Logger logger = LoggerFactory.getLogger(FixTaskController.class);
-
-    /**
-     * 修复title相同的product
-     * /fixtask/mergesametitleproduct
-     *
-     * @return
-     */
-    @RequestMapping(value = "/mergesametitleproduct", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String mergesametitleproduct(@RequestParam(defaultValue = "1") String counts) {
-
-        List<Object[]> titleCountMaps = dbm.query(Q_TITLE_COUNT);
-
-        for (Object[] m : titleCountMaps) {
-            String title = (String) m[0];
-            logger.debug(m[1] + "\t:\t" + title);
-
-            mergeProducts(title);
-
-            if (!"all".equals(counts)) {
-                return "ok";
-            }
-        }
-
-        return "ok";
-    }
-
-    private void mergeProducts(String title) {
-
-        List<PtmProduct> products = dbm.query(Q_PRODUCT_BY_TITLE, Arrays.asList(title));
-
-        if (!ArrayUtils.hasObjs(products) || products.size() <= 1) {
-            return;
-        }
-
-        PtmProduct finalProduct = products.get(0);
-
-        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(finalProduct.getId());
-
-        Map<Website, PtmCmpSku> cmpSkuMap = new HashMap<Website, PtmCmpSku>();
-        for (PtmCmpSku cmpSku : cmpSkus) {
-            if (cmpSku.getWebsite() == null) {
-                // todo 处理
-                continue;
-            }
-            cmpSkuMap.put(cmpSku.getWebsite(), cmpSku);
-        }
-
-        // 处理其他 products
-        // cmpsku 合并
-        int size = products.size();
-        for (int i = 1; i < size; i++) {
-            searchService.mergeProducts(finalProduct, cmpSkuMap, products.get(i));
-        }
-
-    }
 
     @RequestMapping(value = "/fixtitlelikedurex", method = RequestMethod.GET)
     public String fixtitlelikedurex() {

@@ -190,29 +190,44 @@ public class SearchServiceImpl implements ISearchService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void mergeProducts(PtmProduct finalProduct, Map<Website, PtmCmpSku> cmpSkuMap, PtmProduct product) {
+    public void mergeProducts(PtmProduct finalProduct, Map<String, PtmCmpSku> cmpSkuMap, PtmProduct product) {
         // 把关联的log转到第一个商品下
         PageableResult<SrmSearchLog> pagedSeachLogs = listSearchLogsByProductId(product.getId(), 1, Integer.MAX_VALUE);
         List<SrmSearchLog> searchLogs = pagedSeachLogs.getData();
 
+        // 所有的searchlog 合并
         if (ArrayUtils.hasObjs(searchLogs)) {
             for (SrmSearchLog searchLog : searchLogs) {
-                SrmSearchLogUpdater updater = new SrmSearchLogUpdater(searchLog.getId());
-                updater.getPo().setPtmProductId(finalProduct.getId());
-                dbm.update(updater);
+
+                float titleScore = ProductAnalysisService.stringMatch(searchLog.getKeyword(), finalProduct.getTitle());
+                if (titleScore < 0.5) {
+                    dbm.delete(SrmSearchLog.class, searchLog.getId());
+                } else {
+                    SrmSearchLogUpdater updater = new SrmSearchLogUpdater(searchLog.getId());
+                    updater.getPo().setPtmProductId(finalProduct.getId());
+                    dbm.update(updater);
+                }
             }
         }
 
+        // 所有的sku合并
         List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(product.getId());
         for (PtmCmpSku cmpSku : cmpSkus) {
             Website website = cmpSku.getWebsite();
-            if (website != null && !cmpSkuMap.containsKey(website)) {
+            String skuUrl = cmpSku.getUrl();
+            if (website != null && !cmpSkuMap.containsKey(skuUrl)) {
+
+                // 对title和price打分
+                float titleScore = ProductAnalysisService.stringMatch(cmpSku.getTitle(), finalProduct.getTitle());
+                if (titleScore < 0.5) {
+                    continue;
+                }
+
                 PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(cmpSku.getId());
                 updater.getPo().setProductId(finalProduct.getId());
                 dbm.update(updater);
-                cmpSkuMap.put(website, cmpSku);
+                cmpSkuMap.put(skuUrl, cmpSku);
             }
-//            dbm.delete(PtmCmpSku.class, cmpSku.getId());
         }
 
         productService.deleteProduct(product.getId());
