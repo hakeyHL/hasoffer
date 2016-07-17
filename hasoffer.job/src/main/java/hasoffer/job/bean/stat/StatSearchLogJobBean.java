@@ -24,7 +24,8 @@ public class StatSearchLogJobBean extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        String ymd = TimeUtils.parse(TimeUtils.today(), "yyyyMMdd");
+//        String ymd = TimeUtils.parse(TimeUtils.today(), "yyyyMMdd");
+        String ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
 
         // 保存所有被搜索过的商品
         searchService.saveSearchCount(ymd);
