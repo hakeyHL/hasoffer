@@ -412,7 +412,16 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         return ptmCmpSku;
     }
 
-    private void importCmpSku2solr(PtmCmpSku ptmCmpSku) {
+    @Override
+    public void importCmpSku2solrByProductId(Long proId) {
+        List<PtmCmpSku> cmpSkus = listCmpSkus(proId);
+        for (PtmCmpSku cmpSku : cmpSkus) {
+            importCmpSku2solr(cmpSku);
+        }
+    }
+
+    public void importCmpSku2solr(PtmCmpSku ptmCmpSku) {
+        logger.debug(String.format("import or update to solr-sku {%d}", ptmCmpSku.getId()));
         cmpskuIndexService.createOrUpdate(new CmpSkuModel(ptmCmpSku));
     }
 

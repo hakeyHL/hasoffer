@@ -1,5 +1,6 @@
 package hasoffer.admin.controller;
 
+import hasoffer.admin.controller.vo.TitleCountVo;
 import hasoffer.admin.worker.*;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.model.PageableResult;
@@ -45,10 +46,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Date : 2016/3/25
@@ -94,6 +92,34 @@ public class FixController {
     @Resource
     ProductIndexServiceImpl productIndexServiceImpl;
 
+    private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
+
+    /**
+     * find title Count queue
+     *
+     * @return
+     */
+    @RequestMapping(value = "/findsametitleproducts", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String findsametitleproducts() {
+
+        if (titleCountQueue.size() > 0) {
+            return "queue size : " + titleCountQueue.size();
+        }
+
+        List<Object[]> titleCountMaps = dbm.query(Q_TITLE_COUNT);
+
+        for (Object[] m : titleCountMaps) {
+            String title = (String) m[0];
+            System.out.println(m[1] + "\t:\t" + title);
+
+            titleCountQueue.add(new TitleCountVo(title, Integer.parseInt(m[1].toString())));
+        }
+
+        return "queue size : " + titleCountQueue.size();
+    }
+
     /**
      * 修复title相同的product
      * /fixtask/mergesametitleproduct
@@ -105,24 +131,22 @@ public class FixController {
     @ResponseBody
     String mergesametitleproduct(@RequestParam(defaultValue = "1") String counts) {
 
-        List<Object[]> titleCountMaps = dbm.query(Q_TITLE_COUNT);
-
         int count = 1;
 
-        for (Object[] m : titleCountMaps) {
-            String title = (String) m[0];
-            System.out.println(m[1] + "\t:\t" + title);
+        TitleCountVo tcv = titleCountQueue.poll();
 
-            mergeProducts(title);
+        while (tcv != null) {
+            System.out.println(tcv.toString());
 
-            if (!"all".equals(counts)) {
-                break;
-            } else if (NumberUtils.isNumber(counts)) {
+            mergeProducts(tcv.getTitle());
+
+            if (NumberUtils.isNumber(counts)) {
                 int countsInt = Integer.parseInt(counts);
                 if (count >= countsInt) {
                     break;
                 }
             }
+
             count++;
         }
 
