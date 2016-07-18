@@ -124,6 +124,11 @@ public class DealController {
         if (!path.equals("")) {
             deal.setImageUrl(path);
         }
+        if (deal.isDisplay()) {
+            if (StringUtils.isEmpty(deal.getPriceDescription()) || StringUtils.isEmpty(deal.getImageUrl())) {
+                return new ModelAndView().addObject("success", false).addObject("msg", "显示在前台时图片和价格描述不能为空");
+            }
+        }
         dealService.updateDeal(deal);
         return new ModelAndView("redirect:/deal/list");
     }
