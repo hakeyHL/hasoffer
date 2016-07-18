@@ -148,6 +148,7 @@ public class FixController {
             }
 
             count++;
+            tcv = titleCountQueue.poll();
         }
 
         System.out.println("finished.");
