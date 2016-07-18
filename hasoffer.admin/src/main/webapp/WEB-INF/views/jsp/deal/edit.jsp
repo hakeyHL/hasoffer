@@ -88,10 +88,10 @@
             <div class="col-sm-7">
 
                 <label class="radio-inline">
-                    <input type="radio" name="display" value="true" id="inlineRadio3"> 显示
+                    <input type="radio" name="display" value="false" id="inlineRadio3"> 显示
                 </label>
                 <label class="radio-inline">
-                    <input type="radio" name="display" value="false" id="inlineRadio4"> 不显示
+                    <input type="radio" name="display" value="true" id="inlineRadio4"> 不显示
                 </label>
 
             </div>
