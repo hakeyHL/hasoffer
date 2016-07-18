@@ -77,13 +77,11 @@ public class DealController {
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
     public ModelAndView detail(@PathVariable(value = "id") Long dealId) {
 
-        final String IMAGE_URL_PREFIX = "http://img1.hasofferimage.com";
-
         ModelAndView mav = new ModelAndView("deal/edit");
         AppDeal deal = dealService.getDealById(dealId);
 
         if (!StringUtils.isEmpty(deal.getImageUrl())) {
-            deal.setImageUrl(IMAGE_URL_PREFIX + deal.getImageUrl());
+            deal.setImageUrl(ImageUtil.getImageUrl(deal.getImageUrl()));
         }
 
         mav.addObject("deal", deal);
@@ -120,7 +118,6 @@ public class DealController {
             banner.setRank(0);
             dealService.addOrUpdateBanner(banner);
         }
-
         deal.setImageUrl(path);
         dealService.updateDeal(deal);
         return new ModelAndView("redirect:/deal/list");

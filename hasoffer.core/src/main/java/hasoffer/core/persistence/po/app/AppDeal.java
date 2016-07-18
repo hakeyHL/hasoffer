@@ -41,7 +41,6 @@ public class AppDeal implements Identifiable<Long> {
     @Column(length = 1024)
     private String priceDescription;//deal价格描述
 
-    @Column(columnDefinition = "0")
     private boolean display;//是否显示
 
     @Override

@@ -27,17 +27,14 @@ import java.util.*;
 public class DealServiceImpl implements IDealService {
 
     private static final long EXPIRE_TIME_MS = 7 * 24 * 60 * 60 * 1000;
-
-    @Resource
-    private HibernateDao dao;
-
+    private static final String IMPORT_SQL = "insert into appdeal(website, title, linkUrl, expireTime, priceDescription , createTime, description, push ,display ,imageUrl) values(?, ?, ?, ?, ?, ? ,?, ?, ?, ?)";
     @Resource
     IDataBaseManager dbm;
 
     @Resource
     ExcelImporter importer;
-
-    private static final String IMPORT_SQL = "insert into appdeal(website, title, linkUrl, expireTime, imageUrl, createTime, description, push) values(?, ?, ?, ?, ?, ? ,?, ?)";
+    @Resource
+    private HibernateDao dao;
 
     @Override
     public PageableResult<AppDeal> findDealList(int page, int size) {
@@ -47,87 +44,91 @@ public class DealServiceImpl implements IDealService {
     @Override
     public Map<String, Object> importExcelFile(MultipartFile multipartFile) throws Exception {
         Map<String, Object> importResult = importer.setImportConfig(new ImportConfig() {
-            @Override
-            public String validation(Workbook xwb) {
-                return null;
-            }
+                                                                        @Override
+                                                                        public String validation(Workbook xwb) {
+                                                                            return null;
+                                                                        }
 
-            @Override
-            public String getImportSQL() {
-                return IMPORT_SQL;
-            }
+                                                                        @Override
+                                                                        public String getImportSQL() {
+                                                                            return IMPORT_SQL;
+                                                                        }
 
-            @Override
-            public List<Object[]> getImportData(HibernateDao dao, List<Object[]> data) {
+                                                                        @Override
+                                                                        public List<Object[]> getImportData(HibernateDao dao, List<Object[]> data) {
 
-                return data;
-            }
+                                                                            return data;
+                                                                        }
 
-            @Override
-            public ImportCallBack getImportCallBack() {
-                return new ImportCallBack() {
-                    @Override
-                    public Map<String, Object> preOperation(HibernateDao dao, List<Object[]> data) {
-                        Map<String, Object> map = new HashMap<String, Object>();
-                        int _nullRows = 0;
-                        int repeatRows = 0;
-                        List<Object[]> dataQueue = new LinkedList<Object[]>();
-                        for (int i = 0; i < data.size(); i++) {
-                            Object[] tempData = new Object[8];
-                            for (int j = 0; j < tempData.length; j++) {
-                                //TODO  网站名/deal名称/deal跳转链接为空 记录日志
-                                if(StringUtils.isBlank(data.get(i)[0] + "") || StringUtils.isBlank(data.get(i)[1] + "") || StringUtils.isBlank(data.get(i)[2] + "")){
-                                    _nullRows ++;
-                                }else{
-                                    System.arraycopy(data.get(i), 0, tempData, 0, data.get(i).length);
-                                }
+                                                                        @Override
+                                                                        public ImportCallBack getImportCallBack() {
+                                                                            return new ImportCallBack() {
+                                                                                @Override
+                                                                                public Map<String, Object> preOperation(HibernateDao dao, List<Object[]> data) {
+                                                                                    Map<String, Object> map = new HashMap<String, Object>();
+                                                                                    int _nullRows = 0;
+                                                                                    int repeatRows = 0;
+                                                                                    List<Object[]> dataQueue = new LinkedList<Object[]>();
+                                                                                    for (int i = 0; i < data.size(); i++) {
+                                                                                        Object[] tempData = new Object[10];
+                                                                                        for (int j = 0; j < tempData.length; j++) {
+                                                                                            //TODO  网站名/deal名称/deal跳转链接为空 记录日志
+                                                                                            if (StringUtils.isBlank(data.get(i)[0] + "") || StringUtils.isBlank(data.get(i)[1] + "") || StringUtils.isBlank(data.get(i)[2] + "")) {
+                                                                                                _nullRows++;
+                                                                                            } else {
+                                                                                                System.arraycopy(data.get(i), 0, tempData, 0, data.get(i).length);
+                                                                                            }
 
-                                if(!StringUtils.isBlank(tempData[0] + "")){
-                                    tempData[0] = tempData[0].toString().toUpperCase();
-                                }
+                                                                                            if (!StringUtils.isBlank(tempData[0] + "")) {
+                                                                                                tempData[0] = tempData[0].toString().toUpperCase();
+                                                                                            }
 
-                                if(StringUtils.isBlank(tempData[3] + "")){
-                                    tempData[3] = TimeUtils.after(EXPIRE_TIME_MS);
-                                }
+                                                                                            if (StringUtils.isBlank(tempData[3] + "")) {
+                                                                                                tempData[3] = TimeUtils.after(EXPIRE_TIME_MS);
+                                                                                            }
 
-                                if(tempData[5] == null || StringUtils.isBlank(tempData[5] + "")){
-                                    tempData[5] = new Date(TimeUtils.now());
-                                }
+                                                                                            if (tempData[5] == null || StringUtils.isBlank(tempData[5] + "")) {
+                                                                                                tempData[5] = new Date(TimeUtils.now());
+                                                                                            }
 
-                                if(tempData[7] == null || StringUtils.isBlank(tempData[7] + "")){
-                                    tempData[7] = 0;
-                                }
+                                                                                            if (tempData[7] == null || StringUtils.isBlank(tempData[7] + "")) {
+                                                                                                tempData[7] = 0;
+                                                                                            }
+
+                                                                                            if (tempData[8] == null || StringUtils.isBlank(tempData[8] + "")) {
+                                                                                                tempData[8] = 0;
+                                                                                            }
 
 
-                                // TODO 重复元素记录日志
-                                for(int k = 0; k < dataQueue.size(); k++){
-                                    if(dataQueue.get(k)[2].equals(tempData[2])){
-                                        repeatRows ++;
-                                        dataQueue.remove(k);
-                                    }
-                                }
-                            }
-                            dataQueue.add(tempData);
-                        }
-                            map.put("_nullRows", _nullRows);
-                            map.put("repeatRows", repeatRows);
-                            map.put("dataQueue", dataQueue);
-                            return map;
-                        }
+                                                                                            // TODO 重复元素记录日志
+                                                                                            for (int k = 0; k < dataQueue.size(); k++) {
+                                                                                                if (dataQueue.get(k)[2].equals(tempData[2])) {
+                                                                                                    repeatRows++;
+                                                                                                    dataQueue.remove(k);
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                        dataQueue.add(tempData);
+                                                                                    }
+                                                                                    map.put("_nullRows", _nullRows);
+                                                                                    map.put("repeatRows", repeatRows);
+                                                                                    map.put("dataQueue", dataQueue);
+                                                                                    return map;
+                                                                                }
 
-                        @Override
-                        public void postOperation (HibernateDao dao, List < Object[]>data){
+                                                                                @Override
+                                                                                public void postOperation(HibernateDao dao, List<Object[]> data) {
 
-                        }
-                    };
+                                                                                }
+                                                                            };
 
-                }
-            }
+                                                                        }
+                                                                    }
 
-            ).importExcelFile(multipartFile);
+        ).importExcelFile(multipartFile);
 
         return importResult;
-        }
+    }
 
     @Override
     public AppDeal getDealById(Long dealId) {
@@ -142,13 +143,13 @@ public class DealServiceImpl implements IDealService {
 
     @Override
     public void delete(Long dealId) {
-        dbm.delete(AppDeal.class , dealId);
+        dbm.delete(AppDeal.class, dealId);
     }
 
     @Override
     public void batchDelete(Long[] ids) {
 
-        dao.updateBySql("delete from appdeal where id in(?)",  Arrays.asList(ids));
+        dao.updateBySql("delete from appdeal where id in(?)", Arrays.asList(ids));
     }
 
     @Override
