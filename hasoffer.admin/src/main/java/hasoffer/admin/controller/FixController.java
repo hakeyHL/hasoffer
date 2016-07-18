@@ -37,10 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.io.File;
@@ -187,18 +184,18 @@ public class FixController {
 
     }
 
-    @RequestMapping(value = "/fixImage", method = RequestMethod.GET)
+    @RequestMapping(value = "/fiximages/{site}", method = RequestMethod.GET)
     public
     @ResponseBody
-    String fixImage() {
+    String fixImage(@PathVariable final String site) {
         final String Q_PRODUCT_WEBSITE =
-                "SELECT t FROM PtmProduct t WHERE t.sourceSite='FLIPKART' and t.id > 1740208";
+                "SELECT t FROM PtmProduct t WHERE t.sourceSite=?0";
 
         ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<PtmProduct>(
                 new IList<PtmProduct>() {
                     @Override
                     public PageableResult getData(int page) {
-                        return dbm.queryPage(Q_PRODUCT_WEBSITE, page, 500);
+                        return dbm.queryPage(Q_PRODUCT_WEBSITE, page, 500, Arrays.asList(site));
                     }
 
                     @Override
@@ -219,7 +216,10 @@ public class FixController {
                             // update image for product
                             String sourceUrl = o.getSourceUrl();
                             // visit flipkart page to get image url
-                            String oriImageUrl = fetchService.fetchFlipkartImageUrl(sourceUrl);
+                            String oriImageUrl = "";
+                            if (Website.FLIPKART.name().equals(site)) {
+                                fetchService.fetchFlipkartImageUrl(sourceUrl);
+                            }
 
                             productService.updateProductImage2(o.getId(), oriImageUrl);
 
