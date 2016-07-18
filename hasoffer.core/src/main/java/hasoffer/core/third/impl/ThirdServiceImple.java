@@ -72,6 +72,7 @@ public class ThirdServiceImple implements ThirdService {
         }
         List dataList = new ArrayList();
         if (sites != null) {
+            logger.error("has sites");
             sb.append(" and t.website=?2 ");
             sb.append(" order by createTime desc  ");
             for (int i = 0; i < sites.size(); i++) {
@@ -86,6 +87,7 @@ public class ThirdServiceImple implements ThirdService {
                 }
             }
         } else {
+            logger.error("no sites");
             sb.append(" order by createTime desc  ");
             List<AppDeal> deals = hdm.query(sb.toString(), Arrays.asList(createTime, new Date()));
             if (deals != null && deals.size() > 0) {
