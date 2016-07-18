@@ -102,7 +102,7 @@ public class FixController {
     @RequestMapping(value = "/findsametitleproducts", method = RequestMethod.GET)
     public
     @ResponseBody
-    String findsametitleproducts() {
+    synchronized String findsametitleproducts() {
 
         if (titleCountQueue.size() > 0) {
             return "queue size : " + titleCountQueue.size();
