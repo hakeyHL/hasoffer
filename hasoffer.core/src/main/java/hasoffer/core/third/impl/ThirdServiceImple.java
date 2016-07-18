@@ -28,7 +28,7 @@ import java.util.List;
  */
 @Service
 public class ThirdServiceImple implements ThirdService {
-    private static String THIRD_GMOBI_DEALS = "SELECT t from AppDeal t where t.createTime <=?0  ";
+    private static String THIRD_GMOBI_DEALS = "SELECT t from AppDeal t where t.createTime <=?0  and t.expireTime >= ?1  ";
     @Resource
     Hibernate4DataBaseManager hdm;
     @Resource
@@ -72,11 +72,13 @@ public class ThirdServiceImple implements ThirdService {
         }
         List dataList = new ArrayList();
         if (sites != null) {
-            sb.append(" and t.website=?1 ");
+            sb.append(" and t.website=?2 ");
+            sb.append(" order by createTime desc  ");
             for (int i = 0; i < sites.size(); i++) {
                 List li = new ArrayList();
                 Website website = Website.valueOf((String) sites.get(i));
                 li.add(createTime);
+                li.add(new Date());
                 li.add(website);
                 List<AppDeal> deals = hdm.query(sb.toString(), li);
                 if (deals != null && deals.size() > 0) {
@@ -84,7 +86,8 @@ public class ThirdServiceImple implements ThirdService {
                 }
             }
         } else {
-            List<AppDeal> deals = hdm.query(sb.toString(), Arrays.asList(createTime));
+            sb.append(" order by createTime desc  ");
+            List<AppDeal> deals = hdm.query(sb.toString(), Arrays.asList(createTime, new Date()));
             if (deals != null && deals.size() > 0) {
                 dataList.addAll(deals);
             }
