@@ -1324,20 +1324,49 @@ public class FixController {
         return "";
     }
 
-    //fixdata/fixshitcategoryKitchenAppliances
-    @RequestMapping(value = "/fixshitcategoryKitchenAppliances")
+    //fixdata/fixshitcategoryLaptops
+    @RequestMapping(value = "/fixshitcategoryLaptops")
     @ResponseBody
-    public String fixshitcategoryKitchenAppliances() {
+    public String fixshitcategoryLaptops() {
 
         Map<Long, String> shitMap = new HashMap<Long, String>();
 
-//        shitMap.put(1988L, "1944,11026,5834");
-        shitMap.put(1708L, "1709,1711,1795,1800,1802,1898,1900,1958,2006,2013,2016,2028,5886,6258,11255,13022,19597,24544,33873,42891,43609,50504,53915,75078");
+        shitMap.put(681L, "76284");
+        shitMap.put(729L, "11667,14698");
+        shitMap.put(1078L, "1079,1090");
 
         for (Map.Entry<Long, String> categoryInfo : shitMap.entrySet()) {
 
             fixCategory(categoryInfo.getKey(), categoryInfo.getValue().split(","));
 
+        }
+
+        return "";
+    }
+
+    //fixdata/fixshitcategoryTablets
+    @RequestMapping(value = "/fixshitcategoryTablets")
+    @ResponseBody
+    public String fixshitcategoryTablets() {
+
+        long ptmcategoryId = 57;
+        String descPtmcategoryId = "57";
+
+        System.out.println("start: from [" + ptmcategoryId + "] to [" + descPtmcategoryId + "]");
+
+        List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.categoryId = ?0 ", Arrays.asList(Long.valueOf(ptmcategoryId)));
+
+        for (PtmCmpSku sku : skus) {
+
+            PtmProduct product = productService.getProduct(sku.getProductId());
+            if (product == null) {
+                continue;
+            }
+            //更新对应product的categoryId
+            productService.updateProductCategory(product, Long.valueOf(ptmcategoryId));
+
+            System.out.println("skus " + sku.getId());
+            System.out.println("product" + product.getId());
         }
 
         return "";
@@ -1352,7 +1381,7 @@ public class FixController {
             List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.categoryId = ?0 ", Arrays.asList(Long.valueOf(ptmcategoryId)));
 
             for (PtmCmpSku sku : skus) {
-//            更新sku的categoryId
+                //更新sku的categoryId
                 cmpSkuService.updateCategoryid(sku.getId(), Long.valueOf(ptmcategoryId));
                 PtmProduct product = productService.getProduct(sku.getProductId());
                 if (product == null) {
