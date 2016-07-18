@@ -1325,14 +1325,14 @@ public class FixController {
         return "";
     }
 
-    //fixdata/fixshitcategorySmall
-    @RequestMapping(value = "/fixshitcategorySmall")
+    //fixdata/fixshitcategoryComputerMore
+    @RequestMapping(value = "/fixshitcategoryComputerMore")
     @ResponseBody
-    public String fixshitcategorySmall() {
+    public String fixshitcategoryComputerMore() {
 
         Map<Long, String> shitMap = new HashMap<Long, String>();
 
-        shitMap.put(102905L, "2186,157,2454,2407,8745,9893,2548,2506,10862,1989,2294,2466,5128");
+        shitMap.put(102906L, "4880,4624,79330,849,6886,894,977,10605,760,66109,2421,6296,1018");
 
         for (Map.Entry<Long, String> categoryInfo : shitMap.entrySet()) {
 
