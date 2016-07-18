@@ -48,7 +48,7 @@
                                                                                                  name="">
 
                             <div class="fileupload-new thumbnail" style="width: 200px; height: 150px;">
-                                <img src="<%=contextPath%>/static/image/no-image.png" alt="" id="image_url">
+                                <img src="${deal.imageUrl}" alt="" id="image_url">
                             </div>
                             <div class="fileupload-preview fileupload-exists thumbnail"
                                  style="max-width: 200px; max-height: 150px; line-height: 20px;"></div>
@@ -88,10 +88,10 @@
             <div class="col-sm-7">
 
                 <label class="radio-inline">
-                    <input type="radio" name="display" value="false" id="inlineRadio3"> 显示
+                    <input type="radio" name="display" value="true" id="inlineRadio3"> 显示
                 </label>
                 <label class="radio-inline">
-                    <input type="radio" name="display" value="true" id="inlineRadio4"> 不显示
+                    <input type="radio" name="display" value="false" id="inlineRadio4"> 不显示
                 </label>
 
             </div>
@@ -133,7 +133,7 @@
             <label class="col-sm-3 control-label">deal描述：</label>
 
             <div class="col-sm-7">
-                <textarea class="form-control" name="description" rows="5" content="${deal.description}">Click "Activate Deal" button.Add the product of your choice to cart.And no coupon code required.</textarea>
+                <textarea class="form-control" name="description" rows="5">${deal.description}</textarea>
             </div>
         </div>
 

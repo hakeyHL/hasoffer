@@ -48,6 +48,9 @@ public class DealController {
     public ModelAndView listDealData(HttpServletRequest request, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "50") int size) {
         ModelAndView mav = new ModelAndView("deal/list");
         PageableResult<AppDeal> pageableResult = dealService.findDealList(page, size);
+        for (AppDeal appDeal : pageableResult.getData()) {
+            appDeal.setImageUrl(ImageUtil.getImageUrl(appDeal.getImageUrl()));
+        }
         mav.addObject("page", PageHelper.getPageModel(request, pageableResult));
         mav.addObject("datas", pageableResult.getData());
         return mav;
@@ -118,7 +121,9 @@ public class DealController {
             banner.setRank(0);
             dealService.addOrUpdateBanner(banner);
         }
-        deal.setImageUrl(path);
+        if (!path.equals("")) {
+            deal.setImageUrl(path);
+        }
         dealService.updateDeal(deal);
         return new ModelAndView("redirect:/deal/list");
     }
