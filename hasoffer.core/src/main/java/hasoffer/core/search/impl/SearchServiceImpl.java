@@ -227,14 +227,25 @@ public class SearchServiceImpl implements ISearchService {
 
                 System.out.println(String.format("matched sku [%d] ", cmpSku.getId()));
 
+                cmpSku.setProductId(finalProduct.getId());
+
+                // 更新mysql
                 PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(cmpSku.getId());
                 updater.getPo().setProductId(finalProduct.getId());
                 dbm.update(updater);
+
+                // 更新solr
+                cmpSkuService.importCmpSku2solr(cmpSku);
+
                 cmpSkuMap.put(skuUrl, cmpSku);
+            } else {
+                cmpSkuService.deleteCmpSku(cmpSku.getId());
             }
         }
 
         productService.deleteProduct(product.getId());
+
+        productService.importProduct2Solr(finalProduct);
     }
 
     @Override
