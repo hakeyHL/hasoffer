@@ -118,6 +118,22 @@ public class AppDeal implements Identifiable<Long> {
         this.push = push;
     }
 
+    public String getPriceDescription() {
+        return priceDescription;
+    }
+
+    public void setPriceDescription(String priceDescription) {
+        this.priceDescription = priceDescription;
+    }
+
+    public boolean isDisplay() {
+        return display;
+    }
+
+    public void setDisplay(boolean display) {
+        this.display = display;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -126,10 +142,13 @@ public class AppDeal implements Identifiable<Long> {
         AppDeal appDeal = (AppDeal) o;
 
         if (push != appDeal.push) return false;
+        if (display != appDeal.display) return false;
         if (id != null ? !id.equals(appDeal.id) : appDeal.id != null) return false;
         if (website != appDeal.website) return false;
         if (title != null ? !title.equals(appDeal.title) : appDeal.title != null) return false;
         if (linkUrl != null ? !linkUrl.equals(appDeal.linkUrl) : appDeal.linkUrl != null) return false;
+        if (priceDescription != null ? !priceDescription.equals(appDeal.priceDescription) : appDeal.priceDescription != null)
+            return false;
         if (imageUrl != null ? !imageUrl.equals(appDeal.imageUrl) : appDeal.imageUrl != null) return false;
         if (createTime != null ? !createTime.equals(appDeal.createTime) : appDeal.createTime != null) return false;
         if (expireTime != null ? !expireTime.equals(appDeal.expireTime) : appDeal.expireTime != null) return false;
@@ -143,10 +162,12 @@ public class AppDeal implements Identifiable<Long> {
         result = 31 * result + (website != null ? website.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (linkUrl != null ? linkUrl.hashCode() : 0);
+        result = 31 * result + (priceDescription != null ? priceDescription.hashCode() : 0);
         result = 31 * result + (imageUrl != null ? imageUrl.hashCode() : 0);
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (expireTime != null ? expireTime.hashCode() : 0);
         result = 31 * result + (push ? 1 : 0);
+        result = 31 * result + (display ? 1 : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         return result;
     }
