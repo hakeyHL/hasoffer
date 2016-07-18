@@ -1307,27 +1307,8 @@ public class FixController {
 
         Map<Long, String> shitMap = new HashMap<Long, String>();
 
-//        shitMap.put(3100L, "3101,74042,85503");
-        shitMap.put(175L, "177,6352,6693,70704");
-
-        for (Map.Entry<Long, String> categoryInfo : shitMap.entrySet()) {
-
-            fixCategory(categoryInfo.getKey(), categoryInfo.getValue().split(","));
-
-        }
-
-        return "";
-    }
-
-    //fixdata/fixshitcategoryTelevisions
-    @RequestMapping(value = "/fixshitcategoryTelevisions")
-    @ResponseBody
-    public String fixshitcategoryTelevisions() {
-
-        Map<Long, String> shitMap = new HashMap<Long, String>();
-
-        shitMap.put(3100L, "3101,74042,85503");
-//        shitMap.put(175L, "177,6352,6693,70704");
+        shitMap.put(304L, "484,985,70449,98866,2409,2410,3120,3121,35052,69907,71359,71360");
+        shitMap.put(305L, "68101");
 
         for (Map.Entry<Long, String> categoryInfo : shitMap.entrySet()) {
 
