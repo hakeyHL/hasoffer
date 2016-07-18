@@ -1337,6 +1337,14 @@ public class FixController {
         Map<Long, String> shitMap = new HashMap<Long, String>();
 
         shitMap.put(102906L, "4880,4624,79330,849,6886,894,977,10605,760,66109,2421,6296,1018");
+        shitMap.put(1078L, "1079,1090");
+        shitMap.put(729L, "11667,14698");
+        shitMap.put(681L, "76284");
+        shitMap.put(1708L, "1709,1711,1795,1800,1802,1898,1900,1958,2006,2013,2016,2028,5886,6258,11255,13022,19597,24544,33873,42891,43609,50504,53915,75078");
+        shitMap.put(102905L, "2186,157,2454,2407,8745,9893,2548,2506,10862,1989,2294,2466,5128");
+        shitMap.put(304L, "484,985,70449,98866,2409,2410,3120,3121,35052,69907,71359,71360");
+        shitMap.put(3100L, "3101,74042,85503");
+        shitMap.put(175L, "177,6352,6693,70704");
 
         for (Map.Entry<Long, String> categoryInfo : shitMap.entrySet()) {
 
@@ -1352,7 +1360,7 @@ public class FixController {
     @ResponseBody
     public String fixshitcategoryTablets() {
 
-        long[] arrays = {1944L, 11026L, 5834L};
+        long[] arrays = {57L, 11026L, 5834L};
 
         for (long ptmcategoryId : arrays) {
 
@@ -1387,13 +1395,13 @@ public class FixController {
 
             for (PtmCmpSku sku : skus) {
                 //更新sku的categoryId
-                cmpSkuService.updateCategoryid(sku.getId(), Long.valueOf(ptmcategoryId));
+                cmpSkuService.updateCategoryid(sku.getId(), Long.valueOf(descPtmcategoryId));
                 PtmProduct product = productService.getProduct(sku.getProductId());
                 if (product == null) {
                     continue;
                 }
                 //更新对应product的categoryId
-                productService.updateProductCategory(product, Long.valueOf(ptmcategoryId));
+                productService.updateProductCategory(product, Long.valueOf(descPtmcategoryId));
 
                 System.out.println("skus " + sku.getId());
                 System.out.println("product" + product.getId());
