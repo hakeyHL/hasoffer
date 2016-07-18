@@ -1324,34 +1324,15 @@ public class FixController {
         return "";
     }
 
-    //fixdata/fixshitcategoryLargeAppliances
-    @RequestMapping(value = "/fixshitcategoryLargeAppliances")
+    //fixdata/fixshitcategoryKitchenAppliances
+    @RequestMapping(value = "/fixshitcategoryKitchenAppliances")
     @ResponseBody
-    public String fixshitcategorySmartWatches() {
-
-        Map<Long, String> shitMap = new HashMap<Long, String>();
-
-        shitMap.put(1988L, "1944,11026,5834");
-//        shitMap.put(102905L, "2186,157,2454,2407,8745,9893,2548,2506,10862,1989,2294,2466,5128");
-
-        for (Map.Entry<Long, String> categoryInfo : shitMap.entrySet()) {
-
-            fixCategory(categoryInfo.getKey(), categoryInfo.getValue().split(","));
-
-        }
-
-        return "";
-    }
-
-    //fixdata/fixshitcategorySmallAppliances
-    @RequestMapping(value = "/fixshitcategorySmallAppliances")
-    @ResponseBody
-    public String fixshitcategorySmallAppliances() {
+    public String fixshitcategoryKitchenAppliances() {
 
         Map<Long, String> shitMap = new HashMap<Long, String>();
 
 //        shitMap.put(1988L, "1944,11026,5834");
-        shitMap.put(102905L, "2186,157,2454,2407,8745,9893,2548,2506,10862,1989,2294,2466,5128");
+        shitMap.put(1708L, "1709,1711,1795,1800,1802,1898,1900,1958,2006,2013,2016,2028,5886,6258,11255,13022,19597,24544,33873,42891,43609,50504,53915,75078");
 
         for (Map.Entry<Long, String> categoryInfo : shitMap.entrySet()) {
 
