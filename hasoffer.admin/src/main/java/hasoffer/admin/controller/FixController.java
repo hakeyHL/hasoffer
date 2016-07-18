@@ -73,7 +73,6 @@ public class FixController {
     private static Logger logger = LoggerFactory.getLogger(FixController.class);
     @Resource
     IProductService productService;
-
     @Resource
     ISearchService searchService;
     @Resource
