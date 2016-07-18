@@ -22,4 +22,8 @@ public interface IFetchService {
 
     String fetchFlipkartImageUrl(String url) throws HttpFetchException, ContentParseException, AffiliateAPIException, IOException;
 
+    String fetchSnapdealImageUrl(String url) throws HttpFetchException, ContentParseException, AffiliateAPIException, IOException;
+
+    String fetchEbayImageUrl(String url) throws HttpFetchException, ContentParseException, AffiliateAPIException, IOException;
+
 }

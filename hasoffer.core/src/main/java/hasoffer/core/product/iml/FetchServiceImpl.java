@@ -3,6 +3,7 @@ package hasoffer.core.product.iml;
 import hasoffer.affiliate.affs.AffiliateFactory;
 import hasoffer.affiliate.affs.IAffiliateProcessor;
 import hasoffer.affiliate.affs.flipkart.FlipkartAffiliateProductProcessor;
+import hasoffer.affiliate.affs.snapdeal.SnapdealProductProcessor;
 import hasoffer.affiliate.exception.AffiliateAPIException;
 import hasoffer.affiliate.model.AffiliateProduct;
 import hasoffer.base.exception.ContentParseException;
@@ -18,9 +19,11 @@ import hasoffer.fetch.helper.WebsiteSummaryProductProcessorFactory;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.Product;
 import hasoffer.fetch.model.ProductStatus;
+import hasoffer.fetch.sites.ebay.EbayImageProcessor;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import hasoffer.fetch.sites.flipkart.FlipkartImageProcessor;
 import hasoffer.fetch.sites.snapdeal.SnapdealHelper;
+import hasoffer.fetch.sites.snapdeal.SnapdealImageProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -200,6 +203,31 @@ public class FetchServiceImpl implements IFetchService {
 
         }
 
+    }
+
+    @Override
+    public String fetchSnapdealImageUrl(String url) throws HttpFetchException, ContentParseException, AffiliateAPIException, IOException {
+        String sourceId = SnapdealHelper.getSkuIdByUrl(url);
+
+        SnapdealProductProcessor productProcessor = new SnapdealProductProcessor();
+
+        try {
+
+            AffiliateProduct affiliateProduct = productProcessor.getAffiliateProductBySourceId(sourceId);
+
+            return affiliateProduct.getImageUrl();
+
+        } catch (Exception e) {
+
+            return SnapdealImageProcessor.getSnapdealImageUrl(url);
+
+        }
+    }
+
+    @Override
+    public String fetchEbayImageUrl(String url) throws HttpFetchException, ContentParseException, AffiliateAPIException, IOException {
+
+        return EbayImageProcessor.getEbayImageUrl(url);
     }
 
     private OriFetchedProduct getAffiliateSummaryProduct(Website website, String sourceId) throws AffiliateAPIException, IOException {
