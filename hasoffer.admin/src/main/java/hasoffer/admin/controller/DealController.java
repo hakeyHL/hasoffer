@@ -124,7 +124,9 @@ public class DealController {
             }
 
             banner.setSourceId(String.valueOf(deal.getId()));
-            banner.setImageUrl(path);
+            if (!file.isEmpty()) {
+                banner.setImageUrl(path);
+            }
             banner.setCreateTime(deal.getCreateTime());
             banner.setLinkUrl(deal.getLinkUrl());
             banner.setBannerFrom(BannerFrom.DEAL);
