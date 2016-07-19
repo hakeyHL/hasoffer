@@ -42,7 +42,7 @@ public class UpdateTopSellingPriceController {
             return "task running.";
         }
 
-        String queryString = "SELECT t FROM PtmTopSelling t ORDER BY t.id DESC";
+        String queryString = "SELECT t FROM PtmTopSelling t ORDER BY t.count DESC";
 
         ExecutorService es = Executors.newCachedThreadPool();
 
