@@ -1,6 +1,7 @@
 package hasoffer.core.product.iml;
 
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
@@ -111,11 +112,23 @@ public class ProductServiceImpl implements IProductService {
         List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ", Arrays.asList(id));
 
         float price = 0.0f;
+        boolean flag = true;
 
         for (int i = 0; i < skus.size(); i++) {
 
-            if (i == 0) {
+            PtmCmpSku sku = skus.get(i);
+            //status
+            if (sku.getStatus() != SkuStatus.ONSALE) {
+                continue;
+            }
+            //price
+            if (sku.getPrice() <= 0) {
+                continue;
+            }
+
+            if (flag) {
                 price = skus.get(i).getPrice();
+                flag = false;
                 continue;
             }
 
@@ -132,6 +145,10 @@ public class ProductServiceImpl implements IProductService {
             updater.getPo().setPrice(price);
 
             dbm.update(updater);
+
+            PtmProduct product = getProduct(id);
+
+            importProduct2Solr(product);
         }
 
     }
