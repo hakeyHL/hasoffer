@@ -350,6 +350,7 @@ public class AppController {
             if (appDeal.getWebsite().name().equals("FLIPKART") || appDeal.getWebsite().name().equals("SHOPCLUES")) {
                 dealVo.setExtra(1.5);
             }
+            dealVo.setExp(appDeal.getExpireTime());
             dealVo.setTitle(appDeal.getTitle());
             dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
             dealVo.setWebsite(appDeal.getWebsite());
