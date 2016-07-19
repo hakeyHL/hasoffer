@@ -138,7 +138,7 @@ public class DealServiceImpl implements IDealService {
 
     @Override
     public AppBanner getBannerByDealId(Long dealId) {
-        return (AppBanner) dbm.querySingle("SELECT t FROM APPBANNER t WHERE t.sourceId = ?0 ", Arrays.asList(dealId.toString()));
+        return (AppBanner) dbm.querySingle("SELECT t FROM AppBanner t WHERE t.sourceId = ?0 ", Arrays.asList(dealId.toString()));
     }
 
     @Override
@@ -154,13 +154,7 @@ public class DealServiceImpl implements IDealService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void createBannner(AppBanner banner) {
-        dbm.create(banner);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateBanner(AppBanner banner) {
+    public void saveOrUpdateBanner(AppBanner banner) {
         dao.save(banner);
     }
 

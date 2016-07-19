@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Date : 2016/1/13
@@ -127,11 +129,21 @@ public class ImageServiceImpl implements IImageService {
     @Transactional(rollbackOn = Exception.class)
     public void updatePtmProductImagePath(long ptmimageid, String imagePath) {
 
-        PtmImageUpdater updater = new PtmImageUpdater(ptmimageid);
+        List<PtmImage> ptmImageList = dbm.query("SELECT t FROM PtmImage t WHERE t.productId = ?0 ", Arrays.asList(ptmimageid));
+
+        if (ptmImageList == null || ptmImageList.size() == 0) {
+            return;
+        }
+        //修改id最小的那个
+
+        PtmImage ptmImage = ptmImageList.get(0);
+
+        PtmImageUpdater updater = new PtmImageUpdater(ptmImage.getId());
 
         updater.getPo().setPath(imagePath);
         updater.getPo().setPath2(imagePath);
 
         dbm.update(updater);
     }
+
 }
