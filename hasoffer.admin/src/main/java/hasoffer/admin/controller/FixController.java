@@ -1335,7 +1335,7 @@ public class FixController {
     public String fixshitcategoryComputerMore() {
 
         Map<Long, String> shitMap = new HashMap<Long, String>();
-
+//        第一次
 //        shitMap.put(102906L, "4880,4624,79330,849,6886,894,977,10605,760,66109,2421,6296,1018");
 //        shitMap.put(1078L, "1079,1090");
 //        shitMap.put(729L, "11667,14698");
@@ -1346,9 +1346,14 @@ public class FixController {
 //        shitMap.put(3100L, "3101,74042,85503");
 //        shitMap.put(175L, "177,6352,6693,70704");
 //        shitMap.put(3182L, "14837,17272,28928");
-        shitMap.put(3207L, "3220,3223,3229,62347");
-        shitMap.put(1142L, "1143,1148,1159,1202,1210,1247,1253,1282,5230,6564,14216");
-        shitMap.put(1401L, "1402,3354,7048,8453,10545,13499,15632,82616");
+
+//        第二次
+//        shitMap.put(3207L, "3220,3223,3229,62347");
+//        shitMap.put(1142L, "1143,1148,1159,1202,1210,1247,1253,1282,5230,6564,14216");
+//        shitMap.put(1401L, "1402,3354,7048,8453,10545,13499,15632,82616");
+
+//        第三次
+//        shitMap.put();
 
         for (Map.Entry<Long, String> categoryInfo : shitMap.entrySet()) {
 
