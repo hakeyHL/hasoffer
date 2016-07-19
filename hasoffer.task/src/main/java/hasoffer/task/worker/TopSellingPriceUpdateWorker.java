@@ -1,8 +1,8 @@
 package hasoffer.task.worker;
 
-import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.product.IProductService;
+import hasoffer.core.redis.ICacheService;
 import hasoffer.core.worker.ListAndProcessWorkerStatus;
 
 import java.util.concurrent.TimeUnit;
@@ -14,12 +14,12 @@ public class TopSellingPriceUpdateWorker implements Runnable {
 
     private IProductService productService;
     private ListAndProcessWorkerStatus<PtmTopSelling> ws;
-    private IDataBaseManager dbm;
+    private ICacheService cacheService;
 
-    public TopSellingPriceUpdateWorker(IDataBaseManager dbm, ListAndProcessWorkerStatus<PtmTopSelling> ws, IProductService productService) {
-        this.dbm = dbm;
+    public TopSellingPriceUpdateWorker(ListAndProcessWorkerStatus<PtmTopSelling> ws, IProductService productService, ICacheService cacheService) {
         this.ws = ws;
         this.productService = productService;
+        this.cacheService = cacheService;
     }
 
     @Override
@@ -38,6 +38,9 @@ public class TopSellingPriceUpdateWorker implements Runnable {
             }
 
             productService.updatePtmProductPrice(topSelling.getId());
+
+            //清除商品的缓存记录
+            cacheService.del("PRODUCT_" + topSelling.getId());
 
             System.out.println("update success for [" + topSelling.getId() + "]");
 
