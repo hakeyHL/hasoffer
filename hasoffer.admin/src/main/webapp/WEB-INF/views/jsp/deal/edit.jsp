@@ -14,7 +14,6 @@
 <div id="page-wrapper">
 
     <div class="col-lg-12" style="margin: 20px"></div>
-
     <form class="form-horizontal" action="<%=contextPath%>/deal/edit" enctype="multipart/form-data" id="form_edit"
           method="post" onsubmit="return dosubmit()">
 
@@ -49,14 +48,16 @@
 
                             <div class="fileupload-new thumbnail" style="width: 200px; height: 150px;">
                                 <img src="${deal.imageUrl}" alt="" id="image_url">
-                                <input name="imageUrl" value="${imagePath}" type="hidden">
+                                <input name="imageUrl" value="${imagePath}" id="imageUrl" type="hidden">
                             </div>
                             <div class="fileupload-preview fileupload-exists thumbnail"
-                                 style="max-width: 200px; max-height: 150px; line-height: 20px;"></div>
+                                 style="max-width: 200px; max-height: 150px; line-height: 20px;"
+                                 id="dealImagePreview"></div>
                             <div>
                                         <span class="btn btn-file"><span class="fileupload-new">选择图片</span>
                                         <span class="fileupload-exists">更换</span>
-                                        <input type="file" class="default" id="upload_img" name="file" img_url="false"></span>
+                                        <input type="file" class="default" id="upload_img" name="dealFile"
+                                               img_url="false"></span>
                             </div>
                         </div>
                     </div>
@@ -68,7 +69,38 @@
             </div>
         </div>
 
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Banner图片：</label>
 
+            <div class="col-sm-7">
+                <div class="control-group">
+                    <div class="controls" style="width: 300px">
+                        <div class="fileupload fileupload-new" data-provides="fileupload"><input type="hidden" value=""
+                                                                                                 name="">
+
+                            <div class="fileupload-new thumbnail" style="width: 200px; height: 150px;">
+                                <img src="${bannerImageUrl}" alt="" name="banner_image_url" id="banner_image_url">
+                                <input name="bannerImageUrl" type="hidden" value="${bannerImageUrl}"
+                                       id="bannerImageUrl">
+                            </div>
+                            <div class="fileupload-preview fileupload-exists thumbnail"
+                                 style="max-width: 200px; max-height: 150px; line-height: 20px;"
+                                 id="bannerImagePreview"></div>
+                            <div>
+                                        <span class="btn btn-file"><span class="fileupload-new">选择图片</span>
+                                        <span class="fileupload-exists">更换</span>
+                                        <input type="file" class="default" id="banner_upload_img" name="bannerFile"
+                                               banner_img_url="false"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="banner_tip_div"
+                         style="margin: 10px; width: 200px; color: rgb(255, 0, 0); display: none; position:absolute;top:60px;left:226px">
+                        请选择图片
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="form-group">
             <label class="col-sm-3 control-label">推送到banner展示：</label>
 
@@ -199,7 +231,6 @@
             $("#upload_img").attr("img_url", true);
             img.attr("src", imgUrl);
         }
-
         inlineRadio2.on("click", function () {
             inlineRadio1.attr("checked", false);
             inlineRadio2.attr("checked", "checked");
@@ -227,27 +258,45 @@
         var inlineRadio3 = $("#inlineRadio3");
         var checked = inlineRadio1.attr("checked");
         var checked3 = inlineRadio3.attr("checked");
+        var dealImagePreviewImg = $("#dealImagePreview img").length;
+        if (dealImagePreviewImg > 0) {
+            $("#upload_img").attr("img_url", true);
+            $("#imageUrl").val("");
+        } else {
+            if ($("#imageUrl").val() != "") {
+                $("#upload_img").attr("img_url", true);
+            } else {
+                $("#upload_img").attr("img_url", false);
+            }
+        }
         if (checked == "checked") {
-            var imgLen = $(".controls img").length;
-            var img = $("#upload_img").attr("img_url");
-            if (img == "false" && imgLen != 2) {
-                $("#tip_div").show();
+            var bannerImagePreviewImg = $("#bannerImagePreview img").length;
+            if (bannerImagePreviewImg > 0) {
+                //已从本地选择图片则清空bannerImageUrl值以传送文件为准
+                $("#bannerImageUrl").val("");
+                $("#banner_upload_img").attr("banner_img_url", true);
+            } else {
+                if ($("#bannerImageUrl").val() != "") {
+                    //有值则默认使用原图
+                    $("#banner_upload_img").attr("banner_img_url", true);
+                } else {
+                    $("#banner_upload_img").attr("banner_img_url", false);
+                }
+            }
+            var img = $("#banner_upload_img").attr("banner_img_url");
+            if (img == "false") {
+                $("#banner_tip_div").show();
                 return false;
             }
         }
-        //如果选择了在前台显示 图片必有,
-        //如果之前有可以不传
-        //价格描述不能为空
         if (checked3 == "checked") {
-            var imgNum = $(".controls img").length;
             var priDesLength = $("#priceDescription").val().length;
             if (priDesLength < 1) {
                 $("#myModal").modal('show');
                 return false;
             }
             var imgurl = $("#upload_img").attr("img_url");
-            if (imgurl == "false" && imgNum != 2) {
-                //之前不存在图片且本次未上传
+            if (imgurl == "false") {
                 $("#tip_div").show();
                 return false;
             }
