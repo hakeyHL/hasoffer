@@ -8,6 +8,7 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICmpSkuService;
+import hasoffer.core.product.IProductService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchUrlResult;
@@ -31,12 +32,14 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
     private ConcurrentLinkedQueue<SrmSearchLog> queue;
     private ICmpSkuService cmpSkuService;
     private IFetchDubboService fetchService;
+    private IProductService productService;
 
-    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<SrmSearchLog> queue, ICmpSkuService cmpSkuService, IFetchDubboService fetchService) {
+    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<SrmSearchLog> queue, ICmpSkuService cmpSkuService, IFetchDubboService fetchService, IProductService productService) {
         this.dbm = dbm;
         this.queue = queue;
         this.cmpSkuService = cmpSkuService;
         this.fetchService = fetchService;
+        this.productService = productService;
     }
 
     @Override
@@ -72,6 +75,10 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             for (PtmCmpSku sku : skuList) {
                 updatePtmCmpSku(sku, searchLog);
             }
+
+            //更新商品的价格
+//            暂时注释掉，测试完再打开
+            productService.updatePtmProductPrice(productId);
         }
     }
 

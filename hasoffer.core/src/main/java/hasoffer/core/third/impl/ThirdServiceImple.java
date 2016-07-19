@@ -10,6 +10,7 @@ import hasoffer.core.persistence.dbm.Hibernate4DataBaseManager;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.product.iml.CmpSkuServiceImpl;
 import hasoffer.core.third.ThirdService;
+import hasoffer.core.utils.ImageUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,12 +118,15 @@ public class ThirdServiceImple implements ThirdService {
         PropertyFilter propertyFilter = new PropertyFilter() {
             @Override
             public boolean apply(Object o, String s, Object o1) {
-                if (s.equals("push")) {
+                if (s.equals("push") || s.equals("display")) {
                     return false;
                 }
                 return true;
             }
         };
+        for (AppDeal appDeal : (List<AppDeal>) dataList) {
+            appDeal.setImageUrl(ImageUtil.getImageUrl(appDeal.getImageUrl()));
+        }
         resJson.put("deals", dataList);
         resJson.put("errorCode", "00000");
         resJson.put("msg", "ok");

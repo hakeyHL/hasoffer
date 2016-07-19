@@ -14,7 +14,6 @@
 <div id="page-wrapper">
 
     <div class="col-lg-12" style="margin: 20px"></div>
-
     <form class="form-horizontal" action="<%=contextPath%>/deal/edit" enctype="multipart/form-data" id="form_edit"
           method="post" onsubmit="return dosubmit()">
 
@@ -49,13 +48,16 @@
 
                             <div class="fileupload-new thumbnail" style="width: 200px; height: 150px;">
                                 <img src="${deal.imageUrl}" alt="" id="image_url">
+                                <input name="imageUrl" value="${imagePath}" id="imageUrl" type="hidden">
                             </div>
                             <div class="fileupload-preview fileupload-exists thumbnail"
-                                 style="max-width: 200px; max-height: 150px; line-height: 20px;"></div>
+                                 style="max-width: 200px; max-height: 150px; line-height: 20px;"
+                                 id="dealImagePreview"></div>
                             <div>
                                         <span class="btn btn-file"><span class="fileupload-new">选择图片</span>
                                         <span class="fileupload-exists">更换</span>
-                                        <input type="file" class="default" id="upload_img" name="file" img_url="false"></span>
+                                        <input type="file" class="default" id="upload_img" name="dealFile"
+                                               img_url="false"></span>
                             </div>
                         </div>
                     </div>
@@ -67,7 +69,38 @@
             </div>
         </div>
 
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Banner图片：</label>
 
+            <div class="col-sm-7">
+                <div class="control-group">
+                    <div class="controls" style="width: 300px">
+                        <div class="fileupload fileupload-new" data-provides="fileupload"><input type="hidden" value=""
+                                                                                                 name="">
+
+                            <div class="fileupload-new thumbnail" style="width: 200px; height: 150px;">
+                                <img src="${bannerImageUrl}" alt="" name="banner_image_url" id="banner_image_url">
+                                <input name="bannerImageUrl" type="hidden" value="${bannerImageUrl}"
+                                       id="bannerImageUrl">
+                            </div>
+                            <div class="fileupload-preview fileupload-exists thumbnail"
+                                 style="max-width: 200px; max-height: 150px; line-height: 20px;"
+                                 id="bannerImagePreview"></div>
+                            <div>
+                                        <span class="btn btn-file"><span class="fileupload-new">选择图片</span>
+                                        <span class="fileupload-exists">更换</span>
+                                        <input type="file" class="default" id="banner_upload_img" name="bannerFile"
+                                               banner_img_url="false"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="banner_tip_div"
+                         style="margin: 10px; width: 200px; color: rgb(255, 0, 0); display: none; position:absolute;top:60px;left:226px">
+                        请选择图片
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="form-group">
             <label class="col-sm-3 control-label">推送到banner展示：</label>
 
@@ -124,16 +157,17 @@
             <label class="col-sm-3 control-label">价格描述：</label>
 
             <div class="col-sm-7">
-                <textarea class="form-control" name="priceDescription" rows="5"
-                          content="${deal.priceDescription}"></textarea>
+                <textarea class="form-control" id="priceDescription" name="priceDescription"
+                          rows="5">${deal.priceDescription}</textarea>
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" hidden="hidden">
             <label class="col-sm-3 control-label">deal描述：</label>
 
             <div class="col-sm-7">
-                <textarea class="form-control" name="description" rows="5">${deal.description}</textarea>
+                <textarea class="form-control" name="description"
+                          rows="5">${deal.description}</textarea>
             </div>
         </div>
 
@@ -147,7 +181,30 @@
 
 
 </div>
-
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    提示消息:
+                </h4>
+            </div>
+            <div class="modal-body">
+                当Deal设置为前台显示时价格描述不能为空 !
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary"
+                        data-dismiss="modal">关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
 
     $().ready(function () {
@@ -175,7 +232,6 @@
             $("#upload_img").attr("img_url", true);
             img.attr("src", imgUrl);
         }
-
         inlineRadio2.on("click", function () {
             inlineRadio1.attr("checked", false);
             inlineRadio2.attr("checked", "checked");
@@ -200,16 +256,52 @@
 
     function dosubmit() {
         var inlineRadio1 = $("#inlineRadio1");
+        var inlineRadio3 = $("#inlineRadio3");
         var checked = inlineRadio1.attr("checked");
+        var checked3 = inlineRadio3.attr("checked");
+        var dealImagePreviewImg = $("#dealImagePreview img").length;
+        if (dealImagePreviewImg > 0) {
+            $("#upload_img").attr("img_url", true);
+            $("#imageUrl").val("");
+        } else {
+            if ($("#imageUrl").val() != "") {
+                $("#upload_img").attr("img_url", true);
+            } else {
+                $("#upload_img").attr("img_url", false);
+            }
+        }
         if (checked == "checked") {
-            var imgLen = $(".controls img").length;
-            var img = $("#upload_img").attr("img_url");
-            if (img == "false" && imgLen != 2) {
+            var bannerImagePreviewImg = $("#bannerImagePreview img").length;
+            if (bannerImagePreviewImg > 0) {
+                //已从本地选择图片则清空bannerImageUrl值以传送文件为准
+                $("#bannerImageUrl").val("");
+                $("#banner_upload_img").attr("banner_img_url", true);
+            } else {
+                if ($("#bannerImageUrl").val() != "") {
+                    //有值则默认使用原图
+                    $("#banner_upload_img").attr("banner_img_url", true);
+                } else {
+                    $("#banner_upload_img").attr("banner_img_url", false);
+                }
+            }
+            var img = $("#banner_upload_img").attr("banner_img_url");
+            if (img == "false") {
+                $("#banner_tip_div").show();
+                return false;
+            }
+        }
+        if (checked3 == "checked") {
+            var priDesLength = $("#priceDescription").val().length;
+            if (priDesLength < 1) {
+                $("#myModal").modal('show');
+                return false;
+            }
+            var imgurl = $("#upload_img").attr("img_url");
+            if (imgurl == "false") {
                 $("#tip_div").show();
                 return false;
             }
         }
-
         var button_submit = $("#button_submit");
         button_submit.attr("disabled", true);
         return true;

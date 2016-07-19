@@ -21,7 +21,7 @@ public interface IDealService {
 
     AppBanner getBannerByDealId(Long dealId);
 
-    void addOrUpdateBanner(AppBanner banner);
+    void saveOrUpdateBanner(AppBanner banner);
 
     void updateDeal(AppDeal deal);
 

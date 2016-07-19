@@ -18,6 +18,15 @@ public class DealVo {
     private String link;
     private String logoUrl;
     private Website website;
+    private String priceDescription;
+
+    public String getPriceDescription() {
+        return priceDescription;
+    }
+
+    public void setPriceDescription(String priceDescription) {
+        this.priceDescription = priceDescription;
+    }
 
     public Website getWebsite() {
         return website;

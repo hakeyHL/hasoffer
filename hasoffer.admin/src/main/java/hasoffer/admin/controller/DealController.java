@@ -83,8 +83,17 @@ public class DealController {
         ModelAndView mav = new ModelAndView("deal/edit");
         AppDeal deal = dealService.getDealById(dealId);
 
+        mav.addObject("imagePath", deal.getImageUrl());
+
         if (!StringUtils.isEmpty(deal.getImageUrl())) {
             deal.setImageUrl(ImageUtil.getImageUrl(deal.getImageUrl()));
+        }
+
+        if (deal.isPush() == true) {
+            AppBanner appBanner = dealService.getBannerByDealId(dealId);
+            if (!StringUtils.isEmpty(appBanner.getImageUrl())) {
+                mav.addObject("bannerImageUrl", ImageUtil.getImageUrl(appBanner.getImageUrl()));
+            }
         }
 
         mav.addObject("deal", deal);
@@ -92,42 +101,56 @@ public class DealController {
     }
 
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
-    public ModelAndView edit(AppDeal deal, MultipartFile file) throws IOException {
+    public ModelAndView edit(AppDeal deal, MultipartFile dealFile, MultipartFile bannerFile, String bannerImageUrl) throws IOException {
+        String dealPath = "";
+        if (StringUtils.isEmpty(bannerImageUrl)) {
+            //修改了图片
+            if (!bannerFile.isEmpty()) {
+                File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
+                FileUtil.writeBytes(imageFile, bannerFile.getBytes());
+                try {
+                    bannerImageUrl = ImageUtil.uploadImage(imageFile);
+                } catch (Exception e) {
+                    logger.error("banner image upload fail");
+                }
+            }
+        }
+        if (StringUtils.isEmpty(deal.getImageUrl())) {
 
-        //上传图片, 暂支持单个
-        String path = "";
-        if (!file.isEmpty()) {
-            File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
-            FileUtil.writeBytes(imageFile, file.getBytes());
-            try {
-                path = ImageUtil.uploadImage(imageFile);
-            } catch (Exception e) {
-                logger.error("image upload fail");
+            if (!dealFile.isEmpty()) {
+                File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
+                FileUtil.writeBytes(imageFile, dealFile.getBytes());
+                try {
+                    dealPath = ImageUtil.uploadImage(imageFile);
+                } catch (Exception e) {
+                    logger.error("deal image upload fail");
+                }
             }
         }
 
         //推送至banner展示则点击保存时除deal信息外 创建一条banner数据 banner的生效、失效时间、banner图片与此deal相同 banner的rank为默认值
         if (deal.isPush()) {
             AppBanner banner = dealService.getBannerByDealId(deal.getId());
+
             if (banner == null) {
                 banner = new AppBanner();
             }
+
             banner.setSourceId(String.valueOf(deal.getId()));
-            banner.setImageUrl(path);
+            if (!bannerFile.isEmpty()) {
+                banner.setImageUrl(bannerImageUrl);
+            }
             banner.setCreateTime(deal.getCreateTime());
             banner.setLinkUrl(deal.getLinkUrl());
             banner.setBannerFrom(BannerFrom.DEAL);
             banner.setDeadline(deal.getExpireTime());
             banner.setRank(0);
-            dealService.addOrUpdateBanner(banner);
+
+            dealService.saveOrUpdateBanner(banner);
+
         }
-        if (!path.equals("")) {
-            deal.setImageUrl(path);
-        }
-        if (deal.isDisplay()) {
-            if (StringUtils.isEmpty(deal.getPriceDescription()) || StringUtils.isEmpty(deal.getImageUrl())) {
-                return new ModelAndView().addObject("success", false).addObject("msg", "显示在前台时图片和价格描述不能为空");
-            }
+        if (!dealPath.equals("")) {
+            deal.setImageUrl(dealPath);
         }
         dealService.updateDeal(deal);
         return new ModelAndView("redirect:/deal/list");
