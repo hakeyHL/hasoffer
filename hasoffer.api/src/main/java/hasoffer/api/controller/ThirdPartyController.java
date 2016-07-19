@@ -6,6 +6,7 @@ import org.hibernate.annotations.common.util.impl.LoggerFactory;
 import org.jboss.logging.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +29,7 @@ public class ThirdPartyController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/api/deals")
+    @RequestMapping(value = "/api/deals", method = RequestMethod.POST)
     public String config(HttpServletRequest request, HttpServletResponse response) {
         String acceptjson = Httphelper.getJsonFromRequest(request);
         logger.info("accept content is " + acceptjson);
