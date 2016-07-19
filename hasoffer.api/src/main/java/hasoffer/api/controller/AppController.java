@@ -332,14 +332,8 @@ public class AppController {
      * @return
      */
     @RequestMapping(value = "/deals", method = RequestMethod.GET)
-    public ModelAndView deals(String page, String pageSize) {
+    public ModelAndView deals(@RequestParam(defaultValue = "0") String page, @RequestParam(defaultValue = "20") String pageSize) {
         ModelAndView mv = new ModelAndView();
-        if (StringUtils.isEmpty(page)) {
-            page = "0";
-        }
-        if (StringUtils.isEmpty(pageSize)) {
-            pageSize = "20";
-        }
         PageableResult Result = appService.getDeals(Long.valueOf(page), Long.valueOf(pageSize));
         Map map = new HashMap();
         List li = new ArrayList();
@@ -347,17 +341,12 @@ public class AppController {
         for (AppDeal appDeal : deals) {
             DealVo dealVo = new DealVo();
             dealVo.setId(appDeal.getId());
-            dealVo.setExp(appDeal.getExpireTime());
-            dealVo.setExtra(0.0);
-            if (appDeal.getWebsite() == Website.FLIPKART || appDeal.getWebsite() == Website.SHOPCLUES) {
-                dealVo.setExtra(1.5);
-            }
             dealVo.setImage(appDeal.getImageUrl() == null ? "" : ImageUtil.getImageUrl(appDeal.getImageUrl()));
             String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
             DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
             dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
             dealVo.setTitle(appDeal.getTitle());
-            dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+            dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
             dealVo.setWebsite(appDeal.getWebsite());
             li.add(dealVo);
         }

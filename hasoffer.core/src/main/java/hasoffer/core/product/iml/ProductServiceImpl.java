@@ -1,6 +1,7 @@
 package hasoffer.core.product.iml;
 
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
@@ -102,6 +103,55 @@ public class ProductServiceImpl implements IProductService {
             imageUpdater.getPo().setImageUrl2(oriImageUrl);
             dbm.update(imageUpdater);
         }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updatePtmProductPrice(long id) {
+
+        List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ", Arrays.asList(id));
+
+        float price = 0.0f;
+        boolean flag = true;
+
+        for (int i = 0; i < skus.size(); i++) {
+
+            PtmCmpSku sku = skus.get(i);
+            //status
+            if (sku.getStatus() != SkuStatus.ONSALE) {
+                continue;
+            }
+            //price
+            if (sku.getPrice() <= 0) {
+                continue;
+            }
+
+            if (flag) {
+                price = skus.get(i).getPrice();
+                flag = false;
+                continue;
+            }
+
+            if (skus.get(i).getPrice() < price) {
+                price = skus.get(i).getPrice();
+            }
+
+        }
+
+        if (price != 0) {
+
+            PtmProductUpdater updater = new PtmProductUpdater(id);
+
+            updater.getPo().setPrice(price);
+
+            dbm.update(updater);
+
+            PtmProduct product = getProduct(id);
+            product.setPrice(price);
+
+            importProduct2Solr(product);
+        }
+
     }
 
     @Override

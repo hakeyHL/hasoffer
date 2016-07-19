@@ -83,8 +83,17 @@ public class DealController {
         ModelAndView mav = new ModelAndView("deal/edit");
         AppDeal deal = dealService.getDealById(dealId);
 
+        mav.addObject("imagePath", deal.getImageUrl());
+
         if (!StringUtils.isEmpty(deal.getImageUrl())) {
             deal.setImageUrl(ImageUtil.getImageUrl(deal.getImageUrl()));
+        }
+
+        if (deal.isPush() == true) {
+            AppBanner appBanner = dealService.getBannerByDealId(dealId);
+            if (!StringUtils.isEmpty(appBanner.getImageUrl())) {
+                deal.setImageUrl(ImageUtil.getImageUrl(appBanner.getImageUrl()));
+            }
         }
 
         mav.addObject("deal", deal);
@@ -109,9 +118,11 @@ public class DealController {
         //推送至banner展示则点击保存时除deal信息外 创建一条banner数据 banner的生效、失效时间、banner图片与此deal相同 banner的rank为默认值
         if (deal.isPush()) {
             AppBanner banner = dealService.getBannerByDealId(deal.getId());
+
             if (banner == null) {
                 banner = new AppBanner();
             }
+
             banner.setSourceId(String.valueOf(deal.getId()));
             banner.setImageUrl(path);
             banner.setCreateTime(deal.getCreateTime());
@@ -119,7 +130,9 @@ public class DealController {
             banner.setBannerFrom(BannerFrom.DEAL);
             banner.setDeadline(deal.getExpireTime());
             banner.setRank(0);
-            dealService.addOrUpdateBanner(banner);
+
+            dealService.saveOrUpdateBanner(banner);
+
         }
         if (!path.equals("")) {
             deal.setImageUrl(path);
