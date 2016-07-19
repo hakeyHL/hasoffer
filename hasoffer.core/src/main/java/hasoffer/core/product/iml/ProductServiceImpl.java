@@ -147,6 +147,10 @@ public class ProductServiceImpl implements IProductService {
             dbm.update(updater);
 
             PtmProduct product = getProduct(id);
+            if (product == null) {
+                return;
+            }
+
             product.setPrice(price);
 
             importProduct2Solr(product);

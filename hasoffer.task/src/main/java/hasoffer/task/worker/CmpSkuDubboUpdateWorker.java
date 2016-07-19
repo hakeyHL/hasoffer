@@ -78,7 +78,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
             //更新商品的价格
 //            暂时注释掉，测试完再打开
-//            productService.updatePtmProductPrice(productId);
+            productService.updatePtmProductPrice(productId);
         }
     }
 

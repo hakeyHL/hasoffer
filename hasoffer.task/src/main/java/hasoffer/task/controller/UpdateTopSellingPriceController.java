@@ -3,6 +3,7 @@ package hasoffer.task.controller;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.product.IProductService;
+import hasoffer.core.redis.ICacheService;
 import hasoffer.core.worker.ListAndProcessWorkerStatus;
 import hasoffer.task.worker.MysqlListWorker;
 import hasoffer.task.worker.TopSellingPriceUpdateWorker;
@@ -28,6 +29,8 @@ public class UpdateTopSellingPriceController {
     @Resource
     IProductService productService;
     @Resource
+    ICacheService cacheService;
+    @Resource
     IDataBaseManager dbm;
 
     //updatetopselling/start
@@ -39,7 +42,7 @@ public class UpdateTopSellingPriceController {
             return "task running.";
         }
 
-        String queryString = "SELECT t FROM PtmTopSelling t ORDER BY t.id DESC";
+        String queryString = "SELECT t FROM PtmTopSelling t ORDER BY t.count DESC";
 
         ExecutorService es = Executors.newCachedThreadPool();
 
@@ -48,7 +51,7 @@ public class UpdateTopSellingPriceController {
         es.execute(new MysqlListWorker<PtmTopSelling>(queryString, ws, dbm));
 
         for (int i = 0; i < 2; i++) {
-            es.execute(new TopSellingPriceUpdateWorker(dbm, ws, productService));
+            es.execute(new TopSellingPriceUpdateWorker(ws, productService, cacheService));
         }
 
         taskRunning1.set(true);
