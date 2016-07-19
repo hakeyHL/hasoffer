@@ -8,6 +8,8 @@ import hasoffer.core.persistence.mongo.StatHijackFetch;
 import hasoffer.core.persistence.mongo.StatHijackFetchCount;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.quartz.QuartzJobBean;
@@ -20,51 +22,67 @@ import java.util.List;
 
 public class StatHijackFetchJobBean extends QuartzJobBean {
 
+    private static Logger logger = LoggerFactory.getLogger(StatHijackFetchJobBean.class);
+
     @Resource
     IMongoDbManager mdm;
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        //4.劫持失败数
-        List<Website> websiteList = new ArrayList<Website>();
-        websiteList.add(Website.FLIPKART);
-        websiteList.add(Website.SNAPDEAL);
-        websiteList.add(Website.SHOPCLUES);
 
-        String todayString = TimeUtils.parse(TimeUtils.today(), "yyyyMMdd");//20160530
+        try {
 
-        for (Website website : websiteList) {
+            //4.劫持失败数
+            List<Website> websiteList = new ArrayList<Website>();
+            websiteList.add(Website.FLIPKART);
+            websiteList.add(Website.SNAPDEAL);
+            websiteList.add(Website.SHOPCLUES);
 
-            String id = HexDigestUtil.md5(website.name() + todayString); //1.当日零点做为id
+            String todayString = TimeUtils.parse(TimeUtils.today(), "yyyyMMdd");//20160530
 
-            long totalAmount = getTotalAmount(website); //2.StatHijackFetch中当天的数据的总数作为当体应劫持总数
-            long statusSuccessAmount = getStatusSuccessAmount(website);//3.劫持成功数
-            long noIndexAmount = getNoIndexAmount(website);  //6.未收录--no_index
-            long differentUrlAmount = getDifferentUrlAmount(website);//5.因重名失败——different_url
-            long noIndexSuccessAmount = getNoIndexSuccessAmount(website);//7.no_index   result:success
-            long noIndexFailAmount = getNoIndexFailAmount(website); //8.no_index   result:fail
+            for (Website website : websiteList) {
 
-            StatHijackFetchCount countObject = new StatHijackFetchCount();
+                String id = HexDigestUtil.md5(website.name() + todayString); //1.当日零点做为id
 
-            countObject.setId(id);
-            countObject.setWebsite(website);
-            try {
-                Date date = TimeUtils.parse(TimeUtils.parse(TimeUtils.today(), "yyyy-MM-dd"));
-                countObject.setDate(date);
-            } catch (ParseException e) {
+                long totalAmount = getTotalAmount(website); //2.StatHijackFetch中当天的数据的总数作为当体应劫持总数
+                logger.debug("getTotalAmount");
+                long statusSuccessAmount = getStatusSuccessAmount(website);//3.劫持成功数
+                logger.debug("getStatusSuccessAmount");
+                long noIndexAmount = getNoIndexAmount(website);  //6.未收录--no_index
+                logger.debug("getNoIndexAmount");
+                long differentUrlAmount = getDifferentUrlAmount(website);//5.因重名失败——different_url
+                logger.debug("getDifferentUrlAmount");
+                long noIndexSuccessAmount = getNoIndexSuccessAmount(website);//7.no_index   result:success
+                logger.debug("getNoIndexSuccessAmount");
+                long noIndexFailAmount = getNoIndexFailAmount(website); //8.no_index   result:fail
+                logger.debug("getNoIndexFailAmount");
 
+                StatHijackFetchCount countObject = new StatHijackFetchCount();
+
+                countObject.setId(id);
+                countObject.setWebsite(website);
+                try {
+                    Date date = TimeUtils.parse(TimeUtils.parse(TimeUtils.today(), "yyyy-MM-dd"));
+                    countObject.setDate(date);
+                } catch (ParseException e) {
+
+                }
+                countObject.setUpdateTime(TimeUtils.now());
+
+                countObject.setTotalAmount(totalAmount);
+                countObject.setStatusSuccessAmount(statusSuccessAmount);
+                countObject.setNoIndexAmount(noIndexAmount);
+                countObject.setDifferentUrlAmount(differentUrlAmount);
+                countObject.setNoIndexSuccessAmount(noIndexSuccessAmount);
+                countObject.setNoIndexFailAmount(noIndexFailAmount);
+                countObject.setStatusFailAmount(differentUrlAmount + noIndexAmount);
+
+                mdm.save(countObject);
             }
-            countObject.setUpdateTime(TimeUtils.now());
 
-            countObject.setTotalAmount(totalAmount);
-            countObject.setStatusSuccessAmount(statusSuccessAmount);
-            countObject.setNoIndexAmount(noIndexAmount);
-            countObject.setDifferentUrlAmount(differentUrlAmount);
-            countObject.setNoIndexSuccessAmount(noIndexSuccessAmount);
-            countObject.setNoIndexFailAmount(noIndexFailAmount);
-            countObject.setStatusFailAmount(differentUrlAmount + noIndexAmount);
-
-            mdm.save(countObject);
+        } catch (Exception e) {
+            logger.debug("StatHijackFetchCount:任务失败,   DATE:" + new Date() + ":具体如下");
+            logger.debug(e.toString());
         }
     }
 
