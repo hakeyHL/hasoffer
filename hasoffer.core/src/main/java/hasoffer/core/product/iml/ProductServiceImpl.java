@@ -147,6 +147,7 @@ public class ProductServiceImpl implements IProductService {
             dbm.update(updater);
 
             PtmProduct product = getProduct(id);
+            product.setPrice(price);
 
             importProduct2Solr(product);
         }
