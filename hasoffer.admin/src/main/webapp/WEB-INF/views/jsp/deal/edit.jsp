@@ -166,7 +166,14 @@
             <label class="col-sm-3 control-label">deal描述：</label>
 
             <div class="col-sm-7">
-                <textarea class="form-control" name="description" rows="5">${deal.description}</textarea>
+                <textarea class="form-control" content="%s is offering %s\n" +
+                "Steps to order the item at %s website:\n" +
+                "1. First, visit the offer page at %s.\n" +
+                "2. Select your product according to the item variety.\n" +
+                "3. Then click on Buy Now option.\n" +
+                "4. Sign in/ Sign up at %s and fill up your address.\n" +
+                "5. Choose your payment option and make payment your cart value." name="description"
+                rows="5">${deal.description}</textarea>
             </div>
         </div>
 
