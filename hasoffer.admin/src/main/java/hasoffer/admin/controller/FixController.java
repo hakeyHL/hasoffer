@@ -1358,6 +1358,8 @@ public class FixController {
         shitMap.put(4758L, "4759,4788,4994,5678,5691,7574,8209,13566,102801,102824");
         shitMap.put(4641L, "4642,4774,4832,5237,5421,5898,6899,8479");
         shitMap.put(4565L, "4566,4918,5005,5284,5981,6703,10028");
+        shitMap.put(4807L, "6922,15889");
+        shitMap.put(4649L, "4650,9267,4800");
 
         for (Map.Entry<Long, String> categoryInfo : shitMap.entrySet()) {
 
