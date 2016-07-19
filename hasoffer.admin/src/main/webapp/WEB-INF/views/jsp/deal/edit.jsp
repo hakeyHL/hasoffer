@@ -124,8 +124,8 @@
             <label class="col-sm-3 control-label">价格描述：</label>
 
             <div class="col-sm-7">
-                <textarea class="form-control" name="priceDescription" rows="5"
-                          content="${deal.priceDescription}"></textarea>
+                <textarea class="form-control" id="priceDescription" name="priceDescription"
+                          rows="5">${deal.priceDescription}</textarea>
             </div>
         </div>
 
@@ -147,7 +147,30 @@
 
 
 </div>
-
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"
+                        data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    提示消息:
+                </h4>
+            </div>
+            <div class="modal-body">
+                当Deal设置为前台显示时价格描述不能为空 !
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary"
+                        data-dismiss="modal">关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
 
     $().ready(function () {
@@ -200,7 +223,9 @@
 
     function dosubmit() {
         var inlineRadio1 = $("#inlineRadio1");
+        var inlineRadio3 = $("#inlineRadio3");
         var checked = inlineRadio1.attr("checked");
+        var checked3 = inlineRadio3.attr("checked");
         if (checked == "checked") {
             var imgLen = $(".controls img").length;
             var img = $("#upload_img").attr("img_url");
@@ -209,7 +234,23 @@
                 return false;
             }
         }
-
+        //如果选择了在前台显示 图片必有,
+        //如果之前有可以不传
+        //价格描述不能为空
+        if (checked3 == "checked") {
+            var imgNum = $(".controls img").length;
+            var priDesLength = $("#priceDescription").val().length;
+            if (priDesLength < 1) {
+                $("#myModal").modal('show');
+                return false;
+            }
+            var imgurl = $("#upload_img").attr("img_url");
+            if (imgurl == "false" && imgNum != 2) {
+                //之前不存在图片且本次未上传
+                $("#tip_div").show();
+                return false;
+            }
+        }
         var button_submit = $("#button_submit");
         button_submit.attr("disabled", true);
         return true;
