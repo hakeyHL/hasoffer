@@ -159,7 +159,7 @@ public class TopSellingController {
 //            topSellingService.updateTopSellingStatus(topSellingId, TopSellStatus.ONLINE);
 
             //编辑的时候注意更新图片清除缓存
-            String PTMPRODUCT_IMAGE_CACHE_KEY = "PRODUCT__listPagedCmpSkus_TopSelling_0 _20";
+            String PTMPRODUCT_IMAGE_CACHE_KEY = "PRODUCT__getProductMasterImageUrl_" + topSellingId;
 
             cacheService.del(PTMPRODUCT_IMAGE_CACHE_KEY);
         } catch (Exception e) {
