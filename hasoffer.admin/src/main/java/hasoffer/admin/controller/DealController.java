@@ -111,15 +111,18 @@ public class DealController {
             AppBanner banner = dealService.getBannerByDealId(deal.getId());
             if (banner == null) {
                 banner = new AppBanner();
+                banner.setSourceId(String.valueOf(deal.getId()));
+                banner.setImageUrl(path);
+                banner.setCreateTime(deal.getCreateTime());
+                banner.setLinkUrl(deal.getLinkUrl());
+                banner.setBannerFrom(BannerFrom.DEAL);
+                banner.setDeadline(deal.getExpireTime());
+                banner.setRank(0);
+                dealService.createBannner(banner);
+            } else {
+
             }
-            banner.setSourceId(String.valueOf(deal.getId()));
-            banner.setImageUrl(path);
-            banner.setCreateTime(deal.getCreateTime());
-            banner.setLinkUrl(deal.getLinkUrl());
-            banner.setBannerFrom(BannerFrom.DEAL);
-            banner.setDeadline(deal.getExpireTime());
-            banner.setRank(0);
-            dealService.addOrUpdateBanner(banner);
+
         }
         if (!path.equals("")) {
             deal.setImageUrl(path);
