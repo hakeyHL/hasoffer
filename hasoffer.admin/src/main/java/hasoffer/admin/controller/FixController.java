@@ -1353,7 +1353,11 @@ public class FixController {
 //        shitMap.put(1401L, "1402,3354,7048,8453,10545,13499,15632,82616");
 
 //        第三次
-//        shitMap.put();
+        shitMap.put(4299L, "67843");
+        shitMap.put(6741L, "67521");
+        shitMap.put(4758L, "4759,4788,4994,5678,5691,7574,8209,13566,102801,102824");
+        shitMap.put(4641L, "4642,4774,4832,5237,5421,5898,6899,8479");
+        shitMap.put(4565L, "4566,4918,5005,5284,5981,6703,10028");
 
         for (Map.Entry<Long, String> categoryInfo : shitMap.entrySet()) {
 
@@ -1369,7 +1373,8 @@ public class FixController {
     @ResponseBody
     public String fixshitcategoryTablets() {
 
-        long[] arrays = {57L, 11026L, 5834L};
+//        long[] arrays = {57L, 11026L, 5834L};
+        long[] arrays = {4591L, 4568L};
 
         for (long ptmcategoryId : arrays) {
 

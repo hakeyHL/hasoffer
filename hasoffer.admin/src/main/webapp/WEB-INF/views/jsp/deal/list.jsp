@@ -10,7 +10,6 @@
 <jsp:include page="../include/header.jsp"/>
 <jsp:include page="../include/left.jsp"/>
 
-
 <div id="page-wrapper">
     <!-- 删除结果提示 -->
     <div class="alert alert-success" id="delete_success" role="alert" style="display: none">删除成功</div>
@@ -54,7 +53,8 @@
         <div class="modal-dialog">
             <div class="modal-content message_align">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">×</span></button>
                     <h4 class="modal-title">提示信息</h4>
                 </div>
                 <div class="modal-body">
@@ -63,7 +63,7 @@
                 <div class="modal-footer">
                     <input type="hidden" id="url"/>
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                    <a  onclick="urlSubmit()" class="btn btn-success" data-dismiss="modal">确定</a>
+                    <a onclick="urlSubmit()" class="btn btn-success" data-dismiss="modal">确定</a>
                 </div>
             </div>
         </div>
@@ -74,7 +74,8 @@
         <div class="modal-dialog">
             <div class="modal-content message_align">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">×</span></button>
                     <h4 class="modal-title">提示信息</h4>
                 </div>
                 <div class="modal-body">
@@ -83,7 +84,7 @@
                 <div class="modal-footer">
                     <input type="hidden" id="batchUrl"/>
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                    <a  onclick="batchUrlSubmit()" class="btn btn-success" data-dismiss="modal">确定</a>
+                    <a onclick="batchUrlSubmit()" class="btn btn-success" data-dismiss="modal">确定</a>
                 </div>
             </div>
         </div>
@@ -94,7 +95,7 @@
 
     <div class="row">
         <form action="import" enctype="multipart/form-data" method="post" id="form">
-            <div class="col-lg-12" >
+            <div class="col-lg-12">
                 <span class="modal-title">请选择Excel文件:</span>
                 <input type="file" name="multiFile" id="multiFile" class="file-loading" style="display: inline;"/>
             </div>
@@ -104,8 +105,10 @@
     <div class="col-lg-12" style="margin: 10px"></div>
 
     <div class="row">
-        <div class="col-lg-12" >
-            <button type="button" class="btn btn-primary" onclick="batchDelete('<%=contextPath%>/deal/batchDelete')" data-toggle="modal" data-target="#confirm-delete">批量删除</button>
+        <div class="col-lg-12">
+            <button type="button" class="btn btn-primary" onclick="batchDelete('<%=contextPath%>/deal/batchDelete')"
+                    data-toggle="modal" data-target="#confirm-delete">批量删除
+            </button>
         </div>
     </div>
 
@@ -137,7 +140,7 @@
                             <div class="row">
                                 <div class="col-xs-6 col-md-3">
                                     <a href="#" class="thumbnail">
-                                        <img src="${data.imageUrl}" class="img-rounded">
+                                        <img src="${data.imageUrl}" style="width: 40px; max-height: 60px;">
                                     </a>
                                 </div>
                             </div>
@@ -145,12 +148,12 @@
                         </td>
                         <td>
                             <c:choose>
-                            <c:when test="${data.push == 'true'}">
-                                 是
-                            </c:when>
-                            <c:when test="${data.push == 'false'}">
-                                 否
-                            </c:when>
+                                <c:when test="${data.push == 'true'}">
+                                    是
+                                </c:when>
+                                <c:when test="${data.push == 'false'}">
+                                    否
+                                </c:when>
                             </c:choose>
                         </td>
 
@@ -170,7 +173,8 @@
                         <td>${fn:substring(data.createTime, 0, 10)}</td>
                         <td>${fn:substring(data.expireTime, 0, 10)}</td>
                         <td><a href="detail/${data.id}">编辑</a></td>
-                        <td><a href="javascript:void(0)" onclick="deleteById('<%=contextPath%>/deal/delete/${data.id}')" data-toggle="modal" data-target="#confirm-delete">删除</a></td>
+                        <td><a href="javascript:void(0)" onclick="deleteById('<%=contextPath%>/deal/delete/${data.id}')"
+                               data-toggle="modal" data-target="#confirm-delete">删除</a></td>
                     </tr>
                 </c:forEach>
                 </tbody>
@@ -179,121 +183,120 @@
         <jsp:include page="../include/page.jsp"/>
     </div>
 
-<script>
-    $(function(){
-        $('#multiFile').change(function(){
-            $("#form").ajaxSubmit({
-                //定义返回JSON数据，还包括xml和script格式
-                dataType:'json',
-                beforeSend: function() {
-                    //表单提交前做表单验证
-                },
-                success: function(data) {
-                    if(data.success){
-                        $("#totalRows").html(data.totalRows);
-                        $("#successRows").html(data.successRows);
-                        $("#failRows").html(data.failRows);
-                        $("#nullRows").html(data._nullRows);
-                        $("#repeatRows").html(data.repeatRows);
-                        $("#otherFailRows").html(data.otherFailRows);
-                        $('#import_result').modal('show');
-                        $("#confirm_button").click(function(){
-                            $('#import_result').modal('hide');
-                            window.location.reload();
-                        });
-                    }else{
-                        BootstrapDialog.show({
-                            title: '导入失败',
-                            message: '请检查Excel格式，重新导入!'
-                        });
+    <script>
+        $(function () {
+            $('#multiFile').change(function () {
+                $("#form").ajaxSubmit({
+                    //定义返回JSON数据，还包括xml和script格式
+                    dataType: 'json',
+                    beforeSend: function () {
+                        //表单提交前做表单验证
+                    },
+                    success: function (data) {
+                        if (data.success) {
+                            $("#totalRows").html(data.totalRows);
+                            $("#successRows").html(data.successRows);
+                            $("#failRows").html(data.failRows);
+                            $("#nullRows").html(data._nullRows);
+                            $("#repeatRows").html(data.repeatRows);
+                            $("#otherFailRows").html(data.otherFailRows);
+                            $('#import_result').modal('show');
+                            $("#confirm_button").click(function () {
+                                $('#import_result').modal('hide');
+                                window.location.reload();
+                            });
+                        } else {
+                            BootstrapDialog.show({
+                                title: '导入失败',
+                                message: '请检查Excel格式，重新导入!'
+                            });
+                        }
+
+
                     }
-
-
-                }
-            });
-        });
-
-
-        //全选/全不选
-        $("#checkAll").click(function() {
-            $("input[name='subBox']:checkbox").prop("checked", this.checked);
-        });
-        var $subBox = $("input[name='subBox']");
-        $subBox.click(function(){
-            $("#checkAll").prop("checked",$subBox.length == $("input[name='subBox']:checked").length ? true : false);
-        });
-
-    });
-
-    function deleteById(url){
-        $('#url').val(url);//给会话中的隐藏属性URL赋值
-        $('#deleteModel').modal();
-    }
-
-    function urlSubmit(){
-        var url = $.trim($("#url").val());//获取会话中的隐藏属性URL
-        $.ajax({
-            url: url,
-            type: 'GET',
-            success: function(result) {
-                if(result){
-                    $("#delete_success").css("display", "block").hide(3000);
-                    window.location.reload();
-                }
-            },
-            error: function(xhr, textStatus, errorThrown){
-                $("#delete_fail").css("display", "block").hide(3000);
-            }
-        });
-    }
-
-    function batchDelete(batchUrl){
-
-        var arr = new Array();
-        $("input[name='subBox']:checked").each(function(){
-            arr.push($(this).val());
-        });
-
-        if(arr.length == 0){
-            BootstrapDialog.show({
-                title: '提示',
-                message: '请选择要删除的记录!'
+                });
             });
 
-            return false;
+
+            //全选/全不选
+            $("#checkAll").click(function () {
+                $("input[name='subBox']:checkbox").prop("checked", this.checked);
+            });
+            var $subBox = $("input[name='subBox']");
+            $subBox.click(function () {
+                $("#checkAll").prop("checked", $subBox.length == $("input[name='subBox']:checked").length ? true : false);
+            });
+
+        });
+
+        function deleteById(url) {
+            $('#url').val(url);//给会话中的隐藏属性URL赋值
+            $('#deleteModel').modal();
         }
 
-        $('#batchUrl').val(batchUrl);//给会话中的隐藏属性URL赋值
-        $('#batchDeleteModel').modal();
-    }
-
-    function batchUrlSubmit(){
-        var url = $.trim($("#batchUrl").val());//获取会话中的隐藏属性URL
-
-        var arr = new Array();
-        $("input[name='subBox']:checked").each(function(){
-            arr.push($(this).val());
-        });
-
-        $.ajax({
-            url: url,
-            type: 'GET',
-            data: {"ids" : arr},
-            dataType: "json",
-            contentType : 'application/json;charset=utf-8', //设置请求头信息
-            success: function(result) {
-                if(result){
-                    $("#delete_success").css("display", "block").hide(3000);
-                    window.location.reload();
+        function urlSubmit() {
+            var url = $.trim($("#url").val());//获取会话中的隐藏属性URL
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (result) {
+                    if (result) {
+                        $("#delete_success").css("display", "block").hide(3000);
+                        window.location.reload();
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    $("#delete_fail").css("display", "block").hide(3000);
                 }
-            },
-            error: function(xhr, textStatus, errorThrown){
-                $("#delete_fail").css("display", "block").hide(3000);
+            });
+        }
+
+        function batchDelete(batchUrl) {
+
+            var arr = new Array();
+            $("input[name='subBox']:checked").each(function () {
+                arr.push($(this).val());
+            });
+
+            if (arr.length == 0) {
+                BootstrapDialog.show({
+                    title: '提示',
+                    message: '请选择要删除的记录!'
+                });
+
+                return false;
             }
-        });
-    }
+
+            $('#batchUrl').val(batchUrl);//给会话中的隐藏属性URL赋值
+            $('#batchDeleteModel').modal();
+        }
+
+        function batchUrlSubmit() {
+            var url = $.trim($("#batchUrl").val());//获取会话中的隐藏属性URL
+
+            var arr = new Array();
+            $("input[name='subBox']:checked").each(function () {
+                arr.push($(this).val());
+            });
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                data: {"ids": arr},
+                dataType: "json",
+                contentType: 'application/json;charset=utf-8', //设置请求头信息
+                success: function (result) {
+                    if (result) {
+                        $("#delete_success").css("display", "block").hide(3000);
+                        window.location.reload();
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    $("#delete_fail").css("display", "block").hide(3000);
+                }
+            });
+        }
 
 
-
-</script>
-<jsp:include page="../include/footer.jsp"/>
+    </script>
+    <jsp:include page="../include/footer.jsp"/>

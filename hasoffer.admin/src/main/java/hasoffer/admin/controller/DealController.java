@@ -92,7 +92,7 @@ public class DealController {
         if (deal.isPush() == true) {
             AppBanner appBanner = dealService.getBannerByDealId(dealId);
             if (!StringUtils.isEmpty(appBanner.getImageUrl())) {
-                deal.setImageUrl(ImageUtil.getImageUrl(appBanner.getImageUrl()));
+                mav.addObject("bannerImageUrl", ImageUtil.getImageUrl(appBanner.getImageUrl()));
             }
         }
 
@@ -101,17 +101,30 @@ public class DealController {
     }
 
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
-    public ModelAndView edit(AppDeal deal, MultipartFile file) throws IOException {
+    public ModelAndView edit(AppDeal deal, MultipartFile dealFile, MultipartFile bannerFile, String bannerImageUrl) throws IOException {
+        String dealPath = "";
+        if (StringUtils.isEmpty(bannerImageUrl)) {
+            //修改了图片
+            if (!bannerFile.isEmpty()) {
+                File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
+                FileUtil.writeBytes(imageFile, bannerFile.getBytes());
+                try {
+                    bannerImageUrl = ImageUtil.uploadImage(imageFile);
+                } catch (Exception e) {
+                    logger.error("banner image upload fail");
+                }
+            }
+        }
+        if (StringUtils.isEmpty(deal.getImageUrl())) {
 
-        //上传图片, 暂支持单个
-        String path = "";
-        if (!file.isEmpty()) {
-            File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
-            FileUtil.writeBytes(imageFile, file.getBytes());
-            try {
-                path = ImageUtil.uploadImage(imageFile);
-            } catch (Exception e) {
-                logger.error("image upload fail");
+            if (!dealFile.isEmpty()) {
+                File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
+                FileUtil.writeBytes(imageFile, dealFile.getBytes());
+                try {
+                    dealPath = ImageUtil.uploadImage(imageFile);
+                } catch (Exception e) {
+                    logger.error("deal image upload fail");
+                }
             }
         }
 
@@ -124,8 +137,8 @@ public class DealController {
             }
 
             banner.setSourceId(String.valueOf(deal.getId()));
-            if (!file.isEmpty()) {
-                banner.setImageUrl(path);
+            if (!bannerFile.isEmpty()) {
+                banner.setImageUrl(bannerImageUrl);
             }
             banner.setCreateTime(deal.getCreateTime());
             banner.setLinkUrl(deal.getLinkUrl());
@@ -136,8 +149,8 @@ public class DealController {
             dealService.saveOrUpdateBanner(banner);
 
         }
-        if (!path.equals("")) {
-            deal.setImageUrl(path);
+        if (!dealPath.equals("")) {
+            deal.setImageUrl(dealPath);
         }
         dealService.updateDeal(deal);
         return new ModelAndView("redirect:/deal/list");
