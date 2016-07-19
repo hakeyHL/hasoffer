@@ -106,6 +106,38 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public void updateProductPrice(long id) {
+
+        List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ", Arrays.asList(id));
+
+        float price = 0.0f;
+
+        for (int i = 0; i < skus.size(); i++) {
+
+            if (i == 0) {
+                price = skus.get(i).getPrice();
+                continue;
+            }
+
+            if (skus.get(i).getPrice() < price) {
+                price = skus.get(i).getPrice();
+            }
+
+        }
+
+        if (price != 0) {
+
+            PtmProductUpdater updater = new PtmProductUpdater(id);
+
+            updater.getPo().setPrice(price);
+
+            dbm.update(updater);
+        }
+
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void expTopSellingsFromSearchCount(String ymd) {
         // 查询
         int page = 1, size = 40;
