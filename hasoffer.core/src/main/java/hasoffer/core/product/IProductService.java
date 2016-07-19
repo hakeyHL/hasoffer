@@ -77,5 +77,5 @@ public interface IProductService {
 
     void updateProductImage2(Long id, String oriImageUrl);
 
-    void updateProductPrice(long id);
+    void updatePtmProductPrice(long id);
 }

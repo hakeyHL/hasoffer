@@ -106,7 +106,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateProductPrice(long id) {
+    public void updatePtmProductPrice(long id) {
 
         List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ", Arrays.asList(id));
 
