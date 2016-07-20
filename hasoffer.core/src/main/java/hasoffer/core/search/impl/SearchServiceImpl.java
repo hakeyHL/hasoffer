@@ -71,6 +71,10 @@ public class SearchServiceImpl implements ISearchService {
     private static final String STAT_SEARCH_COUNT2 = "SELECT COUNT(t.id) FROM SrmProductSearchCount t WHERE t.ymd=?0 AND t.skuCount>=?1 ";
     private static final String STAT_SEARCH_COUNT3 = "SELECT COUNT(t.id) FROM SrmSearchLog t WHERE t.lUpdateTime>?0 AND t.lUpdateTime<?1 AND t.ptmProductId=0 ";
     private static final String STAT_SEARCH_COUNT4 = "SELECT COUNT(t.id) FROM SrmSearchLog t WHERE t.lUpdateTime>?0 AND t.lUpdateTime<?1 AND t.ptmProductId>0 ";
+
+    private static final String Q_SEARCH_COUNT_BY_PRODUCTID =
+            "SELECT t FROM SrmProductSearchCount t WHERE t.productId = ?0 ORDER BY t.ymd DESC";
+
     @Resource
     IDataBaseManager dbm;
     @Resource
@@ -82,6 +86,17 @@ public class SearchServiceImpl implements ISearchService {
     @Resource
     SearchLogCacheManager searchLogCacheManager;
     private Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
+
+    @Override
+    public SrmProductSearchCount findSearchCountByProductId(Long proId) {
+        List<SrmProductSearchCount> srmProductSearchCounts = dbm.query(Q_SEARCH_COUNT_BY_PRODUCTID, Arrays.asList(proId));
+
+        if (ArrayUtils.hasObjs(srmProductSearchCounts)) {
+            return srmProductSearchCounts.get(0);
+        }
+
+        return null;
+    }
 
     @Override
     @Transactional
@@ -112,6 +127,7 @@ public class SearchServiceImpl implements ISearchService {
         productSearchStat = new SrmProductSearchStat(ymd, (int) count_no_matched, (int) count_matched, (int) count0, (int) count1, (int) count2, (int) count3, (int) count4);
         dbm.create(productSearchStat);
     }
+
 
     @Override
     public List<SrmProductSearchStat> findSearchCountStats() {
