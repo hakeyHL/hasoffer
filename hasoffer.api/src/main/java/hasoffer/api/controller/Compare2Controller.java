@@ -85,7 +85,6 @@ public class Compare2Controller {
                                    @RequestParam(defaultValue = "0") String price,
                                    @RequestParam(defaultValue = "1") int page,
                                    @RequestParam(defaultValue = "10") int size) {
-        logger.info(String.format("[%s]getcmpskus is run.0", q));
         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
 
@@ -94,21 +93,16 @@ public class Compare2Controller {
 
         PtmCmpSkuIndex2 cmpSkuIndex = null;
 
-        logger.info(String.format("[%s]getcmpskus is run.1", q));
-
         try {
             // 先去匹配sku
             cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
-
-            logger.info(String.format("[%s]getcmpskus is run.2", q));
-
             getSioBySearch(sio);
 
-            logger.info(String.format("[%s]getcmpskus is run.3", q));
+            logger.info(String.format("[%s]getcmpskus is run.1", q));
 
             cr = getCmpResult(sio, cmpSkuIndex);
 
-            logger.info(String.format("[%s]getcmpskus is run.4", q));
+            logger.info(String.format("[%s]getcmpskus is run.2", q));
         } catch (Exception e) {
             logger.error(e.getMessage());
             logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
@@ -127,7 +121,6 @@ public class Compare2Controller {
         mav.addObject("newLayout", false);
 
         logger.info(sio.toString());
-        logger.info(String.format("[%s]getcmpskus is run.5", q));
 
         return mav;
     }
@@ -325,8 +318,6 @@ public class Compare2Controller {
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(sio.getHsProId(), sio.getPage(), sio.getSize());
         List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
 
-        logger.info("found cmpsku size = " + cmpSkus.size());
-
         PtmCmpSku clientCmpSku = null;
 
         float cliPrice = sio.getCliPrice(), priceOff = 0.0f;
@@ -420,18 +411,24 @@ public class Compare2Controller {
         logger.info("cmpsku index / deep link");
 
         String currentDeeplink = "";
-        if (cmpSkuIndex != null && cmpSkuIndex.getId() > 0) {
-            PtmCmpSku cmpSku = cmpSkuCacheManager.getCmpSkuById(cmpSkuIndex.getId());
-            if (cmpSku.getWebsite().equals(sio.getCliSite())) {
-                currentDeeplink = WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
-            }
-        } else if (clientCmpSku != null) {
-            if (!cmpSkuCacheManager.isFlowControlled(sio.getDeviceId(), sio.getCliSite())) {
-                if (StringUtils.isEqual(clientCmpSku.getSkuTitle(), sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
-                    currentDeeplink = WebsiteHelper.getDeeplinkWithAff(clientCmpSku.getWebsite(), clientCmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
+        try {
+            if (cmpSkuIndex != null && cmpSkuIndex.getId() > 0) {
+                PtmCmpSku cmpSku = cmpSkuCacheManager.getCmpSkuById(cmpSkuIndex.getId());
+                if (cmpSku.getWebsite().equals(sio.getCliSite())) {
+                    currentDeeplink = WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
+                }
+            } else if (clientCmpSku != null) {
+                if (!cmpSkuCacheManager.isFlowControlled(sio.getDeviceId(), sio.getCliSite())) {
+                    if (StringUtils.isEqual(clientCmpSku.getSkuTitle(), sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
+                        currentDeeplink = WebsiteHelper.getDeeplinkWithAff(clientCmpSku.getWebsite(), clientCmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
+                    }
                 }
             }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
         }
+
+        logger.info("to found image url");
 
         String imageUrl = productCacheManager.getProductMasterImageUrl(sio.getHsProId());//productService.getProductMasterImageUrl(sio.getHsProId());
 
