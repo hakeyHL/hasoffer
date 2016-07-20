@@ -90,6 +90,9 @@ public class DealServiceImpl implements IDealService {
                                                                                             if (tempData[5] == null || StringUtils.isBlank(tempData[5] + "")) {
                                                                                                 tempData[5] = new Date(TimeUtils.now());
                                                                                             }
+                                                                                            if (tempData[6] == null || StringUtils.isBlank(tempData[6] + "")) {
+                                                                                                tempData[6] = "Click \"Activate Deal\" button.Add the product of your choice to cart.And no coupon code required.";
+                                                                                            }
 
                                                                                             if (tempData[7] == null || StringUtils.isBlank(tempData[7] + "")) {
                                                                                                 tempData[7] = 0;
