@@ -248,7 +248,7 @@ public class AppController {
         if (user != null) {
             List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
-                if (orderStatsAnalysisPO.getWebSite().equals(Website.SHOPCLUES.name()) || orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
+                if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
                     OrderVo orderVo = new OrderVo();
                     orderVo.setAccount(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.015)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
                     orderVo.setChannel(orderStatsAnalysisPO.getChannel());
@@ -349,7 +349,7 @@ public class AppController {
             dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
             dealVo.setExtra(0d);
             dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-            if (appDeal.getWebsite().name().equals("FLIPKART") || appDeal.getWebsite().name().equals("SHOPCLUES")) {
+            if (appDeal.getWebsite().name().equals("FLIPKART")) {
                 dealVo.setExtra(1.5);
             }
             dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
@@ -388,7 +388,7 @@ public class AppController {
             map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
             map.put("description", appDeal.getDescription() == null ? "" : appDeal.getDescription());
             map.put("extra", 0);
-            if (appDeal.getWebsite() == Website.FLIPKART || appDeal.getWebsite() == Website.SHOPCLUES) {
+            if (appDeal.getWebsite() == Website.FLIPKART) {
                 map.put("extra", 1.5);
                 map.put("cashbackInfo", "1. Offer valid for a limited time only while stocks last\n" +
                         "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +
