@@ -117,7 +117,7 @@ public class Compare2Controller {
         mav.addObject("page", PageHelper.getPageModel(request, cr.getPagedComparedSkuVos()));
         mav.addObject("newLayout", false);
 
-        logger.info(sio.toString());
+//        logger.info(sio.toString());
 
         return mav;
     }
