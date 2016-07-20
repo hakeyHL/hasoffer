@@ -1420,11 +1420,11 @@ public class FixController {
 
         for (Map.Entry<Long, String> categoryInfo : shitMap.entrySet()) {
 
-            String[] substr = categoryInfo.getValue().split(",");
+            String[] secondCategoryArray = categoryInfo.getValue().split(",");
 
-            for (String str : substr) {
+            for (String secondCategory : secondCategoryArray) {
 
-                fixCategory(categoryInfo.getKey(), Long.valueOf(str));
+                fixCategory(categoryInfo.getKey(), Long.valueOf(secondCategory));
 
             }
 
