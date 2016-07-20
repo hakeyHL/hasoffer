@@ -131,4 +131,8 @@ public class SearchLogCacheManager {
 
         return countMap;
     }
+
+    public void delCache(String searchLogId) {
+        cacheService.del(searchLogId);
+    }
 }

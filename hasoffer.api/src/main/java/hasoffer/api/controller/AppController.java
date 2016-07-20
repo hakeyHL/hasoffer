@@ -352,6 +352,7 @@ public class AppController {
             if (appDeal.getWebsite().name().equals("FLIPKART") || appDeal.getWebsite().name().equals("SHOPCLUES")) {
                 dealVo.setExtra(1.5);
             }
+            dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
             dealVo.setExp(appDeal.getExpireTime());
             dealVo.setTitle(appDeal.getTitle());
             dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
@@ -387,14 +388,18 @@ public class AppController {
             map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
             StringBuilder sb = new StringBuilder();
             sb.append(appDeal.getWebsite().name()).append(" is offering ").append(appDeal.getTitle()).append(" .\n");
-            sb.append("\n");
-            sb.append("Steps to order the item at ").append(appDeal.getWebsite().name()).append(" website: \n");
-            sb.append("\n");
-            sb.append("1. First, visit the offer page at ").append(appDeal.getWebsite()).append(" .\n");
-            sb.append("2. Select your product according to the item variety.\n");
-            sb.append("3. Then click on Buy Now option. \n");
-            sb.append("4. Sign in/ Sign up at ").append(appDeal.getWebsite()).append(" and fill up your address. \n");
-            sb.append("5. Choose your payment option and make payment your cart value.").append(" .\n");
+            if (appDeal.getDescription() == null || appDeal.getDescription().equals("")) {
+                sb.append("\n");
+                sb.append("Steps to order the item at ").append(appDeal.getWebsite().name()).append(" website: \n");
+                sb.append("\n");
+                sb.append("1. First, visit the offer page at ").append(appDeal.getWebsite()).append(" .\n");
+                sb.append("2. Select your product according to the item variety.\n");
+                sb.append("3. Then click on Buy Now option. \n");
+                sb.append("4. Sign in/ Sign up at ").append(appDeal.getWebsite()).append(" and fill up your address. \n");
+                sb.append("5. Choose your payment option and make payment your cart value.").append(" .\n");
+            } else {
+                sb.append(appDeal.getDescription());
+            }
             map.put("description", sb.toString());
             map.put("extra", 0);
             if (appDeal.getWebsite() == Website.FLIPKART || appDeal.getWebsite() == Website.SHOPCLUES) {

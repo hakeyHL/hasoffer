@@ -209,6 +209,8 @@ public class SearchServiceImpl implements ISearchService {
                     updater.getPo().setPtmProductId(finalProduct.getId());
                     dbm.update(updater);
                 }
+
+                searchLogCacheManager.delCache(searchLog.getId());
             }
         }
 

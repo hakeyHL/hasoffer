@@ -127,7 +127,12 @@ public class DealController {
                 }
             }
         }
-
+        if (bannerImageUrl.contains("http")) {
+            bannerImageUrl = bannerImageUrl.substring(bannerImageUrl.indexOf("com") + 3, bannerImageUrl.length());
+        }
+        if (deal.getImageUrl().contains("http")) {
+            deal.setImageUrl(deal.getImageUrl().substring(deal.getImageUrl().indexOf("com") + 3, deal.getImageUrl().length()));
+        }
         //推送至banner展示则点击保存时除deal信息外 创建一条banner数据 banner的生效、失效时间、banner图片与此deal相同 banner的rank为默认值
         if (deal.isPush()) {
             AppBanner banner = dealService.getBannerByDealId(deal.getId());
