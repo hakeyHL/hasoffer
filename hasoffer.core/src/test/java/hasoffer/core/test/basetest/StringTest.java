@@ -4,6 +4,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.fetch.sites.snapdeal.SnapdealHelper;
 import org.junit.Test;
 
 import java.util.regex.Matcher;
@@ -13,6 +14,17 @@ import java.util.regex.Pattern;
  * Created on 2016/5/16.
  */
 public class StringTest {
+
+    @Test
+    public void test10() {
+
+        String url = "http://m.snapdeal.com";
+
+        String deeplink = SnapdealHelper.getUrlWithAff(url);
+
+        System.out.println(deeplink);
+
+    }
 
     @Test
     public void test9() {

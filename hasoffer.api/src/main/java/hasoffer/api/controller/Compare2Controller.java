@@ -85,7 +85,8 @@ public class Compare2Controller {
                                    @RequestParam(defaultValue = "0") String price,
                                    @RequestParam(defaultValue = "1") int page,
                                    @RequestParam(defaultValue = "10") int size) {
-//        System.out.println("getcmpskus is run.");
+        logger.info("getcmpskus is run.");
+        logger.error("getcmpskus is run.");
         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
 
@@ -101,7 +102,8 @@ public class Compare2Controller {
             getSioBySearch(sio);
             cr = getCmpResult(sio, cmpSkuIndex);
         } catch (Exception e) {
-            logger.debug(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
+            logger.error(e.getMessage());
+            logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
 
             cr = getDefaultCmpResult(sio, cmpSkuIndex);
         }
@@ -116,7 +118,7 @@ public class Compare2Controller {
         mav.addObject("page", PageHelper.getPageModel(request, cr.getPagedComparedSkuVos()));
         mav.addObject("newLayout", false);
 
-        logger.debug(sio.toString());
+        logger.info(sio.toString());
 
         return mav;
     }
@@ -291,6 +293,8 @@ public class Compare2Controller {
         String q = sio.getCliQ();
 
         String logId = HexDigestUtil.md5(q + "-" + sio.getCliSite().name()); // 这个值作为log表的id
+        logger.info("log id is " + logId);
+
         SrmSearchLog srmSearchLog = searchLogCacheManager.findSrmSearchLog(logId, true);
 
         if (srmSearchLog != null
@@ -298,7 +302,7 @@ public class Compare2Controller {
                 || srmSearchLog.getPrecise() == SearchPrecise.MANUALSET)) {
 
             if (srmSearchLog.getPtmProductId() <= 0) {
-                logger.debug("Found search log. but product id is 0 .");
+                logger.error("Found search log. but product id is 0 .");
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), "", 0);
             }
 
@@ -349,6 +353,9 @@ public class Compare2Controller {
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(sio.getHsProId(), sio.getPage(), sio.getSize());
         List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
 
+        logger.info("found cmpsku size = " + cmpSkus.size());
+        logger.error("found cmpsku size = " + cmpSkus.size());
+
         PtmCmpSku clientCmpSku = null;
 
         float cliPrice = sio.getCliPrice(), priceOff = 0.0f;
@@ -381,6 +388,7 @@ public class Compare2Controller {
                 if (cmpSku.getWebsite() == null
                         || cmpSku.getPrice() <= 0
                         || cmpSku.getStatus() != SkuStatus.ONSALE) { // 临时过滤掉不能更新价格的商品
+                    logger.error(cmpSku.getId() + ", price=" + cmpSku.getPrice() + ", status=" + cmpSku.getStatus());
                     continue;
                 }
                 if (minPrice <= 0 || minPrice > cmpSku.getPrice()) {
@@ -399,6 +407,7 @@ public class Compare2Controller {
             }
 
             if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {
+                logger.error("Compared SKU VO IS EMPTY");
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", sio.getCliQ(), sio.getCliPrice());
             }
 
@@ -437,6 +446,8 @@ public class Compare2Controller {
 
         sio.setHsSkuId(cmpSkuId);
 
+        logger.info("cmpsku index / deep link");
+
         String currentDeeplink = "";
         if (cmpSkuIndex != null && cmpSkuIndex.getId() > 0) {
             PtmCmpSku cmpSku = cmpSkuCacheManager.getCmpSkuById(cmpSkuIndex.getId());
@@ -452,6 +463,8 @@ public class Compare2Controller {
         }
 
         String imageUrl = productCacheManager.getProductMasterImageUrl(sio.getHsProId());//productService.getProductMasterImageUrl(sio.getHsProId());
+
+        logger.info("found image url");
 
         ProductVo productVo = new ProductVo(sio.getHsProId(), sio.getCliQ(), imageUrl, minPrice, currentDeeplink);
 
