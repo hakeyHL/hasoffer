@@ -503,7 +503,12 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public void importProduct2Solr(PtmProduct product) {
+    public void import2Solr(ProductModel pm) {
+        productIndexService.createOrUpdate(pm);
+    }
+
+    @Override
+    public ProductModel getProductModel(PtmProduct product) {
         List<String> features = getProductFeatures(product.getId());
 
 //        PtmCategory category = dbm.get(PtmCategory.class, product.getCategoryId());
@@ -548,6 +553,13 @@ public class ProductServiceImpl implements IProductService {
                 cate2,
                 cate3,
                 searchCount);
+
+        return productModel;
+    }
+
+    @Override
+    public void importProduct2Solr(PtmProduct product) {
+        ProductModel productModel = getProductModel(product);
 
         productIndexService.createOrUpdate(productModel);
     }

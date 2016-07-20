@@ -4,6 +4,7 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.core.bo.product.ProductBo;
 import hasoffer.core.persistence.po.ptm.*;
+import hasoffer.core.product.solr.ProductModel;
 import hasoffer.fetch.model.ListProduct;
 
 import java.util.Date;
@@ -78,4 +79,8 @@ public interface IProductService {
     void updateProductImage2(Long id, String oriImageUrl);
 
     void updatePtmProductPrice(long id);
+
+    ProductModel getProductModel(PtmProduct product);
+
+    void import2Solr(ProductModel pm);
 }
