@@ -121,6 +121,11 @@
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>%date [%thread][IP:%X{ip}|USER:%X{user}][%-8level%logger{80}] %msg%n</pattern>
         </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
     </appender>
 
     <appender name="ThirdPartLoggerFileOut"
@@ -140,14 +145,14 @@
         </encoder>
     </appender>
 
-    <!-- code info log -->
-    <logger name="hasoffer" level="INFO">
-        <appender-ref ref="InfoLoggerFileOut"/>
-    </logger>
-
     <!--code error log -->
     <logger name="hasoffer" level="ERROR">
         <appender-ref ref="ErrorLoggerFileOut"/>
+    </logger>
+
+    <!-- code info log -->
+    <logger name="hasoffer" level="INFO">
+        <appender-ref ref="InfoLoggerFileOut"/>
     </logger>
 
     <!-- Hibernate SQL -->
