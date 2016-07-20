@@ -101,8 +101,8 @@ public class Compare2Controller {
             getSioBySearch(sio);
             cr = getCmpResult(sio, cmpSkuIndex);
         } catch (Exception e) {
-            logger.debug(e.getMessage());
-            logger.debug(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
+            logger.error(e.getMessage());
+            logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
 
             cr = getDefaultCmpResult(sio, cmpSkuIndex);
         }
@@ -117,7 +117,7 @@ public class Compare2Controller {
         mav.addObject("page", PageHelper.getPageModel(request, cr.getPagedComparedSkuVos()));
         mav.addObject("newLayout", false);
 
-        logger.debug(sio.toString());
+        logger.info(sio.toString());
 
         return mav;
     }
@@ -292,7 +292,7 @@ public class Compare2Controller {
         String q = sio.getCliQ();
 
         String logId = HexDigestUtil.md5(q + "-" + sio.getCliSite().name()); // 这个值作为log表的id
-        logger.debug("log id is " + logId);
+        logger.info("log id is " + logId);
 
         SrmSearchLog srmSearchLog = searchLogCacheManager.findSrmSearchLog(logId, true);
 
@@ -301,7 +301,7 @@ public class Compare2Controller {
                 || srmSearchLog.getPrecise() == SearchPrecise.MANUALSET)) {
 
             if (srmSearchLog.getPtmProductId() <= 0) {
-                logger.debug("Found search log. but product id is 0 .");
+                logger.error("Found search log. but product id is 0 .");
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), "", 0);
             }
 
