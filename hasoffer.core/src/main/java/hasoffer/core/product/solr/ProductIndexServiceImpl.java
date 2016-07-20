@@ -30,7 +30,7 @@ public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductM
     }
 
     public PageableResult<ProductModel> searchProductsByKey(String title, int page, int size) {
-        Sort[] sorts = null;
+        Sort[] sorts = new Sort[]{new Sort("searchCount", Order.DESC)};
         PivotFacet[] pivotFacets = null;
 
         List<FilterQuery> fqList = new ArrayList<FilterQuery>();
@@ -49,7 +49,7 @@ public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductM
 
         String q = "*:*";
 
-        Sort[] sorts = null;
+        Sort[] sorts = new Sort[]{new Sort("searchCount", Order.DESC)};
         PivotFacet[] pivotFacets = null;
 
         List<FilterQuery> fqList = new ArrayList<FilterQuery>();
