@@ -162,7 +162,7 @@
             </div>
         </div>
 
-        <div class="form-group" hidden="hidden">
+        <div class="form-group">
             <label class="col-sm-3 control-label">deal描述：</label>
 
             <div class="col-sm-7">
