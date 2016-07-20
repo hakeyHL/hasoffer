@@ -101,6 +101,7 @@ public class Compare2Controller {
             getSioBySearch(sio);
             cr = getCmpResult(sio, cmpSkuIndex);
         } catch (Exception e) {
+            logger.debug(e.getMessage());
             logger.debug(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
 
             cr = getDefaultCmpResult(sio, cmpSkuIndex);
@@ -291,6 +292,8 @@ public class Compare2Controller {
         String q = sio.getCliQ();
 
         String logId = HexDigestUtil.md5(q + "-" + sio.getCliSite().name()); // 这个值作为log表的id
+        logger.debug("log id is " + logId);
+
         SrmSearchLog srmSearchLog = searchLogCacheManager.findSrmSearchLog(logId, true);
 
         if (srmSearchLog != null
