@@ -85,7 +85,8 @@ public class Compare2Controller {
                                    @RequestParam(defaultValue = "0") String price,
                                    @RequestParam(defaultValue = "1") int page,
                                    @RequestParam(defaultValue = "10") int size) {
-//        System.out.println("getcmpskus is run.");
+        logger.info("getcmpskus is run.");
+        logger.error("getcmpskus is run.");
         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
 
@@ -352,6 +353,9 @@ public class Compare2Controller {
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(sio.getHsProId(), sio.getPage(), sio.getSize());
         List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
 
+        logger.info("found cmpsku size = " + cmpSkus.size());
+        logger.error("found cmpsku size = " + cmpSkus.size());
+
         PtmCmpSku clientCmpSku = null;
 
         float cliPrice = sio.getCliPrice(), priceOff = 0.0f;
@@ -384,6 +388,7 @@ public class Compare2Controller {
                 if (cmpSku.getWebsite() == null
                         || cmpSku.getPrice() <= 0
                         || cmpSku.getStatus() != SkuStatus.ONSALE) { // 临时过滤掉不能更新价格的商品
+                    logger.error(cmpSku.getId() + ", price=" + cmpSku.getPrice() + ", status=" + cmpSku.getStatus());
                     continue;
                 }
                 if (minPrice <= 0 || minPrice > cmpSku.getPrice()) {
@@ -402,6 +407,7 @@ public class Compare2Controller {
             }
 
             if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {
+                logger.error("Compared SKU VO IS EMPTY");
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", sio.getCliQ(), sio.getCliPrice());
             }
 
@@ -440,6 +446,8 @@ public class Compare2Controller {
 
         sio.setHsSkuId(cmpSkuId);
 
+        logger.info("cmpsku index / deep link");
+
         String currentDeeplink = "";
         if (cmpSkuIndex != null && cmpSkuIndex.getId() > 0) {
             PtmCmpSku cmpSku = cmpSkuCacheManager.getCmpSkuById(cmpSkuIndex.getId());
@@ -455,6 +463,8 @@ public class Compare2Controller {
         }
 
         String imageUrl = productCacheManager.getProductMasterImageUrl(sio.getHsProId());//productService.getProductMasterImageUrl(sio.getHsProId());
+
+        logger.info("found image url");
 
         ProductVo productVo = new ProductVo(sio.getHsProId(), sio.getCliQ(), imageUrl, minPrice, currentDeeplink);
 
