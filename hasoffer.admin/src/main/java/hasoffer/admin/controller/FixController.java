@@ -1393,10 +1393,15 @@ public class FixController {
 //        shitMap.put(2334L, "2332,2335,2566,2789,4904,5608,5896,5973,7343,7889,8559,9442,17281,22402,2789,4745,5973,4745,4745");//上次导入的时候4758的level写错了，需要重新导入
 
 //        第五次
-        shitMap.put(4758L, "4759,4788,4994,5678,5691,7574,8209,13566,102801,102824");//上次导入的时候4758的level忘记更改了，需要重新导入
-        shitMap.put(4591L, "4595,4599,4603,4812,5220,19401,19575");
-        shitMap.put(4568L, "4569,4573,4633,4750,4835,4837,4961,5013,5041,6228,7052");
-
+//        shitMap.put(4758L, "4759,4788,4994,5678,5691,7574,8209,13566,102801,102824");//上次导入的时候4758的level忘记更改了，需要重新导入
+//        shitMap.put(4591L, "4595,4599,4603,4812,5220,19401,19575");
+//        shitMap.put(4568L, "4569,4573,4633,4750,4835,4837,4961,5013,5041,6228,7052");
+//        第六次
+        shitMap.put(4979L, "4980,5316,5635,14930");
+        shitMap.put(4979L, "4980,5316,5635,14930");
+        shitMap.put(9054L, "9055,9764,10337,12966,13341,22117,22340,29991");
+        shitMap.put(4584L, "4585,4588,5409");
+        shitMap.put(4755L, "4756,9865");
 
 
         for (Map.Entry<Long, String> categoryInfo : shitMap.entrySet()) {
@@ -1416,6 +1421,10 @@ public class FixController {
         Map<Long, String> shitMap = new HashMap<Long, String>();
 
         shitMap.put(4560L, "5722,4722,7808,6334,6336,4561,7642,26878");
+        shitMap.put(4807L, "4848,5149,5199,5271,5379,6161,6396,6498,7505,8146,8740,90304");
+        shitMap.put(3334L, "3335,3360,3411,3431,5046,5346,6851,6978,7017,7580");
+        shitMap.put(4584L, "3335,3360,3411,3431,5046,5346,6851,6978,7017,7580");
+        shitMap.put(1701L, "1702,6327,7085,8317,8908,12922,12924,14312,98554");
 
 
         for (Map.Entry<Long, String> categoryInfo : shitMap.entrySet()) {
@@ -1500,7 +1509,7 @@ public class FixController {
 
     public void fixCategory(long descPtmcategoryId, long secondCategoryId) {
 
-        List<PtmCategory> thirdCategoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.parentid = ?0 ", Arrays.asList(secondCategoryId));
+        List<PtmCategory> thirdCategoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.parentId = ?0 ", Arrays.asList(secondCategoryId));
 
         List<String> idList = new ArrayList<String>();
 
