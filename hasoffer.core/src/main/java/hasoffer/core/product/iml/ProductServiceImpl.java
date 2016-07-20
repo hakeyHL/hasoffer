@@ -527,6 +527,12 @@ public class ProductServiceImpl implements IProductService {
             }
         }
 
+        long searchCount = 0;
+        SrmProductSearchCount productSearchCount = searchService.findSearchCountByProductId(product.getId());
+        if (productSearchCount != null) {
+            searchCount = productSearchCount.getCount();
+        }
+
         ProductModel productModel = new ProductModel(product.getId(),
                 product.getTitle(),
                 product.getTag(),
@@ -540,7 +546,8 @@ public class ProductServiceImpl implements IProductService {
                 product.getRating(),
                 cate1,
                 cate2,
-                cate3);
+                cate3,
+                searchCount);
 
         productIndexService.createOrUpdate(productModel);
     }

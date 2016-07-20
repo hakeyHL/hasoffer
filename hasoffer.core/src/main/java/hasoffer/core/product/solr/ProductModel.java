@@ -29,10 +29,12 @@ public class ProductModel implements IIdentifiable<Long> {
     private String key0;// title 前3个单词
     private String key1;// title word 3+
 
+    private long searchCount = 0; // 搜索次数，表示商品热度
+
     public ProductModel(Long id, String title, String tag, long cateId, String category,
                         float price, String feature, String description,
                         String color, String size, int rating,
-                        long cate1, long cate2, long cate3) {
+                        long cate1, long cate2, long cate3, long searchCount) {
         this.id = id;
         this.title = title;
         this.tag = tag;
@@ -48,6 +50,8 @@ public class ProductModel implements IIdentifiable<Long> {
         this.cate1 = cate1;
         this.cate2 = cate2;
         this.cate3 = cate3;
+
+        this.searchCount = searchCount;
 
         initKeys();
     }
@@ -197,5 +201,13 @@ public class ProductModel implements IIdentifiable<Long> {
 
     public void setCate3(long cate3) {
         this.cate3 = cate3;
+    }
+
+    public long getSearchCount() {
+        return searchCount;
+    }
+
+    public void setSearchCount(long searchCount) {
+        this.searchCount = searchCount;
     }
 }

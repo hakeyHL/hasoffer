@@ -96,6 +96,30 @@ public class FixController {
      *
      * @return
      */
+    @RequestMapping(value = "/setsearchcounts", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String setsearchcounts() {
+        // 根据 srmproductsearchcount 表的数据更新 solr
+        String sql = "SELECT DISTINCT(t.productId) FROM SrmProductSearchCount t";
+
+        List<Long> ids = dbm.query(sql);
+
+        for (Long id : ids) {
+            PtmProduct product = productService.getProduct(id);
+
+            if (product != null) {
+                productService.importProduct2Solr(product);
+            }
+        }
+        return "ok";
+    }
+
+    /**
+     * find title Count queue
+     *
+     * @return
+     */
     @RequestMapping(value = "/findsametitleproducts", method = RequestMethod.GET)
     public
     @ResponseBody
