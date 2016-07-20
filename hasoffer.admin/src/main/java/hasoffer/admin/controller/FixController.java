@@ -96,6 +96,30 @@ public class FixController {
      *
      * @return
      */
+    @RequestMapping(value = "/setsearchcounts", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String setsearchcounts() {
+        // 根据 srmproductsearchcount 表的数据更新 solr
+        String sql = "SELECT DISTINCT(t.productId) FROM SrmProductSearchCount t";
+
+        List<Long> ids = dbm.query(sql);
+
+        for (Long id : ids) {
+            PtmProduct product = productService.getProduct(id);
+
+            if (product != null) {
+                productService.importProduct2Solr(product);
+            }
+        }
+        return "ok";
+    }
+
+    /**
+     * find title Count queue
+     *
+     * @return
+     */
     @RequestMapping(value = "/findsametitleproducts", method = RequestMethod.GET)
     public
     @ResponseBody
@@ -1370,11 +1394,39 @@ public class FixController {
 
 //        第五次
         shitMap.put(4758L, "4759,4788,4994,5678,5691,7574,8209,13566,102801,102824");//上次导入的时候4758的level忘记更改了，需要重新导入
+        shitMap.put(4591L, "4595,4599,4603,4812,5220,19401,19575");
+        shitMap.put(4568L, "4569,4573,4633,4750,4835,4837,4961,5013,5041,6228,7052");
+
 
 
         for (Map.Entry<Long, String> categoryInfo : shitMap.entrySet()) {
 
             fixCategory(categoryInfo.getKey(), categoryInfo.getValue().split(","));
+
+        }
+
+        return "";
+    }
+
+    //fixdata/fixshitcategorybyparent
+    @RequestMapping(value = "/fixshitcategorybyparent")
+    @ResponseBody
+    public String fixshitcategorybyparent() {
+
+        Map<Long, String> shitMap = new HashMap<Long, String>();
+
+        shitMap.put(4560L, "5722,4722,7808,6334,6336,4561,7642,26878");
+
+
+        for (Map.Entry<Long, String> categoryInfo : shitMap.entrySet()) {
+
+            String[] secondCategoryArray = categoryInfo.getValue().split(",");
+
+            for (String secondCategory : secondCategoryArray) {
+
+                fixCategory(categoryInfo.getKey(), Long.valueOf(secondCategory));
+
+            }
 
         }
 
@@ -1444,5 +1496,22 @@ public class FixController {
 
             dbm.update(updater);
         }
+    }
+
+    public void fixCategory(long descPtmcategoryId, long secondCategoryId) {
+
+        List<PtmCategory> thirdCategoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.parentid = ?0 ", Arrays.asList(secondCategoryId));
+
+        List<String> idList = new ArrayList<String>();
+
+        for (PtmCategory thirdCategory : thirdCategoryList) {
+
+            idList.add(thirdCategory.getId().toString());
+
+        }
+
+        String[] idArray = (String[]) idList.toArray();
+
+        fixCategory(descPtmcategoryId, idArray);
     }
 }

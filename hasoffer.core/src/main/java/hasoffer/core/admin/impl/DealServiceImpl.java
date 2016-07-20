@@ -27,7 +27,7 @@ import java.util.*;
 public class DealServiceImpl implements IDealService {
 
     private static final long EXPIRE_TIME_MS = 7 * 24 * 60 * 60 * 1000;
-    private static final String IMPORT_SQL = "insert into appdeal(website, title, linkUrl, expireTime, priceDescription , createTime, description, push ,display ,imageUrl) values(?, ?, ?, ?, ?, ? ,?, ?, ?, ?)";
+    private static final String IMPORT_SQL = "insert into appdeal(website, title, linkUrl, expireTime, priceDescription ,description, createTime,  push ,display ,imageUrl) values(?, ?, ?, ?, ?, ? ,?, ?, ?, ?)";
     @Resource
     IDataBaseManager dbm;
 
@@ -86,12 +86,22 @@ public class DealServiceImpl implements IDealService {
                                                                                             if (StringUtils.isBlank(tempData[3] + "")) {
                                                                                                 tempData[3] = TimeUtils.after(EXPIRE_TIME_MS);
                                                                                             }
-
                                                                                             if (tempData[5] == null || StringUtils.isBlank(tempData[5] + "")) {
-                                                                                                tempData[5] = new Date(TimeUtils.now());
+                                                                                                StringBuilder sb = new StringBuilder();
+                                                                                                sb.append(tempData[0]).append(" is offering ").append(tempData[1]).append(" .\n");
+                                                                                                sb.append("\n");
+                                                                                                sb.append("Steps to order the item at ").append(tempData[0]).append(" website: \n");
+                                                                                                sb.append("\n");
+                                                                                                sb.append("1. First, visit the offer page at ").append(tempData[0]).append(" .\n");
+                                                                                                sb.append("2. Select your product according to the item variety.\n");
+                                                                                                sb.append("3. Then click on Buy Now option. \n");
+                                                                                                sb.append("4. Sign in/ Sign up at ").append(tempData[0]).append(" and fill up your address. \n");
+                                                                                                sb.append("5. Choose your payment option and make payment your cart value.").append(" .\n");
+                                                                                                tempData[5] = sb.toString();
                                                                                             }
+
                                                                                             if (tempData[6] == null || StringUtils.isBlank(tempData[6] + "")) {
-                                                                                                tempData[6] = "Click \"Activate Deal\" button.Add the product of your choice to cart.And no coupon code required.";
+                                                                                                tempData[6] = new Date(TimeUtils.now());
                                                                                             }
 
                                                                                             if (tempData[7] == null || StringUtils.isBlank(tempData[7] + "")) {
