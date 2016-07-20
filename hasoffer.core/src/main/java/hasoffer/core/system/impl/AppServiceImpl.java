@@ -91,116 +91,113 @@ public class AppServiceImpl implements IAppService {
 
     @Override
     public List<OrderStatsAnalysisPO> getBackDetails(String userToken) {
-        List li=new ArrayList();
+        List li = new ArrayList();
         li.add(userToken);
-        return dbm.query(Q_APP_ORDERS,li);
+        return dbm.query(Q_APP_ORDERS, li);
     }
 
     @Override
     public UrmUser getUserByUserToken(String userToken) {
-        List li=new ArrayList();
+        List li = new ArrayList();
         li.add(userToken);
         UrmUser user = dbm.querySingle(Q_APP_GETUSER, li);
         return user;
     }
 
     @Override
-    public OrderStatsAnalysisPO getOrderDetail(String orderId,String userId) {
-        List li=new ArrayList();
+    public OrderStatsAnalysisPO getOrderDetail(String orderId, String userId) {
+        List li = new ArrayList();
         li.add(orderId);
         li.add(userId);
-        return dbm.querySingle(Q_APP_ORDER,li);
+        return dbm.querySingle(Q_APP_ORDER, li);
     }
 
     @Override
-    public PageableResult getDeals(Long page,Long pageSize) {
-        if(pageSize==0){
-            pageSize=Long.valueOf(20);
-        }
-        return dbm.queryPage(Q_APP_GETDEALS, page.intValue()*pageSize.intValue(), pageSize.intValue(),Arrays.asList(new Date()));
+    public PageableResult getDeals(Long page, Long pageSize) {
+        return dbm.queryPage(Q_APP_GETDEALS, page.intValue() <= 1 ? 1 : page.intValue() + 1, pageSize.intValue(), Arrays.asList(new Date()));
     }
 
     @Override
     public List<PtmCategory> getCategory() {
-      return   dbm.query(Q_APP_CATEGORY);
+        return dbm.query(Q_APP_CATEGORY);
     }
 
     @Override
     public AppDeal getDealDetail(String id) {
-        List li=new ArrayList();
+        List li = new ArrayList();
         li.add(Long.valueOf(id));
-       return dbm.querySingle(Q_APP_GEDEALDETAIL,li);
+        return dbm.querySingle(Q_APP_GEDEALDETAIL, li);
     }
 
     @Override
     public UrmUser getUserById(String thirdId) {
-        List li=Arrays.asList(thirdId);
-        return dbm.querySingle(Q_APP_GETUSERBYTHIRDID,li);
+        List li = Arrays.asList(thirdId);
+        return dbm.querySingle(Q_APP_GETUSERBYTHIRDID, li);
     }
 
     @Override
     public List getProductByCriteria(SearchCriteria criteria) {
-        StringBuilder sb=new StringBuilder();
-        int i=0;
-        String categoryId=criteria.getCategoryId();
-        if(StringUtils.isNotBlank(categoryId)){
-            sb.append(" categoryId = ?"+i+"");
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        String categoryId = criteria.getCategoryId();
+        if (StringUtils.isNotBlank(categoryId)) {
+            sb.append(" categoryId = ?" + i + "");
             i++;
         }
-        int comment=criteria.getComment();
-        if(comment==0){
+        int comment = criteria.getComment();
+        if (comment == 0) {
             sb.append(" order by comment desc ");
-        }else{
+        } else {
             sb.append(" order by comment asc ");
         }
-        String keyword=criteria.getKeyword();
-        if(StringUtils.isNotBlank(keyword)){
-            sb.append(" title like %"+i+"%");
+        String keyword = criteria.getKeyword();
+        if (StringUtils.isNotBlank(keyword)) {
+            sb.append(" title like %" + i + "%");
             i++;
         }
-        Long maxPrice=criteria.getMaxPrice();
-        Long minPrice=criteria.getMinPrice();
+        Long maxPrice = criteria.getMaxPrice();
+        Long minPrice = criteria.getMinPrice();
 
-        int page=criteria.getPage();
-        int pageSize=criteria.getPageSize();
+        int page = criteria.getPage();
+        int pageSize = criteria.getPageSize();
 
 
-        Q_APP_GETPRODUCTS=Q_APP_GETPRODUCTS+"ee";
+        Q_APP_GETPRODUCTS = Q_APP_GETPRODUCTS + "ee";
         return null;
     }
 
     @Override
     public int addUser(UrmUser user) {
-        List li=new ArrayList();
+        List li = new ArrayList();
         li.add(user);
         return dbm.batchSave(li);
     }
 
     @Override
     public void updateUserInfo(UrmUser uUser) {
-        List li=new ArrayList();
+        List li = new ArrayList();
         li.add(uUser);
-         dbm.update(li);
+        dbm.update(li);
     }
 
     @Override
     public List<AppBanner> getBanners() {
-       return  dbm.query(Q_APP_GETBANNERS);
+        return dbm.query(Q_APP_GETBANNERS);
     }
 
     @Override
     public List<PtmCategory> getChildCategorys(String categoryId) {
-        List li=new ArrayList();
+        List li = new ArrayList();
         li.add(Long.valueOf(categoryId));
-       return  dbm.query(Q_APP_GETCHILDCATEGORY,li);
+        return dbm.query(Q_APP_GETCHILDCATEGORY, li);
     }
 
     @Override
     public int isHasChildNode(Long id) {
-        List li=new ArrayList();
+        List li = new ArrayList();
         li.add(id);
-        List<PtmCategory> category=(List)dbm.query(Q_APP_CATEGORY_ISHASCHILDNODE, li);
-        if(category==null||category.size()<1){
+        List<PtmCategory> category = (List) dbm.query(Q_APP_CATEGORY_ISHASCHILDNODE, li);
+        if (category == null || category.size() < 1) {
             return 0;
         }
         return 1;
