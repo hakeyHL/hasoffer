@@ -85,7 +85,6 @@ public class Compare2Controller {
                                    @RequestParam(defaultValue = "0") String price,
                                    @RequestParam(defaultValue = "1") int page,
                                    @RequestParam(defaultValue = "10") int size) {
-//        System.out.println("getcmpskus is run.");
         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
 
@@ -97,9 +96,13 @@ public class Compare2Controller {
         try {
             // 先去匹配sku
             cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
-
             getSioBySearch(sio);
+
+            logger.info(String.format("[%s]getcmpskus is run.1", q));
+
             cr = getCmpResult(sio, cmpSkuIndex);
+
+            logger.info(String.format("[%s]getcmpskus is run.2", q));
         } catch (Exception e) {
             logger.error(e.getMessage());
             logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
@@ -121,7 +124,6 @@ public class Compare2Controller {
 
         return mav;
     }
-
 
     @RequestMapping(value = "/cmpsku", method = RequestMethod.GET)
     public ModelAndView cmpsku(@RequestParam(defaultValue = "0") final String id,
@@ -154,7 +156,6 @@ public class Compare2Controller {
         return mav;
     }
 
-
     private CmpResult getDefaultCmpResult(SearchIO sio, PtmCmpSkuIndex2 cmpSkuIndex) {
         String currentDeeplink = "";
         if (cmpSkuIndex != null && cmpSkuIndex.getId() != null && cmpSkuIndex.getId() > 0) {
@@ -173,39 +174,6 @@ public class Compare2Controller {
                 new PageableResult<ComparedSkuVo>(comparedSkuVos, 0, 1, 10)
         );
     }
-
-   /* private CmpResult getDefaultCmpSku(SearchIO sio, PtmProduct product) {
-        CmpResult cmpResult = new CmpResult();
-        cmpResult.setTotalRatingsNum(Long.valueOf(0));
-        PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, product.getId());
-        String specs = "";
-        if (ptmCmpSkuDescription != null) {
-            specs = ptmCmpSkuDescription.getJsonDescription();
-        }
-        cmpResult.setSpecs(specs);
-        cmpResult.setRatingNum(0);
-        String imageUrl = productCacheManager.getProductMasterImageUrl(product.getId());
-        List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
-        CmpProductListVo cplv = new CmpProductListVo();
-        cplv.setPrice(Math.round(product.getPrice()));
-        cplv.setTotalRatingsNum(Long.valueOf(0));
-        cplv.setRatingNum(0);
-        cplv.setBackRate(1.5f);
-        cplv.setCoins(Math.round(0.015 * product.getPrice()));
-        cplv.setFreight(0);
-        cplv.setImage(null);
-        cplv.setReturnGuarantee(0);
-        cplv.setSupport(null);
-        cplv.setDistributionTime("");
-        cplv.setDeepLinkUrl(WebsiteHelper.getUrlWithAff(Website.valueOf(product.getSourceSite()), product.getSourceUrl(), new String[]{sio.getMarketChannel().name()}));
-        cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(Website.valueOf(product.getSourceSite()), product.getSourceUrl(), new String[]{sio.getMarketChannel().name()}));
-        cmpResult.setImage(imageUrl);
-        cmpResult.setName(product.getTitle());
-        cmpResult.setBestPrice(cplv.getPrice());
-        comparedSkuVos.add(cplv);
-        cmpResult.setPriceList(comparedSkuVos);
-        return cmpResult;
-    }*/
 
     /**
      * 从solr中搜索
@@ -251,9 +219,6 @@ public class Compare2Controller {
     private void searchForResult(SearchIO sio) throws NonMatchedProductException {
         String _q = StringUtils.getSearchKey(sio.getCliQ());
 
-        long cateId = 0L;
-        int level = 0, index_for;
-
         // 搜索SKU
         PageableResult<CmpSkuModel> pagedCmpskuModels = cmpskuIndexService.searchSku(_q, 1, 5);
 
@@ -284,6 +249,7 @@ public class Compare2Controller {
             throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, title, mc);
         }
 
+        long cateId = 0L;
         sio.set(cateId, skuModel.getProductId(), skuModel.getId());
     }
 
@@ -384,6 +350,7 @@ public class Compare2Controller {
                 if (cmpSku.getWebsite() == null
                         || cmpSku.getPrice() <= 0
                         || cmpSku.getStatus() != SkuStatus.ONSALE) { // 临时过滤掉不能更新价格的商品
+                    logger.error(cmpSku.getId() + ", price=" + cmpSku.getPrice() + ", status=" + cmpSku.getStatus());
                     continue;
                 }
                 if (minPrice <= 0 || minPrice > cmpSku.getPrice()) {
@@ -402,6 +369,7 @@ public class Compare2Controller {
             }
 
             if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {
+                logger.error("Compared SKU VO IS EMPTY");
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", sio.getCliQ(), sio.getCliPrice());
             }
 
@@ -434,27 +402,37 @@ public class Compare2Controller {
             });
 
         } else {
-            logger.debug("Found skus size is 0 .");
+            logger.error("Found skus size is 0 .");
             throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
         }
 
         sio.setHsSkuId(cmpSkuId);
 
+        logger.info("cmpsku index / deep link");
+
         String currentDeeplink = "";
-        if (cmpSkuIndex != null && cmpSkuIndex.getId() > 0) {
-            PtmCmpSku cmpSku = cmpSkuCacheManager.getCmpSkuById(cmpSkuIndex.getId());
-            if (cmpSku.getWebsite().equals(sio.getCliSite())) {
-                currentDeeplink = WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
-            }
-        } else if (clientCmpSku != null) {
-            if (!cmpSkuCacheManager.isFlowControlled(sio.getDeviceId(), sio.getCliSite())) {
-                if (StringUtils.isEqual(clientCmpSku.getSkuTitle(), sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
-                    currentDeeplink = WebsiteHelper.getDeeplinkWithAff(clientCmpSku.getWebsite(), clientCmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
+        try {
+            if (cmpSkuIndex != null && cmpSkuIndex.getId() > 0) {
+                PtmCmpSku cmpSku = cmpSkuCacheManager.getCmpSkuById(cmpSkuIndex.getId());
+                if (cmpSku.getWebsite().equals(sio.getCliSite())) {
+                    currentDeeplink = WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
+                }
+            } else if (clientCmpSku != null) {
+                if (!cmpSkuCacheManager.isFlowControlled(sio.getDeviceId(), sio.getCliSite())) {
+                    if (StringUtils.isEqual(clientCmpSku.getSkuTitle(), sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
+                        currentDeeplink = WebsiteHelper.getDeeplinkWithAff(clientCmpSku.getWebsite(), clientCmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
+                    }
                 }
             }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
         }
 
+        logger.info("to found image url");
+
         String imageUrl = productCacheManager.getProductMasterImageUrl(sio.getHsProId());//productService.getProductMasterImageUrl(sio.getHsProId());
+
+        logger.info("found image url");
 
         ProductVo productVo = new ProductVo(sio.getHsProId(), sio.getCliQ(), imageUrl, minPrice, currentDeeplink);
 
