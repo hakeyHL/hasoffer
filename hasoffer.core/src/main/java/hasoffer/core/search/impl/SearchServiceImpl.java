@@ -28,6 +28,7 @@ import hasoffer.core.persistence.po.search.SrmSearchUpdateLog;
 import hasoffer.core.persistence.po.search.updater.SrmSearchLogUpdater;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
+import hasoffer.core.product.solr.ProductModel;
 import hasoffer.core.search.ISearchService;
 import hasoffer.fetch.model.ListProduct;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -155,6 +156,8 @@ public class SearchServiceImpl implements ISearchService {
         for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
 
             long productId = countKv.getKey();
+            long searchCount = countKv.getValue();
+            PtmProduct product = productService.getProduct(productId);
 
             List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId, SkuStatus.ONSALE);
             int size = 0;
@@ -162,7 +165,7 @@ public class SearchServiceImpl implements ISearchService {
                 size = cmpSkus.size();
             }
 
-            spscs.add(new SrmProductSearchCount(ymd, productId, countKv.getValue(), size));
+            spscs.add(new SrmProductSearchCount(ymd, productId, searchCount, size));
 
             if (count % 2000 == 0) {
                 saveLogCount(spscs);
@@ -170,6 +173,9 @@ public class SearchServiceImpl implements ISearchService {
                 spscs.clear();
             }
 
+            ProductModel pm = productService.getProductModel(product);
+            pm.setSearchCount(searchCount);
+            productService.import2Solr(pm);
         }
 
         if (ArrayUtils.hasObjs(spscs)) {
