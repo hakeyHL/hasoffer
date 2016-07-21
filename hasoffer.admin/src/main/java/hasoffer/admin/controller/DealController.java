@@ -49,7 +49,7 @@ public class DealController {
         ModelAndView mav = new ModelAndView("deal/list");
         PageableResult<AppDeal> pageableResult = dealService.findDealList(page, size);
         for (AppDeal appDeal : pageableResult.getData()) {
-            appDeal.setImageUrl(ImageUtil.getImageUrl(appDeal.getImageUrl()));
+            appDeal.setListPageImage(ImageUtil.getImageUrl(appDeal.getListPageImage()));
         }
         mav.addObject("page", PageHelper.getPageModel(request, pageableResult));
         mav.addObject("datas", pageableResult.getData());
