@@ -437,6 +437,7 @@ public class ProductServiceImpl implements IProductService {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void deleteProduct(long ptmProductId) {
         logger.warn("delete product : " + ptmProductId);
+        System.out.println("delete product : " + ptmProductId);
 
         List<PtmCmpSku> cmpSkus = dbm.query("select t from PtmCmpSku t where t.productId = ?0", Arrays.asList(ptmProductId));
 
