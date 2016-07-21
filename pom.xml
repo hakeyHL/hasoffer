@@ -22,9 +22,9 @@
         <!--<module>hasoffer.akka</module>-->
         <module>hasoffer.job</module>
         <module>hasoffer.job.worker</module>
-        <module>hasoffer.dubbo.api</module>
-        <module>hasoffer.dubbo.provider</module>
-        <module>hasoffer.dubbo.consumer</module>
+        <module>hasoffer.fetch.api</module>
+        <module>hasoffer.fetch.provider</module>
+        <module>hasoffer.fetch.consumer</module>
         <module>hasoffer.analysis.api</module>
     </modules>
 
