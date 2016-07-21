@@ -103,12 +103,15 @@ public class DealController {
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
     public ModelAndView edit(AppDeal deal, MultipartFile dealFile, MultipartFile bannerFile, String bannerImageUrl) throws IOException {
         String dealPath = "";
+        String dealSmallPath = "";
+        String dealBigPath = "";
         if (StringUtils.isEmpty(bannerImageUrl)) {
             //修改了图片
             if (!bannerFile.isEmpty()) {
                 File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
                 FileUtil.writeBytes(imageFile, bannerFile.getBytes());
                 try {
+
                     bannerImageUrl = ImageUtil.uploadImage(imageFile);
                 } catch (Exception e) {
                     logger.error("banner image upload fail");
@@ -122,6 +125,8 @@ public class DealController {
                 FileUtil.writeBytes(imageFile, dealFile.getBytes());
                 try {
                     dealPath = ImageUtil.uploadImage(imageFile);
+                    dealBigPath = ImageUtil.uploadImage(imageFile, 180, 180);
+                    dealSmallPath = ImageUtil.uploadImage(imageFile, 316, 180);
                 } catch (Exception e) {
                     logger.error("deal image upload fail");
                 }
@@ -156,6 +161,12 @@ public class DealController {
         }
         if (!dealPath.equals("")) {
             deal.setImageUrl(dealPath);
+        }
+        if (!dealBigPath.equals("")) {
+            deal.setInfoPageImage(dealBigPath);
+        }
+        if (!dealSmallPath.equals("")) {
+            deal.setListPageImage(dealSmallPath);
         }
         dealService.updateDeal(deal);
         return new ModelAndView("redirect:/deal/list");
