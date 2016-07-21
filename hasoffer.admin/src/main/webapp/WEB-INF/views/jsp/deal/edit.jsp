@@ -116,7 +116,7 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="col-sm-3 control-label">是否显示到前台：</label>
+            <label class="col-sm-3 control-label">是否显示到前端：</label>
 
             <div class="col-sm-7">
 
@@ -162,7 +162,7 @@
             </div>
         </div>
 
-        <div class="form-group" hidden="hidden">
+        <div class="form-group">
             <label class="col-sm-3 control-label">deal描述：</label>
 
             <div class="col-sm-7">
@@ -195,7 +195,7 @@
                 </h4>
             </div>
             <div class="modal-body">
-                当Deal设置为前台显示时价格描述不能为空 !
+                当Deal设置为前端显示时价格描述不能为空 !
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary"

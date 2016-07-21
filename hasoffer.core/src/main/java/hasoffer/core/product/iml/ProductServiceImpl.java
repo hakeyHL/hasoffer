@@ -386,7 +386,8 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public List<PtmTopSelling> getTopSellings(int page, int size) {
-        return dbm.query(Q_PTM_TOPSEELLING, page == 0 ? 0 : page * size, size == 0 ? 20 : size);
+        List li = dbm.query(Q_PTM_TOPSEELLING, page <= 1 ? 1 : page + 1, size == 0 ? 20 : size);
+        return li;
     }
 
     @Override
@@ -502,7 +503,12 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public void importProduct2Solr(PtmProduct product) {
+    public void import2Solr(ProductModel pm) {
+        productIndexService.createOrUpdate(pm);
+    }
+
+    @Override
+    public ProductModel getProductModel(PtmProduct product) {
         List<String> features = getProductFeatures(product.getId());
 
 //        PtmCategory category = dbm.get(PtmCategory.class, product.getCategoryId());
@@ -526,6 +532,12 @@ public class ProductServiceImpl implements IProductService {
             }
         }
 
+        long searchCount = 0;
+        SrmProductSearchCount productSearchCount = searchService.findSearchCountByProductId(product.getId());
+        if (productSearchCount != null) {
+            searchCount = productSearchCount.getCount();
+        }
+
         ProductModel productModel = new ProductModel(product.getId(),
                 product.getTitle(),
                 product.getTag(),
@@ -539,7 +551,15 @@ public class ProductServiceImpl implements IProductService {
                 product.getRating(),
                 cate1,
                 cate2,
-                cate3);
+                cate3,
+                searchCount);
+
+        return productModel;
+    }
+
+    @Override
+    public void importProduct2Solr(PtmProduct product) {
+        ProductModel productModel = getProductModel(product);
 
         productIndexService.createOrUpdate(productModel);
     }

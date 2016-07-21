@@ -28,6 +28,7 @@ import hasoffer.core.persistence.po.search.SrmSearchUpdateLog;
 import hasoffer.core.persistence.po.search.updater.SrmSearchLogUpdater;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
+import hasoffer.core.product.solr.ProductModel;
 import hasoffer.core.search.ISearchService;
 import hasoffer.fetch.model.ListProduct;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -71,6 +72,10 @@ public class SearchServiceImpl implements ISearchService {
     private static final String STAT_SEARCH_COUNT2 = "SELECT COUNT(t.id) FROM SrmProductSearchCount t WHERE t.ymd=?0 AND t.skuCount>=?1 ";
     private static final String STAT_SEARCH_COUNT3 = "SELECT COUNT(t.id) FROM SrmSearchLog t WHERE t.lUpdateTime>?0 AND t.lUpdateTime<?1 AND t.ptmProductId=0 ";
     private static final String STAT_SEARCH_COUNT4 = "SELECT COUNT(t.id) FROM SrmSearchLog t WHERE t.lUpdateTime>?0 AND t.lUpdateTime<?1 AND t.ptmProductId>0 ";
+
+    private static final String Q_SEARCH_COUNT_BY_PRODUCTID =
+            "SELECT t FROM SrmProductSearchCount t WHERE t.productId = ?0 ORDER BY t.ymd DESC";
+
     @Resource
     IDataBaseManager dbm;
     @Resource
@@ -82,6 +87,17 @@ public class SearchServiceImpl implements ISearchService {
     @Resource
     SearchLogCacheManager searchLogCacheManager;
     private Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
+
+    @Override
+    public SrmProductSearchCount findSearchCountByProductId(Long proId) {
+        List<SrmProductSearchCount> srmProductSearchCounts = dbm.query(Q_SEARCH_COUNT_BY_PRODUCTID, Arrays.asList(proId));
+
+        if (ArrayUtils.hasObjs(srmProductSearchCounts)) {
+            return srmProductSearchCounts.get(0);
+        }
+
+        return null;
+    }
 
     @Override
     @Transactional
@@ -113,6 +129,7 @@ public class SearchServiceImpl implements ISearchService {
         dbm.create(productSearchStat);
     }
 
+
     @Override
     public List<SrmProductSearchStat> findSearchCountStats() {
         return dbm.query("select t from SrmProductSearchStat t order by t.id desc");
@@ -139,6 +156,8 @@ public class SearchServiceImpl implements ISearchService {
         for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
 
             long productId = countKv.getKey();
+            long searchCount = countKv.getValue();
+            PtmProduct product = productService.getProduct(productId);
 
             List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId, SkuStatus.ONSALE);
             int size = 0;
@@ -146,7 +165,7 @@ public class SearchServiceImpl implements ISearchService {
                 size = cmpSkus.size();
             }
 
-            spscs.add(new SrmProductSearchCount(ymd, productId, countKv.getValue(), size));
+            spscs.add(new SrmProductSearchCount(ymd, productId, searchCount, size));
 
             if (count % 2000 == 0) {
                 saveLogCount(spscs);
@@ -154,6 +173,9 @@ public class SearchServiceImpl implements ISearchService {
                 spscs.clear();
             }
 
+            ProductModel pm = productService.getProductModel(product);
+            pm.setSearchCount(searchCount);
+            productService.import2Solr(pm);
         }
 
         if (ArrayUtils.hasObjs(spscs)) {
@@ -209,6 +231,8 @@ public class SearchServiceImpl implements ISearchService {
                     updater.getPo().setPtmProductId(finalProduct.getId());
                     dbm.update(updater);
                 }
+
+                searchLogCacheManager.delCache(searchLog.getId());
             }
         }
 

@@ -1,5 +1,7 @@
 package hasoffer.core.persistence.po.search;
 
+import hasoffer.core.persistence.dbm.osql.Identifiable;
+
 import javax.persistence.*;
 
 /**
@@ -9,7 +11,7 @@ import javax.persistence.*;
  * 3 保存每天被搜索次数最多的20个商品 - top selling
  */
 @Entity
-public class SrmProductSearchCount {
+public class SrmProductSearchCount implements Identifiable<Long> {
     @Id
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)

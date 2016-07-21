@@ -4,7 +4,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
-import hasoffer.fetch.sites.flipkart.FlipkartHelper;
+import hasoffer.fetch.sites.snapdeal.SnapdealHelper;
 import org.junit.Test;
 
 import java.util.regex.Matcher;
@@ -18,9 +18,9 @@ public class StringTest {
     @Test
     public void test10() {
 
-        String url = "http://dl.flipkart.com/dl";
+        String url = "http://m.snapdeal.com";
 
-        String deeplink = FlipkartHelper.getUrlWithAff(url, null);
+        String deeplink = SnapdealHelper.getUrlWithAff(url);
 
         System.out.println(deeplink);
 

@@ -102,4 +102,6 @@ public interface ISearchService {
     PageableResult<SrmProductSearchCount> findSearchCountsByYmd(String ymd, int page, int size);
 
     List<SrmProductSearchStat> findSearchCountStats();
+
+    SrmProductSearchCount findSearchCountByProductId(Long proId);
 }
