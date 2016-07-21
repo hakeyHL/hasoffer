@@ -111,6 +111,11 @@ public class ImageUtil {
         return s3Storage.save(file);
     }
 
+    public static String uploadImage(File file, int bigSize, int smallSize) throws Exception {
+        ImagePath imagePath = s3Storage.saveAndConvert(file, bigSize, smallSize);
+        return imagePath.getBigPath();
+    }
+
     public static ImagePath convertAndUploadImage(File file) throws Exception {
         ImagePath imagePath = s3Storage.saveAndConvert(file);
 
