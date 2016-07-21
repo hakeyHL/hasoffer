@@ -20,10 +20,6 @@ public interface IFetchService {
 
     OriFetchedProduct udpateSkuInAnyWay(String url, Website website) throws AffiliateAPIException, IOException, HttpFetchException, ContentParseException;
 
-    String fetchFlipkartImageUrl(String url) throws HttpFetchException, ContentParseException, AffiliateAPIException, IOException;
-
-    String fetchSnapdealImageUrl(String url) throws HttpFetchException, ContentParseException, AffiliateAPIException, IOException;
-
-    String fetchEbayImageUrl(String url) throws HttpFetchException, ContentParseException, AffiliateAPIException, IOException;
+    String fetchWebsiteImageUrl(Website website, String url) throws HttpFetchException, ContentParseException;
 
 }
