@@ -115,6 +115,7 @@ public class DealController {
                     bannerImageUrl = ImageUtil.uploadImage(imageFile);
                 } catch (Exception e) {
                     logger.error("banner image upload fail");
+                    return new ModelAndView("redirect:/deal/list");
                 }
             }
         }
@@ -125,10 +126,11 @@ public class DealController {
                 FileUtil.writeBytes(imageFile, dealFile.getBytes());
                 try {
                     dealPath = ImageUtil.uploadImage(imageFile);
-                    dealBigPath = ImageUtil.uploadImage(imageFile, 180, 180);
-                    dealSmallPath = ImageUtil.uploadImage(imageFile, 316, 180);
+                    dealBigPath = ImageUtil.uploadImage(imageFile, 316, 180);
+                    dealSmallPath = ImageUtil.uploadImage(imageFile, 180, 180);
                 } catch (Exception e) {
                     logger.error("deal image upload fail");
+                    return new ModelAndView("redirect:/deal/list");
                 }
             }
         }
@@ -159,13 +161,13 @@ public class DealController {
             dealService.saveOrUpdateBanner(banner);
 
         }
-        if (!dealPath.equals("")) {
+        if (!StringUtils.isEmpty(dealPath)) {
             deal.setImageUrl(dealPath);
         }
-        if (!dealBigPath.equals("")) {
+        if (!StringUtils.isEmpty(dealBigPath)) {
             deal.setInfoPageImage(dealBigPath);
         }
-        if (!dealSmallPath.equals("")) {
+        if (!StringUtils.isEmpty(dealSmallPath)) {
             deal.setListPageImage(dealSmallPath);
         }
         dealService.updateDeal(deal);
