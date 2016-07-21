@@ -93,7 +93,9 @@ public class FixController {
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
 
     @RequestMapping(value = "/cleansearchlogs", method = RequestMethod.GET)
-    public String cleansearchlogs() {
+    public
+    @ResponseBody
+    String cleansearchlogs() {
 
         ListAndProcessTask2<SrmSearchLog> listAndProcessTask2 = new ListAndProcessTask2<SrmSearchLog>(
                 new IList<SrmSearchLog>() {
