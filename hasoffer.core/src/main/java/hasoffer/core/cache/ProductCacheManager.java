@@ -91,7 +91,6 @@ public class ProductCacheManager {
      * @return
      */
     public PageableResult<PtmCmpSku> listPagedCmpSkus(long proId, int page, int size) {
-        logger.error(proId + "_____________");
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_" + String.valueOf(proId) + "_" + page + "_" + size;
 
         String cmpSkusJson = cacheService.get(key, 0);
@@ -147,7 +146,6 @@ public class ProductCacheManager {
         } catch (Exception e) {
             return null;
         }
-        logger.error(pagedCmpskus == null ? "null a  " : "alailailai ");
         return pagedCmpskus;
     }
 

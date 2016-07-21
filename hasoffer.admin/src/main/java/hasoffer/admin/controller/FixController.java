@@ -91,6 +91,14 @@ public class FixController {
 
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
 
+    @RequestMapping(value = "/cleansearchlogs", method = RequestMethod.GET)
+    public String cleansearchlogs() {
+
+//        ListAndProcessTask2<>
+
+        return "ok";
+    }
+
     /**
      * find title Count queue
      *
