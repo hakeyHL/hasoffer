@@ -99,11 +99,9 @@ public class Compare2Controller {
             getSioBySearch(sio);
             cr = getCmpResult(sio, cmpSkuIndex);
         } catch (Exception e) {
-            logger.error(" id  is  " + sio.getHsProId() + "   --------");
             if (sio.getHsProId() > 0) {
                 PtmProduct ptmProduct = productService.getProduct(sio.getHsProId());
                 if (ptmProduct == null) {
-                    logger.error(" delete " + sio.getHsProId() + "   --------");
                     productService.deleteProduct(sio.getHsProId());
                 } else {
                     logger.info(ptmProduct.toString());
@@ -414,7 +412,6 @@ public class Compare2Controller {
         sio.setHsSkuId(cmpSkuId);
         String currentDeeplink = "";
         try {
-            logger.error(" enter this .......");
             if (cmpSkuIndex != null && cmpSkuIndex.getId() > 0) {
                 PtmCmpSku cmpSku = cmpSkuCacheManager.getCmpSkuById(cmpSkuIndex.getId());
                 if (cmpSku.getWebsite().equals(sio.getCliSite())) {
