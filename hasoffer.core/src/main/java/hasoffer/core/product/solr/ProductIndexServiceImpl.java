@@ -17,20 +17,20 @@ public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductM
         return AppConfig.get(AppConfig.SOLR_PRODUCT_URL);
     }
 
-    public List<Long> simpleSearch(String key, int page, int size) {
+    public List<ProductModel> simpleSearch(String key, int page, int size) {
         String q = key;
 
         FilterQuery[] fqs = null;
-        Sort[] sorts = null;
+        Sort[] sorts = new Sort[]{new Sort("searchCount", Order.DESC)};
         PivotFacet[] pivotFacets = null;
 
-        SearchResult<Long> sr = search(q, fqs, sorts, pivotFacets, page, size);
+        SearchResult<ProductModel> sr = searchObjs(q, fqs, sorts, pivotFacets, page, size, true);
 
         return sr.getResult();
     }
 
     public PageableResult<ProductModel> searchProductsByKey(String title, int page, int size) {
-        Sort[] sorts = null;
+        Sort[] sorts = new Sort[]{new Sort("searchCount", Order.DESC)};
         PivotFacet[] pivotFacets = null;
 
         List<FilterQuery> fqList = new ArrayList<FilterQuery>();
@@ -41,6 +41,7 @@ public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductM
 
         return new PageableResult<ProductModel>(sr.getResult(), sr.getTotalCount(), page, size);
     }
+
     public PageableResult<ProductModel> searchPro(long cateId, int level, int page, int size) {
         if (level < 1 || level > 3) {
             return null;
@@ -48,7 +49,7 @@ public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductM
 
         String q = "*:*";
 
-        Sort[] sorts = null;
+        Sort[] sorts = new Sort[]{new Sort("searchCount", Order.DESC)};
         PivotFacet[] pivotFacets = null;
 
         List<FilterQuery> fqList = new ArrayList<FilterQuery>();
@@ -59,10 +60,6 @@ public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductM
         SearchResult<ProductModel> sr = searchObjs(q, fqs, sorts, pivotFacets, page == 0 ? 1 : page + 1, size, true);
 
         return new PageableResult<ProductModel>(sr.getResult(), sr.getTotalCount(), page, size);
-    }
-
-    public PageableResult<Long> searchPro(long cateId, String title, int page, int size) {
-        return searchPro(0, 0, cateId, title, page, size);
     }
 
     public PageableResult searchPro(long cateId, int level, String title, int page, int size) {

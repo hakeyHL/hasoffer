@@ -97,12 +97,7 @@ public class Compare2Controller {
             // 先去匹配sku
             cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
             getSioBySearch(sio);
-
-            logger.info(String.format("[%s]getcmpskus is run.1", q));
-
             cr = getCmpResult(sio, cmpSkuIndex);
-
-            logger.info(String.format("[%s]getcmpskus is run.2", q));
         } catch (Exception e) {
             logger.error(e.getMessage());
             logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
@@ -120,7 +115,7 @@ public class Compare2Controller {
         mav.addObject("page", PageHelper.getPageModel(request, cr.getPagedComparedSkuVos()));
         mav.addObject("newLayout", false);
 
-        logger.info(sio.toString());
+//        logger.info(sio.toString());
 
         return mav;
     }
@@ -258,7 +253,6 @@ public class Compare2Controller {
         String q = sio.getCliQ();
 
         String logId = HexDigestUtil.md5(q + "-" + sio.getCliSite().name()); // 这个值作为log表的id
-        logger.info("log id is " + logId);
 
         SrmSearchLog srmSearchLog = searchLogCacheManager.findSrmSearchLog(logId, true);
 
@@ -317,7 +311,6 @@ public class Compare2Controller {
 
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(sio.getHsProId(), sio.getPage(), sio.getSize());
         List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
-
         PtmCmpSku clientCmpSku = null;
 
         float cliPrice = sio.getCliPrice(), priceOff = 0.0f;
@@ -407,9 +400,6 @@ public class Compare2Controller {
         }
 
         sio.setHsSkuId(cmpSkuId);
-
-        logger.info("cmpsku index / deep link");
-
         String currentDeeplink = "";
         try {
             if (cmpSkuIndex != null && cmpSkuIndex.getId() > 0) {
@@ -428,12 +418,7 @@ public class Compare2Controller {
             logger.error(e.getMessage());
         }
 
-        logger.info("to found image url");
-
         String imageUrl = productCacheManager.getProductMasterImageUrl(sio.getHsProId());//productService.getProductMasterImageUrl(sio.getHsProId());
-
-        logger.info("found image url");
-
         ProductVo productVo = new ProductVo(sio.getHsProId(), sio.getCliQ(), imageUrl, minPrice, currentDeeplink);
 
         return new CmpResult(priceOff, productVo, new PageableResult<ComparedSkuVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize()));

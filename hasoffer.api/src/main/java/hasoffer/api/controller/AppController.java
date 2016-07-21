@@ -248,7 +248,7 @@ public class AppController {
         if (user != null) {
             List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
-                if (orderStatsAnalysisPO.getWebSite().equals(Website.SHOPCLUES.name()) || orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
+                if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
                     OrderVo orderVo = new OrderVo();
                     orderVo.setAccount(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.015)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
                     orderVo.setChannel(orderStatsAnalysisPO.getChannel());
@@ -343,13 +343,13 @@ public class AppController {
         for (AppDeal appDeal : deals) {
             DealVo dealVo = new DealVo();
             dealVo.setId(appDeal.getId());
-            dealVo.setImage(appDeal.getImageUrl() == null ? "" : ImageUtil.getImageUrl(appDeal.getImageUrl()));
+            dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
             String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
             DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
             dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
             dealVo.setExtra(0d);
             dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-            if (appDeal.getWebsite().name().equals("FLIPKART") || appDeal.getWebsite().name().equals("SHOPCLUES")) {
+            if (appDeal.getWebsite().name().equals("FLIPKART")) {
                 dealVo.setExtra(1.5);
             }
             dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
@@ -381,28 +381,14 @@ public class AppController {
         ModelAndView mv = new ModelAndView();
         if (appDeal != null) {
             Map map = new HashMap();
-            map.put("image", appDeal.getImageUrl() == null ? "" : ImageUtil.getImageUrl(appDeal.getImageUrl()));
+            map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
             map.put("title", appDeal.getTitle());
             map.put("website", appDeal.getWebsite());
             map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
             map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-            StringBuilder sb = new StringBuilder();
-            sb.append(appDeal.getWebsite().name()).append(" is offering ").append(appDeal.getTitle()).append(" .\n");
-            if (appDeal.getDescription() == null || appDeal.getDescription().equals("")) {
-                sb.append("\n");
-                sb.append("Steps to order the item at ").append(appDeal.getWebsite().name()).append(" website: \n");
-                sb.append("\n");
-                sb.append("1. First, visit the offer page at ").append(appDeal.getWebsite()).append(" .\n");
-                sb.append("2. Select your product according to the item variety.\n");
-                sb.append("3. Then click on Buy Now option. \n");
-                sb.append("4. Sign in/ Sign up at ").append(appDeal.getWebsite()).append(" and fill up your address. \n");
-                sb.append("5. Choose your payment option and make payment your cart value.").append(" .\n");
-            } else {
-                sb.append(appDeal.getDescription());
-            }
-            map.put("description", sb.toString());
+            map.put("description", appDeal.getDescription() == null ? "" : appDeal.getDescription());
             map.put("extra", 0);
-            if (appDeal.getWebsite() == Website.FLIPKART || appDeal.getWebsite() == Website.SHOPCLUES) {
+            if (appDeal.getWebsite() == Website.FLIPKART) {
                 map.put("extra", 1.5);
                 map.put("cashbackInfo", "1. Offer valid for a limited time only while stocks last\n" +
                         "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +

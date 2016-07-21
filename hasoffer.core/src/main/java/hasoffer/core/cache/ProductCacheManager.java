@@ -146,7 +146,6 @@ public class ProductCacheManager {
         } catch (Exception e) {
             return null;
         }
-
         return pagedCmpskus;
     }
 

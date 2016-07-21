@@ -17,6 +17,7 @@ import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.updater.PtmCategoryUpdater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
+import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.*;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
@@ -90,6 +91,71 @@ public class FixController {
     ProductIndexServiceImpl productIndexServiceImpl;
 
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
+
+    @RequestMapping(value = "/cleansearchlogs", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String cleansearchlogs() {
+
+        ListAndProcessTask2<SrmSearchLog> listAndProcessTask2 = new ListAndProcessTask2<SrmSearchLog>(
+                new IList<SrmSearchLog>() {
+                    @Override
+                    public PageableResult<SrmSearchLog> getData(int page) {
+                        return searchService.listSearchLogs(page, 1000);
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcess<SrmSearchLog>() {
+                    @Override
+                    public void process(SrmSearchLog o) {
+                        long proId = o.getPtmProductId();
+                        if (proId > 0) {
+                            PtmProduct product = dbm.get(PtmProduct.class, proId);
+                            if (product == null) {
+                                productService.deleteProduct(proId);
+                            }
+                        }
+                    }
+                }
+        );
+
+        listAndProcessTask2.go();
+
+        return "ok";
+    }
+
+    /**
+     * find title Count queue
+     *
+     * @return
+     */
+    @RequestMapping(value = "/setsearchcounts", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String setsearchcounts() {
+        // 根据 srmproductsearchcount 表的数据更新 solr
+        String sql = "SELECT DISTINCT(t.productId) FROM SrmProductSearchCount t";
+
+        List<Long> ids = dbm.query(sql);
+
+        for (Long id : ids) {
+            PtmProduct product = productService.getProduct(id);
+
+            if (product != null) {
+                productService.importProduct2Solr(product);
+            }
+        }
+        return "ok";
+    }
 
     /**
      * find title Count queue
@@ -217,13 +283,16 @@ public class FixController {
                             String sourceUrl = o.getSourceUrl();
                             // visit flipkart page to get image url
                             String oriImageUrl = "";
-                            if (Website.FLIPKART.name().equals(site)) {
-                                oriImageUrl = fetchService.fetchFlipkartImageUrl(sourceUrl);
-                            } else if (Website.SNAPDEAL.name().equals(site)) {
-                                oriImageUrl = fetchService.fetchSnapdealImageUrl(sourceUrl);
-                            } else if (Website.EBAY.name().equals(site)) {
-                                oriImageUrl = fetchService.fetchEbayImageUrl(sourceUrl);
-                            }
+
+                            oriImageUrl = fetchService.fetchWebsiteImageUrl(Website.valueOf(site), sourceUrl);
+
+//                            if (Website.FLIPKART.name().equals(site)) {
+//                                oriImageUrl = fetchService.fetchFlipkartImageUrl(sourceUrl);
+//                            } else if (Website.SNAPDEAL.name().equals(site)) {
+//                                oriImageUrl = fetchService.fetchSnapdealImageUrl(sourceUrl);
+//                            } else if (Website.EBAY.name().equals(site)) {
+//                                oriImageUrl = fetchService.fetchEbayImageUrl(sourceUrl);
+//                            }
 
                             productService.updateProductImage2(o.getId(), oriImageUrl);
 
@@ -1362,15 +1431,77 @@ public class FixController {
 //        shitMap.put(4649L, "4650,9267,4800");
 
 //        第四次
-        shitMap.put(4758L, "4759,4788,4994,5678,5691,7574,8209,13566,102801,102824");//上次导入的时候4758的level写错了，需要重新导入
-        shitMap.put(6158L, "6159,8609,13051,23846");
-        shitMap.put(5263L, "5264,19742,72552");
-        shitMap.put(1504L, "1505,2314,2840,3090,4781,4793,4931,67992,68099,68150,68771,69295,69489,69899,69900,70101,70121,70133,70294,70364,71848,72012,72108,72220,72297,72502,72810,72829,72870,72965,73045,73056,73162,73169,73615,73660,73901,73916,74174,74464,74484,74971,74974,75112,75193,75529,75658,75753,76146,76237,76446,76535,76662,76916,77491,77494,77496,78244,78299,78548,4925,5672,6112,25642");
-        shitMap.put(2334L, "2332,2335,2566,2789,4904,5608,5896,5973,7343,7889,8559,9442,17281,22402,2789,4745,5973,4745,4745");//上次导入的时候4758的level写错了，需要重新导入
+//        shitMap.put(4758L, "4759,4788,4994,5678,5691,7574,8209,13566,102801,102824");//上次导入的时候4758的level写错了，需要重新导入
+//        shitMap.put(6158L, "6159,8609,13051,23846");
+//        shitMap.put(5263L, "5264,19742,72552");
+//        shitMap.put(1504L, "1505,2314,2840,3090,4781,4793,4931,67992,68099,68150,68771,69295,69489,69899,69900,70101,70121,70133,70294,70364,71848,72012,72108,72220,72297,72502,72810,72829,72870,72965,73045,73056,73162,73169,73615,73660,73901,73916,74174,74464,74484,74971,74974,75112,75193,75529,75658,75753,76146,76237,76446,76535,76662,76916,77491,77494,77496,78244,78299,78548,4925,5672,6112,25642");
+//        shitMap.put(2334L, "2332,2335,2566,2789,4904,5608,5896,5973,7343,7889,8559,9442,17281,22402,2789,4745,5973,4745,4745");//上次导入的时候4758的level写错了，需要重新导入
+
+//        第五次
+//        shitMap.put(4758L, "4759,4788,4994,5678,5691,7574,8209,13566,102801,102824");//上次导入的时候4758的level忘记更改了，需要重新导入
+//        shitMap.put(4591L, "4595,4599,4603,4812,5220,19401,19575");
+//        shitMap.put(4568L, "4569,4573,4633,4750,4835,4837,4961,5013,5041,6228,7052");
+//        第六次
+//        shitMap.put(4979L, "4980,5316,5635,14930");
+//        shitMap.put(4979L, "4980,5316,5635,14930");
+//        shitMap.put(9054L, "9055,9764,10337,12966,13341,22117,22340,29991");
+//        shitMap.put(4584L, "4585,4588,5409");
+//        shitMap.put(4755L, "4756,9865");
+//        第七次
+//        shitMap.put(4979L, "4980,5316,5635,14930");
+//        shitMap.put(4591L, "4595,4599,4603,4812,5220,19401,19575");//上次执行似乎没有生效，再来一遍
+//        shitMap.put(4568L, "4569,4573,4633,4750,4835,4837,4961,5013,5041,6228,7052");
+//        shitMap.put(4638L, "5463");
+//        shitMap.put(4700L, "4745");
+//        shitMap.put(4949L, "6323");
+//        shitMap.put(8517L, "5281");
+
+//        第八次
+        shitMap.put(183L, "67979");
+        shitMap.put(8923L, "8924,52693");
+        shitMap.put(9197L, "9198,17840,88245");
+        shitMap.put(681L, "74307,85406");
+        shitMap.put(6717L, "6718,39672");
+        shitMap.put(5197L, "8985,8996,11048,10959,13788");
+        shitMap.put(2913L, "13837,8001,4693,14680,75100,26716,4703,2914,15220,20086,13460,6039,12443,7590,18868,14007,13756,18891,34258,86229,5603,18405,52713,56815,8435,75253,34551,15609,39166,83701");
+        shitMap.put(8549L, "50992,85051,78935,8550,9422,17383");
+        shitMap.put(5321L, "27905,6659,68407,26706,16468,10327,61288,34973,75700,5322,7931,67580");
+        shitMap.put(20460L, "20461");
 
         for (Map.Entry<Long, String> categoryInfo : shitMap.entrySet()) {
 
             fixCategory(categoryInfo.getKey(), categoryInfo.getValue().split(","));
+
+        }
+
+        return "";
+    }
+
+    //fixdata/fixshitcategorybyparent
+    @RequestMapping(value = "/fixshitcategorybyparent")
+    @ResponseBody
+    public String fixshitcategorybyparent() {
+
+        Map<Long, String> shitMap = new HashMap<Long, String>();
+
+//        shitMap.put(4560L, "5722,4722,7808,6334,6336,4561,7642,26878");
+//        shitMap.put(4807L, "4848,5149,5199,5271,5379,6161,6396,6498,7505,8146,8740,90304");
+//        shitMap.put(3334L, "3335,3360,3411,3431,5046,5346,6851,6978,7017,7580");
+//        shitMap.put(4584L, "3335,3360,3411,3431,5046,5346,6851,6978,7017,7580");
+//        shitMap.put(1701L, "1702,6327,7085,8317,8908,12922,12924,14312,98554");
+
+//        shitMap.put(7858L, "7859,12534,20529,22469");
+
+
+        for (Map.Entry<Long, String> categoryInfo : shitMap.entrySet()) {
+
+            String[] secondCategoryArray = categoryInfo.getValue().split(",");
+
+            for (String secondCategory : secondCategoryArray) {
+
+                fixCategory(categoryInfo.getKey(), Long.valueOf(secondCategory));
+
+            }
 
         }
 
@@ -1384,7 +1515,11 @@ public class FixController {
 
 //        long[] arrays = {57L, 11026L, 5834L};
 //        long[] arrays = {4591L, 4568L};
-        long[] arrays = {4825L};
+//        long[] arrays = {4825L};
+//        long[] arrays = {4638L, 259L, 2296L, 4886L, 4767L, 4700L, 4949L, 5314L, 4558, 68152, 7858};
+
+//        long[] arrays = {4755L};
+        long[] arrays = {4755L};
 
         for (long ptmcategoryId : arrays) {
 
@@ -1440,5 +1575,24 @@ public class FixController {
 
             dbm.update(updater);
         }
+    }
+
+    public void fixCategory(long descPtmcategoryId, long secondCategoryId) {
+
+        List<PtmCategory> thirdCategoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.parentId = ?0 ", Arrays.asList(secondCategoryId));
+
+        if (thirdCategoryList == null || thirdCategoryList.size() == 0) {
+            return;
+        }
+
+        String[] idArray = new String[thirdCategoryList.size()];
+
+        for (int i = 0; i < idArray.length; i++) {
+
+            idArray[i] = thirdCategoryList.get(i).getId().toString();
+
+        }
+
+        fixCategory(descPtmcategoryId, idArray);
     }
 }

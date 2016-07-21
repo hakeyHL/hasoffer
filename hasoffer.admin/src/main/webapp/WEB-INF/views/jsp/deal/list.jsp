@@ -137,14 +137,7 @@
                         <td>${fn:substring(data.createTime, 0, 10)}</td>
                         <td>${data.website}</td>
                         <td>
-                            <div class="row">
-                                <div class="col-xs-6 col-md-3">
-                                    <a href="#" class="thumbnail">
-                                        <img src="${data.imageUrl}" style="width: 40px; max-height: 60px;">
-                                    </a>
-                                </div>
-                            </div>
-
+                            <img src="${data.listPageImage}" class="img-rounded">
                         </td>
                         <td>
                             <c:choose>
