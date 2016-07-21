@@ -3,6 +3,7 @@ package hasoffer.fetch.sites.ebay;
 import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.utils.HtmlUtils;
+import hasoffer.fetch.core.IImageProcessor;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
@@ -14,12 +15,12 @@ import static hasoffer.base.utils.http.XPathUtils.getSubNodesByXPath;
 /**
  * Created on 2016/7/18.
  */
-public class EbayImageProcessor {
+public class EbayImageProcessor implements IImageProcessor {
 
     private static final String XPATH_IMAGE = "//div[@id='mainImgHldr']/img";
 
-    public static String getEbayImageUrl(String url) throws HttpFetchException, ContentParseException {
-
+    @Override
+    public String getWebsiteImageUrl(String url) throws HttpFetchException, ContentParseException {
         if (url != null && url.contains("dl.flipkart.com/dl/")) {
             url = FlipkartHelper.getUrlByDeeplink(url);
         }
@@ -33,9 +34,7 @@ public class EbayImageProcessor {
         if (imageNodes.size() > 0) {
             imageNode = imageNodes.get(imageNodes.size() - 1);
         }
-        String imageUrl = imageNode.getAttributeByName("src");
 
-        return imageUrl;
+        return imageNode.getAttributeByName("src");
     }
-
 }
