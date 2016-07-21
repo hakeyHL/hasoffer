@@ -92,6 +92,21 @@ public class FixController {
 
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
 
+    @RequestMapping(value = "/deleteproduct/{proId}", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String deleteproduct(@PathVariable Long proId) {
+        if (proId > 0) {
+            PtmProduct product = dbm.get(PtmProduct.class, proId);
+            if (product == null) {
+                productService.deleteProduct(proId);
+            } else {
+                logger.info(product.toString());
+            }
+        }
+        return "ok";
+    }
+
     @RequestMapping(value = "/cleansearchlogs", method = RequestMethod.GET)
     public
     @ResponseBody
