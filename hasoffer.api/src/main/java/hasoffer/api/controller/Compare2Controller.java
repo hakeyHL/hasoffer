@@ -315,7 +315,10 @@ public class Compare2Controller {
 
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(sio.getHsProId(), sio.getPage(), sio.getSize());
         List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
-
+        if (cmpSkus == null) {
+            logger.error("nullnullnullnullnullnullnullnullnull");
+        }
+        logger.error(cmpSkus.size() + "");
         PtmCmpSku clientCmpSku = null;
 
         float cliPrice = sio.getCliPrice(), priceOff = 0.0f;
