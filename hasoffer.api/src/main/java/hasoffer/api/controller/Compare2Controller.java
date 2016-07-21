@@ -413,6 +413,7 @@ public class Compare2Controller {
         sio.setHsSkuId(cmpSkuId);
         String currentDeeplink = "";
         try {
+            logger.error(" enter this .......");
             if (cmpSkuIndex != null && cmpSkuIndex.getId() > 0) {
                 PtmCmpSku cmpSku = cmpSkuCacheManager.getCmpSkuById(cmpSkuIndex.getId());
                 if (cmpSku.getWebsite().equals(sio.getCliSite())) {
