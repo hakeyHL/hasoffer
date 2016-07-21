@@ -42,6 +42,11 @@ public class AppDeal implements Identifiable<Long> {
     private String priceDescription;//deal价格描述
 
     private boolean display;//是否显示
+    @Column(columnDefinition = "text")
+    private String listPageImage;//deal列表页图片
+
+    @Column(columnDefinition = "text")
+    private String infoPageImage;//deal详情页图片
 
     @Override
     public Long getId() {
@@ -133,6 +138,22 @@ public class AppDeal implements Identifiable<Long> {
         this.display = display;
     }
 
+    public String getListPageImage() {
+        return listPageImage;
+    }
+
+    public void setListPageImage(String listPageImage) {
+        this.listPageImage = listPageImage;
+    }
+
+    public String getInfoPageImage() {
+        return infoPageImage;
+    }
+
+    public void setInfoPageImage(String infoPageImage) {
+        this.infoPageImage = infoPageImage;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -149,6 +170,8 @@ public class AppDeal implements Identifiable<Long> {
         if (priceDescription != null ? !priceDescription.equals(appDeal.priceDescription) : appDeal.priceDescription != null)
             return false;
         if (imageUrl != null ? !imageUrl.equals(appDeal.imageUrl) : appDeal.imageUrl != null) return false;
+        if (listPageImage != null ? !listPageImage.equals(appDeal.listPageImage) : appDeal.listPageImage != null) return false;
+        if (infoPageImage != null ? !infoPageImage.equals(appDeal.infoPageImage) : appDeal.infoPageImage != null) return false;
         if (createTime != null ? !createTime.equals(appDeal.createTime) : appDeal.createTime != null) return false;
         if (expireTime != null ? !expireTime.equals(appDeal.expireTime) : appDeal.expireTime != null) return false;
         return !(description != null ? !description.equals(appDeal.description) : appDeal.description != null);
@@ -163,6 +186,8 @@ public class AppDeal implements Identifiable<Long> {
         result = 31 * result + (linkUrl != null ? linkUrl.hashCode() : 0);
         result = 31 * result + (priceDescription != null ? priceDescription.hashCode() : 0);
         result = 31 * result + (imageUrl != null ? imageUrl.hashCode() : 0);
+        result = 31 * result + (listPageImage != null ? listPageImage.hashCode() : 0);
+        result = 31 * result + (infoPageImage != null ? infoPageImage.hashCode() : 0);
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (expireTime != null ? expireTime.hashCode() : 0);
         result = 31 * result + (push ? 1 : 0);
