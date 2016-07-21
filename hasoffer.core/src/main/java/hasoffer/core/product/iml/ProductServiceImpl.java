@@ -455,7 +455,10 @@ public class ProductServiceImpl implements IProductService {
             }
         }
 
-        dbm.delete(PtmProduct.class, ptmProductId);
+        PtmProduct product = dbm.get(PtmProduct.class, ptmProductId);
+        if (product != null) {
+            dbm.delete(PtmProduct.class, ptmProductId);
+        }
 
         productIndexService.remove(String.valueOf(ptmProductId));
 
