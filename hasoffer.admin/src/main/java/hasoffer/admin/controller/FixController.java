@@ -241,13 +241,16 @@ public class FixController {
                             String sourceUrl = o.getSourceUrl();
                             // visit flipkart page to get image url
                             String oriImageUrl = "";
-                            if (Website.FLIPKART.name().equals(site)) {
-                                oriImageUrl = fetchService.fetchFlipkartImageUrl(sourceUrl);
-                            } else if (Website.SNAPDEAL.name().equals(site)) {
-                                oriImageUrl = fetchService.fetchSnapdealImageUrl(sourceUrl);
-                            } else if (Website.EBAY.name().equals(site)) {
-                                oriImageUrl = fetchService.fetchEbayImageUrl(sourceUrl);
-                            }
+
+                            oriImageUrl = fetchService.fetchWebsiteImageUrl(Website.valueOf(site), sourceUrl);
+
+//                            if (Website.FLIPKART.name().equals(site)) {
+//                                oriImageUrl = fetchService.fetchFlipkartImageUrl(sourceUrl);
+//                            } else if (Website.SNAPDEAL.name().equals(site)) {
+//                                oriImageUrl = fetchService.fetchSnapdealImageUrl(sourceUrl);
+//                            } else if (Website.EBAY.name().equals(site)) {
+//                                oriImageUrl = fetchService.fetchEbayImageUrl(sourceUrl);
+//                            }
 
                             productService.updateProductImage2(o.getId(), oriImageUrl);
 

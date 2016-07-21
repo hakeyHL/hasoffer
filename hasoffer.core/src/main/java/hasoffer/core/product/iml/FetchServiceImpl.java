@@ -2,15 +2,16 @@ package hasoffer.core.product.iml;
 
 import hasoffer.affiliate.affs.AffiliateFactory;
 import hasoffer.affiliate.affs.IAffiliateProcessor;
-import hasoffer.affiliate.affs.flipkart.FlipkartAffiliateProductProcessor;
-import hasoffer.affiliate.affs.snapdeal.SnapdealProductProcessor;
 import hasoffer.affiliate.exception.AffiliateAPIException;
 import hasoffer.affiliate.model.AffiliateProduct;
 import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.core.exception.ERROR_CODE;
 import hasoffer.core.product.IFetchService;
+import hasoffer.core.search.exception.WebsiteErrorException;
+import hasoffer.fetch.core.IImageProcessor;
 import hasoffer.fetch.core.IProductProcessor;
 import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.helper.WebsiteHelper;
@@ -19,11 +20,8 @@ import hasoffer.fetch.helper.WebsiteSummaryProductProcessorFactory;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.Product;
 import hasoffer.fetch.model.ProductStatus;
-import hasoffer.fetch.sites.ebay.EbayImageProcessor;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
-import hasoffer.fetch.sites.flipkart.FlipkartImageProcessor;
 import hasoffer.fetch.sites.snapdeal.SnapdealHelper;
-import hasoffer.fetch.sites.snapdeal.SnapdealImageProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -184,50 +182,18 @@ public class FetchServiceImpl implements IFetchService {
         return null;
     }
 
+
     @Override
-    public String fetchFlipkartImageUrl(String url) throws HttpFetchException, ContentParseException {
+    public String fetchWebsiteImageUrl(Website website, String url) throws HttpFetchException, ContentParseException {
 
-        String sourceId = FlipkartHelper.getSkuIdByUrl(url);
+        IImageProcessor imageProcessor = WebsiteProcessorFactory.getImageProcessor(website);
 
-        FlipkartAffiliateProductProcessor productProcessor = new FlipkartAffiliateProductProcessor();
-
-        try {
-
-            AffiliateProduct affiliateProduct = productProcessor.getAffiliateProductBySourceId(sourceId);
-
-            return affiliateProduct.getImageUrl();
-
-        } catch (Exception e) {
-
-            return FlipkartImageProcessor.getFlipkartImageUrl(url);
-
+        if (imageProcessor == null) {
+            throw new WebsiteErrorException(ERROR_CODE.UNKNOWN, "website not correct");
         }
 
-    }
+        return imageProcessor.getWebsiteImageUrl(url);
 
-    @Override
-    public String fetchSnapdealImageUrl(String url) throws HttpFetchException, ContentParseException, AffiliateAPIException, IOException {
-        String sourceId = SnapdealHelper.getSkuIdByUrl(url);
-
-        SnapdealProductProcessor productProcessor = new SnapdealProductProcessor();
-
-        try {
-
-            AffiliateProduct affiliateProduct = productProcessor.getAffiliateProductBySourceId(sourceId);
-
-            return affiliateProduct.getImageUrl();
-
-        } catch (Exception e) {
-
-            return SnapdealImageProcessor.getSnapdealImageUrl(url);
-
-        }
-    }
-
-    @Override
-    public String fetchEbayImageUrl(String url) throws HttpFetchException, ContentParseException, AffiliateAPIException, IOException {
-
-        return EbayImageProcessor.getEbayImageUrl(url);
     }
 
     private OriFetchedProduct getAffiliateSummaryProduct(Website website, String sourceId) throws AffiliateAPIException, IOException {
