@@ -103,15 +103,19 @@ public class DealController {
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
     public ModelAndView edit(AppDeal deal, MultipartFile dealFile, MultipartFile bannerFile, String bannerImageUrl) throws IOException {
         String dealPath = "";
+        String dealSmallPath = "";
+        String dealBigPath = "";
         if (StringUtils.isEmpty(bannerImageUrl)) {
             //修改了图片
             if (!bannerFile.isEmpty()) {
                 File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
                 FileUtil.writeBytes(imageFile, bannerFile.getBytes());
                 try {
+
                     bannerImageUrl = ImageUtil.uploadImage(imageFile);
                 } catch (Exception e) {
                     logger.error("banner image upload fail");
+                    return new ModelAndView("redirect:/deal/list");
                 }
             }
         }
@@ -122,8 +126,11 @@ public class DealController {
                 FileUtil.writeBytes(imageFile, dealFile.getBytes());
                 try {
                     dealPath = ImageUtil.uploadImage(imageFile);
+                    dealBigPath = ImageUtil.uploadImage(imageFile, 316, 180);
+                    dealSmallPath = ImageUtil.uploadImage(imageFile, 180, 180);
                 } catch (Exception e) {
                     logger.error("deal image upload fail");
+                    return new ModelAndView("redirect:/deal/list");
                 }
             }
         }
@@ -154,8 +161,14 @@ public class DealController {
             dealService.saveOrUpdateBanner(banner);
 
         }
-        if (!dealPath.equals("")) {
+        if (!StringUtils.isEmpty(dealPath)) {
             deal.setImageUrl(dealPath);
+        }
+        if (!StringUtils.isEmpty(dealBigPath)) {
+            deal.setInfoPageImage(dealBigPath);
+        }
+        if (!StringUtils.isEmpty(dealSmallPath)) {
+            deal.setListPageImage(dealSmallPath);
         }
         dealService.updateDeal(deal);
         return new ModelAndView("redirect:/deal/list");
