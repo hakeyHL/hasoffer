@@ -96,11 +96,13 @@ public class Compare2Controller {
         try {
             // 先去匹配sku
             cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
-
+            logger.error("1==============================================");
             getSioBySearch(sio);
+            logger.error("2==============================================");
             cr = getCmpResult(sio, cmpSkuIndex);
-
+            logger.error("3==============================================");
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e.getMessage());
             logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
 
