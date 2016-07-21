@@ -7,6 +7,7 @@ import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.product.ProductBo;
+import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
@@ -14,6 +15,7 @@ import hasoffer.core.persistence.po.ptm.updater.PtmImageUpdater;
 import hasoffer.core.persistence.po.ptm.updater.PtmProductUpdater;
 import hasoffer.core.persistence.po.ptm.updater.PtmTopSellingUpdater;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
+import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
@@ -82,10 +84,11 @@ public class ProductServiceImpl implements IProductService {
     @Resource
     ICategoryService categoryService;
     @Resource
+    SearchLogCacheManager searchLogCacheManager;
+    @Resource
     private IDataBaseManager dbm;
     @Resource
     private ICmpSkuService cmpSkuService;
-
     private Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     @Override
@@ -455,6 +458,16 @@ public class ProductServiceImpl implements IProductService {
         dbm.delete(PtmProduct.class, ptmProductId);
 
         productIndexService.remove(String.valueOf(ptmProductId));
+
+        // 删除searchlog 以及 缓存
+        PageableResult<SrmSearchLog> pagedSearchLogs = searchService.listSearchLogsByProductId(ptmProductId, 1, Integer.MAX_VALUE);
+        List<SrmSearchLog> searchLogs = pagedSearchLogs.getData();
+        if (ArrayUtils.hasObjs(searchLogs)) {
+            for (SrmSearchLog srmSearchLog : searchLogs) {
+                dbm.delete(SrmSearchLog.class, srmSearchLog.getId());
+                searchLogCacheManager.delCache(srmSearchLog.getId());
+            }
+        }
     }
 
     @Override
