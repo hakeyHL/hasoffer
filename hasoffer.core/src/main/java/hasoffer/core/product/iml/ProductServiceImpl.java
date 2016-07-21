@@ -436,7 +436,7 @@ public class ProductServiceImpl implements IProductService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void deleteProduct(long ptmProductId) {
-        logger.debug("delete product : " + ptmProductId);
+        logger.warn("delete product : " + ptmProductId);
 
         List<PtmCmpSku> cmpSkus = dbm.query("select t from PtmCmpSku t where t.productId = ?0", Arrays.asList(ptmProductId));
 
@@ -455,7 +455,10 @@ public class ProductServiceImpl implements IProductService {
             }
         }
 
-        dbm.delete(PtmProduct.class, ptmProductId);
+        PtmProduct product = dbm.get(PtmProduct.class, ptmProductId);
+        if (product != null) {
+            dbm.delete(PtmProduct.class, ptmProductId);
+        }
 
         productIndexService.remove(String.valueOf(ptmProductId));
 

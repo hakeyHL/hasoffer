@@ -17,6 +17,7 @@ import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.updater.PtmCategoryUpdater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
+import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.*;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
@@ -91,10 +92,58 @@ public class FixController {
 
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
 
-    @RequestMapping(value = "/cleansearchlogs", method = RequestMethod.GET)
-    public String cleansearchlogs() {
+    @RequestMapping(value = "/deleteproduct/{proId}", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String deleteproduct(@PathVariable Long proId) {
+        if (proId > 0) {
+            PtmProduct product = dbm.get(PtmProduct.class, proId);
+            if (product == null) {
+                productService.deleteProduct(proId);
+            } else {
+                logger.info(product.toString());
+            }
+        }
+        return "ok";
+    }
 
-//        ListAndProcessTask2<>
+    @RequestMapping(value = "/cleansearchlogs", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String cleansearchlogs() {
+
+        ListAndProcessTask2<SrmSearchLog> listAndProcessTask2 = new ListAndProcessTask2<SrmSearchLog>(
+                new IList<SrmSearchLog>() {
+                    @Override
+                    public PageableResult<SrmSearchLog> getData(int page) {
+                        return searchService.listSearchLogs(page, 1000);
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcess<SrmSearchLog>() {
+                    @Override
+                    public void process(SrmSearchLog o) {
+                        long proId = o.getPtmProductId();
+                        if (proId > 0) {
+                            PtmProduct product = dbm.get(PtmProduct.class, proId);
+                            if (product == null) {
+                                productService.deleteProduct(proId);
+                            }
+                        }
+                    }
+                }
+        );
+
+        listAndProcessTask2.go();
 
         return "ok";
     }
