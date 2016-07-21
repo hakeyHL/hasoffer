@@ -113,7 +113,7 @@ public class ImageUtil {
 
     public static String uploadImage(File file, int bigSize, int smallSize) throws Exception {
         ImagePath imagePath = s3Storage.saveAndConvert(file, bigSize, smallSize);
-        return imagePath.getSmallPath();
+        return imagePath.getBigPath();
     }
 
     public static ImagePath convertAndUploadImage(File file) throws Exception {
