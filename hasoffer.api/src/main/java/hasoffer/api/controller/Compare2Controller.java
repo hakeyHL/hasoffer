@@ -257,7 +257,6 @@ public class Compare2Controller {
         String q = sio.getCliQ();
 
         String logId = HexDigestUtil.md5(q + "-" + sio.getCliSite().name()); // 这个值作为log表的id
-        logger.info("log id is " + logId);
 
         SrmSearchLog srmSearchLog = searchLogCacheManager.findSrmSearchLog(logId, true);
 
