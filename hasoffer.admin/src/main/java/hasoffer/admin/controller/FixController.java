@@ -99,8 +99,10 @@ public class FixController {
         if (proId > 0) {
             PtmProduct product = dbm.get(PtmProduct.class, proId);
             if (product == null) {
+                System.out.println("product is null");
                 productService.deleteProduct(proId);
             } else {
+                System.out.println("product is not null");
                 logger.info(product.toString());
             }
         }
