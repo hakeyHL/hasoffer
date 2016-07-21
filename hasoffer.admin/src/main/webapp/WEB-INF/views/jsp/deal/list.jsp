@@ -137,7 +137,7 @@
                         <td>${fn:substring(data.createTime, 0, 10)}</td>
                         <td>${data.website}</td>
                         <td>
-                            <img src="${data.imageUrl}" class="img-rounded">
+                            <img src="${data.listPageImage}" class="img-rounded">
                         </td>
                         <td>
                             <c:choose>

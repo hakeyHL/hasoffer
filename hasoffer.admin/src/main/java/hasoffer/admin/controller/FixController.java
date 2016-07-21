@@ -241,13 +241,16 @@ public class FixController {
                             String sourceUrl = o.getSourceUrl();
                             // visit flipkart page to get image url
                             String oriImageUrl = "";
-                            if (Website.FLIPKART.name().equals(site)) {
-                                oriImageUrl = fetchService.fetchFlipkartImageUrl(sourceUrl);
-                            } else if (Website.SNAPDEAL.name().equals(site)) {
-                                oriImageUrl = fetchService.fetchSnapdealImageUrl(sourceUrl);
-                            } else if (Website.EBAY.name().equals(site)) {
-                                oriImageUrl = fetchService.fetchEbayImageUrl(sourceUrl);
-                            }
+
+                            oriImageUrl = fetchService.fetchWebsiteImageUrl(Website.valueOf(site), sourceUrl);
+
+//                            if (Website.FLIPKART.name().equals(site)) {
+//                                oriImageUrl = fetchService.fetchFlipkartImageUrl(sourceUrl);
+//                            } else if (Website.SNAPDEAL.name().equals(site)) {
+//                                oriImageUrl = fetchService.fetchSnapdealImageUrl(sourceUrl);
+//                            } else if (Website.EBAY.name().equals(site)) {
+//                                oriImageUrl = fetchService.fetchEbayImageUrl(sourceUrl);
+//                            }
 
                             productService.updateProductImage2(o.getId(), oriImageUrl);
 
@@ -1397,12 +1400,31 @@ public class FixController {
 //        shitMap.put(4591L, "4595,4599,4603,4812,5220,19401,19575");
 //        shitMap.put(4568L, "4569,4573,4633,4750,4835,4837,4961,5013,5041,6228,7052");
 //        第六次
-        shitMap.put(4979L, "4980,5316,5635,14930");
-        shitMap.put(4979L, "4980,5316,5635,14930");
-        shitMap.put(9054L, "9055,9764,10337,12966,13341,22117,22340,29991");
-        shitMap.put(4584L, "4585,4588,5409");
-        shitMap.put(4755L, "4756,9865");
+//        shitMap.put(4979L, "4980,5316,5635,14930");
+//        shitMap.put(4979L, "4980,5316,5635,14930");
+//        shitMap.put(9054L, "9055,9764,10337,12966,13341,22117,22340,29991");
+//        shitMap.put(4584L, "4585,4588,5409");
+//        shitMap.put(4755L, "4756,9865");
+//        第七次
+//        shitMap.put(4979L, "4980,5316,5635,14930");
+//        shitMap.put(4591L, "4595,4599,4603,4812,5220,19401,19575");//上次执行似乎没有生效，再来一遍
+//        shitMap.put(4568L, "4569,4573,4633,4750,4835,4837,4961,5013,5041,6228,7052");
+//        shitMap.put(4638L, "5463");
+//        shitMap.put(4700L, "4745");
+//        shitMap.put(4949L, "6323");
+//        shitMap.put(8517L, "5281");
 
+//        第八次
+        shitMap.put(183L, "67979");
+        shitMap.put(8923L, "8924,52693");
+        shitMap.put(9197L, "9198,17840,88245");
+        shitMap.put(681L, "74307,85406");
+        shitMap.put(6717L, "6718,39672");
+        shitMap.put(5197L, "8985,8996,11048,10959,13788");
+        shitMap.put(2913L, "13837,8001,4693,14680,75100,26716,4703,2914,15220,20086,13460,6039,12443,7590,18868,14007,13756,18891,34258,86229,5603,18405,52713,56815,8435,75253,34551,15609,39166,83701");
+        shitMap.put(8549L, "50992,85051,78935,8550,9422,17383");
+        shitMap.put(5321L, "27905,6659,68407,26706,16468,10327,61288,34973,75700,5322,7931,67580");
+        shitMap.put(20460L, "20461");
 
         for (Map.Entry<Long, String> categoryInfo : shitMap.entrySet()) {
 
@@ -1420,11 +1442,13 @@ public class FixController {
 
         Map<Long, String> shitMap = new HashMap<Long, String>();
 
-        shitMap.put(4560L, "5722,4722,7808,6334,6336,4561,7642,26878");
-        shitMap.put(4807L, "4848,5149,5199,5271,5379,6161,6396,6498,7505,8146,8740,90304");
-        shitMap.put(3334L, "3335,3360,3411,3431,5046,5346,6851,6978,7017,7580");
-        shitMap.put(4584L, "3335,3360,3411,3431,5046,5346,6851,6978,7017,7580");
-        shitMap.put(1701L, "1702,6327,7085,8317,8908,12922,12924,14312,98554");
+//        shitMap.put(4560L, "5722,4722,7808,6334,6336,4561,7642,26878");
+//        shitMap.put(4807L, "4848,5149,5199,5271,5379,6161,6396,6498,7505,8146,8740,90304");
+//        shitMap.put(3334L, "3335,3360,3411,3431,5046,5346,6851,6978,7017,7580");
+//        shitMap.put(4584L, "3335,3360,3411,3431,5046,5346,6851,6978,7017,7580");
+//        shitMap.put(1701L, "1702,6327,7085,8317,8908,12922,12924,14312,98554");
+
+//        shitMap.put(7858L, "7859,12534,20529,22469");
 
 
         for (Map.Entry<Long, String> categoryInfo : shitMap.entrySet()) {
@@ -1449,7 +1473,11 @@ public class FixController {
 
 //        long[] arrays = {57L, 11026L, 5834L};
 //        long[] arrays = {4591L, 4568L};
-        long[] arrays = {4825L};
+//        long[] arrays = {4825L};
+//        long[] arrays = {4638L, 259L, 2296L, 4886L, 4767L, 4700L, 4949L, 5314L, 4558, 68152, 7858};
+
+//        long[] arrays = {4755L};
+        long[] arrays = {4755L};
 
         for (long ptmcategoryId : arrays) {
 
@@ -1511,15 +1539,17 @@ public class FixController {
 
         List<PtmCategory> thirdCategoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.parentId = ?0 ", Arrays.asList(secondCategoryId));
 
-        List<String> idList = new ArrayList<String>();
-
-        for (PtmCategory thirdCategory : thirdCategoryList) {
-
-            idList.add(thirdCategory.getId().toString());
-
+        if (thirdCategoryList == null || thirdCategoryList.size() == 0) {
+            return;
         }
 
-        String[] idArray = (String[]) idList.toArray();
+        String[] idArray = new String[thirdCategoryList.size()];
+
+        for (int i = 0; i < idArray.length; i++) {
+
+            idArray[i] = thirdCategoryList.get(i).getId().toString();
+
+        }
 
         fixCategory(descPtmcategoryId, idArray);
     }

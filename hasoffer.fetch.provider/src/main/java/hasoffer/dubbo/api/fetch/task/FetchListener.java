@@ -6,6 +6,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletContextEvent;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -40,5 +41,12 @@ public class FetchListener extends ContextLoaderListener {
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
 
+    }
+
+    public static void main(String[] args) {
+        Date date = new Date(1468526980000L);
+        System.out.println(date);
+        date = new Date(1468567946000L);
+        System.out.println(date);
     }
 }

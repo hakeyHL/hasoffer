@@ -82,7 +82,7 @@ public class StatHijackFetchJobBean extends QuartzJobBean {
 
         } catch (Exception e) {
             logger.debug("StatHijackFetchCount:任务失败,   DATE:" + new Date() + ":具体如下");
-            logger.debug(e.toString());
+            logger.info("error msg:{}",e);
         }
     }
 
