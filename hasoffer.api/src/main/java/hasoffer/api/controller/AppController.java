@@ -4,6 +4,7 @@ import hasoffer.api.controller.vo.*;
 import hasoffer.api.helper.ParseConfigHelper;
 import hasoffer.api.worker.SearchLogQueue;
 import hasoffer.base.enums.AppType;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
@@ -206,13 +207,18 @@ public class AppController {
         AppType appType = null;
 
         DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        MarketChannel marketChannel = deviceInfoVo.getMarketChannel();
         if (deviceInfoVo == null || deviceInfoVo.getAppType() == null) {
             appType = AppType.APP;
         } else {
             appType = deviceInfoVo.getAppType();
         }
-
-        AppVersion appVersion = appService.getLatestVersion(appType);
+        AppVersion appVersion = null;
+        if (marketChannel != null && marketChannel.name().equals("ZUK")) {
+            appVersion = appService.getLatestVersion(marketChannel, appType);
+        } else {
+            appVersion = appService.getLatestVersion(appType);
+        }
 
         ModelAndView mav = new ModelAndView();
 

@@ -1,6 +1,7 @@
 package hasoffer.core.system;
 
 import hasoffer.base.enums.AppType;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
@@ -19,6 +20,8 @@ import java.util.List;
 public interface IAppService {
 
     AppVersion getLatestVersion(AppType appType);
+
+    AppVersion getLatestVersion(MarketChannel marketChannel, AppType appType);
 
     List<AppWebsite> getWebsites(boolean appshow);
 

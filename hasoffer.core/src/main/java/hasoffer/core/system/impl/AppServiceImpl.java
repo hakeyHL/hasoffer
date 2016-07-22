@@ -1,6 +1,7 @@
 package hasoffer.core.system.impl;
 
 import hasoffer.base.enums.AppType;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.core.bo.system.SearchCriteria;
@@ -31,6 +32,10 @@ public class AppServiceImpl implements IAppService {
     private static final String Q_APP_VERSION =
             "SELECT t FROM AppVersion t " +
                     " WHERE t.appType = ?0 " +
+                    " ORDER BY t.publishTime DESC";
+    private static final String Q_CHANNEL_APP_VERSION =
+            "SELECT t FROM AppVersion t " +
+                    " WHERE t.appType = ?0  and marketChannel = ?1" +
                     " ORDER BY t.publishTime DESC";
 
     private static final String Q_APP_WEBSITE =
@@ -81,6 +86,12 @@ public class AppServiceImpl implements IAppService {
 //        return dbm.get(AppVersion.class, 3L);
         List<AppVersion> versions = dbm.query(Q_APP_VERSION, Arrays.asList(appType));
 
+        return ArrayUtils.hasObjs(versions) ? versions.get(0) : null;
+    }
+
+    @Override
+    public AppVersion getLatestVersion(MarketChannel marketChannel, AppType appType) {
+        List<AppVersion> versions = dbm.query(Q_CHANNEL_APP_VERSION, Arrays.asList(appType, marketChannel));
         return ArrayUtils.hasObjs(versions) ? versions.get(0) : null;
     }
 
