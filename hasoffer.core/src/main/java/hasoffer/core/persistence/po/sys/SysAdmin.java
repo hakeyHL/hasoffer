@@ -3,6 +3,8 @@ package hasoffer.core.persistence.po.sys;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 import hasoffer.core.persistence.enums.AdminType;
+import hasoffer.core.persistence.po.app.AppBanner;
+import hasoffer.core.utils.IdWorker;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -14,133 +16,134 @@ import java.util.Date;
 @Entity
 public class SysAdmin implements Identifiable<Long> {
 
-	@Id
-	@Column(unique = true, nullable = false)
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    private static final IdWorker idWorker = IdWorker.getInstance(AppBanner.class);
 
-	private Date createTime = TimeUtils.nowDate();
+    @Id
+    @Column(unique = true, nullable = false)
+    private Long id = idWorker.nextLong();
 
-	private boolean valid;
+    private Date createTime = TimeUtils.nowDate();
 
-	private String uname;
+    private boolean valid;
 
-	private String password;
+    private String uname;
 
-	private String email;
+    private String password;
 
-	private Date lastLoginTime = TimeUtils.nowDate();
+    private String email;
 
-	private String ukey;
+    private Date lastLoginTime = TimeUtils.nowDate();
 
-	@Enumerated(EnumType.STRING)
-	private AdminType type;
+    private String ukey;
 
-	@Override
-	public Long getId() {
-		return id;
-	}
+    @Enumerated(EnumType.STRING)
+    private AdminType type;
 
-	@Override
-	public void setId(Long id) {
-		this.id = id;
-	}
+    @Override
+    public Long getId() {
+        return id;
+    }
 
-	public AdminType getType() {
-		return type;
-	}
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setType(AdminType type) {
-		this.type = type;
-	}
+    public AdminType getType() {
+        return type;
+    }
 
-	public Date getCreateTime() {
-		return createTime;
-	}
+    public void setType(AdminType type) {
+        this.type = type;
+    }
 
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
+    public Date getCreateTime() {
+        return createTime;
+    }
 
-	public String getUname() {
-		return uname;
-	}
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
-	public void setUname(String uname) {
-		this.uname = uname;
-	}
+    public String getUname() {
+        return uname;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public void setUname(String uname) {
+        this.uname = uname;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public Date getLastLoginTime() {
-		return lastLoginTime;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public void setLastLoginTime(Date lastLoginTime) {
-		this.lastLoginTime = lastLoginTime;
-	}
+    public Date getLastLoginTime() {
+        return lastLoginTime;
+    }
 
-	public boolean isValid() {
-		return valid;
-	}
+    public void setLastLoginTime(Date lastLoginTime) {
+        this.lastLoginTime = lastLoginTime;
+    }
 
-	public void setValid(boolean valid) {
-		this.valid = valid;
-	}
+    public boolean isValid() {
+        return valid;
+    }
 
-	public String getUkey() {
-		return ukey;
-	}
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
 
-	public void setUkey(String ukey) {
-		this.ukey = ukey;
-	}
+    public String getUkey() {
+        return ukey;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+    public void setUkey(String ukey) {
+        this.ukey = ukey;
+    }
 
-		SysAdmin sysAdmin = (SysAdmin) o;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-		if (valid != sysAdmin.valid) return false;
-		if (id != null ? !id.equals(sysAdmin.id) : sysAdmin.id != null) return false;
-		if (createTime != null ? !createTime.equals(sysAdmin.createTime) : sysAdmin.createTime != null) return false;
-		if (uname != null ? !uname.equals(sysAdmin.uname) : sysAdmin.uname != null) return false;
-		if (password != null ? !password.equals(sysAdmin.password) : sysAdmin.password != null) return false;
-		if (email != null ? !email.equals(sysAdmin.email) : sysAdmin.email != null) return false;
-		if (lastLoginTime != null ? !lastLoginTime.equals(sysAdmin.lastLoginTime) : sysAdmin.lastLoginTime != null)
-			return false;
-		if (ukey != null ? !ukey.equals(sysAdmin.ukey) : sysAdmin.ukey != null) return false;
-		return type == sysAdmin.type;
+        SysAdmin sysAdmin = (SysAdmin) o;
 
-	}
+        if (valid != sysAdmin.valid) return false;
+        if (id != null ? !id.equals(sysAdmin.id) : sysAdmin.id != null) return false;
+        if (createTime != null ? !createTime.equals(sysAdmin.createTime) : sysAdmin.createTime != null) return false;
+        if (uname != null ? !uname.equals(sysAdmin.uname) : sysAdmin.uname != null) return false;
+        if (password != null ? !password.equals(sysAdmin.password) : sysAdmin.password != null) return false;
+        if (email != null ? !email.equals(sysAdmin.email) : sysAdmin.email != null) return false;
+        if (lastLoginTime != null ? !lastLoginTime.equals(sysAdmin.lastLoginTime) : sysAdmin.lastLoginTime != null)
+            return false;
+        if (ukey != null ? !ukey.equals(sysAdmin.ukey) : sysAdmin.ukey != null) return false;
+        return type == sysAdmin.type;
 
-	@Override
-	public int hashCode() {
-		int result = id != null ? id.hashCode() : 0;
-		result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
-		result = 31 * result + (valid ? 1 : 0);
-		result = 31 * result + (uname != null ? uname.hashCode() : 0);
-		result = 31 * result + (password != null ? password.hashCode() : 0);
-		result = 31 * result + (email != null ? email.hashCode() : 0);
-		result = 31 * result + (lastLoginTime != null ? lastLoginTime.hashCode() : 0);
-		result = 31 * result + (ukey != null ? ukey.hashCode() : 0);
-		result = 31 * result + (type != null ? type.hashCode() : 0);
-		return result;
-	}
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
+        result = 31 * result + (valid ? 1 : 0);
+        result = 31 * result + (uname != null ? uname.hashCode() : 0);
+        result = 31 * result + (password != null ? password.hashCode() : 0);
+        result = 31 * result + (email != null ? email.hashCode() : 0);
+        result = 31 * result + (lastLoginTime != null ? lastLoginTime.hashCode() : 0);
+        result = 31 * result + (ukey != null ? ukey.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        return result;
+    }
 }

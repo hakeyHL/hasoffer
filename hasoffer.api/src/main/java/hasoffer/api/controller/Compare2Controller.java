@@ -96,11 +96,18 @@ public class Compare2Controller {
         try {
             // 先去匹配sku
             cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
-
             getSioBySearch(sio);
             cr = getCmpResult(sio, cmpSkuIndex);
-
         } catch (Exception e) {
+            if (sio.getHsProId() > 0) {
+                PtmProduct ptmProduct = productService.getProduct(sio.getHsProId());
+                if (ptmProduct == null) {
+                    productService.deleteProduct(sio.getHsProId());
+                } else {
+                    logger.info(ptmProduct.toString());
+                }
+
+            }
             logger.error(e.getMessage());
             logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
 
@@ -154,6 +161,7 @@ public class Compare2Controller {
     }
 
     private CmpResult getDefaultCmpResult(SearchIO sio, PtmCmpSkuIndex2 cmpSkuIndex) {
+        logger.error(" enter default");
         String currentDeeplink = "";
         if (cmpSkuIndex != null && cmpSkuIndex.getId() != null && cmpSkuIndex.getId() > 0) {
             PtmCmpSku cmpSku = cmpSkuCacheManager.getCmpSkuById(cmpSkuIndex.getId());
@@ -313,7 +321,6 @@ public class Compare2Controller {
 
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(sio.getHsProId(), sio.getPage(), sio.getSize());
         List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
-
         PtmCmpSku clientCmpSku = null;
 
         float cliPrice = sio.getCliPrice(), priceOff = 0.0f;

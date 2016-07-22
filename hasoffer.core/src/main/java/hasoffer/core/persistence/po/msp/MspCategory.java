@@ -1,148 +1,155 @@
 package hasoffer.core.persistence.po.msp;
 
 import hasoffer.core.persistence.dbm.osql.Identifiable;
+import hasoffer.core.persistence.po.app.AppBanner;
+import hasoffer.core.utils.IdWorker;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 /**
  * Created by chevy on 2015/12/7.
  */
 @Entity
 public class MspCategory implements Identifiable<Long> {
-	@Id
-	@Column(unique = true, nullable = false)
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	private long parentId;
 
-	private String name;
+    private static final IdWorker idWorker = IdWorker.getInstance(AppBanner.class);
 
-	private String url;
+    @Id
+    @Column(unique = true, nullable = false)
+    private Long id = idWorker.nextLong();
 
-	private String imageUrl;
+    private long parentId;
 
-	private String groupName;// 组名 - 把三级目录看成两级目录
-	private int proCount;
+    private String name;
 
-	private long ptmCategoryId; // 对应的 PtmCategory id
+    private String url;
 
-	private boolean compared;
+    private String imageUrl;
 
-	public MspCategory() {
-	}
+    private String groupName;// 组名 - 把三级目录看成两级目录
+    private int proCount;
 
-	public MspCategory(long parentId, String name, String url, String imageUrl, String groupName) {
-		this.parentId = parentId;
-		this.name = name;
-		this.url = url;
-		this.imageUrl = imageUrl;
-		this.groupName = groupName;
-	}
+    private long ptmCategoryId; // 对应的 PtmCategory id
 
-	@Override
-	public Long getId() {
-		return id;
-	}
+    private boolean compared;
 
-	@Override
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public MspCategory() {
+    }
 
-	public long getParentId() {
-		return parentId;
-	}
+    public MspCategory(long parentId, String name, String url, String imageUrl, String groupName) {
+        this.parentId = parentId;
+        this.name = name;
+        this.url = url;
+        this.imageUrl = imageUrl;
+        this.groupName = groupName;
+    }
 
-	public void setParentId(long parentId) {
-		this.parentId = parentId;
-	}
+    @Override
+    public Long getId() {
+        return id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public long getParentId() {
+        return parentId;
+    }
 
-	public String getUrl() {
-		return url;
-	}
+    public void setParentId(long parentId) {
+        this.parentId = parentId;
+    }
 
-	public void setUrl(String url) {
-		this.url = url;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getImageUrl() {
-		return imageUrl;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setImageUrl(String imageUrl) {
-		this.imageUrl = imageUrl;
-	}
+    public String getUrl() {
+        return url;
+    }
 
-	public String getGroupName() {
-		return groupName;
-	}
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-	public void setGroupName(String groupName) {
-		this.groupName = groupName;
-	}
+    public String getImageUrl() {
+        return imageUrl;
+    }
 
-	public int getProCount() {
-		return proCount;
-	}
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
-	public void setProCount(int proCount) {
-		this.proCount = proCount;
-	}
+    public String getGroupName() {
+        return groupName;
+    }
 
-	public long getPtmCategoryId() {
-		return ptmCategoryId;
-	}
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
 
-	public void setPtmCategoryId(long ptmCategoryId) {
-		this.ptmCategoryId = ptmCategoryId;
-	}
+    public int getProCount() {
+        return proCount;
+    }
 
-	public boolean isCompared() {
-		return compared;
-	}
+    public void setProCount(int proCount) {
+        this.proCount = proCount;
+    }
 
-	public void setCompared(boolean compared) {
-		this.compared = compared;
-	}
+    public long getPtmCategoryId() {
+        return ptmCategoryId;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+    public void setPtmCategoryId(long ptmCategoryId) {
+        this.ptmCategoryId = ptmCategoryId;
+    }
 
-		MspCategory that = (MspCategory) o;
+    public boolean isCompared() {
+        return compared;
+    }
 
-		if (parentId != that.parentId) return false;
-		if (proCount != that.proCount) return false;
-		if (ptmCategoryId != that.ptmCategoryId) return false;
-		if (compared != that.compared) return false;
-		if (id != null ? !id.equals(that.id) : that.id != null) return false;
-		if (name != null ? !name.equals(that.name) : that.name != null) return false;
-		if (url != null ? !url.equals(that.url) : that.url != null) return false;
-		if (imageUrl != null ? !imageUrl.equals(that.imageUrl) : that.imageUrl != null) return false;
-		return !(groupName != null ? !groupName.equals(that.groupName) : that.groupName != null);
+    public void setCompared(boolean compared) {
+        this.compared = compared;
+    }
 
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-	@Override
-	public int hashCode() {
-		int result = id != null ? id.hashCode() : 0;
-		result = 31 * result + (int) (parentId ^ (parentId >>> 32));
-		result = 31 * result + (name != null ? name.hashCode() : 0);
-		result = 31 * result + (url != null ? url.hashCode() : 0);
-		result = 31 * result + (imageUrl != null ? imageUrl.hashCode() : 0);
-		result = 31 * result + (groupName != null ? groupName.hashCode() : 0);
-		result = 31 * result + proCount;
-		result = 31 * result + (int) (ptmCategoryId ^ (ptmCategoryId >>> 32));
-		result = 31 * result + (compared ? 1 : 0);
-		return result;
-	}
+        MspCategory that = (MspCategory) o;
+
+        if (parentId != that.parentId) return false;
+        if (proCount != that.proCount) return false;
+        if (ptmCategoryId != that.ptmCategoryId) return false;
+        if (compared != that.compared) return false;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (url != null ? !url.equals(that.url) : that.url != null) return false;
+        if (imageUrl != null ? !imageUrl.equals(that.imageUrl) : that.imageUrl != null) return false;
+        return !(groupName != null ? !groupName.equals(that.groupName) : that.groupName != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (int) (parentId ^ (parentId >>> 32));
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (url != null ? url.hashCode() : 0);
+        result = 31 * result + (imageUrl != null ? imageUrl.hashCode() : 0);
+        result = 31 * result + (groupName != null ? groupName.hashCode() : 0);
+        result = 31 * result + proCount;
+        result = 31 * result + (int) (ptmCategoryId ^ (ptmCategoryId >>> 32));
+        result = 31 * result + (compared ? 1 : 0);
+        return result;
+    }
 }

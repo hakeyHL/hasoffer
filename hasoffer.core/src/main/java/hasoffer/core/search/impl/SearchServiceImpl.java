@@ -214,8 +214,8 @@ public class SearchServiceImpl implements ISearchService {
     @Transactional(rollbackFor = Exception.class)
     public void mergeProducts(PtmProduct finalProduct, Map<String, PtmCmpSku> cmpSkuMap, PtmProduct product) {
         // 把关联的log转到第一个商品下
-        PageableResult<SrmSearchLog> pagedSeachLogs = listSearchLogsByProductId(product.getId(), 1, Integer.MAX_VALUE);
-        List<SrmSearchLog> searchLogs = pagedSeachLogs.getData();
+        PageableResult<SrmSearchLog> pagedSearchLogs = listSearchLogsByProductId(product.getId(), 1, Integer.MAX_VALUE);
+        List<SrmSearchLog> searchLogs = pagedSearchLogs.getData();
 
         // 所有的searchlog 合并
         if (ArrayUtils.hasObjs(searchLogs)) {
