@@ -59,7 +59,7 @@ public class AppServiceImpl implements IAppService {
     private static final String Q_APP_GETDEALS =
             "SELECT t FROM AppDeal t where  t.display='1' and  t.expireTime >= ?0  order by createTime desc   ";
     private static final String Q_APP_GETBANNERS =
-            " SELECT t from AppBanner t ORDER BY id desc";
+            " SELECT t from AppBanner t where t.deadline >=?0 ORDER BY id desc";
 
     private static final String Q_APP_GEDEALDETAIL =
             " SELECT t from AppDeal t where t.id=?0";
@@ -182,7 +182,7 @@ public class AppServiceImpl implements IAppService {
 
     @Override
     public List<AppBanner> getBanners() {
-        return dbm.query(Q_APP_GETBANNERS);
+        return dbm.query(Q_APP_GETBANNERS, Arrays.asList(new Date()));
     }
 
     @Override
