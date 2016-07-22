@@ -8,43 +8,54 @@ import java.util.Date;
  * Created on 2015/12/30.
  */
 public class AppVersionVo {
-	private String version;
+    private String version;
 
-	private String url;
+    private String url;
 
-	private Date publishTime;
+    private Date publishTime;
 
-	public AppVersionVo(AppVersion appVersion) {
-		if (appVersion == null) {
-			return;
-		}
+    private String msg;
 
-		this.version = appVersion.getVersion();
-		this.url = appVersion.getUrl();
-		this.publishTime = appVersion.getPublishTime();
-	}
 
-	public String getVersion() {
-		return version;
-	}
+    public AppVersionVo(AppVersion appVersion) {
+        if (appVersion == null) {
+            return;
+        }
+        this.msg = appVersion.getMsg();
+        this.version = appVersion.getVersion();
+        this.url = appVersion.getUrl();
+        this.publishTime = appVersion.getPublishTime();
+    }
 
-	public void setVersion(String version) {
-		this.version = version;
-	}
+    public String getMsg() {
+        return msg;
+    }
 
-	public String getUrl() {
-		return url;
-	}
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
 
-	public void setUrl(String url) {
-		this.url = url;
-	}
+    public String getVersion() {
+        return version;
+    }
 
-	public Date getPublishTime() {
-		return publishTime;
-	}
+    public void setVersion(String version) {
+        this.version = version;
+    }
 
-	public void setPublishTime(Date publishTime) {
-		this.publishTime = publishTime;
-	}
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public Date getPublishTime() {
+        return publishTime;
+    }
+
+    public void setPublishTime(Date publishTime) {
+        this.publishTime = publishTime;
+    }
 }
