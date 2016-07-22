@@ -2,6 +2,7 @@ package hasoffer.core.persistence.po.app;
 
 import hasoffer.base.enums.AppType;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
+import hasoffer.core.utils.IdWorker;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -12,106 +13,108 @@ import java.util.Date;
 @Entity
 public class AppVersion implements Identifiable<Long> {
 
-	@Id
-	@Column(unique = true, nullable = false)
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    private static final IdWorker idWorker = IdWorker.getInstance(AppBanner.class);
 
-	@Enumerated(EnumType.STRING)
-	private AppType appType;
-	private String version;
+    @Id
+    @Column(unique = true, nullable = false)
+    private Long id = idWorker.nextLong();
 
-	private String url;
+    @Enumerated(EnumType.STRING)
+    private AppType appType;
+    private String version;
 
-	private Date createTime;
+    private String url;
 
-	private Date publishTime;
+    private Date createTime;
 
-	public AppVersion(){}
+    private Date publishTime;
 
-	public AppVersion(AppType appType, String version,
-					  String url, Date createTime, Date publishTime) {
-		this.appType = appType;
-		this.version = version;
-		this.url = url;
-		this.createTime = createTime;
-		this.publishTime = publishTime;
-	}
+    public AppVersion() {
+    }
 
-	@Override
-	public Long getId() {
-		return id;
-	}
+    public AppVersion(AppType appType, String version,
+                      String url, Date createTime, Date publishTime) {
+        this.appType = appType;
+        this.version = version;
+        this.url = url;
+        this.createTime = createTime;
+        this.publishTime = publishTime;
+    }
 
-	@Override
-	public void setId(Long id) {
-		this.id = id;
-	}
+    @Override
+    public Long getId() {
+        return id;
+    }
 
-	public String getVersion() {
-		return version;
-	}
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setVersion(String version) {
-		this.version = version;
-	}
+    public String getVersion() {
+        return version;
+    }
 
-	public String getUrl() {
-		return url;
-	}
+    public void setVersion(String version) {
+        this.version = version;
+    }
 
-	public void setUrl(String url) {
-		this.url = url;
-	}
+    public String getUrl() {
+        return url;
+    }
 
-	public Date getCreateTime() {
-		return createTime;
-	}
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
+    public Date getCreateTime() {
+        return createTime;
+    }
 
-	public Date getPublishTime() {
-		return publishTime;
-	}
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
-	public void setPublishTime(Date publishTime) {
-		this.publishTime = publishTime;
-	}
+    public Date getPublishTime() {
+        return publishTime;
+    }
 
-	public AppType getAppType() {
-		return appType;
-	}
+    public void setPublishTime(Date publishTime) {
+        this.publishTime = publishTime;
+    }
 
-	public void setAppType(AppType appType) {
-		this.appType = appType;
-	}
+    public AppType getAppType() {
+        return appType;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+    public void setAppType(AppType appType) {
+        this.appType = appType;
+    }
 
-		AppVersion that = (AppVersion) o;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-		if (id != null ? !id.equals(that.id) : that.id != null) return false;
-		if (appType != that.appType) return false;
-		if (version != null ? !version.equals(that.version) : that.version != null) return false;
-		if (url != null ? !url.equals(that.url) : that.url != null) return false;
-		if (createTime != null ? !createTime.equals(that.createTime) : that.createTime != null) return false;
-		return !(publishTime != null ? !publishTime.equals(that.publishTime) : that.publishTime != null);
+        AppVersion that = (AppVersion) o;
 
-	}
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (appType != that.appType) return false;
+        if (version != null ? !version.equals(that.version) : that.version != null) return false;
+        if (url != null ? !url.equals(that.url) : that.url != null) return false;
+        if (createTime != null ? !createTime.equals(that.createTime) : that.createTime != null) return false;
+        return !(publishTime != null ? !publishTime.equals(that.publishTime) : that.publishTime != null);
 
-	@Override
-	public int hashCode() {
-		int result = id != null ? id.hashCode() : 0;
-		result = 31 * result + (appType != null ? appType.hashCode() : 0);
-		result = 31 * result + (version != null ? version.hashCode() : 0);
-		result = 31 * result + (url != null ? url.hashCode() : 0);
-		result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
-		result = 31 * result + (publishTime != null ? publishTime.hashCode() : 0);
-		return result;
-	}
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (appType != null ? appType.hashCode() : 0);
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (url != null ? url.hashCode() : 0);
+        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
+        result = 31 * result + (publishTime != null ? publishTime.hashCode() : 0);
+        return result;
+    }
 }

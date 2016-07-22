@@ -1,18 +1,24 @@
 package hasoffer.core.persistence.po.ptm;
 
 import hasoffer.core.persistence.dbm.osql.Identifiable;
+import hasoffer.core.persistence.po.app.AppBanner;
+import hasoffer.core.utils.IdWorker;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 /**
  * Created on 2015/12/7.
  */
 @Entity
 public class PtmImage implements Identifiable<Long> {
+
+	private static final IdWorker idWorker = IdWorker.getInstance(AppBanner.class);
+
 	@Id
 	@Column(unique = true, nullable = false)
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Long id = idWorker.nextLong();
 
 	private long productId; // #
 
