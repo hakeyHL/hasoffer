@@ -13,7 +13,7 @@ import java.util.Date;
 @Entity
 public class AppDeal implements Identifiable<Long> {
 
-    private static final IdWorker idWorker = IdWorker.getInstance(AppBanner.class);
+    private static final IdWorker idWorker = IdWorker.getInstance(AppDeal.class);
 
     @Id
     @Column(unique = true, nullable = false)

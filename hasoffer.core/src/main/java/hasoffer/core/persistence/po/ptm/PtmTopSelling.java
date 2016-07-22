@@ -3,7 +3,6 @@ package hasoffer.core.persistence.po.ptm;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.enums.TopSellStatus;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
-import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.utils.IdWorker;
 
 import javax.persistence.*;
@@ -15,7 +14,7 @@ import javax.persistence.*;
 @Entity
 public class PtmTopSelling implements Identifiable<Long> {
 
-    private static final IdWorker idWorker = IdWorker.getInstance(AppBanner.class);
+    private static final IdWorker idWorker = IdWorker.getInstance(PtmTopSelling.class);
 
     @Id
     @Column(unique = true, nullable = false)
