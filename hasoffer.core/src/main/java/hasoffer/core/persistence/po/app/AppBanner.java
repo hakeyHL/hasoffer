@@ -2,6 +2,7 @@ package hasoffer.core.persistence.po.app;
 
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 import hasoffer.core.persistence.enums.BannerFrom;
+import hasoffer.core.utils.IdWorker;
 
 import javax.persistence.*;
 import java.util.Date;
