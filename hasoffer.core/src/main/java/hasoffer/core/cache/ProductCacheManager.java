@@ -92,7 +92,6 @@ public class ProductCacheManager {
      */
     public PageableResult<PtmCmpSku> listPagedCmpSkus(long proId, int page, int size) {
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_" + String.valueOf(proId) + "_" + page + "_" + size;
-
         String cmpSkusJson = cacheService.get(key, 0);
 
         PageableResult<PtmCmpSku> pagedCmpskus = null;

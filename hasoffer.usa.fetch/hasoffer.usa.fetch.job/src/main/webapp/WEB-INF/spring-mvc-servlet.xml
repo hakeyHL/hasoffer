@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <!--<mvc:annotation-driven/>-->
+    <context:component-scan base-package="hasoffer.crawl.api.controller">
+        <!--<context:include-filter type="annotation"-->
+                                <!--expression="org.springframework.web.bind.annotation.ControllerAdvice"/>-->
+    </context:component-scan>
+
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <!--<mvc:exclude-mapping path="/appexc/**"/>-->
+            <mvc:exclude-mapping path="/static/**"/>
+            <!--<mvc:exclude-mapping path="/third/**"/>-->
+            <bean class="hasoffer.crawl.api.interceptor.RequestInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+    <aop:aspectj-autoproxy/>
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">
+        <property name="interceptors">
+            <list>
+                <bean class="hasoffer.crawl.api.interceptor.RequestTimeInterceptor"/>
+            </list>
+        </property>
+    </bean>
+    <!--<bean id="jsonViewResolver" class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">-->
+    <!--<property name="mediaTypes">-->
+    <!--<map>-->
+    <!--<entry key="json" value="application/json"/>-->
+    <!--</map>-->
+    <!--</property>-->
+    <!--<property name="defaultViews">-->
+    <!--<list>-->
+    <!--<bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView"/>-->
+    <!--</list>-->
+    <!--</property>-->
+    <!--<property name="ignoreAcceptHeader" value="false"/>-->
+    <!--<property name="order" value="1"/>-->
+    <!--</bean>-->
+
+    <!--<bean id="jspViewResolver"-->
+    <!--class="org.springframework.web.servlet.view.InternalResourceViewResolver">-->
+    <!--<property name="viewClass">-->
+    <!--<value>org.springframework.web.servlet.view.InternalResourceView</value>-->
+    <!--</property>-->
+    <!--&lt;!&ndash; 设置前缀，即视图所在的路径 &ndash;&gt;-->
+    <!--<property name="prefix" value="/WEB-INF/views/jsp/"/>-->
+    <!--&lt;!&ndash; 设置后缀，即视图的扩展名 &ndash;&gt;-->
+    <!--<property name="suffix" value=".jsp"/>-->
+    <!--<property name="order" value="2"/>-->
+    <!--</bean>-->
+
+    <!-- 支持上传文件 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+
+
+
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
+                <bean
+                        class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                    <property name="supportedMediaTypes">
+                        <list>
+                            <value>text/html;charset=UTF-8</value>
+                            <value>application/json;charset=UTF-8</value>
+                            <value>application/xml;charset=UTF-8</value>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="org.springframework.http.converter.FormHttpMessageConverter">
+                    <property name="supportedMediaTypes">
+                        <list>
+                            <value>application/x-www-form-urlencoded;charset=UTF-8</value>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean
+            class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="defaultContentType" value="text/html"/>
+        <property name="mediaTypes">
+            <map>
+                <entry key="html" value="text/html"/>
+                <entry key="json" value="application/json"/>
+                <entry key="xml" value="application/xml"/>
+            </map>
+        </property>
+        <property name="viewResolvers">
+            <list>
+                <bean
+                        class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+                    <property name="viewClass"
+                              value="org.springframework.web.servlet.view.JstlView"/>
+                    <property name="prefix" value="/WEB-INF/jsp/"/>
+                    <property name="suffix" value=".jsp"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+</beans>

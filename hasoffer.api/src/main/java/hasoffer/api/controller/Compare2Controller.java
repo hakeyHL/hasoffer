@@ -99,6 +99,15 @@ public class Compare2Controller {
             getSioBySearch(sio);
             cr = getCmpResult(sio, cmpSkuIndex);
         } catch (Exception e) {
+            if (sio.getHsProId() > 0) {
+                PtmProduct ptmProduct = productService.getProduct(sio.getHsProId());
+                if (ptmProduct == null) {
+                    productService.deleteProduct(sio.getHsProId());
+                } else {
+                    logger.info(ptmProduct.toString());
+                }
+
+            }
             logger.error(e.getMessage());
             logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
 
@@ -152,6 +161,7 @@ public class Compare2Controller {
     }
 
     private CmpResult getDefaultCmpResult(SearchIO sio, PtmCmpSkuIndex2 cmpSkuIndex) {
+        logger.error(" enter default");
         String currentDeeplink = "";
         if (cmpSkuIndex != null && cmpSkuIndex.getId() != null && cmpSkuIndex.getId() > 0) {
             PtmCmpSku cmpSku = cmpSkuCacheManager.getCmpSkuById(cmpSkuIndex.getId());
