@@ -31,7 +31,7 @@ public class AppServiceImpl implements IAppService {
 
     private static final String Q_APP_VERSION =
             "SELECT t FROM AppVersion t " +
-                    " WHERE t.appType = ?0 " +
+                    " WHERE t.appType = ?0 and marketChannel != 'ZUK'" +
                     " ORDER BY t.publishTime DESC";
     private static final String Q_CHANNEL_APP_VERSION =
             "SELECT t FROM AppVersion t " +
