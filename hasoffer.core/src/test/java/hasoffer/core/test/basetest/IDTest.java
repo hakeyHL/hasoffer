@@ -1,6 +1,5 @@
 package hasoffer.core.test.basetest;
 
-import hasoffer.core.utils.IdWorker;
 import org.junit.Test;
 
 /**
@@ -10,8 +9,8 @@ public class IDTest {
 
     @Test
     public void f() {
-        IdWorker idWorker = new IdWorker();
-        System.out.println(idWorker.nextId());
+//        IdWorker idWorker = IdWorker.getInstance();
+//        System.out.println(idWorker.nextId());
     }
 
 }
