@@ -1,7 +1,6 @@
 package hasoffer.core.persistence.po.urm;
 
 import hasoffer.core.persistence.dbm.osql.Identifiable;
-import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.utils.IdWorker;
 
 import javax.persistence.Column;
@@ -15,7 +14,7 @@ import javax.persistence.Id;
 @Entity
 public class UrmUserDevice implements Identifiable<Long> {
 
-    private static final IdWorker idWorker = IdWorker.getInstance(AppBanner.class);
+    private static final IdWorker idWorker = IdWorker.getInstance(UrmUserDevice.class);
 
     @Id
     @Column(unique = true, nullable = false)

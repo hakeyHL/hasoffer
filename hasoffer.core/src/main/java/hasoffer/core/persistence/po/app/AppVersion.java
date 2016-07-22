@@ -1,6 +1,7 @@
 package hasoffer.core.persistence.po.app;
 
 import hasoffer.base.enums.AppType;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 import hasoffer.core.utils.IdWorker;
 
@@ -13,7 +14,7 @@ import java.util.Date;
 @Entity
 public class AppVersion implements Identifiable<Long> {
 
-    private static final IdWorker idWorker = IdWorker.getInstance(AppBanner.class);
+    private static final IdWorker idWorker = IdWorker.getInstance(AppVersion.class);
 
     @Id
     @Column(unique = true, nullable = false)
@@ -24,6 +25,9 @@ public class AppVersion implements Identifiable<Long> {
     private String version;
 
     private String url;
+
+    @Enumerated(EnumType.STRING)
+    private MarketChannel marketChannel;
 
     private Date createTime;
 
@@ -49,6 +53,14 @@ public class AppVersion implements Identifiable<Long> {
     @Override
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public MarketChannel getMarketChannel() {
+        return marketChannel;
+    }
+
+    public void setMarketChannel(MarketChannel marketChannel) {
+        this.marketChannel = marketChannel;
     }
 
     public String getVersion() {
@@ -100,6 +112,7 @@ public class AppVersion implements Identifiable<Long> {
 
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (appType != that.appType) return false;
+        if (marketChannel != that.marketChannel) return false;
         if (version != null ? !version.equals(that.version) : that.version != null) return false;
         if (url != null ? !url.equals(that.url) : that.url != null) return false;
         if (createTime != null ? !createTime.equals(that.createTime) : that.createTime != null) return false;
@@ -111,6 +124,7 @@ public class AppVersion implements Identifiable<Long> {
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (appType != null ? appType.hashCode() : 0);
+        result = 31 * result + (marketChannel != null ? marketChannel.hashCode() : 0);
         result = 31 * result + (version != null ? version.hashCode() : 0);
         result = 31 * result + (url != null ? url.hashCode() : 0);
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
