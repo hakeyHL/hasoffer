@@ -24,6 +24,8 @@ public class AppVersion implements Identifiable<Long> {
 
     private String url;
 
+    private String msg;
+
     @Enumerated(EnumType.STRING)
     private MarketChannel marketChannel;
 
@@ -51,6 +53,14 @@ public class AppVersion implements Identifiable<Long> {
     @Override
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
     }
 
     public MarketChannel getMarketChannel() {
@@ -113,6 +123,7 @@ public class AppVersion implements Identifiable<Long> {
         if (marketChannel != that.marketChannel) return false;
         if (version != null ? !version.equals(that.version) : that.version != null) return false;
         if (url != null ? !url.equals(that.url) : that.url != null) return false;
+        if (msg != null ? !msg.equals(that.msg) : that.msg != null) return false;
         if (createTime != null ? !createTime.equals(that.createTime) : that.createTime != null) return false;
         return !(publishTime != null ? !publishTime.equals(that.publishTime) : that.publishTime != null);
 
@@ -125,6 +136,7 @@ public class AppVersion implements Identifiable<Long> {
         result = 31 * result + (marketChannel != null ? marketChannel.hashCode() : 0);
         result = 31 * result + (version != null ? version.hashCode() : 0);
         result = 31 * result + (url != null ? url.hashCode() : 0);
+        result = 31 * result + (msg != null ? msg.hashCode() : 0);
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (publishTime != null ? publishTime.hashCode() : 0);
         return result;
