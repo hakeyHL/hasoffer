@@ -1,8 +1,12 @@
 package hasoffer.core.persistence.po.urm;
 
 import hasoffer.core.persistence.dbm.osql.Identifiable;
+import hasoffer.core.persistence.po.app.AppBanner;
+import hasoffer.core.utils.IdWorker;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 /**
  * 设备--用户关系表
@@ -10,10 +14,13 @@ import javax.persistence.*;
  */
 @Entity
 public class UrmUserDevice implements Identifiable<Long> {
+
+    private static final IdWorker idWorker = IdWorker.getInstance(AppBanner.class);
+
     @Id
     @Column(unique = true, nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id = idWorker.nextLong();
+
     private String userId;
     private String deviceId;
 

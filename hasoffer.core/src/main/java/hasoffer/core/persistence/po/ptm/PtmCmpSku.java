@@ -5,6 +5,7 @@ import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
+import hasoffer.core.utils.IdWorker;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.sites.mysmartprice.model.MySmartPriceCmpSku;
 import org.hibernate.annotations.ColumnDefault;
@@ -15,10 +16,12 @@ import java.util.Date;
 @Entity
 public class PtmCmpSku implements Identifiable<Long> {
 
+    private static final IdWorker idWorker = IdWorker.getInstance(PtmCmpSku.class);
+
     @Id
     @Column(unique = true, nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id = idWorker.nextLong();
+
     private long productId; // PtmProduct # id
 
     private Long categoryId;

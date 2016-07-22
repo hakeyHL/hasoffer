@@ -2,6 +2,7 @@ package hasoffer.core.persistence.po.app;
 
 import hasoffer.base.model.Website;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
+import hasoffer.core.utils.IdWorker;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -12,10 +13,11 @@ import java.util.Date;
 @Entity
 public class AppDeal implements Identifiable<Long> {
 
+    private static final IdWorker idWorker = IdWorker.getInstance(AppBanner.class);
+
     @Id
     @Column(unique = true, nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id = idWorker.nextLong();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -170,8 +172,10 @@ public class AppDeal implements Identifiable<Long> {
         if (priceDescription != null ? !priceDescription.equals(appDeal.priceDescription) : appDeal.priceDescription != null)
             return false;
         if (imageUrl != null ? !imageUrl.equals(appDeal.imageUrl) : appDeal.imageUrl != null) return false;
-        if (listPageImage != null ? !listPageImage.equals(appDeal.listPageImage) : appDeal.listPageImage != null) return false;
-        if (infoPageImage != null ? !infoPageImage.equals(appDeal.infoPageImage) : appDeal.infoPageImage != null) return false;
+        if (listPageImage != null ? !listPageImage.equals(appDeal.listPageImage) : appDeal.listPageImage != null)
+            return false;
+        if (infoPageImage != null ? !infoPageImage.equals(appDeal.infoPageImage) : appDeal.infoPageImage != null)
+            return false;
         if (createTime != null ? !createTime.equals(appDeal.createTime) : appDeal.createTime != null) return false;
         if (expireTime != null ? !expireTime.equals(appDeal.expireTime) : appDeal.expireTime != null) return false;
         return !(description != null ? !description.equals(appDeal.description) : appDeal.description != null);
