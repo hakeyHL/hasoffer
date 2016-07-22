@@ -2,7 +2,6 @@ package hasoffer.core.persistence.po.admin;
 
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
-import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.utils.IdWorker;
 
 import javax.persistence.*;
@@ -14,7 +13,7 @@ import java.util.Date;
 @Entity
 public class StsAlive implements Identifiable<Long>{
 
-    private static final IdWorker idWorker = IdWorker.getInstance(AppBanner.class);
+    private static final IdWorker idWorker = IdWorker.getInstance(StsAlive.class);
 
     @Id
     @Column(unique = true, nullable = false)

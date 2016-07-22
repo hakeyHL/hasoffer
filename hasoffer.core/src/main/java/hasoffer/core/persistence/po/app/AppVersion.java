@@ -14,7 +14,7 @@ import java.util.Date;
 @Entity
 public class AppVersion implements Identifiable<Long> {
 
-    private static final IdWorker idWorker = IdWorker.getInstance(AppBanner.class);
+    private static final IdWorker idWorker = IdWorker.getInstance(AppVersion.class);
 
     @Id
     @Column(unique = true, nullable = false)

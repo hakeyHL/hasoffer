@@ -3,7 +3,6 @@ package hasoffer.core.persistence.po.msp;
 
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
-import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.utils.IdWorker;
 
 import javax.persistence.Column;
@@ -17,7 +16,7 @@ import java.util.Date;
 @Entity
 public class MspProductJob implements Identifiable<Long> {
 
-	private static final IdWorker idWorker = IdWorker.getInstance(AppBanner.class);
+	private static final IdWorker idWorker = IdWorker.getInstance(MspProductJob.class);
 
 	@Id
 	@Column(unique = true, nullable = false)
