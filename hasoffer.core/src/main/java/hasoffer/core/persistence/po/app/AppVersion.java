@@ -3,7 +3,6 @@ package hasoffer.core.persistence.po.app;
 import hasoffer.base.enums.AppType;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
-import hasoffer.core.utils.IdWorker;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -14,11 +13,10 @@ import java.util.Date;
 @Entity
 public class AppVersion implements Identifiable<Long> {
 
-    private static final IdWorker idWorker = IdWorker.getInstance(AppVersion.class);
-
     @Id
     @Column(unique = true, nullable = false)
-    private Long id = idWorker.nextLong();
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     private AppType appType;
