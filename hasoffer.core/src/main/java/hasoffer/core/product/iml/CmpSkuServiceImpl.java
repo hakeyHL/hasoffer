@@ -348,6 +348,10 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         PtmCmpSku ptmCmpSku = new PtmCmpSku();
 
+        if (ptmCmpSku.getId() != null) {
+            System.out.println("new 完对象 id = " + ptmCmpSku.getId());
+        }
+
         ptmCmpSku.setUrl(url);
         ptmCmpSku.setProductId(productId);
         ptmCmpSku.setColor(color);
@@ -370,6 +374,10 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         //sku创建时，添加创建时间字段
         ptmCmpSku.setCreateTime(TimeUtils.nowDate());
+        if (ptmCmpSku.getId() != null) {
+            System.out.println("创建前，di为" + ptmCmpSku.getId());
+        }
+        System.out.println();
         long skuid = dbm.create(ptmCmpSku);
         System.out.println("skuid =" + skuid);
 
