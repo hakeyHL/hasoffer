@@ -75,6 +75,11 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     CmpskuIndexServiceImpl cmpskuIndexService;
     private Logger logger = LoggerFactory.getLogger(CmpSkuServiceImpl.class);
 
+    public static void main(String[] args) {
+        String ss = HexDigestUtil.md5("FLIPKART" + StringUtils.getCleanChars("Apple iPhone 6S (Gold, 64 GB)"));
+        System.out.print(ss);
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateCmpSku(PtmCmpSkuUpdater updater) {
