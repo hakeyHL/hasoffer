@@ -1,14 +1,10 @@
 package hasoffer.core.test.analysis;
 
-import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.product.IProductService;
-import hasoffer.core.task.ListAndProcessTask2;
-import hasoffer.core.task.worker.IList;
-import hasoffer.core.task.worker.IProcess;
 import jodd.io.FileUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,25 +14,25 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by chevy on 2016/7/22.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:spring-beans.xml")
-public class AutoMatchCategoryTest {
+public class ExpTitleTest2 {
 
-    private final static String Q_CATE = "SELECT t FROM PtmCategory t WHERE t.level <= 3 ORDER BY t.level";
+    private static final String Q_CATE = "SELECT t FROM PtmCategory t WHERE t.level <= 3 ORDER BY t.level";
 
-    private final static String Q_PRODUCT = "SELECT COUNT(t.id) FROM PtmProduct t WHERE t.categoryId=?0";
+    private static final String Q_PRODUCT = "SELECT COUNT(t.id) FROM PtmProduct t WHERE t.categoryId=?0";
+
     final Map<Long, PtmCategory> cateMap1 = new HashMap<Long, PtmCategory>();
     final Map<Long, PtmCategory> cateMap2 = new HashMap<Long, PtmCategory>();
     final Map<Long, PtmCategory> cateMap3 = new HashMap<Long, PtmCategory>();
     final List<PtmCategory> cates = new ArrayList<PtmCategory>();
+    final List<Long> cateIds = new ArrayList<Long>();
+
     @Resource
     IDataBaseManager dbm;
     @Resource
@@ -46,68 +42,37 @@ public class AutoMatchCategoryTest {
     public void getI() {
         initCateMap();
 
-        File file1 = null, file2 = null;
+        String fileDir = "E:/data-match/exp/";
+
+        File file1 = null;
         try {
-            file1 = createFile("E:/data-match/exp/file3", true);
+            file1 = createFile(fileDir + "file2_1", true);
         } catch (Exception e) {
             System.out.println("error in create file");
             return;
         }
+
         final File f1 = file1;
-        final File f2 = file2;
 
-        final CurrentCategory cc = new CurrentCategory();
+        int len = cates.size();
+        for (int i = 0; i < len; i++) {
+            PtmCategory cate = cates.get(i);
 
-        IList list = new IList<PtmProduct>() {
-            @Override
-            public PageableResult<PtmProduct> getData(int page) {
-                return productService.listPagedProducts(cc.getCateId(), page, 1000);
-            }
+            System.out.println(String.format("exp No.[%d] cate[%d] to files", i, cate.getId()));
 
-            @Override
-            public boolean isRunForever() {
-                return false;
-            }
+            List<PtmProduct> products = productService.listProducts(cate.getId(), 1, Integer.MAX_VALUE);
 
-            @Override
-            public void setRunForever(boolean runForever) {
-
-            }
-        };
-
-        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<PtmProduct>(
-                list,
-                new IProcess<PtmProduct>() {
-                    @Override
-                    public void process(PtmProduct o) {
-                        if (StringUtils.isEmpty(o.getTitle())) {
-                            return;
-                        }
-
-                        try {
-                            FileUtil.appendString(f1, o.getTitle() + "\n");
-                            FileUtil.appendString(f2, o.getCategoryId() + "\n");
-                        } catch (IOException e) {
-                            System.out.println(String.format("error[IO ERROR] in exp to file[%s].[%d]", o.getTitle(), o.getCategoryId()));
-                        } /*catch (NullPointerException e){
-                            System.out.println(String.format("error[NULL] in exp to file[%s].[%d]", o.getTitle(), o.getCategoryId()));
-                        }*/
-                    }
+            for (PtmProduct o : products) {
+                if (StringUtils.isEmpty(o.getTitle())) {
+                    return;
                 }
-        );
 
-        int count = 0;
-        for (PtmCategory cate : cates) {
-
-            cc.setCateId(cate.getId());
-
-            System.out.println(String.format("exp cate[%d] to files", cate.getId()));
-            listAndProcessTask2.go();
-
-            count++;
-            /*if (count >= 10) {
-                break;
-            }*/
+                try {
+                    FileUtil.appendString(f1, o.getCategoryId() + " " + o.getTitle() + "\n");
+                } catch (IOException e) {
+                    System.out.println(String.format("error[IO ERROR] in exp to file[%s].[%d]", o.getTitle(), o.getCategoryId()));
+                }
+            }
         }
 
         System.out.println("all finished.");
@@ -150,14 +115,15 @@ public class AutoMatchCategoryTest {
                     break;
             }
             if (cateMap != null) {
-//                if (category.getLevel() == 3) {
-//                    long count = dbm.querySingle(Q_PRODUCT, Arrays.asList(category.getId()));
-//                    if (count == 0) {
-//                        continue;
-//                    }
-//                }
+                if (category.getLevel() == 3) {
+                    long count = dbm.querySingle(Q_PRODUCT, Arrays.asList(category.getId()));
+                    if (count == 0) {
+                        continue;
+                    }
+                }
                 cateMap.put(category.getId(), category);
                 cates.add(category);
+                cateIds.add(category.getId());
             }
         }
 
