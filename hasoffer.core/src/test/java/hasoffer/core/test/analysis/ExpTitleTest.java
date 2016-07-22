@@ -1,14 +1,12 @@
 package hasoffer.core.test.analysis;
 
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.product.IProductService;
-import hasoffer.core.task.ListAndProcessTask2;
-import hasoffer.core.task.worker.IList;
-import hasoffer.core.task.worker.IProcess;
 import jodd.io.FileUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,63 +44,55 @@ public class ExpTitleTest {
     public void getI2() {
         initCateMap();
 
-        File file1 = null, file2 = null;
+        String fileDir = "E:/data-match/exp/";
+
+        File file1;
         try {
-            file1 = createFile("E:/data-match/exp/title_in_category", true);
-            file2 = createFile("E:/data-match/exp/title_no_category", true);
+            file1 = createFile(fileDir + "nocate_titles", true);
         } catch (Exception e) {
             System.out.println("error in create file");
             return;
         }
-        final File f1 = file1;
-        final File f2 = file2;
 
-        IList list = new IList<PtmProduct>() {
-            @Override
-            public PageableResult<PtmProduct> getData(int page) {
-                return productService.listPagedProducts(page, 2000);
+        int page = 1, PAGE_SIZE = 2000;
+
+        PageableResult<PtmProduct> pagedPros = productService.listPagedProducts(page, PAGE_SIZE);
+        List<PtmProduct> products = pagedPros.getData();
+        long totalPage = pagedPros.getTotalPage();
+
+        while (page <= totalPage) {
+            if (page > 1) {
+                pagedPros = productService.listPagedProducts(page, PAGE_SIZE);
+//                break;
             }
 
-            @Override
-            public boolean isRunForever() {
-                return false;
-            }
+            products = pagedPros.getData();
 
-            @Override
-            public void setRunForever(boolean runForever) {
+            if (ArrayUtils.hasObjs(products)) {
+                for (PtmProduct o : products) {
+                    if (StringUtils.isEmpty(o.getTitle()) || cateIds.contains(o.getCategoryId())) {
+                        System.out.println(String.format("[%s].[%d]...CONTINUE...", o.getTitle(), o.getCategoryId()));
+                        continue;
+                    }
 
-            }
-        };
-
-        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<PtmProduct>(
-                list,
-                new IProcess<PtmProduct>() {
-                    @Override
-                    public void process(PtmProduct o) {
-                        if (StringUtils.isEmpty(o.getTitle())) {
-                            return;
-                        }
-
-                        try {
-                            long cateId = o.getCategoryId();
-
-                            if (cateIds.contains(cateId)) {
-                                FileUtil.appendString(f1, o.getTitle() + "\n");
-                            } else {
-                                FileUtil.appendString(f2, o.getTitle() + "\n");
-                            }
-                        } catch (IOException e) {
-                            System.out.println(String.format("error[IO ERROR] in exp to file[%s].[%d]", o.getTitle(), o.getCategoryId()));
-                        } /*catch (NullPointerException e){
-                            System.out.println(String.format("error[NULL] in exp to file[%s].[%d]", o.getTitle(), o.getCategoryId()));
-                        }*/
+                    try {
+                        FileUtil.appendString(file1, StringUtils.filterAndTrim(o.getTitle(), Arrays.asList("\n")) + "\n");
+                    } catch (IOException e) {
+                        System.out.println(String.format("error[IO ERROR] in exp to file[%s].[%d]", o.getTitle(), o.getCategoryId()));
                     }
                 }
-        );
+            }
 
-        listAndProcessTask2.go();
+            page++;
+        }
 
         System.out.println("all finished.");
+    }
+
+    @Test
+    public void f() {
+        String t = "xxx \n xll \n";
+        System.out.println(StringUtils.filterAndTrim(t, Arrays.asList("\n")));
     }
 
     @Test
@@ -111,64 +101,33 @@ public class ExpTitleTest {
 
         String fileDir = "E:/data-match/exp/";
 
-        File file1 = null, file2 = null;
+        File file1 = null;
         try {
-            file1 = createFile(fileDir + "file_1", true);
-            file2 = createFile(fileDir + "file_2", true);
+            file1 = createFile(fileDir + "file2_1", true);
         } catch (Exception e) {
             System.out.println("error in create file");
             return;
         }
 
-        final File f1 = file1, f2 = file2;
-
-        final CurrentCategory cc = new CurrentCategory();
-
-        IList list = new IList<PtmProduct>() {
-            @Override
-            public PageableResult<PtmProduct> getData(int page) {
-                return productService.listPagedProducts(cc.getCateId(), page, 2000);
-            }
-
-            @Override
-            public boolean isRunForever() {
-                return false;
-            }
-
-            @Override
-            public void setRunForever(boolean runForever) {
-
-            }
-        };
-
-        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<PtmProduct>(
-                list,
-                new IProcess<PtmProduct>() {
-                    @Override
-                    public void process(PtmProduct o) {
-                        if (StringUtils.isEmpty(o.getTitle())) {
-                            return;
-                        }
-
-                        try {
-                            FileUtil.appendString(f1, o.getCategoryId() + " " + o.getTitle() + "\n");
-                        } catch (IOException e) {
-                            System.out.println(String.format("error[IO ERROR] in exp to file[%s].[%d]", o.getTitle(), o.getCategoryId()));
-                        } /*catch (NullPointerException e){
-                            System.out.println(String.format("error[NULL] in exp to file[%s].[%d]", o.getTitle(), o.getCategoryId()));
-                        }*/
-                    }
-                }
-        );
-
-//        for (PtmCategory cate : cates) {
         int len = cates.size();
         for (int i = 0; i < len; i++) {
             PtmCategory cate = cates.get(i);
-            cc.setCateId(cate.getId());
-            System.out.println(String.format("exp cate[%d] to files", cate.getId()));
 
-            listAndProcessTask2.go();
+            System.out.println(String.format("exp No.[%d] cate[%d] to files", i, cate.getId()));
+
+            List<PtmProduct> products = productService.listProducts(cate.getId(), 1, Integer.MAX_VALUE);
+
+            for (PtmProduct o : products) {
+                if (StringUtils.isEmpty(o.getTitle())) {
+                    return;
+                }
+
+                try {
+                    FileUtil.appendString(file1, StringUtils.filterAndTrim(o.getCategoryId() + " " + o.getTitle(), Arrays.asList("\n")) + "\n");
+                } catch (IOException e) {
+                    System.out.println(String.format("error[IO ERROR] in exp to file[%s].[%d]", o.getTitle(), o.getCategoryId()));
+                }
+            }
         }
 
         System.out.println("all finished.");
