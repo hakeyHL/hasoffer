@@ -41,6 +41,53 @@ public class ExpTitleTest {
     IProductService productService;
 
     @Test
+    public void getI3() {
+        String fileDir = "D:/workspace/datas/hasoffer/";
+
+        File file1;
+        try {
+            file1 = createFile(fileDir + "all_titles", true);
+        } catch (Exception e) {
+            System.out.println("error in create file");
+            return;
+        }
+
+        int page = 1, PAGE_SIZE = 2000;
+
+        PageableResult<PtmProduct> pagedPros = productService.listPagedProducts(page, PAGE_SIZE);
+        List<PtmProduct> products = pagedPros.getData();
+        long totalPage = pagedPros.getTotalPage();
+
+        while (page <= totalPage) {
+            if (page > 1) {
+                pagedPros = productService.listPagedProducts(page, PAGE_SIZE);
+//                break;
+            }
+
+            products = pagedPros.getData();
+
+            if (ArrayUtils.hasObjs(products)) {
+                for (PtmProduct o : products) {
+                    if (StringUtils.isEmpty(o.getTitle())) {
+                        System.out.println(String.format("[%s].[%d]...CONTINUE...", o.getTitle(), o.getCategoryId()));
+                        continue;
+                    }
+
+                    try {
+                        FileUtil.appendString(file1, StringUtils.filterAndTrim(o.getTitle(), Arrays.asList("\n")) + "\n");
+                    } catch (IOException e) {
+                        System.out.println(String.format("error[IO ERROR] in exp to file[%s].[%d]", o.getTitle(), o.getCategoryId()));
+                    }
+                }
+            }
+
+            page++;
+        }
+
+        System.out.println("all finished.");
+    }
+
+    @Test
     public void getI2() {
         initCateMap();
 
