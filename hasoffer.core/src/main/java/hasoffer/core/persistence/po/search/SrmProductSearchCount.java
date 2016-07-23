@@ -1,12 +1,8 @@
 package hasoffer.core.persistence.po.search;
 
 import hasoffer.core.persistence.dbm.osql.Identifiable;
-import hasoffer.core.persistence.po.app.AppBanner;
-import hasoffer.core.utils.IdWorker;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * Created on 2015/12/29.
@@ -17,11 +13,10 @@ import javax.persistence.Id;
 @Entity
 public class SrmProductSearchCount implements Identifiable<Long> {
 
-    private static final IdWorker idWorker = IdWorker.getInstance(AppBanner.class);
-
     @Id
     @Column(unique = true, nullable = false)
-    private Long id = idWorker.nextLong();
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private long productId;
 

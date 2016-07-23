@@ -1,8 +1,6 @@
 package hasoffer.core.persistence.po.match;
 
 import hasoffer.core.persistence.dbm.osql.Identifiable;
-import hasoffer.core.persistence.po.app.AppBanner;
-import hasoffer.core.utils.IdWorker;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,11 +13,9 @@ import javax.persistence.Id;
 @Entity
 public class TagMatched implements Identifiable<Long> {
 
-    private static final IdWorker idWorker = IdWorker.getInstance(AppBanner.class);
-
     @Id
     @Column(unique = true, nullable = false)
-    private Long id = idWorker.nextLong();
+    private Long id;
 
     private String title;
 

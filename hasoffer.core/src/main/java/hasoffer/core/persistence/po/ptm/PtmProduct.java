@@ -2,23 +2,18 @@ package hasoffer.core.persistence.po.ptm;
 
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
-import hasoffer.core.persistence.po.app.AppBanner;
-import hasoffer.core.utils.IdWorker;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 
 @Entity
 public class PtmProduct implements Identifiable<Long> {
 
-    private static final IdWorker idWorker = IdWorker.getInstance(AppBanner.class);
-
     @Id
     @Column(unique = true, nullable = false)
-    private Long id = idWorker.nextLong();
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private Date createTime = TimeUtils.nowDate();
     private Date updateTime;

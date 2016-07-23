@@ -104,7 +104,7 @@ public class ExpTitleTest {
         int page = 1, PAGE_SIZE = 2000;
 
         PageableResult<PtmProduct> pagedPros = productService.listPagedProducts(page, PAGE_SIZE);
-        List<PtmProduct> products = pagedPros.getData();
+
         long totalPage = pagedPros.getTotalPage();
 
         while (page <= totalPage) {
@@ -113,7 +113,7 @@ public class ExpTitleTest {
 //                break;
             }
 
-            products = pagedPros.getData();
+            List<PtmProduct> products = pagedPros.getData();
 
             if (ArrayUtils.hasObjs(products)) {
                 for (PtmProduct o : products) {
@@ -137,12 +137,6 @@ public class ExpTitleTest {
     }
 
     @Test
-    public void f() {
-        String t = "xxx \n xll \n";
-        System.out.println(StringUtils.filterAndTrim(t, Arrays.asList("\n")));
-    }
-
-    @Test
     public void getI() {
         initCateMap();
 
@@ -150,7 +144,7 @@ public class ExpTitleTest {
 
         File file1 = null;
         try {
-            file1 = createFile(fileDir + "file2_1", true);
+            file1 = createFile(fileDir + "hastitle", true);
         } catch (Exception e) {
             System.out.println("error in create file");
             return;
@@ -166,7 +160,7 @@ public class ExpTitleTest {
 
             for (PtmProduct o : products) {
                 if (StringUtils.isEmpty(o.getTitle())) {
-                    return;
+                    continue;
                 }
 
                 try {

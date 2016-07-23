@@ -4,8 +4,6 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
-import hasoffer.core.persistence.po.app.AppBanner;
-import hasoffer.core.utils.IdWorker;
 import hasoffer.fetch.helper.WebsiteHelper;
 
 import javax.persistence.*;
@@ -17,11 +15,9 @@ import java.util.Date;
 @Entity
 public class PtmCmpSkuIndex2 implements Identifiable<Long> {
 
-    private static final IdWorker idWorker = IdWorker.getInstance(AppBanner.class);
-
     @Id
     @Column(unique = true, nullable = false)
-    private Long id = idWorker.nextLong();
+    private Long id;
 
     private long productId;
 

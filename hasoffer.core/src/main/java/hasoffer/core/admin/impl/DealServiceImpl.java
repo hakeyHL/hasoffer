@@ -27,7 +27,8 @@ import java.util.*;
 public class DealServiceImpl implements IDealService {
 
     private static final long EXPIRE_TIME_MS = 7 * 24 * 60 * 60 * 1000;
-    private static final String IMPORT_SQL = "insert into appdeal(website, title, linkUrl, expireTime, priceDescription ,description, createTime,  push ,display ,imageUrl) values(?, ?, ?, ?, ?, ? ,?, ?, ?, ?)";
+    private static final String IMPORT_SQL = "insert into appdeal(website, title, linkUrl, expireTime, priceDescription ,description, createTime,  push ,display ,imageUrl) values(?, ?, ?, ?, ? ,?, ?, ?, ?,?)";
+
     @Resource
     IDataBaseManager dbm;
 
