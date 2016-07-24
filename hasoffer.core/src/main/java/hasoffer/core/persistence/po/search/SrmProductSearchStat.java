@@ -27,12 +27,16 @@ public class SrmProductSearchStat implements Identifiable<String> {
     private int skuCount1;// 比价数量是1个
     private int skuCount2;// 比价数量是2个
     private int skuCount3;// 比价数量是3个
-    private int skuCount4;// 比价数量是4个以上的
+    private int skuCount4;// 比价数量是4-10个的
+    private int skuCount11;// 比价数量是11-50个的
+    private int skuCount51;// 比价数量是51+个的
 
     public SrmProductSearchStat() {
     }
 
-    public SrmProductSearchStat(String id, int noMatchedCount, int matchedCount, int skuCount0, int skuCount1, int skuCount2, int skuCount3, int skuCount4) {
+    public SrmProductSearchStat(String id, int noMatchedCount, int matchedCount,
+                                int skuCount0, int skuCount1, int skuCount2, int skuCount3, int skuCount4,
+                                int skuCount11, int skuCount51) {
         this.id = id;
 
         this.noMatchedCount = noMatchedCount;
@@ -43,6 +47,9 @@ public class SrmProductSearchStat implements Identifiable<String> {
         this.skuCount2 = skuCount2;
         this.skuCount3 = skuCount3;
         this.skuCount4 = skuCount4;
+
+        this.skuCount11 = skuCount11;
+        this.skuCount51 = skuCount51;
     }
 
     @Override
@@ -119,6 +126,22 @@ public class SrmProductSearchStat implements Identifiable<String> {
         this.matchedCount = matchedCount;
     }
 
+    public int getSkuCount11() {
+        return skuCount11;
+    }
+
+    public void setSkuCount11(int skuCount11) {
+        this.skuCount11 = skuCount11;
+    }
+
+    public int getSkuCount51() {
+        return skuCount51;
+    }
+
+    public void setSkuCount51(int skuCount51) {
+        this.skuCount51 = skuCount51;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -133,9 +156,12 @@ public class SrmProductSearchStat implements Identifiable<String> {
         if (skuCount2 != that.skuCount2) return false;
         if (skuCount3 != that.skuCount3) return false;
         if (skuCount4 != that.skuCount4) return false;
+        if (skuCount11 != that.skuCount11) return false;
+        if (skuCount51 != that.skuCount51) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        return !(createTime != null ? !createTime.equals(that.createTime) : that.createTime != null);
+        if (createTime != null ? !createTime.equals(that.createTime) : that.createTime != null) return false;
 
+        return true;
     }
 
     @Override
@@ -149,6 +175,8 @@ public class SrmProductSearchStat implements Identifiable<String> {
         result = 31 * result + skuCount2;
         result = 31 * result + skuCount3;
         result = 31 * result + skuCount4;
+        result = 31 * result + skuCount11;
+        result = 31 * result + skuCount51;
         return result;
     }
 }

@@ -69,7 +69,7 @@ public class SearchServiceImpl implements ISearchService {
     private static final String D_SEARCH_LOG = "delete FROM SrmSearchLog t where t.id in (:ids) ";
     private static final String Q_SEARCH_COUNT = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd=?0 ORDER BY t.count DESC";
     private static final String STAT_SEARCH_COUNT = "SELECT COUNT(t.id) FROM SrmProductSearchCount t WHERE t.ymd=?0 AND t.skuCount=?1 ";
-    private static final String STAT_SEARCH_COUNT2 = "SELECT COUNT(t.id) FROM SrmProductSearchCount t WHERE t.ymd=?0 AND t.skuCount>=?1 ";
+    private static final String STAT_SEARCH_COUNT2 = "SELECT COUNT(t.id) FROM SrmProductSearchCount t WHERE t.ymd=?0 AND t.skuCount>=?1 AND t.skuCount<?2 ";
     private static final String STAT_SEARCH_COUNT3 = "SELECT COUNT(t.id) FROM SrmSearchLog t WHERE t.lUpdateTime>?0 AND t.lUpdateTime<?1 AND t.ptmProductId=0 ";
     private static final String STAT_SEARCH_COUNT4 = "SELECT COUNT(t.id) FROM SrmSearchLog t WHERE t.lUpdateTime>?0 AND t.lUpdateTime<?1 AND t.ptmProductId>0 ";
 
@@ -117,15 +117,19 @@ public class SearchServiceImpl implements ISearchService {
 
         long count3 = dbm.querySingle(STAT_SEARCH_COUNT, Arrays.asList(ymd, 3));
 
-        long count4 = dbm.querySingle(STAT_SEARCH_COUNT2, Arrays.asList(ymd, 4));
+        long count4 = dbm.querySingle(STAT_SEARCH_COUNT2, Arrays.asList(ymd, 4, 11));
 
+        long count5 = dbm.querySingle(STAT_SEARCH_COUNT2, Arrays.asList(ymd, 11, 51));
+
+        long count6 = dbm.querySingle(STAT_SEARCH_COUNT2, Arrays.asList(ymd, 51, 1000));
 
         SrmProductSearchStat productSearchStat = dbm.get(SrmProductSearchStat.class, ymd);
         if (productSearchStat != null) {
             dbm.delete(SrmProductSearchStat.class, ymd);
         }
 
-        productSearchStat = new SrmProductSearchStat(ymd, (int) count_no_matched, (int) count_matched, (int) count0, (int) count1, (int) count2, (int) count3, (int) count4);
+        productSearchStat = new SrmProductSearchStat(ymd, (int) count_no_matched, (int) count_matched,
+                (int) count0, (int) count1, (int) count2, (int) count3, (int) count4, (int) count5, (int) count6);
         dbm.create(productSearchStat);
     }
 
