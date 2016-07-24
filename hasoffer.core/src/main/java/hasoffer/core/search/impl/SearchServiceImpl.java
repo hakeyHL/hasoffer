@@ -178,6 +178,11 @@ public class SearchServiceImpl implements ISearchService {
             }
 
             ProductModel pm = productService.getProductModel(product);
+
+            if (pm == null) {
+                continue;
+            }
+
             pm.setSearchCount(searchCount);
             productService.import2Solr(pm);
         }

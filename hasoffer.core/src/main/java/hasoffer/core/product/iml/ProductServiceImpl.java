@@ -526,6 +526,9 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public ProductModel getProductModel(PtmProduct product) {
+        if (product == null) {
+            return null;
+        }
         List<String> features = getProductFeatures(product.getId());
 
 //        PtmCategory category = dbm.get(PtmCategory.class, product.getCategoryId());
