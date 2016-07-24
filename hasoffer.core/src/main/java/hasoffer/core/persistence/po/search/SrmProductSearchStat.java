@@ -23,7 +23,7 @@ public class SrmProductSearchStat implements Identifiable<String> {
     private int noMatchedCount;// 没有匹配到sku的日志
     private int matchedCount;// 没有匹配到sku的日志
 
-    private int skuCount0;// 比价数量是1个
+    private int skuCount0;// 比价数量是0个
     private int skuCount1;// 比价数量是1个
     private int skuCount2;// 比价数量是2个
     private int skuCount3;// 比价数量是3个
