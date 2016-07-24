@@ -42,7 +42,10 @@ public class SearchResultCountVo {
         this.noMatchedCount = productSearchStat.getNoMatchedCount();
         this.matchedCount = productSearchStat.getMatchedCount();
 
-        this.totalCount = this.skuCount0 + this.skuCount1 + this.skuCount2 + this.skuCount3 + this.skuCount4;
+        this.totalCount = this.skuCount0
+                + this.skuCount1 + this.skuCount2
+                + this.skuCount3 + this.skuCount4
+                + this.skuCount11 + this.skuCount51;
     }
 
     public String getYmd() {
