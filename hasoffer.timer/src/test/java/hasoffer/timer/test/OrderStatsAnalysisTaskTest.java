@@ -60,7 +60,7 @@ public class OrderStatsAnalysisTaskTest {
 //        orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day1AgoTime, day1AgoTime);
 
 //        Date todayTime = new Date(cycleIndex * cycleTime);
-        orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day1AgoTime, todayTime);
+        orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), day1AgoTime, todayTime);
 //        orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), todayTime, todayTime);
 
     }
