@@ -20,7 +20,7 @@
                     <tr>
                         <td rowspan="2">日期</td>
                         <td rowspan="2">搜索匹配率</td>
-                        <td colspan="5">比价列表中SKU数量( onsale 状态)</td>
+                        <td colspan="7">比价列表中SKU数量( onsale 状态)</td>
                         <td rowspan="2">统计时间</td>
                     </tr>
                     <tr>
@@ -28,7 +28,9 @@
                         <td>1个</td>
                         <td>2个</td>
                         <td>3个</td>
-                        <td>≥4个</td>
+                        <td>4-10个</td>
+                        <td>11-50个</td>
+                        <td>51+</td>
                     </tr>
                     </thead>
                     <tbody>
@@ -50,6 +52,12 @@
                             </td>
                             <td>${stat.skuCount4}&nbsp;&nbsp;(<fmt:formatNumber
                                     value="${100 * stat.skuCount4 / stat.totalCount}" pattern="#.##"/> %)
+                            </td>
+                            <td>${stat.skuCount11}&nbsp;&nbsp;(<fmt:formatNumber
+                                    value="${100 * stat.skuCount11 / stat.totalCount}" pattern="#.##"/> %)
+                            </td>
+                            <td>${stat.skuCount51}&nbsp;&nbsp;(<fmt:formatNumber
+                                    value="${100 * stat.skuCount51 / stat.totalCount}" pattern="#.##"/> %)
                             </td>
                             <td><fmt:formatDate value="${stat.createTime}"
                                                 pattern="yyyy/MM/dd HH:mm:ss"></fmt:formatDate></td>
