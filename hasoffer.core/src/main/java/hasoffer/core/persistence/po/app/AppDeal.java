@@ -2,6 +2,7 @@ package hasoffer.core.persistence.po.app;
 
 import hasoffer.base.model.Website;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
+import hasoffer.core.utils.IdWorker;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -12,10 +13,11 @@ import java.util.Date;
 @Entity
 public class AppDeal implements Identifiable<Long> {
 
+    private static final IdWorker idWorker = IdWorker.getInstance(AppDeal.class);
+
     @Id
     @Column(unique = true, nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id = idWorker.nextLong();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
