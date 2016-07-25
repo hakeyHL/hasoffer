@@ -16,11 +16,14 @@ public class SearchResultCountVo {
     private int noMatchedCount;// 没有匹配到sku的日志
     private int matchedCount;// 没有匹配到sku的日志
 
-    private int skuCount0;// 比价数量是1个
+    private int skuCount0;// 比价数量是0个
     private int skuCount1;// 比价数量是1个
     private int skuCount2;// 比价数量是2个
     private int skuCount3;// 比价数量是3个
     private int skuCount4;// 比价数量是4个以上的
+
+    private int skuCount11;// 比价数量是11-50个的
+    private int skuCount51;// 比价数量是51+个的
 
     private int totalCount;
 
@@ -33,10 +36,16 @@ public class SearchResultCountVo {
         this.skuCount3 = productSearchStat.getSkuCount3();
         this.skuCount4 = productSearchStat.getSkuCount4();
 
+        this.skuCount11 = productSearchStat.getSkuCount11();
+        this.skuCount51 = productSearchStat.getSkuCount51();
+
         this.noMatchedCount = productSearchStat.getNoMatchedCount();
         this.matchedCount = productSearchStat.getMatchedCount();
 
-        this.totalCount = this.skuCount0 + this.skuCount1 + this.skuCount2 + this.skuCount3 + this.skuCount4;
+        this.totalCount = this.skuCount0
+                + this.skuCount1 + this.skuCount2
+                + this.skuCount3 + this.skuCount4
+                + this.skuCount11 + this.skuCount51;
     }
 
     public String getYmd() {
@@ -117,5 +126,21 @@ public class SearchResultCountVo {
 
     public void setTotalCount(int totalCount) {
         this.totalCount = totalCount;
+    }
+
+    public int getSkuCount11() {
+        return skuCount11;
+    }
+
+    public void setSkuCount11(int skuCount11) {
+        this.skuCount11 = skuCount11;
+    }
+
+    public int getSkuCount51() {
+        return skuCount51;
+    }
+
+    public void setSkuCount51(int skuCount51) {
+        this.skuCount51 = skuCount51;
     }
 }
