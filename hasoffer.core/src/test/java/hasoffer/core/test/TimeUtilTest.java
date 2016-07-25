@@ -97,6 +97,10 @@ public class TimeUtilTest {
 
     }
 
+    @Test
+    public void test1() {
+        System.out.println(TimeUtils.nowDate());
+    }
 
     @Test
     public void getGMTTime() {
