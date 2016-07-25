@@ -43,6 +43,7 @@ public class IdWorker {
     }
 
     public synchronized static IdWorker getInstance(Class<?> cls) {
+        System.out.println("WN ID_WORKER getInstance=" + (MAP.get(cls.getName()) == null));
         if (MAP.get(cls.getName()) == null) {
             String machineStr = System.getenv("ID_WORKER");
 
