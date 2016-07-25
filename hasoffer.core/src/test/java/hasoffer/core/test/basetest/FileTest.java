@@ -10,7 +10,9 @@ import hasoffer.core.bo.match.AnalysisResult;
 import jodd.io.FileUtil;
 import org.junit.Test;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +21,20 @@ import java.util.Map;
  * Created on 2016/6/30.
  */
 public class FileTest {
+
+    @Test
+    public void ts3() throws Exception {
+
+//        BufferedReader fr = new BufferedReader(new FileReader(new File("d:/datas/hasoffer/all_titles")));
+        BufferedReader fr = new BufferedReader(new FileReader(new File("d:/datas/hasoffer/sen2vec")));
+
+        for (int i = 0; i < 10; i++) {
+            String line = fr.readLine();
+            System.out.println(line);
+        }
+
+        fr.close();
+    }
 
     @Test
     public void ts2() {
