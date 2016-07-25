@@ -24,13 +24,11 @@ public class AppVersion implements Identifiable<Long> {
     private AppType appType;
     private String version;
 
+    private String msg;
     private String url;
-
     @Enumerated(EnumType.STRING)
     private MarketChannel marketChannel;
-
     private Date createTime;
-
     private Date publishTime;
 
     public AppVersion() {
@@ -43,6 +41,14 @@ public class AppVersion implements Identifiable<Long> {
         this.url = url;
         this.createTime = createTime;
         this.publishTime = publishTime;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
     }
 
     @Override
