@@ -48,6 +48,7 @@ public class IdWorker {
 
             byte machine = 0;
             if (machineStr != null && machineStr.trim().length() > 0) {
+                logger.info("GET ID_WORKER SUCCESS,ID_WORKER=" + machineStr);
                 machine = (byte) Integer.parseInt(machineStr);
             } else {
                 logger.warn("没有发现ID_WORKER，如果部署多个实例，必须对每台机器设置不同的ID_WORKER；例如ID_WORKER=1");

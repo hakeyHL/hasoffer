@@ -1,7 +1,6 @@
 package hasoffer.core.persistence.po.sys;
 
 import hasoffer.core.persistence.dbm.osql.Identifiable;
-import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.utils.IdWorker;
 
 import javax.persistence.Column;
@@ -16,7 +15,7 @@ import java.util.Date;
 @Entity
 public class SysCheckTask implements Identifiable<Long> {
 
-    private static final IdWorker idWorker = IdWorker.getInstance(AppBanner.class);
+    private static final IdWorker idWorker = IdWorker.getInstance(SysCheckTask.class);
 
     @Id
     @Column(unique = true, nullable = false)

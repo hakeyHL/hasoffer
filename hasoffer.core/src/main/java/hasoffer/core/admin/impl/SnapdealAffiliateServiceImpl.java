@@ -35,11 +35,19 @@ public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
         Set<String> deviceSet = new HashSet<String>();
         if (orderList != null) {
             for (SnapDealAffiliateOrder order : orderList) {
-                if (order.getAffiliateSubId2() == null || "".equals(order.getAffiliateSubId2())) {
+                String affExtParam2 = order.getAffiliateSubId2();
+                if (affExtParam2 == null || "".equals(affExtParam2)) {
                     continue;
                 }
-                deviceSet.add(order.getAffiliateSubId2());
+                String[] tempArray = affExtParam2.split("_");
+                if (tempArray.length == 2) {
+                    deviceSet.add(tempArray[0]);
+                } else {
+                    deviceSet.add(tempArray[0]);
+                }
             }
+            Map<String, UrmDevice> deviceRegTime = getDeviceRegTime(deviceSet);
+
             Collections.sort(orderList, new Comparator<SnapDealAffiliateOrder>() {
                 public int compare(SnapDealAffiliateOrder arg0, SnapDealAffiliateOrder arg1) {
                     return arg0.getDateTime().compareTo(arg1.getDateTime());
@@ -47,7 +55,6 @@ public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
             });
 
 
-            Map<String, UrmDevice> deviceRegTime = getDeviceRegTime(deviceSet);
             for (SnapDealAffiliateOrder order : orderList) {
                 OrderStatsAnalysisPO po = new OrderStatsAnalysisPO();
                 po.setWebSite(Website.SNAPDEAL.toString());
