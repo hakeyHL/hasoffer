@@ -16,7 +16,6 @@ public class AppVersionVo {
 
     private String msg;
 
-
     public AppVersionVo(AppVersion appVersion) {
         if (appVersion == null) {
             return;
