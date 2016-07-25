@@ -44,20 +44,25 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
         List<AffiliateOrder> orderList = flipProcessor.getAffiliateOrderList(parameterMap);
         Set<String> deviceSet = new HashSet<String>();
         for (AffiliateOrder order : orderList) {
-            if (order.getAffExtParam2() == null || "".equals(order.getAffExtParam2())) {
+            String affExtParam2 = order.getAffExtParam2();
+            if (affExtParam2 == null || "".equals(affExtParam2)) {
                 continue;
             }
-            deviceSet.add(order.getAffExtParam2());
+            String[] tempArray = affExtParam2.split("_");
+            if (tempArray.length == 2) {
+                deviceSet.add(tempArray[0]);
+            } else {
+                deviceSet.add(tempArray[0]);
+            }
         }
+
+        Map<String, UrmDevice> deviceRegTime = getDeviceRegTime(deviceSet);
 
         Collections.sort(orderList, new Comparator<AffiliateOrder>() {
             public int compare(AffiliateOrder arg0, AffiliateOrder arg1) {
                 return arg0.getOrderDate().compareTo(arg1.getOrderDate());
             }
         });
-
-        Map<String, UrmDevice> deviceRegTime = getDeviceRegTime(deviceSet);
-//        Map<String, List<UrmDeviceRequestLog>> deviceReqLogMap = new HashMap<String, List<UrmDeviceRequestLog>>();
 
         for (AffiliateOrder order : orderList) {
             OrderStatsAnalysisPO po = new OrderStatsAnalysisPO();
@@ -71,7 +76,7 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
                 e.printStackTrace();
             }
             String deviceId_userId = order.getAffExtParam2();
-            if (deviceId_userId != null) {
+            if (deviceId_userId != null && !"".equals(deviceId_userId)) {
                 String[] tempArray = deviceId_userId.split("_");
                 if (tempArray.length == 2) {
                     po.setDeviceId(tempArray[0]);
@@ -97,24 +102,11 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
             if (device != null && device.getCreateTime().compareTo(startTime) <= 0) {
                 po.setUserType("OLD");
             }
-//            if (deviceReqLogMap.get(deviceId) == null) {
-//                List<UrmDeviceRequestLog> logList = getLogMap(deviceId, before24H, endTime);
-//                deviceReqLogMap.put(deviceId, logList);
-//            }
-            // SHOP?REDI
-//            po.setOrderType(getOrderType(order.getOrderDate(), deviceReqLogMap.get(deviceId)));
             po.setSaleAmount(new BigDecimal(order.getSaleAmount()));
             po.setCommissionRate(new BigDecimal(order.getCommissionRate()));
             po.setTentativeAmount(new BigDecimal(order.getTentativeAmount()));
             orderPOList.add(po);
         }
-//        Iterator<OrderStatsAnalysisPO> sListIterator = orderPOList.iterator();
-//        while (sListIterator.hasNext()) {
-//            OrderStatsAnalysisPO order = sListIterator.next();
-//            if (order.getOrderTime().compareTo(startTime) < 0) {
-//                sListIterator.remove();
-//            }
-//        }
         return orderPOList;
 
     }
