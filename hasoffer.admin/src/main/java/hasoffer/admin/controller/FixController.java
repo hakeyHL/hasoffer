@@ -796,12 +796,12 @@ public class FixController {
 
                 int pageSize = 1000;
 
-                PageableResult<PtmProduct> pageableResult = dbm.queryPage("SELECT t FROM PtmProduct t Where t.id > ?0 ORDER BY t.id ASC ", curPage, pageSize, Arrays.asList(486463L));
+                PageableResult<PtmProduct> pageableResult = dbm.queryPage("SELECT t FROM PtmProduct t Where t.id > ?0 ORDER BY t.id ASC ", curPage, pageSize, Arrays.asList(512276L));
 
                 while (true) {
 
                     if (curPage > 1) {
-                        pageableResult = dbm.queryPage("SELECT t FROM PtmProduct t Where t.id > ?0 ORDER BY t.id ASC ", curPage, pageSize, Arrays.asList(486463L));
+                        pageableResult = dbm.queryPage("SELECT t FROM PtmProduct t Where t.id > ?0 ORDER BY t.id ASC ", curPage, pageSize, Arrays.asList(512276L));
                     }
 
                     if (productQueue.size() > 5000) {
@@ -844,7 +844,17 @@ public class FixController {
                             continue;
                         }
 
-                        productService.updatePtmProductPrice(ptmProduct.getId());
+                        try {
+                            productService.updatePtmProductPrice(ptmProduct.getId());
+                        } catch (Exception e) {
+                            productQueue.add(ptmProduct);
+                            try {
+                                TimeUnit.SECONDS.sleep(5);
+                            } catch (InterruptedException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
+
                     }
                 }
             });
