@@ -134,10 +134,16 @@ public class Compare2Controller {
                                @RequestParam(defaultValue = "1") int page,
                                @RequestParam(defaultValue = "10") int size
     ) {
+        if (id.equals("1742371")) {
+            System.out.println("______");
+        }
         ModelAndView mav = new ModelAndView();
         CmpResult cr = null;
         PtmProduct product = productService.getProduct(Long.valueOf(id));
         if (product != null) {
+            if (id.equals("1742371")) {
+                System.out.println("______has this ");
+            }
             String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
             DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
             SearchIO sio = new SearchIO(product.getSourceId(), product.getTitle(), "", product.getSourceSite(), product.getPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, size);
@@ -454,10 +460,14 @@ public class Compare2Controller {
     private CmpResult getCmpProducts(SearchIO sio, PtmProduct product) {
         //初始化一个空的用于存放比价商品列表的List
         List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
+        System.out.println("1");
         CmpResult cmpResult = new CmpResult();
         //从ptmCmpSku表获取 productId为指定值、且状态为ONSALE 按照价格升序排列
+        System.out.println("2");
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(product.getId(), sio.getPage(), sio.getSize());
+        System.out.println("3");
         if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
+            System.out.println(pagedCmpskus.getData().size() + "___4");
             List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
             Long tempTotalComments = Long.valueOf(0);
             int tempRatins = 0;
@@ -500,6 +510,7 @@ public class Compare2Controller {
                 logger.debug("Found skus size is 0 .");
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
             }
+            System.out.println("5");
             String imageUrl = productCacheManager.getProductMasterImageUrl(product.getId());
             cmpResult.setImage(imageUrl);
             cmpResult.setName(product.getTitle());
