@@ -134,16 +134,11 @@ public class Compare2Controller {
                                @RequestParam(defaultValue = "1") int page,
                                @RequestParam(defaultValue = "10") int size
     ) {
-        if (id.equals("1742371")) {
-            System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "______");
-        }
+
         ModelAndView mav = new ModelAndView();
         CmpResult cr = null;
         PtmProduct product = productService.getProduct(Long.valueOf(id));
         if (product != null) {
-            if (id.equals("1742371")) {
-                System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "______has this ");
-            }
             String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
             DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
             SearchIO sio = new SearchIO(product.getSourceId(), product.getTitle(), "", product.getSourceSite(), product.getPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, size);
@@ -460,14 +455,10 @@ public class Compare2Controller {
     private CmpResult getCmpProducts(SearchIO sio, PtmProduct product) {
         //初始化一个空的用于存放比价商品列表的List
         List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
-        System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "1");
         CmpResult cmpResult = new CmpResult();
         //从ptmCmpSku表获取 productId为指定值、且状态为ONSALE 按照价格升序排列
-        System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "2");
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(product.getId(), sio.getPage(), sio.getSize());
-        System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "3");
         if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
-            System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + pagedCmpskus.getData().size() + "___4");
             List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
             Long tempTotalComments = Long.valueOf(0);
             int tempRatins = 0;
@@ -484,11 +475,8 @@ public class Compare2Controller {
                     tempCount += 1;
                     // 忽略前台返回的价格
                     tempTotalComments += cmpSku.getCommentsNumber();
-                    System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + tempTotalComments + "+-+-+1");
                     tempRatins += cmpSku.getRatings();
-                    System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + cmpSku + "=====");
                     CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
-                    System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + cplv + "cplv");
                     cplv.setDeepLinkUrl(WebsiteHelper.getUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                     cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                     comparedSkuVos.add(cplv);
@@ -514,13 +502,9 @@ public class Compare2Controller {
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
             }
             String imageUrl = productCacheManager.getProductMasterImageUrl(product.getId());
-            System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + imageUrl + "5");
             cmpResult.setImage(imageUrl);
             cmpResult.setName(product.getTitle());
             PageableResult<CmpProductListVo> priceList = new PageableResult<CmpProductListVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize());
-            System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "priceList:::1  " + priceList);
-            System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "priceList:::2  " + priceList.getData());
-            System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "priceList:::3  " + priceList.getData().size());
             cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
             cmpResult.setPriceList(priceList.getData());
             cmpResult.setRatingNum(tempRatins / (tempCount == 0 ? 1 : tempCount));
