@@ -135,14 +135,14 @@ public class Compare2Controller {
                                @RequestParam(defaultValue = "10") int size
     ) {
         if (id.equals("1742371")) {
-            System.out.println("______");
+            System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "______");
         }
         ModelAndView mav = new ModelAndView();
         CmpResult cr = null;
         PtmProduct product = productService.getProduct(Long.valueOf(id));
         if (product != null) {
             if (id.equals("1742371")) {
-                System.out.println("______has this ");
+                System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "______has this ");
             }
             String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
             DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
