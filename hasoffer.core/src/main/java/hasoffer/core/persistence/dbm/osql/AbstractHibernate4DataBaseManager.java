@@ -19,6 +19,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by glx on 2015/5/20.
@@ -26,6 +28,25 @@ import java.util.*;
 
 public abstract class AbstractHibernate4DataBaseManager implements IDataBaseManager {
     private static Logger logger = LoggerFactory.getLogger(AbstractHibernate4DataBaseManager.class);
+    private static Pattern ORDER_BY = Pattern.compile("\\s+order\\s+by\\s+");
+
+    private static String getCountSql(String sql) {
+        String countSql =
+                "select count(*) " + sql.substring(StringUtils.indexOfIgnoreCase(sql, "from"));
+
+        int index = -1;
+        String temp = countSql.toLowerCase().replace('\t', ' ');
+        Matcher matcher = ORDER_BY.matcher(temp);
+        if (matcher != null && matcher.find()) {
+            index = matcher.start();
+        }
+
+        if (index > -1) {
+            countSql = countSql.substring(0, index);
+        }
+
+        return countSql;
+    }
 
     public <ID extends Serializable, T extends Identifiable<ID>> T get(Class<T> tClass, ID id) {
         return this.getHibernate4Template().get(tClass, id);
@@ -225,7 +246,8 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
     public <T> PageableResult<T> queryPage(String jpaSql, int pageNumber, int pageSize) {
         List<T> results = this.query(jpaSql, pageNumber, pageSize);
 
-        String countSql = "select count(*) " + jpaSql.substring(StringUtils.indexOfIgnoreCase(jpaSql, "from"));
+//        String countSql = "select count(*) " + jpaSql.substring(StringUtils.indexOfIgnoreCase(jpaSql, "from"));
+        String countSql = getCountSql(jpaSql);
 
         long count = this.querySingle(countSql);
         return new PageableResult<T>(results, count, pageNumber, pageSize);
@@ -234,7 +256,8 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
     public <T> PageableResult<T> queryPage(String jpaSql, int pageNumber, int pageSize, List params) {
         List<T> results = this.query(jpaSql, pageNumber, pageSize, params);
 
-        String countSql = "select count(*) " + jpaSql.substring(StringUtils.indexOfIgnoreCase(jpaSql, "from"));
+//        String countSql = "select count(*) " + jpaSql.substring(StringUtils.indexOfIgnoreCase(jpaSql, "from"));
+        String countSql = getCountSql(jpaSql);
 
         long count = this.querySingle(countSql, params);
         return new PageableResult<T>(results, count, pageNumber, pageSize);
