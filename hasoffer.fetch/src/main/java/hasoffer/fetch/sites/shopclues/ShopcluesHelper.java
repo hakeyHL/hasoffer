@@ -1,6 +1,7 @@
 package hasoffer.fetch.sites.shopclues;
 
 import hasoffer.base.utils.StringUtils;
+import hasoffer.base.utils.UrlUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -70,8 +71,8 @@ public class ShopcluesHelper {
     }
 
     public static String getUrlWithAff(String url, String[] affs) {
-        return getDeeplinkWithAff(url, affs);
-        /*if (url.contains("affiliateshopclues")) {
+        //return getDeeplinkWithAff(url, affs);
+        if (url.contains("affiliateshopclues")) {
             url = UrlUtils.getParam(url, "ckmrdr");
             url = StringUtils.urlDecode(url);
         }
@@ -81,11 +82,11 @@ public class ShopcluesHelper {
             market = affs[0];
         }
 
-        return String.format(SHOPCLUES_LOCAL_AFF_TEMP, market, StringUtils.urlEncode(url));*/
+        return String.format(SHOPCLUES_LOCAL_AFF_TEMP, market, StringUtils.urlEncode(url));
     }
 
     public static String getDeeplinkWithAff(String url, String[] affs) {
-//        return getUrlWithAff(getCleanUrl(url), affs);
-        return getCleanUrl(url) + "?ty=0&id=111438445&mcid=aff&utm_source=Hasoffer&OfferId=15";
+        return getUrlWithAff(getCleanUrl(url), affs);
+        // return getCleanUrl(url) + "?ty=0&id=111438445&mcid=aff&utm_source=Hasoffer&OfferId=15";
     }
 }

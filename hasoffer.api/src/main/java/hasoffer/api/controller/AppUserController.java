@@ -34,9 +34,9 @@ public class AppUserController {
 
     public static void main(String[] args) {
         String affs[] = null;
-        affs = new String[]{"GOOGLEPLAY", "12112", "4"};
-        String affsUrl = WebsiteHelper.getDealUrlWithAff(Website.FLIPKART,
-                "http://dl.flipkart.com/dl/mobiles/pr?sid=tyy,4io&offer=nb:mp:0517071430", affs);
+        affs = new String[]{"GOOGLEPLAY", "240a00b4f81c11da"};
+        String affsUrl = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL,
+                "http://m.snapdeal.com?utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_id=82856", affs);
         System.out.println(affsUrl);
     }
 
