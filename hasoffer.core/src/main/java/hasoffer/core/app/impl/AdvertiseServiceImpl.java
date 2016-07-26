@@ -5,6 +5,7 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.admin.Advertisement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -13,9 +14,10 @@ import java.util.List;
  * Created by hs on 2016年07月26日.
  * Time 13:05
  */
+@Service
 public class AdvertiseServiceImpl implements AdvertiseService {
     private static final String Q_AD_GET_CATEGORY =
-            "SELECT t FROM AdCategory t " +
+            "SELECT t FROM Advertisement t " +
                     " ORDER BY t.startTime DESC";
     Logger logger = LoggerFactory.getLogger(AdvertiseServiceImpl.class);
     @Resource

@@ -6,6 +6,8 @@ import hasoffer.core.utils.IdWorker;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Transient;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -30,6 +32,12 @@ public class Advertisement implements Identifiable<Long> {
     private String adBtnContent;
     private String aderSiteUrl;
     private int adLocation;
+    //为适配客户端显示的格式化的时间字符串--开始时间
+    @Transient
+    private String sTime;
+    //为适配客户端显示的格式化的时间字符串---结束时间
+    @Transient
+    private String eTime;
 
     @Override
     public Long getId() {
@@ -39,6 +47,14 @@ public class Advertisement implements Identifiable<Long> {
     @Override
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getsTime() {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.startTime);
+    }
+
+    public String geteTime() {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.endTime);
     }
 
     public Date getStartTime() {
