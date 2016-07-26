@@ -93,13 +93,15 @@ public class ProductCacheManager {
     public PageableResult<PtmCmpSku> listPagedCmpSkus(long proId, int page, int size) {
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_" + String.valueOf(proId) + "_" + page + "_" + size;
         String cmpSkusJson = cacheService.get(key, 0);
-
+        System.out.println("ENTER GET SKUS");
         PageableResult<PtmCmpSku> pagedCmpskus = null;
         try {
             if (StringUtils.isEmpty(cmpSkusJson)) {
                 pagedCmpskus = productService.listOnsaleCmpSkus(proId, page, size);
+                System.out.println("nocache _pagedCmpskus " + pagedCmpskus.getData().size());
                 cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
             } else {
+                System.out.println("in cache ");
                 PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
 
                 List<PtmCmpSku> cmpSkus = new ArrayList<PtmCmpSku>();
@@ -107,7 +109,7 @@ public class ProductCacheManager {
 
                 for (Map<String, Object> map : data) {
                     PtmCmpSku cmpSku = new PtmCmpSku();
-
+                    System.out.println("");
                     String website = (String) map.get("website");
                     Double price = (Double) map.get("price");
 

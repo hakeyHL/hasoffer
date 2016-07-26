@@ -484,8 +484,11 @@ public class Compare2Controller {
                     tempCount += 1;
                     // 忽略前台返回的价格
                     tempTotalComments += cmpSku.getCommentsNumber();
+                    System.out.println(tempTotalComments + "+-+-+1");
                     tempRatins += cmpSku.getRatings();
+                    System.out.println(cmpSku + "=====");
                     CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
+                    System.out.println(cplv + "cplv");
                     cplv.setDeepLinkUrl(WebsiteHelper.getUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                     cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                     comparedSkuVos.add(cplv);
@@ -510,11 +513,14 @@ public class Compare2Controller {
                 logger.debug("Found skus size is 0 .");
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
             }
-            System.out.println("5");
             String imageUrl = productCacheManager.getProductMasterImageUrl(product.getId());
+            System.out.println(imageUrl + "5");
             cmpResult.setImage(imageUrl);
             cmpResult.setName(product.getTitle());
             PageableResult<CmpProductListVo> priceList = new PageableResult<CmpProductListVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize());
+            System.out.println("priceList:::1  " + priceList);
+            System.out.println("priceList:::2  " + priceList.getData());
+            System.out.println("priceList:::3  " + priceList.getData().size());
             cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
             cmpResult.setPriceList(priceList.getData());
             cmpResult.setRatingNum(tempRatins / (tempCount == 0 ? 1 : tempCount));
