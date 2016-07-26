@@ -93,15 +93,12 @@ public class ProductCacheManager {
     public PageableResult<PtmCmpSku> listPagedCmpSkus(long proId, int page, int size) {
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_" + String.valueOf(proId) + "_" + page + "_" + size;
         String cmpSkusJson = cacheService.get(key, 0);
-        System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "ENTER GET SKUS");
         PageableResult<PtmCmpSku> pagedCmpskus = null;
         try {
             if (StringUtils.isEmpty(cmpSkusJson)) {
                 pagedCmpskus = productService.listOnsaleCmpSkus(proId, page, size);
-                System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "nocache _pagedCmpskus " + pagedCmpskus.getData().size());
                 cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
             } else {
-                System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "in cache ");
                 PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
 
                 List<PtmCmpSku> cmpSkus = new ArrayList<PtmCmpSku>();
@@ -109,66 +106,40 @@ public class ProductCacheManager {
 
                 for (Map<String, Object> map : data) {
                     PtmCmpSku cmpSku = new PtmCmpSku();
-                    System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "iter....");
                     String website = (String) map.get("website");
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + " webiste" + website);
                     Double price = (Double) map.get("price");
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "price " + price);
                     if (StringUtils.isEmpty(website) || price == null) {
                         continue;
                     }
 
                     cmpSku.setId(Long.valueOf(map.get("id") + ""));
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "id " + cmpSku.getId());
                     cmpSku.setProductId(((Integer) map.get("productId")).longValue());
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "productId " + cmpSku.getProductId());
                     cmpSku.setWebsite(Website.valueOf(website));
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + " website " + cmpSku.getWebsite());
                     cmpSku.setSeller((String) map.get("seller"));
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "seller " + cmpSku.getSeller());
                     cmpSku.setSkuTitle((String) map.get("skuTitle"));
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "skuTitle " + cmpSku.getSkuTitle());
                     cmpSku.setTitle((String) map.get("title"));
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "title " + cmpSku.getTitle());
                     cmpSku.setPrice(price.floatValue());
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "price " + cmpSku.getPrice());
                     cmpSku.setRating((String) map.get("rating"));
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "rating " + cmpSku.getRating());
                     cmpSku.setImagePath((String) map.get("imagePath"));
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + " imagePath " + cmpSku.getImagePath());
                     cmpSku.setOriImageUrl((String) map.get("oriImageUrl"));
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "oriImageUrl " + cmpSku.getOriImageUrl());
                     cmpSku.setDeeplink((String) map.get("deeplink"));
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "deeplink " + cmpSku.getDeeplink());
                     cmpSku.setUrl((String) map.get("url"));
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "url " + cmpSku.getUrl());
                     cmpSku.setOriUrl((String) map.get("oriUrl"));
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "oriUrl " + cmpSku.getOriUrl());
                     cmpSku.setColor((String) map.get("color"));
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "color " + cmpSku.getColor());
                     cmpSku.setSize((String) map.get("size"));
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "size " + cmpSku.getSize());
                     cmpSku.setUpdateTime(new Date((Long) map.get("updateTime")));
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "updateTime " + cmpSku.getUpdateTime());
                     cmpSku.setChecked((Boolean) map.get("checked"));
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + " checked ");
                     cmpSku.setSourcePid((String) map.get("sourcePid"));
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "sourcePid " + cmpSku.getSourcePid());
                     cmpSku.setSourceSid((String) map.get("sourceSid"));
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "sourceSid " + cmpSku.getSourceSid());
                     cmpSku.setStatus(SkuStatus.valueOf((String) map.get("status")));
-                    System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + " status " + cmpSku.getStatus());
                     cmpSkus.add(cmpSku);
                 }
-
                 pagedCmpskus = new PageableResult<PtmCmpSku>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + " exception " + e.getMessage());
+            logger.error(" deal skus from cache error " + e.getMessage());
             return null;
         }
-        System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + " before out " + pagedCmpskus + "  " + pagedCmpskus.getData().size());
         return pagedCmpskus;
     }
 
