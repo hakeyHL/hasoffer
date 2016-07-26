@@ -804,6 +804,15 @@ public class FixController {
                         pageableResult = dbm.queryPage("SELECT t FROM PtmProduct t Where t.id > ?0 ORDER BY t.id ASC ", curPage, pageSize, Arrays.asList(136664L));
                     }
 
+                    if (productQueue.size() > 5000) {
+                        try {
+                            TimeUnit.SECONDS.sleep(10);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        continue;
+                    }
+
                     List<PtmProduct> productList = pageableResult.getData();
 
                     for (PtmProduct ptmProduct : productList) {
