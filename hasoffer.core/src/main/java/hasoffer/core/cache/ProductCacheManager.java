@@ -118,7 +118,7 @@ public class ProductCacheManager {
                         continue;
                     }
 
-                    cmpSku.setId(((Integer) map.get("id")).longValue());
+                    cmpSku.setId(Long.valueOf(map.get("id") + ""));
                     System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "id " + cmpSku.getId());
                     cmpSku.setProductId(((Integer) map.get("productId")).longValue());
                     System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + "productId " + cmpSku.getProductId());
