@@ -164,7 +164,8 @@ public class ProductCacheManager {
                 pagedCmpskus = new PageableResult<PtmCmpSku>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
             }
         } catch (Exception e) {
-            System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + " exception ");
+            e.printStackTrace();
+            System.out.print(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + " exception " + e.getMessage());
             return null;
         }
         System.out.println(Thread.currentThread().getId() + "=+=+=+=+=+=+=+=+" + " before out " + pagedCmpskus + "  " + pagedCmpskus.getData().size());
