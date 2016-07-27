@@ -188,7 +188,7 @@ public class AppController {
                 String[] SHIDS = new String[]{"none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none"};
                 Map map = new HashMap();
                 Random random = new Random();
-                map.put("info", new StringBuilder().append(FLIDS[random.nextInt(FLIDS.length)]).append(SNIDS[random.nextInt(SNIDS.length)]).append(SHIDS[random.nextInt(SHIDS.length)]));
+                map.put("info", new StringBuilder().append(FLIDS[random.nextInt(FLIDS.length)] + ",").append(SNIDS[random.nextInt(SNIDS.length)] + ",").append(SHIDS[random.nextInt(SHIDS.length)]));
                 modelAndView.addObject("errorCode", "00000");
                 modelAndView.addObject("msg", "ok");
                 modelAndView.addObject("data", map);
