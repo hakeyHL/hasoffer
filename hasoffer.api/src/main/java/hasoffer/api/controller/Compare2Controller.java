@@ -134,6 +134,7 @@ public class Compare2Controller {
                                @RequestParam(defaultValue = "1") int page,
                                @RequestParam(defaultValue = "10") int size
     ) {
+
         ModelAndView mav = new ModelAndView();
         CmpResult cr = null;
         PtmProduct product = productService.getProduct(Long.valueOf(id));
