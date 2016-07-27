@@ -93,7 +93,6 @@ public class ProductCacheManager {
     public PageableResult<PtmCmpSku> listPagedCmpSkus(long proId, int page, int size) {
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_" + String.valueOf(proId) + "_" + page + "_" + size;
         String cmpSkusJson = cacheService.get(key, 0);
-
         PageableResult<PtmCmpSku> pagedCmpskus = null;
         try {
             if (StringUtils.isEmpty(cmpSkusJson)) {
@@ -107,15 +106,13 @@ public class ProductCacheManager {
 
                 for (Map<String, Object> map : data) {
                     PtmCmpSku cmpSku = new PtmCmpSku();
-
                     String website = (String) map.get("website");
                     Double price = (Double) map.get("price");
-
                     if (StringUtils.isEmpty(website) || price == null) {
                         continue;
                     }
 
-                    cmpSku.setId(((Integer) map.get("id")).longValue());
+                    cmpSku.setId(Long.valueOf(map.get("id") + ""));
                     cmpSku.setProductId(((Integer) map.get("productId")).longValue());
                     cmpSku.setWebsite(Website.valueOf(website));
                     cmpSku.setSeller((String) map.get("seller"));
@@ -132,17 +129,15 @@ public class ProductCacheManager {
                     cmpSku.setSize((String) map.get("size"));
                     cmpSku.setUpdateTime(new Date((Long) map.get("updateTime")));
                     cmpSku.setChecked((Boolean) map.get("checked"));
-
                     cmpSku.setSourcePid((String) map.get("sourcePid"));
                     cmpSku.setSourceSid((String) map.get("sourceSid"));
                     cmpSku.setStatus(SkuStatus.valueOf((String) map.get("status")));
-
                     cmpSkus.add(cmpSku);
                 }
-
                 pagedCmpskus = new PageableResult<PtmCmpSku>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
             }
         } catch (Exception e) {
+            logger.error(" deal skus from cache error " + e.getMessage());
             return null;
         }
         return pagedCmpskus;
@@ -178,7 +173,7 @@ public class ProductCacheManager {
                     if (StringUtils.isEmpty(website) || price == null) {
                         continue;
                     }
-                    ptmProduct.setId(((Integer) map.get("id")).longValue());
+                    ptmProduct.setId(Long.valueOf(map.get("id") + ""));
                     ptmProduct.setTitle((String) map.get("title"));
                     ptmProduct.setPrice(price.floatValue());
                     ptmProduct.setRating((Integer) map.get("rating"));
