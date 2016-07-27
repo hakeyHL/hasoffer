@@ -66,7 +66,7 @@ public class SearchServiceImpl implements ISearchService {
     private static final String Q_COUNT_LOG_BY_PRODUCT = "SELECT count(t.id) FROM SrmSearchLog t WHERE t.ptmProductId = ?0 ";
     private static final String Q_SEARCH_LOG_BY_PRODUCTID = "SELECT t FROM SrmSearchLog t WHERE t.ptmProductId = ?0 ";
     private static final String C_KEYWORD = "select count(t.id) from SrmSearchLog t where t.site=?0 and t.keyword=?1";
-    private static final String D_SEARCH_LOG = "delete FROM SrmSearchLog t where t.id in (:ids) ";
+    private static final String D_SEARCH_LOG = "deleteDeal FROM SrmSearchLog t where t.id in (:ids) ";
     private static final String Q_SEARCH_COUNT = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd=?0 ORDER BY t.count DESC";
     private static final String STAT_SEARCH_COUNT = "SELECT COUNT(t.id) FROM SrmProductSearchCount t WHERE t.ymd=?0 AND t.skuCount=?1 ";
     private static final String STAT_SEARCH_COUNT2 = "SELECT COUNT(t.id) FROM SrmProductSearchCount t WHERE t.ymd=?0 AND t.skuCount>=?1 AND t.skuCount<?2 ";
@@ -232,7 +232,7 @@ public class SearchServiceImpl implements ISearchService {
 
                 float titleScore = ProductAnalysisService.stringMatch(searchLog.getKeyword(), finalProduct.getTitle());
                 if (titleScore < 0.5) {
-                    System.out.println(String.format("delete search log [%s] !!! ", searchLog.getId()));
+                    System.out.println(String.format("deleteDeal search log [%s] !!! ", searchLog.getId()));
                     dbm.delete(SrmSearchLog.class, searchLog.getId());
                 } else {
                     System.out.println(String.format("update search log [%s] ~~~", searchLog.getId()));
@@ -727,7 +727,7 @@ public class SearchServiceImpl implements ISearchService {
     }
 
     private void delSearchCount(String ymd) {
-        String sql = "delete from SrmProductSearchCount t where t.ymd='" + ymd + "'";
+        String sql = "deleteDeal from SrmProductSearchCount t where t.ymd='" + ymd + "'";
         dbm.deleteBySQL(sql);
     }
 
