@@ -59,7 +59,7 @@ public class FKCateAndParamWorker implements Runnable {
 
             PtmCmpSkuDescription ptmCmpSkuDescription = mdm.queryOne(PtmCmpSkuDescription.class, sku.getProductId());
             if (ptmCmpSkuDescription != null) {
-                String jsonDescription = ptmCmpSkuDescription.getJsonDescription();
+                String jsonDescription = ptmCmpSkuDescription.getJsonParam();
                 if (!StringUtils.isEmpty(jsonDescription)) {
                     continue;
                 }
@@ -166,7 +166,7 @@ public class FKCateAndParamWorker implements Runnable {
         //将描述信息持久化到mongodb
         PtmCmpSkuDescription skuDescription = new PtmCmpSkuDescription();
         skuDescription.setId(sku.getProductId());
-        skuDescription.setJsonDescription(jsonDescription);
+        skuDescription.setJsonParam(jsonDescription);
         mdm.save(skuDescription);
         logger.debug("save description success for [" + sku.getProductId() + "]");
     }

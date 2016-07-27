@@ -144,7 +144,7 @@ public class CacheServiceImpl<T extends Identifiable> implements ICacheService<T
 
     @Override
     public void del(final String key) {
-//        redisTemplate.delete(key);
+//        redisTemplate.deleteDeal(key);
         redisTemplate.execute(new RedisCallback() {
             @Override
             public Object doInRedis(RedisConnection connection) throws DataAccessException {
