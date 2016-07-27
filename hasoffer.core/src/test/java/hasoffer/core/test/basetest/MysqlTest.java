@@ -5,6 +5,7 @@ import hasoffer.affiliate.model.AffiliateProduct;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
+import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
@@ -28,6 +29,7 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -313,11 +315,29 @@ public class MysqlTest {
     }
 
     @Test
-    public void testFind() {
+    public void testFind() throws IOException {
 
-        List<SrmSearchLog> logList = dbm.query("SELECT t FROM SrmSearchLog t WHERE t.ptmProductId = ?0  ", Arrays.asList(999999L));
+        PageableResult<PtmCmpSku> pageableResult = dbm.queryPage("SElECT t FROM PtmCmpSku t WHERE t.id < 12", 1, 3);
 
-        System.out.println(logList);
+        String cmpSkusJson = JSONUtil.toJSON(pageableResult);
+
+        PageableResult datas = JSONUtil.toObject(cmpSkusJson, PageableResult.class);
+
+        List<Map> data = datas.getData();
+
+        for (Map<String, Object> map : data) {
+
+            Object id = map.get("id");
+
+            if (id instanceof Integer) {
+                System.out.println(1);
+            }
+
+            if (id instanceof Long) {
+                System.out.println(2);
+            }
+
+        }
 
     }
 }
