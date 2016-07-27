@@ -173,7 +173,7 @@ public class ProductCacheManager {
                     if (StringUtils.isEmpty(website) || price == null) {
                         continue;
                     }
-                    ptmProduct.setId(((Integer) map.get("id")).longValue());
+                    ptmProduct.setId(Long.valueOf(map.get("id") + ""));
                     ptmProduct.setTitle((String) map.get("title"));
                     ptmProduct.setPrice(price.floatValue());
                     ptmProduct.setRating((Integer) map.get("rating"));
