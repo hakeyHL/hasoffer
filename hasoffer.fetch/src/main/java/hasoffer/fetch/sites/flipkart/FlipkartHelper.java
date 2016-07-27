@@ -42,7 +42,7 @@ public class FlipkartHelper {
     /**
      * #目标
      * http://dl.flipkart.com/dl/alcatel-onetouch-idol-X-6040d/p/itmdthghx79dtzwf?affid=affiliate357
-     * <p>
+     * <p/>
      * #可能的情况
      * http://www.flipkart.com/karbonn-k106s/p/itmeabrpjprkbmx5
      * http://dl.flipkart.com/dl/karbonn-k106s/p/itmeabrpjprkbmx5
@@ -93,6 +93,7 @@ public class FlipkartHelper {
     }
 
     private static String appendAff(String url, String[] affs) {
+        url = getUrlByDeeplink(url);
         StringBuffer sb = new StringBuffer(url);
 
         String affid = "affiliate357";

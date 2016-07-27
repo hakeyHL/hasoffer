@@ -41,6 +41,10 @@ public class PtmProduct implements Identifiable<Long> {
     public PtmProduct() {
     }
 
+    public PtmProduct(Long id) {
+        this.id = id;
+    }
+
     public PtmProduct(long categoryId, String title, float price,
                       String sourceSite, String sourceUrl, String sourceId) {
         this.categoryId = categoryId;
