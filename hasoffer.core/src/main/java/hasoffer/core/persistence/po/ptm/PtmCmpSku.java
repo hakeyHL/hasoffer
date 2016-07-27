@@ -31,6 +31,7 @@ public class PtmCmpSku implements Identifiable<Long> {
 
     private String skuTitle;// 带商品的color，size属性的
     private String title;
+
     private float price;
 
     private String rating;
