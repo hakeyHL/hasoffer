@@ -796,24 +796,40 @@ public class FixController {
 
                 int pageSize = 1000;
 
-                PageableResult<PtmProduct> pageableResult = dbm.queryPage("SELECT t FROM PtmProduct t Where t.id > ?0 ORDER BY t.id ASC ", curPage, pageSize, Arrays.asList(136664L));
 
                 while (true) {
 
-                    if (curPage > 1) {
-                        pageableResult = dbm.queryPage("SELECT t FROM PtmProduct t Where t.id > ?0 ORDER BY t.id ASC ", curPage, pageSize, Arrays.asList(136664L));
-                    }
+                    try {
+                        PageableResult<PtmProduct> pageableResult = dbm.queryPage("SELECT t FROM PtmProduct t Where t.id > ?0 ORDER BY t.id ASC ", curPage, pageSize, Arrays.asList(1639554L));
 
-                    List<PtmProduct> productList = pageableResult.getData();
 
-                    for (PtmProduct ptmProduct : productList) {
-
-                        long skuNumber = dbm.querySingle("SELECT COUNT(*) FROM PtmCmpSku t WHERE t.productId = ?0 AND t.status = 'ONSALE' ", Arrays.asList(ptmProduct.getId()));
-
-                        if (skuNumber > 0) {
-                            productQueue.add(ptmProduct);
+                        if (curPage > 1) {
+                            pageableResult = dbm.queryPage("SELECT t FROM PtmProduct t Where t.id > ?0 ORDER BY t.id ASC ", curPage, pageSize, Arrays.asList(1639554L));
                         }
 
+                        if (productQueue.size() > 5000) {
+                            try {
+                                TimeUnit.SECONDS.sleep(10);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            continue;
+                        }
+
+                        List<PtmProduct> productList = pageableResult.getData();
+
+                        for (PtmProduct ptmProduct : productList) {
+
+                            long skuNumber = dbm.querySingle("SELECT COUNT(*) FROM PtmCmpSku t WHERE t.productId = ?0 AND t.status = 'ONSALE' ", Arrays.asList(ptmProduct.getId()));
+
+                            if (skuNumber > 0) {
+                                productQueue.add(ptmProduct);
+                            }
+
+                        }
+
+                    } catch (Exception e) {
+                        continue;
                     }
 
                     curPage++;
@@ -835,7 +851,17 @@ public class FixController {
                             continue;
                         }
 
-                        productService.updatePtmProductPrice(ptmProduct.getId());
+                        try {
+                            productService.updatePtmProductPrice(ptmProduct.getId());
+                        } catch (Exception e) {
+                            productQueue.add(ptmProduct);
+                            try {
+                                TimeUnit.SECONDS.sleep(5);
+                            } catch (InterruptedException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
+
                     }
                 }
             });

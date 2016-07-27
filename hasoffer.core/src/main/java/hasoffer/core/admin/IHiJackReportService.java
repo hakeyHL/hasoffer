@@ -10,6 +10,7 @@ public interface IHiJackReportService {
 
     /**
      * 新增一条记录
+     *
      * @param po
      * @return
      */
@@ -17,6 +18,7 @@ public interface IHiJackReportService {
 
     /**
      * 做增量更新，将原有的记录中对应的字段加上该对象的值。
+     *
      * @param po
      * @return
      */
@@ -24,6 +26,7 @@ public interface IHiJackReportService {
 
     /**
      * 根据站点和时间进行查询
+     *
      * @param webSite
      * @param date
      * @return

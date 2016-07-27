@@ -159,7 +159,11 @@ public class DealController {
             banner.setRank(0);
 
             dealService.saveOrUpdateBanner(banner);
-
+        } else {//检查是否由该deal生成的banner，并且删除
+            AppBanner appBanner = dealService.getBannerByDealId(deal.getId());
+            if (appBanner != null) {
+                dealService.deleteBanner(appBanner.getId());
+            }
         }
         if (!StringUtils.isEmpty(dealPath)) {
             deal.setImageUrl(dealPath);
@@ -177,7 +181,7 @@ public class DealController {
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
     @ResponseBody
     public Object delete(@PathVariable(value = "id") Long dealId) {
-        dealService.delete(dealId);
+        dealService.deleteDeal(dealId);
         return true;
     }
 

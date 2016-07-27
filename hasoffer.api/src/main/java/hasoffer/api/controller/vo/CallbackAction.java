@@ -6,6 +6,6 @@ package hasoffer.api.controller.vo;
  */
 public enum CallbackAction {
 
-    FLOWCTRLSUCCESS //流量控制成功
-
+    FLOWCTRLSUCCESS, //流量控制成功
+    HOMEPAGE  //首页jiechi
 }

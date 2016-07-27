@@ -166,7 +166,8 @@
                         <td>${fn:substring(data.createTime, 0, 10)}</td>
                         <td>${fn:substring(data.expireTime, 0, 10)}</td>
                         <td><a href="detail/${data.id}">编辑</a></td>
-                        <td><a href="javascript:void(0)" onclick="deleteById('<%=contextPath%>/deal/delete/${data.id}')"
+                        <td><a href="javascript:void(0)"
+                               onclick="deleteById('<%=contextPath%>/deal/delete/${data.id}')"
                                data-toggle="modal" data-target="#confirm-delete">删除</a></td>
                     </tr>
                 </c:forEach>
