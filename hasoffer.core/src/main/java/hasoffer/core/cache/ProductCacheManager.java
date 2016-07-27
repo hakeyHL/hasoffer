@@ -113,7 +113,7 @@ public class ProductCacheManager {
                     }
 
                     cmpSku.setId(Long.valueOf(map.get("id") + ""));
-                    cmpSku.setProductId(((Integer) map.get("productId")).longValue());
+                    cmpSku.setProductId(Long.valueOf(map.get("productId") + ""));
                     cmpSku.setWebsite(Website.valueOf(website));
                     cmpSku.setSeller((String) map.get("seller"));
                     cmpSku.setSkuTitle((String) map.get("skuTitle"));
