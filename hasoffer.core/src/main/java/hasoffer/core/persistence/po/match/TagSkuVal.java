@@ -2,6 +2,7 @@ package hasoffer.core.persistence.po.match;
 
 import hasoffer.core.bo.match.SkuValType;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
+import hasoffer.core.utils.IdWorker;
 import hasoffer.nlp.core.model.HasTag;
 
 import javax.persistence.*;
@@ -13,10 +14,11 @@ import javax.persistence.*;
 @Entity
 public class TagSkuVal extends HasTag implements Identifiable<Long> {
 
+    private static final IdWorker idWorker = IdWorker.getInstance(TagSkuVal.class);
+
     @Id
     @Column(unique = true, nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id = idWorker.nextLong();
 
     @Column(unique = true, nullable = true)
     private String tag; // tag

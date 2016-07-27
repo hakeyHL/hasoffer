@@ -19,10 +19,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class FixPtmProductWorker implements Runnable {
 
-    private Logger logger = LoggerFactory.getLogger(FixPtmProductWorker.class);
-
     private static final String Q_SRMSEARCHLOG_BYID = "SELECT t FROM SrmSearchLog t WHERE t.ptmProductId = ?0 ";
-
+    private Logger logger = LoggerFactory.getLogger(FixPtmProductWorker.class);
     private ListAndProcessWorkerStatus<PtmProduct> ws;
     private IDataBaseManager dbm;
     private IProductService productService;

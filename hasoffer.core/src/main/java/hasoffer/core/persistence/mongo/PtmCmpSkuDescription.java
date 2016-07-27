@@ -15,7 +15,9 @@ public class PtmCmpSkuDescription {
     @Id
     private long id;//cmpsku Id
 
-    private String jsonDescription;//描述
+    private String jsonParam;//参数
+
+    private String description;
 
     public long getId() {
         return id;
@@ -25,12 +27,20 @@ public class PtmCmpSkuDescription {
         this.id = id;
     }
 
-    public String getJsonDescription() {
-        return jsonDescription;
+    public String getJsonParam() {
+        return jsonParam;
     }
 
-    public void setJsonDescription(String jsonDescription) {
-        this.jsonDescription = jsonDescription;
+    public void setJsonParam(String jsonParam) {
+        this.jsonParam = jsonParam;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
@@ -41,14 +51,16 @@ public class PtmCmpSkuDescription {
         PtmCmpSkuDescription that = (PtmCmpSkuDescription) o;
 
         if (id != that.id) return false;
-        return !(jsonDescription != null ? !jsonDescription.equals(that.jsonDescription) : that.jsonDescription != null);
+        if (jsonParam != null ? !jsonParam.equals(that.jsonParam) : that.jsonParam != null) return false;
+        return !(description != null ? !description.equals(that.description) : that.description != null);
 
     }
 
     @Override
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (jsonDescription != null ? jsonDescription.hashCode() : 0);
+        result = 31 * result + (jsonParam != null ? jsonParam.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
         return result;
     }
 }

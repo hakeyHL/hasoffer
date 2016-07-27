@@ -77,8 +77,17 @@ public class AppController {
     private Logger logger = LoggerFactory.logger(AppController.class);
 
     public static void main(String[] args) {
-        String ss = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL, "http://www.snapdeal.com/product/micromax-canvas-a1-aq4502-8/630310793485", new String[]{"SHANCHUAN", "123"});
-        System.out.print(ss);
+//        String ss = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL, "http://www.snapdeal.com/product/micromax-canvas-a1-aq4502-8/630310793485", new String[]{"SHANCHUAN", "123"});
+//        System.out.print(ss);
+
+        Random random = new Random();
+        for (int i = 0; i < 100; i++) {
+            int nextInt = random.nextInt(8);
+            System.out.println(nextInt);
+        }
+
+        String ss = WebsiteHelper.getDealUrlWithAff(Website.FLIPKART, "http://www.flipkart.com/philips-mix-4-gb-sa5mxx04wf-97-16-mp3-player/p/itmdmfndygbz3wfd?pid=AUDDMFMAC4WSSGGH&al=TQCV0eQ7m7uScf%2FCbjC3PcldugMWZuE7sHPMhtl4IOoHmf27YkMOEISwRAaogpJNxY67buiFvno%3D&offer=nb%3Amp%3A06e1fc0e26&ref=L%3A5882205368552411071&srno=b_1&findingMethod=Deals%20of%20the%20Day&otracker=hp_omu_Deals%20of%20the%20Day_1_39fdd0fe-e2e3-4176-9cf4-15ca32404fe5_0", new String[]{"GOOGLEPLAY", "aaaadfdfdfdf"});
+        System.out.println(ss);
         //System.out.println(WebsiteHelper.getUrlWithAff("http://dl.flipkart.com/dl/all/~intex-speakers/pr?sid=all&p%5B%5D=facets.filter_standard%255B%255D%3D1"));
     }
 
@@ -164,7 +173,7 @@ public class AppController {
     @RequestMapping(value = "/callback", method = RequestMethod.GET)
     public ModelAndView callback(HttpServletRequest request,
                                  @RequestParam CallbackAction action) {
-
+        ModelAndView modelAndView = new ModelAndView();
         switch (action) {
             case FLOWCTRLSUCCESS:
                 // 流量拦截成功
@@ -176,11 +185,21 @@ public class AppController {
                     logger.debug(e.getMessage());
                 }
                 break;
+            case HOMEPAGE:
+                String[] FLIDS = new String[]{"xyangryrg", "zhouxixi0", "harveyouo", "allenooou", "747306881", "hlhakeygm", "oliviersl", "wuningSFg"};
+                String[] SNIDS = new String[]{"89037", "104658", "104664", "104663", "104705", "104659", "104717", "104726"};
+                String[] SHIDS = new String[]{"none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none"};
+                Map map = new HashMap();
+                Random random = new Random();
+                map.put("info", new StringBuilder().append(FLIDS[random.nextInt(FLIDS.length)] + ",").append(SNIDS[random.nextInt(SNIDS.length)] + ",").append(SHIDS[random.nextInt(SHIDS.length)]));
+                modelAndView.addObject("errorCode", "00000");
+                modelAndView.addObject("msg", "ok");
+                modelAndView.addObject("data", map);
+                break;
             default:
                 break;
         }
-
-        return new ModelAndView();
+        return modelAndView;
     }
 
     @RequestMapping(value = "/sites", method = RequestMethod.GET)

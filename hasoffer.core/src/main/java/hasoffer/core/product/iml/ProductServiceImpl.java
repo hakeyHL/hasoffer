@@ -146,6 +146,7 @@ public class ProductServiceImpl implements IProductService {
             PtmProductUpdater updater = new PtmProductUpdater(id);
 
             updater.getPo().setPrice(price);
+            updater.getPo().setUpdateTime(TimeUtils.nowDate());
 
             dbm.update(updater);
 
@@ -157,6 +158,8 @@ public class ProductServiceImpl implements IProductService {
             product.setPrice(price);
 
             importProduct2Solr(product);
+
+            System.out.println("productid = " + product.getId());
         }
 
     }

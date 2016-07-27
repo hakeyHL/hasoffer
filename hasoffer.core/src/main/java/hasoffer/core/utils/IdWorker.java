@@ -43,14 +43,17 @@ public class IdWorker {
     }
 
     public synchronized static IdWorker getInstance(Class<?> cls) {
+        System.out.println("WN ID_WORKER getInstance=" + (MAP.get(cls.getName()) == null));
         if (MAP.get(cls.getName()) == null) {
-            String machineStr = System.getenv("ID_WORKER");
+//            String machineStr = System.getenv("ID_WORKER");
+            String machineStr = System.getProperty("ID_WORKER");
 
             byte machine = 0;
             if (machineStr != null && machineStr.trim().length() > 0) {
+                System.out.println("GET ID_WORKER SUCCESS,ID_WORKER=" + machineStr);
                 machine = (byte) Integer.parseInt(machineStr);
             } else {
-                logger.warn("没有发现ID_WORKER，如果部署多个实例，必须对每台机器设置不同的ID_WORKER；例如ID_WORKER=1");
+                System.out.println("没有发现ID_WORKER，如果部署多个实例，必须对每台机器设置不同的ID_WORKER；例如ID_WORKER=1");
             }
             MAP.put(cls.getName(), new IdWorker(machine));
         }
