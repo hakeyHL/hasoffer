@@ -389,7 +389,7 @@ public class FixController {
 
                     if (count == 0) {
                         productService.deleteProduct(product.getId());
-                        System.out.println("deleteDeal product : " + product.getId() + " - " + TimeUtils.parse(date, "yyyy-MM-dd HH:mm:ss"));
+                        System.out.println("delete product : " + product.getId() + " - " + TimeUtils.parse(date, "yyyy-MM-dd HH:mm:ss"));
                     }
 
                     date = product.getCreateTime();
