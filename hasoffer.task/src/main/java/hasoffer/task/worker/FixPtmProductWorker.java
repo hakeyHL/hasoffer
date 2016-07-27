@@ -57,7 +57,7 @@ public class FixPtmProductWorker implements Runnable {
 
                 }
 
-                //deleteDeal PtmProduct
+                //delete PtmProduct
                 productService.deleteProduct(id);
 
             } else {

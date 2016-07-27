@@ -68,7 +68,7 @@ public class MongoTest {
             if (page % 10 == 0) {
                 file = new File(String.format("d:/TMP/words_1_%d.csv", page / 10));
                 if (file.exists()) {
-                    file.deleteDeal();
+                    file.delete();
                 }
                 System.out.println("page = " + page);
             }

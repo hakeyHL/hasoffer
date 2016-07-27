@@ -439,8 +439,8 @@ public class ProductServiceImpl implements IProductService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void deleteProduct(long ptmProductId) {
-        logger.warn("deleteDeal product : " + ptmProductId);
-        System.out.println("deleteDeal product : " + ptmProductId);
+        logger.warn("delete product : " + ptmProductId);
+        System.out.println("delete product : " + ptmProductId);
 
         List<PtmCmpSku> cmpSkus = dbm.query("select t from PtmCmpSku t where t.productId = ?0", Arrays.asList(ptmProductId));
 
@@ -448,7 +448,7 @@ public class ProductServiceImpl implements IProductService {
 
         if (ArrayUtils.hasObjs(cmpSkus)) {
             for (PtmCmpSku cmpSku : cmpSkus) {
-//                dbm.deleteDeal(PtmCmpSku.class, cmpSku.getId());
+//                dbm.delete(PtmCmpSku.class, cmpSku.getId());
                 cmpSkuService.deleteCmpSku(cmpSku.getId());
             }
         }
