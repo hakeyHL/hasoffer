@@ -41,6 +41,54 @@ public class ExpTitleTest {
     IProductService productService;
 
     @Test
+    public void getI4() {
+        initCateMap();
+
+        String fileDir = "d:/datas/hasoffer/";
+
+        List<Long> stdCates = new ArrayList<>();
+        stdCates.add(1L);
+        stdCates.add(257L);
+        stdCates.add(4662L);
+        stdCates.add(1504L);
+        stdCates.add(2334L);
+
+        File file1 = null;
+        try {
+            file1 = createFile(fileDir + "title_if_std", true);
+        } catch (Exception e) {
+            System.out.println("error in create file");
+            return;
+        }
+
+        int len = cates.size();
+        for (int i = 0; i < len; i++) {
+
+            PtmCategory cate = cates.get(i);
+
+            boolean std = stdCates.contains(cate.getId()) || stdCates.contains(cate.getParentId());
+
+            System.out.println(String.format("exp No.[%d] cate[%d] to files", i, cate.getId()));
+
+            List<PtmProduct> products = productService.listProducts(cate.getId(), 1, Integer.MAX_VALUE);
+
+            for (PtmProduct o : products) {
+                if (StringUtils.isEmpty(o.getTitle())) {
+                    continue;
+                }
+
+                try {
+                    FileUtil.appendString(file1, StringUtils.filterAndTrim(std ? "1" : "0" + " " + o.getTitle(), Arrays.asList("\n")) + "\n");
+                } catch (IOException e) {
+                    System.out.println(String.format("error[IO ERROR] in exp to file[%s].[%d]", o.getTitle(), o.getCategoryId()));
+                }
+            }
+        }
+
+        System.out.println("all finished.");
+    }
+
+    @Test
     public void getI3() {
         String fileDir = "D:/workspace/datas/hasoffer/";
 
