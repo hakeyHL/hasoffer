@@ -171,7 +171,7 @@ public class DealServiceImpl implements IDealService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchDelete(Long[] ids) {
-        dao.updateBySql("deleteDeal from appdeal where id in(?)", Arrays.asList(ids));
+        dao.updateBySql("delete from appdeal where id in(?)", Arrays.asList(ids));
     }
 
     @Override
