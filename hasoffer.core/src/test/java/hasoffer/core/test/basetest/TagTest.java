@@ -136,7 +136,7 @@ public class TagTest {
     }
 
     private void getModelSet(PtmCmpSkuDescription o) {
-        JSONObject json = JSON.parseObject(o.getJsonDescription());
+        JSONObject json = JSON.parseObject(o.getJsonParam());
         for (Map.Entry<String, Object> kv : json.entrySet()) {
             String name = kv.getKey().trim();
             String value = kv.getValue().toString().trim();
@@ -175,7 +175,7 @@ public class TagTest {
     }
 
     private void getBrandSet(PtmCmpSkuDescription cmpSkuDescription) {
-        JSONObject json = JSON.parseObject(cmpSkuDescription.getJsonDescription());
+        JSONObject json = JSON.parseObject(cmpSkuDescription.getJsonParam());
         for (Map.Entry<String, Object> kv : json.entrySet()) {
             String name = kv.getKey().trim();
             String value = kv.getValue().toString().trim();
@@ -195,7 +195,7 @@ public class TagTest {
     }
 
     private void getAttrs(PtmCmpSkuDescription cmpSkuDescription) {
-        JSONObject json = JSON.parseObject(cmpSkuDescription.getJsonDescription());
+        JSONObject json = JSON.parseObject(cmpSkuDescription.getJsonParam());
         for (Map.Entry<String, Object> kv : json.entrySet()) {
             String name = kv.getKey().trim();
             String value = kv.getValue().toString().trim();

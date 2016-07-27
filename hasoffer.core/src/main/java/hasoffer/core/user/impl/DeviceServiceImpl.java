@@ -73,7 +73,7 @@ public class DeviceServiceImpl implements IDeviceService {
             "SELECT t FROM StatDevice t WHERE t.ymd = ?0 ";
     private static final String Q_VISIT =
             "SELECT t FROM UrmDayVisit t ORDER BY t.id DESC";
-    private static final String D_DEVICE_LOG = "delete FROM UrmDevice t where t.id in (:ids) ";
+    private static final String D_DEVICE_LOG = "deleteDeal FROM UrmDevice t where t.id in (:ids) ";
     private static final String Q_DEVICE_BY_IDS = "SELECT t FROM UrmDevice t where t.id in (:ids)";
     @Resource
     IDataBaseManager dbm;

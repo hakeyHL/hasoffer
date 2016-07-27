@@ -162,7 +162,6 @@ public class Compare2Controller {
     }
 
     private CmpResult getDefaultCmpResult(SearchIO sio, PtmCmpSkuIndex2 cmpSkuIndex) {
-        logger.error(" enter default");
         String currentDeeplink = "";
         if (cmpSkuIndex != null && cmpSkuIndex.getId() != null && cmpSkuIndex.getId() > 0) {
             PtmCmpSku cmpSku = cmpSkuCacheManager.getCmpSkuById(cmpSkuIndex.getId());
@@ -511,7 +510,7 @@ public class Compare2Controller {
             PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, product.getId());
             String specs = "";
             if (ptmCmpSkuDescription != null) {
-                specs = ptmCmpSkuDescription.getJsonDescription();
+                specs = ptmCmpSkuDescription.getJsonParam();
             }
             cmpResult.setSpecs(specs);
             cmpResult.setTotalRatingsNum(tempTotalComments / Long.valueOf(tempCount == 0 ? 1 : tempCount));
