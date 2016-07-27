@@ -40,7 +40,7 @@ public class DealServiceImpl implements IDealService {
 
     @Override
     public PageableResult<AppDeal> findDealList(int page, int size) {
-        return dbm.queryPage("select t from AppDeal t order by createTime desc", page, size);
+        return dbm.queryPage("select t from AppDeal t order by t.id desc", page, size);
     }
 
     @Override
