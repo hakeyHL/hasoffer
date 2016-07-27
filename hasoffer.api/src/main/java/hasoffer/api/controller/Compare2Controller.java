@@ -151,7 +151,7 @@ public class Compare2Controller {
         try {
             //根据title匹配到商品
             getSioBySearch(sio);
-            cr = getCmpProducts(sio, new PtmProduct(sio.getHsProId()));
+            cr = getCmpProducts(sio);
         } catch (Exception e) {
             if (sio.getHsProId() > 0) {
                 //若此时匹配到的商品实际库中不存在则删除此匹配记录,下次重新匹配
@@ -589,6 +589,14 @@ public class Compare2Controller {
             cmpResult.setTotalRatingsNum(tempTotalComments / Long.valueOf(tempCount == 0 ? 1 : tempCount));
             return cmpResult;
         }
+        return cmpResult;
+    }
+
+    private CmpResult getCmpProducts(SearchIO sio) {
+        //初始化一个空的用于存放比价商品列表的List
+        List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
+        CmpResult cmpResult = new CmpResult();
+
         return cmpResult;
     }
 
