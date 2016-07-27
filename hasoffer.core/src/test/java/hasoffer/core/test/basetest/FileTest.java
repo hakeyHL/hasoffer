@@ -26,12 +26,24 @@ public class FileTest {
     public void ts3() throws Exception {
 
 //        BufferedReader fr = new BufferedReader(new FileReader(new File("d:/datas/hasoffer/all_titles")));
-        BufferedReader fr = new BufferedReader(new FileReader(new File("d:/datas/hasoffer/sen2vec")));
+        BufferedReader fr = new BufferedReader(new FileReader(new File("d:/datas/test/titles_in_1st_cate_2_vec")));
 
-        for (int i = 0; i < 10; i++) {
-            String line = fr.readLine();
-            System.out.println(line);
+        int count = 0, count2 = 0;
+//        for (int i = 0; i < 10; i++) {
+        String line;
+        while ((line = fr.readLine()) != null) {
+//            String line = fr.readLine();
+            count++;
+            if (count % 2000 == 0) {
+                System.out.println(count + "\t" + count2);
+            }
+
+            if (line.startsWith("L")) {
+                count2++;
+            }
         }
+
+        System.out.println(count + "\t" + count2);
 
         fr.close();
     }
