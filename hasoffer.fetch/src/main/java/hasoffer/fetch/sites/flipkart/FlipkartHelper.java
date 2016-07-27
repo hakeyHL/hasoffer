@@ -89,11 +89,11 @@ public class FlipkartHelper {
     }
 
     public static String getDealUrlWithAff(String url, String[] affs) {
+        url = getDeeplink(url);
         return appendAff(url, affs);
     }
 
     private static String appendAff(String url, String[] affs) {
-        url = getUrlByDeeplink(url);
         StringBuffer sb = new StringBuffer(url);
 
         String affid = "affiliate357";
