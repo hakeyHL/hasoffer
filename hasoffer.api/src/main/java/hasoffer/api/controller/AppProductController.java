@@ -12,8 +12,8 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 @RequestMapping("product")
-public class ProductController {
-    Logger logger = LoggerFactory.getLogger(ProductController.class);
+public class AppProductController {
+    Logger logger = LoggerFactory.getLogger(AppProductController.class);
 
     /**
      * 根据商品获取比价的sku列表
