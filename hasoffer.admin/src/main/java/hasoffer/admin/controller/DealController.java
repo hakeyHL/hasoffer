@@ -161,7 +161,9 @@ public class DealController {
             dealService.saveOrUpdateBanner(banner);
         } else {//检查是否由该deal生成的banner，并且删除
             AppBanner appBanner = dealService.getBannerByDealId(deal.getId());
-            dealService.deleteBanner(appBanner.getId());
+            if (appBanner != null) {
+                dealService.deleteBanner(appBanner.getId());
+            }
         }
         if (!StringUtils.isEmpty(dealPath)) {
             deal.setImageUrl(dealPath);
