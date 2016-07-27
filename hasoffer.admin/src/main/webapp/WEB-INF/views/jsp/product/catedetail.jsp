@@ -142,7 +142,7 @@
 
     var deleteCate = function () {
         if (confirm("将尝试删除类目：${currentCate.name}，请确认！")) {
-            window.location = "/cate/deleteDeal/${currentCate.id}";
+            window.location = "/cate/delete/${currentCate.id}";
         }
     };
 

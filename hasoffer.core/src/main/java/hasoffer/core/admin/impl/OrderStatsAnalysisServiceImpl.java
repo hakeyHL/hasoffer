@@ -26,7 +26,7 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
 
     private static final String Q_BASE = "sum(1) as sumCount, SUM(IF(userType='OLD',1,0)) as oldUserCount,SUM(IF(userType='NEW',1,0)) as newUserCount,SUM(IF(userType='NONE',1,0)) as noneUserCount,sum(if(channel='GOOGLEPLAY',1,0)) as googleChannel,sum(if(channel='SHANCHUAN' or channel='LeoMaster' ,1,0)) as shanchuanChannel,sum(if(channel='NINEAPPS',1,0)) as nineAppChannel,sum(if(channel='NONE',1,0)) as noneChannel from report_ordersatas";
 
-    private static final String D_BASE = "deleteDeal from report_ordersatas where webSite=? and orderTime>=DATE_FORMAT(?,'%Y-%m-%d %H:%i:%S') and orderTime<DATE_FORMAT(?,'%Y-%m-%d %H:%i:%S')";
+    private static final String D_BASE = "delete from report_ordersatas where webSite=? and orderTime>=DATE_FORMAT(?,'%Y-%m-%d %H:%i:%S') and orderTime<DATE_FORMAT(?,'%Y-%m-%d %H:%i:%S')";
     @Resource
     IDataBaseManager dbm;
     @Resource
