@@ -105,12 +105,12 @@ public class Compare2Controller {
                 if (ptmProduct == null) {
                     productService.deleteProduct(sio.getHsProId());
                 } else {
-                    logger.info(ptmProduct.toString());
+                    //logger.info(ptmProduct.toString());
                 }
 
             }
-            logger.error(e.getMessage());
-            logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
+            //logger.error(e.getMessage());
+            //  logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
 
             cr = getDefaultCmpResult(sio, cmpSkuIndex);
         }
@@ -481,7 +481,7 @@ public class Compare2Controller {
             });
 
         } else {
-            logger.error("Found skus size is 0 .");
+            // logger.error("Found skus size is 0 .");
             throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
         }
 
