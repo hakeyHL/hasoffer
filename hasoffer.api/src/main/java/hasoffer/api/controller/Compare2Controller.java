@@ -163,7 +163,7 @@ public class Compare2Controller {
                 }
             }
             logger.error(e.getMessage());
-            logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
+            logger.error(String.format("sdk_cmp_  [NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
             return modelAndView.addObject("data", cr);
         }
         modelAndView.addObject("errorCode", "00000");

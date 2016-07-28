@@ -527,6 +527,7 @@ public class AppController {
         if (StringUtils.isNotBlank(criteria.getCategoryId())) {
             //search by category
             products = productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
+            System.out.println(Thread.currentThread().getName() + "_____" + products.getData().size());
             //products = productIndexServiceImpl.searchPro(Long.valueOf(2), 2, 1, 10);
             if (products != null && products.getData().size() > 0) {
                 addProductVo2List(li, products.getData());
