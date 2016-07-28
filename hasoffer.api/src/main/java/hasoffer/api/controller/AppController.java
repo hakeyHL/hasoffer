@@ -572,6 +572,7 @@ public class AppController {
     }
 
     public void addProductVo2List(List desList, List sourceList) {
+
         if (sourceList != null && sourceList.size() > 0) {
             if (ProductModel.class.isInstance(sourceList.get(0))) {
                 Iterator<ProductModel> modelList = sourceList.iterator();
