@@ -56,7 +56,7 @@ public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductM
         fqList.add(new FilterQuery("cate" + level, String.valueOf(cateId)));
         fqList.add(new FilterQuery("price", "[1 TO *]"));
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
-
+        System.out.println(Thread.currentThread().getName() + " page " + page + "  size " + size);
         SearchResult<ProductModel> sr = searchObjs(q, fqs, sorts, pivotFacets, page <= 1 ? 1 : page, size, true);
 
         return new PageableResult<ProductModel>(sr.getResult(), sr.getTotalCount(), page, size);
