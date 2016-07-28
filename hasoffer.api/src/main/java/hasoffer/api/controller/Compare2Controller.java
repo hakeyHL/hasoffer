@@ -2,6 +2,7 @@ package hasoffer.api.controller;
 
 import hasoffer.api.controller.vo.*;
 import hasoffer.api.helper.SearchHelper;
+import hasoffer.base.model.AppDisplayMode;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.utils.ArrayUtils;
@@ -632,7 +633,8 @@ public class Compare2Controller {
             }
         }
         cmpResult.setPriceList(comparedSkuVos);
-        cmpResult.setCopywriting("");
+        cmpResult.setCopywriting("Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you.");
+        cmpResult.setDisplayMode(AppDisplayMode.WATERFALL);
         return cmpResult;
     }
 
