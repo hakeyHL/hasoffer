@@ -129,6 +129,79 @@ public class Compare2Controller {
         return mav;
     }
 
+    /**
+     * 根据商品获取比价的sku列表
+     *
+     * @return
+     */
+    @RequestMapping("sdk/cmpskus")
+    public ModelAndView cmpSkus(@RequestParam(defaultValue = "") final String q,
+                                @RequestParam(defaultValue = "") final String brand,
+                                @RequestParam(defaultValue = "") final String sourceId,
+                                @RequestParam(defaultValue = "") String site,
+                                @RequestParam(defaultValue = "0") String price,
+                                @RequestParam(defaultValue = "1") int page,
+                                @RequestParam(defaultValue = "10") int size) {
+        ModelAndView modelAndView = new ModelAndView();
+        //初始化sio对象
+        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+        DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        CmpResult cr = null;
+        SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, size);
+        try {
+            //根据title匹配到商品
+            getSioBySearch(sio);
+            cr = getCmpProducts(sio);
+        } catch (Exception e) {
+            if (sio.getHsProId() > 0) {
+                //若此时匹配到的商品实际库中不存在则删除此匹配记录,下次重新匹配
+                PtmProduct ptmProduct = productService.getProduct(sio.getHsProId());
+                if (ptmProduct == null) {
+                    productService.deleteProduct(sio.getHsProId());
+                } else {
+                    logger.info(ptmProduct.toString());
+                }
+            }
+            logger.error(e.getMessage());
+            logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
+            return modelAndView.addObject("data", cr);
+        }
+        modelAndView.addObject("errorCode", "00000");
+        modelAndView.addObject("msg", "ok");
+        if (cr != null) {
+            modelAndView.addObject("data", cr);
+        }
+        modelAndView.addObject("data", "{\n" +
+                "        \"copywriting\": \"\",\n" +
+                "        \"show\": \"waterfall\",\n" +
+                "        \"skus\": [\n" +
+                "            {\n" +
+                "                \"status\": \"onsale\",\n" +
+                "                \"title\": \"小王子（法国“圣埃克苏佩里基金会”官方认可简体中文译本）\",\n" +
+                "                \"imageUrl\": \"http://img13.360buyimg.com/n1/jfs/t2200/173/590579185/269686/4c299e77/56174e3eN362982a4.jpg\",\n" +
+                "                \"cashBack\": \"10\",\n" +
+                "                \"deepLink\": \"http://item.jd.com/11143993.html\",\n" +
+                "                \"saved\": 100,\n" +
+                "                \"id\": \"11143993\",\n" +
+                "                \"price\": \"1,000\",\n" +
+                "                \"website\": \"FLIPKART\"\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"status\": \"sold out\",\n" +
+                "                \"title\": \"摩斯维 手机套/金属边框/防摔保护壳外壳 适用于华为荣耀畅玩4X/全网通/电信/移动版 拉丝尊享款-香槟金-送钢化膜\",\n" +
+                "                \"imageUrl\": \"http://img11.360buyimg.com/n1/jfs/t2698/221/1187894551/168647/33c6c8e1/5736a5f7Nfa29f761.jpg\",\n" +
+                "                \"cashBack\": \"20\",\n" +
+                "                \"deepLink\": \"http://item.jd.com/1381873091.html\",\n" +
+                "                \"saved\": -100,\n" +
+                "                \"id\": \"1381873091\",\n" +
+                "                \"price\": \"1,000\",\n" +
+                "                \"website\": \"FLIPKART\"\n" +
+                "            }\n" +
+                "        ]\n" +
+                "    }");
+        return modelAndView;
+    }
+
     @RequestMapping(value = "/cmpsku", method = RequestMethod.GET)
     public ModelAndView cmpsku(@RequestParam(defaultValue = "0") final String id,
                                @RequestParam(defaultValue = "1") int page,
@@ -516,6 +589,14 @@ public class Compare2Controller {
             cmpResult.setTotalRatingsNum(tempTotalComments / Long.valueOf(tempCount == 0 ? 1 : tempCount));
             return cmpResult;
         }
+        return cmpResult;
+    }
+
+    private CmpResult getCmpProducts(SearchIO sio) {
+        //初始化一个空的用于存放比价商品列表的List
+        List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
+        CmpResult cmpResult = new CmpResult();
+
         return cmpResult;
     }
 

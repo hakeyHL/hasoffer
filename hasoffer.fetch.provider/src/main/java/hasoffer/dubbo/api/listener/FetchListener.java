@@ -1,12 +1,13 @@
-package hasoffer.dubbo.api.fetch.task;
+package hasoffer.dubbo.api.listener;
 
 import hasoffer.base.thread.HasofferThreadFactory;
+import hasoffer.dubbo.api.fetch.task.FetchKeywordWorker;
+import hasoffer.dubbo.api.fetch.task.FetchUrlWorker;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletContextEvent;
-import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -43,10 +44,4 @@ public class FetchListener extends ContextLoaderListener {
 
     }
 
-    public static void main(String[] args) {
-        Date date = new Date(1468526980000L);
-        System.out.println(date);
-        date = new Date(1468567946000L);
-        System.out.println(date);
-    }
 }
