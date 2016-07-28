@@ -34,7 +34,7 @@ public class PtmCmpSku implements Identifiable<Long> {
 
     private float price;
 
-    private float cashBack;
+    private float cashBack = -1;
 
     private String rating;
 
