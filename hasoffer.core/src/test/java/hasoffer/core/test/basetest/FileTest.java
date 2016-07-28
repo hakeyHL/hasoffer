@@ -16,6 +16,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created on 2016/6/30.
@@ -24,26 +26,18 @@ public class FileTest {
 
     @Test
     public void ts3() throws Exception {
-
+        Pattern pattern = Pattern.compile("^[0|1]\\s.+");
 //        BufferedReader fr = new BufferedReader(new FileReader(new File("d:/datas/hasoffer/all_titles")));
-        BufferedReader fr = new BufferedReader(new FileReader(new File("d:/datas/test/titles_in_1st_cate_2_vec")));
+        BufferedReader fr = new BufferedReader(new FileReader(new File("d:/datas/hasoffer/title_if_std")));
 
-        int count = 0, count2 = 0;
-//        for (int i = 0; i < 10; i++) {
         String line;
         while ((line = fr.readLine()) != null) {
 //            String line = fr.readLine();
-            count++;
-            if (count % 2000 == 0) {
-                System.out.println(count + "\t" + count2);
-            }
-
-            if (line.startsWith("L")) {
-                count2++;
+            Matcher m = pattern.matcher(line);
+            if (!m.matches()) {
+                System.out.println(line);
             }
         }
-
-        System.out.println(count + "\t" + count2);
 
         fr.close();
     }

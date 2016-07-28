@@ -8,6 +8,7 @@ import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.product.IProductService;
 import jodd.io.FileUtil;
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -41,7 +42,37 @@ public class ExpTitleTest {
     IProductService productService;
 
     @Test
-    public void getI4() {
+    public void test() throws Exception {
+        String fileDir = "d:/datas/hasoffer/";
+        File file1 = null;
+        try {
+            file1 = createFile(fileDir + "testtesttest", true);
+        } catch (Exception e) {
+            System.out.println("error in create file");
+            return;
+        }
+
+        PtmProduct product = dbm.get(PtmProduct.class, 611437L);
+
+        System.out.println(product.getTitle());
+
+        String newTitle = product.getTitle().replaceAll("[\\n\\r]", "");
+
+        System.out.println(newTitle);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("0")
+                .append(" ")
+                .append(newTitle)
+                .append("\n");
+
+        System.out.println(sb.toString());
+
+        FileUtils.write(file1, sb.toString(), true);
+    }
+
+    @Test
+    public void getI5() throws Exception {
         initCateMap();
 
         String fileDir = "d:/datas/hasoffer/";
@@ -72,17 +103,29 @@ public class ExpTitleTest {
 
             List<PtmProduct> products = productService.listProducts(cate.getId(), 1, Integer.MAX_VALUE);
 
+            StringBuilder sb = new StringBuilder();
+            int count = 0;
             for (PtmProduct o : products) {
                 if (StringUtils.isEmpty(o.getTitle())) {
                     continue;
                 }
 
-                try {
-                    FileUtil.appendString(file1, StringUtils.filterAndTrim(std ? "1" : "0" + " " + o.getTitle(), Arrays.asList("\n")) + "\n");
-                } catch (IOException e) {
-                    System.out.println(String.format("error[IO ERROR] in exp to file[%s].[%d]", o.getTitle(), o.getCategoryId()));
+                String newTitle = o.getTitle().replaceAll("[\\n\\r]", "");
+
+                sb.append(std ? "1" : "0")
+                        .append(" ")
+                        .append(newTitle)
+                        .append("\n");
+
+                if (count % 2000 == 0) {
+                    FileUtil.appendString(file1, sb.toString());
+                    sb = new StringBuilder();
                 }
+
+                count++;
             }
+
+            FileUtil.appendString(file1, sb.toString());
         }
 
         System.out.println("all finished.");
