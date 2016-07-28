@@ -23,6 +23,8 @@ public class CmpResult {
     private int ratingNum;
     //product specification
     private  String specs;
+    private String copywriting;
+
     private String  image;
     public CmpResult(float priceOff, ProductVo productVo, PageableResult<ComparedSkuVo> pagedComparedSkuVos) {
         this.priceOff = priceOff;

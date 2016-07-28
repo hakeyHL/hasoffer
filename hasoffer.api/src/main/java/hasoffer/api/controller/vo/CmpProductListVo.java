@@ -24,7 +24,10 @@ public class CmpProductListVo {
     private String deepLink;
     private String deepLinkUrl;
     private Website website;
-
+    private String title;
+    private String cashBack;
+    private String saved;
+    private Long id;
     public CmpProductListVo() {
     }
 
@@ -169,5 +172,88 @@ public class CmpProductListVo {
 
     public void setSupport(List<String> support) {
         this.support = support;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getCashBack() {
+        return cashBack;
+    }
+
+    public void setCashBack(String cashBack) {
+        this.cashBack = cashBack;
+    }
+
+    public String getSaved() {
+        return saved;
+    }
+
+    public void setSaved(String saved) {
+        this.saved = saved;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CmpProductListVo that = (CmpProductListVo) o;
+
+        if (ratingNum != that.ratingNum) return false;
+        if (price != that.price) return false;
+        if (Float.compare(that.freight, freight) != 0) return false;
+        if (Float.compare(that.backRate, backRate) != 0) return false;
+        if (returnGuarantee != that.returnGuarantee) return false;
+        if (support != null ? !support.equals(that.support) : that.support != null) return false;
+        if (image != null ? !image.equals(that.image) : that.image != null) return false;
+        if (totalRatingsNum != null ? !totalRatingsNum.equals(that.totalRatingsNum) : that.totalRatingsNum != null)
+            return false;
+        if (distributionTime != null ? !distributionTime.equals(that.distributionTime) : that.distributionTime != null)
+            return false;
+        if (coins != null ? !coins.equals(that.coins) : that.coins != null) return false;
+        if (deepLink != null ? !deepLink.equals(that.deepLink) : that.deepLink != null) return false;
+        if (deepLinkUrl != null ? !deepLinkUrl.equals(that.deepLinkUrl) : that.deepLinkUrl != null) return false;
+        if (website != that.website) return false;
+        if (title != null ? !title.equals(that.title) : that.title != null) return false;
+        if (cashBack != null ? !cashBack.equals(that.cashBack) : that.cashBack != null) return false;
+        if (saved != null ? !saved.equals(that.saved) : that.saved != null) return false;
+        return !(id != null ? !id.equals(that.id) : that.id != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = support != null ? support.hashCode() : 0;
+        result = 31 * result + (image != null ? image.hashCode() : 0);
+        result = 31 * result + ratingNum;
+        result = 31 * result + (totalRatingsNum != null ? totalRatingsNum.hashCode() : 0);
+        result = 31 * result + price;
+        result = 31 * result + (freight != +0.0f ? Float.floatToIntBits(freight) : 0);
+        result = 31 * result + (distributionTime != null ? distributionTime.hashCode() : 0);
+        result = 31 * result + (coins != null ? coins.hashCode() : 0);
+        result = 31 * result + (backRate != +0.0f ? Float.floatToIntBits(backRate) : 0);
+        result = 31 * result + returnGuarantee;
+        result = 31 * result + (deepLink != null ? deepLink.hashCode() : 0);
+        result = 31 * result + (deepLinkUrl != null ? deepLinkUrl.hashCode() : 0);
+        result = 31 * result + (website != null ? website.hashCode() : 0);
+        result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (cashBack != null ? cashBack.hashCode() : 0);
+        result = 31 * result + (saved != null ? saved.hashCode() : 0);
+        result = 31 * result + (id != null ? id.hashCode() : 0);
+        return result;
     }
 }
