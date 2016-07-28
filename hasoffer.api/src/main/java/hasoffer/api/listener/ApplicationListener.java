@@ -20,7 +20,6 @@ public class ApplicationListener extends ContextLoaderListener {
     @Override
     public void contextInitialized(ServletContextEvent event) {
         springContext = WebApplicationContextUtils.getWebApplicationContext(event.getServletContext());
-
         serverInitialized();
     }
 
