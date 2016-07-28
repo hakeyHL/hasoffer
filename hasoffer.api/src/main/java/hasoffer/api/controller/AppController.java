@@ -530,6 +530,7 @@ public class AppController {
             System.out.println(Thread.currentThread().getName() + "_____" + products.getData().size());
             //products = productIndexServiceImpl.searchPro(Long.valueOf(2), 2, 1, 10);
             if (products != null && products.getData().size() > 0) {
+                System.out.println(Thread.currentThread().getName() + "_____" + " get this " + products.getData().size());
                 addProductVo2List(li, products.getData());
             }
         } else if (StringUtils.isNotEmpty(criteria.getKeyword())) {
@@ -573,20 +574,34 @@ public class AppController {
     }
 
     public void addProductVo2List(List desList, List sourceList) {
+
         if (sourceList != null && sourceList.size() > 0) {
+            System.out.println(Thread.currentThread().getName() + "_____" + sourceList.size());
             if (ProductModel.class.isInstance(sourceList.get(0))) {
+                System.out.println(Thread.currentThread().getName() + "_____" + "  ProductModel ");
                 Iterator<ProductModel> modelList = sourceList.iterator();
                 while (modelList.hasNext()) {
+                    System.out.println(Thread.currentThread().getName() + "_____" + "  1");
                     ProductModel productModel = modelList.next();
+                    System.out.println(Thread.currentThread().getName() + "_____" + "  2");
                     int count = cmpSkuService.getSkuSoldStoreNum(productModel.getId());
+                    System.out.println(Thread.currentThread().getName() + "_____ count " + count + "  3");
                     if (count > 0) {
+                        System.out.println(Thread.currentThread().getName() + "_____" + "  4");
                         ProductListVo productListVo = new ProductListVo();
+                        System.out.println(Thread.currentThread().getName() + "_____" + "  5");
                         productListVo.setStoresNum(count);
+                        System.out.println(Thread.currentThread().getName() + "_____" + "  6");
                         productListVo.setId(productModel.getId());
+                        System.out.println(Thread.currentThread().getName() + "_____" + "  7");
                         setCommentNumAndRatins(productListVo);
+                        System.out.println(Thread.currentThread().getName() + "_____" + "  8");
                         productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
+                        System.out.println(Thread.currentThread().getName() + "_____" + "  9");
                         productListVo.setName(productModel.getTitle());
+                        System.out.println(Thread.currentThread().getName() + "_____" + "  10");
                         productListVo.setPrice(Math.round(productModel.getPrice()));
+                        System.out.println(Thread.currentThread().getName() + "_____" + "  11");
                         desList.add(productListVo);
                     }
                 }
