@@ -46,7 +46,7 @@ public class WebSiteFetchServiceImpl implements IWebSiteFetchService {
         String threadName = "SearchRecordProcessWorker-Thread";
         HasofferThreadFactory factory = new HasofferThreadFactory(threadName);
         es = Executors.newCachedThreadPool(factory);
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 10; i++) {
             es.execute(new SearchRecordProcessWorker(searchProductService, fetchDubboService, searchLogQueue));
         }
 
