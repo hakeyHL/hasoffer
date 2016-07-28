@@ -133,6 +133,9 @@ public class SearchLogCacheManager {
     }
 
     public void delCache(String searchLogId) {
-        cacheService.del(searchLogId);
+
+        String key = CACHE_KEY_PRE + searchLogId;
+
+        cacheService.del(key);
     }
 }
