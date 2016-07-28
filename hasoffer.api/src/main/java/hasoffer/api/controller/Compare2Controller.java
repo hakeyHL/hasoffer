@@ -192,7 +192,7 @@ public class Compare2Controller {
                 "                \"imageUrl\": \"http://img11.360buyimg.com/n1/jfs/t2698/221/1187894551/168647/33c6c8e1/5736a5f7Nfa29f761.jpg\",\n" +
                 "                \"cashBack\": \"20\",\n" +
                 "                \"deepLink\": \"http://item.jd.com/1381873091.html\",\n" +
-                "                \"saved\": 100,\n" +
+                "                \"saved\": -100,\n" +
                 "                \"id\": \"1381873091\",\n" +
                 "                \"price\": \"1,000\",\n" +
                 "                \"website\": \"FLIPKART\"\n" +

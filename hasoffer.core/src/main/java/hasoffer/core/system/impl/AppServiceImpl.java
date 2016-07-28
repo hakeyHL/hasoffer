@@ -125,7 +125,7 @@ public class AppServiceImpl implements IAppService {
 
     @Override
     public PageableResult getDeals(Long page, Long pageSize) {
-        return dbm.queryPage(Q_APP_GETDEALS, page.intValue() <= 1 ? 1 : page.intValue() + 1, pageSize.intValue(), Arrays.asList(new Date()));
+        return dbm.queryPage(Q_APP_GETDEALS, page.intValue() <= 1 ? 1 : page.intValue(), pageSize.intValue(), Arrays.asList(new Date()));
     }
 
     @Override
