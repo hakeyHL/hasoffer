@@ -16,16 +16,18 @@ public class CmpResult {
     //the lowest price
     private float bestPrice;
     //productname
-    private  String name;
+    private String name;
     //total comment number
-    private  Long totalRatingsNum;
+    private Long totalRatingsNum;
     //comment star number
     private int ratingNum;
     //product specification
-    private  String specs;
+    private String specs;
     private String copywriting;
+    private String displayMode;
 
-    private String  image;
+    private String image;
+
     public CmpResult(float priceOff, ProductVo productVo, PageableResult<ComparedSkuVo> pagedComparedSkuVos) {
         this.priceOff = priceOff;
         this.productVo = productVo;
@@ -114,4 +116,21 @@ public class CmpResult {
     public void setSpecs(String specs) {
         this.specs = specs;
     }
+
+    public String getCopywriting() {
+        return copywriting;
+    }
+
+    public void setCopywriting(String copywriting) {
+        this.copywriting = copywriting;
+    }
+
+    public String getDisplayMode() {
+        return displayMode;
+    }
+
+    public void setDisplayMode(String displayMode) {
+        this.displayMode = displayMode;
+    }
+
 }

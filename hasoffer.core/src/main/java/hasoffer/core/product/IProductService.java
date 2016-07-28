@@ -83,4 +83,6 @@ public interface IProductService {
     ProductModel getProductModel(PtmProduct product);
 
     void import2Solr(ProductModel pm);
+
+    PageableResult<PtmCmpSku> listNotOffSaleCmpSkus(long proId, int page, int size);
 }

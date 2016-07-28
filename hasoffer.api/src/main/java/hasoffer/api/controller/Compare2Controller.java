@@ -596,7 +596,43 @@ public class Compare2Controller {
         //初始化一个空的用于存放比价商品列表的List
         List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
         CmpResult cmpResult = new CmpResult();
+        // 1. 查询此商品对应的sku列表 状态为ONSALE/OUTSTOCK
+        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listCmpSkus(sio.getHsProId(), sio.getPage(), sio.getSize());
+        if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
+            List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
+            if (ArrayUtils.hasObjs(cmpSkus)) {
+                // 获取vo list
+                for (PtmCmpSku cmpSku : cmpSkus) {
+                    if (cmpSku.getWebsite() == null
+                            || cmpSku.getPrice() <= 0) { // 临时过滤掉不能更新价格的商品
+                        continue;
+                    }
+                    CmpProductListVo cplv = new CmpProductListVo(cmpSku, sio.getCliPrice());
+                    comparedSkuVos.add(cplv);
+                }
+                if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {
+                    throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), "productid_" + sio.getHsProId(), sio.getCliPrice());
+                }
+                //根据价格排序
+                Collections.sort(comparedSkuVos, new Comparator<CmpProductListVo>() {
+                    @Override
+                    public int compare(CmpProductListVo o1, CmpProductListVo o2) {
+                        if (o1.getPrice() > o2.getPrice()) {
+                            return 1;
+                        } else if (o1.getPrice() < o2.getPrice()) {
+                            return -1;
+                        }
+                        return 0;
+                    }
+                });
 
+            } else {
+                logger.debug("Found skus size is 0 .");
+                throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
+            }
+        }
+        cmpResult.setPriceList(comparedSkuVos);
+        cmpResult.setCopywriting("");
         return cmpResult;
     }
 
