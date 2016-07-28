@@ -34,6 +34,8 @@ public class PtmCmpSku implements Identifiable<Long> {
 
     private float price;
 
+    private float cashBack;
+
     private String rating;
 
     private String imagePath; // 下载后的图片路径
@@ -382,6 +384,14 @@ public class PtmCmpSku implements Identifiable<Long> {
         this.supportPayMethod = supportPayMethod;
     }
 
+    public float getCashBack() {
+        return cashBack;
+    }
+
+    public void setCashBack(float cashBack) {
+        this.cashBack = cashBack;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -391,6 +401,7 @@ public class PtmCmpSku implements Identifiable<Long> {
 
         if (productId != sku.productId) return false;
         if (Float.compare(sku.price, price) != 0) return false;
+        if (Float.compare(sku.cashBack, cashBack) != 0) return false;
         if (checked != sku.checked) return false;
         if (failLoadImage != sku.failLoadImage) return false;
         if (commentsNumber != sku.commentsNumber) return false;
@@ -438,6 +449,7 @@ public class PtmCmpSku implements Identifiable<Long> {
         result = 31 * result + (skuTitle != null ? skuTitle.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (price != +0.0f ? Float.floatToIntBits(price) : 0);
+        result = 31 * result + (cashBack != +0.0f ? Float.floatToIntBits(cashBack) : 0);
         result = 31 * result + (rating != null ? rating.hashCode() : 0);
         result = 31 * result + (imagePath != null ? imagePath.hashCode() : 0);
         result = 31 * result + (smallImagePath != null ? smallImagePath.hashCode() : 0);
