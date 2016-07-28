@@ -1,5 +1,6 @@
 package hasoffer.api.controller.vo;
 
+import hasoffer.base.model.AppDisplayMode;
 import hasoffer.base.model.PageableResult;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class CmpResult {
     //product specification
     private String specs;
     private String copywriting;
-    private String displayMode;
+    private AppDisplayMode displayMode;
 
     private String image;
 
@@ -125,11 +126,11 @@ public class CmpResult {
         this.copywriting = copywriting;
     }
 
-    public String getDisplayMode() {
+    public AppDisplayMode getDisplayMode() {
         return displayMode;
     }
 
-    public void setDisplayMode(String displayMode) {
+    public void setDisplayMode(AppDisplayMode displayMode) {
         this.displayMode = displayMode;
     }
 
