@@ -22,7 +22,7 @@ public class PtmCmpSkuImage implements Identifiable<Long> {
     @Column(nullable = false)
     private long ptmcmpskuId;//ptmcmpsku id
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, columnDefinition = "text")
     private String oriImageUrl;//原始图片路径
 
     private String imagePath;//上传图片成功返回的path
