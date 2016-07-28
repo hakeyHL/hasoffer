@@ -1,5 +1,6 @@
 package hasoffer.api.controller.vo;
 
+import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
@@ -12,6 +13,7 @@ import java.util.List;
  */
 public class CmpProductListVo {
     List<String> support = new ArrayList<String>();
+    private String imageUrl;
     private String image;
     private int ratingNum;
     private Long totalRatingsNum;
@@ -25,9 +27,11 @@ public class CmpProductListVo {
     private String deepLinkUrl;
     private Website website;
     private String title;
-    private String cashBack;
-    private String saved;
+    private float cashBack;
+    private float saved;
     private Long id;
+    private SkuStatus status;
+
     public CmpProductListVo() {
     }
 
@@ -52,6 +56,18 @@ public class CmpProductListVo {
         }
     }
 
+    public CmpProductListVo(PtmCmpSku cmpSku, float cliPrice) {
+        this.status = cmpSku.getStatus();
+        this.title = cmpSku.getTitle();
+        this.imageUrl = cmpSku.getSmallImagePath();
+        this.cashBack = cmpSku.getCashBack();
+        this.saved = Math.round(cliPrice - cmpSku.getPrice());
+        this.deepLink = cmpSku.getDeeplink();
+        this.id = cmpSku.getId();
+        this.price = Math.round(cmpSku.getPrice());
+        this.website = cmpSku.getWebsite();
+    }
+
     public CmpProductListVo(String image, int ratingNum, Long totalRatingsNum, int price, int freight, String distributionTime, Long coins, float backRate, int returnGuarantee, List<String> support) {
         this.image = image;
         this.ratingNum = ratingNum;
@@ -72,6 +88,14 @@ public class CmpProductListVo {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public SkuStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(SkuStatus status) {
+        this.status = status;
     }
 
     public Website getWebsite() {
@@ -182,19 +206,19 @@ public class CmpProductListVo {
         this.title = title;
     }
 
-    public String getCashBack() {
+    public float getCashBack() {
         return cashBack;
     }
 
-    public void setCashBack(String cashBack) {
+    public void setCashBack(float cashBack) {
         this.cashBack = cashBack;
     }
 
-    public String getSaved() {
+    public float getSaved() {
         return saved;
     }
 
-    public void setSaved(String saved) {
+    public void setSaved(float saved) {
         this.saved = saved;
     }
 
@@ -204,6 +228,14 @@ public class CmpProductListVo {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     @Override
@@ -218,7 +250,10 @@ public class CmpProductListVo {
         if (Float.compare(that.freight, freight) != 0) return false;
         if (Float.compare(that.backRate, backRate) != 0) return false;
         if (returnGuarantee != that.returnGuarantee) return false;
+        if (Float.compare(that.cashBack, cashBack) != 0) return false;
+        if (Float.compare(that.saved, saved) != 0) return false;
         if (support != null ? !support.equals(that.support) : that.support != null) return false;
+        if (imageUrl != null ? !imageUrl.equals(that.imageUrl) : that.imageUrl != null) return false;
         if (image != null ? !image.equals(that.image) : that.image != null) return false;
         if (totalRatingsNum != null ? !totalRatingsNum.equals(that.totalRatingsNum) : that.totalRatingsNum != null)
             return false;
@@ -229,15 +264,15 @@ public class CmpProductListVo {
         if (deepLinkUrl != null ? !deepLinkUrl.equals(that.deepLinkUrl) : that.deepLinkUrl != null) return false;
         if (website != that.website) return false;
         if (title != null ? !title.equals(that.title) : that.title != null) return false;
-        if (cashBack != null ? !cashBack.equals(that.cashBack) : that.cashBack != null) return false;
-        if (saved != null ? !saved.equals(that.saved) : that.saved != null) return false;
-        return !(id != null ? !id.equals(that.id) : that.id != null);
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        return status == that.status;
 
     }
 
     @Override
     public int hashCode() {
         int result = support != null ? support.hashCode() : 0;
+        result = 31 * result + (imageUrl != null ? imageUrl.hashCode() : 0);
         result = 31 * result + (image != null ? image.hashCode() : 0);
         result = 31 * result + ratingNum;
         result = 31 * result + (totalRatingsNum != null ? totalRatingsNum.hashCode() : 0);
@@ -251,9 +286,10 @@ public class CmpProductListVo {
         result = 31 * result + (deepLinkUrl != null ? deepLinkUrl.hashCode() : 0);
         result = 31 * result + (website != null ? website.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
-        result = 31 * result + (cashBack != null ? cashBack.hashCode() : 0);
-        result = 31 * result + (saved != null ? saved.hashCode() : 0);
+        result = 31 * result + (cashBack != +0.0f ? Float.floatToIntBits(cashBack) : 0);
+        result = 31 * result + (saved != +0.0f ? Float.floatToIntBits(saved) : 0);
         result = 31 * result + (id != null ? id.hashCode() : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
         return result;
     }
 }

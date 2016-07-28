@@ -191,4 +191,56 @@ public class ProductCacheManager {
         }
         return products;
     }
+
+    public PageableResult<PtmCmpSku> listCmpSkus(long proId, int page, int size) {
+        String key = CACHE_KEY_PRE + "_listCmpSkus_" + String.valueOf(proId) + "_" + page + "_" + size;
+        String cmpSkusJson = cacheService.get(key, 0);
+        PageableResult<PtmCmpSku> pagedCmpskus = null;
+        try {
+            if (StringUtils.isEmpty(cmpSkusJson)) {
+                pagedCmpskus = productService.listNotOffSaleCmpSkus(proId, page, size);
+                cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
+            } else {
+                PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
+
+                List<PtmCmpSku> cmpSkus = new ArrayList<PtmCmpSku>();
+                List<Map> data = datas.getData();
+
+                for (Map<String, Object> map : data) {
+                    PtmCmpSku cmpSku = new PtmCmpSku();
+                    String website = (String) map.get("website");
+                    Double price = (Double) map.get("price");
+                    if (StringUtils.isEmpty(website) || price == null) {
+                        continue;
+                    }
+                    cmpSku.setId(Long.valueOf(map.get("id") + ""));
+                    cmpSku.setProductId(Long.valueOf(map.get("productId") + ""));
+                    cmpSku.setWebsite(Website.valueOf(website));
+                    cmpSku.setSeller((String) map.get("seller"));
+                    cmpSku.setSkuTitle((String) map.get("skuTitle"));
+                    cmpSku.setTitle((String) map.get("title"));
+                    cmpSku.setPrice(price.floatValue());
+                    cmpSku.setRating((String) map.get("rating"));
+                    cmpSku.setImagePath((String) map.get("imagePath"));
+                    cmpSku.setOriImageUrl((String) map.get("oriImageUrl"));
+                    cmpSku.setDeeplink((String) map.get("deeplink"));
+                    cmpSku.setUrl((String) map.get("url"));
+                    cmpSku.setOriUrl((String) map.get("oriUrl"));
+                    cmpSku.setColor((String) map.get("color"));
+                    cmpSku.setSize((String) map.get("size"));
+                    cmpSku.setUpdateTime(new Date((Long) map.get("updateTime")));
+                    cmpSku.setChecked((Boolean) map.get("checked"));
+                    cmpSku.setSourcePid((String) map.get("sourcePid"));
+                    cmpSku.setSourceSid((String) map.get("sourceSid"));
+                    cmpSku.setStatus(SkuStatus.valueOf((String) map.get("status")));
+                    cmpSkus.add(cmpSku);
+                }
+                pagedCmpskus = new PageableResult<PtmCmpSku>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
+            }
+        } catch (Exception e) {
+            logger.error(" deal skus from cache error " + e.getMessage());
+            return null;
+        }
+        return pagedCmpskus;
+    }
 }

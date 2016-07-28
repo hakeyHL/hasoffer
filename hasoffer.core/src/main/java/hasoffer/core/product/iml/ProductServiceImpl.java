@@ -63,6 +63,12 @@ public class ProductServiceImpl implements IProductService {
                     "   AND t.status = 'ONSALE'  " +
                     " ORDER BY t.price ASC ";
 
+    private static final String Q_NOTOFFSALE_PTM_CMPSKU =
+            "SELECT t FROM PtmCmpSku t " +
+                    " WHERE t.productId = ?0 " +
+                    "   AND t.status != 'OFFSALE'  " +
+                    " ORDER BY t.price ASC ";
+
     private static final String Q_PTM_FEATURE =
             "SELECT t.feature FROM PtmFeature t " +
                     " WHERE t.productId = ?0   ";
@@ -525,6 +531,12 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public void import2Solr(ProductModel pm) {
         productIndexService.createOrUpdate(pm);
+    }
+
+    @Override
+    public PageableResult<PtmCmpSku> listNotOffSaleCmpSkus(long proId, int page, int size) {
+        PageableResult<PtmCmpSku> pagedResult = dbm.queryPage(Q_NOTOFFSALE_PTM_CMPSKU, page, size, Arrays.asList(proId));
+        return pagedResult;
     }
 
     @Override
