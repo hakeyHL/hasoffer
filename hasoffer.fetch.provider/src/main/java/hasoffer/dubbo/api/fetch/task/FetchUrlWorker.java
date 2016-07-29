@@ -1,7 +1,5 @@
 package hasoffer.dubbo.api.fetch.task;
 
-import hasoffer.base.exception.ContentParseException;
-import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.TaskStatus;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.spider.api.IFetchService;
@@ -9,7 +7,6 @@ import hasoffer.spider.api.impl.FetchServiceImpl;
 import hasoffer.spider.common.StringConstant;
 import hasoffer.spider.exception.UnSupportWebsiteException;
 import hasoffer.spider.model.FetchUrlResult;
-import hasoffer.spider.model.FetchedProduct;
 import hasoffer.spider.redis.service.IFetchCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,9 +36,9 @@ public class FetchUrlWorker implements Runnable {
                 if (pop == null) {
                     TimeUnit.MINUTES.sleep(1);
                 } else {
-                    FetchUrlResult fetchResult = JSONUtil.toObject(pop.toString(), FetchUrlResult.class);
-                    fetch(fetchResult);
-                    fetchCacheService.cacheResult(FetchUrlResult.getCacheKey(fetchResult), fetchResult);
+                    FetchUrlResult fetchUrlResult = JSONUtil.toObject(pop.toString(), FetchUrlResult.class);
+                    fetch(fetchUrlResult);
+                    fetchCacheService.cacheResult(FetchUrlResult.getCacheKey(fetchUrlResult), fetchUrlResult);
                 }
             } catch (Exception e) {
                 logger.error("FetchKeywordWorker is error. Error Msg: ", e);
@@ -49,27 +46,13 @@ public class FetchUrlWorker implements Runnable {
         }
     }
 
-    public void fetch(FetchUrlResult fetchResult) {
+    public void fetch(FetchUrlResult fetchUrlResult) {
         try {
-            FetchedProduct product = fetchService.getProductByUrl(fetchResult.getWebsite(), fetchResult.getUrl());
-            fetchResult.setFetchProduct(product);
-            fetchResult.setTaskStatus(TaskStatus.FINISH);
-        } catch (HttpFetchException e) {
-            if (fetchResult.getRunCount() < 5) {
-                fetchResult.setRunCount(fetchResult.getRunCount() + 1);
-                fetchCacheService.saveKeywordList(StringConstant.WAIT_URL_LIST, JSONUtil.toJSON(fetchResult));
-            } else {
-                fetchResult.setTaskStatus(TaskStatus.STOPPED);
-                fetchResult.setErrMsg("Run over 5 times. And stop it.");
-            }
-            e.printStackTrace();
-        } catch (ContentParseException e) {
-            fetchResult.setTaskStatus(TaskStatus.STOPPED);
-            fetchResult.setErrMsg("Parse Content Exception.");
-            e.printStackTrace();
+            fetchUrlResult = fetchService.getProductByUrl(fetchUrlResult);
         } catch (UnSupportWebsiteException e) {
-            fetchResult.setTaskStatus(TaskStatus.STOPPED);
-            fetchResult.setErrMsg("un able support website.");
+            fetchUrlResult.setTaskStatus(TaskStatus.STOPPED);
+            fetchUrlResult.setErrMsg("un able support website.");
+            fetchCacheService.cacheResult(FetchUrlResult.getCacheKey(fetchUrlResult), fetchUrlResult);
             e.printStackTrace();
         }
     }
