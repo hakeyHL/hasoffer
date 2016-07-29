@@ -283,7 +283,7 @@ public class AppController {
                 if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
                     OrderVo orderVo = new OrderVo();
                     BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.015)).min(orderStatsAnalysisPO.getTentativeAmount());
-                    orderVo.setAccount(tempPrice);
+                    orderVo.setAccount(tempPrice.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
                     orderVo.setChannel(orderStatsAnalysisPO.getChannel());
                     orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
                     orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
