@@ -95,26 +95,6 @@ public class ThirdServiceImple implements ThirdService {
                 dataList.addAll(deals);
             }
         }
-        //add topSelling to list
-//        List<PtmProduct> products = productCacheManager.getTopSellingProductsByDate(new SimpleDateFormat("yyyyMMdd").format(createTime), 1, 20);
-//        for (PtmProduct product : products) {
-//            int count = cmpSkuService.getSkuSoldStoreNum(product.getId());
-//            if (count > 0) {
-//                AppDeal appDeal = new AppDeal();
-//                appDeal.setTitle(product.getTitle());
-//                appDeal.setWebsite(Website.valueOf(product.getSourceSite()));
-//                appDeal.setCreateTime(product.getCreateTime());
-//                appDeal.setDescription(product.getDescription());
-//                Calendar calendar = Calendar.getInstance();
-//                calendar.setTime(createTime);
-//                calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH) + 2, 0, 0, 0);
-//                appDeal.setExpireTime(calendar.getTime());
-//                appDeal.setId(product.getId());
-//                appDeal.setImageUrl(productCacheManager.getProductMasterImageUrl(product.getId()));
-//                appDeal.setLinkUrl(product.getSourceUrl() == null ? "" : product.getSourceUrl());
-//                dataList.add(appDeal);
-//            }
-//        }
         PropertyFilter propertyFilter = new PropertyFilter() {
             @Override
             public boolean apply(Object o, String s, Object o1) {
