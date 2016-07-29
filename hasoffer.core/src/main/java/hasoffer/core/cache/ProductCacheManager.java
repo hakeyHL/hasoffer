@@ -16,10 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Date : 2016/5/7
@@ -147,11 +144,17 @@ public class ProductCacheManager {
     public List<PtmProduct> getTopSellins(int page, int size) {
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_TopSelling" + "_" + page + "_" + size;
         String ptmProductJson = cacheService.get(key, 0);
-
         List<PtmProduct> products = new ArrayList<PtmProduct>();
         try {
             if (StringUtils.isEmpty(ptmProductJson)) {
-                List<PtmTopSelling> ptmTopSellings = productService.getTopSellings(page, size);
+                Calendar calendar = Calendar.getInstance();
+                Date date = new Date();
+                calendar.setTime(date);
+                calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), 00, 00, 00);
+                long todayStart = calendar.getTimeInMillis();
+                calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH) - 1, 00, 00, 00);
+                long yesterdayStart = calendar.getTimeInMillis();
+                List<PtmTopSelling> ptmTopSellings = productService.getTopSellings(yesterdayStart, todayStart, page, size);
                 for (PtmTopSelling ptmTopSelling : ptmTopSellings) {
                     PageableResult<PtmCmpSku> pageableResult = productCacheManager.listPagedCmpSkus(ptmTopSelling.getId(), 0, 20);
                     if (pageableResult != null && pageableResult.getData() != null && pageableResult.getData().size() > 0) {
