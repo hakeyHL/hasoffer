@@ -533,6 +533,14 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    @Transactional
+    public void updateProductStd(Long proId, boolean std) {
+        PtmProductUpdater productUpdater = new PtmProductUpdater(proId);
+        productUpdater.getPo().setStd(std);
+        dbm.update(productUpdater);
+    }
+
+    @Override
     public PageableResult<PtmCmpSku> listNotOffSaleCmpSkus(long proId, int page, int size) {
         PageableResult<PtmCmpSku> pagedResult = dbm.queryPage(Q_NOTOFFSALE_PTM_CMPSKU, page, size, Arrays.asList(proId));
         return pagedResult;

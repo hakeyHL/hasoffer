@@ -91,6 +91,59 @@ public class FixController {
 
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
 
+
+    @RequestMapping(value = "/initproductifstd", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String initproductifstd() {
+
+        List<PtmCategory> stdCates = getStdCategories();
+
+        int page = 1, size = 2000;
+
+        int len = stdCates.size();
+        for (int i = 0; i < len; i++) {
+
+            PtmCategory cate = stdCates.get(i);
+
+            System.out.println(String.format("set cate[%d] to std product", cate.getId()));
+
+            List<PtmProduct> products = productService.listProducts(cate.getId(), 1, Integer.MAX_VALUE);
+
+            for (PtmProduct o : products) {
+                productService.updateProductStd(o.getId(), true);
+            }
+        }
+
+        System.out.println("all finished.");
+
+        return "ok";
+    }
+
+    private List<PtmCategory> getStdCategories() {
+
+        Long[] cateIds = new Long[]{1L, 257L, 4662L, 1504L, 2334L};
+
+        List<PtmCategory> cates = new ArrayList<>();
+
+        for (Long cateId : cateIds) {
+            PtmCategory category = categoryservice.getCategory(cateId);
+            getStdCategories(cates, category);
+        }
+
+        return cates;
+    }
+
+    private void getStdCategories(List<PtmCategory> cates, PtmCategory category) {
+        cates.add(category);
+        if (category.getLevel() < 3) {
+            List<PtmCategory> cates2 = categoryservice.listSubCategories(category.getId());
+            for (PtmCategory cate : cates2) {
+                getStdCategories(cates, cate);
+            }
+        }
+    }
+
     @RequestMapping(value = "/deleteproduct/{proId}", method = RequestMethod.GET)
     public
     @ResponseBody
