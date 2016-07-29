@@ -1,7 +1,6 @@
 package hasoffer.core.persistence.po.admin;
 
 import hasoffer.core.persistence.dbm.osql.Identifiable;
-import hasoffer.core.utils.IdWorker;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,10 +15,10 @@ import java.util.Date;
  */
 @Entity
 public class Advertisement implements Identifiable<Long> {
-    private static final IdWorker idWorker = IdWorker.getInstance(Advertisement.class);
+
     @Id
     @Column(unique = true, nullable = false)
-    private Long id = idWorker.nextLong();
+    private Long id;
     private Date startTime;
     private Date endTime;
     private int count;

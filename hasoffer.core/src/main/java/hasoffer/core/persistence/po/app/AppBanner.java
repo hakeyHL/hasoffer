@@ -2,7 +2,6 @@ package hasoffer.core.persistence.po.app;
 
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 import hasoffer.core.persistence.enums.BannerFrom;
-import hasoffer.core.utils.IdWorker;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -13,11 +12,10 @@ import java.util.Date;
 @Entity
 public class AppBanner implements Identifiable<Long> {
 
-    private static final IdWorker idWorker = IdWorker.getInstance(AppBanner.class);
-
     @Id
     @Column(unique = true, nullable = false)
-    private Long id = idWorker.nextLong();//自己生成id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false)
     private String imageUrl;//图片路径
