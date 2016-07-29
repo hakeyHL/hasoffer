@@ -2,7 +2,6 @@ package hasoffer.core.persistence.po.app;
 
 import hasoffer.base.model.Website;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
-import hasoffer.core.utils.IdWorker;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -13,11 +12,10 @@ import java.util.Date;
 @Entity
 public class AppDeal implements Identifiable<Long> {
 
-    private static final IdWorker idWorker = IdWorker.getInstance(AppDeal.class);
-
     @Id
     @Column(unique = true, nullable = false)
-    private Long id = idWorker.nextLong();
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -49,6 +47,12 @@ public class AppDeal implements Identifiable<Long> {
 
     @Column(columnDefinition = "text")
     private String infoPageImage;//deal详情页图片
+
+//    @Column(columnDefinition = "0")
+//    private Long dealClickCount;
+//
+//    @Column(columnDefinition = "0")
+//    private Long dealCategoryId;
 
     @Override
     public Long getId() {
@@ -156,6 +160,23 @@ public class AppDeal implements Identifiable<Long> {
         this.infoPageImage = infoPageImage;
     }
 
+//    public Long getDealClickCount() {
+//        return dealClickCount;
+//    }
+//
+//    public void setDealClickCount(Long dealClickCount) {
+//        this.dealClickCount = dealClickCount;
+//    }
+//
+//    public Long getDealCategoryId() {
+//        return dealCategoryId;
+//    }
+//
+//    public void setDealCategoryId(Long dealCategoryId) {
+//        this.dealCategoryId = dealCategoryId;
+//    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -169,16 +190,15 @@ public class AppDeal implements Identifiable<Long> {
         if (website != appDeal.website) return false;
         if (title != null ? !title.equals(appDeal.title) : appDeal.title != null) return false;
         if (linkUrl != null ? !linkUrl.equals(appDeal.linkUrl) : appDeal.linkUrl != null) return false;
-        if (priceDescription != null ? !priceDescription.equals(appDeal.priceDescription) : appDeal.priceDescription != null)
-            return false;
         if (imageUrl != null ? !imageUrl.equals(appDeal.imageUrl) : appDeal.imageUrl != null) return false;
-        if (listPageImage != null ? !listPageImage.equals(appDeal.listPageImage) : appDeal.listPageImage != null)
-            return false;
-        if (infoPageImage != null ? !infoPageImage.equals(appDeal.infoPageImage) : appDeal.infoPageImage != null)
-            return false;
         if (createTime != null ? !createTime.equals(appDeal.createTime) : appDeal.createTime != null) return false;
         if (expireTime != null ? !expireTime.equals(appDeal.expireTime) : appDeal.expireTime != null) return false;
-        return !(description != null ? !description.equals(appDeal.description) : appDeal.description != null);
+        if (description != null ? !description.equals(appDeal.description) : appDeal.description != null) return false;
+        if (priceDescription != null ? !priceDescription.equals(appDeal.priceDescription) : appDeal.priceDescription != null)
+            return false;
+        if (listPageImage != null ? !listPageImage.equals(appDeal.listPageImage) : appDeal.listPageImage != null)
+            return false;
+        return !(infoPageImage != null ? !infoPageImage.equals(appDeal.infoPageImage) : appDeal.infoPageImage != null);
 
     }
 
@@ -188,15 +208,15 @@ public class AppDeal implements Identifiable<Long> {
         result = 31 * result + (website != null ? website.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (linkUrl != null ? linkUrl.hashCode() : 0);
-        result = 31 * result + (priceDescription != null ? priceDescription.hashCode() : 0);
         result = 31 * result + (imageUrl != null ? imageUrl.hashCode() : 0);
-        result = 31 * result + (listPageImage != null ? listPageImage.hashCode() : 0);
-        result = 31 * result + (infoPageImage != null ? infoPageImage.hashCode() : 0);
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (expireTime != null ? expireTime.hashCode() : 0);
         result = 31 * result + (push ? 1 : 0);
-        result = 31 * result + (display ? 1 : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (priceDescription != null ? priceDescription.hashCode() : 0);
+        result = 31 * result + (display ? 1 : 0);
+        result = 31 * result + (listPageImage != null ? listPageImage.hashCode() : 0);
+        result = 31 * result + (infoPageImage != null ? infoPageImage.hashCode() : 0);
         return result;
     }
 }

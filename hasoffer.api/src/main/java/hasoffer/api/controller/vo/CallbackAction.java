@@ -5,7 +5,7 @@ package hasoffer.api.controller.vo;
  * Function :
  */
 public enum CallbackAction {
-
+    CLICKDEAL, //点击deal
     FLOWCTRLSUCCESS, //流量控制成功
     HOMEPAGE  //首页jiechi
 }

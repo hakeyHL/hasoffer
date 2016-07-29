@@ -196,6 +196,13 @@ public class AppController {
                 modelAndView.addObject("msg", "ok");
                 modelAndView.addObject("data", map);
                 break;
+            case CLICKDEAL:
+                AppDeal appDeal = appService.getDealDetail(request.getParameter("id"));
+                if (appDeal != null) {
+
+                    appService.countDealClickCount(appDeal);
+                }
+                break;
             default:
                 break;
         }

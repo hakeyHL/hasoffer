@@ -40,7 +40,7 @@ public interface IProductService {
 
     List<PtmProduct> getProducts(List<Long> proIds);
 
-    List<PtmTopSelling> getTopSellings(int page, int size);
+    List<PtmTopSelling> getTopSellings(Long yesterdayStart, Long todayStart, int page, int size);
 
     List<String> getProductFeatures(long id);
 

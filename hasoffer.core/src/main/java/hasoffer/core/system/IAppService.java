@@ -25,22 +25,31 @@ public interface IAppService {
 
     List<AppWebsite> getWebsites(boolean appshow);
 
-    List<OrderStatsAnalysisPO>getBackDetails(String userId);
+    List<OrderStatsAnalysisPO> getBackDetails(String userId);
 
     UrmUser getUserByUserToken(String userToken);
 
-    OrderStatsAnalysisPO getOrderDetail(String orderId,String  userId);
-    PageableResult getDeals(Long page,Long pageSize);
+    OrderStatsAnalysisPO getOrderDetail(String orderId, String userId);
+
+    PageableResult getDeals(Long page, Long pageSize);
+
     List<PtmCategory> getCategory();
+
     AppDeal getDealDetail(String id);
+
     UrmUser getUserById(String thirdId);
+
     List getProductByCriteria(SearchCriteria criteria);
 
     int addUser(UrmUser urmUser);
 
     void updateUserInfo(UrmUser uUser);
+
     List<AppBanner> getBanners();
+
     List<PtmCategory> getChildCategorys(String categoryId);
 
     int isHasChildNode(Long id);
+
+    void countDealClickCount(AppDeal appDeal);
 }

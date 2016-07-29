@@ -86,6 +86,8 @@ public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
                     po.setUserType("OLD");
                 }
                 po.setSaleAmount(order.getSale());
+                po.setTitle(order.getProduct());
+                po.setCategory(order.getCategory());
                 po.setCommissionRate(order.getCommissionRate());
                 po.setTentativeAmount(order.getCommissionEarned());
                 po.setOrderStatus(order.getStatus());
