@@ -265,10 +265,24 @@
         </plugins>
     </build>
 
+    <!-- 提交jar到公司maven服务器上 -->
+    <distributionManagement>
+        <repository>
+            <id>hasoffer-nexus-releases</id>
+            <name>Nexus Release Repository</name>
+            <url>http://47.88.137.23:8081/nexus/content/repositories/hasofferReleases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>hasoffer-nexus-snapshots</id>
+            <name>Nexus Snapshot Repository</name>
+            <url>http://47.88.137.23:8081/nexus/content/repositories/hasofferSnapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <!-- 使用公司的maven服务器 -->
     <repositories>
         <repository>
-            <id>hasoffer-nexus</id>
+            <id>hasoffer-nexus-public</id>
             <name>Hasoffer nexus Mirror</name>
             <url>http://47.88.137.23:8081/nexus/content/groups/public</url>
             <layout>default</layout>
@@ -282,9 +296,23 @@
             </snapshots>
         </repository>
         <repository>
-            <id>hasoffer-nexus-Snapshots</id>
+            <id>hasoffer-nexus-releases</id>
             <name>Hasoffer nexus Mirror Snapshots</name>
-            <url>http://47.88.137.23:8081/nexus/content/repositories/snapshots</url>
+            <url>http://47.88.137.23:8081/nexus/content/repositories/hasofferReleases</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>hasoffer-nexus-snapshots</id>
+            <name>Hasoffer nexus Mirror Snapshots</name>
+            <url>http://47.88.137.23:8081/nexus/content/repositories/hasofferSnapshots</url>
             <layout>default</layout>
             <releases>
                 <enabled>true</enabled>
@@ -299,7 +327,7 @@
 
     <pluginRepositories>
         <pluginRepository>
-            <id>hasoffer-nexus</id>
+            <id>hasoffer-nexus-public</id>
             <name>Hasoffer nexus Mirror</name>
             <url>http://47.88.137.23:8081/nexus/content/groups/public</url>
             <releases>
@@ -310,6 +338,4 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
-
-
 </project>
