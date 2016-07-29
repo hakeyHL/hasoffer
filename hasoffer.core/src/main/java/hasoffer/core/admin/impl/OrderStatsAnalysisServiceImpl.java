@@ -102,7 +102,7 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
             whereSql.append(" and orderStatus=? ");
             param.add(orderStatus);
         }
-        String execSql = sql.append(Q_BASE).append(whereSql).append(groupSql).toString();
+        String execSql = sql.append(Q_BASE).append(whereSql).append(groupSql).append(" ORDER BY orderTime desc ").toString();
         System.out.println(execSql + ":" + param.toArray());
         return hdao.findPageOfMapBySql(execSql, page, size, param.toArray());
     }
