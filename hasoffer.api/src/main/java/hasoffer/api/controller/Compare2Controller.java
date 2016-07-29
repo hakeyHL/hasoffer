@@ -1,6 +1,10 @@
 package hasoffer.api.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.PropertyFilter;
 import hasoffer.api.controller.vo.*;
+import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.SearchHelper;
 import hasoffer.base.model.AppDisplayMode;
 import hasoffer.base.model.PageableResult;
@@ -42,6 +46,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -136,14 +141,53 @@ public class Compare2Controller {
      * @return
      */
     @RequestMapping("sdk/cmpskus")
-    public ModelAndView cmpSkus(@RequestParam(defaultValue = "") final String q,
-                                @RequestParam(defaultValue = "") final String brand,
-                                @RequestParam(defaultValue = "") final String sourceId,
-                                @RequestParam(defaultValue = "") String site,
-                                @RequestParam(defaultValue = "0") String price,
-                                @RequestParam(defaultValue = "1") int page,
-                                @RequestParam(defaultValue = "10") int size) {
-        ModelAndView modelAndView = new ModelAndView();
+    public String cmpSkus(@RequestParam(defaultValue = "") final String q,
+                          @RequestParam(defaultValue = "") final String brand,
+                          @RequestParam(defaultValue = "") final String sourceId,
+                          @RequestParam(defaultValue = "") String site,
+                          @RequestParam(defaultValue = "0") String price,
+                          @RequestParam(defaultValue = "1") int page,
+                          @RequestParam(defaultValue = "10") int size,
+                          HttpServletResponse response) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("errorCode", "00000");
+        jsonObject.put("msg", "ok");
+        PropertyFilter propertyFilter = new PropertyFilter() {
+            @Override
+            public boolean apply(Object o, String s, Object o1) {
+                boolean flag = false;
+                switch (s) {
+                    case "ratingNum":
+                        flag = true;
+                        break;
+                    case "bestPrice":
+                        flag = true;
+                        break;
+                    case "priceOff":
+                        flag = true;
+                        break;
+                    case "support":
+                        flag = true;
+                        break;
+                    case "price":
+                        flag = true;
+                        break;
+                    case "returnGuarantee":
+                        flag = true;
+                        break;
+                    case "freight":
+                        flag = true;
+                        break;
+                    case "backRate":
+                        flag = true;
+                        break;
+                    default:
+                        flag = false;
+                }
+                if (flag) return false;
+                return true;
+            }
+        };
         //初始化sio对象
         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
@@ -165,14 +209,15 @@ public class Compare2Controller {
             }
             logger.error(e.getMessage());
             logger.error(String.format("sdk_cmp_  [NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
-            return modelAndView.addObject("data", cr);
+
+            jsonObject.put("data", JSONObject.toJSON(cr));
+            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
+            return null;
         }
-        modelAndView.addObject("errorCode", "00000");
-        modelAndView.addObject("msg", "ok");
         if (cr != null) {
-            modelAndView.addObject("data", cr);
+            jsonObject.put("data", JSONObject.toJSON(cr));
         } else {
-            modelAndView.addObject("data", "{\n" +
+            jsonObject.put("data", "{\n" +
                     "        \"copywriting\": \"\",\n" +
                     "        \"show\": \"waterfall\",\n" +
                     "        \"skus\": [\n" +
@@ -184,7 +229,7 @@ public class Compare2Controller {
                     "                \"deepLink\": \"http://item.jd.com/11143993.html\",\n" +
                     "                \"saved\": 100,\n" +
                     "                \"id\": \"11143993\",\n" +
-                    "                \"price\": \"1,000\",\n" +
+                    "                \"skuPrice\": \"1,000\",\n" +
                     "                \"website\": \"FLIPKART\"\n" +
                     "            },\n" +
                     "            {\n" +
@@ -195,14 +240,14 @@ public class Compare2Controller {
                     "                \"deepLink\": \"http://item.jd.com/1381873091.html\",\n" +
                     "                \"saved\": -100,\n" +
                     "                \"id\": \"1381873091\",\n" +
-                    "                \"price\": \"1,000\",\n" +
+                    "                \"skuPrice\": \"1,000\",\n" +
                     "                \"website\": \"FLIPKART\"\n" +
                     "            }\n" +
                     "        ]\n" +
                     "    }");
         }
-
-        return modelAndView;
+        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
+        return null;
     }
 
     @RequestMapping(value = "/cmpsku", method = RequestMethod.GET)
