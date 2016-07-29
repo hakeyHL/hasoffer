@@ -282,7 +282,8 @@ public class AppController {
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
                 if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
                     OrderVo orderVo = new OrderVo();
-                    orderVo.setAccount(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.015)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+                    BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.015)).min(orderStatsAnalysisPO.getTentativeAmount());
+                    orderVo.setAccount(tempPrice);
                     orderVo.setChannel(orderStatsAnalysisPO.getChannel());
                     orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
                     orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
@@ -291,10 +292,10 @@ public class AppController {
                     orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
                     transcations.add(orderVo);
                     if (orderStatsAnalysisPO.getOrderStatus() != "cancelled") {
-                        PendingCoins = PendingCoins.add(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.015)));
+                        PendingCoins = PendingCoins.add(tempPrice);
                     }
                     if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
-                        VericiedCoins = VericiedCoins.add(orderStatsAnalysisPO.getTentativeAmount());
+                        VericiedCoins = VericiedCoins.add(tempPrice);
                     }
                 }
             }
