@@ -290,11 +290,12 @@ public class AppController {
                     //返利比率=tentativeAmount*rate/SaleAmount
                     orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
                     transcations.add(orderVo);
+                    BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.015)).min(orderStatsAnalysisPO.getTentativeAmount());
                     if (orderStatsAnalysisPO.getOrderStatus() != "cancelled") {
-                        PendingCoins = PendingCoins.add(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.015)));
+                        PendingCoins = PendingCoins.add(tempPrice);
                     }
                     if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
-                        VericiedCoins = VericiedCoins.add(orderStatsAnalysisPO.getTentativeAmount());
+                        VericiedCoins = VericiedCoins.add(tempPrice);
                     }
                 }
             }
