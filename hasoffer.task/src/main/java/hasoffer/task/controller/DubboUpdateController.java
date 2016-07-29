@@ -7,6 +7,7 @@ import hasoffer.core.product.IProductService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.task.worker.CmpSkuDubboUpdateWorker;
 import hasoffer.task.worker.SrmSearchLogListWorker;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,6 +29,7 @@ public class DubboUpdateController {
     private static AtomicBoolean taskRunning1 = new AtomicBoolean(false);
 
     @Resource
+    @Qualifier("fetchDubboService")
     IFetchDubboService fetchDubboService;
     @Resource
     ICmpSkuService cmpSkuService;
