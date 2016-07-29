@@ -48,11 +48,11 @@ public class AppDeal implements Identifiable<Long> {
     @Column(columnDefinition = "text")
     private String infoPageImage;//deal详情页图片
 
-//    @Column(columnDefinition = "0")
-//    private Long dealClickCount;
-//
-//    @Column(columnDefinition = "0")
-//    private Long dealCategoryId;
+    @Column(columnDefinition = "0")
+    private Long dealClickCount;
+
+    @Column(columnDefinition = "0")
+    private Long dealCategoryId;
 
     @Override
     public Long getId() {
@@ -160,21 +160,21 @@ public class AppDeal implements Identifiable<Long> {
         this.infoPageImage = infoPageImage;
     }
 
-//    public Long getDealClickCount() {
-//        return dealClickCount;
-//    }
-//
-//    public void setDealClickCount(Long dealClickCount) {
-//        this.dealClickCount = dealClickCount;
-//    }
-//
-//    public Long getDealCategoryId() {
-//        return dealCategoryId;
-//    }
-//
-//    public void setDealCategoryId(Long dealCategoryId) {
-//        this.dealCategoryId = dealCategoryId;
-//    }
+    public Long getDealClickCount() {
+        return dealClickCount;
+    }
+
+    public void setDealClickCount(Long dealClickCount) {
+        this.dealClickCount = dealClickCount;
+    }
+
+    public Long getDealCategoryId() {
+        return dealCategoryId;
+    }
+
+    public void setDealCategoryId(Long dealCategoryId) {
+        this.dealCategoryId = dealCategoryId;
+    }
 
 
     @Override
@@ -198,8 +198,14 @@ public class AppDeal implements Identifiable<Long> {
             return false;
         if (listPageImage != null ? !listPageImage.equals(appDeal.listPageImage) : appDeal.listPageImage != null)
             return false;
-        return !(infoPageImage != null ? !infoPageImage.equals(appDeal.infoPageImage) : appDeal.infoPageImage != null);
+        if (infoPageImage != null ? !infoPageImage.equals(appDeal.infoPageImage) : appDeal.infoPageImage != null)
+            return false;
+        if (dealClickCount != null ? !dealClickCount.equals(appDeal.dealClickCount) : appDeal.dealClickCount != null)
+            return false;
+        if (dealCategoryId != null ? !dealCategoryId.equals(appDeal.dealCategoryId) : appDeal.dealCategoryId != null)
+            return false;
 
+        return true;
     }
 
     @Override
@@ -217,6 +223,8 @@ public class AppDeal implements Identifiable<Long> {
         result = 31 * result + (display ? 1 : 0);
         result = 31 * result + (listPageImage != null ? listPageImage.hashCode() : 0);
         result = 31 * result + (infoPageImage != null ? infoPageImage.hashCode() : 0);
+        result = 31 * result + (dealClickCount != null ? dealClickCount.hashCode() : 0);
+        result = 31 * result + (dealCategoryId != null ? dealCategoryId.hashCode() : 0);
         return result;
     }
 }
