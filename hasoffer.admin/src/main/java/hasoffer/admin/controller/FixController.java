@@ -135,6 +135,9 @@ public class FixController {
     }
 
     private void getStdCategories(List<PtmCategory> cates, PtmCategory category) {
+        if (category == null) {
+            return;
+        }
         cates.add(category);
         if (category.getLevel() < 3) {
             List<PtmCategory> cates2 = categoryservice.listSubCategories(category.getId());
