@@ -32,6 +32,7 @@ import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.exception.NonMatchedProductException;
 import hasoffer.core.system.impl.AppServiceImpl;
+import hasoffer.core.utils.JsonHelper;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
@@ -152,42 +153,7 @@ public class Compare2Controller {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
-        PropertyFilter propertyFilter = new PropertyFilter() {
-            @Override
-            public boolean apply(Object o, String s, Object o1) {
-                boolean flag = false;
-                switch (s) {
-                    case "ratingNum":
-                        flag = true;
-                        break;
-                    case "bestPrice":
-                        flag = true;
-                        break;
-                    case "priceOff":
-                        flag = true;
-                        break;
-                    case "support":
-                        flag = true;
-                        break;
-                    case "price":
-                        flag = true;
-                        break;
-                    case "returnGuarantee":
-                        flag = true;
-                        break;
-                    case "freight":
-                        flag = true;
-                        break;
-                    case "backRate":
-                        flag = true;
-                        break;
-                    default:
-                        flag = false;
-                }
-                if (flag) return false;
-                return true;
-            }
-        };
+        PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"ratingNum", "bestPrice", "priceOff", "support", "price", "returnGuarantee", "freight", "backRate"});
         //初始化sio对象
         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
