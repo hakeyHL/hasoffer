@@ -18,7 +18,7 @@
 	<aop:aspectj-autoproxy/>
 
 	<import resource="classpath*:spring-beans.xml"/>
-	<import resource="classpath*:spring/dubbo-spring.xml"/>
+	<import resource="classpath*:spring/*.xml"/>
 	<!--<context:component-scan base-package="hasoffer.timer.controller"/>-->
 	<context:component-scan base-package="hasoffer.task.*"/>
 
