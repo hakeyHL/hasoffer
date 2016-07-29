@@ -42,6 +42,57 @@ public class ExpTitleTest {
     IProductService productService;
 
     @Test
+    public void setStdbyFile() throws IOException {
+        File file_ori = new File("d:/datas/hasoffer/predicted_values.txt");
+        List<String> lines = FileUtils.readLines(file_ori);
+
+        StringBuilder sb1 = new StringBuilder();
+        StringBuilder sb2 = new StringBuilder();
+
+        int index = 0;
+        int count_0 = 0;
+        int count_1 = 0;
+        for (int i = 0, len = lines.size(); i < len; i = i + 2) {
+            String keyStr = lines.get(i).trim();
+            String valStr = lines.get(i + 1).trim();
+
+            long key = Long.parseLong(keyStr);
+            long val = Long.parseLong(valStr);
+
+            System.out.println(key + "\t" + val);
+
+            if (val == 0) {
+                count_0++;
+                if (count_0 % 200 == 0) {
+                    PtmProduct product = productService.getProduct(key);
+                    if (product != null && !StringUtils.isEmpty(product.getTitle())) {
+                        sb1.append(val + "\t" + getTitle(product.getTitle())).append("\n");
+                    }
+                }
+            } else {
+                count_1++;
+                if (count_1 % 200 == 0) {
+                    PtmProduct product = productService.getProduct(key);
+                    if (product != null && !StringUtils.isEmpty(product.getTitle())) {
+                        sb2.append(val + "\t" + getTitle(product.getTitle())).append("\n");
+                    }
+                }
+            }
+        }
+
+        System.out.println(count_0 + "\t" + count_1);
+
+        String t0 = "d:/datas/test/t0.txt";
+        String t1 = "d:/datas/test/t1.txt";
+
+        File f0 = createFile(t0, true);
+        File f1 = createFile(t1, true);
+
+        FileUtils.write(f0, sb1.toString());
+        FileUtils.write(f1, sb2.toString());
+    }
+
+    @Test
     public void getI2() {
         initCateMap();
 
