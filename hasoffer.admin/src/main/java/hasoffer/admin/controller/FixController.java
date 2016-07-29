@@ -91,6 +91,16 @@ public class FixController {
 
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
 
+    @RequestMapping(value = "/setprostdbyml", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String setprostdbyml() {
+
+
+        System.out.println("all finished.");
+
+        return "ok";
+    }
 
     @RequestMapping(value = "/initproductifstd", method = RequestMethod.GET)
     public
