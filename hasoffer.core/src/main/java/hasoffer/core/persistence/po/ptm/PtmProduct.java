@@ -38,6 +38,9 @@ public class PtmProduct implements Identifiable<Long> {
     private String sourceUrl;
     private String sourceId;
 
+    @Column
+    private boolean std = true; // 是否标品
+
     public PtmProduct() {
     }
 
