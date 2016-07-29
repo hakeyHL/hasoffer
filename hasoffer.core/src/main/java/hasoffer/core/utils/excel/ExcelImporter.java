@@ -2,8 +2,6 @@ package hasoffer.core.utils.excel;
 
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.HibernateDao;
-import hasoffer.core.persistence.po.app.AppDeal;
-import hasoffer.core.utils.IdWorker;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
@@ -26,8 +24,6 @@ import java.util.*;
 
 @Component
 public class ExcelImporter {
-
-    private static final IdWorker idWorker = IdWorker.getInstance(AppDeal.class);
 
     @Resource
     private JdbcTemplate jdbcTemplate;
@@ -92,7 +88,6 @@ public class ExcelImporter {
                 Object[] objects = batchArgs.get(i);
                 for (int j = 0, length = objects.length; j < length + 1; j++) {
                     if (j == 0) {
-                        preparedStatement.setObject(j + 1, idWorker.nextLong());
                         continue;
                     }
                     preparedStatement.setObject(j + 1, objects[j - 1]);

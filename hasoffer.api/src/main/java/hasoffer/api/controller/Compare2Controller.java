@@ -501,7 +501,7 @@ public class Compare2Controller {
                 }
             }
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            // logger.error(e.getMessage());
         }
 
         String imageUrl = productCacheManager.getProductMasterImageUrl(sio.getHsProId());//productService.getProductMasterImageUrl(sio.getHsProId());

@@ -86,6 +86,9 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
                 }
             }
             po.setOrderStatus(order.getStatus());
+            po.setCategory(order.getCategory());
+            po.setTitle(order.getTitle());
+            po.setProductId(order.getProductId());
             // OLD?NEW
             String deviceId = po.getDeviceId();
             UrmDevice device = null;
