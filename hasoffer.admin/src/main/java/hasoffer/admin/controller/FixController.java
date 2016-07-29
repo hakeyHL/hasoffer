@@ -91,6 +91,16 @@ public class FixController {
 
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
 
+    @RequestMapping(value = "/setprostdbyml", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String setprostdbyml() {
+
+
+        System.out.println("all finished.");
+
+        return "ok";
+    }
 
     @RequestMapping(value = "/initproductifstd", method = RequestMethod.GET)
     public
@@ -135,6 +145,9 @@ public class FixController {
     }
 
     private void getStdCategories(List<PtmCategory> cates, PtmCategory category) {
+        if (category == null) {
+            return;
+        }
         cates.add(category);
         if (category.getLevel() < 3) {
             List<PtmCategory> cates2 = categoryservice.listSubCategories(category.getId());
