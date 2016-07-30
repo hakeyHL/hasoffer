@@ -233,7 +233,7 @@ public class ShowStatController {
             endTime = DEFAULT_TIME;
         }
         webSite = webSite.toUpperCase();
-        String orderStatus="tentative";
+        String orderStatus = "tentative";
         String YMD_WEB_PATTERN = "yyyy-MM-dd";
         Date startYmd = TimeUtils.stringToDate(startTime, YMD_WEB_PATTERN);
         Date endYmd = TimeUtils.stringToDate(endTime, YMD_WEB_PATTERN);
@@ -252,9 +252,9 @@ public class ShowStatController {
                 vo.setNoneUserCount(po.get("noneUserCount").toString());
 //                vo.setRediCount(po.get("rediCount").toString());
 //                vo.setShopCount(po.get("shopCount").toString());
-                vo.setGoogleChannel(po.get("googleChannel").toString());
-                vo.setNineAppChannel(po.get("nineAppChannel").toString());
-                vo.setShanchuanChannel(po.get("shanchuanChannel").toString());
+                vo.setGoogleChannel(po.get("googleChannel").toString() + " /" + po.get("googleOldChannel").toString() + " /" + po.get("googleNewChannel").toString() + " /" + po.get("googleNoneChannel").toString());
+                vo.setShanchuanChannel(po.get("shanchuanChannel").toString() + " /" + po.get("shanchuanOldChannel").toString() + " /" + po.get("shanchuanNewChannel").toString() + " /" + po.get("shanchuanNoneChannel").toString());
+                vo.setNineAppChannel(po.get("nineAppChannel").toString() + " /" + po.get("nineAppOldChannel").toString() + " /" + po.get("nineAppNewChannel").toString() + " /" + po.get("nineAppNoneChannel").toString());
                 vo.setNoneChannel(po.get("noneChannel").toString());
                 reportList.add(vo);
             } catch (Exception e) {
