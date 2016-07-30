@@ -48,11 +48,11 @@ public class AppDeal implements Identifiable<Long> {
     @Column(columnDefinition = "text")
     private String infoPageImage;//deal详情页图片
 
-    @Column(columnDefinition = "0")
-    private Long dealClickCount;
+    @Column
+    private Long dealClickCount = 0l;
 
-    @Column(columnDefinition = "0")
-    private Long dealCategoryId;
+    @Column
+    private Long dealCategoryId = -1l;
 
     @Override
     public Long getId() {

@@ -250,7 +250,7 @@ public class SearchRecordProcessWorker implements Runnable {
 
     private void initResultMap(SrmAutoSearchResult autoSearchResult, FetchResult fetchResult) {
         //1 判断抓取有没有返回商品，没有的话直接退出。
-        if (fetchResult == null || !isClose(fetchResult)) {
+        if (fetchResult == null || !fetchResult.isOver()) {
             return;
         }
         Map<Website, WebFetchResult> fetchResultMap = autoSearchResult.getSitePros();
