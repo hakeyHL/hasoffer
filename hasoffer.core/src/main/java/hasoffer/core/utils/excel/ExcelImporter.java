@@ -87,9 +87,6 @@ public class ExcelImporter {
             public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
                 Object[] objects = batchArgs.get(i);
                 for (int j = 0, length = objects.length; j < length; j++) {
-                    if (j == 0) {
-                        continue;
-                    }
                     preparedStatement.setObject(j + 1, objects[j]);
                 }
 
