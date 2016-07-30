@@ -86,11 +86,11 @@ public class ExcelImporter {
             @Override
             public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
                 Object[] objects = batchArgs.get(i);
-                for (int j = 0, length = objects.length; j < length + 1; j++) {
+                for (int j = 0, length = objects.length; j < length; j++) {
                     if (j == 0) {
                         continue;
                     }
-                    preparedStatement.setObject(j + 1, objects[j - 1]);
+                    preparedStatement.setObject(j + 1, objects[j]);
                 }
 
             }
