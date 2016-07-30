@@ -101,18 +101,10 @@ public class RequestInterceptor implements HandlerInterceptor {
 
     public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o,
                            ModelAndView modelAndView) throws Exception {
-//       UrmUser urmUser= appService.getUserByUserToken( (String) Context.currentContext().get(StaticContext.USER_TOKEN));
-//        if(urmUser==null){
-//            modelAndView.addObject("result", new StringBuilder().append("{\n" +
-//                    "    \"errorCode\": \"10010\",\n" +
-//                    "    \"msg\": \"login expired \"\n" +
-//                    "}"));
-//        }else{
-//            modelAndView.addObject("result", new StringBuilder().append("{\n" +
-//                    "    \"errorCode\": \"00000\",\n" +
-//                    "    \"msg\": \"ok \"\n" +
-//                    "}"));
-//        }
+        //去除不必要的返回
+        if (modelAndView != null && modelAndView.getModel().containsKey("searchCriteria")) {
+            modelAndView.getModel().remove("modelAndView");
+        }
         if (modelAndView != null) {
             UrmUser urmUser = appService.getUserByUserToken((String) Context.currentContext().get(StaticContext.USER_TOKEN));
             if (urmUser == null) {

@@ -14,6 +14,7 @@ public class PtmBasicAttribute implements Identifiable<Long> {
 	@Column(unique = true, nullable = false)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
 	private long productId;
 
 	private String name;//对应PtmBasicAttributeDef 的 id

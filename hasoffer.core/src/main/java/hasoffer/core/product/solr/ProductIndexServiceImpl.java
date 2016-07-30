@@ -30,14 +30,14 @@ public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductM
     }
 
     public PageableResult<ProductModel> searchProductsByKey(String title, int page, int size) {
-        Sort[] sorts = new Sort[]{new Sort("searchCount", Order.DESC)};
+        Sort[] sorts = null;
         PivotFacet[] pivotFacets = null;
 
         List<FilterQuery> fqList = new ArrayList<FilterQuery>();
         fqList.add(new FilterQuery("price", "[1 TO *]"));
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
 
-        SearchResult<ProductModel> sr = searchObjs(title, fqs, sorts, pivotFacets, page == 0 ? 1 : page + 1, size, true);
+        SearchResult<ProductModel> sr = searchObjs(title, fqs, sorts, pivotFacets, page <= 1 ? 1 : page, size, true);
 
         return new PageableResult<ProductModel>(sr.getResult(), sr.getTotalCount(), page, size);
     }
@@ -46,18 +46,16 @@ public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductM
         if (level < 1 || level > 3) {
             return null;
         }
-
-        String q = "*:*";
-
         Sort[] sorts = new Sort[]{new Sort("searchCount", Order.DESC)};
+        String q = "*:*";
         PivotFacet[] pivotFacets = null;
 
         List<FilterQuery> fqList = new ArrayList<FilterQuery>();
         fqList.add(new FilterQuery("cate" + level, String.valueOf(cateId)));
         fqList.add(new FilterQuery("price", "[1 TO *]"));
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
-
-        SearchResult<ProductModel> sr = searchObjs(q, fqs, sorts, pivotFacets, page == 0 ? 1 : page + 1, size, true);
+        System.out.println(Thread.currentThread().getName() + " page " + page + "  size " + size);
+        SearchResult<ProductModel> sr = searchObjs(q, fqs, sorts, pivotFacets, page <= 1 ? 1 : page, size, true);
 
         return new PageableResult<ProductModel>(sr.getResult(), sr.getTotalCount(), page, size);
     }

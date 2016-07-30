@@ -370,6 +370,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         //sku创建时，添加创建时间字段
         ptmCmpSku.setCreateTime(TimeUtils.nowDate());
+
         long skuid = dbm.create(ptmCmpSku);
 
         //创建sku的时候，将固定网站的商品导入到mongodb中,只导入url、website、id
@@ -620,7 +621,26 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         mdm.save(ptmCmpSkuLog);
 
         PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(skuId);
-        //获取商品的status
+
+        //更新逻辑如下
+        //1.如果状态为OFFSALE，更新status和updateTime
+        //2.如果状态为OUTSTOCK，不更新价格
+        //3.如果状态为ONSALE，且价格大于0，更新价格
+        //4.在2和3状态下的
+//                4.1如果title不为空，且和原来数据不一致，更新title
+//                4.2如果imageurl不为空，且和原理数据不一致，更新oriImageUrl
+        //5.如果原来的website为空，且新抓的website不为空，更新website
+        //6.如果新抓的skutitle不为空，且和原来的不一样，更新skutitle
+        //7.如果新抓的（只更新onsale的数据）
+//        commentsNumber;//评论数大于0，更新该值
+//        ratings;//星级，该值大于0，更新该值
+//        shipping = -1;//邮费，该值大于0，更新该值
+//        supportPayMethod;//支付方式，不为空，且和原来的字符串不一致，更新该值
+//        returnDays;//如果该值大于0，更新
+
+        //7.最终设置更新时间
+//        deliveryTime;//送达时间 ex: 1-3   app2.0---暂定为5
+
         if (SkuStatus.OFFSALE.equals(fetchedProduct.getSkuStatus())) {//如果OFFSALE
 
             ptmCmpSkuUpdater.getPo().setStatus(SkuStatus.OFFSALE);
@@ -631,8 +651,9 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
                 ptmCmpSkuUpdater.getPo().setStatus(SkuStatus.OUTSTOCK);
 
-            } else {//修改价格
+            } else {
 
+                //更新 price
                 float price = fetchedProduct.getPrice();
                 if (price > 0) {
                     if (cmpSku.getPrice() != fetchedProduct.getPrice()) {
@@ -640,6 +661,37 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
                     }
                 }
                 ptmCmpSkuUpdater.getPo().setStatus(SkuStatus.ONSALE);
+
+                //更新 commentsNumber
+                long commentsNumber = fetchedProduct.getCommentsNumber();
+                if (commentsNumber > 0) {
+                    ptmCmpSkuUpdater.getPo().setCommentsNumber(commentsNumber);
+                }
+
+                //更新ratings
+                int ratings = fetchedProduct.getRatings();
+                if (ratings > 0) {
+                    ptmCmpSkuUpdater.getPo().setRatings(ratings);
+                }
+
+                //更新 shipping
+                float shipping = fetchedProduct.getShipping();
+                if (shipping > 0) {
+                    ptmCmpSkuUpdater.getPo().setShipping(shipping);
+                }
+
+                //更新 supportPayMethod
+                String supportPayMethod = fetchedProduct.getSupportPayMethod();
+                if (!StringUtils.isEmpty(supportPayMethod) && !StringUtils.isEqual(supportPayMethod, cmpSku.getSupportPayMethod())) {
+                    ptmCmpSkuUpdater.getPo().setSupportPayMethod(supportPayMethod);
+                }
+
+                //更新 returnDays
+                int returnDays = fetchedProduct.getReturnDays();
+                if (returnDays > 0) {
+                    ptmCmpSkuUpdater.getPo().setReturnDays(returnDays);
+                }
+
             }
 
             if (!StringUtils.isEmpty(fetchedProduct.getTitle())) {
@@ -668,6 +720,12 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         }
 
         ptmCmpSkuUpdater.getPo().setUpdateTime(TimeUtils.nowDate());
+
+        //更新 deliveryTime
+//        String deliveryTime = fetchedProduct.getDeliveryTime();
+        String deliveryTime = "1-5";
+        ptmCmpSkuUpdater.getPo().setDeliveryTime(deliveryTime);
+
         dbm.update(ptmCmpSkuUpdater);
 
         return;

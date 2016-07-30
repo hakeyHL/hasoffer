@@ -1,6 +1,7 @@
 package hasoffer.core.system;
 
 import hasoffer.base.enums.AppType;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
@@ -20,24 +21,35 @@ public interface IAppService {
 
     AppVersion getLatestVersion(AppType appType);
 
+    AppVersion getLatestVersion(MarketChannel marketChannel, AppType appType);
+
     List<AppWebsite> getWebsites(boolean appshow);
 
-    List<OrderStatsAnalysisPO>getBackDetails(String userId);
+    List<OrderStatsAnalysisPO> getBackDetails(String userId);
 
     UrmUser getUserByUserToken(String userToken);
 
-    OrderStatsAnalysisPO getOrderDetail(String orderId,String  userId);
-    PageableResult getDeals(Long page,Long pageSize);
+    OrderStatsAnalysisPO getOrderDetail(String orderId, String userId);
+
+    PageableResult getDeals(Long page, Long pageSize);
+
     List<PtmCategory> getCategory();
+
     AppDeal getDealDetail(String id);
+
     UrmUser getUserById(String thirdId);
+
     List getProductByCriteria(SearchCriteria criteria);
 
     int addUser(UrmUser urmUser);
 
     void updateUserInfo(UrmUser uUser);
+
     List<AppBanner> getBanners();
+
     List<PtmCategory> getChildCategorys(String categoryId);
 
     int isHasChildNode(Long id);
+
+    void countDealClickCount(AppDeal appDeal);
 }

@@ -10,10 +10,12 @@ import javax.persistence.*;
  */
 @Entity
 public class PtmCategory2 implements Identifiable<Long> {
+
     @Id
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private long parentId;
     private int level;
     private int rank;

@@ -17,6 +17,7 @@ public class TagCategory extends HasTag implements Identifiable<Long> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     @Column(unique = true, nullable = true)
     private String tag; // tag
 

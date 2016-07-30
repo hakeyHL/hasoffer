@@ -1,6 +1,7 @@
 package hasoffer.core.system.impl;
 
 import hasoffer.base.enums.AppType;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.core.bo.system.SearchCriteria;
@@ -30,7 +31,11 @@ public class AppServiceImpl implements IAppService {
 
     private static final String Q_APP_VERSION =
             "SELECT t FROM AppVersion t " +
-                    " WHERE t.appType = ?0 " +
+                    " WHERE t.appType = ?0 and marketChannel != 'ZUK'" +
+                    " ORDER BY t.publishTime DESC";
+    private static final String Q_CHANNEL_APP_VERSION =
+            "SELECT t FROM AppVersion t " +
+                    " WHERE t.appType = ?0  and marketChannel = ?1" +
                     " ORDER BY t.publishTime DESC";
 
     private static final String Q_APP_WEBSITE =
@@ -59,7 +64,7 @@ public class AppServiceImpl implements IAppService {
     private static final String Q_APP_GETDEALS =
             "SELECT t FROM AppDeal t where  t.display='1' and  t.expireTime >= ?0  order by createTime desc   ";
     private static final String Q_APP_GETBANNERS =
-            " SELECT t from AppBanner t ORDER BY id desc";
+            " SELECT t from AppBanner t where t.deadline >=?0 ORDER BY id desc";
 
     private static final String Q_APP_GEDEALDETAIL =
             " SELECT t from AppDeal t where t.id=?0";
@@ -81,6 +86,12 @@ public class AppServiceImpl implements IAppService {
 //        return dbm.get(AppVersion.class, 3L);
         List<AppVersion> versions = dbm.query(Q_APP_VERSION, Arrays.asList(appType));
 
+        return ArrayUtils.hasObjs(versions) ? versions.get(0) : null;
+    }
+
+    @Override
+    public AppVersion getLatestVersion(MarketChannel marketChannel, AppType appType) {
+        List<AppVersion> versions = dbm.query(Q_CHANNEL_APP_VERSION, Arrays.asList(appType, marketChannel));
         return ArrayUtils.hasObjs(versions) ? versions.get(0) : null;
     }
 
@@ -114,7 +125,7 @@ public class AppServiceImpl implements IAppService {
 
     @Override
     public PageableResult getDeals(Long page, Long pageSize) {
-        return dbm.queryPage(Q_APP_GETDEALS, page.intValue() <= 1 ? 1 : page.intValue() + 1, pageSize.intValue(), Arrays.asList(new Date()));
+        return dbm.queryPage(Q_APP_GETDEALS, page.intValue() <= 1 ? 1 : page.intValue(), pageSize.intValue(), Arrays.asList(new Date()));
     }
 
     @Override
@@ -182,7 +193,7 @@ public class AppServiceImpl implements IAppService {
 
     @Override
     public List<AppBanner> getBanners() {
-        return dbm.query(Q_APP_GETBANNERS);
+        return dbm.query(Q_APP_GETBANNERS, Arrays.asList(new Date()));
     }
 
     @Override
@@ -201,5 +212,12 @@ public class AppServiceImpl implements IAppService {
             return 0;
         }
         return 1;
+    }
+
+    @Override
+    public void countDealClickCount(AppDeal appDeal) {
+        appDeal.setDealClickCount(appDeal.getDealClickCount() + 1);
+        List deals = Arrays.asList(appDeal);
+        dbm.update(deals);
     }
 }

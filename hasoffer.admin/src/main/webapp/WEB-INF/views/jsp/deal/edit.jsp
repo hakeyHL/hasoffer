@@ -18,6 +18,8 @@
           method="post" onsubmit="return dosubmit()">
 
         <input type="hidden" name="id" value="${deal.id}">
+        <input type="hidden" name="listPageImage" value="${deal.listPageImage}">
+        <input type="hidden" name="infoPageImage" value="${deal.infoPageImage}">
         <input type="hidden" name="website" value="${deal.website}">
 
         <div class="form-group">

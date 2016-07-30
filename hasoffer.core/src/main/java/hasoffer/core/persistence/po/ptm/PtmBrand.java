@@ -17,6 +17,7 @@ public class PtmBrand implements Identifiable<Long> {
 	@Column(unique = true, nullable = false)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
 	private Date createTime = TimeUtils.nowDate();
 	private String name;
 	private String logoPath;

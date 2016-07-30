@@ -4,6 +4,7 @@ import hasoffer.api.controller.vo.*;
 import hasoffer.api.helper.ParseConfigHelper;
 import hasoffer.api.worker.SearchLogQueue;
 import hasoffer.base.enums.AppType;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
@@ -76,8 +77,17 @@ public class AppController {
     private Logger logger = LoggerFactory.logger(AppController.class);
 
     public static void main(String[] args) {
-        String ss = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL, "http://www.snapdeal.com/product/micromax-canvas-a1-aq4502-8/630310793485", new String[]{"SHANCHUAN", "123"});
-        System.out.print(ss);
+//        String ss = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL, "http://www.snapdeal.com/product/micromax-canvas-a1-aq4502-8/630310793485", new String[]{"SHANCHUAN", "123"});
+//        System.out.print(ss);
+
+        Random random = new Random();
+        for (int i = 0; i < 100; i++) {
+            int nextInt = random.nextInt(8);
+            System.out.println(nextInt);
+        }
+
+        String ss = WebsiteHelper.getDealUrlWithAff(Website.FLIPKART, "http://www.flipkart.com/philips-mix-4-gb-sa5mxx04wf-97-16-mp3-player/p/itmdmfndygbz3wfd?pid=AUDDMFMAC4WSSGGH&al=TQCV0eQ7m7uScf%2FCbjC3PcldugMWZuE7sHPMhtl4IOoHmf27YkMOEISwRAaogpJNxY67buiFvno%3D&offer=nb%3Amp%3A06e1fc0e26&ref=L%3A5882205368552411071&srno=b_1&findingMethod=Deals%20of%20the%20Day&otracker=hp_omu_Deals%20of%20the%20Day_1_39fdd0fe-e2e3-4176-9cf4-15ca32404fe5_0", new String[]{"GOOGLEPLAY", "aaaadfdfdfdf"});
+        System.out.println(ss);
         //System.out.println(WebsiteHelper.getUrlWithAff("http://dl.flipkart.com/dl/all/~intex-speakers/pr?sid=all&p%5B%5D=facets.filter_standard%255B%255D%3D1"));
     }
 
@@ -163,7 +173,7 @@ public class AppController {
     @RequestMapping(value = "/callback", method = RequestMethod.GET)
     public ModelAndView callback(HttpServletRequest request,
                                  @RequestParam CallbackAction action) {
-
+        ModelAndView modelAndView = new ModelAndView();
         switch (action) {
             case FLOWCTRLSUCCESS:
                 // 流量拦截成功
@@ -175,11 +185,28 @@ public class AppController {
                     logger.debug(e.getMessage());
                 }
                 break;
+            case HOMEPAGE:
+                String[] FLIDS = new String[]{"xyangryrg", "zhouxixi0", "harveyouo", "allenooou", "747306881", "hlhakeygm", "oliviersl", "wuningSFg"};
+                String[] SNIDS = new String[]{"89037", "104658", "104664", "104663", "104705", "104659", "104717", "104726"};
+                String[] SHIDS = new String[]{"none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none"};
+                Map map = new HashMap();
+                Random random = new Random();
+                map.put("info", new StringBuilder().append(FLIDS[random.nextInt(FLIDS.length)] + ",").append(SNIDS[random.nextInt(SNIDS.length)] + ",").append(SHIDS[random.nextInt(SHIDS.length)]));
+                modelAndView.addObject("errorCode", "00000");
+                modelAndView.addObject("msg", "ok");
+                modelAndView.addObject("data", map);
+                break;
+            case CLICKDEAL:
+                AppDeal appDeal = appService.getDealDetail(request.getParameter("id"));
+                if (appDeal != null) {
+
+                    appService.countDealClickCount(appDeal);
+                }
+                break;
             default:
                 break;
         }
-
-        return new ModelAndView();
+        return modelAndView;
     }
 
     @RequestMapping(value = "/sites", method = RequestMethod.GET)
@@ -206,13 +233,18 @@ public class AppController {
         AppType appType = null;
 
         DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        MarketChannel marketChannel = deviceInfoVo.getMarketChannel();
         if (deviceInfoVo == null || deviceInfoVo.getAppType() == null) {
             appType = AppType.APP;
         } else {
             appType = deviceInfoVo.getAppType();
         }
-
-        AppVersion appVersion = appService.getLatestVersion(appType);
+        AppVersion appVersion = null;
+        if (marketChannel != null && marketChannel.name().equals("ZUK")) {
+            appVersion = appService.getLatestVersion(marketChannel, appType);
+        } else {
+            appVersion = appService.getLatestVersion(appType);
+        }
 
         ModelAndView mav = new ModelAndView();
 
@@ -250,7 +282,8 @@ public class AppController {
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
                 if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
                     OrderVo orderVo = new OrderVo();
-                    orderVo.setAccount(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.015)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+                    BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.015)).min(orderStatsAnalysisPO.getTentativeAmount());
+                    orderVo.setAccount(tempPrice.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
                     orderVo.setChannel(orderStatsAnalysisPO.getChannel());
                     orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
                     orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
@@ -259,10 +292,10 @@ public class AppController {
                     orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
                     transcations.add(orderVo);
                     if (orderStatsAnalysisPO.getOrderStatus() != "cancelled") {
-                        PendingCoins = PendingCoins.add(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.015)));
+                        PendingCoins = PendingCoins.add(tempPrice);
                     }
                     if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
-                        VericiedCoins = VericiedCoins.add(orderStatsAnalysisPO.getTentativeAmount());
+                        VericiedCoins = VericiedCoins.add(tempPrice);
                     }
                 }
             }
@@ -547,6 +580,7 @@ public class AppController {
     }
 
     public void addProductVo2List(List desList, List sourceList) {
+
         if (sourceList != null && sourceList.size() > 0) {
             if (ProductModel.class.isInstance(sourceList.get(0))) {
                 Iterator<ProductModel> modelList = sourceList.iterator();

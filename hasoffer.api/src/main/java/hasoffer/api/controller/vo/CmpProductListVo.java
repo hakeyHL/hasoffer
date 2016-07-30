@@ -1,8 +1,10 @@
 package hasoffer.api.controller.vo;
 
+import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.utils.ImageUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +14,11 @@ import java.util.List;
  */
 public class CmpProductListVo {
     List<String> support = new ArrayList<String>();
+    private String imageUrl;
     private String image;
     private int ratingNum;
     private Long totalRatingsNum;
+    private String skuPrice;
     private int price;
     private float freight;
     private String distributionTime;
@@ -24,6 +28,11 @@ public class CmpProductListVo {
     private String deepLink;
     private String deepLinkUrl;
     private Website website;
+    private String title;
+    private float cashBack;
+    private float saved;
+    private Long id;
+    private SkuStatus status;
 
     public CmpProductListVo() {
     }
@@ -49,6 +58,26 @@ public class CmpProductListVo {
         }
     }
 
+    public CmpProductListVo(PtmCmpSku cmpSku, float cliPrice) {
+        this.status = cmpSku.getStatus();
+        this.title = cmpSku.getTitle();
+        this.imageUrl = cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath());
+        this.cashBack = cmpSku.getCashBack();
+        this.saved = Math.round(cliPrice - cmpSku.getPrice());
+        this.deepLink = cmpSku.getDeeplink();
+        String tempPrice = Math.round(cmpSku.getPrice()) + "";
+        StringBuffer sb = new StringBuffer();
+        for (int i = tempPrice.length() - 1; i >= 0; i--) {
+            sb.append(tempPrice.charAt(i));
+            if ((tempPrice.length() - i) % 3 == 0) {
+                sb.append(",");
+            }
+        }
+        this.id = cmpSku.getId();
+        this.skuPrice = sb.reverse().toString();
+        this.website = cmpSku.getWebsite();
+    }
+
     public CmpProductListVo(String image, int ratingNum, Long totalRatingsNum, int price, int freight, String distributionTime, Long coins, float backRate, int returnGuarantee, List<String> support) {
         this.image = image;
         this.ratingNum = ratingNum;
@@ -69,6 +98,22 @@ public class CmpProductListVo {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public String getSkuPrice() {
+        return skuPrice;
+    }
+
+    public void setSkuPrice(String skuPrice) {
+        this.skuPrice = skuPrice;
+    }
+
+    public SkuStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(SkuStatus status) {
+        this.status = status;
     }
 
     public Website getWebsite() {
@@ -169,5 +214,102 @@ public class CmpProductListVo {
 
     public void setSupport(List<String> support) {
         this.support = support;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public float getCashBack() {
+        return cashBack;
+    }
+
+    public void setCashBack(float cashBack) {
+        this.cashBack = cashBack;
+    }
+
+    public float getSaved() {
+        return saved;
+    }
+
+    public void setSaved(float saved) {
+        this.saved = saved;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CmpProductListVo that = (CmpProductListVo) o;
+
+        if (ratingNum != that.ratingNum) return false;
+        if (price != that.price) return false;
+        if (Float.compare(that.freight, freight) != 0) return false;
+        if (Float.compare(that.backRate, backRate) != 0) return false;
+        if (returnGuarantee != that.returnGuarantee) return false;
+        if (Float.compare(that.cashBack, cashBack) != 0) return false;
+        if (Float.compare(that.saved, saved) != 0) return false;
+        if (support != null ? !support.equals(that.support) : that.support != null) return false;
+        if (imageUrl != null ? !imageUrl.equals(that.imageUrl) : that.imageUrl != null) return false;
+        if (image != null ? !image.equals(that.image) : that.image != null) return false;
+        if (totalRatingsNum != null ? !totalRatingsNum.equals(that.totalRatingsNum) : that.totalRatingsNum != null)
+            return false;
+        if (skuPrice != null ? !skuPrice.equals(that.skuPrice) : that.skuPrice != null) return false;
+        if (distributionTime != null ? !distributionTime.equals(that.distributionTime) : that.distributionTime != null)
+            return false;
+        if (coins != null ? !coins.equals(that.coins) : that.coins != null) return false;
+        if (deepLink != null ? !deepLink.equals(that.deepLink) : that.deepLink != null) return false;
+        if (deepLinkUrl != null ? !deepLinkUrl.equals(that.deepLinkUrl) : that.deepLinkUrl != null) return false;
+        if (website != that.website) return false;
+        if (title != null ? !title.equals(that.title) : that.title != null) return false;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        return status == that.status;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = support != null ? support.hashCode() : 0;
+        result = 31 * result + (imageUrl != null ? imageUrl.hashCode() : 0);
+        result = 31 * result + (image != null ? image.hashCode() : 0);
+        result = 31 * result + ratingNum;
+        result = 31 * result + (totalRatingsNum != null ? totalRatingsNum.hashCode() : 0);
+        result = 31 * result + (skuPrice != null ? skuPrice.hashCode() : 0);
+        result = 31 * result + price;
+        result = 31 * result + (freight != +0.0f ? Float.floatToIntBits(freight) : 0);
+        result = 31 * result + (distributionTime != null ? distributionTime.hashCode() : 0);
+        result = 31 * result + (coins != null ? coins.hashCode() : 0);
+        result = 31 * result + (backRate != +0.0f ? Float.floatToIntBits(backRate) : 0);
+        result = 31 * result + returnGuarantee;
+        result = 31 * result + (deepLink != null ? deepLink.hashCode() : 0);
+        result = 31 * result + (deepLinkUrl != null ? deepLinkUrl.hashCode() : 0);
+        result = 31 * result + (website != null ? website.hashCode() : 0);
+        result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (cashBack != +0.0f ? Float.floatToIntBits(cashBack) : 0);
+        result = 31 * result + (saved != +0.0f ? Float.floatToIntBits(saved) : 0);
+        result = 31 * result + (id != null ? id.hashCode() : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        return result;
     }
 }

@@ -11,10 +11,12 @@ import java.util.Date;
 
 @Entity
 public class UrmUser implements Identifiable<Long> {
+
     @Id
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     private String thirdId;
     private String userToken;
     private String userName;

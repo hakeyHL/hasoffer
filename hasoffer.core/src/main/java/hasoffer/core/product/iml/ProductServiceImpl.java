@@ -63,6 +63,12 @@ public class ProductServiceImpl implements IProductService {
                     "   AND t.status = 'ONSALE'  " +
                     " ORDER BY t.price ASC ";
 
+    private static final String Q_NOTOFFSALE_PTM_CMPSKU =
+            "SELECT t FROM PtmCmpSku t " +
+                    " WHERE t.productId = ?0 " +
+                    "   AND t.status != 'OFFSALE'  " +
+                    " ORDER BY t.price ASC ";
+
     private static final String Q_PTM_FEATURE =
             "SELECT t.feature FROM PtmFeature t " +
                     " WHERE t.productId = ?0   ";
@@ -146,6 +152,7 @@ public class ProductServiceImpl implements IProductService {
             PtmProductUpdater updater = new PtmProductUpdater(id);
 
             updater.getPo().setPrice(price);
+            updater.getPo().setUpdateTime(TimeUtils.nowDate());
 
             dbm.update(updater);
 
@@ -157,6 +164,8 @@ public class ProductServiceImpl implements IProductService {
             product.setPrice(price);
 
             importProduct2Solr(product);
+
+            System.out.println("productid = " + product.getId());
         }
 
     }
@@ -388,9 +397,8 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public List<PtmTopSelling> getTopSellings(int page, int size) {
-        List li = dbm.query(Q_PTM_TOPSEELLING, page < 1 ? 1 : page + 1, size == 0 ? 20 : size);
-        return li;
+    public List<PtmTopSelling> getTopSellings(Long yesterdayStart, Long todayStart, int page, int size) {
+        return dbm.query(Q_PTM_TOPSEELLING, page < 1 ? 1 : page, size == 0 ? 20 : size);
     }
 
     @Override
@@ -525,7 +533,24 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    @Transactional
+    public void updateProductStd(Long proId, boolean std) {
+        PtmProductUpdater productUpdater = new PtmProductUpdater(proId);
+        productUpdater.getPo().setStd(std);
+        dbm.update(productUpdater);
+    }
+
+    @Override
+    public PageableResult<PtmCmpSku> listNotOffSaleCmpSkus(long proId, int page, int size) {
+        PageableResult<PtmCmpSku> pagedResult = dbm.queryPage(Q_NOTOFFSALE_PTM_CMPSKU, page, size, Arrays.asList(proId));
+        return pagedResult;
+    }
+
+    @Override
     public ProductModel getProductModel(PtmProduct product) {
+        if (product == null) {
+            return null;
+        }
         List<String> features = getProductFeatures(product.getId());
 
 //        PtmCategory category = dbm.get(PtmCategory.class, product.getCategoryId());

@@ -11,6 +11,7 @@ import java.util.Date;
  */
 @Entity
 public class SysCheckTask implements Identifiable<Long> {
+
     @Id
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)

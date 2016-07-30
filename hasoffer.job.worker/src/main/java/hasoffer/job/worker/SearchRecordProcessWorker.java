@@ -18,6 +18,10 @@ import hasoffer.fetch.model.WebFetchResult;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchedProduct;
 import hasoffer.spring.context.SpringContextHolder;
+import hasoffer.taskschedule.api.listener.CallbackListener;
+import hasoffer.taskschedule.api.vo.TaskSchedule;
+import hasoffer.taskschedule.respservice.impl.TaskScheduleReqClient;
+import helper.IndiaWebsiteHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,11 +45,14 @@ public class SearchRecordProcessWorker implements Runnable {
     private IFetchDubboService fetchService;
     private ISearchService searchService;
 
+    private TaskScheduleReqClient scheduleReqClient;
+
     public SearchRecordProcessWorker(SearchProductService searchProductService, IFetchDubboService flipkartFetchService, LinkedBlockingQueue<SrmAutoSearchResult> searchLogQueue) {
         this.searchProductService = searchProductService;
         this.searchLogQueue = searchLogQueue;
         this.fetchService = flipkartFetchService;
         this.searchService = SpringContextHolder.getBean(SearchServiceImpl.class);
+        this.scheduleReqClient = (TaskScheduleReqClient) SpringContextHolder.getBean("taskScheduleReqClient");
     }
 
     @Override
@@ -58,7 +65,7 @@ public class SearchRecordProcessWorker implements Runnable {
                     if (logger.isDebugEnabled()) {
                         logger.debug("SearchRecordProcessWorker. search-log-queue is null. go to sleep!");
                     }
-                    TimeUnit.MINUTES.sleep(5);
+                    TimeUnit.SECONDS.sleep(5);
                     continue;
                 }
                 //if (logger.isDebugEnabled()) {
@@ -73,6 +80,7 @@ public class SearchRecordProcessWorker implements Runnable {
                 } else if (HasofferRegion.USA.toString().equals(serRegion)) {
                     isFetch = fetchForUsa(autoSearchResult);
                 }
+                fetchByTaskSchedule(autoSearchResult);
 
                 //是否需要重新抓取
                 if (isFetch) {
@@ -83,6 +91,25 @@ public class SearchRecordProcessWorker implements Runnable {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void fetchByTaskSchedule(SrmAutoSearchResult autoSearchResult) {
+
+        String keyWord = autoSearchResult.getTitle();
+
+        TaskSchedule taskSchedule = new TaskSchedule();
+        taskSchedule.setWebsite(Website.AMAZON);
+        taskSchedule.setUrlType(TaskSchedule.UrlType.LIST);
+        taskSchedule.setRegion(HasofferRegion.INDIA);
+        taskSchedule.setUrl(IndiaWebsiteHelper.getSearchUrl(Website.AMAZON, keyWord));
+        scheduleReqClient.pushTaskScheduleInfo(taskSchedule, new CallbackListener() {
+            @Override
+            public void recycleResult(TaskSchedule result) {
+                System.out.println("result:" + result.toString());
+                System.out.println("update mongodb!!!");
+
+            }
+        });
     }
 
     /**
@@ -177,20 +204,6 @@ public class SearchRecordProcessWorker implements Runnable {
             updateMongo(autoSearchResult);
             analysisAndRelate(autoSearchResult);
         }
-        //if (isUpdate && logger.isDebugEnabled()) {
-        //    logger.debug("SearchRecordProcessWorker.flipkartFetchResult  result()--keyword is {} : size() = {}", keyword, flipkartFetchResult == null ? "" : flipkartFetchResult.getFetchProducts().size());
-        //    logger.debug("SearchRecordProcessWorker.amazonFetchResult    result()--keyword is {} : size() = {}", keyword, amazonFetchResult == null ? "" : amazonFetchResult.getFetchProducts().size());
-        //    logger.debug("SearchRecordProcessWorker.snapdealFetchResult  result()--keyword is {} : size() = {}", keyword, snapdealFetchResult == null ? "" : snapdealFetchResult.getFetchProducts().size());
-        //    logger.debug("SearchRecordProcessWorker.shopcluesFetchResult result()--keyword is {} : size() = {}", keyword, shopcluesFetchResult == null ? "" : shopcluesFetchResult.getFetchProducts().size());
-        //    logger.debug("SearchRecordProcessWorker.paytmFetchResult     result()--keyword is {} : size() = {}", keyword, paytmFetchResult == null ? "" : paytmFetchResult.getFetchProducts().size());
-        //    logger.debug("SearchRecordProcessWorker.ebayFetchResult      result()--keyword is {} : size() = {}", keyword, ebayFetchResult == null ? "" : ebayFetchResult.getFetchProducts().size());
-        //    logger.debug("SearchRecordProcessWorker.myntraFetchResult    result()--keyword is {} : size() = {}", keyword, myntraFetchResult == null ? "" : myntraFetchResult.getFetchProducts().size());
-        //    logger.debug("SearchRecordProcessWorker.jabongFetchResult    result()--keyword is {} : size() = {}", keyword, jabongFetchResult == null ? "" : jabongFetchResult.getFetchProducts().size());
-        //    logger.debug("SearchRecordProcessWorker.voonikFetchResult    result()--keyword is {} : size() = {}", keyword, voonikFetchResult == null ? "" : voonikFetchResult.getFetchProducts().size());
-        //    logger.debug("SearchRecordProcessWorker.homeShopResult       result()--keyword is {} : size() = {}", keyword, homeShopResult == null ? "" : homeShopResult.getFetchProducts().size());
-        //    logger.debug("SearchRecordProcessWorker.limeRoadResult       result()--keyword is {} : size() = {}", keyword, limeRoadResult == null ? "" : limeRoadResult.getFetchProducts().size());
-        //}
-
         return isReFetch(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, myntraFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
     }
 
@@ -237,7 +250,7 @@ public class SearchRecordProcessWorker implements Runnable {
 
     private void initResultMap(SrmAutoSearchResult autoSearchResult, FetchResult fetchResult) {
         //1 判断抓取有没有返回商品，没有的话直接退出。
-        if (fetchResult == null || !isClose(fetchResult)) {
+        if (fetchResult == null || !fetchResult.overFetch()) {
             return;
         }
         Map<Website, WebFetchResult> fetchResultMap = autoSearchResult.getSitePros();

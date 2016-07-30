@@ -16,6 +16,7 @@ public class PtmSku implements Identifiable<Long> {
 	@Column(unique = true, nullable = false)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
 	private long productId;
 	private Date createTime = TimeUtils.nowDate();
 	private BigDecimal price;

@@ -16,7 +16,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>4.1.6.RELEASE</version>
+            <version>${spring.framework.version}</version>
         </dependency>
 
         <dependency>
@@ -53,16 +53,15 @@
             <groupId>com.alibaba</groupId>
             <artifactId>dubbo</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.apache.zookeeper</groupId>
             <artifactId>zookeeper</artifactId>
-            <version>3.4.6</version>
         </dependency>
 
         <dependency>
             <groupId>com.github.sgroschupf</groupId>
             <artifactId>zkclient</artifactId>
-            <version>0.1</version>
         </dependency>
 
         <dependency>

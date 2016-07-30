@@ -40,7 +40,7 @@ public interface IProductService {
 
     List<PtmProduct> getProducts(List<Long> proIds);
 
-    List<PtmTopSelling> getTopSellings(int page, int size);
+    List<PtmTopSelling> getTopSellings(Long yesterdayStart, Long todayStart, int page, int size);
 
     List<String> getProductFeatures(long id);
 
@@ -83,4 +83,8 @@ public interface IProductService {
     ProductModel getProductModel(PtmProduct product);
 
     void import2Solr(ProductModel pm);
+
+    PageableResult<PtmCmpSku> listNotOffSaleCmpSkus(long proId, int page, int size);
+
+    void updateProductStd(Long proId, boolean std);
 }

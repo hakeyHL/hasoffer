@@ -15,6 +15,7 @@ public class PtmSkuSaleAttribute implements Identifiable<Long> {
 	@Column(unique = true, nullable = false)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
 	private long productId;
 	private long skuId;
 	private long attributeDefId;

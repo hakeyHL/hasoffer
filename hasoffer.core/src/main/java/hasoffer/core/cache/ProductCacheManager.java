@@ -16,10 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Date : 2016/5/7
@@ -93,7 +90,6 @@ public class ProductCacheManager {
     public PageableResult<PtmCmpSku> listPagedCmpSkus(long proId, int page, int size) {
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_" + String.valueOf(proId) + "_" + page + "_" + size;
         String cmpSkusJson = cacheService.get(key, 0);
-
         PageableResult<PtmCmpSku> pagedCmpskus = null;
         try {
             if (StringUtils.isEmpty(cmpSkusJson)) {
@@ -107,16 +103,14 @@ public class ProductCacheManager {
 
                 for (Map<String, Object> map : data) {
                     PtmCmpSku cmpSku = new PtmCmpSku();
-
                     String website = (String) map.get("website");
                     Double price = (Double) map.get("price");
-
                     if (StringUtils.isEmpty(website) || price == null) {
                         continue;
                     }
 
-                    cmpSku.setId(((Integer) map.get("id")).longValue());
-                    cmpSku.setProductId(((Integer) map.get("productId")).longValue());
+                    cmpSku.setId(Long.valueOf(map.get("id") + ""));
+                    cmpSku.setProductId(Long.valueOf(map.get("productId") + ""));
                     cmpSku.setWebsite(Website.valueOf(website));
                     cmpSku.setSeller((String) map.get("seller"));
                     cmpSku.setSkuTitle((String) map.get("skuTitle"));
@@ -132,17 +126,15 @@ public class ProductCacheManager {
                     cmpSku.setSize((String) map.get("size"));
                     cmpSku.setUpdateTime(new Date((Long) map.get("updateTime")));
                     cmpSku.setChecked((Boolean) map.get("checked"));
-
                     cmpSku.setSourcePid((String) map.get("sourcePid"));
                     cmpSku.setSourceSid((String) map.get("sourceSid"));
                     cmpSku.setStatus(SkuStatus.valueOf((String) map.get("status")));
-
                     cmpSkus.add(cmpSku);
                 }
-
                 pagedCmpskus = new PageableResult<PtmCmpSku>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
             }
         } catch (Exception e) {
+            logger.error(" deal skus from cache error " + e.getMessage());
             return null;
         }
         return pagedCmpskus;
@@ -152,11 +144,17 @@ public class ProductCacheManager {
     public List<PtmProduct> getTopSellins(int page, int size) {
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_TopSelling" + "_" + page + "_" + size;
         String ptmProductJson = cacheService.get(key, 0);
-
         List<PtmProduct> products = new ArrayList<PtmProduct>();
         try {
             if (StringUtils.isEmpty(ptmProductJson)) {
-                List<PtmTopSelling> ptmTopSellings = productService.getTopSellings(page, size);
+                Calendar calendar = Calendar.getInstance();
+                Date date = new Date();
+                calendar.setTime(date);
+                calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), 00, 00, 00);
+                long todayStart = calendar.getTimeInMillis();
+                calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH) - 1, 00, 00, 00);
+                long yesterdayStart = calendar.getTimeInMillis();
+                List<PtmTopSelling> ptmTopSellings = productService.getTopSellings(yesterdayStart, todayStart, page, size);
                 for (PtmTopSelling ptmTopSelling : ptmTopSellings) {
                     PageableResult<PtmCmpSku> pageableResult = productCacheManager.listPagedCmpSkus(ptmTopSelling.getId(), 0, 20);
                     if (pageableResult != null && pageableResult.getData() != null && pageableResult.getData().size() > 0) {
@@ -178,7 +176,7 @@ public class ProductCacheManager {
                     if (StringUtils.isEmpty(website) || price == null) {
                         continue;
                     }
-                    ptmProduct.setId(((Integer) map.get("id")).longValue());
+                    ptmProduct.setId(Long.valueOf(map.get("id") + ""));
                     ptmProduct.setTitle((String) map.get("title"));
                     ptmProduct.setPrice(price.floatValue());
                     ptmProduct.setRating((Integer) map.get("rating"));
@@ -195,5 +193,57 @@ public class ProductCacheManager {
             System.out.println(e.getMessage());
         }
         return products;
+    }
+
+    public PageableResult<PtmCmpSku> listCmpSkus(long proId, int page, int size) {
+        String key = CACHE_KEY_PRE + "_listCmpSkus_" + String.valueOf(proId) + "_" + page + "_" + size;
+        String cmpSkusJson = cacheService.get(key, 0);
+        PageableResult<PtmCmpSku> pagedCmpskus = null;
+        try {
+            if (StringUtils.isEmpty(cmpSkusJson)) {
+                pagedCmpskus = productService.listNotOffSaleCmpSkus(proId, page, size);
+                cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
+            } else {
+                PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
+
+                List<PtmCmpSku> cmpSkus = new ArrayList<PtmCmpSku>();
+                List<Map> data = datas.getData();
+
+                for (Map<String, Object> map : data) {
+                    PtmCmpSku cmpSku = new PtmCmpSku();
+                    String website = (String) map.get("website");
+                    Double price = (Double) map.get("price");
+                    if (StringUtils.isEmpty(website) || price == null) {
+                        continue;
+                    }
+                    cmpSku.setId(Long.valueOf(map.get("id") + ""));
+                    cmpSku.setProductId(Long.valueOf(map.get("productId") + ""));
+                    cmpSku.setWebsite(Website.valueOf(website));
+                    cmpSku.setSeller((String) map.get("seller"));
+                    cmpSku.setSkuTitle((String) map.get("skuTitle"));
+                    cmpSku.setTitle((String) map.get("title"));
+                    cmpSku.setPrice(price.floatValue());
+                    cmpSku.setRating((String) map.get("rating"));
+                    cmpSku.setImagePath((String) map.get("imagePath"));
+                    cmpSku.setOriImageUrl((String) map.get("oriImageUrl"));
+                    cmpSku.setDeeplink((String) map.get("deeplink"));
+                    cmpSku.setUrl((String) map.get("url"));
+                    cmpSku.setOriUrl((String) map.get("oriUrl"));
+                    cmpSku.setColor((String) map.get("color"));
+                    cmpSku.setSize((String) map.get("size"));
+                    cmpSku.setUpdateTime(new Date((Long) map.get("updateTime")));
+                    cmpSku.setChecked((Boolean) map.get("checked"));
+                    cmpSku.setSourcePid((String) map.get("sourcePid"));
+                    cmpSku.setSourceSid((String) map.get("sourceSid"));
+                    cmpSku.setStatus(SkuStatus.valueOf((String) map.get("status")));
+                    cmpSkus.add(cmpSku);
+                }
+                pagedCmpskus = new PageableResult<PtmCmpSku>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
+            }
+        } catch (Exception e) {
+            logger.error(" deal skus from cache error " + e.getMessage());
+            return null;
+        }
+        return pagedCmpskus;
     }
 }

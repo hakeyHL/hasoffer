@@ -44,6 +44,12 @@ public class OrderStatsAnalysisPO  implements Identifiable<Integer> {
     @Column(length = 20)
     private String orderStatus;
 
+    private String title;
+
+    private String productId;
+
+    private String category;
+
     private BigDecimal saleAmount;
 
     private BigDecimal commissionRate;
@@ -126,6 +132,30 @@ public class OrderStatsAnalysisPO  implements Identifiable<Integer> {
 
     public void setOrderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public BigDecimal getSaleAmount() {

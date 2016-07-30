@@ -12,6 +12,7 @@ import javax.persistence.*;
  */
 @Entity
 public class SrmProductSearchCount implements Identifiable<Long> {
+
     @Id
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -27,7 +27,9 @@ import java.util.*;
 public class DealServiceImpl implements IDealService {
 
     private static final long EXPIRE_TIME_MS = 7 * 24 * 60 * 60 * 1000;
-    private static final String IMPORT_SQL = "insert into appdeal(website, title, linkUrl, expireTime, priceDescription ,description, createTime,  push ,display ,imageUrl) values(?, ?, ?, ?, ?, ? ,?, ?, ?, ?)";
+
+    private static final String IMPORT_SQL = "insert into appdeal(website, title, linkUrl, expireTime, priceDescription ,description, createTime,  push ,display ,imageUrl) values(?,?, ?, ?, ?, ? ,?, ?, ?, ?)";
+
     @Resource
     IDataBaseManager dbm;
 
@@ -38,7 +40,7 @@ public class DealServiceImpl implements IDealService {
 
     @Override
     public PageableResult<AppDeal> findDealList(int page, int size) {
-        return dbm.queryPage("select t from AppDeal t order by createTime desc", page, size);
+        return dbm.queryPage("select t from AppDeal t order by t.id desc", page, size);
     }
 
     @Override
@@ -155,13 +157,20 @@ public class DealServiceImpl implements IDealService {
     }
 
     @Override
-    public void delete(Long dealId) {
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteDeal(Long dealId) {
         dbm.delete(AppDeal.class, dealId);
     }
 
     @Override
-    public void batchDelete(Long[] ids) {
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteBanner(Long bannerId) {
+        dbm.delete(AppBanner.class, bannerId);
+    }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void batchDelete(Long[] ids) {
         dao.updateBySql("delete from appdeal where id in(?)", Arrays.asList(ids));
     }
 

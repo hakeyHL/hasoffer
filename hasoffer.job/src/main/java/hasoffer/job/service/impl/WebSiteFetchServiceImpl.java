@@ -23,15 +23,17 @@ import java.util.concurrent.TimeUnit;
 @Service("webSiteFetchService")
 public class WebSiteFetchServiceImpl implements IWebSiteFetchService {
 
+    private Logger logger = LoggerFactory.getLogger(WebSiteFetchServiceImpl.class);
+
     @Resource
     ISearchService searchService;
     @Resource
     IDataBaseManager dbm;
     @Resource
     SearchProductService searchProductService;
+
     @Resource
     IFetchDubboService fetchDubboService;
-    private Logger logger = LoggerFactory.getLogger(WebSiteFetchServiceImpl.class);
 
     @Override
     public void fetchProduct2Mongodb() {
@@ -51,9 +53,8 @@ public class WebSiteFetchServiceImpl implements IWebSiteFetchService {
         while (true) {
             try {
                 TimeUnit.MINUTES.sleep(30);
-                logger.debug("AutoSearchMatchController-new fetcher");
             } catch (Exception e) {
-                logger.debug(e.getMessage());
+                logger.error("Error Msg: ", e);
             }
         }
     }

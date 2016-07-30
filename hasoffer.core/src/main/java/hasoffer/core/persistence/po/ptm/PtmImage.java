@@ -9,6 +9,7 @@ import javax.persistence.*;
  */
 @Entity
 public class PtmImage implements Identifiable<Long> {
+
 	@Id
 	@Column(unique = true, nullable = false)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

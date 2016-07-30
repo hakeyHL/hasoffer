@@ -18,7 +18,6 @@ public class PtmCmpSkuIndex2 implements Identifiable<Long> {
     @Id
     @Column(unique = true, nullable = false)
     private Long id;
-
     private long productId;
 
     @Enumerated(EnumType.STRING)

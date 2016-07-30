@@ -1,7 +1,12 @@
 package hasoffer.api.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.PropertyFilter;
 import hasoffer.api.controller.vo.*;
+import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.SearchHelper;
+import hasoffer.base.model.AppDisplayMode;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.utils.ArrayUtils;
@@ -27,6 +32,7 @@ import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.exception.NonMatchedProductException;
 import hasoffer.core.system.impl.AppServiceImpl;
+import hasoffer.core.utils.JsonHelper;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
@@ -41,6 +47,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -104,12 +111,12 @@ public class Compare2Controller {
                 if (ptmProduct == null) {
                     productService.deleteProduct(sio.getHsProId());
                 } else {
-                    logger.info(ptmProduct.toString());
+                    //logger.info(ptmProduct.toString());
                 }
 
             }
-            logger.error(e.getMessage());
-            logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
+            //logger.error(e.getMessage());
+            //  logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
 
             cr = getDefaultCmpResult(sio, cmpSkuIndex);
         }
@@ -129,11 +136,92 @@ public class Compare2Controller {
         return mav;
     }
 
+    /**
+     * 根据商品获取比价的sku列表
+     *
+     * @return
+     */
+    @RequestMapping("sdk/cmpskus")
+    public String cmpSkus(@RequestParam(defaultValue = "") final String q,
+                          @RequestParam(defaultValue = "") final String brand,
+                          @RequestParam(defaultValue = "") final String sourceId,
+                          @RequestParam(defaultValue = "") String site,
+                          @RequestParam(defaultValue = "0") String price,
+                          @RequestParam(defaultValue = "1") int page,
+                          @RequestParam(defaultValue = "10") int size,
+                          HttpServletResponse response) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("errorCode", "00000");
+        jsonObject.put("msg", "ok");
+        PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"ratingNum", "bestPrice", "priceOff", "support", "price", "returnGuarantee", "freight", "backRate"});
+        //初始化sio对象
+        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+        DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        CmpResult cr = null;
+        SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, size);
+        try {
+            //根据title匹配到商品
+            getSioBySearch(sio);
+            cr = getCmpProducts(sio);
+        } catch (Exception e) {
+            if (sio.getHsProId() > 0) {
+                //若此时匹配到的商品实际库中不存在则删除此匹配记录,下次重新匹配
+                PtmProduct ptmProduct = productService.getProduct(sio.getHsProId());
+                if (ptmProduct == null) {
+                    productService.deleteProduct(sio.getHsProId());
+                } else {
+                    logger.info(ptmProduct.toString());
+                }
+            }
+            logger.error(e.getMessage());
+            logger.error(String.format("sdk_cmp_  [NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
+
+            jsonObject.put("data", JSONObject.toJSON(cr));
+            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
+            return null;
+        }
+        if (cr != null) {
+            jsonObject.put("data", JSONObject.toJSON(cr));
+        } else {
+            jsonObject.put("data", "{\n" +
+                    "        \"copywriting\": \"\",\n" +
+                    "        \"show\": \"waterfall\",\n" +
+                    "        \"skus\": [\n" +
+                    "            {\n" +
+                    "                \"status\": \"onsale\",\n" +
+                    "                \"title\": \"小王子（法国“圣埃克苏佩里基金会”官方认可简体中文译本）\",\n" +
+                    "                \"imageUrl\": \"http://img13.360buyimg.com/n1/jfs/t2200/173/590579185/269686/4c299e77/56174e3eN362982a4.jpg\",\n" +
+                    "                \"cashBack\": \"10\",\n" +
+                    "                \"deepLink\": \"http://item.jd.com/11143993.html\",\n" +
+                    "                \"saved\": 100,\n" +
+                    "                \"id\": \"11143993\",\n" +
+                    "                \"skuPrice\": \"1,000\",\n" +
+                    "                \"website\": \"FLIPKART\"\n" +
+                    "            },\n" +
+                    "            {\n" +
+                    "                \"status\": \"sold out\",\n" +
+                    "                \"title\": \"摩斯维 手机套/金属边框/防摔保护壳外壳 适用于华为荣耀畅玩4X/全网通/电信/移动版 拉丝尊享款-香槟金-送钢化膜\",\n" +
+                    "                \"imageUrl\": \"http://img11.360buyimg.com/n1/jfs/t2698/221/1187894551/168647/33c6c8e1/5736a5f7Nfa29f761.jpg\",\n" +
+                    "                \"cashBack\": \"20\",\n" +
+                    "                \"deepLink\": \"http://item.jd.com/1381873091.html\",\n" +
+                    "                \"saved\": -100,\n" +
+                    "                \"id\": \"1381873091\",\n" +
+                    "                \"skuPrice\": \"1,000\",\n" +
+                    "                \"website\": \"FLIPKART\"\n" +
+                    "            }\n" +
+                    "        ]\n" +
+                    "    }");
+        }
+        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
+        return null;
+    }
+
     @RequestMapping(value = "/cmpsku", method = RequestMethod.GET)
     public ModelAndView cmpsku(@RequestParam(defaultValue = "0") final String id,
                                @RequestParam(defaultValue = "1") int page,
                                @RequestParam(defaultValue = "10") int size
     ) {
+
         ModelAndView mav = new ModelAndView();
         CmpResult cr = null;
         PtmProduct product = productService.getProduct(Long.valueOf(id));
@@ -161,7 +249,6 @@ public class Compare2Controller {
     }
 
     private CmpResult getDefaultCmpResult(SearchIO sio, PtmCmpSkuIndex2 cmpSkuIndex) {
-        logger.error(" enter default");
         String currentDeeplink = "";
         if (cmpSkuIndex != null && cmpSkuIndex.getId() != null && cmpSkuIndex.getId() > 0) {
             PtmCmpSku cmpSku = cmpSkuCacheManager.getCmpSkuById(cmpSkuIndex.getId());
@@ -405,7 +492,7 @@ public class Compare2Controller {
             });
 
         } else {
-            logger.error("Found skus size is 0 .");
+            // logger.error("Found skus size is 0 .");
             throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
         }
 
@@ -425,7 +512,7 @@ public class Compare2Controller {
                 }
             }
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            // logger.error(e.getMessage());
         }
 
         String imageUrl = productCacheManager.getProductMasterImageUrl(sio.getHsProId());//productService.getProductMasterImageUrl(sio.getHsProId());
@@ -510,12 +597,57 @@ public class Compare2Controller {
             PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, product.getId());
             String specs = "";
             if (ptmCmpSkuDescription != null) {
-                specs = ptmCmpSkuDescription.getJsonDescription();
+                specs = ptmCmpSkuDescription.getJsonParam();
             }
             cmpResult.setSpecs(specs);
             cmpResult.setTotalRatingsNum(tempTotalComments / Long.valueOf(tempCount == 0 ? 1 : tempCount));
             return cmpResult;
         }
+        return cmpResult;
+    }
+
+    private CmpResult getCmpProducts(SearchIO sio) {
+        //初始化一个空的用于存放比价商品列表的List
+        List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
+        CmpResult cmpResult = new CmpResult();
+        // 1. 查询此商品对应的sku列表 状态为ONSALE/OUTSTOCK
+        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listCmpSkus(sio.getHsProId(), sio.getPage(), sio.getSize());
+        if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
+            List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
+            if (ArrayUtils.hasObjs(cmpSkus)) {
+                // 获取vo list
+                for (PtmCmpSku cmpSku : cmpSkus) {
+                    if (cmpSku.getWebsite() == null
+                            || cmpSku.getPrice() <= 0) { // 临时过滤掉不能更新价格的商品
+                        continue;
+                    }
+                    CmpProductListVo cplv = new CmpProductListVo(cmpSku, sio.getCliPrice());
+                    comparedSkuVos.add(cplv);
+                }
+                if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {
+                    throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), "productid_" + sio.getHsProId(), sio.getCliPrice());
+                }
+                //根据价格排序
+                Collections.sort(comparedSkuVos, new Comparator<CmpProductListVo>() {
+                    @Override
+                    public int compare(CmpProductListVo o1, CmpProductListVo o2) {
+                        if (o1.getPrice() > o2.getPrice()) {
+                            return 1;
+                        } else if (o1.getPrice() < o2.getPrice()) {
+                            return -1;
+                        }
+                        return 0;
+                    }
+                });
+
+            } else {
+                logger.debug("Found skus size is 0 .");
+                throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
+            }
+        }
+        cmpResult.setPriceList(comparedSkuVos);
+        cmpResult.setCopywriting("Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you.");
+        cmpResult.setDisplayMode(AppDisplayMode.WATERFALL);
         return cmpResult;
     }
 

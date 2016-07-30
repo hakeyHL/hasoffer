@@ -12,10 +12,12 @@ import java.util.Date;
  */
 @Entity
 public class MspProductJob implements Identifiable<Long> {
+
 	@Id
 	@Column(unique = true, nullable = false)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
 	private long categoryId; // MspCategory # id
 
 	@Column(unique = true, nullable = false)

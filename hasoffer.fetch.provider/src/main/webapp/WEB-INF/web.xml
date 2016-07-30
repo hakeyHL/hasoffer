@@ -48,7 +48,7 @@
 
     <listener>
         <display-name>web_listener</display-name>
-        <listener-class>hasoffer.dubbo.api.fetch.task.FetchListener</listener-class>
+        <listener-class>hasoffer.dubbo.api.listener.FetchListener</listener-class>
     </listener>
 
     <!--dubbo 服务根路径-->
