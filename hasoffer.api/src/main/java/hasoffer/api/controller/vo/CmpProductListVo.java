@@ -4,6 +4,7 @@ import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.utils.ImageUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ public class CmpProductListVo {
     private String image;
     private int ratingNum;
     private Long totalRatingsNum;
+    private String skuPrice;
     private int price;
     private float freight;
     private String distributionTime;
@@ -59,12 +61,20 @@ public class CmpProductListVo {
     public CmpProductListVo(PtmCmpSku cmpSku, float cliPrice) {
         this.status = cmpSku.getStatus();
         this.title = cmpSku.getTitle();
-        this.imageUrl = cmpSku.getSmallImagePath();
+        this.imageUrl = cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath());
         this.cashBack = cmpSku.getCashBack();
         this.saved = Math.round(cliPrice - cmpSku.getPrice());
         this.deepLink = cmpSku.getDeeplink();
+        String tempPrice = Math.round(cmpSku.getPrice()) + "";
+        StringBuffer sb = new StringBuffer();
+        for (int i = tempPrice.length() - 1; i >= 0; i--) {
+            sb.append(tempPrice.charAt(i));
+            if ((tempPrice.length() - i) % 3 == 0) {
+                sb.append(",");
+            }
+        }
         this.id = cmpSku.getId();
-        this.price = Math.round(cmpSku.getPrice());
+        this.skuPrice = sb.reverse().toString();
         this.website = cmpSku.getWebsite();
     }
 
@@ -88,6 +98,14 @@ public class CmpProductListVo {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public String getSkuPrice() {
+        return skuPrice;
+    }
+
+    public void setSkuPrice(String skuPrice) {
+        this.skuPrice = skuPrice;
     }
 
     public SkuStatus getStatus() {
@@ -257,6 +275,7 @@ public class CmpProductListVo {
         if (image != null ? !image.equals(that.image) : that.image != null) return false;
         if (totalRatingsNum != null ? !totalRatingsNum.equals(that.totalRatingsNum) : that.totalRatingsNum != null)
             return false;
+        if (skuPrice != null ? !skuPrice.equals(that.skuPrice) : that.skuPrice != null) return false;
         if (distributionTime != null ? !distributionTime.equals(that.distributionTime) : that.distributionTime != null)
             return false;
         if (coins != null ? !coins.equals(that.coins) : that.coins != null) return false;
@@ -276,6 +295,7 @@ public class CmpProductListVo {
         result = 31 * result + (image != null ? image.hashCode() : 0);
         result = 31 * result + ratingNum;
         result = 31 * result + (totalRatingsNum != null ? totalRatingsNum.hashCode() : 0);
+        result = 31 * result + (skuPrice != null ? skuPrice.hashCode() : 0);
         result = 31 * result + price;
         result = 31 * result + (freight != +0.0f ? Float.floatToIntBits(freight) : 0);
         result = 31 * result + (distributionTime != null ? distributionTime.hashCode() : 0);
