@@ -14,7 +14,7 @@
         <module>hasoffer.affiliate</module>
         <module>hasoffer.core</module>
         <module>hasoffer.api</module>
-        <module>hasoffer.timer</module>
+        <!--<module>hasoffer.timer</module>-->
         <module>hasoffer.admin</module>
         <module>hasoffer.webcommon</module>
         <module>hasoffer.task</module>

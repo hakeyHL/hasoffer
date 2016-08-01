@@ -9,14 +9,11 @@ import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.thd.ThdProduct;
-import hasoffer.core.persistence.po.thd.flipkart.ThdBProduct;
 import hasoffer.core.product.*;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
-import hasoffer.core.thd.IThdService;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,8 +55,6 @@ public class ProductTest {
     @Resource
     IDataBaseManager dbm;
     @Resource
-    IThdService thdService;
-    @Resource
     ICmpSkuService cmpSkuService;
     @Resource
     ISearchService searchService;
@@ -85,24 +80,39 @@ public class ProductTest {
             PtmProduct product = productService.getProduct(productId);
             if (product != null) {
                 System.out.println("---------------- " + productId + " ----------------");
+                System.out.println(product.getTitle());
                 Set<String> skuUrlSet = new HashSet<>();
-                List<String> skuTitleScores = new ArrayList<>();
 
                 List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId);
                 for (PtmCmpSku cmpSku : cmpSkus) {
-                    skuUrlSet.add(cmpSku.getUrl());
-                    skuTitleScores.add(String.valueOf(ProductAnalysisService.stringMatch(product.getTitle(), cmpSku.getTitle())));
-                }
+                    if (!StringUtils.isEmpty(product.getTitle())) {
+                        System.out.println(cmpSku.getTitle());
+                        float score = ProductAnalysisService.stringMatch(product.getTitle(), cmpSku.getTitle());
+                        if (score < 0.4) {
+                            logger.debug(String.format("[Delete_%d]Score is [%f].", cmpSku.getId(), score));
+                            cmpSkuService.deleteCmpSku(cmpSku.getId());
+                            continue;
+                        }
+                    }
 
-                System.out.println("sku size = " + skuUrlSet.size() + " : " + cmpSkus.size());
-                System.out.println(StringUtils.arrayToString(skuTitleScores.toArray(new String[0]), ","));
+                    boolean exists = skuUrlSet.contains(cmpSku.getUrl());
+
+                    if (exists) {
+                        logger.debug(String.format("[Delete_%d] Exist.", cmpSku.getId()));
+                        cmpSkuService.deleteCmpSku(cmpSku.getId());
+                    } else {
+                        skuUrlSet.add(cmpSku.getUrl());
+                    }
+
+                }
 
                 System.out.println("---------------------end-----------------------");
             }
 
             count++;
-            if (count >= 10) {
-                return;
+            if (count % 100 == 0) {
+                System.out.println(count + "..products processed.");
+//                break;
             }
         }
     }
@@ -121,12 +131,6 @@ public class ProductTest {
     public void downloadskuimage() {
         PtmCmpSku sku = dbm.get(PtmCmpSku.class, 1L);
         cmpSkuService.downloadImage(sku);
-    }
-
-    @Test
-    public void relate() {
-        ThdProduct thd = dbm.get(ThdBProduct.class, 32769L);
-        thdService.relate(thd);
     }
 
     @Test
