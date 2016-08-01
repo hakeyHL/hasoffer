@@ -9,10 +9,12 @@ import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
 import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.updater.PtmImageUpdater;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICmpSkuService;
+import hasoffer.core.product.IPtmCmpSkuImageService;
 import hasoffer.core.search.ISearchService;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.ProductStatus;
@@ -67,6 +69,8 @@ public class MysqlTest {
     ICmpSkuService cmpSkuService;
     @Resource
     ISearchService searchService;
+    @Resource
+    IPtmCmpSkuImageService ptmCmpSkuImageService;
     private Logger logger = LoggerFactory.getLogger(MysqlTest.class);
     private ConcurrentLinkedQueue<PtmCmpSku> skuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
 
@@ -338,6 +342,16 @@ public class MysqlTest {
             }
 
         }
+
+    }
+
+    @Test
+    public void test123() {
+
+        PtmCmpSkuImage ptmCmpSkuImage = new PtmCmpSkuImage();
+        ptmCmpSkuImageService.createPtmCmpSkuImage(ptmCmpSkuImage);
+
+        System.out.println();
 
     }
 }
