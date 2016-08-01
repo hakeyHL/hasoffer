@@ -86,6 +86,9 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
             //更新商品的价格，同时修改updateTime字段
 //            暂时注释掉，测试完再打开
+            if (skuList == null || skuList.size() == 0) {
+                continue;
+            }
             productService.updatePtmProductPrice(productId);
         }
     }
