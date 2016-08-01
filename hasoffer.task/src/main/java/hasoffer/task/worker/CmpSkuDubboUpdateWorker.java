@@ -14,6 +14,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
+import hasoffer.core.product.IPtmCmpSkuImageService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchUrlResult;
@@ -39,15 +40,17 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
     private ICmpSkuService cmpSkuService;
     private IFetchDubboService fetchService;
     private IProductService productService;
+    private IPtmCmpSkuImageService ptmCmpSkuImageService;
     private IMongoDbManager mdm;
 
-    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<SrmSearchLog> queue, ICmpSkuService cmpSkuService, IFetchDubboService fetchService, IProductService productService, IMongoDbManager mdm) {
+    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<SrmSearchLog> queue, ICmpSkuService cmpSkuService, IFetchDubboService fetchService, IProductService productService, IMongoDbManager mdm, IPtmCmpSkuImageService ptmCmpSkuImageService) {
         this.dbm = dbm;
         this.queue = queue;
         this.cmpSkuService = cmpSkuService;
         this.fetchService = fetchService;
         this.productService = productService;
         this.mdm = mdm;
+        this.ptmCmpSkuImageService = ptmCmpSkuImageService;
     }
 
     @Override
@@ -168,7 +171,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                     ptmCmpSkuImage.setOriImageUrl(imageUrlList.get(i));
                     ptmCmpSkuImage.setPtmcmpskuId(sku.getId());
 
-                    dbm.create(ptmCmpSkuImage);
+                    ptmCmpSkuImageService.createPtmCmpSkuImage(ptmCmpSkuImage);
                     System.out.println("create ptmCmpSkuImage success for ptmCmpSkuId = [" + sku.getId() + "] " + i);
                 }
             }

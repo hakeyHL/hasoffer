@@ -5,6 +5,7 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
+import hasoffer.core.product.IPtmCmpSkuImageService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.task.worker.CmpSkuDubboUpdateWorker;
 import hasoffer.task.worker.SrmSearchLogListWorker;
@@ -40,6 +41,8 @@ public class DubboUpdateController {
     IDataBaseManager dbm;
     @Resource
     IMongoDbManager mdm;
+    @Resource
+    IPtmCmpSkuImageService ptmCmpSkuImageService;
 
     //dubbofetchtask/updatestart
     @RequestMapping(value = "/updatestart", method = RequestMethod.GET)
@@ -57,7 +60,7 @@ public class DubboUpdateController {
         es.execute(new SrmSearchLogListWorker(dbm, queue));
 
         for (int i = 0; i < 10; i++) {
-            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, cmpSkuService, fetchDubboService, productService, mdm));
+            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, cmpSkuService, fetchDubboService, productService, mdm, ptmCmpSkuImageService));
         }
 
         taskRunning1.set(true);

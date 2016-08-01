@@ -2,9 +2,6 @@ package hasoffer.admin.controller;
 
 import hasoffer.admin.controller.vo.TitleCountVo;
 import hasoffer.admin.worker.FixSkuErrorInPriceWorker;
-import hasoffer.admin.worker.ShopcluesOffsaleUpdateWorker;
-import hasoffer.admin.worker.ShopcluesStockOutUpdateWorker;
-import hasoffer.admin.worker.ShopcluesUrlFixListWorker;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
@@ -477,39 +474,6 @@ public class FixController {
                     date = product.getCreateTime();
                 }
             }
-        }
-
-
-        return "ok";
-    }
-
-    @RequestMapping(value = "/fixshopcluesoffsaleurlbyresearch", method = RequestMethod.GET)
-    public String fixshopcluesoffsaleurlbyresearch() {
-
-        ConcurrentLinkedQueue<PtmCmpSku> skuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
-
-        ExecutorService es = Executors.newCachedThreadPool();
-
-        es.execute(new ShopcluesUrlFixListWorker(dbm, skuQueue, Q_SHOPCLUES_OFFSALE));
-
-        for (int i = 0; i < 10; i++) {
-            es.execute(new ShopcluesOffsaleUpdateWorker(skuQueue, cmpSkuService, dbm, dataFixService));
-        }
-
-        return "ok";
-    }
-
-    @RequestMapping(value = "/fixshopcluesstockouturlbyresearch", method = RequestMethod.GET)
-    public String fixshopcluesstockouturlbyresearch() {
-
-        ConcurrentLinkedQueue<PtmCmpSku> skuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
-
-        ExecutorService es = Executors.newCachedThreadPool();
-
-        es.execute(new ShopcluesUrlFixListWorker(dbm, skuQueue, Q_SHOPCLUES_STOCKOUT));
-
-        for (int i = 0; i < 10; i++) {
-            es.execute(new ShopcluesStockOutUpdateWorker(skuQueue, cmpSkuService, dbm, dataFixService));
         }
 
         return "ok";
