@@ -6,7 +6,7 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.core.bo.product.SkuBo;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.log.ShopcluesFixLog;
-import hasoffer.core.persistence.po.log.ShopcluesFixLogUpdater;
+import hasoffer.core.persistence.po.log.updater.ShopcluesFixLogUpdater;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.product.ICmpSkuService;
