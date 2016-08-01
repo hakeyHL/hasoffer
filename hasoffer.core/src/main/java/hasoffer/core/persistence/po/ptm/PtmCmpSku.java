@@ -68,15 +68,15 @@ public class PtmCmpSku implements Identifiable<Long> {
     private SkuStatus status = SkuStatus.ONSALE;
 
     @ColumnDefault(value = "0")
-    private long commentsNumber;//评论数
+    private long commentsNumber = 0;//评论数
     @ColumnDefault(value = "0")
-    private int ratings;//星级，存放百分比的整数位如 88即表示88%
+    private int ratings = 0;//星级，存放百分比的整数位如 88即表示88%
     @ColumnDefault(value = "-1")
     private float shipping = -1;//邮费，默认值为-1,free shipping时值为0
     private String supportPayMethod;//支付方式  ex：COD,EMI,...,
     private String deliveryTime;//送达时间 ex: 1-3
     @ColumnDefault(value = "0")
-    private int returnDays;
+    private int returnDays = 0;
 
     public PtmCmpSku() {
     }
