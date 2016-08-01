@@ -1,5 +1,6 @@
 package hasoffer.task.controller;
 
+import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICmpSkuService;
@@ -37,6 +38,8 @@ public class DubboUpdateController {
     IProductService productService;
     @Resource
     IDataBaseManager dbm;
+    @Resource
+    IMongoDbManager mdm;
 
     //dubbofetchtask/updatestart
     @RequestMapping(value = "/updatestart", method = RequestMethod.GET)
@@ -54,7 +57,7 @@ public class DubboUpdateController {
         es.execute(new SrmSearchLogListWorker(dbm, queue));
 
         for (int i = 0; i < 10; i++) {
-            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, cmpSkuService, fetchDubboService, productService));
+            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, cmpSkuService, fetchDubboService, productService, mdm));
         }
 
         taskRunning1.set(true);
