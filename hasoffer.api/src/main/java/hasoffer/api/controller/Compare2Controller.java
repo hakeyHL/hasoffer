@@ -19,7 +19,7 @@ import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.exception.ERROR_CODE;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.enums.SearchPrecise;
-import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
+import hasoffer.core.persistence.mongo.PtmProductDescription;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
@@ -610,10 +610,10 @@ public class Compare2Controller {
             cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
             cmpResult.setPriceList(priceList.getData());
             cmpResult.setRatingNum(tempRatins / (tempCount == 0 ? 1 : tempCount));
-            PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, product.getId());
+            PtmProductDescription ptmProductDescription = mongoDbManager.queryOne(PtmProductDescription.class, product.getId());
             String specs = "";
-            if (ptmCmpSkuDescription != null) {
-                specs = ptmCmpSkuDescription.getJsonParam();
+            if (ptmProductDescription != null) {
+                specs = ptmProductDescription.getJsonParam();
             }
             cmpResult.setSpecs(specs);
             cmpResult.setTotalRatingsNum(tempTotalComments / Long.valueOf(tempCount == 0 ? 1 : tempCount));
