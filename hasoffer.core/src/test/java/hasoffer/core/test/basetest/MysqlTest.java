@@ -9,7 +9,6 @@ import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
 import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.updater.PtmImageUpdater;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
@@ -339,18 +338,6 @@ public class MysqlTest {
             }
 
         }
-
-    }
-
-    @Test
-    public void testCreate() {
-
-        PtmCmpSkuImage ptmCmpSkuImage = new PtmCmpSkuImage();
-
-        ptmCmpSkuImage.setOriImageUrl("sfaddf");
-        ptmCmpSkuImage.setPtmcmpskuId(234L);
-
-        dbm.create(ptmCmpSkuImage);
 
     }
 }
