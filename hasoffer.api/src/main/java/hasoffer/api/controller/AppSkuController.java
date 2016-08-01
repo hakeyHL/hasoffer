@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -21,8 +22,9 @@ public class AppSkuController {
      * @return
      */
     @RequestMapping("info")
-    public ModelAndView getSkuInfo() {
+    public ModelAndView getSkuInfo(@RequestParam(defaultValue = "0") Long id) {
         ModelAndView modelAndView = new ModelAndView();
+
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
         modelAndView.addObject("data", "{\n" +
