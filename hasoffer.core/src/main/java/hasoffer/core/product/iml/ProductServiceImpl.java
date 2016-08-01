@@ -324,11 +324,6 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public List<PtmBasicAttribute> getProductBasicAttributes(long id) {
-        return dbm.query(Q_PTM_BASICATTRIBUTE, Arrays.asList(id));
-    }
-
-    @Override
     public List<String> getProductFeatures(long id) {
         return dbm.query(Q_PTM_FEATURE, Arrays.asList(id));
     }

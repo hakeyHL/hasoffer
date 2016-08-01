@@ -25,6 +25,20 @@ import java.util.regex.Pattern;
 public class FileTest {
 
     @Test
+    public void show() {
+        String path = "D:\\tmp\\po";
+        File file = new File(path);
+        File[] dirs = file.listFiles();
+        for (File d : dirs) {
+            System.out.println("---" + d.getName() + "---");
+            File[] dirss = d.listFiles();
+            for (File d2 : dirss) {
+                System.out.println(d2.getName());
+            }
+        }
+    }
+
+    @Test
     public void ts3() throws Exception {
         Pattern pattern = Pattern.compile("^[0|1]\\s.+");
 //        BufferedReader fr = new BufferedReader(new FileReader(new File("d:/datas/hasoffer/all_titles")));
