@@ -185,8 +185,8 @@ public class TopSellingController {
         TopSellStatus status = topSelling.getStatus();
 
         //清除缓存
-        cacheService.del("PRODUCT__listPagedCmpSkus_TopSelling_0 _20");
-
+        cacheService.del("PRODUCT__listPagedCmpSkus_TopSelling_0_20");
+//                        PRODUCT__listPagedCmpSkus_TopSelling_0_20
         if (TopSellStatus.WAIT.equals(status)) {
             topSellingService.updateTopSellingStatus(topsellingid, TopSellStatus.ONLINE);
         } else {

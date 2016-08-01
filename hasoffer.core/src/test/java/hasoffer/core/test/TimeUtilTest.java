@@ -106,4 +106,10 @@ public class TimeUtilTest {
     public void getGMTTime() {
         System.out.println(TimeUtils.getGMTDate(new Date()));
     }
+
+    @Test
+    public void test2() {
+        // > 0
+        System.out.println(TimeUtils.nowDate().compareTo(TimeUtils.toDate(TimeUtils.today())));
+    }
 }

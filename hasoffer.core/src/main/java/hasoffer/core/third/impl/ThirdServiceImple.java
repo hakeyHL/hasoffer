@@ -11,6 +11,7 @@ import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.product.iml.CmpSkuServiceImpl;
 import hasoffer.core.third.ThirdService;
 import hasoffer.core.utils.ImageUtil;
+import hasoffer.core.utils.JsonHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,15 +96,7 @@ public class ThirdServiceImple implements ThirdService {
                 dataList.addAll(deals);
             }
         }
-        PropertyFilter propertyFilter = new PropertyFilter() {
-            @Override
-            public boolean apply(Object o, String s, Object o1) {
-                if (s.equals("push") || s.equals("display")) {
-                    return false;
-                }
-                return true;
-            }
-        };
+        PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"push", "display"});
         for (AppDeal appDeal : (List<AppDeal>) dataList) {
             appDeal.setImageUrl(ImageUtil.getImageUrl(appDeal.getImageUrl()));
         }
