@@ -14,6 +14,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
+import hasoffer.core.product.IPtmCmpSkuImageService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchUrlResult;
@@ -39,15 +40,17 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
     private ICmpSkuService cmpSkuService;
     private IFetchDubboService fetchService;
     private IProductService productService;
+    private IPtmCmpSkuImageService ptmCmpSkuImageService;
     private IMongoDbManager mdm;
 
-    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<SrmSearchLog> queue, ICmpSkuService cmpSkuService, IFetchDubboService fetchService, IProductService productService, IMongoDbManager mdm) {
+    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<SrmSearchLog> queue, ICmpSkuService cmpSkuService, IFetchDubboService fetchService, IProductService productService, IMongoDbManager mdm, IPtmCmpSkuImageService ptmCmpSkuImageService) {
         this.dbm = dbm;
         this.queue = queue;
         this.cmpSkuService = cmpSkuService;
         this.fetchService = fetchService;
         this.productService = productService;
         this.mdm = mdm;
+        this.ptmCmpSkuImageService = ptmCmpSkuImageService;
     }
 
     @Override
@@ -140,7 +143,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 //            }
 //        }
 
-        System.out.println(JSONUtil.toJSON(fetchedProduct));
+        System.out.println(JSONUtil.toJSON(fetchedProduct).toString());
 
 
         //更新ptmcmpsku表
@@ -161,16 +164,23 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
                 List<String> imageUrlList = fetchedProduct.getImageUrlList();
 
+                PtmCmpSkuImage ptmCmpSkuImage = new PtmCmpSkuImage();
                 for (int i = 0; i < imageUrlList.size(); i++) {
 
-                    PtmCmpSkuImage ptmCmpSkuImage = new PtmCmpSkuImage();
-
-                    ptmCmpSkuImage.setOriImageUrl(imageUrlList.get(i));
-                    ptmCmpSkuImage.setPtmcmpskuId(sku.getId());
-
-                    dbm.create(ptmCmpSkuImage);
-                    System.out.println("create ptmCmpSkuImage success for ptmCmpSkuId = [" + sku.getId() + "] " + i);
+                    if (i == 0) {
+                        ptmCmpSkuImage.setOriImageUrl1(imageUrlList.get(i));
+                    } else if (i == 1) {
+                        ptmCmpSkuImage.setOriImageUrl2(imageUrlList.get(i));
+                    } else if (i == 2) {
+                        ptmCmpSkuImage.setOriImageUrl3(imageUrlList.get(i));
+                    } else if (i == 3) {
+                        ptmCmpSkuImage.setOriImageUrl4(imageUrlList.get(i));
+                    } else {
+                        continue;
+                    }
                 }
+                dbm.create(ptmCmpSkuImage);
+                System.out.println("create ptmCmpSkuImage success for ptmCmpSkuId = [" + sku.getId() + "]");
             }
         } catch (Exception e) {
             System.out.println("create ptmCmpSkuImage fail for ptmCmpSkuId = [" + sku.getId() + "]");
@@ -186,7 +196,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
             ptmCmpSkuDescription.setId(sku.getId());
             ptmCmpSkuDescription.setJsonParam(jsonParam);
-            ptmCmpSkuDescription.setDescription(description);
+            ptmCmpSkuDescription.setJsonDescription(description);
 
             mdm.save(ptmCmpSkuDescription);
             System.out.println("create ptmCmpSkuDescription success for ptmCmpSkuId = [" + sku.getId() + "]");

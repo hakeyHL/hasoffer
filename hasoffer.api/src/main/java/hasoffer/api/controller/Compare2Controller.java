@@ -19,7 +19,7 @@ import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.exception.ERROR_CODE;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.enums.SearchPrecise;
-import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
+import hasoffer.core.persistence.mongo.PtmProductDescription;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
@@ -154,7 +154,7 @@ public class Compare2Controller {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
-        PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"ratingNum", "bestPrice", "priceOff", "support", "price", "returnGuarantee", "freight", "backRate"});
+        PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"ratingNum", "bestPrice", "priceOff", "backRate", "support", "price", "returnGuarantee", "freight"});
         //初始化sio对象
         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
@@ -176,6 +176,7 @@ public class Compare2Controller {
                     cr = getCmpProducts(sio);
                     cr.setCopywriting(ptmProduct != null && ptmProduct.isStd() ? "Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you." : "Looked around Myntre,Jabong & 5 other apps,thought you might like these items as well..");
                     cr.setDisplayMode(ptmProduct != null && ptmProduct.isStd() ? AppDisplayMode.NONE : AppDisplayMode.WATERFALL);
+                    cr.setStd(ptmProduct.isStd());
                 }
             } else {
                 //小于等于0,直接返回
@@ -609,10 +610,10 @@ public class Compare2Controller {
             cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
             cmpResult.setPriceList(priceList.getData());
             cmpResult.setRatingNum(tempRatins / (tempCount == 0 ? 1 : tempCount));
-            PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, product.getId());
+            PtmProductDescription ptmProductDescription = mongoDbManager.queryOne(PtmProductDescription.class, product.getId());
             String specs = "";
-            if (ptmCmpSkuDescription != null) {
-                specs = ptmCmpSkuDescription.getJsonParam();
+            if (ptmProductDescription != null) {
+                specs = ptmProductDescription.getJsonParam();
             }
             cmpResult.setSpecs(specs);
             cmpResult.setTotalRatingsNum(tempTotalComments / Long.valueOf(tempCount == 0 ? 1 : tempCount));

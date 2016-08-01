@@ -4,9 +4,7 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmImage;
-import hasoffer.core.persistence.po.sys.SysTimerTaskLog;
 import hasoffer.core.product.IImageService;
-import hasoffer.core.system.ITimerService;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
@@ -30,12 +28,9 @@ public class ImageDownloadJobBean extends QuartzJobBean {
     IImageService imageService;
     @Resource
     IDataBaseManager dbm;
-    @Resource
-    ITimerService timerService;
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        SysTimerTaskLog log = timerService.createTaskLog("ImageDownloadTask");
 
         int page = 1, PAGE_SIZE = 1000;
         PageableResult<PtmImage> pagedImages = dbm.queryPage(Q_PTM_IMAGE, page, PAGE_SIZE);
@@ -61,6 +56,5 @@ public class ImageDownloadJobBean extends QuartzJobBean {
             logger.debug(String.format("download images. page : %d", page));
         }
 
-        timerService.updateTaskLog(log.getId(), "");
     }
 }

@@ -3,7 +3,6 @@ package hasoffer.admin.controller;
 import hasoffer.admin.common.chart.ChartHelper;
 import hasoffer.admin.controller.vo.CategoryVo;
 import hasoffer.admin.controller.vo.CmpSkuVo;
-import hasoffer.admin.controller.vo.ProductBasicAttributeVo;
 import hasoffer.admin.controller.vo.ProductVo;
 import hasoffer.base.model.PageModel;
 import hasoffer.base.model.PageableResult;
@@ -12,11 +11,9 @@ import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
-import hasoffer.core.msp.IMspService;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.enums.SrmSearchLogUpdate;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
-import hasoffer.core.persistence.po.ptm.PtmBasicAttribute;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
@@ -29,7 +26,6 @@ import hasoffer.core.product.IProductService;
 import hasoffer.core.product.exception.ProductNotFoundException;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
-import hasoffer.core.thd.IThdService;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
@@ -63,10 +59,6 @@ public class ProductController {
     @Resource
     ICmpSkuService cmpSkuService;
     @Resource
-    IMspService mspService;
-    @Resource
-    IThdService thdService;
-    @Resource
     IFetchService fetchService;
     @Resource
     IDataBaseManager dbm;
@@ -84,7 +76,7 @@ public class ProductController {
     @ResponseBody
     public Map updateCompare(@PathVariable long id) {
 
-        Map<String,String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<String, String>();
 
         PtmCmpSku ptmCmpSku = cmpSkuService.getCmpSkuById(id);
 
@@ -95,12 +87,12 @@ public class ProductController {
             oriFetchedProduct = fetchService.fetchSummaryProductByUrl(url);
             if (oriFetchedProduct != null) {
                 cmpSkuService.updateCmpSkuByOriFetchedProduct(id, oriFetchedProduct);
-                map.put("status","success");
-            }else{
-                map.put("status","fail");
+                map.put("status", "success");
+            } else {
+                map.put("status", "fail");
             }
         } catch (Exception e) {
-            map.put("status","fail");
+            map.put("status", "fail");
         }
 
         return map;
@@ -235,7 +227,7 @@ public class ProductController {
         for (Map.Entry<Website, Map<String, Float>> kv : priceLogMap.entrySet()) {
             Website website = kv.getKey();
 
-            if (website == null){
+            if (website == null) {
                 continue;
             }
 
@@ -266,32 +258,10 @@ public class ProductController {
 
         mav.addObject("product", getProductVo(product));
         mav.addObject("imageUrls", productService.getProductImageUrls(id));
-        mav.addObject("features", productService.getProductFeatures(id));
+        mav.addObject("features", new ArrayList<>());
+        mav.addObject("basicAttributes", new ArrayList<>());
 
-        List<PtmBasicAttribute> basicAttributes = productService.getProductBasicAttributes(id);
-        mav.addObject("basicAttributes", getAttributeVos(basicAttributes));
-
-        mav.addObject("mspJob", mspService.findJobByPtmProductId(id));
         return mav;
-    }
-
-    private Map<String, List<ProductBasicAttributeVo>> getAttributeVos(List<PtmBasicAttribute> basicAttributes) {
-        Map<String, List<ProductBasicAttributeVo>> basicAttrMap = new LinkedHashMap<String, List<ProductBasicAttributeVo>>();
-
-        for (PtmBasicAttribute basicAttribute : basicAttributes) {
-            String group = basicAttribute.getGroupName();
-
-            List<ProductBasicAttributeVo> basicAttributeVos = basicAttrMap.get(group);
-
-            if (ArrayUtils.isNullOrEmpty(basicAttributeVos)) {
-                basicAttributeVos = new ArrayList<ProductBasicAttributeVo>();
-                basicAttrMap.put(group, basicAttributeVos);
-            }
-
-            basicAttributeVos.add(new ProductBasicAttributeVo(basicAttribute));
-        }
-
-        return basicAttrMap;
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)

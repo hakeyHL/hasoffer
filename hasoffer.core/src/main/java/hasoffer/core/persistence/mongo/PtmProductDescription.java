@@ -4,21 +4,25 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * Created on 2016/6/20.
- * updateTime：2016-06-29 14:25
- * id更新为ptmproductId
- * 更新逻辑，更新为ptmcmpsku中website为flipkart的关联的ptmproduct的id
- * id更换为PtmCmpSkuId
+ * Created on 2016/8/1.
  */
-@Document(collection = "PtmCmpSkuDescription")
-public class PtmCmpSkuDescription {
+@Document(collection = "PtmProductDescription")
+public class PtmProductDescription {
 
     @Id
-    private long id;//cmpsku Id
+    private long id;
 
     private String jsonParam;//参数
 
     private String jsonDescription;
+
+    public String getJsonDescription() {
+        return jsonDescription;
+    }
+
+    public void setJsonDescription(String jsonDescription) {
+        this.jsonDescription = jsonDescription;
+    }
 
     public long getId() {
         return id;
@@ -36,20 +40,12 @@ public class PtmCmpSkuDescription {
         this.jsonParam = jsonParam;
     }
 
-    public String getJsonDescription() {
-        return jsonDescription;
-    }
-
-    public void setJsonDescription(String jsonDescription) {
-        this.jsonDescription = jsonDescription;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        PtmCmpSkuDescription that = (PtmCmpSkuDescription) o;
+        PtmProductDescription that = (PtmProductDescription) o;
 
         if (id != that.id) return false;
         if (jsonParam != null ? !jsonParam.equals(that.jsonParam) : that.jsonParam != null) return false;

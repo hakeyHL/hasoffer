@@ -5,8 +5,6 @@ import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.bo.product.SkuBo;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.po.log.ShopcluesFixLog;
-import hasoffer.core.persistence.po.log.ShopcluesFixLogUpdater;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.product.ICmpSkuService;
@@ -193,33 +191,5 @@ public class DataFixServiceImpl implements IDataFixService {
         }
 
         return skuBoList;
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ShopcluesFixLog createShopcluesFixLog(ShopcluesFixLog shopcluesFixLog) {
-        dbm.create(shopcluesFixLog);
-        return shopcluesFixLog;
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateFixLog(ShopcluesFixLog shopcluesFixLog) {
-
-        ShopcluesFixLogUpdater updater = new ShopcluesFixLogUpdater(shopcluesFixLog.getId());
-
-        updater.getPo().setOriUrl(shopcluesFixLog.getOriUrl());
-        updater.getPo().setOriStatus(shopcluesFixLog.getOriStatus());
-        updater.getPo().setUpdateTime(shopcluesFixLog.getUpdateTime());
-
-        if (!StringUtils.isEmpty(shopcluesFixLog.getNewUrl())) {
-            updater.getPo().setNewUrl(shopcluesFixLog.getNewUrl());
-        }
-
-        if (shopcluesFixLog.getNewStatus() != null) {
-            updater.getPo().setNewStatus(shopcluesFixLog.getNewStatus());
-        }
-
-        dbm.update(updater);
     }
 }

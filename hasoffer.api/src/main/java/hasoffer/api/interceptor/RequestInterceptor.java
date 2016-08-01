@@ -103,7 +103,7 @@ public class RequestInterceptor implements HandlerInterceptor {
                            ModelAndView modelAndView) throws Exception {
         //去除不必要的返回
         if (modelAndView != null && modelAndView.getModel().containsKey("searchCriteria")) {
-            modelAndView.getModel().remove("modelAndView");
+            modelAndView.getModel().remove("searchCriteria");
         }
         if (modelAndView != null) {
             UrmUser urmUser = appService.getUserByUserToken((String) Context.currentContext().get(StaticContext.USER_TOKEN));
