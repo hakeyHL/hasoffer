@@ -179,7 +179,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                         continue;
                     }
                 }
-                dbm.create(ptmCmpSkuImage);
+                ptmCmpSkuImageService.createPtmCmpSkuImage(ptmCmpSkuImage);
                 System.out.println("create ptmCmpSkuImage success for ptmCmpSkuId = [" + sku.getId() + "]");
             }
         } catch (Exception e) {
