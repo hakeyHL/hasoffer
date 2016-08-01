@@ -165,6 +165,9 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 List<String> imageUrlList = fetchedProduct.getImageUrlList();
 
                 PtmCmpSkuImage ptmCmpSkuImage = new PtmCmpSkuImage();
+
+                ptmCmpSkuImage.setId(sku.getId());
+
                 for (int i = 0; i < imageUrlList.size(); i++) {
 
                     if (i == 0) {
