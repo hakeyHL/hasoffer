@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.PropertyFilter;
 import hasoffer.api.controller.vo.*;
+import hasoffer.api.helper.ExceptionHelper;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.SearchHelper;
 import hasoffer.base.model.AppDisplayMode;
@@ -158,24 +159,34 @@ public class Compare2Controller {
         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         CmpResult cr = null;
+        PtmProduct ptmProduct = null;
         SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, size);
         try {
             //根据title匹配到商品
             getSioBySearch(sio);
-            cr = getCmpProducts(sio);
-        } catch (Exception e) {
+            logger.info("get product from solr or searchLog ");
             if (sio.getHsProId() > 0) {
+                ptmProduct = productService.getProduct(sio.getHsProId());
                 //若此时匹配到的商品实际库中不存在则删除此匹配记录,下次重新匹配
-                PtmProduct ptmProduct = productService.getProduct(sio.getHsProId());
                 if (ptmProduct == null) {
+                    logger.info("product id" + sio.getHsProId() + " is not exist ");
                     productService.deleteProduct(sio.getHsProId());
+                    //未匹配,结束操作
                 } else {
-                    logger.info(ptmProduct.toString());
+                    cr = getCmpProducts(sio);
+                    cr.setCopywriting(ptmProduct != null && ptmProduct.isStd() ? "Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you." : "Looked around Myntre,Jabong & 5 other apps,thought you might like these items as well..");
+                    cr.setDisplayMode(ptmProduct != null && ptmProduct.isStd() ? AppDisplayMode.NONE : AppDisplayMode.WATERFALL);
                 }
+            } else {
+                //小于等于0,直接返回
+                logger.info("productid is " + sio.getHsProId() + " ls than zero");
+                jsonObject.put("data", JSONObject.toJSON(cr));
+                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
+                return null;
             }
-            logger.error(e.getMessage());
+        } catch (Exception e) {
+            logger.error(ExceptionHelper.getExceptionMessage(e));
             logger.error(String.format("sdk_cmp_  [NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
-
             jsonObject.put("data", JSONObject.toJSON(cr));
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
             return null;
@@ -185,7 +196,7 @@ public class Compare2Controller {
         } else {
             jsonObject.put("data", "{\n" +
                     "        \"copywriting\": \"\",\n" +
-                    "        \"show\": \"waterfall\",\n" +
+                    "        \"show\": \"WATERFALL\",\n" +
                     "        \"skus\": [\n" +
                     "            {\n" +
                     "                \"status\": \"onsale\",\n" +
