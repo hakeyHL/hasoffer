@@ -30,6 +30,7 @@ public class AppAdController {
      */
     @RequestMapping("product")
     public ModelAndView getAdsByProductId() {
+        //TODO 广告返回
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
