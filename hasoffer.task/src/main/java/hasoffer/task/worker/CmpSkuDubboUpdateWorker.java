@@ -140,7 +140,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 //            }
 //        }
 
-        System.out.println(JSONUtil.toJSON(fetchedProduct));
+        System.out.println(JSONUtil.toJSON(fetchedProduct).toString());
 
 
         //更新ptmcmpsku表
