@@ -3,6 +3,7 @@ package hasoffer.core.test;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.core.analysis.ProductAnalysisService;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
@@ -16,6 +17,7 @@ import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.thd.IThdService;
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -24,10 +26,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -39,6 +39,12 @@ public class ProductTest {
 
     private static final String Q_PRODUCT_BY_CATEGORY =
             "SELECT t FROM PtmProduct t WHERE t.categoryId = ?0";
+    private static final String Q_PRODUCT_ID =
+            "SELECT COUNT(t.id),t.productId FROM PtmCmpSku t " +
+                    "WHERE t.productId > 0 " +
+                    "GROUP BY t.productId " +
+                    "HAVING COUNT(t.id)>50 " +
+                    "ORDER BY COUNT(t.id) DESC";
     @Resource
     ProductIndexServiceImpl productIndexService;
     @Resource
@@ -62,6 +68,44 @@ public class ProductTest {
     private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
 
     private Logger logger = LoggerFactory.getLogger(ProductTest.class);
+
+    @Test
+    public void testProductSkuUrl() throws Exception {
+        File file = new File("D:\\datas\\match\\51+sku.txt");
+        List<String> lines = FileUtils.readLines(file);
+        int count = 0;
+        for (String line : lines) {
+
+            String[] vals = line.split("\t");
+            long skuCount = Long.valueOf(vals[0].trim());
+            long productId = Long.valueOf(vals[1].trim());
+
+            System.out.println(productId + "\t" + skuCount);
+
+            PtmProduct product = productService.getProduct(productId);
+            if (product != null) {
+                System.out.println("---------------- " + productId + " ----------------");
+                Set<String> skuUrlSet = new HashSet<>();
+                List<String> skuTitleScores = new ArrayList<>();
+
+                List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId);
+                for (PtmCmpSku cmpSku : cmpSkus) {
+                    skuUrlSet.add(cmpSku.getUrl());
+                    skuTitleScores.add(String.valueOf(ProductAnalysisService.stringMatch(product.getTitle(), cmpSku.getTitle())));
+                }
+
+                System.out.println("sku size = " + skuUrlSet.size() + " : " + cmpSkus.size());
+                System.out.println(StringUtils.arrayToString(skuTitleScores.toArray(new String[0]), ","));
+
+                System.out.println("---------------------end-----------------------");
+            }
+
+            count++;
+            if (count >= 10) {
+                return;
+            }
+        }
+    }
 
     @Test
     public void testCmpskuSolr() {
