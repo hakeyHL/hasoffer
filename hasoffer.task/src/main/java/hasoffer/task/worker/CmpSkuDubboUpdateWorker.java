@@ -4,8 +4,10 @@ import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.TaskStatus;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
@@ -17,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
@@ -57,14 +60,6 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 continue;
             }
 
-//  for test暂时注释掉               判断，如果该sku 当天更新过价格, 直接跳过
-//                Date updateTime = sku.getUpdateTime();
-//                if (updateTime != null) {
-//                    if (updateTime.compareTo(TimeUtils.toDate(TimeUtils.today())) > 0) {
-//                        continue;
-//                    }
-//                }
-
             long productId = searchLog.getPtmProductId();
             if (productId == 0) {
                 continue;
@@ -73,10 +68,19 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             List<PtmCmpSku> skuList = dbm.query(Q_PTMCMPSKU_BYPRODUCTID, Arrays.asList(productId));
 
             for (PtmCmpSku sku : skuList) {
+                //判断，如果该sku 当天更新过价格, 直接跳过
+                Date updateTime = sku.getUpdateTime();
+                if (updateTime != null) {
+                    if (updateTime.compareTo(TimeUtils.toDate(TimeUtils.today())) > 0) {
+                        continue;
+                    }
+                }
+
+                //更新商品的信息，写入多图数据，写入描述/参数
                 updatePtmCmpSku(sku, searchLog);
             }
 
-            //更新商品的价格
+            //更新商品的价格，同时修改updateTime字段
 //            暂时注释掉，测试完再打开
             productService.updatePtmProductPrice(productId);
         }
@@ -128,6 +132,8 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 //            }
 //        }
 
+
+        //更新ptmcmpsku表
         try {
             cmpSkuService.updateCmpSkuBySpiderFetchedProduct(sku.getId(), fetchedProduct);
             logger.info("fetch success for [" + sku.getId() + "]");
@@ -137,5 +143,15 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 logger.info("title:" + fetchedProduct.getTitle());
             }
         }
+
+        //创建多图
+        List<PtmCmpSkuImage> ptmCmpSkuImageList = dbm.query("SELECT t FROM PtmCmpSkuImage t WHERE t.ptmcmpskuId = ?0 ", Arrays.asList(sku.getId()));
+
+        if (ptmCmpSkuImageList == null || ptmCmpSkuImageList.size() == 0) {
+
+            List<String> imageUrlList = fetchedProduct.getImageUrlList();
+
+        }
+
     }
 }
