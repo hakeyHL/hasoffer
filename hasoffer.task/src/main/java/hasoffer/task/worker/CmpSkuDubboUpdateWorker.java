@@ -4,6 +4,7 @@ import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.TaskStatus;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
@@ -139,7 +140,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 //            }
 //        }
 
-        System.out.println(fetchedProduct);
+        System.out.println(JSONUtil.toJSON(fetchedProduct));
 
 
         //更新ptmcmpsku表
