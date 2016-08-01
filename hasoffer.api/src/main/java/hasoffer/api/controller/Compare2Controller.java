@@ -167,7 +167,6 @@ public class Compare2Controller {
             logger.info("get product from solr or searchLog ");
             if (sio.getHsProId() > 0) {
                 ptmProduct = productService.getProduct(sio.getHsProId());
-                System.out.println(ptmProduct.isStd() + " ++++++++");
                 //若此时匹配到的商品实际库中不存在则删除此匹配记录,下次重新匹配
                 if (ptmProduct == null) {
                     logger.info("product id" + sio.getHsProId() + " is not exist ");
