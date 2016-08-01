@@ -40,11 +40,13 @@ public class AppSkuController {
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
         if (ptmCmpSku != null) {
+            logger.info(" has this sku " + id);
             PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, ptmCmpSku.getId());
+            logger.info("get sku description from  mongo " + ptmCmpSkuDescription == null ? " not null" : " is null");
             Map map = new HashMap<>();
             map.put("description", ptmCmpSkuDescription.getJsonDescription());//描述
             map.put("specs", ptmCmpSkuDescription.getJsonParam());//参数
-            //
+            //TODO 获取图片列表waiting for WF
             map.put("images", "[\"http://img12.360buyimg.com/n1/jfs/t1174/164/723303127/202924/1a956bbf/554acf00N87f6cea3.jpg\",\"http://img12.360buyimg.com/n1/jfs/t1033/328/802932418/412261/261452dc/554acd64N27651f09.jpg\"]");//图片列表
             map.put("distribution", 5);
             modelAndView.addObject("data", map);
