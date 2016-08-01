@@ -25,6 +25,7 @@ import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel;
+import hasoffer.core.redis.ICacheService;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.task.ListAndProcessTask2;
 import hasoffer.core.task.worker.IList;
@@ -88,8 +89,22 @@ public class FixController {
     ICategoryService categoryservice;
     @Resource
     ProductIndexServiceImpl productIndexServiceImpl;
+    @Resource
+    ICacheService cacheServiceImpl;
 
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
+
+    @RequestMapping(value = "/updateptmproduct/{id}", method = RequestMethod.GET)
+    @ResponseBody
+    public String updateptmproduct(@PathVariable long id) {
+
+        //更新商品价格
+        productService.updatePtmProductPrice(id);
+        //清除缓存
+        cacheServiceImpl.del("PRODUCT_" + id);
+
+        return "ok";
+    }
 
     @RequestMapping(value = "/setprostdbyml", method = RequestMethod.GET)
     public
