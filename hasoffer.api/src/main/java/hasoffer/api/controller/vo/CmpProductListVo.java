@@ -61,7 +61,7 @@ public class CmpProductListVo {
     public CmpProductListVo(PtmCmpSku cmpSku, float cliPrice) {
         this.status = cmpSku.getStatus();
         this.title = cmpSku.getTitle();
-        this.imageUrl = cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath());
+        this.imageUrl = cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getImagePath());
         this.cashBack = cmpSku.getCashBack();
         this.saved = Math.round(cliPrice - cmpSku.getPrice());
         this.deepLink = cmpSku.getDeeplink();
