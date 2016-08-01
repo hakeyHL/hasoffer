@@ -164,8 +164,6 @@ public class ProductServiceImpl implements IProductService {
             product.setPrice(price);
 
             importProduct2Solr(product);
-
-            System.out.println("update price for product productid = [" + product.getId() + "]");
         }
 
     }

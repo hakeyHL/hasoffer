@@ -4,6 +4,7 @@ import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.TaskStatus;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
@@ -86,6 +87,9 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
             //更新商品的价格，同时修改updateTime字段
 //            暂时注释掉，测试完再打开
+            if (skuList == null || skuList.size() == 0) {
+                continue;
+            }
             productService.updatePtmProductPrice(productId);
         }
     }
@@ -117,7 +121,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         //如果返回结果状态为running，那么将sku返回队列
         if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
             queue.add(searchLog);
-            logger.info("taskstatus RUNNING for [" + sku.getId() + "]");
+//            logger.info("taskstatus RUNNING for [" + sku.getId() + "]");
             return;
         } else if (TaskStatus.STOPPED.equals(taskStatus)) {
             logger.info("taskstatus STOPPED for [" + sku.getId() + "]");
@@ -136,7 +140,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 //            }
 //        }
 
-        System.out.println(fetchedProduct);
+        System.out.println(JSONUtil.toJSON(fetchedProduct));
 
 
         //更新ptmcmpsku表
