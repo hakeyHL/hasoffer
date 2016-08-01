@@ -85,11 +85,13 @@ public class ProductTest {
             PtmProduct product = productService.getProduct(productId);
             if (product != null) {
                 System.out.println("---------------- " + productId + " ----------------");
+                System.out.println(product.getTitle());
                 Set<String> skuUrlSet = new HashSet<>();
 
                 List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId);
                 for (PtmCmpSku cmpSku : cmpSkus) {
                     if (!StringUtils.isEmpty(product.getTitle())) {
+                        System.out.println(cmpSku.getTitle());
                         float score = ProductAnalysisService.stringMatch(product.getTitle(), cmpSku.getTitle());
                         if (score < 0.4) {
                             logger.debug(String.format("[Delete_%d]Score is [%f].", cmpSku.getId(), score));
@@ -113,8 +115,9 @@ public class ProductTest {
             }
 
             count++;
-            if (count >= 10) {
-                return;
+            if (count % 100 == 0) {
+                System.out.println(count + "..products processed.");
+//                break;
             }
         }
     }
