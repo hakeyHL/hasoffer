@@ -3,9 +3,7 @@ package hasoffer.joe.test;
 import hasoffer.base.model.PageableResult;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.persistence.po.sys.SysTimerTaskLog;
 import hasoffer.core.product.ICmpSkuService;
-import hasoffer.core.system.ITimerService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.job.worker.CmpSkuUpdateWorker;
 import org.junit.Test;
@@ -30,14 +28,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @ContextConfiguration(locations = {"classpath:applicationContext.xml","classpath:quartz-applicationContext.xml","classpath:dubbo-spring.xml","classpath:spring-beans.xml"} )
 public class CmpUpdataTaskTest {
 
-    private static Logger logger = LoggerFactory.getLogger(CmpUpdataTaskTest.class);
-
     private static final String Q_PTM_CMPSKUTEST = "SELECT t FROM PtmCmpSku t WHERE website = 'FLIPKART' ";
-
+    private static Logger logger = LoggerFactory.getLogger(CmpUpdataTaskTest.class);
     @Resource
     IDataBaseManager dbm;
-    @Resource
-    ITimerService timerService;
     @Resource
     ICmpSkuService cmpSkuService;
     @Resource
@@ -45,8 +39,6 @@ public class CmpUpdataTaskTest {
 
     @Test
     public void testCmpUpdateTask() {
-
-        SysTimerTaskLog log = timerService.createTaskLog("CmpUpdateTask");
 
         logger.debug("------------------------------------CmpUpdateTask-START------------------------------------");
         final ConcurrentLinkedQueue<PtmCmpSku> skuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
@@ -112,8 +104,6 @@ public class CmpUpdataTaskTest {
         es.shutdown();
 
         logger.debug("------------------------------------CmpUpdateTask-END------------------------------------");
-        timerService.updateTaskLog(log.getId(), "");
-
     }
 
 }
