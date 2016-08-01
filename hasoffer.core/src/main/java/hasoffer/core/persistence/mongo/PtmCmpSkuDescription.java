@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * updateTime：2016-06-29 14:25
  * id更新为ptmproductId
  * 更新逻辑，更新为ptmcmpsku中website为flipkart的关联的ptmproduct的id
+ * id更换为PtmCmpSkuId,将初始数据迁移到PtmProductDescription
  */
 @Document(collection = "PtmCmpSkuDescription")
 public class PtmCmpSkuDescription {
