@@ -6,10 +6,7 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.aws.AwsDynamoDbService;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.enums.IndexStat;
-import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
-import hasoffer.core.persistence.mongo.StatHijackFetch;
-import hasoffer.core.persistence.mongo.UrmDeviceBuyLog;
-import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
+import hasoffer.core.persistence.mongo.*;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.product.ICmpSkuService;
@@ -212,6 +209,19 @@ public class MongoTest {
         statHijackFetch = new StatHijackFetch(id, website, sourceId, cliQ, createTime, lCreateTime, status, null);
 
         mdm.save(statHijackFetch);
+
+    }
+
+    @Test
+    public void testQuery() {
+
+        Query query = new Query();
+
+        PageableResult<PtmCmpSkuDescription> pageableResult = mdm.queryPage(PtmCmpSkuDescription.class, query, 1, 5);
+
+        List<PtmCmpSkuDescription> data = pageableResult.getData();
+
+        System.out.println(data);
 
     }
 }
