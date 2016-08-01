@@ -86,16 +86,28 @@ public class ProductTest {
             if (product != null) {
                 System.out.println("---------------- " + productId + " ----------------");
                 Set<String> skuUrlSet = new HashSet<>();
-                List<String> skuTitleScores = new ArrayList<>();
 
                 List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId);
                 for (PtmCmpSku cmpSku : cmpSkus) {
-                    skuUrlSet.add(cmpSku.getUrl());
-                    skuTitleScores.add(String.valueOf(ProductAnalysisService.stringMatch(product.getTitle(), cmpSku.getTitle())));
-                }
+                    if (!StringUtils.isEmpty(product.getTitle())) {
+                        float score = ProductAnalysisService.stringMatch(product.getTitle(), cmpSku.getTitle());
+                        if (score < 0.4) {
+                            logger.debug(String.format("[Delete_%d]Score is [%f].", cmpSku.getId(), score));
+                            cmpSkuService.deleteCmpSku(cmpSku.getId());
+                            continue;
+                        }
+                    }
 
-                System.out.println("sku size = " + skuUrlSet.size() + " : " + cmpSkus.size());
-                System.out.println(StringUtils.arrayToString(skuTitleScores.toArray(new String[0]), ","));
+                    boolean exists = skuUrlSet.contains(cmpSku.getUrl());
+
+                    if (exists) {
+                        logger.debug(String.format("[Delete_%d] Exist.", cmpSku.getId()));
+                        cmpSkuService.deleteCmpSku(cmpSku.getId());
+                    } else {
+                        skuUrlSet.add(cmpSku.getUrl());
+                    }
+
+                }
 
                 System.out.println("---------------------end-----------------------");
             }
