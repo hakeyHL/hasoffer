@@ -3,7 +3,10 @@ package hasoffer.core.product;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.core.bo.product.ProductBo;
-import hasoffer.core.persistence.po.ptm.*;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmImage;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.product.solr.ProductModel;
 import hasoffer.fetch.model.ListProduct;
 
@@ -47,8 +50,6 @@ public interface IProductService {
     String getProductMasterImageUrl(Long id);
 
     List<String> getProductImageUrls(Long id);
-
-    List<PtmBasicAttribute> getProductBasicAttributes(long id);
 
     void updateSku(long skuId, String url);
 
