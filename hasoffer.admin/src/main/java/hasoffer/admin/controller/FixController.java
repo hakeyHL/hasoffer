@@ -94,6 +94,7 @@ public class FixController {
 
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
 
+    //fixdata/updateptmproduct/{id}
     @RequestMapping(value = "/updateptmproduct/{id}", method = RequestMethod.GET)
     @ResponseBody
     public String updateptmproduct(@PathVariable long id) {
