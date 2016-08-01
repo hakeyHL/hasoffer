@@ -9,14 +9,11 @@ import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.thd.ThdProduct;
-import hasoffer.core.persistence.po.thd.flipkart.ThdBProduct;
 import hasoffer.core.product.*;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
-import hasoffer.core.thd.IThdService;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,8 +54,6 @@ public class ProductTest {
     ICategoryService categoryService;
     @Resource
     IDataBaseManager dbm;
-    @Resource
-    IThdService thdService;
     @Resource
     ICmpSkuService cmpSkuService;
     @Resource
@@ -136,12 +131,6 @@ public class ProductTest {
     public void downloadskuimage() {
         PtmCmpSku sku = dbm.get(PtmCmpSku.class, 1L);
         cmpSkuService.downloadImage(sku);
-    }
-
-    @Test
-    public void relate() {
-        ThdProduct thd = dbm.get(ThdBProduct.class, 32769L);
-        thdService.relate(thd);
     }
 
     @Test

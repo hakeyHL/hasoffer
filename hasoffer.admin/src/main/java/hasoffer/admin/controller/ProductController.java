@@ -12,7 +12,6 @@ import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
-import hasoffer.core.msp.IMspService;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.enums.SrmSearchLogUpdate;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
@@ -29,7 +28,6 @@ import hasoffer.core.product.IProductService;
 import hasoffer.core.product.exception.ProductNotFoundException;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
-import hasoffer.core.thd.IThdService;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
@@ -62,10 +60,6 @@ public class ProductController {
     ProductIndexServiceImpl productIndexService;
     @Resource
     ICmpSkuService cmpSkuService;
-    @Resource
-    IMspService mspService;
-    @Resource
-    IThdService thdService;
     @Resource
     IFetchService fetchService;
     @Resource
@@ -271,7 +265,6 @@ public class ProductController {
         List<PtmBasicAttribute> basicAttributes = productService.getProductBasicAttributes(id);
         mav.addObject("basicAttributes", getAttributeVos(basicAttributes));
 
-        mav.addObject("mspJob", mspService.findJobByPtmProductId(id));
         return mav;
     }
 
