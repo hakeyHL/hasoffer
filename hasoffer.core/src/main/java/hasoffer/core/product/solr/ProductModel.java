@@ -16,7 +16,6 @@ public class ProductModel implements IIdentifiable<Long> {
     private String category;
     private float price;
 
-    private String feature;
     private String description;
 
     private String color;
@@ -32,7 +31,7 @@ public class ProductModel implements IIdentifiable<Long> {
     private long searchCount = 0; // 搜索次数，表示商品热度
 
     public ProductModel(Long id, String title, String tag, long cateId, String category,
-                        float price, String feature, String description,
+                        float price, String description,
                         String color, String size, int rating,
                         long cate1, long cate2, long cate3, long searchCount) {
         this.id = id;
@@ -41,7 +40,6 @@ public class ProductModel implements IIdentifiable<Long> {
         this.cateId = cateId;
         this.category = category;
         this.price = price;
-        this.feature = feature;
         this.description = description;
         this.color = color;
         this.size = size;
@@ -105,14 +103,6 @@ public class ProductModel implements IIdentifiable<Long> {
 
     public void setPrice(float price) {
         this.price = price;
-    }
-
-    public String getFeature() {
-        return feature;
-    }
-
-    public void setFeature(String feature) {
-        this.feature = feature;
     }
 
     public String getDescription() {

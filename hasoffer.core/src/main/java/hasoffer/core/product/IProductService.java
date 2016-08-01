@@ -45,8 +45,6 @@ public interface IProductService {
 
     List<PtmTopSelling> getTopSellings(Long yesterdayStart, Long todayStart, int page, int size);
 
-    List<String> getProductFeatures(long id);
-
     String getProductMasterImageUrl(Long id);
 
     List<String> getProductImageUrls(Long id);

@@ -258,7 +258,7 @@ public class ProductController {
 
         mav.addObject("product", getProductVo(product));
         mav.addObject("imageUrls", productService.getProductImageUrls(id));
-        mav.addObject("features", productService.getProductFeatures(id));
+        mav.addObject("features", new ArrayList<>());
         mav.addObject("basicAttributes", new ArrayList<>());
 
         return mav;
