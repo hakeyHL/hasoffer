@@ -40,7 +40,9 @@ public class AppSkuController {
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
         if (ptmCmpSku != null) {
+            logger.info(" has this sku " + id);
             PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, ptmCmpSku.getId());
+            logger.info("get sku description from  mongo " + ptmCmpSkuDescription == null ? " not null" : " is null");
             Map map = new HashMap<>();
             map.put("description", ptmCmpSkuDescription.getDescription());//描述
             map.put("specs", ptmCmpSkuDescription.getJsonParam());//参数
