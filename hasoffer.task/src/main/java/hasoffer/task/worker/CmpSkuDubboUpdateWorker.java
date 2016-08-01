@@ -4,8 +4,11 @@ import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.TaskStatus;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
@@ -36,13 +39,15 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
     private ICmpSkuService cmpSkuService;
     private IFetchDubboService fetchService;
     private IProductService productService;
+    private IMongoDbManager mdm;
 
-    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<SrmSearchLog> queue, ICmpSkuService cmpSkuService, IFetchDubboService fetchService, IProductService productService) {
+    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<SrmSearchLog> queue, ICmpSkuService cmpSkuService, IFetchDubboService fetchService, IProductService productService, IMongoDbManager mdm) {
         this.dbm = dbm;
         this.queue = queue;
         this.cmpSkuService = cmpSkuService;
         this.fetchService = fetchService;
         this.productService = productService;
+        this.mdm = mdm;
     }
 
     @Override
@@ -82,6 +87,9 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
             //更新商品的价格，同时修改updateTime字段
 //            暂时注释掉，测试完再打开
+            if (skuList == null || skuList.size() == 0) {
+                continue;
+            }
             productService.updatePtmProductPrice(productId);
         }
     }
@@ -113,7 +121,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         //如果返回结果状态为running，那么将sku返回队列
         if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
             queue.add(searchLog);
-            logger.info("taskstatus RUNNING for [" + sku.getId() + "]");
+//            logger.info("taskstatus RUNNING for [" + sku.getId() + "]");
             return;
         } else if (TaskStatus.STOPPED.equals(taskStatus)) {
             logger.info("taskstatus STOPPED for [" + sku.getId() + "]");
@@ -132,6 +140,8 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 //            }
 //        }
 
+        System.out.println(JSONUtil.toJSON(fetchedProduct));
+
 
         //更新ptmcmpsku表
         try {
@@ -145,12 +155,43 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         }
 
         //创建多图
-        List<PtmCmpSkuImage> ptmCmpSkuImageList = dbm.query("SELECT t FROM PtmCmpSkuImage t WHERE t.ptmcmpskuId = ?0 ", Arrays.asList(sku.getId()));
+        try {
+            List<PtmCmpSkuImage> ptmCmpSkuImageList = dbm.query("SELECT t FROM PtmCmpSkuImage t WHERE t.ptmcmpskuId = ?0 ", Arrays.asList(sku.getId()));
+            if (ptmCmpSkuImageList == null || ptmCmpSkuImageList.size() == 0) {
 
-        if (ptmCmpSkuImageList == null || ptmCmpSkuImageList.size() == 0) {
+                List<String> imageUrlList = fetchedProduct.getImageUrlList();
 
-            List<String> imageUrlList = fetchedProduct.getImageUrlList();
+                for (int i = 0; i < imageUrlList.size(); i++) {
 
+                    PtmCmpSkuImage ptmCmpSkuImage = new PtmCmpSkuImage();
+
+                    ptmCmpSkuImage.setOriImageUrl(imageUrlList.get(i));
+                    ptmCmpSkuImage.setPtmcmpskuId(sku.getId());
+
+                    dbm.create(ptmCmpSkuImage);
+                    System.out.println("create ptmCmpSkuImage success for ptmCmpSkuId = [" + sku.getId() + "] " + i);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("create ptmCmpSkuImage fail for ptmCmpSkuId = [" + sku.getId() + "]");
+        }
+
+
+        //添加描述
+        try {
+            String jsonParam = fetchedProduct.getJsonParam();
+            String description = fetchedProduct.getDescription();
+
+            PtmCmpSkuDescription ptmCmpSkuDescription = new PtmCmpSkuDescription();
+
+            ptmCmpSkuDescription.setId(sku.getId());
+            ptmCmpSkuDescription.setJsonParam(jsonParam);
+            ptmCmpSkuDescription.setDescription(description);
+
+            mdm.save(ptmCmpSkuDescription);
+            System.out.println("create ptmCmpSkuDescription success for ptmCmpSkuId = [" + sku.getId() + "]");
+        } catch (Exception e) {
+            System.out.println("create ptmCmpSkuDescription fail for ptmCmpSkuId = [" + sku.getId() + "]");
         }
 
     }

@@ -80,7 +80,7 @@ public class ProductServiceImpl implements IProductService {
                     " WHERE t.productId = ?0 ";
 
     private static final String Q_PTM_TOPSEELLING =
-            "select t from PtmTopSelling t where t.status='ONLINE' order by t.count desc, t.lUpdateTime desc";
+            "select t from PtmTopSelling t where  t.lUpdateTime between ?0  and  ?1 and t.status='ONLINE'  order by t.count desc, t.lUpdateTime desc";
 
     @Resource
     ISearchService searchService;
@@ -164,8 +164,6 @@ public class ProductServiceImpl implements IProductService {
             product.setPrice(price);
 
             importProduct2Solr(product);
-
-            System.out.println("update price for product productid = [" + product.getId() + "]");
         }
 
     }
@@ -398,7 +396,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public List<PtmTopSelling> getTopSellings(Long yesterdayStart, Long todayStart, int page, int size) {
-        return dbm.query(Q_PTM_TOPSEELLING, page < 1 ? 1 : page, size == 0 ? 20 : size);
+        return dbm.query(Q_PTM_TOPSEELLING, page < 1 ? 1 : page, size == 0 ? 20 : size, Arrays.asList(yesterdayStart, todayStart));
     }
 
     @Override

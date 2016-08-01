@@ -5,6 +5,7 @@ import hasoffer.base.model.Website;
 import hasoffer.core.bo.product.SkuPriceUpdateResultBo;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku2;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.persistence.po.stat.StatPtmCmpSkuUpdate;
@@ -19,9 +20,9 @@ import java.util.List;
  */
 public interface ICmpSkuService {
 
-    PtmCmpSku createCmpSkuForIndex(PtmCmpSku ptmCmpSku);
+    PtmCmpSku2 createCmpSkuForIndex(PtmCmpSku2 ptmCmpSku);
 
-    void createPtmCmpSkuIndexToMysql(PtmCmpSku ptmCmpsku);
+    void createPtmCmpSkuIndexToMysql(PtmCmpSku2 ptmCmpsku);
 
     void updateCmpSkuByOriFetchedProduct(long skuId, OriFetchedProduct oriFetchedProduct);
 
