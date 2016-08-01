@@ -15,6 +15,7 @@ import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku2;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.persistence.po.stat.StatPtmCmpSkuUpdate;
@@ -396,7 +397,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public PtmCmpSku createCmpSkuForIndex(PtmCmpSku ptmCmpSku) {
+    public PtmCmpSku2 createCmpSkuForIndex(PtmCmpSku2 ptmCmpSku) {
 
         //sku创建时，添加创建时间字段
         ptmCmpSku.setCreateTime(TimeUtils.nowDate());
@@ -485,7 +486,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void createPtmCmpSkuIndexToMysql(PtmCmpSku ptmCmpSku) {
+    public void createPtmCmpSkuIndexToMysql(PtmCmpSku2 ptmCmpSku) {
 
         if (ptmCmpSku.getWebsite() == null) {
             return;
