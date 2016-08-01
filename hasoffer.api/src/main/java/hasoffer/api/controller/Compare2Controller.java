@@ -154,7 +154,7 @@ public class Compare2Controller {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
-        PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"ratingNum", "bestPrice", "priceOff", "support", "price", "returnGuarantee", "freight", "backRate"});
+        PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"ratingNum", "bestPrice", "priceOff", "backRate", "support", "price", "returnGuarantee", "freight"});
         //初始化sio对象
         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
@@ -167,6 +167,7 @@ public class Compare2Controller {
             logger.info("get product from solr or searchLog ");
             if (sio.getHsProId() > 0) {
                 ptmProduct = productService.getProduct(sio.getHsProId());
+                System.out.println(ptmProduct.isStd() + " ++++++++");
                 //若此时匹配到的商品实际库中不存在则删除此匹配记录,下次重新匹配
                 if (ptmProduct == null) {
                     logger.info("product id" + sio.getHsProId() + " is not exist ");
@@ -176,6 +177,7 @@ public class Compare2Controller {
                     cr = getCmpProducts(sio);
                     cr.setCopywriting(ptmProduct != null && ptmProduct.isStd() ? "Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you." : "Looked around Myntre,Jabong & 5 other apps,thought you might like these items as well..");
                     cr.setDisplayMode(ptmProduct != null && ptmProduct.isStd() ? AppDisplayMode.NONE : AppDisplayMode.WATERFALL);
+                    cr.setStd(ptmProduct.isStd());
                 }
             } else {
                 //小于等于0,直接返回
