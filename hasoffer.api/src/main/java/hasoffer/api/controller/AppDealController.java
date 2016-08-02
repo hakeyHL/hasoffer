@@ -45,7 +45,7 @@ public class AppDealController {
                 "                \"website\": \"FLIPKART\",\n" +
                 "                \"logoUrl\": \"http://img2.imgtn.bdimg.com/it/u=878754940,809562928&fm=21&gp=0.jpg\",\n" +
                 "                \"title\": \"宏碁（acer）TMP236 13.3英寸轻薄笔记本电脑（i5-5200U 8G 8G SSHD+500G 核芯显卡 全高清屏Win7）\",\n" +
-                "                \"discount\": \"200\",\n" +
+                "                \"discount\": \"60\",\n" +
                 "                \"deepLink\": \"http://item.jd.com/1362743.html?cpdad=1DLSUE\",\n" +
                 "                \"id\": \"1362743\"\n" +
                 "            },\n" +
@@ -53,7 +53,7 @@ public class AppDealController {
                 "                \"website\": \"FLIPKART\",\n" +
                 "                \"logoUrl\": \"http://img2.imgtn.bdimg.com/it/u=878754940,809562928&fm=21&gp=0.jpg\",\n" +
                 "                \"title\": \"伯希和PELLIOT户外防晒皮肤衣 男女轻薄透气速衣1731 男孔雀蓝色 L\",\n" +
-                "                \"discount\": \"\",\n" +
+                "                \"discount\": \"70\",\n" +
                 "                \"deepLink\": \"http://item.jd.com/2908042.html?cpdad=1DLSUE\",\n" +
                 "                \"id\": \"2908042\"\n" +
                 "            }\n" +
