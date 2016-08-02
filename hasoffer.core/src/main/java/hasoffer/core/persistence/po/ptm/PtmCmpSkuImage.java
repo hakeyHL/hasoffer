@@ -1,6 +1,7 @@
 package hasoffer.core.persistence.po.ptm;
 
 import hasoffer.core.persistence.dbm.osql.Identifiable;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,6 +34,9 @@ public class PtmCmpSkuImage implements Identifiable<Long> {
     private String imagePath3;//上传图片成功返回的path
     @Column(columnDefinition = "text")
     private String imagePath4;//上传图片成功返回的path
+
+    @ColumnDefault(value = "0")
+    private int oriImageUrlNumber = 0;//该sku有多少张图片
 
     @Override
     public Long getId() {
@@ -108,6 +112,14 @@ public class PtmCmpSkuImage implements Identifiable<Long> {
         this.oriImageUrl4 = oriImageUrl4;
     }
 
+    public int getOriImageUrlNumber() {
+        return oriImageUrlNumber;
+    }
+
+    public void setOriImageUrlNumber(int oriImageUrlNumber) {
+        this.oriImageUrlNumber = oriImageUrlNumber;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -115,6 +127,7 @@ public class PtmCmpSkuImage implements Identifiable<Long> {
 
         PtmCmpSkuImage that = (PtmCmpSkuImage) o;
 
+        if (oriImageUrlNumber != that.oriImageUrlNumber) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (oriImageUrl1 != null ? !oriImageUrl1.equals(that.oriImageUrl1) : that.oriImageUrl1 != null) return false;
         if (oriImageUrl2 != null ? !oriImageUrl2.equals(that.oriImageUrl2) : that.oriImageUrl2 != null) return false;
@@ -138,6 +151,7 @@ public class PtmCmpSkuImage implements Identifiable<Long> {
         result = 31 * result + (imagePath2 != null ? imagePath2.hashCode() : 0);
         result = 31 * result + (imagePath3 != null ? imagePath3.hashCode() : 0);
         result = 31 * result + (imagePath4 != null ? imagePath4.hashCode() : 0);
+        result = 31 * result + oriImageUrlNumber;
         return result;
     }
 }
