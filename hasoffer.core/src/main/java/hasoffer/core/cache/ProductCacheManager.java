@@ -152,10 +152,8 @@ public class ProductCacheManager {
                 calendar.setTime(date);
                 calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), 00, 00, 00);
                 long todayStart = calendar.getTimeInMillis();
-                System.out.println(todayStart);
                 calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH) - 1, 00, 00, 00);
                 long yesterdayStart = calendar.getTimeInMillis();
-                System.out.println(yesterdayStart);
                 List<PtmTopSelling> ptmTopSellings = productService.getTopSellings(yesterdayStart, todayStart, page, size);
                 for (PtmTopSelling ptmTopSelling : ptmTopSellings) {
                     PageableResult<PtmCmpSku> pageableResult = productCacheManager.listPagedCmpSkus(ptmTopSelling.getId(), 0, 20);
