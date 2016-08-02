@@ -179,7 +179,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
                 List<String> imageUrlList = fetchedProduct.getImageUrlList();
 
-                if (imageUrlList != null || imageUrlList.size() != 0) {
+                if (imageUrlList != null && imageUrlList.size() != 0) {
 
                     ptmCmpSkuImage = new PtmCmpSkuImage();
 
