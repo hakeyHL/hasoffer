@@ -3,6 +3,7 @@ package hasoffer.core.test;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
@@ -60,9 +61,15 @@ public class ProductTest {
     ISearchService searchService;
     @Resource
     IFetchService fetchService;
+    @Resource
+    IDealService dealService;
     private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
-
     private Logger logger = LoggerFactory.getLogger(ProductTest.class);
+
+    @Test
+    public void importDeal2Solr() {
+        dealService.reimportAllDeals2Solr();
+    }
 
     @Test
     public void testCmpskuSolr() {
