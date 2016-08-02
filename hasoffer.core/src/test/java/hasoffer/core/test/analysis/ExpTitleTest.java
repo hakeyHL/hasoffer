@@ -42,6 +42,39 @@ public class ExpTitleTest {
     IProductService productService;
 
     @Test
+    public void getI6() throws Exception {
+        initCateMap();
+
+        List<Long> stdCates = new ArrayList<>();
+        stdCates.add(1L);
+        stdCates.add(257L);
+        stdCates.add(4662L);
+        stdCates.add(1504L);
+        stdCates.add(2334L);
+
+        String U_CATEGORY = "UPDATE ptmcategory SET STD=0 WHERE id=%d;";
+        String U_PRODUCT = "UPDATE ptmproduct SET STD=%d WHERE categoryid=%d;";
+
+        int len = cates.size();
+        for (int i = 0; i < len; i++) {
+
+            PtmCategory cate = cates.get(i);
+
+            boolean std = stdCates.contains(cate.getId()) || stdCates.contains(cate.getParentId());
+
+            if (!std) {
+                String sql1 = String.format(U_CATEGORY, cate.getId());
+                System.out.println(sql1);
+            }
+
+            String sql2 = String.format(U_PRODUCT, std ? 1 : 0, cate.getId());
+            System.out.println(sql2);
+        }
+
+        System.out.println("all finished.");
+    }
+
+    @Test
     public void setStdbyFile() throws IOException {
         File file_ori = new File("d:/datas/hasoffer/predicted_values.txt");
         List<String> lines = FileUtils.readLines(file_ori);

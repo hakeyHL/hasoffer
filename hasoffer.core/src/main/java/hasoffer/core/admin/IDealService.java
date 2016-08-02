@@ -3,6 +3,7 @@ package hasoffer.core.admin;
 import hasoffer.base.model.PageableResult;
 import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
+import hasoffer.core.product.solr.DealModel;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
@@ -30,4 +31,8 @@ public interface IDealService {
     void deleteBanner(Long bannerId);
 
     void batchDelete(Long[] ids);
+
+    void importDeal2Solr(DealModel dm);
+
+    void reimportAllDeals2Solr();
 }

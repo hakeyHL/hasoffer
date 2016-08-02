@@ -291,7 +291,7 @@ public class AppController {
                     //返利比率=tentativeAmount*rate/SaleAmount
                     orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
                     transcations.add(orderVo);
-                    if (orderStatsAnalysisPO.getOrderStatus() != "cancelled") {
+                    if (orderStatsAnalysisPO.getOrderStatus() != "cancelled" && orderStatsAnalysisPO.getOrderStatus() != "disapproved") {
                         PendingCoins = PendingCoins.add(tempPrice);
                     }
                     if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {

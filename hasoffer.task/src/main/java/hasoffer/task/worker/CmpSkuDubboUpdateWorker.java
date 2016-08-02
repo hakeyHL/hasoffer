@@ -110,7 +110,13 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             if (skuList == null || skuList.size() == 0) {
                 continue;
             }
-            productService.updatePtmProductPrice(productId);
+
+            try {
+                productService.updatePtmProductPrice(productId);
+            } catch (Exception e) {
+                logger.info("update product fail for [" + productId + "]");
+            }
+
 
             if (flipkartWaitNumber % 1000 == 0 || snapdealWaitNumber % 1000 == 0 || shopcluesWaitNumber % 1000 == 0 || amazonWaitNumber % 1000 == 0) {
                 logger.info("flipkartWaitNumber" + flipkartWaitNumber + "");
