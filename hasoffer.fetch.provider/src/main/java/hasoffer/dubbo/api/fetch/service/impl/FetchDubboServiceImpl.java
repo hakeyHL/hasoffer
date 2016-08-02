@@ -59,11 +59,13 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     }
 
     private void addFetchUrlTask(FetchUrlResult fetchUrlResult) {
+        logger.info("FetchDubboServiceImpl.addFetchUrlTask(fetchUrlResult) param={} " + fetchUrlResult.getUrl());
         String key = FetchUrlResult.getCacheKey(fetchUrlResult);
         if (key == null) {
             return;
         }
         fetchCacheService.saveKeywordList(StringConstant.WAIT_URL_LIST, JSONUtil.toJSON(fetchUrlResult));
+        logger.info("FetchDubboServiceImpl.addFetchUrlTask(fetchUrlResult) save {} into Redis List {}", fetchUrlResult.getUrl(), StringConstant.WAIT_URL_LIST);
         fetchCacheService.cacheResult(key, fetchUrlResult);
 
     }
