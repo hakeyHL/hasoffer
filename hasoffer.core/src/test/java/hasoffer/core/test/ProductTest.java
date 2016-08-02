@@ -3,7 +3,6 @@ package hasoffer.core.test;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
-import hasoffer.core.analysis.ProductAnalysisService;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
@@ -14,7 +13,6 @@ import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -23,8 +21,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -63,59 +63,6 @@ public class ProductTest {
     private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
 
     private Logger logger = LoggerFactory.getLogger(ProductTest.class);
-
-    @Test
-    public void testProductSkuUrl() throws Exception {
-        File file = new File("D:\\datas\\match\\51+sku.txt");
-        List<String> lines = FileUtils.readLines(file);
-        int count = 0;
-        for (String line : lines) {
-
-            String[] vals = line.split("\t");
-            long skuCount = Long.valueOf(vals[0].trim());
-            long productId = Long.valueOf(vals[1].trim());
-
-            System.out.println(productId + "\t" + skuCount);
-
-            PtmProduct product = productService.getProduct(productId);
-            if (product != null) {
-                System.out.println("---------------- " + productId + " ----------------");
-                System.out.println(product.getTitle());
-                Set<String> skuUrlSet = new HashSet<>();
-
-                List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId);
-                for (PtmCmpSku cmpSku : cmpSkus) {
-                    if (!StringUtils.isEmpty(product.getTitle())) {
-                        System.out.println(cmpSku.getTitle());
-                        float score = ProductAnalysisService.stringMatch(product.getTitle(), cmpSku.getTitle());
-                        if (score < 0.4) {
-                            logger.debug(String.format("[Delete_%d]Score is [%f].", cmpSku.getId(), score));
-                            cmpSkuService.deleteCmpSku(cmpSku.getId());
-                            continue;
-                        }
-                    }
-
-                    boolean exists = skuUrlSet.contains(cmpSku.getUrl());
-
-                    if (exists) {
-                        logger.debug(String.format("[Delete_%d] Exist.", cmpSku.getId()));
-                        cmpSkuService.deleteCmpSku(cmpSku.getId());
-                    } else {
-                        skuUrlSet.add(cmpSku.getUrl());
-                    }
-
-                }
-
-                System.out.println("---------------------end-----------------------");
-            }
-
-            count++;
-            if (count % 100 == 0) {
-                System.out.println(count + "..products processed.");
-//                break;
-            }
-        }
-    }
 
     @Test
     public void testCmpskuSolr() {
