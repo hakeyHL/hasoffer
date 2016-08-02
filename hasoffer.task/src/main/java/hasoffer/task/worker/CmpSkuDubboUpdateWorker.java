@@ -199,7 +199,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                     ptmCmpSkuImage = new PtmCmpSkuImage();
 
                     ptmCmpSkuImage.setId(sku.getId());
-                    ptmCmpSkuImage.setOriImageUrlNumber(imageUrlList.size());
+                    ptmCmpSkuImage.setOriImageUrlNumber(imageUrlList.size() >= 4 ? 4 : imageUrlList.size());//如果数量大于4，就存4张
 
                     for (int i = 0; i < imageUrlList.size(); i++) {
 
