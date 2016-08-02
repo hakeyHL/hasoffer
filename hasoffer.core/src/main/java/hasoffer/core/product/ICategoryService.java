@@ -1,7 +1,6 @@
 package hasoffer.core.product;
 
 import hasoffer.core.persistence.po.ptm.PtmCategory;
-import hasoffer.core.persistence.po.ptm.PtmCategory2;
 
 import java.util.List;
 import java.util.Queue;
@@ -30,7 +29,7 @@ public interface ICategoryService {
 
 	void deleteCategory(long id);
 
-	PtmCategory2 createAppCategory(PtmCategory2 category);
+//	PtmCategory2 createAppCategory(PtmCategory2 category);
 
 	//使用完成记得删除
 	void tempDeleteCategoryForCategoryUpdate(long id);
