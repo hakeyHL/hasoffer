@@ -32,8 +32,6 @@ import hasoffer.fetch.sites.shopclues.ShopcluesHelper;
 import hasoffer.fetch.sites.shopclues.ShopcluesListProcessor;
 import hasoffer.fetch.sites.snapdeal.SnapdealHelper;
 import hasoffer.fetch.sites.snapdeal.SnapdealListProcessor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 public class SaveOrUpdateIndexWorker implements Runnable {
 
     private static final String Q_PTMCMPSKU_SOURCESID = "SELECT t FROM PtmCmpSku2 t WHERE t.sourceSid = ?0 AND t.website = ?1";
-    private static Logger logger = LoggerFactory.getLogger(SaveOrUpdateIndexWorker.class);
+    //    private static Logger logger = LoggerFactory.getLogger(SaveOrUpdateIndexWorker.class);
     private ConcurrentLinkedQueue<StatHijackFetch> queue;
     private IDataBaseManager dbm;
     private IMongoDbManager mdm;
@@ -71,7 +69,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
             if (statHijackFetch == null) {
                 try {
                     TimeUnit.SECONDS.sleep(3);
-                    logger.info("update flipkartSkuTitle worker get null sleep 3 seconds");
+//                    logger.info("update flipkartSkuTitle worker get null sleep 3 seconds");
                 } catch (InterruptedException e) {
                     return;
                 }
@@ -290,7 +288,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
                     skuList.add(sku);
                 }
             }
-            logger.info("flipkart page parse get " + skuList.size() + " sku for [" + cliQ + "]");
+//            logger.info("flipkart page parse get " + skuList.size() + " sku for [" + cliQ + "]");
 
         } else {
 
@@ -327,7 +325,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
 
             skuList.add(sku);
 
-            logger.info("flipkart affiliate get sku success [" + sourceId + "]");
+//            logger.info("flipkart affiliate get sku success [" + sourceId + "]");
         }
 
         return skuList;
@@ -374,10 +372,10 @@ public class SaveOrUpdateIndexWorker implements Runnable {
                         skuList.add(sku);
                     }
                 }
-                logger.info("snapdeal page parse get " + productList.size() + " sku for [" + cliQ + "]");
+//                logger.info("snapdeal page parse get " + productList.size() + " sku for [" + cliQ + "]");
             } catch (Exception e) {
-                logger.info("snapdeal page parse get sku fail for [" + cliQ + "]");
-                logger.info(e.toString());
+//                logger.info("snapdeal page parse get sku fail for [" + cliQ + "]");
+//                logger.info(e.toString());
             }
         } else {
             SnapdealProductProcessor processor = new SnapdealProductProcessor();
@@ -406,9 +404,9 @@ public class SaveOrUpdateIndexWorker implements Runnable {
 
                 skuList.add(sku);
 
-                logger.info("snapdeal affiliate get sku success [" + sourceId + "]");
+//                logger.info("snapdeal affiliate get sku success [" + sourceId + "]");
             } catch (Exception e) {
-                logger.info("snapdeal affiliate create sku fail for [" + sourceId + "]");
+//                logger.info("snapdeal affiliate create sku fail for [" + sourceId + "]");
             }
         }
 
