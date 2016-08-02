@@ -613,7 +613,7 @@ public class Compare2Controller {
             PtmProductDescription ptmProductDescription = mongoDbManager.queryOne(PtmProductDescription.class, product.getId());
             String specs = "";
             if (ptmProductDescription != null) {
-                specs = ptmProductDescription.getJsonParam();
+                specs = ptmProductDescription.getJsonDescription();
             }
             cmpResult.setSpecs(specs);
             cmpResult.setTotalRatingsNum(tempTotalComments / Long.valueOf(tempCount == 0 ? 1 : tempCount));
