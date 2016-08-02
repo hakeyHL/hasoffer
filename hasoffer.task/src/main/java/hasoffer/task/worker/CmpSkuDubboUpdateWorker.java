@@ -56,6 +56,12 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
     @Override
     public void run() {
+
+        int flipkartWaitNumber = 0;
+        int snapdealWaitNumber = 0;
+        int amazonWaitNumber = 0;
+        int shopcluesWaitNumber = 0;
+
         while (true) {
             SrmSearchLog searchLog = queue.poll();
 
@@ -86,6 +92,16 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 }
 
                 //更新商品的信息，写入多图数据，写入描述/参数
+                if (Website.FLIPKART.equals(sku.getWebsite())) {
+                    flipkartWaitNumber++;
+                } else if (Website.SNAPDEAL.equals(sku.getWebsite())) {
+                    snapdealWaitNumber++;
+                } else if (Website.AMAZON.equals(sku.getWebsite())) {
+                    amazonWaitNumber++;
+                } else if (Website.SHOPCLUES.equals(sku.getWebsite())) {
+                    shopcluesWaitNumber++;
+                }
+
                 updatePtmCmpSku(sku, searchLog);
             }
 
@@ -95,6 +111,13 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 continue;
             }
             productService.updatePtmProductPrice(productId);
+
+            if (flipkartWaitNumber % 1000 == 0 || snapdealWaitNumber % 1000 == 0 || shopcluesWaitNumber % 1000 == 0 || amazonWaitNumber % 1000 == 0) {
+                logger.info("flipkartWaitNumber" + flipkartWaitNumber + "");
+                logger.info("snapdealWaitNumber" + snapdealWaitNumber + "");
+                logger.info("shopcluesWaitNumber" + shopcluesWaitNumber + "");
+                logger.info("amazonWaitNumber" + amazonWaitNumber + "");
+            }
         }
     }
 
@@ -129,9 +152,10 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             return;
         } else if (TaskStatus.STOPPED.equals(taskStatus)) {
             logger.info("taskstatus STOPPED for [" + sku.getId() + "]");
+            return;
         } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
             logger.info("taskstatus EXCEPTION for [" + sku.getId() + "]");
-            logger.info("EXCEPTION url:[" + sku.getUrl() + "]");
+//            logger.info("EXCEPTION url:[" + sku.getUrl() + "]");
             return;
         } else {//(TaskStatus.FINISH.equals(taskStatus)))
             logger.info("taskstatus FINISH for [" + sku.getId() + "]");
@@ -175,7 +199,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                     ptmCmpSkuImage = new PtmCmpSkuImage();
 
                     ptmCmpSkuImage.setId(sku.getId());
-                    ptmCmpSkuImage.setOriImageUrlNumber(imageUrlList.size());
+                    ptmCmpSkuImage.setOriImageUrlNumber(imageUrlList.size() >= 4 ? 4 : imageUrlList.size());//如果数量大于4，就存4张
 
                     for (int i = 0; i < imageUrlList.size(); i++) {
 

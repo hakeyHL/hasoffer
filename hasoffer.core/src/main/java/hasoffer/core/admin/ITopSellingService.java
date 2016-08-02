@@ -10,7 +10,7 @@ import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 public interface ITopSellingService {
 
 
-    PageableResult<PtmTopSelling> findTopSellingList(TopSellStatus status, int page, int size);
+    PageableResult<PtmTopSelling> findTopSellingList(Long yesterdayStart, Long todayStart, TopSellStatus status, int page, int size);
 
     PtmTopSelling findTopSellingById(long id);
 
