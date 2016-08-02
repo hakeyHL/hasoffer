@@ -2,13 +2,18 @@ package hasoffer.api.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.PropertyFilter;
 import hasoffer.api.controller.vo.DealVo;
 import hasoffer.api.controller.vo.DeviceInfoVo;
 import hasoffer.api.helper.Httphelper;
+import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.Website;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.product.solr.DealIndexServiceImpl;
 import hasoffer.core.product.solr.DealModel;
+import hasoffer.core.system.IAppService;
+import hasoffer.core.utils.JsonHelper;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
@@ -34,6 +39,8 @@ public class AppDealController {
     @Resource
     IDealService dealService;
     @Resource
+    IAppService appService;
+    @Resource
     DealIndexServiceImpl indexService;
 
     /**
@@ -43,32 +50,79 @@ public class AppDealController {
      */
     @RequestMapping("product")
     public ModelAndView getDealsByProductTitle(@RequestParam(defaultValue = "") String title,
-                                               @RequestParam(defaultValue = "0") int page,
-                                               @RequestParam(defaultValue = "20") int pageSize) {
+                                               @RequestParam(defaultValue = "1") int page,
+                                               @RequestParam(defaultValue = "20") int pageSize,
+                                               HttpServletResponse response) {
         //TODO 从Solr搜索Deal列表
-        ModelAndView modelAndView = new ModelAndView();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("errorCode", "00000");
+        jsonObject.put("msg", "ok");
+        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+        DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         List<DealVo> deals = new ArrayList<DealVo>();
-        modelAndView.addObject("errorCode", "00000");
-        modelAndView.addObject("msg", "ok");
+        PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"exp", "extra", "link", "priceDescription", "image"});
+        //先展示与浏览商品同类的deal
         List<DealModel> dealModels = indexService.simpleSearch(title, page, pageSize);
         if (dealModels != null && dealModels.size() > 0) {
             for (DealModel dealModel : dealModels) {
                 DealVo dealVo = new DealVo();
-                dealVo.setLogoUrl(dealModel.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(dealModel.getWebsite()));
+                dealVo.setLogoUrl(dealModel.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(Website.valueOf(dealModel.getWebsite())));
                 dealVo.setTitle(dealModel.getTitle());
-                dealVo.setWebsite(dealModel.getWebsite());
+                dealVo.setWebsite(Website.valueOf(dealModel.getWebsite()));
                 dealVo.setId(dealModel.getId());
-                dealVo.setDiscount(new Random().nextInt(50) + 50);
-                String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-                DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-                dealVo.setDeepLink(dealModel.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(dealModel.getWebsite(), dealModel.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+                dealVo.setDiscount(dealModel.getDiscount());
+                dealVo.setDeepLink(dealModel.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(Website.valueOf(dealModel.getWebsite()), dealModel.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
                 deals.add(dealVo);
+            }
+            //再展示手机类deal id或parentid 为 5 level小于等于3
+            PageableResult pageableResult = appService.getDeals(page + 0l, pageSize + 0l);
+            if (pageableResult != null && pageableResult.getData() != null && pageableResult.getData().size() > 0) {
+                List<AppDeal> list = pageableResult.getData();
+                List<DealVo> mobileDeals = new ArrayList<DealVo>();
+                Iterator<AppDeal> dealIterator = list.iterator();
+                while (dealIterator.hasNext()) {
+                    AppDeal appDeal = dealIterator.next();
+                    if (appDeal.getDealCategoryId() == 5) {
+                        DealVo dealVo = new DealVo();
+                        dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                        dealVo.setTitle(appDeal.getTitle());
+                        dealVo.setWebsite(appDeal.getWebsite());
+                        dealVo.setId(appDeal.getId());
+                        dealVo.setDiscount(appDeal.getDiscount());
+                        dealVo.setDeepLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+                        mobileDeals.add(dealVo);
+                        dealIterator.remove();
+                    }
+                }
+                deals.addAll(mobileDeals);
+                //其他deal按照点击次数排序
+                Collections.sort(list, new Comparator<AppDeal>() {
+                    @Override
+                    public int compare(AppDeal o1, AppDeal o2) {
+                        if (o1.getDealClickCount() > o2.getDealClickCount()) {
+                            return -1;
+                        } else if (o1.getDealClickCount() < o2.getDealClickCount()) {
+                            return 1;
+                        }
+                        return 0;
+                    }
+                });
+                for (AppDeal appDeal : list) {
+                    DealVo dealVo = new DealVo();
+                    dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                    dealVo.setTitle(appDeal.getTitle());
+                    dealVo.setWebsite(appDeal.getWebsite());
+                    dealVo.setId(appDeal.getId());
+                    dealVo.setDiscount(appDeal.getDiscount());
+                    dealVo.setDeepLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+                    deals.add(dealVo);
+                }
             }
             Map map = new HashMap();
             map.put("deals", deals);
-            modelAndView.addObject("data", dealModels);
+            jsonObject.put("data", JSONObject.toJSON(map));
         } else {
-            modelAndView.addObject("data", "{\n" +
+            jsonObject.put("data", "{\n" +
                     "        \"deals\": [\n" +
                     "            {\n" +
                     "                \"website\": \"FLIPKART\",\n" +
@@ -89,7 +143,8 @@ public class AppDealController {
                     "        ]\n" +
                     "    }");
         }
-        return modelAndView;
+        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
+        return null;
     }
 
     @RequestMapping("info")

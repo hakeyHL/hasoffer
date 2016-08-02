@@ -1,6 +1,5 @@
 package hasoffer.core.product.solr;
 
-import hasoffer.base.model.Website;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.data.solr.IIdentifiable;
 
@@ -9,7 +8,7 @@ import hasoffer.data.solr.IIdentifiable;
  */
 public class DealModel implements IIdentifiable<Long> {
     private Long id;
-    private Website website;//deal来源网站
+    private String website;//deal来源网站
 
     private String title;//deal标题
 
@@ -20,7 +19,7 @@ public class DealModel implements IIdentifiable<Long> {
 
     private long dealClickCount;
 
-    public DealModel(Long id, Website website, String title, Long dealCategoryId, String linkUrl, int discount, long dealClickCount) {
+    public DealModel(Long id, String website, String title, Long dealCategoryId, String linkUrl, int discount, long dealClickCount) {
         this.id = id;
         this.website = website;
         this.title = title;
@@ -31,7 +30,10 @@ public class DealModel implements IIdentifiable<Long> {
     }
 
     public DealModel(AppDeal ad) {
-        this(ad.getId(), ad.getWebsite(), ad.getTitle(), ad.getDealCategoryId(), ad.getLinkUrl(), ad.getDiscount(), ad.getDealClickCount());
+        this(ad.getId(), ad.getWebsite().name(), ad.getTitle(), ad.getDealCategoryId(), ad.getLinkUrl(), ad.getDiscount(), ad.getDealClickCount());
+    }
+
+    public DealModel() {
     }
 
     @Override
@@ -43,11 +45,11 @@ public class DealModel implements IIdentifiable<Long> {
         this.id = id;
     }
 
-    public Website getWebsite() {
+    public String getWebsite() {
         return website;
     }
 
-    public void setWebsite(Website website) {
+    public void setWebsite(String website) {
         this.website = website;
     }
 
