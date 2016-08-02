@@ -132,6 +132,14 @@
             </div>
         </div>
         <div class="form-group">
+            <label class="col-sm-3 control-label">折扣额度：</label>
+
+            <div class="col-sm-6">
+                <input type="text" name="discount" id="discount" value="${deal.discount}"
+                       class="form-control">
+            </div>
+        </div>
+        <div class="form-group">
             <label class="col-sm-3 control-label">生效时间：</label>
 
             <div class="col-sm-6">

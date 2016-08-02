@@ -10,7 +10,6 @@ import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.persistence.po.search.SrmProductSearchStat;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
-import hasoffer.core.persistence.po.search.SrmSearchUpdateLog;
 import hasoffer.fetch.model.ListProduct;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,8 +32,6 @@ public interface ISearchService {
     void relateUnmatchedSearchLog(SrmSearchLog searchLog, Map<Website, ListProduct> listProductMap);
 
     void relateUnmatchedSearchLogx(SrmAutoSearchResult autoSearchResult);
-
-    void saveSrmSearchUpdateLog(SrmSearchUpdateLog srmSearchUpdateLog);
 
     void saveSearchLog(SearchLogBo searchLogBo);
 

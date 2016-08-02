@@ -199,7 +199,6 @@ public class AppController {
             case CLICKDEAL:
                 AppDeal appDeal = appService.getDealDetail(request.getParameter("id"));
                 if (appDeal != null) {
-
                     appService.countDealClickCount(appDeal);
                 }
                 break;
