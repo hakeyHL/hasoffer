@@ -15,15 +15,23 @@ public class DealModel implements IIdentifiable<Long> {
 
     private Long dealCategoryId = -1l;
 
-    public DealModel(Long id, Website website, String title, Long dealCategoryId) {
+    private String linkUrl;
+    private int discount;
+
+    private long dealClickCount;
+
+    public DealModel(Long id, Website website, String title, Long dealCategoryId, String linkUrl, int discount, long dealClickCount) {
         this.id = id;
         this.website = website;
         this.title = title;
         this.dealCategoryId = dealCategoryId;
+        this.linkUrl = linkUrl;
+        this.discount = discount;
+        this.dealClickCount = dealClickCount;
     }
 
     public DealModel(AppDeal ad) {
-        this(ad.getId(), ad.getWebsite(), ad.getTitle(), ad.getDealCategoryId());
+        this(ad.getId(), ad.getWebsite(), ad.getTitle(), ad.getDealCategoryId(), ad.getLinkUrl(), ad.getDiscount(), ad.getDealClickCount());
     }
 
     @Override
@@ -57,5 +65,29 @@ public class DealModel implements IIdentifiable<Long> {
 
     public void setDealCategoryId(Long dealCategoryId) {
         this.dealCategoryId = dealCategoryId;
+    }
+
+    public String getLinkUrl() {
+        return linkUrl;
+    }
+
+    public void setLinkUrl(String linkUrl) {
+        this.linkUrl = linkUrl;
+    }
+
+    public int getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(int discount) {
+        this.discount = discount;
+    }
+
+    public long getDealClickCount() {
+        return dealClickCount;
+    }
+
+    public void setDealClickCount(long dealClickCount) {
+        this.dealClickCount = dealClickCount;
     }
 }

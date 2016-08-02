@@ -15,14 +15,12 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
-import hasoffer.core.persistence.enums.SrmSearchLogUpdate;
 import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.search.SrmProductSearchStat;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
-import hasoffer.core.persistence.po.search.SrmSearchUpdateLog;
 import hasoffer.core.persistence.po.sys.SysAdmin;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
@@ -519,7 +517,6 @@ public class SearchController {
         String newPtmProductId = request.getParameter("productId");
         long ptmProductId = Long.parseLong(newPtmProductId);
         SysAdmin admin = (SysAdmin) Context.currentContext().get(StaticContext.USER);
-        SrmSearchUpdateLog srmSearchUpdateLog = new SrmSearchUpdateLog();
 
         //如果有srmSearchLogId，更新srmSearchLog
         String willUpdateSrmSearchLogId = request.getParameter("srmSearchLogId");
@@ -532,13 +529,6 @@ public class SearchController {
             //如果新值和旧的值一样，认为只是添加比价列表，不进行添加更新log的日志记录
             if (oldValue != ptmProductId) {
                 searchService.setPtmProductId(willUpdateSrmSearchLogId, ptmProductId);
-
-                srmSearchUpdateLog.setNewValue(ptmProductId + "");
-                srmSearchUpdateLog.setOldValue(oldValue + "");
-                srmSearchUpdateLog.setOperatorId(admin.getId());
-                srmSearchUpdateLog.setTargetId(willUpdateSrmSearchLogId);
-                srmSearchUpdateLog.setSrmUpdate(SrmSearchLogUpdate.UPDATELOG);
-                searchService.saveSrmSearchUpdateLog(srmSearchUpdateLog);
             }
         }
 
@@ -569,14 +559,6 @@ public class SearchController {
                     }
 
                 }
-
-                //添加cmpSku的日志
-                srmSearchUpdateLog.setSrmUpdate(SrmSearchLogUpdate.NEWCMPSKU);
-                srmSearchUpdateLog.setTargetId(ptmProductId + "");
-                srmSearchUpdateLog.setOperatorId(admin.getId());
-                srmSearchUpdateLog.setOldValue("0");
-                srmSearchUpdateLog.setNewValue(stringBuilder.toString());
-                searchService.saveSrmSearchUpdateLog(srmSearchUpdateLog);
             }
         }
 

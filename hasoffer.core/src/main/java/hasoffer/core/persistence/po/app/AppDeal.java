@@ -49,10 +49,14 @@ public class AppDeal implements Identifiable<Long> {
     private String infoPageImage;//deal详情页图片
 
     @Column
-    private Long dealClickCount = 0l;
+    private Long dealClickCount = 0l;//deal的点击次数
 
     @Column
-    private Long dealCategoryId = -1l;
+    private Long dealCategoryId = -1l;//deal的目录id
+
+    @Column
+    private int discount = 50;//deal的折扣额度
+
 
     @Override
     public Long getId() {
@@ -78,6 +82,14 @@ public class AppDeal implements Identifiable<Long> {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public int getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(int discount) {
+        this.discount = discount;
     }
 
     public Date getExpireTime() {
@@ -176,7 +188,6 @@ public class AppDeal implements Identifiable<Long> {
         this.dealCategoryId = dealCategoryId;
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -186,6 +197,7 @@ public class AppDeal implements Identifiable<Long> {
 
         if (push != appDeal.push) return false;
         if (display != appDeal.display) return false;
+        if (discount != appDeal.discount) return false;
         if (id != null ? !id.equals(appDeal.id) : appDeal.id != null) return false;
         if (website != appDeal.website) return false;
         if (title != null ? !title.equals(appDeal.title) : appDeal.title != null) return false;
@@ -202,10 +214,8 @@ public class AppDeal implements Identifiable<Long> {
             return false;
         if (dealClickCount != null ? !dealClickCount.equals(appDeal.dealClickCount) : appDeal.dealClickCount != null)
             return false;
-        if (dealCategoryId != null ? !dealCategoryId.equals(appDeal.dealCategoryId) : appDeal.dealCategoryId != null)
-            return false;
+        return !(dealCategoryId != null ? !dealCategoryId.equals(appDeal.dealCategoryId) : appDeal.dealCategoryId != null);
 
-        return true;
     }
 
     @Override
@@ -225,6 +235,7 @@ public class AppDeal implements Identifiable<Long> {
         result = 31 * result + (infoPageImage != null ? infoPageImage.hashCode() : 0);
         result = 31 * result + (dealClickCount != null ? dealClickCount.hashCode() : 0);
         result = 31 * result + (dealCategoryId != null ? dealCategoryId.hashCode() : 0);
+        result = 31 * result + discount;
         return result;
     }
 }

@@ -19,6 +19,8 @@ public class DealVo {
     private String logoUrl;
     private Website website;
     private String priceDescription;
+    private String deepLink;
+    private int discount;
 
     public String getPriceDescription() {
         return priceDescription;
@@ -90,5 +92,21 @@ public class DealVo {
 
     public void setLink(String link) {
         this.link = link;
+    }
+
+    public int getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(int discount) {
+        this.discount = discount;
+    }
+
+    public String getDeepLink() {
+        return deepLink;
+    }
+
+    public void setDeepLink(String deepLink) {
+        this.deepLink = deepLink;
     }
 }
