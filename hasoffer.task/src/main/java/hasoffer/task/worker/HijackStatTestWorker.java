@@ -84,7 +84,6 @@ public class HijackStatTestWorker implements Runnable {
             }
 
             mdm.save(statHijackFetch);
-            System.out.println("save statHijackFetch success :" + log.getId());
         }
     }
 }
