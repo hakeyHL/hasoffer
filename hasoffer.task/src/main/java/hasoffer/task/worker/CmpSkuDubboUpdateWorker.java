@@ -131,7 +131,8 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             logger.info("taskstatus STOPPED for [" + sku.getId() + "]");
         } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
             logger.info("taskstatus EXCEPTION for [" + sku.getId() + "]");
-            logger.debug("EXCEPTION url:[" + sku.getUrl() + "]");
+            logger.info("EXCEPTION url:[" + sku.getUrl() + "]");
+            return;
         } else {//(TaskStatus.FINISH.equals(taskStatus)))
             logger.info("taskstatus FINISH for [" + sku.getId() + "]");
             fetchedProduct = fetchedResult.getFetchProduct();
