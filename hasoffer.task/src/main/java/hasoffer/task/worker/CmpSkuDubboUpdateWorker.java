@@ -131,6 +131,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             logger.info("taskstatus STOPPED for [" + sku.getId() + "]");
         } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
             logger.info("taskstatus EXCEPTION for [" + sku.getId() + "]");
+            logger.debug("EXCEPTION url:[" + sku.getUrl() + "]");
         } else {//(TaskStatus.FINISH.equals(taskStatus)))
             logger.info("taskstatus FINISH for [" + sku.getId() + "]");
             fetchedProduct = fetchedResult.getFetchProduct();
@@ -154,9 +155,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 fetchedProduct.setDeliveryTime("1-5");
             }
             cmpSkuService.updateCmpSkuBySpiderFetchedProduct(sku.getId(), fetchedProduct);
-            logger.info("fetch success for [" + sku.getId() + "]");
         } catch (Exception e) {
-            logger.info(e.toString());
             if (fetchedProduct != null) {
                 logger.info("title:" + fetchedProduct.getTitle());
             }
