@@ -24,7 +24,7 @@ import java.util.*;
 public class SnapdealProductProcessor implements IAffiliateProcessor<SnapDealAffiliateOrder> {
 
     private static final String TRACKINGID = "82856";
-    private static final String TOEKN = "cc3aa2059100114e957e7d97cbe0df";
+    private static final String TOEKN = "09bf4a55fafe2ccc3c077e2ea48642";
     private static final String AFFILIATE_BASE_URL = "http://affiliate-feeds.snapdeal.com/feed/" + TRACKINGID + ".json";
     private static final String AFFILIATE_PRODUCTDETAIL_URL = "http://affiliate-feeds.snapdeal.com/feed/product?id=";
 
@@ -136,7 +136,7 @@ public class SnapdealProductProcessor implements IAffiliateProcessor<SnapDealAff
         if (headerMap == null) {
             headerMap = new HashMap<String, String>();
         }
-        headerMap.put("Snapdeal-Token-Id", getAffiliateToken());
+        headerMap.put("Snapdeal-Token-Id", TOEKN);
         headerMap.put("Snapdeal-Affiliate-Id", TRACKINGID);
 
         HttpResponseModel responseModel = HttpUtils.get(urlString, headerMap, parameterMap);
