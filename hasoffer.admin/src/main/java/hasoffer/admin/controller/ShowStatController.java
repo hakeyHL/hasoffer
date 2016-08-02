@@ -15,10 +15,7 @@ import hasoffer.core.admin.IOrderStatsAnalysisService;
 import hasoffer.core.persistence.mongo.StatDayAlive;
 import hasoffer.core.persistence.mongo.StatDevice;
 import hasoffer.core.persistence.mongo.StatHijackFetchCount;
-import hasoffer.core.persistence.po.log.SkuUpdateLog;
-import hasoffer.core.product.ICmpSkuUpdateStatService;
 import hasoffer.core.user.IDeviceService;
-import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.helper.PageHelper;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -53,9 +50,6 @@ public class ShowStatController {
 
     @Resource
     IOrderStatsAnalysisService orderStatsAnalysisService;
-
-    @Resource
-    ICmpSkuUpdateStatService cmpSkuUpdateStatService;
 
     @Resource
     IHijackFetchService hijackFetchService;
@@ -435,50 +429,6 @@ public class ShowStatController {
         }
 
         return idList;
-    }
-
-    @RequestMapping(value = "/skuvisitupdate", method = RequestMethod.GET)
-    public ModelAndView skuVisitUpdate(@RequestParam(defaultValue = "") String webSite,
-                                       @RequestParam(defaultValue = "") String startTime,
-                                       @RequestParam(defaultValue = "") String endTime) {
-
-        ModelAndView modelAndView = new ModelAndView("showstat/skuVisitUpdate");
-
-        if (StringUtils.isEmpty(startTime)) {
-            startTime = TimeUtils.parse(TimeUtils.today(), "yyyy-MM-dd");
-        }
-        if (StringUtils.isEmpty(endTime)) {
-            endTime = TimeUtils.parse(TimeUtils.today(), "yyyy-MM-dd");
-        }
-
-        Date startDate = TimeUtils.stringToDate(startTime, "yyyy-MM-dd");
-        Date endDate = TimeUtils.stringToDate(endTime, "yyyy-MM-dd");
-
-        List<String> idList = new ArrayList<String>();
-
-        if (StringUtils.isEmpty(webSite)) {
-            for (Website website : WebsiteHelper.DEFAULT_WEBSITES) {
-                idList.addAll(getIdByDate(startDate, endDate, website.name()));
-            }
-        } else {
-            idList.addAll(getIdByDate(startDate, endDate, webSite.toUpperCase()));
-        }
-
-
-        List<SkuUpdateLog> logList = new ArrayList<SkuUpdateLog>();
-
-        for (String id : idList) {
-
-            SkuUpdateLog skuUpdateLog = cmpSkuUpdateStatService.findSkuUpdateLog(id);
-            logList.add(skuUpdateLog);
-        }
-
-        modelAndView.addObject("logList", logList);
-        modelAndView.addObject("webSite", webSite);
-        modelAndView.addObject("startTime", startTime);
-        modelAndView.addObject("endTime", endTime);
-
-        return modelAndView;
     }
 
 }
