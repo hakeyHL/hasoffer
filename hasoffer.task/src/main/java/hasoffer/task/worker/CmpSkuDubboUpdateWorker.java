@@ -223,6 +223,9 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             ptmCmpSkuDescription.setJsonParam(jsonParam);
             ptmCmpSkuDescription.setJsonDescription(description);
 
+            if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
+                return;
+            }
             mdm.save(ptmCmpSkuDescription);
             System.out.println("create ptmCmpSkuDescription success for ptmCmpSkuId = [" + sku.getId() + "]");
         } catch (Exception e) {
