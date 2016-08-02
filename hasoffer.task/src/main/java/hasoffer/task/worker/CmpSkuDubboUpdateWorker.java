@@ -159,31 +159,41 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
         //创建多图
         try {
-            List<PtmCmpSkuImage> ptmCmpSkuImageList = dbm.query("SELECT t FROM PtmCmpSkuImage t WHERE t.ptmcmpskuId = ?0 ", Arrays.asList(sku.getId()));
-            if (ptmCmpSkuImageList == null || ptmCmpSkuImageList.size() == 0) {
+            PtmCmpSkuImage ptmCmpSkuImage = dbm.querySingle("SELECT t FROM PtmCmpSkuImage t WHERE t.id = ?0 ", Arrays.asList(sku.getId()));
+
+            if (ptmCmpSkuImage == null) {
 
                 List<String> imageUrlList = fetchedProduct.getImageUrlList();
 
-                PtmCmpSkuImage ptmCmpSkuImage = new PtmCmpSkuImage();
+                if (imageUrlList != null || imageUrlList.size() != 0) {
 
-                ptmCmpSkuImage.setId(sku.getId());
+                    ptmCmpSkuImage = new PtmCmpSkuImage();
 
-                for (int i = 0; i < imageUrlList.size(); i++) {
+                    ptmCmpSkuImage.setId(sku.getId());
+                    ptmCmpSkuImage.setOriImageUrlNumber(imageUrlList.size());
 
-                    if (i == 0) {
-                        ptmCmpSkuImage.setOriImageUrl1(imageUrlList.get(i));
-                    } else if (i == 1) {
-                        ptmCmpSkuImage.setOriImageUrl2(imageUrlList.get(i));
-                    } else if (i == 2) {
-                        ptmCmpSkuImage.setOriImageUrl3(imageUrlList.get(i));
-                    } else if (i == 3) {
-                        ptmCmpSkuImage.setOriImageUrl4(imageUrlList.get(i));
-                    } else {
-                        continue;
+                    for (int i = 0; i < imageUrlList.size(); i++) {
+
+                        if (i == 0) {
+                            ptmCmpSkuImage.setOriImageUrl1(imageUrlList.get(i));
+                        } else if (i == 1) {
+                            ptmCmpSkuImage.setOriImageUrl2(imageUrlList.get(i));
+                        } else if (i == 2) {
+                            ptmCmpSkuImage.setOriImageUrl3(imageUrlList.get(i));
+                        } else if (i == 3) {
+                            ptmCmpSkuImage.setOriImageUrl4(imageUrlList.get(i));
+                        } else {
+                            continue;
+                        }
                     }
+
+                    ptmCmpSkuImageService.createPtmCmpSkuImage(ptmCmpSkuImage);
+                    System.out.println("create ptmCmpSkuImage success for ptmCmpSkuId = [" + sku.getId() + "]");
                 }
-                ptmCmpSkuImageService.createPtmCmpSkuImage(ptmCmpSkuImage);
-                System.out.println("create ptmCmpSkuImage success for ptmCmpSkuId = [" + sku.getId() + "]");
+            } else {
+
+                System.out.println("get null or 0 imageurl for ptmCmpSkuId = [" + sku.getId() + "]");
+
             }
         } catch (Exception e) {
             System.out.println("create ptmCmpSkuImage fail for ptmCmpSkuId = [" + sku.getId() + "]");
