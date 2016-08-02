@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 public class FetchDubboServiceImpl implements IFetchDubboService {
     private Logger logger = LoggerFactory.getLogger(FetchDubboServiceImpl.class);
@@ -40,6 +41,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
         if (fetchUrlResult == null) {
             fetchUrlResult = new FetchUrlResult(webSite, url);
             fetchUrlResult.setTaskStatus(TaskStatus.START);
+            fetchUrlResult.setDate(new Date());
             addFetchUrlTask(fetchUrlResult);
         }
 
