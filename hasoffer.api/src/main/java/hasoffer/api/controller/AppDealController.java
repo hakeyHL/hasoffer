@@ -61,7 +61,7 @@ public class AppDealController {
                 dealVo.setDiscount(new Random().nextInt(50) + 50);
                 String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
                 DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-                //dealVo.setDeepLink(dealModel.get() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+                dealVo.setDeepLink(dealModel.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(dealModel.getWebsite(), dealModel.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
                 deals.add(dealVo);
             }
             Map map = new HashMap();
