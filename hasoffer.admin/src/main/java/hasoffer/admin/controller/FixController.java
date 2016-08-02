@@ -6,6 +6,7 @@ import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.*;
+import hasoffer.core.analysis.ProductAnalysisService;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.HijackLog;
@@ -31,6 +32,7 @@ import hasoffer.core.user.IDeviceService;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import hasoffer.fetch.sites.paytm.PaytmHelper;
 import hasoffer.fetch.sites.shopclues.ShopcluesHelper;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -90,6 +94,68 @@ public class FixController {
     ICacheService cacheServiceImpl;
 
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
+
+    @RequestMapping(value = "/fixmultiskus", method = RequestMethod.GET)
+    @ResponseBody
+    public String fixmultiskus(@RequestParam String filename) {
+        File file = new File("/home/hasoffer/tmp/" + filename);
+        List<String> lines;
+        try {
+            lines = FileUtils.readLines(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "error";
+        }
+        int count = 0;
+        for (String line : lines) {
+
+            String[] vals = line.split("\t");
+            long skuCount = Long.valueOf(vals[0].trim());
+            long productId = Long.valueOf(vals[1].trim());
+
+            System.out.println(productId + "\t" + skuCount);
+
+            PtmProduct product = productService.getProduct(productId);
+            if (product != null) {
+                System.out.println("---------------- " + productId + " ----------------");
+                System.out.println(product.getTitle());
+                Set<String> skuUrlSet = new HashSet<>();
+
+                List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId);
+                for (PtmCmpSku cmpSku : cmpSkus) {
+                    if (!StringUtils.isEmpty(product.getTitle())) {
+                        System.out.println(cmpSku.getTitle());
+                        float score = ProductAnalysisService.stringMatch(product.getTitle(), cmpSku.getTitle());
+                        if (score < 0.4) {
+                            logger.debug(String.format("[Delete_%d]Score is [%f].", cmpSku.getId(), score));
+                            cmpSkuService.deleteCmpSku(cmpSku.getId());
+                            continue;
+                        }
+                    }
+
+                    boolean exists = skuUrlSet.contains(cmpSku.getUrl());
+
+                    if (exists) {
+                        logger.debug(String.format("[Delete_%d] Exist.", cmpSku.getId()));
+                        cmpSkuService.deleteCmpSku(cmpSku.getId());
+                    } else {
+                        skuUrlSet.add(cmpSku.getUrl());
+                    }
+
+                }
+
+                System.out.println("---------------------end-----------------------");
+            }
+
+            count++;
+            if (count % 100 == 0) {
+                System.out.println(count + "..products processed.");
+//                break;
+            }
+        }
+
+        return "ok";
+    }
 
     //fixdata/updateptmproduct/{id}
     @RequestMapping(value = "/updateptmproduct/{id}", method = RequestMethod.GET)
