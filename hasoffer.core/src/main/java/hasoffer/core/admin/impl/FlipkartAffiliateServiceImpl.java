@@ -17,6 +17,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Transactional
@@ -27,21 +28,33 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
     @Resource
     private IDeviceService deviceService;
 
-//    @Resource
-//    private IMongoDbManager mongoDbManager;
-
-
     @Override
     public List<OrderStatsAnalysisPO> countOrderList(Date startTime, Date endTime) {
         List<OrderStatsAnalysisPO> orderPOList = new ArrayList<OrderStatsAnalysisPO>();
 //        Date before24H = new Date(startTime.getTime() - 1000 * 60 * 60 * 24);
 
-        Map<String, String> parameterMap = new HashMap<String, String>();
-        parameterMap.put(FlipkartAffiliateProductProcessor.R_START_DATE, DateFormatUtils.format(startTime, "yyyy-MM-dd"));
-        parameterMap.put(FlipkartAffiliateProductProcessor.R_END_DATE, DateFormatUtils.format(endTime, "yyyy-MM-dd"));
-        parameterMap.put(FlipkartAffiliateProductProcessor.R_ORDER_STATUS, FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE);
-        parameterMap.put(FlipkartAffiliateProductProcessor.R_OFFSET, "0");
-        List<AffiliateOrder> orderList = flipProcessor.getAffiliateOrderList(parameterMap);
+        Map<String, String> tentativeParamMap = new HashMap<String, String>();
+        tentativeParamMap.put(FlipkartAffiliateProductProcessor.R_START_DATE, DateFormatUtils.format(startTime, "yyyy-MM-dd"));
+        tentativeParamMap.put(FlipkartAffiliateProductProcessor.R_END_DATE, DateFormatUtils.format(endTime, "yyyy-MM-dd"));
+        tentativeParamMap.put(FlipkartAffiliateProductProcessor.R_ORDER_STATUS, FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE);
+        tentativeParamMap.put(FlipkartAffiliateProductProcessor.R_OFFSET, "0");
+        List<AffiliateOrder> tentativeOrderList = flipProcessor.getAffiliateOrderList(tentativeParamMap);
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Map<String, String> approvedParamMap = new HashMap<String, String>();
+        approvedParamMap.put(FlipkartAffiliateProductProcessor.R_START_DATE, DateFormatUtils.format(startTime, "yyyy-MM-dd"));
+        approvedParamMap.put(FlipkartAffiliateProductProcessor.R_END_DATE, DateFormatUtils.format(endTime, "yyyy-MM-dd"));
+        approvedParamMap.put(FlipkartAffiliateProductProcessor.R_ORDER_STATUS, FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED);
+        approvedParamMap.put(FlipkartAffiliateProductProcessor.R_OFFSET, "0");
+        List<AffiliateOrder> approvedOrderList = flipProcessor.getAffiliateOrderList(approvedParamMap);
+
+        List<AffiliateOrder> orderList = new ArrayList<>();
+        orderList.addAll(tentativeOrderList);
+        orderList.addAll(approvedOrderList);
+
         Set<String> deviceSet = new HashSet<String>();
         for (AffiliateOrder order : orderList) {
             String affExtParam2 = order.getAffExtParam2();
@@ -95,8 +108,9 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
             if (deviceId != null) {
                 device = deviceRegTime.get(deviceId);
             }
-            if (device != null && !"".equals(deviceId)) {
+            if (device != null) {
                 po.setDeviceRegTime(device.getCreateTime());
+                po.setVersion(device.getAppVersion());
             }
             po.setUserType("NONE");
             if (device != null && device.getCreateTime().compareTo(startTime) > 0) {
