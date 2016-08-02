@@ -8,7 +8,6 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku2;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
-import hasoffer.core.persistence.po.stat.StatPtmCmpSkuUpdate;
 import hasoffer.core.persistence.po.stat.StatSkuPriceUpdateResult;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.spider.model.FetchedProduct;
@@ -75,10 +74,6 @@ public interface ICmpSkuService {
     void updateCmpSku(PtmCmpSkuUpdater updater);
 
     PtmCmpSkuIndex2 getCmpSkuIndex2(Website cliSite, String sourceId, String keyword);
-
-    StatPtmCmpSkuUpdate createStatPtmCmpSkuUpdate(StatPtmCmpSkuUpdate statPtmCmpSkuUpdate);
-
-    void updateStatPtmCmpSkuUpdate(String id, long onSaleAmount, long soldOutAmount, long offsaleAmount, long allAmount, long updateSuccessAmount, long alwaysFailAmount, long newSkuAmount, long indexAmount, long newIndexAmount);
 
     int getSkuSoldStoreNum(Long id);
 

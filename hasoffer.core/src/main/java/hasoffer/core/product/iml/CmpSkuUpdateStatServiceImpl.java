@@ -5,7 +5,6 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.log.SkuUpdateLog;
 import hasoffer.core.persistence.po.log.updater.SkuUpdateLogUpdater;
-import hasoffer.core.persistence.po.stat.StatPtmCmpSkuUpdate;
 import hasoffer.core.product.ICmpSkuUpdateStatService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +19,6 @@ public class CmpSkuUpdateStatServiceImpl implements ICmpSkuUpdateStatService {
 
     @Resource
     IDataBaseManager dbm;
-
-    @Override
-    public StatPtmCmpSkuUpdate findStatPtmCmpSkuUpdateById(String id) {
-        return dbm.get(StatPtmCmpSkuUpdate.class, id);
-    }
 
     @Override
     public SkuUpdateLog findSkuUpdateLog(String id) {

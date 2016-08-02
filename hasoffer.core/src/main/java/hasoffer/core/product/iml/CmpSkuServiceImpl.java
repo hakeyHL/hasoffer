@@ -18,9 +18,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku2;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
-import hasoffer.core.persistence.po.stat.StatPtmCmpSkuUpdate;
 import hasoffer.core.persistence.po.stat.StatSkuPriceUpdateResult;
-import hasoffer.core.persistence.po.stat.updater.StatPtmCmpSkuUpdateUpdater;
 import hasoffer.core.persistence.po.stat.updater.StatSkuPriceUpdateResultUpdater;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IFetchService;
@@ -121,35 +119,6 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         }
 
         return finalIndex;
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public StatPtmCmpSkuUpdate createStatPtmCmpSkuUpdate(StatPtmCmpSkuUpdate statPtmCmpSkuUpdate) {
-        String id = dbm.create(statPtmCmpSkuUpdate);
-        statPtmCmpSkuUpdate.setId(id);
-        return statPtmCmpSkuUpdate;
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateStatPtmCmpSkuUpdate(String id, long onSaleAmount, long soldOutAmount, long offsaleAmount, long allAmount, long updateSuccessAmount, long alwaysFailAmount, long newSkuAmount, long indexAmount, long newIndexAmount) {
-
-        StatPtmCmpSkuUpdateUpdater updater = new StatPtmCmpSkuUpdateUpdater(id);
-
-        updater.getPo().setUpdateTime(TimeUtils.nowDate());
-        updater.getPo().setOnSaleAmount(onSaleAmount);
-        updater.getPo().setSoldOutAmount(soldOutAmount);
-        updater.getPo().setOffsaleAmount(offsaleAmount);
-        updater.getPo().setAllAmount(allAmount);
-        updater.getPo().setUpdateSuccessAmount(updateSuccessAmount);
-        updater.getPo().setAlwaysFailAmount(alwaysFailAmount);
-        updater.getPo().setNewSkuAmount(newSkuAmount);
-        updater.getPo().setIndexAmount(indexAmount);
-        updater.getPo().setNewIndexAmount(newIndexAmount);
-
-        dbm.update(updater);
-
     }
 
     @Override
