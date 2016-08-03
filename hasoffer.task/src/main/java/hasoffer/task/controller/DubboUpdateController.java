@@ -9,6 +9,7 @@ import hasoffer.core.product.IPtmCmpSkuImageService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.task.worker.CmpSkuDubboUpdateWorker;
 import hasoffer.task.worker.SrmSearchLogListWorker;
+import hasoffer.task.worker.TopSellingListWorker;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class DubboUpdateController {
 
     private static AtomicBoolean taskRunning1 = new AtomicBoolean(false);
+    private static AtomicBoolean taskRunning2 = new AtomicBoolean(false);
 
     @Resource
     @Qualifier("fetchDubboService")
@@ -64,6 +66,30 @@ public class DubboUpdateController {
         }
 
         taskRunning1.set(true);
+
+        return "ok";
+    }
+
+    //dubbofetchtask/updateTopSellingSpec
+    @RequestMapping(value = "/updateTopSellingSpec", method = RequestMethod.GET)
+    @ResponseBody
+    public String updateTopSellingSpec() {
+
+        if (taskRunning2.get()) {
+            return "task running.";
+        }
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        ConcurrentLinkedQueue<SrmSearchLog> queue = new ConcurrentLinkedQueue<SrmSearchLog>();
+
+        es.execute(new TopSellingListWorker(dbm, queue));
+
+        for (int i = 0; i < 10; i++) {
+            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, cmpSkuService, fetchDubboService, productService, mdm, ptmCmpSkuImageService));
+        }
+
+        taskRunning2.set(true);
 
         return "ok";
     }
