@@ -62,44 +62,44 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
 //            try {
 
-                SrmSearchLog searchLog = queue.poll();
+            SrmSearchLog searchLog = queue.poll();
 
-                if (searchLog == null) {
-                    try {
-                        TimeUnit.SECONDS.sleep(3);
-                        logger.info("task update get null sleep 3 seconds");
-                    } catch (InterruptedException e) {
-                        return;
+            if (searchLog == null) {
+                try {
+                    TimeUnit.SECONDS.sleep(3);
+                    logger.info("task update get null sleep 3 seconds");
+                } catch (InterruptedException e) {
+                    return;
+                }
+                continue;
+            }
+
+            long productId = searchLog.getPtmProductId();
+            if (productId == 0) {
+                continue;
+            }
+
+            List<PtmCmpSku> skuList = dbm.query(Q_PTMCMPSKU_BYPRODUCTID, Arrays.asList(productId));
+
+            for (PtmCmpSku sku : skuList) {
+                //判断，如果该sku 当天更新过价格, 直接跳过
+                Date updateTime = sku.getUpdateTime();
+                if (updateTime != null) {
+                    if (updateTime.compareTo(TimeUtils.toDate(TimeUtils.today())) > 0) {
+                        continue;
                     }
-                    continue;
                 }
 
-                long productId = searchLog.getPtmProductId();
-                if (productId == 0) {
-                    continue;
-                }
+                //更新商品的信息，写入多图数据，写入描述/参数
+                updatePtmCmpSku(sku, searchLog);
+            }
 
-                List<PtmCmpSku> skuList = dbm.query(Q_PTMCMPSKU_BYPRODUCTID, Arrays.asList(productId));
+            //更新商品的价格，同时修改updateTime字段
+            if (skuList == null || skuList.size() == 0) {
+                continue;
+            }
 
-                for (PtmCmpSku sku : skuList) {
-                    //判断，如果该sku 当天更新过价格, 直接跳过
-                    Date updateTime = sku.getUpdateTime();
-                    if (updateTime != null) {
-                        if (updateTime.compareTo(TimeUtils.toDate(TimeUtils.today())) > 0) {
-                            continue;
-                        }
-                    }
-
-                    //更新商品的信息，写入多图数据，写入描述/参数
-                    updatePtmCmpSku(sku, searchLog);
-                }
-
-                //更新商品的价格，同时修改updateTime字段
-                if (skuList == null || skuList.size() == 0) {
-                    continue;
-                }
-
-                productService.updatePtmProductPrice(productId);
+            productService.updatePtmProductPrice(productId);
 
 //            } catch (Exception e) {
 //
@@ -135,11 +135,11 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
         //如果返回结果状态为running，那么将sku返回队列
         if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
-            try {
-                TimeUnit.SECONDS.sleep(5);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                TimeUnit.SECONDS.sleep();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
             queue.add(searchLog);
             logger.info("taskstatus RUNNING for [" + sku.getId() + "]");
             return;
@@ -236,6 +236,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
         //save productDescription
         PtmProductDescription ptmProductDescription = mdm.queryOne(PtmProductDescription.class, sku.getProductId());
+
         if (ptmProductDescription == null) {
 
             System.out.println("ptmProductDescription is null");
@@ -245,7 +246,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
             ptmProductDescription = new PtmProductDescription();
 
-            ptmProductDescription.setId(sku.getId());
+            ptmProductDescription.setId(sku.getProductId());
             //最开始需求没说明白描述和参数问题，字段写错了，修改通知前台
             ptmProductDescription.setJsonDescription(jsonParam);
             ptmProductDescription.setJsonParam(description);
