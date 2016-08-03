@@ -174,6 +174,8 @@ public class AppController {
     public ModelAndView callback(HttpServletRequest request,
                                  @RequestParam CallbackAction action) {
         ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("errorCode", "00000");
+        modelAndView.addObject("msg", "ok");
         switch (action) {
             case FLOWCTRLSUCCESS:
                 // 流量拦截成功
@@ -192,8 +194,6 @@ public class AppController {
                 Map map = new HashMap();
                 Random random = new Random();
                 map.put("info", new StringBuilder().append(FLIDS[random.nextInt(FLIDS.length)] + ",").append(SNIDS[random.nextInt(SNIDS.length)] + ",").append(SHIDS[random.nextInt(SHIDS.length)]));
-                modelAndView.addObject("errorCode", "00000");
-                modelAndView.addObject("msg", "ok");
                 modelAndView.addObject("data", map);
                 break;
             case CLICKDEAL:
