@@ -126,13 +126,12 @@ public class ProductController {
     @RequestMapping(value = "/cmp/{id}", method = RequestMethod.GET)
     public ModelAndView listCompares(@PathVariable long id) throws ProductNotFoundException {
         ModelAndView mav = new ModelAndView("product/cmp");
-
+        mav.addObject("pId", id);
         PtmProduct product = dbm.get(PtmProduct.class, id);
 
         if (product == null) {
             throw new ProductNotFoundException(id + "");
         }
-
         PageableResult<PtmCmpSku> pagedCmpSkus = productService.listPagedCmpSkus(id, 1, Integer.MAX_VALUE);
         List<PtmCmpSku> cmpSkus = pagedCmpSkus.getData();
 
@@ -401,5 +400,10 @@ public class ProductController {
         return product;
     }
 
-
+    @RequestMapping(value = "/batchDelete", method = RequestMethod.GET)
+    @ResponseBody
+    public boolean batchDelete(@RequestParam(value = "ids[]") Long[] ids) {
+        cmpSkuService.batchDeleteCmpSku(ids);
+        return true;
+    }
 }

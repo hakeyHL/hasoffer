@@ -5,7 +5,9 @@
 
 <jsp:include page="../include/header.jsp"/>
 <jsp:include page="../include/left.jsp"/>
-
+<%
+    String contextPath = request.getContextPath();
+%>
 <style>
     .p_detail_image {
         width: 60px;
@@ -27,7 +29,26 @@
         max-height: 60px;
     }
 </style>
-
+<!-- 批量删除确认 -->
+<div class="modal fade" id="batchDeleteModel">
+    <div class="modal-dialog">
+        <div class="modal-content message_align">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+                <h4 class="modal-title">提示信息</h4>
+            </div>
+            <div class="modal-body">
+                <p>您确认要删除选中记录吗？</p>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" id="batchUrl"/>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <a onclick="batchUrlSubmit()" class="btn btn-success" data-dismiss="modal">确定</a>
+            </div>
+        </div>
+    </div>
+</div>
 <div id="page-wrapper">
     <div class="row">
         <div class="col-lg-12">
@@ -62,6 +83,24 @@
 
                             <p>评论(reviews): ${product.rating} </p>
 
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <button type="button" class="btn btn-primary"
+                                            onclick="batchDelete('<%=contextPath%>/p/batchDelete')"
+                                            data-toggle="modal" data-target="#confirm-delete">批量删除
+                                    </button>
+                                </div>
+                                <div class="col-lg-12">
+
+                                </div>
+                                <div class="col-lg-12">
+                                    <p>
+                                        <button id="changeStatus" class="btn btn-info" onclick="change(${pId})">切换状态
+                                        </button>
+                                    </p>
+                                </div>
+
+                            </div>
                             <div class="col-lg-12">
                                 <c:forEach items="${imageUrls}" var="imageUrl">
                                     <div class="p_detail_image_div">
@@ -79,9 +118,10 @@
                         </div>
 
                         <!-- Table -->
-                        <table class="table table-condensed table-bordered">
+                        <table class="table table-bordered table-hover table-condensed" style="font-size:12px;">
                             <thead>
                             <tr>
+                                <td><input type="checkbox" id="checkAll"/>全选</td>
                                 <td>序号</td>
                                 <td>网站</td>
                                 <td>图片</td>
@@ -89,12 +129,13 @@
                                 <td>价格(Rs.)</td>
                                 <td>状态</td>
                                 <td>更新时间</td>
-                                <td></td>
+                                <td>执行操作</td>
                             </tr>
                             </thead>
                             <tbody>
                             <c:forEach items="${cmpSkus}" var="cmpSku">
                                 <tr>
+                                    <td><input type="checkbox" name="subBox" value="${cmpSku.id}"/></td>
                                     <td>${cmpSku.id}</td>
                                     <td>${cmpSku.website}</td>
                                     <td>
@@ -109,14 +150,14 @@
                                     <td>${cmpSku.status}</td>
                                     <td>${cmpSku.updateTime}</td>
                                     <td>
-                                        <a href="javascript:void(0);"
+                                        <a class="active" href="javascript:void(0);"
                                            onclick="compareCtrl.preModify(${cmpSku.id}, '${cmpSku.url}', ${cmpSku.price}, '${cmpSku.size}', '${cmpSku.color}')">
                                             编辑</a>
-                                        <a href="javascript:void(0);"
-                                           onclick="compareCtrl.delete(${cmpSku.id})">删除</a>
-                                        <a href="javascript:void(0)"
-                                           onclick="compareCtrl.update(${cmpSku.id})">更新</a>
                                     </td>
+                                    <td><a href="javascript:void(0);"
+                                           onclick="compareCtrl.delete(${cmpSku.id})">删除</a></td>
+                                    <td><a href="javascript:void(0)"
+                                           onclick="compareCtrl.update(${cmpSku.id})">更新</a></td>
                                 </tr>
                             </c:forEach>
                             </tbody>
@@ -223,7 +264,7 @@
             }
         },
         update: function (id) {
-            http.doPost("/p/cmp/update/" + id,null, function (data) {
+            http.doPost("/p/cmp/update/" + id, null, function (data) {
                 var status = data.status;
                 if (status == 'success') {
                     alert("更新成功");
@@ -273,6 +314,72 @@
             series: ${priceMap}
         });
     });
+</script>
+
+<script>
+
+    //状态切换
+    function change(topSellingId) {
+
+        url = "/topselling/changeStatus/" + topSellingId;
+        http.doGet(url);
+
+        window.location.href = "/topselling/list?topSellingStatusString=ONLINE&tmp=" + Math.random() * 10000000000000000;
+    }
+    function batchDelete(batchUrl) {
+
+        var arr = new Array();
+        $("input[name='subBox']:checked").each(function () {
+            arr.push($(this).val());
+        });
+
+        if (arr.length == 0) {
+            BootstrapDialog.show({
+                title: '提示',
+                message: '请选择要删除的记录!'
+            });
+
+            return false;
+        }
+
+        $('#batchUrl').val(batchUrl);//给会话中的隐藏属性URL赋值
+        $('#batchDeleteModel').modal();
+    }
+    //全选/全不选
+    $("#checkAll").click(function () {
+        $("input[name='subBox']:checkbox").prop("checked", this.checked);
+    });
+
+    var $subBox = $("input[name='subBox']");
+    $subBox.click(function () {
+        $("#checkAll").prop("checked", $subBox.length == $("input[name='subBox']:checked").length ? true : false);
+    });
+
+    function batchUrlSubmit() {
+        var url = $.trim($("#batchUrl").val());//获取会话中的隐藏属性URL
+
+        var arr = new Array();
+        $("input[name='subBox']:checked").each(function () {
+            arr.push($(this).val());
+        });
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: {"ids": arr},
+            dataType: "json",
+            contentType: 'application/json;charset=utf-8', //设置请求头信息
+            success: function (result) {
+                if (result) {
+                    $("#delete_success").css("display", "block").hide(3000);
+                    window.location.reload();
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                $("#delete_fail").css("display", "block").hide(3000);
+            }
+        });
+    }
 </script>
 
 <jsp:include page="../include/footer.jsp"/>
