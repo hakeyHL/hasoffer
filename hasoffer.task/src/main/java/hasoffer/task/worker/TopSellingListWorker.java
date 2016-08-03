@@ -1,11 +1,11 @@
 package hasoffer.task.worker;
 
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -27,11 +27,20 @@ public class TopSellingListWorker implements Runnable {
     @Override
     public void run() {
 
-        List<PtmTopSelling> topSellingList = dbm.query("SELECT t FROM PtmTopSelling t ORDER BY t.count DESC,t.lUpdateTime DESC");
+//        List<PtmTopSelling> topSellingList = dbm.query("SELECT t FROM PtmTopSelling t ORDER BY t.count DESC,t.lUpdateTime DESC");
 
-        for (PtmTopSelling topSelling : topSellingList) {
+//        for (PtmTopSelling topSelling : topSellingList) {
+        List<Long> idList = new ArrayList<>();
 
-            Long productid = topSelling.getId();
+        idList.add(1742371L);
+        idList.add(1866396L);
+        idList.add(3198L);
+        idList.add(1897310L);
+        idList.add(1762335L);
+
+        for (Long productid : idList) {
+
+//             productid = topSelling.getId();
 
             SrmSearchLog log = new SrmSearchLog();
             log.setPtmProductId(productid);
