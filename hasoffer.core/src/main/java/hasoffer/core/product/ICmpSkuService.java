@@ -84,4 +84,6 @@ public interface ICmpSkuService {
     void importCmpSku2solr(PtmCmpSku ptmCmpSku);
 
     void importCmpSku2solrByProductId(Long proId);
+
+    void batchDeleteCmpSku(Long[] ids);
 }
