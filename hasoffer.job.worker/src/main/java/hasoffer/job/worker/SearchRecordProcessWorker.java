@@ -18,10 +18,6 @@ import hasoffer.fetch.model.WebFetchResult;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchedProduct;
 import hasoffer.spring.context.SpringContextHolder;
-import hasoffer.taskschedule.api.listener.CallbackListener;
-import hasoffer.taskschedule.api.vo.TaskSchedule;
-import hasoffer.taskschedule.respservice.impl.TaskScheduleReqClient;
-import helper.IndiaWebsiteHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,14 +41,14 @@ public class SearchRecordProcessWorker implements Runnable {
     private IFetchDubboService fetchService;
     private ISearchService searchService;
 
-    private TaskScheduleReqClient scheduleReqClient;
+    //private TaskScheduleReqClient scheduleReqClient;
 
     public SearchRecordProcessWorker(SearchProductService searchProductService, IFetchDubboService flipkartFetchService, LinkedBlockingQueue<SrmAutoSearchResult> searchLogQueue) {
         this.searchProductService = searchProductService;
         this.searchLogQueue = searchLogQueue;
         this.fetchService = flipkartFetchService;
         this.searchService = SpringContextHolder.getBean(SearchServiceImpl.class);
-        this.scheduleReqClient = (TaskScheduleReqClient) SpringContextHolder.getBean("taskScheduleReqClient");
+        //this.scheduleReqClient = (TaskScheduleReqClient) SpringContextHolder.getBean("taskScheduleReqClient");
     }
 
     @Override
@@ -97,19 +93,19 @@ public class SearchRecordProcessWorker implements Runnable {
 
         String keyWord = autoSearchResult.getTitle();
 
-        TaskSchedule taskSchedule = new TaskSchedule();
-        taskSchedule.setWebsite(Website.AMAZON);
-        taskSchedule.setUrlType(TaskSchedule.UrlType.LIST);
-        taskSchedule.setRegion(HasofferRegion.INDIA);
-        taskSchedule.setUrl(IndiaWebsiteHelper.getSearchUrl(Website.AMAZON, keyWord));
-        scheduleReqClient.pushTaskScheduleInfo(taskSchedule, new CallbackListener() {
-            @Override
-            public void recycleResult(TaskSchedule result) {
-                System.out.println("result:" + result.toString());
-                System.out.println("update mongodb!!!");
-
-            }
-        });
+        //TaskSchedule taskSchedule = new TaskSchedule();
+        //taskSchedule.setWebsite(Website.AMAZON);
+        //taskSchedule.setUrlType(TaskSchedule.UrlType.LIST);
+        //taskSchedule.setRegion(HasofferRegion.INDIA);
+        //taskSchedule.setUrl(IndiaWebsiteHelper.getSearchUrl(Website.AMAZON, keyWord));
+        //scheduleReqClient.pushTaskScheduleInfo(taskSchedule, new CallbackListener() {
+        //    @Override
+        //    public void recycleResult(TaskSchedule result) {
+        //        System.out.println("result:" + result.toString());
+        //        System.out.println("update mongodb!!!");
+        //
+        //    }
+        //});
     }
 
     /**
