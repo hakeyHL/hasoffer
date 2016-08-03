@@ -27,7 +27,7 @@ public class TopSellingListWorker implements Runnable {
     @Override
     public void run() {
 
-        List<PtmTopSelling> topSellingList = dbm.query("SELECT t FROM PtmTopSelling t ORDER BY t.id ");
+        List<PtmTopSelling> topSellingList = dbm.query("SELECT t FROM PtmTopSelling t ORDER BY t.count DESC,t.lUpdateTime DESC");
 
         for (PtmTopSelling topSelling : topSellingList) {
 

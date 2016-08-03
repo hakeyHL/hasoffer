@@ -58,6 +58,8 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
     @Override
     public void run() {
 
+        int number = 0;
+
         while (true) {
 
             try {
@@ -91,7 +93,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                     }
 
                     //更新商品的信息，写入多图数据，写入描述/参数
-                    updatePtmCmpSku(sku, searchLog);
+                    updatePtmCmpSku(sku, searchLog, number);
                 }
 
                 //更新商品的价格，同时修改updateTime字段
@@ -107,7 +109,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         }
     }
 
-    private void updatePtmCmpSku(PtmCmpSku sku, SrmSearchLog searchLog) {
+    private void updatePtmCmpSku(PtmCmpSku sku, SrmSearchLog searchLog, int number) {
         // try update sku
         String url = sku.getUrl();
         Website website = WebsiteHelper.getWebSite(url);
@@ -120,6 +122,8 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         FetchUrlResult fetchedResult = null;
 
         try {
+            logger.info("send success for _" + sku.getUrl());
+            logger.info("number :" + number++);
             fetchedResult = fetchService.getProductsByUrl(website, url);
         } catch (HttpFetchException e) {
             logger.info("HttpFetchException for [" + sku.getId() + "]");
