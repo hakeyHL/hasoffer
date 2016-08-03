@@ -20,6 +20,7 @@ import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Date : 2016/2/18
@@ -128,4 +129,11 @@ public class RedisTest {
         });
     }
 
+    @Test
+    public void save() {
+
+        Set sets = cacheService.keys("PRODUCT__listPagedCmpSkus_3198*");
+
+        System.out.println(sets);
+    }
 }
