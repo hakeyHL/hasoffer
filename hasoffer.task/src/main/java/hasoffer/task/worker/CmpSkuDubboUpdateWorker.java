@@ -60,7 +60,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
         while (true) {
 
-            try {
+//            try {
 
                 SrmSearchLog searchLog = queue.poll();
 
@@ -101,9 +101,11 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
                 productService.updatePtmProductPrice(productId);
 
-            } catch (Exception e) {
-
-            }
+//            } catch (Exception e) {
+//
+//
+//
+//            }
         }
     }
 
@@ -236,6 +238,8 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         PtmProductDescription ptmProductDescription = mdm.queryOne(PtmProductDescription.class, sku.getProductId());
         if (ptmProductDescription == null) {
 
+            System.out.println("ptmProductDescription is null");
+
             String jsonParam = fetchedProduct.getJsonParam();
             String description = fetchedProduct.getDescription();
 
@@ -249,10 +253,15 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
                 return;
             }
+
+            System.out.println("before create ptmProductDescription success for ptmproductId = [" + sku.getProductId() + "]");
             mdm.save(ptmProductDescription);
             System.out.println("create ptmProductDescription success for ptmproductId = [" + sku.getProductId() + "]");
 
         }
+
+        System.out.println("ptmProductDescription is not null");
+
 
     }
 }
