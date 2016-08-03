@@ -65,7 +65,6 @@ public class AppDealController {
         List<DealModel> dealModels = indexService.simpleSearch(title, page, pageSize);
         if (dealModels != null && dealModels.size() > 0) {
             for (DealModel dealModel : dealModels) {
-                //TODO 需要Deal的过期时间以便判断是否过期以及是否显示Display判断是否返回前台
                 if (dealModel.getExpireTime().compareTo(new Date()) != 1 && dealModel.isDisplay()) {
                     DealVo dealVo = new DealVo();
                     dealVo.setLogoUrl(dealModel.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(Website.valueOf(dealModel.getWebsite())));
