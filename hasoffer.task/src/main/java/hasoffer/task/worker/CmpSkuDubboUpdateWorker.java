@@ -136,7 +136,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         //如果返回结果状态为running，那么将sku返回队列
         if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
             try {
-                TimeUnit.SECONDS.sleep(15);
+                TimeUnit.SECONDS.sleep(5);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
