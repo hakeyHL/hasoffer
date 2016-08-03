@@ -12,7 +12,7 @@ public class PtmProductDescription {
     @Id
     private long id;
 
-    private String jsonParam;//参数
+//    private String jsonParam;//参数
 
     private String jsonDescription;
 
@@ -32,13 +32,14 @@ public class PtmProductDescription {
         this.id = id;
     }
 
-    public String getJsonParam() {
-        return jsonParam;
-    }
+//    public String getJsonParam() {
+//        return jsonParam;
+//    }
+//
+//    public void setJsonParam(String jsonParam) {
+//        this.jsonParam = jsonParam;
+//    }
 
-    public void setJsonParam(String jsonParam) {
-        this.jsonParam = jsonParam;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -48,7 +49,6 @@ public class PtmProductDescription {
         PtmProductDescription that = (PtmProductDescription) o;
 
         if (id != that.id) return false;
-        if (jsonParam != null ? !jsonParam.equals(that.jsonParam) : that.jsonParam != null) return false;
         return !(jsonDescription != null ? !jsonDescription.equals(that.jsonDescription) : that.jsonDescription != null);
 
     }
@@ -56,7 +56,6 @@ public class PtmProductDescription {
     @Override
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (jsonParam != null ? jsonParam.hashCode() : 0);
         result = 31 * result + (jsonDescription != null ? jsonDescription.hashCode() : 0);
         return result;
     }
