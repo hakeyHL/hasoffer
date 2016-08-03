@@ -215,13 +215,9 @@ public class MongoTest {
     @Test
     public void testQuery() {
 
-        Query query = new Query();
+        PtmCmpSkuDescription ptmCmpSkuDescription = mdm.queryOne(PtmCmpSkuDescription.class, 5555L);
 
-        PageableResult<PtmCmpSkuDescription> pageableResult = mdm.queryPage(PtmCmpSkuDescription.class, query, 1, 5);
-
-        List<PtmCmpSkuDescription> data = pageableResult.getData();
-
-        System.out.println(data);
+        System.out.println();
 
     }
 }
