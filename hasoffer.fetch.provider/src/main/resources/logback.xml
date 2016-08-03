@@ -27,11 +27,11 @@
         </encoder>
     </appender>
 
-    <appender name="SqlLoggerFileOut"
+    <appender name="FetchTaskLoggerFileOut"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.base}/sql-access.log</file>
+        <file>${log.base}/fetch-task.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/sql-access.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <FileNamePattern>${log.base}/fetch-task.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <MaxHistory>5</MaxHistory>
@@ -44,11 +44,11 @@
         </encoder>
     </appender>
 
-    <appender name="SpringExceptionLoggerFileOut"
+    <appender name="FetchTaskResultLoggerFileOut"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.base}/spring-exception.log</file>
+        <file>${log.base}/fetch-task-result.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/spring-exception.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <FileNamePattern>${log.base}/fetch-task-result.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <MaxHistory>5</MaxHistory>
@@ -59,12 +59,8 @@
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>%date [%thread][IP:%X{ip}|USER:%X{user}][%-8level%logger{80}] %msg%n</pattern>
         </encoder>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>ERROR</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
     </appender>
+
 
     <appender name="ErrorLoggerFileOut"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -87,7 +83,6 @@
             <onMismatch>DENY</onMismatch>
         </filter>
     </appender>
-
 
 
     <appender name="InfoLoggerFileOut"
@@ -177,6 +172,14 @@
 
     <logger name="us.codecraft" level="DEBUG">
         <appender-ref ref="fetchLoggerFileOut"/>
+    </logger>
+
+    <logger name="hasoffer.dubbo.api.fetch.service.impl.FetchDubboServiceImpl" level="DEBUG">
+        <appender-ref ref="FetchTaskLoggerFileOut"/>
+    </logger>
+
+    <logger name="hasoffer.dubbo.api.fetch.service.impl.FetchDubboServiceImpl" level="DEBUG">
+        <appender-ref ref="FetchTaskResultLoggerFileOut"/>
     </logger>
 
     <root>
