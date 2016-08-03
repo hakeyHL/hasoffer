@@ -77,12 +77,7 @@ public class LingHelper {
             String type = chunk.type();
             double score = chunk.score();
             String phrase = text.substring(start, end);
-//            System.out.println(text +
-//                    "  phrase=|" + phrase + "|"
-//                    + " start=" + start
-//                    + " end=" + end
-//                    + " type=" + type
-//                    + " score=" + score);
+
             List<TagMatchResult> tags = tagMap.get(type);
 
             if (tags == null) {

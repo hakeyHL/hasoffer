@@ -396,6 +396,15 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         }
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void batchDeleteCmpSku(Long[] ids) {
+        for (Long id : ids) {
+            dbm.delete(PtmCmpSku.class, id);
+            cmpskuIndexService.remove(String.valueOf(id));
+        }
+    }
+
     public void importCmpSku2solr(PtmCmpSku ptmCmpSku) {
         logger.debug(String.format("import or update to solr-sku {%d}", ptmCmpSku.getId()));
         cmpskuIndexService.createOrUpdate(new CmpSkuModel(ptmCmpSku));
