@@ -38,7 +38,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     public FetchUrlResult getProductsByUrl(Website webSite, String url) throws HttpFetchException, ContentParseException {
 
         FetchUrlResult fetchUrlResult = getFetchUrlResult(webSite, url);
-        logger.info("FetchDubboServiceImpl.getProductsByUrl(webSite,url):{}, {}", webSite, url);
+        logger.info("FetchDubboServiceImpl.getProductsByUrl(webSite,url):{}, {} . Now is {} ", webSite, url, fetchUrlResult);
         if (fetchUrlResult == null) {
             fetchUrlResult = new FetchUrlResult(webSite, url);
             fetchUrlResult.setTaskStatus(TaskStatus.START);
