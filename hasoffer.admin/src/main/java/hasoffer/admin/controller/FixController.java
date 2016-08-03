@@ -178,8 +178,12 @@ public class FixController {
         //清除product缓存
         cacheServiceImpl.del("PRODUCT_" + id);
         //清除sku缓存        PRODUCT__listPagedCmpSkus_3198_1_10
-        cacheServiceImpl.del("PRODUCT__listPagedCmpSkus_" + id + "_*");
+        Set<String> keys = cacheServiceImpl.keys("PRODUCT__listPagedCmpSkus_" + id + "_*");
 
+        for (String key : keys) {
+            cacheServiceImpl.del(key);
+        }
+        
         return "ok";
     }
 

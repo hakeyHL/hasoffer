@@ -44,7 +44,7 @@ public class CheckStatusController {
         for (Long productid : productIdList) {
 
             long needUpdateNumber = dbm.querySingle("SELECT count(*) FROM PtmCmpSku t WHERE t.productId = ?0 ", Arrays.asList(productid));
-            long updateSuccessNumber = dbm.querySingle("SELECT count(*) FROM PtmCmpSku t WHERE t.productId = ?0 AND t.updateTime > ?1", Arrays.asList(productid, TimeUtils.toDate(TimeUtils.today())));
+            long updateSuccessNumber = dbm.querySingle("SELECT count(*) FROM PtmCmpSku t WHERE t.productId = ?0 AND t.updateTime > ?1", Arrays.asList(productid, TimeUtils.add(TimeUtils.toDate(TimeUtils.today()), -1)));
 
             updateSuccess += updateSuccessNumber;
             needUpdate += needUpdateNumber;
