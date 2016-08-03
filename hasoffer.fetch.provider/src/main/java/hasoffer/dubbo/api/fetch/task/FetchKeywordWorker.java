@@ -30,7 +30,7 @@ public class FetchKeywordWorker implements Runnable {
     @Override
     public void run() {
         while (true) {
-            Object pop = fetchCacheService.popKeyword(StringConstant.WAIT_KEY_LIST);
+            Object pop = fetchCacheService.popTaskList(StringConstant.WAIT_KEY_LIST);
             if (pop == null) {
                 try {
                     TimeUnit.MINUTES.sleep(1);

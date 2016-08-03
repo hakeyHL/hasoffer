@@ -10,6 +10,7 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
+import hasoffer.core.persistence.mongo.PtmProductDescription;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
@@ -57,6 +58,8 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
     @Override
     public void run() {
 
+        int number = 0;
+
         while (true) {
 
             try {
@@ -90,7 +93,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                     }
 
                     //更新商品的信息，写入多图数据，写入描述/参数
-                    updatePtmCmpSku(sku, searchLog);
+                    updatePtmCmpSku(sku, searchLog, number);
                 }
 
                 //更新商品的价格，同时修改updateTime字段
@@ -106,7 +109,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         }
     }
 
-    private void updatePtmCmpSku(PtmCmpSku sku, SrmSearchLog searchLog) {
+    private void updatePtmCmpSku(PtmCmpSku sku, SrmSearchLog searchLog, int number) {
         // try update sku
         String url = sku.getUrl();
         Website website = WebsiteHelper.getWebSite(url);
@@ -119,6 +122,8 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         FetchUrlResult fetchedResult = null;
 
         try {
+            logger.info("send success for _" + sku.getUrl());
+            logger.info("number :" + number++);
             fetchedResult = fetchService.getProductsByUrl(website, url);
         } catch (HttpFetchException e) {
             logger.info("HttpFetchException for [" + sku.getId() + "]");
@@ -216,22 +221,50 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
         //添加描述
         try {
-            String jsonParam = fetchedProduct.getJsonParam();
-            String description = fetchedProduct.getDescription();
 
-            PtmCmpSkuDescription ptmCmpSkuDescription = new PtmCmpSkuDescription();
+            PtmCmpSkuDescription ptmCmpSkuDescription = mdm.queryOne(PtmCmpSkuDescription.class, sku.getId());
 
-            ptmCmpSkuDescription.setId(sku.getId());
-            ptmCmpSkuDescription.setJsonParam(jsonParam);
-            ptmCmpSkuDescription.setJsonDescription(description);
+            if (ptmCmpSkuDescription == null) {
+                String jsonParam = fetchedProduct.getJsonParam();
+                String description = fetchedProduct.getDescription();
 
-            if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
-                return;
+                ptmCmpSkuDescription = new PtmCmpSkuDescription();
+
+                ptmCmpSkuDescription.setId(sku.getId());
+                ptmCmpSkuDescription.setJsonParam(jsonParam);
+                ptmCmpSkuDescription.setJsonDescription(description);
+
+                if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
+                    return;
+                }
+                mdm.save(ptmCmpSkuDescription);
+                System.out.println("create ptmCmpSkuDescription success for ptmCmpSkuId = [" + sku.getId() + "]");
             }
-            mdm.save(ptmCmpSkuDescription);
-            System.out.println("create ptmCmpSkuDescription success for ptmCmpSkuId = [" + sku.getId() + "]");
+
+            //save productDescription
+            PtmProductDescription ptmProductDescription = mdm.queryOne(PtmProductDescription.class, sku.getProductId());
+            if (ptmProductDescription == null) {
+
+                String jsonParam = fetchedProduct.getJsonParam();
+                String description = fetchedProduct.getDescription();
+
+                ptmCmpSkuDescription = new PtmCmpSkuDescription();
+
+                ptmCmpSkuDescription.setId(sku.getId());
+                //最开始需求没说明白描述和参数问题，字段写错了，修改通知前台
+                ptmCmpSkuDescription.setJsonDescription(jsonParam);
+                ptmCmpSkuDescription.setJsonParam(description);
+
+                if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
+                    return;
+                }
+                mdm.save(ptmProductDescription);
+                System.out.println("create ptmProductDescription success for ptmproductId = [" + sku.getProductId() + "]");
+
+            }
+
         } catch (Exception e) {
-            System.out.println("create ptmCmpSkuDescription fail for ptmCmpSkuId = [" + sku.getId() + "]");
+            System.out.println("create description fail for ptmCmpSkuId = [" + sku.getId() + "]");
         }
 
     }

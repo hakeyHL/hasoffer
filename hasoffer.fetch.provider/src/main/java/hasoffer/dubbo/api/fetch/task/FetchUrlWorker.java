@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class FetchUrlWorker implements Runnable {
@@ -31,13 +30,15 @@ public class FetchUrlWorker implements Runnable {
     public void run() {
         while (true) {
             try {
-                logger.info("FetchUrlWorker is alive at {}", new Date());
-                Object pop = fetchCacheService.popKeyword(StringConstant.WAIT_URL_LIST);
+                Object pop = fetchCacheService.popTaskList(StringConstant.WAIT_URL_LIST);
                 if (pop == null) {
                     TimeUnit.MINUTES.sleep(1);
                 } else {
                     FetchUrlResult fetchUrlResult = JSONUtil.toObject(pop.toString(), FetchUrlResult.class);
                     fetch(fetchUrlResult);
+                    if (fetchUrlResult.overFetch()) {
+                        logger.info("FetchUrlWorker crawl finish: {} ", fetchUrlResult);
+                    }
                     fetchCacheService.cacheResult(FetchUrlResult.getCacheKey(fetchUrlResult), fetchUrlResult);
                 }
             } catch (Exception e) {
