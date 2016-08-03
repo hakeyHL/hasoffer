@@ -38,17 +38,21 @@ public class CheckStatusController {
         //大概14秒,100kb左右的数据量
         List<Long> productIdList = dbm.query("SELECT distinct t.ptmProductId FROM SrmSearchLog t WHERE t.updateTime > ?0", Arrays.asList(TimeUtils.toDate(TimeUtils.today())));
 
-        long notUpdateNumber = 0;
+        long updateSuccess = 0;
+        long needUpdate = 0;
 
         for (Long productid : productIdList) {
 
-            long numberFound = dbm.querySingle("SELECT count(*) FROM PtmCmpSku t WHERE t.productId = ?0 AND t.updateTime > ?1", Arrays.asList(productid, TimeUtils.toDate(TimeUtils.today())));
+            long needUpdateNumber = dbm.querySingle("SELECT count(*) FROM PtmCmpSku t WHERE t.productId = ?0 ", Arrays.asList(productid));
+            long updateSuccessNumber = dbm.querySingle("SELECT count(*) FROM PtmCmpSku t WHERE t.productId = ?0 AND t.updateTime > ?1", Arrays.asList(productid, TimeUtils.toDate(TimeUtils.today())));
 
-            notUpdateNumber += numberFound;
+            updateSuccess += updateSuccessNumber;
+            needUpdate += needUpdateNumber;
 
         }
 
-        System.out.println("notUpdateNumber = " + notUpdateNumber);
+        System.out.println("needUpdate = " + needUpdate);
+        System.out.println("updateSuccess = " + updateSuccess);
 
         taskRunning1.set(true);
 
