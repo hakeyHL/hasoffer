@@ -27,11 +27,11 @@ public class TopSellingListWorker implements Runnable {
     @Override
     public void run() {
 
-        List<PtmTopSelling> topSellingList = dbm.query("SELECT t FROM PtmTopSelling t ORDER BY t.count DESC,t.lUpdateTime DESC limit 30");
+        List<PtmTopSelling> topSellingList = dbm.query("SELECT t FROM PtmTopSelling t ORDER BY t.count DESC,t.lUpdateTime DESC");
 
-        for (PtmTopSelling topSelling : topSellingList) {
+        for (int i = 0; i < 20; i++) {
 
-            Long productid = topSelling.getId();
+            Long productid = topSellingList.get(i).getId();
 
             SrmSearchLog log = new SrmSearchLog();
             log.setPtmProductId(productid);
