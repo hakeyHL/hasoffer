@@ -164,8 +164,10 @@ public class FixController {
 
         //更新商品价格
         productService.updatePtmProductPrice(id);
-        //清除缓存
+        //清除product缓存
         cacheServiceImpl.del("PRODUCT_" + id);
+        //清除sku缓存        PRODUCT__listPagedCmpSkus_3198_1_10
+        cacheServiceImpl.del("PRODUCT__listPagedCmpSkus_" + id + "_*");
 
         return "ok";
     }
