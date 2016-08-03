@@ -10,6 +10,7 @@ import hasoffer.api.helper.SearchHelper;
 import hasoffer.base.model.AppDisplayMode;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
+import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.StringUtils;
@@ -49,10 +50,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created on 2015/12/21.
@@ -630,12 +628,17 @@ public class Compare2Controller {
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listCmpSkus(sio.getHsProId(), sio.getPage(), sio.getSize());
         if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
             List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
+            //统计site
+            Set<Website> websiteSet = new HashSet<Website>();
             if (ArrayUtils.hasObjs(cmpSkus)) {
                 // 获取vo list
                 for (PtmCmpSku cmpSku : cmpSkus) {
                     if (cmpSku.getWebsite() == null
                             || cmpSku.getPrice() <= 0) { // 临时过滤掉不能更新价格的商品
                         continue;
+                    }
+                    if (cmpSku.getWebsite() != null) {
+                        websiteSet.add(cmpSku.getWebsite());
                     }
                     CmpProductListVo cplv = new CmpProductListVo(cmpSku, sio.getCliPrice());
                     comparedSkuVos.add(cplv);
@@ -660,6 +663,26 @@ public class Compare2Controller {
                 logger.debug("Found skus size is 0 .");
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
             }
+            List<CmpProductListVo> tempCmpProductListVos = new ArrayList<CmpProductListVo>();
+            //每个site只保留一个且为最低价
+            long startTime = System.nanoTime();   //获取开始时间
+            for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
+                if (websiteSet.size() <= 0) {
+                    break;
+                }
+                if (websiteSet.contains(cmpProductListVo.getWebsite())) {
+                    websiteSet.remove(cmpProductListVo.getWebsite());
+                    //去除列表中除此之外的其他此site的数据
+                    tempCmpProductListVos.add(cmpProductListVo);
+                }
+            }
+            //移除之前加进列表的所有的sku列表
+            comparedSkuVos = null;
+            comparedSkuVos = new ArrayList<>();
+            //将新的加入的放入到列表中
+            comparedSkuVos.addAll(tempCmpProductListVos);
+            long endTime = System.nanoTime(); //获取结束时间
+            System.out.println("total time is " + (endTime - startTime) / 1000000 + "");
         }
         cmpResult.setPriceList(comparedSkuVos);
         cmpResult.setCopywriting("Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you.");
