@@ -29,9 +29,9 @@ public class TopSellingListWorker implements Runnable {
 
         List<PtmTopSelling> topSellingList = dbm.query("SELECT t FROM PtmTopSelling t ORDER BY t.count DESC,t.lUpdateTime DESC");
 
-        for (int i = 0; i < 20; i++) {
+        for (PtmTopSelling topSelling : topSellingList) {
 
-            Long productid = topSellingList.get(i).getId();
+            Long productid = topSelling.getId();
 
             SrmSearchLog log = new SrmSearchLog();
             log.setPtmProductId(productid);

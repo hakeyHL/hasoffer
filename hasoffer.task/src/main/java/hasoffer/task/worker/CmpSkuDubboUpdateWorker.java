@@ -256,6 +256,8 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             }
 
         } catch (Exception e) {
+
+            logger.info(e.getMessage());
             System.out.println("create description fail for ptmCmpSkuId = [" + sku.getId() + "]");
         }
 
