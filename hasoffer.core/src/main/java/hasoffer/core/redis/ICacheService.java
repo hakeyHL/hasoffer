@@ -1,6 +1,7 @@
 package hasoffer.core.redis;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Date : 2016/5/3
@@ -29,4 +30,6 @@ public interface ICacheService<T> {
     boolean exists(String key);
 
     Map<String, String> mapGetAll(final String mName);
+
+    Set<String> keys(final String pattern);
 }

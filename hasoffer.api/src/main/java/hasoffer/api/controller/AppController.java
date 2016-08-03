@@ -174,6 +174,8 @@ public class AppController {
     public ModelAndView callback(HttpServletRequest request,
                                  @RequestParam CallbackAction action) {
         ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("errorCode", "00000");
+        modelAndView.addObject("msg", "ok");
         switch (action) {
             case FLOWCTRLSUCCESS:
                 // 流量拦截成功
@@ -192,14 +194,11 @@ public class AppController {
                 Map map = new HashMap();
                 Random random = new Random();
                 map.put("info", new StringBuilder().append(FLIDS[random.nextInt(FLIDS.length)] + ",").append(SNIDS[random.nextInt(SNIDS.length)] + ",").append(SHIDS[random.nextInt(SHIDS.length)]));
-                modelAndView.addObject("errorCode", "00000");
-                modelAndView.addObject("msg", "ok");
                 modelAndView.addObject("data", map);
                 break;
             case CLICKDEAL:
                 AppDeal appDeal = appService.getDealDetail(request.getParameter("id"));
                 if (appDeal != null) {
-
                     appService.countDealClickCount(appDeal);
                 }
                 break;
@@ -291,7 +290,7 @@ public class AppController {
                     //返利比率=tentativeAmount*rate/SaleAmount
                     orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
                     transcations.add(orderVo);
-                    if (orderStatsAnalysisPO.getOrderStatus() != "cancelled") {
+                    if (orderStatsAnalysisPO.getOrderStatus() != "cancelled" && orderStatsAnalysisPO.getOrderStatus() != "disapproved") {
                         PendingCoins = PendingCoins.add(tempPrice);
                     }
                     if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {

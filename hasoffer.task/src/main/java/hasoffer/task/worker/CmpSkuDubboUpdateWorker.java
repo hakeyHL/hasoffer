@@ -56,45 +56,53 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
     @Override
     public void run() {
+
         while (true) {
-            SrmSearchLog searchLog = queue.poll();
 
-            if (searchLog == null) {
-                try {
-                    TimeUnit.SECONDS.sleep(3);
-                    logger.info("task update get null sleep 3 seconds");
-                } catch (InterruptedException e) {
-                    return;
-                }
-                continue;
-            }
+            try {
 
-            long productId = searchLog.getPtmProductId();
-            if (productId == 0) {
-                continue;
-            }
+                SrmSearchLog searchLog = queue.poll();
 
-            List<PtmCmpSku> skuList = dbm.query(Q_PTMCMPSKU_BYPRODUCTID, Arrays.asList(productId));
-
-            for (PtmCmpSku sku : skuList) {
-                //判断，如果该sku 当天更新过价格, 直接跳过
-                Date updateTime = sku.getUpdateTime();
-                if (updateTime != null) {
-                    if (updateTime.compareTo(TimeUtils.toDate(TimeUtils.today())) > 0) {
-                        continue;
+                if (searchLog == null) {
+                    try {
+                        TimeUnit.SECONDS.sleep(3);
+                        logger.info("task update get null sleep 3 seconds");
+                    } catch (InterruptedException e) {
+                        return;
                     }
+                    continue;
                 }
 
-                //更新商品的信息，写入多图数据，写入描述/参数
-                updatePtmCmpSku(sku, searchLog);
-            }
+                long productId = searchLog.getPtmProductId();
+                if (productId == 0) {
+                    continue;
+                }
 
-            //更新商品的价格，同时修改updateTime字段
-//            暂时注释掉，测试完再打开
-            if (skuList == null || skuList.size() == 0) {
-                continue;
+                List<PtmCmpSku> skuList = dbm.query(Q_PTMCMPSKU_BYPRODUCTID, Arrays.asList(productId));
+
+                for (PtmCmpSku sku : skuList) {
+                    //判断，如果该sku 当天更新过价格, 直接跳过
+                    Date updateTime = sku.getUpdateTime();
+                    if (updateTime != null) {
+                        if (updateTime.compareTo(TimeUtils.toDate(TimeUtils.today())) > 0) {
+                            continue;
+                        }
+                    }
+
+                    //更新商品的信息，写入多图数据，写入描述/参数
+                    updatePtmCmpSku(sku, searchLog);
+                }
+
+                //更新商品的价格，同时修改updateTime字段
+                if (skuList == null || skuList.size() == 0) {
+                    continue;
+                }
+
+                productService.updatePtmProductPrice(productId);
+
+            } catch (Exception e) {
+
             }
-            productService.updatePtmProductPrice(productId);
         }
     }
 
@@ -125,13 +133,15 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         //如果返回结果状态为running，那么将sku返回队列
         if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
             queue.add(searchLog);
-            logger.info("taskstatus RUNNING for [" + sku.getId() + "]");
+//            logger.info("taskstatus RUNNING for [" + sku.getId() + "]");
             return;
         } else if (TaskStatus.STOPPED.equals(taskStatus)) {
             logger.info("taskstatus STOPPED for [" + sku.getId() + "]");
+            return;
         } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
             logger.info("taskstatus EXCEPTION for [" + sku.getId() + "]");
-            logger.debug("EXCEPTION url:[" + sku.getUrl() + "]");
+//            logger.info("EXCEPTION url:[" + sku.getUrl() + "]");
+            return;
         } else {//(TaskStatus.FINISH.equals(taskStatus)))
             logger.info("taskstatus FINISH for [" + sku.getId() + "]");
             fetchedProduct = fetchedResult.getFetchProduct();
@@ -169,12 +179,12 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
                 List<String> imageUrlList = fetchedProduct.getImageUrlList();
 
-                if (imageUrlList != null || imageUrlList.size() != 0) {
+                if (imageUrlList != null && imageUrlList.size() != 0) {
 
                     ptmCmpSkuImage = new PtmCmpSkuImage();
 
                     ptmCmpSkuImage.setId(sku.getId());
-                    ptmCmpSkuImage.setOriImageUrlNumber(imageUrlList.size());
+                    ptmCmpSkuImage.setOriImageUrlNumber(imageUrlList.size() >= 4 ? 4 : imageUrlList.size());//如果数量大于4，就存4张
 
                     for (int i = 0; i < imageUrlList.size(); i++) {
 
@@ -215,6 +225,9 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             ptmCmpSkuDescription.setJsonParam(jsonParam);
             ptmCmpSkuDescription.setJsonDescription(description);
 
+            if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
+                return;
+            }
             mdm.save(ptmCmpSkuDescription);
             System.out.println("create ptmCmpSkuDescription success for ptmCmpSkuId = [" + sku.getId() + "]");
         } catch (Exception e) {

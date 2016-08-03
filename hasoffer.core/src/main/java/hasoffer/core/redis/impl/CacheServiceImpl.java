@@ -13,7 +13,9 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Date : 2016/5/3
@@ -68,6 +70,30 @@ public class CacheServiceImpl<T extends Identifiable> implements ICacheService<T
         }
 
         return map;
+    }
+
+    @Override
+    public Set<String> keys(final String pattern) {
+
+        return (Set<String>) redisTemplate.execute(new RedisCallback() {
+            @Override
+            public Set<String> doInRedis(RedisConnection redisConnection) throws DataAccessException {
+                Set<byte[]> keys = redisConnection.keys(pattern.getBytes());
+
+                Set<String> keySet = new HashSet<String>();
+
+                for (byte[] array : keys) {
+
+                    String key = new String(array);
+
+                    keySet.add(key);
+
+                }
+
+                return keySet;
+            }
+        });
+
     }
 
     @Override

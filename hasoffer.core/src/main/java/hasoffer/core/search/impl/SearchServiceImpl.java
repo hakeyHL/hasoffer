@@ -24,7 +24,6 @@ import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.persistence.po.search.SrmProductSearchStat;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
-import hasoffer.core.persistence.po.search.SrmSearchUpdateLog;
 import hasoffer.core.persistence.po.search.updater.SrmSearchLogUpdater;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
@@ -641,12 +640,6 @@ public class SearchServiceImpl implements ISearchService {
         sb.append(" ORDER BY t.").append(sortBy).append(" ").append(sortDir);
 
         return dbm.queryPage(sb.toString(), page, size);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void saveSrmSearchUpdateLog(SrmSearchUpdateLog srmSearchUpdateLog) {
-        dbm.create(srmSearchUpdateLog);
     }
 
     @Override

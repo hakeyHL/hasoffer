@@ -95,6 +95,13 @@ public class FixController {
 
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
 
+    @RequestMapping(value = "/fixproductcmps/{productId}", method = RequestMethod.GET)
+    @ResponseBody
+    public String fixproductcmps1(@PathVariable long productId) {
+        fixProductCmps(productId);
+        return "ok";
+    }
+
     @RequestMapping(value = "/fixmultiskus", method = RequestMethod.GET)
     @ResponseBody
     public String fixmultiskus(@RequestParam String filename) {
@@ -115,37 +122,7 @@ public class FixController {
 
             System.out.println(productId + "\t" + skuCount);
 
-            PtmProduct product = productService.getProduct(productId);
-            if (product != null) {
-                System.out.println("---------------- " + productId + " ----------------");
-                System.out.println(product.getTitle());
-                Set<String> skuUrlSet = new HashSet<>();
-
-                List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId);
-                for (PtmCmpSku cmpSku : cmpSkus) {
-                    if (!StringUtils.isEmpty(product.getTitle())) {
-                        System.out.println(cmpSku.getTitle());
-                        float score = ProductAnalysisService.stringMatch(product.getTitle(), cmpSku.getTitle());
-                        if (score < 0.4) {
-                            logger.debug(String.format("[Delete_%d]Score is [%f].", cmpSku.getId(), score));
-                            cmpSkuService.deleteCmpSku(cmpSku.getId());
-                            continue;
-                        }
-                    }
-
-                    boolean exists = skuUrlSet.contains(cmpSku.getUrl());
-
-                    if (exists) {
-                        logger.debug(String.format("[Delete_%d] Exist.", cmpSku.getId()));
-                        cmpSkuService.deleteCmpSku(cmpSku.getId());
-                    } else {
-                        skuUrlSet.add(cmpSku.getUrl());
-                    }
-
-                }
-
-                System.out.println("---------------------end-----------------------");
-            }
+            fixProductCmps(productId);
 
             count++;
             if (count % 100 == 0) {
@@ -157,6 +134,40 @@ public class FixController {
         return "ok";
     }
 
+    private void fixProductCmps(long productId) {
+        PtmProduct product = productService.getProduct(productId);
+        if (product != null) {
+            System.out.println("---------------- " + productId + " ----------------");
+            System.out.println(product.getTitle());
+            Set<String> skuUrlSet = new HashSet<>();
+
+            List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId);
+            for (PtmCmpSku cmpSku : cmpSkus) {
+                if (!StringUtils.isEmpty(product.getTitle())) {
+                    System.out.println(cmpSku.getTitle());
+                    float score = ProductAnalysisService.stringMatch(product.getTitle(), cmpSku.getTitle());
+                    if (score < 0.4) {
+                        logger.debug(String.format("[Delete_%d]Score is [%f].", cmpSku.getId(), score));
+                        cmpSkuService.deleteCmpSku(cmpSku.getId());
+                        continue;
+                    }
+                }
+
+                boolean exists = skuUrlSet.contains(cmpSku.getUrl());
+
+                if (exists) {
+                    logger.debug(String.format("[Delete_%d] Exist.", cmpSku.getId()));
+                    cmpSkuService.deleteCmpSku(cmpSku.getId());
+                } else {
+                    skuUrlSet.add(cmpSku.getUrl());
+                }
+
+            }
+
+            System.out.println("---------------------end-----------------------");
+        }
+    }
+
     //fixdata/updateptmproduct/{id}
     @RequestMapping(value = "/updateptmproduct/{id}", method = RequestMethod.GET)
     @ResponseBody
@@ -164,9 +175,15 @@ public class FixController {
 
         //更新商品价格
         productService.updatePtmProductPrice(id);
-        //清除缓存
+        //清除product缓存
         cacheServiceImpl.del("PRODUCT_" + id);
+        //清除sku缓存        PRODUCT__listPagedCmpSkus_3198_1_10
+        Set<String> keys = cacheServiceImpl.keys("PRODUCT__listPagedCmpSkus_" + id + "_*");
 
+        for (String key : keys) {
+            cacheServiceImpl.del(key);
+        }
+        
         return "ok";
     }
 

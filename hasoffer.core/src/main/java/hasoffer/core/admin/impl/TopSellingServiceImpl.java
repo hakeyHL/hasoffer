@@ -18,14 +18,14 @@ import java.util.Arrays;
 @Service
 public class TopSellingServiceImpl implements ITopSellingService {
 
-    private static final String Q_TOPSELLINGLIST_BYSTATUS = "SELECT t FROM PtmTopSelling t WHERE t.status = ?0 ORDER BY t.count DESC";
+    private static final String Q_TOPSELLINGLIST_BYSTATUS = "SELECT t FROM PtmTopSelling t WHERE t.lUpdateTime between ?0  and  ?1 and t.status = ?2 ORDER BY t.count DESC";
 
     @Resource
     IDataBaseManager dbm;
 
     @Override
-    public PageableResult<PtmTopSelling> findTopSellingList(TopSellStatus status, int page, int size) {
-        PageableResult<PtmTopSelling> pageableResult = dbm.queryPage(Q_TOPSELLINGLIST_BYSTATUS, page, size, Arrays.asList(status));
+    public PageableResult<PtmTopSelling> findTopSellingList(Long yesterdayStart, Long todayStart, TopSellStatus status, int page, int size) {
+        PageableResult<PtmTopSelling> pageableResult = dbm.queryPage(Q_TOPSELLINGLIST_BYSTATUS, page, size, Arrays.asList(yesterdayStart, todayStart, status));
         return pageableResult;
     }
 

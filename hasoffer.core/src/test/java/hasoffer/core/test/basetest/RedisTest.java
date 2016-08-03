@@ -128,4 +128,13 @@ public class RedisTest {
         });
     }
 
+    @Test
+    public void save() {
+
+//        Set sets = cacheService.keys("PRODUCT__listPagedCmpSkus_3198*");
+
+        cacheService.del("PRODUCT__listPagedCmpSkus_3198_1_20");//del PRODUCT__listPagedCmpSkus_3198_1_30");
+
+//        System.out.println(sets);
+    }
 }

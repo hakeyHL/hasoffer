@@ -1,9 +1,12 @@
 package hasoffer.api.controller;
 
+import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
 import hasoffer.core.product.ICmpSkuService;
+import hasoffer.core.product.IPtmCmpSkuImageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -12,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,7 +31,33 @@ public class AppSkuController {
     ICmpSkuService cmpSkuService;
     @Resource
     IMongoDbManager mongoDbManager;
+    @Resource
+    IPtmCmpSkuImageService ptmCmpSkuImageService;
     Logger logger = LoggerFactory.getLogger(AppSkuController.class);
+
+    public static List getImageArray(List<PtmCmpSkuImage> list) {
+        List li = new ArrayList();
+        if (list != null && list.size() > 0) {
+            PtmCmpSkuImage ptmCmpSkuImage = list.get(0);
+            String imagePath1 = ptmCmpSkuImage.getImagePath1();
+            String imagePath2 = ptmCmpSkuImage.getImagePath2();
+            String imagePath3 = ptmCmpSkuImage.getImagePath3();
+            String imagePath4 = ptmCmpSkuImage.getImagePath4();
+            if (!StringUtils.isEmpty(imagePath1)) {
+                li.add(ptmCmpSkuImage.getImagePath1());
+            }
+            if (!StringUtils.isEmpty(imagePath2)) {
+                li.add(ptmCmpSkuImage.getImagePath2());
+            }
+            if (!StringUtils.isEmpty(imagePath3)) {
+                li.add(ptmCmpSkuImage.getImagePath3());
+            }
+            if (!StringUtils.isEmpty(imagePath4)) {
+                li.add(ptmCmpSkuImage.getImagePath4());
+            }
+        }
+        return li;
+    }
 
     /**
      * 根据sku的id获取sku详细信息
@@ -46,7 +77,8 @@ public class AppSkuController {
             Map map = new HashMap<>();
             map.put("description", ptmCmpSkuDescription.getJsonDescription());//描述
             map.put("specs", ptmCmpSkuDescription.getJsonParam());//参数
-            //TODO 获取图片列表waiting for WF
+            List<PtmCmpSkuImage> ptmCmpSkuImages = ptmCmpSkuImageService.ptmCmpSkuImages(ptmCmpSku.getProductId());
+            map.put("images", getImageArray(ptmCmpSkuImages));
             map.put("images", "[\"http://img12.360buyimg.com/n1/jfs/t1174/164/723303127/202924/1a956bbf/554acf00N87f6cea3.jpg\",\"http://img12.360buyimg.com/n1/jfs/t1033/328/802932418/412261/261452dc/554acd64N27651f09.jpg\"]");//图片列表
             map.put("distribution", 5);
             modelAndView.addObject("data", map);

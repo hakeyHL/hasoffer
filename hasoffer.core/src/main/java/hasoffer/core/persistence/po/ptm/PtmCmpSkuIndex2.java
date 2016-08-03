@@ -17,6 +17,7 @@ public class PtmCmpSkuIndex2 implements Identifiable<Long> {
 
     @Id
     @Column(unique = true, nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private long productId;
 

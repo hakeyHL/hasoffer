@@ -12,12 +12,10 @@ import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.enums.SrmSearchLogUpdate;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.search.SrmSearchUpdateLog;
 import hasoffer.core.persistence.po.sys.SysAdmin;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
@@ -396,24 +394,9 @@ public class ProductController {
 
         //newProoduct的日志
         SysAdmin admin = (SysAdmin) Context.currentContext().get(StaticContext.USER);
-        SrmSearchUpdateLog srmSearchUpdateLog = new SrmSearchUpdateLog();
-        srmSearchUpdateLog.setOldValue("0");
-        srmSearchUpdateLog.setNewValue(product.getId() + "");
-        srmSearchUpdateLog.setOperatorId(admin.getId());
-        srmSearchUpdateLog.setTargetId(product.getId() + "");
-        srmSearchUpdateLog.setSrmUpdate(SrmSearchLogUpdate.NEWPRODUCT);
-        searchService.saveSrmSearchUpdateLog(srmSearchUpdateLog);
 
         //添加cmpSku
         PtmCmpSku cmpSku = cmpSkuService.createCmpSku(product.getId(), url, color, size, price);
-
-        //添加cmpSku的日志
-        srmSearchUpdateLog.setSrmUpdate(SrmSearchLogUpdate.NEWCMPSKU);
-        srmSearchUpdateLog.setTargetId(product.getId() + "");
-        srmSearchUpdateLog.setOperatorId(admin.getId());
-        srmSearchUpdateLog.setOldValue("0");
-        srmSearchUpdateLog.setNewValue(cmpSku.getId() + "");
-        searchService.saveSrmSearchUpdateLog(srmSearchUpdateLog);
 
         return product;
     }

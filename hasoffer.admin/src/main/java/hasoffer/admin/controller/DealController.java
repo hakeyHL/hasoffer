@@ -4,6 +4,7 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.IDUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.admin.IDealService;
+import hasoffer.core.admin.impl.DealServiceImpl;
 import hasoffer.core.persistence.enums.BannerFrom;
 import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
@@ -37,6 +38,8 @@ public class DealController {
 
     @Resource
     IDealService dealService;
+    @Resource
+    DealServiceImpl dealServiceImple;
     private Logger logger = LoggerFactory.getLogger(DealController.class);
 
     @InitBinder
@@ -68,6 +71,7 @@ public class DealController {
         Map<String, Object> result = new HashMap<String, Object>();
         try {
             result = dealService.importExcelFile(multiFile);
+            dealServiceImple.reimportAllDeals2Solr();
             result.put("success", true);
         } catch (Exception e) {
             logger.error("导入失败");
@@ -95,7 +99,7 @@ public class DealController {
                 mav.addObject("bannerImageUrl", ImageUtil.getImageUrl(appBanner.getImageUrl()));
             }
         }
-
+        dealServiceImple.reimportAllDeals2Solr();
         mav.addObject("deal", deal);
         return mav;
     }
@@ -175,6 +179,7 @@ public class DealController {
             deal.setListPageImage(dealSmallPath);
         }
         dealService.updateDeal(deal);
+        dealServiceImple.reimportAllDeals2Solr();
         return new ModelAndView("redirect:/deal/list");
     }
 
