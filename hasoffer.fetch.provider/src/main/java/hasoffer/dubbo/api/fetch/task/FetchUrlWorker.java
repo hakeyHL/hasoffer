@@ -30,7 +30,7 @@ public class FetchUrlWorker implements Runnable {
     public void run() {
         while (true) {
             try {
-                Object pop = fetchCacheService.popKeyword(StringConstant.WAIT_URL_LIST);
+                Object pop = fetchCacheService.popTaskList(StringConstant.WAIT_URL_LIST);
                 if (pop == null) {
                     TimeUnit.MINUTES.sleep(1);
                 } else {

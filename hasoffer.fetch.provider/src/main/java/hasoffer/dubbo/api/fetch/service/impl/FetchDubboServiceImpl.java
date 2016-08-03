@@ -50,7 +50,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
 
     private void addFetchTask(FetchResult fetchResult) {
         String key = FetchResult.getCacheKey(fetchResult);
-        fetchCacheService.saveKeywordList(StringConstant.WAIT_KEY_LIST, JSONUtil.toJSON(fetchResult));
+        fetchCacheService.pushTaskList(StringConstant.WAIT_KEY_LIST, JSONUtil.toJSON(fetchResult));
         logger.info("FetchDubboServiceImpl.addFetchTask(FetchResult fetchResult) save {} into Redis List {}", fetchResult.getWebsite() + "_" + fetchResult.getKeyword(), StringConstant.WAIT_KEY_LIST);
         fetchCacheService.cacheResult(key, fetchResult);
     }
@@ -67,7 +67,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
         if (key == null) {
             return;
         }
-        fetchCacheService.saveKeywordList(StringConstant.WAIT_URL_LIST, JSONUtil.toJSON(fetchUrlResult));
+        fetchCacheService.pushTaskList(StringConstant.WAIT_URL_LIST, JSONUtil.toJSON(fetchUrlResult));
         logger.info("FetchDubboServiceImpl.addFetchUrlTask(fetchUrlResult) save {} into Redis List {}", fetchUrlResult.getUrl(), StringConstant.WAIT_URL_LIST);
         fetchCacheService.cacheResult(key, fetchUrlResult);
 
