@@ -66,14 +66,16 @@ public class AppDealController {
         if (dealModels != null && dealModels.size() > 0) {
             for (DealModel dealModel : dealModels) {
                 //TODO 需要Deal的过期时间以便判断是否过期以及是否显示Display判断是否返回前台
-                DealVo dealVo = new DealVo();
-                dealVo.setLogoUrl(dealModel.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(Website.valueOf(dealModel.getWebsite())));
-                dealVo.setTitle(dealModel.getTitle());
-                dealVo.setWebsite(Website.valueOf(dealModel.getWebsite()));
-                dealVo.setId(dealModel.getId());
-                dealVo.setDiscount(dealModel.getDiscount());
-                dealVo.setDeepLink(dealModel.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(Website.valueOf(dealModel.getWebsite()), dealModel.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
-                deals.add(dealVo);
+                if (dealModel.getExpireTime().compareTo(new Date()) != 1 && dealModel.isDisplay()) {
+                    DealVo dealVo = new DealVo();
+                    dealVo.setLogoUrl(dealModel.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(Website.valueOf(dealModel.getWebsite())));
+                    dealVo.setTitle(dealModel.getTitle());
+                    dealVo.setWebsite(Website.valueOf(dealModel.getWebsite()));
+                    dealVo.setId(dealModel.getId());
+                    dealVo.setDiscount(dealModel.getDiscount());
+                    dealVo.setDeepLink(dealModel.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(Website.valueOf(dealModel.getWebsite()), dealModel.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+                    deals.add(dealVo);
+                }
             }
             //再展示手机类deal id或parentid 为 5 level小于等于3
             PageableResult pageableResult = appService.getDeals(page + 0l, pageSize + 0l);
