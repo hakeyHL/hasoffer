@@ -39,7 +39,6 @@ public class FetchUrlWorker implements Runnable {
                     if (fetchUrlResult.overFetch()) {
                         logger.info("FetchUrlWorker crawl finish: {} ", fetchUrlResult);
                     }
-                    fetchCacheService.cacheResult(FetchUrlResult.getCacheKey(fetchUrlResult), fetchUrlResult);
                 }
             } catch (Exception e) {
                 logger.error("FetchKeywordWorker is error. Error Msg: ", e);
@@ -50,6 +49,7 @@ public class FetchUrlWorker implements Runnable {
     public void fetch(FetchUrlResult fetchUrlResult) {
         try {
             fetchUrlResult = fetchService.getProductByUrl(fetchUrlResult);
+            //fetchCacheService.cacheResult(FetchUrlResult.getCacheKey(fetchUrlResult), fetchUrlResult);
         } catch (UnSupportWebsiteException e) {
             fetchUrlResult.setTaskStatus(TaskStatus.STOPPED);
             fetchUrlResult.setErrMsg("un able support website.");

@@ -69,7 +69,7 @@ public class CmpProductListVo {
         StringBuffer sb = new StringBuffer();
         for (int i = tempPrice.length() - 1; i >= 0; i--) {
             sb.append(tempPrice.charAt(i));
-            if ((tempPrice.length() - i) % 3 == 0) {
+            if ((tempPrice.length() - i) % 3 == 0 && i != 0) {
                 sb.append(",");
             }
         }
