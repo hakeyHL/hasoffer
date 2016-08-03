@@ -33,7 +33,7 @@ public class DealServiceImpl implements IDealService {
 
     private static final long EXPIRE_TIME_MS = 7 * 24 * 60 * 60 * 1000;
 
-    private static final String IMPORT_SQL = "insert into appdeal(website, title, linkUrl, expireTime, priceDescription ,description, createTime,  push ,display ,imageUrl) values(?,?, ?, ?, ?, ? ,?, ?, ?, ?)";
+    private static final String IMPORT_SQL = "insert into appdeal(website, title, linkUrl, expireTime, priceDescription ,description, createTime,  push ,display ,imageUrl,discount,dealCategoryId,dealClickCount) values(?,?, ?, ?, ?, ? ,?, ?, ?, ?,?,?,?)";
 
     private static final String Q_DEALS = "SELECT t FROM AppDeal t";
 
@@ -80,7 +80,7 @@ public class DealServiceImpl implements IDealService {
                                                                                     int repeatRows = 0;
                                                                                     List<Object[]> dataQueue = new LinkedList<Object[]>();
                                                                                     for (int i = 0; i < data.size(); i++) {
-                                                                                        Object[] tempData = new Object[10];
+                                                                                        Object[] tempData = new Object[13];
                                                                                         for (int j = 0; j < tempData.length; j++) {
                                                                                             //TODO  网站名/deal名称/deal跳转链接为空 记录日志
                                                                                             if (StringUtils.isBlank(data.get(i)[0] + "") || StringUtils.isBlank(data.get(i)[1] + "") || StringUtils.isBlank(data.get(i)[2] + "")) {
@@ -121,7 +121,15 @@ public class DealServiceImpl implements IDealService {
                                                                                             if (tempData[8] == null || StringUtils.isBlank(tempData[8] + "")) {
                                                                                                 tempData[8] = 0;
                                                                                             }
-
+                                                                                            if (tempData[10] == null || StringUtils.isBlank(tempData[10] + "")) {
+                                                                                                tempData[10] = 50;
+                                                                                            }
+                                                                                            if (tempData[11] == null || StringUtils.isBlank(tempData[11] + "")) {
+                                                                                                tempData[11] = -1l;
+                                                                                            }
+                                                                                            if (tempData[12] == null || StringUtils.isBlank(tempData[12] + "")) {
+                                                                                                tempData[12] = 0l;
+                                                                                            }
 
                                                                                             // TODO 重复元素记录日志
                                                                                             for (int k = 0; k < dataQueue.size(); k++) {
