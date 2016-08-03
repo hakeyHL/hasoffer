@@ -36,7 +36,7 @@ public class CheckStatusController {
         String todayStartString = TimeUtils.parse(TimeUtils.today(), "yyyy-MM-dd HH:mm:ss");
 
         //大概14秒,100kb左右的数据量
-        List<Long> productIdList = dbm.query("SELECT distinct t.ptmProductId FROM SrmSearchLog t WHERE t.updateTime > ?0", Arrays.asList(TimeUtils.addDay(TimeUtils.toDate(TimeUtils.today()), -1)));
+        List<Long> productIdList = dbm.query("SELECT distinct t.ptmProductId FROM SrmSearchLog t WHERE t.updateTime > ?0", Arrays.asList(TimeUtils.toDate(TimeUtils.today())));
 
         long updateSuccess = 0;
         long needUpdate = 0;
@@ -44,7 +44,7 @@ public class CheckStatusController {
         for (Long productid : productIdList) {
 
             long needUpdateNumber = dbm.querySingle("SELECT count(*) FROM PtmCmpSku t WHERE t.productId = ?0 ", Arrays.asList(productid));
-            long updateSuccessNumber = dbm.querySingle("SELECT count(*) FROM PtmCmpSku t WHERE t.productId = ?0 AND t.updateTime > ?1", Arrays.asList(productid, TimeUtils.toDate(TimeUtils.today())));
+            long updateSuccessNumber = dbm.querySingle("SELECT count(*) FROM PtmCmpSku t WHERE t.productId = ?0 AND t.updateTime > ?1", Arrays.asList(productid, TimeUtils.add(TimeUtils.toDate(TimeUtils.today()), -1)));
 
             updateSuccess += updateSuccessNumber;
             needUpdate += needUpdateNumber;
