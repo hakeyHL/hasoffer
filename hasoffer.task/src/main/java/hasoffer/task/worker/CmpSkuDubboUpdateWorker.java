@@ -212,53 +212,46 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
 
         //添加描述
-        try {
 
-            PtmCmpSkuDescription ptmCmpSkuDescription = mdm.queryOne(PtmCmpSkuDescription.class, sku.getId());
+        PtmCmpSkuDescription ptmCmpSkuDescription = mdm.queryOne(PtmCmpSkuDescription.class, sku.getId());
 
-            if (ptmCmpSkuDescription == null) {
-                String jsonParam = fetchedProduct.getJsonParam();
-                String description = fetchedProduct.getDescription();
+        if (ptmCmpSkuDescription == null) {
+            String jsonParam = fetchedProduct.getJsonParam();
+            String description = fetchedProduct.getDescription();
 
-                ptmCmpSkuDescription = new PtmCmpSkuDescription();
+            ptmCmpSkuDescription = new PtmCmpSkuDescription();
 
-                ptmCmpSkuDescription.setId(sku.getId());
-                ptmCmpSkuDescription.setJsonParam(jsonParam);
-                ptmCmpSkuDescription.setJsonDescription(description);
+            ptmCmpSkuDescription.setId(sku.getId());
+            ptmCmpSkuDescription.setJsonParam(jsonParam);
+            ptmCmpSkuDescription.setJsonDescription(description);
 
-                if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
-                    return;
-                }
-                mdm.save(ptmCmpSkuDescription);
-                System.out.println("create ptmCmpSkuDescription success for ptmCmpSkuId = [" + sku.getId() + "]");
+            if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
+                return;
             }
+            mdm.save(ptmCmpSkuDescription);
+            System.out.println("create ptmCmpSkuDescription success for ptmCmpSkuId = [" + sku.getId() + "]");
+        }
 
-            //save productDescription
-            PtmProductDescription ptmProductDescription = mdm.queryOne(PtmProductDescription.class, sku.getProductId());
-            if (ptmProductDescription == null) {
+        //save productDescription
+        PtmProductDescription ptmProductDescription = mdm.queryOne(PtmProductDescription.class, sku.getProductId());
+        if (ptmProductDescription == null) {
 
-                String jsonParam = fetchedProduct.getJsonParam();
-                String description = fetchedProduct.getDescription();
+            String jsonParam = fetchedProduct.getJsonParam();
+            String description = fetchedProduct.getDescription();
 
-                ptmCmpSkuDescription = new PtmCmpSkuDescription();
+            ptmCmpSkuDescription = new PtmCmpSkuDescription();
 
-                ptmCmpSkuDescription.setId(sku.getId());
-                //最开始需求没说明白描述和参数问题，字段写错了，修改通知前台
-                ptmCmpSkuDescription.setJsonDescription(jsonParam);
-                ptmCmpSkuDescription.setJsonParam(description);
+            ptmCmpSkuDescription.setId(sku.getId());
+            //最开始需求没说明白描述和参数问题，字段写错了，修改通知前台
+            ptmCmpSkuDescription.setJsonDescription(jsonParam);
+            ptmCmpSkuDescription.setJsonParam(description);
 
-                if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
-                    return;
-                }
-                mdm.save(ptmProductDescription);
-                System.out.println("create ptmProductDescription success for ptmproductId = [" + sku.getProductId() + "]");
-
+            if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
+                return;
             }
+            mdm.save(ptmProductDescription);
+            System.out.println("create ptmProductDescription success for ptmproductId = [" + sku.getProductId() + "]");
 
-        } catch (Exception e) {
-
-            logger.info(e.getMessage());
-            System.out.println("create description fail for ptmCmpSkuId = [" + sku.getId() + "]");
         }
 
     }
