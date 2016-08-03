@@ -80,7 +80,7 @@ public class DealServiceImpl implements IDealService {
                                                                                     int repeatRows = 0;
                                                                                     List<Object[]> dataQueue = new LinkedList<Object[]>();
                                                                                     for (int i = 0; i < data.size(); i++) {
-                                                                                        Object[] tempData = new Object[12];
+                                                                                        Object[] tempData = new Object[13];
                                                                                         for (int j = 0; j < tempData.length; j++) {
                                                                                             //TODO  网站名/deal名称/deal跳转链接为空 记录日志
                                                                                             if (StringUtils.isBlank(data.get(i)[0] + "") || StringUtils.isBlank(data.get(i)[1] + "") || StringUtils.isBlank(data.get(i)[2] + "")) {
@@ -209,6 +209,7 @@ public class DealServiceImpl implements IDealService {
 
     @Override
     public void reimportAllDeals2Solr() {
+
         ListAndProcessTask2<AppDeal> listAndProcessTask2 = new ListAndProcessTask2<AppDeal>(
                 new IList<AppDeal>() {
                     @Override
@@ -234,6 +235,12 @@ public class DealServiceImpl implements IDealService {
                     }
                 }
         );
+
+        try {
+            dealIndexService.removeAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         listAndProcessTask2.go();
     }
