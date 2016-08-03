@@ -245,7 +245,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 ptmCmpSkuDescription.setId(sku.getId());
                 //最开始需求没说明白描述和参数问题，字段写错了，修改通知前台
                 ptmCmpSkuDescription.setJsonDescription(jsonParam);
-                ptmCmpSkuDescription.setJsonParam(description);
+//                ptmCmpSkuDescription.setJsonParam(description);
 
                 if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
                     return;
