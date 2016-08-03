@@ -58,8 +58,6 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
     @Override
     public void run() {
 
-        int number = 0;
-
         while (true) {
 
             try {
@@ -93,7 +91,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                     }
 
                     //更新商品的信息，写入多图数据，写入描述/参数
-                    updatePtmCmpSku(sku, searchLog, number);
+                    updatePtmCmpSku(sku, searchLog);
                 }
 
                 //更新商品的价格，同时修改updateTime字段
@@ -109,7 +107,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         }
     }
 
-    private void updatePtmCmpSku(PtmCmpSku sku, SrmSearchLog searchLog, int number) {
+    private void updatePtmCmpSku(PtmCmpSku sku, SrmSearchLog searchLog) {
         // try update sku
         String url = sku.getUrl();
         Website website = WebsiteHelper.getWebSite(url);
@@ -122,8 +120,6 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         FetchUrlResult fetchedResult = null;
 
         try {
-            logger.info("send success for _" + sku.getUrl());
-            logger.info("number :" + number++);
             fetchedResult = fetchService.getProductsByUrl(website, url);
         } catch (HttpFetchException e) {
             logger.info("HttpFetchException for [" + sku.getId() + "]");
@@ -137,8 +133,13 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
         //如果返回结果状态为running，那么将sku返回队列
         if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
+            try {
+                TimeUnit.SECONDS.sleep(15);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             queue.add(searchLog);
-//            logger.info("taskstatus RUNNING for [" + sku.getId() + "]");
+            logger.info("taskstatus RUNNING for [" + sku.getId() + "]");
             return;
         } else if (TaskStatus.STOPPED.equals(taskStatus)) {
             logger.info("taskstatus STOPPED for [" + sku.getId() + "]");
@@ -152,16 +153,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             fetchedProduct = fetchedResult.getFetchProduct();
         }
 
-//        此处是FK、SD正常更新逻辑放弃对title字段的更新，该有另外的task统一维护
-//        切换新的更新模式，采用页面更新的方式，所有可以不用考虑title
-//        if (fetchedProduct != null) {
-//            if (Website.FLIPKART.equals(fetchedProduct.getWebsite()) || Website.SNAPDEAL.equals(fetchedProduct.getWebsite())) {
-//                fetchedProduct.setTitle(null);
-//            }
-//        }
-
         System.out.println(JSONUtil.toJSON(fetchedProduct).toString());
-
 
         //更新ptmcmpsku表
         try {
@@ -253,7 +245,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 ptmCmpSkuDescription.setId(sku.getId());
                 //最开始需求没说明白描述和参数问题，字段写错了，修改通知前台
                 ptmCmpSkuDescription.setJsonDescription(jsonParam);
-                ptmCmpSkuDescription.setJsonParam(description);
+//                ptmCmpSkuDescription.setJsonParam(description);
 
                 if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
                     return;
