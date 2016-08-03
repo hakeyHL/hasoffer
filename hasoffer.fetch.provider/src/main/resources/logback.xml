@@ -178,7 +178,7 @@
         <appender-ref ref="FetchTaskLoggerFileOut"/>
     </logger>
 
-    <logger name="hasoffer.dubbo.api.fetch.service.impl.FetchDubboServiceImpl" level="DEBUG">
+    <logger name="hasoffer.dubbo.api.fetch.task.FetchUrlWorker" level="DEBUG">
         <appender-ref ref="FetchTaskResultLoggerFileOut"/>
     </logger>
 
