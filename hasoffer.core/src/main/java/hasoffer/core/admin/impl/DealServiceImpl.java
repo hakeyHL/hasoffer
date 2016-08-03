@@ -209,6 +209,7 @@ public class DealServiceImpl implements IDealService {
 
     @Override
     public void reimportAllDeals2Solr() {
+
         ListAndProcessTask2<AppDeal> listAndProcessTask2 = new ListAndProcessTask2<AppDeal>(
                 new IList<AppDeal>() {
                     @Override
@@ -234,6 +235,12 @@ public class DealServiceImpl implements IDealService {
                     }
                 }
         );
+
+        try {
+            dealIndexService.removeAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         listAndProcessTask2.go();
     }
