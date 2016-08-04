@@ -229,10 +229,13 @@ public class Compare2Controller {
     @RequestMapping(value = "/cmpsku", method = RequestMethod.GET)
     public ModelAndView cmpsku(@RequestParam(defaultValue = "0") final String id,
                                @RequestParam(defaultValue = "1") int page,
-                               @RequestParam(defaultValue = "10") int size
+                               @RequestParam(defaultValue = "10") int size,
+                               HttpServletResponse response
     ) {
-
-        ModelAndView mav = new ModelAndView();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("errorCode", "00000");
+        jsonObject.put("msg", "ok");
+        PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"imageUrl", "skuPrice", "deepLink", "title", "saved", "id", "status", "priceOff", "productVo", "pagedComparedSkuVos", "copywriting", "displayMode", "std", "cashBack"});
         CmpResult cr = null;
         PtmProduct product = productService.getProduct(Long.valueOf(id));
         if (product != null) {
@@ -240,22 +243,24 @@ public class Compare2Controller {
             DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
             SearchIO sio = new SearchIO(product.getSourceId(), product.getTitle(), "", product.getSourceSite(), product.getPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, size);
             try {
-//            getSioBySearch(sio);
                 cr = getCmpProducts(sio, product);
             } catch (Exception e) {
                 logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, size));
                 //if exception occured ,get default cmpResult
-                mav.addObject("data", cr);
-                return mav;
+                jsonObject.put("data", JSONObject.toJSON(cr));
+                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
+                return null;
             }
             // 速度优化
             SearchHelper.addToLog(sio);
             logger.debug(sio.toString());
-            mav.addObject("data", cr);
-            return mav;
+            jsonObject.put("data", JSONObject.toJSON(cr));
+            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
+            return null;
         }
-        mav.addObject("data", cr);
-        return mav;
+        jsonObject.put("data", JSONObject.toJSON(cr));
+        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
+        return null;
     }
 
     private CmpResult getDefaultCmpResult(SearchIO sio, PtmCmpSkuIndex2 cmpSkuIndex) {
@@ -520,7 +525,6 @@ public class Compare2Controller {
             } else if (clientCmpSku != null) {
                 if (!cmpSkuCacheManager.isFlowControlled(sio.getDeviceId(), sio.getCliSite())) {
                     if (StringUtils.isEqual(clientCmpSku.getSkuTitle(), sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
-                        logger.info("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
                         currentDeeplink = WebsiteHelper.getDeeplinkWithAff(clientCmpSku.getWebsite(), clientCmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
                     }
                 }
@@ -563,6 +567,8 @@ public class Compare2Controller {
             Long tempTotalComments = Long.valueOf(0);
             int tempRatins = 0;
             int tempCount = 0;
+            //统计site
+            Set<Website> websiteSet = new HashSet<Website>();
             //初始化price为客户端传输的price
             if (ArrayUtils.hasObjs(cmpSkus)) {
                 // 获取vo list
@@ -571,6 +577,9 @@ public class Compare2Controller {
                             || cmpSku.getPrice() <= 0
                             || cmpSku.getStatus() != SkuStatus.ONSALE) { // 临时过滤掉不能更新价格的商品
                         continue;
+                    }
+                    if (cmpSku.getWebsite() != null) {
+                        websiteSet.add(cmpSku.getWebsite());
                     }
                     tempCount += 1;
                     // 忽略前台返回的价格
@@ -601,6 +610,23 @@ public class Compare2Controller {
                 logger.debug("Found skus size is 0 .");
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
             }
+            List<CmpProductListVo> tempCmpProductListVos = new ArrayList<CmpProductListVo>();
+            //每个site只保留一个且为最低价
+            for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
+                if (websiteSet.size() <= 0) {
+                    break;
+                }
+                if (websiteSet.contains(cmpProductListVo.getWebsite())) {
+                    websiteSet.remove(cmpProductListVo.getWebsite());
+                    //去除列表中除此之外的其他此site的数据
+                    tempCmpProductListVos.add(cmpProductListVo);
+                }
+            }
+            //移除之前加进列表的所有的sku列表
+            comparedSkuVos = null;
+            comparedSkuVos = new ArrayList<>();
+            //将新的加入的放入到列表中
+            comparedSkuVos.addAll(tempCmpProductListVos);
             String imageUrl = productCacheManager.getProductMasterImageUrl(product.getId());
             cmpResult.setImage(imageUrl);
             cmpResult.setName(product.getTitle());
