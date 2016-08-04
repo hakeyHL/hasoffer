@@ -114,7 +114,6 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         Website website = WebsiteHelper.getWebSite(url);
 
         if (website == null) {
-            logger.info(" parse website get null for [" + sku.getId() + "]");
             return;
         }
 
@@ -134,11 +133,6 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
         //如果返回结果状态为running，那么将sku返回队列
         if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
-//            try {
-//                TimeUnit.SECONDS.sleep();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
             queue.add(searchLog);
             logger.info("taskstatus RUNNING for [" + sku.getId() + "]");
             return;
@@ -147,7 +141,6 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             return;
         } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
             logger.info("taskstatus EXCEPTION for [" + sku.getId() + "]");
-//            logger.info("EXCEPTION url:[" + sku.getUrl() + "]");
             return;
         } else {//(TaskStatus.FINISH.equals(taskStatus)))
             logger.info("taskstatus FINISH for [" + sku.getId() + "]");
@@ -156,69 +149,34 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
         System.out.println(JSONUtil.toJSON(fetchedProduct).toString());
 
-        //更新ptmcmpsku表
-        try {
-            //送达时间如果为空，写1-5天
-            if (StringUtils.isEmpty(fetchedProduct.getDeliveryTime())) {
-                fetchedProduct.setDeliveryTime("1-5");
-            }
-            cmpSkuService.updateCmpSkuBySpiderFetchedProduct(sku.getId(), fetchedProduct);
-        } catch (Exception e) {
-            if (fetchedProduct != null) {
-                logger.info("title:" + fetchedProduct.getTitle());
-            }
+        //更新ptmcmpsku
+        cmpSkuService.updateCmpSkuBySpiderFetchedProduct(sku.getId(), fetchedProduct);
+        //多图
+        createPtmCmpSkuImage(sku.getId(), fetchedProduct);
+        //描述
+        createMethod(sku, fetchedProduct);
+
+    }
+
+    /**
+     * 保存或者更新参数和描述
+     *
+     * @param sku
+     * @param fetchedProduct
+     */
+    private void createMethod(PtmCmpSku sku, FetchedProduct fetchedProduct) {
+
+        String jsonParam = fetchedProduct.getJsonParam();
+        String description = fetchedProduct.getDescription();
+
+        //在fetch包暂时无法跟新升级的时候，先在这里回避掉这种错误
+        if (StringUtils.isEqual("[]", description)) {
+            description = "";
         }
 
-        //创建多图
-        try {
-            PtmCmpSkuImage ptmCmpSkuImage = dbm.querySingle("SELECT t FROM PtmCmpSkuImage t WHERE t.id = ?0 ", Arrays.asList(sku.getId()));
-
-            if (ptmCmpSkuImage == null) {
-
-                List<String> imageUrlList = fetchedProduct.getImageUrlList();
-
-                if (imageUrlList != null && imageUrlList.size() != 0) {
-
-                    ptmCmpSkuImage = new PtmCmpSkuImage();
-
-                    ptmCmpSkuImage.setId(sku.getId());
-                    ptmCmpSkuImage.setOriImageUrlNumber(imageUrlList.size() >= 4 ? 4 : imageUrlList.size());//如果数量大于4，就存4张
-
-                    for (int i = 0; i < imageUrlList.size(); i++) {
-
-                        if (i == 0) {
-                            ptmCmpSkuImage.setOriImageUrl1(imageUrlList.get(i));
-                        } else if (i == 1) {
-                            ptmCmpSkuImage.setOriImageUrl2(imageUrlList.get(i));
-                        } else if (i == 2) {
-                            ptmCmpSkuImage.setOriImageUrl3(imageUrlList.get(i));
-                        } else if (i == 3) {
-                            ptmCmpSkuImage.setOriImageUrl4(imageUrlList.get(i));
-                        } else {
-                            continue;
-                        }
-                    }
-
-                    ptmCmpSkuImageService.createPtmCmpSkuImage(ptmCmpSkuImage);
-                    System.out.println("create ptmCmpSkuImage success for ptmCmpSkuId = [" + sku.getId() + "]");
-                }
-            } else {
-
-                System.out.println("get null or 0 imageurl for ptmCmpSkuId = [" + sku.getId() + "]");
-
-            }
-        } catch (Exception e) {
-            System.out.println("create ptmCmpSkuImage fail for ptmCmpSkuId = [" + sku.getId() + "]");
-        }
-
-
-        //添加描述
-
+        //save ptmcmpskuDescription
         PtmCmpSkuDescription ptmCmpSkuDescription = mdm.queryOne(PtmCmpSkuDescription.class, sku.getId());
-
-        if (ptmCmpSkuDescription == null) {
-            String jsonParam = fetchedProduct.getJsonParam();
-            String description = fetchedProduct.getDescription();
+        if (ptmCmpSkuDescription == null) {//不存在该条记录
 
             ptmCmpSkuDescription = new PtmCmpSkuDescription();
 
@@ -231,17 +189,35 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             }
             mdm.save(ptmCmpSkuDescription);
             System.out.println("create ptmCmpSkuDescription success for ptmCmpSkuId = [" + sku.getId() + "]");
+        } else {//存在该条记录
+
+            boolean flagDescription = false;
+            boolean flagJsonParam = false;
+
+            String oldJsonDescription = ptmCmpSkuDescription.getJsonDescription();
+            String oldJsonParam = ptmCmpSkuDescription.getJsonParam();
+
+            //新的参数不为空，且新的参数和原有的不相同，更新
+            if (!StringUtils.isEmpty(jsonParam) && !StringUtils.isEqual(jsonParam, oldJsonParam)) {
+                ptmCmpSkuDescription.setJsonParam(jsonParam);
+                flagDescription = true;
+            }
+
+            //新的描述不为空，且和旧的参数不相同
+            if (!StringUtils.isEmpty(description) && StringUtils.isEqual(description, oldJsonDescription)) {
+                ptmCmpSkuDescription.setJsonDescription(description);
+                flagJsonParam = true;
+            }
+
+            if (flagDescription || flagJsonParam) {
+                mdm.save(ptmCmpSkuDescription);
+            }
         }
 
         //save productDescription
         PtmProductDescription ptmProductDescription = mdm.queryOne(PtmProductDescription.class, sku.getProductId());
 
-        if (ptmProductDescription == null) {
-
-            System.out.println("ptmProductDescription is null");
-
-            String jsonParam = fetchedProduct.getJsonParam();
-            String description = fetchedProduct.getDescription();
+        if (ptmProductDescription == null) {//如果不存在该记录
 
             ptmProductDescription = new PtmProductDescription();
 
@@ -254,14 +230,82 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 return;
             }
 
-            System.out.println("before create ptmProductDescription success for ptmproductId = [" + sku.getProductId() + "]");
             mdm.save(ptmProductDescription);
             System.out.println("create ptmProductDescription success for ptmproductId = [" + sku.getProductId() + "]");
 
+        } else {//如果存在
+
+            boolean flagDescription = false;
+            boolean flagJsonParam = false;
+
+            //最一开始设计的错误，修改需要通知api
+            String oldJsonDescription = ptmProductDescription.getJsonParam();//product 描述
+            String oldJsonParam = ptmCmpSkuDescription.getJsonDescription();//product 参数
+
+            //新的参数不为空，且新的参数和原有的不相同，更新
+            if (!StringUtils.isEmpty(jsonParam) && !StringUtils.isEqual(jsonParam, oldJsonParam)) {
+                ptmProductDescription.setJsonDescription(jsonParam);
+                flagDescription = true;
+            }
+
+            //新的描述不为空，且和旧的参数不相同
+            if (!StringUtils.isEmpty(description) && StringUtils.isEqual(description, oldJsonDescription)) {
+                ptmCmpSkuDescription.setJsonParam(description);
+                flagJsonParam = true;
+            }
+
+            if (flagDescription || flagJsonParam) {
+                mdm.save(ptmProductDescription);
+            }
+
+        }
+    }
+
+    /**
+     * 创建PtmCmpSKuImage
+     */
+    private void createPtmCmpSkuImage(long id, FetchedProduct fetchedProduct) {
+
+        if (id <= 0 || fetchedProduct == null || fetchedProduct.getImageUrlList() == null || fetchedProduct.getImageUrlList().size() == 0) {
+            return;
         }
 
-        System.out.println("ptmProductDescription is not null");
+        List<String> imageUrlList = fetchedProduct.getImageUrlList();
 
+        PtmCmpSkuImage ptmCmpSkuImage = dbm.querySingle("SELECT t FROM PtmCmpSkuImage t WHERE t.id = ?0 ", Arrays.asList(id));
 
+        if (ptmCmpSkuImage == null) {//如果不存在
+            createOrUpdatePtmCmpSkuImage(id, imageUrlList);
+        } else {//如果存在
+            if (!StringUtils.isEqual(ptmCmpSkuImage.getOriImageUrl1(), imageUrlList.get(0)) && imageUrlList.size() > ptmCmpSkuImage.getOriImageUrlNumber()) {//只有在第一张图片url不一致，并且新的图片数量比旧的总数大（该值最大为4）的情况下更新
+                createOrUpdatePtmCmpSkuImage(id, imageUrlList);
+            }
+        }
+    }
+
+    private void createOrUpdatePtmCmpSkuImage(long id, List<String> imageUrlList) {
+
+        PtmCmpSkuImage ptmCmpSkuImage = new PtmCmpSkuImage();
+
+        ptmCmpSkuImage.setId(id);
+        ptmCmpSkuImage.setOriImageUrlNumber(imageUrlList.size() >= 4 ? 4 : imageUrlList.size());//如果数量大于4，就存4张
+
+        for (int i = 0; i < imageUrlList.size(); i++) {
+
+            if (i == 0) {
+                ptmCmpSkuImage.setOriImageUrl1(imageUrlList.get(i));
+            } else if (i == 1) {
+                ptmCmpSkuImage.setOriImageUrl2(imageUrlList.get(i));
+            } else if (i == 2) {
+                ptmCmpSkuImage.setOriImageUrl3(imageUrlList.get(i));
+            } else if (i == 3) {
+                ptmCmpSkuImage.setOriImageUrl4(imageUrlList.get(i));
+            } else {
+                continue;
+            }
+        }
+
+        ptmCmpSkuImageService.createPtmCmpSkuImage(ptmCmpSkuImage);
+        System.out.println("create ptmCmpSkuImage success for ptmCmpSkuId = [" + id + "]");
     }
 }
