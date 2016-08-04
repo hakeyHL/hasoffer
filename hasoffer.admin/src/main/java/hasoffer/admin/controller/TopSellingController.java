@@ -217,7 +217,7 @@ public class TopSellingController {
 
             //更新商品的信息，写入多图数据，写入描述/参数
             try {
-                fetchDubboService.getProductsByUrl(sku.getWebsite(), sku.getUrl());
+                fetchDubboService.getProductsByUrl(sku.getId(), sku.getWebsite(), sku.getUrl());
             } catch (Exception e) {
 
             }
