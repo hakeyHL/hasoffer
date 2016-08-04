@@ -19,5 +19,7 @@ public class FetchUpdateServiceImpl implements IFetchUpdateService {
     @Override
     public void updatePtmCmpSkuInfo(FetchUrlResult fetchUrlResult) {
 
+//        fetchUrlResult.
+
     }
 }
