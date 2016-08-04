@@ -154,7 +154,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         //多图
         createPtmCmpSkuImage(sku.getId(), fetchedProduct);
         //描述
-        createMethod(sku, fetchedProduct);
+        createDescription(sku, fetchedProduct);
 
     }
 
@@ -164,7 +164,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
      * @param sku
      * @param fetchedProduct
      */
-    private void createMethod(PtmCmpSku sku, FetchedProduct fetchedProduct) {
+    private void createDescription(PtmCmpSku sku, FetchedProduct fetchedProduct) {
 
         String jsonParam = fetchedProduct.getJsonParam();
         String description = fetchedProduct.getDescription();
