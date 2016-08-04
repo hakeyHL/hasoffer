@@ -105,9 +105,7 @@ public class SearchRecordProcessWorker implements Runnable {
         scheduleReqClient.pushTaskScheduleInfo(taskSchedule, new CallbackListener() {
             @Override
             public void recycleResult(TaskSchedule result) {
-                System.out.println("result:" + result.toString());
-                System.out.println("update mongodb!!!");
-
+                logger.info("dubbo.CallbackListener():" + result.toString());
             }
         });
     }
