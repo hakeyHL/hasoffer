@@ -28,7 +28,10 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created on 2016/7/6.
@@ -70,13 +73,7 @@ public class TopSellingController {
 
         TopSellStatus selectstatus = TopSellStatus.valueOf(topSellingStatusString);
         Calendar calendar = Calendar.getInstance();
-        Date date = new Date();
-        calendar.setTime(date);
-        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), 00, 00, 00);
-        long todayStart = calendar.getTimeInMillis();
-        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH) - 1, 00, 00, 00);
-        long yesterdayStart = calendar.getTimeInMillis();
-        PageableResult<PtmTopSelling> pageableResult = topSellingService.findTopSellingList(yesterdayStart, todayStart, selectstatus, page, size);
+        PageableResult<PtmTopSelling> pageableResult = topSellingService.findTopSellingList(selectstatus, page, size);
 
         List<PtmTopSelling> ptmTopSellingList = pageableResult.getData();
 
