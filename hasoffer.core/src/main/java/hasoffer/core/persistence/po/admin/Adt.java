@@ -14,7 +14,7 @@ import java.util.Date;
  * Time 12:02
  */
 @Entity
-public class Advertisement implements Identifiable<Long> {
+public class Adt implements Identifiable<Long> {
 
     @Id
     @Column(unique = true, nullable = false)
@@ -157,7 +157,7 @@ public class Advertisement implements Identifiable<Long> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Advertisement that = (Advertisement) o;
+        Adt that = (Adt) o;
 
         if (count != that.count) return false;
         if (adLocation != that.adLocation) return false;
