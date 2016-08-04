@@ -1,7 +1,5 @@
 package hasoffer.task.worker;
 
-import hasoffer.base.exception.ContentParseException;
-import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
@@ -99,6 +97,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
     private void updatePtmCmpSku(PtmCmpSku sku, SrmSearchLog searchLog) {
         // try update sku
+        Long skuid = sku.getId();
         String url = sku.getUrl();
         Website website = WebsiteHelper.getWebSite(url);
 
@@ -108,13 +107,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
         FetchUrlResult fetchedResult = null;
 
-        try {
-            fetchedResult = fetchService.getProductsByUrl(website, url);
-        } catch (HttpFetchException e) {
-            logger.info("HttpFetchException for [" + sku.getId() + "]");
-        } catch (ContentParseException e) {
-            logger.info("ContentParseException for [" + sku.getId() + "]");
-        }
+        fetchedResult = fetchService.getProductsByUrl(skuid, website, url);
 
         TaskStatus taskStatus = fetchedResult.getTaskStatus();
 
@@ -138,12 +131,6 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
         System.out.println(JSONUtil.toJSON(fetchedProduct).toString());
 
-        //更新ptmcmpsku
-        cmpSkuService.updateCmpSkuBySpiderFetchedProduct(sku.getId(), fetchedProduct);
-        //多图
-        cmpSkuService.createPtmCmpSkuImage(sku.getId(), fetchedProduct);
-        //描述
-        cmpSkuService.createDescription(sku, fetchedProduct);
 
     }
 }
