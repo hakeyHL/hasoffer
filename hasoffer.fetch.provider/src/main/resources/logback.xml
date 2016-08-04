@@ -14,10 +14,10 @@
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/stdout.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/stdout.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <FileNamePattern>${log.base}/stdout.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <MaxHistory>5</MaxHistory>
+                <MaxHistory>10</MaxHistory>
                 <!-- or whenever the file size reaches 100MB -->
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -31,10 +31,10 @@
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/fetch-task.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/fetch-task.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <FileNamePattern>${log.base}/fetch-task.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <MaxHistory>5</MaxHistory>
+                <MaxHistory>10</MaxHistory>
                 <!-- or whenever the file size reaches 100MB -->
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -48,10 +48,10 @@
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/fetch-task-result.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/fetch-task-result.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <FileNamePattern>${log.base}/fetch-task-result.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <MaxHistory>5</MaxHistory>
+                <MaxHistory>10</MaxHistory>
                 <!-- or whenever the file size reaches 100MB -->
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -66,10 +66,10 @@
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/error.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/error.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <FileNamePattern>${log.base}/error.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <MaxHistory>5</MaxHistory>
+                <MaxHistory>10</MaxHistory>
                 <!-- or whenever the file size reaches 100MB -->
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -89,10 +89,10 @@
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/info.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/info.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <FileNamePattern>${log.base}/info.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <MaxHistory>5</MaxHistory>
+                <MaxHistory>10</MaxHistory>
                 <!-- or whenever the file size reaches 100MB -->
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -106,10 +106,10 @@
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/thirdPart.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/thirdPart.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <FileNamePattern>${log.base}/thirdPart.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <MaxHistory>5</MaxHistory>
+                <MaxHistory>10</MaxHistory>
                 <!-- or whenever the file size reaches 100MB -->
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -121,12 +121,13 @@
 
     <appender name="fetchLoggerFileOut"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <Encoding></Encoding>
         <file>${log.base}/fetch.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/fetch.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <FileNamePattern>${log.base}/fetch.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <MaxHistory>5</MaxHistory>
+                <MaxHistory>10</MaxHistory>
                 <!-- or whenever the file size reaches 100MB -->
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
