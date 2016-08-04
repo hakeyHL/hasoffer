@@ -64,4 +64,13 @@ public class PtmCmpSkuDescription {
         result = 31 * result + (jsonDescription != null ? jsonDescription.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "PtmCmpSkuDescription{" +
+                "id=" + id +
+                ", jsonParam='" + jsonParam + '\'' +
+                ", jsonDescription='" + jsonDescription + '\'' +
+                '}';
+    }
 }

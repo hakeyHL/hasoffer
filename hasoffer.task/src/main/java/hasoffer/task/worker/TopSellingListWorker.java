@@ -31,7 +31,7 @@ public class TopSellingListWorker implements Runnable {
 
         for (PtmTopSelling topSelling : topSellingList) {
 
-            Long productid = topSelling.getId();
+            long productid = topSelling.getId();
 
             SrmSearchLog log = new SrmSearchLog();
             log.setPtmProductId(productid);

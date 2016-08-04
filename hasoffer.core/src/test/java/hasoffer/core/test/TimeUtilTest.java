@@ -56,12 +56,12 @@ public class TimeUtilTest {
 
     @Test
     public void f2() {
-        System.out.println(new Date(1461816231294L));
+        System.out.println(new Date(1470262389785L));
     }
 
     @Test
     public void getTimeMillis() {
-        Date date = TimeUtils.stringToDate("2016-06-06 00:00:00", "yyyy-MM-dd HH:mm:ss");
+        Date date = TimeUtils.stringToDate("2016-08-04 00:00:00", "yyyy-MM-dd HH:mm:ss");
         Date date1 = TimeUtils.stringToDate("2016-06-07 00:00:00", "yyyy-MM-dd hh:mm:ss");
         System.out.println(date.toString());
         System.out.println(date1.toString());

@@ -1,11 +1,12 @@
 package hasoffer.api.controller;
 
 import hasoffer.core.app.AdvertiseService;
-import hasoffer.core.persistence.po.admin.Advertisement;
+import hasoffer.core.persistence.po.admin.Adt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
@@ -29,14 +30,13 @@ public class AppAdController {
      * @return
      */
     @RequestMapping("product")
-    public ModelAndView getAdsByProductId() {
-        //TODO 广告返回
+    public ModelAndView getAdsByProductId(@RequestParam(defaultValue = "0") Long productId) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
-        List<Advertisement> advertisements = advertiseService.getAdByCategory();
-        if (advertisements != null && advertisements.size() > 0) {
-            modelAndView.addObject("data", advertisements.get(0));
+        List<Adt> adt = advertiseService.getAdByCategory();
+        if (adt != null && adt.size() > 0) {
+            modelAndView.addObject("data", adt.get(0));
         } else {
             modelAndView.addObject("data", "{\n" +
                     "        \"aderlogoUrl\": \"http://h.hiphotos.baidu.com/baike/w%3D268%3Bg%3D0/sign=d66357243fdbb6fd255be220311fcc25/c75c10385343fbf235a845fcb67eca8064388f6d.jpg\",\n" +
