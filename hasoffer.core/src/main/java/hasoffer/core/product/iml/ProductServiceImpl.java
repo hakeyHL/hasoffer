@@ -382,7 +382,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public List<PtmTopSelling> getTopSellings(Long yesterdayStart, Long todayStart, int page, int size) {
-        return dbm.query(Q_PTM_TOPSEELLING, page < 1 ? 1 : page, size == 0 ? 20 : size, Arrays.asList(yesterdayStart, todayStart));
+        return dbm.query(Q_PTM_TOPSEELLING, page < 1 ? 1 : page, size == 0 ? 20 : size);
     }
 
     @Override
