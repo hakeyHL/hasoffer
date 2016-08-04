@@ -1,6 +1,6 @@
 package hasoffer.core.app;
 
-import hasoffer.core.persistence.po.admin.Advertisement;
+import hasoffer.core.persistence.po.admin.Adt;
 
 import java.util.List;
 
@@ -10,5 +10,6 @@ import java.util.List;
  */
 public interface AdvertiseService {
 
-    public List<Advertisement> getAdByCategory();
+    public List<Adt> getAdByCategory();
+
 }
