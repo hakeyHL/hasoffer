@@ -60,52 +60,51 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
         while (true) {
 
-//            try {
+            try {
 
-            SrmSearchLog searchLog = queue.poll();
+                SrmSearchLog searchLog = queue.poll();
 
-            if (searchLog == null) {
-                try {
-                    TimeUnit.SECONDS.sleep(3);
-                    logger.info("task update get null sleep 3 seconds");
-                } catch (InterruptedException e) {
-                    return;
-                }
-                continue;
-            }
-
-            long productId = searchLog.getPtmProductId();
-            if (productId == 0) {
-                continue;
-            }
-
-            List<PtmCmpSku> skuList = dbm.query(Q_PTMCMPSKU_BYPRODUCTID, Arrays.asList(productId));
-
-            for (PtmCmpSku sku : skuList) {
-                //判断，如果该sku 当天更新过价格, 直接跳过
-                Date updateTime = sku.getUpdateTime();
-                if (updateTime != null) {
-                    if (updateTime.compareTo(TimeUtils.toDate(TimeUtils.today())) > 0) {
-                        continue;
+                if (searchLog == null) {
+                    try {
+                        TimeUnit.SECONDS.sleep(3);
+                        logger.info("task update get null sleep 3 seconds");
+                    } catch (InterruptedException e) {
+                        return;
                     }
+                    continue;
                 }
 
-                //更新商品的信息，写入多图数据，写入描述/参数
-                updatePtmCmpSku(sku, searchLog);
+                long productId = searchLog.getPtmProductId();
+                if (productId == 0) {
+                    continue;
+                }
+
+                List<PtmCmpSku> skuList = dbm.query(Q_PTMCMPSKU_BYPRODUCTID, Arrays.asList(productId));
+
+                for (PtmCmpSku sku : skuList) {
+                    //判断，如果该sku 当天更新过价格, 直接跳过
+                    Date updateTime = sku.getUpdateTime();
+                    if (updateTime != null) {
+                        if (updateTime.compareTo(TimeUtils.toDate(TimeUtils.today())) > 0) {
+                            continue;
+                        }
+                    }
+
+                    //更新商品的信息，写入多图数据，写入描述/参数
+                    updatePtmCmpSku(sku, searchLog);
+                }
+
+                //更新商品的价格，同时修改updateTime字段
+                if (skuList == null || skuList.size() == 0) {
+                    continue;
+                }
+
+                productService.updatePtmProductPrice(productId);
+
+            } catch (Exception e) {
+
+
             }
-
-            //更新商品的价格，同时修改updateTime字段
-            if (skuList == null || skuList.size() == 0) {
-                continue;
-            }
-
-            productService.updatePtmProductPrice(productId);
-
-//            } catch (Exception e) {
-//
-//
-//
-//            }
         }
     }
 
