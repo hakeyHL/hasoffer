@@ -105,9 +105,7 @@ public class SearchRecordProcessWorker implements Runnable {
         scheduleReqClient.pushTaskScheduleInfo(taskSchedule, new CallbackListener() {
             @Override
             public void recycleResult(TaskSchedule result) {
-                System.out.println("result:" + result.toString());
-                System.out.println("update mongodb!!!");
-
+                logger.info("dubbo.CallbackListener():" + result.toString());
             }
         });
     }
@@ -250,7 +248,7 @@ public class SearchRecordProcessWorker implements Runnable {
 
     private void initResultMap(SrmAutoSearchResult autoSearchResult, FetchResult fetchResult) {
         //1 判断抓取有没有返回商品，没有的话直接退出。
-        if (fetchResult == null || !fetchResult.isOver()) {
+        if (fetchResult == null || !fetchResult.overFetch()) {
             return;
         }
         Map<Website, WebFetchResult> fetchResultMap = autoSearchResult.getSitePros();

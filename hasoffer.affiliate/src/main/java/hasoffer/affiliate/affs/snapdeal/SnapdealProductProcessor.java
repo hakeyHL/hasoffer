@@ -12,7 +12,6 @@ import hasoffer.affiliate.model.AffiliateCategory;
 import hasoffer.affiliate.model.AffiliateProduct;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.model.Website;
-import hasoffer.base.utils.TimeUtils;
 import hasoffer.base.utils.http.HttpUtils;
 
 import java.io.IOException;
@@ -25,7 +24,7 @@ import java.util.*;
 public class SnapdealProductProcessor implements IAffiliateProcessor<SnapDealAffiliateOrder> {
 
     private static final String TRACKINGID = "82856";
-    private static final String TOEKN = "cc3aa2059100114e957e7d97cbe0df";
+    private static final String TOEKN = "09bf4a55fafe2ccc3c077e2ea48642";
     private static final String AFFILIATE_BASE_URL = "http://affiliate-feeds.snapdeal.com/feed/" + TRACKINGID + ".json";
     private static final String AFFILIATE_PRODUCTDETAIL_URL = "http://affiliate-feeds.snapdeal.com/feed/product?id=";
 
@@ -35,7 +34,7 @@ public class SnapdealProductProcessor implements IAffiliateProcessor<SnapDealAff
 
     public static final String R_ORDER_STATUS_APPROVED = "approved";
     public static final String R_ORDER_STATUS_CANCELLED = "cancelled";
-    public static final String R_ORDER_STATUS_TENTATIVE = "cancelled";
+    //public static final String R_ORDER_STATUS_TENTATIVE = "approved";
 
 
 
@@ -137,7 +136,7 @@ public class SnapdealProductProcessor implements IAffiliateProcessor<SnapDealAff
         if (headerMap == null) {
             headerMap = new HashMap<String, String>();
         }
-        headerMap.put("Snapdeal-Token-Id", getAffiliateToken());
+        headerMap.put("Snapdeal-Token-Id", TOEKN);
         headerMap.put("Snapdeal-Affiliate-Id", TRACKINGID);
 
         HttpResponseModel responseModel = HttpUtils.get(urlString, headerMap, parameterMap);
@@ -184,10 +183,10 @@ public class SnapdealProductProcessor implements IAffiliateProcessor<SnapDealAff
                     if (order.getStatus() == null) {
                         order.setStatus(parameterMap.get(R_ORDER_STATUS));
                     }
-                    long x= TimeUtils.MILLISECONDS_OF_1_DAY*30;
-                    if (R_ORDER_STATUS_APPROVED.equals(order.getStatus()) && new Date().getTime() - order.getDateTime().getTime() < x) {
-                        order.setStatus(R_ORDER_STATUS_TENTATIVE);
-                    }
+                    //long x= TimeUtils.MILLISECONDS_OF_1_DAY*30;
+                    //if (R_ORDER_STATUS_APPROVED.equals(order.getStatus()) && new Date().getTime() - order.getDateTime().getTime() < x) {
+                    //    order.setStatus(R_ORDER_STATUS_APPROVED);
+                    //}
                 }
             }
             return productDetails;

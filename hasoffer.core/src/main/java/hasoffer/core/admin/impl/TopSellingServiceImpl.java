@@ -18,7 +18,7 @@ import java.util.Arrays;
 @Service
 public class TopSellingServiceImpl implements ITopSellingService {
 
-    private static final String Q_TOPSELLINGLIST_BYSTATUS = "SELECT t FROM PtmTopSelling t WHERE t.status = ?0 ORDER BY t.count DESC";
+    private static final String Q_TOPSELLINGLIST_BYSTATUS = "SELECT t FROM PtmTopSelling t WHERE  t.status = ?0 order by t.lUpdateTime desc , t.count desc ";
 
     @Resource
     IDataBaseManager dbm;

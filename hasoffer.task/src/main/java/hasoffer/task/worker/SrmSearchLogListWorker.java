@@ -1,12 +1,12 @@
 package hasoffer.task.worker;
 
 import hasoffer.base.model.PageableResult;
-import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
-import hasoffer.fetch.helper.WebsiteHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
@@ -17,6 +17,8 @@ import java.util.concurrent.TimeUnit;
  * Created on 2016/5/13.
  */
 public class SrmSearchLogListWorker implements Runnable {
+
+    private static Logger logger = LoggerFactory.getLogger(SrmSearchLogListWorker.class);
 
     private IDataBaseManager dbm;
     private ConcurrentLinkedQueue<SrmSearchLog> queue;
@@ -44,13 +46,15 @@ public class SrmSearchLogListWorker implements Runnable {
             if (ArrayUtils.hasObjs(dataList)) {
                 startDate = dataList.get(dataList.size() - 1).getUpdateTime();
 
-                for (SrmSearchLog log : dataList) {
-
-                    Website website = Website.valueOf(log.getSite());
-                    if (WebsiteHelper.DEFAULT_WEBSITES.contains(website)) {
-                        queue.add(log);
-                    }
-                }
+                queue.addAll(dataList);
+//                for (SrmSearchLog log : dataList) {
+//
+//                    Website website = Website.valueOf(log.getSite());
+//                    if (WebsiteHelper.DEFAULT_WEBSITES.contains(website)) {
+//                        queue.add(log);
+//                    }
+//                }
+                logger.info("next start date : " + startDateString + "---------------------------------------------------------------------------");
             } else {
                 try {
                     TimeUnit.MINUTES.sleep(1);

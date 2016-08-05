@@ -7,6 +7,11 @@ import hasoffer.core.persistence.dbm.HibernateDao;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
+import hasoffer.core.product.solr.DealIndexServiceImpl;
+import hasoffer.core.product.solr.DealModel;
+import hasoffer.core.task.ListAndProcessTask2;
+import hasoffer.core.task.worker.IList;
+import hasoffer.core.task.worker.IProcess;
 import hasoffer.core.utils.excel.ExcelImporter;
 import hasoffer.core.utils.excel.ImportCallBack;
 import hasoffer.core.utils.excel.ImportConfig;
@@ -28,11 +33,14 @@ public class DealServiceImpl implements IDealService {
 
     private static final long EXPIRE_TIME_MS = 7 * 24 * 60 * 60 * 1000;
 
-    private static final String IMPORT_SQL = "insert into appdeal(website, title, linkUrl, expireTime, priceDescription ,description, createTime,  push ,display ,imageUrl) values(?,?, ?, ?, ?, ? ,?, ?, ?, ?)";
+    private static final String IMPORT_SQL = "insert into appdeal(website, title, linkUrl, expireTime, priceDescription ,description, createTime,  push ,display ,imageUrl,discount,dealCategoryId,dealClickCount) values(?,?, ?, ?, ?, ? ,?, ?, ?, ?,?,?,?)";
+
+    private static final String Q_DEALS = "SELECT t FROM AppDeal t";
 
     @Resource
     IDataBaseManager dbm;
-
+    @Resource
+    DealIndexServiceImpl dealIndexService;
     @Resource
     ExcelImporter importer;
     @Resource
@@ -72,7 +80,7 @@ public class DealServiceImpl implements IDealService {
                                                                                     int repeatRows = 0;
                                                                                     List<Object[]> dataQueue = new LinkedList<Object[]>();
                                                                                     for (int i = 0; i < data.size(); i++) {
-                                                                                        Object[] tempData = new Object[10];
+                                                                                        Object[] tempData = new Object[13];
                                                                                         for (int j = 0; j < tempData.length; j++) {
                                                                                             //TODO  网站名/deal名称/deal跳转链接为空 记录日志
                                                                                             if (StringUtils.isBlank(data.get(i)[0] + "") || StringUtils.isBlank(data.get(i)[1] + "") || StringUtils.isBlank(data.get(i)[2] + "")) {
@@ -113,7 +121,15 @@ public class DealServiceImpl implements IDealService {
                                                                                             if (tempData[8] == null || StringUtils.isBlank(tempData[8] + "")) {
                                                                                                 tempData[8] = 0;
                                                                                             }
-
+                                                                                            if (tempData[10] == null || StringUtils.isBlank(tempData[10] + "")) {
+                                                                                                tempData[10] = 50;
+                                                                                            }
+                                                                                            if (tempData[11] == null || StringUtils.isBlank(tempData[11] + "")) {
+                                                                                                tempData[11] = -1l;
+                                                                                            }
+                                                                                            if (tempData[12] == null || StringUtils.isBlank(tempData[12] + "")) {
+                                                                                                tempData[12] = 0l;
+                                                                                            }
 
                                                                                             // TODO 重复元素记录日志
                                                                                             for (int k = 0; k < dataQueue.size(); k++) {
@@ -184,5 +200,48 @@ public class DealServiceImpl implements IDealService {
     @Transactional(rollbackFor = Exception.class)
     public void updateDeal(AppDeal deal) {
         dao.save(deal);
+    }
+
+    @Override
+    public void importDeal2Solr(DealModel dm) {
+        dealIndexService.createOrUpdate(dm);
+    }
+
+    @Override
+    public void reimportAllDeals2Solr() {
+
+        ListAndProcessTask2<AppDeal> listAndProcessTask2 = new ListAndProcessTask2<AppDeal>(
+                new IList<AppDeal>() {
+                    @Override
+                    public PageableResult getData(int page) {
+                        return dbm.queryPage(Q_DEALS, page, 500);
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcess<AppDeal>() {
+                    @Override
+                    public void process(AppDeal o) {
+                        DealModel dm = new DealModel(o);
+                        importDeal2Solr(dm);
+                    }
+                }
+        );
+
+        try {
+            dealIndexService.removeAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        listAndProcessTask2.go();
     }
 }

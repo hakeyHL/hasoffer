@@ -1,9 +1,9 @@
 package hasoffer.task.worker;
 
-import hasoffer.base.exception.ContentParseException;
-import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.TaskStatus;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.JSONUtil;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
@@ -44,63 +45,69 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
     @Override
     public void run() {
+
         while (true) {
-            SrmSearchLog searchLog = queue.poll();
 
-            if (searchLog == null) {
-                try {
-                    TimeUnit.SECONDS.sleep(3);
-                    logger.info("task update get null sleep 3 seconds");
-                } catch (InterruptedException e) {
-                    return;
+            try {
+
+                SrmSearchLog searchLog = queue.poll();
+
+                if (searchLog == null) {
+                    try {
+                        TimeUnit.SECONDS.sleep(3);
+                        logger.info("task update get null sleep 3 seconds");
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                    continue;
                 }
-                continue;
+
+                long productId = searchLog.getPtmProductId();
+                if (productId == 0) {
+                    continue;
+                }
+
+                List<PtmCmpSku> skuList = dbm.query(Q_PTMCMPSKU_BYPRODUCTID, Arrays.asList(productId));
+
+                for (PtmCmpSku sku : skuList) {
+                    //判断，如果该sku 当天更新过价格, 直接跳过
+                    Date updateTime = sku.getUpdateTime();
+                    if (updateTime != null) {
+                        if (updateTime.compareTo(TimeUtils.toDate(TimeUtils.today())) > 0) {
+                            continue;
+                        }
+                    }
+
+                    //更新商品的信息，写入多图数据，写入描述/参数
+                    updatePtmCmpSku(sku, searchLog);
+                }
+
+                //更新商品的价格，同时修改updateTime字段
+                if (skuList == null || skuList.size() == 0) {
+                    continue;
+                }
+
+                productService.updatePtmProductPrice(productId);
+
+            } catch (Exception e) {
+
             }
-
-//  for test暂时注释掉               判断，如果该sku 当天更新过价格, 直接跳过
-//                Date updateTime = sku.getUpdateTime();
-//                if (updateTime != null) {
-//                    if (updateTime.compareTo(TimeUtils.toDate(TimeUtils.today())) > 0) {
-//                        continue;
-//                    }
-//                }
-
-            long productId = searchLog.getPtmProductId();
-            if (productId == 0) {
-                continue;
-            }
-
-            List<PtmCmpSku> skuList = dbm.query(Q_PTMCMPSKU_BYPRODUCTID, Arrays.asList(productId));
-
-            for (PtmCmpSku sku : skuList) {
-                updatePtmCmpSku(sku, searchLog);
-            }
-
-            //更新商品的价格
-//            暂时注释掉，测试完再打开
-            productService.updatePtmProductPrice(productId);
         }
     }
 
     private void updatePtmCmpSku(PtmCmpSku sku, SrmSearchLog searchLog) {
         // try update sku
+        Long skuid = sku.getId();
         String url = sku.getUrl();
         Website website = WebsiteHelper.getWebSite(url);
 
         if (website == null) {
-            logger.info(" parse website get null for [" + sku.getId() + "]");
             return;
         }
 
         FetchUrlResult fetchedResult = null;
 
-        try {
-            fetchedResult = fetchService.getProductsByUrl(website, url);
-        } catch (HttpFetchException e) {
-            logger.info("HttpFetchException for [" + sku.getId() + "]");
-        } catch (ContentParseException e) {
-            logger.info("ContentParseException for [" + sku.getId() + "]");
-        }
+        fetchedResult = fetchService.getProductsByUrl(skuid, website, url);
 
         TaskStatus taskStatus = fetchedResult.getTaskStatus();
 
@@ -113,29 +120,17 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             return;
         } else if (TaskStatus.STOPPED.equals(taskStatus)) {
             logger.info("taskstatus STOPPED for [" + sku.getId() + "]");
+            return;
         } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
             logger.info("taskstatus EXCEPTION for [" + sku.getId() + "]");
+            return;
         } else {//(TaskStatus.FINISH.equals(taskStatus)))
             logger.info("taskstatus FINISH for [" + sku.getId() + "]");
             fetchedProduct = fetchedResult.getFetchProduct();
         }
 
-//        此处是FK、SD正常更新逻辑放弃对title字段的更新，该有另外的task统一维护
-//        切换新的更新模式，采用页面更新的方式，所有可以不用考虑title
-//        if (fetchedProduct != null) {
-//            if (Website.FLIPKART.equals(fetchedProduct.getWebsite()) || Website.SNAPDEAL.equals(fetchedProduct.getWebsite())) {
-//                fetchedProduct.setTitle(null);
-//            }
-//        }
+        System.out.println(JSONUtil.toJSON(fetchedProduct).toString());
 
-        try {
-            cmpSkuService.updateCmpSkuBySpiderFetchedProduct(sku.getId(), fetchedProduct);
-            logger.info("fetch success for [" + sku.getId() + "]");
-        } catch (Exception e) {
-            logger.info(e.toString());
-            if (fetchedProduct != null) {
-                logger.info("title:" + fetchedProduct.getTitle());
-            }
-        }
+
     }
 }

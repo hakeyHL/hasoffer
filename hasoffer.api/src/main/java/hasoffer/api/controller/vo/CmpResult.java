@@ -26,7 +26,7 @@ public class CmpResult {
     private String specs;
     private String copywriting;
     private AppDisplayMode displayMode;
-
+    private boolean std;//是否为标品
     private String image;
 
     public CmpResult(float priceOff, ProductVo productVo, PageableResult<ComparedSkuVo> pagedComparedSkuVos) {
@@ -134,4 +134,11 @@ public class CmpResult {
         this.displayMode = displayMode;
     }
 
+    public boolean isStd() {
+        return std;
+    }
+
+    public void setStd(boolean std) {
+        this.std = std;
+    }
 }

@@ -1,6 +1,9 @@
 package hasoffer.admin.controller;
 
-import hasoffer.admin.controller.vo.*;
+import hasoffer.admin.controller.vo.CmpStatVo;
+import hasoffer.admin.controller.vo.DeviceAliveVo;
+import hasoffer.admin.controller.vo.HiJackReportVo;
+import hasoffer.admin.controller.vo.OrderStatsAnalysisVO;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.HexDigestUtil;
@@ -12,11 +15,7 @@ import hasoffer.core.admin.IOrderStatsAnalysisService;
 import hasoffer.core.persistence.mongo.StatDayAlive;
 import hasoffer.core.persistence.mongo.StatDevice;
 import hasoffer.core.persistence.mongo.StatHijackFetchCount;
-import hasoffer.core.persistence.po.log.SkuUpdateLog;
-import hasoffer.core.persistence.po.stat.StatPtmCmpSkuUpdate;
-import hasoffer.core.product.ICmpSkuUpdateStatService;
 import hasoffer.core.user.IDeviceService;
-import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.helper.PageHelper;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -28,7 +27,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.text.ParseException;
 import java.util.*;
 
 
@@ -52,9 +50,6 @@ public class ShowStatController {
 
     @Resource
     IOrderStatsAnalysisService orderStatsAnalysisService;
-
-    @Resource
-    ICmpSkuUpdateStatService cmpSkuUpdateStatService;
 
     @Resource
     IHijackFetchService hijackFetchService;
@@ -233,7 +228,7 @@ public class ShowStatController {
             endTime = DEFAULT_TIME;
         }
         webSite = webSite.toUpperCase();
-        String orderStatus="tentative";
+        String orderStatus = "tentative";
         String YMD_WEB_PATTERN = "yyyy-MM-dd";
         Date startYmd = TimeUtils.stringToDate(startTime, YMD_WEB_PATTERN);
         Date endYmd = TimeUtils.stringToDate(endTime, YMD_WEB_PATTERN);
@@ -252,9 +247,9 @@ public class ShowStatController {
                 vo.setNoneUserCount(po.get("noneUserCount").toString());
 //                vo.setRediCount(po.get("rediCount").toString());
 //                vo.setShopCount(po.get("shopCount").toString());
-                vo.setGoogleChannel(po.get("googleChannel").toString());
-                vo.setNineAppChannel(po.get("nineAppChannel").toString());
-                vo.setShanchuanChannel(po.get("shanchuanChannel").toString());
+                vo.setGoogleChannel(po.get("googleChannel").toString() + " /" + po.get("googleOldChannel").toString() + " /" + po.get("googleNewChannel").toString() + " /" + po.get("googleNoneChannel").toString());
+                vo.setShanchuanChannel(po.get("shanchuanChannel").toString() + " /" + po.get("shanchuanOldChannel").toString() + " /" + po.get("shanchuanNewChannel").toString() + " /" + po.get("shanchuanNoneChannel").toString());
+                vo.setNineAppChannel(po.get("nineAppChannel").toString() + " /" + po.get("nineAppOldChannel").toString() + " /" + po.get("nineAppNewChannel").toString() + " /" + po.get("nineAppNoneChannel").toString());
                 vo.setNoneChannel(po.get("noneChannel").toString());
                 reportList.add(vo);
             } catch (Exception e) {
@@ -355,119 +350,6 @@ public class ShowStatController {
         return mav;
     }
 
-
-    @RequestMapping(value = "/listskuupdate", method = RequestMethod.GET)
-    public ModelAndView listSkuUpdate(HttpServletRequest request,
-                                      @RequestParam(defaultValue = "ALL") String webSite,
-                                      @RequestParam(defaultValue = "") String startTime,
-                                      @RequestParam(defaultValue = "") String endTime,
-                                      @RequestParam(defaultValue = "1") int page,
-                                      @RequestParam(defaultValue = "100") int size) throws ParseException {
-
-        if (StringUtils.isEmpty(startTime)) {
-            startTime = TimeUtils.parse(TimeUtils.today(), "yyyy-MM-dd");
-        }
-        if (StringUtils.isEmpty(endTime)) {
-            endTime = TimeUtils.parse(TimeUtils.today(), "yyyy-MM-dd");
-        }
-
-        ModelAndView modelAndView = new ModelAndView("showstat/listSkuUpdateStat");
-
-        List<StatPtmCmpSkuUpdate> cmpUpdateList = new ArrayList<StatPtmCmpSkuUpdate>();
-        // 获取idlist
-        List<String> idList = getStatSkuUpdateIdList(startTime, endTime, webSite);
-        // 通过idlist查询
-        for (String idString : idList) {
-            StatPtmCmpSkuUpdate cmpUpdateStat = cmpSkuUpdateStatService.findStatPtmCmpSkuUpdateById(idString);
-            if (cmpUpdateStat != null) {
-                cmpUpdateList.add(cmpUpdateStat);
-            }
-        }
-
-        //封装一个返回前台的vo集合
-        List<StatPtmCmpSkuUpdateVo> cmpUpdateVoList = getCmpUpdateStatVoList(cmpUpdateList);
-
-        // 集合返回前台
-        modelAndView.addObject("cmpUpdateVoList", cmpUpdateVoList);
-        modelAndView.addObject("webSite", webSite.toLowerCase());
-        modelAndView.addObject("startTime", startTime);
-        modelAndView.addObject("endTime", endTime);
-
-        return modelAndView;
-    }
-
-    private List<StatPtmCmpSkuUpdateVo> getCmpUpdateStatVoList(List<StatPtmCmpSkuUpdate> cmpUpdateList) {
-
-        List<StatPtmCmpSkuUpdateVo> cmpUpdateStatVoList = new ArrayList<StatPtmCmpSkuUpdateVo>();
-
-        for (StatPtmCmpSkuUpdate cmpUpdateStat : cmpUpdateList) {
-            StatPtmCmpSkuUpdateVo cmpUpdateStatVo = getCmpUpdateVo(cmpUpdateStat);
-            cmpUpdateStatVoList.add(cmpUpdateStatVo);
-        }
-
-        return cmpUpdateStatVoList;
-    }
-
-    private StatPtmCmpSkuUpdateVo getCmpUpdateVo(StatPtmCmpSkuUpdate cmpUpdateStat) {
-
-        StatPtmCmpSkuUpdateVo cmpUpdateStatVo = new StatPtmCmpSkuUpdateVo();
-
-        cmpUpdateStatVo.setDate(cmpUpdateStat.getDate());
-        cmpUpdateStatVo.setWebsite(cmpUpdateStat.getWebsite());
-        cmpUpdateStatVo.setOnSaleAmount(cmpUpdateStat.getOnSaleAmount());
-        cmpUpdateStatVo.setSoldOutAmount(cmpUpdateStat.getSoldOutAmount());
-        cmpUpdateStatVo.setOffsaleAmount(cmpUpdateStat.getOffsaleAmount());
-        cmpUpdateStatVo.setUpdateSuccessAmount(cmpUpdateStat.getUpdateSuccessAmount());
-        cmpUpdateStatVo.setAlwaysFailAmount(cmpUpdateStat.getAlwaysFailAmount());
-        cmpUpdateStatVo.setNewSkuAmount(cmpUpdateStat.getNewSkuAmount());
-        cmpUpdateStatVo.setIndexAmount(cmpUpdateStat.getIndexAmount());
-        cmpUpdateStatVo.setNewIndexAmount(cmpUpdateStat.getNewIndexAmount());
-        cmpUpdateStatVo.setUpdateTime(cmpUpdateStat.getUpdateTime());
-        long all = cmpUpdateStat.getOnSaleAmount() + cmpUpdateStat.getSoldOutAmount() + cmpUpdateStat.getOffsaleAmount();
-        if (all == 0) {
-            cmpUpdateStatVo.setProportion(0);
-        } else {
-            long proportion = cmpUpdateStat.getUpdateSuccessAmount() * 100 / all;
-            cmpUpdateStatVo.setProportion(proportion);
-        }
-
-
-        return cmpUpdateStatVo;
-    }
-
-    private List<String> getStatSkuUpdateIdList(String startTime, String endTime, String webSite) {
-
-        List<String> idList = new ArrayList<String>();
-
-        Date startDate = TimeUtils.stringToDate(startTime, "yyyy-MM-dd");
-        Date endDate = TimeUtils.stringToDate(endTime, "yyyy-MM-dd");
-
-        if (StringUtils.isEqual("ALL", webSite)) {
-            while (startDate.getTime() <= endDate.getTime()) {
-                for (Website website : WebsiteHelper.DEFAULT_WEBSITES) {
-                    String todayString = TimeUtils.parse(startDate, "yyyyMMdd");
-                    String id = HexDigestUtil.md5(website.name() + todayString);
-                    idList.add(id);
-                }
-                startDate = TimeUtils.addDay(startDate, 1);
-            }
-        } else {
-            while (startDate.getTime() <= endDate.getTime()) {
-                for (Website website : WebsiteHelper.DEFAULT_WEBSITES) {
-                    if (website.name().equals(webSite)) {
-                        String todayString = TimeUtils.parse(startDate, "yyyyMMdd");
-                        String id = HexDigestUtil.md5(website.name() + todayString);
-                        idList.add(id);
-                    }
-                }
-                startDate = TimeUtils.addDay(startDate, 1);
-            }
-
-        }
-
-        return idList;
-    }
-
     @RequestMapping(value = "/listsearchloghijacktest", method = RequestMethod.GET)
     public ModelAndView listSearchlogHijackTest(
             @RequestParam(defaultValue = "") String webSite,
@@ -547,50 +429,6 @@ public class ShowStatController {
         }
 
         return idList;
-    }
-
-    @RequestMapping(value = "/skuvisitupdate", method = RequestMethod.GET)
-    public ModelAndView skuVisitUpdate(@RequestParam(defaultValue = "") String webSite,
-                                       @RequestParam(defaultValue = "") String startTime,
-                                       @RequestParam(defaultValue = "") String endTime) {
-
-        ModelAndView modelAndView = new ModelAndView("showstat/skuVisitUpdate");
-
-        if (StringUtils.isEmpty(startTime)) {
-            startTime = TimeUtils.parse(TimeUtils.today(), "yyyy-MM-dd");
-        }
-        if (StringUtils.isEmpty(endTime)) {
-            endTime = TimeUtils.parse(TimeUtils.today(), "yyyy-MM-dd");
-        }
-
-        Date startDate = TimeUtils.stringToDate(startTime, "yyyy-MM-dd");
-        Date endDate = TimeUtils.stringToDate(endTime, "yyyy-MM-dd");
-
-        List<String> idList = new ArrayList<String>();
-
-        if (StringUtils.isEmpty(webSite)) {
-            for (Website website : WebsiteHelper.DEFAULT_WEBSITES) {
-                idList.addAll(getIdByDate(startDate, endDate, website.name()));
-            }
-        } else {
-            idList.addAll(getIdByDate(startDate, endDate, webSite.toUpperCase()));
-        }
-
-
-        List<SkuUpdateLog> logList = new ArrayList<SkuUpdateLog>();
-
-        for (String id : idList) {
-
-            SkuUpdateLog skuUpdateLog = cmpSkuUpdateStatService.findSkuUpdateLog(id);
-            logList.add(skuUpdateLog);
-        }
-
-        modelAndView.addObject("logList", logList);
-        modelAndView.addObject("webSite", webSite);
-        modelAndView.addObject("startTime", startTime);
-        modelAndView.addObject("endTime", endTime);
-
-        return modelAndView;
     }
 
 }

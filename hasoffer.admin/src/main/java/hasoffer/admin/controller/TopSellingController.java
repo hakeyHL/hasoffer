@@ -5,9 +5,11 @@ import hasoffer.base.model.PageModel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.IDUtil;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.ITopSellingService;
 import hasoffer.core.bo.enums.TopSellStatus;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.PtmTopSelling;
@@ -16,10 +18,12 @@ import hasoffer.core.product.IImageService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.utils.ImageUtil;
+import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.webcommon.helper.PageHelper;
 import jodd.io.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,9 +32,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created on 2016/7/6.
@@ -41,6 +43,7 @@ public class TopSellingController {
 
     private static final String Q_COUNT_SKU = "SELECT COUNT(*) FROM PtmCmpSku t WHERE t.productId = ?0 ";
     private static final String Q_SRMSEARCHLOG_BYPRODUCTID = "SELECT t FROM SrmSearchLog t WHERE t.ptmProductId = ?0 ";
+    private static final String Q_PTMCMPSKU_BYPRODUCTID = "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ";
 
     @Resource
     ITopSellingService topSellingService;
@@ -52,6 +55,9 @@ public class TopSellingController {
     ICacheService cacheService;
     @Resource
     IDataBaseManager dbm;
+    @Resource
+    @Qualifier
+    IFetchDubboService fetchDubboService;
 
     private Logger logger = LoggerFactory.getLogger(TopSellingController.class);
 
@@ -71,7 +77,7 @@ public class TopSellingController {
         }
 
         TopSellStatus selectstatus = TopSellStatus.valueOf(topSellingStatusString);
-
+        Calendar calendar = Calendar.getInstance();
         PageableResult<PtmTopSelling> pageableResult = topSellingService.findTopSellingList(selectstatus, page, size);
 
         List<PtmTopSelling> ptmTopSellingList = pageableResult.getData();
@@ -185,12 +191,38 @@ public class TopSellingController {
         TopSellStatus status = topSelling.getStatus();
 
         //清除缓存
-        cacheService.del("PRODUCT__listPagedCmpSkus_TopSelling_0 _20");
-
+        cacheService.del("PRODUCT__listPagedCmpSkus_TopSelling_0_20");
+//                        PRODUCT__listPagedCmpSkus_TopSelling_0_20
         if (TopSellStatus.WAIT.equals(status)) {
             topSellingService.updateTopSellingStatus(topsellingid, TopSellStatus.ONLINE);
         } else {
             topSellingService.updateTopSellingStatus(topsellingid, TopSellStatus.WAIT);
         }
+    }
+
+    @RequestMapping(value = "/sendFetchRequest/{productid}", method = RequestMethod.GET)
+    @ResponseBody
+    public String sendFetchRequest(@PathVariable long productid) {
+
+        List<PtmCmpSku> skuList = dbm.query(Q_PTMCMPSKU_BYPRODUCTID, Arrays.asList(productid));
+
+        for (PtmCmpSku sku : skuList) {
+            //判断，如果该sku 当天更新过价格, 直接跳过
+            Date updateTime = sku.getUpdateTime();
+            if (updateTime != null) {
+                if (updateTime.compareTo(TimeUtils.toDate(TimeUtils.today())) > 0) {
+                    continue;
+                }
+            }
+
+            //更新商品的信息，写入多图数据，写入描述/参数
+            try {
+                fetchDubboService.getProductsByUrl(sku.getId(), sku.getWebsite(), sku.getUrl());
+            } catch (Exception e) {
+
+            }
+        }
+
+        return "ok";
     }
 }

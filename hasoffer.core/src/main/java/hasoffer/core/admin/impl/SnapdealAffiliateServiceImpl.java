@@ -78,6 +78,10 @@ public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
                 if (deviceId != null) {
                     device = deviceRegTime.get(deviceId);
                 }
+                if (device != null) {
+                    po.setDeviceRegTime(device.getCreateTime());
+                    po.setVersion(device.getAppVersion());
+                }
                 po.setUserType("NONE");
                 if (device != null && device.getCreateTime().compareTo(startTime) > 0) {
                     po.setUserType("NEW");

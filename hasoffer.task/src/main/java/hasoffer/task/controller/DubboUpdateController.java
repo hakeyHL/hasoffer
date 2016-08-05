@@ -1,12 +1,15 @@
 package hasoffer.task.controller;
 
+import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
+import hasoffer.core.product.IPtmCmpSkuImageService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.task.worker.CmpSkuDubboUpdateWorker;
 import hasoffer.task.worker.SrmSearchLogListWorker;
+import hasoffer.task.worker.TopSellingListWorker;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,8 +29,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RequestMapping(value = "/dubbofetchtask")
 public class DubboUpdateController {
 
+    private static final String Q_PTMCMPSKU_BYPRODUCTID = "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ";
     private static AtomicBoolean taskRunning1 = new AtomicBoolean(false);
-
+    private static AtomicBoolean taskRunning2 = new AtomicBoolean(false);
+    private static AtomicBoolean taskRunning3 = new AtomicBoolean(false);
     @Resource
     @Qualifier("fetchDubboService")
     IFetchDubboService fetchDubboService;
@@ -37,6 +42,10 @@ public class DubboUpdateController {
     IProductService productService;
     @Resource
     IDataBaseManager dbm;
+    @Resource
+    IMongoDbManager mdm;
+    @Resource
+    IPtmCmpSkuImageService ptmCmpSkuImageService;
 
     //dubbofetchtask/updatestart
     @RequestMapping(value = "/updatestart", method = RequestMethod.GET)
@@ -62,4 +71,27 @@ public class DubboUpdateController {
         return "ok";
     }
 
+    //dubbofetchtask/updateTopSellingSpec
+    @RequestMapping(value = "/updateTopSellingSpec", method = RequestMethod.GET)
+    @ResponseBody
+    public String updateTopSellingSpec() {
+
+        if (taskRunning2.get()) {
+            return "task running.";
+        }
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        ConcurrentLinkedQueue<SrmSearchLog> queue = new ConcurrentLinkedQueue<SrmSearchLog>();
+
+        es.execute(new TopSellingListWorker(dbm, queue));
+
+//        for (int i = 0; i < 30; i++) {
+        es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, cmpSkuService, fetchDubboService, productService));
+//        }
+
+        taskRunning2.set(true);
+
+        return "ok";
+    }
 }

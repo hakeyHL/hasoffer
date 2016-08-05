@@ -1,7 +1,5 @@
 package hasoffer.dubbo.api.fetch.service.impl;
 
-import hasoffer.base.exception.ContentParseException;
-import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
@@ -14,8 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 public class FetchDubboServiceImpl implements IFetchDubboService {
+
     private Logger logger = LoggerFactory.getLogger(FetchDubboServiceImpl.class);
 
     @Resource
@@ -34,12 +34,14 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
 
 
     @Override
-    public FetchUrlResult getProductsByUrl(Website webSite, String url) throws HttpFetchException, ContentParseException {
+    public FetchUrlResult getProductsByUrl(Long skuId, Website webSite, String url) {
 
         FetchUrlResult fetchUrlResult = getFetchUrlResult(webSite, url);
+        logger.info("FetchDubboServiceImpl.getProductsByUrl(webSite,url):{}, {} . Now is {} ", webSite, url, fetchUrlResult);
         if (fetchUrlResult == null) {
             fetchUrlResult = new FetchUrlResult(webSite, url);
             fetchUrlResult.setTaskStatus(TaskStatus.START);
+            fetchUrlResult.setDate(new Date());
             addFetchUrlTask(fetchUrlResult);
         }
 
@@ -48,7 +50,8 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
 
     private void addFetchTask(FetchResult fetchResult) {
         String key = FetchResult.getCacheKey(fetchResult);
-        fetchCacheService.saveKeywordList(StringConstant.WAIT_KEY_LIST, JSONUtil.toJSON(fetchResult));
+        fetchCacheService.pushTaskList(StringConstant.WAIT_KEY_LIST, JSONUtil.toJSON(fetchResult));
+        logger.info("FetchDubboServiceImpl.addFetchTask(FetchResult fetchResult) save {} into Redis List {}", fetchResult.getWebsite() + "_" + fetchResult.getKeyword(), StringConstant.WAIT_KEY_LIST);
         fetchCacheService.cacheResult(key, fetchResult);
     }
 
@@ -59,11 +62,13 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     }
 
     private void addFetchUrlTask(FetchUrlResult fetchUrlResult) {
+        logger.info("FetchDubboServiceImpl.addFetchUrlTask(fetchUrlResult) param={} " + fetchUrlResult.getUrl());
         String key = FetchUrlResult.getCacheKey(fetchUrlResult);
         if (key == null) {
             return;
         }
-        fetchCacheService.saveKeywordList(StringConstant.WAIT_URL_LIST, JSONUtil.toJSON(fetchUrlResult));
+        fetchCacheService.pushTaskList(StringConstant.WAIT_URL_LIST, JSONUtil.toJSON(fetchUrlResult));
+        logger.info("FetchDubboServiceImpl.addFetchUrlTask(fetchUrlResult) save {} into Redis List {}", fetchUrlResult.getUrl(), StringConstant.WAIT_URL_LIST);
         fetchCacheService.cacheResult(key, fetchUrlResult);
 
     }
@@ -72,6 +77,5 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
         String fetchResultKey = FetchUrlResult.getCacheKey(webSite, url);
         return fetchCacheService.getProductByUrl(fetchResultKey);
     }
-
 
 }

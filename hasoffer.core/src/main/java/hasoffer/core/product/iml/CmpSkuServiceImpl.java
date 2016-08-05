@@ -13,16 +13,19 @@ import hasoffer.core.exception.CmpSkuUrlNotFoundException;
 import hasoffer.core.exception.MultiUrlException;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
+import hasoffer.core.persistence.mongo.PtmProductDescription;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku2;
+import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
-import hasoffer.core.persistence.po.stat.StatPtmCmpSkuUpdate;
 import hasoffer.core.persistence.po.stat.StatSkuPriceUpdateResult;
-import hasoffer.core.persistence.po.stat.updater.StatPtmCmpSkuUpdateUpdater;
 import hasoffer.core.persistence.po.stat.updater.StatSkuPriceUpdateResultUpdater;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IFetchService;
+import hasoffer.core.product.IPtmCmpSkuImageService;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.utils.ImageUtil;
@@ -73,6 +76,9 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     IMongoDbManager mdm;
     @Resource
     CmpskuIndexServiceImpl cmpskuIndexService;
+    @Resource
+    IPtmCmpSkuImageService ptmCmpSkuImageService;
+
     private Logger logger = LoggerFactory.getLogger(CmpSkuServiceImpl.class);
 
     public static void main(String[] args) {
@@ -120,35 +126,6 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         }
 
         return finalIndex;
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public StatPtmCmpSkuUpdate createStatPtmCmpSkuUpdate(StatPtmCmpSkuUpdate statPtmCmpSkuUpdate) {
-        String id = dbm.create(statPtmCmpSkuUpdate);
-        statPtmCmpSkuUpdate.setId(id);
-        return statPtmCmpSkuUpdate;
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateStatPtmCmpSkuUpdate(String id, long onSaleAmount, long soldOutAmount, long offsaleAmount, long allAmount, long updateSuccessAmount, long alwaysFailAmount, long newSkuAmount, long indexAmount, long newIndexAmount) {
-
-        StatPtmCmpSkuUpdateUpdater updater = new StatPtmCmpSkuUpdateUpdater(id);
-
-        updater.getPo().setUpdateTime(TimeUtils.nowDate());
-        updater.getPo().setOnSaleAmount(onSaleAmount);
-        updater.getPo().setSoldOutAmount(soldOutAmount);
-        updater.getPo().setOffsaleAmount(offsaleAmount);
-        updater.getPo().setAllAmount(allAmount);
-        updater.getPo().setUpdateSuccessAmount(updateSuccessAmount);
-        updater.getPo().setAlwaysFailAmount(alwaysFailAmount);
-        updater.getPo().setNewSkuAmount(newSkuAmount);
-        updater.getPo().setIndexAmount(indexAmount);
-        updater.getPo().setNewIndexAmount(newIndexAmount);
-
-        dbm.update(updater);
-
     }
 
     @Override
@@ -395,8 +372,123 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     }
 
     @Override
+    public void createDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct) {
+
+        String jsonParam = fetchedProduct.getJsonParam();
+        String description = fetchedProduct.getDescription();
+
+        //在fetch包暂时无法跟新升级的时候，先在这里回避掉这种错误
+        if (StringUtils.isEqual("[]", description)) {
+            description = "";
+        }
+
+        //save ptmcmpskuDescription
+        PtmCmpSkuDescription ptmCmpSkuDescription = mdm.queryOne(PtmCmpSkuDescription.class, ptmCmpSku.getId());
+        if (ptmCmpSkuDescription == null) {//不存在该条记录
+
+            ptmCmpSkuDescription = new PtmCmpSkuDescription();
+
+            ptmCmpSkuDescription.setId(ptmCmpSku.getId());
+            ptmCmpSkuDescription.setJsonParam(jsonParam);
+            ptmCmpSkuDescription.setJsonDescription(description);
+
+            if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
+                return;
+            }
+            mdm.save(ptmCmpSkuDescription);
+        } else {//存在该条记录
+
+            boolean flagDescription = false;
+            boolean flagJsonParam = false;
+
+            String oldJsonDescription = ptmCmpSkuDescription.getJsonDescription();
+            String oldJsonParam = ptmCmpSkuDescription.getJsonParam();
+
+            //新的参数不为空，且新的参数和原有的不相同，更新
+            if (!StringUtils.isEmpty(jsonParam) && !StringUtils.isEqual(jsonParam, oldJsonParam)) {
+                ptmCmpSkuDescription.setJsonParam(jsonParam);
+                flagDescription = true;
+            }
+
+            //新的描述不为空，且和旧的参数不相同
+            if (!StringUtils.isEmpty(description) && StringUtils.isEqual(description, oldJsonDescription)) {
+                ptmCmpSkuDescription.setJsonDescription(description);
+                flagJsonParam = true;
+            }
+
+            if (flagDescription || flagJsonParam) {
+                mdm.save(ptmCmpSkuDescription);
+            }
+        }
+
+        //save productDescription
+        PtmProductDescription ptmProductDescription = mdm.queryOne(PtmProductDescription.class, ptmCmpSku.getProductId());
+
+        if (ptmProductDescription == null) {//如果不存在该记录
+
+            ptmProductDescription = new PtmProductDescription();
+
+            ptmProductDescription.setId(ptmCmpSku.getProductId());
+            //最开始需求没说明白描述和参数问题，字段写错了，修改通知前台
+            ptmProductDescription.setJsonDescription(jsonParam);
+            ptmProductDescription.setJsonParam(description);
+
+            if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
+                return;
+            }
+
+            mdm.save(ptmProductDescription);
+        } else {//如果存在
+
+            boolean flagDescription = false;
+            boolean flagJsonParam = false;
+
+            //最一开始设计的错误，修改需要通知api
+            String oldJsonDescription = ptmProductDescription.getJsonParam();//product 描述
+            String oldJsonParam = ptmCmpSkuDescription.getJsonDescription();//product 参数
+
+            //新的参数不为空，且新的参数和原有的不相同，更新
+            if (!StringUtils.isEmpty(jsonParam) && !StringUtils.isEqual(jsonParam, oldJsonParam)) {
+                ptmProductDescription.setJsonDescription(jsonParam);
+                flagDescription = true;
+            }
+
+            //新的描述不为空，且和旧的参数不相同
+            if (!StringUtils.isEmpty(description) && StringUtils.isEqual(description, oldJsonDescription)) {
+                ptmCmpSkuDescription.setJsonParam(description);
+                flagJsonParam = true;
+            }
+
+            if (flagDescription || flagJsonParam) {
+                mdm.save(ptmProductDescription);
+            }
+        }
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
-    public PtmCmpSku createCmpSkuForIndex(PtmCmpSku ptmCmpSku) {
+    public void createPtmCmpSkuImage(long skuId, FetchedProduct fetchedProduct) {
+        if (skuId <= 0 || fetchedProduct == null || fetchedProduct.getImageUrlList() == null || fetchedProduct.getImageUrlList().size() == 0) {
+            return;
+        }
+
+        List<String> imageUrlList = fetchedProduct.getImageUrlList();
+
+        PtmCmpSkuImage ptmCmpSkuImage = dbm.querySingle("SELECT t FROM PtmCmpSkuImage t WHERE t.id = ?0 ", Arrays.asList(skuId));
+
+        if (ptmCmpSkuImage == null) {//如果不存在
+            createOrUpdatePtmCmpSkuImage(skuId, imageUrlList);
+        } else {//如果存在
+            if (!StringUtils.isEqual(ptmCmpSkuImage.getOriImageUrl1(), imageUrlList.get(0)) && imageUrlList.size() > ptmCmpSkuImage.getOriImageUrlNumber()) {//只有在第一张图片url不一致，并且新的图片数量比旧的总数大（该值最大为4）的情况下更新
+                ptmCmpSkuImageService.delete(skuId);
+                createOrUpdatePtmCmpSkuImage(skuId, imageUrlList);
+            }
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public PtmCmpSku2 createCmpSkuForIndex(PtmCmpSku2 ptmCmpSku) {
 
         //sku创建时，添加创建时间字段
         ptmCmpSku.setCreateTime(TimeUtils.nowDate());
@@ -423,6 +515,15 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         List<PtmCmpSku> cmpSkus = listCmpSkus(proId);
         for (PtmCmpSku cmpSku : cmpSkus) {
             importCmpSku2solr(cmpSku);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void batchDeleteCmpSku(Long[] ids) {
+        for (Long id : ids) {
+            dbm.delete(PtmCmpSku.class, id);
+            cmpskuIndexService.remove(String.valueOf(id));
         }
     }
 
@@ -485,7 +586,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void createPtmCmpSkuIndexToMysql(PtmCmpSku ptmCmpSku) {
+    public void createPtmCmpSkuIndexToMysql(PtmCmpSku2 ptmCmpSku) {
 
         if (ptmCmpSku.getWebsite() == null) {
             return;
@@ -729,5 +830,30 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         dbm.update(ptmCmpSkuUpdater);
 
         return;
+    }
+
+    private void createOrUpdatePtmCmpSkuImage(long id, List<String> imageUrlList) {
+
+        PtmCmpSkuImage ptmCmpSkuImage = new PtmCmpSkuImage();
+
+        ptmCmpSkuImage.setId(id);
+        ptmCmpSkuImage.setOriImageUrlNumber(imageUrlList.size() >= 4 ? 4 : imageUrlList.size());//如果数量大于4，就存4张
+
+        for (int i = 0; i < imageUrlList.size(); i++) {
+
+            if (i == 0) {
+                ptmCmpSkuImage.setOriImageUrl1(imageUrlList.get(i));
+            } else if (i == 1) {
+                ptmCmpSkuImage.setOriImageUrl2(imageUrlList.get(i));
+            } else if (i == 2) {
+                ptmCmpSkuImage.setOriImageUrl3(imageUrlList.get(i));
+            } else if (i == 3) {
+                ptmCmpSkuImage.setOriImageUrl4(imageUrlList.get(i));
+            } else {
+                continue;
+            }
+        }
+
+        ptmCmpSkuImageService.createPtmCmpSkuImage(ptmCmpSkuImage);
     }
 }

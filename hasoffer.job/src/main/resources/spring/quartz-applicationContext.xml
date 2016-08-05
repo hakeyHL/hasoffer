@@ -28,7 +28,7 @@
                 <ref bean="skuImageDownLoadTrigger"/>
                 <ref bean="statHijackFetchTrigger"/>
                 <ref bean="statSearchLogTrigger"/>
-                <ref bean="statVisitSkuUpdateTrigger"/>
+                <!--<ref bean="statVisitSkuUpdateTrigger"/>-->
             </list>
         </property>
 
@@ -121,11 +121,11 @@
         <property name="cronExpression" value="0 45 4 * * ?"/>
     </bean>
 
-    <bean name="statVisitSkuUpdateJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="hasoffer.job.bean.stat.StatVisitSkuUpdateJobBean"/>
-    </bean>
-    <bean id="statVisitSkuUpdateTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-        <property name="jobDetail" ref="statVisitSkuUpdateJob"/>
-        <property name="cronExpression" value="0 30 0/1 * * ?"/>
-    </bean>
+    <!--<bean name="statVisitSkuUpdateJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
+    <!--<property name="jobClass" value="hasoffer.job.bean.stat.StatVisitSkuUpdateJobBean"/>-->
+    <!--</bean>-->
+    <!--<bean id="statVisitSkuUpdateTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
+    <!--<property name="jobDetail" ref="statVisitSkuUpdateJob"/>-->
+    <!--<property name="cronExpression" value="0 30 0/1 * * ?"/>-->
+    <!--</bean>-->
 </beans>

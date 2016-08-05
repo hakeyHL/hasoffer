@@ -1,5 +1,6 @@
 package hasoffer.core.test;
 
+import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.solr.CategoryIndexServiceImpl;
@@ -10,6 +11,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -20,11 +22,49 @@ import java.util.List;
 @ContextConfiguration(locations = "classpath:spring-beans.xml")
 public class CategoryTest {
 
-
+    private final static String Q_CATE_PARENTID_LEVEL =
+            "SELECT t FROM PtmCategory t WHERE t.parentId=?0 AND t.level=?1 ORDER BY t.rank ASC";
+    @Resource
+    IDataBaseManager dbm;
     @Resource
     ICategoryService categoryService;
     @Resource
     CategoryIndexServiceImpl categoryIndexService;
+
+    @Test
+    public void testCate() {
+        StringBuilder sb = new StringBuilder();
+        getSubCates(null, sb);
+        System.out.println(sb.toString());
+    }
+
+    private void getSubCates(PtmCategory cate, StringBuilder sb) {
+
+        long parentId = 0L;
+        int level = 1;
+
+        if (cate != null) {
+            parentId = cate.getId();
+            level = cate.getLevel() + 1;
+
+            String splitStr = "";
+            if (level == 3) {
+                splitStr = "__";
+            } else if (level == 4) {
+                splitStr = "____";
+            }
+
+            System.out.println(splitStr + cate.getId() + "\t" + cate.getLevel() + "\t" + cate.getName());
+            sb.append("," + cate.getId());
+        }
+
+        if (level < 4) {
+            List<PtmCategory> subCates = dbm.query(Q_CATE_PARENTID_LEVEL, Arrays.asList(parentId, level));
+            for (PtmCategory subCate : subCates) {
+                getSubCates(subCate, sb);
+            }
+        }
+    }
 
     @Test
     public void testShow() {

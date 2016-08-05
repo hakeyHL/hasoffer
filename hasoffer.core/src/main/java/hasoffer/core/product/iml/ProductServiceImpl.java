@@ -4,7 +4,6 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
-import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.product.ProductBo;
 import hasoffer.core.cache.SearchLogCacheManager;
@@ -69,9 +68,6 @@ public class ProductServiceImpl implements IProductService {
                     "   AND t.status != 'OFFSALE'  " +
                     " ORDER BY t.price ASC ";
 
-    private static final String Q_PTM_FEATURE =
-            "SELECT t.feature FROM PtmFeature t " +
-                    " WHERE t.productId = ?0   ";
     private static final String Q_PTM_IMAGE =
             "SELECT t FROM PtmImage t " +
                     " WHERE t.productId = ?0  ";
@@ -80,7 +76,7 @@ public class ProductServiceImpl implements IProductService {
                     " WHERE t.productId = ?0 ";
 
     private static final String Q_PTM_TOPSEELLING =
-            "select t from PtmTopSelling t where t.status='ONLINE' order by t.count desc, t.lUpdateTime desc";
+            "select t from PtmTopSelling t where   t.status='ONLINE'  order by t.lUpdateTime desc , t.count desc ";
 
     @Resource
     ISearchService searchService;
@@ -164,8 +160,6 @@ public class ProductServiceImpl implements IProductService {
             product.setPrice(price);
 
             importProduct2Solr(product);
-
-            System.out.println("productid = " + product.getId());
         }
 
     }
@@ -323,16 +317,6 @@ public class ProductServiceImpl implements IProductService {
 //    @Cacheable(value = CACHE_KEY, key = "#root.methodName + '_' + #root.args[0]")
     public PtmProduct getProduct(long proId) {
         return dbm.get(PtmProduct.class, proId);
-    }
-
-    @Override
-    public List<PtmBasicAttribute> getProductBasicAttributes(long id) {
-        return dbm.query(Q_PTM_BASICATTRIBUTE, Arrays.asList(id));
-    }
-
-    @Override
-    public List<String> getProductFeatures(long id) {
-        return dbm.query(Q_PTM_FEATURE, Arrays.asList(id));
     }
 
     @Override
@@ -551,8 +535,6 @@ public class ProductServiceImpl implements IProductService {
         if (product == null) {
             return null;
         }
-        List<String> features = getProductFeatures(product.getId());
-
 //        PtmCategory category = dbm.get(PtmCategory.class, product.getCategoryId());
         List<PtmCategory> categories = categoryService.getRouterCategoryList(product.getCategoryId());
 
@@ -586,7 +568,6 @@ public class ProductServiceImpl implements IProductService {
                 cate3,
                 cate3name,
                 product.getPrice(),
-                StringUtils.arrayToString(features),
                 product.getDescription(),
                 product.getColor(),
                 product.getSize(),

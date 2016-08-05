@@ -5,9 +5,9 @@ import hasoffer.base.model.Website;
 import hasoffer.core.bo.product.SkuPriceUpdateResultBo;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku2;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
-import hasoffer.core.persistence.po.stat.StatPtmCmpSkuUpdate;
 import hasoffer.core.persistence.po.stat.StatSkuPriceUpdateResult;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.spider.model.FetchedProduct;
@@ -19,9 +19,13 @@ import java.util.List;
  */
 public interface ICmpSkuService {
 
-    PtmCmpSku createCmpSkuForIndex(PtmCmpSku ptmCmpSku);
+    void createDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct);
 
-    void createPtmCmpSkuIndexToMysql(PtmCmpSku ptmCmpsku);
+    void createPtmCmpSkuImage(long skuId, FetchedProduct fetchedProduct);
+
+    PtmCmpSku2 createCmpSkuForIndex(PtmCmpSku2 ptmCmpSku);
+
+    void createPtmCmpSkuIndexToMysql(PtmCmpSku2 ptmCmpsku);
 
     void updateCmpSkuByOriFetchedProduct(long skuId, OriFetchedProduct oriFetchedProduct);
 
@@ -75,10 +79,6 @@ public interface ICmpSkuService {
 
     PtmCmpSkuIndex2 getCmpSkuIndex2(Website cliSite, String sourceId, String keyword);
 
-    StatPtmCmpSkuUpdate createStatPtmCmpSkuUpdate(StatPtmCmpSkuUpdate statPtmCmpSkuUpdate);
-
-    void updateStatPtmCmpSkuUpdate(String id, long onSaleAmount, long soldOutAmount, long offsaleAmount, long allAmount, long updateSuccessAmount, long alwaysFailAmount, long newSkuAmount, long indexAmount, long newIndexAmount);
-
     int getSkuSoldStoreNum(Long id);
 
     List<PtmCmpSku> listCmpSkus(long productId, SkuStatus onsale);
@@ -88,4 +88,6 @@ public interface ICmpSkuService {
     void importCmpSku2solr(PtmCmpSku ptmCmpSku);
 
     void importCmpSku2solrByProductId(Long proId);
+
+    void batchDeleteCmpSku(Long[] ids);
 }

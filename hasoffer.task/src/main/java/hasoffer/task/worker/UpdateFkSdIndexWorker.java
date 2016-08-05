@@ -58,7 +58,7 @@ public class UpdateFkSdIndexWorker implements Runnable {
                     if (SkuStatus.OFFSALE.equals(sku.getStatus())) {
                         continue;
                     }
-                    cmpSkuService.createPtmCmpSkuIndexToMysql(sku);
+//                    cmpSkuService.createPtmCmpSkuIndexToMysql(sku);
                     logger.debug("create index id = " + sku.getId());
                 } else {
 

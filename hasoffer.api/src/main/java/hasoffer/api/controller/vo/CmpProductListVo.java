@@ -61,7 +61,7 @@ public class CmpProductListVo {
     public CmpProductListVo(PtmCmpSku cmpSku, float cliPrice) {
         this.status = cmpSku.getStatus();
         this.title = cmpSku.getTitle();
-        this.imageUrl = cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath());
+        this.imageUrl = cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getImagePath());
         this.cashBack = cmpSku.getCashBack();
         this.saved = Math.round(cliPrice - cmpSku.getPrice());
         this.deepLink = cmpSku.getDeeplink();
@@ -69,7 +69,7 @@ public class CmpProductListVo {
         StringBuffer sb = new StringBuffer();
         for (int i = tempPrice.length() - 1; i >= 0; i--) {
             sb.append(tempPrice.charAt(i));
-            if ((tempPrice.length() - i) % 3 == 0) {
+            if ((tempPrice.length() - i) % 3 == 0 && i != 0) {
                 sb.append(",");
             }
         }

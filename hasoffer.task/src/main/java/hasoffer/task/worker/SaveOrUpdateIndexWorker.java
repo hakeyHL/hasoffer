@@ -16,10 +16,10 @@ import hasoffer.core.bo.product.IndexHistory;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.StatHijackFetch;
-import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku2;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
+import hasoffer.core.persistence.po.ptm.updater.PtmCmpSku2Updater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
-import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.model.ListProduct;
@@ -32,8 +32,6 @@ import hasoffer.fetch.sites.shopclues.ShopcluesHelper;
 import hasoffer.fetch.sites.shopclues.ShopcluesListProcessor;
 import hasoffer.fetch.sites.snapdeal.SnapdealHelper;
 import hasoffer.fetch.sites.snapdeal.SnapdealListProcessor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,8 +45,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class SaveOrUpdateIndexWorker implements Runnable {
 
-    private static final String Q_PTMCMPSKU_SOURCESID = "SELECT t FROM PtmCmpSku t WHERE t.sourceSid = ?0 AND t.website = ?1";
-    private static Logger logger = LoggerFactory.getLogger(SaveOrUpdateIndexWorker.class);
+    private static final String Q_PTMCMPSKU_SOURCESID = "SELECT t FROM PtmCmpSku2 t WHERE t.sourceSid = ?0 AND t.website = ?1";
+    //    private static Logger logger = LoggerFactory.getLogger(SaveOrUpdateIndexWorker.class);
     private ConcurrentLinkedQueue<StatHijackFetch> queue;
     private IDataBaseManager dbm;
     private IMongoDbManager mdm;
@@ -71,7 +69,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
             if (statHijackFetch == null) {
                 try {
                     TimeUnit.SECONDS.sleep(3);
-                    logger.info("update flipkartSkuTitle worker get null sleep 3 seconds");
+//                    logger.info("update flipkartSkuTitle worker get null sleep 3 seconds");
                 } catch (InterruptedException e) {
                     return;
                 }
@@ -88,7 +86,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
             String sourceId = statHijackFetch.getSourceId();
 
             //在此处，对不同的网站进行不同的处理动作，结果3种  1.创建sku 2.updateSku 3.获取失败
-            List<PtmCmpSku> skuList = null;
+            List<PtmCmpSku2> skuList = null;
             List<IndexHistory> indexHistoryList = statHijackFetch.getIndexHistoryList();
             if (indexHistoryList == null) {
                 indexHistoryList = new ArrayList<IndexHistory>();
@@ -142,19 +140,19 @@ public class SaveOrUpdateIndexWorker implements Runnable {
         }
     }
 
-    private void createOrUpdateIndex(List<PtmCmpSku> skuList, StatHijackFetch statHijackFetch) {
+    private void createOrUpdateIndex(List<PtmCmpSku2> skuList, StatHijackFetch statHijackFetch) {
 
-        for (PtmCmpSku sku : skuList) {
+        for (PtmCmpSku2 sku : skuList) {
 
-            List<PtmCmpSku> resultList = dbm.query(Q_PTMCMPSKU_SOURCESID, Arrays.asList(sku.getSourceSid(), sku.getWebsite()));
+            List<PtmCmpSku2> resultList = dbm.query(Q_PTMCMPSKU_SOURCESID, Arrays.asList(sku.getSourceSid(), sku.getWebsite()));
 
             //如果有结果，将所有结果的url和tltle等字段进行全部的更新
             //如果没有结果，创建sku，新建索引
             if (ArrayUtils.hasObjs(resultList)) {
-                for (PtmCmpSku oldSku : resultList) {
+                for (PtmCmpSku2 oldSku : resultList) {
 
                     //更新sku
-                    PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(oldSku.getId());
+                    PtmCmpSku2Updater updater = new PtmCmpSku2Updater(oldSku.getId());
 
                     updater.getPo().setSkuTitle(sku.getSkuTitle());
                     updater.getPo().setUrl(sku.getUrl());
@@ -183,7 +181,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
                 }
             } else {
 
-                PtmCmpSku cmpSkuForIndex = cmpSkuService.createCmpSkuForIndex(sku);
+                PtmCmpSku2 cmpSkuForIndex = cmpSkuService.createCmpSkuForIndex(sku);
                 cmpSkuService.createPtmCmpSkuIndexToMysql(cmpSkuForIndex);
                 statHijackFetch.getAffectSkuIdList().add(cmpSkuForIndex.getId() + "");
             }
@@ -193,7 +191,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
         mdm.save(statHijackFetch);
     }
 
-    private List<PtmCmpSku> getSku(Website website, String cliQ, String sourceId) throws ContentParseException, HttpFetchException, AffiliateAPIException, IOException {
+    private List<PtmCmpSku2> getSku(Website website, String cliQ, String sourceId) throws ContentParseException, HttpFetchException, AffiliateAPIException, IOException {
 
         if (Website.FLIPKART.equals(website)) {
             return getFlipkartProduct(cliQ, sourceId);
@@ -206,9 +204,9 @@ public class SaveOrUpdateIndexWorker implements Runnable {
         return null;
     }
 
-    private List<PtmCmpSku> getShopcluesProduct(String cliQ, String sourceId) throws HttpFetchException, ContentParseException {
+    private List<PtmCmpSku2> getShopcluesProduct(String cliQ, String sourceId) throws HttpFetchException, ContentParseException {
 
-        List<PtmCmpSku> skuList = new ArrayList<PtmCmpSku>();
+        List<PtmCmpSku2> skuList = new ArrayList<PtmCmpSku2>();
 
         ShopcluesListProcessor processor = new ShopcluesListProcessor();
 
@@ -229,7 +227,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
                     skuStatus = skuStatus.ONSALE;
                 }
 
-                PtmCmpSku sku = new PtmCmpSku();
+                PtmCmpSku2 sku = new PtmCmpSku2();
 
                 sku.setProductId(0);
                 sku.setUpdateTime(TimeUtils.nowDate());
@@ -250,9 +248,9 @@ public class SaveOrUpdateIndexWorker implements Runnable {
     }
 
 
-    private List<PtmCmpSku> getFlipkartProduct(String cliQ, String sourceId) throws HttpFetchException, ContentParseException, AffiliateAPIException, IOException {
+    private List<PtmCmpSku2> getFlipkartProduct(String cliQ, String sourceId) throws HttpFetchException, ContentParseException, AffiliateAPIException, IOException {
 
-        List<PtmCmpSku> skuList = new ArrayList<PtmCmpSku>();
+        List<PtmCmpSku2> skuList = new ArrayList<PtmCmpSku2>();
 
         if (StringUtils.isEmpty(sourceId) || "0".equals(sourceId)) {//sourceId为空，走页面解析
             FlipkartListProcessor processor = new FlipkartListProcessor();
@@ -274,7 +272,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
                         skuStatus = skuStatus.ONSALE;
                     }
 
-                    PtmCmpSku sku = new PtmCmpSku();
+                    PtmCmpSku2 sku = new PtmCmpSku2();
 
                     sku.setProductId(0);
                     sku.setUpdateTime(TimeUtils.nowDate());
@@ -290,7 +288,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
                     skuList.add(sku);
                 }
             }
-            logger.info("flipkart page parse get " + skuList.size() + " sku for [" + cliQ + "]");
+//            logger.info("flipkart page parse get " + skuList.size() + " sku for [" + cliQ + "]");
 
         } else {
 
@@ -305,7 +303,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
                 status = SkuStatus.OUTSTOCK;
             }
 
-            PtmCmpSku sku = new PtmCmpSku();
+            PtmCmpSku2 sku = new PtmCmpSku2();
 
             sku.setProductId(0);
             sku.setUpdateTime(TimeUtils.nowDate());
@@ -327,15 +325,15 @@ public class SaveOrUpdateIndexWorker implements Runnable {
 
             skuList.add(sku);
 
-            logger.info("flipkart affiliate get sku success [" + sourceId + "]");
+//            logger.info("flipkart affiliate get sku success [" + sourceId + "]");
         }
 
         return skuList;
     }
 
-    private List<PtmCmpSku> getSnapdealProduct(String cliQ, String sourceId) {
+    private List<PtmCmpSku2> getSnapdealProduct(String cliQ, String sourceId) {
 
-        List<PtmCmpSku> skuList = new ArrayList<PtmCmpSku>();
+        List<PtmCmpSku2> skuList = new ArrayList<PtmCmpSku2>();
 
         if (StringUtils.isEmpty(sourceId) || "0".equals(sourceId)) {
             SnapdealListProcessor processor = new SnapdealListProcessor();
@@ -358,7 +356,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
                             status = SkuStatus.ONSALE;
                         }
 
-                        PtmCmpSku sku = new PtmCmpSku();
+                        PtmCmpSku2 sku = new PtmCmpSku2();
 
                         sku.setProductId(0);
                         sku.setUpdateTime(TimeUtils.nowDate());
@@ -374,10 +372,10 @@ public class SaveOrUpdateIndexWorker implements Runnable {
                         skuList.add(sku);
                     }
                 }
-                logger.info("snapdeal page parse get " + productList.size() + " sku for [" + cliQ + "]");
+//                logger.info("snapdeal page parse get " + productList.size() + " sku for [" + cliQ + "]");
             } catch (Exception e) {
-                logger.info("snapdeal page parse get sku fail for [" + cliQ + "]");
-                logger.info(e.toString());
+//                logger.info("snapdeal page parse get sku fail for [" + cliQ + "]");
+//                logger.info(e.toString());
             }
         } else {
             SnapdealProductProcessor processor = new SnapdealProductProcessor();
@@ -391,7 +389,7 @@ public class SaveOrUpdateIndexWorker implements Runnable {
                     status = SkuStatus.OUTSTOCK;
                 }
 
-                PtmCmpSku sku = new PtmCmpSku();
+                PtmCmpSku2 sku = new PtmCmpSku2();
 
                 sku.setProductId(0);
                 sku.setUpdateTime(TimeUtils.nowDate());
@@ -406,9 +404,9 @@ public class SaveOrUpdateIndexWorker implements Runnable {
 
                 skuList.add(sku);
 
-                logger.info("snapdeal affiliate get sku success [" + sourceId + "]");
+//                logger.info("snapdeal affiliate get sku success [" + sourceId + "]");
             } catch (Exception e) {
-                logger.info("snapdeal affiliate create sku fail for [" + sourceId + "]");
+//                logger.info("snapdeal affiliate create sku fail for [" + sourceId + "]");
             }
         }
 

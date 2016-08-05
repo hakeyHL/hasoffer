@@ -62,6 +62,8 @@ public class OrderStatsAnalysisPO  implements Identifiable<Integer> {
 
     private Date deviceRegTime;
 
+    private String version;
+
     public Integer getId() {
         return id;
     }
@@ -204,5 +206,13 @@ public class OrderStatsAnalysisPO  implements Identifiable<Integer> {
 
     public void setDeviceRegTime(Date deviceRegTime) {
         this.deviceRegTime = deviceRegTime;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

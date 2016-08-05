@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * updateTime：2016-06-29 14:25
  * id更新为ptmproductId
  * 更新逻辑，更新为ptmcmpsku中website为flipkart的关联的ptmproduct的id
+ * id更换为PtmCmpSkuId
  */
 @Document(collection = "PtmCmpSkuDescription")
 public class PtmCmpSkuDescription {
@@ -17,7 +18,7 @@ public class PtmCmpSkuDescription {
 
     private String jsonParam;//参数
 
-    private String description;
+    private String jsonDescription;
 
     public long getId() {
         return id;
@@ -35,12 +36,12 @@ public class PtmCmpSkuDescription {
         this.jsonParam = jsonParam;
     }
 
-    public String getDescription() {
-        return description;
+    public String getJsonDescription() {
+        return jsonDescription;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setJsonDescription(String jsonDescription) {
+        this.jsonDescription = jsonDescription;
     }
 
     @Override
@@ -52,7 +53,7 @@ public class PtmCmpSkuDescription {
 
         if (id != that.id) return false;
         if (jsonParam != null ? !jsonParam.equals(that.jsonParam) : that.jsonParam != null) return false;
-        return !(description != null ? !description.equals(that.description) : that.description != null);
+        return !(jsonDescription != null ? !jsonDescription.equals(that.jsonDescription) : that.jsonDescription != null);
 
     }
 
@@ -60,7 +61,16 @@ public class PtmCmpSkuDescription {
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (jsonParam != null ? jsonParam.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (jsonDescription != null ? jsonDescription.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "PtmCmpSkuDescription{" +
+                "id=" + id +
+                ", jsonParam='" + jsonParam + '\'' +
+                ", jsonDescription='" + jsonDescription + '\'' +
+                '}';
     }
 }
