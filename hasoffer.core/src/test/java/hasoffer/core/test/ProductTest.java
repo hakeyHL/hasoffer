@@ -1,6 +1,7 @@
 package hasoffer.core.test;
 
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.admin.IDealService;
@@ -14,6 +15,9 @@ import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
+import hasoffer.core.task.ListAndProcessTask2;
+import hasoffer.core.task.worker.IList;
+import hasoffer.core.task.worker.IProcess;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -26,6 +30,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 /**
@@ -43,6 +48,7 @@ public class ProductTest {
                     "GROUP BY t.productId " +
                     "HAVING COUNT(t.id)>50 " +
                     "ORDER BY COUNT(t.id) DESC";
+    private static String Q_PRODUCT_WEBSITE = "SELECT t from PtmProduct t where t.sourceSite = ?0";
     @Resource
     ProductIndexServiceImpl productIndexService;
     @Resource
@@ -65,6 +71,60 @@ public class ProductTest {
     IDealService dealService;
     private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
     private Logger logger = LoggerFactory.getLogger(ProductTest.class);
+
+    @Test
+    public void testFlipkartSKu() {
+        final Website[] sites = new Website[]{Website.SNAPDEAL, Website.SHOPCLUES, Website.EBAY, Website.AMAZON, Website.PAYTM};
+
+        final SiteCount siteCount = new SiteCount();
+
+        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<>(
+                new IList() {
+                    @Override
+                    public PageableResult getData(int page) {
+                        return dbm.queryPage(Q_PRODUCT_WEBSITE, page, 2000, Arrays.asList(siteCount.site.name()));
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcess<PtmProduct>() {
+                    @Override
+                    public void process(PtmProduct o) {
+                        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(o.getId());
+                        boolean hasFlipSKu = false;
+
+                        for (PtmCmpSku cmpSku : cmpSkus) {
+                            if (cmpSku.getWebsite() == Website.FLIPKART) {
+                                hasFlipSKu = true;
+                            }
+                        }
+
+                        if (hasFlipSKu) {
+                            siteCount.countHasFlipkartSku.addAndGet(1);
+                        } else {
+                            siteCount.countNoFlipkartSku.addAndGet(1);
+                        }
+                    }
+                }
+        );
+
+        for (Website site : sites) {
+            siteCount.reset(site);
+
+            listAndProcessTask2.go();
+
+            siteCount.show();
+        }
+
+    }
 
     @Test
     public void importDeal2Solr() {
@@ -266,5 +326,30 @@ public class ProductTest {
         image.setImageUrl(url);
         image.setId(123l);
         imageService.downloadImage(image);
+    }
+
+    class SiteCount {
+        final AtomicInteger countHasFlipkartSku = new AtomicInteger(0);
+        final AtomicInteger countNoFlipkartSku = new AtomicInteger(0);
+        Website site;
+
+        @Override
+        public String toString() {
+            return "SiteCount{" +
+                    "site=" + site +
+                    ", countHasFlipkartSku=" + countHasFlipkartSku.get() +
+                    ", countNoFlipkartSku=" + countNoFlipkartSku.get() +
+                    '}';
+        }
+
+        public void show() {
+            System.out.println(this.toString());
+        }
+
+        public void reset(Website site) {
+            this.site = site;
+            this.countHasFlipkartSku.set(0);
+            this.countNoFlipkartSku.set(0);
+        }
     }
 }

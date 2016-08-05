@@ -1,22 +1,14 @@
 package hasoffer.task.worker;
 
-import hasoffer.base.exception.ContentParseException;
-import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
-import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
-import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
-import hasoffer.core.persistence.mongo.PtmProductDescription;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
-import hasoffer.core.product.IPtmCmpSkuImageService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchUrlResult;
@@ -42,17 +34,13 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
     private ICmpSkuService cmpSkuService;
     private IFetchDubboService fetchService;
     private IProductService productService;
-    private IPtmCmpSkuImageService ptmCmpSkuImageService;
-    private IMongoDbManager mdm;
 
-    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<SrmSearchLog> queue, ICmpSkuService cmpSkuService, IFetchDubboService fetchService, IProductService productService, IMongoDbManager mdm, IPtmCmpSkuImageService ptmCmpSkuImageService) {
+    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<SrmSearchLog> queue, ICmpSkuService cmpSkuService, IFetchDubboService fetchService, IProductService productService) {
         this.dbm = dbm;
         this.queue = queue;
         this.cmpSkuService = cmpSkuService;
         this.fetchService = fetchService;
         this.productService = productService;
-        this.mdm = mdm;
-        this.ptmCmpSkuImageService = ptmCmpSkuImageService;
     }
 
     @Override
@@ -103,13 +91,13 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
             } catch (Exception e) {
 
-
             }
         }
     }
 
     private void updatePtmCmpSku(PtmCmpSku sku, SrmSearchLog searchLog) {
         // try update sku
+        Long skuid = sku.getId();
         String url = sku.getUrl();
         Website website = WebsiteHelper.getWebSite(url);
 
@@ -119,13 +107,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
         FetchUrlResult fetchedResult = null;
 
-        try {
-            fetchedResult = fetchService.getProductsByUrl(website, url);
-        } catch (HttpFetchException e) {
-            logger.info("HttpFetchException for [" + sku.getId() + "]");
-        } catch (ContentParseException e) {
-            logger.info("ContentParseException for [" + sku.getId() + "]");
-        }
+        fetchedResult = fetchService.getProductsByUrl(skuid, website, url);
 
         TaskStatus taskStatus = fetchedResult.getTaskStatus();
 
@@ -149,163 +131,6 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
         System.out.println(JSONUtil.toJSON(fetchedProduct).toString());
 
-        //更新ptmcmpsku
-        cmpSkuService.updateCmpSkuBySpiderFetchedProduct(sku.getId(), fetchedProduct);
-        //多图
-        createPtmCmpSkuImage(sku.getId(), fetchedProduct);
-        //描述
-        createDescription(sku, fetchedProduct);
 
-    }
-
-    /**
-     * 保存或者更新参数和描述
-     *
-     * @param sku
-     * @param fetchedProduct
-     */
-    private void createDescription(PtmCmpSku sku, FetchedProduct fetchedProduct) {
-
-        String jsonParam = fetchedProduct.getJsonParam();
-        String description = fetchedProduct.getDescription();
-
-        //在fetch包暂时无法跟新升级的时候，先在这里回避掉这种错误
-        if (StringUtils.isEqual("[]", description)) {
-            description = "";
-        }
-
-        //save ptmcmpskuDescription
-        PtmCmpSkuDescription ptmCmpSkuDescription = mdm.queryOne(PtmCmpSkuDescription.class, sku.getId());
-        if (ptmCmpSkuDescription == null) {//不存在该条记录
-
-            ptmCmpSkuDescription = new PtmCmpSkuDescription();
-
-            ptmCmpSkuDescription.setId(sku.getId());
-            ptmCmpSkuDescription.setJsonParam(jsonParam);
-            ptmCmpSkuDescription.setJsonDescription(description);
-
-            if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
-                return;
-            }
-            mdm.save(ptmCmpSkuDescription);
-            System.out.println("create ptmCmpSkuDescription success for ptmCmpSkuId = [" + sku.getId() + "]");
-        } else {//存在该条记录
-
-            boolean flagDescription = false;
-            boolean flagJsonParam = false;
-
-            String oldJsonDescription = ptmCmpSkuDescription.getJsonDescription();
-            String oldJsonParam = ptmCmpSkuDescription.getJsonParam();
-
-            //新的参数不为空，且新的参数和原有的不相同，更新
-            if (!StringUtils.isEmpty(jsonParam) && !StringUtils.isEqual(jsonParam, oldJsonParam)) {
-                ptmCmpSkuDescription.setJsonParam(jsonParam);
-                flagDescription = true;
-            }
-
-            //新的描述不为空，且和旧的参数不相同
-            if (!StringUtils.isEmpty(description) && StringUtils.isEqual(description, oldJsonDescription)) {
-                ptmCmpSkuDescription.setJsonDescription(description);
-                flagJsonParam = true;
-            }
-
-            if (flagDescription || flagJsonParam) {
-                mdm.save(ptmCmpSkuDescription);
-            }
-        }
-
-        //save productDescription
-        PtmProductDescription ptmProductDescription = mdm.queryOne(PtmProductDescription.class, sku.getProductId());
-
-        if (ptmProductDescription == null) {//如果不存在该记录
-
-            ptmProductDescription = new PtmProductDescription();
-
-            ptmProductDescription.setId(sku.getProductId());
-            //最开始需求没说明白描述和参数问题，字段写错了，修改通知前台
-            ptmProductDescription.setJsonDescription(jsonParam);
-            ptmProductDescription.setJsonParam(description);
-
-            if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
-                return;
-            }
-
-            mdm.save(ptmProductDescription);
-            System.out.println("create ptmProductDescription success for ptmproductId = [" + sku.getProductId() + "]");
-
-        } else {//如果存在
-
-            boolean flagDescription = false;
-            boolean flagJsonParam = false;
-
-            //最一开始设计的错误，修改需要通知api
-            String oldJsonDescription = ptmProductDescription.getJsonParam();//product 描述
-            String oldJsonParam = ptmCmpSkuDescription.getJsonDescription();//product 参数
-
-            //新的参数不为空，且新的参数和原有的不相同，更新
-            if (!StringUtils.isEmpty(jsonParam) && !StringUtils.isEqual(jsonParam, oldJsonParam)) {
-                ptmProductDescription.setJsonDescription(jsonParam);
-                flagDescription = true;
-            }
-
-            //新的描述不为空，且和旧的参数不相同
-            if (!StringUtils.isEmpty(description) && StringUtils.isEqual(description, oldJsonDescription)) {
-                ptmCmpSkuDescription.setJsonParam(description);
-                flagJsonParam = true;
-            }
-
-            if (flagDescription || flagJsonParam) {
-                mdm.save(ptmProductDescription);
-            }
-
-        }
-    }
-
-    /**
-     * 创建PtmCmpSKuImage
-     */
-    private void createPtmCmpSkuImage(long id, FetchedProduct fetchedProduct) {
-
-        if (id <= 0 || fetchedProduct == null || fetchedProduct.getImageUrlList() == null || fetchedProduct.getImageUrlList().size() == 0) {
-            return;
-        }
-
-        List<String> imageUrlList = fetchedProduct.getImageUrlList();
-
-        PtmCmpSkuImage ptmCmpSkuImage = dbm.querySingle("SELECT t FROM PtmCmpSkuImage t WHERE t.id = ?0 ", Arrays.asList(id));
-
-        if (ptmCmpSkuImage == null) {//如果不存在
-            createOrUpdatePtmCmpSkuImage(id, imageUrlList);
-        } else {//如果存在
-            if (!StringUtils.isEqual(ptmCmpSkuImage.getOriImageUrl1(), imageUrlList.get(0)) && imageUrlList.size() > ptmCmpSkuImage.getOriImageUrlNumber()) {//只有在第一张图片url不一致，并且新的图片数量比旧的总数大（该值最大为4）的情况下更新
-                createOrUpdatePtmCmpSkuImage(id, imageUrlList);
-            }
-        }
-    }
-
-    private void createOrUpdatePtmCmpSkuImage(long id, List<String> imageUrlList) {
-
-        PtmCmpSkuImage ptmCmpSkuImage = new PtmCmpSkuImage();
-
-        ptmCmpSkuImage.setId(id);
-        ptmCmpSkuImage.setOriImageUrlNumber(imageUrlList.size() >= 4 ? 4 : imageUrlList.size());//如果数量大于4，就存4张
-
-        for (int i = 0; i < imageUrlList.size(); i++) {
-
-            if (i == 0) {
-                ptmCmpSkuImage.setOriImageUrl1(imageUrlList.get(i));
-            } else if (i == 1) {
-                ptmCmpSkuImage.setOriImageUrl2(imageUrlList.get(i));
-            } else if (i == 2) {
-                ptmCmpSkuImage.setOriImageUrl3(imageUrlList.get(i));
-            } else if (i == 3) {
-                ptmCmpSkuImage.setOriImageUrl4(imageUrlList.get(i));
-            } else {
-                continue;
-            }
-        }
-
-        ptmCmpSkuImageService.createPtmCmpSkuImage(ptmCmpSkuImage);
-        System.out.println("create ptmCmpSkuImage success for ptmCmpSkuId = [" + id + "]");
     }
 }

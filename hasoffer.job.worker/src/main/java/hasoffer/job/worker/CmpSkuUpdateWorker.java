@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
  * Created on 2015/12/21.
  */
 public class CmpSkuUpdateWorker implements Runnable {
+    public static List<String> ipPortList = new ArrayList<String>();
     private static Logger logger = LoggerFactory.getLogger(CmpSkuUpdateWorker.class);
     ConcurrentLinkedQueue<PtmCmpSku> skuQueue;
     ICmpSkuService cmpSkuService;
@@ -35,8 +36,6 @@ public class CmpSkuUpdateWorker implements Runnable {
         this.cmpSkuService = cmpSkuService;
         this.fetchService = fetchService;
     }
-
-    public static List<String> ipPortList = new ArrayList<String>();
 
     @Override
     public void run() {
@@ -66,7 +65,7 @@ public class CmpSkuUpdateWorker implements Runnable {
             // try update sku
             String url = sku.getUrl();
 
-            if(url == null){
+            if (url == null) {
                 continue;
             }
 
@@ -95,8 +94,8 @@ public class CmpSkuUpdateWorker implements Runnable {
 
             FetchedProduct fetchedProduct = null;
             try {
-                FetchUrlResult productsByUrl = fetchService.getProductsByUrl(null, url);
-                if(productsByUrl != null){
+                FetchUrlResult productsByUrl = fetchService.getProductsByUrl(sku.getId(), null, url);
+                if (productsByUrl != null) {
                     fetchedProduct = productsByUrl.getFetchProduct();
                 }
             } catch (Exception e) {
