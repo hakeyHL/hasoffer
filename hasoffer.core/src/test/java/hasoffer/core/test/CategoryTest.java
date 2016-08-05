@@ -48,17 +48,17 @@ public class CategoryTest {
             level = cate.getLevel() + 1;
 
             String splitStr = "";
-            if (level == 3) {
-                splitStr = "__";
-            } else if (level == 4) {
-                splitStr = "____";
+            if (level == 2) {
+                splitStr = "";
+            } else if (level == 3) {
+                splitStr = "\t";
             }
 
             System.out.println(splitStr + cate.getId() + "\t" + cate.getLevel() + "\t" + cate.getName());
             sb.append("," + cate.getId());
         }
 
-        if (level < 4) {
+        if (level < 3) {
             List<PtmCategory> subCates = dbm.query(Q_CATE_PARENTID_LEVEL, Arrays.asList(parentId, level));
             for (PtmCategory subCate : subCates) {
                 getSubCates(subCate, sb);
