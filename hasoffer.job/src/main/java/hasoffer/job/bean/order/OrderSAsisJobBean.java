@@ -33,16 +33,16 @@ public class OrderSAsisJobBean extends QuartzJobBean {
             Date day1AgoTime = TimeUtils.addDay(todayTime, -1);
 
             orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day15AgoTime, day15AgoTime);
-//            orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day3AgoTime, day3AgoTime);
-//            orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day2AgoTime, day2AgoTime);
-//            orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day1AgoTime, day1AgoTime);
-            orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day3AgoTime, todayTime);
+            orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day3AgoTime, day3AgoTime);
+            orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day2AgoTime, day2AgoTime);
+            orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day1AgoTime, day1AgoTime);
+            orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), todayTime, todayTime);
 
-            orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), day15AgoTime, day15AgoTime);
+            //orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), day15AgoTime, day15AgoTime);
             //orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), day3AgoTime, day3AgoTime);
             //orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), day2AgoTime, day2AgoTime);
             //orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), day3AgoTime, day1AgoTime);
-            orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), day3AgoTime, todayTime);
+            orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), day15AgoTime, todayTime);
 
         } catch (Exception e) {
             logger.debug("reportOrderStatistic:任务失败,   DATE:" + new Date() + ":具体如下");
