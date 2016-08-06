@@ -1,6 +1,7 @@
 package hasoffer.affiliate.model;
 
 public class AffiliateOrder {
+    private String affID;
     private String price;
     private String category;
     private String title;
@@ -18,6 +19,14 @@ public class AffiliateOrder {
     private Sale sales;
 
     private TentativeCommission tentativeCommission;
+
+    public String getAffID() {
+        return affID;
+    }
+
+    public void setAffID(String affID) {
+        this.affID = affID;
+    }
 
     public String getPrice() {
         return price;
