@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created on 2016/3/7.
@@ -85,6 +86,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
             while (true) {
                 if (!"".equals(report.getNext()) && parameterMap.get(R_OFFSET) != null) {
                     parameterMap.put(R_OFFSET, String.valueOf(Integer.valueOf(parameterMap.get(R_OFFSET)) + 500));
+                    TimeUnit.SECONDS.sleep(5);
                     respJson = sendRequest(url, headerMap, parameterMap);
                     report = gson.fromJson(respJson, AffiliateOrderReport.class);
                     if (report.getOrderList() != null) {

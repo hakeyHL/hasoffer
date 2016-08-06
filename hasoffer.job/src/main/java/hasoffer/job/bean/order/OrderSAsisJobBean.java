@@ -23,28 +23,28 @@ public class OrderSAsisJobBean extends QuartzJobBean {
         try {
 
             Date todayTime = new Date();
-            //头15天
-            Date day15AgoTime = TimeUtils.addDay(todayTime, -15);
-            // 头7天
-            Date day7AgoTime = TimeUtils.addDay(todayTime, -7);
-            //头三天
-            Date day3AgoTime = TimeUtils.addDay(todayTime, -3);
-            //头两天
-            Date day2AgoTime = TimeUtils.addDay(todayTime, -2);
-            //头一天
-            Date day1AgoTime = TimeUtils.addDay(todayTime, -1);
+            ////头15天
+            //Date day15AgoTime = TimeUtils.addDay(todayTime, -15);
+            //// 头7天
+            //Date day7AgoTime = TimeUtils.addDay(todayTime, -7);
+            ////头三天
+            //Date day3AgoTime = TimeUtils.addDay(todayTime, -3);
+            ////头两天
+            //Date day2AgoTime = TimeUtils.addDay(todayTime, -2);
+            ////头一天
+            //Date day1AgoTime = TimeUtils.addDay(todayTime, -1);
+            //
+            //orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day15AgoTime, day15AgoTime);
+            //orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day3AgoTime, day3AgoTime);
+            //orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day2AgoTime, day2AgoTime);
+            //orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day1AgoTime, day1AgoTime);
 
-            orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day15AgoTime, day15AgoTime);
-            orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day3AgoTime, day3AgoTime);
-            orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day2AgoTime, day2AgoTime);
-            orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day1AgoTime, day1AgoTime);
-            orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), todayTime, todayTime);
+            for (int i = 0; i < 30; i++) {
+                Date day = TimeUtils.addDay(todayTime, -15);
+                orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day, day);
+                orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), day, day);
 
-            orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), day15AgoTime, day15AgoTime);
-            orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), day7AgoTime, day3AgoTime);
-            orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), day2AgoTime, day2AgoTime);
-            orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), day1AgoTime, day1AgoTime);
-            orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), todayTime, todayTime);
+            }
 
         } catch (Exception e) {
             logger.debug("reportOrderStatistic:任务失败,   DATE:" + new Date() + ":具体如下");
