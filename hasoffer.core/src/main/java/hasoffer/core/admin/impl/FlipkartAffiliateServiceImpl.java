@@ -216,6 +216,7 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
 
 
     private List<AffiliateOrder> getOrderList(String affId, String token, String orderState, Date startTime, Date endTime) {
+        logger.info("countOrderList: affid={},token={},startTime={},endTime={}", affId, token, startTime, endTime);
         Map<String, String> headerMap = new HashMap<>();
         headerMap.put("Fk-Affiliate-Id", affId);
         headerMap.put("Fk-Affiliate-Token", token);
