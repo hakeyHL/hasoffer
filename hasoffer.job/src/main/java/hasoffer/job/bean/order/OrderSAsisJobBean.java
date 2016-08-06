@@ -40,7 +40,7 @@ public class OrderSAsisJobBean extends QuartzJobBean {
             //orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day1AgoTime, day1AgoTime);
 
             for (int i = 0; i < 30; i++) {
-                Date day = TimeUtils.addDay(todayTime, -15);
+                Date day = TimeUtils.addDay(todayTime, -i);
                 orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day, day);
                 orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), day, day);
 
