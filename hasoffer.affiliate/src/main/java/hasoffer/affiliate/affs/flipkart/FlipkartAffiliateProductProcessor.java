@@ -85,7 +85,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
             while (true) {
                 if (!"".equals(report.getNext()) && parameterMap.get(R_OFFSET) != null) {
                     parameterMap.put(R_OFFSET, String.valueOf(Integer.valueOf(parameterMap.get(R_OFFSET)) + 500));
-                    respJson = sendRequest(url, null, parameterMap);
+                    respJson = sendRequest(url, headerMap, parameterMap);
                     report = gson.fromJson(respJson, AffiliateOrderReport.class);
                     if (report.getOrderList() != null) {
                         orderList.addAll(report.getOrderList());
@@ -106,7 +106,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
             return orderList;
         } catch (Exception e) {
             e.printStackTrace();
-            return new ArrayList<AffiliateOrder>();
+            return new ArrayList<>();
         }
 
     }
@@ -137,7 +137,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
 
             case HttpURLConnection.HTTP_UNAUTHORIZED:
                 // The API Token or the Tracking ID is invalid.
-                throw new AffiliateAPIException("API Token or Affiliate Tracking ID invalid.");
+                throw new AffiliateAPIException("API Token:"+headerMap.get("Fk-Affiliate-Token")+" or Affiliate Tracking ID:"+headerMap.get("Fk-Affiliate-Id")+" invalid.");
 
             case HttpURLConnection.HTTP_FORBIDDEN:
                 // Tampered URL, i.e., there is a signature mismatch.
