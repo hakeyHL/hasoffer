@@ -68,11 +68,14 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
     }
 
     @Override
-    public List<AffiliateOrder> getAffiliateOrderList(Map<String, String> parameterMap) {
+    public List<AffiliateOrder> getAffiliateOrderList(Map<String, String> headerMap, Map<String, String> parameterMap) {
         String url="https://affiliate-api.flipkart.net/affiliate/report/orders/detail/json";
 
+        //headerMap.put("Fk-Affiliate-Token", getAffiliateToken());
+        //headerMap.put("Fk-Affiliate-Id", TRACKINGID);
+
         try {
-            String respJson = sendRequest(url, null, parameterMap);
+            String respJson = sendRequest(url, headerMap, parameterMap);
             Gson gson = new Gson();
             AffiliateOrderReport report = gson.fromJson(respJson, AffiliateOrderReport.class);
             List<AffiliateOrder> orderList = new ArrayList<AffiliateOrder>();
@@ -95,6 +98,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
             }
 
             for (AffiliateOrder order : orderList) {
+                order.setAffExtParam1(headerMap.get("Fk-Affiliate-Id"));
                 if (order.getStatus() == null) {
                     order.setStatus(parameterMap.get(R_ORDER_STATUS));
                 }
@@ -120,8 +124,6 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
         if (headerMap == null) {
             headerMap = new HashMap<String, String>();
         }
-        headerMap.put("Fk-Affiliate-Token", getAffiliateToken());
-        headerMap.put("Fk-Affiliate-Id", TRACKINGID);
 
         HttpResponseModel responseModel = HttpUtils.get(urlString, headerMap, paramMap);
 

@@ -32,28 +32,34 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
     public List<OrderStatsAnalysisPO> countOrderList(Date startTime, Date endTime) {
         List<OrderStatsAnalysisPO> orderPOList = new ArrayList<OrderStatsAnalysisPO>();
 //        Date before24H = new Date(startTime.getTime() - 1000 * 60 * 60 * 24);
-
-        Map<String, String> tentativeParamMap = new HashMap<String, String>();
-        tentativeParamMap.put(FlipkartAffiliateProductProcessor.R_START_DATE, DateFormatUtils.format(startTime, "yyyy-MM-dd"));
-        tentativeParamMap.put(FlipkartAffiliateProductProcessor.R_END_DATE, DateFormatUtils.format(endTime, "yyyy-MM-dd"));
-        tentativeParamMap.put(FlipkartAffiliateProductProcessor.R_ORDER_STATUS, FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE);
-        tentativeParamMap.put(FlipkartAffiliateProductProcessor.R_OFFSET, "0");
-        List<AffiliateOrder> tentativeOrderList = flipProcessor.getAffiliateOrderList(tentativeParamMap);
-        try {
-            TimeUnit.SECONDS.sleep(5);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Map<String, String> approvedParamMap = new HashMap<String, String>();
-        approvedParamMap.put(FlipkartAffiliateProductProcessor.R_START_DATE, DateFormatUtils.format(startTime, "yyyy-MM-dd"));
-        approvedParamMap.put(FlipkartAffiliateProductProcessor.R_END_DATE, DateFormatUtils.format(endTime, "yyyy-MM-dd"));
-        approvedParamMap.put(FlipkartAffiliateProductProcessor.R_ORDER_STATUS, FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED);
-        approvedParamMap.put(FlipkartAffiliateProductProcessor.R_OFFSET, "0");
-        List<AffiliateOrder> approvedOrderList = flipProcessor.getAffiliateOrderList(approvedParamMap);
-
         List<AffiliateOrder> orderList = new ArrayList<>();
-        orderList.addAll(tentativeOrderList);
-        orderList.addAll(approvedOrderList);
+        orderList.addAll(getOrderList("affiliate357","56e46c994b92488c91e43fad138d5c71", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
+        orderList.addAll(getOrderList("affiliate357","56e46c994b92488c91e43fad138d5c71", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
+
+        orderList.addAll(getOrderList("xyangryrg","c9c9b3d833054bf490c9989ac602b852", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
+        orderList.addAll(getOrderList("xyangryrg","c9c9b3d833054bf490c9989ac602b852", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
+
+        orderList.addAll(getOrderList("zhouxixi0","55b1c6fa469b4e0296bb00259faf4056", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
+        orderList.addAll(getOrderList("zhouxixi0","55b1c6fa469b4e0296bb00259faf4056", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
+
+        orderList.addAll(getOrderList("harveyouo","c54bfd150ea74047a9233a4c3c3d356c", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
+        orderList.addAll(getOrderList("harveyouo","c54bfd150ea74047a9233a4c3c3d356c", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
+
+        orderList.addAll(getOrderList("allenooou","857de2a9c43e40bfbdf572db3d728db4", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
+        orderList.addAll(getOrderList("allenooou","857de2a9c43e40bfbdf572db3d728db4", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
+
+        orderList.addAll(getOrderList("747306881","f3ec71e03799496d8b73c38b5456fb0b", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
+        orderList.addAll(getOrderList("747306881","f3ec71e03799496d8b73c38b5456fb0b", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
+
+        orderList.addAll(getOrderList("hlhakeygm","01cfa560bac247eaa8a37f57fa8149f8", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
+        orderList.addAll(getOrderList("hlhakeygm","01cfa560bac247eaa8a37f57fa8149f8", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
+
+        orderList.addAll(getOrderList("oliviers","6cf21891892d4bd8b839d85d51ac809cl", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
+        orderList.addAll(getOrderList("oliviers","6cf21891892d4bd8b839d85d51ac809cl", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
+
+        orderList.addAll(getOrderList("wuningSFg","04bece2ed64945a3bce45c2f51293ef0", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
+        orderList.addAll(getOrderList("wuningSFg","04bece2ed64945a3bce45c2f51293ef0", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
+
 
         Set<String> deviceSet = new HashSet<String>();
         for (AffiliateOrder order : orderList) {
@@ -81,6 +87,7 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
             OrderStatsAnalysisPO po = new OrderStatsAnalysisPO();
             po.setWebSite(Website.FLIPKART.toString());
             po.setOrderId(order.getAffiliateOrderItemId());
+            po.setAffID(order.getAffID());
             String channel = order.getAffExtParam1();
             po.setChannel(channel == null || "".equals(channel) ? "NONE" : channel);
             try {
@@ -185,6 +192,19 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
 //
 //        return "OLD";
 //    }
+
+
+    private List<AffiliateOrder> getOrderList(String affId,String token, String orderState, Date startTime, Date endTime) {
+        Map<String, String> headerMap = new HashMap<>();
+        headerMap.put("Fk-Affiliate-Id", affId);
+        headerMap.put("Fk-Affiliate-Token", token);
+        Map<String, String> approvedParamMap = new HashMap<>();
+        approvedParamMap.put(FlipkartAffiliateProductProcessor.R_START_DATE, DateFormatUtils.format(startTime, "yyyy-MM-dd"));
+        approvedParamMap.put(FlipkartAffiliateProductProcessor.R_END_DATE, DateFormatUtils.format(endTime, "yyyy-MM-dd"));
+        approvedParamMap.put(FlipkartAffiliateProductProcessor.R_ORDER_STATUS, orderState);
+        approvedParamMap.put(FlipkartAffiliateProductProcessor.R_OFFSET, "0");
+        return flipProcessor.getAffiliateOrderList(headerMap, approvedParamMap);
+    }
 
     private Map<String, UrmDevice> getDeviceRegTime(Set<String> deviceSet) {
 

@@ -167,13 +167,11 @@ public class SnapdealProductProcessor implements IAffiliateProcessor<SnapDealAff
     }
 
     @Override
-    public List<SnapDealAffiliateOrder> getAffiliateOrderList(Map<String, String> parameterMap) {
+    public List<SnapDealAffiliateOrder> getAffiliateOrderList(Map<String, String> headerMap,Map<String, String> parameterMap) {
         String url = "affiliate-feeds.snapdeal.com/feed/api/order";
         try {
-            Map<String, String> headerMap = new HashMap<String, String>();
             headerMap.put("Accept", "application/json");
             String respJson = sendRequest(url, headerMap, parameterMap);
-            System.out.println(respJson);
             Gson gson = new GsonBuilder().setDateFormat("MM/dd/yyyy HH:mm:ss").create();
             SnapdealOrderReport report = gson.fromJson(respJson, SnapdealOrderReport.class);
 
