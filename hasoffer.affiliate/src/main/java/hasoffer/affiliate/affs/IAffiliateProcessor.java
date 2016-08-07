@@ -3,6 +3,7 @@ package hasoffer.affiliate.affs;
 
 import hasoffer.affiliate.exception.AffiliateAPIException;
 import hasoffer.affiliate.model.AffiliateCategory;
+import hasoffer.affiliate.model.AffiliateOrder;
 import hasoffer.affiliate.model.AffiliateProduct;
 
 import java.io.IOException;
@@ -20,7 +21,15 @@ public interface IAffiliateProcessor<T> {
     String getAffiliateToken() throws IOException;
 
 
-    String sendRequest(String url, Map<String, String> headerMap ,Map<String, String> paramMap) throws AffiliateAPIException, IOException;
+    /**
+     * 获取订单
+     * @param headerMap
+     * @param parameterMap
+     * @return
+     */
+    List<T> getAffiliateOrderList(Map<String, String> headerMap, Map<String, String> parameterMap);
+
+    String sendRequest(String url, Map<String, String> headerMap , Map<String, String> paramMap) throws AffiliateAPIException, IOException;
 
     /**
      * @return
@@ -65,10 +74,10 @@ public interface IAffiliateProcessor<T> {
      */
     AffiliateProduct getAffiliateProductBySourceId(String sourceId) throws AffiliateAPIException, IOException;
 
-    /**
-     * 获取订单信息
-     * @return
-     */
-    List<T> getAffiliateOrderList(Map<String, String> parameterMap);
+    ///**
+    // * 获取订单信息
+    // * @return
+    // */
+    //List<T> getAffiliateOrderList(Map<String, String> parameterMap);
 
 }

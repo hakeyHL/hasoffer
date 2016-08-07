@@ -27,11 +27,12 @@ public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
     @Override
     public List<OrderStatsAnalysisPO> countOrderList(Date startTime, Date endTime) {
         List<OrderStatsAnalysisPO> orderPOList = new ArrayList<OrderStatsAnalysisPO>();
-        Map<String, String> parameterMap = new HashMap<String, String>();
+        Map<String, String> headerMap = new HashMap<>();
+        Map<String, String> parameterMap = new HashMap<>();
         parameterMap.put(SnapdealProductProcessor.R_START_DATE, DateFormatUtils.format(startTime, "yyyy-MM-dd"));
         parameterMap.put(SnapdealProductProcessor.R_END_DATE, DateFormatUtils.format(endTime, "yyyy-MM-dd"));
         parameterMap.put(SnapdealProductProcessor.R_ORDER_STATUS, SnapdealProductProcessor.R_ORDER_STATUS_APPROVED);
-        List<SnapDealAffiliateOrder> orderList = snapDealProcessor.getAffiliateOrderList(parameterMap);
+        List<SnapDealAffiliateOrder> orderList = snapDealProcessor.getAffiliateOrderList(headerMap, parameterMap);
         Set<String> deviceSet = new HashSet<String>();
         if (orderList != null) {
             for (SnapDealAffiliateOrder order : orderList) {

@@ -189,7 +189,7 @@ public class AmazonAffiliateProductProcessor implements IAffiliateProcessor<Amaz
     }
 
     @Override
-    public List<AmazonOrder> getAffiliateOrderList(Map<String, String> parameterMap) {
+    public List<AmazonOrder> getAffiliateOrderList(Map<String, String> headerMap, Map<String, String> parameterMap) {
         return null;
     }
 }
