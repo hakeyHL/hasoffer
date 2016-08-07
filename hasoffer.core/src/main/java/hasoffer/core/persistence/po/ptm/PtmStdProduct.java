@@ -21,6 +21,9 @@ public class PtmStdProduct implements Identifiable<Long> {
 
     private String title;// 标题
 
+    private String brand; // 品牌
+    private String model; // 型号 (品牌+型号不允许有重复)
+
     @Column(columnDefinition = "longtext")
     private String defaultDesc; // 默认的描述信息
 
@@ -69,6 +72,22 @@ public class PtmStdProduct implements Identifiable<Long> {
         this.defaultDesc = defaultDesc;
     }
 
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -80,6 +99,8 @@ public class PtmStdProduct implements Identifiable<Long> {
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (createTime != null ? !createTime.equals(that.createTime) : that.createTime != null) return false;
         if (title != null ? !title.equals(that.title) : that.title != null) return false;
+        if (brand != null ? !brand.equals(that.brand) : that.brand != null) return false;
+        if (model != null ? !model.equals(that.model) : that.model != null) return false;
         return !(defaultDesc != null ? !defaultDesc.equals(that.defaultDesc) : that.defaultDesc != null);
 
     }
@@ -90,6 +111,8 @@ public class PtmStdProduct implements Identifiable<Long> {
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (int) (categoryId ^ (categoryId >>> 32));
         result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (brand != null ? brand.hashCode() : 0);
+        result = 31 * result + (model != null ? model.hashCode() : 0);
         result = 31 * result + (defaultDesc != null ? defaultDesc.hashCode() : 0);
         return result;
     }
