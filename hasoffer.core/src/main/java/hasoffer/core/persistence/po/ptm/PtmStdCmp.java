@@ -17,6 +17,12 @@ public class PtmStdCmp implements Identifiable<Long> {
     private long stdSkuId; // ptm_std_sku # id
 
     private String title;// 带商品的color，size属性的
+
+    private String imageUrl;
+    private String oriImagePath;
+    private String bigImagePath;
+    private String smallImagePath;
+
     private String url;
 
     private float price;
@@ -85,6 +91,38 @@ public class PtmStdCmp implements Identifiable<Long> {
         this.createTime = createTime;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getOriImagePath() {
+        return oriImagePath;
+    }
+
+    public void setOriImagePath(String oriImagePath) {
+        this.oriImagePath = oriImagePath;
+    }
+
+    public String getBigImagePath() {
+        return bigImagePath;
+    }
+
+    public void setBigImagePath(String bigImagePath) {
+        this.bigImagePath = bigImagePath;
+    }
+
+    public String getSmallImagePath() {
+        return smallImagePath;
+    }
+
+    public void setSmallImagePath(String smallImagePath) {
+        this.smallImagePath = smallImagePath;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -96,6 +134,13 @@ public class PtmStdCmp implements Identifiable<Long> {
         if (Float.compare(ptmStdCmp.price, price) != 0) return false;
         if (id != null ? !id.equals(ptmStdCmp.id) : ptmStdCmp.id != null) return false;
         if (title != null ? !title.equals(ptmStdCmp.title) : ptmStdCmp.title != null) return false;
+        if (imageUrl != null ? !imageUrl.equals(ptmStdCmp.imageUrl) : ptmStdCmp.imageUrl != null) return false;
+        if (oriImagePath != null ? !oriImagePath.equals(ptmStdCmp.oriImagePath) : ptmStdCmp.oriImagePath != null)
+            return false;
+        if (bigImagePath != null ? !bigImagePath.equals(ptmStdCmp.bigImagePath) : ptmStdCmp.bigImagePath != null)
+            return false;
+        if (smallImagePath != null ? !smallImagePath.equals(ptmStdCmp.smallImagePath) : ptmStdCmp.smallImagePath != null)
+            return false;
         if (url != null ? !url.equals(ptmStdCmp.url) : ptmStdCmp.url != null) return false;
         if (updateTime != null ? !updateTime.equals(ptmStdCmp.updateTime) : ptmStdCmp.updateTime != null) return false;
         return !(createTime != null ? !createTime.equals(ptmStdCmp.createTime) : ptmStdCmp.createTime != null);
@@ -107,6 +152,10 @@ public class PtmStdCmp implements Identifiable<Long> {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (int) (stdSkuId ^ (stdSkuId >>> 32));
         result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (imageUrl != null ? imageUrl.hashCode() : 0);
+        result = 31 * result + (oriImagePath != null ? oriImagePath.hashCode() : 0);
+        result = 31 * result + (bigImagePath != null ? bigImagePath.hashCode() : 0);
+        result = 31 * result + (smallImagePath != null ? smallImagePath.hashCode() : 0);
         result = 31 * result + (url != null ? url.hashCode() : 0);
         result = 31 * result + (price != +0.0f ? Float.floatToIntBits(price) : 0);
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
