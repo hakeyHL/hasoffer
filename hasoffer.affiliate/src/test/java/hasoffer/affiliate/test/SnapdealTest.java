@@ -16,7 +16,7 @@ public class SnapdealTest {
         paraMap.put("status", "approved");
 //        status=approved
 
-        List<SnapDealAffiliateOrder> affiliateOrderList = productProcessor.getAffiliateOrderList(paraMap);
+        List<SnapDealAffiliateOrder> affiliateOrderList = productProcessor.getAffiliateOrderList(null,paraMap);
         if (affiliateOrderList == null) {
             return;
         }

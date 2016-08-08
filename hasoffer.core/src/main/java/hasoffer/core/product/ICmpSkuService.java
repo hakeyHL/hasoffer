@@ -19,6 +19,10 @@ import java.util.List;
  */
 public interface ICmpSkuService {
 
+    void createDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct);
+
+    void createPtmCmpSkuImage(long skuId, FetchedProduct fetchedProduct);
+
     PtmCmpSku2 createCmpSkuForIndex(PtmCmpSku2 ptmCmpSku);
 
     void createPtmCmpSkuIndexToMysql(PtmCmpSku2 ptmCmpsku);

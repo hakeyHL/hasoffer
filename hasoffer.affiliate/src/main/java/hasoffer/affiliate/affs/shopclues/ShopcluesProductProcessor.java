@@ -63,10 +63,10 @@ public class ShopcluesProductProcessor implements IAffiliateProcessor<ShopcluesO
     }
 
     @Override
-    public List<ShopcluesOrder> getAffiliateOrderList(Map<String, String> parameterMap) {
+    public List<ShopcluesOrder> getAffiliateOrderList(Map<String, String> headerMap,Map<String, String> parameterMap) {
         String requestUrl = "https://affiliatelogin.shopclues.com/affiliates/api/2/reports.asmx/OrderDetailChanges";
         try {
-            sendRequest(requestUrl, null, parameterMap);
+            sendRequest(requestUrl, headerMap, parameterMap);
         } catch (Exception e) {
             e.printStackTrace();
         }

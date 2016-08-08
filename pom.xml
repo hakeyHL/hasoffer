@@ -26,7 +26,6 @@
         <module>hasoffer.fetch.provider</module>
         <module>hasoffer.fetch.consumer</module>
         <module>hasoffer.analysis.api</module>
-        <module>hasoffer.usa.fetch</module>
     </modules>
 
     <properties>

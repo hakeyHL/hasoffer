@@ -49,12 +49,13 @@ public class FilpkartExport {
         columnModelMap.put(columnIndex++, new ExcelExportUtil.ColumnModel("salesChannel", "salesChannel"));
         columnModelMap.put(columnIndex, new ExcelExportUtil.ColumnModel("customerType", "customerType"));
 
+        Map<String, String> headerMap = new HashMap<String, String>();
         Map<String, String> parameterMap = new HashMap<String, String>();
         parameterMap.put("startDate", "2016-08-01");
         parameterMap.put("endDate", "2016-08-02");
         parameterMap.put("status", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE);
         parameterMap.put("offset", "0");
-        List<AffiliateOrder> affiliateOrderList = processor.getAffiliateOrderList(parameterMap);
+        List<AffiliateOrder> affiliateOrderList = processor.getAffiliateOrderList(headerMap, parameterMap);
         //parameterMap.put("startDate", "2016-04-01");
         //parameterMap.put("endDate", "2016-04-30");
         //parameterMap.put("status", "approved");
