@@ -26,7 +26,7 @@ public class ShopCluesTest {
         //paraMap.put("status", "approved");
 //        status=approved
 
-        List<ShopcluesOrder> affiliateOrderList = productProcessor.getAffiliateOrderList(paraMap);
+        List<ShopcluesOrder> affiliateOrderList = productProcessor.getAffiliateOrderList(null, paraMap);
         for (ShopcluesOrder order : affiliateOrderList) {
             System.out.println(order);
         }
