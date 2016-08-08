@@ -7,6 +7,7 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
+import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
@@ -32,12 +33,14 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
     private ConcurrentLinkedQueue<SrmSearchLog> queue;
     private IFetchDubboService fetchService;
     private IProductService productService;
+    private ICmpSkuService cmpSkuService;
 
-    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<SrmSearchLog> queue, IFetchDubboService fetchService, IProductService productService) {
+    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<SrmSearchLog> queue, IFetchDubboService fetchService, IProductService productService, ICmpSkuService cmpSkuService) {
         this.dbm = dbm;
         this.queue = queue;
         this.fetchService = fetchService;
         this.productService = productService;
+        this.cmpSkuService = cmpSkuService;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
         while (true) {
 
-//            try {
+            try {
 
                 SrmSearchLog searchLog = queue.poll();
 
@@ -87,9 +90,9 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
                 productService.updatePtmProductPrice(productId);
 
-//            } catch (Exception e) {
-//
-//            }
+            } catch (Exception e) {
+
+            }
         }
     }
 
@@ -129,6 +132,10 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
         System.out.println(JSONUtil.toJSON(fetchedProduct).toString());
 
+        cmpSkuService.createDescription(sku, fetchedProduct);
 
+        cmpSkuService.updateCmpSkuBySpiderFetchedProduct(sku.getId(), fetchedProduct);
+
+        cmpSkuService.createPtmCmpSkuImage(sku.getId(), fetchedProduct);
     }
 }

@@ -26,10 +26,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RequestMapping(value = "/flipkart")
 public class FlipkartCategoryParamController {
 
-    private static AtomicBoolean taskRunning1 = new AtomicBoolean(false);
-
     private static final String Q_FLIPKART_CMP = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' ORDER BY t.id";
-
+    private static AtomicBoolean taskRunning1 = new AtomicBoolean(false);
     @Resource
     IDataBaseManager dbm;
     @Resource
@@ -63,5 +61,16 @@ public class FlipkartCategoryParamController {
         return "ok";
     }
 
+    /**
+     * 该方法用于将现有sku中（Date：2016-08-08）,flipkart的被访问的sku，找到其对应的类目
+     */
+    //flipkart/getflipkartskucate2
+    @RequestMapping(value = "/getFlipkartSkuCate2", method = RequestMethod.GET)
+    @ResponseBody
+    public String getFlipkartSkuCate2() {
+
+
+        return "ok";
+    }
 
 }
