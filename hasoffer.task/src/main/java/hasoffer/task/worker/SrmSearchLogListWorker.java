@@ -47,6 +47,8 @@ public class SrmSearchLogListWorker implements Runnable {
                 startDate = dataList.get(dataList.size() - 1).getUpdateTime();
 
                 queue.addAll(dataList);
+                logger.info(dataList.size() + "");
+                logger.info(queue.size() + "");
 //                for (SrmSearchLog log : dataList) {
 //
 //                    Website website = Website.valueOf(log.getSite());
