@@ -10,7 +10,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.worker.ListAndProcessWorkerStatus;
 import org.htmlcleaner.TagNode;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -26,7 +26,7 @@ public class FlipkartSkuCategory2GetSaveWorker implements Runnable {
     private ListAndProcessWorkerStatus<PtmCmpSku> ws;
     private IDataBaseManager dbm;
 
-    public FlipkartSkuCategory2GetSaveWorker(IDataBaseManager dbm, ListAndProcessWorkerStatus<PtmCmpSku> ws) {//, ICategoryService categoryService
+    public FlipkartSkuCategory2GetSaveWorker(IDataBaseManager dbm, ListAndProcessWorkerStatus<PtmCmpSku> ws) {//ICategoryService categoryService
         this.dbm = dbm;
         this.ws = ws;
 //        this.categoryService = categoryService;
@@ -79,13 +79,19 @@ public class FlipkartSkuCategory2GetSaveWorker implements Runnable {
             cateSize = cateSize - 1;
         }
 
-        long parentId = 0;
+        List<PtmCategory2> categoryList = new ArrayList<PtmCategory2>();
 
         for (int i = 0; i < cateSize; i++) {
 
             if (i == 0) {//排除导航中的第一个home
                 continue;
             }
+
+            /*
+                如果有效类目size小于等于3，取最后一个
+                查询是否存在该类目，存在关联id
+                如果不存在，查询是否存在父类目依次创建
+             */
 
             try {
 
@@ -94,21 +100,6 @@ public class FlipkartSkuCategory2GetSaveWorker implements Runnable {
                 //获取类目名称
                 String pathString = StringUtils.filterAndTrim(pathNode.getText().toString(), null);
 
-                //检查类目是否存在
-                PtmCategory2 category = dbm.querySingle(Q_CATEGORY_BYNAME, Arrays.asList(pathString));
-
-                if (category != null) {
-                    parentId = category.getId();
-                } else {
-                    category = new PtmCategory2();
-
-                    category.setName(pathString);
-                    category.setLevel(i);
-                    category.setParentId(parentId);
-
-//                    category = categoryService.createAppCategory(category);
-                    parentId = category.getId();
-                }
 
             } catch (ContentParseException exception) {
                 break;
