@@ -32,7 +32,7 @@ public class SrmSearchLogListWorker implements Runnable {
     public void run() {
 
         //设置起始时间，起始时间的初始值是当前时间的24小时前
-        Date startDate = TimeUtils.addDay(TimeUtils.nowDate(), -1);
+        Date startDate = TimeUtils.addDay(TimeUtils.nowDate(), -2);
 
         while (true) {
 
