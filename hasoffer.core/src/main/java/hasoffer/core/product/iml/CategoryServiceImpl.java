@@ -3,6 +3,7 @@ package hasoffer.core.product.iml;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
+import hasoffer.core.persistence.po.ptm.PtmCategory3;
 import hasoffer.core.persistence.po.ptm.updater.PtmCategoryUpdater;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.solr.CategoryIndexServiceImpl;
@@ -75,13 +76,13 @@ public class CategoryServiceImpl implements ICategoryService {
         categoryIndexService.remove(String.valueOf(id));
     }
 
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public PtmCategory2 createAppCategory(PtmCategory2 category) {
-//        Long aLong = dbm.create(category);
-//        category.setId(aLong);
-//        return category;
-//    }
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public PtmCategory3 createAppCategory(PtmCategory3 category) {
+        Long aLong = dbm.create(category);
+        category.setId(aLong);
+        return category;
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
