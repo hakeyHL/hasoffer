@@ -62,7 +62,7 @@ public class DubboUpdateController {
         es.execute(new SrmSearchLogListWorker(dbm, queue));
 
         for (int i = 0; i < 10; i++) {
-            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, productService));
+            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, productService, cmpSkuService));
         }
 
         taskRunning1.set(true);
@@ -86,7 +86,7 @@ public class DubboUpdateController {
         es.execute(new TopSellingListWorker(dbm, queue));
 
 //        for (int i = 0; i < 30; i++) {
-        es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, productService));
+        es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, productService, cmpSkuService));
 //        }
 
         taskRunning2.set(true);
