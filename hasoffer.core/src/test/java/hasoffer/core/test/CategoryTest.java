@@ -23,13 +23,34 @@ import java.util.List;
 public class CategoryTest {
 
     private final static String Q_CATE_PARENTID_LEVEL =
-            "SELECT t FROM PtmCategory t WHERE t.parentId=?0 AND t.level=?1 ORDER BY t.rank ASC";
+            "SELECT t FROM PtmCategory2 t WHERE t.parentId=?0 AND t.level=?1 ORDER BY t.rank ASC";
     @Resource
     IDataBaseManager dbm;
     @Resource
     ICategoryService categoryService;
     @Resource
     CategoryIndexServiceImpl categoryIndexService;
+
+    @Test
+    public void showCate1() {
+        List<PtmCategory> cates1 = dbm.query(Q_CATE_PARENTID_LEVEL, Arrays.asList(0L, 1));
+
+        for (PtmCategory cate1 : cates1) {
+            List<PtmCategory> cates2 = dbm.query(Q_CATE_PARENTID_LEVEL, Arrays.asList(cate1.getId(), 2));
+
+            for (PtmCategory cate2 : cates2) {
+                List<PtmCategory> cates3 = dbm.query(Q_CATE_PARENTID_LEVEL, Arrays.asList(cate1.getId(), 2));
+
+                for (PtmCategory cate3 : cates3) {
+                    System.out.print(cate1.getId() + "_" + cate1.getName() + "\t");
+                    System.out.print(cate2.getId() + "_" + cate2.getName() + "\t");
+                    System.out.print(cate3.getId() + "_" + cate3.getName() + "\t");
+                    System.out.println();
+                }
+            }
+        }
+
+    }
 
     @Test
     public void testCate() {
@@ -48,17 +69,17 @@ public class CategoryTest {
             level = cate.getLevel() + 1;
 
             String splitStr = "";
-            if (level == 3) {
-                splitStr = "__";
-            } else if (level == 4) {
-                splitStr = "____";
+            if (level == 2) {
+                splitStr = "";
+            } else if (level == 3) {
+                splitStr = "\t";
             }
 
             System.out.println(splitStr + cate.getId() + "\t" + cate.getLevel() + "\t" + cate.getName());
             sb.append("," + cate.getId());
         }
 
-        if (level < 4) {
+        if (level < 3) {
             List<PtmCategory> subCates = dbm.query(Q_CATE_PARENTID_LEVEL, Arrays.asList(parentId, level));
             for (PtmCategory subCate : subCates) {
                 getSubCates(subCate, sb);

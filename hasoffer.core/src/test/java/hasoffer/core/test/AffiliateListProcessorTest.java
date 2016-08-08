@@ -8,7 +8,6 @@ import hasoffer.affiliate.model.AffiliateProduct;
 import hasoffer.core.product.IFetchService;
 import hasoffer.core.product.iml.FetchServiceImpl;
 import hasoffer.fetch.model.Product;
-import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import hasoffer.fetch.sites.snapdeal.SnapdealHelper;
 import org.junit.Test;
 
@@ -33,16 +32,17 @@ public class AffiliateListProcessorTest {
 
     @Test
     public void testFlipkartAffiliateProduct() {
-        String url = "http://www.flipkart.com/samsung-galaxy-s7-edge/p/itmegmkzvcpxxqhz?pid=MOBEGFZPCHJHAZVU&ref=L%3A7915091748451274242&srno=p_1&query=Samsung+Galaxy+S7+Edge&otracker=from-search";
-        String sourceId = FlipkartHelper.getSkuIdByUrl(url);
+        String sourceId = "MOBE77SZAETQFKZQ";
         FlipkartAffiliateProductProcessor flipkartAffilicateProductProcessor = new FlipkartAffiliateProductProcessor();
         AffiliateProduct flipkartProduct = null;
         try {
-            flipkartProduct = flipkartAffilicateProductProcessor.getAffiliateProductBySourceId("MOBEGFZPCHJHAZVU");
+            flipkartProduct = flipkartAffilicateProductProcessor.getAffiliateProductBySourceId(sourceId);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        System.out.println(flipkartProduct.getTitle());
     }
 
     @Test
