@@ -45,7 +45,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
         while (true) {
 
-            try {
+//            try {
 
                 SrmSearchLog searchLog = queue.poll();
 
@@ -61,6 +61,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
                 long productId = searchLog.getPtmProductId();
                 if (productId == 0) {
+                    logger.info("task update get productId zero sleep 3 seconds");
                     continue;
                 }
 
@@ -86,9 +87,9 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
                 productService.updatePtmProductPrice(productId);
 
-            } catch (Exception e) {
-
-            }
+//            } catch (Exception e) {
+//
+//            }
         }
     }
 
