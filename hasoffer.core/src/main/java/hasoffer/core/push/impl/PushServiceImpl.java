@@ -50,9 +50,10 @@ public class PushServiceImpl implements IPushService {
         try {
             postResult = Httphelper.doPostJsonWithHeader("https://gcm-http.googleapis.com/gcm/send", datasJson, header);
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println(e.getMessage());
         }
-        System.out.println(postResult);
+        System.out.println("postResult :" + postResult);
     }
 
     @Override

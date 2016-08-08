@@ -676,6 +676,7 @@ public class AppController {
             for (String gcmToken : gcmTokens) {
                 System.out.println("____  " + i + "  ____");
                 pushService.push(gcmToken, pushBo);
+                i++;
             }
         } catch (Exception e) {
             mv.addObject("msg", ExceptionHelper.getExceptionMessage(e));
