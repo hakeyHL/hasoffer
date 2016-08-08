@@ -136,8 +136,6 @@ public class SnapdealProductProcessor implements IAffiliateProcessor<SnapDealAff
         if (headerMap == null) {
             headerMap = new HashMap<String, String>();
         }
-        headerMap.put("Snapdeal-Token-Id", TOEKN);
-        headerMap.put("Snapdeal-Affiliate-Id", TRACKINGID);
 
         HttpResponseModel responseModel = HttpUtils.get(urlString, headerMap, parameterMap);
 
@@ -170,7 +168,6 @@ public class SnapdealProductProcessor implements IAffiliateProcessor<SnapDealAff
     public List<SnapDealAffiliateOrder> getAffiliateOrderList(Map<String, String> headerMap,Map<String, String> parameterMap) {
         String url = "affiliate-feeds.snapdeal.com/feed/api/order";
         try {
-            headerMap.put("Accept", "application/json");
             String respJson = sendRequest(url, headerMap, parameterMap);
             Gson gson = new GsonBuilder().setDateFormat("MM/dd/yyyy HH:mm:ss").create();
             SnapdealOrderReport report = gson.fromJson(respJson, SnapdealOrderReport.class);

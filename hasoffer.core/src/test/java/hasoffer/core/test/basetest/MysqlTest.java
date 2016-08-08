@@ -8,8 +8,8 @@ import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
 import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.updater.PtmImageUpdater;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
@@ -28,6 +28,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -346,12 +347,23 @@ public class MysqlTest {
     }
 
     @Test
-    public void test123() {
+    public void test123() throws IOException {
 
-        PtmCmpSkuImage ptmCmpSkuImage = new PtmCmpSkuImage();
-        ptmCmpSkuImageService.createPtmCmpSkuImage(ptmCmpSkuImage);
+        File file = new File("C:/Users/wing/Desktop/category.txt");
 
-        System.out.println();
+        List<PtmCategory> categoryList = dbm.query("SELECT t FROM PtmCategory t");
+
+        for (PtmCategory category : categoryList) {
+
+            PtmCategory ptmcategory = dbm.querySingle("SELECT t FROM PtmCategory t WHERE t.id = ?0 ", Arrays.asList(category.getParentId()));
+
+            if (ptmcategory == null) {
+                FileUtil.appendString(file, category.getId() + "\n");
+            }
+
+        }
+
+
 
     }
 }

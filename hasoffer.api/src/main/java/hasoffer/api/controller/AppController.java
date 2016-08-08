@@ -1,6 +1,7 @@
 package hasoffer.api.controller;
 
 import hasoffer.api.controller.vo.*;
+import hasoffer.api.helper.ExceptionHelper;
 import hasoffer.api.helper.ParseConfigHelper;
 import hasoffer.api.worker.SearchLogQueue;
 import hasoffer.base.enums.AppType;
@@ -9,6 +10,7 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.core.bo.product.Banners;
+import hasoffer.core.bo.push.*;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.cache.AppCacheManager;
 import hasoffer.core.cache.CmpSkuCacheManager;
@@ -20,12 +22,14 @@ import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.urm.UrmDevice;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.iml.ProductServiceImpl;
 import hasoffer.core.product.solr.CategoryIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel;
+import hasoffer.core.push.IPushService;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
 import hasoffer.core.utils.ImageUtil;
@@ -74,20 +78,23 @@ public class AppController {
     ICmpSkuService cmpSkuService;
     @Resource
     AppCacheManager appCacheManager;
+    @Resource
+    IPushService pushService;
     private Logger logger = LoggerFactory.logger(AppController.class);
 
     public static void main(String[] args) {
 //        String ss = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL, "http://www.snapdeal.com/product/micromax-canvas-a1-aq4502-8/630310793485", new String[]{"SHANCHUAN", "123"});
 //        System.out.print(ss);
 
-        Random random = new Random();
-        for (int i = 0; i < 100; i++) {
-            int nextInt = random.nextInt(8);
-            System.out.println(nextInt);
-        }
-
-        String ss = WebsiteHelper.getDealUrlWithAff(Website.FLIPKART, "http://www.flipkart.com/philips-mix-4-gb-sa5mxx04wf-97-16-mp3-player/p/itmdmfndygbz3wfd?pid=AUDDMFMAC4WSSGGH&al=TQCV0eQ7m7uScf%2FCbjC3PcldugMWZuE7sHPMhtl4IOoHmf27YkMOEISwRAaogpJNxY67buiFvno%3D&offer=nb%3Amp%3A06e1fc0e26&ref=L%3A5882205368552411071&srno=b_1&findingMethod=Deals%20of%20the%20Day&otracker=hp_omu_Deals%20of%20the%20Day_1_39fdd0fe-e2e3-4176-9cf4-15ca32404fe5_0", new String[]{"GOOGLEPLAY", "aaaadfdfdfdf"});
-        System.out.println(ss);
+        //Random random = new Random();
+        //for (int i = 0; i < 100; i++) {
+        //   int nextInt = random.nextInt(8);
+        //    System.out.println(nextInt);
+        // }
+        String dealUrlWithAff = WebsiteHelper.getDealUrlWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
+        System.out.println(dealUrlWithAff);
+        // String ss = WebsiteHelper.getDealUrlWithAff(Website.FLIPKART, "http://www.flipkart.com/philips-mix-4-gb-sa5mxx04wf-97-16-mp3-player/p/itmdmfndygbz3wfd?pid=AUDDMFMAC4WSSGGH&al=TQCV0eQ7m7uScf%2FCbjC3PcldugMWZuE7sHPMhtl4IOoHmf27YkMOEISwRAaogpJNxY67buiFvno%3D&offer=nb%3Amp%3A06e1fc0e26&ref=L%3A5882205368552411071&srno=b_1&findingMethod=Deals%20of%20the%20Day&otracker=hp_omu_Deals%20of%20the%20Day_1_39fdd0fe-e2e3-4176-9cf4-15ca32404fe5_0", new String[]{"GOOGLEPLAY", "aaaadfdfdfdf"});
+        //System.out.println(ss);
         //System.out.println(WebsiteHelper.getUrlWithAff("http://dl.flipkart.com/dl/all/~intex-speakers/pr?sid=all&p%5B%5D=facets.filter_standard%255B%255D%3D1"));
     }
 
@@ -635,4 +642,47 @@ public class AppController {
             }
         }
     }
+
+    @RequestMapping(value = "/push")
+    public ModelAndView psuhMessage(String app, String version, String marketChannel, String msg, String packageName, String type, String id, int number) {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("errorCode", "00000");
+        mv.addObject("msg", "ok");
+        try {
+            List<String> gcmTokens = new ArrayList<String>();
+            AppPushMessage message = new AppPushMessage(
+                    new AppMsgDisplay(msg, msg, msg),
+                    new AppMsgClick(AppMsgClickType.valueOf(type), id, packageName)
+            );
+            AppPushBo pushBo = new AppPushBo("5x1", "15:10", message);
+            //安装了指定app的、指定数量、指定包名、指定类型、指定id推送
+            List<UrmDevice> urmDevices = pushService.getGcmTokens(version);
+            for (UrmDevice urmDevice : urmDevices) {
+                String shopApps = urmDevice.getShopApp();
+                String[] split = shopApps.split(",");
+                for (String str : split) {
+                    if (urmDevice.getMarketChannel() != null) {
+                        if (str.equals(app) && urmDevice.getMarketChannel().name().equals(marketChannel)) {
+                            if (gcmTokens.size() < number && !StringUtils.isEmpty(urmDevice.getGcmToken())) {
+                                gcmTokens.add(urmDevice.getGcmToken());
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            int i = 0;
+            for (String gcmToken : gcmTokens) {
+                System.out.println("____  " + i + "  ____");
+                pushService.push(gcmToken, pushBo);
+                i++;
+            }
+        } catch (Exception e) {
+            mv.addObject("msg", ExceptionHelper.getExceptionMessage(e));
+            return mv;
+        }
+        return mv;
+    }
+
 }
