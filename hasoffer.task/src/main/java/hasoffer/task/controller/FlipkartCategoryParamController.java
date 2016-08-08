@@ -60,17 +60,4 @@ public class FlipkartCategoryParamController {
 
         return "ok";
     }
-
-    /**
-     * 该方法用于将现有sku中（Date：2016-08-08）,flipkart的被访问的sku，找到其对应的类目
-     */
-    //flipkart/getflipkartskucate2
-    @RequestMapping(value = "/getFlipkartSkuCate2", method = RequestMethod.GET)
-    @ResponseBody
-    public String getFlipkartSkuCate2() {
-
-
-        return "ok";
-    }
-
 }
