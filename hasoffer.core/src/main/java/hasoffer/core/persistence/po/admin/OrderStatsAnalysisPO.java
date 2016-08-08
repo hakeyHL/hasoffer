@@ -8,17 +8,20 @@ import java.util.Date;
 
 @Entity
 @Table(name = "report_ordersatas")
-public class OrderStatsAnalysisPO  implements Identifiable<Integer> {
+public class OrderStatsAnalysisPO implements Identifiable<Integer> {
     @Id
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(length=20,nullable = false)
+    @Column(length = 100)
+    private String affID;
+
+    @Column(length = 20, nullable = false)
     private String webSite;
 
 
-    @Column(length=20,nullable=false)
+    @Column(length = 20, nullable = false)
     private String channel;
 
     @Column(length = 100)
@@ -27,10 +30,10 @@ public class OrderStatsAnalysisPO  implements Identifiable<Integer> {
     /**
      * 新用户（NEW）还是老用户（OLD）。
      */
-    @Column(length=10,nullable=false)
+    @Column(length = 10, nullable = false)
     private String userType;
 
-    @Column(length=20,nullable=false)
+    @Column(length = 20, nullable = false)
     private String orderId;
 
     private Date orderTime;
@@ -38,7 +41,7 @@ public class OrderStatsAnalysisPO  implements Identifiable<Integer> {
     /**
      * 比价订单或者流量劫持订单（SHOP/REDI）
      */
-    @Column(length=10)
+    @Column(length = 10)
     private String orderType;
 
     @Column(length = 20)
@@ -70,6 +73,14 @@ public class OrderStatsAnalysisPO  implements Identifiable<Integer> {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getAffID() {
+        return affID;
+    }
+
+    public void setAffID(String affID) {
+        this.affID = affID;
     }
 
     public String getWebSite() {

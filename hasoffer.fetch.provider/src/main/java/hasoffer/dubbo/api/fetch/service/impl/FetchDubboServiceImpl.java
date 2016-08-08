@@ -1,7 +1,5 @@
 package hasoffer.dubbo.api.fetch.service.impl;
 
-import hasoffer.base.exception.ContentParseException;
-import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
@@ -17,6 +15,7 @@ import javax.annotation.Resource;
 import java.util.Date;
 
 public class FetchDubboServiceImpl implements IFetchDubboService {
+
     private Logger logger = LoggerFactory.getLogger(FetchDubboServiceImpl.class);
 
     @Resource
@@ -35,7 +34,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
 
 
     @Override
-    public FetchUrlResult getProductsByUrl(Website webSite, String url) throws HttpFetchException, ContentParseException {
+    public FetchUrlResult getProductsByUrl(Long skuId, Website webSite, String url) {
 
         FetchUrlResult fetchUrlResult = getFetchUrlResult(webSite, url);
         logger.info("FetchDubboServiceImpl.getProductsByUrl(webSite,url):{}, {} . Now is {} ", webSite, url, fetchUrlResult);

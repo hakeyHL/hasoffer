@@ -13,4 +13,5 @@ public interface IPtmCmpSkuImageService {
 
     List<PtmCmpSkuImage> ptmCmpSkuImages(Long productId);
 
+    void delete(long ptmcmpskuid);
 }

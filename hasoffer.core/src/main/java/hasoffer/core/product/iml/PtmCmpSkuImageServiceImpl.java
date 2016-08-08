@@ -15,7 +15,9 @@ import java.util.List;
  */
 @Service
 public class PtmCmpSkuImageServiceImpl implements IPtmCmpSkuImageService {
-    private final String Q_APP_IMAGES_PRODUCTID = "select t from PtmCmpSkuImage t  where t.id=?0";
+
+    private final String Q_APP_IMAGES_PRODUCTID = "SELECT t FROM PtmCmpSkuImage t  where t.id=?0";
+
     @Resource
     IDataBaseManager dbm;
 
@@ -28,5 +30,11 @@ public class PtmCmpSkuImageServiceImpl implements IPtmCmpSkuImageService {
     @Override
     public List<PtmCmpSkuImage> ptmCmpSkuImages(Long productId) {
         return dbm.query(Q_APP_IMAGES_PRODUCTID, Arrays.asList(productId));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(long ptmcmpskuid) {
+        dbm.delete(PtmCmpSkuImage.class, ptmcmpskuid);
     }
 }
