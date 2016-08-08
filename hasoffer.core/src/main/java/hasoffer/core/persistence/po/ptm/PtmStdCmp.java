@@ -3,10 +3,13 @@ package hasoffer.core.persistence.po.ptm;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.util.Date;
 
-@Entity
+//@Entity
 public class PtmStdCmp implements Identifiable<Long> {
 
     @Id
