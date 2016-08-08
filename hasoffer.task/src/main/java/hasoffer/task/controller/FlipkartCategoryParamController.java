@@ -26,10 +26,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RequestMapping(value = "/flipkart")
 public class FlipkartCategoryParamController {
 
-    private static AtomicBoolean taskRunning1 = new AtomicBoolean(false);
-
     private static final String Q_FLIPKART_CMP = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' ORDER BY t.id";
-
+    private static AtomicBoolean taskRunning1 = new AtomicBoolean(false);
     @Resource
     IDataBaseManager dbm;
     @Resource
@@ -62,6 +60,4 @@ public class FlipkartCategoryParamController {
 
         return "ok";
     }
-
-
 }

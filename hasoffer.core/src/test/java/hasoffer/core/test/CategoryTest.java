@@ -2,6 +2,7 @@ package hasoffer.core.test;
 
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
+import hasoffer.core.persistence.po.ptm.PtmCategory2;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.solr.CategoryIndexServiceImpl;
 import hasoffer.core.product.solr.CategoryModel;
@@ -22,14 +23,59 @@ import java.util.List;
 @ContextConfiguration(locations = "classpath:spring-beans.xml")
 public class CategoryTest {
 
-    private final static String Q_CATE_PARENTID_LEVEL =
+    private final static String Q_CATE_PARENTID_LEVEL_1 =
             "SELECT t FROM PtmCategory t WHERE t.parentId=?0 AND t.level=?1 ORDER BY t.rank ASC";
+    private final static String Q_CATE_PARENTID_LEVEL_2 =
+            "SELECT t FROM PtmCategory2 t WHERE t.parentId=?0 AND t.level=?1 ORDER BY t.rank ASC";
+
     @Resource
     IDataBaseManager dbm;
     @Resource
     ICategoryService categoryService;
     @Resource
     CategoryIndexServiceImpl categoryIndexService;
+
+    @Test
+    public void showCate1() {
+        List<PtmCategory> cates1 = dbm.query(Q_CATE_PARENTID_LEVEL_1, Arrays.asList(0L, 1));
+
+        for (PtmCategory cate1 : cates1) {
+            List<PtmCategory> cates2 = dbm.query(Q_CATE_PARENTID_LEVEL_1, Arrays.asList(cate1.getId(), 2));
+
+            for (PtmCategory cate2 : cates2) {
+                List<PtmCategory> cates3 = dbm.query(Q_CATE_PARENTID_LEVEL_1, Arrays.asList(cate2.getId(), 3));
+
+                System.out.print(cate1.getId() + "_" + cate1.getName() + "\t");
+                System.out.print(cate2.getId() + "_" + cate2.getName() + "\t");
+
+                System.out.println();
+
+                for (PtmCategory cate3 : cates3) {
+                    System.out.print(cate1.getId() + "_" + cate1.getName() + "\t");
+                    System.out.print(cate2.getId() + "_" + cate2.getName() + "\t");
+                    System.out.print(cate3.getId() + "_" + cate3.getName() + "\t");
+                    System.out.println();
+                }
+            }
+        }
+
+    }
+
+    @Test
+    public void showCate2() {
+        List<PtmCategory2> cates1 = dbm.query(Q_CATE_PARENTID_LEVEL_2, Arrays.asList(0L, 1));
+
+        for (PtmCategory2 cate1 : cates1) {
+            List<PtmCategory2> cates2 = dbm.query(Q_CATE_PARENTID_LEVEL_2, Arrays.asList(cate1.getId(), 2));
+
+            for (PtmCategory2 cate2 : cates2) {
+                System.out.print(cate1.getId() + "_" + cate1.getName() + "\t");
+                System.out.print(cate2.getId() + "_" + cate2.getName() + "\t" + cate2.getId());
+                System.out.println();
+            }
+        }
+
+    }
 
     @Test
     public void testCate() {
@@ -48,18 +94,18 @@ public class CategoryTest {
             level = cate.getLevel() + 1;
 
             String splitStr = "";
-            if (level == 3) {
-                splitStr = "__";
-            } else if (level == 4) {
-                splitStr = "____";
+            if (level == 2) {
+                splitStr = "";
+            } else if (level == 3) {
+                splitStr = "\t";
             }
 
             System.out.println(splitStr + cate.getId() + "\t" + cate.getLevel() + "\t" + cate.getName());
             sb.append("," + cate.getId());
         }
 
-        if (level < 4) {
-            List<PtmCategory> subCates = dbm.query(Q_CATE_PARENTID_LEVEL, Arrays.asList(parentId, level));
+        if (level < 3) {
+            List<PtmCategory> subCates = dbm.query(Q_CATE_PARENTID_LEVEL_1, Arrays.asList(parentId, level));
             for (PtmCategory subCate : subCates) {
                 getSubCates(subCate, sb);
             }

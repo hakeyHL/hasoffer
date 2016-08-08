@@ -23,6 +23,9 @@ public class PtmCmpSku implements Identifiable<Long> {
     private long productId; // PtmProduct # id
 
     private Long categoryId;
+    @ColumnDefault(value = "0")
+    private Long categoryId2 = 0L;//保存flipkart的sku的三级或者末尾级别的类目
+
     @Enumerated(EnumType.STRING)
     private Website website;
     private String seller;
@@ -390,6 +393,14 @@ public class PtmCmpSku implements Identifiable<Long> {
         this.cashBack = cashBack;
     }
 
+    public Long getCategoryId2() {
+        return categoryId2;
+    }
+
+    public void setCategoryId2(Long categoryId2) {
+        this.categoryId2 = categoryId2;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -408,6 +419,7 @@ public class PtmCmpSku implements Identifiable<Long> {
         if (returnDays != sku.returnDays) return false;
         if (id != null ? !id.equals(sku.id) : sku.id != null) return false;
         if (categoryId != null ? !categoryId.equals(sku.categoryId) : sku.categoryId != null) return false;
+        if (categoryId2 != null ? !categoryId2.equals(sku.categoryId2) : sku.categoryId2 != null) return false;
         if (website != sku.website) return false;
         if (seller != null ? !seller.equals(sku.seller) : sku.seller != null) return false;
         if (skuTitle != null ? !skuTitle.equals(sku.skuTitle) : sku.skuTitle != null) return false;
@@ -442,6 +454,7 @@ public class PtmCmpSku implements Identifiable<Long> {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (int) (productId ^ (productId >>> 32));
         result = 31 * result + (categoryId != null ? categoryId.hashCode() : 0);
+        result = 31 * result + (categoryId2 != null ? categoryId2.hashCode() : 0);
         result = 31 * result + (website != null ? website.hashCode() : 0);
         result = 31 * result + (seller != null ? seller.hashCode() : 0);
         result = 31 * result + (skuTitle != null ? skuTitle.hashCode() : 0);

@@ -31,16 +31,16 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
     private static Logger logger = LoggerFactory.getLogger(CmpSkuDubboUpdateWorker.class);
     private IDataBaseManager dbm;
     private ConcurrentLinkedQueue<SrmSearchLog> queue;
-    private ICmpSkuService cmpSkuService;
     private IFetchDubboService fetchService;
     private IProductService productService;
+    private ICmpSkuService cmpSkuService;
 
-    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<SrmSearchLog> queue, ICmpSkuService cmpSkuService, IFetchDubboService fetchService, IProductService productService) {
+    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<SrmSearchLog> queue, IFetchDubboService fetchService, IProductService productService, ICmpSkuService cmpSkuService) {
         this.dbm = dbm;
         this.queue = queue;
-        this.cmpSkuService = cmpSkuService;
         this.fetchService = fetchService;
         this.productService = productService;
+        this.cmpSkuService = cmpSkuService;
     }
 
     @Override
@@ -64,6 +64,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
                 long productId = searchLog.getPtmProductId();
                 if (productId == 0) {
+                    logger.info("task update get productId zero sleep 3 seconds");
                     continue;
                 }
 
@@ -131,6 +132,10 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
         System.out.println(JSONUtil.toJSON(fetchedProduct).toString());
 
+        cmpSkuService.createDescription(sku, fetchedProduct);
 
+        cmpSkuService.updateCmpSkuBySpiderFetchedProduct(sku.getId(), fetchedProduct);
+
+        cmpSkuService.createPtmCmpSkuImage(sku.getId(), fetchedProduct);
     }
 }

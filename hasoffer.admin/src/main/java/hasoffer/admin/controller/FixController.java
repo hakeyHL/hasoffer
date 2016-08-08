@@ -2,6 +2,7 @@ package hasoffer.admin.controller;
 
 import hasoffer.admin.controller.vo.TitleCountVo;
 import hasoffer.admin.worker.FixSkuErrorInPriceWorker;
+import hasoffer.admin.worker.FlipkartSkuCategory2GetListWorker;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
@@ -29,6 +30,7 @@ import hasoffer.core.task.ListAndProcessTask2;
 import hasoffer.core.task.worker.IList;
 import hasoffer.core.task.worker.IProcess;
 import hasoffer.core.user.IDeviceService;
+import hasoffer.core.worker.ListAndProcessWorkerStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import hasoffer.fetch.sites.paytm.PaytmHelper;
 import hasoffer.fetch.sites.shopclues.ShopcluesHelper;
@@ -92,8 +94,34 @@ public class FixController {
     ProductIndexServiceImpl productIndexServiceImpl;
     @Resource
     ICacheService cacheServiceImpl;
-
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
+
+    /**
+     * 该方法用于将现有sku中（Date：2016-08-08）,flipkart的被访问的sku，找到其对应的类目
+     */
+    //flipkart/getflipkartskucate2
+    @RequestMapping(value = "/getFlipkartSkuCate2", method = RequestMethod.GET)
+    @ResponseBody
+    public String getFlipkartSkuCate2() {
+
+        //俩种添加策略
+        //1.按照访问向队列添加
+        //2.按照id升序向队列添加
+        String queryString = "";
+//        String queryString = ;
+
+        ListAndProcessWorkerStatus ws = new ListAndProcessWorkerStatus();
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        es.execute(new FlipkartSkuCategory2GetListWorker(queryString, ws, dbm));
+
+        for (int i = 0; i < 10; i++) {
+//            es.execute(new FlipkartSkuCategory2GetSaveWorker());
+        }
+
+        return "ok";
+    }
 
     @RequestMapping(value = "/fixproductcmps/{productId}", method = RequestMethod.GET)
     @ResponseBody
@@ -183,7 +211,7 @@ public class FixController {
         for (String key : keys) {
             cacheServiceImpl.del(key);
         }
-        
+
         return "ok";
     }
 
