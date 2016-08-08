@@ -29,10 +29,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RequestMapping(value = "/dubbofetchtask")
 public class DubboUpdateController {
 
-    private static final String Q_PTMCMPSKU_BYPRODUCTID = "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ";
     private static AtomicBoolean taskRunning1 = new AtomicBoolean(false);
     private static AtomicBoolean taskRunning2 = new AtomicBoolean(false);
-    private static AtomicBoolean taskRunning3 = new AtomicBoolean(false);
+
     @Resource
     @Qualifier("fetchDubboService")
     IFetchDubboService fetchDubboService;
@@ -63,7 +62,7 @@ public class DubboUpdateController {
         es.execute(new SrmSearchLogListWorker(dbm, queue));
 
         for (int i = 0; i < 10; i++) {
-            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, cmpSkuService, fetchDubboService, productService));
+            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, productService));
         }
 
         taskRunning1.set(true);
@@ -87,7 +86,7 @@ public class DubboUpdateController {
         es.execute(new TopSellingListWorker(dbm, queue));
 
 //        for (int i = 0; i < 30; i++) {
-        es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, cmpSkuService, fetchDubboService, productService));
+        es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, productService));
 //        }
 
         taskRunning2.set(true);
