@@ -52,9 +52,9 @@ public class FlipkartCategoryParamController {
 
         es.execute(new MysqlListWorker<PtmCmpSku>(Q_FLIPKART_CMP, ws, dbm));
 
-        for (int i = 0; i < 20; i++) {
+//        for (int i = 0; i < 20; i++) {
             es.execute(new FKCateAndParamWorker(dbm, ws, categoryService));// mdm,
-        }
+//        }
 
         taskRunning1.set(true);
 
