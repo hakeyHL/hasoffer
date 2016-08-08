@@ -23,6 +23,7 @@ public class PtmCmpSku implements Identifiable<Long> {
     private long productId; // PtmProduct # id
 
     private Long categoryId;
+    @ColumnDefault(value = "0")
     private Long categoryId2 = 0L;//保存flipkart的sku的三级或者末尾级别的类目
 
     @Enumerated(EnumType.STRING)
