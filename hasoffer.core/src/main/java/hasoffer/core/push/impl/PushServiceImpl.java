@@ -1,11 +1,17 @@
 package hasoffer.core.push.impl;
+
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.core.bo.push.AppPushBo;
+import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.po.urm.UrmDevice;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.utils.Httphelper;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,6 +20,11 @@ import java.util.Map;
  */
 @Service
 public class PushServiceImpl implements IPushService {
+    private static final String Q_URM_GET_GCMTOKENS =
+            "SELECT t FROM UrmDevice t " +
+                    " WHERE t.appVersion = ?0 ";
+    @Resource
+    private IDataBaseManager dbm;
 
     @Override
     public void push(String to, AppPushBo pushBo) {
@@ -42,5 +53,10 @@ public class PushServiceImpl implements IPushService {
             System.out.println(e.getMessage());
         }
         System.out.println(postResult);
+    }
+
+    @Override
+    public List<UrmDevice> getGcmTokens(String version) {
+        return dbm.query(Q_URM_GET_GCMTOKENS, Arrays.asList(version));
     }
 }

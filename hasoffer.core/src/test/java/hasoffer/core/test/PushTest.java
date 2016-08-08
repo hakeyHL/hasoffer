@@ -2,6 +2,7 @@ package hasoffer.core.test;
 
 import hasoffer.core.bo.push.*;
 import hasoffer.core.push.IPushService;
+import hasoffer.core.push.impl.PushServiceImpl;
 import hasoffer.core.user.IDeviceService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,17 +26,18 @@ public class PushTest {
 
     @Test
     public void f() {
+        PushServiceImpl p = new PushServiceImpl();
 //        String to3 = "d8jxhUTX_V8:APA91bERHojtZm7qCDNgdeUU3PXgHEkgDVXA8xbxdEZ-3MUb-HaisGuRL-IvfQ-lgoIx9vdZ38IJVHblHszk_OkOz5F548r80UUEqqDbY8XI6Jonv_LYYEQ6kuXgxOl6uNAIcwlhs2Ao";
 //        String to2 = "ewZ71EnFqlw:APA91bEna9Fvlkcp1qo2yNfSnDyKBOtUnnC-4GSfeEUPoCHZO6PG2EjL4oHO_XpDylqagW1NHCFwS2GZq7M6MuR5ZaphlFVyqJ7MOOS6YEvv9cCSwID1u5qRIg5srI8oU5qBzo8XCVCI";
 //        String to1 = "cTJQKR5lAX0:APA91bHKSxBXExt2Rj26HSL9NG4503f-z1dgmAX2rftijut6IPwg_6WDu4xUSv4nEzzBWaxd6vlqjNAWzB4UqCn7-NktO6MsQbCA0bnfBHhisqFtYasJLnf9RQJZ4iXH8l23-c1WiHYl";
-        String to2 = "c4gUXbiRD2Y:APA91bFJd4v3ktjpEZtBBhryPLABiFR2jRbimm-onYfP6Vf_tToJibMfqFpgcHzTr99epCbVhyWkMe9mOdXg7IavkHsBe_TGKl8lmnMOVBIiItkXlvJ2uzUj7dWHr2zBufrCT7mXlPP-";
+        String to2 = "fNW9YETlPwY:APA91bF9dPmnddHLYcRE-dNtcPuAsp_tb4xvIs383WK8cDpB3jHcapaTO7DPNIgMbQdh940izEtq4dl70UR2jmQTz50vQCulhxVgaawOoeOETd4vUHy3Qo0C9demeKjZ9iLKbbRfGCO8";
 //        String to3 = "de1R9kclQ4g:APA91bEzvw6cS2i_iDa3Xd-b4x1rRcDhlIwB4yDQ1R52TZ20eJRCjCsQBtRmfCbck2n48-XHHXzM_ymdJpVXDEg8_YX2AzFEd6bu8ZG7I7Gz5oK09dl-bUgLhFMx4S-vtOYIFi-JvaaL";
 
 //        System.out.println(to2.equals(to3));
 
         AppPushMessage message = new AppPushMessage(
-                new AppMsgDisplay("accessibility2", "accessibility2", "accessibility2"),
-                new AppMsgClick(AppMsgClickType.DEAL, "52", "com.flipkart.android")
+                new AppMsgDisplay("Lenovo Vibe K5 Note at Rs. 13,499 + Exchange Offer", "Lenovo Vibe K5 Note at Rs. 13,499 + Exchange Offer", "Lenovo Vibe K5 Note at Rs. 13,499 + Exchange Offer"),
+                new AppMsgClick(AppMsgClickType.DEAL, "99000085", "com.flipkart.android")
         );
 
         /*AppPushMessage message = new AppPushMessage(
@@ -56,7 +58,7 @@ public class PushTest {
         AppPushBo pushBo = new AppPushBo("5x1", "15:10", message);
 
 //        pushService.push(to1, pushBo);
-        pushService.push(to2, pushBo);
+        p.push(to2, pushBo);
 //        pushService.push(to3, pushBo);
 
         System.out.println();
