@@ -128,6 +128,7 @@ public class FKCateAndParamWorker implements Runnable {
                     category.setName(pathString);
                     category.setLevel(i);
                     category.setParentId(parentId);
+                    category.setSkuid(sku.getId());
 
                     category = categoryService.createAppCategory(category);
                     parentId = category.getId();
