@@ -85,6 +85,8 @@ public class Compare2Controller {
         String dealUrlWithAff = WebsiteHelper.getDealUrlWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
         String urlWithAff = WebsiteHelper.getUrlWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
         System.out.println(urlWithAff);
+        String flipkart = WebsiteHelper.getDealUrlWithAff(Website.FLIPKART, "https://www.flipkart.com/apple-iphone-6s-silver-16-gb/p/itmebysgupjepunx", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
+        System.out.println(flipkart);
         String deeplinkWithAff = WebsiteHelper.getDeeplinkWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
         System.out.println(deeplinkWithAff);
 
@@ -239,7 +241,7 @@ public class Compare2Controller {
     @RequestMapping(value = "/cmpsku", method = RequestMethod.GET)
     public ModelAndView cmpsku(@RequestParam(defaultValue = "0") final String id,
                                @RequestParam(defaultValue = "1") int page,
-                               @RequestParam(defaultValue = "10") int size,
+                               @RequestParam(defaultValue = "20") int size,
                                HttpServletResponse response
     ) {
         JSONObject jsonObject = new JSONObject();
@@ -596,7 +598,7 @@ public class Compare2Controller {
                     tempTotalComments += cmpSku.getCommentsNumber();
                     tempRatins += cmpSku.getRatings();
                     CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
-                    cplv.setDeepLinkUrl(WebsiteHelper.getUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
+                    cplv.setDeepLinkUrl(WebsiteHelper.getDealUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                     cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                     comparedSkuVos.add(cplv);
                 }

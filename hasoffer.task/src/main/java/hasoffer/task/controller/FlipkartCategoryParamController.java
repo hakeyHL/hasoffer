@@ -44,7 +44,7 @@ public class FlipkartCategoryParamController {
             return "task running.";
         }
 
-        ConcurrentLinkedQueue<SrmSearchLog> logQueue = new ConcurrentLinkedQueue<SrmSearchLog>();
+//        ConcurrentLinkedQueue<SrmSearchLog> logQueue = new ConcurrentLinkedQueue<SrmSearchLog>();
 
         ExecutorService es = Executors.newCachedThreadPool();
 
@@ -52,9 +52,9 @@ public class FlipkartCategoryParamController {
 
         es.execute(new MysqlListWorker<PtmCmpSku>(Q_FLIPKART_CMP, ws, dbm));
 
-        for (int i = 0; i < 20; i++) {
-            es.execute(new FKCateAndParamWorker(dbm, mdm, ws, categoryService));
-        }
+//        for (int i = 0; i < 20; i++) {
+            es.execute(new FKCateAndParamWorker(dbm, ws, categoryService));// mdm,
+//        }
 
         taskRunning1.set(true);
 
