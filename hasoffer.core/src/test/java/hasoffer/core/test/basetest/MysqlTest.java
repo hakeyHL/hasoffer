@@ -380,7 +380,7 @@ public class MysqlTest {
 
                 int page = 1;
 
-                PageableResult<PtmCmpSku> pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' order by t.id asc", page, 1000);
+                PageableResult<PtmCmpSku> pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' and t.id > 77594 order by t.id asc", page, 1000);
 
                 while (true) {
 
