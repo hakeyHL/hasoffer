@@ -50,7 +50,9 @@ public class CmpProductListVo {
         this.backRate = cmpSku.getWebsite() == Website.FLIPKART ? 1.5f : 0;
         this.returnGuarantee = cmpSku.getReturnDays();
         String payMethod = cmpSku.getSupportPayMethod();
+        System.out.println("website" + website + "  price  " + price + "  " + payMethod);
         if (!StringUtils.isEmpty(payMethod)) {
+            System.out.println("enter this ");
             String[] temps = payMethod.split(",");
             for (String str : temps) {
                 this.support.add(str);
