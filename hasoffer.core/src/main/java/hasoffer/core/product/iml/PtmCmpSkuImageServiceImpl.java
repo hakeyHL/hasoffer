@@ -28,7 +28,7 @@ public class PtmCmpSkuImageServiceImpl implements IPtmCmpSkuImageService {
     }
 
     @Override
-    public List<PtmCmpSkuImage> ptmCmpSkuImages(Long productId) {
+    public List<PtmCmpSkuImage> findPtmCmpSkuImages(Long productId) {
         return dbm.query(Q_APP_IMAGES_PRODUCTID, Arrays.asList(productId));
     }
 

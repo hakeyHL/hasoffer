@@ -663,7 +663,7 @@ public class AppController {
                 for (String str : split) {
                     if (urmDevice.getMarketChannel() != null) {
                         if (str.equals(app) && urmDevice.getMarketChannel().name().equals(marketChannel)) {
-                            if (gcmTokens.size() <= number) {
+                            if (gcmTokens.size() < number && !StringUtils.isEmpty(urmDevice.getGcmToken())) {
                                 gcmTokens.add(urmDevice.getGcmToken());
                             } else {
                                 break;
@@ -676,6 +676,7 @@ public class AppController {
             for (String gcmToken : gcmTokens) {
                 System.out.println("____  " + i + "  ____");
                 pushService.push(gcmToken, pushBo);
+                i++;
             }
         } catch (Exception e) {
             mv.addObject("msg", ExceptionHelper.getExceptionMessage(e));

@@ -3,6 +3,7 @@ package hasoffer.admin.controller;
 import hasoffer.admin.controller.vo.TitleCountVo;
 import hasoffer.admin.worker.FixSkuErrorInPriceWorker;
 import hasoffer.admin.worker.FlipkartSkuCategory2GetListWorker;
+import hasoffer.admin.worker.FlipkartSkuCategory2GetSaveWorker;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
@@ -107,7 +108,7 @@ public class FixController {
         //俩种添加策略
         //1.按照访问向队列添加
         //2.按照id升序向队列添加
-        String queryString = "";
+        String queryString = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' AND t.categoryid = 0";
 //        String queryString = ;
 
         ListAndProcessWorkerStatus ws = new ListAndProcessWorkerStatus();
@@ -117,7 +118,7 @@ public class FixController {
         es.execute(new FlipkartSkuCategory2GetListWorker(queryString, ws, dbm));
 
         for (int i = 0; i < 10; i++) {
-//            es.execute(new FlipkartSkuCategory2GetSaveWorker());
+            es.execute(new FlipkartSkuCategory2GetSaveWorker(dbm, ws));
         }
 
         return "ok";
