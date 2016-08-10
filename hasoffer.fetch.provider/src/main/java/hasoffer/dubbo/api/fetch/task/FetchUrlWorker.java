@@ -4,7 +4,7 @@ import hasoffer.base.model.TaskStatus;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.spider.api.IFetchService;
 import hasoffer.spider.api.impl.FetchServiceImpl;
-import hasoffer.spider.common.StringConstant;
+import hasoffer.spider.common.RedisKeysConstant;
 import hasoffer.spider.exception.UnSupportWebsiteException;
 import hasoffer.spider.model.FetchUrlResult;
 import hasoffer.spider.redis.service.IFetchCacheService;
@@ -30,7 +30,7 @@ public class FetchUrlWorker implements Runnable {
     public void run() {
         while (true) {
             try {
-                Object pop = fetchCacheService.popTaskList(StringConstant.WAIT_URL_LIST);
+                Object pop = fetchCacheService.popTaskList(RedisKeysConstant.WAIT_URL_LIST);
                 if (pop == null) {
                     TimeUnit.MINUTES.sleep(1);
                 } else {
