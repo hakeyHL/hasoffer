@@ -644,14 +644,14 @@ public class AppController {
     }
 
     @RequestMapping(value = "/push")
-    public ModelAndView psuhMessage(String app, String version, String marketChannel, String msg, String packageName, String type, String id, int number) {
+    public ModelAndView psuhMessage(String title, String content, String app, String version, String marketChannel, String outline, String packageName, String type, String id, int number) {
         ModelAndView mv = new ModelAndView();
         mv.addObject("errorCode", "00000");
         mv.addObject("msg", "ok");
         try {
             List<String> gcmTokens = new ArrayList<String>();
             AppPushMessage message = new AppPushMessage(
-                    new AppMsgDisplay(msg, msg, msg),
+                    new AppMsgDisplay(outline, title, content),
                     new AppMsgClick(AppMsgClickType.valueOf(type), id, packageName)
             );
             AppPushBo pushBo = new AppPushBo("5x1", "15:10", message);
