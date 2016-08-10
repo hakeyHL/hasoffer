@@ -28,6 +28,7 @@
                 <ref bean="skuImageDownLoadTrigger"/>
                 <ref bean="statHijackFetchTrigger"/>
                 <ref bean="statSearchLogTrigger"/>
+                <ref bean="skuImageListDownLoadTrigger"/>
                 <!--<ref bean="statVisitSkuUpdateTrigger"/>-->
             </list>
         </property>
@@ -102,6 +103,14 @@
     <bean id="skuImageDownLoadTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="skuImageDownLoadJob"/>
         <property name="cronExpression" value="0 0/10 * * * ?"/>
+    </bean>
+
+    <bean name="skuImageListDownLoadJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.image.SkuImageListDownLoadJobBean"/>
+    </bean>
+    <bean id="skuImageListDownLoadTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="skuImageListDownLoadJob"/>
+        <property name="cronExpression" value="0 30 12 * * ?"/>
     </bean>
 
     <!-- 定时统计 -->
