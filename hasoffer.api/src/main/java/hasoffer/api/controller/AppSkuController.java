@@ -79,7 +79,7 @@ public class AppSkuController {
                 map.put("description", ptmCmpSkuDescription.getJsonDescription() == null ? "" : ptmCmpSkuDescription.getJsonDescription());//描述
                 map.put("specs", ptmCmpSkuDescription.getJsonParam());//参数
             }
-            List<PtmCmpSkuImage> ptmCmpSkuImages = ptmCmpSkuImageService.findPtmCmpSkuImages(ptmCmpSku.getProductId());
+            List<PtmCmpSkuImage> ptmCmpSkuImages = ptmCmpSkuImageService.findPtmCmpSkuImages(ptmCmpSku.getId());
             map.put("images", getImageArray(ptmCmpSkuImages));
             //map.put("images", "[\"http://img12.360buyimg.com/n1/jfs/t1174/164/723303127/202924/1a956bbf/554acf00N87f6cea3.jpg\",\"http://img12.360buyimg.com/n1/jfs/t1033/328/802932418/412261/261452dc/554acd64N27651f09.jpg\"]");//图片列表
             map.put("distribution", 5);

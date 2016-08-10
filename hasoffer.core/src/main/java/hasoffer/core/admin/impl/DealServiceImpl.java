@@ -1,6 +1,7 @@
 package hasoffer.core.admin.impl;
 
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.dbm.HibernateDao;
@@ -46,6 +47,12 @@ public class DealServiceImpl implements IDealService {
     @Resource
     private HibernateDao dao;
 
+    public static void main(String[] args) {
+        if (!(Website.valueOf("SHOP") instanceof Website)) {
+            System.out.printf("hha ");
+        }
+    }
+
     @Override
     public PageableResult<AppDeal> findDealList(int page, int size) {
         return dbm.queryPage("select t from AppDeal t order by t.id desc", page, size);
@@ -75,6 +82,7 @@ public class DealServiceImpl implements IDealService {
                                                                             return new ImportCallBack() {
                                                                                 @Override
                                                                                 public Map<String, Object> preOperation(HibernateDao dao, List<Object[]> data) {
+                                                                                    Website website = null;
                                                                                     Map<String, Object> map = new HashMap<String, Object>();
                                                                                     int _nullRows = 0;
                                                                                     int repeatRows = 0;
@@ -91,6 +99,13 @@ public class DealServiceImpl implements IDealService {
 
                                                                                             if (!StringUtils.isBlank(tempData[0] + "")) {
                                                                                                 tempData[0] = tempData[0].toString().toUpperCase();
+                                                                                                //检查字符串是否属于规范
+                                                                                                try {
+                                                                                                    website = Website.valueOf(tempData[0] + "");
+                                                                                                } catch (Exception e) {
+                                                                                                    System.out.printf(e.getMessage());
+                                                                                                    website = null;
+                                                                                                }
                                                                                             }
 
                                                                                             if (StringUtils.isBlank(tempData[3] + "")) {
@@ -139,7 +154,11 @@ public class DealServiceImpl implements IDealService {
                                                                                                 }
                                                                                             }
                                                                                         }
-                                                                                        dataQueue.add(tempData);
+                                                                                        if (website != null) {
+                                                                                            dataQueue.add(tempData);
+                                                                                        } else {
+                                                                                            continue;
+                                                                                        }
                                                                                     }
                                                                                     map.put("_nullRows", _nullRows);
                                                                                     map.put("repeatRows", repeatRows);
