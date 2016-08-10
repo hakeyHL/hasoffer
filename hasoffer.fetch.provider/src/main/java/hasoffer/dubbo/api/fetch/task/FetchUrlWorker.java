@@ -11,6 +11,7 @@ import hasoffer.spider.redis.service.IFetchCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
+import spider.common.SpiderLogger;
 
 import java.util.concurrent.TimeUnit;
 
@@ -34,6 +35,7 @@ public class FetchUrlWorker implements Runnable {
                 if (pop == null) {
                     TimeUnit.MINUTES.sleep(1);
                 } else {
+                    SpiderLogger.info("start spider this url: {}", pop);
                     FetchUrlResult fetchUrlResult = JSONUtil.toObject(pop.toString(), FetchUrlResult.class);
                     fetch(fetchUrlResult);
                     if (fetchUrlResult.overFetch()) {
@@ -41,6 +43,7 @@ public class FetchUrlWorker implements Runnable {
                     } else {
                         logger.info("FetchUrlWorker crawl running: {} ", fetchUrlResult);
                     }
+                    SpiderLogger.info("Finish spider this url: {}", pop);
                 }
             } catch (Exception e) {
                 logger.error("FetchKeywordWorker is error. Error Msg: Json to Object fail.", e);
