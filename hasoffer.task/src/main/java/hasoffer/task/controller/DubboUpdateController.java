@@ -8,7 +8,7 @@ import hasoffer.core.product.IProductService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.task.worker.CmpSkuDubboUpdateWorker;
-import hasoffer.task.worker.SrmSearchLogListWorker;
+import hasoffer.task.worker.SrmProductSearchCountListWorker;
 import hasoffer.task.worker.TopSellingListWorker;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -59,7 +59,7 @@ public class DubboUpdateController {
 
         ConcurrentLinkedQueue<SrmSearchLog> queue = new ConcurrentLinkedQueue<SrmSearchLog>();
 
-        es.execute(new SrmSearchLogListWorker(dbm, queue));
+        es.execute(new SrmProductSearchCountListWorker(dbm, queue));
 
         for (int i = 0; i < 10; i++) {
             es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, productService, cmpSkuService));

@@ -161,7 +161,7 @@ public class SearchRecordProcessWorker implements Runnable {
         // 需要的话，则加入更新队列。并返回一个实体。如果不需要，这返回空
         if (isFetch) {
             try {
-                return fetchService.getProductsKeyWord(website, keyword, 0, 10);
+                return fetchService.getProductsKeyWord(website, keyword);
             } catch (Exception e) {
                 FetchResult temp = new FetchResult(website, keyword);
                 temp.setTaskStatus(TaskStatus.START);

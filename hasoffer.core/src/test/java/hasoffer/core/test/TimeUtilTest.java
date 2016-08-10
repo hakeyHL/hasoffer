@@ -78,8 +78,8 @@ public class TimeUtilTest {
 
     @Test
     public void testUtil() {
-        long hour = TimeUtils.MILLISECONDS_OF_1_HOUR;
-        System.out.println(hour);
+        String startDateString = TimeUtils.parse(TimeUtils.today() - TimeUtils.MILLISECONDS_OF_1_DAY, "yyyyMMdd");
+        System.out.println(startDateString);
     }
 
     @Test

@@ -21,13 +21,14 @@
             <list>
                 <ref bean="demoTrigger"/>
                 <ref bean="fetchTrigger"/>
-                <ref bean="dealozTrigger"/>
+                <!--<ref bean="dealozTrigger"/>-->
                 <ref bean="orderSATrigger"/>
                 <ref bean="imageDownLoadTrigger"/>
                 <ref bean="imageDownLoadTrigger2"/>
                 <ref bean="skuImageDownLoadTrigger"/>
                 <ref bean="statHijackFetchTrigger"/>
                 <ref bean="statSearchLogTrigger"/>
+                <ref bean="skuImageListDownLoadTrigger"/>
                 <!--<ref bean="statVisitSkuUpdateTrigger"/>-->
             </list>
         </property>
@@ -63,13 +64,13 @@
     </bean>
 
 
-    <bean name="dealozJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="hasoffer.job.bean.fetch.DealozJobBean"/>
-    </bean>
-    <bean id="dealozTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-        <property name="jobDetail" ref="dealozJob"/>
-        <property name="cronExpression" value="0 0 1 1 1 ? 2066 "/>
-    </bean>
+    <!--<bean name="dealozJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
+    <!--<property name="jobClass" value="hasoffer.job.bean.fetch.DealozJobBean"/>-->
+    <!--</bean>-->
+    <!--<bean id="dealozTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
+    <!--<property name="jobDetail" ref="dealozJob"/>-->
+    <!--<property name="cronExpression" value="0 0 1 1 1 ? 2066 "/>-->
+    <!--</bean>-->
 
     <bean name="orderSAJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="hasoffer.job.bean.order.OrderSAsisJobBean"/>
@@ -102,6 +103,14 @@
     <bean id="skuImageDownLoadTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="skuImageDownLoadJob"/>
         <property name="cronExpression" value="0 0/10 * * * ?"/>
+    </bean>
+
+    <bean name="skuImageListDownLoadJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.image.SkuImageListDownLoadJobBean"/>
+    </bean>
+    <bean id="skuImageListDownLoadTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="skuImageListDownLoadJob"/>
+        <property name="cronExpression" value="0 30 12 * * ?"/>
     </bean>
 
     <!-- 定时统计 -->
