@@ -69,7 +69,7 @@ public class SrmProductSearchCountListWorker implements Runnable {
 
                     SrmSearchLog srmSearchLog = new SrmSearchLog();
 
-                    log.setProductId(log.getProductId());
+                    srmSearchLog.setPtmProductId(log.getProductId());
 
                     queue.add(srmSearchLog);
                 }
