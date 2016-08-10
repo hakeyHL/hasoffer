@@ -46,6 +46,15 @@ public class SkuImageListDownLoadJobBean extends QuartzJobBean {
 
                 while (page < totalPage) {
 
+                    if (ptmCmpSkuImageQueue.size() > 10000) {
+                        try {
+                            TimeUnit.SECONDS.sleep(5);
+                        } catch (InterruptedException e) {
+
+                        }
+                        continue;
+                    }
+
                     if (page > 1) {
                         pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSkuImage t WHERE t.fetched = 0", page, pageSize);
                     }
