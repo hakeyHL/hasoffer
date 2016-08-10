@@ -5,9 +5,7 @@ import hasoffer.core.push.IPushService;
 import hasoffer.core.push.impl.PushServiceImpl;
 import hasoffer.core.user.IDeviceService;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 
@@ -15,7 +13,7 @@ import javax.annotation.Resource;
  * Date : 2016/4/27
  * Function :
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+//@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:spring-beans.xml")
 public class PushTest {
 
@@ -36,8 +34,8 @@ public class PushTest {
 //        System.out.println(to2.equals(to3));
 
         AppPushMessage message = new AppPushMessage(
-                new AppMsgDisplay("Lenovo Vibe K5 Note at Rs. 13,499 + Exchange Offer", "Lenovo Vibe K5 Note at Rs. 13,499 + Exchange Offer", "Lenovo Vibe K5 Note at Rs. 13,499 + Exchange Offer"),
-                new AppMsgClick(AppMsgClickType.DEAL, "99000085", "com.flipkart.android")
+                new AppMsgDisplay("The Freedom Sale Just Rs.11,999! Redmi Note 3 (Gold, 32 GB)", "The Freedom Sale！", "Just Rs.11,999! Redmi Note 3 (Gold, 32 GB)"),
+                new AppMsgClick(AppMsgClickType.DEAL, "99000109", "com.flipkart.android")
         );
 
         /*AppPushMessage message = new AppPushMessage(
