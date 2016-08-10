@@ -66,7 +66,7 @@
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/fetch-flow.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/fetch-task-result.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+            <FileNamePattern>${log.base}/fetch-flow.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <MaxHistory>10</MaxHistory>
