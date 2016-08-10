@@ -55,12 +55,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
     public FlipkartSkuInfo getSkuInfo(String sourceId) throws Exception {
         String queryString = AFFILIATE_PRODUCTID_URL + sourceId;
 
-        Map<String, String> headerMap = new HashMap<String, String>();
-
-        headerMap.put("Fk-Affiliate-Token", getAffiliateToken());
-        headerMap.put("Fk-Affiliate-Id", TRACKINGID);
-
-        String jsonString = sendRequest(queryString, headerMap, null);
+        String jsonString = sendRequest(queryString, getRequestToken(), null);
         JSONObject obj = JSON.parseObject(jsonString);
 
         JSONObject jsonProduct = obj.getJSONObject("productBaseInfoV1");
@@ -97,6 +92,32 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
         fsi.setImageUrls(imageUrls);
         fsi.setFlipkartSellingPrice(jsonProduct.getObject("flipkartSellingPrice", FlipkartPrice.class));
         fsi.setAttributes(jsonProduct.getObject("attributes", FlipkartAttribute.class));
+
+        String modelName = "";
+        JSONObject categorySpecificInfoV1 = obj.getJSONObject("categorySpecificInfoV1");
+        if (categorySpecificInfoV1 != null) {
+            JSONArray ja = categorySpecificInfoV1.getJSONArray("specificationList");
+            int len = ja.size();
+            for (int i = 0; i < len; i++) {
+                JSONObject oo = ja.getJSONObject(i);
+                String key = oo.getString("key");
+                if ("GENERAL FEATURES".equalsIgnoreCase(key)) {
+                    JSONArray oos = oo.getJSONArray("values");
+                    int len2 = oos.size();
+                    for (int j = 0; j < len2; j++) {
+                        JSONObject ooso = (JSONObject) oos.get(j);
+                        String oosokey = ooso.getString("key");
+                        if ("Model Name".equalsIgnoreCase(oosokey)) {
+                            modelName = StringUtils.arrayToString(ooso.getJSONArray("value").toArray(new String[0]), "");
+
+                            i = len;// 跳出双重循环
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        fsi.setModelName(modelName);
 
         return fsi;
     }
@@ -302,7 +323,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
 //https://affiliate-api.flipkart.net/affiliate/search/json
         String queryString = AFFILIATE_KEYWORDQUERY_URL + "?query=" + StringUtils.urlEncode(keyword) + "&resultCount=" + resultNum;
 
-        String jsonData = sendRequest(queryString, null, null);
+        String jsonData = sendRequest(queryString, getRequestToken(), null);
 
         JSONObject jsonObject = JSONObject.parseObject(jsonData);
 
@@ -344,6 +365,15 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
         }
 
         return affiliateProductList;
+    }
+
+    private Map<String, String> getRequestToken() {
+        Map<String, String> headerMap = new HashMap<String, String>();
+
+        headerMap.put("Fk-Affiliate-Token", getAffiliateToken());
+        headerMap.put("Fk-Affiliate-Id", TRACKINGID);
+
+        return headerMap;
     }
 
     // 测试结果：价格采用flipkartSpecialPrice，有可能返回结果为null，此时商品为offsale状态

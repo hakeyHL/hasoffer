@@ -1,5 +1,7 @@
 package hasoffer.affiliate.model;
 
+import hasoffer.base.utils.StringUtils;
+
 /**
  * Created by chevy on 2016/8/10.
  */
@@ -10,6 +12,27 @@ public class FlipkartAttribute {
     private String storage;
     private String sizeUnit;
     private String displaySize;
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        if (!StringUtils.isEmpty(size)) {
+            sb.append(size).append(",");
+        }
+        if (!StringUtils.isEmpty(color)) {
+            sb.append(color).append(",");
+        }
+        if (!StringUtils.isEmpty(storage)) {
+            sb.append(storage).append(",");
+        }
+        if (!StringUtils.isEmpty(sizeUnit)) {
+            sb.append(sizeUnit).append(",");
+        }
+        if (!StringUtils.isEmpty(displaySize)) {
+            sb.append(displaySize).append(",");
+        }
+        return sb.toString();
+    }
 
     public String getSize() {
         return size;
