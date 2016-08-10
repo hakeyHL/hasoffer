@@ -3,7 +3,7 @@ package hasoffer.dubbo.api.fetch.task;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.spider.api.IFetchService;
 import hasoffer.spider.api.impl.FetchServiceImpl;
-import hasoffer.spider.common.StringConstant;
+import hasoffer.spider.common.RedisKeysConstant;
 import hasoffer.spider.exception.UnSupportWebsiteException;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.redis.service.IFetchCacheService;
@@ -30,7 +30,7 @@ public class FetchKeywordWorker implements Runnable {
     @Override
     public void run() {
         while (true) {
-            Object pop = fetchCacheService.popTaskList(StringConstant.WAIT_KEY_LIST);
+            Object pop = fetchCacheService.popTaskList(RedisKeysConstant.WAIT_KEY_LIST);
             if (pop == null) {
                 try {
                     TimeUnit.MINUTES.sleep(1);
