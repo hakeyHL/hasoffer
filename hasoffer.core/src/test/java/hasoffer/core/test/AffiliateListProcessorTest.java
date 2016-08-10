@@ -5,6 +5,7 @@ import hasoffer.affiliate.affs.flipkart.FlipkartAffiliateProductProcessor;
 import hasoffer.affiliate.affs.snapdeal.SnapdealProductProcessor;
 import hasoffer.affiliate.exception.AffiliateAPIException;
 import hasoffer.affiliate.model.AffiliateProduct;
+import hasoffer.affiliate.model.FlipkartSkuInfo;
 import hasoffer.core.product.IFetchService;
 import hasoffer.core.product.iml.FetchServiceImpl;
 import hasoffer.fetch.model.Product;
@@ -32,11 +33,28 @@ public class AffiliateListProcessorTest {
 
     @Test
     public void testFlipkartAffiliateProduct() {
-        String sourceId = "MOBE77SZAETQFKZQ";
+        //https://www.flipkart.com/apple-iphone-6s-space-grey-128-gb/p/itmebysghjwzaxgy?pid=MOBEBY3VSFWH9TE7
+        String sourceId = "MOBEBY3VSFWH9TE7";
         FlipkartAffiliateProductProcessor flipkartAffilicateProductProcessor = new FlipkartAffiliateProductProcessor();
         AffiliateProduct flipkartProduct = null;
         try {
             flipkartProduct = flipkartAffilicateProductProcessor.getAffiliateProductBySourceId(sourceId);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(flipkartProduct.getTitle());
+    }
+
+    @Test
+    public void testFlipkartAffiliateProduct2() {
+        //https://www.flipkart.com/apple-iphone-6s-space-grey-128-gb/p/itmebysghjwzaxgy?pid=MOBEBY3VSFWH9TE7
+        String sourceId = "MOBEBY3VSFWH9TE7";
+        FlipkartAffiliateProductProcessor flipkartAffilicateProductProcessor = new FlipkartAffiliateProductProcessor();
+        FlipkartSkuInfo flipkartProduct = null;
+        try {
+            flipkartProduct = flipkartAffilicateProductProcessor.getSkuInfo(sourceId);
 
         } catch (Exception e) {
             e.printStackTrace();

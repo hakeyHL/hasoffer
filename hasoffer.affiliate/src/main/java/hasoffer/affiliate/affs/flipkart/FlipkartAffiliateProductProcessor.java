@@ -7,10 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import hasoffer.affiliate.affs.IAffiliateProcessor;
 import hasoffer.affiliate.exception.AffiliateAPIException;
-import hasoffer.affiliate.model.AffiliateCategory;
-import hasoffer.affiliate.model.AffiliateOrder;
-import hasoffer.affiliate.model.AffiliateOrderReport;
-import hasoffer.affiliate.model.AffiliateProduct;
+import hasoffer.affiliate.model.*;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
@@ -28,15 +25,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<AffiliateOrder> {
 
-    private static Logger logger = LoggerFactory.getLogger(FlipkartAffiliateProductProcessor.class);
-
-    private static final String TRACKINGID = "affiliate357";
-    private static final String AFFILIATE_BASE_URL = "https://affiliate-api.flipkart.net/affiliate/api/" + TRACKINGID + ".json";
-    private static final String AFFILIATE_KEYWORDQUERY_URL = "https://affiliate-api.flipkart.net/affiliate/search/json";
-    private static final String AFFILIATE_PRODUCTID_URL = "https://affiliate-api.flipkart.net/affiliate/1.0/product.json?id=";
-    //    private static final String TOKEN_URL = "https://affiliate.flipkart.com/api/a_generateToken";
-    private static String TOKEN = "56e46c994b92488c91e43fad138d5c71";
-
     public static final String R_START_DATE = "startDate";
     public static final String R_END_DATE = "endDate";
     public static final String R_OFFSET = "offset";
@@ -45,7 +33,13 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
     public static final String R_ORDER_STATUS_APPROVED = "approved";
     public static final String R_ORDER_STATUS_CANCELLED = "cancelled";
     public static final String R_ORDER_STATUS_DISAPPROVED = "disapproved";
-
+    private static final String TRACKINGID = "affiliate357";
+    private static final String AFFILIATE_BASE_URL = "https://affiliate-api.flipkart.net/affiliate/api/" + TRACKINGID + ".json";
+    private static final String AFFILIATE_KEYWORDQUERY_URL = "https://affiliate-api.flipkart.net/affiliate/search/json";
+    private static final String AFFILIATE_PRODUCTID_URL = "https://affiliate-api.flipkart.net/affiliate/1.0/product.json?id=";
+    private static Logger logger = LoggerFactory.getLogger(FlipkartAffiliateProductProcessor.class);
+    //    private static final String TOKEN_URL = "https://affiliate.flipkart.com/api/a_generateToken";
+    private static String TOKEN = "56e46c994b92488c91e43fad138d5c71";
 
     public static void main(String[] args) throws AffiliateAPIException, IOException {
 
@@ -56,7 +50,76 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
         String jsonString = processor.sendRequest(url, null, null);
 
         System.out.println(jsonString);
+    }
 
+    public FlipkartSkuInfo getSkuInfo(String sourceId) throws Exception {
+        String queryString = AFFILIATE_PRODUCTID_URL + sourceId;
+
+        String jsonString = sendRequest(queryString, getRequestToken(), null);
+        JSONObject obj = JSON.parseObject(jsonString);
+
+        JSONObject jsonProduct = obj.getJSONObject("productBaseInfoV1");
+
+        FlipkartSkuInfo fsi = new FlipkartSkuInfo();
+
+        // other skus
+        // productFamily.get()
+        JSONArray productFamily = (JSONArray) jsonProduct.get("productFamily");
+        int pfSize = productFamily.size();
+        String[] pfs = new String[pfSize];
+        for (int i = 0; i < pfSize; i++) {
+            pfs[i] = productFamily.getString(i).trim();
+        }
+
+        // image urls
+        FlipkartImageUrls imageUrls = new FlipkartImageUrls();
+        JSONObject imageUrlsJson = jsonProduct.getJSONObject("imageUrls");
+        imageUrls.setImg200(imageUrlsJson.getString("200x200"));
+        imageUrls.setImg400(imageUrlsJson.getString("400x400"));
+        imageUrls.setImg800(imageUrlsJson.getString("800x800"));
+        imageUrls.setImguk(imageUrlsJson.getString("unknown"));
+
+        // set values
+        fsi.setProductId(jsonProduct.getString("productId"));
+        fsi.setTitle(jsonProduct.getString("title"));
+        fsi.setProductBrand(jsonProduct.getString("productBrand"));
+        fsi.setInStock(jsonProduct.getBoolean("inStock"));
+        fsi.setProductUrl(jsonProduct.getString("productUrl"));
+
+        fsi.setCategoryPath(jsonProduct.getString("categoryPath"));
+
+        fsi.setProductFamily(pfs);
+        fsi.setImageUrls(imageUrls);
+        fsi.setFlipkartSellingPrice(jsonProduct.getObject("flipkartSellingPrice", FlipkartPrice.class));
+        fsi.setAttributes(jsonProduct.getObject("attributes", FlipkartAttribute.class));
+
+        String modelName = "";
+        JSONObject categorySpecificInfoV1 = obj.getJSONObject("categorySpecificInfoV1");
+        if (categorySpecificInfoV1 != null) {
+            JSONArray ja = categorySpecificInfoV1.getJSONArray("specificationList");
+            int len = ja.size();
+            for (int i = 0; i < len; i++) {
+                JSONObject oo = ja.getJSONObject(i);
+                String key = oo.getString("key");
+                if ("GENERAL FEATURES".equalsIgnoreCase(key)) {
+                    JSONArray oos = oo.getJSONArray("values");
+                    int len2 = oos.size();
+                    for (int j = 0; j < len2; j++) {
+                        JSONObject ooso = (JSONObject) oos.get(j);
+                        String oosokey = ooso.getString("key");
+                        if ("Model Name".equalsIgnoreCase(oosokey)) {
+                            modelName = StringUtils.arrayToString(ooso.getJSONArray("value").toArray(new String[0]), "");
+
+                            i = len;// 跳出双重循环
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        fsi.setModelName(modelName);
+
+        return fsi;
     }
 
     /**
@@ -64,13 +127,13 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
      *
      * @return
      */
-    public String getAffiliateToken() throws IOException {
+    public String getAffiliateToken() {
         return TOKEN;
     }
 
     @Override
     public List<AffiliateOrder> getAffiliateOrderList(Map<String, String> headerMap, Map<String, String> parameterMap) {
-        String url="https://affiliate-api.flipkart.net/affiliate/report/orders/detail/json";
+        String url = "https://affiliate-api.flipkart.net/affiliate/report/orders/detail/json";
 
         //headerMap.put("Fk-Affiliate-Token", getAffiliateToken());
         //headerMap.put("Fk-Affiliate-Id", TRACKINGID);
@@ -93,7 +156,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
                         orderList.addAll(report.getOrderList());
                     }
                 }
-                if("".equals(report.getNext())){
+                if ("".equals(report.getNext())) {
                     break;
                 }
 
@@ -101,7 +164,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
 
             for (AffiliateOrder order : orderList) {
                 order.setAffID(headerMap.get("Fk-Affiliate-Id"));
-                logger.info("order.setAffID({})",headerMap.get("Fk-Affiliate-Id"));
+                logger.info("order.setAffID({})", headerMap.get("Fk-Affiliate-Id"));
                 if (order.getStatus() == null) {
                     order.setStatus(parameterMap.get(R_ORDER_STATUS));
                 }
@@ -140,7 +203,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
 
             case HttpURLConnection.HTTP_UNAUTHORIZED:
                 // The API Token or the Tracking ID is invalid.
-                throw new AffiliateAPIException("API Token:"+headerMap.get("Fk-Affiliate-Token")+" or Affiliate Tracking ID:"+headerMap.get("Fk-Affiliate-Id")+" invalid.");
+                throw new AffiliateAPIException("API Token:" + headerMap.get("Fk-Affiliate-Token") + " or Affiliate Tracking ID:" + headerMap.get("Fk-Affiliate-Id") + " invalid.");
 
             case HttpURLConnection.HTTP_FORBIDDEN:
                 // Tampered URL, i.e., there is a signature mismatch.
@@ -166,7 +229,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
         List<AffiliateCategory> categoryList = new ArrayList<AffiliateCategory>();
 
         // Query the API service and get back the result.
-        String jsonData = sendRequest(AFFILIATE_BASE_URL, null,null);
+        String jsonData = sendRequest(AFFILIATE_BASE_URL, null, null);
 
         // Bookkeep the retrieved data in a local productDirectory Map.
         JSONObject obj = JSONObject.parseObject(jsonData);
@@ -257,10 +320,10 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
      */
     @Override
     public List<AffiliateProduct> getAffiliateProductByKeyword(String keyword, int resultNum) throws AffiliateAPIException, IOException {
-
+//https://affiliate-api.flipkart.net/affiliate/search/json
         String queryString = AFFILIATE_KEYWORDQUERY_URL + "?query=" + StringUtils.urlEncode(keyword) + "&resultCount=" + resultNum;
 
-        String jsonData = sendRequest(queryString, null, null);
+        String jsonData = sendRequest(queryString, getRequestToken(), null);
 
         JSONObject jsonObject = JSONObject.parseObject(jsonData);
 
@@ -304,13 +367,27 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
         return affiliateProductList;
     }
 
+    private Map<String, String> getRequestToken() {
+        Map<String, String> headerMap = new HashMap<String, String>();
+
+        headerMap.put("Fk-Affiliate-Token", getAffiliateToken());
+        headerMap.put("Fk-Affiliate-Id", TRACKINGID);
+
+        return headerMap;
+    }
+
     // 测试结果：价格采用flipkartSpecialPrice，有可能返回结果为null，此时商品为offsale状态
     @Override
     public AffiliateProduct getAffiliateProductBySourceId(String sourceId) throws AffiliateAPIException, IOException {
 
         String queryString = AFFILIATE_PRODUCTID_URL + sourceId;
 
-        String jsonDate = sendRequest(queryString, null, null);
+        Map<String, String> headerMap = new HashMap<String, String>();
+
+        headerMap.put("Fk-Affiliate-Token", getAffiliateToken());
+        headerMap.put("Fk-Affiliate-Id", TRACKINGID);
+
+        String jsonDate = sendRequest(queryString, headerMap, null);
 
         JSONObject obj = JSON.parseObject(jsonDate);
 
@@ -358,6 +435,25 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
         getProductNextUrl(nextUrl, nextUrlList);
     }
 
+    public String getCatePath(String sourceId) throws IOException, AffiliateAPIException {
+
+        String queryString = AFFILIATE_PRODUCTID_URL + sourceId;
+
+        Map<String, String> headerMap = new HashMap<String, String>();
+
+        headerMap.put("Fk-Affiliate-Token", getAffiliateToken());
+        headerMap.put("Fk-Affiliate-Id", TRACKINGID);
+
+        String jsonDate = sendRequest(queryString, headerMap, null);
+
+        JSONObject obj = JSON.parseObject(jsonDate);
+
+        JSONObject jsonProduct = obj.getJSONObject("productBaseInfoV1");
+
+        String path = jsonProduct.getString("categoryPath");
+
+        return path;
+    }
 }
 
 

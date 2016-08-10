@@ -34,6 +34,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -362,8 +364,89 @@ public class MysqlTest {
             }
 
         }
+    }
 
+    @Test
+    public void testFlipkartAffiliateProduct() {
 
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        final ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
+
+        es.execute(new Runnable() {
+
+            @Override
+            public void run() {
+
+                int page = 1;
+
+                PageableResult<PtmCmpSku> pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' and t.id > 77594 order by t.id asc", page, 1000);
+
+                while (true) {
+
+                    if (queue.size() > 5000) {
+                        try {
+                            TimeUnit.SECONDS.sleep(5);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        continue;
+                    }
+
+                    if (page > 1) {
+                        pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' order by t.id asc", page, 1000);
+                    }
+
+                    List<PtmCmpSku> skuList = pageableResult.getData();
+
+                    queue.addAll(skuList);
+
+                    page++;
+
+                }
+
+            }
+        });
+
+        for (int i = 0; i < 10; i++) {
+            es.execute(new Runnable() {
+                @Override
+                public void run() {
+                    while (true) {
+
+                        PtmCmpSku sku = queue.poll();
+
+                        if (sku == null) {
+                            try {
+                                TimeUnit.SECONDS.sleep(5);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            continue;
+                        }
+
+                        String sourceId = FlipkartHelper.getSkuIdByUrl(sku.getUrl());
+
+                        FlipkartAffiliateProductProcessor flipkartAffilicateProductProcessor = new FlipkartAffiliateProductProcessor();
+                        AffiliateProduct flipkartProduct = null;
+                        try {
+
+                            File file = new File("C:/Users/wing/Desktop/catepath.txt");
+
+                            String catepath = flipkartAffilicateProductProcessor.getCatePath(sourceId);
+
+                            FileUtil.appendString(file, catepath + "\n");
+                        } catch (Exception e) {
+                        }
+                    }
+                }
+            });
+        }
+
+        while (true) {
+
+        }
 
     }
+
 }
