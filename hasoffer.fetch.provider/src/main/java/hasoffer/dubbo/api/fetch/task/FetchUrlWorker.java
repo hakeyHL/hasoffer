@@ -38,10 +38,12 @@ public class FetchUrlWorker implements Runnable {
                     fetch(fetchUrlResult);
                     if (fetchUrlResult.overFetch()) {
                         logger.info("FetchUrlWorker crawl finish: {} ", fetchUrlResult);
+                    } else {
+                        logger.info("FetchUrlWorker crawl running: {} ", fetchUrlResult);
                     }
                 }
             } catch (Exception e) {
-                logger.error("FetchKeywordWorker is error. Error Msg: ", e);
+                logger.error("FetchKeywordWorker is error. Error Msg: Json to Object fail.", e);
             }
         }
     }
@@ -49,12 +51,11 @@ public class FetchUrlWorker implements Runnable {
     public void fetch(FetchUrlResult fetchUrlResult) {
         try {
             fetchUrlResult = fetchService.getProductByUrl(fetchUrlResult);
-            //fetchCacheService.cacheResult(FetchUrlResult.getCacheKey(fetchUrlResult), fetchUrlResult);
         } catch (UnSupportWebsiteException e) {
             fetchUrlResult.setTaskStatus(TaskStatus.STOPPED);
             fetchUrlResult.setErrMsg("un able support website.");
             fetchCacheService.cacheResult(FetchUrlResult.getCacheKey(fetchUrlResult), fetchUrlResult);
-            e.printStackTrace();
+            logger.error("FetchKeywordWorker is error. Error Msg: un able support website.", e);
         }
     }
 
