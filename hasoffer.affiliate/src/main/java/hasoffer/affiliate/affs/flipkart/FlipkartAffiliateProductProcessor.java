@@ -7,10 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import hasoffer.affiliate.affs.IAffiliateProcessor;
 import hasoffer.affiliate.exception.AffiliateAPIException;
-import hasoffer.affiliate.model.AffiliateCategory;
-import hasoffer.affiliate.model.AffiliateOrder;
-import hasoffer.affiliate.model.AffiliateOrderReport;
-import hasoffer.affiliate.model.AffiliateProduct;
+import hasoffer.affiliate.model.*;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
@@ -53,7 +50,55 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
         String jsonString = processor.sendRequest(url, null, null);
 
         System.out.println(jsonString);
+    }
 
+    public FlipkartSkuInfo getSkuInfo(String sourceId) throws Exception {
+        String queryString = AFFILIATE_PRODUCTID_URL + sourceId;
+
+        Map<String, String> headerMap = new HashMap<String, String>();
+
+        headerMap.put("Fk-Affiliate-Token", getAffiliateToken());
+        headerMap.put("Fk-Affiliate-Id", TRACKINGID);
+
+        String jsonString = sendRequest(queryString, headerMap, null);
+        JSONObject obj = JSON.parseObject(jsonString);
+
+        JSONObject jsonProduct = obj.getJSONObject("productBaseInfoV1");
+
+        FlipkartSkuInfo fsi = new FlipkartSkuInfo();
+
+        // other skus
+        // productFamily.get()
+        JSONArray productFamily = (JSONArray) jsonProduct.get("productFamily");
+        int pfSize = productFamily.size();
+        String[] pfs = new String[pfSize];
+        for (int i = 0; i < pfSize; i++) {
+            pfs[i] = productFamily.getString(i).trim();
+        }
+
+        // image urls
+        FlipkartImageUrls imageUrls = new FlipkartImageUrls();
+        JSONObject imageUrlsJson = jsonProduct.getJSONObject("imageUrls");
+        imageUrls.setImg200(imageUrlsJson.getString("200x200"));
+        imageUrls.setImg400(imageUrlsJson.getString("400x400"));
+        imageUrls.setImg800(imageUrlsJson.getString("800x800"));
+        imageUrls.setImguk(imageUrlsJson.getString("unknown"));
+
+        // set values
+        fsi.setProductId(jsonProduct.getString("productId"));
+        fsi.setTitle(jsonProduct.getString("title"));
+        fsi.setProductBrand(jsonProduct.getString("productBrand"));
+        fsi.setInStock(jsonProduct.getBoolean("inStock"));
+        fsi.setProductUrl(jsonProduct.getString("productUrl"));
+
+        fsi.setCategoryPath(jsonProduct.getString("categoryPath"));
+
+        fsi.setProductFamily(pfs);
+        fsi.setImageUrls(imageUrls);
+        fsi.setFlipkartSellingPrice(jsonProduct.getObject("flipkartSellingPrice", FlipkartPrice.class));
+        fsi.setAttributes(jsonProduct.getObject("attributes", FlipkartAttribute.class));
+
+        return fsi;
     }
 
     /**
@@ -61,7 +106,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
      *
      * @return
      */
-    public String getAffiliateToken() throws IOException {
+    public String getAffiliateToken() {
         return TOKEN;
     }
 
