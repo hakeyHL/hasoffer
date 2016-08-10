@@ -6,8 +6,6 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
 import hasoffer.core.product.IPtmCmpSkuImageService;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import javax.annotation.Resource;
@@ -21,8 +19,6 @@ import java.util.concurrent.TimeUnit;
  * Created on 2016/8/9.
  */
 public class SkuImageListDownLoadJobBean extends QuartzJobBean {
-
-    private static final Logger logger = LoggerFactory.getLogger(SkuImageListDownLoadJobBean.class);
 
     @Resource
     IDataBaseManager dbm;
@@ -48,7 +44,7 @@ public class SkuImageListDownLoadJobBean extends QuartzJobBean {
 
                 long totalPage = pageableResult.getTotalPage();
 
-                while (page < 2) {
+                while (page < totalPage) {
 
                     if (page > 1) {
                         pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSkuImage t WHERE t.fetched = 0", page, pageSize);
@@ -64,33 +60,33 @@ public class SkuImageListDownLoadJobBean extends QuartzJobBean {
             }
         });
 
-//        for (int i = 0; i < 10; i++) {
-        es.execute(new Runnable() {
+        for (int i = 0; i < 10; i++) {
+            es.execute(new Runnable() {
 
-            @Override
-            public void run() {
-                while (true) {
+                @Override
+                public void run() {
+                    while (true) {
 
-                    PtmCmpSkuImage ptmCmpSkuImage = ptmCmpSkuImageQueue.poll();
+                        PtmCmpSkuImage ptmCmpSkuImage = ptmCmpSkuImageQueue.poll();
 
-                    if (ptmCmpSkuImage == null) {
-                        try {
-                            TimeUnit.SECONDS.sleep(5);
-                        } catch (InterruptedException e) {
+                        if (ptmCmpSkuImage == null) {
+                            try {
+                                TimeUnit.SECONDS.sleep(5);
+                            } catch (InterruptedException e) {
 
+                            }
+                            continue;
                         }
-                        continue;
-                    }
 
-                    boolean fetchResultFlag = ptmCmpSkuImageService.downloadPtmCmpSkuImage(ptmCmpSkuImage.getId());
+                        boolean fetchResultFlag = ptmCmpSkuImageService.downloadPtmCmpSkuImage(ptmCmpSkuImage.getId());
 
-                    if (fetchResultFlag) {
-                        ptmCmpSkuImageService.updateFetchStatus(ptmCmpSkuImage.getId(), fetchResultFlag);
+                        if (fetchResultFlag) {
+                            ptmCmpSkuImageService.updateFetchStatus(ptmCmpSkuImage.getId(), fetchResultFlag);
+                        }
                     }
                 }
-            }
-        });
-//        }
+            });
+        }
 
         while (true) {
             try {
