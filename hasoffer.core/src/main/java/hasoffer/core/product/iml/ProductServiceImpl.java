@@ -25,7 +25,6 @@ import hasoffer.core.utils.ImageUtil;
 import hasoffer.data.solr.*;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.model.ListProduct;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -33,7 +32,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -498,17 +496,18 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public void reimport2Solr(boolean removeFirst) {
-        if (removeFirst) {
-            try {
-                productIndexService.removeAll();
-            } catch (SolrServerException e) {
-                logger.error("{}", e);
-            } catch (IOException e) {
-                logger.error("{}", e);
-            }
-        }
-
-        addOrUpdateSolr(Q_PRODUCT, null);
+        updateProductIndex2Solr();
+//        if (removeFirst) {
+//            try {
+//                productIndexService.removeAll();
+//            } catch (SolrServerException e) {
+//                logger.error("{}", e);
+//            } catch (IOException e) {
+//                logger.error("{}", e);
+//            }
+//    }
+//
+//        addOrUpdateSolr(Q_PRODUCT, null);
     }
 
     @Override
@@ -619,6 +618,41 @@ public class ProductServiceImpl implements IProductService {
             }
 
             pageNum++;
+        }
+    }
+
+    private void updateProductIndex2Solr() {
+        long id = 1L;
+
+        final String Q_MAX_PROID = "SELECT MAX(t.id) FROM PtmProduct t";
+        final long maxId = dbm.querySingle(Q_MAX_PROID);
+
+        while (id <= maxId) {
+            PtmProduct product = getProduct(id);
+
+            if (id++ % 500 == 0) {
+                System.out.println("addOrUpdateSolr2, id = " + id);
+            }
+
+            if (product == null || product.getPrice() <= 0) {
+                productIndexService.remove(String.valueOf(id));
+                continue;
+            }
+
+            List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(id);
+            int validCount = 0;
+            for (PtmCmpSku cmpSku : cmpSkus) {
+                if (cmpSku.getStatus() == SkuStatus.OFFSALE || cmpSku.getPrice() <= 0) {
+                    continue;
+                }
+                validCount++;
+            }
+
+            if (validCount <= 0) {
+                // remove from solr
+                productIndexService.remove(String.valueOf(id));
+            }
+
         }
     }
 
