@@ -299,7 +299,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
      */
     @Override
     public List<AffiliateProduct> getAffiliateProductByKeyword(String keyword, int resultNum) throws AffiliateAPIException, IOException {
-
+//https://affiliate-api.flipkart.net/affiliate/search/json
         String queryString = AFFILIATE_KEYWORDQUERY_URL + "?query=" + StringUtils.urlEncode(keyword) + "&resultCount=" + resultNum;
 
         String jsonData = sendRequest(queryString, null, null);
