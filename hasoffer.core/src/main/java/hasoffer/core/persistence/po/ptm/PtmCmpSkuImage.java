@@ -38,6 +38,8 @@ public class PtmCmpSkuImage implements Identifiable<Long> {
     @ColumnDefault(value = "0")
     private int oriImageUrlNumber = 0;//该sku有多少张图片
 
+    private boolean fetched = false;//该条记录是否抓取过
+
     @Override
     public Long getId() {
         return id;
@@ -120,6 +122,14 @@ public class PtmCmpSkuImage implements Identifiable<Long> {
         this.oriImageUrlNumber = oriImageUrlNumber;
     }
 
+    public boolean isFetched() {
+        return fetched;
+    }
+
+    public void setFetched(boolean fetched) {
+        this.fetched = fetched;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -128,6 +138,7 @@ public class PtmCmpSkuImage implements Identifiable<Long> {
         PtmCmpSkuImage that = (PtmCmpSkuImage) o;
 
         if (oriImageUrlNumber != that.oriImageUrlNumber) return false;
+        if (fetched != that.fetched) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (oriImageUrl1 != null ? !oriImageUrl1.equals(that.oriImageUrl1) : that.oriImageUrl1 != null) return false;
         if (oriImageUrl2 != null ? !oriImageUrl2.equals(that.oriImageUrl2) : that.oriImageUrl2 != null) return false;
@@ -152,6 +163,7 @@ public class PtmCmpSkuImage implements Identifiable<Long> {
         result = 31 * result + (imagePath3 != null ? imagePath3.hashCode() : 0);
         result = 31 * result + (imagePath4 != null ? imagePath4.hashCode() : 0);
         result = 31 * result + oriImageUrlNumber;
+        result = 31 * result + (fetched ? 1 : 0);
         return result;
     }
 }
