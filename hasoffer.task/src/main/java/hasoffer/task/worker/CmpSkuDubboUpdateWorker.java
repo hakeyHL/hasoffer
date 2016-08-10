@@ -106,38 +106,37 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             return;
         }
 
-        FetchUrlResult fetchedResult = null;
+        TaskStatus taskStatus = fetchService.getUrlTaskStatus(website, url);
 
-        logger.info("before visit fetchService interface");
-        fetchedResult = fetchService.getProductsByUrl(skuid, website, url);
-        logger.info("after visit fetchService interface");
-
-        TaskStatus taskStatus = fetchedResult.getTaskStatus();
-
-        FetchedProduct fetchedProduct = null;
+        FetchUrlResult fetchUrlResult = null;
 
         //如果返回结果状态为running，那么将sku返回队列
         if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
             queue.add(searchLog);
-            logger.info("taskstatus RUNNING for [" + sku.getId() + "]");
+            logger.info("taskstatus RUNNING for [" + skuid + "]");
             return;
         } else if (TaskStatus.STOPPED.equals(taskStatus)) {
-            logger.info("taskstatus STOPPED for [" + sku.getId() + "]");
+            logger.info("taskstatus STOPPED for [" + skuid + "]");
             return;
         } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
-            logger.info("taskstatus EXCEPTION for [" + sku.getId() + "]");
+            logger.info("taskstatus EXCEPTION for [" + skuid + "]");
+            return;
+        } else if (TaskStatus.NONE.equals(taskStatus)) {
+            logger.info("taskstatus NONE for [" + skuid + "]");
             return;
         } else {//(TaskStatus.FINISH.equals(taskStatus)))
-            logger.info("taskstatus FINISH for [" + sku.getId() + "]");
-            fetchedProduct = fetchedResult.getFetchProduct();
+            logger.info("taskstatus FINISH for [" + skuid + "]");
+            fetchUrlResult = fetchService.getProductsByUrl(skuid, sku.getWebsite(), sku.getUrl());
+
+            FetchedProduct fetchedProduct = fetchUrlResult.getFetchProduct();
+
+            System.out.println(JSONUtil.toJSON(fetchedProduct).toString());
+
+            cmpSkuService.createDescription(sku, fetchedProduct);
+
+            cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
+
+            cmpSkuService.createPtmCmpSkuImage(skuid, fetchedProduct);
         }
-
-        System.out.println(JSONUtil.toJSON(fetchedProduct).toString());
-
-        cmpSkuService.createDescription(sku, fetchedProduct);
-
-        cmpSkuService.updateCmpSkuBySpiderFetchedProduct(sku.getId(), fetchedProduct);
-
-        cmpSkuService.createPtmCmpSkuImage(sku.getId(), fetchedProduct);
     }
 }
