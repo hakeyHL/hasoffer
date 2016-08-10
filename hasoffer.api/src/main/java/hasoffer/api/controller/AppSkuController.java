@@ -7,6 +7,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
+import hasoffer.core.utils.ImageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -44,16 +45,16 @@ public class AppSkuController {
             String imagePath3 = ptmCmpSkuImage.getImagePath3();
             String imagePath4 = ptmCmpSkuImage.getImagePath4();
             if (!StringUtils.isEmpty(imagePath1)) {
-                li.add(ptmCmpSkuImage.getImagePath1());
+                li.add(ImageUtil.getImageUrl(ptmCmpSkuImage.getImagePath1()));
             }
             if (!StringUtils.isEmpty(imagePath2)) {
-                li.add(ptmCmpSkuImage.getImagePath2());
+                li.add(ImageUtil.getImageUrl(ptmCmpSkuImage.getImagePath2()));
             }
             if (!StringUtils.isEmpty(imagePath3)) {
-                li.add(ptmCmpSkuImage.getImagePath3());
+                li.add(ImageUtil.getImageUrl(ptmCmpSkuImage.getImagePath3()));
             }
             if (!StringUtils.isEmpty(imagePath4)) {
-                li.add(ptmCmpSkuImage.getImagePath4());
+                li.add(ImageUtil.getImageUrl(ptmCmpSkuImage.getImagePath4()));
             }
         }
         return li;
