@@ -32,13 +32,34 @@ public class SrmProductSearchCountListWorker implements Runnable {
     @Override
     public void run() {
 
-        while (true) {
+        int page = 1;
+        int pageSize = 1000;
 
-            String startDateString = TimeUtils.parse(TimeUtils.today() - TimeUtils.MILLISECONDS_OF_1_DAY, "yyyyMMdd");
+        String startDateString = TimeUtils.parse(TimeUtils.today() - TimeUtils.MILLISECONDS_OF_1_DAY, "yyyyMMdd");
 
-            String Q_LOG_BYUPDATETIME = "SELECT t FROM SrmProductSearchCount  t WHERE t.ymd > ?0 AND t.count > 10 ORDER BY t.id ASC";
+        String Q_LOG_BYUPDATETIME = "SELECT t FROM SrmProductSearchCount  t WHERE t.ymd > ?0 AND t.count > 10 ORDER BY t.id ASC";
 
-            PageableResult<SrmProductSearchCount> pageableResult = dbm.queryPage(Q_LOG_BYUPDATETIME, 0, 1000, Arrays.asList(startDateString));
+        PageableResult<SrmProductSearchCount> pageableResult = dbm.queryPage(Q_LOG_BYUPDATETIME, page, pageSize, Arrays.asList(startDateString));
+
+        long totalPage = pageableResult.getTotalPage();
+        logger.info("totalPage :" + totalPage);
+
+        while (page < totalPage) {
+
+            if (queue.size() > 10000) {
+                try {
+                    TimeUnit.MINUTES.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                continue;
+            }
+            logger.info("curpage :" + page);
+
+            if (page > 1) {
+                pageableResult = dbm.queryPage(Q_LOG_BYUPDATETIME, page, pageSize, Arrays.asList(startDateString));
+            }
+
             List<SrmProductSearchCount> dataList = pageableResult.getData();
 
             if (ArrayUtils.hasObjs(dataList)) {
@@ -54,22 +75,7 @@ public class SrmProductSearchCountListWorker implements Runnable {
                 }
 
                 logger.info("add succes size = " + dataList.size());
-            } else {
-                try {
-                    TimeUnit.MINUTES.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
-
-            if (queue.size() > 10000) {
-                try {
-                    TimeUnit.MINUTES.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
         }
     }
 }
