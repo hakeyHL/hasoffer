@@ -108,7 +108,9 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
         FetchUrlResult fetchedResult = null;
 
+        logger.info("before visit fetchService interface");
         fetchedResult = fetchService.getProductsByUrl(skuid, website, url);
+        logger.info("after visit fetchService interface");
 
         TaskStatus taskStatus = fetchedResult.getTaskStatus();
 
