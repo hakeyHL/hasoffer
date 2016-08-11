@@ -60,4 +60,9 @@ public class PushServiceImpl implements IPushService {
     public List<UrmDevice> getGcmTokens(String version) {
         return dbm.query(Q_URM_GET_GCMTOKENS, Arrays.asList(version));
     }
+
+    @Override
+    public void sendPush(int page, int size) {
+        
+    }
 }
