@@ -34,8 +34,8 @@ public class PushTest {
 //        System.out.println(to2.equals(to3));
 
         AppPushMessage message = new AppPushMessage(
-                new AppMsgDisplay("The Freedom Sale Just Rs.11,999! Redmi Note 3 (Gold, 32 GB)", "The Freedom Sale！", "Just Rs.11,999! Redmi Note 3 (Gold, 32 GB)"),
-                new AppMsgClick(AppMsgClickType.DEAL, "99000109", "com.flipkart.android")
+                new AppMsgDisplay("The Freedom Sale！Just Rs.13,499!Lenovo Vibe K5 Note ", "The Freedom Sale！", "Just Rs.13,499!Lenovo Vibe K5 Note"),
+                new AppMsgClick(AppMsgClickType.DEAL, "99000106", "com.flipkart.android")
         );
 
         /*AppPushMessage message = new AppPushMessage(
