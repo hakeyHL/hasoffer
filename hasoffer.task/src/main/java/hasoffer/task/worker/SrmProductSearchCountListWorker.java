@@ -43,7 +43,7 @@ public class SrmProductSearchCountListWorker implements Runnable {
 
         String startDateString = TimeUtils.parse(TimeUtils.today() - TimeUtils.MILLISECONDS_OF_1_DAY * 2, "yyyyMMdd");
 
-        String Q_LOG_BYUPDATETIME = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd > ?0 AND t.count > 10 ORDER BY t.id ASC";
+        String Q_LOG_BYUPDATETIME = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd > ?0 AND t.count > 5 ORDER BY t.id ASC";
 
         PageableResult<SrmProductSearchCount> pageableResult = dbm.queryPage(Q_LOG_BYUPDATETIME, page, pageSize, Arrays.asList(startDateString));
 
