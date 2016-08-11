@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.base.utils.http.MyHttpUtils;
+import hasoffer.core.utils.Httphelper;
 import org.apache.http.HttpHost;
 import org.junit.Test;
 
@@ -43,5 +44,21 @@ public class HttpTest {
         JSONObject jsObj = JSON.parseObject(responseModel.getBodyString());
 
         System.out.println(responseModel.getBodyString());
+    }
+
+    @Test
+    public void getFlipkartProductInfo() throws Exception {
+
+        String url = "https://www.flipkart.com/api/3/page/dynamic/product";
+
+        String json = "{\"requestContext\":{\"productId\":\"MIXEAMVTVJAGVMCF\"}}";
+
+        Map<String, String> header = new HashMap<>();
+
+        header.put("x-user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36 FKUA/website/41/website/Desktop");
+
+        String response = Httphelper.doPostJsonWithHeader(url, json, header);
+
+        System.out.println(response);
     }
 }
