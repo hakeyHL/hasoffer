@@ -10,8 +10,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hs on 2016/7/25.
@@ -33,11 +34,13 @@ public class AppAdController {
     @RequestMapping("product")
     public ModelAndView getAdsByProductId(@RequestParam(defaultValue = "0") Long productId) {
         ModelAndView modelAndView = new ModelAndView();
+        Map map = new HashMap<>();
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
         List<Adt> adt = advertiseService.getAdByCategory();
         if (adt != null && adt.size() > 0) {
-            modelAndView.addObject("data", Arrays.asList(adt.get(0)));
+            map.put("ads", adt.get(0));
+            modelAndView.addObject("data", map);
         } else {
             modelAndView.addObject("data", "{\n" +
                     "        \"aderlogoUrl\": \"http://h.hiphotos.baidu.com/baike/w%3D268%3Bg%3D0/sign=d66357243fdbb6fd255be220311fcc25/c75c10385343fbf235a845fcb67eca8064388f6d.jpg\",\n" +
