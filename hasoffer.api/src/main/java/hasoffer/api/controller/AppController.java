@@ -32,6 +32,7 @@ import hasoffer.core.product.solr.ProductModel;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
+import hasoffer.core.utils.IdHelper;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
@@ -195,12 +196,8 @@ public class AppController {
                 }
                 break;
             case HOMEPAGE:
-                String[] FLIDS = new String[]{"xyangryrg", "zhouxixi0", "harveyouo", "allenooou", "747306881", "hlhakeygm", "oliviersl", "wuningSFg"};
-                String[] SNIDS = new String[]{"89037", "104658", "104664", "104663", "104705", "104659", "104717", "104726"};
-                String[] SHIDS = new String[]{"none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none"};
                 Map map = new HashMap();
-                Random random = new Random();
-                map.put("info", new StringBuilder().append(FLIDS[random.nextInt(FLIDS.length)] + ",").append(SNIDS[random.nextInt(SNIDS.length)] + ",").append(SHIDS[random.nextInt(SHIDS.length)]));
+                map.put("info", IdHelper.getAffiIds());
                 modelAndView.addObject("data", map);
                 break;
             case CLICKDEAL:
@@ -644,14 +641,14 @@ public class AppController {
     }
 
     @RequestMapping(value = "/push")
-    public ModelAndView psuhMessage(String app, String version, String marketChannel, String msg, String packageName, String type, String id, int number) {
+    public ModelAndView psuhMessage(String title, String content, String app, String version, String marketChannel, String outline, String packageName, String type, String id, int number) {
         ModelAndView mv = new ModelAndView();
         mv.addObject("errorCode", "00000");
         mv.addObject("msg", "ok");
         try {
             List<String> gcmTokens = new ArrayList<String>();
             AppPushMessage message = new AppPushMessage(
-                    new AppMsgDisplay(msg, msg, msg),
+                    new AppMsgDisplay(outline, title, content),
                     new AppMsgClick(AppMsgClickType.valueOf(type), id, packageName)
             );
             AppPushBo pushBo = new AppPushBo("5x1", "15:10", message);
