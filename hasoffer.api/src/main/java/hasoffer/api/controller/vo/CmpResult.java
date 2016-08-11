@@ -28,6 +28,7 @@ public class CmpResult {
     private AppDisplayMode displayMode;
     private boolean std;//是否为标品
     private String image;
+    private Long productId;
 
     public CmpResult(float priceOff, ProductVo productVo, PageableResult<ComparedSkuVo> pagedComparedSkuVos) {
         this.priceOff = priceOff;
@@ -140,5 +141,13 @@ public class CmpResult {
 
     public void setStd(boolean std) {
         this.std = std;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 }
