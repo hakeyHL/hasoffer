@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -36,7 +37,7 @@ public class AppAdController {
         modelAndView.addObject("msg", "ok");
         List<Adt> adt = advertiseService.getAdByCategory();
         if (adt != null && adt.size() > 0) {
-            modelAndView.addObject("data", adt.get(0));
+            modelAndView.addObject("data", Arrays.asList(adt.get(0)));
         } else {
             modelAndView.addObject("data", "{\n" +
                     "        \"aderlogoUrl\": \"http://h.hiphotos.baidu.com/baike/w%3D268%3Bg%3D0/sign=d66357243fdbb6fd255be220311fcc25/c75c10385343fbf235a845fcb67eca8064388f6d.jpg\",\n" +

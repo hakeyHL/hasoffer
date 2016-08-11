@@ -154,6 +154,9 @@
                                 <li class="active">
                                     <a href="/topselling/list">top selling</a>
                                 </li>
+                                <li class="active">
+                                    <a href="/push/pushMessage">top selling</a>
+                                </li>
                             </ul>
                         </li>
                     </c:if>

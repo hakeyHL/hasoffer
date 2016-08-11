@@ -14,4 +14,6 @@ public interface IPushService {
     void push(String to, AppPushBo pushBo);
 
     List<UrmDevice> getGcmTokens(String version);
+
+    void sendPush(int page, int size);
 }
