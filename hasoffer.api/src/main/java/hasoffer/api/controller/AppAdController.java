@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class AppAdController {
         modelAndView.addObject("msg", "ok");
         List<Adt> adt = advertiseService.getAdByCategory();
         if (adt != null && adt.size() > 0) {
-            map.put("ads", adt.get(0));
+            map.put("ads", Arrays.asList(adt.get(0)));
             modelAndView.addObject("data", map);
         } else {
             modelAndView.addObject("data", "{\n" +
