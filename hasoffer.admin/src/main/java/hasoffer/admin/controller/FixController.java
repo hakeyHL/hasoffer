@@ -1083,8 +1083,8 @@ public class FixController {
                     }
 
                     System.out.println("queue size " + cmpSkuQueue.size());
-                    break;//for test
-//                    page++;
+//                    break;//for test
+                    page++;
                 }
             }
         });
@@ -1098,7 +1098,7 @@ public class FixController {
                         PtmCmpSku t = cmpSkuQueue.poll();
 
                         if (t == null) {
-                            System.out.println("poll get null sleep 5 seconds");
+                            System.out.println("poll get null sleep 15 seconds");
                             continue;
                         }
 
