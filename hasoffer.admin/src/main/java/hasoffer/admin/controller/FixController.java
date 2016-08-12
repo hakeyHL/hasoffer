@@ -1056,7 +1056,7 @@ public class FixController {
                 PageableResult<PtmCmpSku> pageableResult = dbm.queryPage(Q_SKU_IMAGE, page, PAGE_SIZE);
 
                 long totalPage = pageableResult.getTotalPage();
-                System.out.println(totalPage);
+                System.out.println("totalpage =" + totalPage);
 
                 while (page < totalPage) {
 
@@ -1082,7 +1082,8 @@ public class FixController {
                         }
                     }
 
-                    System.out.println("queue size " + cmpSkuQueue.size());
+                    System.out.println("queue size =" + cmpSkuQueue.size());
+                    System.out.println("currentPage =" + page);
 //                    break;//for test
                     page++;
                 }
@@ -1098,7 +1099,7 @@ public class FixController {
                         PtmCmpSku t = cmpSkuQueue.poll();
 
                         if (t == null) {
-                            System.out.println("poll get null sleep 15 seconds");
+//                            System.out.println("poll get null sleep 15 seconds");
                             try {
                                 TimeUnit.SECONDS.sleep(15);
                             } catch (InterruptedException e) {
