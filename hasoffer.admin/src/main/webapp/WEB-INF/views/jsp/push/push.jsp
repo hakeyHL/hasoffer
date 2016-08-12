@@ -66,9 +66,9 @@
             <div class="col-sm-7">
                 <div class="col-lg-8">
                     <c:forEach items="${versions}" var="version">
-                        <div class="active">
+                        <div class="checkbox-inline">
                             <label class="checkbox-inline">
-                                <input type="checkbox" name="version" id="version" value="${version}">
+                                <input type="checkbox" name="version" id="version" value="${version}">${version}
                             </label>
                         </div>
                     </c:forEach>
@@ -82,32 +82,32 @@
                 <div class="col-lg-8">
                     <div class="active">
                         <label class="radio-inline">
-                            <input type="radio" name="type" id="type1" value="MAIN">MAIN
+                            <input type="radio" name="messageType" id="type1" value="MAIN">MAIN
                         </label>
                     </div>
                     <div class="active">
                         <label class="radio-inline">
-                            <input type="radio" name="type" id="type2" value="DEEPLINK">DEEPLINK
+                            <input type="radio" name="messageType" id="type2" value="DEEPLINK">DEEPLINK
                         </label>
                     </div>
                     <div class="active">
                         <label class="radio-inline">
-                            <input type="radio" name="type" id="type3" value="WEBVIEW">WEBVIEW
+                            <input type="radio" name="messageType" id="type3" value="WEBVIEW">WEBVIEW
                         </label>
                     </div>
                     <div class="active">
                         <label class="radio-inline">
-                            <input type="radio" name="type" id="type4" value="GOOGLEPLAY">GOOGLEPLAY
+                            <input type="radio" name="messageType" id="type4" value="GOOGLEPLAY">GOOGLEPLAY
                         </label>
                     </div>
                     <div class="active">
                         <label class="radio-inline">
-                            <input type="radio" name="type" id="type5" value="PRODUCT">PRODUCT
+                            <input type="radio" name="messageType" id="type5" value="PRODUCT">PRODUCT
                         </label>
                     </div>
                     <div class="active">
                         <label class="radio-inline">
-                            <input type="radio" name="type" id="type6" value="DEAL">DEAL
+                            <input type="radio" name="messageType" id="type6" value="DEAL">DEAL
                         </label>
                     </div>
                 </div>
@@ -117,7 +117,7 @@
             <label class="col-sm-3 control-label">类型值</label>
 
             <div class="col-sm-7">
-                <input type="text" name="id" class="form-control" value="" placeholder="请根据推送类型填写相应值">
+                <input type="text" name="value" class="form-control" value="" placeholder="请根据推送类型填写相应值">
             </div>
         </div>
         <div class="form-group">
@@ -125,14 +125,12 @@
 
             <div class="col-sm-7">
                 <div class="col-lg-8">
-                    <c:forEach items="${websites}" var="website">
-                        <div class="active checkbox-inline">
-                            <label class="checkbox-inline">
-                                <input type="checkbox" name="website" id="website"
-                                       value="${website.name()}">${website.name()}
-                            </label>
-                        </div>
-                    </c:forEach>
+                    <select multiple class="form-control" name="website">
+                        <c:forEach items="${websites}" var="website">
+                            <option
+                                    value="${website.name()}">${website.name()}</option>
+                        </c:forEach>
+                    </select>
                 </div>
             </div>
         </div>
@@ -141,11 +139,14 @@
 
             <div class="col-sm-7">
                 <div class="col-lg-8">
-                    <select multiple class="form-control">
-                        <c:forEach items="${channels}" var="channel">
-                            <option id="channel" name="channel" value="${channel.name()}">${channel.name()}</option>
-                        </c:forEach>
-                    </select>
+                    <c:forEach items="${channels}" var="channel">
+                        <div class="active checkbox-inline">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="channel" id="channel"
+                                       value="${channel.name()}">${channel.name()}
+                            </label>
+                        </div>
+                    </c:forEach>
                 </div>
             </div>
         </div>
@@ -156,6 +157,13 @@
                 <input type="text" name="number" class="form-control" value="" placeholder="此处不填,推送给所有符合条件的用户">
             </div>
         </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-3 col-sm-9">
+                <button type="submit" class="btn btn-default" id="button_submit">推送</button>
+            </div>
+        </div>
+
     </form>
 
 
