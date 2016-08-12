@@ -68,7 +68,7 @@
                     <c:forEach items="${versions}" var="version">
                         <div class="active">
                             <label class="checkbox-inline">
-                                <input type="checkbox" id="version" value="${version}">
+                                <input type="checkbox" name="version" id="version" value="${version}">
                             </label>
                         </div>
                     </c:forEach>
@@ -128,7 +128,8 @@
                     <c:forEach items="${websites}" var="website">
                         <div class="active checkbox-inline">
                             <label class="checkbox-inline">
-                                <input type="checkbox" id="website" value="${website.name()}">${website.name()}
+                                <input type="checkbox" name="website" id="website"
+                                       value="${website.name()}">${website.name()}
                             </label>
                         </div>
                     </c:forEach>
@@ -142,7 +143,7 @@
                 <div class="col-lg-8">
                     <select multiple class="form-control">
                         <c:forEach items="${channels}" var="channel">
-                            <option id="channel" value="${channel.name()}">${channel.name()}</option>
+                            <option id="channel" name="channel" value="${channel.name()}">${channel.name()}</option>
                         </c:forEach>
                     </select>
                 </div>
