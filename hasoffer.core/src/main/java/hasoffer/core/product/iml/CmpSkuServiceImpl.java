@@ -527,6 +527,17 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         }
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void fixSmallImagePath(long skuid, String smallImagePath) {
+
+        PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(skuid);
+
+        updater.getPo().setSmallImagePath(smallImagePath);
+
+        dbm.update(updater);
+    }
+
     public void importCmpSku2solr(PtmCmpSku ptmCmpSku) {
         logger.debug(String.format("import or update to solr-sku {%d}", ptmCmpSku.getId()));
         cmpskuIndexService.createOrUpdate(new CmpSkuModel(ptmCmpSku));
