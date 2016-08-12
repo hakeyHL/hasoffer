@@ -24,16 +24,18 @@ public class IdHelper {
             case "FLIPKART":
                 return FLIDS[random.nextInt(FLIDS.length)];
             case "SNAPDEAL":
-                return FLIDS[random.nextInt(SNIDS.length)];
+                return SNIDS[random.nextInt(SNIDS.length)];
             case "SHOPCLUES":
-                return FLIDS[random.nextInt(SHIDS.length)];
+                return SHIDS[random.nextInt(SHIDS.length)];
             default:
                 return null;
         }
     }
 
     public static void main(String[] args) {
-        String affiIds = IdHelper.getAffiIds();
-        System.out.printf(affiIds);
+        for (int i = 0; i < 10000; i++) {
+            String affiIds = IdHelper.getAffiIdByWebsite(Website.SHOPCLUES);
+            System.out.printf(affiIds);
+        }
     }
 }
