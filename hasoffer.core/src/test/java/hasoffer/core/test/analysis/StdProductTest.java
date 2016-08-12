@@ -82,7 +82,7 @@ public class StdProductTest {
 
     @Test
     public void getFlipkartProduct() throws Exception {
-        String keyword = "bingo u8 smartwatch";
+        String keyword = "samsung galaxy j2 2016 edition (8gb)";
 
         Map<String, FlipkartSkuInfo> skuInfoMap = stdProductService.searchSku(keyword);
 

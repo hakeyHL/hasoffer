@@ -118,10 +118,11 @@ public class StdProductServiceImpl implements IStdProductService {
         }
 
         // query product by brand and model
-//        long count = dbm.querySingle("select count(t.id) from PtmStdProduct t where t.brand=?0 and t.model=?1 ", Arrays.asList(brandName, modelName));
-//        if (count >= 1) {
-//            System.out.println(String.format("brand[%s].model[%s].exists.", brandName, modelName));
-//        }
+        long count = dbm.querySingle("select count(t.id) from PtmStdProduct t where t.brand=?0 and t.model=?1 ", Arrays.asList(brandName, modelName));
+        if (count >= 1) {
+            System.out.println(String.format("brand[%s].model[%s].exists.", brandName, modelName));
+            return;
+        }
 
         PtmStdProduct stdProduct = new PtmStdProduct(productName, brandName, modelName, desc);
 
