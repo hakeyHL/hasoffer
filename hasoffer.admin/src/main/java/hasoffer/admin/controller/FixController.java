@@ -1058,6 +1058,7 @@ public class FixController {
                 PageableResult<PtmCmpSku> pageableResult = dbm.queryPage(Q_SKU_IMAGE, page, PAGE_SIZE);
 
                 long totalPage = pageableResult.getTotalPage();
+                System.out.println(totalPage);
 
                 while (page < totalPage) {
 
@@ -1083,6 +1084,7 @@ public class FixController {
                         }
                     }
 
+                    System.out.println("queue size " + cmpSkuQueue.size());
                     break;//for test
 //                    page++;
                 }
@@ -1101,8 +1103,6 @@ public class FixController {
                         if (t == null) {
                             break;
                         }
-
-                        cmpSkuService.downloadImage2(t);
 
                         String oriImageUrl = t.getOriImageUrl();
 
