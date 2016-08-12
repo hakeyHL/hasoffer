@@ -1083,8 +1083,8 @@ public class FixController {
                     }
 
                     System.out.println("queue size " + cmpSkuQueue.size());
-                    break;//for test
-//                    page++;
+//                    break;//for test
+                    page++;
                 }
             }
         });
