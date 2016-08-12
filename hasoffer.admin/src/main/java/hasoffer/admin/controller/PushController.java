@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by lihongde on 2016/6/21 12:47
+ * Created on 2016/6/21 12:47
  */
 
 @Controller
@@ -42,7 +42,7 @@ public class PushController {
         return mav;
     }
 
-    @RequestMapping(value = "/pushIndex")
+    @RequestMapping(value = "/y")
     public ModelAndView PushMessage(PushVo pushVol) {
         //app类型
         //渠道
