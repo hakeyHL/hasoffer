@@ -4,7 +4,9 @@ import hasoffer.admin.controller.vo.TitleCountVo;
 import hasoffer.admin.worker.FixSkuErrorInPriceWorker;
 import hasoffer.admin.worker.FlipkartSkuCategory2GetListWorker;
 import hasoffer.admin.worker.FlipkartSkuCategory2GetSaveWorker;
+import hasoffer.base.exception.ImageDownloadOrUploadException;
 import hasoffer.base.model.HttpResponseModel;
+import hasoffer.base.model.ImagePath;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.*;
@@ -32,6 +34,7 @@ import hasoffer.core.task.worker.IList;
 import hasoffer.core.task.worker.IProcess;
 import hasoffer.core.user.IDeviceService;
 import hasoffer.core.worker.ListAndProcessWorkerStatus;
+import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import hasoffer.fetch.sites.paytm.PaytmHelper;
 import hasoffer.fetch.sites.shopclues.ShopcluesHelper;
@@ -49,6 +52,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Date : 2016/3/25
@@ -1025,6 +1029,123 @@ public class FixController {
             });
 
         }
+
+        return "ok";
+    }
+
+    //fixdata/fixsmallimagepathnull
+    @RequestMapping("/fixsmallimagepathnull")
+    @ResponseBody
+    public String fixsmallimagepathnull() {
+
+
+        final ConcurrentLinkedQueue<PtmCmpSku> cmpSkuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        int processCount = 20;
+        final AtomicInteger processorCount = new AtomicInteger(0);
+
+        es.execute(new Runnable() {
+
+            String Q_SKU_IMAGE = "SELECT t FROM PtmCmpSku t WHERE t.smallImagePath is null and t.status <> 'OFFSALE' and t.price > 0 and t.oriImageUrl IS NOT NULL and t.oriImageUrl <> '' ORDER BT t.id";
+
+            int page = 1, PAGE_SIZE = 1000;
+
+            @Override
+            public void run() {
+
+                PageableResult<PtmCmpSku> pageableResult = dbm.queryPage(Q_SKU_IMAGE, page, PAGE_SIZE);
+
+                long totalPage = pageableResult.getTotalPage();
+
+                while (page < totalPage) {
+
+                    if (cmpSkuQueue.size() > 10000) {
+                        try {
+                            TimeUnit.SECONDS.sleep(5);
+                        } catch (InterruptedException e) {
+
+                        }
+                    }
+
+                    if (page > 1) {
+                        pageableResult = dbm.queryPage(Q_SKU_IMAGE, page, PAGE_SIZE);
+                    }
+
+                    List<PtmCmpSku> ptmCmpSkuList = pageableResult.getData();
+
+                    for (PtmCmpSku ptmCmpSku : ptmCmpSkuList) {
+
+                        if (WebsiteHelper.DEFAULT_WEBSITES.contains(ptmCmpSku.getWebsite())) {
+
+                            cmpSkuQueue.add(ptmCmpSku);
+                        }
+                    }
+
+                    break;//for test
+//                    page++;
+                }
+            }
+        });
+
+        for (int i = 0; i < processCount; i++) {
+            es.execute(new Runnable() {
+                @Override
+                public void run() {
+                    processorCount.addAndGet(1);
+
+                    while (true) {
+                        PtmCmpSku t = cmpSkuQueue.poll();
+
+                        if (t == null) {
+                            break;
+                        }
+
+                        cmpSkuService.downloadImage2(t);
+
+                        String oriImageUrl = t.getOriImageUrl();
+
+                        try {
+                            ImagePath imagePath = hasoffer.core.utils.ImageUtil.downloadAndUpload2(oriImageUrl);
+
+                            cmpSkuService.fixSmallImagePath(t.getId(), imagePath.getSmallPath());
+
+                            System.out.println("fix success for " + t.getId());
+                        } catch (ImageDownloadOrUploadException e) {
+                            System.out.println("down image error for " + t.getId());
+                        }
+
+
+                    }
+
+                    processorCount.addAndGet(-1);
+                }
+            });
+        }
+
+
+        while (true) {
+            try {
+                TimeUnit.SECONDS.sleep(5);
+            } catch (Exception e) {
+                break;
+            }
+
+            if (cmpSkuQueue.size() > 0) {
+                logger.info("queue size = " + cmpSkuQueue.size());
+                continue;
+            }
+
+            if (processorCount.get() > 0) {
+                logger.info("processorCount = " + processorCount.get());
+                continue;
+            }
+
+            break;
+        }
+
+        logger.info("All jobs finished.");
 
         return "ok";
     }
