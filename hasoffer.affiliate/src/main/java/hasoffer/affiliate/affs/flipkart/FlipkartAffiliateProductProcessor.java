@@ -85,6 +85,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
         fsi.setProductBrand(jsonProduct.getString("productBrand"));
         fsi.setInStock(jsonProduct.getBoolean("inStock"));
         fsi.setProductUrl(jsonProduct.getString("productUrl"));
+        fsi.setDesc(jsonProduct.getString("productDescription"));
 
         fsi.setCategoryPath(jsonProduct.getString("categoryPath"));
 

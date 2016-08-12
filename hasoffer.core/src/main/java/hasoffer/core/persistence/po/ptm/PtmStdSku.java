@@ -3,13 +3,10 @@ package hasoffer.core.persistence.po.ptm;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
-//@Entity
+@Entity
 public class PtmStdSku implements Identifiable<Long> {
 
     @Id
@@ -23,13 +20,17 @@ public class PtmStdSku implements Identifiable<Long> {
 
     private float refPrice; // 参考价格
 
-    private String color; // 颜色
-    private String size; // 大小
-
-    private Date updateTime = TimeUtils.nowDate();
     private Date createTime;//该条sku记录的创建时间
 
-    public PtmStdSku() {
+    private PtmStdSku() {
+        this.createTime = TimeUtils.nowDate();
+    }
+
+    public PtmStdSku(long stdProId, String title, float refPrice) {
+        this();
+        this.stdProId = stdProId;
+        this.title = title;
+        this.refPrice = refPrice;
     }
 
     @Override
@@ -66,30 +67,6 @@ public class PtmStdSku implements Identifiable<Long> {
         this.refPrice = refPrice;
     }
 
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public String getSize() {
-        return size;
-    }
-
-    public void setSize(String size) {
-        this.size = size;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
     public Date getCreateTime() {
         return createTime;
     }
@@ -109,9 +86,6 @@ public class PtmStdSku implements Identifiable<Long> {
         if (Float.compare(ptmStdSku.refPrice, refPrice) != 0) return false;
         if (id != null ? !id.equals(ptmStdSku.id) : ptmStdSku.id != null) return false;
         if (title != null ? !title.equals(ptmStdSku.title) : ptmStdSku.title != null) return false;
-        if (color != null ? !color.equals(ptmStdSku.color) : ptmStdSku.color != null) return false;
-        if (size != null ? !size.equals(ptmStdSku.size) : ptmStdSku.size != null) return false;
-        if (updateTime != null ? !updateTime.equals(ptmStdSku.updateTime) : ptmStdSku.updateTime != null) return false;
         return !(createTime != null ? !createTime.equals(ptmStdSku.createTime) : ptmStdSku.createTime != null);
 
     }
@@ -122,9 +96,6 @@ public class PtmStdSku implements Identifiable<Long> {
         result = 31 * result + (int) (stdProId ^ (stdProId >>> 32));
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (refPrice != +0.0f ? Float.floatToIntBits(refPrice) : 0);
-        result = 31 * result + (color != null ? color.hashCode() : 0);
-        result = 31 * result + (size != null ? size.hashCode() : 0);
-        result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         return result;
     }

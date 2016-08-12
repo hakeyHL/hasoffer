@@ -3,11 +3,13 @@ package hasoffer.core.test.analysis;
 import hasoffer.affiliate.affs.flipkart.FlipkartAffiliateProductProcessor;
 import hasoffer.affiliate.model.AffiliateProduct;
 import hasoffer.affiliate.model.FlipkartSkuInfo;
+import hasoffer.core.product.IStdProductService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +21,8 @@ import java.util.Map;
 @ContextConfiguration(locations = "classpath:spring-beans.xml")
 public class StdProductTest {
 
+    @Resource
+    IStdProductService stdProductService;
 
     @Test
     public void getFlipkartProduct() throws Exception {
@@ -50,7 +54,7 @@ public class StdProductTest {
             }
         }
 
-        System.out.println(skuInfoMap.size());
+        stdProductService.createStd(skuInfoMap);
     }
 
 }

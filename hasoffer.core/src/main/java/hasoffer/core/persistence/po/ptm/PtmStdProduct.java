@@ -10,7 +10,7 @@ import javax.persistence.Id;
 import java.util.Date;
 
 
-//@Entity
+@Entity
 public class PtmStdProduct implements Identifiable<Long> {
 
     @Id
@@ -30,7 +30,16 @@ public class PtmStdProduct implements Identifiable<Long> {
     @Column(columnDefinition = "longtext")
     private String defaultDesc; // 默认的描述信息
 
-    public PtmStdProduct() {
+    private PtmStdProduct() {
+        //init default values
+    }
+
+    public PtmStdProduct(String title, String brand, String model, String defaultDesc) {
+        this();
+        this.title = title;
+        this.brand = brand;
+        this.model = model;
+        this.defaultDesc = defaultDesc;
     }
 
     @Override

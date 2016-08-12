@@ -26,6 +26,8 @@ public class FlipkartSkuInfo {
 
     private FlipkartAttribute attributes;
 
+    private String desc;
+
     public String getProductId() {
         return productId;
     }
@@ -112,5 +114,13 @@ public class FlipkartSkuInfo {
 
     public void setAttributes(FlipkartAttribute attributes) {
         this.attributes = attributes;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 }
