@@ -9,7 +9,7 @@ import java.util.Random;
  * Time 10:30
  */
 public class IdHelper {
-    final static String[] FLIDS = new String[]{"affiliate357", "xyangryrg", "zhouxixi0", "harveyouo", "allenooou", "747306881", "hlhakeygm", "oliviersl", "wuningSFg"};
+    final static String[] FLIDS = new String[]{"xyangryrg", "zhouxixi0", "harveyouo", "allenooou", "747306881", "hlhakeygm", "oliviersl", "wuningSFg"};
     final static String[] SNIDS = new String[]{"89037", "104658", "104664", "104663", "104705", "104659", "104717", "104726"};
     final static String[] SHIDS = new String[]{"none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none"};
 
@@ -24,16 +24,18 @@ public class IdHelper {
             case "FLIPKART":
                 return FLIDS[random.nextInt(FLIDS.length)];
             case "SNAPDEAL":
-                return FLIDS[random.nextInt(SNIDS.length)];
+                return SNIDS[random.nextInt(SNIDS.length)];
             case "SHOPCLUES":
-                return FLIDS[random.nextInt(SHIDS.length)];
+                return SHIDS[random.nextInt(SHIDS.length)];
             default:
                 return null;
         }
     }
 
     public static void main(String[] args) {
-        String affiIds = IdHelper.getAffiIds();
-        System.out.printf(affiIds);
+        for (int i = 0; i < 10000; i++) {
+            String affiIds = IdHelper.getAffiIdByWebsite(Website.SHOPCLUES);
+            System.out.printf(affiIds);
+        }
     }
 }
