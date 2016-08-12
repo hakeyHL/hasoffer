@@ -1099,6 +1099,11 @@ public class FixController {
 
                         if (t == null) {
                             System.out.println("poll get null sleep 15 seconds");
+                            try {
+                                TimeUnit.SECONDS.sleep(15);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                             continue;
                         }
 
