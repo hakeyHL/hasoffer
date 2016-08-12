@@ -84,16 +84,18 @@ public class AppDealController {
                 Iterator<AppDeal> dealIterator = list.iterator();
                 while (dealIterator.hasNext()) {
                     AppDeal appDeal = dealIterator.next();
-                    if (appDeal.getDealCategoryId() == 5) {
-                        DealVo dealVo = new DealVo();
-                        dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                        dealVo.setTitle(appDeal.getTitle());
-                        dealVo.setWebsite(appDeal.getWebsite());
-                        dealVo.setId(appDeal.getId());
-                        dealVo.setDiscount(appDeal.getDiscount());
-                        dealVo.setDeepLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
-                        mobileDeals.add(dealVo);
-                        dealIterator.remove();
+                    if (appDeal.getExpireTime().compareTo(new Date()) != 1 && appDeal.isDisplay()) {
+                        if (appDeal.getDealCategoryId() == 5) {
+                            DealVo dealVo = new DealVo();
+                            dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                            dealVo.setTitle(appDeal.getTitle());
+                            dealVo.setWebsite(appDeal.getWebsite());
+                            dealVo.setId(appDeal.getId());
+                            dealVo.setDiscount(appDeal.getDiscount());
+                            dealVo.setDeepLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+                            mobileDeals.add(dealVo);
+                            dealIterator.remove();
+                        }
                     }
                 }
                 deals.addAll(mobileDeals);
@@ -110,14 +112,16 @@ public class AppDealController {
                     }
                 });
                 for (AppDeal appDeal : list) {
-                    DealVo dealVo = new DealVo();
-                    dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                    dealVo.setTitle(appDeal.getTitle());
-                    dealVo.setWebsite(appDeal.getWebsite());
-                    dealVo.setId(appDeal.getId());
-                    dealVo.setDiscount(appDeal.getDiscount());
-                    dealVo.setDeepLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
-                    deals.add(dealVo);
+                    if (appDeal.getExpireTime().compareTo(new Date()) != 1 && appDeal.isDisplay()) {
+                        DealVo dealVo = new DealVo();
+                        dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                        dealVo.setTitle(appDeal.getTitle());
+                        dealVo.setWebsite(appDeal.getWebsite());
+                        dealVo.setId(appDeal.getId());
+                        dealVo.setDiscount(appDeal.getDiscount());
+                        dealVo.setDeepLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+                        deals.add(dealVo);
+                    }
                 }
             }
             Map map = new HashMap();

@@ -1,5 +1,6 @@
 package hasoffer.admin.controller;
 
+import hasoffer.admin.controller.vo.PushVo;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
 import hasoffer.core.push.IPushService;
@@ -28,10 +29,7 @@ public class PushController {
 
 
     @RequestMapping(value = "/pushIndex")
-    public ModelAndView PushMessage() {
-        //app类型
-        //渠道
-        //
+    public ModelAndView PushIndex() {
         ModelAndView mav = new ModelAndView("push/push");
         List<MarketChannel> channles = pushService.getAllMarketChannels();
         List<Website> websites = new ArrayList<>();
@@ -41,6 +39,16 @@ public class PushController {
         }
         mav.addObject("channels", channles);
         mav.addObject("websites", websites);
+        return mav;
+    }
+
+    @RequestMapping(value = "/pushIndex")
+    public ModelAndView PushMessage(PushVo pushVol) {
+        //app类型
+        //渠道
+        //
+        ModelAndView mav = new ModelAndView("push/push");
+
         return mav;
     }
 }
