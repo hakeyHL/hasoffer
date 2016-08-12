@@ -52,7 +52,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Date : 2016/3/25
@@ -1044,7 +1043,6 @@ public class FixController {
         ExecutorService es = Executors.newCachedThreadPool();
 
         int processCount = 20;
-        final AtomicInteger processorCount = new AtomicInteger(0);
 
         es.execute(new Runnable() {
 
@@ -1095,16 +1093,16 @@ public class FixController {
             es.execute(new Runnable() {
                 @Override
                 public void run() {
-                    processorCount.addAndGet(1);
 
                     while (true) {
                         PtmCmpSku t = cmpSkuQueue.poll();
 
                         if (t == null) {
-                            break;
+                            System.out.println("poll get null sleep 5 seconds");
                         }
 
                         String oriImageUrl = t.getOriImageUrl();
+                        System.out.println("ready to download " + t.getId());
 
                         try {
                             ImagePath imagePath = hasoffer.core.utils.ImageUtil.downloadAndUpload2(oriImageUrl);
@@ -1118,12 +1116,9 @@ public class FixController {
 
 
                     }
-
-                    processorCount.addAndGet(-1);
                 }
             });
         }
-
 
         while (true) {
             try {
@@ -1131,21 +1126,7 @@ public class FixController {
             } catch (Exception e) {
                 break;
             }
-
-            if (cmpSkuQueue.size() > 0) {
-                logger.info("queue size = " + cmpSkuQueue.size());
-                continue;
-            }
-
-            if (processorCount.get() > 0) {
-                logger.info("processorCount = " + processorCount.get());
-                continue;
-            }
-
-            break;
         }
-
-        logger.info("All jobs finished.");
 
         return "ok";
     }
