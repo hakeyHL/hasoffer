@@ -32,7 +32,7 @@ import hasoffer.core.product.solr.ProductModel;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
-import hasoffer.core.utils.IdHelper;
+import hasoffer.core.utils.AffliIdHelper;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
@@ -197,7 +197,7 @@ public class AppController {
                 break;
             case HOMEPAGE:
                 Map map = new HashMap();
-                map.put("info", IdHelper.getAffiIds());
+                map.put("info", AffliIdHelper.getAffiIds());
                 modelAndView.addObject("data", map);
                 break;
             case CLICKDEAL:

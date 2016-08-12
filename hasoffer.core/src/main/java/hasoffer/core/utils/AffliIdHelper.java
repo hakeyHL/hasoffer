@@ -1,4 +1,4 @@
-package hasoffer.fetch.helper;
+package hasoffer.core.utils;
 
 import hasoffer.base.model.Website;
 
@@ -8,7 +8,7 @@ import java.util.Random;
  * Created by hs on 2016年08月11日.
  * Time 10:30
  */
-public class IdHelper {
+public class AffliIdHelper {
     final static String[] FLIDS = new String[]{"xyangryrg", "zhouxixi0", "harveyouo", "allenooou", "747306881", "hlhakeygm", "oliviersl", "wuningSFg"};
     final static String[] SNIDS = new String[]{"89037", "104658", "82856"};
     final static String[] SHIDS = new String[]{"none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none"};
@@ -33,7 +33,9 @@ public class IdHelper {
     }
 
     public static void main(String[] args) {
-        String affiIds = IdHelper.getAffiIds();
-        System.out.printf(affiIds);
+        for (int i = 0; i < 10000; i++) {
+            String affiIds = AffliIdHelper.getAffiIdByWebsite(Website.SHOPCLUES);
+            System.out.printf(affiIds);
+        }
     }
 }
