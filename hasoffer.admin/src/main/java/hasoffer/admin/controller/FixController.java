@@ -1099,6 +1099,7 @@ public class FixController {
 
                         if (t == null) {
                             System.out.println("poll get null sleep 5 seconds");
+                            continue;
                         }
 
                         String oriImageUrl = t.getOriImageUrl();
