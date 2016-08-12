@@ -90,4 +90,12 @@ public interface ICmpSkuService {
     void importCmpSku2solrByProductId(Long proId);
 
     void batchDeleteCmpSku(Long[] ids);
+
+    /**
+     * 用来修复小图的问题
+     *
+     * @param skuid
+     * @param smallImagePath
+     */
+    void fixSmallImagePath(long skuid, String smallImagePath);
 }
