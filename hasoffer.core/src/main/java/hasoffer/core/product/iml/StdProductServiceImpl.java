@@ -10,6 +10,7 @@ import hasoffer.core.persistence.po.ptm.PtmStdSku;
 import hasoffer.core.persistence.po.ptm.PtmStdSkuValue;
 import hasoffer.core.product.IStdProductService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Iterator;
@@ -26,6 +27,7 @@ public class StdProductServiceImpl implements IStdProductService {
     IDataBaseManager dbm;
 
     @Override
+    @Transactional
     public void createStd(Map<String, FlipkartSkuInfo> skuInfoMap) {
         skuInfoMap.keySet();
         Set<Map.Entry<String, FlipkartSkuInfo>> skuInfoSet = skuInfoMap.entrySet();
@@ -44,7 +46,7 @@ public class StdProductServiceImpl implements IStdProductService {
         PtmStdProduct stdProduct = new PtmStdProduct(productName, brandName, modelName, desc);
 
         // create product
-        // dbm.create(stdProduct);
+        dbm.create(stdProduct);
         do {
             createStdSku(stdProduct.getId(), skuInfo);
 
@@ -62,7 +64,7 @@ public class StdProductServiceImpl implements IStdProductService {
     private void createStdSku(long stdProductId, FlipkartSkuInfo fsi) {
         PtmStdSku stdSku = new PtmStdSku(stdProductId, fsi.getTitle(), fsi.getFlipkartSellingPrice().getAmount());
         // create sku
-        // dbm.create(stdSku);
+        dbm.create(stdSku);
 
         createStdSkuValues(stdSku.getId(), fsi.getAttributes());
     }

@@ -3,6 +3,7 @@ package hasoffer.core.test.analysis;
 import hasoffer.affiliate.affs.flipkart.FlipkartAffiliateProductProcessor;
 import hasoffer.affiliate.model.AffiliateProduct;
 import hasoffer.affiliate.model.FlipkartSkuInfo;
+import hasoffer.base.utils.ArrayUtils;
 import hasoffer.core.product.IStdProductService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,6 +31,11 @@ public class StdProductTest {
 
         FlipkartAffiliateProductProcessor fapp = new FlipkartAffiliateProductProcessor();
         List<AffiliateProduct> searchedPros = fapp.getAffiliateProductByKeyword(keyword, 5);
+
+        if (ArrayUtils.isNullOrEmpty(searchedPros)) {
+            System.out.println("no searched results.");
+            return;
+        }
 
         for (AffiliateProduct ap : searchedPros) {
             System.out.println(ap.getSourceId() + "\t" + ap.getTitle());

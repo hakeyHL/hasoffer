@@ -2,7 +2,9 @@ package hasoffer.core.persistence.po.ptm;
 
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 
 /**
  * Created by chevy on 2016/8/12.
@@ -10,6 +12,8 @@ import javax.persistence.Entity;
 @Entity
 public class PtmStdDef implements Identifiable<String> {
 
+    @Id
+    @Column(unique = true, nullable = false)
     private String id;
 
     private String stdName; // 规格名称
