@@ -75,9 +75,9 @@ public class AppDealController {
                     dealVo.setDiscount(dealModel.getDiscount());
                     dealVo.setDeepLink(dealModel.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(Website.valueOf(dealModel.getWebsite()), dealModel.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
                     deals.add(dealVo);
-                    System.out.println("from solr get   :" + deals.size());
                 }
             }
+            System.out.println("from solr get   :" + deals.size());
             //再展示手机类deal id或parentid 为 5 level小于等于3
             PageableResult pageableResult = appService.getDeals(page + 0l, pageSize + 0l);
             if (pageableResult != null && pageableResult.getData() != null && pageableResult.getData().size() > 0) {
@@ -87,18 +87,16 @@ public class AppDealController {
                 Iterator<AppDeal> dealIterator = list.iterator();
                 while (dealIterator.hasNext()) {
                     AppDeal appDeal = dealIterator.next();
-                    if (appDeal.getExpireTime().compareTo(new Date()) != 1 && appDeal.isDisplay()) {
-                        if (appDeal.getDealCategoryId() == 5) {
-                            DealVo dealVo = new DealVo();
-                            dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                            dealVo.setTitle(appDeal.getTitle());
-                            dealVo.setWebsite(appDeal.getWebsite());
-                            dealVo.setId(appDeal.getId());
-                            dealVo.setDiscount(appDeal.getDiscount());
-                            dealVo.setDeepLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
-                            mobileDeals.add(dealVo);
-                            dealIterator.remove();
-                        }
+                    if (appDeal.getDealCategoryId() == 5) {
+                        DealVo dealVo = new DealVo();
+                        dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                        dealVo.setTitle(appDeal.getTitle());
+                        dealVo.setWebsite(appDeal.getWebsite());
+                        dealVo.setId(appDeal.getId());
+                        dealVo.setDiscount(appDeal.getDiscount());
+                        dealVo.setDeepLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+                        mobileDeals.add(dealVo);
+                        dealIterator.remove();
                     }
                 }
                 System.out.println("mobile  get   :" + mobileDeals.size());
@@ -116,20 +114,18 @@ public class AppDealController {
                         return 0;
                     }
                 });
+                System.out.println("last  list size   :" + list.size());
                 for (AppDeal appDeal : list) {
-                    System.out.println("last  list size   :" + list.size());
-                    if (appDeal.getExpireTime().compareTo(new Date()) != 1 && appDeal.isDisplay()) {
-                        DealVo dealVo = new DealVo();
-                        dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                        dealVo.setTitle(appDeal.getTitle());
-                        dealVo.setWebsite(appDeal.getWebsite());
-                        dealVo.setId(appDeal.getId());
-                        dealVo.setDiscount(appDeal.getDiscount());
-                        dealVo.setDeepLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
-                        deals.add(dealVo);
-                        System.out.println("current  deals size   :" + deals.size());
-                    }
+                    DealVo dealVo = new DealVo();
+                    dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                    dealVo.setTitle(appDeal.getTitle());
+                    dealVo.setWebsite(appDeal.getWebsite());
+                    dealVo.setId(appDeal.getId());
+                    dealVo.setDiscount(appDeal.getDiscount());
+                    dealVo.setDeepLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+                    deals.add(dealVo);
                 }
+                System.out.println("current  deals size   :" + deals.size());
             }
             Map map = new HashMap();
             map.put("deals", deals);
