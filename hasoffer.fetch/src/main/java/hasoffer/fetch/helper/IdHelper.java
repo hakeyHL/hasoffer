@@ -10,7 +10,7 @@ import java.util.Random;
  */
 public class IdHelper {
     final static String[] FLIDS = new String[]{"xyangryrg", "zhouxixi0", "harveyouo", "allenooou", "747306881", "hlhakeygm", "oliviersl", "wuningSFg"};
-    final static String[] SNIDS = new String[]{"82856", "89037", "104658", "104664", "104663", "104705", "104659", "104717", "104726"};
+    final static String[] SNIDS = new String[]{"82856", "89037", "104658", "", "104663", "104705", "104659", "104717", "104726"};
     final static String[] SHIDS = new String[]{"none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none"};
 
     public static String getAffiIds() {
@@ -24,9 +24,9 @@ public class IdHelper {
             case "FLIPKART":
                 return FLIDS[random.nextInt(FLIDS.length)];
             case "SNAPDEAL":
-                return FLIDS[random.nextInt(SNIDS.length)];
+                return SNIDS[random.nextInt(SNIDS.length)];
             case "SHOPCLUES":
-                return FLIDS[random.nextInt(SHIDS.length)];
+                return SHIDS[random.nextInt(SHIDS.length)];
             default:
                 return null;
         }
