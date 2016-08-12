@@ -1048,7 +1048,7 @@ public class FixController {
 
         es.execute(new Runnable() {
 
-            String Q_SKU_IMAGE = "SELECT t FROM PtmCmpSku t WHERE t.smallImagePath is null and t.status <> 'OFFSALE' and t.price > 0 and t.oriImageUrl IS NOT NULL and t.oriImageUrl <> '' ORDER BT t.id";
+            String Q_SKU_IMAGE = "SELECT t FROM PtmCmpSku t WHERE t.smallImagePath is null and t.status <> 'OFFSALE' and t.price > 0 and t.oriImageUrl IS NOT NULL and t.oriImageUrl <> '' ORDER BY t.id";
 
             int page = 1, PAGE_SIZE = 1000;
 
