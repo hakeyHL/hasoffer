@@ -21,6 +21,7 @@ public class PtmStdProduct implements Identifiable<Long> {
 
     private String title;// 标题
 
+    //ALTER TABLE ptmstdproduct ADD UNIQUE INDEX unique_brand_model(brand, model);
     private String brand; // 品牌
     private String model; // 型号 (品牌+型号不允许有重复)
 

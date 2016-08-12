@@ -102,7 +102,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
             for (int i = 0; i < len; i++) {
                 JSONObject oo = ja.getJSONObject(i);
                 String key = oo.getString("key");
-                if ("GENERAL FEATURES".equalsIgnoreCase(key)) {
+                if ("GENERAL FEATURES".equalsIgnoreCase(key) || "General".equalsIgnoreCase(key)) {
                     JSONArray oos = oo.getJSONArray("values");
                     int len2 = oos.size();
                     for (int j = 0; j < len2; j++) {

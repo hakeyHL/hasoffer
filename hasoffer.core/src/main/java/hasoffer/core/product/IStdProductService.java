@@ -11,4 +11,6 @@ public interface IStdProductService {
 
     void createStd(Map<String, FlipkartSkuInfo> skuInfoMap);
 
+    Map<String, FlipkartSkuInfo> searchSku(String keyword);
+
 }

@@ -1,9 +1,11 @@
 package hasoffer.core.test.analysis;
 
-import hasoffer.affiliate.affs.flipkart.FlipkartAffiliateProductProcessor;
-import hasoffer.affiliate.model.AffiliateProduct;
 import hasoffer.affiliate.model.FlipkartSkuInfo;
-import hasoffer.base.utils.ArrayUtils;
+import hasoffer.core.bo.enums.TopSellStatus;
+import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.ptm.PtmTopSelling;
+import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.product.IStdProductService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,7 +13,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -25,40 +27,64 @@ public class StdProductTest {
     @Resource
     IStdProductService stdProductService;
 
+    @Resource
+    IDataBaseManager dbm;
+
     @Test
-    public void getFlipkartProduct() throws Exception {
-        String keyword = "iphone 5s";
+    public void buildStdResp() {
+        final String Q_P = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd=?0 ";
 
-        FlipkartAffiliateProductProcessor fapp = new FlipkartAffiliateProductProcessor();
-        List<AffiliateProduct> searchedPros = fapp.getAffiliateProductByKeyword(keyword, 5);
+        List<SrmProductSearchCount> spscs = dbm.query(Q_P, Arrays.asList("20160720"));
+        for (SrmProductSearchCount spsc : spscs) {
+            PtmProduct product = dbm.get(PtmProduct.class, spsc.getProductId());
+            if (product == null) {
+//                System.out.println(String.format("%d not exists.", spsc.getProductId()));
+                continue;
+            }
 
-        if (ArrayUtils.isNullOrEmpty(searchedPros)) {
-            System.out.println("no searched results.");
-            return;
-        }
+            String keyword = product.getTitle();
+            String keyword_2 = keyword.toLowerCase().trim();
 
-        for (AffiliateProduct ap : searchedPros) {
-            System.out.println(ap.getSourceId() + "\t" + ap.getTitle());
-        }
+            Map<String, FlipkartSkuInfo> skuInfoMap = stdProductService.searchSku(keyword_2);
 
-        String sourceId = searchedPros.get(0).getSourceId();
-        FlipkartSkuInfo skuInfo = fapp.getSkuInfo(sourceId);
-
-        Map<String, FlipkartSkuInfo> skuInfoMap = new HashMap<>();
-
-        String[] sourceIds = skuInfo.getProductFamily();
-        skuInfoMap.put(sourceId, skuInfo);
-
-        for (String sid : sourceIds) {
             try {
-                FlipkartSkuInfo skuInfo1 = fapp.getSkuInfo(sid);
-                skuInfoMap.put(skuInfo1.getProductId(), skuInfo1);
-
-                System.out.println(skuInfo1.getProductBrand() + "|\t" + skuInfo1.getModelName() + "|\t" + skuInfo1.getAttributes());
+                stdProductService.createStd(skuInfoMap);
             } catch (Exception e) {
-                System.out.println("error");
+                System.out.println(keyword + "...create error...");
             }
         }
+    }
+
+    @Test
+    public void buildStdResp2() {
+        final String Q_P = "SELECT t FROM PtmTopSelling t WHERE t.status=?0 ";
+
+        List<PtmTopSelling> ptss = dbm.query(Q_P, Arrays.asList(TopSellStatus.ONLINE));
+        for (PtmTopSelling pts : ptss) {
+            PtmProduct product = dbm.get(PtmProduct.class, pts.getId());
+            if (product == null) {
+//                System.out.println(String.format("%d not exists.", spsc.getProductId()));
+                continue;
+            }
+
+            String keyword = product.getTitle();
+            String keyword_2 = keyword.toLowerCase().trim();
+
+            Map<String, FlipkartSkuInfo> skuInfoMap = stdProductService.searchSku(keyword_2);
+
+            try {
+                stdProductService.createStd(skuInfoMap);
+            } catch (Exception e) {
+                System.out.println(keyword + "...create error...");
+            }
+        }
+    }
+
+    @Test
+    public void getFlipkartProduct() throws Exception {
+        String keyword = "bingo u8 smartwatch";
+
+        Map<String, FlipkartSkuInfo> skuInfoMap = stdProductService.searchSku(keyword);
 
         stdProductService.createStd(skuInfoMap);
     }
