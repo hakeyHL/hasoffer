@@ -9,7 +9,7 @@ import java.util.Random;
  * Time 10:30
  */
 public class IdHelper {
-    final static String[] FLIDS = new String[]{"affiliate357", "xyangryrg", "zhouxixi0", "harveyouo", "allenooou", "747306881", "hlhakeygm", "oliviersl", "wuningSFg"};
+    final static String[] FLIDS = new String[]{"xyangryrg", "zhouxixi0", "harveyouo", "allenooou", "747306881", "hlhakeygm", "oliviersl", "wuningSFg"};
     final static String[] SNIDS = new String[]{"89037", "104658", "104664", "104663", "104705", "104659", "104717", "104726"};
     final static String[] SHIDS = new String[]{"none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none"};
 
