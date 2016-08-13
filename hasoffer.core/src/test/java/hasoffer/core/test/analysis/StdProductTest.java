@@ -1,6 +1,7 @@
 package hasoffer.core.test.analysis;
 
 import hasoffer.affiliate.model.FlipkartSkuInfo;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.core.bo.enums.TopSellStatus;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
@@ -32,6 +33,40 @@ public class StdProductTest {
 
     @Resource
     IDataBaseManager dbm;
+
+    @Test
+    public void expProductTitles() throws Exception {
+        final String Q_P = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd=?0";
+
+        File file = new File("/home/work/std.log");
+        if (file.exists()) {
+            file.delete();
+        }
+        file.createNewFile();
+
+        StringBuffer sb = new StringBuffer();
+
+        List<SrmProductSearchCount> spscs = dbm.query(Q_P, Arrays.asList("20160812"));
+
+        int count = 1;
+        for (SrmProductSearchCount spsc : spscs) {
+            PtmProduct product = dbm.get(PtmProduct.class, spsc.getProductId());
+
+            if (product != null && StringUtils.isEmpty(product.getTitle())) {
+                sb.append(product.getTitle()).append("\n");
+            } else {
+                continue;
+            }
+
+            count++;
+            if (count % 1000 == 0) {
+                FileUtils.writeStringToFile(file, sb.toString());
+                sb = new StringBuffer();
+            }
+        }
+
+        FileUtils.writeStringToFile(file, sb.toString());
+    }
 
     @Test
     public void buildStdResp() throws Exception {
