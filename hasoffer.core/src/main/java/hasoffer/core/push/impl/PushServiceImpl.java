@@ -26,6 +26,8 @@ public class PushServiceImpl implements IPushService {
                     " WHERE t.appVersion = ?0 ";
     private static final String Q_APPVERSION_GET_MARKETCHANNELS =
             "SELECT  DISTINCT t.marketChannel from AppVersion  t";
+    private static final String Q_APPVERSION_GET_ALLVERSIONS =
+            "SELECT DISTINCT t.version  from AppVersion t where t.appType='APP'";
     @Resource
     private IDataBaseManager dbm;
 
@@ -73,5 +75,11 @@ public class PushServiceImpl implements IPushService {
     public List<MarketChannel> getAllMarketChannels() {
 
         return dbm.query(Q_APPVERSION_GET_MARKETCHANNELS);
+    }
+
+    @Override
+    public List<String> getAllAppVersions() {
+
+        return dbm.query(Q_APPVERSION_GET_ALLVERSIONS);
     }
 }
