@@ -31,7 +31,6 @@ public class StdProductServiceImpl implements IStdProductService {
 
     @Override
     public Map<String, FlipkartSkuInfo> searchSku(String keyword) {
-        System.out.println(keyword);
         try {
             FlipkartAffiliateProductProcessor fapp = new FlipkartAffiliateProductProcessor();
             List<AffiliateProduct> searchedPros = fapp.getAffiliateProductByKeyword(keyword, 10);
@@ -94,10 +93,10 @@ public class StdProductServiceImpl implements IStdProductService {
 
     @Override
     @Transactional
-    public void createStd(Map<String, FlipkartSkuInfo> skuInfoMap) {
+    public PtmStdProduct createStd(Map<String, FlipkartSkuInfo> skuInfoMap) {
         if (skuInfoMap == null) {
             System.out.println("sku map is null.");
-            return;
+            return null;
         }
         Set<Map.Entry<String, FlipkartSkuInfo>> skuInfoSet = skuInfoMap.entrySet();
         Iterator<Map.Entry<String, FlipkartSkuInfo>> it = skuInfoSet.iterator();
@@ -114,20 +113,21 @@ public class StdProductServiceImpl implements IStdProductService {
 
         if (StringUtils.isEmpty(brandName) || StringUtils.isEmpty(modelName)) {
             System.out.println(String.format("brand[%s].model[%s].one is empty.skipped.", brandName, modelName));
-            return;
+            return null;
         }
 
         // query product by brand and model
         long count = dbm.querySingle("select count(t.id) from PtmStdProduct t where t.brand=?0 and t.model=?1 ", Arrays.asList(brandName, modelName));
         if (count >= 1) {
             System.out.println(String.format("brand[%s].model[%s].exists.", brandName, modelName));
-            return;
+            return null;
         }
 
         PtmStdProduct stdProduct = new PtmStdProduct(productName, brandName, modelName, desc);
 
         // create product
         dbm.create(stdProduct);
+
         do {
             createStdSku(stdProduct.getId(), skuInfo);
 
@@ -140,6 +140,7 @@ public class StdProductServiceImpl implements IStdProductService {
         } while (skuInfo != null);
 
         System.out.println(skuInfoMap.size());
+        return stdProduct;
     }
 
     private void createStdSku(long stdProductId, FlipkartSkuInfo fsi) {

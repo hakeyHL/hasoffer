@@ -1,6 +1,7 @@
 package hasoffer.core.product;
 
 import hasoffer.affiliate.model.FlipkartSkuInfo;
+import hasoffer.core.persistence.po.ptm.PtmStdProduct;
 
 import java.util.Map;
 
@@ -9,7 +10,7 @@ import java.util.Map;
  */
 public interface IStdProductService {
 
-    void createStd(Map<String, FlipkartSkuInfo> skuInfoMap);
+    PtmStdProduct createStd(Map<String, FlipkartSkuInfo> skuInfoMap);
 
     Map<String, FlipkartSkuInfo> searchSku(String keyword);
 
