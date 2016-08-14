@@ -78,44 +78,17 @@ public class AppDealController {
                 }
             }
             System.out.println("from solr get   :" + deals.size());
-            //再展示手机类deal id或parentid 为 5 level小于等于3
-            PageableResult pageableResult = appService.getDeals(page + 0l, pageSize + 0l);
-            if (pageableResult != null && pageableResult.getData() != null && pageableResult.getData().size() > 0) {
-                List<AppDeal> list = pageableResult.getData();
-                System.out.println("search from mysql get   :" + list.size());
-                List<DealVo> mobileDeals = new ArrayList<DealVo>();
-                Iterator<AppDeal> dealIterator = list.iterator();
-                while (dealIterator.hasNext()) {
-                    AppDeal appDeal = dealIterator.next();
-                    if (appDeal.getDealCategoryId() == 5) {
-                        DealVo dealVo = new DealVo();
-                        dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                        dealVo.setTitle(appDeal.getTitle());
-                        dealVo.setWebsite(appDeal.getWebsite());
-                        dealVo.setId(appDeal.getId());
-                        dealVo.setDiscount(appDeal.getDiscount());
-                        dealVo.setDeepLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
-                        mobileDeals.add(dealVo);
-                        dealIterator.remove();
-                    }
-                }
-                System.out.println("mobile  get   :" + mobileDeals.size());
-                deals.addAll(mobileDeals);
-                System.out.println("current size   :" + deals.size());
-                //其他deal按照点击次数排序
-                Collections.sort(list, new Comparator<AppDeal>() {
-                    @Override
-                    public int compare(AppDeal o1, AppDeal o2) {
-                        if (o1.getDealClickCount() > o2.getDealClickCount()) {
-                            return -1;
-                        } else if (o1.getDealClickCount() < o2.getDealClickCount()) {
-                            return 1;
-                        }
-                        return 0;
-                    }
-                });
-                System.out.println("last  list size   :" + list.size());
-                for (AppDeal appDeal : list) {
+        }
+        //再展示手机类deal id或parentid 为 5 level小于等于3
+        PageableResult pageableResult = appService.getDeals(page + 0l, pageSize + 0l);
+        if (pageableResult != null && pageableResult.getData() != null && pageableResult.getData().size() > 0) {
+            List<AppDeal> list = pageableResult.getData();
+            System.out.println("search from mysql get   :" + list.size());
+            List<DealVo> mobileDeals = new ArrayList<DealVo>();
+            Iterator<AppDeal> dealIterator = list.iterator();
+            while (dealIterator.hasNext()) {
+                AppDeal appDeal = dealIterator.next();
+                if (appDeal.getDealCategoryId() == 5) {
                     DealVo dealVo = new DealVo();
                     dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
                     dealVo.setTitle(appDeal.getTitle());
@@ -123,14 +96,41 @@ public class AppDealController {
                     dealVo.setId(appDeal.getId());
                     dealVo.setDiscount(appDeal.getDiscount());
                     dealVo.setDeepLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
-                    deals.add(dealVo);
+                    mobileDeals.add(dealVo);
+                    dealIterator.remove();
                 }
-                System.out.println("current  deals size   :" + deals.size());
             }
-            Map map = new HashMap();
-            map.put("deals", deals);
-            jsonObject.put("data", JSONObject.toJSON(map));
+            System.out.println("mobile  get   :" + mobileDeals.size());
+            deals.addAll(mobileDeals);
+            System.out.println("current size   :" + deals.size());
+            //其他deal按照点击次数排序
+            Collections.sort(list, new Comparator<AppDeal>() {
+                @Override
+                public int compare(AppDeal o1, AppDeal o2) {
+                    if (o1.getDealClickCount() > o2.getDealClickCount()) {
+                        return -1;
+                    } else if (o1.getDealClickCount() < o2.getDealClickCount()) {
+                        return 1;
+                    }
+                    return 0;
+                }
+            });
+            System.out.println("last  list size   :" + list.size());
+            for (AppDeal appDeal : list) {
+                DealVo dealVo = new DealVo();
+                dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                dealVo.setTitle(appDeal.getTitle());
+                dealVo.setWebsite(appDeal.getWebsite());
+                dealVo.setId(appDeal.getId());
+                dealVo.setDiscount(appDeal.getDiscount());
+                dealVo.setDeepLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+                deals.add(dealVo);
+            }
+            System.out.println("current  deals size   :" + deals.size());
         }
+        Map map = new HashMap();
+        map.put("deals", deals);
+        jsonObject.put("data", JSONObject.toJSON(map));
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
         return null;
     }
