@@ -85,12 +85,17 @@ public class StdProductTest {
             System.out.println(keyword);
             String keyword_2 = keyword.toLowerCase().trim();
 
+            if (StringUtils.isEmpty(keyword_2)) {
+                continue;
+            }
+
             int tryTimes = 1;
             while (tryTimes++ <= 3) {
                 try {
                     if (tryTimes > 2) {
-                        System.out.println("retry - " + keyword);
+                        System.out.print("retry - ");
                     }
+                    System.out.println("search - " + keyword);
 
                     Map<String, FlipkartSkuInfo> skuInfoMap = stdProductService.searchSku(keyword_2);
 
