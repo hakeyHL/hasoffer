@@ -17,6 +17,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,10 @@ public class StdProductTest {
     public void expProductTitles() throws Exception {
         final String Q_P = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd=?0";
 
-        File file = new File("/home/work/std.log");
+//        String ymd = "20160812";
+//        File file = new File("/home/work/std.log");
+        String ymd = "20160720";
+        File file = new File("d:/tmp/std.log");
         if (file.exists()) {
             file.delete();
         }
@@ -46,7 +50,7 @@ public class StdProductTest {
 
         StringBuffer sb = new StringBuffer();
 
-        List<SrmProductSearchCount> spscs = dbm.query(Q_P, Arrays.asList("20160812"));
+        List<SrmProductSearchCount> spscs = dbm.query(Q_P, Arrays.asList(ymd));
 
         int count = 1;
         for (SrmProductSearchCount spsc : spscs) {
@@ -54,18 +58,98 @@ public class StdProductTest {
 
             if (product != null && StringUtils.isEmpty(product.getTitle())) {
                 sb.append(product.getTitle()).append("\n");
+                System.out.println(product.getTitle());
             } else {
                 continue;
             }
 
             count++;
             if (count % 1000 == 0) {
+                System.out.println("write to file..............");
                 FileUtils.writeStringToFile(file, sb.toString());
                 sb = new StringBuffer();
             }
         }
 
         FileUtils.writeStringToFile(file, sb.toString());
+    }
+
+    @Test
+    public void buildStdRespBySearchLog() throws Exception {
+
+        File keywordFile = new File("D:\\tmp\\title.txt");//"d:/datas/fetch/b.txt"
+
+        File okFile = createFile("d:/tmp/std_ok.log");
+        File errFile = createFile("d:/tmp/std_err.log");
+
+        StringBuffer sb_ok = new StringBuffer();
+        StringBuffer sb_err = new StringBuffer();
+
+        List<String> keywords = FileUtils.readLines(keywordFile);
+
+        int count = 1;
+        for (String keyword : keywords) {
+            System.out.println(keyword);
+            String keyword_2 = keyword.toLowerCase().trim();
+
+            Map<String, FlipkartSkuInfo> skuInfoMap = stdProductService.searchSku(keyword_2);
+
+            int tryTimes = 1;
+            while (tryTimes++ <= 3) {
+                try {
+                    if (tryTimes > 2) {
+                        System.out.print("retry - " + keyword);
+                    }
+
+                    PtmStdProduct sp = stdProductService.createStd(skuInfoMap);
+                    if (sp != null) {
+                        sb_ok.append(keyword_2).append("\t")
+                                .append("OK").append("\t")
+                                .append(sp.getId()).append("\t")
+                                .append(sp.getTitle()).append("\t")
+                                .append(sp.getBrand()).append("\t")
+                                .append(sp.getModel()).append("\t")
+                                .append("\n");
+                    } else {
+                        sb_err.append(keyword_2).append("\t")
+                                .append("NULL").append("\n");
+                    }
+
+                    break;
+                } catch (Exception e) {
+                    if (tryTimes > 3) {
+                        sb_err.append(keyword_2).append("\t")
+                                .append("ERROR").append("\n");
+                    }
+                    System.out.println(keyword + "...create error...");
+                }
+            }
+
+            count++;
+            if (count % 10 == 0) {
+                FileUtils.writeStringToFile(okFile, sb_ok.toString());
+                sb_ok = new StringBuffer();
+
+                FileUtils.writeStringToFile(errFile, sb_err.toString());
+                sb_err = new StringBuffer();
+            }
+        }
+
+        FileUtils.writeStringToFile(okFile, sb_ok.toString());
+        FileUtils.writeStringToFile(errFile, sb_err.toString());
+    }
+
+    private File createFile(String s) {
+        File file = new File(s);
+        if (file.exists()) {
+            file.delete();
+        }
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return file;
     }
 
     @Test
