@@ -30,65 +30,109 @@ public class StdProductServiceImpl implements IStdProductService {
     IDataBaseManager dbm;
 
     @Override
-    public Map<String, FlipkartSkuInfo> searchSku(String keyword) {
-        try {
-            FlipkartAffiliateProductProcessor fapp = new FlipkartAffiliateProductProcessor();
-            List<AffiliateProduct> searchedPros = fapp.getAffiliateProductByKeyword(keyword, 10);
+    public Map<String, FlipkartSkuInfo> searchSku(String keyword) throws Exception {
+        FlipkartAffiliateProductProcessor fapp = new FlipkartAffiliateProductProcessor();
+        List<AffiliateProduct> searchedPros = fapp.getAffiliateProductByKeyword(keyword, 10);
 
-            if (ArrayUtils.isNullOrEmpty(searchedPros)) {
-                System.out.println("no searched results.");
-                return null;
-            }
-
-            List<FlipkartSearchedSkuAnalysisResult> analysisResults = new ArrayList<>();
-
-            for (AffiliateProduct ap : searchedPros) {
-                float score = ProductAnalysisService.stringMatch(keyword, ap.getTitle());
-                System.out.println(ap.getSourceId() + "\t" + ap.getTitle() + "\t" + score);
-                analysisResults.add(new FlipkartSearchedSkuAnalysisResult(score, ap));
-            }
-
-            Collections.sort(analysisResults, new Comparator<FlipkartSearchedSkuAnalysisResult>() {
-                @Override
-                public int compare(FlipkartSearchedSkuAnalysisResult o1, FlipkartSearchedSkuAnalysisResult o2) {
-                    if (o1.getScore() > o2.getScore()) {
-                        return -1;
-                    } else {
-                        return 1;
-                    }
-                }
-            });
-
-            String sourceId = analysisResults.get(0).getAp().getSourceId();
-            FlipkartSkuInfo skuInfo = fapp.getSkuInfo(sourceId);
-
-            if (StringUtils.isEmpty(skuInfo.getProductBrand()) || StringUtils.isEmpty(skuInfo.getModelName())) {
-                System.out.println(skuInfo.getTitle() + "\t|\t" + skuInfo.getProductBrand() + "\t|\t" + skuInfo.getModelName());
-                return null;
-            }
-
-            Map<String, FlipkartSkuInfo> skuInfoMap = new HashMap<>();
-
-            String[] sourceIds = skuInfo.getProductFamily();
-            skuInfoMap.put(sourceId, skuInfo);
-
-            for (String sid : sourceIds) {
-                try {
-                    FlipkartSkuInfo skuInfo1 = fapp.getSkuInfo(sid);
-                    skuInfoMap.put(skuInfo1.getProductId(), skuInfo1);
-
-                    System.out.println(skuInfo1.getProductBrand() + "|\t" + skuInfo1.getModelName() + "|\t" + skuInfo1.getAttributes());
-                } catch (Exception e) {
-                    System.out.println("error");
-                }
-            }
-
-            return skuInfoMap;
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (ArrayUtils.isNullOrEmpty(searchedPros)) {
+            System.out.println("no searched results.");
+            return null;
         }
 
-        return null;
+        FlipkartSkuInfo skuInfo = null;
+        for (AffiliateProduct ap : searchedPros) {
+            FlipkartSkuInfo for_skuInfo = fapp.getSkuInfo(ap.getSourceId());
+            System.out.println("[title]" + for_skuInfo.getTitle() + "\t| [brand]\t" + for_skuInfo.getProductBrand() + "\t| [model]"
+                    + for_skuInfo.getModelNum() + "|"
+                    + for_skuInfo.getModelName() + "|"
+                    + for_skuInfo.getModelId());
+            if (keyword.contains(for_skuInfo.getProductBrand().toLowerCase())
+                    &&
+                    (keyword.contains(for_skuInfo.getModelNum())
+                            || keyword.contains(for_skuInfo.getModelName())
+                            || keyword.contains(for_skuInfo.getModelId())
+                    )) {
+                skuInfo = for_skuInfo;
+                break;
+            }
+        }
+
+        if (skuInfo == null) {
+            return null;
+        }
+
+        Map<String, FlipkartSkuInfo> skuInfoMap = new HashMap<>();
+
+        String[] sourceIds = skuInfo.getProductFamily();
+        skuInfoMap.put(skuInfo.getProductId(), skuInfo);
+
+        for (String sid : sourceIds) {
+            try {
+                FlipkartSkuInfo skuInfo1 = fapp.getSkuInfo(sid);
+                skuInfoMap.put(skuInfo1.getProductId(), skuInfo1);
+
+                System.out.println(skuInfo1.getProductBrand() + "|\t" + skuInfo1.getModelName() + "|\t" + skuInfo1.getAttributes());
+            } catch (Exception e) {
+                System.out.println("error");
+            }
+        }
+
+        return skuInfoMap;
+    }
+
+    public Map<String, FlipkartSkuInfo> searchSku_bak(String keyword) throws Exception {
+        FlipkartAffiliateProductProcessor fapp = new FlipkartAffiliateProductProcessor();
+        List<AffiliateProduct> searchedPros = fapp.getAffiliateProductByKeyword(keyword, 10);
+
+        if (ArrayUtils.isNullOrEmpty(searchedPros)) {
+            System.out.println("no searched results.");
+            return null;
+        }
+
+        List<FlipkartSearchedSkuAnalysisResult> analysisResults = new ArrayList<>();
+
+        for (AffiliateProduct ap : searchedPros) {
+            float score = ProductAnalysisService.stringMatch(keyword, ap.getTitle());
+            System.out.println(ap.getSourceId() + "\t" + ap.getTitle() + "\t" + score);
+            analysisResults.add(new FlipkartSearchedSkuAnalysisResult(score, ap));
+        }
+
+        Collections.sort(analysisResults, new Comparator<FlipkartSearchedSkuAnalysisResult>() {
+            @Override
+            public int compare(FlipkartSearchedSkuAnalysisResult o1, FlipkartSearchedSkuAnalysisResult o2) {
+                if (o1.getScore() > o2.getScore()) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            }
+        });
+
+        String sourceId = analysisResults.get(0).getAp().getSourceId();
+        FlipkartSkuInfo skuInfo = fapp.getSkuInfo(sourceId);
+
+        if (StringUtils.isEmpty(skuInfo.getProductBrand()) || StringUtils.isEmpty(skuInfo.getModelName())) {
+            System.out.println(skuInfo.getTitle() + "\t|\t" + skuInfo.getProductBrand() + "\t|\t" + skuInfo.getModelName());
+            return null;
+        }
+
+        Map<String, FlipkartSkuInfo> skuInfoMap = new HashMap<>();
+
+        String[] sourceIds = skuInfo.getProductFamily();
+        skuInfoMap.put(sourceId, skuInfo);
+
+        for (String sid : sourceIds) {
+            try {
+                FlipkartSkuInfo skuInfo1 = fapp.getSkuInfo(sid);
+                skuInfoMap.put(skuInfo1.getProductId(), skuInfo1);
+
+                System.out.println(skuInfo1.getProductBrand() + "|\t" + skuInfo1.getModelName() + "|\t" + skuInfo1.getAttributes());
+            } catch (Exception e) {
+                System.out.println("error");
+            }
+        }
+
+        return skuInfoMap;
     }
 
     @Override
@@ -108,8 +152,15 @@ public class StdProductServiceImpl implements IStdProductService {
         // build std product
         String productName = skuInfo.getTitle();
         String brandName = skuInfo.getProductBrand();
-        String modelName = skuInfo.getModelName();
         String desc = skuInfo.getDesc();
+
+        String modelName = skuInfo.getModelName();
+        if (StringUtils.isEmpty(modelName)) {
+            modelName = skuInfo.getModelNum();
+            if (StringUtils.isEmpty(modelName)) {
+                modelName = skuInfo.getModelId();
+            }
+        }
 
         if (StringUtils.isEmpty(brandName) || StringUtils.isEmpty(modelName)) {
             System.out.println(String.format("brand[%s].model[%s].one is empty.skipped.", brandName, modelName));

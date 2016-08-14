@@ -18,7 +18,10 @@ public class FlipkartSkuInfo {
     private String productUrl;
 
     private String productBrand;
-    private String modelName;
+
+    private String modelName;//Model Name
+    private String modelNum;//Model Number
+    private String modelId;//Model ID
 
     private boolean inStock;
 
@@ -122,5 +125,21 @@ public class FlipkartSkuInfo {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public String getModelNum() {
+        return modelNum;
+    }
+
+    public void setModelNum(String modelNum) {
+        this.modelNum = modelNum;
+    }
+
+    public String getModelId() {
+        return modelId;
+    }
+
+    public void setModelId(String modelId) {
+        this.modelId = modelId;
     }
 }

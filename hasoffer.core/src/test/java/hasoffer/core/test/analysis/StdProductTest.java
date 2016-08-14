@@ -2,11 +2,9 @@ package hasoffer.core.test.analysis;
 
 import hasoffer.affiliate.model.FlipkartSkuInfo;
 import hasoffer.base.utils.StringUtils;
-import hasoffer.core.bo.enums.TopSellStatus;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.PtmStdProduct;
-import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.product.IStdProductService;
 import org.apache.commons.io.FileUtils;
@@ -17,7 +15,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -42,11 +39,7 @@ public class StdProductTest {
 //        String ymd = "20160812";
 //        File file = new File("/home/work/std.log");
         String ymd = "20160720";
-        File file = new File("d:/tmp/std.log");
-        if (file.exists()) {
-            file.delete();
-        }
-        file.createNewFile();
+        File file = hasoffer.base.utils.FileUtils.createFile("d:/tmp/std.log", true);
 
         StringBuffer sb = new StringBuffer();
 
@@ -77,10 +70,10 @@ public class StdProductTest {
     @Test
     public void buildStdRespBySearchLog() throws Exception {
 
-        File keywordFile = new File("D:\\tmp\\title.txt");//"d:/datas/fetch/b.txt"
+        File keywordFile = new File("D:\\datas\\fetch\\mobiles\\title_2.txt");
 
-        File okFile = createFile("d:/tmp/std_ok.log");
-        File errFile = createFile("d:/tmp/std_err.log");
+        File okFile = hasoffer.base.utils.FileUtils.createFile("D:\\datas\\fetch\\mobiles\\std_ok.log", true);
+        File errFile = hasoffer.base.utils.FileUtils.createFile("D:\\datas\\fetch\\mobiles\\std_err.log", true);
 
         StringBuffer sb_ok = new StringBuffer();
         StringBuffer sb_err = new StringBuffer();
@@ -92,14 +85,14 @@ public class StdProductTest {
             System.out.println(keyword);
             String keyword_2 = keyword.toLowerCase().trim();
 
-            Map<String, FlipkartSkuInfo> skuInfoMap = stdProductService.searchSku(keyword_2);
-
             int tryTimes = 1;
             while (tryTimes++ <= 3) {
                 try {
                     if (tryTimes > 2) {
-                        System.out.print("retry - " + keyword);
+                        System.out.println("retry - " + keyword);
                     }
+
+                    Map<String, FlipkartSkuInfo> skuInfoMap = stdProductService.searchSku(keyword_2);
 
                     PtmStdProduct sp = stdProductService.createStd(skuInfoMap);
                     if (sp != null) {
@@ -118,7 +111,7 @@ public class StdProductTest {
                     break;
                 } catch (Exception e) {
                     if (tryTimes > 3) {
-                        sb_err.append(keyword_2).append("\t")
+                        sb_err.append(keyword).append("\t")
                                 .append("ERROR").append("\n");
                     }
                     System.out.println(keyword + "...create error...");
@@ -139,28 +132,11 @@ public class StdProductTest {
         FileUtils.writeStringToFile(errFile, sb_err.toString());
     }
 
-    private File createFile(String s) {
-        File file = new File(s);
-        if (file.exists()) {
-            file.delete();
-        }
-        try {
-            file.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return file;
-    }
-
     @Test
     public void buildStdResp() throws Exception {
         final String Q_P = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd=?0";
 
-        File file = new File("d:/tmp/std.log");
-        if (file.exists()) {
-            file.delete();
-        }
-        file.createNewFile();
+        File file = hasoffer.base.utils.FileUtils.createFile("d:/tmp/std.log", true);
 
         StringBuffer sb = new StringBuffer();
 
@@ -176,11 +152,11 @@ public class StdProductTest {
             String keyword = product.getTitle();
             String keyword_2 = keyword.toLowerCase().trim();
 
-            Map<String, FlipkartSkuInfo> skuInfoMap = stdProductService.searchSku(keyword_2);
-
             int tryTimes = 1;
             while (tryTimes++ <= 3) {
                 try {
+                    Map<String, FlipkartSkuInfo> skuInfoMap = stdProductService.searchSku(keyword_2);
+
                     if (tryTimes > 2) {
                         System.out.print("retry - ");
                     }
@@ -217,33 +193,8 @@ public class StdProductTest {
     }
 
     @Test
-    public void buildStdResp2() {
-        final String Q_P = "SELECT t FROM PtmTopSelling t WHERE t.status=?0 ";
-
-        List<PtmTopSelling> ptss = dbm.query(Q_P, Arrays.asList(TopSellStatus.ONLINE));
-        for (PtmTopSelling pts : ptss) {
-            PtmProduct product = dbm.get(PtmProduct.class, pts.getId());
-            if (product == null) {
-//                System.out.println(String.format("%d not exists.", spsc.getProductId()));
-                continue;
-            }
-
-            String keyword = product.getTitle();
-            String keyword_2 = keyword.toLowerCase().trim();
-
-            Map<String, FlipkartSkuInfo> skuInfoMap = stdProductService.searchSku(keyword_2);
-
-            try {
-                stdProductService.createStd(skuInfoMap);
-            } catch (Exception e) {
-                System.out.println(keyword + "...create error...");
-            }
-        }
-    }
-
-    @Test
     public void getFlipkartProduct() throws Exception {
-        String keyword = "samsung galaxy j2 2016 edition (8gb)";
+        String keyword = "Chilli B03";
 
         Map<String, FlipkartSkuInfo> skuInfoMap = stdProductService.searchSku(keyword);
 

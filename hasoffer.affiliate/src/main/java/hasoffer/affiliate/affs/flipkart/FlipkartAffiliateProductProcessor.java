@@ -94,7 +94,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
         fsi.setFlipkartSellingPrice(jsonProduct.getObject("flipkartSellingPrice", FlipkartPrice.class));
         fsi.setAttributes(jsonProduct.getObject("attributes", FlipkartAttribute.class));
 
-        String modelName = "";
+        String modelNum = "", modelName = "", modelId = "";
         JSONObject categorySpecificInfoV1 = obj.getJSONObject("categorySpecificInfoV1");
         if (categorySpecificInfoV1 != null) {
             JSONArray ja = categorySpecificInfoV1.getJSONArray("specificationList");
@@ -108,17 +108,24 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
                     for (int j = 0; j < len2; j++) {
                         JSONObject ooso = (JSONObject) oos.get(j);
                         String oosokey = ooso.getString("key");
+                        if ("Model Number".equalsIgnoreCase(oosokey)) {
+                            modelNum = StringUtils.arrayToString(ooso.getJSONArray("value").toArray(new String[0]), "");
+                        }
+
                         if ("Model Name".equalsIgnoreCase(oosokey)) {
                             modelName = StringUtils.arrayToString(ooso.getJSONArray("value").toArray(new String[0]), "");
+                        }
 
-                            i = len;// 跳出双重循环
-                            break;
+                        if ("Model ID".equalsIgnoreCase(oosokey)) {
+                            modelId = StringUtils.arrayToString(ooso.getJSONArray("value").toArray(new String[0]), "");
                         }
                     }
                 }
             }
         }
+        fsi.setModelNum(modelNum);
         fsi.setModelName(modelName);
+        fsi.setModelId(modelId);
 
         return fsi;
     }

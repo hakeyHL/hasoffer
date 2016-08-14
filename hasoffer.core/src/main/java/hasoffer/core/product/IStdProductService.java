@@ -12,6 +12,6 @@ public interface IStdProductService {
 
     PtmStdProduct createStd(Map<String, FlipkartSkuInfo> skuInfoMap);
 
-    Map<String, FlipkartSkuInfo> searchSku(String keyword);
+    Map<String, FlipkartSkuInfo> searchSku(String keyword) throws Exception;
 
 }
