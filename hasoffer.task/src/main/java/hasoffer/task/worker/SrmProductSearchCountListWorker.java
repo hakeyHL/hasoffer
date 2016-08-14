@@ -97,6 +97,8 @@ public class SrmProductSearchCountListWorker implements Runnable {
                     }
                 }
             }
+
+            page++;
         }
     }
 }
