@@ -1,7 +1,9 @@
 package hasoffer.fetch.sites.flipkart;
 
+import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.UrlUtils;
+import hasoffer.fetch.helper.AffliIdHelper;
 
 /**
  * Date:2015/12/30
@@ -96,7 +98,7 @@ public class FlipkartHelper {
     private static String appendAff(String url, String[] affs) {
         StringBuffer sb = new StringBuffer(url);
 
-        String affid = "affiliate357";
+        String affid = AffliIdHelper.getAffiIdByWebsite(Website.FLIPKART);
 
         if (sb.indexOf("?") > 0) {
             sb.append("&affid=").append(affid);

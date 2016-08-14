@@ -1,5 +1,6 @@
 package hasoffer.core.push.impl;
 
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.core.bo.push.AppPushBo;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
@@ -23,6 +24,10 @@ public class PushServiceImpl implements IPushService {
     private static final String Q_URM_GET_GCMTOKENS =
             "SELECT t FROM UrmDevice t " +
                     " WHERE t.appVersion = ?0 ";
+    private static final String Q_APPVERSION_GET_MARKETCHANNELS =
+            "SELECT  DISTINCT t.marketChannel from AppVersion  t";
+    private static final String Q_APPVERSION_GET_ALLVERSIONS =
+            "SELECT DISTINCT t.version  from AppVersion t where t.appType='APP'";
     @Resource
     private IDataBaseManager dbm;
 
@@ -59,5 +64,22 @@ public class PushServiceImpl implements IPushService {
     @Override
     public List<UrmDevice> getGcmTokens(String version) {
         return dbm.query(Q_URM_GET_GCMTOKENS, Arrays.asList(version));
+    }
+
+    @Override
+    public void sendPush(int page, int size) {
+
+    }
+
+    @Override
+    public List<MarketChannel> getAllMarketChannels() {
+
+        return dbm.query(Q_APPVERSION_GET_MARKETCHANNELS);
+    }
+
+    @Override
+    public List<String> getAllAppVersions() {
+
+        return dbm.query(Q_APPVERSION_GET_ALLVERSIONS);
     }
 }

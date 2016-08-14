@@ -1,6 +1,8 @@
 package hasoffer.fetch.sites.snapdeal;
 
+import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.fetch.helper.AffliIdHelper;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,7 +55,7 @@ public class SnapdealHelper {
     }
 
     public static String appendAff(String url, String[] affs) {
-        final String aff_query = "?aff_id=82856&utm_source=aff_prog&utm_campaign=afts&offer_id=17";
+        String aff_query = "?aff_id=" + AffliIdHelper.getAffiIdByWebsite(Website.SNAPDEAL) + "&utm_source=aff_prog&utm_campaign=afts&offer_id=17";
 //        final String aff_query = "?utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_id=82856&aff_sub=613e3e809daad9e";
 
         StringBuffer sb = new StringBuffer(url);

@@ -35,6 +35,7 @@ import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.exception.NonMatchedProductException;
 import hasoffer.core.system.impl.AppServiceImpl;
+import hasoffer.core.utils.ImageUtil;
 import hasoffer.core.utils.JsonHelper;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
@@ -159,7 +160,7 @@ public class Compare2Controller {
                           @RequestParam(defaultValue = "") String site,
                           @RequestParam(defaultValue = "0") String price,
                           @RequestParam(defaultValue = "1") int page,
-                          @RequestParam(defaultValue = "10") int size,
+                          @RequestParam(defaultValue = "20") int pageSize,
                           HttpServletResponse response) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
@@ -170,7 +171,7 @@ public class Compare2Controller {
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         CmpResult cr = null;
         PtmProduct ptmProduct = null;
-        SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, size);
+        SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, pageSize);
         try {
             //根据title匹配到商品
             getSioBySearch(sio);
@@ -184,6 +185,7 @@ public class Compare2Controller {
                     //未匹配,结束操作
                 } else {
                     cr = getCmpProducts(sio);
+                    cr.setProductId(sio.getHsProId());
                     cr.setCopywriting(ptmProduct != null && ptmProduct.isStd() ? "Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you." : "Looked around Myntre,Jabong & 5 other apps,thought you might like these items as well..");
                     cr.setDisplayMode(ptmProduct != null && ptmProduct.isStd() ? AppDisplayMode.NONE : AppDisplayMode.WATERFALL);
                     cr.setStd(ptmProduct.isStd());
@@ -197,7 +199,7 @@ public class Compare2Controller {
             }
         } catch (Exception e) {
             logger.error(ExceptionHelper.getExceptionMessage(e));
-            logger.error(String.format("sdk_cmp_  [NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
+            logger.error(String.format("sdk_cmp_  [NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, pageSize));
             jsonObject.put("data", JSONObject.toJSON(cr));
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
             return null;
@@ -677,6 +679,10 @@ public class Compare2Controller {
                     }
                     if (cmpSku.getWebsite() != null) {
                         websiteSet.add(cmpSku.getWebsite());
+                    }
+                    if (cmpSku.getWebsite().equals(sio.getCliSite())) {
+                        //取与客户端所传商品同一个site的sku作为sku匹配sku
+                        cmpResult.setProductVo(new ProductVo(sio.getHsProId(), sio.getCliQ(), cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath()), 0.0f, WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()})));
                     }
                     CmpProductListVo cplv = new CmpProductListVo(cmpSku, sio.getCliPrice());
                     comparedSkuVos.add(cplv);
