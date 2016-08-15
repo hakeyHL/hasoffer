@@ -7,7 +7,6 @@ import hasoffer.api.controller.vo.*;
 import hasoffer.api.helper.ExceptionHelper;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.SearchHelper;
-import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.AppDisplayMode;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
@@ -52,6 +51,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -83,14 +83,38 @@ public class Compare2Controller {
     private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
 
     public static void main(String[] args) {
-        String dealUrlWithAff = WebsiteHelper.getDealUrlWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
-        String urlWithAff = WebsiteHelper.getUrlWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
-        System.out.println(urlWithAff);
-        String flipkart = WebsiteHelper.getDealUrlWithAff(Website.FLIPKART, "https://www.flipkart.com/apple-iphone-6s-silver-16-gb/p/itmebysgupjepunx", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
-        System.out.println(flipkart);
-        String deeplinkWithAff = WebsiteHelper.getDeeplinkWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
-        System.out.println(deeplinkWithAff);
-
+//        String dealUrlWithAff = WebsiteHelper.getDealUrlWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
+//        String urlWithAff = WebsiteHelper.getUrlWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
+//        System.out.println(urlWithAff);
+//        String flipkart = WebsiteHelper.getDealUrlWithAff(Website.FLIPKART, "https://www.flipkart.com/apple-iphone-6s-silver-16-gb/p/itmebysgupjepunx", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
+//        System.out.println(flipkart);
+//        String deeplinkWithAff = WebsiteHelper.getDeeplinkWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
+//        System.out.println(deeplinkWithAff);
+        Map<Long, Integer> map = new HashMap<Long, Integer>();
+        map.put(1l, 4);
+        map.put(3l, 100);
+        map.put(2l, 3);
+        Set<Long> longs = map.keySet();
+        int t = 0;
+        int t1 = 0;
+        Iterator<Long> iterator = longs.iterator();
+        while (iterator.hasNext()) {
+            Long next = iterator.next();
+            t += map.get(next);
+            t1 += map.get(next) * next;
+        }
+        System.out.println(t1);
+        System.out.println(t);
+        System.out.println(BigDecimal.valueOf(t).divide(BigDecimal.valueOf(10), 1, BigDecimal.ROUND_HALF_UP));
+        BigDecimal s = BigDecimal.ZERO;
+        Set<Long> long2 = map.keySet();
+        Iterator<Long> iterator1 = long2.iterator();
+        while (iterator1.hasNext()) {
+            Long next = iterator1.next();
+            BigDecimal ss = BigDecimal.valueOf(map.get(next)).divide(BigDecimal.valueOf(t), 1, BigDecimal.ROUND_HALF_UP);
+            s = s.add(ss.multiply(BigDecimal.valueOf(next)));
+        }
+        System.out.println(s.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
     }
 
     // @Cacheable(value = "compare", key = "'getcmpskus_'+#q+'_'+#site+'_'+#price+'_'+#page+'_'+#size")
@@ -656,8 +680,20 @@ public class Compare2Controller {
             //评论星级为加权平均值
             Set<Map.Entry<Long, Integer>> entries = tempComment.entrySet();
             //算得每一个的权值
+            int totalWeigth = 0;
+            for (Map.Entry<Long, Integer> map : entries) {
+                //算总值
+                totalWeigth += map.getValue();
+            }
+            BigDecimal WeightedAverage = BigDecimal.ZERO;
+            for (Map.Entry<Long, Integer> map : entries) {
+                //算得加权平均值
+                Long key = map.getKey();
+                Integer value = map.getValue();
 
-            //算得加权平均值
+                BigDecimal Weight = BigDecimal.valueOf(value).divide(BigDecimal.valueOf(totalWeigth), 1, BigDecimal.ROUND_HALF_UP);
+                WeightedAverage = WeightedAverage.add(Weight.multiply(BigDecimal.valueOf(key)));
+            }
             cmpResult.setRatingNum(tempRatins / tempCmpProductListVos.size());
             PtmProductDescription ptmProductDescription = mongoDbManager.queryOne(PtmProductDescription.class, product.getId());
             String specs = "";
@@ -665,7 +701,7 @@ public class Compare2Controller {
                 specs = ptmProductDescription.getJsonDescription();
             }
             cmpResult.setSpecs(specs);
-            cmpResult.setTotalRatingsNum(tempTotalComments / Long.valueOf(tempCount == 0 ? 1 : tempCount));
+            cmpResult.setTotalRatingsNum(WeightedAverage.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).longValue());
             return cmpResult;
         }
         return cmpResult;
