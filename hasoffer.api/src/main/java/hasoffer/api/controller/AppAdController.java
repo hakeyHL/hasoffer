@@ -60,7 +60,7 @@ public class AppAdController {
             if (website != "") {
                 adt1.setPackageName(packageMap.get(Website.valueOf(website)));
             }
-            map.put("ads", Arrays.asList(adt.get(0)));
+            map.put("ads", Arrays.asList(adt1));
             modelAndView.addObject("data", map);
         }
         return modelAndView;
