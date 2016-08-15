@@ -1,6 +1,7 @@
 package hasoffer.dubbo.api.fetch.service;
 
-import hasoffer.base.model.TaskStatus;
+import hasoffer.base.enums.TaskLevel;
+import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchUrlResult;
@@ -34,7 +35,7 @@ public interface IFetchDubboService {
     TaskStatus getKeyWordTaskStatus(Website webSite, String keyword);
 
     /**
-     * 提交URL更新任务
+     * 提交URL更新任务，该任务级别默认为TaskLevel.LEVEL_5(最低)。
      *
      * @param website
      * @param url
@@ -42,7 +43,16 @@ public interface IFetchDubboService {
     void sendUrlTask(Website website, String url);
 
     /**
-     * 获取URL任务的状态
+     * 提交URL更新任务
+     *
+     * @param website
+     * @param url
+     * @param taskLevel 任务优先度，分为5级，TaskLevel.LEVEL_1(最高)，TaskLevel.LEVEL_5(最低)。
+     */
+    void sendUrlTask(Website website, String url, TaskLevel taskLevel);
+
+    /**
+     * 获取URL任务的状态。
      *
      * @param website
      * @param url
