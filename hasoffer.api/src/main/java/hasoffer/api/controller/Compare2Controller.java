@@ -680,12 +680,12 @@ public class Compare2Controller {
             //评论星级为加权平均值
             Set<Map.Entry<Long, Integer>> entries = tempComment.entrySet();
             //算得每一个的权值
-            int totalWeigth = 0;
+            Long totalWeigth = 0l;
             for (Map.Entry<Long, Integer> map : entries) {
                 //算总值
                 totalWeigth += map.getValue();
             }
-            BigDecimal WeightedAverage = BigDecimal.ZERO;
+           /* BigDecimal WeightedAverage = BigDecimal.ZERO;
             for (Map.Entry<Long, Integer> map : entries) {
                 //算得加权平均值
                 Long key = map.getKey();
@@ -693,7 +693,7 @@ public class Compare2Controller {
 
                 BigDecimal Weight = BigDecimal.valueOf(value).divide(BigDecimal.valueOf(totalWeigth), 1, BigDecimal.ROUND_HALF_UP);
                 WeightedAverage = WeightedAverage.add(Weight.multiply(BigDecimal.valueOf(key)));
-            }
+            }*/
             cmpResult.setRatingNum(tempRatins / tempCmpProductListVos.size());
             PtmProductDescription ptmProductDescription = mongoDbManager.queryOne(PtmProductDescription.class, product.getId());
             String specs = "";
@@ -701,7 +701,8 @@ public class Compare2Controller {
                 specs = ptmProductDescription.getJsonDescription();
             }
             cmpResult.setSpecs(specs);
-            cmpResult.setTotalRatingsNum(WeightedAverage.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).longValue());
+            //cmpResult.setTotalRatingsNum(WeightedAverage.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).longValue());
+            cmpResult.setTotalRatingsNum(totalWeigth);
             return cmpResult;
         }
         return cmpResult;

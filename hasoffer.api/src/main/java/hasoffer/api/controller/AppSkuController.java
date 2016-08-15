@@ -3,6 +3,7 @@ package hasoffer.api.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.api.helper.Httphelper;
+import hasoffer.api.helper.JsonHelper;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
@@ -19,7 +20,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hs on 2016/7/25.
@@ -86,17 +90,7 @@ public class AppSkuController {
             if (ptmCmpSkuDescription != null) {
                 map.put("description", ptmCmpSkuDescription.getJsonDescription() == null ? "" : ptmCmpSkuDescription.getJsonDescription());//描述
                 String tempJsonParam = ptmCmpSkuDescription.getJsonParam();
-                if (tempJsonParam != null) {
-                    Map param = new HashMap();
-                    JSONObject jsonObject1 = JSONObject.parseObject(tempJsonParam);
-                    Set<Map.Entry<String, Object>> entries = jsonObject1.entrySet();
-                    Iterator<Map.Entry<String, Object>> iterator = entries.iterator();
-                    while (iterator.hasNext()) {
-                        Map.Entry<String, Object> next = iterator.next();
-                        param.put(next.getKey(), next.getValue());
-                    }
-                    map.put("specs", param);//参数
-                }
+                map.put("specs", JsonHelper.getJsonMap(tempJsonParam));//参数
             }
             List<PtmCmpSkuImage> ptmCmpSkuImages = ptmCmpSkuImageService.findPtmCmpSkuImages(ptmCmpSku.getId());
             map.put("images", getImageArray(ptmCmpSkuImages));
