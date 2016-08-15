@@ -82,7 +82,7 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
                 values.append("");
 
                 String sql = "insert into " + tableName + columns + "select " + values + " from DUAL" + where + ";";
-                logger.debug(sql);
+//                logger.debug(sql);
                 Query query = session.createSQLQuery(sql);
                 query.executeUpdate();
                 return null;

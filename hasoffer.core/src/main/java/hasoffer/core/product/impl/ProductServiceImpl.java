@@ -1,4 +1,4 @@
-package hasoffer.core.product.iml;
+package hasoffer.core.product.impl;
 
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;

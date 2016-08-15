@@ -7,7 +7,7 @@ import hasoffer.affiliate.exception.AffiliateAPIException;
 import hasoffer.affiliate.model.AffiliateProduct;
 import hasoffer.affiliate.model.FlipkartSkuInfo;
 import hasoffer.core.product.IFetchService;
-import hasoffer.core.product.iml.FetchServiceImpl;
+import hasoffer.core.product.impl.FetchServiceImpl;
 import hasoffer.fetch.model.Product;
 import hasoffer.fetch.sites.snapdeal.SnapdealHelper;
 import org.junit.Test;

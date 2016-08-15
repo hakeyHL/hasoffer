@@ -1261,4 +1261,90 @@ public class FixController {
 
         return "ok";
     }
+
+    //fixdata/fixSkuSmallImagePathSizeZero
+    @RequestMapping(value = "/fixSkuSmallImagePathSizeZero")
+    @ResponseBody
+    public String fixSkuSmallImagePathSizeZero() {
+
+        final ConcurrentLinkedQueue<PtmCmpSku> cmpSkuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        es.execute(new Runnable() {
+
+            @Override
+            public void run() {
+
+                int curPage = 1;
+                int pageSize = 1000;
+
+                PageableResult<PtmCmpSku> pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.smallImagePath like '/2016/0714/%' ", curPage, pageSize);
+
+                long totalPage = pageableResult.getTotalPage();
+
+                while (curPage <= totalPage) {
+
+                    if (cmpSkuQueue.size() > 10000) {
+                        try {
+                            TimeUnit.SECONDS.sleep(5);
+                        } catch (InterruptedException e) {
+
+                        }
+                        System.out.println("queue size = " + cmpSkuQueue.size());
+                        continue;
+                    }
+
+                    if (curPage > 1) {
+                        pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.smallImagePath like '/2016/0714/%' ", curPage, pageSize);
+                    }
+
+                    List<PtmCmpSku> cmpSkuList = pageableResult.getData();
+
+                    cmpSkuQueue.addAll(cmpSkuList);
+
+                    curPage++;
+                }
+            }
+        });
+
+        for (int i = 0; i < 10; i++) {
+
+            es.execute(new Runnable() {
+                @Override
+                public void run() {
+                    while (true) {
+
+                        PtmCmpSku sku = cmpSkuQueue.poll();
+
+                        if (sku == null) {
+                            try {
+                                TimeUnit.SECONDS.sleep(3);
+                            } catch (InterruptedException e) {
+
+                            }
+                            continue;
+                        }
+
+                        cmpSkuService.downloadImage2(sku);
+                    }
+                }
+            });
+        }
+
+        return "ok";
+    }
+
+    //fixdata/fixSkuSmallImagePathSizeZeroTest
+    @RequestMapping(value = "/fixSkuSmallImagePathSizeZeroTest")
+    @ResponseBody
+    public String fixSkuSmallImagePathSizeZeroTest() {
+
+        PtmCmpSku sku = dbm.querySingle("SELECT t FROM PtmCmpSku t WHERE t.id = ?0 ", Arrays.asList(6428134L));
+
+        cmpSkuService.downloadImage2(sku);
+
+        return "ok";
+    }
+
 }
