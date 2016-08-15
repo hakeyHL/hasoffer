@@ -58,7 +58,7 @@ public class AutoSearchResultTest {
 
     @Test
     public void ts3() {
-        SrmAutoSearchResult asr = mdm.queryOne(SrmAutoSearchResult.class, "09fb82519bb66ee0473d0cf40aa7fe40");
+        SrmAutoSearchResult asr = mdm.queryOne(SrmAutoSearchResult.class, "05f432a9fb990d1ebf28ef9bce2073ae");
         try {
             searchService.analysisAndRelate(asr);
         } catch (Exception e) {
