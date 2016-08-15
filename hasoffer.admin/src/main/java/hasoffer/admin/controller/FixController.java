@@ -1281,7 +1281,7 @@ public class FixController {
                 for (int i = 0; i < strArray.length; i++) {
 
                     String str = strArray[i];
-                    System.out.println("cur str");
+                    System.out.println("cur str" + str);
 
                     int curPage = 1;
                     int pageSize = 1000;
