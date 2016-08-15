@@ -1286,7 +1286,7 @@ public class FixController {
                     int curPage = 1;
                     int pageSize = 1000;
 
-                    PageableResult<PtmCmpSku> pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.smallImagePath like '/2016/?0/%' ", curPage, pageSize, Arrays.asList(str));
+                    PageableResult<PtmCmpSku> pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.smallImagePath like '/2016/" + str + "/%' ", curPage, pageSize);
 
                     long totalPage = pageableResult.getTotalPage();
 
@@ -1303,7 +1303,7 @@ public class FixController {
                         }
 
                         if (curPage > 1) {
-                            pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.smallImagePath like '/2016/?0/%' ", curPage, pageSize, Arrays.asList(str));
+                            pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.smallImagePath like '/2016/" + str + "/%' ", curPage, pageSize);
                         }
 
                         List<PtmCmpSku> cmpSkuList = pageableResult.getData();
