@@ -19,4 +19,6 @@ public interface IPushService {
     void sendPush(int page, int size);
 
     List<MarketChannel> getAllMarketChannels();
+
+    List<String> getAllAppVersions();
 }

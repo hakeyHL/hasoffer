@@ -35,6 +35,7 @@ import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.exception.NonMatchedProductException;
 import hasoffer.core.system.impl.AppServiceImpl;
+import hasoffer.core.utils.ImageUtil;
 import hasoffer.core.utils.JsonHelper;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
@@ -159,7 +160,7 @@ public class Compare2Controller {
                           @RequestParam(defaultValue = "") String site,
                           @RequestParam(defaultValue = "0") String price,
                           @RequestParam(defaultValue = "1") int page,
-                          @RequestParam(defaultValue = "10") int size,
+                          @RequestParam(defaultValue = "20") int pageSize,
                           HttpServletResponse response) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
@@ -170,7 +171,7 @@ public class Compare2Controller {
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         CmpResult cr = null;
         PtmProduct ptmProduct = null;
-        SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, size);
+        SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, pageSize);
         try {
             //根据title匹配到商品
             getSioBySearch(sio);
@@ -198,7 +199,7 @@ public class Compare2Controller {
             }
         } catch (Exception e) {
             logger.error(ExceptionHelper.getExceptionMessage(e));
-            logger.error(String.format("sdk_cmp_  [NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
+            logger.error(String.format("sdk_cmp_  [NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, pageSize));
             jsonObject.put("data", JSONObject.toJSON(cr));
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
             return null;
@@ -577,7 +578,9 @@ public class Compare2Controller {
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(product.getId(), sio.getPage(), sio.getSize());
         if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
             List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
+            //评论数按照加权平均值展示
             Long tempTotalComments = Long.valueOf(0);
+            //评论星级按照平均值展示
             int tempRatins = 0;
             int tempCount = 0;
             //统计site
@@ -594,10 +597,7 @@ public class Compare2Controller {
                     if (cmpSku.getWebsite() != null) {
                         websiteSet.add(cmpSku.getWebsite());
                     }
-                    tempCount += 1;
                     // 忽略前台返回的价格
-                    tempTotalComments += cmpSku.getCommentsNumber();
-                    tempRatins += cmpSku.getRatings();
                     CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
                     cplv.setDeepLinkUrl(WebsiteHelper.getDealUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                     cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
@@ -624,6 +624,7 @@ public class Compare2Controller {
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
             }
             List<CmpProductListVo> tempCmpProductListVos = new ArrayList<CmpProductListVo>();
+            Map<Long, Integer> tempComment = new HashMap<Long, Integer>();
             //每个site只保留一个且为最低价
             for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
                 if (websiteSet.size() <= 0) {
@@ -632,6 +633,12 @@ public class Compare2Controller {
                 if (websiteSet.contains(cmpProductListVo.getWebsite())) {
                     websiteSet.remove(cmpProductListVo.getWebsite());
                     //去除列表中除此之外的其他此site的数据
+                    if (tempComment.containsKey(cmpProductListVo.getTotalRatingsNum())) {
+                        tempComment.put(cmpProductListVo.getTotalRatingsNum(), tempComment.get(cmpProductListVo.getTotalRatingsNum()) + 1);
+                    } else {
+                        tempComment.put(cmpProductListVo.getTotalRatingsNum(), 1);
+                    }
+                    tempRatins += cmpProductListVo.getRatingNum();
                     tempCmpProductListVos.add(cmpProductListVo);
                 }
             }
@@ -646,7 +653,12 @@ public class Compare2Controller {
             PageableResult<CmpProductListVo> priceList = new PageableResult<CmpProductListVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize());
             cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
             cmpResult.setPriceList(priceList.getData());
-            cmpResult.setRatingNum(tempRatins / (tempCount == 0 ? 1 : tempCount));
+            //评论星级为加权平均值
+            Set<Map.Entry<Long, Integer>> entries = tempComment.entrySet();
+            //算得每一个的权值
+
+            //算得加权平均值
+            cmpResult.setRatingNum(tempRatins / tempCmpProductListVos.size());
             PtmProductDescription ptmProductDescription = mongoDbManager.queryOne(PtmProductDescription.class, product.getId());
             String specs = "";
             if (ptmProductDescription != null) {
@@ -678,6 +690,10 @@ public class Compare2Controller {
                     }
                     if (cmpSku.getWebsite() != null) {
                         websiteSet.add(cmpSku.getWebsite());
+                    }
+                    if (cmpSku.getWebsite().equals(sio.getCliSite())) {
+                        //取与客户端所传商品同一个site的sku作为sku匹配sku
+                        cmpResult.setProductVo(new ProductVo(sio.getHsProId(), sio.getCliQ(), cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath()), 0.0f, WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()})));
                     }
                     CmpProductListVo cplv = new CmpProductListVo(cmpSku, sio.getCliPrice());
                     comparedSkuVos.add(cplv);

@@ -8,19 +8,19 @@ public class PushVo {
     private String title;
     private String content;
     private String outline;
-    private String[] apps;
+    private String[] website;
     private String version;
-    private String[] marketChannel;
+    private String[] channel;
     private String messageType;
-    private String id;
+    private String value;
     private int number;
 
-    public String[] getMarketChannel() {
-        return marketChannel;
+    public String[] getChannel() {
+        return channel;
     }
 
-    public void setMarketChannel(String[] marketChannel) {
-        this.marketChannel = marketChannel;
+    public void setChannel(String[] channel) {
+        this.channel = channel;
     }
 
     public String getTitle() {
@@ -47,12 +47,12 @@ public class PushVo {
         this.outline = outline;
     }
 
-    public String[] getApps() {
-        return apps;
+    public String[] getWebsite() {
+        return website;
     }
 
-    public void setApps(String[] apps) {
-        this.apps = apps;
+    public void setWebsite(String[] website) {
+        this.website = website;
     }
 
     public String getVersion() {
@@ -71,12 +71,12 @@ public class PushVo {
         this.messageType = messageType;
     }
 
-    public String getId() {
-        return id;
+    public String getValue() {
+        return value;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setValue(String value) {
+        this.value = value;
     }
 
     public int getNumber() {
