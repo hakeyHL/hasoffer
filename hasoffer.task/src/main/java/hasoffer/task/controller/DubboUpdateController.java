@@ -61,7 +61,7 @@ public class DubboUpdateController {
 
         es.execute(new SrmProductSearchCountListWorker(dbm, queue, fetchDubboService));
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 50; i++) {
             es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, productService, cmpSkuService));
         }
 
