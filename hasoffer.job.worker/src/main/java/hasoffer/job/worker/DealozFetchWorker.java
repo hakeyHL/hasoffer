@@ -7,7 +7,7 @@ import hasoffer.core.search.SearchProductService;
 import hasoffer.fetch.model.ListProduct;
 import hasoffer.fetch.model.ProductStatus;
 import hasoffer.fetch.model.WebFetchResult;
-import hasoffer.spider.common.RedisKeysConstant;
+import hasoffer.spider.common.RedisKeysUtils;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchedProduct;
 import hasoffer.spider.redis.service.IFetchCacheService;
@@ -29,7 +29,7 @@ public class DealozFetchWorker implements Runnable {
     @Override
     public void run() {
         while (true) {
-            FetchResult fetchResult = fetchCacheService.popFetchResult(RedisKeysConstant.DEALOZ_RESULT_LIST);
+            FetchResult fetchResult = fetchCacheService.popFetchResult(RedisKeysUtils.DEALOZ_RESULT_LIST);
             if (fetchResult == null) {
                 try {
                     TimeUnit.SECONDS.sleep(10);

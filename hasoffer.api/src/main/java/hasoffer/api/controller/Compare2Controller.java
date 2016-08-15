@@ -648,7 +648,7 @@ public class Compare2Controller {
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
             }
             List<CmpProductListVo> tempCmpProductListVos = new ArrayList<CmpProductListVo>();
-            Map<Long, Integer> tempComment = new HashMap<Long, Integer>();
+//            Map<Long, Integer> tempComment = new HashMap<Long, Integer>();
             //每个site只保留一个且为最低价
             for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
                 if (websiteSet.size() <= 0) {
@@ -657,11 +657,12 @@ public class Compare2Controller {
                 if (websiteSet.contains(cmpProductListVo.getWebsite())) {
                     websiteSet.remove(cmpProductListVo.getWebsite());
                     //去除列表中除此之外的其他此site的数据
-                    if (tempComment.containsKey(cmpProductListVo.getTotalRatingsNum())) {
-                        tempComment.put(cmpProductListVo.getTotalRatingsNum(), tempComment.get(cmpProductListVo.getTotalRatingsNum()) + 1);
-                    } else {
-                        tempComment.put(cmpProductListVo.getTotalRatingsNum(), 1);
-                    }
+//                    if (tempComment.containsKey(cmpProductListVo.getTotalRatingsNum())) {
+//                        tempComment.put(cmpProductListVo.getTotalRatingsNum(), tempComment.get(cmpProductListVo.getTotalRatingsNum()) + 1);
+//                    } else {
+//                        tempComment.put(cmpProductListVo.getTotalRatingsNum(), 1);
+//                    }
+                    tempTotalComments += cmpProductListVo.getTotalRatingsNum();
                     tempRatins += cmpProductListVo.getRatingNum();
                     tempCmpProductListVos.add(cmpProductListVo);
                 }
@@ -678,13 +679,13 @@ public class Compare2Controller {
             cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
             cmpResult.setPriceList(priceList.getData());
             //评论星级为加权平均值
-            Set<Map.Entry<Long, Integer>> entries = tempComment.entrySet();
+//            Set<Map.Entry<Long, Integer>> entries = tempComment.entrySet();
             //算得每一个的权值
-            Long totalWeigth = 0l;
-            for (Map.Entry<Long, Integer> map : entries) {
-                //算总值
-                totalWeigth += map.getValue();
-            }
+//            Long totalWeigth = 0l;
+//            for (Map.Entry<Long, Integer> map : entries) {
+//                //算总值
+//                totalWeigth += map.getValue();
+//            }
            /* BigDecimal WeightedAverage = BigDecimal.ZERO;
             for (Map.Entry<Long, Integer> map : entries) {
                 //算得加权平均值
@@ -702,7 +703,7 @@ public class Compare2Controller {
             }
             cmpResult.setSpecs(specs);
             //cmpResult.setTotalRatingsNum(WeightedAverage.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).longValue());
-            cmpResult.setTotalRatingsNum(totalWeigth);
+            cmpResult.setTotalRatingsNum(tempTotalComments);
             return cmpResult;
         }
         return cmpResult;
