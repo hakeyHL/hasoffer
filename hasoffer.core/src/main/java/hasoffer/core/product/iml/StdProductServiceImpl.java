@@ -48,9 +48,9 @@ public class StdProductServiceImpl implements IStdProductService {
                     + for_skuInfo.getModelId());
             if (keyword.contains(for_skuInfo.getProductBrand().toLowerCase())
                     &&
-                    (keyword.contains(for_skuInfo.getModelNum())
-                            || keyword.contains(for_skuInfo.getModelName())
-                            || keyword.contains(for_skuInfo.getModelId())
+                    (keyword.contains(for_skuInfo.getModelNum().toLowerCase())
+                            || keyword.contains(for_skuInfo.getModelName().toLowerCase())
+                            || keyword.contains(for_skuInfo.getModelId().toLowerCase())
                     )) {
                 skuInfo = for_skuInfo;
                 break;
