@@ -1,6 +1,6 @@
 package hasoffer.task.worker;
 
-import hasoffer.base.model.TaskStatus;
+import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.TimeUtils;

@@ -1,10 +1,11 @@
 package hasoffer.dubbo.api.fetch.service.impl;
 
-import hasoffer.base.model.TaskStatus;
+import hasoffer.base.enums.TaskLevel;
+import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
-import hasoffer.spider.common.RedisKeysConstant;
+import hasoffer.spider.common.RedisKeysUtils;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchUrlResult;
 import hasoffer.spider.redis.service.IFetchCacheService;
@@ -46,11 +47,11 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
             if (key == null) {
                 return;
             }
-            fetchCacheService.pushTaskList(RedisKeysConstant.WAIT_KEY_LIST, JSONUtil.toJSON(fetchResult));
+            fetchCacheService.pushTaskList(RedisKeysUtils.WAIT_KEY_LIST, JSONUtil.toJSON(fetchResult));
             fetchCacheService.setTaskStatusByKeyword(key, TaskStatus.START);
-            logger.info("FetchDubboServiceImpl.sendKeyWordTask(FetchResult fetchResult) save {} into Redis List {} success", fetchResult.getWebsite() + "_" + fetchResult.getKeyword(), RedisKeysConstant.WAIT_KEY_LIST);
+            logger.info("FetchDubboServiceImpl.sendKeyWordTask(FetchResult fetchResult) save {} into Redis List {} success", fetchResult.getWebsite() + "_" + fetchResult.getKeyword(), RedisKeysUtils.WAIT_KEY_LIST);
         } catch (Exception e) {
-            logger.error("FetchDubboServiceImpl.sendKeyWordTask(FetchResult fetchResult) save {} into Redis List {} fail", fetchResult.getWebsite() + "_" + fetchResult.getKeyword(), RedisKeysConstant.WAIT_KEY_LIST, e);
+            logger.error("FetchDubboServiceImpl.sendKeyWordTask(FetchResult fetchResult) save {} into Redis List {} fail", fetchResult.getWebsite() + "_" + fetchResult.getKeyword(), RedisKeysUtils.WAIT_KEY_LIST, e);
         }
 
     }
@@ -63,9 +64,15 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
 
     @Override
     public void sendUrlTask(Website website, String url) {
+        sendUrlTask(website, url, TaskLevel.LEVEL_5);
+    }
+
+    @Override
+    public void sendUrlTask(Website website, String url, TaskLevel taskLevel) {
         FetchUrlResult fetchUrlResult = new FetchUrlResult(website, url);
         fetchUrlResult.setTaskStatus(TaskStatus.START);
         fetchUrlResult.setDate(new Date());
+        String redisKey = RedisKeysUtils.getWaitUrlListKey(taskLevel);
         try {
             String key = FetchUrlResult.getCacheKey(fetchUrlResult);
             if (key == null) {
@@ -73,13 +80,12 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
             }
             TaskStatus taskStatusByUrl = fetchCacheService.getTaskStatusByUrl(key);
             if (TaskStatus.NONE.equals(taskStatusByUrl)) {
-                fetchCacheService.pushTaskList(RedisKeysConstant.WAIT_URL_LIST, JSONUtil.toJSON(fetchUrlResult));
-                logger.info("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} success", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), RedisKeysConstant.WAIT_URL_LIST);
+                fetchCacheService.pushTaskList(redisKey, JSONUtil.toJSON(fetchUrlResult));
+                logger.info("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} success", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), redisKey);
                 fetchCacheService.setTaskStatusByUrl(key, TaskStatus.START);
             }
-
         } catch (Exception e) {
-            logger.error("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} fail", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), RedisKeysConstant.WAIT_URL_LIST, e);
+            logger.error("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} fail", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), redisKey, e);
         }
     }
 
