@@ -90,7 +90,7 @@ public class AppDealController {
                 AppDeal appDeal = dealIterator.next();
                 if (appDeal.getDealCategoryId() == 5) {
                     DealVo dealVo = new DealVo();
-                    dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                    dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getBiggerLogoUrl(appDeal.getWebsite()));
                     dealVo.setTitle(appDeal.getTitle());
                     dealVo.setWebsite(appDeal.getWebsite());
                     dealVo.setId(appDeal.getId());

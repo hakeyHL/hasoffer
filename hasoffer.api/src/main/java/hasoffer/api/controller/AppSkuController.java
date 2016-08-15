@@ -19,10 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hs on 2016/7/25.
@@ -90,9 +87,16 @@ public class AppSkuController {
                 map.put("description", ptmCmpSkuDescription.getJsonDescription() == null ? "" : ptmCmpSkuDescription.getJsonDescription());//描述
                 String tempJsonParam = ptmCmpSkuDescription.getJsonParam();
                 if (tempJsonParam != null) {
-                    tempJsonParam = tempJsonParam.replaceAll("\\\\", "");
+                    Map param = new HashMap();
+                    JSONObject jsonObject1 = JSONObject.parseObject(tempJsonParam);
+                    Set<Map.Entry<String, Object>> entries = jsonObject1.entrySet();
+                    Iterator<Map.Entry<String, Object>> iterator = entries.iterator();
+                    while (iterator.hasNext()) {
+                        Map.Entry<String, Object> next = iterator.next();
+                        param.put(next.getKey(), next.getValue());
+                    }
+                    map.put("specs", param);//参数
                 }
-                map.put("specs", tempJsonParam);//参数
             }
             List<PtmCmpSkuImage> ptmCmpSkuImages = ptmCmpSkuImageService.findPtmCmpSkuImages(ptmCmpSku.getId());
             map.put("images", getImageArray(ptmCmpSkuImages));
