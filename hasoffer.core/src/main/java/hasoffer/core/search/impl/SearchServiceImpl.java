@@ -1,7 +1,5 @@
 package hasoffer.core.search.impl;
 
-import hasoffer.base.config.AppConfig;
-import hasoffer.base.enums.HasofferRegion;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
@@ -203,6 +201,11 @@ public class SearchServiceImpl implements ISearchService {
         });*/
     }
 
+    /**
+     * 匹配、关联
+     *
+     * @param asr
+     */
     @Override
     public void analysisAndRelate(SrmAutoSearchResult asr) {
         ProductBo productBo = null;
@@ -360,9 +363,11 @@ public class SearchServiceImpl implements ISearchService {
             if (ArrayUtils.hasObjs(logSkus)) {
                 stdSku = logSkus.get(0);
             } else {
-                Iterator<Website> websiteIterator = searchedSkuMap.keySet().iterator();
-                Website website = websiteIterator.next();
-                stdSku = searchedSkuMap.get(website).get(0);
+                // 如果目标网站的sku不存在，那么暂不创建商品
+                return;
+//                Iterator<Website> websiteIterator = searchedSkuMap.keySet().iterator();
+//                Website website = websiteIterator.next();
+//                stdSku = searchedSkuMap.get(website).get(0);
             }
 
             ProductBo productBo = productService.createProduct(0, autoSearchResult.getTitle(), autoSearchResult.getPrice(),
@@ -392,13 +397,13 @@ public class SearchServiceImpl implements ISearchService {
             for (SearchedSku searchedSku : ssku) {
                 float thd_title_score = 0.5f, thd_price_score = 0.5f;
 
-                if (AppConfig.get(AppConfig.SER_REGION).equals(HasofferRegion.USA)) {
-                    thd_title_score = 0.3f;
-                    thd_price_score = 0.8f;
-                }
+//                if (AppConfig.get(AppConfig.SER_REGION).equals(HasofferRegion.USA)) {
+//                    thd_title_score = 0.3f;
+//                    thd_price_score = 0.8f;
+//                }
 
                 if (searchedSku.getTitleScore() < thd_title_score || searchedSku.getPriceScore() > thd_price_score) {
-                    logger.debug(String.format("title/price:[%s/%f].titleScore/priceScore:[%f/%f]", searchedSku.getTitle(), searchedSku.getPrice(), searchedSku.getTitleScore(), searchedSku.getPriceScore()));
+                    logger.debug(String.format("[NO_MATCH]title/price:[%s/%f].titleScore/priceScore:[%f/%f]", searchedSku.getTitle(), searchedSku.getPrice(), searchedSku.getTitleScore(), searchedSku.getPriceScore()));
                     continue;
                 }
 
