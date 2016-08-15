@@ -68,7 +68,7 @@ public class AppDealController {
             for (DealModel dealModel : dealModels) {
                 if (dealModel.getExpireTime().compareTo(new Date()) != 1 && dealModel.isDisplay()) {
                     DealVo dealVo = new DealVo();
-                    dealVo.setLogoUrl(dealModel.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(Website.valueOf(dealModel.getWebsite())));
+                    dealVo.setLogoUrl(dealModel.getWebsite() == null ? "" : WebsiteHelper.getBiggerLogoUrl(Website.valueOf(dealModel.getWebsite())));
                     dealVo.setTitle(dealModel.getTitle());
                     dealVo.setWebsite(Website.valueOf(dealModel.getWebsite()));
                     dealVo.setId(dealModel.getId());
@@ -118,7 +118,7 @@ public class AppDealController {
             System.out.println("last  list size   :" + list.size());
             for (AppDeal appDeal : list) {
                 DealVo dealVo = new DealVo();
-                dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getBiggerLogoUrl(appDeal.getWebsite()));
                 dealVo.setTitle(appDeal.getTitle());
                 dealVo.setWebsite(appDeal.getWebsite());
                 dealVo.setId(appDeal.getId());
