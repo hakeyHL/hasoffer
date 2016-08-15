@@ -622,21 +622,39 @@ public class AppController {
     }
 
     public void setCommentNumAndRatins(ProductListVo productListVo) {
-        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productListVo.getId(), 1, 10);
-        if (pagedCmpskus != null) {
+        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productListVo.getId(), 1, 20);
+        if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
+            List<PtmCmpSku> tempSkuList = pagedCmpskus.getData();
+            List<PtmCmpSku> newSkuList = new ArrayList<PtmCmpSku>();
+            //统计site
+            Set<Website> websiteSet = new HashSet<Website>();
             Long totalCommentNum = Long.valueOf(0);
             int totalRating = 0;
-            for (PtmCmpSku ptmCmpSku : pagedCmpskus.getData()) {
-                totalCommentNum += ptmCmpSku.getCommentsNumber();
-                totalRating += ptmCmpSku.getRatings();
+            for (PtmCmpSku ptmCmpSku : tempSkuList) {
+
+                if (ptmCmpSku.getWebsite() != null) {
+                    websiteSet.add(ptmCmpSku.getWebsite());
+                }
             }
-            if (totalCommentNum == 0 || pagedCmpskus.getData().size() == 0 || totalRating == 0) {
-                productListVo.setCommentNum(Long.valueOf(0));
-                productListVo.setRatingNum(0);
-            } else {
-                productListVo.setCommentNum(totalCommentNum / Long.valueOf(pagedCmpskus.getData().size()));
-                productListVo.setRatingNum(totalRating / pagedCmpskus.getData().size());
+            for (PtmCmpSku ptmCmpSku2 : tempSkuList) {
+                if (websiteSet.size() <= 0) {
+                    break;
+                }
+                if (websiteSet.contains(ptmCmpSku2.getWebsite())) {
+                    websiteSet.remove(ptmCmpSku2.getWebsite());
+                    //去除列表中除此之外的其他此site的数据
+                    totalCommentNum += ptmCmpSku2.getCommentsNumber();
+                    totalRating += ptmCmpSku2.getRatings();
+                    newSkuList.add(ptmCmpSku2);
+                }
             }
+            //移除之前加进列表的所有的sku列表
+            tempSkuList = null;
+            tempSkuList = new ArrayList<>();
+            //将新的加入的放入到列表中
+            tempSkuList.addAll(newSkuList);
+            productListVo.setCommentNum(totalCommentNum);
+            productListVo.setRatingNum(totalRating / tempSkuList.size());
         }
     }
 

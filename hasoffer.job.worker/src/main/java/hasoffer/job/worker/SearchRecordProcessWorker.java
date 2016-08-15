@@ -2,8 +2,8 @@ package hasoffer.job.worker;
 
 import hasoffer.base.config.AppConfig;
 import hasoffer.base.enums.HasofferRegion;
+import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.SkuStatus;
-import hasoffer.base.model.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;

@@ -1276,34 +1276,42 @@ public class FixController {
             @Override
             public void run() {
 
-                int curPage = 1;
-                int pageSize = 1000;
+                String[] strArray = {"0715", "0716", "0717", "0718", "0719", "0720", "0721", "0722", "0723", "0724", "0725", "0726", "0728", "0729", "0730", "0731", "0801", "0802", "0803", "0804", "0805", "0806", "0807", "0808", "0809", "0810", "0811", "0812", "0813"};
 
-                PageableResult<PtmCmpSku> pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.smallImagePath like '/2016/0714/%' ", curPage, pageSize);
+                for (int i = 0; i < strArray.length; i++) {
 
-                long totalPage = pageableResult.getTotalPage();
+                    String str = strArray[i];
+                    System.out.println("cur str");
 
-                while (curPage <= totalPage) {
+                    int curPage = 1;
+                    int pageSize = 1000;
 
-                    if (cmpSkuQueue.size() > 10000) {
-                        try {
-                            TimeUnit.SECONDS.sleep(5);
-                        } catch (InterruptedException e) {
+                    PageableResult<PtmCmpSku> pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.smallImagePath like '/2016/" + str + "/%' ", curPage, pageSize);
 
+                    long totalPage = pageableResult.getTotalPage();
+
+                    while (curPage <= totalPage) {
+
+                        if (cmpSkuQueue.size() > 10000) {
+                            try {
+                                TimeUnit.SECONDS.sleep(5);
+                            } catch (InterruptedException e) {
+
+                            }
+                            System.out.println("queue size = " + cmpSkuQueue.size());
+                            continue;
                         }
-                        System.out.println("queue size = " + cmpSkuQueue.size());
-                        continue;
+
+                        if (curPage > 1) {
+                            pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.smallImagePath like '/2016/" + str + "/%' ", curPage, pageSize);
+                        }
+
+                        List<PtmCmpSku> cmpSkuList = pageableResult.getData();
+
+                        cmpSkuQueue.addAll(cmpSkuList);
+
+                        curPage++;
                     }
-
-                    if (curPage > 1) {
-                        pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.smallImagePath like '/2016/0714/%' ", curPage, pageSize);
-                    }
-
-                    List<PtmCmpSku> cmpSkuList = pageableResult.getData();
-
-                    cmpSkuQueue.addAll(cmpSkuList);
-
-                    curPage++;
                 }
             }
         });
