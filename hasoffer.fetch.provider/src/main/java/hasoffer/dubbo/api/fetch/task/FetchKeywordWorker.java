@@ -1,9 +1,10 @@
 package hasoffer.dubbo.api.fetch.task;
 
+import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.spider.api.IFetchService;
 import hasoffer.spider.api.impl.FetchServiceImpl;
-import hasoffer.spider.common.RedisKeysConstant;
+import hasoffer.spider.common.RedisKeysUtils;
 import hasoffer.spider.exception.UnSupportWebsiteException;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.redis.service.IFetchCacheService;
@@ -30,7 +31,19 @@ public class FetchKeywordWorker implements Runnable {
     @Override
     public void run() {
         while (true) {
-            Object pop = fetchCacheService.popTaskList(RedisKeysConstant.WAIT_KEY_LIST);
+            Object pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_1));
+            if (pop == null) {
+                pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_2));
+            }
+            if (pop == null) {
+                pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_3));
+            }
+            if (pop == null) {
+                pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_4));
+            }
+            if (pop == null) {
+                pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_5));
+            }
             if (pop == null) {
                 try {
                     TimeUnit.MINUTES.sleep(1);
