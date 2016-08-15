@@ -729,6 +729,7 @@ public class Compare2Controller {
                     if (cmpSku.getWebsite() != null) {
                         websiteSet.add(cmpSku.getWebsite());
                     }
+                    System.out.println("id :  " + cmpSku.getId() + " imagePath " + cmpSku.getSmallImagePath());
                     if (cmpSku.getWebsite().equals(sio.getCliSite())) {
                         //取与客户端所传商品同一个site的sku作为sku匹配sku
                         cmpResult.setProductVo(new ProductVo(sio.getHsProId(), sio.getCliQ(), cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath()), 0.0f, WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()})));
