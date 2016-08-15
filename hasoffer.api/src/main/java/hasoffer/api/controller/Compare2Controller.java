@@ -27,7 +27,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.urm.UrmUser;
-import hasoffer.core.product.iml.ProductServiceImpl;
+import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.solr.CategoryIndexServiceImpl;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;

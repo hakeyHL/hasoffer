@@ -25,7 +25,7 @@ import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.urm.UrmDevice;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.product.ICmpSkuService;
-import hasoffer.core.product.iml.ProductServiceImpl;
+import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.solr.CategoryIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel;
