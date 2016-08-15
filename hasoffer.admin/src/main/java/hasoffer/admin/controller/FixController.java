@@ -1,5 +1,8 @@
 package hasoffer.admin.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import hasoffer.admin.controller.vo.TitleCountVo;
 import hasoffer.admin.worker.FixSkuErrorInPriceWorker;
 import hasoffer.admin.worker.FlipkartSkuCategory2GetListWorker;
@@ -15,10 +18,7 @@ import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.HijackLog;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
-import hasoffer.core.persistence.po.ptm.PtmCategory;
-import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
-import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
@@ -33,6 +33,7 @@ import hasoffer.core.task.ListAndProcessTask2;
 import hasoffer.core.task.worker.IList;
 import hasoffer.core.task.worker.IProcess;
 import hasoffer.core.user.IDeviceService;
+import hasoffer.core.utils.Httphelper;
 import hasoffer.core.worker.ListAndProcessWorkerStatus;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
@@ -1122,6 +1123,129 @@ public class FixController {
                         }
 
 
+                    }
+                }
+            });
+        }
+
+        while (true) {
+            try {
+                TimeUnit.SECONDS.sleep(5);
+            } catch (Exception e) {
+                break;
+            }
+        }
+
+        return "ok";
+    }
+
+    //fixdata/fixflipkartcategoryidnull
+    @RequestMapping(value = "/fixflipkartcategoryidnull")
+    @ResponseBody
+    public String fixflipkartcategoryidnull() {
+
+        final ConcurrentLinkedQueue<PtmCmpSku> cmpSkuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        es.execute(new Runnable() {
+
+            String Q_SKU_IMAGE = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' and t.categoryId IS NULL ORDER BY t.id";
+
+            int page = 1, PAGE_SIZE = 1000;
+
+            @Override
+            public void run() {
+
+                PageableResult<PtmCmpSku> pageableResult = dbm.queryPage(Q_SKU_IMAGE, page, PAGE_SIZE);
+
+                long totalPage = pageableResult.getTotalPage();
+                System.out.println("totalpage =" + totalPage);
+
+                while (page < totalPage) {
+
+                    if (cmpSkuQueue.size() > 10000) {
+                        try {
+                            TimeUnit.SECONDS.sleep(5);
+                        } catch (InterruptedException e) {
+
+                        }
+                    }
+
+                    if (page > 1) {
+                        pageableResult = dbm.queryPage(Q_SKU_IMAGE, page, PAGE_SIZE);
+                    }
+
+                    List<PtmCmpSku> ptmCmpSkuList = pageableResult.getData();
+
+                    cmpSkuQueue.addAll(ptmCmpSkuList);
+
+                    System.out.println("queue size =" + cmpSkuQueue.size());
+                    System.out.println("currentPage =" + page);
+//                    break;//for test
+                    page++;
+                }
+            }
+        });
+
+        for (int i = 0; i < 10; i++) {
+            es.execute(new Runnable() {
+                @Override
+                public void run() {
+
+                    while (true) {
+                        PtmCmpSku ptmcmpsku = cmpSkuQueue.poll();
+
+                        if (ptmcmpsku == null) {
+//                            System.out.println("poll get null sleep 15 seconds");
+                            try {
+                                TimeUnit.SECONDS.sleep(15);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            continue;
+                        }
+
+                        System.out.println("ready to parse " + ptmcmpsku.getId());
+
+                        String skuid = FlipkartHelper.getSkuIdByUrl(ptmcmpsku.getUrl());
+
+                        String url = "https://www.flipkart.com/api/3/page/dynamic/product";
+
+                        String json = "{\"requestContext\":{\"productId\":\"" + skuid + "\"}}";
+
+                        Map<String, String> header = new HashMap<>();
+
+                        header.put("x-user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36 FKUA/website/41/website/Desktop");
+
+                        try {
+
+                            String response = Httphelper.doPostJsonWithHeader(url, json, header);
+
+                            JSONObject responseJson = JSON.parseObject(response);
+
+                            JSONArray jsonArray = responseJson.getJSONObject("response").getJSONObject("product_breadcrumb").getJSONObject("data").getJSONObject("0").getJSONObject("value").getJSONArray("productBreadcrumbs");
+
+                            String catepath = "";
+
+                            for (int i = 0; i < jsonArray.size(); i++) {
+                                if (i > 2) {
+                                    break;
+                                }
+
+                                catepath = jsonArray.getJSONObject(i).getString("title");
+                            }
+
+                            if (StringUtils.isEmpty(catepath)) {
+
+                                PtmCategory3 category3 = dbm.querySingle("SELECT t FROM PtmCategory3 t WHERE t.name = ?0", Arrays.asList(catepath));
+
+
+                            }
+
+                        } catch (Exception e) {
+                            System.out.println("parse exception for " + ptmcmpsku.getId());
+                        }
                     }
                 }
             });

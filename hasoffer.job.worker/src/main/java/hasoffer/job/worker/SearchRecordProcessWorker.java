@@ -18,7 +18,6 @@ import hasoffer.fetch.model.WebFetchResult;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchedProduct;
 import hasoffer.spring.context.SpringContextHolder;
-import hasoffer.taskschedule.api.listener.CallbackListener;
 import hasoffer.taskschedule.api.vo.TaskSchedule;
 import hasoffer.taskschedule.respservice.impl.TaskScheduleReqClient;
 import helper.IndiaWebsiteHelper;
@@ -102,12 +101,7 @@ public class SearchRecordProcessWorker implements Runnable {
         taskSchedule.setUrlType(TaskSchedule.UrlType.LIST);
         taskSchedule.setRegion(HasofferRegion.INDIA);
         taskSchedule.setUrl(IndiaWebsiteHelper.getSearchUrl(Website.AMAZON, keyWord));
-        scheduleReqClient.pushTaskScheduleInfo(taskSchedule, new CallbackListener() {
-            @Override
-            public void recycleResult(TaskSchedule result) {
-                logger.info("dubbo.CallbackListener():" + result.toString());
-            }
-        });
+        scheduleReqClient.pushTaskScheduleInfo(taskSchedule);
     }
 
     /**
