@@ -1,6 +1,7 @@
 package hasoffer.api.controller;
 
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.core.app.AdvertiseService;
 import hasoffer.core.persistence.po.admin.Adt;
 import org.slf4j.Logger;
@@ -57,7 +58,7 @@ public class AppAdController {
         List<Adt> adt = advertiseService.getAdByCategory();
         if (adt != null && adt.size() > 0) {
             Adt adt1 = adt.get(0);
-            if (website != "") {
+            if (!StringUtils.isEmpty(website)) {
                 adt1.setPackageName(packageMap.get(Website.valueOf(website)));
             }
             map.put("ads", Arrays.asList(adt1));
