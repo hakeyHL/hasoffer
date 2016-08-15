@@ -250,7 +250,7 @@ public class WebsiteHelper {
         if (website == null) {
             path = path + "NULL.png";
         } else {
-            path = path + website.name() + "b_.jpg";
+            path = path + website.name() + "_b.jpg";
         }
         return AppConfig.get(AppConfig.IMAGE_SITELOGO_PATH) + path;
     }
