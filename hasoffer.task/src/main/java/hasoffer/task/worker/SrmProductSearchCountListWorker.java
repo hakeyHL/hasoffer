@@ -50,7 +50,7 @@ public class SrmProductSearchCountListWorker implements Runnable {
         long totalPage = pageableResult.getTotalPage();
         logger.info("totalPage :" + totalPage);
 
-        while (page < totalPage) {
+        while (page <= totalPage) {
 
             if (queue.size() > 50000) {
                 logger.info("queue size =" + queue.size());
@@ -101,5 +101,7 @@ public class SrmProductSearchCountListWorker implements Runnable {
 
             page++;
         }
+
+        logger.info("send url finish");
     }
 }
