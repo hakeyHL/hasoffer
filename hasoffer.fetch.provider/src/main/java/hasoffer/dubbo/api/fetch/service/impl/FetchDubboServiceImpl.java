@@ -41,7 +41,18 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     public void sendKeyWordTask(Website website, String keyword) {
         FetchResult fetchResult = new FetchResult(website, keyword);
         fetchResult.setTaskStatus(TaskStatus.START);
-        addFetchTask(fetchResult);
+        try {
+            String key = FetchResult.getCacheKey(fetchResult);
+            if (key == null) {
+                return;
+            }
+            fetchCacheService.pushTaskList(RedisKeysConstant.WAIT_KEY_LIST, JSONUtil.toJSON(fetchResult));
+            fetchCacheService.setTaskStatusByKeyword(key, TaskStatus.START);
+            logger.info("FetchDubboServiceImpl.sendKeyWordTask(FetchResult fetchResult) save {} into Redis List {} success", fetchResult.getWebsite() + "_" + fetchResult.getKeyword(), RedisKeysConstant.WAIT_KEY_LIST);
+        } catch (Exception e) {
+            logger.error("FetchDubboServiceImpl.sendKeyWordTask(FetchResult fetchResult) save {} into Redis List {} fail", fetchResult.getWebsite() + "_" + fetchResult.getKeyword(), RedisKeysConstant.WAIT_KEY_LIST, e);
+        }
+
     }
 
     @Override
@@ -55,7 +66,21 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
         FetchUrlResult fetchUrlResult = new FetchUrlResult(website, url);
         fetchUrlResult.setTaskStatus(TaskStatus.START);
         fetchUrlResult.setDate(new Date());
-        addFetchUrlTask(fetchUrlResult);
+        try {
+            String key = FetchUrlResult.getCacheKey(fetchUrlResult);
+            if (key == null) {
+                return;
+            }
+            TaskStatus taskStatusByUrl = fetchCacheService.getTaskStatusByUrl(key);
+            if (TaskStatus.NONE.equals(taskStatusByUrl)) {
+                fetchCacheService.pushTaskList(RedisKeysConstant.WAIT_URL_LIST, JSONUtil.toJSON(fetchUrlResult));
+                logger.info("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} success", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), RedisKeysConstant.WAIT_URL_LIST);
+                fetchCacheService.setTaskStatusByUrl(key, TaskStatus.START);
+            }
+
+        } catch (Exception e) {
+            logger.error("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} fail", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), RedisKeysConstant.WAIT_URL_LIST, e);
+        }
     }
 
     @Override
@@ -64,42 +89,12 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
         return fetchCacheService.getTaskStatusByUrl(cacheKey);
     }
 
-    private void addFetchTask(FetchResult fetchResult) {
-        try {
-            String key = FetchResult.getCacheKey(fetchResult);
-            if (key == null) {
-                return;
-            }
-            fetchCacheService.pushTaskList(RedisKeysConstant.WAIT_KEY_LIST, JSONUtil.toJSON(fetchResult));
-            //fetchCacheService.cacheResult(key, fetchResult);
-            fetchCacheService.setTaskStatusByUrl(key, TaskStatus.START);
-            logger.info("FetchDubboServiceImpl.addFetchTask(FetchResult fetchResult) save {} into Redis List {}", fetchResult.getWebsite() + "_" + fetchResult.getKeyword(), RedisKeysConstant.WAIT_KEY_LIST);
-        } catch (Exception e) {
-            logger.error("FetchDubboServiceImpl.addFetchTask(FetchResult fetchResult) save {} into Redis List {} fail", fetchResult.getWebsite() + "_" + fetchResult.getKeyword(), RedisKeysConstant.WAIT_KEY_LIST, e);
-        }
-    }
-
     private FetchResult getFetchResultList(Website webSite, String keyWord) {
         String fetchResultKey = FetchResult.getCacheKey(webSite, keyWord);
         return fetchCacheService.getResultByKeyword(fetchResultKey);
 
     }
 
-    private void addFetchUrlTask(FetchUrlResult fetchUrlResult) {
-        try {
-            String key = FetchUrlResult.getCacheKey(fetchUrlResult);
-            if (key == null) {
-                return;
-            }
-            fetchCacheService.pushTaskList(RedisKeysConstant.WAIT_URL_LIST, JSONUtil.toJSON(fetchUrlResult));
-            logger.info("FetchDubboServiceImpl.addFetchUrlTask(fetchUrlResult) save {} into Redis List {}", fetchUrlResult.getUrl(), RedisKeysConstant.WAIT_URL_LIST);
-            //fetchCacheService.cacheResult(key, fetchUrlResult);
-            fetchCacheService.setTaskStatusByUrl(key, TaskStatus.START);
-        } catch (Exception e) {
-            logger.error("FetchDubboServiceImpl.addFetchUrlTask(fetchUrlResult) save {} into Redis List {} fail", fetchUrlResult.getUrl(), RedisKeysConstant.WAIT_URL_LIST, e);
-
-        }
-    }
 
     private FetchUrlResult getFetchUrlResult(Website webSite, String url) {
         String fetchResultKey = FetchUrlResult.getCacheKey(webSite, url);
