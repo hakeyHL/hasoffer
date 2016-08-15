@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.PropertyFilter;
 import hasoffer.api.controller.vo.*;
-import hasoffer.api.helper.ExceptionHelper;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.SearchHelper;
 import hasoffer.base.model.AppDisplayMode;
@@ -222,7 +221,6 @@ public class Compare2Controller {
                 return null;
             }
         } catch (Exception e) {
-            logger.error(ExceptionHelper.getExceptionMessage(e));
             logger.error(String.format("sdk_cmp_  [NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, pageSize));
             jsonObject.put("data", JSONObject.toJSON(cr));
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
