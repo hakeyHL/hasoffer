@@ -303,6 +303,16 @@ public class FixController {
         return "ok";
     }
 
+    @RequestMapping(value = "/deleteproductanyway/{proId}", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String deleteproduct2(@PathVariable Long proId) {
+        if (proId > 0) {
+            productService.deleteProduct(proId);
+        }
+        return "ok";
+    }
+
     @RequestMapping(value = "/cleansearchlogs", method = RequestMethod.GET)
     public
     @ResponseBody
