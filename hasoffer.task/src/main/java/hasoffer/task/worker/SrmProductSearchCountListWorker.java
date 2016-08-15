@@ -101,5 +101,7 @@ public class SrmProductSearchCountListWorker implements Runnable {
 
             page++;
         }
+
+        logger.info("send url finish");
     }
 }
