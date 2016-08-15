@@ -30,6 +30,8 @@ public class Adt implements Identifiable<Long> {
     private String adLink;
     private String adBtnContent;
     private String aderSiteUrl;
+    @Transient
+    private String packageName;
     private int adLocation;
     //为适配客户端显示的格式化的时间字符串--开始时间
     @Transient
@@ -152,6 +154,7 @@ public class Adt implements Identifiable<Long> {
         this.adLocation = adLocation;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -191,5 +194,13 @@ public class Adt implements Identifiable<Long> {
         result = 31 * result + (aderSiteUrl != null ? aderSiteUrl.hashCode() : 0);
         result = 31 * result + adLocation;
         return result;
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
     }
 }
