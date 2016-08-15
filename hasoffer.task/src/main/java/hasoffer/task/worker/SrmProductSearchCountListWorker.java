@@ -52,7 +52,7 @@ public class SrmProductSearchCountListWorker implements Runnable {
 
         while (page < totalPage) {
 
-            if (queue.size() > 10000) {
+            if (queue.size() > 50000) {
                 try {
                     TimeUnit.MINUTES.sleep(1);
                 } catch (InterruptedException e) {
@@ -97,6 +97,8 @@ public class SrmProductSearchCountListWorker implements Runnable {
                     }
                 }
             }
+
+            page++;
         }
     }
 }
