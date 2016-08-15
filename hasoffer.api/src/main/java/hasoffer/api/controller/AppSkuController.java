@@ -65,7 +65,8 @@ public class AppSkuController {
 
     public static void main(String[] args) {
         String temp = "{\"Fabric Care:\":\"Hand wash at 30°C, Do not bleach, Mild Iron, Do not Tumble Dry, Line Dry in shade, wash separately, do not iron on decorations/print, Use mild detergents\",\"Sales Package\":\"1 Kurti\",\"Legging Available\":\"No\",\"Ideal For\":\"Women's\",\"Other details\":\"Stitched\",\"Neck\":\"Mandarin collar\"}";
-        System.out.println(temp);
+        String ss = "\\ysf";
+        System.out.println(ss.replaceAll("\\\\", ""));
     }
 
     /**
@@ -87,7 +88,11 @@ public class AppSkuController {
             Map map = new HashMap<>();
             if (ptmCmpSkuDescription != null) {
                 map.put("description", ptmCmpSkuDescription.getJsonDescription() == null ? "" : ptmCmpSkuDescription.getJsonDescription());//描述
-                map.put("specs", JSONObject.toJSON(ptmCmpSkuDescription.getJsonParam()));//参数
+                String tempJsonParam = ptmCmpSkuDescription.getJsonParam();
+                if (tempJsonParam != null) {
+                    tempJsonParam = tempJsonParam.replaceAll("\\\\", "");
+                }
+                map.put("specs", tempJsonParam);//参数
             }
             List<PtmCmpSkuImage> ptmCmpSkuImages = ptmCmpSkuImageService.findPtmCmpSkuImages(ptmCmpSku.getId());
             map.put("images", getImageArray(ptmCmpSkuImages));
@@ -97,4 +102,5 @@ public class AppSkuController {
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
+
 }
