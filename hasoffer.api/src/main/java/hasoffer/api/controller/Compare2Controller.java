@@ -212,8 +212,11 @@ public class Compare2Controller {
                     cr = getCmpProducts(sio);
                     cr.setProductId(sio.getHsProId());
                     cr.setCopywriting(ptmProduct != null && ptmProduct.isStd() ? "Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you." : "Looked around Myntre,Jabong & 5 other apps,thought you might like these items as well..");
-                    cr.setDisplayMode(ptmProduct != null && ptmProduct.isStd() ? AppDisplayMode.NONE : AppDisplayMode.WATERFALL);
-                    cr.setStd(ptmProduct.isStd());
+                    //暂时屏蔽标品非标品
+                    // cr.setDisplayMode(ptmProduct != null && ptmProduct.isStd() ? AppDisplayMode.NONE : AppDisplayMode.WATERFALL);
+                    // cr.setStd(ptmProduct.isStd());
+                    cr.setDisplayMode(AppDisplayMode.NONE);
+                    cr.setStd(true);
                 }
             } else {
                 //小于等于0,直接返回
