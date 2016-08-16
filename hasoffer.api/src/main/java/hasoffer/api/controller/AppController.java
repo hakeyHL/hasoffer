@@ -626,6 +626,8 @@ public class AppController {
         if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
             List<PtmCmpSku> tempSkuList = pagedCmpskus.getData();
             List<PtmCmpSku> newSkuList = new ArrayList<PtmCmpSku>();
+            //计算评论数*星级的总和
+            int sum = 0;
             //统计site
             Set<Website> websiteSet = new HashSet<Website>();
             Long totalCommentNum = Long.valueOf(0);
@@ -642,9 +644,13 @@ public class AppController {
                 }
                 if (websiteSet.contains(ptmCmpSku2.getWebsite())) {
                     websiteSet.remove(ptmCmpSku2.getWebsite());
-                    //去除列表中除此之外的其他此site的数据
-                    totalCommentNum += ptmCmpSku2.getCommentsNumber();
-                    totalRating += ptmCmpSku2.getRatings();
+                    if (!ptmCmpSku2.getWebsite().equals(Website.EBAY)) {
+                        //评论数*星级 累加 除以评论数和
+                        sum += ptmCmpSku2.getRatings() * ptmCmpSku2.getCommentsNumber();
+                        //去除列表中除此之外的其他此site的数据
+                        totalCommentNum += ptmCmpSku2.getCommentsNumber();
+                        totalRating += ptmCmpSku2.getRatings();
+                    }
                     newSkuList.add(ptmCmpSku2);
                 }
             }
@@ -654,7 +660,7 @@ public class AppController {
             //将新的加入的放入到列表中
             tempSkuList.addAll(newSkuList);
             productListVo.setCommentNum(totalCommentNum);
-            productListVo.setRatingNum(totalRating / tempSkuList.size());
+            productListVo.setRatingNum(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(totalRating), 0, BigDecimal.ROUND_HALF_UP).intValue());
         }
     }
 
