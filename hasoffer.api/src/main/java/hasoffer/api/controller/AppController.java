@@ -1,7 +1,7 @@
 package hasoffer.api.controller;
 
 import hasoffer.api.controller.vo.*;
-import hasoffer.api.helper.ExceptionHelper;
+import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.ParseConfigHelper;
 import hasoffer.api.worker.SearchLogQueue;
 import hasoffer.base.enums.AppType;
@@ -653,7 +653,7 @@ public class AppController {
                 }
             }
             productListVo.setCommentNum(totalCommentNum);
-            productListVo.setRatingNum(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(totalRating == 0 ? 1 : totalRating), 0, BigDecimal.ROUND_HALF_UP).intValue());
+            productListVo.setRatingNum(ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(totalCommentNum == 0 ? 1 : totalCommentNum), 0, BigDecimal.ROUND_HALF_UP).longValue()));
         }
     }
 
@@ -693,7 +693,7 @@ public class AppController {
                 i++;
             }
         } catch (Exception e) {
-            mv.addObject("msg", ExceptionHelper.getExceptionMessage(e));
+            mv.addObject("msg", "faild " + e.getMessage());
             return mv;
         }
         return mv;

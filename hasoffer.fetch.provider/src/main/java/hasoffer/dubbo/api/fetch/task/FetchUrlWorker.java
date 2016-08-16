@@ -1,5 +1,6 @@
 package hasoffer.dubbo.api.fetch.task;
 
+import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.spider.api.IFetchService;
@@ -31,7 +32,19 @@ public class FetchUrlWorker implements Runnable {
     public void run() {
         while (true) {
             try {
-                Object pop = fetchCacheService.popTaskList(RedisKeysUtils.WAIT_URL_LIST);
+                Object pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_1));
+                if (pop == null) {
+                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_2));
+                }
+                if (pop == null) {
+                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_3));
+                }
+                if (pop == null) {
+                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_4));
+                }
+                if (pop == null) {
+                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_5));
+                }
                 if (pop == null) {
                     TimeUnit.MINUTES.sleep(1);
                 } else {
