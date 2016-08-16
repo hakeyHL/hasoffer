@@ -116,6 +116,8 @@ public class ProductCacheManager {
                     cmpSku.setSkuTitle((String) map.get("skuTitle"));
                     cmpSku.setTitle((String) map.get("title"));
                     cmpSku.setPrice(price.floatValue());
+                    cmpSku.setRatings((Integer) map.get("ratings"));
+                    cmpSku.setCommentsNumber(Long.valueOf(map.get("commentsNumber") + ""));
                     cmpSku.setRating((String) map.get("rating"));
                     cmpSku.setImagePath((String) map.get("imagePath"));
                     cmpSku.setOriImageUrl((String) map.get("oriImageUrl"));
@@ -227,6 +229,7 @@ public class ProductCacheManager {
                     cmpSku.setImagePath((String) map.get("imagePath"));
                     cmpSku.setOriImageUrl((String) map.get("oriImageUrl"));
                     cmpSku.setDeeplink((String) map.get("deeplink"));
+                    cmpSku.setSmallImagePath((String) map.get("smallImagePath"));
                     cmpSku.setUrl((String) map.get("url"));
                     cmpSku.setOriUrl((String) map.get("oriUrl"));
                     cmpSku.setColor((String) map.get("color"));
