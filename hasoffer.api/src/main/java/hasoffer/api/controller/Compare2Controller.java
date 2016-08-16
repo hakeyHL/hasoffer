@@ -340,8 +340,8 @@ public class Compare2Controller {
 
         // 搜索SKU
         PageableResult<CmpSkuModel> pagedCmpskuModels = cmpskuIndexService.searchSku(_q, 1, 5);
-
         List<CmpSkuModel> skuModels = pagedCmpskuModels.getData();
+        System.out.println("skuModels   " + skuModels.size());
 
         if (ArrayUtils.isNullOrEmpty(skuModels)) {
             throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, "", 0);
@@ -363,12 +363,14 @@ public class Compare2Controller {
         String title = skuModel.getTitle();
 
         float mc = StringUtils.wordMatchD(StringUtils.toLowerCase(title), _q);
+        System.out.println(" mc " + mc);
         // 匹配度如果小于40%, 则认为不匹配
         if (mc <= 0.4) {
             throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, title, mc);
         }
 
         long cateId = 0L;
+        System.out.println("skuModel.getProductId()  " + skuModel.getProductId());
         sio.set(cateId, skuModel.getProductId(), skuModel.getId());
     }
 
