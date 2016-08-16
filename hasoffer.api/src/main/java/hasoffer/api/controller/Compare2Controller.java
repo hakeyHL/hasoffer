@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.PropertyFilter;
 import hasoffer.api.controller.vo.*;
+import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.SearchHelper;
 import hasoffer.base.model.AppDisplayMode;
@@ -89,31 +90,32 @@ public class Compare2Controller {
 //        System.out.println(flipkart);
 //        String deeplinkWithAff = WebsiteHelper.getDeeplinkWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
 //        System.out.println(deeplinkWithAff);
-        Map<Long, Integer> map = new HashMap<Long, Integer>();
-        map.put(1l, 4);
-        map.put(3l, 100);
-        map.put(2l, 3);
-        Set<Long> longs = map.keySet();
-        int t = 0;
-        int t1 = 0;
-        Iterator<Long> iterator = longs.iterator();
-        while (iterator.hasNext()) {
-            Long next = iterator.next();
-            t += map.get(next);
-            t1 += map.get(next) * next;
-        }
-        System.out.println(t1);
-        System.out.println(t);
-        System.out.println(BigDecimal.valueOf(t).divide(BigDecimal.valueOf(10), 1, BigDecimal.ROUND_HALF_UP));
-        BigDecimal s = BigDecimal.ZERO;
-        Set<Long> long2 = map.keySet();
-        Iterator<Long> iterator1 = long2.iterator();
-        while (iterator1.hasNext()) {
-            Long next = iterator1.next();
-            BigDecimal ss = BigDecimal.valueOf(map.get(next)).divide(BigDecimal.valueOf(t), 1, BigDecimal.ROUND_HALF_UP);
-            s = s.add(ss.multiply(BigDecimal.valueOf(next)));
-        }
-        System.out.println(s.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+//        Map<Long, Integer> map = new HashMap<Long, Integer>();
+//        map.put(1l, 4);
+//        map.put(3l, 100);
+//        map.put(2l, 3);
+//        Set<Long> longs = map.keySet();
+//        int t = 0;
+//        int t1 = 0;
+//        Iterator<Long> iterator = longs.iterator();
+//        while (iterator.hasNext()) {
+//            Long next = iterator.next();
+//            t += map.get(next);
+//            t1 += map.get(next) * next;
+//        }
+//        System.out.println(t1);
+//        System.out.println(t);
+//        System.out.println(BigDecimal.valueOf(t).divide(BigDecimal.valueOf(10), 1, BigDecimal.ROUND_HALF_UP));
+//        BigDecimal s = BigDecimal.ZERO;
+//        Set<Long> long2 = map.keySet();
+//        Iterator<Long> iterator1 = long2.iterator();
+//        while (iterator1.hasNext()) {
+//            Long next = iterator1.next();
+//            BigDecimal ss = BigDecimal.valueOf(map.get(next)).divide(BigDecimal.valueOf(t), 1, BigDecimal.ROUND_HALF_UP);
+//            s = s.add(ss.multiply(BigDecimal.valueOf(next)));
+//        }
+//        System.out.println(s.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+        System.out.println(305 % 10);
     }
 
     // @Cacheable(value = "compare", key = "'getcmpskus_'+#q+'_'+#site+'_'+#price+'_'+#page+'_'+#size")
@@ -675,7 +677,7 @@ public class Compare2Controller {
             PageableResult<CmpProductListVo> priceList = new PageableResult<CmpProductListVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize());
             cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
             cmpResult.setPriceList(priceList.getData());
-            cmpResult.setRatingNum(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(tempRatins == 0 ? 1 : tempRatins), 0, BigDecimal.ROUND_HALF_UP).intValue());
+            cmpResult.setRatingNum(ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(tempTotalComments == 0 ? 1 : tempTotalComments), 0, BigDecimal.ROUND_HALF_UP).longValue()));
             PtmProductDescription ptmProductDescription = mongoDbManager.queryOne(PtmProductDescription.class, product.getId());
             String specs = "";
             if (ptmProductDescription != null) {
