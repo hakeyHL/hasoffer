@@ -105,6 +105,8 @@ public class ProductCacheManager {
                     PtmCmpSku cmpSku = new PtmCmpSku();
                     String website = (String) map.get("website");
                     Double price = (Double) map.get("price");
+                    Double cashBack = (Double) map.get("cashBack");
+                    Double shipping = (Double) map.get("shipping");
                     if (StringUtils.isEmpty(website) || price == null) {
                         continue;
                     }
@@ -115,8 +117,12 @@ public class ProductCacheManager {
                     cmpSku.setSeller((String) map.get("seller"));
                     cmpSku.setSkuTitle((String) map.get("skuTitle"));
                     cmpSku.setTitle((String) map.get("title"));
+                    cmpSku.setSupportPayMethod((String) map.get("supportPayMethod"));
                     cmpSku.setPrice(price.floatValue());
+                    cmpSku.setCashBack(cashBack.floatValue());
+                    cmpSku.setShipping(shipping.floatValue());
                     cmpSku.setRatings((Integer) map.get("ratings"));
+                    cmpSku.setReturnDays((Integer) map.get("returnDays"));
                     cmpSku.setCommentsNumber(Long.valueOf(map.get("commentsNumber") + ""));
                     cmpSku.setRating((String) map.get("rating"));
                     cmpSku.setImagePath((String) map.get("imagePath"));
