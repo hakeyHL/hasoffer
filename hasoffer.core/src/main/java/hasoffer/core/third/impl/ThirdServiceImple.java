@@ -8,7 +8,7 @@ import hasoffer.base.model.Website;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.dbm.Hibernate4DataBaseManager;
 import hasoffer.core.persistence.po.app.AppDeal;
-import hasoffer.core.product.iml.CmpSkuServiceImpl;
+import hasoffer.core.product.impl.CmpSkuServiceImpl;
 import hasoffer.core.third.ThirdService;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.core.utils.JsonHelper;

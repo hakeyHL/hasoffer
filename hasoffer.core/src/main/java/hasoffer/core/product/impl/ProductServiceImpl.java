@@ -1,4 +1,4 @@
-package hasoffer.core.product.iml;
+package hasoffer.core.product.impl;
 
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
@@ -18,6 +18,8 @@ import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
+import hasoffer.core.product.solr.CmpSkuModel;
+import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel;
 import hasoffer.core.search.ISearchService;
@@ -85,6 +87,8 @@ public class ProductServiceImpl implements IProductService {
     ICategoryService categoryService;
     @Resource
     SearchLogCacheManager searchLogCacheManager;
+    @Resource
+    CmpskuIndexServiceImpl cmpskuIndexService;
     @Resource
     private IDataBaseManager dbm;
     @Resource
@@ -437,6 +441,14 @@ public class ProductServiceImpl implements IProductService {
             for (PtmCmpSku cmpSku : cmpSkus) {
 //                dbm.delete(PtmCmpSku.class, cmpSku.getId());
                 cmpSkuService.deleteCmpSku(cmpSku.getId());
+            }
+        } else {
+            PageableResult<CmpSkuModel> skuModelPageableResult = cmpskuIndexService.search("productId", String.valueOf(ptmProductId), 1, Integer.MAX_VALUE);
+            List<CmpSkuModel> skuModels = skuModelPageableResult.getData();
+            if (ArrayUtils.hasObjs(skuModels)) {
+                for (CmpSkuModel cmpSkuModel : skuModels) {
+                    cmpskuIndexService.remove(String.valueOf(cmpSkuModel.getId()));
+                }
             }
         }
 

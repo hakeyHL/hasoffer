@@ -70,32 +70,24 @@ public class ProductAnalysisService {
 
             List<PtmCmpSku> relatedCmpSkus = productBo.getCmpSkus();
 
-            float minPrice = -1, maxPrice = -1;
+            float sumPrice = 0.0f;
+            int validPriceCount = 0;
             for (PtmCmpSku cmpSku : relatedCmpSkus) {
-                if (logSite == cmpSku.getWebsite()) {
-                    stdPrice = cmpSku.getPrice();
-                    break;
-                }
-
-                if (minPrice == -1) {
-                    minPrice = cmpSku.getPrice();
-                    maxPrice = cmpSku.getPrice();
+                float price = cmpSku.getPrice();
+                if (price <= 0) {
                     continue;
                 }
 
-                if (minPrice > cmpSku.getPrice()) {
-                    minPrice = cmpSku.getPrice();
-                }
-                if (maxPrice < cmpSku.getPrice()) {
-                    maxPrice = cmpSku.getPrice();
-                }
+                sumPrice += price;
+                validPriceCount++;
             }
 
-            if (stdPrice <= 0) {
-                stdPrice = (maxPrice + minPrice) / 2;
-            }
+            stdPrice = sumPrice / validPriceCount;
         } else {
             WebFetchResult webFetchResult = listProductMap.get(logSite);
+            if (webFetchResult == null) {
+                return;
+            }
             List<ListProduct> logPros = webFetchResult.getProductList();
             if (ArrayUtils.hasObjs(logPros)) {
                 for (ListProduct lp : logPros) {
@@ -105,6 +97,8 @@ public class ProductAnalysisService {
                         stdPrice = lp.getPrice();
                     }
                 }
+            } else {
+                return;
             }
         }
 

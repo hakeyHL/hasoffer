@@ -42,4 +42,19 @@ public class ClientHelper {
         return stringBuilder.toString();
     }
 
+    public static int returnNumberBetween0And5(Long number) {
+        //取得其余数
+        Long tempNumber = number % 10;
+        if (tempNumber > 0 && tempNumber <= 5) {
+            number = (number / 10) * 10 + 5;
+        } else if (tempNumber > 5) {
+            number = (number / 10) * 10 + 10;
+        }
+        return number.intValue();
+    }
+
+    public static void main(String[] args) {
+        int i = ClientHelper.returnNumberBetween0And5(Long.valueOf(0));
+        System.out.println(i);
+    }
 }
