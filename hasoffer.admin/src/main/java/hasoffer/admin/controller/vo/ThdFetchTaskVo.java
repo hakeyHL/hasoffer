@@ -1,8 +1,5 @@
 package hasoffer.admin.controller.vo;
 
-import hasoffer.base.model.TaskStatus;
-import hasoffer.base.model.Website;
-
 import java.util.Date;
 
 /**

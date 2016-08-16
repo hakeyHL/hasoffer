@@ -303,6 +303,16 @@ public class FixController {
         return "ok";
     }
 
+    @RequestMapping(value = "/deleteproductanyway/{proId}", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String deleteproduct2(@PathVariable Long proId) {
+        if (proId > 0) {
+            productService.deleteProduct(proId);
+        }
+        return "ok";
+    }
+
     @RequestMapping(value = "/cleansearchlogs", method = RequestMethod.GET)
     public
     @ResponseBody
@@ -1261,6 +1271,100 @@ public class FixController {
 
         return "ok";
     }
+
+    //fixdata/fixSkuSmallImagePathSizeZero
+    @RequestMapping(value = "/fixSkuSmallImagePathSizeZero")
+    @ResponseBody
+    public String fixSkuSmallImagePathSizeZero() {
+
+        final ConcurrentLinkedQueue<PtmCmpSku> cmpSkuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        es.execute(new Runnable() {
+
+            @Override
+            public void run() {
+
+                String[] strArray = {"0715", "0716", "0717", "0718", "0719", "0720", "0721", "0722", "0723", "0724", "0725", "0726", "0727", "0728", "0729", "0730", "0731", "0801", "0802", "0803", "0804", "0805", "0806", "0807", "0808", "0809", "0810", "0811", "0812", "0813"};
+
+                for (int i = 0; i < strArray.length; i++) {
+
+                    String str = strArray[i];
+                    System.out.println("cur str" + str);
+
+                    int curPage = 1;
+                    int pageSize = 1000;
+
+                    PageableResult<PtmCmpSku> pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.smallImagePath like '/2016/" + str + "/%' ", curPage, pageSize);
+
+                    long totalPage = pageableResult.getTotalPage();
+
+                    while (curPage <= totalPage) {
+
+                        if (cmpSkuQueue.size() > 10000) {
+                            try {
+                                TimeUnit.SECONDS.sleep(5);
+                            } catch (InterruptedException e) {
+
+                            }
+                            System.out.println("queue size = " + cmpSkuQueue.size());
+                            continue;
+                        }
+
+                        if (curPage > 1) {
+                            pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.smallImagePath like '/2016/" + str + "/%' ", curPage, pageSize);
+                        }
+
+                        List<PtmCmpSku> cmpSkuList = pageableResult.getData();
+
+                        cmpSkuQueue.addAll(cmpSkuList);
+
+                        curPage++;
+                    }
+                }
+            }
+        });
+
+        for (int i = 0; i < 10; i++) {
+
+            es.execute(new Runnable() {
+                @Override
+                public void run() {
+                    while (true) {
+
+                        PtmCmpSku sku = cmpSkuQueue.poll();
+
+                        if (sku == null) {
+                            try {
+                                TimeUnit.SECONDS.sleep(3);
+                            } catch (InterruptedException e) {
+
+                            }
+                            continue;
+                        }
+
+                        cmpSkuService.downloadImage2(sku);
+                    }
+                }
+            });
+        }
+
+        return "ok";
+    }
+
+    //fixdata/fixSkuSmallImagePathSizeZeroTest
+    @RequestMapping(value = "/fixSkuSmallImagePathSizeZeroTest")
+    @ResponseBody
+    public String fixSkuSmallImagePathSizeZeroTest() {
+
+        PtmCmpSku sku = dbm.querySingle("SELECT t FROM PtmCmpSku t WHERE t.id = ?0 ", Arrays.asList(6428134L));
+
+        cmpSkuService.downloadImage2(sku);
+
+        return "ok";
+    }
+
 
     //fixdata/deleteProductByString
     @RequestMapping(value = "/deleteProductByString")

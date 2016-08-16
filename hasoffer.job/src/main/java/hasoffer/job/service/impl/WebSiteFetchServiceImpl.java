@@ -27,8 +27,10 @@ public class WebSiteFetchServiceImpl implements IWebSiteFetchService {
 
     @Resource
     ISearchService searchService;
+
     @Resource
     IDataBaseManager dbm;
+
     @Resource
     SearchProductService searchProductService;
 

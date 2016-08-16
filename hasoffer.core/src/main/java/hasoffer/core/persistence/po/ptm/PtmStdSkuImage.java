@@ -2,15 +2,12 @@ package hasoffer.core.persistence.po.ptm;
 
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * Created on 2015/12/7.
  */
-//@Entity
+@Entity
 public class PtmStdSkuImage implements Identifiable<Long> {
 
     @Id
