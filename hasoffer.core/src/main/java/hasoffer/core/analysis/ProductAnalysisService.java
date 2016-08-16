@@ -85,6 +85,9 @@ public class ProductAnalysisService {
             stdPrice = sumPrice / validPriceCount;
         } else {
             WebFetchResult webFetchResult = listProductMap.get(logSite);
+            if (webFetchResult == null) {
+                return;
+            }
             List<ListProduct> logPros = webFetchResult.getProductList();
             if (ArrayUtils.hasObjs(logPros)) {
                 for (ListProduct lp : logPros) {
