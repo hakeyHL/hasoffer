@@ -81,6 +81,9 @@ public class PtmCmpSku implements Identifiable<Long> {
     @ColumnDefault(value = "0")
     private int returnDays = 0;
 
+    private String brand;//品牌
+    private String model;//型号
+
     public PtmCmpSku() {
     }
 
@@ -401,6 +404,22 @@ public class PtmCmpSku implements Identifiable<Long> {
         this.categoryId2 = categoryId2;
     }
 
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -445,7 +464,9 @@ public class PtmCmpSku implements Identifiable<Long> {
         if (status != sku.status) return false;
         if (supportPayMethod != null ? !supportPayMethod.equals(sku.supportPayMethod) : sku.supportPayMethod != null)
             return false;
-        return !(deliveryTime != null ? !deliveryTime.equals(sku.deliveryTime) : sku.deliveryTime != null);
+        if (deliveryTime != null ? !deliveryTime.equals(sku.deliveryTime) : sku.deliveryTime != null) return false;
+        if (brand != null ? !brand.equals(sku.brand) : sku.brand != null) return false;
+        return !(model != null ? !model.equals(sku.model) : sku.model != null);
 
     }
 
@@ -486,6 +507,8 @@ public class PtmCmpSku implements Identifiable<Long> {
         result = 31 * result + (supportPayMethod != null ? supportPayMethod.hashCode() : 0);
         result = 31 * result + (deliveryTime != null ? deliveryTime.hashCode() : 0);
         result = 31 * result + returnDays;
+        result = 31 * result + (brand != null ? brand.hashCode() : 0);
+        result = 31 * result + (model != null ? model.hashCode() : 0);
         return result;
     }
 }

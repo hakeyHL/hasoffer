@@ -1,5 +1,6 @@
 package hasoffer.task.worker;
 
+import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.TimeUtils;
@@ -87,7 +88,7 @@ public class SrmProductSearchCountListWorker implements Runnable {
                         }
 
                         queue.add(sku);
-                        fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl());
+                        fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_1);
                         logger.info("send url request succes for sku id is [" + sku.getId() + "]");
                     }
                 }
