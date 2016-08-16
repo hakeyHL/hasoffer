@@ -625,7 +625,6 @@ public class AppController {
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productListVo.getId(), 1, 20);
         if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
             List<PtmCmpSku> tempSkuList = pagedCmpskus.getData();
-            List<PtmCmpSku> newSkuList = new ArrayList<PtmCmpSku>();
             //计算评论数*星级的总和
             int sum = 0;
             //统计site
@@ -651,14 +650,8 @@ public class AppController {
                         totalCommentNum += ptmCmpSku2.getCommentsNumber();
                         totalRating += ptmCmpSku2.getRatings();
                     }
-                    newSkuList.add(ptmCmpSku2);
                 }
             }
-            //移除之前加进列表的所有的sku列表
-            tempSkuList = null;
-            tempSkuList = new ArrayList<>();
-            //将新的加入的放入到列表中
-            tempSkuList.addAll(newSkuList);
             productListVo.setCommentNum(totalCommentNum);
             productListVo.setRatingNum(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(totalRating), 0, BigDecimal.ROUND_HALF_UP).intValue());
         }
