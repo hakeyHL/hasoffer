@@ -2,7 +2,6 @@ package hasoffer.api.controller;
 
 import hasoffer.api.controller.vo.*;
 import hasoffer.api.helper.ClientHelper;
-import hasoffer.api.helper.ExceptionHelper;
 import hasoffer.api.helper.ParseConfigHelper;
 import hasoffer.api.worker.SearchLogQueue;
 import hasoffer.base.enums.AppType;
@@ -694,7 +693,7 @@ public class AppController {
                 i++;
             }
         } catch (Exception e) {
-            mv.addObject("msg", ExceptionHelper.getExceptionMessage(e));
+            mv.addObject("msg", "faild " + e.getMessage());
             return mv;
         }
         return mv;
