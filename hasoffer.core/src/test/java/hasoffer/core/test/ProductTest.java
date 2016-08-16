@@ -1,6 +1,7 @@
 package hasoffer.core.test;
 
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
@@ -10,6 +11,7 @@ import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.product.*;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
@@ -18,6 +20,7 @@ import hasoffer.core.search.ISearchService;
 import hasoffer.core.task.ListAndProcessTask2;
 import hasoffer.core.task.worker.IList;
 import hasoffer.core.task.worker.IProcess;
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -26,6 +29,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -71,6 +75,77 @@ public class ProductTest {
     IDealService dealService;
     private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
     private Logger logger = LoggerFactory.getLogger(ProductTest.class);
+
+    private void print(String str) {
+        System.out.println(str);
+    }
+
+    @Test
+    public void import2Solr() {
+        productService.deleteProduct(100);
+//        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(100);
+//        cmpSkuService.importCmpSku2solr(cmpSkus.get(0));
+    }
+
+    @Test
+    public void expPriceExcept() throws Exception {
+        String sql = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd='20160815' order by t.count DESC";
+
+        List<SrmProductSearchCount> searchCounts = dbm.query(sql);
+
+        File file = hasoffer.base.utils.FileUtils.createFile("d:/tmp/price.txt", true);
+
+        StringBuilder sb = new StringBuilder();
+
+        int count = 0;
+        for (int i = 0; i < searchCounts.size(); i++) {
+            SrmProductSearchCount searchCount = searchCounts.get(i);
+            long productId = searchCount.getProductId();
+            PtmProduct product = dbm.get(PtmProduct.class, productId);
+            if (product == null) {
+                print(String.format("product is null...[%d]", productId));
+            } else {
+                List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId);
+                float minPrice = -1, maxPrice = -1;
+                for (PtmCmpSku cmpSku : cmpSkus) {
+                    float price = cmpSku.getPrice();
+                    if (cmpSku.getStatus() == SkuStatus.OFFSALE || price <= 0) {
+                        continue;
+                    }
+
+                    if (minPrice < 0) {
+                        minPrice = price;
+                        maxPrice = minPrice;
+                    }
+
+                    if (minPrice > price) {
+                        minPrice = price;
+                    }
+
+                    if (maxPrice < price) {
+                        maxPrice = price;
+                    }
+                }
+
+                if (maxPrice < 0) {
+                    print(String.format("no price...[%d]", productId));
+                    continue;
+                }
+
+                if (maxPrice / minPrice > 6) {
+                    sb.append(productId).append("\t").append(maxPrice).append("\t").append(minPrice).append("\n");
+                    if (count++ % 100 == 0) {
+                        print(count + "/" + i);
+                        FileUtils.write(file, sb.toString(), true);
+                        sb = new StringBuilder();
+                    }
+                    print(String.format("price max/min > 6...[%d]", productId));
+                } else {
+                    print("ok");
+                }
+            }
+        }
+    }
 
     @Test
     public void testFlipkartSKu() {
