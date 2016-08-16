@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.PropertyFilter;
 import hasoffer.api.controller.vo.*;
+import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.SearchHelper;
 import hasoffer.base.model.AppDisplayMode;
@@ -89,31 +90,32 @@ public class Compare2Controller {
 //        System.out.println(flipkart);
 //        String deeplinkWithAff = WebsiteHelper.getDeeplinkWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
 //        System.out.println(deeplinkWithAff);
-        Map<Long, Integer> map = new HashMap<Long, Integer>();
-        map.put(1l, 4);
-        map.put(3l, 100);
-        map.put(2l, 3);
-        Set<Long> longs = map.keySet();
-        int t = 0;
-        int t1 = 0;
-        Iterator<Long> iterator = longs.iterator();
-        while (iterator.hasNext()) {
-            Long next = iterator.next();
-            t += map.get(next);
-            t1 += map.get(next) * next;
-        }
-        System.out.println(t1);
-        System.out.println(t);
-        System.out.println(BigDecimal.valueOf(t).divide(BigDecimal.valueOf(10), 1, BigDecimal.ROUND_HALF_UP));
-        BigDecimal s = BigDecimal.ZERO;
-        Set<Long> long2 = map.keySet();
-        Iterator<Long> iterator1 = long2.iterator();
-        while (iterator1.hasNext()) {
-            Long next = iterator1.next();
-            BigDecimal ss = BigDecimal.valueOf(map.get(next)).divide(BigDecimal.valueOf(t), 1, BigDecimal.ROUND_HALF_UP);
-            s = s.add(ss.multiply(BigDecimal.valueOf(next)));
-        }
-        System.out.println(s.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+//        Map<Long, Integer> map = new HashMap<Long, Integer>();
+//        map.put(1l, 4);
+//        map.put(3l, 100);
+//        map.put(2l, 3);
+//        Set<Long> longs = map.keySet();
+//        int t = 0;
+//        int t1 = 0;
+//        Iterator<Long> iterator = longs.iterator();
+//        while (iterator.hasNext()) {
+//            Long next = iterator.next();
+//            t += map.get(next);
+//            t1 += map.get(next) * next;
+//        }
+//        System.out.println(t1);
+//        System.out.println(t);
+//        System.out.println(BigDecimal.valueOf(t).divide(BigDecimal.valueOf(10), 1, BigDecimal.ROUND_HALF_UP));
+//        BigDecimal s = BigDecimal.ZERO;
+//        Set<Long> long2 = map.keySet();
+//        Iterator<Long> iterator1 = long2.iterator();
+//        while (iterator1.hasNext()) {
+//            Long next = iterator1.next();
+//            BigDecimal ss = BigDecimal.valueOf(map.get(next)).divide(BigDecimal.valueOf(t), 1, BigDecimal.ROUND_HALF_UP);
+//            s = s.add(ss.multiply(BigDecimal.valueOf(next)));
+//        }
+//        System.out.println(s.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+        System.out.println(305 % 10);
     }
 
     // @Cacheable(value = "compare", key = "'getcmpskus_'+#q+'_'+#site+'_'+#price+'_'+#page+'_'+#size")
@@ -210,8 +212,14 @@ public class Compare2Controller {
                     cr = getCmpProducts(sio);
                     cr.setProductId(sio.getHsProId());
                     cr.setCopywriting(ptmProduct != null && ptmProduct.isStd() ? "Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you." : "Looked around Myntre,Jabong & 5 other apps,thought you might like these items as well..");
-                    cr.setDisplayMode(ptmProduct != null && ptmProduct.isStd() ? AppDisplayMode.NONE : AppDisplayMode.WATERFALL);
-                    cr.setStd(ptmProduct.isStd());
+                    //暂时屏蔽标品非标品
+                    // cr.setDisplayMode(ptmProduct != null && ptmProduct.isStd() ? AppDisplayMode.NONE : AppDisplayMode.WATERFALL);
+                    // cr.setStd(ptmProduct.isStd());
+                    cr.setDisplayMode(AppDisplayMode.NONE);
+                    cr.setStd(true);
+                    jsonObject.put("data", JSONObject.toJSON(cr));
+                    Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
+                    return null;
                 }
             } else {
                 //小于等于0,直接返回
@@ -225,38 +233,6 @@ public class Compare2Controller {
             jsonObject.put("data", JSONObject.toJSON(cr));
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
             return null;
-        }
-        if (cr != null) {
-            jsonObject.put("data", JSONObject.toJSON(cr));
-        } else {
-            jsonObject.put("data", "{\n" +
-                    "        \"copywriting\": \"\",\n" +
-                    "        \"show\": \"WATERFALL\",\n" +
-                    "        \"skus\": [\n" +
-                    "            {\n" +
-                    "                \"status\": \"onsale\",\n" +
-                    "                \"title\": \"小王子（法国“圣埃克苏佩里基金会”官方认可简体中文译本）\",\n" +
-                    "                \"imageUrl\": \"http://img13.360buyimg.com/n1/jfs/t2200/173/590579185/269686/4c299e77/56174e3eN362982a4.jpg\",\n" +
-                    "                \"cashBack\": \"10\",\n" +
-                    "                \"deepLink\": \"http://item.jd.com/11143993.html\",\n" +
-                    "                \"saved\": 100,\n" +
-                    "                \"id\": \"11143993\",\n" +
-                    "                \"skuPrice\": \"1,000\",\n" +
-                    "                \"website\": \"FLIPKART\"\n" +
-                    "            },\n" +
-                    "            {\n" +
-                    "                \"status\": \"sold out\",\n" +
-                    "                \"title\": \"摩斯维 手机套/金属边框/防摔保护壳外壳 适用于华为荣耀畅玩4X/全网通/电信/移动版 拉丝尊享款-香槟金-送钢化膜\",\n" +
-                    "                \"imageUrl\": \"http://img11.360buyimg.com/n1/jfs/t2698/221/1187894551/168647/33c6c8e1/5736a5f7Nfa29f761.jpg\",\n" +
-                    "                \"cashBack\": \"20\",\n" +
-                    "                \"deepLink\": \"http://item.jd.com/1381873091.html\",\n" +
-                    "                \"saved\": -100,\n" +
-                    "                \"id\": \"1381873091\",\n" +
-                    "                \"skuPrice\": \"1,000\",\n" +
-                    "                \"website\": \"FLIPKART\"\n" +
-                    "            }\n" +
-                    "        ]\n" +
-                    "    }");
         }
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
         return null;
@@ -604,7 +580,6 @@ public class Compare2Controller {
             Long tempTotalComments = Long.valueOf(0);
             //评论星级按照平均值展示
             int tempRatins = 0;
-            int tempCount = 0;
             //统计site
             Set<Website> websiteSet = new HashSet<Website>();
             //初始化price为客户端传输的price
@@ -646,7 +621,8 @@ public class Compare2Controller {
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
             }
             List<CmpProductListVo> tempCmpProductListVos = new ArrayList<CmpProductListVo>();
-//            Map<Long, Integer> tempComment = new HashMap<Long, Integer>();
+            //计算评论数*星级的总和
+            int sum = 0;
             //每个site只保留一个且为最低价
             for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
                 if (websiteSet.size() <= 0) {
@@ -655,13 +631,12 @@ public class Compare2Controller {
                 if (websiteSet.contains(cmpProductListVo.getWebsite())) {
                     websiteSet.remove(cmpProductListVo.getWebsite());
                     //去除列表中除此之外的其他此site的数据
-//                    if (tempComment.containsKey(cmpProductListVo.getTotalRatingsNum())) {
-//                        tempComment.put(cmpProductListVo.getTotalRatingsNum(), tempComment.get(cmpProductListVo.getTotalRatingsNum()) + 1);
-//                    } else {
-//                        tempComment.put(cmpProductListVo.getTotalRatingsNum(), 1);
-//                    }
-                    tempTotalComments += cmpProductListVo.getTotalRatingsNum();
-                    tempRatins += cmpProductListVo.getRatingNum();
+                    if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
+                        //评论数*星级 累加 除以评论数和
+                        sum += cmpProductListVo.getTotalRatingsNum() * cmpProductListVo.getRatingNum();
+                        tempTotalComments += cmpProductListVo.getTotalRatingsNum();
+                        tempRatins += cmpProductListVo.getRatingNum();
+                    }
                     tempCmpProductListVos.add(cmpProductListVo);
                 }
             }
@@ -676,24 +651,7 @@ public class Compare2Controller {
             PageableResult<CmpProductListVo> priceList = new PageableResult<CmpProductListVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize());
             cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
             cmpResult.setPriceList(priceList.getData());
-            //评论星级为加权平均值
-//            Set<Map.Entry<Long, Integer>> entries = tempComment.entrySet();
-            //算得每一个的权值
-//            Long totalWeigth = 0l;
-//            for (Map.Entry<Long, Integer> map : entries) {
-//                //算总值
-//                totalWeigth += map.getValue();
-//            }
-           /* BigDecimal WeightedAverage = BigDecimal.ZERO;
-            for (Map.Entry<Long, Integer> map : entries) {
-                //算得加权平均值
-                Long key = map.getKey();
-                Integer value = map.getValue();
-
-                BigDecimal Weight = BigDecimal.valueOf(value).divide(BigDecimal.valueOf(totalWeigth), 1, BigDecimal.ROUND_HALF_UP);
-                WeightedAverage = WeightedAverage.add(Weight.multiply(BigDecimal.valueOf(key)));
-            }*/
-            cmpResult.setRatingNum(tempRatins / tempCmpProductListVos.size());
+            cmpResult.setRatingNum(ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(tempTotalComments == 0 ? 1 : tempTotalComments), 0, BigDecimal.ROUND_HALF_UP).longValue()));
             PtmProductDescription ptmProductDescription = mongoDbManager.queryOne(PtmProductDescription.class, product.getId());
             String specs = "";
             if (ptmProductDescription != null) {
@@ -757,6 +715,7 @@ public class Compare2Controller {
             }
             List<CmpProductListVo> tempCmpProductListVos = new ArrayList<CmpProductListVo>();
             //每个site只保留一个且为最低价
+            System.out.println("websiteSet :" + websiteSet.size());
             long startTime = System.nanoTime();   //获取开始时间
             for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
                 if (websiteSet.size() <= 0) {
@@ -772,13 +731,14 @@ public class Compare2Controller {
             comparedSkuVos = null;
             comparedSkuVos = new ArrayList<>();
             //将新的加入的放入到列表中
+            System.out.println("tempCmpProductListVos" + tempCmpProductListVos.size());
             comparedSkuVos.addAll(tempCmpProductListVos);
             long endTime = System.nanoTime(); //获取结束时间
             System.out.println("total time is " + (endTime - startTime) / 1000000 + "");
         }
+        System.out.println("comparedSkuVos" + comparedSkuVos.size());
         cmpResult.setPriceList(comparedSkuVos);
         cmpResult.setCopywriting("Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you.");
-        cmpResult.setDisplayMode(AppDisplayMode.WATERFALL);
         return cmpResult;
     }
 
