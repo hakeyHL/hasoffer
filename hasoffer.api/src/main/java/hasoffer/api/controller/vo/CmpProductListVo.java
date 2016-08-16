@@ -42,7 +42,6 @@ public class CmpProductListVo {
         this.ratingNum = cmpSku.getRatings();
         this.totalRatingsNum = cmpSku.getCommentsNumber();
         this.image = logoImage;
-        this.ratingNum = cmpSku.getRatings();
         this.price = Math.round(cmpSku.getPrice());
         this.website = cmpSku.getWebsite();
         this.freight = cmpSku.getShipping();
@@ -140,7 +139,7 @@ public class CmpProductListVo {
         this.deepLink = deepLink;
     }
 
-    public float getRatingNum() {
+    public int getRatingNum() {
         return ratingNum;
     }
 
