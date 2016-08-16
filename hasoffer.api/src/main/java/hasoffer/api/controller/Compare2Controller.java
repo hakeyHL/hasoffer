@@ -604,7 +604,6 @@ public class Compare2Controller {
             Long tempTotalComments = Long.valueOf(0);
             //评论星级按照平均值展示
             int tempRatins = 0;
-            int tempCount = 0;
             //统计site
             Set<Website> websiteSet = new HashSet<Website>();
             //初始化price为客户端传输的price
@@ -646,7 +645,8 @@ public class Compare2Controller {
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
             }
             List<CmpProductListVo> tempCmpProductListVos = new ArrayList<CmpProductListVo>();
-//            Map<Long, Integer> tempComment = new HashMap<Long, Integer>();
+            //计算评论数*星级的总和
+            int sum = 0;
             //每个site只保留一个且为最低价
             for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
                 if (websiteSet.size() <= 0) {
@@ -655,13 +655,12 @@ public class Compare2Controller {
                 if (websiteSet.contains(cmpProductListVo.getWebsite())) {
                     websiteSet.remove(cmpProductListVo.getWebsite());
                     //去除列表中除此之外的其他此site的数据
-//                    if (tempComment.containsKey(cmpProductListVo.getTotalRatingsNum())) {
-//                        tempComment.put(cmpProductListVo.getTotalRatingsNum(), tempComment.get(cmpProductListVo.getTotalRatingsNum()) + 1);
-//                    } else {
-//                        tempComment.put(cmpProductListVo.getTotalRatingsNum(), 1);
-//                    }
-                    tempTotalComments += cmpProductListVo.getTotalRatingsNum();
-                    tempRatins += cmpProductListVo.getRatingNum();
+                    if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
+                        //评论数*星级 累加 除以评论数和
+                        sum += cmpProductListVo.getTotalRatingsNum() * cmpProductListVo.getRatingNum();
+                        tempTotalComments += cmpProductListVo.getTotalRatingsNum();
+                        tempRatins += cmpProductListVo.getRatingNum();
+                    }
                     tempCmpProductListVos.add(cmpProductListVo);
                 }
             }
@@ -676,24 +675,7 @@ public class Compare2Controller {
             PageableResult<CmpProductListVo> priceList = new PageableResult<CmpProductListVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize());
             cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
             cmpResult.setPriceList(priceList.getData());
-            //评论星级为加权平均值
-//            Set<Map.Entry<Long, Integer>> entries = tempComment.entrySet();
-            //算得每一个的权值
-//            Long totalWeigth = 0l;
-//            for (Map.Entry<Long, Integer> map : entries) {
-//                //算总值
-//                totalWeigth += map.getValue();
-//            }
-           /* BigDecimal WeightedAverage = BigDecimal.ZERO;
-            for (Map.Entry<Long, Integer> map : entries) {
-                //算得加权平均值
-                Long key = map.getKey();
-                Integer value = map.getValue();
-
-                BigDecimal Weight = BigDecimal.valueOf(value).divide(BigDecimal.valueOf(totalWeigth), 1, BigDecimal.ROUND_HALF_UP);
-                WeightedAverage = WeightedAverage.add(Weight.multiply(BigDecimal.valueOf(key)));
-            }*/
-            cmpResult.setRatingNum(tempRatins / tempCmpProductListVos.size());
+            cmpResult.setRatingNum(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(tempRatins), 0, BigDecimal.ROUND_HALF_UP).intValue());
             PtmProductDescription ptmProductDescription = mongoDbManager.queryOne(PtmProductDescription.class, product.getId());
             String specs = "";
             if (ptmProductDescription != null) {
