@@ -390,15 +390,22 @@ public class Compare2Controller {
             }
 
             sio.set(srmSearchLog.getCategory(), srmSearchLog.getPtmProductId(), srmSearchLog.getPtmCmpSkuId());
+            System.out.println("getHsProId  :" + sio.getHsProId());
         } else {
             if (srmSearchLog == null) {
+                System.out.println("srmSearchLog is null");
                 sio.setFirstSearch(true);
+                System.out.println("setFirstSearch is true");
             }
 
             try {
+                System.out.println("searchForResult  ");
                 searchForResult(sio);
+                System.out.println(" searchForResult result  " + sio.getHsProId());
             } catch (NonMatchedProductException e) {
+                System.out.println("searchForResult_old  ");
                 searchForResult_old(sio);
+                System.out.println(" searchForResult_old result  " + sio.getHsProId());
             }
         }
 
