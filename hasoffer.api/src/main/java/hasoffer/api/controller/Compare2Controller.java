@@ -675,7 +675,7 @@ public class Compare2Controller {
             PageableResult<CmpProductListVo> priceList = new PageableResult<CmpProductListVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize());
             cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
             cmpResult.setPriceList(priceList.getData());
-            cmpResult.setRatingNum(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(tempRatins), 0, BigDecimal.ROUND_HALF_UP).intValue());
+            cmpResult.setRatingNum(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(tempRatins == 0 ? 1 : tempRatins), 0, BigDecimal.ROUND_HALF_UP).intValue());
             PtmProductDescription ptmProductDescription = mongoDbManager.queryOne(PtmProductDescription.class, product.getId());
             String specs = "";
             if (ptmProductDescription != null) {
