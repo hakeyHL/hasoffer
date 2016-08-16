@@ -2,7 +2,7 @@ package hasoffer.task.controller;
 
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.po.search.SrmSearchLog;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
@@ -57,7 +57,7 @@ public class DubboUpdateController {
 
         ExecutorService es = Executors.newCachedThreadPool();
 
-        ConcurrentLinkedQueue<SrmSearchLog> queue = new ConcurrentLinkedQueue<SrmSearchLog>();
+        ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<PtmCmpSku>();
 
         es.execute(new SrmProductSearchCountListWorker(dbm, queue, fetchDubboService));
 
@@ -81,7 +81,7 @@ public class DubboUpdateController {
 
         ExecutorService es = Executors.newCachedThreadPool();
 
-        ConcurrentLinkedQueue<SrmSearchLog> queue = new ConcurrentLinkedQueue<SrmSearchLog>();
+        ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<PtmCmpSku>();
 
         es.execute(new TopSellingListWorker(dbm, queue, fetchDubboService));
 
