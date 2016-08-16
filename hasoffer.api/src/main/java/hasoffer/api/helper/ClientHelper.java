@@ -47,9 +47,14 @@ public class ClientHelper {
         Long tempNumber = number % 10;
         if (tempNumber > 0 && tempNumber <= 5) {
             number = (number / 10) * 10 + 5;
-        } else {
+        } else if (tempNumber > 5) {
             number = (number / 10) * 10 + 10;
         }
         return number.intValue();
+    }
+
+    public static void main(String[] args) {
+        int i = ClientHelper.returnNumberBetween0And5(Long.valueOf(0));
+        System.out.println(i);
     }
 }
