@@ -217,6 +217,9 @@ public class Compare2Controller {
                     // cr.setStd(ptmProduct.isStd());
                     cr.setDisplayMode(AppDisplayMode.NONE);
                     cr.setStd(true);
+                    jsonObject.put("data", JSONObject.toJSON(cr));
+                    Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
+                    return null;
                 }
             } else {
                 //小于等于0,直接返回
@@ -230,38 +233,6 @@ public class Compare2Controller {
             jsonObject.put("data", JSONObject.toJSON(cr));
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
             return null;
-        }
-        if (cr != null) {
-            jsonObject.put("data", JSONObject.toJSON(cr));
-        } else {
-            jsonObject.put("data", "{\n" +
-                    "        \"copywriting\": \"\",\n" +
-                    "        \"show\": \"WATERFALL\",\n" +
-                    "        \"skus\": [\n" +
-                    "            {\n" +
-                    "                \"status\": \"onsale\",\n" +
-                    "                \"title\": \"小王子（法国“圣埃克苏佩里基金会”官方认可简体中文译本）\",\n" +
-                    "                \"imageUrl\": \"http://img13.360buyimg.com/n1/jfs/t2200/173/590579185/269686/4c299e77/56174e3eN362982a4.jpg\",\n" +
-                    "                \"cashBack\": \"10\",\n" +
-                    "                \"deepLink\": \"http://item.jd.com/11143993.html\",\n" +
-                    "                \"saved\": 100,\n" +
-                    "                \"id\": \"11143993\",\n" +
-                    "                \"skuPrice\": \"1,000\",\n" +
-                    "                \"website\": \"FLIPKART\"\n" +
-                    "            },\n" +
-                    "            {\n" +
-                    "                \"status\": \"sold out\",\n" +
-                    "                \"title\": \"摩斯维 手机套/金属边框/防摔保护壳外壳 适用于华为荣耀畅玩4X/全网通/电信/移动版 拉丝尊享款-香槟金-送钢化膜\",\n" +
-                    "                \"imageUrl\": \"http://img11.360buyimg.com/n1/jfs/t2698/221/1187894551/168647/33c6c8e1/5736a5f7Nfa29f761.jpg\",\n" +
-                    "                \"cashBack\": \"20\",\n" +
-                    "                \"deepLink\": \"http://item.jd.com/1381873091.html\",\n" +
-                    "                \"saved\": -100,\n" +
-                    "                \"id\": \"1381873091\",\n" +
-                    "                \"skuPrice\": \"1,000\",\n" +
-                    "                \"website\": \"FLIPKART\"\n" +
-                    "            }\n" +
-                    "        ]\n" +
-                    "    }");
         }
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
         return null;
@@ -744,6 +715,7 @@ public class Compare2Controller {
             }
             List<CmpProductListVo> tempCmpProductListVos = new ArrayList<CmpProductListVo>();
             //每个site只保留一个且为最低价
+            System.out.println("websiteSet :" + websiteSet.size());
             long startTime = System.nanoTime();   //获取开始时间
             for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
                 if (websiteSet.size() <= 0) {
@@ -759,13 +731,14 @@ public class Compare2Controller {
             comparedSkuVos = null;
             comparedSkuVos = new ArrayList<>();
             //将新的加入的放入到列表中
+            System.out.println("tempCmpProductListVos" + tempCmpProductListVos.size());
             comparedSkuVos.addAll(tempCmpProductListVos);
             long endTime = System.nanoTime(); //获取结束时间
             System.out.println("total time is " + (endTime - startTime) / 1000000 + "");
         }
+        System.out.println("comparedSkuVos" + comparedSkuVos.size());
         cmpResult.setPriceList(comparedSkuVos);
         cmpResult.setCopywriting("Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you.");
-        cmpResult.setDisplayMode(AppDisplayMode.WATERFALL);
         return cmpResult;
     }
 
