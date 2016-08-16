@@ -653,7 +653,7 @@ public class AppController {
                 }
             }
             productListVo.setCommentNum(totalCommentNum);
-            productListVo.setRatingNum(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(totalRating), 0, BigDecimal.ROUND_HALF_UP).intValue());
+            productListVo.setRatingNum(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(totalRating == 0 ? 1 : totalRating), 0, BigDecimal.ROUND_HALF_UP).intValue());
         }
     }
 
