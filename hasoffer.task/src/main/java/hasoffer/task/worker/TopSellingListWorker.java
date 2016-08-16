@@ -1,5 +1,6 @@
 package hasoffer.task.worker;
 
+import hasoffer.base.enums.TaskLevel;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmTopSelling;
@@ -46,7 +47,7 @@ public class TopSellingListWorker implements Runnable {
                 }
 
                 queue.add(sku);
-                fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl());
+                fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_1);
                 logger.info("send url request success for [" + sku.getId() + "]");
             }
         }

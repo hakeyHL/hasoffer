@@ -735,20 +735,21 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(skuId);
 
         //更新逻辑如下
-        //1.如果状态为OFFSALE，更新status和updateTime
-        //2.如果状态为OUTSTOCK，不更新价格
-        //3.如果状态为ONSALE，且价格大于0，更新价格
-        //4.在2和3状态下的
+//        1.如果状态为OFFSALE，更新status和updateTime
+//        2.如果状态为OUTSTOCK，不更新价格
+//        3.如果状态为ONSALE，且价格大于0，更新价格
+//        4.在2和3状态下的
 //                4.1如果title不为空，且和原来数据不一致，更新title
 //                4.2如果imageurl不为空，且和原理数据不一致，更新oriImageUrl
-        //5.如果原来的website为空，且新抓的website不为空，更新website
-        //6.如果新抓的skutitle不为空，且和原来的不一样，更新skutitle
-        //7.如果新抓的（只更新onsale的数据）
+//        5.如果原来的website为空，且新抓的website不为空，更新website
+//        6.如果新抓的skutitle不为空，且和原来的不一样，更新skutitle
+//        7.如果新抓的（只更新onsale的数据）
 //        commentsNumber;//评论数大于0，更新该值
 //        ratings;//星级，该值大于0，更新该值
 //        shipping = -1;//邮费，该值大于0，更新该值
 //        supportPayMethod;//支付方式，不为空，且和原来的字符串不一致，更新该值
 //        returnDays;//如果该值大于0，更新
+//        8.brand,model,如果新抓的不为null且和原来的不一样，更新
 
         //7.最终设置更新时间
 //        deliveryTime;//送达时间 ex: 1-3   app2.0---暂定为5
@@ -829,6 +830,16 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         if (!StringUtils.isEmpty(fetchedProduct.getSubTitle())) {
             ptmCmpSkuUpdater.getPo().setSkuTitle(fetchedProduct.getTitle() + fetchedProduct.getSubTitle());
+        }
+
+        //更新brand
+        if (!StringUtils.isEmpty(fetchedProduct.getBrand()) && !StringUtils.isEqual(fetchedProduct.getBrand(), cmpSku.getBrand())) {
+            ptmCmpSkuUpdater.getPo().setBrand(fetchedProduct.getBrand());
+        }
+
+        //更新model
+        if (!StringUtils.isEmpty(fetchedProduct.getModel()) && !StringUtils.isEqual(fetchedProduct.getModel(), cmpSku.getModel())) {
+            ptmCmpSkuUpdater.getPo().setModel(fetchedProduct.getModel());
         }
 
         ptmCmpSkuUpdater.getPo().setUpdateTime(TimeUtils.nowDate());
