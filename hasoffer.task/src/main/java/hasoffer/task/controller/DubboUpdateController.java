@@ -83,7 +83,7 @@ public class DubboUpdateController {
 
         ConcurrentLinkedQueue<SrmSearchLog> queue = new ConcurrentLinkedQueue<SrmSearchLog>();
 
-        es.execute(new TopSellingListWorker(dbm, queue));
+        es.execute(new TopSellingListWorker(dbm, queue, fetchDubboService));
 
         for (int i = 0; i < 30; i++) {
             es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, productService, cmpSkuService));

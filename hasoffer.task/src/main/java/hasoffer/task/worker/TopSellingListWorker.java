@@ -1,11 +1,14 @@
 package hasoffer.task.worker;
 
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
+import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -18,10 +21,12 @@ public class TopSellingListWorker implements Runnable {
 
     private IDataBaseManager dbm;
     private ConcurrentLinkedQueue<SrmSearchLog> queue;
+    private IFetchDubboService fetchDubboService;
 
-    public TopSellingListWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<SrmSearchLog> queue) {
+    public TopSellingListWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<SrmSearchLog> queue, IFetchDubboService fetchDubboService) {
         this.dbm = dbm;
         this.queue = queue;
+        this.fetchDubboService = fetchDubboService;
     }
 
     @Override
@@ -37,8 +42,17 @@ public class TopSellingListWorker implements Runnable {
             log.setPtmProductId(productid);
             queue.add(log);
 
-            logger.info("topselling add success _" + productid);
-        }
+            List<PtmCmpSku> skuList = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ", Arrays.asList(productid));
 
+            for (PtmCmpSku sku : skuList) {
+
+                if (sku.getWebsite() == null) {
+                    continue;
+                }
+
+                fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl());
+                logger.info("send url request success for [" + sku.getId() + "]");
+            }
+        }
     }
 }
