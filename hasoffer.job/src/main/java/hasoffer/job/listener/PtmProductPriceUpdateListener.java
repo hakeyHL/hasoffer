@@ -1,5 +1,6 @@
 package hasoffer.job.listener;
 
+import hasoffer.core.persistence.dbm.Hibernate4DataBaseManager;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -23,9 +24,12 @@ public class PtmProductPriceUpdateListener extends ContextLoaderListener {
     }
 
     private void serverInitialized() {
+
+        Hibernate4DataBaseManager dbm = springContext.getBean(Hibernate4DataBaseManager.class);
+
         ExecutorService es = Executors.newCachedThreadPool();
 
-//        es.execute(DaemonThreadFactory.create();
+//        es.execute(DaemonThreadFactory.create(new PtmProductPriceUpdateWorker(dbm)));
     }
 
     @Override

@@ -1382,8 +1382,6 @@ public class FixController {
             } catch (Exception e) {
                 System.out.println("delete fail for " + id);
             }
-
-
         }
 
         return "ok";
