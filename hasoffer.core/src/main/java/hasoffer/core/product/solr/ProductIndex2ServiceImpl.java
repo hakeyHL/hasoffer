@@ -14,7 +14,7 @@ import java.util.List;
 public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, ProductModel2> {
     @Override
     protected String getSolrUrl() {
-        return AppConfig.get(AppConfig.SOLR_PRODUCT_URL);
+        return AppConfig.get(AppConfig.SOLR_PRODUCT_2_URL);
     }
 
     public PageableResult<ProductModel2> searchProductsByKey(String title, int page, int size) {

@@ -81,6 +81,8 @@ public class ProductServiceImpl implements IProductService {
     @Resource
     ProductIndexServiceImpl productIndexService;
     @Resource
+    ProductIndex2ServiceImpl productIndex2Service;
+    @Resource
     ICategoryService categoryService;
     @Resource
     SearchLogCacheManager searchLogCacheManager;
@@ -677,6 +679,14 @@ public class ProductServiceImpl implements IProductService {
         ProductModel productModel = getProductModel(product);
 
         productIndexService.createOrUpdate(productModel);
+    }
+
+    @Override
+    public void importProduct2Solr2(PtmProduct product) {
+        ProductModel2 productModel2 = getProductModel2(product);
+        if (productModel2 != null) {
+            productIndex2Service.createOrUpdate(productModel2);
+        }
     }
 
     private void addOrUpdateSolr(final String queryString, List params) {

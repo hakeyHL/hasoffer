@@ -54,6 +54,8 @@ public interface IProductService {
 
     void importProduct2Solr(PtmProduct product);
 
+    void importProduct2Solr2(PtmProduct product);
+
     PtmProduct getProduct(long proId);
 
     boolean updateProductTag(String proId, String tag);
