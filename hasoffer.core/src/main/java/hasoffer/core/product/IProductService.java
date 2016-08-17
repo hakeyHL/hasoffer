@@ -8,6 +8,7 @@ import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.product.solr.ProductModel;
+import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.fetch.model.ListProduct;
 
 import java.util.Date;
@@ -84,6 +85,8 @@ public interface IProductService {
     void import2Solr(ProductModel pm);
 
     PageableResult<PtmCmpSku> listNotOffSaleCmpSkus(long proId, int page, int size);
+
+    ProductModel2 getProductModel2(PtmProduct product);
 
     void updateProductStd(Long proId, boolean std);
 }

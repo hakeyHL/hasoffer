@@ -5,7 +5,6 @@ import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.persistence.po.search.updater.SrmProductSearchCountUpdater;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
-import hasoffer.core.product.solr.ProductModel;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -63,15 +62,6 @@ public class TestMain {
             dbm.update(updater);
 
             System.out.println(cou);
-        }
-    }
-
-    @Test
-    public void testSearch() {
-        List<ProductModel> pms = productIndexService.simpleSearch("gps device", 1, 20);
-
-        for (ProductModel pm : pms) {
-            System.out.println(pm.getId() + "\t" + pm.getSearchCount());
         }
     }
 
