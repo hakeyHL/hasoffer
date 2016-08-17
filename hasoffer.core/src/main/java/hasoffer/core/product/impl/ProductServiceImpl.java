@@ -519,6 +519,7 @@ public class ProductServiceImpl implements IProductService {
 //    }
 //
 //        addOrUpdateSolr(Q_PRODUCT, null);
+
     }
 
     @Override
