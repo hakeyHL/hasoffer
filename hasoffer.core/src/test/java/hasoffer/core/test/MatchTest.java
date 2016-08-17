@@ -1,35 +1,42 @@
 package hasoffer.core.test;
 
-import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
-import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.annotation.Resource;
+import java.io.File;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by chevy on 2016/7/13.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:spring-beans.xml")
 public class MatchTest {
 
-    @Resource
-    IMongoDbManager mdm;
-
-    private Logger logger = LoggerFactory.getLogger(MatchTest.class);
-
     @Test
-    public void f() {
-        String searchLogId = "bfeb39e0a69dbe345ab0cbdac406658d";
+    public void getUnProcessedProductId() throws Exception {
 
-        SrmAutoSearchResult srmAutoSearchResult = mdm.queryOne(SrmAutoSearchResult.class, searchLogId);
+        File file = hasoffer.base.utils.FileUtils.createFile("d:\\tmp\\price_1.txt", true);
 
-        logger.debug(srmAutoSearchResult.toString());
+        Set<String> idSet = new HashSet<>();
+
+        List<String> lines = FileUtils.readLines(new File("D:\\tmp\\price_0.txt"));
+
+        for (String line : lines) {
+            String id = line.split("\t")[0];
+            System.out.println(id);
+            idSet.add(id);
+        }
+
+        lines = FileUtils.readLines(new File("D:\\tmp\\price.txt"));
+        for (String line : lines) {
+            String id = line.split("\t")[0];
+            if (idSet.contains(id)) {
+                System.out.println(String.format("Exists [%s]", id));
+            } else {
+                FileUtils.write(file, line + "\n", true);
+            }
+        }
     }
 
 }
