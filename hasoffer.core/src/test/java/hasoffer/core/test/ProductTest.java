@@ -82,9 +82,32 @@ public class ProductTest {
 
     @Test
     public void import2Solr() {
-        productService.deleteProduct(100);
-//        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(100);
-//        cmpSkuService.importCmpSku2solr(cmpSkus.get(0));
+        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<>(
+                new IList() {
+                    @Override
+                    public PageableResult getData(int page) {
+                        return productService.listPagedProducts(page, 2000);
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcess<PtmProduct>() {
+                    @Override
+                    public void process(PtmProduct o) {
+                        productService.importProduct2Solr2(o);
+                    }
+                }
+        );
+
+        listAndProcessTask2.go();
     }
 
     @Test

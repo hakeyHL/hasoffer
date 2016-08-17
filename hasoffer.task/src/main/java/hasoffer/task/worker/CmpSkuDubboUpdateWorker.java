@@ -113,7 +113,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
             FetchedProduct fetchedProduct = fetchUrlResult.getFetchProduct();
 
-            System.out.println(JSONUtil.toJSON(fetchedProduct).toString());
+            System.out.println(JSONUtil.toJSON(fetchedProduct).toString() + "id=" + skuid);
 
             cmpSkuService.createDescription(sku, fetchedProduct);
 

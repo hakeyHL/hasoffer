@@ -18,10 +18,7 @@ import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
-import hasoffer.core.product.solr.CmpSkuModel;
-import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
-import hasoffer.core.product.solr.ProductIndexServiceImpl;
-import hasoffer.core.product.solr.ProductModel;
+import hasoffer.core.product.solr.*;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.data.solr.*;
@@ -83,6 +80,8 @@ public class ProductServiceImpl implements IProductService {
 
     @Resource
     ProductIndexServiceImpl productIndexService;
+    @Resource
+    ProductIndex2ServiceImpl productIndex2Service;
     @Resource
     ICategoryService categoryService;
     @Resource
@@ -523,7 +522,18 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    public void reimport2Solr(long productId) {
+        PtmProduct ptmProduct = getProduct(productId);
+        if (ptmProduct != null) {
+            importProduct2Solr(ptmProduct);
+        }
+    }
+
+    @Override
     public void import2Solr(ProductModel pm) {
+        if (pm == null) {
+            return;
+        }
         productIndexService.createOrUpdate(pm);
     }
 
@@ -546,6 +556,34 @@ public class ProductServiceImpl implements IProductService {
         if (product == null) {
             return null;
         }
+
+        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(product.getId());
+        float minPrice = -1f, maxPrice = -1f;
+        for (PtmCmpSku cmpSku : cmpSkus) {
+            float skuPrice = cmpSku.getPrice();
+            if (skuPrice <= 0 || cmpSku.getStatus() == SkuStatus.OFFSALE) {
+                continue;
+            }
+
+            if (minPrice <= 0) {
+                minPrice = skuPrice;
+                maxPrice = minPrice;
+                continue;
+            }
+
+            if (minPrice > skuPrice) {
+                minPrice = skuPrice;
+            }
+            if (maxPrice < skuPrice) {
+                maxPrice = skuPrice;
+            }
+        }
+
+        if (minPrice < 0) {
+            productIndexService.remove(String.valueOf(product.getId()));
+            return null;
+        }
+
 //        PtmCategory category = dbm.get(PtmCategory.class, product.getCategoryId());
         List<PtmCategory> categories = categoryService.getRouterCategoryList(product.getCategoryId());
 
@@ -578,7 +616,7 @@ public class ProductServiceImpl implements IProductService {
                 product.getTag(),
                 cate3,
                 cate3name,
-                product.getPrice(),
+                minPrice,
                 product.getDescription(),
                 product.getColor(),
                 product.getSize(),
@@ -592,10 +630,106 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    public ProductModel2 getProductModel2(PtmProduct product) {
+        if (product == null) {
+            return null;
+        }
+
+        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(product.getId());
+        float minPrice = -1f, maxPrice = -1f;
+        for (PtmCmpSku cmpSku : cmpSkus) {
+            float skuPrice = cmpSku.getPrice();
+            if (skuPrice <= 0 || cmpSku.getStatus() == SkuStatus.OFFSALE) {
+                continue;
+            }
+
+            if (minPrice <= 0) {
+                minPrice = skuPrice;
+                maxPrice = minPrice;
+                continue;
+            }
+
+            if (minPrice > skuPrice) {
+                minPrice = skuPrice;
+            }
+            if (maxPrice < skuPrice) {
+                maxPrice = skuPrice;
+            }
+        }
+
+        if (minPrice < 0) {
+            return null;
+        }
+
+        // 类目关键词
+        long cate1 = 0L, cate2 = 0L, cate3 = 0L;
+        String cate1name = "", cate2name = "", cate3name = "";
+
+        List<PtmCategory> categories = categoryService.getRouterCategoryList(product.getCategoryId());
+
+        // 目前仅支持3级类目
+        if (ArrayUtils.hasObjs(categories)) {
+            PtmCategory cate = categories.get(0);
+
+            cate1 = cate.getId();
+            cate1name = cate.getName();
+
+            int cateSize = categories.size();
+
+            if (cateSize > 1) {
+                cate = categories.get(1);
+                cate2 = cate.getId();
+                cate2name = cate.getName();
+            }
+
+            if (cateSize > 2) {
+                cate = categories.get(2);
+                cate3 = cate.getId();
+                cate3name = cate.getName();
+            }
+        }
+
+        long searchCount = 0;
+        SrmProductSearchCount productSearchCount = searchService.findSearchCountByProductId(product.getId());
+        if (productSearchCount != null) {
+            searchCount = productSearchCount.getCount();
+        }
+
+        ProductModel2 productModel = new ProductModel2(
+                product.getId(),
+                product.getTitle(),
+                product.getTag(),
+                cate1,
+                cate2,
+                cate3,
+                cate1name,
+                cate2name,
+                cate3name,
+                minPrice,
+                maxPrice,
+                product.getRating(),
+                searchCount);
+
+        return productModel;
+    }
+
+    @Override
     public void importProduct2Solr(PtmProduct product) {
         ProductModel productModel = getProductModel(product);
 
-        productIndexService.createOrUpdate(productModel);
+        if (productModel != null) {
+            productIndexService.createOrUpdate(productModel);
+        } else {
+            productIndexService.remove(String.valueOf(product.getId()));
+        }
+    }
+
+    @Override
+    public void importProduct2Solr2(PtmProduct product) {
+        ProductModel2 productModel2 = getProductModel2(product);
+        if (productModel2 != null) {
+            productIndex2Service.createOrUpdate(productModel2);
+        }
     }
 
     private void addOrUpdateSolr(final String queryString, List params) {
