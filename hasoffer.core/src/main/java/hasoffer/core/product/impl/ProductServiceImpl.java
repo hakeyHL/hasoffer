@@ -20,9 +20,6 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.solr.*;
 import hasoffer.core.search.ISearchService;
-import hasoffer.core.task.ListAndProcessTask2;
-import hasoffer.core.task.worker.IList;
-import hasoffer.core.task.worker.IProcess;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.data.solr.*;
 import hasoffer.fetch.helper.WebsiteHelper;
@@ -510,7 +507,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public void reimport2Solr(boolean removeFirst) {
-//        updateProductIndex2Solr();
+        updateProductIndex2Solr();
 //        if (removeFirst) {
 //            try {
 //                productIndexService.removeAll();
@@ -522,33 +519,7 @@ public class ProductServiceImpl implements IProductService {
 //    }
 //
 //        addOrUpdateSolr(Q_PRODUCT, null);
-        final String sql = "select t from PtmProduct t order by t.categoryId asc";
-        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<>(
-                new IList() {
-                    @Override
-                    public PageableResult getData(int page) {
-                        return dbm.queryPage(sql, page, 2000);
-                    }
 
-                    @Override
-                    public boolean isRunForever() {
-                        return false;
-                    }
-
-                    @Override
-                    public void setRunForever(boolean runForever) {
-
-                    }
-                },
-                new IProcess<PtmProduct>() {
-                    @Override
-                    public void process(PtmProduct o) {
-                        importProduct2Solr(o);
-                    }
-                }
-        );
-
-        listAndProcessTask2.go();
     }
 
     @Override
