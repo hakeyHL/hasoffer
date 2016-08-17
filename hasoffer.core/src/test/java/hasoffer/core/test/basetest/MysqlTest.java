@@ -78,6 +78,15 @@ public class MysqlTest {
     private ConcurrentLinkedQueue<PtmCmpSku> skuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
 
     @Test
+    public void testDistinctQuery() {
+
+        List<String> skuList = dbm.query("SELECT distinct t.title FROM PtmCmpSku t WHERE t.productId = ?0", Arrays.asList(12312L));
+
+        System.out.println(skuList);
+
+    }
+
+    @Test
     public void testV() {
 //        searchService.statSearchCount("20160306");//stime = 1457193600000
 //        etime = 1457280000000
