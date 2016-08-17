@@ -14,6 +14,7 @@ import java.util.List;
  */
 public class CmpProductListVo {
     List<String> support = new ArrayList<String>();
+    List<String> offers = new ArrayList<String>();
     private String imageUrl;
     private String image;
     private int ratingNum;
@@ -258,6 +259,14 @@ public class CmpProductListVo {
         this.imageUrl = imageUrl;
     }
 
+    public List<String> getOffers() {
+        return offers;
+    }
+
+    public void setOffers(List<String> offers) {
+        this.offers = offers;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -286,7 +295,8 @@ public class CmpProductListVo {
         if (website != that.website) return false;
         if (title != null ? !title.equals(that.title) : that.title != null) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        return status == that.status;
+        if (status != that.status) return false;
+        return !(offers != null ? !offers.equals(that.offers) : that.offers != null);
 
     }
 
@@ -312,6 +322,7 @@ public class CmpProductListVo {
         result = 31 * result + (saved != +0.0f ? Float.floatToIntBits(saved) : 0);
         result = 31 * result + (id != null ? id.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
+        result = 31 * result + (offers != null ? offers.hashCode() : 0);
         return result;
     }
 }
