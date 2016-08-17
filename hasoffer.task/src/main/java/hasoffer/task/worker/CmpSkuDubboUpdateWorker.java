@@ -118,7 +118,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
             cmpSkuService.createPtmCmpSkuImage(skuid, fetchedProduct);
 
-            //对FLIPKART没有类目的数据进行更新
+            //对FLIPKART没有类目的数据进行更新,暂时注释掉
 //            if (Website.FLIPKART.equals(sku.getWebsite()) && sku.getCategoryId() == 0) {
 //
 //                List<String> categoryPathList = fetchedProduct.getCategoryPathList();
