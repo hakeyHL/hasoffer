@@ -111,6 +111,63 @@ public class ProductTest {
     }
 
     @Test
+    public void expPriceExcept2() throws Exception {
+        String sql = "SELECT t FROM PtmProduct t WHERE t.categoryId=?0";
+
+        List<PtmProduct> products = dbm.query(sql, Arrays.asList(5L));
+
+        File file = hasoffer.base.utils.FileUtils.createFile("d:/tmp/price_3.txt", true);
+
+        StringBuilder sb = new StringBuilder();
+
+        int count = 0;
+        for (PtmProduct product : products) {
+            long productId = product.getId();
+            if (product == null) {
+                print(String.format("product is null...[%d]", productId));
+            } else {
+                List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId);
+                float minPrice = -1, maxPrice = -1;
+                for (PtmCmpSku cmpSku : cmpSkus) {
+                    float price = cmpSku.getPrice();
+                    if (cmpSku.getStatus() == SkuStatus.OFFSALE || price <= 0) {
+                        continue;
+                    }
+
+                    if (minPrice < 0) {
+                        minPrice = price;
+                        maxPrice = minPrice;
+                    }
+
+                    if (minPrice > price) {
+                        minPrice = price;
+                    }
+
+                    if (maxPrice < price) {
+                        maxPrice = price;
+                    }
+                }
+
+                if (maxPrice < 0) {
+                    print(String.format("no price...[%d]", productId));
+                    continue;
+                }
+
+                if (maxPrice / minPrice > 6) {
+                    sb.append(productId).append("\t").append(maxPrice).append("\t").append(minPrice).append("\n");
+                    if (count++ % 100 == 0) {
+                        FileUtils.write(file, sb.toString(), true);
+                        sb = new StringBuilder();
+                    }
+                    print(String.format("price max/min > 6...[%d]", productId));
+                } else {
+                    print("ok");
+                }
+            }
+        }
+    }
+
+    @Test
     public void expPriceExcept() throws Exception {
         String sql = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd='20160815' order by t.count DESC";
 
