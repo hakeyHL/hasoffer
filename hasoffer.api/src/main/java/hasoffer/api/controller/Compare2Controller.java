@@ -243,7 +243,8 @@ public class Compare2Controller {
     public ModelAndView cmpsku(@RequestParam(defaultValue = "0") final String id,
                                @RequestParam(defaultValue = "1") int page,
                                @RequestParam(defaultValue = "20") int size,
-                               HttpServletResponse response
+                               HttpServletResponse response,
+                               HttpServletRequest request
     ) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
@@ -258,6 +259,7 @@ public class Compare2Controller {
             SearchIO sio = new SearchIO(product.getSourceId(), product.getTitle(), "", product.getSourceSite(), product.getPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, size);
             try {
                 cr = getCmpProducts(sio, product);
+                jsonObject.put("page", JSONObject.toJSON(PageHelper.getPageModel(request, cr.getPagedComparedSkuVos())));
             } catch (Exception e) {
                 logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, size));
                 //if exception occured ,get default cmpResult
@@ -683,6 +685,7 @@ public class Compare2Controller {
             if (ptmProductDescription != null) {
                 specs = ptmProductDescription.getJsonDescription();
             }
+            cmpResult.setPagedComparedSkuVos(priceList);
             cmpResult.setSpecs(specs);
             //cmpResult.setTotalRatingsNum(WeightedAverage.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).longValue());
             cmpResult.setTotalRatingsNum(tempTotalComments);
