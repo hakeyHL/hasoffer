@@ -59,7 +59,7 @@ public class ProductServiceImpl implements IProductService {
     private static final String Q_ONSALE_PTM_CMPSKU =
             "SELECT t FROM PtmCmpSku t " +
                     " WHERE t.productId = ?0 " +
-                    "   AND t.status = 'ONSALE'  " +
+                    "   AND t.status = 'ONSALE' or  t.status = 'OUTSTOCK'  " +
                     " ORDER BY t.price ASC ";
 
     private static final String Q_NOTOFFSALE_PTM_CMPSKU =
@@ -692,6 +692,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public PageableResult<PtmCmpSku> listOnsaleCmpSkus(long proId, int page, int size) {
+        //outstock的sku也返回
         PageableResult<PtmCmpSku> pagedResult = dbm.queryPage(Q_ONSALE_PTM_CMPSKU, page, size, Arrays.asList(proId));
         return pagedResult;
     }
