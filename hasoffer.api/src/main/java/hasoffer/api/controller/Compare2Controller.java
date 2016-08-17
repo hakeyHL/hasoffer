@@ -20,6 +20,7 @@ import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.exception.ERROR_CODE;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.enums.SearchPrecise;
+import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.mongo.PtmProductDescription;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
@@ -590,7 +591,7 @@ public class Compare2Controller {
             //评论星级按照平均值展示
             int tempRatins = 0;
             //统计site
-            Set<Website> websiteSet = new HashSet<Website>();
+//            Set<Website> websiteSet = new HashSet<Website>();
             //初始化price为客户端传输的price
             if (ArrayUtils.hasObjs(cmpSkus)) {
                 // 获取vo list
@@ -601,9 +602,9 @@ public class Compare2Controller {
                             || cmpSku.getStatus() != SkuStatus.OUTSTOCK) { //outstock的sku也返回
                         continue;
                     }
-                    if (cmpSku.getWebsite() != null) {
-                        websiteSet.add(cmpSku.getWebsite());
-                    }
+//                    if (cmpSku.getWebsite() != null) {
+//                        websiteSet.add(cmpSku.getWebsite());
+//                    }
                     // 忽略前台返回的价格
                     CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
                     cplv.setDeepLinkUrl(WebsiteHelper.getDealUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
@@ -635,17 +636,22 @@ public class Compare2Controller {
             int sum = 0;
             //每个site只保留一个且为最低价
             for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
-                if (websiteSet.size() <= 0) {
-                    break;
-                }
-                if (websiteSet.contains(cmpProductListVo.getWebsite())) {
-                    websiteSet.remove(cmpProductListVo.getWebsite());
                     //去除列表中除此之外的其他此site的数据
                     if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
                         //评论数*星级 累加 除以评论数和
                         sum += cmpProductListVo.getTotalRatingsNum() * cmpProductListVo.getRatingNum();
                         tempTotalComments += cmpProductListVo.getTotalRatingsNum();
                         tempRatins += cmpProductListVo.getRatingNum();
+                        //获取offers
+                        PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, cmpProductListVo.getId());
+                        if (ptmCmpSkuDescription != null) {
+                            String offers = ptmCmpSkuDescription.getOffers();
+                            if (!StringUtils.isEmpty(offers)) {
+                                String[] temps = offers.split(",");
+                                for (String str : temps) {
+                                    cmpProductListVo.getOffers().add(str);
+                                }
+                            }
                     }
                     tempCmpProductListVos.add(cmpProductListVo);
                 }

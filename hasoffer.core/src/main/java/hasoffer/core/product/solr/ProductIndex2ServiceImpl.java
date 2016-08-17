@@ -11,13 +11,13 @@ import java.util.List;
 
 
 @Service
-public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductModel> {
+public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, ProductModel2> {
     @Override
     protected String getSolrUrl() {
-        return AppConfig.get(AppConfig.SOLR_PRODUCT_URL);
+        return AppConfig.get(AppConfig.SOLR_PRODUCT_2_URL);
     }
 
-    public PageableResult<ProductModel> searchProductsByKey(String title, int page, int size) {
+    public PageableResult<ProductModel2> searchProductsByKey(String title, int page, int size) {
         Sort[] sorts = null;
         PivotFacet[] pivotFacets = null;
 
@@ -25,12 +25,12 @@ public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductM
         fqList.add(new FilterQuery("price", "[1 TO *]"));
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
 
-        SearchResult<ProductModel> sr = searchObjs(title, fqs, sorts, pivotFacets, page <= 1 ? 1 : page, size, true);
+        SearchResult<ProductModel2> sr = searchObjs(title, fqs, sorts, pivotFacets, page <= 1 ? 1 : page, size, true);
 
-        return new PageableResult<ProductModel>(sr.getResult(), sr.getTotalCount(), page, size);
+        return new PageableResult<ProductModel2>(sr.getResult(), sr.getTotalCount(), page, size);
     }
 
-    public PageableResult<ProductModel> searchPro(long cateId, int level, int page, int size) {
+    public PageableResult<ProductModel2> searchPro(long cateId, int level, int page, int size) {
         if (level < 1 || level > 3) {
             return null;
         }
@@ -43,9 +43,9 @@ public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductM
         fqList.add(new FilterQuery("price", "[1 TO *]"));
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
         System.out.println(Thread.currentThread().getName() + " page " + page + "  size " + size);
-        SearchResult<ProductModel> sr = searchObjs(q, fqs, sorts, pivotFacets, page <= 1 ? 1 : page, size, true);
+        SearchResult<ProductModel2> sr = searchObjs(q, fqs, sorts, pivotFacets, page <= 1 ? 1 : page, size, true);
 
-        return new PageableResult<ProductModel>(sr.getResult(), sr.getTotalCount(), page, size);
+        return new PageableResult<ProductModel2>(sr.getResult(), sr.getTotalCount(), page, size);
     }
 
     public PageableResult searchPro(long cateId, int level, String title, int page, int size) {
