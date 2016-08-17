@@ -608,11 +608,15 @@ public class Compare2Controller {
 //                        websiteSet.add(cmpSku.getWebsite());
 //                    }
                     // 忽略前台返回的价格
-                    CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
-                    System.out.println("set properteis over l");
-                    cplv.setDeepLinkUrl(WebsiteHelper.getDealUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
-                    cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
-                    comparedSkuVos.add(cplv);
+                    try {
+                        CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
+                        System.out.println("set properteis over l");
+                        cplv.setDeepLinkUrl(WebsiteHelper.getDealUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
+                        cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
+                        comparedSkuVos.add(cplv);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
                 if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {
                     throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", product.getTitle(), product.getPrice());

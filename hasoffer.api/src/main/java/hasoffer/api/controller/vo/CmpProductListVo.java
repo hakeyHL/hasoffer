@@ -44,7 +44,7 @@ public class CmpProductListVo {
         this.imageUrl = cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath());
         this.totalRatingsNum = cmpSku.getCommentsNumber();
         this.image = logoImage;
-        this.title = cmpSku.getTitle();
+        this.title = cmpSku.getTitle() == null ? "" : cmpSku.getTitle();
         this.status = cmpSku.getStatus();
         this.price = Math.round(cmpSku.getPrice());
         this.website = cmpSku.getWebsite();
