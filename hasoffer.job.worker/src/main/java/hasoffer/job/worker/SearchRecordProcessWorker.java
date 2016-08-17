@@ -2,8 +2,8 @@ package hasoffer.job.worker;
 
 import hasoffer.base.config.AppConfig;
 import hasoffer.base.enums.HasofferRegion;
+import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.SkuStatus;
-import hasoffer.base.model.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
@@ -155,11 +155,16 @@ public class SearchRecordProcessWorker implements Runnable {
         // 需要的话，则加入更新队列。并返回一个实体。如果不需要，这返回空
         if (isFetch) {
             try {
+                TaskStatus keyWordTaskStatus = fetchService.getKeyWordTaskStatus(website, keyword);
+                if(TaskStatus.NONE.equals(keyWordTaskStatus)){
+                    fetchService.sendKeyWordTask(website, keyword);
+                    return FetchResult.createFetchResult(website, keyword, TaskStatus.RUNNING);
+                }
+                if(TaskStatus.START.equals(keyWordTaskStatus)||TaskStatus.RUNNING.equals(keyWordTaskStatus)){
+                    return FetchResult.createFetchResult(website, keyword, TaskStatus.RUNNING);                }
                 return fetchService.getProductsKeyWord(website, keyword);
             } catch (Exception e) {
-                FetchResult temp = new FetchResult(website, keyword);
-                temp.setTaskStatus(TaskStatus.START);
-                return temp;
+                return FetchResult.createFetchResult(website, keyword, TaskStatus.RUNNING);
             }
         }
         return null;

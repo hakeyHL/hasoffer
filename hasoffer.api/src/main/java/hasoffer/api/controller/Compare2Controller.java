@@ -4,10 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.PropertyFilter;
 import hasoffer.api.controller.vo.*;
-import hasoffer.api.helper.ExceptionHelper;
+import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.SearchHelper;
-import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.AppDisplayMode;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
@@ -27,7 +26,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.urm.UrmUser;
-import hasoffer.core.product.iml.ProductServiceImpl;
+import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.solr.CategoryIndexServiceImpl;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
@@ -35,6 +34,7 @@ import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.exception.NonMatchedProductException;
 import hasoffer.core.system.impl.AppServiceImpl;
+import hasoffer.core.utils.ImageUtil;
 import hasoffer.core.utils.JsonHelper;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
@@ -51,6 +51,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -82,14 +83,39 @@ public class Compare2Controller {
     private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
 
     public static void main(String[] args) {
-        String dealUrlWithAff = WebsiteHelper.getDealUrlWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
-        String urlWithAff = WebsiteHelper.getUrlWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
-        System.out.println(urlWithAff);
-        String flipkart = WebsiteHelper.getDealUrlWithAff(Website.FLIPKART, "https://www.flipkart.com/apple-iphone-6s-silver-16-gb/p/itmebysgupjepunx", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
-        System.out.println(flipkart);
-        String deeplinkWithAff = WebsiteHelper.getDeeplinkWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
-        System.out.println(deeplinkWithAff);
-
+//        String dealUrlWithAff = WebsiteHelper.getDealUrlWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
+//        String urlWithAff = WebsiteHelper.getUrlWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
+//        System.out.println(urlWithAff);
+//        String flipkart = WebsiteHelper.getDealUrlWithAff(Website.FLIPKART, "https://www.flipkart.com/apple-iphone-6s-silver-16-gb/p/itmebysgupjepunx", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
+//        System.out.println(flipkart);
+//        String deeplinkWithAff = WebsiteHelper.getDeeplinkWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
+//        System.out.println(deeplinkWithAff);
+//        Map<Long, Integer> map = new HashMap<Long, Integer>();
+//        map.put(1l, 4);
+//        map.put(3l, 100);
+//        map.put(2l, 3);
+//        Set<Long> longs = map.keySet();
+//        int t = 0;
+//        int t1 = 0;
+//        Iterator<Long> iterator = longs.iterator();
+//        while (iterator.hasNext()) {
+//            Long next = iterator.next();
+//            t += map.get(next);
+//            t1 += map.get(next) * next;
+//        }
+//        System.out.println(t1);
+//        System.out.println(t);
+//        System.out.println(BigDecimal.valueOf(t).divide(BigDecimal.valueOf(10), 1, BigDecimal.ROUND_HALF_UP));
+//        BigDecimal s = BigDecimal.ZERO;
+//        Set<Long> long2 = map.keySet();
+//        Iterator<Long> iterator1 = long2.iterator();
+//        while (iterator1.hasNext()) {
+//            Long next = iterator1.next();
+//            BigDecimal ss = BigDecimal.valueOf(map.get(next)).divide(BigDecimal.valueOf(t), 1, BigDecimal.ROUND_HALF_UP);
+//            s = s.add(ss.multiply(BigDecimal.valueOf(next)));
+//        }
+//        System.out.println(s.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+        System.out.println(305 % 10);
     }
 
     // @Cacheable(value = "compare", key = "'getcmpskus_'+#q+'_'+#site+'_'+#price+'_'+#page+'_'+#size")
@@ -159,7 +185,7 @@ public class Compare2Controller {
                           @RequestParam(defaultValue = "") String site,
                           @RequestParam(defaultValue = "0") String price,
                           @RequestParam(defaultValue = "1") int page,
-                          @RequestParam(defaultValue = "10") int size,
+                          @RequestParam(defaultValue = "20") int pageSize,
                           HttpServletResponse response) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
@@ -170,7 +196,7 @@ public class Compare2Controller {
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         CmpResult cr = null;
         PtmProduct ptmProduct = null;
-        SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, size);
+        SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, pageSize);
         try {
             //根据title匹配到商品
             getSioBySearch(sio);
@@ -186,8 +212,14 @@ public class Compare2Controller {
                     cr = getCmpProducts(sio);
                     cr.setProductId(sio.getHsProId());
                     cr.setCopywriting(ptmProduct != null && ptmProduct.isStd() ? "Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you." : "Looked around Myntre,Jabong & 5 other apps,thought you might like these items as well..");
-                    cr.setDisplayMode(ptmProduct != null && ptmProduct.isStd() ? AppDisplayMode.NONE : AppDisplayMode.WATERFALL);
-                    cr.setStd(ptmProduct.isStd());
+                    //暂时屏蔽标品非标品
+                    // cr.setDisplayMode(ptmProduct != null && ptmProduct.isStd() ? AppDisplayMode.NONE : AppDisplayMode.WATERFALL);
+                    // cr.setStd(ptmProduct.isStd());
+                    cr.setDisplayMode(AppDisplayMode.NONE);
+                    cr.setStd(true);
+                    jsonObject.put("data", JSONObject.toJSON(cr));
+                    Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
+                    return null;
                 }
             } else {
                 //小于等于0,直接返回
@@ -197,43 +229,10 @@ public class Compare2Controller {
                 return null;
             }
         } catch (Exception e) {
-            logger.error(ExceptionHelper.getExceptionMessage(e));
-            logger.error(String.format("sdk_cmp_  [NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, size));
+            logger.error(String.format("sdk_cmp_  [NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, pageSize));
             jsonObject.put("data", JSONObject.toJSON(cr));
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
             return null;
-        }
-        if (cr != null) {
-            jsonObject.put("data", JSONObject.toJSON(cr));
-        } else {
-            jsonObject.put("data", "{\n" +
-                    "        \"copywriting\": \"\",\n" +
-                    "        \"show\": \"WATERFALL\",\n" +
-                    "        \"skus\": [\n" +
-                    "            {\n" +
-                    "                \"status\": \"onsale\",\n" +
-                    "                \"title\": \"小王子（法国“圣埃克苏佩里基金会”官方认可简体中文译本）\",\n" +
-                    "                \"imageUrl\": \"http://img13.360buyimg.com/n1/jfs/t2200/173/590579185/269686/4c299e77/56174e3eN362982a4.jpg\",\n" +
-                    "                \"cashBack\": \"10\",\n" +
-                    "                \"deepLink\": \"http://item.jd.com/11143993.html\",\n" +
-                    "                \"saved\": 100,\n" +
-                    "                \"id\": \"11143993\",\n" +
-                    "                \"skuPrice\": \"1,000\",\n" +
-                    "                \"website\": \"FLIPKART\"\n" +
-                    "            },\n" +
-                    "            {\n" +
-                    "                \"status\": \"sold out\",\n" +
-                    "                \"title\": \"摩斯维 手机套/金属边框/防摔保护壳外壳 适用于华为荣耀畅玩4X/全网通/电信/移动版 拉丝尊享款-香槟金-送钢化膜\",\n" +
-                    "                \"imageUrl\": \"http://img11.360buyimg.com/n1/jfs/t2698/221/1187894551/168647/33c6c8e1/5736a5f7Nfa29f761.jpg\",\n" +
-                    "                \"cashBack\": \"20\",\n" +
-                    "                \"deepLink\": \"http://item.jd.com/1381873091.html\",\n" +
-                    "                \"saved\": -100,\n" +
-                    "                \"id\": \"1381873091\",\n" +
-                    "                \"skuPrice\": \"1,000\",\n" +
-                    "                \"website\": \"FLIPKART\"\n" +
-                    "            }\n" +
-                    "        ]\n" +
-                    "    }");
         }
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
         return null;
@@ -248,7 +247,7 @@ public class Compare2Controller {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
-        PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"imageUrl", "skuPrice", "deepLink", "title", "saved", "id", "status", "priceOff", "productVo", "pagedComparedSkuVos", "copywriting", "displayMode", "std", "cashBack"});
+        PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"skuPrice", "deepLink", "saved", "id", "priceOff", "productVo", "pagedComparedSkuVos", "copywriting", "displayMode", "std", "cashBack"});
         CmpResult cr = null;
         PtmProduct product = productService.getProduct(Long.valueOf(id));
         if (product != null) {
@@ -341,8 +340,8 @@ public class Compare2Controller {
 
         // 搜索SKU
         PageableResult<CmpSkuModel> pagedCmpskuModels = cmpskuIndexService.searchSku(_q, 1, 5);
-
         List<CmpSkuModel> skuModels = pagedCmpskuModels.getData();
+        System.out.println("skuModels   " + skuModels.size());
 
         if (ArrayUtils.isNullOrEmpty(skuModels)) {
             throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, "", 0);
@@ -364,12 +363,14 @@ public class Compare2Controller {
         String title = skuModel.getTitle();
 
         float mc = StringUtils.wordMatchD(StringUtils.toLowerCase(title), _q);
+        System.out.println(" mc " + mc);
         // 匹配度如果小于40%, 则认为不匹配
         if (mc <= 0.4) {
             throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, title, mc);
         }
 
         long cateId = 0L;
+        System.out.println("skuModel.getProductId()  " + skuModel.getProductId());
         sio.set(cateId, skuModel.getProductId(), skuModel.getId());
     }
 
@@ -391,15 +392,22 @@ public class Compare2Controller {
             }
 
             sio.set(srmSearchLog.getCategory(), srmSearchLog.getPtmProductId(), srmSearchLog.getPtmCmpSkuId());
+            System.out.println("getHsProId  :" + sio.getHsProId());
         } else {
             if (srmSearchLog == null) {
+                System.out.println("srmSearchLog is null");
                 sio.setFirstSearch(true);
+                System.out.println("setFirstSearch is true");
             }
 
             try {
+                System.out.println("searchForResult  ");
                 searchForResult(sio);
+                System.out.println(" searchForResult result  " + sio.getHsProId());
             } catch (NonMatchedProductException e) {
+                System.out.println("searchForResult_old  ");
                 searchForResult_old(sio);
+                System.out.println(" searchForResult_old result  " + sio.getHsProId());
             }
         }
 
@@ -577,9 +585,10 @@ public class Compare2Controller {
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(product.getId(), sio.getPage(), sio.getSize());
         if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
             List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
+            //评论数按照加权平均值展示
             Long tempTotalComments = Long.valueOf(0);
+            //评论星级按照平均值展示
             int tempRatins = 0;
-            int tempCount = 0;
             //统计site
             Set<Website> websiteSet = new HashSet<Website>();
             //初始化price为客户端传输的price
@@ -588,16 +597,14 @@ public class Compare2Controller {
                 for (PtmCmpSku cmpSku : cmpSkus) {
                     if (cmpSku.getWebsite() == null
                             || cmpSku.getPrice() <= 0
-                            || cmpSku.getStatus() != SkuStatus.ONSALE) { // 临时过滤掉不能更新价格的商品
+                            || cmpSku.getStatus() != SkuStatus.ONSALE
+                            || cmpSku.getStatus() != SkuStatus.OUTSTOCK) { //outstock的sku也返回
                         continue;
                     }
                     if (cmpSku.getWebsite() != null) {
                         websiteSet.add(cmpSku.getWebsite());
                     }
-                    tempCount += 1;
                     // 忽略前台返回的价格
-                    tempTotalComments += cmpSku.getCommentsNumber();
-                    tempRatins += cmpSku.getRatings();
                     CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
                     cplv.setDeepLinkUrl(WebsiteHelper.getDealUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                     cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
@@ -624,6 +631,8 @@ public class Compare2Controller {
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
             }
             List<CmpProductListVo> tempCmpProductListVos = new ArrayList<CmpProductListVo>();
+            //计算评论数*星级的总和
+            int sum = 0;
             //每个site只保留一个且为最低价
             for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
                 if (websiteSet.size() <= 0) {
@@ -632,6 +641,12 @@ public class Compare2Controller {
                 if (websiteSet.contains(cmpProductListVo.getWebsite())) {
                     websiteSet.remove(cmpProductListVo.getWebsite());
                     //去除列表中除此之外的其他此site的数据
+                    if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
+                        //评论数*星级 累加 除以评论数和
+                        sum += cmpProductListVo.getTotalRatingsNum() * cmpProductListVo.getRatingNum();
+                        tempTotalComments += cmpProductListVo.getTotalRatingsNum();
+                        tempRatins += cmpProductListVo.getRatingNum();
+                    }
                     tempCmpProductListVos.add(cmpProductListVo);
                 }
             }
@@ -646,14 +661,15 @@ public class Compare2Controller {
             PageableResult<CmpProductListVo> priceList = new PageableResult<CmpProductListVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize());
             cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
             cmpResult.setPriceList(priceList.getData());
-            cmpResult.setRatingNum(tempRatins / (tempCount == 0 ? 1 : tempCount));
+            cmpResult.setRatingNum(ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(tempTotalComments == 0 ? 1 : tempTotalComments), 0, BigDecimal.ROUND_HALF_UP).longValue()));
             PtmProductDescription ptmProductDescription = mongoDbManager.queryOne(PtmProductDescription.class, product.getId());
             String specs = "";
             if (ptmProductDescription != null) {
                 specs = ptmProductDescription.getJsonDescription();
             }
             cmpResult.setSpecs(specs);
-            cmpResult.setTotalRatingsNum(tempTotalComments / Long.valueOf(tempCount == 0 ? 1 : tempCount));
+            //cmpResult.setTotalRatingsNum(WeightedAverage.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).longValue());
+            cmpResult.setTotalRatingsNum(tempTotalComments);
             return cmpResult;
         }
         return cmpResult;
@@ -678,6 +694,11 @@ public class Compare2Controller {
                     }
                     if (cmpSku.getWebsite() != null) {
                         websiteSet.add(cmpSku.getWebsite());
+                    }
+                    System.out.println("id :  " + cmpSku.getId() + " imagePath " + cmpSku.getSmallImagePath());
+                    if (cmpSku.getWebsite().equals(sio.getCliSite())) {
+                        //取与客户端所传商品同一个site的sku作为sku匹配sku
+                        cmpResult.setProductVo(new ProductVo(sio.getHsProId(), sio.getCliQ(), cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath()), 0.0f, WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()})));
                     }
                     CmpProductListVo cplv = new CmpProductListVo(cmpSku, sio.getCliPrice());
                     comparedSkuVos.add(cplv);
@@ -704,6 +725,7 @@ public class Compare2Controller {
             }
             List<CmpProductListVo> tempCmpProductListVos = new ArrayList<CmpProductListVo>();
             //每个site只保留一个且为最低价
+            System.out.println("websiteSet :" + websiteSet.size());
             long startTime = System.nanoTime();   //获取开始时间
             for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
                 if (websiteSet.size() <= 0) {
@@ -719,13 +741,14 @@ public class Compare2Controller {
             comparedSkuVos = null;
             comparedSkuVos = new ArrayList<>();
             //将新的加入的放入到列表中
+            System.out.println("tempCmpProductListVos" + tempCmpProductListVos.size());
             comparedSkuVos.addAll(tempCmpProductListVos);
             long endTime = System.nanoTime(); //获取结束时间
             System.out.println("total time is " + (endTime - startTime) / 1000000 + "");
         }
+        System.out.println("comparedSkuVos" + comparedSkuVos.size());
         cmpResult.setPriceList(comparedSkuVos);
         cmpResult.setCopywriting("Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you.");
-        cmpResult.setDisplayMode(AppDisplayMode.WATERFALL);
         return cmpResult;
     }
 

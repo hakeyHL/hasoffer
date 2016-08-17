@@ -1,12 +1,12 @@
 package hasoffer.task.worker;
 
+import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
-import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +27,9 @@ public class SrmProductSearchCountListWorker implements Runnable {
 
     private IFetchDubboService fetchDubboService;
     private IDataBaseManager dbm;
-    private ConcurrentLinkedQueue<SrmSearchLog> queue;
+    private ConcurrentLinkedQueue<PtmCmpSku> queue;
 
-    public SrmProductSearchCountListWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<SrmSearchLog> queue, IFetchDubboService fetchDubboService) {
+    public SrmProductSearchCountListWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService) {
         this.dbm = dbm;
         this.queue = queue;
         this.fetchDubboService = fetchDubboService;
@@ -43,16 +43,17 @@ public class SrmProductSearchCountListWorker implements Runnable {
 
         String startDateString = TimeUtils.parse(TimeUtils.today() - TimeUtils.MILLISECONDS_OF_1_DAY * 2, "yyyyMMdd");
 
-        String Q_LOG_BYUPDATETIME = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd > ?0 AND t.count > 5 ORDER BY t.id ASC";
+        String Q_LOG_BYUPDATETIME = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd > ?0 AND t.count > 10 ORDER BY t.id ASC";
 
         PageableResult<SrmProductSearchCount> pageableResult = dbm.queryPage(Q_LOG_BYUPDATETIME, page, pageSize, Arrays.asList(startDateString));
 
         long totalPage = pageableResult.getTotalPage();
         logger.info("totalPage :" + totalPage);
 
-        while (page < totalPage) {
+        while (page <= totalPage) {
 
-            if (queue.size() > 10000) {
+            if (queue.size() > 50000) {
+                logger.info("queue size =" + queue.size());
                 try {
                     TimeUnit.MINUTES.sleep(1);
                 } catch (InterruptedException e) {
@@ -73,13 +74,7 @@ public class SrmProductSearchCountListWorker implements Runnable {
                 //暂时先拼凑一个srmsearchlog用于适配更新的接口
                 for (SrmProductSearchCount log : dataList) {
 
-                    SrmSearchLog srmSearchLog = new SrmSearchLog();
-
                     long productId = log.getProductId();
-
-                    srmSearchLog.setPtmProductId(productId);
-
-                    queue.add(srmSearchLog);
 
                     List<PtmCmpSku> skuList = dbm.query(Q_PTMCMPSKU_BYPRODUCTID, Arrays.asList(productId));
 
@@ -92,11 +87,16 @@ public class SrmProductSearchCountListWorker implements Runnable {
                             }
                         }
 
-                        fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl());
+                        queue.add(sku);
+                        fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_1);
                         logger.info("send url request succes for sku id is [" + sku.getId() + "]");
                     }
                 }
             }
+
+            page++;
         }
+
+        logger.info("send url finish");
     }
 }

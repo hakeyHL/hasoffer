@@ -3,14 +3,11 @@ package hasoffer.core.persistence.po.ptm;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 
-//@Entity
+@Entity
 public class PtmStdProduct implements Identifiable<Long> {
 
     @Id
@@ -24,13 +21,23 @@ public class PtmStdProduct implements Identifiable<Long> {
 
     private String title;// 标题
 
+    //ALTER TABLE ptmstdproduct ADD UNIQUE INDEX unique_brand_model(brand, model);
     private String brand; // 品牌
     private String model; // 型号 (品牌+型号不允许有重复)
 
     @Column(columnDefinition = "longtext")
     private String defaultDesc; // 默认的描述信息
 
-    public PtmStdProduct() {
+    private PtmStdProduct() {
+        //init default values
+    }
+
+    public PtmStdProduct(String title, String brand, String model, String defaultDesc) {
+        this();
+        this.title = title;
+        this.brand = brand;
+        this.model = model;
+        this.defaultDesc = defaultDesc;
     }
 
     @Override

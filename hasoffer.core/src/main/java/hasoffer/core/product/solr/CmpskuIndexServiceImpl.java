@@ -29,4 +29,18 @@ public class CmpskuIndexServiceImpl extends AbstractIndexService<Long, CmpSkuMod
 
         return new PageableResult<CmpSkuModel>(sr.getResult(), sr.getTotalCount(), page, size);
     }
+
+    public PageableResult<CmpSkuModel> search(String column, String value, int page, int size) {
+        String q = "*:*";
+
+        FilterQuery[] fqs = new FilterQuery[1];
+        fqs[0] = new FilterQuery(column, value);
+        Sort[] sorts = null;
+        PivotFacet[] pivotFacets = null;
+
+        SearchResult<CmpSkuModel> sr = searchObjs(q, fqs, sorts, pivotFacets, page, size, true);
+
+        return new PageableResult<CmpSkuModel>(sr.getResult(), sr.getTotalCount(), page, size);
+    }
+
 }

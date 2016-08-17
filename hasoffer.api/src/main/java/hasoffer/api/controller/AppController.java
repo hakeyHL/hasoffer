@@ -1,7 +1,7 @@
 package hasoffer.api.controller;
 
 import hasoffer.api.controller.vo.*;
-import hasoffer.api.helper.ExceptionHelper;
+import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.ParseConfigHelper;
 import hasoffer.api.worker.SearchLogQueue;
 import hasoffer.base.enums.AppType;
@@ -25,7 +25,7 @@ import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.urm.UrmDevice;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.product.ICmpSkuService;
-import hasoffer.core.product.iml.ProductServiceImpl;
+import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.solr.CategoryIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel;
@@ -622,21 +622,38 @@ public class AppController {
     }
 
     public void setCommentNumAndRatins(ProductListVo productListVo) {
-        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productListVo.getId(), 1, 10);
-        if (pagedCmpskus != null) {
+        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productListVo.getId(), 1, 20);
+        if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
+            List<PtmCmpSku> tempSkuList = pagedCmpskus.getData();
+            //计算评论数*星级的总和
+            int sum = 0;
+            //统计site
+            Set<Website> websiteSet = new HashSet<Website>();
             Long totalCommentNum = Long.valueOf(0);
             int totalRating = 0;
-            for (PtmCmpSku ptmCmpSku : pagedCmpskus.getData()) {
-                totalCommentNum += ptmCmpSku.getCommentsNumber();
-                totalRating += ptmCmpSku.getRatings();
+            for (PtmCmpSku ptmCmpSku : tempSkuList) {
+
+                if (ptmCmpSku.getWebsite() != null) {
+                    websiteSet.add(ptmCmpSku.getWebsite());
+                }
             }
-            if (totalCommentNum == 0 || pagedCmpskus.getData().size() == 0 || totalRating == 0) {
-                productListVo.setCommentNum(Long.valueOf(0));
-                productListVo.setRatingNum(0);
-            } else {
-                productListVo.setCommentNum(totalCommentNum / Long.valueOf(pagedCmpskus.getData().size()));
-                productListVo.setRatingNum(totalRating / pagedCmpskus.getData().size());
+            for (PtmCmpSku ptmCmpSku2 : tempSkuList) {
+                if (websiteSet.size() <= 0) {
+                    break;
+                }
+                if (websiteSet.contains(ptmCmpSku2.getWebsite())) {
+                    websiteSet.remove(ptmCmpSku2.getWebsite());
+                    if (!ptmCmpSku2.getWebsite().equals(Website.EBAY)) {
+                        //评论数*星级 累加 除以评论数和
+                        sum += ptmCmpSku2.getRatings() * ptmCmpSku2.getCommentsNumber();
+                        //去除列表中除此之外的其他此site的数据
+                        totalCommentNum += ptmCmpSku2.getCommentsNumber();
+                        totalRating += ptmCmpSku2.getRatings();
+                    }
+                }
             }
+            productListVo.setCommentNum(totalCommentNum);
+            productListVo.setRatingNum(ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(totalCommentNum == 0 ? 1 : totalCommentNum), 0, BigDecimal.ROUND_HALF_UP).longValue()));
         }
     }
 
@@ -676,7 +693,7 @@ public class AppController {
                 i++;
             }
         } catch (Exception e) {
-            mv.addObject("msg", ExceptionHelper.getExceptionMessage(e));
+            mv.addObject("msg", "faild " + e.getMessage());
             return mv;
         }
         return mv;

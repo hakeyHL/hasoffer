@@ -1,4 +1,4 @@
-package hasoffer.core.product.iml;
+package hasoffer.core.product.impl;
 
 import hasoffer.base.exception.ImageDownloadOrUploadException;
 import hasoffer.base.model.ImagePath;
@@ -376,6 +376,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         String jsonParam = fetchedProduct.getJsonParam();
         String description = fetchedProduct.getDescription();
+        String offers = fetchedProduct.getOffers();
 
         //在fetch包暂时无法跟新升级的时候，先在这里回避掉这种错误
         if (StringUtils.isEqual("[]", description)) {
@@ -391,6 +392,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             ptmCmpSkuDescription.setId(ptmCmpSku.getId());
             ptmCmpSkuDescription.setJsonParam(jsonParam);
             ptmCmpSkuDescription.setJsonDescription(description);
+            ptmCmpSkuDescription.setOffers(offers);
 
             if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
                 return;
@@ -400,9 +402,11 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
             boolean flagDescription = false;
             boolean flagJsonParam = false;
+            boolean flagOffers = false;
 
             String oldJsonDescription = ptmCmpSkuDescription.getJsonDescription();
             String oldJsonParam = ptmCmpSkuDescription.getJsonParam();
+            String oldOffers = ptmCmpSkuDescription.getOffers();
 
             //新的参数不为空，且新的参数和原有的不相同，更新
             if (!StringUtils.isEmpty(jsonParam) && !StringUtils.isEqual(jsonParam, oldJsonParam)) {
@@ -411,12 +415,19 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             }
 
             //新的描述不为空，且和旧的参数不相同
-            if (!StringUtils.isEmpty(description) && StringUtils.isEqual(description, oldJsonDescription)) {
+            if (!StringUtils.isEmpty(description) && !StringUtils.isEqual(description, oldJsonDescription)) {
                 ptmCmpSkuDescription.setJsonDescription(description);
                 flagJsonParam = true;
             }
 
-            if (flagDescription || flagJsonParam) {
+            //新的offers不为空，且和就得offers不相同
+            if (!StringUtils.isEmpty(offers) && !StringUtils.isEqual(offers, oldOffers)) {
+                ptmCmpSkuDescription.setOffers(offers);
+                flagOffers = true;
+            }
+
+
+            if (flagDescription || flagJsonParam || flagOffers) {
                 mdm.save(ptmCmpSkuDescription);
             }
         }
@@ -735,20 +746,21 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(skuId);
 
         //更新逻辑如下
-        //1.如果状态为OFFSALE，更新status和updateTime
-        //2.如果状态为OUTSTOCK，不更新价格
-        //3.如果状态为ONSALE，且价格大于0，更新价格
-        //4.在2和3状态下的
+//        1.如果状态为OFFSALE，更新status和updateTime
+//        2.如果状态为OUTSTOCK，不更新价格
+//        3.如果状态为ONSALE，且价格大于0，更新价格
+//        4.在2和3状态下的
 //                4.1如果title不为空，且和原来数据不一致，更新title
 //                4.2如果imageurl不为空，且和原理数据不一致，更新oriImageUrl
-        //5.如果原来的website为空，且新抓的website不为空，更新website
-        //6.如果新抓的skutitle不为空，且和原来的不一样，更新skutitle
-        //7.如果新抓的（只更新onsale的数据）
+//        5.如果原来的website为空，且新抓的website不为空，更新website
+//        6.如果新抓的skutitle不为空，且和原来的不一样，更新skutitle
+//        7.如果新抓的（只更新onsale的数据）
 //        commentsNumber;//评论数大于0，更新该值
 //        ratings;//星级，该值大于0，更新该值
 //        shipping = -1;//邮费，该值大于0，更新该值
 //        supportPayMethod;//支付方式，不为空，且和原来的字符串不一致，更新该值
 //        returnDays;//如果该值大于0，更新
+//        8.brand,model,如果新抓的不为null且和原来的不一样，更新
 
         //7.最终设置更新时间
 //        deliveryTime;//送达时间 ex: 1-3   app2.0---暂定为5
@@ -829,6 +841,16 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         if (!StringUtils.isEmpty(fetchedProduct.getSubTitle())) {
             ptmCmpSkuUpdater.getPo().setSkuTitle(fetchedProduct.getTitle() + fetchedProduct.getSubTitle());
+        }
+
+        //更新brand
+        if (!StringUtils.isEmpty(fetchedProduct.getBrand()) && !StringUtils.isEqual(fetchedProduct.getBrand(), cmpSku.getBrand())) {
+            ptmCmpSkuUpdater.getPo().setBrand(fetchedProduct.getBrand());
+        }
+
+        //更新model
+        if (!StringUtils.isEmpty(fetchedProduct.getModel()) && !StringUtils.isEqual(fetchedProduct.getModel(), cmpSku.getModel())) {
+            ptmCmpSkuUpdater.getPo().setModel(fetchedProduct.getModel());
         }
 
         ptmCmpSkuUpdater.getPo().setUpdateTime(TimeUtils.nowDate());

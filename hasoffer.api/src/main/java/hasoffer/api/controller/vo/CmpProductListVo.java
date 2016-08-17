@@ -40,9 +40,11 @@ public class CmpProductListVo {
     public CmpProductListVo(PtmCmpSku cmpSku, String logoImage) {
         this.coins = cmpSku.getWebsite() == Website.FLIPKART ? Math.round(0.015 * cmpSku.getPrice()) : 0;
         this.ratingNum = cmpSku.getRatings();
+        this.imageUrl = cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath());
         this.totalRatingsNum = cmpSku.getCommentsNumber();
         this.image = logoImage;
-        this.ratingNum = cmpSku.getRatings();
+        this.title = cmpSku.getTitle();
+        this.status = cmpSku.getStatus();
         this.price = Math.round(cmpSku.getPrice());
         this.website = cmpSku.getWebsite();
         this.freight = cmpSku.getShipping();
@@ -140,7 +142,7 @@ public class CmpProductListVo {
         this.deepLink = deepLink;
     }
 
-    public float getRatingNum() {
+    public int getRatingNum() {
         return ratingNum;
     }
 

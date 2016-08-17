@@ -1,4 +1,4 @@
-package hasoffer.core.product.iml;
+package hasoffer.core.product.impl;
 
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
@@ -18,8 +18,7 @@ import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
-import hasoffer.core.product.solr.ProductIndexServiceImpl;
-import hasoffer.core.product.solr.ProductModel;
+import hasoffer.core.product.solr.*;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.data.solr.*;
@@ -57,7 +56,7 @@ public class ProductServiceImpl implements IProductService {
     private static final String Q_ONSALE_PTM_CMPSKU =
             "SELECT t FROM PtmCmpSku t " +
                     " WHERE t.productId = ?0 " +
-                    "   AND t.status = 'ONSALE'  " +
+                    "   AND t.status = 'ONSALE' or  t.status = 'OUTSTOCK'  " +
                     " ORDER BY t.price ASC ";
 
     private static final String Q_NOTOFFSALE_PTM_CMPSKU =
@@ -85,6 +84,8 @@ public class ProductServiceImpl implements IProductService {
     ICategoryService categoryService;
     @Resource
     SearchLogCacheManager searchLogCacheManager;
+    @Resource
+    CmpskuIndexServiceImpl cmpskuIndexService;
     @Resource
     private IDataBaseManager dbm;
     @Resource
@@ -438,6 +439,14 @@ public class ProductServiceImpl implements IProductService {
 //                dbm.delete(PtmCmpSku.class, cmpSku.getId());
                 cmpSkuService.deleteCmpSku(cmpSku.getId());
             }
+        } else {
+            PageableResult<CmpSkuModel> skuModelPageableResult = cmpskuIndexService.search("productId", String.valueOf(ptmProductId), 1, Integer.MAX_VALUE);
+            List<CmpSkuModel> skuModels = skuModelPageableResult.getData();
+            if (ArrayUtils.hasObjs(skuModels)) {
+                for (CmpSkuModel cmpSkuModel : skuModels) {
+                    cmpskuIndexService.remove(String.valueOf(cmpSkuModel.getId()));
+                }
+            }
         }
 
         if (ArrayUtils.hasObjs(images)) {
@@ -580,6 +589,90 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    public ProductModel2 getProductModel2(PtmProduct product) {
+        if (product == null) {
+            return null;
+        }
+
+        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(product.getId());
+        float minPrice = -1f, maxPrice = -1f;
+        for (PtmCmpSku cmpSku : cmpSkus) {
+            float skuPrice = cmpSku.getPrice();
+            if (skuPrice <= 0 || cmpSku.getStatus() == SkuStatus.OFFSALE) {
+                continue;
+            }
+
+            if (minPrice <= 0) {
+                minPrice = skuPrice;
+                maxPrice = minPrice;
+                continue;
+            }
+
+            if (minPrice > skuPrice) {
+                minPrice = skuPrice;
+            }
+            if (maxPrice < skuPrice) {
+                maxPrice = skuPrice;
+            }
+        }
+
+        if (minPrice < 0) {
+            return null;
+        }
+
+        // 类目关键词
+        long cate1 = 0L, cate2 = 0L, cate3 = 0L;
+        String cate1name = "", cate2name = "", cate3name = "";
+
+        List<PtmCategory> categories = categoryService.getRouterCategoryList(product.getCategoryId());
+
+        // 目前仅支持3级类目
+        if (ArrayUtils.hasObjs(categories)) {
+            PtmCategory cate = categories.get(0);
+
+            cate1 = cate.getId();
+            cate1name = cate.getName();
+
+            int cateSize = categories.size();
+
+            if (cateSize > 1) {
+                cate = categories.get(1);
+                cate2 = cate.getId();
+                cate2name = cate.getName();
+            }
+
+            if (cateSize > 2) {
+                cate = categories.get(2);
+                cate3 = cate.getId();
+                cate3name = cate.getName();
+            }
+        }
+
+        long searchCount = 0;
+        SrmProductSearchCount productSearchCount = searchService.findSearchCountByProductId(product.getId());
+        if (productSearchCount != null) {
+            searchCount = productSearchCount.getCount();
+        }
+
+        ProductModel2 productModel = new ProductModel2(
+                product.getId(),
+                product.getTitle(),
+                product.getTag(),
+                cate1,
+                cate2,
+                cate3,
+                cate1name,
+                cate2name,
+                cate3name,
+                minPrice,
+                maxPrice,
+                product.getRating(),
+                searchCount);
+
+        return productModel;
+    }
+
+    @Override
     public void importProduct2Solr(PtmProduct product) {
         ProductModel productModel = getProductModel(product);
 
@@ -680,6 +773,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public PageableResult<PtmCmpSku> listOnsaleCmpSkus(long proId, int page, int size) {
+        //outstock的sku也返回
         PageableResult<PtmCmpSku> pagedResult = dbm.queryPage(Q_ONSALE_PTM_CMPSKU, page, size, Arrays.asList(proId));
         return pagedResult;
     }
