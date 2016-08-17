@@ -522,7 +522,18 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    public void reimport2Solr(long productId) {
+        PtmProduct ptmProduct = getProduct(productId);
+        if (ptmProduct != null) {
+            importProduct2Solr(ptmProduct);
+        }
+    }
+
+    @Override
     public void import2Solr(ProductModel pm) {
+        if (pm == null) {
+            return;
+        }
         productIndexService.createOrUpdate(pm);
     }
 
@@ -545,6 +556,34 @@ public class ProductServiceImpl implements IProductService {
         if (product == null) {
             return null;
         }
+
+        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(product.getId());
+        float minPrice = -1f, maxPrice = -1f;
+        for (PtmCmpSku cmpSku : cmpSkus) {
+            float skuPrice = cmpSku.getPrice();
+            if (skuPrice <= 0 || cmpSku.getStatus() == SkuStatus.OFFSALE) {
+                continue;
+            }
+
+            if (minPrice <= 0) {
+                minPrice = skuPrice;
+                maxPrice = minPrice;
+                continue;
+            }
+
+            if (minPrice > skuPrice) {
+                minPrice = skuPrice;
+            }
+            if (maxPrice < skuPrice) {
+                maxPrice = skuPrice;
+            }
+        }
+
+        if (minPrice < 0) {
+            productIndexService.remove(String.valueOf(product.getId()));
+            return null;
+        }
+
 //        PtmCategory category = dbm.get(PtmCategory.class, product.getCategoryId());
         List<PtmCategory> categories = categoryService.getRouterCategoryList(product.getCategoryId());
 
@@ -577,7 +616,7 @@ public class ProductServiceImpl implements IProductService {
                 product.getTag(),
                 cate3,
                 cate3name,
-                product.getPrice(),
+                minPrice,
                 product.getDescription(),
                 product.getColor(),
                 product.getSize(),
@@ -678,7 +717,11 @@ public class ProductServiceImpl implements IProductService {
     public void importProduct2Solr(PtmProduct product) {
         ProductModel productModel = getProductModel(product);
 
-        productIndexService.createOrUpdate(productModel);
+        if (productModel != null) {
+            productIndexService.createOrUpdate(productModel);
+        } else {
+            productIndexService.remove(String.valueOf(product.getId()));
+        }
     }
 
     @Override

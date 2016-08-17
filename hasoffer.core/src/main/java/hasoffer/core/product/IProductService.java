@@ -91,4 +91,6 @@ public interface IProductService {
     ProductModel2 getProductModel2(PtmProduct product);
 
     void updateProductStd(Long proId, boolean std);
+
+    void reimport2Solr(long productId);
 }
