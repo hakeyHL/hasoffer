@@ -588,6 +588,7 @@ public class Compare2Controller {
         if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
             System.out.println("get skus size is " + pagedCmpskus.getData().size());
             List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
+            System.out.println(" cmpskus size is " + cmpSkus.size());
             //评论数按照加权平均值展示
             Long tempTotalComments = Long.valueOf(0);
             //评论星级按照平均值展示
@@ -609,6 +610,7 @@ public class Compare2Controller {
 //                    }
                     // 忽略前台返回的价格
                     try {
+                        System.out.println(" Enter cmpProductListVO set area ");
                         CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
                         System.out.println("set properteis over l");
                         cplv.setDeepLinkUrl(WebsiteHelper.getDealUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
