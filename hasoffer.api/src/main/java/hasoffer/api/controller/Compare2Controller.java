@@ -601,8 +601,7 @@ public class Compare2Controller {
                 for (PtmCmpSku cmpSku : cmpSkus) {
                     if (cmpSku.getWebsite() == null
                             || cmpSku.getPrice() <= 0
-                            || cmpSku.getStatus() != SkuStatus.ONSALE
-                            || cmpSku.getStatus() != SkuStatus.OUTSTOCK) { //outstock的sku也返回
+                            ) {
                         continue;
                     }
 //                    if (cmpSku.getWebsite() != null) {
