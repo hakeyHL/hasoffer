@@ -247,7 +247,7 @@ public class Compare2Controller {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
-        PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"imageUrl", "skuPrice", "deepLink", "title", "saved", "id", "status", "priceOff", "productVo", "pagedComparedSkuVos", "copywriting", "displayMode", "std", "cashBack"});
+        PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"skuPrice", "deepLink", "saved", "id", "priceOff", "productVo", "pagedComparedSkuVos", "copywriting", "displayMode", "std", "cashBack"});
         CmpResult cr = null;
         PtmProduct product = productService.getProduct(Long.valueOf(id));
         if (product != null) {
@@ -340,8 +340,8 @@ public class Compare2Controller {
 
         // 搜索SKU
         PageableResult<CmpSkuModel> pagedCmpskuModels = cmpskuIndexService.searchSku(_q, 1, 5);
-
         List<CmpSkuModel> skuModels = pagedCmpskuModels.getData();
+        System.out.println("skuModels   " + skuModels.size());
 
         if (ArrayUtils.isNullOrEmpty(skuModels)) {
             throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, "", 0);
@@ -363,12 +363,14 @@ public class Compare2Controller {
         String title = skuModel.getTitle();
 
         float mc = StringUtils.wordMatchD(StringUtils.toLowerCase(title), _q);
+        System.out.println(" mc " + mc);
         // 匹配度如果小于40%, 则认为不匹配
         if (mc <= 0.4) {
             throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, title, mc);
         }
 
         long cateId = 0L;
+        System.out.println("skuModel.getProductId()  " + skuModel.getProductId());
         sio.set(cateId, skuModel.getProductId(), skuModel.getId());
     }
 
@@ -390,15 +392,22 @@ public class Compare2Controller {
             }
 
             sio.set(srmSearchLog.getCategory(), srmSearchLog.getPtmProductId(), srmSearchLog.getPtmCmpSkuId());
+            System.out.println("getHsProId  :" + sio.getHsProId());
         } else {
             if (srmSearchLog == null) {
+                System.out.println("srmSearchLog is null");
                 sio.setFirstSearch(true);
+                System.out.println("setFirstSearch is true");
             }
 
             try {
+                System.out.println("searchForResult  ");
                 searchForResult(sio);
+                System.out.println(" searchForResult result  " + sio.getHsProId());
             } catch (NonMatchedProductException e) {
+                System.out.println("searchForResult_old  ");
                 searchForResult_old(sio);
+                System.out.println(" searchForResult_old result  " + sio.getHsProId());
             }
         }
 
@@ -588,7 +597,8 @@ public class Compare2Controller {
                 for (PtmCmpSku cmpSku : cmpSkus) {
                     if (cmpSku.getWebsite() == null
                             || cmpSku.getPrice() <= 0
-                            || cmpSku.getStatus() != SkuStatus.ONSALE) { // 临时过滤掉不能更新价格的商品
+                            || cmpSku.getStatus() != SkuStatus.ONSALE
+                            || cmpSku.getStatus() != SkuStatus.OUTSTOCK) { //outstock的sku也返回
                         continue;
                     }
                     if (cmpSku.getWebsite() != null) {

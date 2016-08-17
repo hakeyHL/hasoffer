@@ -18,6 +18,8 @@ import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
+import hasoffer.core.product.solr.CmpSkuModel;
+import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel;
 import hasoffer.core.search.ISearchService;
@@ -57,7 +59,7 @@ public class ProductServiceImpl implements IProductService {
     private static final String Q_ONSALE_PTM_CMPSKU =
             "SELECT t FROM PtmCmpSku t " +
                     " WHERE t.productId = ?0 " +
-                    "   AND t.status = 'ONSALE'  " +
+                    "   AND t.status = 'ONSALE' or  t.status = 'OUTSTOCK'  " +
                     " ORDER BY t.price ASC ";
 
     private static final String Q_NOTOFFSALE_PTM_CMPSKU =
@@ -85,6 +87,8 @@ public class ProductServiceImpl implements IProductService {
     ICategoryService categoryService;
     @Resource
     SearchLogCacheManager searchLogCacheManager;
+    @Resource
+    CmpskuIndexServiceImpl cmpskuIndexService;
     @Resource
     private IDataBaseManager dbm;
     @Resource
@@ -438,6 +442,14 @@ public class ProductServiceImpl implements IProductService {
 //                dbm.delete(PtmCmpSku.class, cmpSku.getId());
                 cmpSkuService.deleteCmpSku(cmpSku.getId());
             }
+        } else {
+            PageableResult<CmpSkuModel> skuModelPageableResult = cmpskuIndexService.search("productId", String.valueOf(ptmProductId), 1, Integer.MAX_VALUE);
+            List<CmpSkuModel> skuModels = skuModelPageableResult.getData();
+            if (ArrayUtils.hasObjs(skuModels)) {
+                for (CmpSkuModel cmpSkuModel : skuModels) {
+                    cmpskuIndexService.remove(String.valueOf(cmpSkuModel.getId()));
+                }
+            }
         }
 
         if (ArrayUtils.hasObjs(images)) {
@@ -680,6 +692,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public PageableResult<PtmCmpSku> listOnsaleCmpSkus(long proId, int page, int size) {
+        //outstock的sku也返回
         PageableResult<PtmCmpSku> pagedResult = dbm.queryPage(Q_ONSALE_PTM_CMPSKU, page, size, Arrays.asList(proId));
         return pagedResult;
     }

@@ -57,7 +57,7 @@ public class DubboUpdateController {
 
         ExecutorService es = Executors.newCachedThreadPool();
 
-        ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<PtmCmpSku>();
+        ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
 
         es.execute(new SrmProductSearchCountListWorker(dbm, queue, fetchDubboService));
 
@@ -81,7 +81,7 @@ public class DubboUpdateController {
 
         ExecutorService es = Executors.newCachedThreadPool();
 
-        ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<PtmCmpSku>();
+        ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
 
         es.execute(new TopSellingListWorker(dbm, queue, fetchDubboService));
 
