@@ -82,7 +82,12 @@ public class FKCateAndParamWorker implements Runnable {
 
             long parentid = 0;
 
-            for (int i = 1; i < 4; i++) {
+            for (int i = 1; i < pathArray.size(); i++) {
+
+                //取最长3位
+                if (i > 3) {
+                    break;
+                }
 
                 //忽略第一个home节点
                 String path = pathArray.getJSONObject(i).getString("title");
