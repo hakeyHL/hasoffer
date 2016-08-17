@@ -137,4 +137,8 @@
     <!--<property name="jobDetail" ref="statVisitSkuUpdateJob"/>-->
     <!--<property name="cronExpression" value="0 30 0/1 * * ?"/>-->
     <!--</bean>-->
+
+    <!-- 随系统启动自启动，主商品价格更新-->
+
+
 </beans>
