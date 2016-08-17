@@ -24,19 +24,16 @@ import java.util.concurrent.TimeUnit;
  */
 public class CmpSkuDubboUpdateWorker implements Runnable {
 
-    private static final String Q_PTMCMPSKU_BYPRODUCTID = "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ";
     private static Logger logger = LoggerFactory.getLogger(CmpSkuDubboUpdateWorker.class);
     private IDataBaseManager dbm;
     private ConcurrentLinkedQueue<PtmCmpSku> queue;
     private IFetchDubboService fetchService;
-    private IProductService productService;
     private ICmpSkuService cmpSkuService;
 
     public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchService, IProductService productService, ICmpSkuService cmpSkuService) {
         this.dbm = dbm;
         this.queue = queue;
         this.fetchService = fetchService;
-        this.productService = productService;
         this.cmpSkuService = cmpSkuService;
     }
 
@@ -120,6 +117,22 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
 
             cmpSkuService.createPtmCmpSkuImage(skuid, fetchedProduct);
+
+            //对FLIPKART没有类目的数据进行更新,暂时注释掉
+//            if (Website.FLIPKART.equals(sku.getWebsite()) && sku.getCategoryId() == 0) {
+//
+//                List<String> categoryPathList = fetchedProduct.getCategoryPathList();
+//
+//                String lastCategoryPath = categoryPathList.get(categoryPathList.size() - 1);
+//
+//                PtmCategory3 ptmCategory3 = dbm.querySingle("SELECT t FROM PtmCategory3 t WHERE t.name = ?0", Arrays.asList(lastCategoryPath));
+//
+//                long categoryid = ptmCategory3.getHasofferCateogryId();
+//
+//                if (categoryid != 0) {
+//                    cmpSkuService.updateCategoryid(skuid, categoryid);
+//                }
+//            }
         }
     }
 }
