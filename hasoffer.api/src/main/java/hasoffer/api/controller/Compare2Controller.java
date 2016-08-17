@@ -252,6 +252,7 @@ public class Compare2Controller {
         CmpResult cr = null;
         PtmProduct product = productService.getProduct(Long.valueOf(id));
         if (product != null) {
+            System.out.println("product is exist in our system " + product.getId());
             String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
             DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
             SearchIO sio = new SearchIO(product.getSourceId(), product.getTitle(), "", product.getSourceSite(), product.getPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, size);
@@ -585,6 +586,7 @@ public class Compare2Controller {
         //从ptmCmpSku表获取 productId为指定值、且状态为ONSALE 按照价格升序排列
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(product.getId(), sio.getPage(), sio.getSize());
         if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
+            System.out.println("get skus size is " + pagedCmpskus.getData().size());
             List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
             //评论数按照加权平均值展示
             Long tempTotalComments = Long.valueOf(0);
@@ -607,6 +609,7 @@ public class Compare2Controller {
 //                    }
                     // 忽略前台返回的价格
                     CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
+                    System.out.println("set properteis over l");
                     cplv.setDeepLinkUrl(WebsiteHelper.getDealUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                     cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                     comparedSkuVos.add(cplv);
@@ -634,24 +637,26 @@ public class Compare2Controller {
             List<CmpProductListVo> tempCmpProductListVos = new ArrayList<CmpProductListVo>();
             //计算评论数*星级的总和
             int sum = 0;
-            //每个site只保留一个且为最低价
+            System.out.println("iterator  comparedSkuVos , and  it is size is " + comparedSkuVos.size());
             for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
-                    //去除列表中除此之外的其他此site的数据
-                    if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
-                        //评论数*星级 累加 除以评论数和
-                        sum += cmpProductListVo.getTotalRatingsNum() * cmpProductListVo.getRatingNum();
-                        tempTotalComments += cmpProductListVo.getTotalRatingsNum();
-                        tempRatins += cmpProductListVo.getRatingNum();
-                        //获取offers
-                        PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, cmpProductListVo.getId());
-                        if (ptmCmpSkuDescription != null) {
-                            String offers = ptmCmpSkuDescription.getOffers();
-                            if (!StringUtils.isEmpty(offers)) {
-                                String[] temps = offers.split(",");
-                                for (String str : temps) {
-                                    cmpProductListVo.getOffers().add(str);
-                                }
+                if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
+                    System.out.println("not ebay ");
+                    //评论数*星级 累加 除以评论数和
+                    sum += cmpProductListVo.getTotalRatingsNum() * cmpProductListVo.getRatingNum();
+                    tempTotalComments += cmpProductListVo.getTotalRatingsNum();
+                    tempRatins += cmpProductListVo.getRatingNum();
+                    //获取offers
+                    System.out.println(" get offers from mongoDb ");
+                    PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, cmpProductListVo.getId());
+                    if (ptmCmpSkuDescription != null) {
+                        String offers = ptmCmpSkuDescription.getOffers();
+                        System.out.println(" got it ,and offers is " + offers);
+                        if (!StringUtils.isEmpty(offers)) {
+                            String[] temps = offers.split(",");
+                            for (String str : temps) {
+                                cmpProductListVo.getOffers().add(str);
                             }
+                        }
                     }
                     tempCmpProductListVos.add(cmpProductListVo);
                 }
