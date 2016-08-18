@@ -596,8 +596,8 @@ public class Compare2Controller {
             System.out.println(" cmpskus size is " + cmpSkus.size());
             //评论数按照加权平均值展示
             Long tempTotalComments = Long.valueOf(0);
-            //评论星级按照平均值展示
-            int tempRatins = 0;
+            //统计site
+            Set<Website> websiteSet = new HashSet<Website>();
             //统计site
 //            Set<Website> websiteSet = new HashSet<Website>();
             //初始化price为客户端传输的price
@@ -609,20 +609,16 @@ public class Compare2Controller {
                             ) {
                         continue;
                     }
-//                    if (cmpSku.getWebsite() != null) {
-//                        websiteSet.add(cmpSku.getWebsite());
-//                    }
-                    // 忽略前台返回的价格
-                    try {
-                        System.out.println(" Enter cmpProductListVO set area ");
-                        CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
-                        System.out.println("set properteis over l");
-                        cplv.setDeepLinkUrl(WebsiteHelper.getDealUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
-                        cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
-                        comparedSkuVos.add(cplv);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    if (cmpSku.getWebsite() != null) {
+                        websiteSet.add(cmpSku.getWebsite());
                     }
+                    // 忽略前台返回的价格
+                    System.out.println(" Enter cmpProductListVO set area ");
+                    CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
+                    System.out.println("set properteis over l");
+                    cplv.setDeepLinkUrl(WebsiteHelper.getDealUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
+                    cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
+                    comparedSkuVos.add(cplv);
                 }
                 if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {
                     throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", product.getTitle(), product.getPrice());
@@ -649,12 +645,18 @@ public class Compare2Controller {
             int sum = 0;
             System.out.println("iterator  comparedSkuVos , and  it is size is " + comparedSkuVos.size());
             for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
-                if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
-                    System.out.println("not ebay ");
-                    //评论数*星级 累加 除以评论数和
-                    sum += cmpProductListVo.getTotalRatingsNum() * cmpProductListVo.getRatingNum();
-                    tempTotalComments += cmpProductListVo.getTotalRatingsNum();
-                    tempRatins += cmpProductListVo.getRatingNum();
+                if (websiteSet.size() <= 0) {
+                    break;
+                }
+                if (websiteSet.contains(cmpProductListVo.getWebsite())) {
+                    websiteSet.remove(cmpProductListVo.getWebsite());
+                    //去除列表中除此之外的其他此site的数据
+                    if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
+                        System.out.println("not ebay ");
+                        //评论数*星级 累加 除以评论数和
+                        sum += cmpProductListVo.getTotalRatingsNum() * cmpProductListVo.getRatingNum();
+                        tempTotalComments += cmpProductListVo.getTotalRatingsNum();
+                    }
                     //获取offers
                     System.out.println(" get offers from mongoDb ");
                     PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, cmpProductListVo.getId());
@@ -668,8 +670,8 @@ public class Compare2Controller {
                             }
                         }
                     }
+                    tempCmpProductListVos.add(cmpProductListVo);
                 }
-                tempCmpProductListVos.add(cmpProductListVo);
             }
             //移除之前加进列表的所有的sku列表
             comparedSkuVos = null;
