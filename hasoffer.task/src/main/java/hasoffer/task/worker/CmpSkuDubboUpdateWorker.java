@@ -1,5 +1,6 @@
 package hasoffer.task.worker;
 
+import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
@@ -27,13 +28,13 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
     private static Logger logger = LoggerFactory.getLogger(CmpSkuDubboUpdateWorker.class);
     private IDataBaseManager dbm;
     private ConcurrentLinkedQueue<PtmCmpSku> queue;
-    private IFetchDubboService fetchService;
+    private IFetchDubboService fetchDubboService;
     private ICmpSkuService cmpSkuService;
 
-    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchService, IProductService productService, ICmpSkuService cmpSkuService) {
+    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, IProductService productService, ICmpSkuService cmpSkuService) {
         this.dbm = dbm;
         this.queue = queue;
-        this.fetchService = fetchService;
+        this.fetchDubboService = fetchDubboService;
         this.cmpSkuService = cmpSkuService;
     }
 
@@ -85,7 +86,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             return;
         }
 
-        TaskStatus taskStatus = fetchService.getUrlTaskStatus(website, url);
+        TaskStatus taskStatus = fetchDubboService.getUrlTaskStatus(website, url);
 
         FetchUrlResult fetchUrlResult = null;
 
@@ -102,11 +103,12 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             return;
         } else if (TaskStatus.NONE.equals(taskStatus)) {
             queue.add(sku);
+            fetchDubboService.sendUrlTask(sku.getWebsite(), url, TaskLevel.LEVEL_1);
             logger.info("taskstatus NONE for [" + skuid + "]");
             return;
         } else {//(TaskStatus.FINISH.equals(taskStatus)))
             logger.info("taskstatus FINISH for [" + skuid + "]");
-            fetchUrlResult = fetchService.getProductsByUrl(skuid, sku.getWebsite(), sku.getUrl());
+            fetchUrlResult = fetchDubboService.getProductsByUrl(skuid, sku.getWebsite(), sku.getUrl());
 
             FetchedProduct fetchedProduct = fetchUrlResult.getFetchProduct();
 

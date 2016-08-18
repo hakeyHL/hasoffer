@@ -20,6 +20,7 @@ import javax.annotation.Resource;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -61,7 +62,14 @@ public class DubboUpdateController {
 
         es.execute(new SrmProductSearchCountListWorker(dbm, queue, fetchDubboService));
 
-        for (int i = 0; i < 50; i++) {
+        //保证list任务优先执行
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        for (int i = 0; i < 100; i++) {
             es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, productService, cmpSkuService));
         }
 
