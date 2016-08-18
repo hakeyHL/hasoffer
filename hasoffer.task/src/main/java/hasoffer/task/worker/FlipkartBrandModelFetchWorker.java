@@ -94,7 +94,7 @@ public class FlipkartBrandModelFetchWorker implements Runnable {
                         brand = val;
                     }
 
-                    //在参数中寻找“Model Name”，“Model”，“Model Number”,"Model ID","Part Number","Series"
+                    //在参数中寻找“Model Name”，“Model”，“Model Number”,"Model ID","Part Number","Series","model_name"
                     if (StringUtils.isEqual(key, "Model Name")) {
                         model += val + ",";
                     }
@@ -111,6 +111,9 @@ public class FlipkartBrandModelFetchWorker implements Runnable {
                         model += val + ",";
                     }
                     if (StringUtils.isEqual(key, "Series")) {
+                        model += val + ",";
+                    }
+                    if (StringUtils.isEqual(key, "model_name")) {
                         model += val + ",";
                     }
                 }
