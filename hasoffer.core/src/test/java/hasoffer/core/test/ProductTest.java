@@ -81,36 +81,6 @@ public class ProductTest {
     }
 
     @Test
-    public void import2Solr() {
-        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<>(
-                new IList() {
-                    @Override
-                    public PageableResult getData(int page) {
-                        return productService.listPagedProducts(page, 2000);
-                    }
-
-                    @Override
-                    public boolean isRunForever() {
-                        return false;
-                    }
-
-                    @Override
-                    public void setRunForever(boolean runForever) {
-
-                    }
-                },
-                new IProcess<PtmProduct>() {
-                    @Override
-                    public void process(PtmProduct o) {
-                        productService.importProduct2Solr2(o);
-                    }
-                }
-        );
-
-        listAndProcessTask2.go();
-    }
-
-    @Test
     public void expPriceExcept2() throws Exception {
         String sql = "SELECT t FROM PtmProduct t WHERE t.categoryId=?0";
 
