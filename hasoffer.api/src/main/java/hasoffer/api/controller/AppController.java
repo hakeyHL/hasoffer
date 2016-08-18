@@ -206,6 +206,24 @@ public class AppController {
                     appService.countDealClickCount(appDeal);
                 }
                 break;
+            case DOWNLOADBOOTCONFIG:
+                //app下载引导
+                List<String> checkPackages = new ArrayList<>();
+                Map<String, String> channels = new HashMap<String, String>();
+                HashMap<String, List<ThirdAppVo>> apps = new HashMap<String, List<ThirdAppVo>>();
+                List<ThirdAppVo> googlePlayApps = new ArrayList<ThirdAppVo>();
+                List<ThirdAppVo> nineApp = new ArrayList<ThirdAppVo>();
+                Website[] websites = Website.values();
+                for (Website website : websites) {
+                    googlePlayApps.add(new ThirdAppVo(website, "", "", "", 4.5f, 100l, "500,000"));
+                }
+                for (Website website : websites) {
+                    nineApp.add(new ThirdAppVo(website, "", "", "", 4.5f, 100l, "500,000"));
+                }
+                apps.put("GOOGLEPLAY", googlePlayApps);
+                apps.put("9APP", nineApp);
+                DownloadConfigVo downloadConfigVo = new DownloadConfigVo(true, checkPackages, "9APP", channels, apps);
+                break;
             default:
                 break;
         }

@@ -18,9 +18,21 @@ public class DownloadConfigVo {
     //优先下载渠道
     private String priorDownloadChannel = "9APP";
     //下载渠道及deeplink
-    private Map<String, String> map = new HashMap<String, String>();
+    private Map<String, String> channels = new HashMap<String, String>();
     //APP在不同下载渠道的deeplink、logo、简介、评分值、评论数、下载数(googleplay的下载链接需添加联盟id)
-    private Map<String, ThirdAppVo> apps = new HashMap<String, ThirdAppVo>();
+
+    private HashMap<String, List<ThirdAppVo>> apps = new HashMap<String, List<ThirdAppVo>>();
+
+    public DownloadConfigVo() {
+    }
+
+    public DownloadConfigVo(boolean isBoot, List<String> checkPackages, String priorDownloadChannel, Map<String, String> channels, HashMap<String, List<ThirdAppVo>> apps) {
+        this.isBoot = isBoot;
+        this.checkPackages = checkPackages;
+        this.priorDownloadChannel = priorDownloadChannel;
+        this.channels = channels;
+        this.apps = apps;
+    }
 
     public boolean isBoot() {
         return isBoot;
@@ -46,19 +58,19 @@ public class DownloadConfigVo {
         this.priorDownloadChannel = priorDownloadChannel;
     }
 
-    public Map<String, String> getMap() {
-        return map;
-    }
-
-    public void setMap(Map<String, String> map) {
-        this.map = map;
-    }
-
-    public Map<String, ThirdAppVo> getApps() {
+    public HashMap<String, List<ThirdAppVo>> getApps() {
         return apps;
     }
 
-    public void setApps(Map<String, ThirdAppVo> apps) {
+    public void setApps(HashMap<String, List<ThirdAppVo>> apps) {
         this.apps = apps;
+    }
+
+    public Map<String, String> getChannels() {
+        return channels;
+    }
+
+    public void setChannels(Map<String, String> channels) {
+        this.channels = channels;
     }
 }
