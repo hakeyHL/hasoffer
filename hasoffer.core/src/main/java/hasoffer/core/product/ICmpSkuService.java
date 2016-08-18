@@ -98,4 +98,6 @@ public interface ICmpSkuService {
      * @param smallImagePath
      */
     void fixSmallImagePath(long skuid, String smallImagePath);
+
+    void updateFlipakrtSkuBrandAndModel(long skuid, String brand, String model);
 }

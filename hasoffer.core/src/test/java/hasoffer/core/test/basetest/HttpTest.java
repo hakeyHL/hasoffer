@@ -65,7 +65,6 @@ public class HttpTest {
         JSONArray pathArray = jsonObject.getJSONObject("RESPONSE").getJSONObject("data").getJSONObject("product_breadcrumb").getJSONArray("data").getJSONObject(0).getJSONObject("value").getJSONArray("productBreadcrumbs");
         for (int i = 1; i < pathArray.size(); i++) {
 
-            //取最长3位（1,2,3），忽略第一个home
             if (i > 3) {
                 break;
             }
