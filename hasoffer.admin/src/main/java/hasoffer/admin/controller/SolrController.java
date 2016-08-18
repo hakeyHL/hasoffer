@@ -25,6 +25,8 @@ import java.util.concurrent.Executors;
 @RequestMapping(value = "/solr")
 public class SolrController {
 
+    private static final String Q_PRODUCT =
+            "SELECT t FROM PtmProduct t where t.id > 726884";
     @Resource
     IProductService productService;
     @Resource
@@ -38,7 +40,7 @@ public class SolrController {
                 new IList() {
                     @Override
                     public PageableResult getData(int page) {
-                        return productService.listPagedProducts(page, 2000);
+                        return dbm.queryPage(Q_PRODUCT, page, 2000);
                     }
 
                     @Override

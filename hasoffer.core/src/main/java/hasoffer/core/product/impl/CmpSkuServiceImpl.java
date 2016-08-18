@@ -549,6 +549,23 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         dbm.update(updater);
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateFlipakrtSkuBrandAndModel(long skuid, String brand, String model) {
+
+        PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(skuid);
+
+        if (!StringUtils.isEmpty(brand)) {
+            updater.getPo().setBrand(brand);
+        }
+
+        if (!StringUtils.isEmpty(model)) {
+            updater.getPo().setModel(model);
+        }
+
+        dbm.update(updater);
+    }
+
     public void importCmpSku2solr(PtmCmpSku ptmCmpSku) {
         logger.debug(String.format("import or update to solr-sku {%d}", ptmCmpSku.getId()));
         cmpskuIndexService.createOrUpdate(new CmpSkuModel(ptmCmpSku));

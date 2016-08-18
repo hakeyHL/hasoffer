@@ -4,8 +4,10 @@ import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICategoryService;
+import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.worker.ListAndProcessWorkerStatus;
 import hasoffer.task.worker.FKCateAndParamWorker;
+import hasoffer.task.worker.FlipkartBrandModelFetchWorker;
 import hasoffer.task.worker.MysqlListWorker;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,13 +27,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class FlipkartCategoryParamController {
 
     private static final String Q_FLIPKART_CMP = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' AND t.categoryId2 <> 0 ORDER BY t.id";
+    private static final String Q_FLIPKART_SKU = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' ORDER BY t.id ASC";
     private static AtomicBoolean taskRunning1 = new AtomicBoolean(false);
+    private static AtomicBoolean taskRunning2 = new AtomicBoolean(false);
     @Resource
     IDataBaseManager dbm;
     @Resource
     IMongoDbManager mdm;
     @Resource
     ICategoryService categoryService;
+    @Resource
+    ICmpSkuService cmpSkuService;
 
     //flipkart/cateandparam
     @RequestMapping(value = "/cateandparam", method = RequestMethod.GET)
@@ -53,6 +59,30 @@ public class FlipkartCategoryParamController {
         }
 
         taskRunning1.set(true);
+
+        return "ok";
+    }
+
+    //flipkart/fetchBrandAndModel
+    @RequestMapping(value = "/fetchBrandAndModel", method = RequestMethod.GET)
+    @ResponseBody
+    public String fetchBrandAndModel() {
+
+        if (taskRunning2.get()) {
+            return "task running.";
+        }
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        ListAndProcessWorkerStatus<PtmCmpSku> ws = new ListAndProcessWorkerStatus<PtmCmpSku>();
+
+        es.execute(new MysqlListWorker(Q_FLIPKART_SKU, ws, dbm));
+
+        for (int i = 0; i < 20; i++) {
+            es.execute(new FlipkartBrandModelFetchWorker(cmpSkuService, ws));// mdm,
+        }
+
+        taskRunning2.set(true);
 
         return "ok";
     }
