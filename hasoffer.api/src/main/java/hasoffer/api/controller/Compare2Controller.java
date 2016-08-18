@@ -212,7 +212,7 @@ public class Compare2Controller {
                 } else {
                     cr = getCmpProducts(sio);
                     if (cr != null && cr.getPriceList().size() > 0 && cr.getPriceList().size() > 0) {
-                        cr.setPriceOff(Float.valueOf(price) - cr.getPriceList().get(0).getPrice());
+                        cr.setPriceOff(cr.getPriceList().get(0).getSaved());
                     }
                     cr.setProductId(sio.getHsProId());
                     cr.setCopywriting(ptmProduct != null && ptmProduct.isStd() ? "Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you." : "Looked around Myntre,Jabong & 5 other apps,thought you might like these items as well..");
