@@ -53,11 +53,15 @@ public class ProductServiceImpl implements IProductService {
                     " WHERE t.productId = ?0   " +
                     " ORDER BY t.price ASC ";
 
+    //    private static final String Q_ONSALE_PTM_CMPSKU =
+//            "SELECT t FROM PtmCmpSku t " +
+//                    " WHERE t.productId = ?0  AND  t.price >?1  " +
+//                    "   AND t.status = 'ONSALE' or  t.status = 'OUTSTOCK'  " +
+//                    " ORDER BY t.price ASC ";
     private static final String Q_ONSALE_PTM_CMPSKU =
             "SELECT t FROM PtmCmpSku t " +
-                    " WHERE t.productId = ?0 " +
-                    "   AND t.status = 'ONSALE' or  t.status = 'OUTSTOCK'  " +
-                    " ORDER BY t.price ASC ";
+                    " WHERE t.productId = ?0  AND  t.price >?1  AND t.status <> 'OFFSALE'  ORDER BY t.price ASC  ";
+
 
     private static final String Q_NOTOFFSALE_PTM_CMPSKU =
             "SELECT t FROM PtmCmpSku t " +
@@ -828,7 +832,7 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public PageableResult<PtmCmpSku> listOnsaleCmpSkus(long proId, int page, int size) {
         //outstock的sku也返回
-        PageableResult<PtmCmpSku> pagedResult = dbm.queryPage(Q_ONSALE_PTM_CMPSKU, page, size, Arrays.asList(proId));
+        PageableResult<PtmCmpSku> pagedResult = dbm.queryPage(Q_ONSALE_PTM_CMPSKU, page, size, Arrays.asList(proId, 100.0f));
         return pagedResult;
     }
 }

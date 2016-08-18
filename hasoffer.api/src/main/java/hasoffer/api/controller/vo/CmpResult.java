@@ -13,7 +13,7 @@ public class CmpResult {
     List<CmpProductListVo> priceList;
     float priceOff;
     ProductVo productVo;
-    PageableResult<ComparedSkuVo> pagedComparedSkuVos;
+    PageableResult pagedComparedSkuVos;
     //the lowest price
     private float bestPrice;
     //productname
@@ -63,11 +63,11 @@ public class CmpResult {
         this.productVo = productVo;
     }
 
-    public PageableResult<ComparedSkuVo> getPagedComparedSkuVos() {
+    public PageableResult getPagedComparedSkuVos() {
         return pagedComparedSkuVos;
     }
 
-    public void setPagedComparedSkuVos(PageableResult<ComparedSkuVo> pagedComparedSkuVos) {
+    public void setPagedComparedSkuVos(PageableResult pagedComparedSkuVos) {
         this.pagedComparedSkuVos = pagedComparedSkuVos;
     }
 

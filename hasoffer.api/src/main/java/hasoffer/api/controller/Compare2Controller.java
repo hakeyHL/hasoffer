@@ -243,7 +243,8 @@ public class Compare2Controller {
     public ModelAndView cmpsku(@RequestParam(defaultValue = "0") final String id,
                                @RequestParam(defaultValue = "1") int page,
                                @RequestParam(defaultValue = "20") int size,
-                               HttpServletResponse response
+                               HttpServletResponse response,
+                               HttpServletRequest request
     ) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
@@ -258,6 +259,7 @@ public class Compare2Controller {
             SearchIO sio = new SearchIO(product.getSourceId(), product.getTitle(), "", product.getSourceSite(), product.getPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, size);
             try {
                 cr = getCmpProducts(sio, product);
+                jsonObject.put("page", JSONObject.toJSON(PageHelper.getPageModel(request, cr.getPagedComparedSkuVos())));
             } catch (Exception e) {
                 logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, size));
                 //if exception occured ,get default cmpResult
@@ -588,6 +590,7 @@ public class Compare2Controller {
         if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
             System.out.println("get skus size is " + pagedCmpskus.getData().size());
             List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
+            System.out.println(" cmpskus size is " + cmpSkus.size());
             //评论数按照加权平均值展示
             Long tempTotalComments = Long.valueOf(0);
             //评论星级按照平均值展示
@@ -600,8 +603,7 @@ public class Compare2Controller {
                 for (PtmCmpSku cmpSku : cmpSkus) {
                     if (cmpSku.getWebsite() == null
                             || cmpSku.getPrice() <= 0
-                            || cmpSku.getStatus() != SkuStatus.ONSALE
-                            || cmpSku.getStatus() != SkuStatus.OUTSTOCK) { //outstock的sku也返回
+                            ) {
                         continue;
                     }
 //                    if (cmpSku.getWebsite() != null) {
@@ -609,6 +611,7 @@ public class Compare2Controller {
 //                    }
                     // 忽略前台返回的价格
                     try {
+                        System.out.println(" Enter cmpProductListVO set area ");
                         CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
                         System.out.println("set properteis over l");
                         cplv.setDeepLinkUrl(WebsiteHelper.getDealUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
@@ -682,6 +685,7 @@ public class Compare2Controller {
             if (ptmProductDescription != null) {
                 specs = ptmProductDescription.getJsonDescription();
             }
+            cmpResult.setPagedComparedSkuVos(priceList);
             cmpResult.setSpecs(specs);
             //cmpResult.setTotalRatingsNum(WeightedAverage.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).longValue());
             cmpResult.setTotalRatingsNum(tempTotalComments);
