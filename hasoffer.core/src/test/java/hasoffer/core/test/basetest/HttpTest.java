@@ -1,6 +1,7 @@
 package hasoffer.core.test.basetest;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.utils.http.HttpUtils;
@@ -59,6 +60,22 @@ public class HttpTest {
 
         String response = Httphelper.doPostJsonWithHeader(url, json, header);
 
-        System.out.println(response);
+        JSONObject jsonObject = JSONObject.parseObject(response.trim());
+
+        JSONArray pathArray = jsonObject.getJSONObject("RESPONSE").getJSONObject("data").getJSONObject("product_breadcrumb").getJSONArray("data").getJSONObject(0).getJSONObject("value").getJSONArray("productBreadcrumbs");
+        for (int i = 1; i < pathArray.size(); i++) {
+
+            //取最长3位（1,2,3），忽略第一个home
+            if (i > 3) {
+                break;
+            }
+
+            String categoryPath = pathArray.getJSONObject(i).getString("title");
+
+            System.out.println(categoryPath);
+
+        }
+
+
     }
 }

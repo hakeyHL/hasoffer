@@ -1335,16 +1335,21 @@ public class FixController {
 
                         PtmCmpSku sku = cmpSkuQueue.poll();
 
-                        if (sku == null) {
-                            try {
-                                TimeUnit.SECONDS.sleep(3);
-                            } catch (InterruptedException e) {
+                        try {
 
+                            if (sku == null) {
+                                try {
+                                    TimeUnit.SECONDS.sleep(3);
+                                } catch (InterruptedException e) {
+
+                                }
+                                continue;
                             }
-                            continue;
-                        }
 
-                        cmpSkuService.downloadImage2(sku);
+                            cmpSkuService.downloadImage2(sku);
+                        } catch (Exception e) {
+                            System.out.println("error download for " + sku.getId());
+                        }
                     }
                 }
             });
