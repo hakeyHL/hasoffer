@@ -183,10 +183,6 @@
         <appender-ref ref="fetchLoggerFileOut"/>
     </logger>
 
-    <logger name="hasoffer.base" level="DEBUG">
-        <appender-ref ref="fetchLoggerFileOut"/>
-    </logger>
-
     <logger name="us.codecraft" level="DEBUG">
         <appender-ref ref="fetchLoggerFileOut"/>
     </logger>
