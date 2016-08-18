@@ -20,7 +20,8 @@ public class PtmCmpSkuDescription {
 
     private String jsonDescription;
 
-    private String offers;
+    private String
+    ;
 
     public long getId() {
         return id;
