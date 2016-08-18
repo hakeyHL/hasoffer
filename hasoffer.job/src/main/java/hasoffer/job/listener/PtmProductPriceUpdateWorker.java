@@ -35,7 +35,7 @@ public class PtmProductPriceUpdateWorker implements Runnable {
             System.out.println("product price udpateworker start time from " + t1 + "-to-" + t2);
 
             //保证更新时间与当前时间有1小时时差
-            if (t1.getTime() - TimeUtils.now() > TimeUtils.MILLISECONDS_OF_1_HOUR) {
+            if (TimeUtils.now() - t1.getTime() < TimeUtils.MILLISECONDS_OF_1_HOUR) {
                 try {
                     TimeUnit.HOURS.sleep(1);
                 } catch (InterruptedException e) {
@@ -46,22 +46,13 @@ public class PtmProductPriceUpdateWorker implements Runnable {
 
             List<Long> productIdList = dbm.query("SELECT distinct t.productId FROM PtmCmpSku t WHERE t.updateTime > ?0 and t.updateTime < ?1", Arrays.asList(t1, t2));
 
-            if (productIdList != null && productIdList.size() != 0) {
-                t1 = t2;
-                t2 = TimeUtils.add(t2, TimeUtils.MILLISECONDS_OF_1_MINUTE * 10);
-            } else {
-                try {
-                    TimeUnit.MINUTES.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                continue;
-            }
-
             for (long productid : productIdList) {
                 productService.updatePtmProductPrice(productid);
                 System.out.println("update Ptmproduct price success for " + productid);
             }
+
+            t1 = t2;
+            t2 = TimeUtils.add(t2, TimeUtils.MILLISECONDS_OF_1_MINUTE * 10);
         }
 
     }
