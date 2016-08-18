@@ -7,11 +7,10 @@ import java.util.Map;
 
 /**
  * Created by hs on 2016年08月18日.
- * Time 10:32
- * APP 下载引导
+ * Time 11:15
+ * APP下载引导
  */
-public class DownloadConfdigVo {
-
+public class DownloadConfigVo {
     //是否开启下载以引导
     private boolean isBoot;
     //配置客户端检测哪些包
