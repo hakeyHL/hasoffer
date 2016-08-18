@@ -81,33 +81,60 @@ public class ProductTest {
     }
 
     @Test
-    public void import2Solr() {
-        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<>(
-                new IList() {
-                    @Override
-                    public PageableResult getData(int page) {
-                        return productService.listPagedProducts(page, 2000);
+    public void expPriceExcept2() throws Exception {
+        String sql = "SELECT t FROM PtmProduct t WHERE t.categoryId=?0";
+
+        List<PtmProduct> products = dbm.query(sql, Arrays.asList(5L));
+
+        File file = hasoffer.base.utils.FileUtils.createFile("d:/tmp/price_3.txt", true);
+
+        StringBuilder sb = new StringBuilder();
+
+        int count = 0;
+        for (PtmProduct product : products) {
+            long productId = product.getId();
+            if (product == null) {
+                print(String.format("product is null...[%d]", productId));
+            } else {
+                List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId);
+                float minPrice = -1, maxPrice = -1;
+                for (PtmCmpSku cmpSku : cmpSkus) {
+                    float price = cmpSku.getPrice();
+                    if (cmpSku.getStatus() == SkuStatus.OFFSALE || price <= 0) {
+                        continue;
                     }
 
-                    @Override
-                    public boolean isRunForever() {
-                        return false;
+                    if (minPrice < 0) {
+                        minPrice = price;
+                        maxPrice = minPrice;
                     }
 
-                    @Override
-                    public void setRunForever(boolean runForever) {
-
+                    if (minPrice > price) {
+                        minPrice = price;
                     }
-                },
-                new IProcess<PtmProduct>() {
-                    @Override
-                    public void process(PtmProduct o) {
-                        productService.importProduct2Solr2(o);
+
+                    if (maxPrice < price) {
+                        maxPrice = price;
                     }
                 }
-        );
 
-        listAndProcessTask2.go();
+                if (maxPrice < 0) {
+                    print(String.format("no price...[%d]", productId));
+                    continue;
+                }
+
+                if (maxPrice / minPrice > 6) {
+                    sb.append(productId).append("\t").append(maxPrice).append("\t").append(minPrice).append("\n");
+                    if (count++ % 100 == 0) {
+                        FileUtils.write(file, sb.toString(), true);
+                        sb = new StringBuilder();
+                    }
+                    print(String.format("price max/min > 6...[%d]", productId));
+                } else {
+                    print("ok");
+                }
+            }
+        }
     }
 
     @Test

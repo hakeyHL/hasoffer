@@ -191,7 +191,7 @@ public class Compare2Controller {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
-        PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"ratingNum", "bestPrice", "priceOff", "backRate", "support", "price", "returnGuarantee", "freight"});
+        PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"ratingNum", "bestPrice", "backRate", "support", "price", "returnGuarantee", "freight"});
         //初始化sio对象
         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
@@ -211,6 +211,9 @@ public class Compare2Controller {
                     //未匹配,结束操作
                 } else {
                     cr = getCmpProducts(sio);
+                    if (cr != null && cr.getPriceList().size() > 0 && cr.getPriceList().size() > 0) {
+                        cr.setPriceOff(cr.getPriceList().get(0).getSaved());
+                    }
                     cr.setProductId(sio.getHsProId());
                     cr.setCopywriting(ptmProduct != null && ptmProduct.isStd() ? "Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you." : "Looked around Myntre,Jabong & 5 other apps,thought you might like these items as well..");
                     //暂时屏蔽标品非标品
@@ -720,6 +723,7 @@ public class Compare2Controller {
                         cmpResult.setProductVo(new ProductVo(sio.getHsProId(), sio.getCliQ(), cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath()), 0.0f, WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()})));
                     }
                     CmpProductListVo cplv = new CmpProductListVo(cmpSku, sio.getCliPrice());
+                    cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                     comparedSkuVos.add(cplv);
                 }
                 if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {
