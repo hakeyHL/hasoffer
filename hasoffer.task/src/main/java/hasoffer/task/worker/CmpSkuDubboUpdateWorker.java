@@ -104,7 +104,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         } else if (TaskStatus.NONE.equals(taskStatus)) {
             queue.add(sku);
             fetchDubboService.sendUrlTask(sku.getWebsite(), url, TaskLevel.LEVEL_1);
-            logger.info("taskstatus NONE for [" + skuid + "]");
+            logger.info("taskstatus NONE for [" + skuid + "] , resend success");
             return;
         } else {//(TaskStatus.FINISH.equals(taskStatus)))
             logger.info("taskstatus FINISH for [" + skuid + "]");
