@@ -52,11 +52,13 @@ public class AppAdController {
     @RequestMapping("product")
     public ModelAndView getAdsByProductId(@RequestParam(defaultValue = "0") Long productId, @RequestParam(defaultValue = "") String website) {
         ModelAndView modelAndView = new ModelAndView();
+        logger.info(" get advertisement ");
         Map map = new HashMap<>();
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
         List<Adt> adt = advertiseService.getAdByCategory();
         if (adt != null && adt.size() > 0) {
+            System.out.println(" get  ..");
             Adt adt1 = adt.get(0);
             if (!StringUtils.isEmpty(website)) {
                 adt1.setPackageName(packageMap.get(Website.valueOf(website)));
