@@ -648,16 +648,17 @@ public class AppController {
             Long totalCommentNum = Long.valueOf(0);
             int totalRating = 0;
             for (PtmCmpSku ptmCmpSku2 : tempSkuList) {
-                    if (!ptmCmpSku2.getWebsite().equals(Website.EBAY)) {
-                        //评论数*星级 累加 除以评论数和
-                        sum += ptmCmpSku2.getRatings() * ptmCmpSku2.getCommentsNumber();
-                        //去除列表中除此之外的其他此site的数据
-                        totalCommentNum += ptmCmpSku2.getCommentsNumber();
-                        totalRating += ptmCmpSku2.getRatings();
-                    }
+                if (!ptmCmpSku2.getWebsite().equals(Website.EBAY)) {
+                    //评论数*星级 累加 除以评论数和
+                    sum += ptmCmpSku2.getRatings() * ptmCmpSku2.getCommentsNumber();
+                    //去除列表中除此之外的其他此site的数据
+                    totalCommentNum += ptmCmpSku2.getCommentsNumber();
+                    totalRating += ptmCmpSku2.getRatings();
+                }
             }
             productListVo.setCommentNum(totalCommentNum);
-            productListVo.setRatingNum(ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(totalCommentNum == 0 ? 1 : totalCommentNum), 0, BigDecimal.ROUND_HALF_UP).longValue()));
+            int rating = ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(totalCommentNum == 0 ? 1 : totalCommentNum), 0, BigDecimal.ROUND_HALF_UP).longValue());
+            productListVo.setRatingNum(rating <= 0 ? 90 : rating);
         }
     }
 
