@@ -6,6 +6,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.product.ProductBo;
+import hasoffer.core.cache.CategoryCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.*;
@@ -92,6 +93,8 @@ public class ProductServiceImpl implements IProductService {
     SearchLogCacheManager searchLogCacheManager;
     @Resource
     CmpskuIndexServiceImpl cmpskuIndexService;
+    @Resource
+    CategoryCacheManager categoryCacheManager;
     @Resource
     private IDataBaseManager dbm;
     @Resource
@@ -590,7 +593,7 @@ public class ProductServiceImpl implements IProductService {
         }
 
 //        PtmCategory category = dbm.get(PtmCategory.class, product.getCategoryId());
-        List<PtmCategory> categories = categoryService.getRouterCategoryList(product.getCategoryId());
+        List<PtmCategory> categories = categoryCacheManager.getRouterCategoryList(product.getCategoryId());
 
         long cate1 = 0L, cate2 = 0L, cate3 = 0L;
         String cate3name = "";
@@ -670,7 +673,7 @@ public class ProductServiceImpl implements IProductService {
         long cate1 = 0L, cate2 = 0L, cate3 = 0L;
         String cate1name = "", cate2name = "", cate3name = "";
 
-        List<PtmCategory> categories = categoryService.getRouterCategoryList(product.getCategoryId());
+        List<PtmCategory> categories = categoryCacheManager.getRouterCategoryList(product.getCategoryId());
 
         // 目前仅支持3级类目
         if (ArrayUtils.hasObjs(categories)) {

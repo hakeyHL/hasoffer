@@ -67,7 +67,6 @@ public class CmpProductListVo {
         this.imageUrl = cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath());
         this.cashBack = cmpSku.getCashBack();
         this.saved = Math.round(cliPrice - cmpSku.getPrice());
-        this.deepLink = cmpSku.getDeeplink();
         String tempPrice = Math.round(cmpSku.getPrice()) + "";
         StringBuffer sb = new StringBuffer();
         for (int i = tempPrice.length() - 1; i >= 0; i--) {
