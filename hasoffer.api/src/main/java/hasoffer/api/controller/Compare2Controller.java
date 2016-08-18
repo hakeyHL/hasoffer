@@ -668,8 +668,8 @@ public class Compare2Controller {
                             }
                         }
                     }
-                    tempCmpProductListVos.add(cmpProductListVo);
                 }
+                tempCmpProductListVos.add(cmpProductListVo);
             }
             //移除之前加进列表的所有的sku列表
             comparedSkuVos = null;
