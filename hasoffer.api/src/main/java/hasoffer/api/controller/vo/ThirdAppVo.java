@@ -14,19 +14,19 @@ public class ThirdAppVo {
     private String downloadLink;//下载地址
     private String logoUrl;//logo图片地址
     private String introduction;//简介
-    private float ratins;//评分值
-    private Long comments;//评论数
+    private float ratings;//评分值
+    private String comments;//评论数
     private String downloads;//下载量
 
     public ThirdAppVo() {
     }
 
-    public ThirdAppVo(Website website, String downloadLink, String logoUrl, String introduction, float ratins, Long comments, String downloads) {
+    public ThirdAppVo(Website website, String downloadLink, String logoUrl, String introduction, float ratings, String comments, String downloads) {
         this.website = website;
         this.downloadLink = downloadLink;
         this.logoUrl = logoUrl;
         this.introduction = introduction;
-        this.ratins = ratins;
+        this.ratings = ratings;
         this.comments = comments;
         this.downloads = downloads;
     }
@@ -63,19 +63,19 @@ public class ThirdAppVo {
         this.introduction = introduction;
     }
 
-    public float getRatins() {
-        return ratins;
+    public float getRatings() {
+        return ratings;
     }
 
-    public void setRatins(float ratins) {
-        this.ratins = ratins;
+    public void setRatings(float ratins) {
+        this.ratings = ratins;
     }
 
-    public Long getComments() {
+    public String getComments() {
         return comments;
     }
 
-    public void setComments(Long comments) {
+    public void setComments(String comments) {
         this.comments = comments;
     }
 

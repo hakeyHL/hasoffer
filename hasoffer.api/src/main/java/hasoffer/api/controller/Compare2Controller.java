@@ -116,7 +116,21 @@ public class Compare2Controller {
 //            s = s.add(ss.multiply(BigDecimal.valueOf(next)));
 //        }
 //        System.out.println(s.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
-        System.out.println(305 % 10);
+//        System.out.println(305 % 10);
+        String price = "Rs. 17,511";
+        if (!StringUtils.isEmpty(price)) {
+            //如果price不为空
+            if (price.contains(",")) {
+                System.out.println(price + "    contains , ");
+                price = price.replaceAll(",", " ");
+            }
+            if (price.contains("Rs.")) {
+                System.out.println(price + "    contains Rs. ");
+                price = price.replaceAll("Rs.", " ");
+            }
+            price = price.replaceAll(" ", "");
+            System.out.println(" price is " + price);
+        }
     }
 
     // @Cacheable(value = "compare", key = "'getcmpskus_'+#q+'_'+#site+'_'+#price+'_'+#page+'_'+#size")
@@ -197,6 +211,19 @@ public class Compare2Controller {
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         CmpResult cr = null;
         PtmProduct ptmProduct = null;
+        if (!StringUtils.isEmpty(price)) {
+            //如果price不为空
+            if (price.contains(",")) {
+                System.out.println(price + "    contains , ");
+                price = price.replaceAll(",", " ");
+            }
+            if (price.contains("Rs.")) {
+                System.out.println(price + "    contains Rs. ");
+                price = price.replaceAll("Rs.", " ");
+            }
+            price = price.replaceAll(" ", "");
+            System.out.println(" price is " + price);
+        }
         SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, pageSize);
         try {
             //根据title匹配到商品

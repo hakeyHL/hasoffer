@@ -208,21 +208,17 @@ public class AppController {
                 break;
             case DOWNLOADBOOTCONFIG:
                 //app下载引导
-                List<String> checkPackages = new ArrayList<>();
-                Map<String, String> channels = new HashMap<String, String>();
-                HashMap<String, List<ThirdAppVo>> apps = new HashMap<String, List<ThirdAppVo>>();
+                List<Map<String, List<ThirdAppVo>>> apps = new ArrayList<Map<String, List<ThirdAppVo>>>();
+                //添加GooglePlay渠道的app下载属性
                 List<ThirdAppVo> googlePlayApps = new ArrayList<ThirdAppVo>();
+
+                //添加9APP渠道的app下载属性
                 List<ThirdAppVo> nineApp = new ArrayList<ThirdAppVo>();
-                Website[] websites = Website.values();
-                for (Website website : websites) {
-                    googlePlayApps.add(new ThirdAppVo(website, "", "", "", 4.5f, 100l, "500,000"));
-                }
-                for (Website website : websites) {
-                    nineApp.add(new ThirdAppVo(website, "", "", "", 4.5f, 100l, "500,000"));
-                }
-                apps.put("GOOGLEPLAY", googlePlayApps);
-                apps.put("9APP", nineApp);
-                DownloadConfigVo downloadConfigVo = new DownloadConfigVo(true, checkPackages, "9APP", channels, apps);
+
+
+                googlePlayApps.addAll(Arrays.asList(new ThirdAppVo(Website.FLIPKART, "", "", "", 4.5f, "100", "500,000")));
+                nineApp.add(new ThirdAppVo(Website.SNAPDEAL, "", "", "", 4.5f, "100l", "500,000"));
+                DownloadConfigVo downloadConfigVo = new DownloadConfigVo(true, Arrays.asList("com.snapdeal.main", "com.flipkart.android", "in.amazon.mShop.android.shopping", "net.one97.paytm", "com.ebay.mobile", "com.shopclues", "com.infibeam.infibeamapp", "com.myntra.android", "com.jabong.android", "com.voonik.android"), "9APP", Arrays.asList(new DownLoadConfigChannle("GOOGLEPLAY", "https://www.googleplay.com"), new DownLoadConfigChannle("9APP", "https://www.9APP.com")), apps);
                 break;
             default:
                 break;
