@@ -6,6 +6,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.spider.common.RedisKeysUtils;
+import hasoffer.spider.common.SpiderLogger;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchUrlResult;
 import hasoffer.spider.redis.service.IFetchCacheService;
@@ -48,9 +49,9 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
             }
             fetchCacheService.pushTaskList(RedisKeysUtils.WAIT_KEY_LIST, JSONUtil.toJSON(fetchResult));
             fetchCacheService.setTaskStatusByKeyword(key, TaskStatus.START);
-            logger.info("FetchDubboServiceImpl.sendKeyWordTask(FetchResult fetchResult) save {} into Redis List {} success", fetchResult.getWebsite() + "_" + fetchResult.getKeyword(), RedisKeysUtils.WAIT_KEY_LIST);
+            SpiderLogger.debugSearchList("FetchDubboServiceImpl.sendKeyWordTask(FetchResult fetchResult) save {} into Redis List {} success", fetchResult.getWebsite() + "_" + fetchResult.getKeyword(), RedisKeysUtils.WAIT_KEY_LIST);
         } catch (Exception e) {
-            logger.error("FetchDubboServiceImpl.sendKeyWordTask(FetchResult fetchResult) save {} into Redis List {} fail", fetchResult.getWebsite() + "_" + fetchResult.getKeyword(), RedisKeysUtils.WAIT_KEY_LIST, e);
+            SpiderLogger.debugSearchList("FetchDubboServiceImpl.sendKeyWordTask(FetchResult fetchResult) save {} into Redis List {} fail", fetchResult.getWebsite() + "_" + fetchResult.getKeyword(), RedisKeysUtils.WAIT_KEY_LIST, e);
         }
 
     }
@@ -80,11 +81,11 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
             TaskStatus taskStatusByUrl = fetchCacheService.getTaskStatusByUrl(key);
             if (TaskStatus.NONE.equals(taskStatusByUrl)) {
                 fetchCacheService.pushTaskList(redisKey, JSONUtil.toJSON(fetchUrlResult));
-                logger.info("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} success", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), redisKey);
+                SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} success", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), redisKey);
                 fetchCacheService.setTaskStatusByUrl(key, TaskStatus.START);
             }
         } catch (Exception e) {
-            logger.error("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} fail", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), redisKey, e);
+            SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} fail", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), redisKey, e);
         }
     }
 
