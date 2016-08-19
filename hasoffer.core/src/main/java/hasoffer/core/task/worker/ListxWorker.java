@@ -17,11 +17,13 @@ public class ListxWorker<T> implements Runnable {
 
     ListAndProcessWorkerStatus<T> ws;
     IList list;
+    long queueMaxSize = 3000;
     private Logger logger = LoggerFactory.getLogger(ListxWorker.class);
 
-    public ListxWorker(ListAndProcessWorkerStatus<T> ws, IList list) {
+    public ListxWorker(ListAndProcessWorkerStatus<T> ws, IList list, long queueMaxSize) {
         this.ws = ws;
         this.list = list;
+        this.queueMaxSize = queueMaxSize;
     }
 
     @Override
@@ -34,7 +36,7 @@ public class ListxWorker<T> implements Runnable {
 
         while (page <= TOTAL_PAGE || list.isRunForever()) {
 
-            if (ws.getSdQueue().size() > 3000) {
+            if (ws.getSdQueue().size() > queueMaxSize) {
                 try {
                     logger.debug("sd queue size = " + ws.getSdQueue().size());
                     TimeUnit.SECONDS.sleep(5);

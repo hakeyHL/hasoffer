@@ -20,6 +20,8 @@ public class ListAndProcessTask2<T> {
 
     IList list;
     IProcess processor;
+    int processorCount = 20;
+    long queueMaxSize = 3000;
     private Logger logger = LoggerFactory.getLogger(ListAndProcessTask2.class);
 
     public ListAndProcessTask2(IList list,
@@ -32,9 +34,9 @@ public class ListAndProcessTask2<T> {
         ListAndProcessWorkerStatus<T> ws = new ListAndProcessWorkerStatus<T>();
 
         ExecutorService es = Executors.newCachedThreadPool();
-        es.execute(new ListxWorker<T>(ws, list));
+        es.execute(new ListxWorker<T>(ws, list, queueMaxSize));
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < processorCount; i++) {
             es.execute(new ProcessWorker(ws, processor));
         }
 
@@ -53,4 +55,19 @@ public class ListAndProcessTask2<T> {
         logger.debug("work finished.");
     }
 
+    public int getProcessorCount() {
+        return processorCount;
+    }
+
+    public void setProcessorCount(int processorCount) {
+        this.processorCount = processorCount;
+    }
+
+    public long getQueueMaxSize() {
+        return queueMaxSize;
+    }
+
+    public void setQueueMaxSize(long queueMaxSize) {
+        this.queueMaxSize = queueMaxSize;
+    }
 }

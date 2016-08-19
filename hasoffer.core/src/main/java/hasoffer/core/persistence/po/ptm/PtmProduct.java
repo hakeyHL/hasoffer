@@ -21,6 +21,10 @@ public class PtmProduct implements Identifiable<Long> {
     private long categoryId;
     private String title;// 标题
     private String tag;
+
+    private String brand;
+    private String model;
+
     private float price;
 
     private String color;
@@ -191,6 +195,22 @@ public class PtmProduct implements Identifiable<Long> {
         this.std = std;
     }
 
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -207,6 +227,8 @@ public class PtmProduct implements Identifiable<Long> {
         if (updateTime != null ? !updateTime.equals(product.updateTime) : product.updateTime != null) return false;
         if (title != null ? !title.equals(product.title) : product.title != null) return false;
         if (tag != null ? !tag.equals(product.tag) : product.tag != null) return false;
+        if (brand != null ? !brand.equals(product.brand) : product.brand != null) return false;
+        if (model != null ? !model.equals(product.model) : product.model != null) return false;
         if (color != null ? !color.equals(product.color) : product.color != null) return false;
         if (size != null ? !size.equals(product.size) : product.size != null) return false;
         if (description != null ? !description.equals(product.description) : product.description != null) return false;
@@ -224,6 +246,8 @@ public class PtmProduct implements Identifiable<Long> {
         result = 31 * result + (int) (categoryId ^ (categoryId >>> 32));
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (tag != null ? tag.hashCode() : 0);
+        result = 31 * result + (brand != null ? brand.hashCode() : 0);
+        result = 31 * result + (model != null ? model.hashCode() : 0);
         result = 31 * result + (price != +0.0f ? Float.floatToIntBits(price) : 0);
         result = 31 * result + (color != null ? color.hashCode() : 0);
         result = 31 * result + (size != null ? size.hashCode() : 0);

@@ -38,6 +38,7 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
 
         SearchResult<ProductModel2> sr = searchObjs(title, fqs, sorts, pivotFacets, page <= 1 ? 1 : page, size, true);
+
         NamedList<List<PivotField>> nl = sr.getFacetPivot();
 
         List<PivotField> cate2List = nl.get("cate2");
@@ -143,4 +144,132 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
 
         return new PageableResult<Long>(sr.getResult(), totalCount, page, size);
     }
+
+    // ************************父类实现*******************************
+    /*
+    protected QueryResponse searchSolr(Query[] qs, FilterQuery[] fqs, Sort[] sorts, PivotFacet[] pivotFacets, int pageNumber, int pageSize, boolean useCache) {
+        SolrQuery query = new SolrQuery();
+        query.setRequestHandler("/query2");//select
+        String q = this.getQ(qs);
+        if (!useCache) {
+            q = "{!cache=false}" + q;
+        }
+        query.setQuery(q);
+
+        String fq = this.getFQ(fqs);
+        if (!useCache) {
+            fq = "{!cache=false}" + fq;
+        }
+        query.setFilterQueries(fq);
+
+        query.setSorts(this.getSort(sorts));
+        query.setStart(pageNumber * pageSize - pageSize);
+        query.setRows(pageSize);
+
+        if (pivotFacets != null && pivotFacets.length > 0) {
+            List<String> facetFields = new LinkedList<String>();
+            for (PivotFacet pivotFacet : pivotFacets) {
+                facetFields.add(pivotFacet.getField());
+            }
+            query.setFacet(true);
+            query.addFacetPivotField(facetFields.toArray(new String[]{}));
+        }
+
+        String qStr = query.toString();
+        qStr = URLDecoder.decode(qStr);
+
+        QueryResponse rsp = null;
+        try {
+            rsp = solrServer.query(query);
+        } catch (SolrServerException e) {
+            throw new RuntimeException(e);
+        }
+
+        return rsp;
+    }
+
+    protected HttpSolrServer solrServer;
+
+    public ProductIndex2ServiceImpl() {
+        solrServer = new HttpSolrServer(getSolrUrl());
+        solrServer.setConnectionTimeout(5000);
+    }
+
+    private String getFQ(FilterQuery[] fqs) {
+        if (fqs == null) {
+            return null;
+        }
+
+        StringBuffer buffer = new StringBuffer();
+        for (int i = 0; i < fqs.length; i++) {
+            if (fqs[i] == null) {
+                continue;
+            }
+            if (i != fqs.length - 1) {
+                buffer.append(fqs[i].toString() + " AND ");
+            } else {
+                buffer.append(fqs[i].toString());
+            }
+        }
+
+        return buffer.toString();
+    }
+
+    private String getQ(Query[] qs) {
+        if (qs == null) {
+            return null;
+        }
+        StringBuffer buffer = new StringBuffer();
+        for (int i = 0; i < qs.length; i++) {
+            if (qs[i] == null) {
+                continue;
+            }
+            if (i != qs.length - 1) {
+                buffer.append(qs[i].toString() + " OR ");
+            } else {
+                buffer.append(qs[i].toString());
+            }
+        }
+
+        return buffer.toString();
+    }
+
+    public SearchResult<ProductModel2> searchObjs(String q, FilterQuery[] fqs, Sort[] sorts, PivotFacet[] pivotFacets, int pageNumber, int pageSize, boolean useCache) {
+        Query[] qs = new Query[]{new Query("", q)};
+        QueryResponse rsp = searchSolr(qs, fqs, sorts, pivotFacets, pageNumber, pageSize, useCache);
+
+        Class clazz = (Class<ProductModel2>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
+        List<ProductModel2> ms = convert(rsp.getResults(), clazz);
+
+        SearchResult<ProductModel2> result = new SearchResult<ProductModel2>();
+        result.setResult(ms);
+
+        long numFound = rsp.getResults().getNumFound();
+        result.setTotalCount(numFound);
+
+        NamedList<List<PivotField>> namedFacetPivot = rsp.getFacetPivot();
+        result.setFacetPivot(namedFacetPivot);
+
+        return result;
+    }
+
+    private List<ProductModel2> convert(SolrDocumentList results, Class<ProductModel2> clazz) {
+        List<ProductModel2> list = new ArrayList<ProductModel2>();
+
+        Iterator<SolrDocument> iter = results.iterator();
+        while (iter.hasNext()) {
+            SolrDocument sd = iter.next();
+            try {
+                ProductModel2 m = clazz.newInstance();
+                for (Map.Entry<String, Object> kv : sd.entrySet()) {
+                    BeanUtils.setProperty(m, kv.getKey(), kv.getValue());
+                }
+                list.add(m);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return list;
+    }*/
 }

@@ -550,6 +550,15 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     }
 
     @Override
+    @Transactional
+    public void updateCmpSkuBrandModel(Long id, String brand, String model) {
+        PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(id);
+        ptmCmpSkuUpdater.getPo().setBrand(brand);
+        ptmCmpSkuUpdater.getPo().setModel(model);
+        dbm.update(ptmCmpSkuUpdater);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateFlipakrtSkuBrandAndModel(long skuid, String brand, String model) {
 

@@ -530,6 +530,23 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    public void importProduct2Solr2(long proId) {
+        PtmProduct product = getProduct(proId);
+        importProduct2Solr2(product);
+    }
+
+    @Override
+    @Transactional
+    public void updateProductBrandModel(long proId, String productBrand, String modelName) {
+        PtmProductUpdater productUpdater = new PtmProductUpdater(proId);
+
+        productUpdater.getPo().setModel(modelName);
+        productUpdater.getPo().setBrand(productBrand);
+
+        dbm.update(productUpdater);
+    }
+
+    @Override
     public void reimport2Solr(long productId) {
         PtmProduct ptmProduct = getProduct(productId);
         if (ptmProduct != null) {
@@ -707,6 +724,8 @@ public class ProductServiceImpl implements IProductService {
                 product.getId(),
                 product.getTitle(),
                 product.getTag(),
+                product.getBrand(),
+                product.getModel(),
                 cate1,
                 cate2,
                 cate3,
