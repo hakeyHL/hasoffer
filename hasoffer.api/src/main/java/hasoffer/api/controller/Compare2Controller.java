@@ -116,7 +116,21 @@ public class Compare2Controller {
 //            s = s.add(ss.multiply(BigDecimal.valueOf(next)));
 //        }
 //        System.out.println(s.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
-        System.out.println(305 % 10);
+//        System.out.println(305 % 10);
+        String price = "Rs. 17,511";
+        if (!StringUtils.isEmpty(price)) {
+            //如果price不为空
+            if (price.contains(",")) {
+                System.out.println(price + "    contains , ");
+                price = price.replaceAll(",", " ");
+            }
+            if (price.contains("Rs.")) {
+                System.out.println(price + "    contains Rs. ");
+                price = price.replaceAll("Rs.", " ");
+            }
+            price = price.replaceAll(" ", "");
+            System.out.println(" price is " + price);
+        }
     }
 
     // @Cacheable(value = "compare", key = "'getcmpskus_'+#q+'_'+#site+'_'+#price+'_'+#page+'_'+#size")
@@ -197,6 +211,19 @@ public class Compare2Controller {
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         CmpResult cr = null;
         PtmProduct ptmProduct = null;
+        if (!StringUtils.isEmpty(price)) {
+            //如果price不为空
+            if (price.contains(",")) {
+                System.out.println(price + "    contains , ");
+                price = price.replaceAll(",", " ");
+            }
+            if (price.contains("Rs.")) {
+                System.out.println(price + "    contains Rs. ");
+                price = price.replaceAll("Rs.", " ");
+            }
+            price = price.replaceAll(" ", "");
+            System.out.println(" price is " + price);
+        }
         SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, pageSize);
         try {
             //根据title匹配到商品
@@ -215,7 +242,8 @@ public class Compare2Controller {
                         cr.setPriceOff(cr.getPriceList().get(0).getSaved());
                     }
                     cr.setProductId(sio.getHsProId());
-                    cr.setCopywriting(ptmProduct != null && ptmProduct.isStd() ? "Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you." : "Looked around Myntre,Jabong & 5 other apps,thought you might like these items as well..");
+                    //cr.setCopywriting(ptmProduct != null && ptmProduct.isStd() ? "Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you." : "Looked around Myntre,Jabong & 5 other apps,thought you might like these items as well..");
+                    cr.setCopywriting("Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you.");
                     //暂时屏蔽标品非标品
                     // cr.setDisplayMode(ptmProduct != null && ptmProduct.isStd() ? AppDisplayMode.NONE : AppDisplayMode.WATERFALL);
                     // cr.setStd(ptmProduct.isStd());
@@ -596,8 +624,8 @@ public class Compare2Controller {
             System.out.println(" cmpskus size is " + cmpSkus.size());
             //评论数按照加权平均值展示
             Long tempTotalComments = Long.valueOf(0);
-            //评论星级按照平均值展示
-            int tempRatins = 0;
+            //统计site
+            Set<Website> websiteSet = new HashSet<Website>();
             //统计site
 //            Set<Website> websiteSet = new HashSet<Website>();
             //初始化price为客户端传输的price
@@ -609,20 +637,16 @@ public class Compare2Controller {
                             ) {
                         continue;
                     }
-//                    if (cmpSku.getWebsite() != null) {
-//                        websiteSet.add(cmpSku.getWebsite());
-//                    }
-                    // 忽略前台返回的价格
-                    try {
-                        System.out.println(" Enter cmpProductListVO set area ");
-                        CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
-                        System.out.println("set properteis over l");
-                        cplv.setDeepLinkUrl(WebsiteHelper.getDealUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
-                        cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
-                        comparedSkuVos.add(cplv);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    if (cmpSku.getWebsite() != null) {
+                        websiteSet.add(cmpSku.getWebsite());
                     }
+                    // 忽略前台返回的价格
+                    System.out.println(" Enter cmpProductListVO set area ");
+                    CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
+                    System.out.println("set properteis over l");
+                    cplv.setDeepLinkUrl(WebsiteHelper.getDealUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
+                    cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
+                    comparedSkuVos.add(cplv);
                 }
                 if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {
                     throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", product.getTitle(), product.getPrice());
@@ -649,12 +673,18 @@ public class Compare2Controller {
             int sum = 0;
             System.out.println("iterator  comparedSkuVos , and  it is size is " + comparedSkuVos.size());
             for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
-                if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
-                    System.out.println("not ebay ");
-                    //评论数*星级 累加 除以评论数和
-                    sum += cmpProductListVo.getTotalRatingsNum() * cmpProductListVo.getRatingNum();
-                    tempTotalComments += cmpProductListVo.getTotalRatingsNum();
-                    tempRatins += cmpProductListVo.getRatingNum();
+                if (websiteSet.size() <= 0) {
+                    break;
+                }
+                if (websiteSet.contains(cmpProductListVo.getWebsite())) {
+                    websiteSet.remove(cmpProductListVo.getWebsite());
+                    //去除列表中除此之外的其他此site的数据
+                    if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
+                        System.out.println("not ebay ");
+                        //评论数*星级 累加 除以评论数和
+                        sum += cmpProductListVo.getTotalRatingsNum() * cmpProductListVo.getRatingNum();
+                        tempTotalComments += cmpProductListVo.getTotalRatingsNum();
+                    }
                     //获取offers
                     System.out.println(" get offers from mongoDb ");
                     PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, cmpProductListVo.getId());
@@ -682,7 +712,8 @@ public class Compare2Controller {
             PageableResult<CmpProductListVo> priceList = new PageableResult<CmpProductListVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize());
             cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
             cmpResult.setPriceList(priceList.getData());
-            cmpResult.setRatingNum(ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(tempTotalComments == 0 ? 1 : tempTotalComments), 0, BigDecimal.ROUND_HALF_UP).longValue()));
+            int rating = ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(tempTotalComments == 0 ? 1 : tempTotalComments), 0, BigDecimal.ROUND_HALF_UP).longValue());
+            cmpResult.setRatingNum(rating <= 0 ? 90 : rating);
             PtmProductDescription ptmProductDescription = mongoDbManager.queryOne(PtmProductDescription.class, product.getId());
             String specs = "";
             if (ptmProductDescription != null) {

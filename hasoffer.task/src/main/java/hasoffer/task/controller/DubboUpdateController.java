@@ -69,7 +69,7 @@ public class DubboUpdateController {
             e.printStackTrace();
         }
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 60; i++) {
             es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, productService, cmpSkuService));
         }
 
