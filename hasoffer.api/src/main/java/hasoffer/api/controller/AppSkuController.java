@@ -2,6 +2,7 @@ package hasoffer.api.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.JsonHelper;
 import hasoffer.base.utils.StringUtils;
@@ -88,8 +89,10 @@ public class AppSkuController {
             logger.info("get sku totalWeigth from  mongo " + ptmCmpSkuDescription == null ? " not null" : " is null");
             Map map = new HashMap<>();
             if (ptmCmpSkuDescription != null) {
-                map.put("description", ptmCmpSkuDescription.getJsonDescription() == null ? "" : ptmCmpSkuDescription.getJsonDescription());//描述
+                map.put("description", ptmCmpSkuDescription.getJsonDescription() == null ? "" : ClientHelper.delHTMLTag(ptmCmpSkuDescription.getJsonDescription()));//描述
                 String tempJsonParam = ptmCmpSkuDescription.getJsonParam();
+                //去除html标签
+                tempJsonParam = ClientHelper.delHTMLTag(tempJsonParam);
                 map.put("specs", JsonHelper.getJsonMap(tempJsonParam));//参数
             }
             List<PtmCmpSkuImage> ptmCmpSkuImages = ptmCmpSkuImageService.findPtmCmpSkuImages(ptmCmpSku.getId());
