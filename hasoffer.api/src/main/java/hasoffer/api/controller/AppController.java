@@ -643,6 +643,9 @@ public class AppController {
             int sum = 0;
             //统计site
             Set<Website> websiteSet = new HashSet<Website>();
+            for (PtmCmpSku ptmCmpSku : tempSkuList) {
+                websiteSet.add(ptmCmpSku.getWebsite());
+            }
             Long totalCommentNum = Long.valueOf(0);
             for (PtmCmpSku ptmCmpSku2 : tempSkuList) {
                 if (websiteSet.size() <= 0) {
@@ -651,6 +654,7 @@ public class AppController {
                 if (websiteSet.contains(ptmCmpSku2.getWebsite())) {
                     websiteSet.remove(ptmCmpSku2.getWebsite());
                     if (!ptmCmpSku2.getWebsite().equals(Website.EBAY)) {
+                        System.out.println("not ebay ");
                         //评论数*星级 累加 除以评论数和
                         sum += ptmCmpSku2.getRatings() * ptmCmpSku2.getCommentsNumber();
                         //去除列表中除此之外的其他此site的数据
@@ -658,6 +662,7 @@ public class AppController {
                     }
                 }
             }
+            System.out.println("totalCommentNum   " + totalCommentNum);
             productListVo.setCommentNum(totalCommentNum);
             int rating = ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(totalCommentNum == 0 ? 1 : totalCommentNum), 0, BigDecimal.ROUND_HALF_UP).longValue());
             productListVo.setRatingNum(rating <= 0 ? 90 : rating);
