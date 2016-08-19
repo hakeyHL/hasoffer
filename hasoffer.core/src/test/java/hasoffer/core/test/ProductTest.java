@@ -23,8 +23,6 @@ import hasoffer.core.task.worker.IProcess;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -76,14 +74,6 @@ public class ProductTest {
     @Resource
     ProductIndex2ServiceImpl productIndex2Service;
     private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
-    private Logger logger = LoggerFactory.getLogger(ProductTest.class);
-
-    @Test
-    public void testUpdate() {
-
-        productService.updateProductBrandModel(2789L, "123", "321");
-
-    }
 
     @Test
     public void import2SolrAndUpdateBrand() {
