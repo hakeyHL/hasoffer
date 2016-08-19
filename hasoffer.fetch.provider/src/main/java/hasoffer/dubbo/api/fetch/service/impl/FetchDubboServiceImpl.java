@@ -32,7 +32,6 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
 
     @Override
     public FetchUrlResult getProductsByUrl(Long skuId, Website webSite, String url) {
-
         FetchUrlResult fetchUrlResult = getFetchUrlResult(webSite, url);
         logger.info("FetchDubboServiceImpl.getProductsByUrl(webSite,url):{}, {} . Now is {} ", webSite, url, fetchUrlResult);
         return fetchUrlResult;

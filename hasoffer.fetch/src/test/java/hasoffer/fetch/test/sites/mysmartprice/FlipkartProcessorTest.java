@@ -50,7 +50,7 @@ public class FlipkartProcessorTest {
 
         FlipkartListProcessor processor = new FlipkartListProcessor();
 
-        List<ListProduct> productList = processor.getProductSetByKeyword("women", 5);
+        List<ListProduct> productList = processor.getProductSetByKeyword("FIRETALK YK-470 SHRINK EARHOOK NECKBAND EARPHONES Wired Headset (Pink)", 5);
 
         System.out.print(productList);
 
