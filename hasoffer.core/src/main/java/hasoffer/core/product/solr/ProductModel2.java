@@ -27,6 +27,9 @@ public class ProductModel2 implements IIdentifiable<Long> {
 
     private long searchCount = 0; // 搜索次数，表示商品热度
 
+    public ProductModel2() {
+    }
+
     public ProductModel2(Long id, String title, String tag,
                          long cate1, long cate2, long cate3,
                          String cate1Name, String cate2Name, String cate3Name,

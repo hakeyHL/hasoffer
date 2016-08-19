@@ -15,6 +15,7 @@ import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.product.*;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
+import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.task.ListAndProcessTask2;
@@ -73,11 +74,18 @@ public class ProductTest {
     IFetchService fetchService;
     @Resource
     IDealService dealService;
+    @Resource
+    ProductIndex2ServiceImpl productIndex2Service;
     private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
     private Logger logger = LoggerFactory.getLogger(ProductTest.class);
 
     private void print(String str) {
         System.out.println(str);
+    }
+
+    @Test
+    public void testNewSolr() {
+        productIndex2Service.searchProductsByKey_test("xiaomi bettery", 1, 10);
     }
 
     @Test
