@@ -256,6 +256,16 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateCategoryid2(Long ptmcmpskuid, long categoryid2) {
+        PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(ptmcmpskuid);
+
+        updater.getPo().setCategoryId(categoryid2);
+
+        dbm.update(updater);
+    }
+
+    @Override
     public List<StatSkuPriceUpdateResult> listUpdateResults() {
         return dbm.query("select t from StatSkuPriceUpdateResult t order by t.id desc");
     }

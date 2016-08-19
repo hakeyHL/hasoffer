@@ -85,6 +85,8 @@ public interface ICmpSkuService {
 
     void updateCategoryid(long ptmcmpskuid, long categoryid);
 
+    void updateCategoryid2(Long ptmcmpskuid, long categoryid2);
+
     void importCmpSku2solr(PtmCmpSku ptmCmpSku);
 
     void importCmpSku2solrByProductId(Long proId);

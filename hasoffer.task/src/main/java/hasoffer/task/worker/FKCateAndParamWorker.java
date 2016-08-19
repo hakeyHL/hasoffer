@@ -6,6 +6,7 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory3;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICategoryService;
+import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.utils.Httphelper;
 import hasoffer.core.worker.ListAndProcessWorkerStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
@@ -28,11 +29,13 @@ public class FKCateAndParamWorker implements Runnable {
     private ListAndProcessWorkerStatus<PtmCmpSku> ws;
     private IDataBaseManager dbm;
     private ICategoryService categoryService;
+    private ICmpSkuService cmpSkuService;
 
-    public FKCateAndParamWorker(IDataBaseManager dbm, ListAndProcessWorkerStatus<PtmCmpSku> ws, ICategoryService categoryService) {
+    public FKCateAndParamWorker(IDataBaseManager dbm, ListAndProcessWorkerStatus<PtmCmpSku> ws, ICategoryService categoryService, ICmpSkuService cmpSkuService) {
         this.dbm = dbm;
         this.ws = ws;
         this.categoryService = categoryService;
+        this.cmpSkuService = cmpSkuService;
     }
 
     @Override
@@ -81,6 +84,7 @@ public class FKCateAndParamWorker implements Runnable {
             JSONArray pathArray = jsonObject.getJSONObject("RESPONSE").getJSONObject("data").getJSONObject("product_breadcrumb").getJSONArray("data").getJSONObject(0).getJSONObject("value").getJSONArray("productBreadcrumbs");
 
             long parentid = 0;
+            long categoryid = 0;
 
             for (int i = 1; i < pathArray.size(); i++) {
 
@@ -102,11 +106,16 @@ public class FKCateAndParamWorker implements Runnable {
                     ptmCategory3.setParentId(parentid);
                     ptmCategory3.setSkuid(sku.getId());
 
-                    categoryService.createAppCategory(ptmCategory3);
+                    PtmCategory3 category = categoryService.createAppCategory(ptmCategory3);
+                    categoryid = category.getId();
                 } else {
                     parentid = ptmCategory3.getId();
+                    categoryid = ptmCategory3.getId();
                 }
             }
+
+            cmpSkuService.updateCategoryid2(sku.getId(), categoryid);
+
         } catch (Exception e) {
 
         }
