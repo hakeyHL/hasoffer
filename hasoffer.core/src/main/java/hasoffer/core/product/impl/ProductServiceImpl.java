@@ -131,7 +131,7 @@ public class ProductServiceImpl implements IProductService {
 
             PtmCmpSku sku = skus.get(i);
             //status
-            if (sku.getStatus() != SkuStatus.ONSALE) {
+            if (sku.getStatus() == SkuStatus.OFFSALE) {
                 continue;
             }
             //price
