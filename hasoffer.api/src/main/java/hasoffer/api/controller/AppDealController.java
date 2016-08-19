@@ -142,7 +142,7 @@ public class AppDealController {
         Map hashMap = new HashMap<>();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
-        hashMap.put("provisions", "• Taxs are applicable.\\n• This offer cannot be clubbed with any other ongoing offer.\\n• Offer cannot be redeemed for cash.\\n• No coupon code required.\\n• Company has the right to end this offer without prior notice.\"\n");
+        hashMap.put("provisions", "• Taxs are applicable.\n• This offer cannot be clubbed with any other ongoing offer.\n• Offer cannot be redeemed for cash.\n• No coupon code required.\n• Company has the right to end this offer without prior notice.\n");
         if (appDeal != null) {
             logger.info("has this deal " + id);
             hashMap.put("description", appDeal.getDescription());
