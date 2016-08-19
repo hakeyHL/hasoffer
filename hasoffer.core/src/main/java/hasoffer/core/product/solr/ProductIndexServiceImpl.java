@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Deprecated
 @Service
 public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductModel> {
     @Override

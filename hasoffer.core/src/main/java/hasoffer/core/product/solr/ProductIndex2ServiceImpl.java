@@ -17,6 +17,14 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         return AppConfig.get(AppConfig.SOLR_PRODUCT_2_URL);
     }
 
+    /**
+     * 根据关键词搜索
+     *
+     * @param title
+     * @param page
+     * @param size
+     * @return
+     */
     public PageableResult<ProductModel2> searchProductsByKey(String title, int page, int size) {
         Sort[] sorts = null;
         PivotFacet[] pivotFacets = null;
@@ -30,6 +38,14 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         return new PageableResult<ProductModel2>(sr.getResult(), sr.getTotalCount(), page, size);
     }
 
+    /**
+     * 根据类目搜索商品
+     * @param cateId
+     * @param level
+     * @param page
+     * @param size
+     * @return
+     */
     public PageableResult<ProductModel2> searchPro(long cateId, int level, int page, int size) {
         if (level < 1 || level > 3) {
             return null;
@@ -48,6 +64,15 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         return new PageableResult<ProductModel2>(sr.getResult(), sr.getTotalCount(), page, size);
     }
 
+    /**
+     * 类目下按关键词搜索
+     * @param cateId
+     * @param level
+     * @param title
+     * @param page
+     * @param size
+     * @return
+     */
     public PageableResult searchPro(long cateId, int level, String title, int page, int size) {
         long cate1 = 0, cate2 = 0, cate3 = 0;
 
@@ -62,7 +87,7 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         return searchPro(cate1, cate2, cate3, title, page, size);
     }
 
-    public PageableResult searchPro(long category1, long category2, long category3, String title, int page, int size) {
+    private PageableResult searchPro(long category1, long category2, long category3, String title, int page, int size) {
         String q = title;
         if (StringUtils.isEmpty(q)) {
             q = "*:*";
