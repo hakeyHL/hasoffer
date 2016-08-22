@@ -574,7 +574,7 @@ public class AppController {
      *
      * @return
      */
-    @RequestMapping(value = "/productsList", method = RequestMethod.GET)
+    @RequestMapping(value = "/productsList")
     public ModelAndView productsList(SearchCriteria criteria, @RequestParam(defaultValue = "3") int type) {
         ModelAndView mv = new ModelAndView();
         List li = new ArrayList();
