@@ -1,5 +1,6 @@
 package hasoffer.core.test;
 
+import hasoffer.base.enums.SearchResultSort;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
@@ -79,10 +80,11 @@ public class ProductTest {
 
     @Test
     public void testNewSolr() {
-        PageableResult<ProductModel2> pms = productIndex2Service.searchProductsByKey("iphone back case cover", 1, 10, null, Arrays.asList("cate2"));
+        PageableResult<ProductModel2> pms = productIndex2Service.searchProductsByKey("mi redmi 2", 1, 10, SearchResultSort.PRICEH2L, Arrays.asList("cate2"));
         List<ProductModel2> pmList = pms.getData();
         for (ProductModel2 pm : pmList) {
-            System.out.println(pm.getSearchCount() + "\t_" + pm.getBrand() + "_\t" + pm.getTitle());
+            System.out.println(pm.toString());
+//            System.out.println(pm.getSearchCount() + "\t_" + pm.getBrand() + "_\t" + pm.getTitle() + "\t" + pm.getMinPrice());
         }
     }
 

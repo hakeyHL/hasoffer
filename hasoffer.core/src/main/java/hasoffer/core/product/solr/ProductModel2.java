@@ -194,4 +194,14 @@ public class ProductModel2 implements IIdentifiable<Long> {
     public void setModel(String model) {
         this.model = model;
     }
+
+    @Override
+    public String toString() {
+        return "ProductModel2{" +
+                "title='" + title + '\'' +
+                ", minPrice=" + minPrice +
+                ", searchCount=" + searchCount +
+                ", brand='" + brand + '\'' +
+                '}';
+    }
 }
