@@ -143,7 +143,11 @@ public class AppServiceImpl implements IAppService {
     @Override
     public UrmUser getUserById(String thirdId) {
         List li = Arrays.asList(thirdId);
-        return dbm.querySingle(Q_APP_GETUSERBYTHIRDID, li);
+        List<UrmUser> urmUsers = dbm.query(Q_APP_GETUSERBYTHIRDID, li);
+        if (urmUsers != null && urmUsers.size() > 0) {
+            return urmUsers.get(0);
+        }
+        return null;
     }
 
     @Override
