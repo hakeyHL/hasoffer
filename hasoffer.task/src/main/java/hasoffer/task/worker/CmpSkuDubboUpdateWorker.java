@@ -71,7 +71,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 //                productService.updatePtmProductPrice(productId);
 
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
         }
     }
