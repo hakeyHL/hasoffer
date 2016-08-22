@@ -93,7 +93,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         //如果返回结果状态为running，那么将sku返回队列
         if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
             queue.add(sku);
-//            logger.info("taskstatus RUNNING for [" + skuid + "]");
+            logger.info("taskstatus RUNNING for [" + skuid + "]");
             return;
         } else if (TaskStatus.STOPPED.equals(taskStatus)) {
             logger.info("taskstatus STOPPED for [" + skuid + "]");
@@ -103,7 +103,13 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             return;
         } else if (TaskStatus.NONE.equals(taskStatus)) {
             queue.add(sku);
-            fetchDubboService.sendUrlTask(sku.getWebsite(), url, TaskLevel.LEVEL_1);
+            if (Website.SNAPDEAL.equals(website) || Website.FLIPKART.equals(website) || Website.AMAZON.equals(website)) {
+                queue.add(sku);
+                fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_1);
+            } else {
+                queue.add(sku);
+                fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_5);
+            }
             logger.info("taskstatus NONE for [" + skuid + "] , resend success");
             return;
         } else {//(TaskStatus.FINISH.equals(taskStatus)))
