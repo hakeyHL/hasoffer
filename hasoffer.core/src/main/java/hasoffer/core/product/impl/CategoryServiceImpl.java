@@ -20,6 +20,7 @@ import java.util.*;
 public class CategoryServiceImpl implements ICategoryService {
 
     private final static String Q_CATEGORY = "SELECT t FROM PtmCategory t";
+
     private static final String Q_CATEGORY_BY_PARENTID =
             "SELECT t FROM PtmCategory t WHERE t.parentId = ?0";
     private final static String CACHE_KEY = "category";
@@ -34,6 +35,11 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     public PtmCategory getCategory(long cateId) {
         return dbm.get(PtmCategory.class, cateId);
+    }
+
+    @Override
+    public List<PtmCategory> listCates() {
+        return dbm.query(Q_CATEGORY);
     }
 
     @Override
