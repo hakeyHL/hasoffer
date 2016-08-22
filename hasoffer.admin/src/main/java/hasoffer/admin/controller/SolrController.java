@@ -45,7 +45,7 @@ public class SolrController {
     ICmpSkuService cmpSkuService;
 
     @RequestMapping(value = "/product/importbycategory", method = RequestMethod.GET)
-    public void importNewAll() {
+    public void importNewAll(@RequestParam long minCateId) {
         final String Q_SKU = "select t from PtmCmpSku t where t.website=?0 and t.categoryId=?1 and t.sourceSid is not null";
 
         final ProcessCate pc = new ProcessCate();
@@ -108,7 +108,7 @@ public class SolrController {
         // cate list for each
         List<PtmCategory> cates = categoryService.listCates();
         for (PtmCategory cate : cates) {
-            if (cate.getId() <= 5) {
+            if (cate.getId() <= minCateId) {
                 continue;
             }
             pc.setCateId(cate.getId());

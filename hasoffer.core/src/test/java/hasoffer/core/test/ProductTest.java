@@ -79,7 +79,7 @@ public class ProductTest {
 
     @Test
     public void testNewSolr() {
-        PageableResult<ProductModel2> pms = productIndex2Service.searchProductsByKey_test("iPhone case", 1, 10);
+        PageableResult<ProductModel2> pms = productIndex2Service.searchProductsByKey("iPhone case", 1, 10);
         List<ProductModel2> pmList = pms.getData();
         for (ProductModel2 pm : pmList) {
             System.out.println(pm.getSearchCount() + "\t" + pm.getTitle());
