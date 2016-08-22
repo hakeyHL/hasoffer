@@ -1,5 +1,7 @@
 package hasoffer.core.test;
 
+import hasoffer.affiliate.affs.flipkart.FlipkartAffiliateProductProcessor;
+import hasoffer.affiliate.model.FlipkartSkuInfo;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
@@ -13,9 +15,7 @@ import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.product.*;
-import hasoffer.core.product.solr.CmpSkuModel;
-import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
-import hasoffer.core.product.solr.ProductIndexServiceImpl;
+import hasoffer.core.product.solr.*;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.task.ListAndProcessTask2;
 import hasoffer.core.task.worker.IList;
@@ -23,8 +23,6 @@ import hasoffer.core.task.worker.IProcess;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -73,11 +71,77 @@ public class ProductTest {
     IFetchService fetchService;
     @Resource
     IDealService dealService;
+    @Resource
+    ProductIndex2ServiceImpl productIndex2Service;
     private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
-    private Logger logger = LoggerFactory.getLogger(ProductTest.class);
+
+    @Test
+    public void import2SolrAndUpdateBrand() {
+
+        final String Q_SKU = "select t from PtmCmpSku t where t.website=?0 and t.categoryId>=0 and t.sourceSid is not null";
+        ListAndProcessTask2<PtmCmpSku> listAndProcessTask2 = new ListAndProcessTask2<>(
+                new IList() {
+                    @Override
+                    public PageableResult getData(int page) {
+                        return dbm.queryPage(Q_SKU, page, 100, Arrays.asList(Website.FLIPKART));
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcess<PtmCmpSku>() {
+                    @Override
+                    public void process(PtmCmpSku o) {
+                        if (StringUtils.isEmpty(o.getSourceSid())) {
+                            return;
+                        }
+                        FlipkartAffiliateProductProcessor fapp = new FlipkartAffiliateProductProcessor();
+
+                        try {
+                            FlipkartSkuInfo skuInfo = fapp.getSkuInfo(o.getSourceSid());
+
+                            long proId = o.getProductId();
+
+                            String brand = skuInfo.getProductBrand();
+                            String model = skuInfo.getModelName();
+
+                            // 更新商品brand和model， solr
+                            cmpSkuService.updateCmpSkuBrandModel(o.getId(), brand, model);
+                            productService.updateProductBrandModel(proId, brand, model);
+
+                            productService.importProduct2Solr2(proId);
+
+                            System.out.println("Update Brand : " + skuInfo.getProductBrand());
+                        } catch (Exception e) {
+                            System.out.println(String.format("Error : [%s]. Info : [%s]", e.getMessage(), o.getSourceSid()));
+                        }
+                    }
+                }
+        );
+
+        listAndProcessTask2.setProcessorCount(10);
+        listAndProcessTask2.setQueueMaxSize(200);
+        listAndProcessTask2.go();
+    }
 
     private void print(String str) {
         System.out.println(str);
+    }
+
+    @Test
+    public void testNewSolr() {
+        PageableResult<ProductModel2> pms = productIndex2Service.searchProductsByKey_test("redmi mobiles", 1, 10);
+        List<ProductModel2> pmList = pms.getData();
+        for (ProductModel2 pm : pmList) {
+            System.out.println(pm.getSearchCount() + "\t" + pm.getTitle());
+        }
     }
 
     @Test

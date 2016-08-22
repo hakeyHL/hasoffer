@@ -256,6 +256,16 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateCategoryid2(Long ptmcmpskuid, long categoryid2) {
+        PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(ptmcmpskuid);
+
+        updater.getPo().setCategoryId(categoryid2);
+
+        dbm.update(updater);
+    }
+
+    @Override
     public List<StatSkuPriceUpdateResult> listUpdateResults() {
         return dbm.query("select t from StatSkuPriceUpdateResult t order by t.id desc");
     }
@@ -547,6 +557,15 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         updater.getPo().setSmallImagePath(smallImagePath);
 
         dbm.update(updater);
+    }
+
+    @Override
+    @Transactional
+    public void updateCmpSkuBrandModel(Long id, String brand, String model) {
+        PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(id);
+        ptmCmpSkuUpdater.getPo().setBrand(brand);
+        ptmCmpSkuUpdater.getPo().setModel(model);
+        dbm.update(ptmCmpSkuUpdater);
     }
 
     @Override
