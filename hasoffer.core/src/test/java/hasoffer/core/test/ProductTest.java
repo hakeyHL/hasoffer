@@ -78,7 +78,7 @@ public class ProductTest {
     @Test
     public void import2SolrAndUpdateBrand() {
 
-        final String Q_SKU = "select t from PtmCmpSku t where t.website=?0 and t.categoryId=5 and t.sourceSid is not null";
+        final String Q_SKU = "select t from PtmCmpSku t where t.website=?0 and t.categoryId>=0 and t.sourceSid is not null";
         ListAndProcessTask2<PtmCmpSku> listAndProcessTask2 = new ListAndProcessTask2<>(
                 new IList() {
                     @Override
@@ -137,9 +137,11 @@ public class ProductTest {
 
     @Test
     public void testNewSolr() {
-        PageableResult<ProductModel2> pms = productIndex2Service.searchProductsByKey_test("xiaomi", 1, 10);
+        PageableResult<ProductModel2> pms = productIndex2Service.searchProductsByKey_test("redmi mobiles", 1, 10);
         List<ProductModel2> pmList = pms.getData();
-//        pmList.forEach(s -> System.out.println(s.getSearchCount() + "\t" + s.getTitle()));
+        for (ProductModel2 pm : pmList) {
+            System.out.println(pm.getSearchCount() + "\t" + pm.getTitle());
+        }
     }
 
     @Test

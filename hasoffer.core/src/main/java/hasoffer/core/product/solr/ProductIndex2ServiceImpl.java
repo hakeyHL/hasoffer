@@ -4,16 +4,31 @@ import hasoffer.base.config.AppConfig;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.data.solr.*;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.PivotField;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.ParameterizedType;
+import java.net.URLDecoder;
+import java.util.*;
 
 
 @Service
 public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, ProductModel2> {
+    protected HttpSolrServer solrServer;
+
+    public ProductIndex2ServiceImpl() {
+        solrServer = new HttpSolrServer(getSolrUrl());
+        solrServer.setConnectionTimeout(5000);
+    }
+
     @Override
     protected String getSolrUrl() {
         return AppConfig.get(AppConfig.SOLR_PRODUCT_2_URL);
@@ -95,6 +110,8 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         return new PageableResult<ProductModel2>(sr.getResult(), sr.getTotalCount(), page, size);
     }
 
+    // ************************父类实现*******************************
+
     /**
      * 类目下按关键词搜索
      *
@@ -145,8 +162,6 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         return new PageableResult<Long>(sr.getResult(), totalCount, page, size);
     }
 
-    // ************************父类实现*******************************
-    /*
     protected QueryResponse searchSolr(Query[] qs, FilterQuery[] fqs, Sort[] sorts, PivotFacet[] pivotFacets, int pageNumber, int pageSize, boolean useCache) {
         SolrQuery query = new SolrQuery();
         query.setRequestHandler("/query2");//select
@@ -186,13 +201,6 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         }
 
         return rsp;
-    }
-
-    protected HttpSolrServer solrServer;
-
-    public ProductIndex2ServiceImpl() {
-        solrServer = new HttpSolrServer(getSolrUrl());
-        solrServer.setConnectionTimeout(5000);
     }
 
     private String getFQ(FilterQuery[] fqs) {
@@ -271,5 +279,5 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         }
 
         return list;
-    }*/
+    }
 }
