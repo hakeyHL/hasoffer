@@ -1,15 +1,19 @@
 package hasoffer.core.product.solr;
 
 import hasoffer.base.config.AppConfig;
+import hasoffer.base.enums.SearchResultSort;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.data.solr.*;
+import jodd.util.NameValue;
 import org.apache.solr.client.solrj.response.PivotField;
 import org.apache.solr.common.util.NamedList;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -46,14 +50,63 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
 
         SearchResult<ProductModel2> sr = searchObjs(title, fqs, sorts, pivotFacets, page <= 1 ? 1 : page, size, true);
 
-        NamedList<List<PivotField>> nl = sr.getFacetPivot();
+        return new PageableResult<ProductModel2>(sr.getResult(), sr.getTotalCount(), page, size);
+    }
 
-        List<PivotField> cate2List = nl.get("cate2");
-        for (PivotField pf : cate2List) {
-            System.out.println(pf.getValue() + "\t" + pf.getCount());
+    /**
+     * 根据关键词搜索
+     *
+     * @param title
+     * @param page
+     * @param size
+     * @return
+     */
+    public PageableResult<ProductModel2> searchProductsByKey(String title, int page, int size, SearchResultSort resultSort, List<String> pivotFields) {
+        int pivotFieldSize = pivotFields == null ? 0 : pivotFields.size();
+
+        Sort[] sorts = null;
+        if (resultSort != null) {
+            sorts = new Sort[1];
+            if (resultSort == SearchResultSort.POPULARITY) {
+                sorts[0] = new Sort("searchCount", Order.DESC);
+            } else if (resultSort == SearchResultSort.PRICEL2H) {
+                sorts[0] = new Sort("minPrice", Order.ASC);
+            } else if (resultSort == SearchResultSort.PRICEH2L) {
+                sorts[0] = new Sort("minPrice", Order.DESC);
+            }
         }
 
-        return new PageableResult<ProductModel2>(sr.getResult(), sr.getTotalCount(), page, size);
+        PivotFacet[] pivotFacets = new PivotFacet[pivotFieldSize];
+
+        if (pivotFieldSize > 0) {
+            for (int i = 0; i < pivotFieldSize; i++) {
+                // cate2 distinct 提取出来所有值
+                pivotFacets[i] = new PivotFacet(pivotFields.get(i));
+            }
+        }
+
+        List<FilterQuery> fqList = new ArrayList<FilterQuery>();
+        FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
+
+        SearchResult<ProductModel2> sr = searchObjs(title, fqs, sorts, pivotFacets, page <= 1 ? 1 : page, size, true);
+
+        // pivot fields
+        Map<String, NameValue> pivotFieldVals = new HashMap<>();
+        if (pivotFieldSize > 0) {
+            NamedList<List<PivotField>> nl = sr.getFacetPivot();
+
+            for (int i = 0; i < pivotFieldSize; i++) {
+                String field = pivotFields.get(i);
+
+                List<PivotField> cate2List = nl.get(field);
+                for (PivotField pf : cate2List) {// string - object - long
+                    System.out.println(pf.getValue() + "\t" + pf.getCount());
+                    pivotFieldVals.put(field, new NameValue<Long, Long>((Long) pf.getValue(), Long.valueOf(pf.getCount())));
+                }
+            }
+        }
+
+        return new PageableResult<ProductModel2>(sr.getResult(), sr.getTotalCount(), page, size, pivotFieldVals);
     }
 
     /**
