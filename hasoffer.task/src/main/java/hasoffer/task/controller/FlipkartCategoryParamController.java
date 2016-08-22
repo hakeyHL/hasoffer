@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RequestMapping(value = "/flipkart")
 public class FlipkartCategoryParamController {
 
-    private static final String Q_FLIPKART_CMP = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' AND t.categoryId2 <> 0 ORDER BY t.id";
+    private static final String Q_FLIPKART_CMP = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' AND t.categoryId = 0 ORDER BY t.id";
     private static final String Q_FLIPKART_SKU = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' ORDER BY t.id ASC";
     private static AtomicBoolean taskRunning1 = new AtomicBoolean(false);
     private static AtomicBoolean taskRunning2 = new AtomicBoolean(false);
@@ -55,7 +55,7 @@ public class FlipkartCategoryParamController {
         es.execute(new MysqlListWorker(Q_FLIPKART_CMP, ws, dbm));
 
         for (int i = 0; i < 20; i++) {
-            es.execute(new FKCateAndParamWorker(dbm, ws, categoryService));// mdm,
+            es.execute(new FKCateAndParamWorker(dbm, ws, categoryService, cmpSkuService));// mdm,
         }
 
         taskRunning1.set(true);

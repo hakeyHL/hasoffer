@@ -93,4 +93,8 @@ public interface IProductService {
     void updateProductStd(Long proId, boolean std);
 
     void reimport2Solr(long productId);
+
+    void updateProductBrandModel(long proId, String productBrand, String modelName);
+
+    void importProduct2Solr2(long proId);
 }

@@ -241,6 +241,10 @@ public class Compare2Controller {
                     if (cr != null && cr.getPriceList().size() > 0 && cr.getPriceList().size() > 0) {
                         cr.setPriceOff(cr.getPriceList().get(0).getSaved());
                     }
+                    if (cr == null) {
+                        cr = new CmpResult();
+                        cr.setProductVo(new ProductVo(sio.getHsProId(), sio.getCliQ(), productCacheManager.getProductMasterImageUrl(ptmProduct.getId()), 0.0f, WebsiteHelper.getDeeplinkWithAff(Website.valueOf(ptmProduct.getSourceSite()), ptmProduct.getSourceUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()})));
+                    }
                     cr.setProductId(sio.getHsProId());
                     //cr.setCopywriting(ptmProduct != null && ptmProduct.isStd() ? "Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you." : "Looked around Myntre,Jabong & 5 other apps,thought you might like these items as well..");
                     cr.setCopywriting("Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you.");
@@ -754,7 +758,7 @@ public class Compare2Controller {
                         cmpResult.setProductVo(new ProductVo(sio.getHsProId(), sio.getCliQ(), cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath()), 0.0f, WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()})));
                     }
                     CmpProductListVo cplv = new CmpProductListVo(cmpSku, sio.getCliPrice());
-                    cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
+                    cplv.setDeepLink(WebsiteHelper.getDealUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                     comparedSkuVos.add(cplv);
                 }
                 if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {

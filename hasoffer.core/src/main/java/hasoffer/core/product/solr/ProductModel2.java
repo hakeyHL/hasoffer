@@ -1,16 +1,18 @@
 package hasoffer.core.product.solr;
 
-import hasoffer.base.utils.StringUtils;
 import hasoffer.data.solr.IIdentifiable;
 
 public class ProductModel2 implements IIdentifiable<Long> {
     private Long id;
 
     private String title;
-    private String key0;// title 前3个单词
-    private String key1;// title word 3+
+//    private String key0;// title 前3个单词
+//    private String key1;// title word 3+
 
     private String tag;
+
+    private String brand;// 品牌
+    private String model;// 型号
 
     private long cate1;
     private long cate2;
@@ -27,7 +29,11 @@ public class ProductModel2 implements IIdentifiable<Long> {
 
     private long searchCount = 0; // 搜索次数，表示商品热度
 
+    public ProductModel2() {
+    }
+
     public ProductModel2(Long id, String title, String tag,
+                         String brand, String model,
                          long cate1, long cate2, long cate3,
                          String cate1Name, String cate2Name, String cate3Name,
                          float minPrice, float maxPrice,
@@ -35,6 +41,10 @@ public class ProductModel2 implements IIdentifiable<Long> {
         this.id = id;
         this.title = title;
         this.tag = tag;
+
+        this.brand = brand;
+        this.model = model;
+
         this.cate1 = cate1;
         this.cate2 = cate2;
         this.cate3 = cate3;
@@ -46,23 +56,23 @@ public class ProductModel2 implements IIdentifiable<Long> {
         this.rating = rating;
         this.searchCount = searchCount;
 
-        initKeys();
+//        initKeys();
     }
 
-    private void initKeys() {
-        key0 = title;
-        key1 = "";
-        if (StringUtils.isEmpty(title)) {
-            return;
-        }
-        title = title.replaceAll("\\s+", " ").trim();
-        String[] ts = title.split(" ");
-        if (ts.length > 3) {
-            int index = title.indexOf(ts[2]) + ts[2].length();
-            key0 = title.substring(0, index);
-            key1 = title.substring(index + 1);
-        }
-    }
+//    private void initKeys() {
+//        key0 = title;
+//        key1 = "";
+//        if (StringUtils.isEmpty(title)) {
+//            return;
+//        }
+//        title = title.replaceAll("\\s+", " ").trim();
+//        String[] ts = title.split(" ");
+//        if (ts.length > 3) {
+//            int index = title.indexOf(ts[2]) + ts[2].length();
+//            key0 = title.substring(0, index);
+//            key1 = title.substring(index + 1);
+//        }
+//    }
 
     @Override
     public Long getId() {
@@ -79,22 +89,6 @@ public class ProductModel2 implements IIdentifiable<Long> {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getKey0() {
-        return key0;
-    }
-
-    public void setKey0(String key0) {
-        this.key0 = key0;
-    }
-
-    public String getKey1() {
-        return key1;
-    }
-
-    public void setKey1(String key1) {
-        this.key1 = key1;
     }
 
     public String getTag() {
