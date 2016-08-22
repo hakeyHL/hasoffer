@@ -23,4 +23,12 @@ public class DownLoadConfigChannle {
     public void setChannel(String channel) {
         this.channel = channel;
     }
+
+    public String getDeepLink() {
+        return deepLink;
+    }
+
+    public void setDeepLink(String deepLink) {
+        this.deepLink = deepLink;
+    }
 }
