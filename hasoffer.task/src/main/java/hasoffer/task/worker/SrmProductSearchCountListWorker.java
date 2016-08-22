@@ -104,7 +104,7 @@ public class SrmProductSearchCountListWorker implements Runnable {
                             fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_5);
                         }
 
-                        logger.info("send url request succes for " + sku.getWebsite() + "sku id is [" + sku.getId() + "]");
+                        logger.info("send url request succes for " + sku.getWebsite() + " sku id is [" + sku.getId() + "]");
                     }
                 }
             }
