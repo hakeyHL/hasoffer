@@ -854,7 +854,7 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public PageableResult<PtmCmpSku> listOnsaleCmpSkus(long proId, int page, int size) {
         //outstock的sku也返回
-        PageableResult<PtmCmpSku> pagedResult = dbm.queryPage(Q_ONSALE_PTM_CMPSKU, page, size, Arrays.asList(proId, 100.0f));
+        PageableResult<PtmCmpSku> pagedResult = dbm.queryPage(Q_ONSALE_PTM_CMPSKU, page, size, Arrays.asList(proId, 1.0f));
         return pagedResult;
     }
 }

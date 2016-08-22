@@ -1,17 +1,22 @@
 package hasoffer.core.bo.system;
 
+import hasoffer.base.enums.SearchResultSort;
+
 /**
  * Created by hs on 2016/6/21.
  */
 public class SearchCriteria {
     private int comment;
     private Long minPrice;
-    private  Long maxPrice;
-    private  String keyword;
-    private  String categoryId;
-    private  int page;
-    private  int pageSize;
-    private  int level;
+    private Long maxPrice;
+    private String keyword;
+    private String categoryId;
+    private int page = 1;
+    private int pageSize = 20;
+    private int level;
+    private int priceFrom = 0;
+    private int priceTo = 0;
+    private SearchResultSort sort;
 
     public int getLevel() {
         return level;
@@ -62,7 +67,7 @@ public class SearchCriteria {
     }
 
     public int getPage() {
-        return page==0?0:page;
+        return page <= 1 ? 0 : page;
     }
 
     public void setPage(int page) {
@@ -70,10 +75,34 @@ public class SearchCriteria {
     }
 
     public int getPageSize() {
-        return pageSize==0?20:pageSize;
+        return pageSize <= 1 ? 20 : pageSize;
     }
 
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
+    }
+
+    public int getPriceFrom() {
+        return priceFrom;
+    }
+
+    public void setPriceFrom(int priceFrom) {
+        this.priceFrom = priceFrom;
+    }
+
+    public int getPriceTo() {
+        return priceTo;
+    }
+
+    public void setPriceTo(int priceTo) {
+        this.priceTo = priceTo;
+    }
+
+    public SearchResultSort getSort() {
+        return sort;
+    }
+
+    public void setSort(SearchResultSort sort) {
+        this.sort = sort;
     }
 }

@@ -1,33 +1,29 @@
 package hasoffer.core.product.solr;
 
 import hasoffer.base.config.AppConfig;
+import hasoffer.base.enums.SearchResultSort;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.data.solr.*;
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import jodd.util.NameValue;
 import org.apache.solr.client.solrj.response.PivotField;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.ParameterizedType;
-import java.net.URLDecoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Service
 public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, ProductModel2> {
-    protected HttpSolrServer solrServer;
+    /*protected HttpSolrServer solrServer;
 
     public ProductIndex2ServiceImpl() {
         solrServer = new HttpSolrServer(getSolrUrl());
         solrServer.setConnectionTimeout(5000);
-    }
+    }*/
 
     @Override
     protected String getSolrUrl() {
@@ -42,7 +38,7 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
      * @param size
      * @return
      */
-    public PageableResult<ProductModel2> searchProductsByKey_test(String title, int page, int size) {
+    public PageableResult<ProductModel2> searchProductsByKey(String title, int page, int size) {
         Sort[] sorts = null;
         PivotFacet[] pivotFacets = new PivotFacet[1];
 
@@ -53,13 +49,6 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
 
         SearchResult<ProductModel2> sr = searchObjs(title, fqs, sorts, pivotFacets, page <= 1 ? 1 : page, size, true);
-
-        NamedList<List<PivotField>> nl = sr.getFacetPivot();
-
-        List<PivotField> cate2List = nl.get("cate2");
-        for (PivotField pf : cate2List) {
-            System.out.println(pf.getValue() + "\t" + pf.getCount());
-        }
 
         return new PageableResult<ProductModel2>(sr.getResult(), sr.getTotalCount(), page, size);
     }
@@ -72,16 +61,52 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
      * @param size
      * @return
      */
-    public PageableResult<ProductModel2> searchProductsByKey(String title, int page, int size) {
+    public PageableResult<ProductModel2> searchProductsByKey(String title, int page, int size, SearchResultSort resultSort, List<String> pivotFields) {
+        int pivotFieldSize = pivotFields == null ? 0 : pivotFields.size();
+
         Sort[] sorts = null;
-        PivotFacet[] pivotFacets = null;
+        if (resultSort != null) {
+            sorts = new Sort[1];
+            if (resultSort == SearchResultSort.POPULARITY) {
+                sorts[0] = new Sort("searchCount", Order.DESC);
+            } else if (resultSort == SearchResultSort.PRICEL2H) {
+                sorts[0] = new Sort("minPrice", Order.ASC);
+            } else if (resultSort == SearchResultSort.PRICEH2L) {
+                sorts[0] = new Sort("minPrice", Order.DESC);
+            }
+        }
+
+        PivotFacet[] pivotFacets = new PivotFacet[pivotFieldSize];
+
+        if (pivotFieldSize > 0) {
+            for (int i = 0; i < pivotFieldSize; i++) {
+                // cate2 distinct 提取出来所有值
+                pivotFacets[i] = new PivotFacet(pivotFields.get(i));
+            }
+        }
 
         List<FilterQuery> fqList = new ArrayList<FilterQuery>();
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
 
         SearchResult<ProductModel2> sr = searchObjs(title, fqs, sorts, pivotFacets, page <= 1 ? 1 : page, size, true);
 
-        return new PageableResult<ProductModel2>(sr.getResult(), sr.getTotalCount(), page, size);
+        // pivot fields
+        Map<String, NameValue> pivotFieldVals = new HashMap<>();
+        if (pivotFieldSize > 0) {
+            NamedList<List<PivotField>> nl = sr.getFacetPivot();
+
+            for (int i = 0; i < pivotFieldSize; i++) {
+                String field = pivotFields.get(i);
+
+                List<PivotField> cate2List = nl.get(field);
+                for (PivotField pf : cate2List) {// string - object - long
+                    System.out.println(pf.getValue() + "\t" + pf.getCount());
+                    pivotFieldVals.put(field, new NameValue<Long, Long>((Long) pf.getValue(), Long.valueOf(pf.getCount())));
+                }
+            }
+        }
+
+        return new PageableResult<ProductModel2>(sr.getResult(), sr.getTotalCount(), page, size, pivotFieldVals);
     }
 
     /**
@@ -109,8 +134,6 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
 
         return new PageableResult<ProductModel2>(sr.getResult(), sr.getTotalCount(), page, size);
     }
-
-    // ************************父类实现*******************************
 
     /**
      * 类目下按关键词搜索
@@ -162,9 +185,10 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         return new PageableResult<Long>(sr.getResult(), totalCount, page, size);
     }
 
-    protected QueryResponse searchSolr(Query[] qs, FilterQuery[] fqs, Sort[] sorts, PivotFacet[] pivotFacets, int pageNumber, int pageSize, boolean useCache) {
+    // ************************父类实现*******************************
+    /*protected QueryResponse searchSolr(Query[] qs, FilterQuery[] fqs, Sort[] sorts, PivotFacet[] pivotFacets, int pageNumber, int pageSize, boolean useCache) {
         SolrQuery query = new SolrQuery();
-        query.setRequestHandler("/query2");//select
+        query.setRequestHandler("/select");//select
         String q = this.getQ(qs);
         if (!useCache) {
             q = "{!cache=false}" + q;
@@ -279,5 +303,5 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         }
 
         return list;
-    }
+    }*/
 }
