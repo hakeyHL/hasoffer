@@ -47,7 +47,7 @@ public class FKCateAndParamWorker implements Runnable {
             if (sku == null) {
                 try {
                     TimeUnit.SECONDS.sleep(3);
-                    logger.debug("flipkart category and param fetch get null sleep 3 seconds");
+                    logger.info("flipkart category and param fetch get null sleep 3 seconds");
                 } catch (InterruptedException e) {
                     return;
                 }
@@ -115,6 +115,7 @@ public class FKCateAndParamWorker implements Runnable {
             }
 
             cmpSkuService.updateCategoryid2(sku.getId(), categoryid);
+            logger.info("update flipkart categoryid2 success for " + sku.getId());
 
         } catch (Exception e) {
 
