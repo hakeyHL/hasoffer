@@ -329,7 +329,7 @@
                 'break', 'case', 'catch', 'continue', 'debugger', 'default', 'delete', 'do',
                 'finally', 'for', 'function', 'in', 'instanceof', 'new', 'return', 'switch',
                 'this', 'throw', 'try', 'typeof', 'var', 'void', 'while', 'with', 'null', 'typeof',
-                'class', 'enum', 'export', 'extends', 'import', 'super', 'implements', 'interface',
+                'class', 'apienum', 'export', 'extends', 'import', 'super', 'implements', 'interface',
                 'let', 'package', 'private', 'protected', 'public', 'static', 'yield', 'const', 'arguments',
                 'true', 'false', 'undefined', 'NaN'
             ];
