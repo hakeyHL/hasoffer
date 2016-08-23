@@ -2,6 +2,7 @@ package hasoffer.task.worker;
 
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
@@ -22,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class SrmProductSearchCountListWorker implements Runnable {
 
-    private static final String Q_PTMCMPSKU_BYPRODUCTID = "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ";
+    private static final String Q_PTMCMPSKU_BYPRODUCTID = "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ORDER BY t.id ASC";
     private static Logger logger = LoggerFactory.getLogger(SrmProductSearchCountListWorker.class);
 
     private IFetchDubboService fetchDubboService;
@@ -43,7 +44,7 @@ public class SrmProductSearchCountListWorker implements Runnable {
 
         String startDateString = TimeUtils.parse(TimeUtils.today() - TimeUtils.MILLISECONDS_OF_1_DAY * 2, "yyyyMMdd");
 
-        String Q_LOG_BYUPDATETIME = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd > ?0 AND t.count > 5 ORDER BY t.id ASC";
+        String Q_LOG_BYUPDATETIME = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd = ?0 AND t.count > 5 ORDER BY t.id ASC";
 
         PageableResult<SrmProductSearchCount> pageableResult = dbm.queryPage(Q_LOG_BYUPDATETIME, page, pageSize, Arrays.asList(startDateString));
 
@@ -87,9 +88,23 @@ public class SrmProductSearchCountListWorker implements Runnable {
                             }
                         }
 
-                        queue.add(sku);
-                        fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_1);
-                        logger.info("send url request succes for sku id is [" + sku.getId() + "]");
+                        Website website = sku.getWebsite();
+
+                        //暂时过滤掉myntra
+                        if (Website.MYNTRA.equals(website)) {
+                            continue;
+                        }
+
+                        //高优先级的网站
+                        if (Website.SNAPDEAL.equals(website) || Website.FLIPKART.equals(website) || Website.AMAZON.equals(website)) {
+                            queue.add(sku);
+                            fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_1);
+                        } else {
+                            queue.add(sku);
+                            fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_5);
+                        }
+
+                        logger.info("send url request succes for " + sku.getWebsite() + " sku id is [" + sku.getId() + "]");
                     }
                 }
             }

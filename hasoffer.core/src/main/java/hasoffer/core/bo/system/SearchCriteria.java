@@ -2,8 +2,6 @@ package hasoffer.core.bo.system;
 
 import hasoffer.base.enums.SearchResultSort;
 
-import java.util.List;
-
 /**
  * Created by hs on 2016/6/21.
  */
@@ -20,6 +18,7 @@ public class SearchCriteria {
     private int priceTo = 0;
     private SearchResultSort sort;
     private List<String> pivotFields;
+    private SearchResultSort sort = SearchResultSort.RELEVANCE;
 
     public int getLevel() {
         return level;
