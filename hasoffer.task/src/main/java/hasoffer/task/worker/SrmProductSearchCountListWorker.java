@@ -4,6 +4,7 @@ import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
@@ -97,6 +98,14 @@ public class SrmProductSearchCountListWorker implements Runnable {
 
                         //高优先级的网站
                         if (Website.SNAPDEAL.equals(website) || Website.FLIPKART.equals(website) || Website.AMAZON.equals(website)) {
+
+                            //过滤掉snapdeal中viewAllSeller的情况
+                            if (Website.SNAPDEAL.equals(website)) {
+                                String url = sku.getUrl();
+                                url = StringUtils.filterAndTrim(url, Arrays.asList("/viewAllSellers"));
+                                sku.setUrl(url);
+                            }
+
                             queue.add(sku);
                             fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_1);
                         } else {

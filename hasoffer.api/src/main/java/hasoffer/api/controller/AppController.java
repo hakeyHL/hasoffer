@@ -650,8 +650,10 @@ public class AppController {
         } else if (StringUtils.isNotEmpty(criteria.getKeyword())) {
             //search by title
             System.out.println("  sort " + criteria.getSort().name());
-            PageableResult p = ProductIndex2ServiceImpl.searchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize(), criteria.getSort(), null);
+            PageableResult p = ProductIndex2ServiceImpl.searchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize(), criteria.getSort(), Arrays.asList("cate2"));
             if (p != null && p.getData().size() > 0) {
+                System.out.println("getPivotFieldVals  " + p.getPivotFieldVals().size());
+                map.put("categorys", p.getPivotFieldVals());
                 addProductVo2List(li, p.getData());
             }
         }
