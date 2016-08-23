@@ -80,7 +80,7 @@ public class ProductTest {
 
     @Test
     public void testNewSolr() {
-        PageableResult<ProductModel2> pms = productIndex2Service.searchProductsByKey("mi redmi 2", 1, 10, SearchResultSort.PRICEH2L, Arrays.asList("cate2"));
+        PageableResult<ProductModel2> pms = productIndex2Service.searchProductsByKey("redmi 2 mi", 1, 10, SearchResultSort.RELEVANCE, Arrays.asList("cate2"));
         List<ProductModel2> pmList = pms.getData();
         for (ProductModel2 pm : pmList) {
             System.out.println(pm.toString());
