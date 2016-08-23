@@ -155,11 +155,17 @@ public class SearchRecordProcessWorker implements Runnable {
         // 需要的话，则加入更新队列。并返回一个实体。如果不需要，这返回空
         if (isFetch) {
             try {
+                TaskStatus keyWordTaskStatus = fetchService.getKeyWordTaskStatus(website, keyword);
+                if (TaskStatus.NONE.equals(keyWordTaskStatus)) {
+                    fetchService.sendKeyWordTask(website, keyword);
+                    return FetchResult.createFetchResult(website, keyword, TaskStatus.RUNNING);
+                }
+                if (TaskStatus.START.equals(keyWordTaskStatus) || TaskStatus.RUNNING.equals(keyWordTaskStatus)) {
+                    return FetchResult.createFetchResult(website, keyword, TaskStatus.RUNNING);
+                }
                 return fetchService.getProductsKeyWord(website, keyword);
             } catch (Exception e) {
-                FetchResult temp = new FetchResult(website, keyword);
-                temp.setTaskStatus(TaskStatus.START);
-                return temp;
+                return FetchResult.createFetchResult(website, keyword, TaskStatus.RUNNING);
             }
         }
         return null;
@@ -174,7 +180,7 @@ public class SearchRecordProcessWorker implements Runnable {
         FetchResult shopcluesFetchResult = getFetchResult(Website.SHOPCLUES, keyword, sitePros);
         FetchResult paytmFetchResult = getFetchResult(Website.PAYTM, keyword, sitePros);
         FetchResult ebayFetchResult = getFetchResult(Website.EBAY, keyword, sitePros);
-        FetchResult myntraFetchResult = getFetchResult(Website.MYNTRA, keyword, sitePros);
+        //FetchResult myntraFetchResult = getFetchResult(Website.MYNTRA, keyword, sitePros);
         FetchResult jabongFetchResult = getFetchResult(Website.JABONG, keyword, sitePros);
         FetchResult voonikFetchResult = getFetchResult(Website.VOONIK, keyword, sitePros);
         FetchResult homeShopResult = getFetchResult(Website.HOMESHOP18, keyword, sitePros);
@@ -185,18 +191,20 @@ public class SearchRecordProcessWorker implements Runnable {
         initResultMap(autoSearchResult, shopcluesFetchResult);
         initResultMap(autoSearchResult, paytmFetchResult);
         initResultMap(autoSearchResult, ebayFetchResult);
-        initResultMap(autoSearchResult, myntraFetchResult);
+        //initResultMap(autoSearchResult, myntraFetchResult);
         initResultMap(autoSearchResult, jabongFetchResult);
         initResultMap(autoSearchResult, voonikFetchResult);
         initResultMap(autoSearchResult, homeShopResult);
         initResultMap(autoSearchResult, limeRoadResult);
 
-        Boolean isUpdate = isUpdate(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, myntraFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
+        Boolean isUpdate = isUpdate(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
+        //Boolean isUpdate = isUpdate(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, myntraFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
         if (isUpdate) {
             updateMongo(autoSearchResult);
             analysisAndRelate(autoSearchResult);
         }
-        return isReFetch(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, myntraFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
+        //return isReFetch(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, myntraFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
+        return isReFetch(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
     }
 
     private boolean isReFetch(FetchResult... fetchResultList) {
@@ -237,7 +245,7 @@ public class SearchRecordProcessWorker implements Runnable {
     }
 
     private boolean isClose(FetchResult result) {
-        return result != null && (TaskStatus.FINISH.equals(result.getTaskStatus()) || TaskStatus.STOPPED.equals(result.getTaskStatus()));
+        return result != null && (TaskStatus.FINISH.equals(result.getTaskStatus()) || TaskStatus.STOPPED.equals(result.getTaskStatus()) || TaskStatus.EXCEPTION.equals(result.getTaskStatus()));
     }
 
     private void initResultMap(SrmAutoSearchResult autoSearchResult, FetchResult fetchResult) {

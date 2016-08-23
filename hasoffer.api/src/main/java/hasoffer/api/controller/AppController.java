@@ -10,6 +10,7 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.core.bo.product.Banners;
+import hasoffer.core.bo.product.CategoryVo;
 import hasoffer.core.bo.push.*;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.cache.AppCacheManager;
@@ -20,15 +21,14 @@ import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
+import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.urm.UrmDevice;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.impl.ProductServiceImpl;
-import hasoffer.core.product.solr.CategoryIndexServiceImpl;
-import hasoffer.core.product.solr.ProductIndexServiceImpl;
-import hasoffer.core.product.solr.ProductModel;
+import hasoffer.core.product.solr.*;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
@@ -37,6 +37,7 @@ import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
+import jodd.util.NameValue;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.common.util.impl.LoggerFactory;
 import org.jboss.logging.Logger;
@@ -74,6 +75,8 @@ public class AppController {
     @Resource
     ProductIndexServiceImpl productIndexServiceImpl;
     @Resource
+    ProductIndex2ServiceImpl ProductIndex2ServiceImpl;
+    @Resource
     ProductServiceImpl productService;
     @Resource
     ICmpSkuService cmpSkuService;
@@ -97,6 +100,11 @@ public class AppController {
         // String ss = WebsiteHelper.getDealUrlWithAff(Website.FLIPKART, "http://www.flipkart.com/philips-mix-4-gb-sa5mxx04wf-97-16-mp3-player/p/itmdmfndygbz3wfd?pid=AUDDMFMAC4WSSGGH&al=TQCV0eQ7m7uScf%2FCbjC3PcldugMWZuE7sHPMhtl4IOoHmf27YkMOEISwRAaogpJNxY67buiFvno%3D&offer=nb%3Amp%3A06e1fc0e26&ref=L%3A5882205368552411071&srno=b_1&findingMethod=Deals%20of%20the%20Day&otracker=hp_omu_Deals%20of%20the%20Day_1_39fdd0fe-e2e3-4176-9cf4-15ca32404fe5_0", new String[]{"GOOGLEPLAY", "aaaadfdfdfdf"});
         //System.out.println(ss);
         //System.out.println(WebsiteHelper.getUrlWithAff("http://dl.flipkart.com/dl/all/~intex-speakers/pr?sid=all&p%5B%5D=facets.filter_standard%255B%255D%3D1"));
+        String ss = "<div id='mini_nav_qq'><li><a target='_top' " +
+                "href='http:// lady.qq.com/emo/emotio.shtml'>情感</a></li><li>" +
+                "<a target='_top' href='http://lady.qq.com/beauty/beauty.shtml'>美容</a></li></div>";
+        String s = ClientHelper.delHTMLTag(ss);
+        System.out.println(s);
     }
 
     @RequestMapping(value = "/newconfig", method = RequestMethod.GET)
@@ -205,6 +213,48 @@ public class AppController {
                 if (appDeal != null) {
                     appService.countDealClickCount(appDeal);
                 }
+                break;
+            case DOWNLOADBOOTCONFIG:
+                //app下载引导
+                List<Map<String, List<ThirdAppVo>>> apps = new ArrayList<Map<String, List<ThirdAppVo>>>();
+                Map<String, List<ThirdAppVo>> nine = new HashMap<>();
+                Map<String, List<ThirdAppVo>> google = new HashMap<>();
+
+                //添加GooglePlay渠道的app下载属性
+                List<ThirdAppVo> googlePlayApps = new ArrayList<ThirdAppVo>();
+                ThirdAppVo googlePlayApps_Amazon = new ThirdAppVo(Website.AMAZON, "https://play.google.com/store/apps/details?id=com.amazon.mShop.android.shopping", WebsiteHelper.getBiggerLogoUrl(Website.AMAZON), "SBrowse,search & buy millions of products right from your Android device", 4.3f, "491,637", "50,000,000 - 100,000,000");
+                ThirdAppVo googlePlayApps_Flipkart = new ThirdAppVo(Website.FLIPKART, "https://play.google.com/store/apps/details?id=com.flipkart.android", WebsiteHelper.getBiggerLogoUrl(Website.FLIPKART), "Shop for electronics,apparels & more using our Flipart app Free shipping & COD", 4.2f, "2,044,978", "50,000,000 - 100,000,000");
+                ThirdAppVo googlePlayApps_ShopClues = new ThirdAppVo(Website.SHOPCLUES, "https://play.google.com/store/apps/details?id=com.shopclues", WebsiteHelper.getBiggerLogoUrl(Website.SHOPCLUES), "India's largest Online Marketplace is now in your Pocket - Install,Shop,Enjoy!", 3.9f, "235,468", "10,000,000 - 50,000,000");
+                ThirdAppVo googlePlayApps_eBay = new ThirdAppVo(Website.EBAY, "https://play.google.com/store/apps/details?id=com.ebay.mobile", WebsiteHelper.getBiggerLogoUrl(Website.EBAY), "Buy,bid & sell! Deals & Discounts to Save Money on Home,Collectables & Cars", 4.2f, "1,759,547", "100,000,000 - 500,000,000");
+                ThirdAppVo googlePlayApps_Paytm = new ThirdAppVo(Website.PAYTM, "https://play.google.com/store/apps/details?id=net.one97.paytm", WebsiteHelper.getBiggerLogoUrl(Website.PAYTM), "Best Mobile Recharge and DTH Recharge, Bill Payment and Shipping Experience", 4.3f, "1,401,209", "10,000,000 - 50,000,000");
+                ThirdAppVo googlePlayApps_Snapdeal = new ThirdAppVo(Website.SNAPDEAL, "https://play.google.com/store/apps/details?id=com.snapdeal.main", WebsiteHelper.getBiggerLogoUrl(Website.SNAPDEAL), "Best deals on women & men's fashion,home essentials,electronics & gadgets!", 4.1f, "1,035,900", "10,000,000 - 50,000,000");
+                ThirdAppVo googlePlayApps_Jabong = new ThirdAppVo(Website.JABONG, "https://play.google.com/store/apps/details?id=com.jabong.android", WebsiteHelper.getBiggerLogoUrl(Website.JABONG), "India's Best Online Shopping App To Buy Latest Fashion for Men,Women,Kids", 3.9f, "171,487", "10,000,000 - 50,000,000");
+                ThirdAppVo googlePlayApps_VOONIK = new ThirdAppVo(Website.VOONIK, "https://play.google.com/store/apps/details?id=com.voonik.android", WebsiteHelper.getBiggerLogoUrl(Website.VOONIK), "Online Shopping for women clothing,ethnic wear,sarees,kurtis,lingere in India", 4.2f, "129,079", "5,000,000 - 10,000,000");
+                ThirdAppVo googlePlayApps_INFIBEAM = new ThirdAppVo(Website.INFIBEAM, "https://play.google.com/store/apps/details?id=com.infibeam.infibeamapp", WebsiteHelper.getBiggerLogoUrl(Website.INFIBEAM), "Infibeam.com-Buy Mobiles,Electronics,Books,Gifts,Clothes & more", 3.7f, "8,424", "1,000,000 - 5,000,000");
+                ThirdAppVo googlePlayApps_Myntra = new ThirdAppVo(Website.MYNTRA, "https://play.google.com/store/apps/details?id=com.myntra.android&hl=en", WebsiteHelper.getBiggerLogoUrl(Website.MYNTRA), "Online shopping for fashion clothes,footwear,accessories for Men,Women & Kids", 4.1f, "509,053", "10,000,000 - 50,000,000");
+
+                googlePlayApps.addAll(Arrays.asList(googlePlayApps_Amazon, googlePlayApps_Flipkart, googlePlayApps_ShopClues, googlePlayApps_eBay, googlePlayApps_Paytm, googlePlayApps_Snapdeal, googlePlayApps_Jabong, googlePlayApps_VOONIK, googlePlayApps_INFIBEAM, googlePlayApps_Myntra));
+                google.put("GOOGLEPLAY", googlePlayApps);
+
+                //添加9APP渠道的app下载属性
+                List<ThirdAppVo> nineApp = new ArrayList<ThirdAppVo>();
+                ThirdAppVo nineApp_Amazon = new ThirdAppVo(Website.AMAZON, "http://www.9apps.com/android-apps/Amazon-India-Shopping/", WebsiteHelper.getBiggerLogoUrl(Website.AMAZON), "SBrowse,search & buy millions of products right from your Android device", 4.3f, "491,637", "50,000,000 - 100,000,000");
+                ThirdAppVo nineApp_Flipkart = new ThirdAppVo(Website.FLIPKART, "http://www.9apps.com/android-apps/Flipkart-Amazing-Discounts-Everyday/", WebsiteHelper.getBiggerLogoUrl(Website.FLIPKART), "Shop for electronics,apparels & more using our Flipart app Free shipping & COD", 4.2f, "2,044,978", "50,000,000 - 100,000,000");
+                ThirdAppVo nineApp_ShopClues = new ThirdAppVo(Website.SHOPCLUES, "http://www.9apps.com/android-apps/ShopClues/", WebsiteHelper.getBiggerLogoUrl(Website.SHOPCLUES), "India's largest Online Marketplace is now in your Pocket - Install,Shop,Enjoy!", 3.9f, "235,468", "10,000,000 - 50,000,000");
+                ThirdAppVo nineApp_eBay = new ThirdAppVo(Website.EBAY, "http://www.9apps.com/android-apps/eBay/", WebsiteHelper.getBiggerLogoUrl(Website.EBAY), "Buy,bid & sell! Deals & Discounts to Save Money on Home,Collectables & Cars", 4.2f, "1,759,547", "100,000,000 - 500,000,000");
+                ThirdAppVo nineApp_Paytm = new ThirdAppVo(Website.PAYTM, "http://www.9apps.com/android-apps/Recharge-Shop-and-Wallet-Paytm/", WebsiteHelper.getBiggerLogoUrl(Website.PAYTM), "Best Mobile Recharge and DTH Recharge, Bill Payment and Shipping Experience", 4.3f, "1,401,209", "10,000,000 - 50,000,000");
+                ThirdAppVo nineApp_Snapdeal = new ThirdAppVo(Website.SNAPDEAL, "http://www.9apps.com/android-apps/Snapdeal-Online-Shopping-India/", WebsiteHelper.getBiggerLogoUrl(Website.SNAPDEAL), "Best deals on women & men's fashion,home essentials,electronics & gadgets!", 4.1f, "1,035,900", "10,000,000 - 50,000,000");
+                ThirdAppVo nineApp_Jabong = new ThirdAppVo(Website.JABONG, "http://www.9apps.com/android-apps/Jabong-Online-Fashion-Shopping/", WebsiteHelper.getBiggerLogoUrl(Website.JABONG), "India's Best Online Shopping App To Buy Latest Fashion for Men,Women,Kids", 3.9f, "171,487", "10,000,000 - 50,000,000");
+                ThirdAppVo nineApp_VOONIK = new ThirdAppVo(Website.VOONIK, "http://www.9apps.com/android-apps/Voonik-Shopping-App-For-Women/", WebsiteHelper.getBiggerLogoUrl(Website.VOONIK), "Online Shopping for women clothing,ethnic wear,sarees,kurtis,lingere in India", 4.2f, "129,079", "5,000,000 - 10,000,000");
+                ThirdAppVo nineApp_INFIBEAM = new ThirdAppVo(Website.INFIBEAM, "http://www.9apps.com/android-apps/Infibeam-Online-Shopping-App/", WebsiteHelper.getBiggerLogoUrl(Website.INFIBEAM), "Infibeam.com-Buy Mobiles,Electronics,Books,Gifts,Clothes & more", 3.7f, "8,424", "1,000,000 - 5,000,000");
+                ThirdAppVo nineApp_Myntra = new ThirdAppVo(Website.MYNTRA, "http://www.9apps.com/android-apps/Myntra-Fashion-Shopping-App/", WebsiteHelper.getBiggerLogoUrl(Website.MYNTRA), "Online shopping for fashion clothes,footwear,accessories for Men,Women & Kids", 4.1f, "509,053", "10,000,000 - 50,000,000");
+
+                nineApp.addAll(Arrays.asList(nineApp_Amazon, nineApp_Flipkart, nineApp_ShopClues, nineApp_eBay, nineApp_Paytm, nineApp_Snapdeal, nineApp_Jabong, nineApp_VOONIK, nineApp_INFIBEAM, nineApp_Myntra));
+                nine.put("9APP", nineApp);
+                apps.add(nine);
+                apps.add(google);
+                DownloadConfigVo downloadConfigVo = new DownloadConfigVo(true, Arrays.asList("com.snapdeal.main", "com.flipkart.android", "in.amazon.mShop.android.shopping", "net.one97.paytm", "com.ebay.mobile", "com.shopclues", "com.infibeam.infibeamapp", "com.myntra.android", "com.jabong.android", "com.voonik.android", "cn.xender", "com.india.hasoffer", "com.lenovo.anyshare,gps", "com.mobile.indiapp", "com.leo.appmaster", "com.voodoo.android", "com.app.buyhatke"), "9APP", Arrays.asList(new DownLoadConfigChannle("GOOGLEPLAY", "https://www.googleplay.com"), new DownLoadConfigChannle("9APP", "https://www.9APP.com")), apps);
+                modelAndView.addObject("data", downloadConfigVo);
                 break;
             default:
                 break;
@@ -527,7 +577,7 @@ public class AppController {
      *
      * @return
      */
-    @RequestMapping(value = "/productsList", method = RequestMethod.GET)
+    @RequestMapping(value = "/productsList")
     public ModelAndView productsList(SearchCriteria criteria, @RequestParam(defaultValue = "3") int type) {
         ModelAndView mv = new ModelAndView();
         List li = new ArrayList();
@@ -582,6 +632,99 @@ public class AppController {
         return mv;
     }
 
+    /**
+     * 商品列表
+     *
+     * @return
+     */
+    @RequestMapping(value = "/temp/productsList")
+    public ModelAndView tempProductsList(SearchCriteria criteria, @RequestParam(defaultValue = "4") int type) {
+        ModelAndView mv = new ModelAndView();
+        List li = new ArrayList();
+        Map map = new HashMap();
+        PageableResult<ProductModel2> products;
+        String data = "";
+        //查询热卖商品
+        List<PtmProduct> products2s = productCacheManager.getTopSellins(criteria.getPage(), criteria.getPageSize());
+        switch (type) {
+            case 0:
+                addProductVo2List(li, products2s);
+                if (products2s != null && products2s.size() > 4) {
+                    li = li.subList(0, 5);
+                }
+                map.put("product", li);
+                break;
+            case 1:
+                addProductVo2List(li, products2s);
+                map.put("product", li);
+                break;
+            case 2:
+                //search by title
+                System.out.println("  sort " + criteria.getSort().name());
+                criteria.setPivotFields(Arrays.asList("cate2"));
+                PageableResult p = ProductIndex2ServiceImpl.searchProducts(criteria);
+                if (p != null && p.getData().size() > 0) {
+                    System.out.println("getPivotFieldVals  " + p.getPivotFieldVals().size());
+                    if (p.getPivotFieldVals() != null && p.getPivotFieldVals().size() > 0) {
+                        // List<CategoryVo>
+                        List<CategoryVo> categorys = new ArrayList();
+                        Map pivotFieldVals = p.getPivotFieldVals();
+                        Set<Map.Entry> set = pivotFieldVals.entrySet();
+                        Iterator<Map.Entry> iterator = set.iterator();
+                        while (iterator.hasNext()) {
+                            Map.Entry next = iterator.next();
+                            System.out.println("key " + next.getKey());
+                            List<NameValue> nameValues = (List<NameValue>) next.getValue();
+                            for (NameValue nameValue : nameValues) {
+                                Long cateId = (Long) nameValue.getName();
+                                PtmCategory ptmCategory = appCacheManager.getCategoryById(cateId);
+                                if (ptmCategory != null) {
+                                    CategoryVo categoryVo = new CategoryVo();
+                                    categoryVo.setId(ptmCategory.getId());
+                                    categoryVo.setLevel(ptmCategory.getLevel());
+                                    categoryVo.setName(ptmCategory.getName());
+                                    categoryVo.setCategorys(appCacheManager.getCategorys(cateId + ""));
+                                    categorys.add(categoryVo);
+                                }
+                            }
+                        }
+                        map.put("categorys", categorys);
+                    }
+                    addProductVo2List(li, p.getData());
+                }
+                map.put("product", li);
+                break;
+            case 3:
+                //类目搜索
+                //category level page size
+                if (StringUtils.isNotBlank(criteria.getCategoryId())) {
+                    //search by category
+                    products = ProductIndex2ServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
+                    if (products != null && products.getData().size() > 0) {
+                        addProductVo2List(li, products.getData());
+                    }
+                }
+                break;
+            case 4:
+                //如果是默认值,则判断类目id和level是否传递了,传了就是类目搜索,适配老接口
+                if (StringUtils.isNotBlank(criteria.getCategoryId())) {
+                    //search by category
+                    products = ProductIndex2ServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
+                    if (products != null && products.getData().size() > 0) {
+                        addProductVo2List(li, products.getData());
+                    }
+                }
+                break;
+            default:
+                map.put("product", null);
+        }
+        if (li != null && li.size() > 0) {
+            map.put("product", li);
+        }
+        mv.addObject("data", map);
+        return mv;
+    }
+
     public void addProductVo2List(List desList, List sourceList) {
 
         if (sourceList != null && sourceList.size() > 0) {
@@ -617,6 +760,22 @@ public class AppController {
                         desList.add(productListVo);
                     }
                 }
+            } else if (ProductModel2.class.isInstance(sourceList.get(0))) {
+                Iterator<ProductModel2> ptmList = sourceList.iterator();
+                while (ptmList.hasNext()) {
+                    ProductModel2 ptmProduct = ptmList.next();
+                    int count = cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
+                    if (count > 0) {
+                        ProductListVo productListVo = new ProductListVo();
+                        productListVo.setId(ptmProduct.getId());
+                        productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
+                        productListVo.setName(ptmProduct.getTitle());
+                        productListVo.setPrice(Math.round(ptmProduct.getMinPrice()));
+                        productListVo.setStoresNum(count);
+                        setCommentNumAndRatins(productListVo);
+                        desList.add(productListVo);
+                    }
+                }
             }
         }
     }
@@ -629,14 +788,10 @@ public class AppController {
             int sum = 0;
             //统计site
             Set<Website> websiteSet = new HashSet<Website>();
-            Long totalCommentNum = Long.valueOf(0);
-            int totalRating = 0;
             for (PtmCmpSku ptmCmpSku : tempSkuList) {
-
-                if (ptmCmpSku.getWebsite() != null) {
-                    websiteSet.add(ptmCmpSku.getWebsite());
-                }
+                websiteSet.add(ptmCmpSku.getWebsite());
             }
+            Long totalCommentNum = Long.valueOf(0);
             for (PtmCmpSku ptmCmpSku2 : tempSkuList) {
                 if (websiteSet.size() <= 0) {
                     break;
@@ -644,16 +799,18 @@ public class AppController {
                 if (websiteSet.contains(ptmCmpSku2.getWebsite())) {
                     websiteSet.remove(ptmCmpSku2.getWebsite());
                     if (!ptmCmpSku2.getWebsite().equals(Website.EBAY)) {
+                        System.out.println("not ebay ");
                         //评论数*星级 累加 除以评论数和
                         sum += ptmCmpSku2.getRatings() * ptmCmpSku2.getCommentsNumber();
                         //去除列表中除此之外的其他此site的数据
                         totalCommentNum += ptmCmpSku2.getCommentsNumber();
-                        totalRating += ptmCmpSku2.getRatings();
                     }
                 }
             }
+            System.out.println("totalCommentNum   " + totalCommentNum);
             productListVo.setCommentNum(totalCommentNum);
-            productListVo.setRatingNum(ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(totalCommentNum == 0 ? 1 : totalCommentNum), 0, BigDecimal.ROUND_HALF_UP).longValue()));
+            int rating = ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(totalCommentNum == 0 ? 1 : totalCommentNum), 0, BigDecimal.ROUND_HALF_UP).longValue());
+            productListVo.setRatingNum(rating <= 0 ? 90 : rating);
         }
     }
 

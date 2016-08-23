@@ -1286,7 +1286,7 @@ public class FixController {
             @Override
             public void run() {
 
-                String[] strArray = {"0715", "0716", "0717", "0718", "0719", "0720", "0721", "0722", "0723", "0724", "0725", "0726", "0727", "0728", "0729", "0730", "0731", "0801", "0802", "0803", "0804", "0805", "0806", "0807", "0808", "0809", "0810", "0811", "0812", "0813"};
+                String[] strArray = {"0717", "0719", "0721", "0722", "0723", "0724", "0726", "0727", "0728", "0729", "0731", "0801", "0802", "0803", "0804", "0805", "0806", "0808", "0812", "0813"};
 
                 for (int i = 0; i < strArray.length; i++) {
 
@@ -1335,16 +1335,21 @@ public class FixController {
 
                         PtmCmpSku sku = cmpSkuQueue.poll();
 
-                        if (sku == null) {
-                            try {
-                                TimeUnit.SECONDS.sleep(3);
-                            } catch (InterruptedException e) {
+                        try {
 
+                            if (sku == null) {
+                                try {
+                                    TimeUnit.SECONDS.sleep(3);
+                                } catch (InterruptedException e) {
+
+                                }
+                                continue;
                             }
-                            continue;
-                        }
 
-                        cmpSkuService.downloadImage2(sku);
+                            cmpSkuService.downloadImage2(sku);
+                        } catch (Exception e) {
+                            System.out.println("error download for " + sku.getId());
+                        }
                     }
                 }
             });
@@ -1382,8 +1387,6 @@ public class FixController {
             } catch (Exception e) {
                 System.out.println("delete fail for " + id);
             }
-
-
         }
 
         return "ok";

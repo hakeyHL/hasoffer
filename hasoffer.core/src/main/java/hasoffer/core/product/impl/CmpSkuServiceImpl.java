@@ -256,6 +256,16 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateCategoryid2(Long ptmcmpskuid, long categoryid2) {
+        PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(ptmcmpskuid);
+
+        updater.getPo().setCategoryId(categoryid2);
+
+        dbm.update(updater);
+    }
+
+    @Override
     public List<StatSkuPriceUpdateResult> listUpdateResults() {
         return dbm.query("select t from StatSkuPriceUpdateResult t order by t.id desc");
     }
@@ -376,6 +386,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         String jsonParam = fetchedProduct.getJsonParam();
         String description = fetchedProduct.getDescription();
+        String offers = fetchedProduct.getOffers();
 
         //在fetch包暂时无法跟新升级的时候，先在这里回避掉这种错误
         if (StringUtils.isEqual("[]", description)) {
@@ -391,6 +402,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             ptmCmpSkuDescription.setId(ptmCmpSku.getId());
             ptmCmpSkuDescription.setJsonParam(jsonParam);
             ptmCmpSkuDescription.setJsonDescription(description);
+            ptmCmpSkuDescription.setOffers(offers);
 
             if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
                 return;
@@ -400,9 +412,11 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
             boolean flagDescription = false;
             boolean flagJsonParam = false;
+            boolean flagOffers = false;
 
             String oldJsonDescription = ptmCmpSkuDescription.getJsonDescription();
             String oldJsonParam = ptmCmpSkuDescription.getJsonParam();
+            String oldOffers = ptmCmpSkuDescription.getOffers();
 
             //新的参数不为空，且新的参数和原有的不相同，更新
             if (!StringUtils.isEmpty(jsonParam) && !StringUtils.isEqual(jsonParam, oldJsonParam)) {
@@ -411,12 +425,19 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             }
 
             //新的描述不为空，且和旧的参数不相同
-            if (!StringUtils.isEmpty(description) && StringUtils.isEqual(description, oldJsonDescription)) {
+            if (!StringUtils.isEmpty(description) && !StringUtils.isEqual(description, oldJsonDescription)) {
                 ptmCmpSkuDescription.setJsonDescription(description);
                 flagJsonParam = true;
             }
 
-            if (flagDescription || flagJsonParam) {
+            //新的offers不为空，且和就得offers不相同
+            if (!StringUtils.isEmpty(offers) && !StringUtils.isEqual(offers, oldOffers)) {
+                ptmCmpSkuDescription.setOffers(offers);
+                flagOffers = true;
+            }
+
+
+            if (flagDescription || flagJsonParam || flagOffers) {
                 mdm.save(ptmCmpSkuDescription);
             }
         }
@@ -534,6 +555,32 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(skuid);
 
         updater.getPo().setSmallImagePath(smallImagePath);
+
+        dbm.update(updater);
+    }
+
+    @Override
+    @Transactional
+    public void updateCmpSkuBrandModel(Long id, String brand, String model) {
+        PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(id);
+        ptmCmpSkuUpdater.getPo().setBrand(brand);
+        ptmCmpSkuUpdater.getPo().setModel(model);
+        dbm.update(ptmCmpSkuUpdater);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateFlipakrtSkuBrandAndModel(long skuid, String brand, String model) {
+
+        PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(skuid);
+
+        if (!StringUtils.isEmpty(brand)) {
+            updater.getPo().setBrand(brand);
+        }
+
+        if (!StringUtils.isEmpty(model)) {
+            updater.getPo().setModel(model);
+        }
 
         dbm.update(updater);
     }

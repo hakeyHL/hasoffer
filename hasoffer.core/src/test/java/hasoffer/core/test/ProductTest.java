@@ -1,5 +1,6 @@
 package hasoffer.core.test;
 
+import hasoffer.base.enums.SearchResultSort;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
@@ -13,9 +14,7 @@ import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.product.*;
-import hasoffer.core.product.solr.CmpSkuModel;
-import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
-import hasoffer.core.product.solr.ProductIndexServiceImpl;
+import hasoffer.core.product.solr.*;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.task.ListAndProcessTask2;
 import hasoffer.core.task.worker.IList;
@@ -23,8 +22,6 @@ import hasoffer.core.task.worker.IProcess;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -73,18 +70,85 @@ public class ProductTest {
     IFetchService fetchService;
     @Resource
     IDealService dealService;
+    @Resource
+    ProductIndex2ServiceImpl productIndex2Service;
     private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
-    private Logger logger = LoggerFactory.getLogger(ProductTest.class);
 
     private void print(String str) {
         System.out.println(str);
     }
 
     @Test
-    public void import2Solr() {
-        productService.deleteProduct(100);
-//        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(100);
-//        cmpSkuService.importCmpSku2solr(cmpSkus.get(0));
+    public void show() {
+        String str = "\\n3.1737967 = sum of:\\n  3.1403005 = sum of:\\n    0.7952872 = max of:\\n      0.7952872 = weight(title:lenovo^50.0 in 40304) [DefaultSimilarity], result of:\\n        0.7952872 = score(doc=40304,freq=1.0), product of:\\n          0.15440796 = queryWeight, product of:\\n            50.0 = boost\\n            5.150558 = idf(docFreq=2843, maxDocs=180507)\\n            5.995776E-4 = queryNorm\\n          5.150558 = fieldWeight in 40304, product of:\\n            1.0 = tf(freq=1.0), with freq of:\\n              1.0 = termFreq=1.0\\n            5.150558 = idf(docFreq=2843, maxDocs=180507)\\n            1.0 = fieldNorm(doc=40304)\\n    2.3450134 = max of:\\n      0.45247084 = weight(model:appl^10.0 in 40304) [DefaultSimilarity], result of:\\n        0.45247084 = score(doc=40304,freq=3.0), product of:\\n          0.039576527 = queryWeight, product of:\\n            10.0 = boost\\n            6.6007347 = idf(docFreq=666, maxDocs=180507)\\n            5.995776E-4 = queryNorm\\n          11.432808 = fieldWeight in 40304, product of:\\n            1.7320508 = tf(freq=3.0), with freq of:\\n              3.0 = termFreq=3.0\\n            6.6007347 = idf(docFreq=666, maxDocs=180507)\\n            1.0 = fieldNorm(doc=40304)\\n      1.314008 = weight(title:appl^50.0 in 40304) [DefaultSimilarity], result of:\\n        1.314008 = score(doc=40304,freq=2.0), product of:\\n          0.16689727 = queryWeight, product of:\\n            50.0 = boost\\n            5.567161 = idf(docFreq=1874, maxDocs=180507)\\n            5.995776E-4 = queryNorm\\n          7.8731546 = fieldWeight in 40304, product of:\\n            1.4142135 = tf(freq=2.0), with freq of:\\n              2.0 = termFreq=2.0\\n            5.567161 = idf(docFreq=1874, maxDocs=180507)\\n            1.0 = fieldNorm(doc=40304)\\n      2.3450134 = weight(brand:appl^80.0 in 40304) [DefaultSimilarity], result of:\\n        2.3450134 = score(doc=40304,freq=1.0), product of:\\n          0.33538246 = queryWeight, product of:\\n            80.0 = boost\\n            6.9920573 = idf(docFreq=450, maxDocs=180507)\\n            5.995776E-4 = queryNorm\\n          6.9920573 = fieldWeight in 40304, product of:\\n            1.0 = tf(freq=1.0), with freq of:\\n              1.0 = termFreq=1.0\\n            6.9920573 = idf(docFreq=450, maxDocs=180507)\\n            1.0 = fieldNorm(doc=40304)\\n  0.033496123 = FunctionQuery(sum(100.0*float(sqrt(log(1.0*float(long(searchCount))+2.0)))+1.0)), product of:\\n    55.8662 = sum(100.0*float(sqrt(log(1.0*float(long(searchCount)=0)+2.0)))+1.0)\\n    1.0 = boost\\n    5.995776E-4 = queryNorm\\n";
+        print(str);
+    }
+
+    @Test
+    public void testNewSolr() {
+        PageableResult<ProductModel2> pms = productIndex2Service.searchProductsByKey("redmi 2 mi", 1, 10, SearchResultSort.RELEVANCE);
+        List<ProductModel2> pmList = pms.getData();
+        for (ProductModel2 pm : pmList) {
+            System.out.println(pm.toString());
+//            System.out.println(pm.getSearchCount() + "\t_" + pm.getBrand() + "_\t" + pm.getTitle() + "\t" + pm.getMinPrice());
+        }
+    }
+
+    @Test
+    public void expPriceExcept2() throws Exception {
+        String sql = "SELECT t FROM PtmProduct t WHERE t.categoryId=?0";
+
+        List<PtmProduct> products = dbm.query(sql, Arrays.asList(5L));
+
+        File file = hasoffer.base.utils.FileUtils.createFile("d:/tmp/price_3.txt", true);
+
+        StringBuilder sb = new StringBuilder();
+
+        int count = 0;
+        for (PtmProduct product : products) {
+            long productId = product.getId();
+            if (product == null) {
+                print(String.format("product is null...[%d]", productId));
+            } else {
+                List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId);
+                float minPrice = -1, maxPrice = -1;
+                for (PtmCmpSku cmpSku : cmpSkus) {
+                    float price = cmpSku.getPrice();
+                    if (cmpSku.getStatus() == SkuStatus.OFFSALE || price <= 0) {
+                        continue;
+                    }
+
+                    if (minPrice < 0) {
+                        minPrice = price;
+                        maxPrice = minPrice;
+                    }
+
+                    if (minPrice > price) {
+                        minPrice = price;
+                    }
+
+                    if (maxPrice < price) {
+                        maxPrice = price;
+                    }
+                }
+
+                if (maxPrice < 0) {
+                    print(String.format("no price...[%d]", productId));
+                    continue;
+                }
+
+                if (maxPrice / minPrice > 6) {
+                    sb.append(productId).append("\t").append(maxPrice).append("\t").append(minPrice).append("\n");
+                    if (count++ % 100 == 0) {
+                        FileUtils.write(file, sb.toString(), true);
+                        sb = new StringBuilder();
+                    }
+                    print(String.format("price max/min > 6...[%d]", productId));
+                } else {
+                    print("ok");
+                }
+            }
+        }
     }
 
     @Test

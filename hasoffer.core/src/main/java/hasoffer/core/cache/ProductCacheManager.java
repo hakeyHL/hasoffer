@@ -33,8 +33,6 @@ public class ProductCacheManager {
     ICacheService<PtmProduct> cacheService;
     @Resource
     IProductService productService;
-    @Resource
-    ProductCacheManager productCacheManager;
     Logger logger = LoggerFactory.getLogger(ProductCacheManager.class);
 
     /**
@@ -164,7 +162,7 @@ public class ProductCacheManager {
                 long yesterdayStart = calendar.getTimeInMillis();
                 List<PtmTopSelling> ptmTopSellings = productService.getTopSellings(yesterdayStart, todayStart, page, size);
                 for (PtmTopSelling ptmTopSelling : ptmTopSellings) {
-                    PageableResult<PtmCmpSku> pageableResult = productCacheManager.listPagedCmpSkus(ptmTopSelling.getId(), 0, 20);
+                    PageableResult<PtmCmpSku> pageableResult = listPagedCmpSkus(ptmTopSelling.getId(), 0, 20);
                     if (pageableResult != null && pageableResult.getData() != null && pageableResult.getData().size() > 0) {
                         PtmProduct product = productService.getProduct(ptmTopSelling.getId());
                         if (product != null && product.getPrice() > 0) {

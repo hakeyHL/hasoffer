@@ -9,24 +9,12 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Deprecated
 @Service
 public class ProductIndexServiceImpl extends AbstractIndexService<Long, ProductModel> {
     @Override
     protected String getSolrUrl() {
         return AppConfig.get(AppConfig.SOLR_PRODUCT_URL);
-    }
-
-    public List<ProductModel> simpleSearch(String key, int page, int size) {
-        String q = key;
-
-        FilterQuery[] fqs = null;
-        Sort[] sorts = new Sort[]{new Sort("searchCount", Order.DESC)};
-        PivotFacet[] pivotFacets = null;
-
-        SearchResult<ProductModel> sr = searchObjs(q, fqs, sorts, pivotFacets, page, size, true);
-
-        return sr.getResult();
     }
 
     public PageableResult<ProductModel> searchProductsByKey(String title, int page, int size) {
