@@ -132,7 +132,6 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         if (priceFrom < priceTo && priceFrom >= 0) {
             if (priceFrom < 0) {
                 priceFrom = 0;
-
             }
             priceFromStr = String.valueOf(priceFrom);
             if (priceTo > 0) {
