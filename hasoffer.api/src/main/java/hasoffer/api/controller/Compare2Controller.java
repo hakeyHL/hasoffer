@@ -35,7 +35,6 @@ import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.exception.NonMatchedProductException;
 import hasoffer.core.system.impl.AppServiceImpl;
-import hasoffer.core.utils.ImageUtil;
 import hasoffer.core.utils.JsonHelper;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
@@ -226,6 +225,8 @@ public class Compare2Controller {
         }
         SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, pageSize);
         try {
+            //匹配sku
+            PtmCmpSkuIndex2 cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
             //根据title匹配到商品
             getSioBySearch(sio);
             logger.info("get product from solr or searchLog ");
@@ -237,7 +238,7 @@ public class Compare2Controller {
                     productService.deleteProduct(sio.getHsProId());
                     //未匹配,结束操作
                 } else {
-                    cr = getCmpProducts(sio);
+                    cr = getCmpProducts(cmpSkuIndex, sio);
                     if (cr != null && cr.getPriceList().size() > 0 && cr.getPriceList().size() > 0) {
                         cr.setPriceOff(cr.getPriceList().get(0).getSaved());
                     }
@@ -732,17 +733,42 @@ public class Compare2Controller {
         return cmpResult;
     }
 
-    private CmpResult getCmpProducts(SearchIO sio) {
+    private CmpResult getCmpProducts(PtmCmpSkuIndex2 ptmCmpSkuIndex2, SearchIO sio) {
+        long cmpSkuId = 0L;
         //初始化一个空的用于存放比价商品列表的List
         List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
         CmpResult cmpResult = new CmpResult();
         // 1. 查询此商品对应的sku列表 状态为ONSALE/OUTSTOCK
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listCmpSkus(sio.getHsProId(), sio.getPage(), sio.getSize());
+        PtmCmpSku clientCmpSku = null;
+        float cliPrice = sio.getCliPrice();
         if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
             List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
             //统计site
             Set<Website> websiteSet = new HashSet<Website>();
             if (ArrayUtils.hasObjs(cmpSkus)) {
+                for (PtmCmpSku cmpSku : cmpSkus) {
+                    if (sio.getCliSite().equals(cmpSku.getWebsite())) {
+                        clientCmpSku = cmpSku;
+                        break;
+                    }
+                }
+
+                if (clientCmpSku != null) {
+                    cmpSkuId = clientCmpSku.getId();
+                    if (cliPrice <= 0) {
+                        cliPrice = clientCmpSku.getPrice();
+                    } else {
+                        clientCmpSku.setPrice(cliPrice);
+                    }
+                } else {
+                    // 如果比价列表中没有找到该网站的 sku， 则把客户端传上来的商品返回
+                    CmpProductListVo cplv = new CmpProductListVo();
+                    cplv.setTitle(sio.getCliQ());
+                    cplv.setPrice(Math.round(sio.getCliPrice()));
+                    cplv.setWebsite(sio.getCliSite());
+                    comparedSkuVos.add(cplv);
+                }
                 // 获取vo list
                 for (PtmCmpSku cmpSku : cmpSkus) {
                     if (cmpSku.getWebsite() == null
@@ -753,10 +779,6 @@ public class Compare2Controller {
                         websiteSet.add(cmpSku.getWebsite());
                     }
                     System.out.println("id :  " + cmpSku.getId() + " imagePath " + cmpSku.getSmallImagePath());
-                    if (cmpSku.getWebsite().equals(sio.getCliSite())) {
-                        //取与客户端所传商品同一个site的sku作为sku匹配sku
-                        cmpResult.setProductVo(new ProductVo(sio.getHsProId(), sio.getCliQ(), cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath()), 0.0f, WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()})));
-                    }
                     CmpProductListVo cplv = new CmpProductListVo(cmpSku, sio.getCliPrice());
                     cplv.setDeepLink(WebsiteHelper.getDealUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                     comparedSkuVos.add(cplv);
@@ -781,6 +803,7 @@ public class Compare2Controller {
                 logger.debug("Found skus size is 0 .");
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
             }
+            sio.setHsSkuId(cmpSkuId);
             List<CmpProductListVo> tempCmpProductListVos = new ArrayList<CmpProductListVo>();
             //每个site只保留一个且为最低价
             System.out.println("websiteSet :" + websiteSet.size());
@@ -804,6 +827,24 @@ public class Compare2Controller {
             long endTime = System.nanoTime(); //获取结束时间
             System.out.println("total time is " + (endTime - startTime) / 1000000 + "");
         }
+        String currentDeeplink = "";
+        try {
+            if (ptmCmpSkuIndex2 != null && ptmCmpSkuIndex2.getId() > 0) {
+                if (ptmCmpSkuIndex2.getWebsite().equals(sio.getCliSite())) {
+                    currentDeeplink = WebsiteHelper.getDeeplinkWithAff(ptmCmpSkuIndex2.getWebsite(), ptmCmpSkuIndex2.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
+                }
+            } else if (clientCmpSku != null) {
+                if (!cmpSkuCacheManager.isFlowControlled(sio.getDeviceId(), sio.getCliSite())) {
+                    if (StringUtils.isEqual(clientCmpSku.getSkuTitle(), sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
+                        currentDeeplink = WebsiteHelper.getDeeplinkWithAff(clientCmpSku.getWebsite(), clientCmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("get deepLink failed ");
+        }
+        //取与客户端所传商品同一个site的sku作为sku匹配sku
+        cmpResult.setProductVo(new ProductVo(sio.getHsProId(), sio.getCliQ(), productCacheManager.getProductMasterImageUrl(sio.getHsProId()), 0.0f, currentDeeplink));
         System.out.println("comparedSkuVos" + comparedSkuVos.size());
         cmpResult.setPriceList(comparedSkuVos);
         cmpResult.setCopywriting("Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you.");
