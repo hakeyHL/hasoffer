@@ -93,7 +93,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     public TaskStatus getUrlTaskStatus(Website website, String url) {
         String cacheKey = FetchUrlResult.getCacheKey(website, url);
         TaskStatus taskStatusByUrl = fetchCacheService.getTaskStatusByUrl(cacheKey);
-        SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.getUrlTaskStatus(website,url) -->website:{}, url:{}, taskstate:{}", website, url, taskStatusByUrl);
+        SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.getUrlTaskStatus(website,url) -->website:{}, url:{}, taskState:{}", website, url, taskStatusByUrl);
 
         return taskStatusByUrl;
     }
