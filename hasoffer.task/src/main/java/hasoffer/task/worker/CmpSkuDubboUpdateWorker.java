@@ -67,9 +67,6 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 //更新商品的信息，写入多图数据，写入描述/参数
                 updatePtmCmpSku(sku);
 
-                //更新商品的价格，同时修改updateTime字段
-//                productService.updatePtmProductPrice(productId);
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -93,7 +90,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         //如果返回结果状态为running，那么将sku返回队列
         if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
             queue.add(sku);
-            logger.info("taskstatus RUNNING for [" + skuid + "]");
+//            logger.info("taskstatus RUNNING for [" + skuid + "]");
             return;
         } else if (TaskStatus.STOPPED.equals(taskStatus)) {
             logger.info("taskstatus STOPPED for [" + skuid + "]");

@@ -1,5 +1,9 @@
 package hasoffer.task.controller;
 
+import hasoffer.base.enums.TaskLevel;
+import hasoffer.base.enums.TaskStatus;
+import hasoffer.base.model.Website;
+import hasoffer.base.utils.JSONUtil;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
@@ -7,11 +11,14 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
+import hasoffer.spider.model.FetchUrlResult;
+import hasoffer.spider.model.FetchedProduct;
 import hasoffer.task.worker.CmpSkuDubboUpdateWorker;
 import hasoffer.task.worker.SrmProductSearchCountListWorker;
 import hasoffer.task.worker.TopSellingListWorker;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -98,6 +105,52 @@ public class DubboUpdateController {
         }
 
         taskRunning2.set(true);
+
+        return "ok";
+    }
+
+    //dubbofetchtask/testSingle
+    @RequestMapping(value = "/testSingle/{skuid}", method = RequestMethod.GET)
+    @ResponseBody
+    public String testSingle(@PathVariable long skuid) {
+
+        PtmCmpSku ptmCmpSku = dbm.get(PtmCmpSku.class, skuid);
+
+        if (ptmCmpSku == null) {
+            return "sku do not exists";
+        }
+
+        Website website = ptmCmpSku.getWebsite();
+        String url = ptmCmpSku.getUrl();
+
+        fetchDubboService.sendUrlTask(website, url, TaskLevel.LEVEL_1);
+        System.out.println("send url success");
+
+        while (true) {
+            TaskStatus taskStatus = fetchDubboService.getUrlTaskStatus(website, url);
+            if (TaskStatus.FINISH.equals(taskStatus)) {
+                break;
+            } else {
+                System.out.println(taskStatus);
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (InterruptedException e) {
+
+                }
+            }
+        }
+
+        FetchUrlResult fetchUrlResult = fetchDubboService.getProductsByUrl(skuid, website, url);
+
+        FetchedProduct fetchedProduct = fetchUrlResult.getFetchProduct();
+
+        System.out.println(JSONUtil.toJSON(fetchedProduct).toString() + "id=" + skuid);
+
+        cmpSkuService.createDescription(ptmCmpSku, fetchedProduct);
+
+        cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
+
+        cmpSkuService.createPtmCmpSkuImage(skuid, fetchedProduct);
 
         return "ok";
     }
