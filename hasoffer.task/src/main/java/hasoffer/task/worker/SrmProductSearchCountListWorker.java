@@ -43,7 +43,7 @@ public class SrmProductSearchCountListWorker implements Runnable {
         int page = 1;
         int pageSize = 1000;
 
-        String startDateString = TimeUtils.parse(TimeUtils.today() - TimeUtils.MILLISECONDS_OF_1_DAY * 2, "yyyyMMdd");
+        String startDateString = TimeUtils.parse(TimeUtils.today() - TimeUtils.MILLISECONDS_OF_1_DAY * 1, "yyyyMMdd");
 
         String Q_LOG_BYUPDATETIME = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd = ?0 AND t.count > 5 ORDER BY t.id ASC";
 
@@ -107,7 +107,7 @@ public class SrmProductSearchCountListWorker implements Runnable {
                             }
 
                             queue.add(sku);
-                            fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_1);
+                            fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_2);
                         } else {
                             queue.add(sku);
                             fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_5);
