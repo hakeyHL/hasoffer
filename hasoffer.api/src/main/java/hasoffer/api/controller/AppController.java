@@ -10,6 +10,7 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.core.bo.product.Banners;
+import hasoffer.core.bo.product.CategoryVo;
 import hasoffer.core.bo.push.*;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.cache.AppCacheManager;
@@ -20,6 +21,7 @@ import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
+import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.urm.UrmDevice;
@@ -35,6 +37,7 @@ import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
+import jodd.util.NameValue;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.common.util.impl.LoggerFactory;
 import org.jboss.logging.Logger;
@@ -656,21 +659,28 @@ public class AppController {
                 System.out.println("getPivotFieldVals  " + p.getPivotFieldVals().size());
                 if (p.getPivotFieldVals() != null && p.getPivotFieldVals().size() > 0) {
                     // List<CategoryVo>
-                    List categorys = new ArrayList();
+                    List<CategoryVo> categorys = new ArrayList();
                     Map pivotFieldVals = p.getPivotFieldVals();
                     Set<Map.Entry> set = pivotFieldVals.entrySet();
                     Iterator<Map.Entry> iterator = set.iterator();
                     while (iterator.hasNext()) {
                         Map.Entry next = iterator.next();
                         System.out.println("key " + next.getKey());
-                        System.out.println("value " + next.getValue());
-                        //String cateId = (String) next.getValue();
-                        //List cate = appCacheManager.getCategorys(cateId);
-//                        if (cate != null && cate.size() > 0) {
-//                            categorys.addAll(cate);
-//                        }
+                        List<NameValue> nameValues = (List<NameValue>) next.getValue();
+                        for (NameValue nameValue : nameValues) {
+                            Long cateId = (Long) nameValue.getName();
+                            PtmCategory ptmCategory = appCacheManager.getCategoryById(cateId);
+                            if (ptmCategory != null) {
+                                CategoryVo categoryVo = new CategoryVo();
+                                categoryVo.setId(ptmCategory.getId());
+                                categoryVo.setLevel(ptmCategory.getLevel());
+                                categoryVo.setName(ptmCategory.getName());
+                                categoryVo.setCategorys(appCacheManager.getCategorys(cateId + ""));
+                                categorys.add(categoryVo);
+                            }
+                        }
                     }
-                    map.put("categorys", p.getPivotFieldVals());
+                    map.put("categorys", categorys);
                 }
                 addProductVo2List(li, p.getData());
             }
