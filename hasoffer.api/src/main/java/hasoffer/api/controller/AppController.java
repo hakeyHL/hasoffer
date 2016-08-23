@@ -638,53 +638,11 @@ public class AppController {
      * @return
      */
     @RequestMapping(value = "/temp/productsList")
-    public ModelAndView tempProductsList(SearchCriteria criteria, @RequestParam(defaultValue = "3") int type) {
+    public ModelAndView tempProductsList(SearchCriteria criteria, @RequestParam(defaultValue = "4") int type) {
         ModelAndView mv = new ModelAndView();
         List li = new ArrayList();
         Map map = new HashMap();
         PageableResult<ProductModel2> products;
-        //category level page size
-        if (StringUtils.isNotBlank(criteria.getCategoryId())) {
-            //search by category
-            products = ProductIndex2ServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
-            if (products != null && products.getData().size() > 0) {
-                addProductVo2List(li, products.getData());
-            }
-        } else if (StringUtils.isNotEmpty(criteria.getKeyword())) {
-            //search by title
-            System.out.println("  sort " + criteria.getSort().name());
-            criteria.setPivotFields(Arrays.asList("cate2"));
-            PageableResult p = ProductIndex2ServiceImpl.searchProducts(criteria);
-            if (p != null && p.getData().size() > 0) {
-                System.out.println("getPivotFieldVals  " + p.getPivotFieldVals().size());
-                if (p.getPivotFieldVals() != null && p.getPivotFieldVals().size() > 0) {
-                    // List<CategoryVo>
-                    List<CategoryVo> categorys = new ArrayList();
-                    Map pivotFieldVals = p.getPivotFieldVals();
-                    Set<Map.Entry> set = pivotFieldVals.entrySet();
-                    Iterator<Map.Entry> iterator = set.iterator();
-                    while (iterator.hasNext()) {
-                        Map.Entry next = iterator.next();
-                        System.out.println("key " + next.getKey());
-                        List<NameValue> nameValues = (List<NameValue>) next.getValue();
-                        for (NameValue nameValue : nameValues) {
-                            Long cateId = (Long) nameValue.getName();
-                            PtmCategory ptmCategory = appCacheManager.getCategoryById(cateId);
-                            if (ptmCategory != null) {
-                                CategoryVo categoryVo = new CategoryVo();
-                                categoryVo.setId(ptmCategory.getId());
-                                categoryVo.setLevel(ptmCategory.getLevel());
-                                categoryVo.setName(ptmCategory.getName());
-                                categoryVo.setCategorys(appCacheManager.getCategorys(cateId + ""));
-                                categorys.add(categoryVo);
-                            }
-                        }
-                    }
-                    map.put("categorys", categorys);
-                }
-                addProductVo2List(li, p.getData());
-            }
-        }
         String data = "";
         //查询热卖商品
         List<PtmProduct> products2s = productCacheManager.getTopSellins(criteria.getPage(), criteria.getPageSize());
@@ -701,11 +659,61 @@ public class AppController {
                 map.put("product", li);
                 break;
             case 2:
-                PageableResult p = productIndexServiceImpl.searchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
+                //search by title
+                System.out.println("  sort " + criteria.getSort().name());
+//            criteria.setPivotFields(Arrays.asList("cate2"));
+                PageableResult p = ProductIndex2ServiceImpl.searchProducts(criteria);
                 if (p != null && p.getData().size() > 0) {
+                    System.out.println("getPivotFieldVals  " + p.getPivotFieldVals().size());
+                    if (p.getPivotFieldVals() != null && p.getPivotFieldVals().size() > 0) {
+                        // List<CategoryVo>
+                        List<CategoryVo> categorys = new ArrayList();
+                        Map pivotFieldVals = p.getPivotFieldVals();
+                        Set<Map.Entry> set = pivotFieldVals.entrySet();
+                        Iterator<Map.Entry> iterator = set.iterator();
+                        while (iterator.hasNext()) {
+                            Map.Entry next = iterator.next();
+                            System.out.println("key " + next.getKey());
+                            List<NameValue> nameValues = (List<NameValue>) next.getValue();
+                            for (NameValue nameValue : nameValues) {
+                                Long cateId = (Long) nameValue.getName();
+                                PtmCategory ptmCategory = appCacheManager.getCategoryById(cateId);
+                                if (ptmCategory != null) {
+                                    CategoryVo categoryVo = new CategoryVo();
+                                    categoryVo.setId(ptmCategory.getId());
+                                    categoryVo.setLevel(ptmCategory.getLevel());
+                                    categoryVo.setName(ptmCategory.getName());
+                                    categoryVo.setCategorys(appCacheManager.getCategorys(cateId + ""));
+                                    categorys.add(categoryVo);
+                                }
+                            }
+                        }
+                        map.put("categorys", categorys);
+                    }
                     addProductVo2List(li, p.getData());
                 }
                 map.put("product", li);
+                break;
+            case 3:
+                //类目搜索
+                //category level page size
+                if (StringUtils.isNotBlank(criteria.getCategoryId())) {
+                    //search by category
+                    products = ProductIndex2ServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
+                    if (products != null && products.getData().size() > 0) {
+                        addProductVo2List(li, products.getData());
+                    }
+                }
+                break;
+            case 4:
+                //如果是默认值,则判断类目id和level是否传递了,传了就是类目搜索,适配老接口
+                if (StringUtils.isNotBlank(criteria.getCategoryId())) {
+                    //search by category
+                    products = ProductIndex2ServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
+                    if (products != null && products.getData().size() > 0) {
+                        addProductVo2List(li, products.getData());
+                    }
+                }
                 break;
             default:
                 map.put("product", null);
