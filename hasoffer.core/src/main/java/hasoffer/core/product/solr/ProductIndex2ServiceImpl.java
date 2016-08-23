@@ -4,8 +4,10 @@ import hasoffer.base.config.AppConfig;
 import hasoffer.base.enums.SearchResultSort;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.data.solr.*;
 import jodd.util.NameValue;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.solr.client.solrj.response.PivotField;
 import org.apache.solr.common.util.NamedList;
 import org.springframework.stereotype.Service;
@@ -107,6 +109,88 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         }
 
         return new PageableResult<ProductModel2>(sr.getResult(), sr.getTotalCount(), page, size, pivotFieldVals);
+    }
+
+    /**
+     * 根据关键词搜索
+     *
+     * @param sc
+     * @return
+     */
+    public PageableResult<ProductModel2> searchProducts(SearchCriteria sc) {
+        List<String> pivotFields = sc.getPivotFields();
+        int pivotFieldSize = pivotFields == null ? 0 : pivotFields.size();
+
+        Sort[] sorts = null;
+
+        // sort by
+        SearchResultSort resultSort = sc.getSort();
+        if (resultSort != null) {
+            sorts = new Sort[1];
+            if (resultSort == SearchResultSort.POPULARITY) {
+                sorts[0] = new Sort(ProductModel2SortField.F_POPULARITY.getFieldName(), Order.DESC);
+            } else if (resultSort == SearchResultSort.PRICEL2H) {
+                sorts[0] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.ASC);
+            } else if (resultSort == SearchResultSort.PRICEH2L) {
+                sorts[0] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.DESC);
+            }
+        }
+
+        // pivot fields
+        PivotFacet[] pivotFacets = new PivotFacet[pivotFieldSize];
+        if (pivotFieldSize > 0) {
+            for (int i = 0; i < pivotFieldSize; i++) {
+                // cate2 distinct 提取出来所有值
+                pivotFacets[i] = new PivotFacet(pivotFields.get(i));
+            }
+        }
+
+        // filter list
+        List<FilterQuery> fqList = new ArrayList<FilterQuery>();
+        if (NumberUtils.isNumber(sc.getCategoryId())) {
+            long cateId = Long.valueOf(sc.getCategoryId());
+            fqList.add(new FilterQuery("cate" + sc.getLevel(), sc.getCategoryId()));
+        }
+        int priceFrom = sc.getPriceFrom(), priceTo = sc.getPriceTo();
+        String priceFromStr = "*", priceToStr = "*";
+        if (priceFrom < priceTo && priceFrom >= 0) {
+            if (priceFrom < 0) {
+                priceFrom = 0;
+
+            }
+            priceFromStr = String.valueOf(priceFrom);
+            if (priceTo > 0) {
+                priceToStr = String.valueOf(priceTo);
+            }
+            fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", priceFromStr, priceToStr)));
+        }
+        FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
+
+        String keyword = sc.getKeyword();
+        if (StringUtils.isEmpty(keyword)) {
+            keyword = "*:*";
+        }
+
+        // search by solr
+        SearchResult<ProductModel2> sr = searchObjs(keyword, fqs, sorts, pivotFacets, sc.getPage() <= 1 ? 1 : sc.getPage(), sc.getPageSize(), true);
+
+        //process pivot fields
+        Map<String, NameValue> pivotFieldVals = new HashMap<>();
+        if (pivotFieldSize > 0) {
+            NamedList<List<PivotField>> nl = sr.getFacetPivot();
+
+            for (int i = 0; i < pivotFieldSize; i++) {
+                String field = pivotFields.get(i);
+
+                List<PivotField> cate2List = nl.get(field);
+                for (PivotField pf : cate2List) {// string - object - long
+                    System.out.println(pf.getValue() + "\t" + pf.getCount());
+                    pivotFieldVals.put(field, new NameValue<Long, Long>((Long) pf.getValue(), Long.valueOf(pf.getCount())));
+                }
+            }
+        }
+
+        return new PageableResult<ProductModel2>(sr.getResult(), sr.getTotalCount(), sc.getPage(), sc.getPageSize(), pivotFieldVals);
     }
 
     /**
