@@ -110,7 +110,7 @@ public class DubboUpdateController {
     }
 
     //dubbofetchtask/testSingle
-    @RequestMapping(value = "/testSingle/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/testSingle/{skuid}", method = RequestMethod.GET)
     @ResponseBody
     public String testSingle(@PathVariable long skuid) {
 
