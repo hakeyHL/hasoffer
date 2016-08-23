@@ -16,7 +16,7 @@ public class SearchCriteria {
     private int level;
     private int priceFrom = 0;
     private int priceTo = 0;
-    private SearchResultSort sort;
+    private SearchResultSort sort = SearchResultSort.RELEVANCE;
 
     public int getLevel() {
         return level;

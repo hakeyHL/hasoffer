@@ -56,7 +56,8 @@ public class TimeUtilTest {
 
     @Test
     public void f2() {
-        System.out.println(new Date(1470262389785L));
+        String startDateString = TimeUtils.parse(TimeUtils.today() - TimeUtils.MILLISECONDS_OF_1_DAY * 2, "yyyyMMdd");
+        System.out.println(startDateString);
     }
 
     @Test
