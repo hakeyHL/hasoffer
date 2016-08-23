@@ -171,6 +171,7 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
             keyword = "*:*";
         }
 
+        // search by solr
         SearchResult<ProductModel2> sr = searchObjs(keyword, fqs, sorts, pivotFacets, sc.getPage() <= 1 ? 1 : sc.getPage(), sc.getPageSize(), true);
 
         //process pivot fields
