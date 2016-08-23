@@ -734,6 +734,7 @@ public class Compare2Controller {
     }
 
     private CmpResult getCmpProducts(PtmCmpSkuIndex2 ptmCmpSkuIndex2, SearchIO sio) {
+        System.out.println(" ptmCmpSkuIndex2  " + ptmCmpSkuIndex2);
         long cmpSkuId = 0L;
         //初始化一个空的用于存放比价商品列表的List
         List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
@@ -831,12 +832,16 @@ public class Compare2Controller {
         try {
             if (ptmCmpSkuIndex2 != null && ptmCmpSkuIndex2.getId() > 0) {
                 if (ptmCmpSkuIndex2.getWebsite().equals(sio.getCliSite())) {
+                    System.out.println(" enter ptmCmpSkuIndex2 get deepLink ");
                     currentDeeplink = WebsiteHelper.getDeeplinkWithAff(ptmCmpSkuIndex2.getWebsite(), ptmCmpSkuIndex2.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
+                    System.out.println("currentDeeplink1  " + currentDeeplink);
                 }
             } else if (clientCmpSku != null) {
                 if (!cmpSkuCacheManager.isFlowControlled(sio.getDeviceId(), sio.getCliSite())) {
+                    System.out.println(" enter clientCmpSku get deepLink ");
                     if (StringUtils.isEqual(clientCmpSku.getSkuTitle(), sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
                         currentDeeplink = WebsiteHelper.getDeeplinkWithAff(clientCmpSku.getWebsite(), clientCmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
+                        System.out.println("currentDeeplink2  " + currentDeeplink);
                     }
                 }
             }

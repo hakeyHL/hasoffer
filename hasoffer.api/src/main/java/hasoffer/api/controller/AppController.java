@@ -650,10 +650,28 @@ public class AppController {
         } else if (StringUtils.isNotEmpty(criteria.getKeyword())) {
             //search by title
             System.out.println("  sort " + criteria.getSort().name());
-            PageableResult p = ProductIndex2ServiceImpl.searchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize(), criteria.getSort(), Arrays.asList("cate2"));
+            criteria.setPivotFields(Arrays.asList("cate2"));
+            PageableResult p = ProductIndex2ServiceImpl.searchProducts(criteria);
             if (p != null && p.getData().size() > 0) {
                 System.out.println("getPivotFieldVals  " + p.getPivotFieldVals().size());
-                map.put("categorys", p.getPivotFieldVals());
+                if (p.getPivotFieldVals() != null && p.getPivotFieldVals().size() > 0) {
+                    // List<CategoryVo>
+                    List categorys = new ArrayList();
+                    Map pivotFieldVals = p.getPivotFieldVals();
+                    Set<Map.Entry> set = pivotFieldVals.entrySet();
+                    Iterator<Map.Entry> iterator = set.iterator();
+                    while (iterator.hasNext()) {
+                        Map.Entry next = iterator.next();
+                        System.out.println("key " + next.getKey());
+                        System.out.println("value " + next.getValue());
+                        //String cateId = (String) next.getValue();
+                        //List cate = appCacheManager.getCategorys(cateId);
+//                        if (cate != null && cate.size() > 0) {
+//                            categorys.addAll(cate);
+//                        }
+                    }
+                    map.put("categorys", p.getPivotFieldVals());
+                }
                 addProductVo2List(li, p.getData());
             }
         }
