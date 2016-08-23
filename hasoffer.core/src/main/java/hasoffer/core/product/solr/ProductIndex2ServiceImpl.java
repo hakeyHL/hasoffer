@@ -63,8 +63,7 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
      * @param size
      * @return
      */
-    public PageableResult<ProductModel2> searchProductsByKey(String title, int page, int size, SearchResultSort resultSort, List<String> pivotFields) {
-        int pivotFieldSize = pivotFields == null ? 0 : pivotFields.size();
+    public PageableResult<ProductModel2> searchProductsByKey(String title, int page, int size, SearchResultSort resultSort) {
 
         Sort[] sorts = null;
         if (resultSort != null) {
@@ -78,37 +77,14 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
             }
         }
 
-        PivotFacet[] pivotFacets = new PivotFacet[pivotFieldSize];
-
-        if (pivotFieldSize > 0) {
-            for (int i = 0; i < pivotFieldSize; i++) {
-                // cate2 distinct 提取出来所有值
-                pivotFacets[i] = new PivotFacet(pivotFields.get(i));
-            }
-        }
+        PivotFacet[] pivotFacets = null;
 
         List<FilterQuery> fqList = new ArrayList<FilterQuery>();
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
 
         SearchResult<ProductModel2> sr = searchObjs(title, fqs, sorts, pivotFacets, page <= 1 ? 1 : page, size, true);
 
-        // pivot fields
-        Map<String, NameValue> pivotFieldVals = new HashMap<>();
-        if (pivotFieldSize > 0) {
-            NamedList<List<PivotField>> nl = sr.getFacetPivot();
-
-            for (int i = 0; i < pivotFieldSize; i++) {
-                String field = pivotFields.get(i);
-
-                List<PivotField> cate2List = nl.get(field);
-                for (PivotField pf : cate2List) {// string - object - long
-                    System.out.println(pf.getValue() + "\t" + pf.getCount());
-                    pivotFieldVals.put(field, new NameValue<Long, Long>((Long) pf.getValue(), Long.valueOf(pf.getCount())));
-                }
-            }
-        }
-
-        return new PageableResult<ProductModel2>(sr.getResult(), sr.getTotalCount(), page, size, pivotFieldVals);
+        return new PageableResult<ProductModel2>(sr.getResult(), sr.getTotalCount(), page, size);
     }
 
     /**
@@ -175,7 +151,7 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         SearchResult<ProductModel2> sr = searchObjs(keyword, fqs, sorts, pivotFacets, sc.getPage() <= 1 ? 1 : sc.getPage(), sc.getPageSize(), true);
 
         //process pivot fields
-        Map<String, NameValue> pivotFieldVals = new HashMap<>();
+        Map<String, List<NameValue>> pivotFieldVals = new HashMap<>();
         if (pivotFieldSize > 0) {
             NamedList<List<PivotField>> nl = sr.getFacetPivot();
 
@@ -185,7 +161,12 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
                 List<PivotField> cate2List = nl.get(field);
                 for (PivotField pf : cate2List) {// string - object - long
                     System.out.println(pf.getValue() + "\t" + pf.getCount());
-                    pivotFieldVals.put(field, new NameValue<Long, Long>((Long) pf.getValue(), Long.valueOf(pf.getCount())));
+                    List<NameValue> nvs = pivotFieldVals.get(field);
+                    if (nvs == null) {
+                        nvs = new ArrayList<>();
+                        pivotFieldVals.put(field, nvs);
+                    }
+                    nvs.add(new NameValue<Long, Long>((Long) pf.getValue(), Long.valueOf(pf.getCount())));
                 }
             }
         }
