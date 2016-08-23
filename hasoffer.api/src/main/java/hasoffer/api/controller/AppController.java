@@ -26,9 +26,7 @@ import hasoffer.core.persistence.po.urm.UrmDevice;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.impl.ProductServiceImpl;
-import hasoffer.core.product.solr.CategoryIndexServiceImpl;
-import hasoffer.core.product.solr.ProductIndexServiceImpl;
-import hasoffer.core.product.solr.ProductModel;
+import hasoffer.core.product.solr.*;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
@@ -73,6 +71,8 @@ public class AppController {
     CategoryIndexServiceImpl categoryIndexService;
     @Resource
     ProductIndexServiceImpl productIndexServiceImpl;
+    @Resource
+    ProductIndex2ServiceImpl ProductIndex2ServiceImpl;
     @Resource
     ProductServiceImpl productService;
     @Resource
@@ -250,7 +250,7 @@ public class AppController {
                 nine.put("9APP", nineApp);
                 apps.add(nine);
                 apps.add(google);
-                DownloadConfigVo downloadConfigVo = new DownloadConfigVo(true, Arrays.asList("com.snapdeal.main", "com.flipkart.android", "in.amazon.mShop.android.shopping", "net.one97.paytm", "com.ebay.mobile", "com.shopclues", "com.infibeam.infibeamapp", "com.myntra.android", "com.jabong.android", "com.voonik.android"), "9APP", Arrays.asList(new DownLoadConfigChannle("GOOGLEPLAY", "https://www.googleplay.com"), new DownLoadConfigChannle("9APP", "https://www.9APP.com")), apps);
+                DownloadConfigVo downloadConfigVo = new DownloadConfigVo(true, Arrays.asList("com.snapdeal.main", "com.flipkart.android", "in.amazon.mShop.android.shopping", "net.one97.paytm", "com.ebay.mobile", "com.shopclues", "com.infibeam.infibeamapp", "com.myntra.android", "com.jabong.android", "com.voonik.android", "cn.xender", "com.india.hasoffer", "com.lenovo.anyshare,gps", "com.mobile.indiapp", "com.leo.appmaster", "com.voodoo.android", "com.app.buyhatke"), "9APP", Arrays.asList(new DownLoadConfigChannle("GOOGLEPLAY", "https://www.googleplay.com"), new DownLoadConfigChannle("9APP", "https://www.9APP.com")), apps);
                 modelAndView.addObject("data", downloadConfigVo);
                 break;
             default:
@@ -629,6 +629,64 @@ public class AppController {
         return mv;
     }
 
+    /**
+     * 商品列表
+     *
+     * @return
+     */
+    @RequestMapping(value = "/temp/productsList")
+    public ModelAndView tempProductsList(SearchCriteria criteria, @RequestParam(defaultValue = "3") int type) {
+        ModelAndView mv = new ModelAndView();
+        List li = new ArrayList();
+        Map map = new HashMap();
+        PageableResult<ProductModel2> products;
+        //category level page size
+        if (StringUtils.isNotBlank(criteria.getCategoryId())) {
+            //search by category
+            products = ProductIndex2ServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
+            if (products != null && products.getData().size() > 0) {
+                addProductVo2List(li, products.getData());
+            }
+        } else if (StringUtils.isNotEmpty(criteria.getKeyword())) {
+            //search by title
+            System.out.println("  sort " + criteria.getSort().name());
+            PageableResult p = ProductIndex2ServiceImpl.searchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize(), criteria.getSort(), null);
+            if (p != null && p.getData().size() > 0) {
+                addProductVo2List(li, p.getData());
+            }
+        }
+        String data = "";
+        //查询热卖商品
+        List<PtmProduct> products2s = productCacheManager.getTopSellins(criteria.getPage(), criteria.getPageSize());
+        switch (type) {
+            case 0:
+                addProductVo2List(li, products2s);
+                if (products2s != null && products2s.size() > 4) {
+                    li = li.subList(0, 5);
+                }
+                map.put("product", li);
+                break;
+            case 1:
+                addProductVo2List(li, products2s);
+                map.put("product", li);
+                break;
+            case 2:
+                PageableResult p = productIndexServiceImpl.searchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
+                if (p != null && p.getData().size() > 0) {
+                    addProductVo2List(li, p.getData());
+                }
+                map.put("product", li);
+                break;
+            default:
+                map.put("product", null);
+        }
+        if (li != null && li.size() > 0) {
+            map.put("product", li);
+        }
+        mv.addObject("data", map);
+        return mv;
+    }
+
     public void addProductVo2List(List desList, List sourceList) {
 
         if (sourceList != null && sourceList.size() > 0) {
@@ -659,6 +717,22 @@ public class AppController {
                         productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
                         productListVo.setName(ptmProduct.getTitle());
                         productListVo.setPrice(Math.round(ptmProduct.getPrice()));
+                        productListVo.setStoresNum(count);
+                        setCommentNumAndRatins(productListVo);
+                        desList.add(productListVo);
+                    }
+                }
+            } else if (ProductModel2.class.isInstance(sourceList.get(0))) {
+                Iterator<ProductModel2> ptmList = sourceList.iterator();
+                while (ptmList.hasNext()) {
+                    ProductModel2 ptmProduct = ptmList.next();
+                    int count = cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
+                    if (count > 0) {
+                        ProductListVo productListVo = new ProductListVo();
+                        productListVo.setId(ptmProduct.getId());
+                        productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
+                        productListVo.setName(ptmProduct.getTitle());
+                        productListVo.setPrice(Math.round(ptmProduct.getMinPrice()));
                         productListVo.setStoresNum(count);
                         setCommentNumAndRatins(productListVo);
                         desList.add(productListVo);
