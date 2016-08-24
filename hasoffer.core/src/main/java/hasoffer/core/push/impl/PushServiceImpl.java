@@ -32,7 +32,7 @@ public class PushServiceImpl implements IPushService {
     private IDataBaseManager dbm;
 
     @Override
-    public void push(String to, AppPushBo pushBo) {
+    public String push(String to, AppPushBo pushBo) {
 
         Map<String, String> header = new HashMap<String, String>();
         Map<String, Object> body = new HashMap<String, Object>();
@@ -46,12 +46,7 @@ public class PushServiceImpl implements IPushService {
         datas.put("to", to);
 
         String datasJson = JSONUtil.toJSON(datas);
-
-//        body.put("", datasJson);
-//        body.put("data", JSONUtil.toJSON(pushBo));
-
-        //HttpResponseModel responseModel = HttpUtils.postByRaw("https://gcm-http.googleapis.com/gcm/send", datasJson, header);
-        String postResult = "";
+        String postResult = null;
         try {
             postResult = Httphelper.doPostJsonWithHeader("https://gcm-http.googleapis.com/gcm/send", datasJson, header);
         } catch (Exception e) {
@@ -59,6 +54,7 @@ public class PushServiceImpl implements IPushService {
             System.out.println("exception Message :" + e.getMessage());
         }
         System.out.println("postResult :" + postResult);
+        return postResult;
     }
 
     @Override
@@ -68,7 +64,6 @@ public class PushServiceImpl implements IPushService {
 
     @Override
     public void sendPush(int page, int size) {
-
     }
 
     @Override

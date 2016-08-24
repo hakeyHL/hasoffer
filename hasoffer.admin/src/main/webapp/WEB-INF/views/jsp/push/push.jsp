@@ -12,6 +12,27 @@
 
 
 <div id="page-wrapper">
+    <div class="modal fade in" id="push_result" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" style="display: none;top:20%">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">导入结果</h4>
+                </div>
+                <div class="modal-body">
+                    <ul>
+                        <li>本次推送类型：<span id="type"></span>${push.pushType}</li>
+                        <li>本次共推 :<span id="totalRows">${push.pushCount}</span>个</li>
+                        <li>本次推送成功数量: <span id="successRows">${push.successCount}个</span></li>
+                        <li>本次推送失败数量:<span id="failRows">${push.failedCount}个</span></li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button id="confirm_button" type="button" class="btn btn-primary">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row">
         <div class="col-lg-12">
             <h1 class="page-header">推送消息</h1>
@@ -37,8 +58,8 @@
     </div>
     <div class="col-lg-12" style="margin: 20px"></div>
     <form class="form-horizontal" action="<%=contextPath%>/push/pushMessage" enctype="application/x-www-form-urlencoded"
-          id="form_edit"
-          method="post" onsubmit="return dosubmit()">
+          id="pushForm"
+          method="post">
         <div class="form-group">
             <label class="col-sm-3 control-label">推送类型 pushType </label>
 
@@ -181,7 +202,9 @@
 
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-9">
-                <button type="submit" class="btn btn-large btn-block btn-primary" id="button_submit">推送</button>
+                <button id="pushMessage" type="button" class="btn btn-large btn-block btn-primary">
+                    推送
+                </button>
             </div>
         </div>
 
@@ -189,33 +212,38 @@
 
 
 </div>
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
-     aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close"
-                        data-dismiss="modal" aria-hidden="true">
-                    &times;
-                </button>
-                <h4 class="modal-title" id="myModalLabel">
-                    提示消息:
-                </h4>
-            </div>
-            <div class="modal-body">
-                当Deal设置为前端显示时价格描述不能为空 !
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary"
-                        data-dismiss="modal">关闭
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 <script>
 
     $().ready(function () {
+        $('#pushMessage').click(function () {
+            $("#pushForm").ajaxSubmit({
+                //定义返回JSON数据，还包括xml和script格式
+                dataType: 'json',
+                beforeSend: function () {
+                    //表单提交前做表单验证
+                },
+                success: function (data) {
+                    if (data.success) {
+                        $("#totalRows").html(data.totalRows);
+                        $("#successRows").html(data.successCount);
+                        $("#failRows").html(data.failedCount);
+                        $("#type").html(data.ptype);
+                        $('#push_result').modal('show');
+                        $("#push_result").click(function () {
+                            $('#push_result').modal('hide');
+                            window.location.reload();
+                        });
+                    } else {
+                        BootstrapDialog.show({
+                            title: '导入失败',
+                            message: '请检查Excel格式，重新导入!'
+                        });
+                    }
+
+
+                }
+            });
+        });
         $("#gcmTokenDiv").hide();
         var singlePush = $("#singlePush");
         var groupPush = $("#groupPush");
@@ -230,11 +258,6 @@
             $("#gcmTokenDiv").hide();
         });
     });
-
-    function dosubmit() {
-        return true;
-    }
-
 </script>
 
 <jsp:include page="../include/footer.jsp"/>

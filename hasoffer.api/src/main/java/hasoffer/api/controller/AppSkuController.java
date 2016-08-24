@@ -21,10 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hs on 2016/7/25.
@@ -98,7 +95,11 @@ public class AppSkuController {
                 map.put("specs", JsonHelper.getJsonMap(tempJsonParam));//参数
             }
             List<PtmCmpSkuImage> ptmCmpSkuImages = ptmCmpSkuImageService.findPtmCmpSkuImages(ptmCmpSku.getId());
-            map.put("images", getImageArray(ptmCmpSkuImages));
+            if (ptmCmpSkuImages != null && ptmCmpSkuImages.size() > 0) {
+                map.put("images", getImageArray(ptmCmpSkuImages));
+            } else {
+                map.put("images", Arrays.asList(ptmCmpSku.getBigImagePath() == null ? "" : ImageUtil.getImageUrl(ptmCmpSku.getBigImagePath())));
+            }
             map.put("distribution", 5);
             jsonObject.put("data", JSONObject.toJSON(map));
         }

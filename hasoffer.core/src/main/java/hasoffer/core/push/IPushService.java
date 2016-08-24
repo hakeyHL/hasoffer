@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface IPushService {
 
-    void push(String to, AppPushBo pushBo);
+    String push(String to, AppPushBo pushBo);
 
     List<UrmDevice> getGcmTokens(String version);
 
