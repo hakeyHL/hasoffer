@@ -1,5 +1,6 @@
 package hasoffer.core.product.solr;
 
+import hasoffer.base.config.AppConfig;
 import hasoffer.base.enums.SearchResultSort;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.StringUtils;
@@ -28,8 +29,8 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
 
     @Override
     protected String getSolrUrl() {
-        return "http://solrserver:8983/solr/hasofferproduct3/";
-//        return AppConfig.get(AppConfig.SOLR_PRODUCT_2_URL);
+//        return "http://solrserver:8983/solr/hasofferproduct3/";
+        return AppConfig.get(AppConfig.SOLR_PRODUCT_2_URL);
     }
 
     /**
