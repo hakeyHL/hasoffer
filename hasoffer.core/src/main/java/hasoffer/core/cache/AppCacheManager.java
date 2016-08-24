@@ -24,7 +24,9 @@ public class AppCacheManager {
     private static final String CACHE_KEY_PRE = "APP_PTM_CATEGORY";
     private static final long CACHE_EXPIRE_TIME = TimeUtils.MILLISECONDS_OF_1_DAY;
     @Resource
-    ICacheService<CategoryBo> cacheService;
+    ICacheService<CategoryBo> CategoryBoService;
+    @Resource
+    ICacheService<PtmCategory> PtmCategoryService;
     @Resource
     AppServiceImpl appService;
     private Logger logger = LoggerFactory.getLogger(AppCacheManager.class);
@@ -34,7 +36,7 @@ public class AppCacheManager {
         List categorys = new ArrayList();
         if (StringUtils.isBlank(categoryId)) {
             key = CACHE_KEY_PRE + "_LEVEL1";
-            CategoryBo categoryBo = cacheService.get(CategoryBo.class, key, 0);
+            CategoryBo categoryBo = CategoryBoService.get(CategoryBo.class, key, 0);
             if (categoryBo != null) {
                 categorys = categoryBo.getCategorys();
             } else {
@@ -59,11 +61,11 @@ public class AppCacheManager {
             }
             categoryBo.setCategorys(categorys);
             if (categoryBo.getCategorys() != null && categoryBo.getCategorys().size() > 0) {
-                cacheService.add(key, categoryBo, CACHE_EXPIRE_TIME);
+                CategoryBoService.add(key, categoryBo, CACHE_EXPIRE_TIME);
             }
         } else {
             key = CACHE_KEY_PRE + categoryId;
-            CategoryBo categoryBo = cacheService.get(CategoryBo.class, key, 0);
+            CategoryBo categoryBo = CategoryBoService.get(CategoryBo.class, key, 0);
             if (categoryBo != null) {
                 categorys = categoryBo.getCategorys();
             } else {
@@ -101,11 +103,29 @@ public class AppCacheManager {
                 }
                 categoryBo.setCategorys(categorys);
                 if (categoryBo.getCategorys() != null && categoryBo.getCategorys().size() > 0) {
-                    cacheService.add(key, categoryBo, CACHE_EXPIRE_TIME);
+                    CategoryBoService.add(key, categoryBo, CACHE_EXPIRE_TIME);
                 }
             }
         }
         return categorys;
     }
 
+    public PtmCategory getCategoryById(Long cateId) {
+        PtmCategory ptmCategory = null;
+        String key = null;
+        key = CACHE_KEY_PRE + "_BYID_" + cateId;
+        ptmCategory = PtmCategoryService.get(PtmCategory.class, key, 0);
+        if (ptmCategory != null) {
+            //缓存中有
+            return ptmCategory;
+        } else {
+            ptmCategory = appService.getCategoryInfo(cateId);
+            if (ptmCategory != null) {
+                System.out.println("将类目加入缓存 :" + ptmCategory.getId());
+                PtmCategoryService.add(key, ptmCategory, CACHE_EXPIRE_TIME);
+                return ptmCategory;
+            }
+        }
+        return ptmCategory;
+    }
 }
