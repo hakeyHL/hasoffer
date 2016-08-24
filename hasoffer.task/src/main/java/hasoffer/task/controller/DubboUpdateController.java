@@ -124,7 +124,7 @@ public class DubboUpdateController {
         String url = ptmCmpSku.getUrl();
 
         fetchDubboService.sendUrlTask(website, url, TaskLevel.LEVEL_1);
-        System.out.println("send url success");
+        System.out.println("send single url success for " + skuid);
 
         while (true) {
             TaskStatus taskStatus = fetchDubboService.getUrlTaskStatus(website, url);
