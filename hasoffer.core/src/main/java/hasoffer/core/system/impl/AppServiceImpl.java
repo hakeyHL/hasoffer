@@ -75,6 +75,9 @@ public class AppServiceImpl implements IAppService {
 
     private static final String Q_APP_CATEGORY_ISHASCHILDNODE =
             "SELECT t FROM PtmCategory t where t.parentId=?0 ";
+
+    private static final String Q_APP_CATEGORY_BYID =
+            "SELECT t FROM PtmCategory t where t.id=?0 and t.level=2";
     @Resource
     IDataBaseManager dbm;
     private String Q_APP_GETPRODUCTS =
@@ -223,5 +226,13 @@ public class AppServiceImpl implements IAppService {
         appDeal.setDealClickCount(appDeal.getDealClickCount() + 1);
         List deals = Arrays.asList(appDeal);
         dbm.update(deals);
+    }
+
+    public PtmCategory getCategoryInfo(Long cateId) {
+        List<PtmCategory> query = dbm.query(Q_APP_CATEGORY_BYID, Arrays.asList(cateId));
+        if (query != null && query.size() > 0) {
+            return query.get(0);
+        }
+        return null;
     }
 }

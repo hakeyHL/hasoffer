@@ -1286,7 +1286,7 @@ public class FixController {
             @Override
             public void run() {
 
-                String[] strArray = {"0717", "0719", "0721", "0722", "0723", "0724", "0726", "0727", "0728", "0729", "0731", "0801", "0802", "0803", "0804", "0805", "0806", "0808", "0812", "0813"};
+                String[] strArray = {"0802"};
 
                 for (int i = 0; i < strArray.length; i++) {
 
