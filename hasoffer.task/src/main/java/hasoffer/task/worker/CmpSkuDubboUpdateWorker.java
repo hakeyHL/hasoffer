@@ -127,19 +127,23 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             cmpSkuService.createPtmCmpSkuImage(skuid, fetchedProduct);
 
 //            对FLIPKART没有类目的数据进行更新,暂时注释掉
-            if (Website.FLIPKART.equals(sku.getWebsite()) && sku.getCategoryId() == 0) {
+            if (Website.FLIPKART.equals(sku.getWebsite())) {
 
-                List<String> categoryPathList = fetchedProduct.getCategoryPathList();
+                if (sku.getCategoryId() == null || sku.getCategoryId() == 0) {
 
-                String lastCategoryPath = categoryPathList.get(categoryPathList.size() - 1);
+                    List<String> categoryPathList = fetchedProduct.getCategoryPathList();
 
-                PtmCategory3 ptmCategory3 = dbm.querySingle("SELECT t FROM PtmCategory3 t WHERE t.name = ?0", Arrays.asList(lastCategoryPath));
+                    String lastCategoryPath = categoryPathList.get(categoryPathList.size() - 1);
 
-                long categoryid = ptmCategory3.getHasofferCateogryId();
+                    PtmCategory3 ptmCategory3 = dbm.querySingle("SELECT t FROM PtmCategory3 t WHERE t.name = ?0", Arrays.asList(lastCategoryPath));
 
-                if (categoryid != 0) {
-                    cmpSkuService.updateCategoryid(skuid, categoryid);
-                    logger.info("update flipkart sku categoryid success for _" + skuid + "_  to _" + categoryid + "_");
+                    long categoryid = ptmCategory3.getHasofferCateogryId();
+
+                    if (categoryid != 0) {
+                        cmpSkuService.updateCategoryid(skuid, categoryid);
+                        logger.info("update flipkart sku categoryid success for _" + skuid + "_  to _" + categoryid + "_");
+                    }
+
                 }
             }
         }
