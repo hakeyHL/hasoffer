@@ -130,22 +130,31 @@ public class SolrController {
                         String info = String.format("[Product]%d, Cate Set[%d], Brand Set[%d], Model Set[%d].", o.getId(), cateSet.size(), brandSet.size(), modelSet.size());
                         System.out.println(info);
 
-                        if (StringUtils.isEmpty(brand) && flipSku != null) {
-                            if (StringUtils.isEmpty(flipSku.getBrand())) {
-                                FlipkartAffiliateProductProcessor fapp = new FlipkartAffiliateProductProcessor();
-                                FlipkartSkuInfo skuInfo = null;
-                                try {
-                                    skuInfo = fapp.getSkuInfo(flipSku.getSourceSid());
-                                } catch (Exception e) {
-                                    System.out.println(String.format("Error : [%s]. Info : [%s]", e.getMessage(), flipSku.getSourceSid()));
+                        if (StringUtils.isEmpty(brand)) {
+                            if (flipSku != null) {
+                                if (StringUtils.isEmpty(flipSku.getBrand())) {
+                                    FlipkartAffiliateProductProcessor fapp = new FlipkartAffiliateProductProcessor();
+                                    FlipkartSkuInfo skuInfo = null;
+                                    try {
+                                        skuInfo = fapp.getSkuInfo(flipSku.getSourceSid());
+                                        if (skuInfo != null) {
+                                            brand = skuInfo.getProductBrand();
+                                            model = skuInfo.getModelName();
+                                            // 更新商品brand和model， solr
+                                            cmpSkuService.updateCmpSkuBrandModel(flipSku.getId(), brand, model);
+                                        }
+                                    } catch (Exception e) {
+                                        System.out.println(String.format("Error : [%s]. Info : [%s]", e.getMessage(), flipSku.getSourceSid()));
+                                    }
+
+                                } else {
+                                    brand = flipSku.getBrand();
+                                    model = flipSku.getModel();
                                 }
-                                brand = skuInfo.getProductBrand();
-                                model = skuInfo.getModelName();
-                                // 更新商品brand和model， solr
-                                cmpSkuService.updateCmpSkuBrandModel(flipSku.getId(), brand, model);
                             } else {
-                                brand = flipSku.getBrand();
-                                model = flipSku.getModel();
+                                if (brandSet.size() == 1) {
+                                    brand = brandSet.iterator().next();
+                                }
                             }
 
                             productService.updateProductBrandModel(o.getId(), brand, model);
