@@ -139,6 +139,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
                 if (categoryid != 0) {
                     cmpSkuService.updateCategoryid(skuid, categoryid);
+                    logger.info("update flipkart sku categoryid success for _" + skuid + "_  to _" + categoryid + "_");
                 }
             }
         }
