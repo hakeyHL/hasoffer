@@ -97,4 +97,6 @@ public interface IProductService {
     void updateProductBrandModel(long proId, String productBrand, String modelName);
 
     void importProduct2Solr2(long proId);
+
+    void importProduct2Solr2(PtmProduct o, List<PtmCmpSku> cmpSkus);
 }
