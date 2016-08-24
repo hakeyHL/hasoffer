@@ -3,6 +3,7 @@ package hasoffer.admin.controller;
 import hasoffer.affiliate.affs.flipkart.FlipkartAffiliateProductProcessor;
 import hasoffer.affiliate.model.FlipkartSkuInfo;
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
@@ -25,7 +26,9 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -43,6 +46,123 @@ public class SolrController {
     IDataBaseManager dbm;
     @Resource
     ICmpSkuService cmpSkuService;
+
+    @RequestMapping(value = "/product/importbycategory2", method = RequestMethod.GET)
+    public void importNewAllProducts(@RequestParam final long minProId) {
+        final String Q_PRO = "SELECT t FROM PtmProduct t where t.id > ?0";
+        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<>(
+                new IList() {
+                    @Override
+                    public PageableResult getData(int page) {
+                        System.out.println("importNewAllProducts page = " + page);
+                        return dbm.queryPage(Q_PRO, page, 2000, Arrays.asList(minProId));
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcess<PtmProduct>() {
+                    @Override
+                    public void process(PtmProduct o) {
+
+                        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(o.getId(), SkuStatus.ONSALE);
+
+                        long cateId = o.getCategoryId();
+                        String brand = o.getBrand();
+                        String model = o.getModel();
+
+
+                        Set<Long> cateSet = new HashSet<>();
+                        Set<String> brandSet = new HashSet<>();
+                        Set<String> modelSet = new HashSet<>();
+
+                        PtmCmpSku flipSku = null;
+
+                        float minPrice = -1f, maxPrice = -1f;
+
+                        for (PtmCmpSku cmpSku : cmpSkus) {
+                            float skuPrice = cmpSku.getPrice();
+                            if (skuPrice <= 0 || cmpSku.getStatus() == SkuStatus.OFFSALE) {
+                                continue;
+                            }
+
+                            if (minPrice <= 0) {
+                                minPrice = skuPrice;
+                                maxPrice = minPrice;
+                                continue;
+                            }
+
+                            if (minPrice > skuPrice) {
+                                minPrice = skuPrice;
+                            }
+                            if (maxPrice < skuPrice) {
+                                maxPrice = skuPrice;
+                            }
+
+                            // ....
+
+                            if (cmpSku.getCategoryId() != null && cmpSku.getCategoryId() > 0) {
+                                cateSet.add(cmpSku.getCategoryId());
+                            }
+                            if (StringUtils.isEmpty(cmpSku.getBrand())) {
+                                brandSet.add(cmpSku.getBrand());
+                            }
+                            if (StringUtils.isEmpty(cmpSku.getModel())) {
+                                modelSet.add(cmpSku.getModel());
+                            }
+
+                            if (flipSku == null && Website.FLIPKART == cmpSku.getWebsite()) {
+                                flipSku = cmpSku;
+                            }
+                        }
+
+                        if (minPrice < 0) {
+                            return;
+                        }
+
+                        String info = String.format("[Product]%d, Cate Set[%d], Brand Set[%d], Model Set[%d].", o.getId(), cateSet.size(), brandSet.size(), modelSet.size());
+                        System.out.println(info);
+
+                        if (StringUtils.isEmpty(brand) && flipSku != null) {
+                            if (StringUtils.isEmpty(flipSku.getBrand())) {
+                                FlipkartAffiliateProductProcessor fapp = new FlipkartAffiliateProductProcessor();
+                                FlipkartSkuInfo skuInfo = null;
+                                try {
+                                    skuInfo = fapp.getSkuInfo(flipSku.getSourceSid());
+                                } catch (Exception e) {
+                                    System.out.println(String.format("Error : [%s]. Info : [%s]", e.getMessage(), flipSku.getSourceSid()));
+                                }
+                                brand = skuInfo.getProductBrand();
+                                model = skuInfo.getModelName();
+                                // 更新商品brand和model， solr
+                                cmpSkuService.updateCmpSkuBrandModel(flipSku.getId(), brand, model);
+                            } else {
+                                brand = flipSku.getBrand();
+                                model = flipSku.getModel();
+                            }
+
+                            productService.updateProductBrandModel(o.getId(), brand, model);
+                            o.setBrand(brand);
+                            o.setModel(model);
+                        }
+
+                        productService.importProduct2Solr2(o, cmpSkus);
+                    }
+                }
+        );
+
+        listAndProcessTask2.setProcessorCount(10);
+        listAndProcessTask2.setQueueMaxSize(200);
+
+        listAndProcessTask2.go();
+    }
 
     @RequestMapping(value = "/product/importbycategory", method = RequestMethod.GET)
     public void importNewAll(@RequestParam long minCateId) {
