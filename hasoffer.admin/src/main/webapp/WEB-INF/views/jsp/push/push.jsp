@@ -57,9 +57,8 @@
 
     </div>
     <div class="col-lg-12" style="margin: 20px"></div>
-    <form class="form-horizontal" action="<%=contextPath%>/push/pushMessage" enctype="application/x-www-form-urlencoded"
-          id="pushForm"
-          method="post">
+    <form class="form-horizontal" action="<%=contextPath%>/push/pushMessage" enctype="text/plain"
+          method="post" id="pushForm">
         <div class="form-group">
             <label class="col-sm-3 control-label">推送类型 pushType </label>
 
@@ -202,20 +201,17 @@
 
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-9">
-                <button id="pushMessage" type="button" class="btn btn-large btn-block btn-primary">
+                <button id="push" type="button" class="btn btn-large btn-block btn-primary">
                     推送
                 </button>
             </div>
         </div>
-
     </form>
-
-
 </div>
 <script>
 
     $().ready(function () {
-        $('#pushMessage').click(function () {
+        $('#push').click(function () {
             $("#pushForm").ajaxSubmit({
                 //定义返回JSON数据，还包括xml和script格式
                 dataType: 'json',
@@ -227,7 +223,7 @@
                         $("#totalRows").html(data.totalRows);
                         $("#successRows").html(data.successCount);
                         $("#failRows").html(data.failedCount);
-                        $("#type").html(data.ptype);
+                        $("#type").html(data.pushType);
                         $('#push_result').modal('show');
                         $("#push_result").click(function () {
                             $('#push_result').modal('hide');
@@ -235,12 +231,10 @@
                         });
                     } else {
                         BootstrapDialog.show({
-                            title: '导入失败',
-                            message: '请检查Excel格式，重新导入!'
+                            title: '推送失败',
+                            message: '请联系管理员 ! '
                         });
                     }
-
-
                 }
             });
         });
@@ -258,6 +252,8 @@
             $("#gcmTokenDiv").hide();
         });
     });
+
+
 </script>
 
 <jsp:include page="../include/footer.jsp"/>
