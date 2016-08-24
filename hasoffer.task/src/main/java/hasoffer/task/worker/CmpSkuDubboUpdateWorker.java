@@ -6,6 +6,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.po.ptm.PtmCategory3;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
@@ -16,7 +17,9 @@ import hasoffer.spider.model.FetchedProduct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -123,21 +126,26 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
             cmpSkuService.createPtmCmpSkuImage(skuid, fetchedProduct);
 
-            //对FLIPKART没有类目的数据进行更新,暂时注释掉
-//            if (Website.FLIPKART.equals(sku.getWebsite()) && sku.getCategoryId() == 0) {
-//
-//                List<String> categoryPathList = fetchedProduct.getCategoryPathList();
-//
-//                String lastCategoryPath = categoryPathList.get(categoryPathList.size() - 1);
-//
-//                PtmCategory3 ptmCategory3 = dbm.querySingle("SELECT t FROM PtmCategory3 t WHERE t.name = ?0", Arrays.asList(lastCategoryPath));
-//
-//                long categoryid = ptmCategory3.getHasofferCateogryId();
-//
-//                if (categoryid != 0) {
-//                    cmpSkuService.updateCategoryid(skuid, categoryid);
-//                }
-//            }
+//            对FLIPKART没有类目的数据进行更新,暂时注释掉
+            if (Website.FLIPKART.equals(sku.getWebsite())) {
+
+                if (sku.getCategoryId() == null || sku.getCategoryId() == 0) {
+
+                    List<String> categoryPathList = fetchedProduct.getCategoryPathList();
+
+                    String lastCategoryPath = categoryPathList.get(categoryPathList.size() - 1);
+
+                    PtmCategory3 ptmCategory3 = dbm.querySingle("SELECT t FROM PtmCategory3 t WHERE t.name = ?0", Arrays.asList(lastCategoryPath));
+
+                    long categoryid = ptmCategory3.getHasofferCateogryId();
+
+                    if (categoryid != 0) {
+                        cmpSkuService.updateCategoryid(skuid, categoryid);
+                        logger.info("update flipkart sku categoryid success for _" + skuid + "_  to _" + categoryid + "_");
+                    }
+
+                }
+            }
         }
     }
 }

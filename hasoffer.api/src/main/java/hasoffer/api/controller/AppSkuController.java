@@ -92,7 +92,9 @@ public class AppSkuController {
                 map.put("description", ptmCmpSkuDescription.getJsonDescription() == null ? "" : ClientHelper.delHTMLTag(ptmCmpSkuDescription.getJsonDescription()));//描述
                 String tempJsonParam = ptmCmpSkuDescription.getJsonParam();
                 //去除html标签
-                tempJsonParam = ClientHelper.delHTMLTag(tempJsonParam);
+                if (!StringUtils.isEmpty(tempJsonParam)) {
+                    tempJsonParam = ClientHelper.delHTMLTag(tempJsonParam);
+                }
                 map.put("specs", JsonHelper.getJsonMap(tempJsonParam));//参数
             }
             List<PtmCmpSkuImage> ptmCmpSkuImages = ptmCmpSkuImageService.findPtmCmpSkuImages(ptmCmpSku.getId());

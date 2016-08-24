@@ -40,10 +40,31 @@
           id="form_edit"
           method="post" onsubmit="return dosubmit()">
         <div class="form-group">
+            <label class="col-sm-3 control-label">推送类型 pushType </label>
+
+            <div class="col-sm-7">
+                <label class="radio inline">
+                    <input type="radio" name="pushType" id="singlePush" value="single">
+                    Single Push
+                </label>
+                <label class="radio inline">
+                    <input type="radio" name="pushType" id="groupPush" value="group" checked>
+                    Group Push
+                </label>
+            </div>
+        </div>
+        <div class="form-group" id="gcmTokenDiv">
+            <label class="col-sm-3 control-label">gcmToken</label>
+
+            <div class="col-sm-7">
+                <input type="text" name="gcmToken" class="form-control input-large" placeholder="gcmToken">
+            </div>
+        </div>
+        <div class="form-group">
             <label class="col-sm-3 control-label">outline</label>
 
             <div class="col-sm-7">
-                <input type="text" name="outline" class="form-control" value="" placeholder="outline">
+                <input type="text" name="outline" chclass="form-control input-large" value="" placeholder="outline">
             </div>
         </div>
         <div class="form-group">
@@ -160,7 +181,7 @@
 
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-9">
-                <button type="submit" class="btn btn-default" id="button_submit">推送</button>
+                <button type="submit" class="btn btn-large btn-block btn-primary" id="button_submit">推送</button>
             </div>
         </div>
 
@@ -195,7 +216,19 @@
 <script>
 
     $().ready(function () {
-
+        $("#gcmTokenDiv").hide();
+        var singlePush = $("#singlePush");
+        var groupPush = $("#groupPush");
+        singlePush.on("click", function () {
+            groupPush.attr("checked", false);
+            singlePush.attr("checked", "checked");
+            $("#gcmTokenDiv").show();
+        });
+        groupPush.on("click", function () {
+            singlePush.attr("checked", false);
+            groupPush.attr("checked", "checked");
+            $("#gcmTokenDiv").hide();
+        });
     });
 
     function dosubmit() {
