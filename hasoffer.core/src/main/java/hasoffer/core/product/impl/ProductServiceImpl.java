@@ -536,6 +536,14 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    public void importProduct2Solr2(PtmProduct o, List<PtmCmpSku> cmpSkus) {
+        ProductModel2 productModel2 = getProductModel2(o, cmpSkus);
+        if (productModel2 != null) {
+            productIndex2Service.createOrUpdate(productModel2);
+        }
+    }
+
+    @Override
     @Transactional
     public void updateProductBrandModel(long proId, String productBrand, String modelName) {
         PtmProductUpdater productUpdater = new PtmProductUpdater(proId);
@@ -661,6 +669,15 @@ public class ProductServiceImpl implements IProductService {
         }
 
         List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(product.getId());
+
+        return getProductModel2(product, cmpSkus);
+    }
+
+    private ProductModel2 getProductModel2(PtmProduct product, List<PtmCmpSku> cmpSkus) {
+        if (product == null || ArrayUtils.isNullOrEmpty(cmpSkus)) {
+            return null;
+        }
+
         float minPrice = -1f, maxPrice = -1f;
         for (PtmCmpSku cmpSku : cmpSkus) {
             float skuPrice = cmpSku.getPrice();

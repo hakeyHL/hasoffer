@@ -29,6 +29,7 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
 
     @Override
     protected String getSolrUrl() {
+//        return "http://solrserver:8983/solr/hasofferproduct3/";
         return AppConfig.get(AppConfig.SOLR_PRODUCT_2_URL);
     }
 
