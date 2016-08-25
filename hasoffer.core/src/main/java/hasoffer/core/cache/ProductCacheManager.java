@@ -124,6 +124,7 @@ public class ProductCacheManager {
                     cmpSku.setCommentsNumber(Long.valueOf(map.get("commentsNumber") + ""));
                     cmpSku.setRating((String) map.get("rating"));
                     cmpSku.setImagePath((String) map.get("imagePath"));
+                    cmpSku.setSmallImagePath((String) map.get("smallImagePath"));
                     cmpSku.setOriImageUrl((String) map.get("oriImageUrl"));
                     cmpSku.setDeeplink((String) map.get("deeplink"));
                     cmpSku.setUrl((String) map.get("url"));
