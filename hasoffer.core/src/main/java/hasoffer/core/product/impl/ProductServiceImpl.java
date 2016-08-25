@@ -174,6 +174,16 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public void updatePtmProdcutWebsite(long id, Website website) {
+        PtmProductUpdater updater = new PtmProductUpdater(id);
+
+        updater.getPo().setSourceSite(website.name());
+
+        dbm.update(updater);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void expTopSellingsFromSearchCount(String ymd) {
         // 查询
         int page = 1, size = 40;

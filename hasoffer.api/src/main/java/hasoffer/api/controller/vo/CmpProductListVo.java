@@ -46,7 +46,20 @@ public class CmpProductListVo {
         this.imageUrl = cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath());
         this.totalRatingsNum = cmpSku.getWebsite().equals(Website.EBAY) ? 0 : cmpSku.getCommentsNumber();
         this.image = logoImage;
-        this.title = cmpSku.getTitle() == null ? "" : cmpSku.getWebsite().equals(Website.FLIPKART) ? cmpSku.getTitle() + cmpSku.getSkuTitle() == null ? "" : cmpSku.getSkuTitle() : cmpSku.getTitle();
+        if (cmpSku.getWebsite().equals(Website.FLIPKART)) {
+            if (cmpSku.getTitle() != null) {
+                this.title = cmpSku.getTitle();
+                if (cmpSku.getSkuTitle() != null) {
+                    this.title += cmpSku.getSkuTitle();
+                }
+            } else {
+                if (cmpSku.getSkuTitle() != null) {
+                    this.title = cmpSku.getSkuTitle();
+                }
+            }
+        } else {
+            this.title = cmpSku.getTitle() == null ? "" : cmpSku.getTitle();
+        }
         this.status = cmpSku.getStatus();
         this.price = Math.round(cmpSku.getPrice());
         this.website = cmpSku.getWebsite();
