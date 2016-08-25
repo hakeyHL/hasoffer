@@ -5,6 +5,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.utils.ImageUtil;
+import jodd.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +47,16 @@ public class CmpProductListVo {
         this.imageUrl = cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath());
         this.totalRatingsNum = cmpSku.getWebsite().equals(Website.EBAY) ? 0 : cmpSku.getCommentsNumber();
         this.image = logoImage;
-        this.title = cmpSku.getTitle() == null ? "" : cmpSku.getWebsite().equals(Website.FLIPKART) ? cmpSku.getTitle() + cmpSku.getSkuTitle() == null ? "" : cmpSku.getSkuTitle() : cmpSku.getTitle();
+        if (!StringUtil.isBlank(cmpSku.getTitle())) {
+            this.title = cmpSku.getTitle();
+            if (cmpSku.getSkuTitle() != null) {
+                this.title += cmpSku.getSkuTitle();
+            }
+        } else {
+            if (cmpSku.getSkuTitle() != null) {
+                this.title = cmpSku.getSkuTitle();
+            }
+        }
         this.status = cmpSku.getStatus();
         this.price = Math.round(cmpSku.getPrice());
         this.website = cmpSku.getWebsite();
