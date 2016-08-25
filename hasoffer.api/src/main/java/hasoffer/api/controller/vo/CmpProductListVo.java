@@ -34,33 +34,33 @@ public class CmpProductListVo {
     private float saved;
     private Long id;
     private SkuStatus status;
-    private int min_deliveryTime;
-    private int max_deliveryTime;
+//    private int min_deliveryTime;
+//    private int max_deliveryTime;
 
     public CmpProductListVo() {
     }
 
     public CmpProductListVo(PtmCmpSku cmpSku, String logoImage) {
         this.coins = cmpSku.getWebsite() == Website.FLIPKART ? Math.round(0.015 * cmpSku.getPrice()) : 0;
-        this.ratingNum = cmpSku.getRatings();
+        this.ratingNum = cmpSku.getWebsite().equals(Website.EBAY) ? 0 : cmpSku.getRatings();
         this.imageUrl = cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath());
-        this.totalRatingsNum = cmpSku.getCommentsNumber();
+        this.totalRatingsNum = cmpSku.getWebsite().equals(Website.EBAY) ? 0 : cmpSku.getCommentsNumber();
         this.image = logoImage;
         this.title = cmpSku.getTitle() == null ? "" : cmpSku.getWebsite().equals(Website.FLIPKART) ? cmpSku.getTitle() + cmpSku.getSkuTitle() == null ? "" : cmpSku.getSkuTitle() : cmpSku.getTitle();
         this.status = cmpSku.getStatus();
         this.price = Math.round(cmpSku.getPrice());
         this.website = cmpSku.getWebsite();
         this.freight = cmpSku.getShipping();
-        this.min_deliveryTime = 1;
-        this.max_deliveryTime = 5;
-        String deliveryTime = cmpSku.getDeliveryTime();
-        if (!StringUtils.isEmpty(deliveryTime)) {
-            String[] split = deliveryTime.split("-");
-            if (split.length == 2) {
-                min_deliveryTime = Integer.valueOf(split[0]);
-                max_deliveryTime = Integer.valueOf(split[1]);
-            }
-        }
+//        this.min_deliveryTime = 1;
+//        this.max_deliveryTime = 5;
+//        String deliveryTime = cmpSku.getDeliveryTime();
+//        if (!StringUtils.isEmpty(deliveryTime)) {
+//            String[] split = deliveryTime.split("-");
+//            if (split.length == 2) {
+//                min_deliveryTime = Integer.valueOf(split[0]);
+//                max_deliveryTime = Integer.valueOf(split[1]);
+//            }
+//        }
         this.distributionTime = cmpSku.getDeliveryTime();
         this.backRate = cmpSku.getWebsite() == Website.FLIPKART ? 1.5f : 0;
         this.returnGuarantee = cmpSku.getReturnDays();
@@ -278,21 +278,21 @@ public class CmpProductListVo {
         this.offers = offers;
     }
 
-    public int getMin_deliveryTime() {
-        return min_deliveryTime;
-    }
-
-    public void setMin_deliveryTime(int min_deliveryTime) {
-        this.min_deliveryTime = min_deliveryTime;
-    }
-
-    public int getMax_deliveryTime() {
-        return max_deliveryTime;
-    }
-
-    public void setMax_deliveryTime(int max_deliveryTime) {
-        this.max_deliveryTime = max_deliveryTime;
-    }
+//    public int getMin_deliveryTime() {
+//        return min_deliveryTime;
+//    }
+//
+//    public void setMin_deliveryTime(int min_deliveryTime) {
+//        this.min_deliveryTime = min_deliveryTime;
+//    }
+//
+//    public int getMax_deliveryTime() {
+//        return max_deliveryTime;
+//    }
+//
+//    public void setMax_deliveryTime(int max_deliveryTime) {
+//        this.max_deliveryTime = max_deliveryTime;
+//    }
 
     @Override
     public boolean equals(Object o) {
@@ -308,8 +308,8 @@ public class CmpProductListVo {
         if (returnGuarantee != that.returnGuarantee) return false;
         if (Float.compare(that.cashBack, cashBack) != 0) return false;
         if (Float.compare(that.saved, saved) != 0) return false;
-        if (min_deliveryTime != that.min_deliveryTime) return false;
-        if (max_deliveryTime != that.max_deliveryTime) return false;
+//        if (min_deliveryTime != that.min_deliveryTime) return false;
+//        if (max_deliveryTime != that.max_deliveryTime) return false;
         if (support != null ? !support.equals(that.support) : that.support != null) return false;
         if (offers != null ? !offers.equals(that.offers) : that.offers != null) return false;
         if (imageUrl != null ? !imageUrl.equals(that.imageUrl) : that.imageUrl != null) return false;
@@ -352,8 +352,8 @@ public class CmpProductListVo {
         result = 31 * result + (saved != +0.0f ? Float.floatToIntBits(saved) : 0);
         result = 31 * result + (id != null ? id.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
-        result = 31 * result + min_deliveryTime;
-        result = 31 * result + max_deliveryTime;
+//        result = 31 * result + min_deliveryTime;
+//        result = 31 * result + max_deliveryTime;
         return result;
     }
 }

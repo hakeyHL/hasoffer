@@ -71,6 +71,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 updatePtmCmpSku(sku);
 
             } catch (Exception e) {
+                System.out.println(TimeUtils.nowDate());
                 e.printStackTrace();
             }
         }
@@ -120,11 +121,23 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
             System.out.println(JSONUtil.toJSON(fetchedProduct).toString() + "id=" + skuid);
 
-            cmpSkuService.createDescription(sku, fetchedProduct);
+            try {
+                cmpSkuService.createDescription(sku, fetchedProduct);
+            } catch (Exception e) {
 
-            cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
+            }
 
-            cmpSkuService.createPtmCmpSkuImage(skuid, fetchedProduct);
+            try {
+                cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
+            } catch (Exception e) {
+
+            }
+
+            try {
+                cmpSkuService.createPtmCmpSkuImage(skuid, fetchedProduct);
+            } catch (Exception e) {
+
+            }
 
 //            对FLIPKART没有类目的数据进行更新,暂时注释掉
             if (Website.FLIPKART.equals(sku.getWebsite())) {
