@@ -470,6 +470,7 @@ public class ProductServiceImpl implements IProductService {
         }
 
         productIndexService.remove(String.valueOf(ptmProductId));
+        productIndex2Service.remove(String.valueOf(ptmProductId));
 
         // 删除searchlog 以及 缓存
         PageableResult<SrmSearchLog> pagedSearchLogs = searchService.listSearchLogsByProductId(ptmProductId, 1, Integer.MAX_VALUE);
@@ -614,6 +615,7 @@ public class ProductServiceImpl implements IProductService {
 
         if (minPrice < 0) {
             productIndexService.remove(String.valueOf(product.getId()));
+            productIndex2Service.remove(String.valueOf(product.getId()));
             return null;
         }
 
@@ -759,6 +761,9 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public void importProduct2Solr(PtmProduct product) {
+        // new import
+        importProduct2Solr2(product);
+
         ProductModel productModel = getProductModel(product);
 
         if (productModel != null) {
