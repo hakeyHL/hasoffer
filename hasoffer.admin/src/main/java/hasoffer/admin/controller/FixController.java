@@ -1444,11 +1444,11 @@ public class FixController {
                 PageableResult<PtmCmpSku> pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' AND t.skuTitle like '%null%'", curPage, pageSize);
 
                 long totalPage = pageableResult.getTotalPage();
-
+                System.out.println("total page " + totalPage);
 
                 while (curPage < totalPage) {
 
-                    if (cmpSkuQueue.size() > 5000) {
+                    if (cmpSkuQueue.size() > 50000) {
                         try {
                             TimeUnit.SECONDS.sleep(5);
                         } catch (InterruptedException e) {
@@ -1468,9 +1468,9 @@ public class FixController {
                         System.out.println("add success " + ptmCmpSku.getId() + "\n skutitle = " + ptmCmpSku.getSkuTitle() + "\n url =" + ptmCmpSku.getUrl());
                     }
 
+                    System.out.println("curPage = " + curPage);
                     curPage++;
                 }
-
             }
         });
 
