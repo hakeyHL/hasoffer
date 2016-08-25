@@ -250,6 +250,38 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         return new PageableResult<Long>(sr.getResult(), totalCount, page, size);
     }
 
+//    public Map<String, List<String>> spellCheck(String keyword) {
+//        SolrQuery query = new SolrQuery();
+//        query.setRequestHandler("/spell");//select
+//        query.set("spellcheck", "true");
+//        query.set("spellcheck.q", keyword);
+//        query.set("spellcheck.build", "true");// 遇到新的检查词，会自动添加到索引里面
+//        query.set("spellcheck.count", 5);
+//
+//        QueryResponse rsp = null;
+//        String s = "";
+//        List<String> suggestStrs = new ArrayList<>();
+//        Map<String, List<String>> map = new HashMap<>();
+//        try {
+//            rsp = solrServer.query(query);
+//
+//            SpellCheckResponse spellres = rsp.getSpellCheckResponse();
+//
+//            if (spellres != null) {
+//                if (!spellres.isCorrectlySpelled()) {
+//                    List<SpellCheckResponse.Suggestion> suggestions = spellres.getSuggestions();
+//                    for (SpellCheckResponse.Suggestion suggestion1 : suggestions) {
+//                        map.put(suggestion1.getToken(), suggestion1.getAlternatives());
+//                    }
+//                }
+//            }
+//        } catch (SolrServerException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        return map;
+//    }
+
     // ************************父类实现*******************************
     /*protected QueryResponse searchSolr(Query[] qs, FilterQuery[] fqs, Sort[] sorts, PivotFacet[] pivotFacets, int pageNumber, int pageSize, boolean useCache) {
         SolrQuery query = new SolrQuery();
