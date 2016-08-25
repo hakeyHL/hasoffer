@@ -761,6 +761,9 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public void importProduct2Solr(PtmProduct product) {
+        if (product == null) {
+            return;
+        }
         // new import
         importProduct2Solr2(product);
 
@@ -778,6 +781,8 @@ public class ProductServiceImpl implements IProductService {
         ProductModel2 productModel2 = getProductModel2(product);
         if (productModel2 != null) {
             productIndex2Service.createOrUpdate(productModel2);
+        } else {
+            productIndex2Service.remove(String.valueOf(product.getId()));
         }
     }
 
