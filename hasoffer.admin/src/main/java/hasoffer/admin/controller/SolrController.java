@@ -47,6 +47,7 @@ public class SolrController {
     @Resource
     ICmpSkuService cmpSkuService;
 
+    //1973863
     @RequestMapping(value = "/product/importbycategory2", method = RequestMethod.GET)
     public void importNewAllProducts(@RequestParam final long minProId) {
         final String Q_PRO = "SELECT t FROM PtmProduct t where t.id > ?0";
@@ -71,7 +72,14 @@ public class SolrController {
                 new IProcess<PtmProduct>() {
                     @Override
                     public void process(PtmProduct o) {
+                        try {
+                            process2(o);
+                        } catch (Exception e) {
+                            System.out.println("ERROR " + o.getId() + "\t" + e.getMessage());
+                        }
+                    }
 
+                    private void process2(PtmProduct o) {
                         List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(o.getId(), SkuStatus.ONSALE);
 
                         long cateId = o.getCategoryId();

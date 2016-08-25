@@ -101,6 +101,61 @@ public class FixController {
     ICacheService cacheServiceImpl;
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
 
+    private Website[] websites = {
+            Website.ASKMEBAZAAR,
+            Website.INDIATIMES,
+            Website.CROMARETAIL,
+            Website.CROMA,
+            Website.HOMESHOP18,
+            Website.BAGITTODAY,
+            Website.THEITDEPOT,
+            Website.SAHOLIC,
+            Website.FIRSTCRY,
+            Website.EDABBA,
+            Website.GADGETS360,
+            Website.MANIACSTORE,
+            Website.SYBERPLACE,
+            Website.BABYOYE,
+            Website.SHOPMONK,
+            Website.PURPLLE,
+            Website.NAAPTOL,
+            Website.ZOOMIN
+    };
+
+    @RequestMapping(value = "/deletesmallsitesku", method = RequestMethod.GET)
+    @ResponseBody
+    public String deletesmallsitesku() {
+
+        final String Q_SKU = "select t from PtmCmpSku t where t.website=?0";
+        final Set<Long> proIdSet = new HashSet<>();
+
+        for (Website website : websites) {
+            System.out.println(String.format("Delete [%s] skus....", website.name()));
+            List<PtmCmpSku> cmpSkus = dbm.query(Q_SKU, Arrays.asList(website));
+            int count = 0, size = cmpSkus.size();
+            for (PtmCmpSku cmpSku : cmpSkus) {
+                proIdSet.add(cmpSku.getProductId());
+                // delete cmpsku
+                cmpSkuService.deleteCmpSku(cmpSku.getId());
+                count++;
+                if (count % 10 == 0) {
+                    System.out.println(String.format("Delete [%s] skus....[%d/%d]", website.name(), count, size));
+                }
+            }
+        }
+
+        for (Long proId : proIdSet) {
+            PtmProduct pro = dbm.get(PtmProduct.class, proId);
+            if (pro != null) {
+                productService.importProduct2Solr(pro);
+            } else {
+                productService.deleteProduct(proId);
+            }
+        }
+
+        return "ok";
+    }
+
     /**
      * 该方法用于将现有sku中（Date：2016-08-08）,flipkart的被访问的sku，找到其对应的类目
      */
