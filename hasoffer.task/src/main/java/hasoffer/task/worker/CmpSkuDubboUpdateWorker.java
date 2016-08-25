@@ -71,6 +71,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 updatePtmCmpSku(sku);
 
             } catch (Exception e) {
+                System.out.println(TimeUtils.nowDate());
                 e.printStackTrace();
             }
         }

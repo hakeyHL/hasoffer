@@ -813,13 +813,6 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
             } else {
 
-                //更新 price
-                float price = fetchedProduct.getPrice();
-                if (price > 0) {
-                    if (cmpSku.getPrice() != fetchedProduct.getPrice()) {
-                        ptmCmpSkuUpdater.getPo().setPrice(price);
-                    }
-                }
                 ptmCmpSkuUpdater.getPo().setStatus(SkuStatus.ONSALE);
 
                 //更新 commentsNumber
@@ -852,6 +845,15 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
                     ptmCmpSkuUpdater.getPo().setReturnDays(returnDays);
                 }
 
+            }
+
+            //更新 price
+            //策略更新  2016-08-24由于outstock商品返回前台，所以现在offsale不更新价格，别的状态都要更新价格
+            float price = fetchedProduct.getPrice();
+            if (price > 0) {
+                if (cmpSku.getPrice() != fetchedProduct.getPrice()) {
+                    ptmCmpSkuUpdater.getPo().setPrice(price);
+                }
             }
 
             if (!StringUtils.isEmpty(fetchedProduct.getTitle())) {
