@@ -778,6 +778,9 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public void importProduct2Solr2(PtmProduct product) {
+        if (product == null) {
+            return;
+        }
         ProductModel2 productModel2 = getProductModel2(product);
         if (productModel2 != null) {
             productIndex2Service.createOrUpdate(productModel2);

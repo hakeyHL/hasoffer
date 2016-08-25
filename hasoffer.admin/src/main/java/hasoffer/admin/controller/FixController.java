@@ -146,8 +146,11 @@ public class FixController {
 
         for (Long proId : proIdSet) {
             PtmProduct pro = dbm.get(PtmProduct.class, proId);
-            productService.importProduct2Solr(pro);
-            productService.importProduct2Solr2(pro);
+            if (pro != null) {
+                productService.importProduct2Solr(pro);
+            } else {
+                productService.deleteProduct(proId);
+            }
         }
 
         return "ok";
