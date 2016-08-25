@@ -82,6 +82,8 @@ public interface IProductService {
 
     void updatePtmProductPrice(long id);
 
+    void updatePtmProdcutWebsite(long id, Website website);
+
     ProductModel getProductModel(PtmProduct product);
 
     void import2Solr(ProductModel pm);
