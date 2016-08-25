@@ -42,9 +42,9 @@ public class CmpProductListVo {
 
     public CmpProductListVo(PtmCmpSku cmpSku, String logoImage) {
         this.coins = cmpSku.getWebsite() == Website.FLIPKART ? Math.round(0.015 * cmpSku.getPrice()) : 0;
-        this.ratingNum = cmpSku.getRatings();
+        this.ratingNum = cmpSku.getWebsite().equals(Website.EBAY) ? 0 : cmpSku.getRatings();
         this.imageUrl = cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath());
-        this.totalRatingsNum = cmpSku.getCommentsNumber();
+        this.totalRatingsNum = cmpSku.getWebsite().equals(Website.EBAY) ? 0 : cmpSku.getCommentsNumber();
         this.image = logoImage;
         this.title = cmpSku.getTitle() == null ? "" : cmpSku.getWebsite().equals(Website.FLIPKART) ? cmpSku.getTitle() + cmpSku.getSkuTitle() == null ? "" : cmpSku.getSkuTitle() : cmpSku.getTitle();
         this.status = cmpSku.getStatus();
