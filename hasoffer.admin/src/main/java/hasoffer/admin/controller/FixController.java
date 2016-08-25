@@ -1446,7 +1446,7 @@ public class FixController {
                 long totalPage = pageableResult.getTotalPage();
                 System.out.println("total page " + totalPage);
 
-                while (curPage < totalPage) {
+                while (curPage <= totalPage) {
 
                     if (cmpSkuQueue.size() > 50000) {
                         try {
@@ -1502,6 +1502,30 @@ public class FixController {
                     }
                 }
             });
+        }
+
+        return "ok";
+    }
+
+    //fixdata/fixProductSourceSiteNull
+    @RequestMapping(value = "/fixProductSourceSiteNull")
+    @ResponseBody
+    public String fixProductSourceSiteNull() {
+
+
+        List<PtmProduct> productList = dbm.query("SELECT t FROM PtmProduct t WHERE t.sourceSite = ''");
+
+        for (PtmProduct ptmProduct : productList) {
+
+            System.out.println("ready to fix product " + ptmProduct.getId());
+            List<PtmCmpSku> ptmcmpskuList = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ", Arrays.asList(ptmProduct.getId()));
+
+            for (PtmCmpSku ptmCmpSku : ptmcmpskuList) {
+                if (StringUtils.isEqual(ptmProduct.getTitle(), ptmCmpSku.getTitle())) {
+                    productService.updatePtmProdcutWebsite(ptmProduct.getId(), ptmCmpSku.getWebsite());
+                    System.out.println("fix success for " + ptmProduct.getId() + " to " + ptmCmpSku.getWebsite().name());
+                }
+            }
         }
 
         return "ok";
