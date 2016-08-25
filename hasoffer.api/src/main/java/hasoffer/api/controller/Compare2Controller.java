@@ -647,7 +647,9 @@ public class Compare2Controller {
                     }
                     // 忽略前台返回的价格
                     System.out.println(" Enter cmpProductListVO set area ");
+                    System.out.println("sku smallImagePath is " + cmpSku.getSmallImagePath());
                     CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
+                    System.out.println("after set , imageUrl is  " + cplv.getImageUrl());
                     System.out.println("set properteis over l");
                     cplv.setDeepLinkUrl(WebsiteHelper.getDealUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                     cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
