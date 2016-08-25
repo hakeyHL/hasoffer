@@ -661,7 +661,7 @@ public class AppController {
             case 2:
                 //search by title
                 System.out.println("  sort " + criteria.getSort().name());
-                criteria.setPivotFields(Arrays.asList("cate2"));
+//                criteria.setPivotFields(Arrays.asList("cate2"));
                 PageableResult p = ProductIndex2ServiceImpl.searchProducts(criteria);
                 if (p != null && p.getData().size() > 0) {
                     System.out.println("getPivotFieldVals  " + p.getPivotFieldVals().size());
@@ -713,10 +713,15 @@ public class AppController {
                     if (products != null && products.getData().size() > 0) {
                         addProductVo2List(li, products.getData());
                     }
+                } else if (StringUtils.isNotBlank(criteria.getKeyword())) {
+                    PageableResult pKeywordResult = ProductIndex2ServiceImpl.searchProducts(criteria);
+                    if (pKeywordResult != null && pKeywordResult.getData().size() > 0) {
+                        addProductVo2List(li, pKeywordResult.getData());
+                        map.put("product", li);
+                    }
                 }
-                break;
             default:
-                map.put("product", null);
+                break;
         }
         if (li != null && li.size() > 0) {
             map.put("product", li);

@@ -9,11 +9,13 @@ public class PushVo {
     private String content;
     private String outline;
     private String[] website;
-    private String version;
+    private String[] version;
     private String[] channel;
     private String messageType;
     private String value;
     private int number;
+    private String pushType;
+    private String gcmToken;
 
     public String[] getChannel() {
         return channel;
@@ -21,6 +23,14 @@ public class PushVo {
 
     public void setChannel(String[] channel) {
         this.channel = channel;
+    }
+
+    public String getGcmToken() {
+        return gcmToken;
+    }
+
+    public void setGcmToken(String gcmToken) {
+        this.gcmToken = gcmToken;
     }
 
     public String getTitle() {
@@ -55,11 +65,11 @@ public class PushVo {
         this.website = website;
     }
 
-    public String getVersion() {
+    public String[] getVersion() {
         return version;
     }
 
-    public void setVersion(String version) {
+    public void setVersion(String[] version) {
         this.version = version;
     }
 
@@ -85,5 +95,13 @@ public class PushVo {
 
     public void setNumber(int number) {
         this.number = number;
+    }
+
+    public String getPushType() {
+        return pushType;
+    }
+
+    public void setPushType(String pushType) {
+        this.pushType = pushType;
     }
 }
