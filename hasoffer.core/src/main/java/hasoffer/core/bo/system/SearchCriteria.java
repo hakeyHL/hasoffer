@@ -116,4 +116,22 @@ public class SearchCriteria {
     public void setPivotFields(List<String> pivotFields) {
         this.pivotFields = pivotFields;
     }
+
+    @Override
+    public String toString() {
+        return "SearchCriteria{" +
+                "comment=" + comment +
+                ", minPrice=" + minPrice +
+                ", maxPrice=" + maxPrice +
+                ", keyword='" + keyword + '\'' +
+                ", categoryId='" + categoryId + '\'' +
+                ", page=" + page +
+                ", pageSize=" + pageSize +
+                ", level=" + level +
+                ", priceFrom=" + priceFrom +
+                ", priceTo=" + priceTo +
+                ", pivotFields=" + pivotFields +
+                ", sort=" + sort +
+                '}';
+    }
 }
