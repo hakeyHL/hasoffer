@@ -253,7 +253,6 @@ public class FixTaskController {
 
                     List<PtmProduct> ptmProductList = pageableResult.getData();
 
-
                     for (PtmProduct ptmProduct : ptmProductList) {
 
                         List<PtmCmpSku> skuList = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0", Arrays.asList(ptmProduct.getId()));
@@ -265,7 +264,7 @@ public class FixTaskController {
                             if (Website.FLIPKART.equals(website) || Website.SNAPDEAL.equals(website) || Website.AMAZON.equals(website) || Website.EBAY.equals(website)) {
                                 cmpSkuQueue.add(ptmCmpSku);
                                 System.out.println("add success to queue " + ptmCmpSku.getId());
-                                fetchDubboService.sendUrlTask(ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), TaskLevel.LEVEL_1);
+                                fetchDubboService.sendUrlTask(ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), TaskLevel.LEVEL_2);
                                 System.out.println("send request success for " + ptmCmpSku.getId());
                             }
                         }
@@ -317,12 +316,9 @@ public class FixTaskController {
                             return;
                         } else if (TaskStatus.NONE.equals(taskStatus)) {
                             cmpSkuQueue.add(ptmcmpsku);
-                            if (Website.SNAPDEAL.equals(website) || Website.FLIPKART.equals(website) || Website.AMAZON.equals(website)) {
+                            if (Website.SNAPDEAL.equals(website) || Website.FLIPKART.equals(website) || Website.AMAZON.equals(website) || Website.EBAY.equals(website)) {
                                 cmpSkuQueue.add(ptmcmpsku);
                                 fetchDubboService.sendUrlTask(ptmcmpsku.getWebsite(), ptmcmpsku.getUrl(), TaskLevel.LEVEL_2);
-                            } else {
-                                cmpSkuQueue.add(ptmcmpsku);
-                                fetchDubboService.sendUrlTask(ptmcmpsku.getWebsite(), ptmcmpsku.getUrl(), TaskLevel.LEVEL_5);
                             }
                             logger.info("taskstatus NONE for [" + skuid + "] , resend success");
                             return;
