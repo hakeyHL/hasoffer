@@ -79,13 +79,16 @@ public class CategoryCacheManager {
     }
 
     public String getCategoryTag(long categoryId) {
-        String key = CACHE_KEY_PRE + "_Tag_Map";
+        String key = CACHE_KEY_PRE + "Tag_Map";
 
         String cateTag = "";
 
         boolean exists = cacheService.exists(key);
         if (exists) {
             cateTag = cacheService.mapGet(key, String.valueOf(categoryId));
+            if (StringUtils.isEmpty(cateTag)) {
+                cateTag = "";
+            }
         } else {
             List<PtmCateTag> cateTags = categoryService.listAllCategoryTags();
             if (ArrayUtils.hasObjs(cateTags)) {
