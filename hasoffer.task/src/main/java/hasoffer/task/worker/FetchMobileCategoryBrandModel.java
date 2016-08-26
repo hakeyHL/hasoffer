@@ -62,13 +62,13 @@ public class FetchMobileCategoryBrandModel implements Runnable {
                 if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
                     cmpSkuQueue.add(ptmcmpsku);
                     System.out.println("taskstatus RUNNING for [" + skuid + "]");
-                    return;
+                    continue;
                 } else if (TaskStatus.STOPPED.equals(taskStatus)) {
                     System.out.println("taskstatus STOPPED for [" + skuid + "]");
-                    return;
+                    continue;
                 } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
                     System.out.println("taskstatus EXCEPTION for [" + skuid + "]");
-                    return;
+                    continue;
                 } else if (TaskStatus.NONE.equals(taskStatus)) {
                     cmpSkuQueue.add(ptmcmpsku);
                     if (Website.SNAPDEAL.equals(website) || Website.FLIPKART.equals(website) || Website.AMAZON.equals(website) || Website.EBAY.equals(website)) {
@@ -76,7 +76,7 @@ public class FetchMobileCategoryBrandModel implements Runnable {
                         fetchDubboService.sendUrlTask(ptmcmpsku.getWebsite(), ptmcmpsku.getUrl(), TaskLevel.LEVEL_2);
                     }
                     System.out.println("taskstatus NONE for [" + skuid + "] , resend success");
-                    return;
+                    continue;
                 } else {//(TaskStatus.FINISH.equals(taskStatus)))
                     System.out.println("taskstatus FINISH for [" + skuid + "]");
                     fetchUrlResult = fetchDubboService.getProductsByUrl(skuid, ptmcmpsku.getWebsite(), ptmcmpsku.getUrl());
@@ -104,7 +104,7 @@ public class FetchMobileCategoryBrandModel implements Runnable {
                     }
 
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
