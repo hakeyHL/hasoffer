@@ -256,7 +256,7 @@ public class FixTaskController {
 
                     for (PtmProduct ptmProduct : ptmProductList) {
 
-                        List<PtmCmpSku> skuList = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productid = ?0", Arrays.asList(ptmProduct.getId()));
+                        List<PtmCmpSku> skuList = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0", Arrays.asList(ptmProduct.getId()));
 
                         for (PtmCmpSku ptmCmpSku : skuList) {
 
