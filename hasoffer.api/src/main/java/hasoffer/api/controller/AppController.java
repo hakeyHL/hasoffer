@@ -624,6 +624,7 @@ public class AppController {
                                 PtmCategory ptmCategory = appCacheManager.getCategoryById(cateId);
                                 if (ptmCategory != null && ptmCategory.getLevel() == 2) {
                                     //处理二级类目
+                                    System.out.println("cate level   :" + ptmCategory.getLevel());
                                     CategoryVo categoryVo = new CategoryVo();
                                     categoryVo.setId(ptmCategory.getId());
                                     categoryVo.setLevel(ptmCategory.getLevel());
