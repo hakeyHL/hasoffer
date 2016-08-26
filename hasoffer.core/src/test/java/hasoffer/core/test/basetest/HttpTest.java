@@ -5,9 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.utils.http.HttpUtils;
-import hasoffer.base.utils.http.MyHttpUtils;
 import hasoffer.core.utils.Httphelper;
-import org.apache.http.HttpHost;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -20,12 +18,9 @@ import java.util.Map;
 public class HttpTest {
     @Test
     public void testHttp() throws Exception {
-        String url = "https://www.snapdeal.com/product/samsung-galaxy-s5-shimmery-white/922485437";
+        String url = "https://www.flipkart.com/mobiles-accessories/pr?sid=tyy&q=JBL+headphone";
 
-//        HttpHost proxy = new HttpHost("175.142.198.36", 80, "http");
-        HttpHost proxy = new HttpHost("52.77.165.138", 8888, "http");
-
-        HttpResponseModel responseModel = MyHttpUtils.getByProxy(url, proxy);
+        HttpResponseModel responseModel = HttpUtils.get(url, null);
 
         System.out.println(responseModel.getBodyString());
     }

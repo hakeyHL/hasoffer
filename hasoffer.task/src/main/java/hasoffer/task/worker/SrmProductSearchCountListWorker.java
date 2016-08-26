@@ -105,6 +105,12 @@ public class SrmProductSearchCountListWorker implements Runnable {
                                 url = StringUtils.filterAndTrim(url, Arrays.asList("/viewAllSellers"));
                                 sku.setUrl(url);
                             }
+                            //过滤掉amazon中gp/offer-listing的url,该url没有描述等信息
+                            if (Website.AMAZON.equals(website)) {
+                                String url = sku.getUrl();
+                                url = url.replace("gp/offer-listing", "dp");
+                                sku.setUrl(url);
+                            }
 
                             queue.add(sku);
                             fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_2);
