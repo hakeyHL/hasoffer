@@ -47,7 +47,7 @@ public class HttpTest {
 
         String url = "https://www.flipkart.com/api/3/page/dynamic/product";
 
-        String json = "{\"requestContext\":{\"productId\":\"DEODKHRAM2MXMXYR\"}}";
+        String json = "{\"requestContext\":{\"productId\":\"MOBEYHZ2VSVKHAZH\"}}";
 
         Map<String, String> header = new HashMap<>();
 
