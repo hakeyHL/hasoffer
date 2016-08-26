@@ -47,6 +47,26 @@ public class SolrController {
     @Resource
     ICmpSkuService cmpSkuService;
 
+    @RequestMapping(value = "/product/reimport111", method = RequestMethod.GET)
+    public void reimport111() {
+
+        String Q_PRO_BRAND = "SELECT COUNT(t.id),t.brand FROM PtmProduct t WHERE t.brand LIKE '%mobile%' GROUP BY t.brand";
+        String Q_PRO_BRAND_1 = "SELECT t from PtmProduct t where t.brand=?0 ";
+        List<Object[]> datas = dbm.query(Q_PRO_BRAND);
+
+        for (Object[] data : datas) {
+            String brand = (String) data[1];
+            List<PtmProduct> products = dbm.query(Q_PRO_BRAND_1, Arrays.asList(brand));
+            for (PtmProduct product : products) {
+                product.setBrand("");
+                productService.importProduct2Solr2(product);
+            }
+        }
+
+        System.out.println(datas.size());
+
+    }
+
     //1973863
     @RequestMapping(value = "/product/importbycategory3", method = RequestMethod.GET)
     public void importbycategory3(@RequestParam final long cate) {
