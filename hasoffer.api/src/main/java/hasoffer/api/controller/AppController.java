@@ -682,8 +682,6 @@ public class AppController {
                                     tempThirdCategoryList.add(cate);
                                 }
                             }
-
-
                             //对三级类目按照rank排序
                             Collections.sort(tempThirdCategoryList, new Comparator<CategoryVo>() {
                                 @Override
@@ -696,6 +694,7 @@ public class AppController {
                                     return 0;
                                 }
                             });
+                            next.setHasChildren(1);
                             next.setCategorys(tempThirdCategoryList);
                         }
 
