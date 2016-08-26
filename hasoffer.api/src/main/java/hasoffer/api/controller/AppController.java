@@ -607,6 +607,7 @@ public class AppController {
                     System.out.println("getPivotFieldVals  " + p.getPivotFieldVals().size());
                     if (p.getPivotFieldVals() != null && p.getPivotFieldVals().size() > 0) {
                         // List<CategoryVo>
+                        List<CategoryVo> tempCategorys = new ArrayList();
                         List<CategoryVo> categorys = new ArrayList();
                         Map pivotFieldVals = p.getPivotFieldVals();
                         Set<Map.Entry> set = pivotFieldVals.entrySet();
@@ -622,12 +623,39 @@ public class AppController {
                                     CategoryVo categoryVo = new CategoryVo();
                                     categoryVo.setId(ptmCategory.getId());
                                     categoryVo.setLevel(ptmCategory.getLevel());
+                                    categoryVo.setParentId(ptmCategory.getParentId());
+                                    categoryVo.setRank(ptmCategory.getRank());
                                     categoryVo.setName(ptmCategory.getName());
                                     categoryVo.setCategorys(appCacheManager.getCategorys(cateId + ""));
                                     if (categoryVo.getCategorys() != null && categoryVo.getCategorys().size() > 0) {
                                         categoryVo.setHasChildren(1);
                                     }
-                                    categorys.add(categoryVo);
+                                    tempCategorys.add(categoryVo);
+                                }
+                            }
+                        }
+                        //获取到类目id appCacheManager.getCategorys(categoryId);
+                        //先获取一级类目列表
+                        List<PtmCategory> firstCategoryList = appCacheManager.getCategorys("");
+
+                        //对二级类目按照rank排序
+                        Collections.sort(tempCategorys, new Comparator<CategoryVo>() {
+                            @Override
+                            public int compare(CategoryVo o1, CategoryVo o2) {
+                                if (o1.getRank() > o2.getRank()) {
+                                    return 1;
+                                } else if (o1.getRank() < o2.getRank()) {
+                                    return -1;
+                                }
+                                return 0;
+                            }
+                        });
+
+                        for (PtmCategory firstPtmCategory : firstCategoryList) {
+                            for (CategoryVo cate : tempCategorys) {
+                                //遍历所有,如果父类id是其则加入list
+                                if (cate.getParentId() == firstPtmCategory.getId()) {
+                                    categorys.add(cate);
                                 }
                             }
                         }
