@@ -238,7 +238,7 @@ public class FixTaskController {
 
                 while (curPage <= totalPage) {
 
-                    if (cmpSkuQueue.size() > 50000) {
+                    if (cmpSkuQueue.size() > 10000) {
                         try {
                             TimeUnit.SECONDS.sleep(5);
                         } catch (InterruptedException e) {
