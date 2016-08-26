@@ -130,16 +130,17 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         }
         int priceFrom = sc.getPriceFrom(), priceTo = sc.getPriceTo();
         String priceFromStr = "*", priceToStr = "*";
-        if (priceFrom < priceTo && priceFrom >= 0) {
-            if (priceFrom < 0) {
-                priceFrom = 0;
-            }
-            priceFromStr = String.valueOf(priceFrom);
-            if (priceTo > 0) {
-                priceToStr = String.valueOf(priceTo);
-            }
-            fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", priceFromStr, priceToStr)));
+        if (priceFrom < 0) {
+            priceFrom = 0;
         }
+        if (priceFrom < priceTo) {
+            priceFromStr = String.valueOf(priceFrom);
+            priceToStr = String.valueOf(priceTo);
+        } else {
+            priceFromStr = String.valueOf(priceFrom);
+        }
+        fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", priceFromStr, priceToStr)));
+
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
 
         String keyword = sc.getKeyword();
