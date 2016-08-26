@@ -176,22 +176,44 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
 
     /**
      * 根据类目搜索商品
-     *
-     * @param cateId
-     * @param level
-     * @param page
-     * @param size
-     * @return
      */
-    public PageableResult<ProductModel2> searchPro(long cateId, int level, int page, int size) {
+    public PageableResult<ProductModel2> searchPro(SearchCriteria criteria) {
+        int level = criteria.getLevel();
+        String cateId = criteria.getCategoryId();
+        int page = criteria.getPage();
+        int size = criteria.getPageSize();
         if (level < 1 || level > 3) {
             return null;
         }
-        Sort[] sorts = new Sort[]{new Sort("searchCount", Order.DESC)};
+        List<FilterQuery> fqList = new ArrayList<FilterQuery>();
+        int priceFrom = criteria.getPriceFrom(), priceTo = criteria.getPriceTo();
+        String priceFromStr = "*", priceToStr = "*";
+        if (priceFrom < priceTo && priceFrom >= 0) {
+            if (priceFrom < 0) {
+                priceFrom = 0;
+            }
+            priceFromStr = String.valueOf(priceFrom);
+            if (priceTo > 0) {
+                priceToStr = String.valueOf(priceTo);
+            }
+            fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", priceFromStr, priceToStr)));
+        }
+//        Sort[] sorts = null;
+        Sort[] sorts = new Sort[2];
+        sorts[0] = new Sort("searchCount", Order.DESC);
+        // sort by
+        SearchResultSort resultSort = criteria.getSort();
+        if (resultSort != null) {
+            if (resultSort == SearchResultSort.POPULARITY) {
+                sorts[1] = new Sort(ProductModel2SortField.F_POPULARITY.getFieldName(), Order.DESC);
+            } else if (resultSort == SearchResultSort.PRICEL2H) {
+                sorts[1] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.ASC);
+            } else if (resultSort == SearchResultSort.PRICEH2L) {
+                sorts[1] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.DESC);
+            }
+        }
         String q = "*:*";
         PivotFacet[] pivotFacets = null;
-
-        List<FilterQuery> fqList = new ArrayList<FilterQuery>();
         fqList.add(new FilterQuery("cate" + level, String.valueOf(cateId)));
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
         System.out.println(Thread.currentThread().getName() + " page " + page + "  size " + size);
