@@ -601,7 +601,7 @@ public class AppController {
             case 2:
                 //search by title
                 System.out.println("  sort " + criteria.getSort().name());
-//                criteria.setPivotFields(Arrays.asList("cate2"));
+                criteria.setPivotFields(Arrays.asList("cate2"));
                 PageableResult p = ProductIndex2ServiceImpl.searchProducts(criteria);
                 if (p != null && p.getData().size() > 0) {
                     System.out.println("getPivotFieldVals  " + p.getPivotFieldVals().size());
@@ -624,6 +624,9 @@ public class AppController {
                                     categoryVo.setLevel(ptmCategory.getLevel());
                                     categoryVo.setName(ptmCategory.getName());
                                     categoryVo.setCategorys(appCacheManager.getCategorys(cateId + ""));
+                                    if (categoryVo.getCategorys() != null && categoryVo.getCategorys().size() > 0) {
+                                        categoryVo.setHasChildren(1);
+                                    }
                                     categorys.add(categoryVo);
                                 }
                             }
