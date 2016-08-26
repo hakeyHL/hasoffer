@@ -698,14 +698,14 @@ public class AppController {
                             next.setCategorys(tempThirdCategoryList);
                         }
 
-                        for (CategoryVo secondPtmCategory : secondCategoryList) {
-                            for (CategoryVo cate : thirdCategoryList) {
-                                //遍历所有,如果父类id是其则加入list
-                                if (cate.getParentId() == secondPtmCategory.getId()) {
-                                    categorys.add(cate);
-                                }
-                            }
-                        }
+//                        for (CategoryVo secondPtmCategory : secondCategoryList) {
+//                            for (CategoryVo cate : thirdCategoryList) {
+//                                //遍历所有,如果父类id是其则加入list
+//                                if (cate.getParentId() == secondPtmCategory.getId()) {
+//                                    categorys.add(cate);
+//                                }
+//                            }
+//                        }
 
                         map.put("categorys", categorys);
                     }
