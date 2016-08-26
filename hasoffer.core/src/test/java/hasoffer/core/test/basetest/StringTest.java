@@ -17,6 +17,18 @@ import java.util.regex.Pattern;
 public class StringTest {
 
     @Test
+    public void test12() {
+
+        String oldUrl = "http://www.amazon.in/gp/offer-listing/B01BK92AMK";
+
+        String newUrl = oldUrl.replace("gp/offer-listing", "dp");
+
+        System.out.println(oldUrl);
+        System.out.println(newUrl);
+
+    }
+
+    @Test
     public void test11() {
 
         String a = "&nbsp;";
