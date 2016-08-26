@@ -630,9 +630,11 @@ public class AppController {
                                     categoryVo.setParentId(ptmCategory.getParentId());
                                     categoryVo.setRank(ptmCategory.getRank());
                                     categoryVo.setName(ptmCategory.getName());
+                                    categoryVo.setHasChildren(0);
                                     secondCategoryList.add(categoryVo);
                                 } else if (ptmCategory != null && ptmCategory.getLevel() == 3) {
                                     //处理三级类目
+                                    System.out.println("has third ");
                                     CategoryVo categoryVo = new CategoryVo();
                                     categoryVo.setId(ptmCategory.getId());
                                     categoryVo.setLevel(ptmCategory.getLevel());
@@ -679,6 +681,7 @@ public class AppController {
                             for (CategoryVo cate : thirdCategoryList) {
                                 //遍历所有,如果父类id是其则加入list
                                 if (cate.getParentId() == next.getId()) {
+                                    System.out.println("add to tempThirdCategoryList ");
                                     tempThirdCategoryList.add(cate);
                                 }
                             }
@@ -694,7 +697,9 @@ public class AppController {
                                     return 0;
                                 }
                             });
-                            next.setHasChildren(1);
+                            if (tempThirdCategoryList.size() > 0) {
+                                next.setHasChildren(1);
+                            }
                             next.setCategorys(tempThirdCategoryList);
                         }
 
