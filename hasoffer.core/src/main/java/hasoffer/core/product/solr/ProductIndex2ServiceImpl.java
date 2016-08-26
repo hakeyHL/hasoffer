@@ -130,16 +130,17 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         }
         int priceFrom = sc.getPriceFrom(), priceTo = sc.getPriceTo();
         String priceFromStr = "*", priceToStr = "*";
-        if (priceFrom < priceTo && priceFrom >= 0) {
-            if (priceFrom < 0) {
-                priceFrom = 0;
-            }
-            priceFromStr = String.valueOf(priceFrom);
-            if (priceTo > 0) {
-                priceToStr = String.valueOf(priceTo);
-            }
-            fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", priceFromStr, priceToStr)));
+        if (priceFrom < 0) {
+            priceFrom = 0;
         }
+        if (priceFrom < priceTo) {
+            priceFromStr = String.valueOf(priceFrom);
+            priceToStr = String.valueOf(priceTo);
+        } else {
+            priceFromStr = String.valueOf(priceFrom);
+        }
+        fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", priceFromStr, priceToStr)));
+
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
 
         String keyword = sc.getKeyword();
@@ -176,22 +177,44 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
 
     /**
      * 根据类目搜索商品
-     *
-     * @param cateId
-     * @param level
-     * @param page
-     * @param size
-     * @return
      */
-    public PageableResult<ProductModel2> searchPro(long cateId, int level, int page, int size) {
+    public PageableResult<ProductModel2> searchPro(SearchCriteria criteria) {
+        int level = criteria.getLevel();
+        String cateId = criteria.getCategoryId();
+        int page = criteria.getPage();
+        int size = criteria.getPageSize();
         if (level < 1 || level > 3) {
             return null;
         }
-        Sort[] sorts = new Sort[]{new Sort("searchCount", Order.DESC)};
+        List<FilterQuery> fqList = new ArrayList<FilterQuery>();
+        int priceFrom = criteria.getPriceFrom(), priceTo = criteria.getPriceTo();
+        String priceFromStr = "*", priceToStr = "*";
+        if (priceFrom < priceTo && priceFrom >= 0) {
+            if (priceFrom < 0) {
+                priceFrom = 0;
+            }
+            priceFromStr = String.valueOf(priceFrom);
+            if (priceTo > 0) {
+                priceToStr = String.valueOf(priceTo);
+            }
+            fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", priceFromStr, priceToStr)));
+        }
+//        Sort[] sorts = null;
+        Sort[] sorts = new Sort[2];
+        sorts[0] = new Sort("searchCount", Order.DESC);
+        // sort by
+        SearchResultSort resultSort = criteria.getSort();
+        if (resultSort != null) {
+            if (resultSort == SearchResultSort.POPULARITY) {
+                sorts[1] = new Sort(ProductModel2SortField.F_POPULARITY.getFieldName(), Order.DESC);
+            } else if (resultSort == SearchResultSort.PRICEL2H) {
+                sorts[1] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.ASC);
+            } else if (resultSort == SearchResultSort.PRICEH2L) {
+                sorts[1] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.DESC);
+            }
+        }
         String q = "*:*";
         PivotFacet[] pivotFacets = null;
-
-        List<FilterQuery> fqList = new ArrayList<FilterQuery>();
         fqList.add(new FilterQuery("cate" + level, String.valueOf(cateId)));
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
         System.out.println(Thread.currentThread().getName() + " page " + page + "  size " + size);
@@ -249,6 +272,38 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
 
         return new PageableResult<Long>(sr.getResult(), totalCount, page, size);
     }
+
+//    public Map<String, List<String>> spellCheck(String keyword) {
+//        SolrQuery query = new SolrQuery();
+//        query.setRequestHandler("/spell");//select
+//        query.set("spellcheck", "true");
+//        query.set("spellcheck.q", keyword);
+//        query.set("spellcheck.build", "true");// 遇到新的检查词，会自动添加到索引里面
+//        query.set("spellcheck.count", 5);
+//
+//        QueryResponse rsp = null;
+//        String s = "";
+//        List<String> suggestStrs = new ArrayList<>();
+//        Map<String, List<String>> map = new HashMap<>();
+//        try {
+//            rsp = solrServer.query(query);
+//
+//            SpellCheckResponse spellres = rsp.getSpellCheckResponse();
+//
+//            if (spellres != null) {
+//                if (!spellres.isCorrectlySpelled()) {
+//                    List<SpellCheckResponse.Suggestion> suggestions = spellres.getSuggestions();
+//                    for (SpellCheckResponse.Suggestion suggestion1 : suggestions) {
+//                        map.put(suggestion1.getToken(), suggestion1.getAlternatives());
+//                    }
+//                }
+//            }
+//        } catch (SolrServerException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        return map;
+//    }
 
     // ************************父类实现*******************************
     /*protected QueryResponse searchSolr(Query[] qs, FilterQuery[] fqs, Sort[] sorts, PivotFacet[] pivotFacets, int pageNumber, int pageSize, boolean useCache) {

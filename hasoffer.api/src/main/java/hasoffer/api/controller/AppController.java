@@ -578,67 +578,7 @@ public class AppController {
      * @return
      */
     @RequestMapping(value = "/productsList")
-    public ModelAndView productsList(SearchCriteria criteria, @RequestParam(defaultValue = "3") int type) {
-        ModelAndView mv = new ModelAndView();
-        List li = new ArrayList();
-        Map map = new HashMap();
-        PageableResult<ProductModel> products;
-        //category level page size
-        // PageableResult <ProductModel> products=productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()),criteria.getLevel(),criteria.getPage(),criteria.getPageSize());
-        if (StringUtils.isNotBlank(criteria.getCategoryId())) {
-            //search by category
-            products = productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
-            //products = productIndexServiceImpl.searchPro(Long.valueOf(2), 2, 1, 10);
-            if (products != null && products.getData().size() > 0) {
-                addProductVo2List(li, products.getData());
-            }
-        } else if (StringUtils.isNotEmpty(criteria.getKeyword())) {
-            //search by title
-            //productIndexServiceImpl.simpleSearch(criteria.getKeyword(),1,10);
-            PageableResult p = productIndexServiceImpl.searchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
-            if (p != null && p.getData().size() > 0) {
-                addProductVo2List(li, p.getData());
-            }
-        }
-        String data = "";
-        //查询热卖商品
-        List<PtmProduct> products2s = productCacheManager.getTopSellins(criteria.getPage(), criteria.getPageSize());
-        switch (type) {
-            case 0:
-                addProductVo2List(li, products2s);
-                if (products2s != null && products2s.size() > 4) {
-                    li = li.subList(0, 5);
-                }
-                map.put("product", li);
-                break;
-            case 1:
-                addProductVo2List(li, products2s);
-                map.put("product", li);
-                break;
-            case 2:
-                PageableResult p = productIndexServiceImpl.searchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
-                if (p != null && p.getData().size() > 0) {
-                    addProductVo2List(li, p.getData());
-                }
-                map.put("product", li);
-                break;
-            default:
-                map.put("product", null);
-        }
-        if (li != null && li.size() > 0) {
-            map.put("product", li);
-        }
-        mv.addObject("data", map);
-        return mv;
-    }
-
-    /**
-     * 商品列表
-     *
-     * @return
-     */
-    @RequestMapping(value = "/temp/productsList")
-    public ModelAndView tempProductsList(SearchCriteria criteria, @RequestParam(defaultValue = "4") int type) {
+    public ModelAndView productsList(SearchCriteria criteria, @RequestParam(defaultValue = "4") int type) {
         ModelAndView mv = new ModelAndView();
         List li = new ArrayList();
         Map map = new HashMap();
@@ -661,7 +601,7 @@ public class AppController {
             case 2:
                 //search by title
                 System.out.println("  sort " + criteria.getSort().name());
-//                criteria.setPivotFields(Arrays.asList("cate2"));
+                criteria.setPivotFields(Arrays.asList("cate2"));
                 PageableResult p = ProductIndex2ServiceImpl.searchProducts(criteria);
                 if (p != null && p.getData().size() > 0) {
                     System.out.println("getPivotFieldVals  " + p.getPivotFieldVals().size());
@@ -684,6 +624,9 @@ public class AppController {
                                     categoryVo.setLevel(ptmCategory.getLevel());
                                     categoryVo.setName(ptmCategory.getName());
                                     categoryVo.setCategorys(appCacheManager.getCategorys(cateId + ""));
+                                    if (categoryVo.getCategorys() != null && categoryVo.getCategorys().size() > 0) {
+                                        categoryVo.setHasChildren(1);
+                                    }
                                     categorys.add(categoryVo);
                                 }
                             }
@@ -699,7 +642,7 @@ public class AppController {
                 //category level page size
                 if (StringUtils.isNotBlank(criteria.getCategoryId())) {
                     //search by category
-                    products = ProductIndex2ServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
+                    products = ProductIndex2ServiceImpl.searchPro(criteria);
                     if (products != null && products.getData().size() > 0) {
                         addProductVo2List(li, products.getData());
                     }
@@ -709,7 +652,7 @@ public class AppController {
                 //如果是默认值,则判断类目id和level是否传递了,传了就是类目搜索,适配老接口
                 if (StringUtils.isNotBlank(criteria.getCategoryId())) {
                     //search by category
-                    products = ProductIndex2ServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
+                    products = ProductIndex2ServiceImpl.searchPro(criteria);
                     if (products != null && products.getData().size() > 0) {
                         addProductVo2List(li, products.getData());
                     }
@@ -729,6 +672,60 @@ public class AppController {
         mv.addObject("data", map);
         return mv;
     }
+//    public ModelAndView productsList(SearchCriteria criteria, @RequestParam(defaultValue = "3") int type) {
+//        ModelAndView mv = new ModelAndView();
+//        List li = new ArrayList();
+//        Map map = new HashMap();
+//        PageableResult<ProductModel> products;
+//        //category level page size
+//        // PageableResult <ProductModel> products=productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()),criteria.getLevel(),criteria.getPage(),criteria.getPageSize());
+//        if (StringUtils.isNotBlank(criteria.getCategoryId())) {
+//            //search by category
+//            products = productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
+//            //products = productIndexServiceImpl.searchPro(Long.valueOf(2), 2, 1, 10);
+//            if (products != null && products.getData().size() > 0) {
+//                addProductVo2List(li, products.getData());
+//            }
+//        } else if (StringUtils.isNotEmpty(criteria.getKeyword())) {
+//            //search by title
+//            //productIndexServiceImpl.simpleSearch(criteria.getKeyword(),1,10);
+//            PageableResult p = productIndexServiceImpl.searchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
+//            if (p != null && p.getData().size() > 0) {
+//                addProductVo2List(li, p.getData());
+//            }
+//        }
+//        String data = "";
+//        //查询热卖商品
+//        List<PtmProduct> products2s = productCacheManager.getTopSellins(criteria.getPage(), criteria.getPageSize());
+//        switch (type) {
+//            case 0:
+//                addProductVo2List(li, products2s);
+//                if (products2s != null && products2s.size() > 4) {
+//                    li = li.subList(0, 5);
+//                }
+//                map.put("product", li);
+//                break;
+//            case 1:
+//                addProductVo2List(li, products2s);
+//                map.put("product", li);
+//                break;
+//            case 2:
+//                PageableResult p = productIndexServiceImpl.searchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
+//                if (p != null && p.getData().size() > 0) {
+//                    addProductVo2List(li, p.getData());
+//                }
+//                map.put("product", li);
+//                break;
+//            default:
+//                map.put("product", null);
+//        }
+//        if (li != null && li.size() > 0) {
+//            map.put("product", li);
+//        }
+//        mv.addObject("data", map);
+//        return mv;
+//    }
+
 
     public void addProductVo2List(List desList, List sourceList) {
 

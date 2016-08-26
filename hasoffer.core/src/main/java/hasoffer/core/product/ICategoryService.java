@@ -1,5 +1,6 @@
 package hasoffer.core.product;
 
+import hasoffer.core.persistence.po.ptm.PtmCateTag;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCategory3;
 
@@ -36,4 +37,6 @@ public interface ICategoryService {
     void tempDeleteCategoryForCategoryUpdate(long id);
 
     List<PtmCategory> listCates();
+
+    List<PtmCateTag> listAllCategoryTags();
 }

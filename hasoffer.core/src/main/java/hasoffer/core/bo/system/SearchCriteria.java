@@ -16,8 +16,8 @@ public class SearchCriteria {
     private int page = 1;
     private int pageSize = 20;
     private int level;
-    private int priceFrom = 0;
-    private int priceTo = 0;
+    private int priceFrom = -1;
+    private int priceTo = -1;
     private List<String> pivotFields;
     private SearchResultSort sort = SearchResultSort.RELEVANCE;
 
