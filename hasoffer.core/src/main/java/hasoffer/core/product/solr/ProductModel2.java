@@ -10,6 +10,7 @@ public class ProductModel2 implements IIdentifiable<Long> {
 //    private String key1;// title word 3+
 
     private String tag;
+    private String cateTag;
 
     private String brand;// 品牌
     private String model;// 型号
@@ -32,7 +33,7 @@ public class ProductModel2 implements IIdentifiable<Long> {
     public ProductModel2() {
     }
 
-    public ProductModel2(Long id, String title, String tag,
+    public ProductModel2(Long id, String title, String tag, String cateTag,
                          String brand, String model,
                          long cate1, long cate2, long cate3,
                          String cate1Name, String cate2Name, String cate3Name,
@@ -56,7 +57,7 @@ public class ProductModel2 implements IIdentifiable<Long> {
         this.rating = rating;
         this.searchCount = searchCount;
 
-//        initKeys();
+        this.cateTag = cateTag;
     }
 
 //    private void initKeys() {
@@ -193,6 +194,14 @@ public class ProductModel2 implements IIdentifiable<Long> {
 
     public void setModel(String model) {
         this.model = model;
+    }
+
+    public String getCateTag() {
+        return cateTag;
+    }
+
+    public void setCateTag(String cateTag) {
+        this.cateTag = cateTag;
     }
 
     @Override
