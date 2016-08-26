@@ -79,8 +79,13 @@ public class ProductTest {
     }
 
     @Test
+    public void reimport111() {
+
+    }
+
+    @Test
     public void testSpellCheck() {
-        String brand = "xiaomi mobile";
+        String brand = "iphone mobila";
         Map<String, List<String>> strs = null;//productIndex2Service.spellCheck(brand);
         for (Map.Entry<String, List<String>> str : strs.entrySet()) {
             System.out.println(str.getKey() + "\n");

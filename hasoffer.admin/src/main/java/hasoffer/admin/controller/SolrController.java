@@ -47,6 +47,65 @@ public class SolrController {
     @Resource
     ICmpSkuService cmpSkuService;
 
+    @RequestMapping(value = "/product/reimport111", method = RequestMethod.GET)
+    public void reimport111() {
+
+        String Q_PRO_BRAND = "SELECT COUNT(t.id),t.brand FROM PtmProduct t WHERE t.brand LIKE '%mobile%' GROUP BY t.brand";
+        String Q_PRO_BRAND_1 = "SELECT t from PtmProduct t where t.brand=?0 ";
+        List<Object[]> datas = dbm.query(Q_PRO_BRAND);
+
+        for (Object[] data : datas) {
+            String brand = (String) data[1];
+            List<PtmProduct> products = dbm.query(Q_PRO_BRAND_1, Arrays.asList(brand));
+            for (PtmProduct product : products) {
+                product.setBrand("");
+                productService.importProduct2Solr2(product);
+            }
+        }
+
+        System.out.println(datas.size());
+
+    }
+
+    //1973863
+    @RequestMapping(value = "/product/importbycategory3", method = RequestMethod.GET)
+    public void importbycategory3(@RequestParam final long cate) {
+        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<>(
+                new IList() {
+                    @Override
+                    public PageableResult<PtmProduct> getData(int page) {
+                        System.out.println(String.format("importbycategory3, cate=%d page=%d", cate, page));
+                        return productService.listPagedProducts(cate, page, 2000);
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcess<PtmProduct>() {
+                    @Override
+                    public void process(PtmProduct o) {
+                        try {
+                            import2Solr(o);
+                        } catch (Exception e) {
+                            System.out.println("ERROR " + o.getId() + "\t" + e.getMessage());
+                        }
+                    }
+                }
+        );
+
+        listAndProcessTask2.setProcessorCount(10);
+        listAndProcessTask2.setQueueMaxSize(200);
+
+        listAndProcessTask2.go();
+    }
+
     //1973863
     @RequestMapping(value = "/product/importbycategory2", method = RequestMethod.GET)
     public void importNewAllProducts(@RequestParam final long minProId) {
@@ -73,104 +132,10 @@ public class SolrController {
                     @Override
                     public void process(PtmProduct o) {
                         try {
-                            process2(o);
+                            import2Solr(o);
                         } catch (Exception e) {
                             System.out.println("ERROR " + o.getId() + "\t" + e.getMessage());
                         }
-                    }
-
-                    private void process2(PtmProduct o) {
-                        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(o.getId(), SkuStatus.ONSALE);
-
-                        long cateId = o.getCategoryId();
-                        String brand = o.getBrand();
-                        String model = o.getModel();
-
-
-                        Set<Long> cateSet = new HashSet<>();
-                        Set<String> brandSet = new HashSet<>();
-                        Set<String> modelSet = new HashSet<>();
-
-                        PtmCmpSku flipSku = null;
-
-                        float minPrice = -1f, maxPrice = -1f;
-
-                        for (PtmCmpSku cmpSku : cmpSkus) {
-                            float skuPrice = cmpSku.getPrice();
-                            if (skuPrice <= 0 || cmpSku.getStatus() == SkuStatus.OFFSALE) {
-                                continue;
-                            }
-
-                            if (minPrice <= 0) {
-                                minPrice = skuPrice;
-                                maxPrice = minPrice;
-                                continue;
-                            }
-
-                            if (minPrice > skuPrice) {
-                                minPrice = skuPrice;
-                            }
-                            if (maxPrice < skuPrice) {
-                                maxPrice = skuPrice;
-                            }
-
-                            // ....
-
-                            if (cmpSku.getCategoryId() != null && cmpSku.getCategoryId() > 0) {
-                                cateSet.add(cmpSku.getCategoryId());
-                            }
-                            if (StringUtils.isEmpty(cmpSku.getBrand())) {
-                                brandSet.add(cmpSku.getBrand());
-                            }
-                            if (StringUtils.isEmpty(cmpSku.getModel())) {
-                                modelSet.add(cmpSku.getModel());
-                            }
-
-                            if (flipSku == null && Website.FLIPKART == cmpSku.getWebsite()) {
-                                flipSku = cmpSku;
-                            }
-                        }
-
-                        if (minPrice < 0) {
-                            return;
-                        }
-
-                        String info = String.format("[Product]%d, Cate Set[%d], Brand Set[%d], Model Set[%d].", o.getId(), cateSet.size(), brandSet.size(), modelSet.size());
-                        System.out.println(info);
-
-                        if (StringUtils.isEmpty(brand)) {
-                            if (flipSku != null) {
-                                if (StringUtils.isEmpty(flipSku.getBrand())) {
-                                    FlipkartAffiliateProductProcessor fapp = new FlipkartAffiliateProductProcessor();
-                                    FlipkartSkuInfo skuInfo = null;
-                                    try {
-                                        skuInfo = fapp.getSkuInfo(flipSku.getSourceSid());
-                                        if (skuInfo != null) {
-                                            brand = skuInfo.getProductBrand();
-                                            model = skuInfo.getModelName();
-                                            // 更新商品brand和model， solr
-                                            cmpSkuService.updateCmpSkuBrandModel(flipSku.getId(), brand, model);
-                                        }
-                                    } catch (Exception e) {
-                                        System.out.println(String.format("Error : [%s]. Info : [%s]", e.getMessage(), flipSku.getSourceSid()));
-                                    }
-
-                                } else {
-                                    brand = flipSku.getBrand();
-                                    model = flipSku.getModel();
-                                }
-                            } else {
-                                if (brandSet.size() == 1) {
-                                    brand = brandSet.iterator().next();
-                                }
-                            }
-
-                            productService.updateProductBrandModel(o.getId(), brand, model);
-                            o.setBrand(brand);
-                            o.setModel(model);
-                        }
-
-                        productService.importProduct2Solr2(o, cmpSkus);
                     }
                 }
         );
@@ -179,6 +144,100 @@ public class SolrController {
         listAndProcessTask2.setQueueMaxSize(200);
 
         listAndProcessTask2.go();
+    }
+
+    private void import2Solr(PtmProduct o) {
+        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(o.getId(), SkuStatus.ONSALE);
+
+        long cateId = o.getCategoryId();
+        String brand = o.getBrand();
+        String model = o.getModel();
+
+
+        Set<Long> cateSet = new HashSet<>();
+        Set<String> brandSet = new HashSet<>();
+        Set<String> modelSet = new HashSet<>();
+
+        PtmCmpSku flipSku = null;
+
+        float minPrice = -1f, maxPrice = -1f;
+
+        for (PtmCmpSku cmpSku : cmpSkus) {
+            float skuPrice = cmpSku.getPrice();
+            if (skuPrice <= 0 || cmpSku.getStatus() == SkuStatus.OFFSALE) {
+                continue;
+            }
+
+            if (minPrice <= 0) {
+                minPrice = skuPrice;
+                maxPrice = minPrice;
+                continue;
+            }
+
+            if (minPrice > skuPrice) {
+                minPrice = skuPrice;
+            }
+            if (maxPrice < skuPrice) {
+                maxPrice = skuPrice;
+            }
+
+            // ....
+
+            if (cmpSku.getCategoryId() != null && cmpSku.getCategoryId() > 0) {
+                cateSet.add(cmpSku.getCategoryId());
+            }
+            if (StringUtils.isEmpty(cmpSku.getBrand())) {
+                brandSet.add(cmpSku.getBrand());
+            }
+            if (StringUtils.isEmpty(cmpSku.getModel())) {
+                modelSet.add(cmpSku.getModel());
+            }
+
+            if (flipSku == null && Website.FLIPKART == cmpSku.getWebsite()) {
+                flipSku = cmpSku;
+            }
+        }
+
+        if (minPrice < 0) {
+            return;
+        }
+
+        String info = String.format("[Product]%d, Cate Set[%d], Brand Set[%d], Model Set[%d].", o.getId(), cateSet.size(), brandSet.size(), modelSet.size());
+        System.out.println(info);
+
+        if (StringUtils.isEmpty(brand)) {
+            if (flipSku != null) {
+                if (StringUtils.isEmpty(flipSku.getBrand())) {
+                    FlipkartAffiliateProductProcessor fapp = new FlipkartAffiliateProductProcessor();
+                    FlipkartSkuInfo skuInfo = null;
+                    try {
+                        skuInfo = fapp.getSkuInfo(flipSku.getSourceSid());
+                        if (skuInfo != null) {
+                            brand = skuInfo.getProductBrand();
+                            model = skuInfo.getModelName();
+                            // 更新商品brand和model， solr
+                            cmpSkuService.updateCmpSkuBrandModel(flipSku.getId(), brand, model);
+                        }
+                    } catch (Exception e) {
+                        System.out.println(String.format("Error : [%s]. Info : [%s]", e.getMessage(), flipSku.getSourceSid()));
+                    }
+
+                } else {
+                    brand = flipSku.getBrand();
+                    model = flipSku.getModel();
+                }
+            } else {
+                if (brandSet.size() == 1) {
+                    brand = brandSet.iterator().next();
+                }
+            }
+
+            productService.updateProductBrandModel(o.getId(), brand, model);
+            o.setBrand(brand);
+            o.setModel(model);
+        }
+
+        productService.importProduct2Solr2(o, cmpSkus);
     }
 
     @RequestMapping(value = "/product/importbycategory", method = RequestMethod.GET)
