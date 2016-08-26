@@ -616,7 +616,6 @@ public class AppController {
                         Iterator<Map.Entry> iterator = set.iterator();
                         while (iterator.hasNext()) {
                             Map.Entry next = iterator.next();
-                            System.out.println("key " + next.getKey());
                             List<NameValue> nameValues = (List<NameValue>) next.getValue();
                             for (NameValue nameValue : nameValues) {
                                 Long cateId = (Long) nameValue.getName();
@@ -624,7 +623,6 @@ public class AppController {
                                 PtmCategory ptmCategory = appCacheManager.getCategoryById(cateId);
                                 if (ptmCategory != null && ptmCategory.getLevel() == 2) {
                                     //处理二级类目
-                                    System.out.println("cate level   :" + ptmCategory.getLevel());
                                     CategoryVo categoryVo = new CategoryVo();
                                     categoryVo.setId(ptmCategory.getId());
                                     categoryVo.setLevel(ptmCategory.getLevel());
@@ -635,22 +633,20 @@ public class AppController {
                                     secondCategoryList.add(categoryVo);
                                 } else if (ptmCategory != null && ptmCategory.getLevel() == 3) {
                                     //处理三级类目
-                                    System.out.println("has third ");
-                                    CategoryVo categoryVo = new CategoryVo();
-                                    categoryVo.setId(ptmCategory.getId());
-                                    categoryVo.setLevel(ptmCategory.getLevel());
-                                    categoryVo.setParentId(ptmCategory.getParentId());
-                                    categoryVo.setRank(ptmCategory.getRank());
-                                    categoryVo.setName(ptmCategory.getName());
-                                    categoryVo.setHasChildren(0);
-                                    thirdCategoryList.add(categoryVo);
+                                    CategoryVo categoryVo3 = new CategoryVo();
+                                    categoryVo3.setId(ptmCategory.getId());
+                                    categoryVo3.setLevel(ptmCategory.getLevel());
+                                    categoryVo3.setParentId(ptmCategory.getParentId());
+                                    categoryVo3.setRank(ptmCategory.getRank());
+                                    categoryVo3.setName(ptmCategory.getName());
+                                    categoryVo3.setHasChildren(0);
+                                    thirdCategoryList.add(categoryVo3);
                                 }
                             }
                         }
                         //获取到类目id appCacheManager.getCategorys(categoryId);
                         //先获取一级类目列表
                         List<CategoryVo> firstCategoryList = appCacheManager.getCategorys("");
-
                         //对二级类目按照rank排序
                         Collections.sort(secondCategoryList, new Comparator<CategoryVo>() {
                             @Override
@@ -668,24 +664,24 @@ public class AppController {
                         for (CategoryVo firstPtmCategory : firstCategoryList) {
                             for (CategoryVo cate : secondCategoryList) {
                                 //遍历所有,如果父类id是其则加入list
-                                if (cate.getParentId() == firstPtmCategory.getId()) {
+                                if (cate.getParentId().equals(firstPtmCategory.getId())) {
                                     categorys.add(cate);
                                 }
                             }
                         }
 
                         //遍历二级类目,将三级类目匹配排序和归类
-                        Iterator<CategoryVo> iterator1 = secondCategoryList.iterator();
+                        Iterator<CategoryVo> iterator1 = categorys.iterator();
                         while (iterator1.hasNext()) {
                             List<CategoryVo> tempThirdCategoryList = new ArrayList();
                             CategoryVo next = iterator1.next();
                             for (CategoryVo cate : thirdCategoryList) {
                                 //遍历所有,如果父类id是其则加入list
-                                if (cate.getParentId() == next.getId()) {
-                                    System.out.println("add to tempThirdCategoryList ");
+                                if (cate.getParentId().equals(next.getId())) {
                                     tempThirdCategoryList.add(cate);
                                 }
                             }
+
                             //对三级类目按照rank排序
                             Collections.sort(tempThirdCategoryList, new Comparator<CategoryVo>() {
                                 @Override
@@ -703,16 +699,6 @@ public class AppController {
                             }
                             next.setCategorys(tempThirdCategoryList);
                         }
-
-//                        for (CategoryVo secondPtmCategory : secondCategoryList) {
-//                            for (CategoryVo cate : thirdCategoryList) {
-//                                //遍历所有,如果父类id是其则加入list
-//                                if (cate.getParentId() == secondPtmCategory.getId()) {
-//                                    categorys.add(cate);
-//                                }
-//                            }
-//                        }
-
                         map.put("categorys", categorys);
                     }
                     addProductVo2List(li, p.getData());

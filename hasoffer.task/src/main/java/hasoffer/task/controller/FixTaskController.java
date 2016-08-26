@@ -1,11 +1,6 @@
 package hasoffer.task.controller;
 
-import hasoffer.base.enums.TaskLevel;
-import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.HttpResponseModel;
-import hasoffer.base.model.PageableResult;
-import hasoffer.base.model.Website;
-import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
@@ -19,8 +14,6 @@ import hasoffer.core.search.ISearchService;
 import hasoffer.core.worker.ListAndProcessWorkerStatus;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
-import hasoffer.spider.model.FetchUrlResult;
-import hasoffer.spider.model.FetchedProduct;
 import hasoffer.task.worker.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,12 +23,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Date : 2016/4/14
@@ -223,139 +214,16 @@ public class FixTaskController {
 
         ExecutorService es = Executors.newCachedThreadPool();
 
-        final ConcurrentLinkedQueue<PtmCmpSku> cmpSkuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
+        ConcurrentLinkedQueue<PtmCmpSku> cmpSkuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
 
-        es.execute(new Runnable() {
-            @Override
-            public void run() {
-
-                int curPage = 1;
-                int pageSize = 1000;
-                PageableResult<PtmProduct> pageableResult = dbm.queryPage("SELECT t FROM PtmProduct t WHERE t.categoryId = 5 ORDER BY t.id", curPage, pageSize);
-
-                long totalPage = pageableResult.getTotalPage();
-                System.out.println("total page " + totalPage);
-
-                while (curPage <= totalPage) {
-
-                    if (cmpSkuQueue.size() > 10000) {
-                        try {
-                            TimeUnit.SECONDS.sleep(5);
-                        } catch (InterruptedException e) {
-
-                        }
-                        continue;
-                    }
-
-                    if (curPage > 1) {
-                        pageableResult = dbm.queryPage("SELECT t FROM PtmProduct t WHERE t.categoryId = 5 ORDER BY t.id", curPage, pageSize);
-                    }
-
-                    List<PtmProduct> ptmProductList = pageableResult.getData();
-
-                    for (PtmProduct ptmProduct : ptmProductList) {
-
-                        List<PtmCmpSku> skuList = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0", Arrays.asList(ptmProduct.getId()));
-
-                        for (PtmCmpSku ptmCmpSku : skuList) {
-
-                            Website website = ptmCmpSku.getWebsite();
-                            //flipkart,snapdeal,amazon,ebay
-                            if (Website.FLIPKART.equals(website) || Website.SNAPDEAL.equals(website) || Website.AMAZON.equals(website) || Website.EBAY.equals(website)) {
-                                cmpSkuQueue.add(ptmCmpSku);
-                                System.out.println("add success to queue " + ptmCmpSku.getId());
-                                fetchDubboService.sendUrlTask(ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), TaskLevel.LEVEL_2);
-                                System.out.println("send request success for " + ptmCmpSku.getId());
-                            }
-                        }
-                    }
-
-                    System.out.println("curPage = " + curPage);
-                    curPage++;
-                }
-            }
+        es.execute(new FetchMobileCategoryBrandModelListWorker(dbm, cmpSkuQueue, fetchDubboService) {
         });
 
 
-        for (int i = 0; i < 10; i++) {
-            es.execute(new Runnable() {
-                @Override
-                public void run() {
-                    while (true) {
-
-                        PtmCmpSku ptmcmpsku = cmpSkuQueue.poll();
-
-                        if (ptmcmpsku == null) {
-                            System.out.println("pull get null wait 5 seconds");
-                            try {
-                                TimeUnit.SECONDS.sleep(5);
-                            } catch (InterruptedException e) {
-
-                            }
-                            continue;
-                        }
-
-                        long skuid = ptmcmpsku.getId();
-                        Website website = ptmcmpsku.getWebsite();
-                        String url = ptmcmpsku.getUrl();
-
-                        TaskStatus taskStatus = fetchDubboService.getUrlTaskStatus(website, url);
-
-                        FetchUrlResult fetchUrlResult = null;
-
-                        //如果返回结果状态为running，那么将sku返回队列
-                        if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
-                            cmpSkuQueue.add(ptmcmpsku);
-                            logger.info("taskstatus RUNNING for [" + skuid + "]");
-                            return;
-                        } else if (TaskStatus.STOPPED.equals(taskStatus)) {
-                            logger.info("taskstatus STOPPED for [" + skuid + "]");
-                            return;
-                        } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
-                            logger.info("taskstatus EXCEPTION for [" + skuid + "]");
-                            return;
-                        } else if (TaskStatus.NONE.equals(taskStatus)) {
-                            cmpSkuQueue.add(ptmcmpsku);
-                            if (Website.SNAPDEAL.equals(website) || Website.FLIPKART.equals(website) || Website.AMAZON.equals(website) || Website.EBAY.equals(website)) {
-                                cmpSkuQueue.add(ptmcmpsku);
-                                fetchDubboService.sendUrlTask(ptmcmpsku.getWebsite(), ptmcmpsku.getUrl(), TaskLevel.LEVEL_2);
-                            }
-                            logger.info("taskstatus NONE for [" + skuid + "] , resend success");
-                            return;
-                        } else {//(TaskStatus.FINISH.equals(taskStatus)))
-                            logger.info("taskstatus FINISH for [" + skuid + "]");
-                            fetchUrlResult = fetchDubboService.getProductsByUrl(skuid, ptmcmpsku.getWebsite(), ptmcmpsku.getUrl());
-
-                            FetchedProduct fetchedProduct = fetchUrlResult.getFetchProduct();
-
-                            System.out.println(JSONUtil.toJSON(fetchedProduct).toString() + "id=" + skuid);
-
-                            try {
-                                cmpSkuService.createDescription(ptmcmpsku, fetchedProduct);
-                            } catch (Exception e) {
-
-                            }
-
-                            try {
-                                cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
-                            } catch (Exception e) {
-
-                            }
-
-                            try {
-                                cmpSkuService.createPtmCmpSkuImage(skuid, fetchedProduct);
-                            } catch (Exception e) {
-
-                            }
-
-                        }
-                    }
-                }
-            });
+        for (int i = 0; i < 20; i++) {
+            es.execute(new FetchMobileCategoryBrandModel(cmpSkuQueue, fetchDubboService, cmpSkuService));
         }
 
-        while(true){
-
-        }
+        return "ok";
     }
 }

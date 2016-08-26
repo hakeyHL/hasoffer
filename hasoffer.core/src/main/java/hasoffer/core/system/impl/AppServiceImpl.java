@@ -77,7 +77,7 @@ public class AppServiceImpl implements IAppService {
             "SELECT t FROM PtmCategory t where t.parentId=?0 ";
 
     private static final String Q_APP_CATEGORY_BYID =
-            "SELECT t FROM PtmCategory t where t.id=?0 and t.level=2";
+            "SELECT t FROM PtmCategory t where t.id=?0 ";
     @Resource
     IDataBaseManager dbm;
     private String Q_APP_GETPRODUCTS =
