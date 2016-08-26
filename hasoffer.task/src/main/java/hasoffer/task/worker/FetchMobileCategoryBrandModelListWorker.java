@@ -65,9 +65,9 @@ public class FetchMobileCategoryBrandModelListWorker implements Runnable {
                     //flipkart,snapdeal,amazon,ebay
                     if (Website.FLIPKART.equals(website) || Website.SNAPDEAL.equals(website) || Website.AMAZON.equals(website) || Website.EBAY.equals(website)) {
                         cmpSkuQueue.add(ptmCmpSku);
-                        System.out.println("add success to queue " + ptmCmpSku.getId());
+//                        System.out.println("add success to queue " + ptmCmpSku.getId());
                         fetchDubboService.sendUrlTask(ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), TaskLevel.LEVEL_2);
-                        System.out.println("send request success for " + ptmCmpSku.getId());
+//                        System.out.println("send request success for " + ptmCmpSku.getId());
                     }
                 }
             }
