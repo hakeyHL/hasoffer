@@ -636,7 +636,7 @@ public class AppController {
                         }
                         //获取到类目id appCacheManager.getCategorys(categoryId);
                         //先获取一级类目列表
-                        List<PtmCategory> firstCategoryList = appCacheManager.getCategorys("");
+                        List<CategoryVo> firstCategoryList = appCacheManager.getCategorys("");
 
                         //对二级类目按照rank排序
                         Collections.sort(tempCategorys, new Comparator<CategoryVo>() {
@@ -651,7 +651,7 @@ public class AppController {
                             }
                         });
 
-                        for (PtmCategory firstPtmCategory : firstCategoryList) {
+                        for (CategoryVo firstPtmCategory : firstCategoryList) {
                             for (CategoryVo cate : tempCategorys) {
                                 //遍历所有,如果父类id是其则加入list
                                 if (cate.getParentId() == firstPtmCategory.getId()) {
