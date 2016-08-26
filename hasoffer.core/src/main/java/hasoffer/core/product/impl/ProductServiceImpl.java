@@ -717,7 +717,7 @@ public class ProductServiceImpl implements IProductService {
 
         // 类目关键词
         long cate1 = 0L, cate2 = 0L, cate3 = 0L;
-        String cate1name = "", cate2name = "", cate3name = "";
+        String cate1name = "", cate2name = "", cate3name = "", cateTag = "";
 
         List<PtmCategory> categories = categoryCacheManager.getRouterCategoryList(product.getCategoryId());
 
@@ -741,6 +741,8 @@ public class ProductServiceImpl implements IProductService {
                 cate3 = cate.getId();
                 cate3name = cate.getName();
             }
+
+            cateTag = categoryCacheManager.getCategoryTag(product.getCategoryId());
         }
 
         long searchCount = 0;
@@ -753,6 +755,7 @@ public class ProductServiceImpl implements IProductService {
                 product.getId(),
                 product.getTitle(),
                 product.getTag(),
+                cateTag,
                 product.getBrand(),
                 product.getModel(),
                 cate1,

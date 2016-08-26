@@ -2,6 +2,7 @@ package hasoffer.core.product.impl;
 
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.po.ptm.PtmCateTag;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCategory3;
 import hasoffer.core.persistence.po.ptm.updater.PtmCategoryUpdater;
@@ -21,6 +22,8 @@ public class CategoryServiceImpl implements ICategoryService {
 
     private final static String Q_CATEGORY = "SELECT t FROM PtmCategory t";
 
+    private final static String Q_CATEGORY_TAG = "SELECT t FROM PtmCateTag t";
+
     private static final String Q_CATEGORY_BY_PARENTID =
             "SELECT t FROM PtmCategory t WHERE t.parentId = ?0";
     private final static String CACHE_KEY = "category";
@@ -35,6 +38,11 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     public PtmCategory getCategory(long cateId) {
         return dbm.get(PtmCategory.class, cateId);
+    }
+
+    @Override
+    public List<PtmCateTag> listAllCategoryTags() {
+        return dbm.query(Q_CATEGORY_TAG);
     }
 
     @Override
