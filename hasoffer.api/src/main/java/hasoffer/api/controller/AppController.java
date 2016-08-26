@@ -624,6 +624,9 @@ public class AppController {
                                     categoryVo.setLevel(ptmCategory.getLevel());
                                     categoryVo.setName(ptmCategory.getName());
                                     categoryVo.setCategorys(appCacheManager.getCategorys(cateId + ""));
+                                    if (categoryVo.getCategorys() != null && categoryVo.getCategorys().size() > 0) {
+                                        categoryVo.setHasChildren(1);
+                                    }
                                     categorys.add(categoryVo);
                                 }
                             }
