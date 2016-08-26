@@ -216,13 +216,12 @@ public class FixTaskController {
 
         ConcurrentLinkedQueue<PtmCmpSku> cmpSkuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
 
-        es.execute(new FetchMobileCategoryBrandModelListWorker(dbm, cmpSkuQueue, fetchDubboService) {
-        });
-
-
         for (int i = 0; i < 20; i++) {
             es.execute(new FetchMobileCategoryBrandModel(cmpSkuQueue, fetchDubboService, cmpSkuService));
         }
+
+        es.execute(new FetchMobileCategoryBrandModelListWorker(dbm, cmpSkuQueue, fetchDubboService) {
+        });
 
         return "ok";
     }
