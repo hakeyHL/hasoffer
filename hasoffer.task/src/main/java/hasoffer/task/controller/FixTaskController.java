@@ -216,7 +216,7 @@ public class FixTaskController {
         return "ok";
     }
 
-    //fixdata/fetchMobileCategoryBrandModel
+    //fixtask/fetchMobileCategoryBrandModel
     @RequestMapping(value = "/fetchMobileCategoryBrandModel")
     @ResponseBody
     public String fetchMobileCategoryBrandModel() {
@@ -231,7 +231,7 @@ public class FixTaskController {
 
                 int curPage = 1;
                 int pageSize = 1000;
-                PageableResult<PtmProduct> pageableResult = dbm.queryPage("SELECT t FROM PtmProduct t WHERE t.categoryid = 5 ORDER BY t.id", curPage, pageSize);
+                PageableResult<PtmProduct> pageableResult = dbm.queryPage("SELECT t FROM PtmProduct t WHERE t.categoryId = 5 ORDER BY t.id", curPage, pageSize);
 
                 long totalPage = pageableResult.getTotalPage();
                 System.out.println("total page " + totalPage);
@@ -248,7 +248,7 @@ public class FixTaskController {
                     }
 
                     if (curPage > 1) {
-                        pageableResult = dbm.queryPage("SELECT t FROM PtmProduct t WHERE t.categoryid = 5 ORDER BY t.id", curPage, pageSize);
+                        pageableResult = dbm.queryPage("SELECT t FROM PtmProduct t WHERE t.categoryId = 5 ORDER BY t.id", curPage, pageSize);
                     }
 
                     List<PtmProduct> ptmProductList = pageableResult.getData();
