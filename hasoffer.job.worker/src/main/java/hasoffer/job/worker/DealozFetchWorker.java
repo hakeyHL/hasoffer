@@ -7,11 +7,11 @@ import hasoffer.core.search.SearchProductService;
 import hasoffer.fetch.model.ListProduct;
 import hasoffer.fetch.model.ProductStatus;
 import hasoffer.fetch.model.WebFetchResult;
-import hasoffer.spider.common.RedisKeysUtils;
+import hasoffer.spider.constants.RedisKeysUtils;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchedProduct;
 import hasoffer.spider.redis.service.IFetchCacheService;
-import hasoffer.spider.redis.utils.FetchCacheUtil;
+import hasoffer.spring.context.SpringContextHolder;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -23,7 +23,7 @@ public class DealozFetchWorker implements Runnable {
 
     public DealozFetchWorker(SearchProductService searchProductService, IDataBaseManager dbm) {
         this.searchProductService = searchProductService;
-        this.fetchCacheService = FetchCacheUtil.getBean();
+        this.fetchCacheService = (IFetchCacheService) SpringContextHolder.getBean("fetchCacheService");
     }
 
     @Override

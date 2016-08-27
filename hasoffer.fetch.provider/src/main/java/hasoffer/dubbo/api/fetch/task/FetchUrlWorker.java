@@ -3,10 +3,10 @@ package hasoffer.dubbo.api.fetch.task;
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.utils.JSONUtil;
-import hasoffer.spider.api.IFetchService;
-import hasoffer.spider.api.impl.FetchServiceImpl;
-import hasoffer.spider.common.RedisKeysUtils;
+import hasoffer.spider.api.ISpiderService;
+import hasoffer.spider.api.impl.SpiderServiceImpl;
 import hasoffer.spider.common.SpiderLogger;
+import hasoffer.spider.constants.RedisKeysUtils;
 import hasoffer.spider.exception.UnSupportWebsiteException;
 import hasoffer.spider.model.FetchUrlResult;
 import hasoffer.spider.redis.service.IFetchCacheService;
@@ -22,7 +22,7 @@ public class FetchUrlWorker implements Runnable {
 
     private IFetchCacheService fetchCacheService;
 
-    private IFetchService fetchService = new FetchServiceImpl();
+    private ISpiderService fetchService = new SpiderServiceImpl();
 
     public FetchUrlWorker(WebApplicationContext springContext) {
         fetchCacheService = (IFetchCacheService) springContext.getBean("fetchCacheService");
@@ -66,7 +66,7 @@ public class FetchUrlWorker implements Runnable {
 
     public void fetch(FetchUrlResult fetchUrlResult) {
         try {
-            fetchUrlResult = fetchService.getProductByUrl(fetchUrlResult);
+            fetchUrlResult = fetchService.spiderProductByUrl(fetchUrlResult);
         } catch (UnSupportWebsiteException e) {
             fetchUrlResult.setTaskStatus(TaskStatus.STOPPED);
             fetchUrlResult.setErrMsg("un able support website.");

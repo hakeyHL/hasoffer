@@ -12,11 +12,6 @@
     <artifactId>hasoffer.fetch.api</artifactId>
 
     <dependencies>
-        <!--<dependency>-->
-            <!--<groupId>hasoffer</groupId>-->
-            <!--<artifactId>hasoffer.fetch</artifactId>-->
-            <!--<version>1.0-SNAPSHOT</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>hasoffer</groupId>
             <artifactId>hasoffer.base</artifactId>
@@ -24,8 +19,13 @@
         </dependency>
         <dependency>
             <groupId>hasoffer</groupId>
-            <artifactId>hasoffer.spider.api</artifactId>
+            <artifactId>hasoffer.spider.model</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <!--<dependency>-->
+        <!--<groupId>hasoffer</groupId>-->
+        <!--<artifactId>hasoffer.spider.api</artifactId>-->
+        <!--<version>1.0-SNAPSHOT</version>-->
+        <!--</dependency>-->
     </dependencies>
 </project>
