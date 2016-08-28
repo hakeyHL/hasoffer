@@ -32,5 +32,5 @@ public interface IMongoDbManager {
     <T> AggregationResults<T> aggregate(Class<T> clazz, TypedAggregation<T> agg);
 
     // table
-
+    <T> boolean exists(Class<T> clazz, Object id);
 }
