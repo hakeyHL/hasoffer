@@ -4,9 +4,10 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
-import hasoffer.fetch.sites.snapdeal.SnapdealHelper;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,13 +17,36 @@ import java.util.regex.Pattern;
 public class StringTest {
 
     @Test
+    public void test12() {
+
+        String oldUrl = "http://www.amazon.in/gp/offer-listing/B01BK92AMK";
+
+        String newUrl = oldUrl.replace("gp/offer-listing", "dp");
+
+        System.out.println(oldUrl);
+        System.out.println(newUrl);
+
+    }
+
+    @Test
+    public void test11() {
+
+        String a = "&nbsp;";
+
+        String s = StringUtils.filterAndTrim(a, Arrays.asList("&nbsp;"));
+
+        System.out.println(s);
+
+    }
+
+    @Test
     public void test10() {
 
-        String url = "http://m.snapdeal.com";
+        String url = "{\"Transfer Speed\\\":\\\"Read 18.62 MB/sec, Write 4.02 MB/sec\\\",\\\"Part Number\\\":\\\"Cruzer Blade 8gb\\\",\\\"Color\\\":\\\"Multicolor\\\",\\\"Dimensions\\\":\\\"7.4 mm x 17.6 mm x 41.5 mm\\\",\\\"Encryption\\\":\\\"128-bit AES Encryption\\\",\\\"Weight\\\":\\\"2.50 g\\\",\\\"Brand\\\":\\\"SanDisk\\\",\\\"USB on the go\\\":\\\"No\\\",\\\"Form Factor\\\":\\\"USB Flash Drive\\\",\\\"Type\\\":\\\"Utility Pendrive\\\",\\\"Model\\\":\\\"SDCZ50-008G-I35\\\",\\\"Features\\\":\\\"<p>Ultra Portable, Small Size</p> <p>Feather light</p> <p>Smart and stylish</p>\\\",\\\"Case Material\\\":\\\"Plastic\\\",\\\"Capacity (GB)\\\":\\\"8 GB\\\",\\\"Interface\\\":\\\"USB 2.0\\\"}";
 
-        String deeplink = SnapdealHelper.getUrlWithAff(url);
+        url = StringEscapeUtils.unescapeHtml(url);
 
-        System.out.println(deeplink);
+        System.out.println(url);
 
     }
 

@@ -68,7 +68,7 @@ public class AppDealController {
             for (DealModel dealModel : dealModels) {
                 if (dealModel.getExpireTime().compareTo(new Date()) != 1 && dealModel.isDisplay()) {
                     DealVo dealVo = new DealVo();
-                    dealVo.setLogoUrl(dealModel.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(Website.valueOf(dealModel.getWebsite())));
+                    dealVo.setLogoUrl(dealModel.getWebsite() == null ? "" : WebsiteHelper.getBiggerLogoUrl(Website.valueOf(dealModel.getWebsite())));
                     dealVo.setTitle(dealModel.getTitle());
                     dealVo.setWebsite(Website.valueOf(dealModel.getWebsite()));
                     dealVo.setId(dealModel.getId());
@@ -78,80 +78,59 @@ public class AppDealController {
                 }
             }
             System.out.println("from solr get   :" + deals.size());
-            //再展示手机类deal id或parentid 为 5 level小于等于3
-            PageableResult pageableResult = appService.getDeals(page + 0l, pageSize + 0l);
-            if (pageableResult != null && pageableResult.getData() != null && pageableResult.getData().size() > 0) {
-                List<AppDeal> list = pageableResult.getData();
-                System.out.println("search from mysql get   :" + list.size());
-                List<DealVo> mobileDeals = new ArrayList<DealVo>();
-                Iterator<AppDeal> dealIterator = list.iterator();
-                while (dealIterator.hasNext()) {
-                    AppDeal appDeal = dealIterator.next();
-                    if (appDeal.getDealCategoryId() == 5) {
-                        DealVo dealVo = new DealVo();
-                        dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                        dealVo.setTitle(appDeal.getTitle());
-                        dealVo.setWebsite(appDeal.getWebsite());
-                        dealVo.setId(appDeal.getId());
-                        dealVo.setDiscount(appDeal.getDiscount());
-                        dealVo.setDeepLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
-                        mobileDeals.add(dealVo);
-                        dealIterator.remove();
-                    }
-                }
-                System.out.println("mobile  get   :" + mobileDeals.size());
-                deals.addAll(mobileDeals);
-                System.out.println("current size   :" + deals.size());
-                //其他deal按照点击次数排序
-                Collections.sort(list, new Comparator<AppDeal>() {
-                    @Override
-                    public int compare(AppDeal o1, AppDeal o2) {
-                        if (o1.getDealClickCount() > o2.getDealClickCount()) {
-                            return -1;
-                        } else if (o1.getDealClickCount() < o2.getDealClickCount()) {
-                            return 1;
-                        }
-                        return 0;
-                    }
-                });
-                System.out.println("last  list size   :" + list.size());
-                for (AppDeal appDeal : list) {
+        }
+        //再展示手机类deal id或parentid 为 5 level小于等于3
+        PageableResult pageableResult = appService.getDeals(page + 0l, pageSize + 0l);
+        if (pageableResult != null && pageableResult.getData() != null && pageableResult.getData().size() > 0) {
+            List<AppDeal> list = pageableResult.getData();
+            System.out.println("search from mysql get   :" + list.size());
+            List<DealVo> mobileDeals = new ArrayList<DealVo>();
+            Iterator<AppDeal> dealIterator = list.iterator();
+            while (dealIterator.hasNext()) {
+                AppDeal appDeal = dealIterator.next();
+                if (appDeal.getDealCategoryId() == 5) {
                     DealVo dealVo = new DealVo();
-                    dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                    dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getBiggerLogoUrl(appDeal.getWebsite()));
                     dealVo.setTitle(appDeal.getTitle());
                     dealVo.setWebsite(appDeal.getWebsite());
                     dealVo.setId(appDeal.getId());
                     dealVo.setDiscount(appDeal.getDiscount());
                     dealVo.setDeepLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
-                    deals.add(dealVo);
+                    mobileDeals.add(dealVo);
+                    dealIterator.remove();
                 }
-                System.out.println("current  deals size   :" + deals.size());
             }
-            Map map = new HashMap();
-            map.put("deals", deals);
-            jsonObject.put("data", JSONObject.toJSON(map));
-        } else {
-            jsonObject.put("data", "{\n" +
-                    "        \"deals\": [\n" +
-                    "            {\n" +
-                    "                \"website\": \"FLIPKART\",\n" +
-                    "                \"logoUrl\": \"http://img2.imgtn.bdimg.com/it/u=878754940,809562928&fm=21&gp=0.jpg\",\n" +
-                    "                \"title\": \"宏碁（acer）TMP236 13.3英寸轻薄笔记本电脑（i5-5200U 8G 8G SSHD+500G 核芯显卡 全高清屏Win7）\",\n" +
-                    "                \"discount\": \"60\",\n" +
-                    "                \"deepLink\": \"http://item.jd.com/1362743.html?cpdad=1DLSUE\",\n" +
-                    "                \"id\": \"1362743\"\n" +
-                    "            },\n" +
-                    "            {\n" +
-                    "                \"website\": \"FLIPKART\",\n" +
-                    "                \"logoUrl\": \"http://img2.imgtn.bdimg.com/it/u=878754940,809562928&fm=21&gp=0.jpg\",\n" +
-                    "                \"title\": \"伯希和PELLIOT户外防晒皮肤衣 男女轻薄透气速衣1731 男孔雀蓝色 L\",\n" +
-                    "                \"discount\": \"70\",\n" +
-                    "                \"deepLink\": \"http://item.jd.com/2908042.html?cpdad=1DLSUE\",\n" +
-                    "                \"id\": \"2908042\"\n" +
-                    "            }\n" +
-                    "        ]\n" +
-                    "    }");
+            System.out.println("mobile  get   :" + mobileDeals.size());
+            deals.addAll(mobileDeals);
+            System.out.println("current size   :" + deals.size());
+            //其他deal按照点击次数排序
+            Collections.sort(list, new Comparator<AppDeal>() {
+                @Override
+                public int compare(AppDeal o1, AppDeal o2) {
+                    if (o1.getDealClickCount() > o2.getDealClickCount()) {
+                        return -1;
+                    } else if (o1.getDealClickCount() < o2.getDealClickCount()) {
+                        return 1;
+                    }
+                    return 0;
+                }
+            });
+            System.out.println("last  list size   :" + list.size());
+            for (AppDeal appDeal : list) {
+                DealVo dealVo = new DealVo();
+                dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getBiggerLogoUrl(appDeal.getWebsite()));
+                dealVo.setTitle(appDeal.getTitle());
+                dealVo.setWebsite(appDeal.getWebsite());
+                dealVo.setId(appDeal.getId());
+                dealVo.setDiscount(appDeal.getDiscount());
+                dealVo.setDeepLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+                deals.add(dealVo);
+            }
+            System.out.println("current  deals size   :" + deals.size());
         }
+        Map map = new HashMap();
+        map.put("deals", deals);
+        jsonObject.put("data", JSONObject.toJSON(map));
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
         return null;
     }
@@ -163,7 +142,7 @@ public class AppDealController {
         Map hashMap = new HashMap<>();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
-        hashMap.put("provisions", "• Taxs are applicable.\\n• This offer cannot be clubbed with any other ongoing offer.\\n• Offer cannot be redeemed for cash.\\n• No coupon code required.\\n• Company has the right to end this offer without prior notice.\"\n");
+        hashMap.put("provisions", "• Taxs are applicable.\n• This offer cannot be clubbed with any other ongoing offer.\n• Offer cannot be redeemed for cash.\n• No coupon code required.\n• Company has the right to end this offer without prior notice.\n");
         if (appDeal != null) {
             logger.info("has this deal " + id);
             hashMap.put("description", appDeal.getDescription());

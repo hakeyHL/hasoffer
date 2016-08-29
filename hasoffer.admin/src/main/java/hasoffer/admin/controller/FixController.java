@@ -101,6 +101,61 @@ public class FixController {
     ICacheService cacheServiceImpl;
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
 
+    private Website[] websites = {
+            Website.ASKMEBAZAAR,
+            Website.INDIATIMES,
+            Website.CROMARETAIL,
+            Website.CROMA,
+            Website.HOMESHOP18,
+            Website.BAGITTODAY,
+            Website.THEITDEPOT,
+            Website.SAHOLIC,
+            Website.FIRSTCRY,
+            Website.EDABBA,
+            Website.GADGETS360,
+            Website.MANIACSTORE,
+            Website.SYBERPLACE,
+            Website.BABYOYE,
+            Website.SHOPMONK,
+            Website.PURPLLE,
+            Website.NAAPTOL,
+            Website.ZOOMIN
+    };
+
+    @RequestMapping(value = "/deletesmallsitesku", method = RequestMethod.GET)
+    @ResponseBody
+    public String deletesmallsitesku() {
+
+        final String Q_SKU = "select t from PtmCmpSku t where t.website=?0";
+        final Set<Long> proIdSet = new HashSet<>();
+
+        for (Website website : websites) {
+            System.out.println(String.format("Delete [%s] skus....", website.name()));
+            List<PtmCmpSku> cmpSkus = dbm.query(Q_SKU, Arrays.asList(website));
+            int count = 0, size = cmpSkus.size();
+            for (PtmCmpSku cmpSku : cmpSkus) {
+                proIdSet.add(cmpSku.getProductId());
+                // delete cmpsku
+                cmpSkuService.deleteCmpSku(cmpSku.getId());
+                count++;
+                if (count % 10 == 0) {
+                    System.out.println(String.format("Delete [%s] skus....[%d/%d]", website.name(), count, size));
+                }
+            }
+        }
+
+        for (Long proId : proIdSet) {
+            PtmProduct pro = dbm.get(PtmProduct.class, proId);
+            if (pro != null) {
+                productService.importProduct2Solr(pro);
+            } else {
+                productService.deleteProduct(proId);
+            }
+        }
+
+        return "ok";
+    }
+
     /**
      * 该方法用于将现有sku中（Date：2016-08-08）,flipkart的被访问的sku，找到其对应的类目
      */
@@ -286,6 +341,7 @@ public class FixController {
         }
     }
 
+    //fixdata/deleteproduct/
     @RequestMapping(value = "/deleteproduct/{proId}", method = RequestMethod.GET)
     public
     @ResponseBody
@@ -299,6 +355,17 @@ public class FixController {
                 System.out.println("product is not null");
                 logger.info(product.toString());
             }
+        }
+        return "ok";
+    }
+
+    //fixdata/deleteproductanyway/
+    @RequestMapping(value = "/deleteproductanyway/{proId}", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String deleteproduct2(@PathVariable Long proId) {
+        if (proId > 0) {
+            productService.deleteProduct(proId);
         }
         return "ok";
     }
@@ -1256,6 +1323,210 @@ public class FixController {
                 TimeUnit.SECONDS.sleep(5);
             } catch (Exception e) {
                 break;
+            }
+        }
+
+        return "ok";
+    }
+
+    //fixdata/fixSkuSmallImagePathSizeZero
+    @RequestMapping(value = "/fixSkuSmallImagePathSizeZero")
+    @ResponseBody
+    public String fixSkuSmallImagePathSizeZero() {
+
+        final ConcurrentLinkedQueue<PtmCmpSku> cmpSkuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        es.execute(new Runnable() {
+
+            @Override
+            public void run() {
+
+                String[] strArray = {"0802"};
+
+                for (int i = 0; i < strArray.length; i++) {
+
+                    String str = strArray[i];
+                    System.out.println("cur str" + str);
+
+                    int curPage = 1;
+                    int pageSize = 1000;
+
+                    PageableResult<PtmCmpSku> pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.smallImagePath like '/2016/" + str + "/%' ", curPage, pageSize);
+
+                    long totalPage = pageableResult.getTotalPage();
+
+                    while (curPage <= totalPage) {
+
+                        if (cmpSkuQueue.size() > 10000) {
+                            try {
+                                TimeUnit.SECONDS.sleep(5);
+                            } catch (InterruptedException e) {
+
+                            }
+                            System.out.println("queue size = " + cmpSkuQueue.size());
+                            continue;
+                        }
+
+                        if (curPage > 1) {
+                            pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.smallImagePath like '/2016/" + str + "/%' ", curPage, pageSize);
+                        }
+
+                        List<PtmCmpSku> cmpSkuList = pageableResult.getData();
+
+                        cmpSkuQueue.addAll(cmpSkuList);
+
+                        curPage++;
+                    }
+                }
+            }
+        });
+
+        for (int i = 0; i < 10; i++) {
+
+            es.execute(new Runnable() {
+                @Override
+                public void run() {
+                    while (true) {
+
+                        PtmCmpSku sku = cmpSkuQueue.poll();
+
+                        try {
+
+                            if (sku == null) {
+                                try {
+                                    TimeUnit.SECONDS.sleep(3);
+                                } catch (InterruptedException e) {
+
+                                }
+                                continue;
+                            }
+
+                            cmpSkuService.downloadImage2(sku);
+                        } catch (Exception e) {
+                            System.out.println("error download for " + sku.getId());
+                        }
+                    }
+                }
+            });
+        }
+
+        return "ok";
+    }
+
+    //fixdata/fixSkuSmallImagePathSizeZeroTest
+    @RequestMapping(value = "/fixSkuSmallImagePathSizeZeroTest")
+    @ResponseBody
+    public String fixSkuSmallImagePathSizeZeroTest() {
+
+        PtmCmpSku sku = dbm.querySingle("SELECT t FROM PtmCmpSku t WHERE t.id = ?0 ", Arrays.asList(6428134L));
+
+        cmpSkuService.downloadImage2(sku);
+
+        return "ok";
+    }
+
+
+    //fixdata/fixFlipkartSkutitleNull
+    @RequestMapping(value = "/fixFlipkartSkutitleNull")
+    @ResponseBody
+    public String fixFlipkartSkutitleNull() {
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        final ConcurrentLinkedQueue<PtmCmpSku> cmpSkuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
+
+        es.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                int curPage = 1;
+                int pageSize = 1000;
+                PageableResult<PtmCmpSku> pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' AND t.skuTitle like '%null%'", curPage, pageSize);
+
+                long totalPage = pageableResult.getTotalPage();
+                System.out.println("total page " + totalPage);
+
+                while (curPage <= totalPage) {
+
+                    if (cmpSkuQueue.size() > 50000) {
+                        try {
+                            TimeUnit.SECONDS.sleep(5);
+                        } catch (InterruptedException e) {
+
+                        }
+                        continue;
+                    }
+
+                    if (curPage > 1) {
+                        pageableResult = dbm.queryPage("SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' AND t.skuTitle like '%null%'", curPage, pageSize);
+                    }
+
+                    List<PtmCmpSku> ptmCmpSkuList = pageableResult.getData();
+
+                    for (PtmCmpSku ptmCmpSku : ptmCmpSkuList) {
+                        cmpSkuQueue.add(ptmCmpSku);
+                        System.out.println("add success " + ptmCmpSku.getId() + "\n skutitle = " + ptmCmpSku.getSkuTitle() + "\n url =" + ptmCmpSku.getUrl());
+                    }
+
+                    System.out.println("curPage = " + curPage);
+                    curPage++;
+                }
+            }
+        });
+
+        for (int i = 0; i < 10; i++) {
+            es.execute(new Runnable() {
+                @Override
+                public void run() {
+                    while (true) {
+
+                        PtmCmpSku ptmcmpsku = cmpSkuQueue.poll();
+
+                        if (ptmcmpsku == null) {
+                            System.out.println("pull get null wait 5 seconds");
+                            try {
+                                TimeUnit.SECONDS.sleep(5);
+                            } catch (InterruptedException e) {
+
+                            }
+                            continue;
+                        }
+
+                        String oldSkuTitle = ptmcmpsku.getSkuTitle();
+                        String newSkuTitle = StringUtils.filterAndTrim(oldSkuTitle, Arrays.asList("null"));
+
+                        cmpSkuService.fixFlipkartSkuTitleNull(ptmcmpsku.getId(), newSkuTitle);
+
+                        System.out.println("fix success for " + ptmcmpsku.getId() + "\n" + oldSkuTitle + "---" + newSkuTitle);
+
+                    }
+                }
+            });
+        }
+
+        return "ok";
+    }
+
+    //fixdata/fixProductSourceSiteNull
+    @RequestMapping(value = "/fixProductSourceSiteNull")
+    @ResponseBody
+    public String fixProductSourceSiteNull() {
+
+
+        List<PtmProduct> productList = dbm.query("SELECT t FROM PtmProduct t WHERE t.sourceSite = ''");
+
+        for (PtmProduct ptmProduct : productList) {
+
+            System.out.println("ready to fix product " + ptmProduct.getId());
+            List<PtmCmpSku> ptmcmpskuList = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ", Arrays.asList(ptmProduct.getId()));
+
+            for (PtmCmpSku ptmCmpSku : ptmcmpskuList) {
+                if (StringUtils.isEqual(ptmProduct.getTitle(), ptmCmpSku.getTitle())) {
+                    productService.updatePtmProdcutWebsite(ptmProduct.getId(), ptmCmpSku.getWebsite());
+                    System.out.println("fix success for " + ptmProduct.getId() + " to " + ptmCmpSku.getWebsite().name());
+                }
             }
         }
 

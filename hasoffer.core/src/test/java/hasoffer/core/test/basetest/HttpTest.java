@@ -1,12 +1,11 @@
 package hasoffer.core.test.basetest;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.utils.http.HttpUtils;
-import hasoffer.base.utils.http.MyHttpUtils;
 import hasoffer.core.utils.Httphelper;
-import org.apache.http.HttpHost;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -19,12 +18,9 @@ import java.util.Map;
 public class HttpTest {
     @Test
     public void testHttp() throws Exception {
-        String url = "https://www.snapdeal.com/product/samsung-galaxy-s5-shimmery-white/922485437";
+        String url = "https://www.flipkart.com/mobiles-accessories/pr?sid=tyy&q=JBL+headphone";
 
-//        HttpHost proxy = new HttpHost("175.142.198.36", 80, "http");
-        HttpHost proxy = new HttpHost("52.77.165.138", 8888, "http");
-
-        HttpResponseModel responseModel = MyHttpUtils.getByProxy(url, proxy);
+        HttpResponseModel responseModel = HttpUtils.get(url, null);
 
         System.out.println(responseModel.getBodyString());
     }
@@ -51,7 +47,7 @@ public class HttpTest {
 
         String url = "https://www.flipkart.com/api/3/page/dynamic/product";
 
-        String json = "{\"requestContext\":{\"productId\":\"MIXEAMVTVJAGVMCF\"}}";
+        String json = "{\"requestContext\":{\"productId\":\"MOBEYHZ2VSVKHAZH\"}}";
 
         Map<String, String> header = new HashMap<>();
 
@@ -59,6 +55,21 @@ public class HttpTest {
 
         String response = Httphelper.doPostJsonWithHeader(url, json, header);
 
-        System.out.println(response);
+        JSONObject jsonObject = JSONObject.parseObject(response.trim());
+
+        JSONArray pathArray = jsonObject.getJSONObject("RESPONSE").getJSONObject("data").getJSONObject("product_breadcrumb").getJSONArray("data").getJSONObject(0).getJSONObject("value").getJSONArray("productBreadcrumbs");
+        for (int i = 1; i < pathArray.size(); i++) {
+
+            if (i > 3) {
+                break;
+            }
+
+            String categoryPath = pathArray.getJSONObject(i).getString("title");
+
+            System.out.println(categoryPath);
+
+        }
+
+
     }
 }

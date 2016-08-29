@@ -1,6 +1,6 @@
 package hasoffer.fetch.model;
 
-import hasoffer.base.model.TaskStatus;
+import hasoffer.base.enums.TaskStatus;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.io.Serializable;

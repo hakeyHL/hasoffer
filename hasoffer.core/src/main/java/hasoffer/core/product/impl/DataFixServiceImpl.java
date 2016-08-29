@@ -1,4 +1,4 @@
-package hasoffer.core.product.iml;
+package hasoffer.core.product.impl;
 
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;

@@ -1,25 +1,33 @@
 package hasoffer.api.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import hasoffer.api.controller.vo.PriceCurveVo;
+import hasoffer.api.helper.ClientHelper;
+import hasoffer.api.helper.Httphelper;
+import hasoffer.api.helper.JsonHelper;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
+import hasoffer.core.persistence.mongo.PriceNode;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
+import hasoffer.core.product.impl.CmpSkuServiceImpl;
+import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.utils.ImageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by hs on 2016/7/25.
@@ -34,6 +42,10 @@ public class AppSkuController {
     IMongoDbManager mongoDbManager;
     @Resource
     IPtmCmpSkuImageService ptmCmpSkuImageService;
+    @Resource
+    CmpSkuServiceImpl iCmpSkuService;
+    @Resource
+    ProductServiceImpl productService;
     Logger logger = LoggerFactory.getLogger(AppSkuController.class);
 
     public static List getImageArray(List<PtmCmpSkuImage> list) {
@@ -60,41 +72,130 @@ public class AppSkuController {
         return li;
     }
 
+    public static void main(String[] args) {
+        String temp = "{\"Fabric Care:\":\"Hand wash at 30°C, Do not bleach, Mild Iron, Do not Tumble Dry, Line Dry in shade, wash separately, do not iron on decorations/print, Use mild detergents\",\"Sales Package\":\"1 Kurti\",\"Legging Available\":\"No\",\"Ideal For\":\"Women's\",\"Other details\":\"Stitched\",\"Neck\":\"Mandarin collar\"}";
+        String ss = "\\ysf";
+        System.out.println(ss.replaceAll("\\\\", ""));
+    }
+
     /**
      * 根据sku的id获取sku详细信息
      *
      * @return
      */
     @RequestMapping("info")
-    public ModelAndView getSkuInfo(@RequestParam(defaultValue = "0") Long id) {
-        ModelAndView modelAndView = new ModelAndView();
+    public String getSkuInfo(@RequestParam(defaultValue = "0") Long id, HttpServletResponse response) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("errorCode", "00000");
+        jsonObject.put("msg", "ok");
+        //PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"ratingNum", "bestPrice", "priceOff", "backRate", "support", "price", "returnGuarantee", "freight"});
         PtmCmpSku ptmCmpSku = cmpSkuService.getCmpSkuById(id);
-        modelAndView.addObject("errorCode", "00000");
-        modelAndView.addObject("msg", "ok");
         if (ptmCmpSku != null) {
             logger.info(" has this sku " + id);
             PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, ptmCmpSku.getId());
-            logger.info("get sku description from  mongo " + ptmCmpSkuDescription == null ? " not null" : " is null");
+            logger.info("get sku totalWeigth from  mongo " + ptmCmpSkuDescription == null ? " not null" : " is null");
             Map map = new HashMap<>();
             if (ptmCmpSkuDescription != null) {
-                map.put("description", ptmCmpSkuDescription.getJsonDescription() == null ? "" : ptmCmpSkuDescription.getJsonDescription());//描述
-                map.put("specs", ptmCmpSkuDescription.getJsonParam());//参数
+                map.put("description", ptmCmpSkuDescription.getJsonDescription() == null ? "" : ClientHelper.delHTMLTag(ptmCmpSkuDescription.getJsonDescription()));//描述
+                String tempJsonParam = ptmCmpSkuDescription.getJsonParam();
+                //去除html标签
+                if (!StringUtils.isEmpty(tempJsonParam)) {
+                    tempJsonParam = ClientHelper.delHTMLTag(tempJsonParam);
+                }
+                map.put("specs", JsonHelper.getJsonMap(tempJsonParam));//参数
             }
             List<PtmCmpSkuImage> ptmCmpSkuImages = ptmCmpSkuImageService.findPtmCmpSkuImages(ptmCmpSku.getId());
-            map.put("images", getImageArray(ptmCmpSkuImages));
-            //map.put("images", "[\"http://img12.360buyimg.com/n1/jfs/t1174/164/723303127/202924/1a956bbf/554acf00N87f6cea3.jpg\",\"http://img12.360buyimg.com/n1/jfs/t1033/328/802932418/412261/261452dc/554acd64N27651f09.jpg\"]");//图片列表
+            if (ptmCmpSkuImages != null && ptmCmpSkuImages.size() > 0) {
+                map.put("images", getImageArray(ptmCmpSkuImages));
+            } else {
+                map.put("images", Arrays.asList(ptmCmpSku.getBigImagePath() == null ? "" : ImageUtil.getImageUrl(ptmCmpSku.getBigImagePath())));
+            }
             map.put("distribution", 5);
-            modelAndView.addObject("data", map);
+            jsonObject.put("data", JSONObject.toJSON(map));
         }
-       /* modelAndView.addObject("data", "{\n" +
-                "        \"description\": \"划线价：商品展示的划横线价格为参考价，该价格可能是品牌专柜标价、商品吊牌价或由品牌供应商提供的正品零售价（如厂商指导价、建议零售价等）或该商品在京东平台上曾经展示过的销售价；由于地区、时间的差异性和市场行情波动，品牌专柜标价、商品吊牌价等可能会与您购物时展示的不一致，该价格仅供您参考。\\n折扣：如无特殊说明，折扣指销售商在原价、或划线价（如品牌专柜标价、商品吊牌价、厂商指导价、厂商建议零售价）等某一价格基础上计算出的优惠比例或优惠金额；如有疑问，您可在购买前联系销售商进行咨询。\",\n" +
-                "        \"specs\": \"\",\n" +
-                "        \"images\": [\n" +
-                "            \"http://img14.360buyimg.com/n1/jfs/t2191/111/699154754/198998/32d7bfe0/5624b582Nbc01af5b.jpg\",\n" +
-                "            \"http://img13.360buyimg.com/n1/jfs/t2200/173/590579185/269686/4c299e77/56174e3eN362982a4.jpg\"\n" +
-                "        ],\n" +
-                "        \"distribution\": 5\n" +
-                "    }");*/
-        return modelAndView;
+        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        return null;
+    }
+
+    /**
+     * 获取sku的价格曲线
+     *
+     * @param id
+     * @param response
+     * @return
+     */
+    @RequestMapping("curve")
+    public String getPriceCurve(@RequestParam(defaultValue = "0") Long id, HttpServletResponse response) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("errorCode", "00000");
+        jsonObject.put("msg", "ok");
+        Map<String, Float> priceXY = new HashMap<>();
+        List<PriceNode> priceNodes = iCmpSkuService.queryHistoryPrice(id);
+        System.out.println(priceNodes != null ? "  priceNodes  :" + priceNodes.size() : "null a .....");
+        if (priceNodes != null && priceNodes.size() > 0) {
+            for (PriceNode priceNode : priceNodes) {
+//            jsonObject.put("data", JSONObject.toJSON(priceNodes));
+                //查询到价格历史,开始分析
+                priceXY.put(this.getDateMMdd(priceNode.getPriceTimeL()), priceNode.getPrice());
+            }
+            //X轴  20天为间隔显示日期 , 格式为：　10-30
+            List<String> X = new ArrayList<>();
+            X.add("4-19");
+            X.add("5-11");
+            X.add("6-01");
+            X.add("7-12");
+            X.add("8-02");
+            X.add("8-22");
+
+            //Y轴
+            List<Long> Y = new ArrayList<>();
+            Y.add(3750l);
+            Y.add(3850l);
+            Y.add(3950l);
+            Y.add(4050l);
+            Y.add(4150l);
+            //两个数据点
+            PriceCurveVo priceCurveVo = new PriceCurveVo(X, Y, priceXY, 3799l, 4088l);
+            jsonObject.put("data", JSONObject.toJSON(priceCurveVo));
+        }
+        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        return null;
+    }
+
+    /**
+     * @param id
+     * @param response
+     * @return
+     */
+    @RequestMapping("offerTest")
+    public String getOffers(@RequestParam(defaultValue = "0") Long id, HttpServletResponse response) {
+        System.out.println(" get get get get  offers offers offers ");
+        PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, id);
+        if (ptmCmpSkuDescription != null) {
+            String offers = ptmCmpSkuDescription.getOffers();
+            System.out.println(" got it ,and offers is " + offers);
+            PtmCmpSku ptmCmpSku = cmpSkuService.getCmpSkuById(id);
+            if (ptmCmpSku != null) {
+                System.out.println("sku id is :" + id + " and productId is " + ptmCmpSku.getProductId());
+                PtmProduct product = productService.getProduct(ptmCmpSku.getProductId());
+                if (product != null) {
+                    System.out.println(" product is exist  and title is  " + product.getTitle());
+                    System.out.println(" price is :" + product.getPrice());
+                }
+            }
+        }
+        return null;
+    }
+
+    public String getDateMMdd(Long time) {
+        Date date = new Date();
+        date.setTime(time);
+        String format = null;
+        try {
+            format = new SimpleDateFormat("MM-dd").format(date);
+        } catch (Exception e) {
+            logger.error("transfer long date to MM-dd failed " + date);
+        }
+        return format;
     }
 }

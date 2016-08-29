@@ -1,11 +1,12 @@
 package hasoffer.dubbo.api.fetch.task;
 
-import hasoffer.base.model.TaskStatus;
+import hasoffer.base.enums.TaskLevel;
+import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.utils.JSONUtil;
-import hasoffer.spider.api.IFetchService;
-import hasoffer.spider.api.impl.FetchServiceImpl;
-import hasoffer.spider.common.RedisKeysConstant;
+import hasoffer.spider.api.ISpiderService;
+import hasoffer.spider.api.impl.SpiderServiceImpl;
 import hasoffer.spider.common.SpiderLogger;
+import hasoffer.spider.constants.RedisKeysUtils;
 import hasoffer.spider.exception.UnSupportWebsiteException;
 import hasoffer.spider.model.FetchUrlResult;
 import hasoffer.spider.redis.service.IFetchCacheService;
@@ -21,7 +22,7 @@ public class FetchUrlWorker implements Runnable {
 
     private IFetchCacheService fetchCacheService;
 
-    private IFetchService fetchService = new FetchServiceImpl();
+    private ISpiderService fetchService = new SpiderServiceImpl();
 
     public FetchUrlWorker(WebApplicationContext springContext) {
         fetchCacheService = (IFetchCacheService) springContext.getBean("fetchCacheService");
@@ -31,7 +32,19 @@ public class FetchUrlWorker implements Runnable {
     public void run() {
         while (true) {
             try {
-                Object pop = fetchCacheService.popTaskList(RedisKeysConstant.WAIT_URL_LIST);
+                Object pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_1));
+                if (pop == null) {
+                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_2));
+                }
+                if (pop == null) {
+                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_3));
+                }
+                if (pop == null) {
+                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_4));
+                }
+                if (pop == null) {
+                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_5));
+                }
                 if (pop == null) {
                     TimeUnit.MINUTES.sleep(1);
                 } else {
@@ -53,7 +66,7 @@ public class FetchUrlWorker implements Runnable {
 
     public void fetch(FetchUrlResult fetchUrlResult) {
         try {
-            fetchUrlResult = fetchService.getProductByUrl(fetchUrlResult);
+            fetchUrlResult = fetchService.spiderProductByUrl(fetchUrlResult);
         } catch (UnSupportWebsiteException e) {
             fetchUrlResult.setTaskStatus(TaskStatus.STOPPED);
             fetchUrlResult.setErrMsg("un able support website.");

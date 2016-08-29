@@ -1,12 +1,11 @@
 package hasoffer.admin.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import hasoffer.admin.controller.vo.PushVo;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
 import hasoffer.core.bo.push.*;
-import hasoffer.core.persistence.po.urm.UrmDevice;
 import hasoffer.core.push.IPushService;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -65,45 +64,51 @@ public class PushController {
     @RequestMapping(value = "/pushMessage")
     public ModelAndView PushMessage(PushVo pushVol) {
         ModelAndView mv = new ModelAndView();
-        mv.addObject("errorCode", "00000");
-        mv.addObject("msg", "ok");
-        //1.先按版本推
-        //2.推安装了选定app的用户
-        //3.推哪些渠道的用户
-        //4.数量控制
-        try {
-            List<String> gcmTokens = new ArrayList<String>();
-            AppPushMessage message = new AppPushMessage(
-                    new AppMsgDisplay(pushVol.getOutline(), pushVol.getTitle(), pushVol.getContent()),
-                    new AppMsgClick(AppMsgClickType.valueOf(pushVol.getMessageType()), pushVol.getValue(), packageMap.get(pushVol.getWebsite()))
-            );
-            AppPushBo pushBo = new AppPushBo("5x1", "15:10", message);
-            //安装了指定app的、指定数量、指定包名、指定类型、指定id推送
-            List<UrmDevice> urmDevices = pushService.getGcmTokens(pushVol.getVersion());
-            for (UrmDevice urmDevice : urmDevices) {
-                String shopApps = urmDevice.getShopApp();
-                String[] split = shopApps.split(",");
-                for (String str : split) {
-                    if (urmDevice.getMarketChannel() != null) {
-                        if (str.equals(pushVol.getWebsite()[0]) && urmDevice.getMarketChannel().name().equals(pushVol.getChannel())) {
-                            if (gcmTokens.size() < pushVol.getNumber() && !StringUtils.isEmpty(urmDevice.getGcmToken())) {
-                                gcmTokens.add(urmDevice.getGcmToken());
-                            } else {
-                                break;
-                            }
-                        }
+        mv.addObject("success", true);
+        //1.推送类型
+        switch (pushVol.getPushType()) {
+            case "single":
+                //2.1单
+                AppPushMessage message = new AppPushMessage(
+                        new AppMsgDisplay(pushVol.getOutline(), pushVol.getTitle(), pushVol.getContent()),
+                        new AppMsgClick(AppMsgClickType.valueOf(pushVol.getMessageType()), pushVol.getValue(), packageMap.get(pushVol.getWebsite()))
+                );
+                mv.addObject("pushCount", 1);
+                mv.addObject("pushType", "single");
+                AppPushBo pushBo = new AppPushBo("5x1", "15:10", message);
+//                //3.渠道
+//                for (String channel : pushVol.getChannel()) {
+//                    //4.版本列表
+//                    for (String version : pushVol.getVersion()) {
+//
+//                        for (String website : pushVol.getWebsite()) {
+//
+//                        }
+//                        //5.app列表
+//                    }
+//                }
+                String pushResult = pushService.push(pushVol.getGcmToken(), pushBo);
+                if (pushResult != null) {
+                    JSONObject JsonObject = JSONObject.parseObject(pushResult);
+                    if (JsonObject.getInteger("success") == 1) {
+                        mv.addObject("successCount", 1);
+                    } else {
+                        mv.addObject("successCount", 0);
+                        mv.addObject("failedCount", 1);
                     }
+//                    JSONArray results = JsonObject.getJSONArray("results");
+//                    JSONObject jsonObject = results.getJSONObject(0);
+//                    String error = jsonObject.getString("error");
+                } else {
+                    mv.addObject("success", true);
+                    mv.addObject("msg", "网络请求失败!");
                 }
-            }
-            int i = 0;
-            for (String gcmToken : gcmTokens) {
-                System.out.println("____  " + i + "  ____");
-                pushService.push(gcmToken, pushBo);
-                i++;
-            }
-        } catch (Exception e) {
-            mv.addObject("msg", e.getMessage());
-            return mv;
+                break;
+            case "group":
+                //2.2群
+                break;
+            default:
+                break;
         }
         return mv;
     }

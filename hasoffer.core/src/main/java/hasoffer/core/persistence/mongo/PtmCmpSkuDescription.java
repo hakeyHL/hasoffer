@@ -20,6 +20,8 @@ public class PtmCmpSkuDescription {
 
     private String jsonDescription;
 
+    private String offers;
+
     public long getId() {
         return id;
     }
@@ -44,6 +46,14 @@ public class PtmCmpSkuDescription {
         this.jsonDescription = jsonDescription;
     }
 
+    public String getOffers() {
+        return offers;
+    }
+
+    public void setOffers(String offers) {
+        this.offers = offers;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -53,7 +63,9 @@ public class PtmCmpSkuDescription {
 
         if (id != that.id) return false;
         if (jsonParam != null ? !jsonParam.equals(that.jsonParam) : that.jsonParam != null) return false;
-        return !(jsonDescription != null ? !jsonDescription.equals(that.jsonDescription) : that.jsonDescription != null);
+        if (jsonDescription != null ? !jsonDescription.equals(that.jsonDescription) : that.jsonDescription != null)
+            return false;
+        return !(offers != null ? !offers.equals(that.offers) : that.offers != null);
 
     }
 
@@ -62,6 +74,7 @@ public class PtmCmpSkuDescription {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (jsonParam != null ? jsonParam.hashCode() : 0);
         result = 31 * result + (jsonDescription != null ? jsonDescription.hashCode() : 0);
+        result = 31 * result + (offers != null ? offers.hashCode() : 0);
         return result;
     }
 
@@ -71,6 +84,7 @@ public class PtmCmpSkuDescription {
                 "id=" + id +
                 ", jsonParam='" + jsonParam + '\'' +
                 ", jsonDescription='" + jsonDescription + '\'' +
+                ", offers='" + offers + '\'' +
                 '}';
     }
 }

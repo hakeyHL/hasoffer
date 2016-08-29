@@ -1,4 +1,4 @@
-package hasoffer.core.product.iml;
+package hasoffer.core.product.impl;
 
 import hasoffer.affiliate.affs.AffiliateFactory;
 import hasoffer.affiliate.affs.IAffiliateProcessor;

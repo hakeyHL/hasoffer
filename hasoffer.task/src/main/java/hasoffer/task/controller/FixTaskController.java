@@ -12,6 +12,7 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.worker.ListAndProcessWorkerStatus;
+import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import hasoffer.task.worker.*;
 import org.slf4j.Logger;
@@ -45,6 +46,8 @@ public class FixTaskController {
     ISearchService searchService;
     @Resource
     IProductService productService;
+    @Resource
+    IFetchDubboService fetchDubboService;
 
     private Logger logger = LoggerFactory.getLogger(FixTaskController.class);
 
@@ -200,6 +203,25 @@ public class FixTaskController {
         for (int i = 0; i < 5; i++) {
             es.execute(new CategoryTestWorker(dbm, categoryQueue));
         }
+
+        return "ok";
+    }
+
+    //fixtask/fetchMobileCategoryBrandModel
+    @RequestMapping(value = "/fetchMobileCategoryBrandModel")
+    @ResponseBody
+    public String fetchMobileCategoryBrandModel() {
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        ConcurrentLinkedQueue<PtmCmpSku> cmpSkuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
+
+        for (int i = 0; i < 20; i++) {
+            es.execute(new FetchMobileCategoryBrandModel(cmpSkuQueue, fetchDubboService, cmpSkuService));
+        }
+
+        es.execute(new FetchMobileCategoryBrandModelListWorker(dbm, cmpSkuQueue, fetchDubboService) {
+        });
 
         return "ok";
     }

@@ -3,7 +3,7 @@ package hasoffer.core.product;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.core.bo.product.SkuPriceUpdateResultBo;
-import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
+import hasoffer.core.persistence.mongo.PriceNode;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku2;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
@@ -12,12 +12,17 @@ import hasoffer.core.persistence.po.stat.StatSkuPriceUpdateResult;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.spider.model.FetchedProduct;
 
+import java.util.Date;
 import java.util.List;
 
 /**
  * Created on 2016/1/4.
  */
 public interface ICmpSkuService {
+
+    List<PriceNode> queryHistoryPrice(long id);
+
+    void saveHistoryPrice(long id, Date time, float price);
 
     void createDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct);
 
@@ -32,13 +37,6 @@ public interface ICmpSkuService {
     void updateCmpSkuBySpiderFetchedProduct(long skuId, FetchedProduct fetchedProduct);
 
     void updateCmpSku(long id, String url, String color, String size, float price);
-
-    void updateCmpSku(long id, String url, float price, SkuStatus skuStatus);
-
-    void updateCmpSku(long id, SkuStatus skuStatus, String skuTitle, float price, String imageUrl, String url, String deeplink);
-
-    // 某 cmpsku 所有的历史价格
-    List<PtmCmpSkuLog> listByPcsId(long pcsId);
 
     SkuPriceUpdateResultBo countUpdate(String ymd);
 
@@ -55,8 +53,6 @@ public interface ICmpSkuService {
     PtmCmpSku getCmpSkuById(long id);
 
     List<PtmCmpSku> listCmpSkus(long productId);
-
-    void updateCmpSkuPrice(Long id, float price);
 
     void downloadImage(PtmCmpSku sku);
 
@@ -85,6 +81,8 @@ public interface ICmpSkuService {
 
     void updateCategoryid(long ptmcmpskuid, long categoryid);
 
+    void updateCategoryid2(Long ptmcmpskuid, long categoryid2);
+
     void importCmpSku2solr(PtmCmpSku ptmCmpSku);
 
     void importCmpSku2solrByProductId(Long proId);
@@ -98,4 +96,10 @@ public interface ICmpSkuService {
      * @param smallImagePath
      */
     void fixSmallImagePath(long skuid, String smallImagePath);
+
+    void fixFlipkartSkuTitleNull(long skuid, String skutitle);
+
+    void updateFlipakrtSkuBrandAndModel(long skuid, String brand, String model);
+
+    void updateCmpSkuBrandModel(Long id, String brand, String model);
 }

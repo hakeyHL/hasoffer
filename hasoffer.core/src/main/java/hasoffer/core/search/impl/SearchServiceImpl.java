@@ -1,7 +1,5 @@
 package hasoffer.core.search.impl;
 
-import hasoffer.base.config.AppConfig;
-import hasoffer.base.enums.HasofferRegion;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
@@ -29,6 +27,7 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.solr.ProductModel;
 import hasoffer.core.search.ISearchService;
+import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.model.ListProduct;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -203,6 +202,11 @@ public class SearchServiceImpl implements ISearchService {
         });*/
     }
 
+    /**
+     * 匹配、关联
+     *
+     * @param asr
+     */
     @Override
     public void analysisAndRelate(SrmAutoSearchResult asr) {
         ProductBo productBo = null;
@@ -353,16 +357,21 @@ public class SearchServiceImpl implements ISearchService {
 
         long ptmProductId = autoSearchResult.getRelatedProId();
 
+        float stdPrice = 0.0f;
+
         if (ptmProductId == 0) {
             logger.debug("build product...");
             SearchedSku stdSku = null;
             List<SearchedSku> logSkus = searchedSkuMap.get(Website.valueOf(autoSearchResult.getFromWebsite()));
             if (ArrayUtils.hasObjs(logSkus)) {
                 stdSku = logSkus.get(0);
+                stdPrice = stdSku.getPrice();
             } else {
-                Iterator<Website> websiteIterator = searchedSkuMap.keySet().iterator();
-                Website website = websiteIterator.next();
-                stdSku = searchedSkuMap.get(website).get(0);
+                // 如果目标网站的sku不存在，那么暂不创建商品
+                return;
+//                Iterator<Website> websiteIterator = searchedSkuMap.keySet().iterator();
+//                Website website = websiteIterator.next();
+//                stdSku = searchedSkuMap.get(website).get(0);
             }
 
             ProductBo productBo = productService.createProduct(0, autoSearchResult.getTitle(), autoSearchResult.getPrice(),
@@ -375,12 +384,19 @@ public class SearchServiceImpl implements ISearchService {
             autoSearchResult.setRelatedProId(ptmProductId);
         } else {
             List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(ptmProductId);
+            int count = 0;
+            float sumPrice = 0.0f;
             for (PtmCmpSku cmpSku : cmpSkus) {
                 if (StringUtils.isEmpty(cmpSku.getUrl())) {
                     continue;
                 }
                 skuMap.put(cmpSku.getUrl(), cmpSku);
+
+                sumPrice += cmpSku.getPrice();
+                count++;
             }
+
+            stdPrice = sumPrice / count;
         }
 
         // todo - 如果同一个网站，两次抓取结果不同，第二次抓取的更准确，则要把第一次的结果更新为更准确的sku
@@ -392,17 +408,23 @@ public class SearchServiceImpl implements ISearchService {
             for (SearchedSku searchedSku : ssku) {
                 float thd_title_score = 0.5f, thd_price_score = 0.5f;
 
-                if (AppConfig.get(AppConfig.SER_REGION).equals(HasofferRegion.USA)) {
-                    thd_title_score = 0.3f;
-                    thd_price_score = 0.8f;
-                }
+//                if (AppConfig.get(AppConfig.SER_REGION).equals(HasofferRegion.USA)) {
+//                    thd_title_score = 0.3f;
+//                    thd_price_score = 0.8f;
+//                }
+                float skuPrice = searchedSku.getPrice();
+                float priceScore = Math.abs(stdPrice - skuPrice) / stdPrice;
 
-                if (searchedSku.getTitleScore() < thd_title_score || searchedSku.getPriceScore() > thd_price_score) {
-                    logger.debug(String.format("title/price:[%s/%f].titleScore/priceScore:[%f/%f]", searchedSku.getTitle(), searchedSku.getPrice(), searchedSku.getTitleScore(), searchedSku.getPriceScore()));
+                // 价格条件筛选
+                if (searchedSku.getTitleScore() < thd_title_score
+                        || searchedSku.getPriceScore() > thd_price_score
+                        || priceScore > thd_price_score) {
+                    logger.debug(String.format("[NO_MATCH]title/price:[%s/%f].titleScore/priceScore:[%f/%f]", searchedSku.getTitle(), searchedSku.getPrice(), searchedSku.getTitleScore(), searchedSku.getPriceScore()));
                     continue;
                 }
 
                 String skuUrl = searchedSku.getUrl();
+                skuUrl = WebsiteHelper.getCleanUrl(searchedSku.getWebsite(), skuUrl);
 
                 // 如果sku存在，则进行下次循环
                 if (skuMap.containsKey(skuUrl)) {

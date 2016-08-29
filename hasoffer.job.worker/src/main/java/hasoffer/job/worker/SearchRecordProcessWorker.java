@@ -2,8 +2,8 @@ package hasoffer.job.worker;
 
 import hasoffer.base.config.AppConfig;
 import hasoffer.base.enums.HasofferRegion;
+import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.SkuStatus;
-import hasoffer.base.model.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
@@ -18,10 +18,6 @@ import hasoffer.fetch.model.WebFetchResult;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchedProduct;
 import hasoffer.spring.context.SpringContextHolder;
-import hasoffer.taskschedule.api.listener.CallbackListener;
-import hasoffer.taskschedule.api.vo.TaskSchedule;
-import hasoffer.taskschedule.respservice.impl.TaskScheduleReqClient;
-import helper.IndiaWebsiteHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,14 +41,14 @@ public class SearchRecordProcessWorker implements Runnable {
     private IFetchDubboService fetchService;
     private ISearchService searchService;
 
-    private TaskScheduleReqClient scheduleReqClient;
+    //private TaskScheduleReqClient scheduleReqClient;
 
     public SearchRecordProcessWorker(SearchProductService searchProductService, IFetchDubboService flipkartFetchService, LinkedBlockingQueue<SrmAutoSearchResult> searchLogQueue) {
         this.searchProductService = searchProductService;
         this.searchLogQueue = searchLogQueue;
         this.fetchService = flipkartFetchService;
         this.searchService = SpringContextHolder.getBean(SearchServiceImpl.class);
-        this.scheduleReqClient = (TaskScheduleReqClient) SpringContextHolder.getBean("taskScheduleReqClient");
+        //this.scheduleReqClient = (TaskScheduleReqClient) SpringContextHolder.getBean("taskScheduleReqClient");
     }
 
     @Override
@@ -80,7 +76,7 @@ public class SearchRecordProcessWorker implements Runnable {
                 } else if (HasofferRegion.USA.toString().equals(serRegion)) {
                     isFetch = fetchForUsa(autoSearchResult);
                 }
-                fetchByTaskSchedule(autoSearchResult);
+                //fetchByTaskSchedule(autoSearchResult);
 
                 //是否需要重新抓取
                 if (isFetch) {
@@ -93,22 +89,17 @@ public class SearchRecordProcessWorker implements Runnable {
         }
     }
 
-    private void fetchByTaskSchedule(SrmAutoSearchResult autoSearchResult) {
-
-        String keyWord = autoSearchResult.getTitle();
-
-        TaskSchedule taskSchedule = new TaskSchedule();
-        taskSchedule.setWebsite(Website.AMAZON);
-        taskSchedule.setUrlType(TaskSchedule.UrlType.LIST);
-        taskSchedule.setRegion(HasofferRegion.INDIA);
-        taskSchedule.setUrl(IndiaWebsiteHelper.getSearchUrl(Website.AMAZON, keyWord));
-        scheduleReqClient.pushTaskScheduleInfo(taskSchedule, new CallbackListener() {
-            @Override
-            public void recycleResult(TaskSchedule result) {
-                logger.info("dubbo.CallbackListener():" + result.toString());
-            }
-        });
-    }
+    //private void fetchByTaskSchedule(SrmAutoSearchResult autoSearchResult) {
+    //
+    //    String keyWord = autoSearchResult.getTitle();
+    //
+    //    TaskSchedule taskSchedule = new TaskSchedule();
+    //    taskSchedule.setWebsite(Website.AMAZON);
+    //    taskSchedule.setUrlType(TaskSchedule.UrlType.LIST);
+    //    taskSchedule.setRegion(HasofferRegion.INDIA);
+    //    taskSchedule.setUrl(IndiaWebsiteHelper.getSearchUrl(Website.AMAZON, keyWord));
+    //    scheduleReqClient.pushTaskScheduleInfo(taskSchedule);
+    //}
 
     /**
      * 抓取并判断是否需要更新到mongodb中。
@@ -161,11 +152,17 @@ public class SearchRecordProcessWorker implements Runnable {
         // 需要的话，则加入更新队列。并返回一个实体。如果不需要，这返回空
         if (isFetch) {
             try {
+                TaskStatus keyWordTaskStatus = fetchService.getKeyWordTaskStatus(website, keyword);
+                if (TaskStatus.NONE.equals(keyWordTaskStatus)) {
+                    fetchService.sendKeyWordTask(website, keyword);
+                    return FetchResult.createFetchResult(website, keyword, TaskStatus.RUNNING);
+                }
+                if (TaskStatus.START.equals(keyWordTaskStatus) || TaskStatus.RUNNING.equals(keyWordTaskStatus)) {
+                    return FetchResult.createFetchResult(website, keyword, TaskStatus.RUNNING);
+                }
                 return fetchService.getProductsKeyWord(website, keyword);
             } catch (Exception e) {
-                FetchResult temp = new FetchResult(website, keyword);
-                temp.setTaskStatus(TaskStatus.START);
-                return temp;
+                return FetchResult.createFetchResult(website, keyword, TaskStatus.RUNNING);
             }
         }
         return null;
@@ -180,7 +177,7 @@ public class SearchRecordProcessWorker implements Runnable {
         FetchResult shopcluesFetchResult = getFetchResult(Website.SHOPCLUES, keyword, sitePros);
         FetchResult paytmFetchResult = getFetchResult(Website.PAYTM, keyword, sitePros);
         FetchResult ebayFetchResult = getFetchResult(Website.EBAY, keyword, sitePros);
-        FetchResult myntraFetchResult = getFetchResult(Website.MYNTRA, keyword, sitePros);
+        //FetchResult myntraFetchResult = getFetchResult(Website.MYNTRA, keyword, sitePros);
         FetchResult jabongFetchResult = getFetchResult(Website.JABONG, keyword, sitePros);
         FetchResult voonikFetchResult = getFetchResult(Website.VOONIK, keyword, sitePros);
         FetchResult homeShopResult = getFetchResult(Website.HOMESHOP18, keyword, sitePros);
@@ -191,18 +188,20 @@ public class SearchRecordProcessWorker implements Runnable {
         initResultMap(autoSearchResult, shopcluesFetchResult);
         initResultMap(autoSearchResult, paytmFetchResult);
         initResultMap(autoSearchResult, ebayFetchResult);
-        initResultMap(autoSearchResult, myntraFetchResult);
+        //initResultMap(autoSearchResult, myntraFetchResult);
         initResultMap(autoSearchResult, jabongFetchResult);
         initResultMap(autoSearchResult, voonikFetchResult);
         initResultMap(autoSearchResult, homeShopResult);
         initResultMap(autoSearchResult, limeRoadResult);
 
-        Boolean isUpdate = isUpdate(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, myntraFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
+        Boolean isUpdate = isUpdate(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
+        //Boolean isUpdate = isUpdate(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, myntraFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
         if (isUpdate) {
             updateMongo(autoSearchResult);
             analysisAndRelate(autoSearchResult);
         }
-        return isReFetch(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, myntraFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
+        //return isReFetch(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, myntraFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
+        return isReFetch(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
     }
 
     private boolean isReFetch(FetchResult... fetchResultList) {
@@ -243,7 +242,7 @@ public class SearchRecordProcessWorker implements Runnable {
     }
 
     private boolean isClose(FetchResult result) {
-        return result != null && (TaskStatus.FINISH.equals(result.getTaskStatus()) || TaskStatus.STOPPED.equals(result.getTaskStatus()));
+        return result != null && (TaskStatus.FINISH.equals(result.getTaskStatus()) || TaskStatus.STOPPED.equals(result.getTaskStatus()) || TaskStatus.EXCEPTION.equals(result.getTaskStatus()));
     }
 
     private void initResultMap(SrmAutoSearchResult autoSearchResult, FetchResult fetchResult) {

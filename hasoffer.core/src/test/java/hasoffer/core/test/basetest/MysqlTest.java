@@ -3,6 +3,7 @@ package hasoffer.core.test.basetest;
 import hasoffer.affiliate.affs.flipkart.FlipkartAffiliateProductProcessor;
 import hasoffer.affiliate.model.AffiliateProduct;
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.JSONUtil;
@@ -19,6 +20,7 @@ import hasoffer.core.search.ISearchService;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.ProductStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
+import hasoffer.spider.model.FetchedProduct;
 import jodd.io.FileUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -76,6 +78,33 @@ public class MysqlTest {
     IPtmCmpSkuImageService ptmCmpSkuImageService;
     private Logger logger = LoggerFactory.getLogger(MysqlTest.class);
     private ConcurrentLinkedQueue<PtmCmpSku> skuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
+
+    @Test
+    public void testSkuUpdate(){
+
+        FetchedProduct fetchedProduct = new FetchedProduct();
+//     \\\\\\N":"13810840","Duration":"1 year","UPC":"does not apply"}', description='null', model='Redmi Note 3S,', offers='null', categoryPathList=null}
+        fetchedProduct.setBrand("Xiaomi");
+        fetchedProduct.setTitle("Xiaomi Redmi 3S PRIME 32GB 3GB RAM - Sealed Pack");
+        fetchedProduct.setWebsite(Website.EBAY);
+        fetchedProduct.setSubTitle("One Year Manufacturer Warranty");
+        fetchedProduct.setSourceId("121969226604");
+        fetchedProduct.setSkuStatus(SkuStatus.ONSALE);
+        fetchedProduct.setPrice(11999);
+        fetchedProduct.setUrl("http://www.ebay.in/itm/Xiaomi-Redmi-Note-3-Gold-32-GB-");
+
+        cmpSkuService.updateCmpSkuBySpiderFetchedProduct(123L,fetchedProduct);
+
+    }
+
+    @Test
+    public void testDistinctQuery() {
+
+        List<String> skuList = dbm.query("SELECT distinct t.title FROM PtmCmpSku t WHERE t.productId = ?0", Arrays.asList(12312L));
+
+        System.out.println(skuList);
+
+    }
 
     @Test
     public void testV() {

@@ -11,7 +11,6 @@ import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
-import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
@@ -22,6 +21,7 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IFetchService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.exception.ProductNotFoundException;
+import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
 import hasoffer.fetch.model.OriFetchedProduct;
@@ -55,16 +55,23 @@ public class ProductController {
     @Resource
     ProductIndexServiceImpl productIndexService;
     @Resource
+    CmpskuIndexServiceImpl cmpskuIndexService;
+    @Resource
     ICmpSkuService cmpSkuService;
     @Resource
     IFetchService fetchService;
-    @Resource
-    IDataBaseManager dbm;
 
     @RequestMapping(value = "/cmp/del/{id}", method = RequestMethod.GET)
     public ModelAndView delCompare(@PathVariable long id) {
 
-        cmpSkuService.deleteCmpSku(id);
+        PtmCmpSku cmpSku = cmpSkuService.getCmpSkuById(id);
+        if (cmpSku == null) {
+            cmpskuIndexService.remove(String.valueOf(id));
+        } else {
+            cmpSkuService.deleteCmpSku(id);
+
+            productService.reimport2Solr(cmpSku.getProductId());
+        }
 
         ModelAndView mav = new ModelAndView();
         return mav;
@@ -127,7 +134,7 @@ public class ProductController {
     public ModelAndView listCompares(@PathVariable long id) throws ProductNotFoundException {
         ModelAndView mav = new ModelAndView("product/cmp");
         mav.addObject("pId", id);
-        PtmProduct product = dbm.get(PtmProduct.class, id);
+        PtmProduct product = productService.getProduct(id);
 
         if (product == null) {
             throw new ProductNotFoundException(id + "");
@@ -248,7 +255,7 @@ public class ProductController {
 
         ModelAndView mav = new ModelAndView("product/detail");
 
-        PtmProduct product = dbm.get(PtmProduct.class, id);
+        PtmProduct product = productService.getProduct(id);
         if (product == null) {
             throw new ProductNotFoundException();
         }
@@ -403,7 +410,27 @@ public class ProductController {
     @RequestMapping(value = "/batchDelete", method = RequestMethod.GET)
     @ResponseBody
     public boolean batchDelete(@RequestParam(value = "ids[]") Long[] ids) {
-        cmpSkuService.batchDeleteCmpSku(ids);
+//        cmpSkuService.batchDeleteCmpSku(ids);
+
+        long productId = 0L;
+
+        for (long id : ids) {
+            PtmCmpSku cmpSku = cmpSkuService.getCmpSkuById(id);
+            if (cmpSku == null) {
+                cmpskuIndexService.remove(String.valueOf(id));
+            } else {
+                cmpSkuService.deleteCmpSku(id);
+            }
+
+            if (productId <= 0) {
+                productId = cmpSku.getProductId();
+            }
+        }
+
+        productService.reimport2Solr(productId);
+
+        ModelAndView mav = new ModelAndView();
+
         return true;
     }
 }
