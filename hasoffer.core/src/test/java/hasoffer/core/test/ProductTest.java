@@ -85,6 +85,7 @@ public class ProductTest {
     MongoDbFactory mongoDbFactory;
     private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
 
+
     private void print(String str) {
         System.out.println(str);
     }
@@ -115,6 +116,14 @@ public class ProductTest {
             System.out.print(i + "\t");
         }
         System.out.println();
+    }
+
+    /**
+     * 1- sku 有多少有brand，model，同时都有
+     */
+    @Test
+    public void querySku() {
+
     }
 
     @Test
