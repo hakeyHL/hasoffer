@@ -123,6 +123,7 @@ public class AppSkuController {
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
         List<PriceNode> priceNodes = iCmpSkuService.queryHistoryPrice(id);
+        System.out.println(priceNodes != null ? "  priceNodes  :" + priceNodes.size() : "null a .....");
         jsonObject.put("data", JSONObject.toJSON(priceNodes));
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
