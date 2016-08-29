@@ -680,9 +680,9 @@ public class Compare2Controller {
             int sum = 0;
             System.out.println("iterator  comparedSkuVos , and  it is size is " + comparedSkuVos.size());
             for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
-                if (websiteSet.size() <= 0) {
-                    break;
-                }
+//                if (websiteSet.size() <= 0) {
+//                    break;
+//                }
                 if (websiteSet.contains(cmpProductListVo.getWebsite())) {
                     websiteSet.remove(cmpProductListVo.getWebsite());
                     //去除列表中除此之外的其他此site的数据
