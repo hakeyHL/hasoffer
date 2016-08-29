@@ -27,6 +27,7 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.solr.ProductModel;
 import hasoffer.core.search.ISearchService;
+import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.model.ListProduct;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -423,6 +424,7 @@ public class SearchServiceImpl implements ISearchService {
                 }
 
                 String skuUrl = searchedSku.getUrl();
+                skuUrl = WebsiteHelper.getCleanUrl(searchedSku.getWebsite(), skuUrl);
 
                 // 如果sku存在，则进行下次循环
                 if (skuMap.containsKey(skuUrl)) {
