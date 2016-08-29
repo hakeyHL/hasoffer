@@ -11,9 +11,11 @@ import hasoffer.core.persistence.mongo.PriceNode;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
 import hasoffer.core.product.impl.CmpSkuServiceImpl;
+import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.utils.ImageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,8 @@ public class AppSkuController {
     IPtmCmpSkuImageService ptmCmpSkuImageService;
     @Resource
     CmpSkuServiceImpl iCmpSkuService;
+    @Resource
+    ProductServiceImpl productService;
     Logger logger = LoggerFactory.getLogger(AppSkuController.class);
 
     public static List getImageArray(List<PtmCmpSkuImage> list) {
@@ -142,6 +146,14 @@ public class AppSkuController {
         if (ptmCmpSkuDescription != null) {
             String offers = ptmCmpSkuDescription.getOffers();
             System.out.println(" got it ,and offers is " + offers);
+            PtmCmpSku ptmCmpSku = cmpSkuService.getCmpSkuById(id);
+            if (ptmCmpSku != null) {
+                System.out.println("sku id is :" + id + " and productId is " + ptmCmpSku.getProductId());
+                PtmProduct product = productService.getProduct(ptmCmpSku.getProductId());
+                if (product != null) {
+                    System.out.println(" product is exist  and title is  " + product.getTitle());
+                }
+            }
         }
         return null;
     }
