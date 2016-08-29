@@ -684,7 +684,7 @@ public class Compare2Controller {
 //                    break;
 //                }
 //                if (websiteSet.contains(cmpProductListVo.getWebsite())) {
-                websiteSet.remove(cmpProductListVo.getWebsite());
+//                websiteSet.remove(cmpProductListVo.getWebsite());
                 //去除列表中除此之外的其他此site的数据
                 if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
                     System.out.println("not ebay ");
