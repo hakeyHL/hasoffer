@@ -7,11 +7,13 @@ import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.JsonHelper;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
+import hasoffer.core.persistence.mongo.PriceNode;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
+import hasoffer.core.product.impl.CmpSkuServiceImpl;
 import hasoffer.core.utils.ImageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +38,8 @@ public class AppSkuController {
     IMongoDbManager mongoDbManager;
     @Resource
     IPtmCmpSkuImageService ptmCmpSkuImageService;
+    @Resource
+    CmpSkuServiceImpl iCmpSkuService;
     Logger logger = LoggerFactory.getLogger(AppSkuController.class);
 
     public static List getImageArray(List<PtmCmpSkuImage> list) {
@@ -103,6 +107,25 @@ public class AppSkuController {
             map.put("distribution", 5);
             jsonObject.put("data", JSONObject.toJSON(map));
         }
+        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        return null;
+    }
+
+    /**
+     * 获取sku的价格曲线
+     *
+     * @param id
+     * @param response
+     * @return
+     */
+    @RequestMapping("curve")
+    public String getPriceCurve(@RequestParam(defaultValue = "0") Long id, HttpServletResponse response) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("errorCode", "00000");
+        jsonObject.put("msg", "ok");
+        List<PriceNode> priceNodes = iCmpSkuService.queryHistoryPrice(id);
+        System.out.println(priceNodes != null ? "  priceNodes  :" + priceNodes.size() : "null a .....");
+        jsonObject.put("data", JSONObject.toJSON(priceNodes));
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
