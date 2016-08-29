@@ -162,7 +162,7 @@ public class DubboUpdateController {
     @ResponseBody
     public String testListSingle(@PathVariable String websiteString, @PathVariable String keyword) {
 
-        Website website = Website.valueOf(websiteString);
+        Website website = Website.valueOf(websiteString.toUpperCase());
 
         fetchDubboService.sendKeyWordTask(website, keyword);
         System.out.println("send single list processor success for " + websiteString + " " + keyword);
