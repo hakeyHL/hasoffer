@@ -21,7 +21,7 @@ public class DownloadConfigVo {
     //优先下载渠道
     private String priorDownloadChannel = "9APP";
     //下载渠道及deeplink
-    private List<DownLoadConfigChannle> channels = new ArrayList<DownLoadConfigChannle>();
+//    private List<DownLoadConfigChannle> channels = new ArrayList<DownLoadConfigChannle>();
     //APP在不同下载渠道的deeplink、logo、简介、评分值、评论数、下载数(googleplay的下载链接需添加联盟id)
 
     private List<Map<String, List<ThirdAppVo>>> apps = new ArrayList<Map<String, List<ThirdAppVo>>>();
@@ -29,11 +29,10 @@ public class DownloadConfigVo {
     public DownloadConfigVo() {
     }
 
-    public DownloadConfigVo(boolean isBoot, List<String> checkPackages, String priorDownloadChannel, List<DownLoadConfigChannle> channels, List<Map<String, List<ThirdAppVo>>> apps) {
+    public DownloadConfigVo(boolean isBoot, List<String> checkPackages, String priorDownloadChannel, List<Map<String, List<ThirdAppVo>>> apps) {
         this.isBoot = isBoot;
         this.checkPackages = checkPackages;
         this.priorDownloadChannel = priorDownloadChannel;
-        this.channels = channels;
         this.apps = apps;
     }
 
@@ -129,13 +128,5 @@ public class DownloadConfigVo {
 
     public void setApps(List<Map<String, List<ThirdAppVo>>> apps) {
         this.apps = apps;
-    }
-
-    public List<DownLoadConfigChannle> getChannels() {
-        return channels;
-    }
-
-    public void setChannels(List<DownLoadConfigChannle> channels) {
-        this.channels = channels;
     }
 }
