@@ -43,6 +43,11 @@ public class MongoDbManager implements IMongoDbManager {
         query.with(new QPageRequest(mongoPage, size));
     }
 
+    public <T> boolean exists(Class<T> clazz, Object id) {
+        Query query = new Query(Criteria.where("id").is(id));
+        return mongoTemplate.exists(query, clazz);
+    }
+
     @Override
     public <T> PageableResult<T> queryPage(Class<T> clazz, Query query, int page, int size) {
         pageQuery(query, page, size);
@@ -79,7 +84,7 @@ public class MongoDbManager implements IMongoDbManager {
     @Override
     public <T> T queryOne(Class<T> clazz, Object id) {
         Query query = new Query(Criteria.where("id").is(id));
-        return mongoTemplate.findOne(query,clazz);
+        return mongoTemplate.findOne(query, clazz);
     }
 
     @Override
