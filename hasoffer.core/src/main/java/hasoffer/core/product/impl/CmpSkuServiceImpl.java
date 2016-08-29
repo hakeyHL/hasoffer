@@ -720,8 +720,8 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             return;
         }
 //        更新mongodb
-        PtmCmpSkuLog ptmCmpSkuLog = new PtmCmpSkuLog(cmpSku);
-        mdm.save(ptmCmpSkuLog);
+//        PtmCmpSkuLog ptmCmpSkuLog = new PtmCmpSkuLog(cmpSku);
+//        mdm.save(ptmCmpSkuLog);
 
         PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(id);
         //获取商品的status
@@ -790,8 +790,13 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         }
 
 //        更新mongodb
-        PtmCmpSkuLog ptmCmpSkuLog = new PtmCmpSkuLog(cmpSku);
-        mdm.save(ptmCmpSkuLog);
+//        PtmCmpSkuLog ptmCmpSkuLog = new PtmCmpSkuLog(cmpSku);
+//        mdm.save(ptmCmpSkuLog);
+
+        //保存新抓来的价格
+        if (fetchedProduct.getPrice() != 0.0f) {
+            saveHistoryPrice(skuId, TimeUtils.nowDate(), fetchedProduct.getPrice());
+        }
 
         PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(skuId);
 
