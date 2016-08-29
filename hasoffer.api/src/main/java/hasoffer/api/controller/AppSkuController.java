@@ -130,4 +130,20 @@ public class AppSkuController {
         return null;
     }
 
+    /**
+     * @param id
+     * @param response
+     * @return
+     */
+    @RequestMapping("curve")
+    public String getOffers(@RequestParam(defaultValue = "0") Long id, HttpServletResponse response) {
+        System.out.println(" get get get get  offers offers offers ");
+        PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, id);
+        if (ptmCmpSkuDescription != null) {
+            String offers = ptmCmpSkuDescription.getOffers();
+            System.out.println(" got it ,and offers is " + offers);
+        }
+        return null;
+    }
+
 }
