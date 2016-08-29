@@ -41,10 +41,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created on 2016/1/4.
@@ -109,6 +106,18 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         } else {
             return;
         }
+
+        // 排序
+        Collections.sort(priceNodes, new Comparator<PriceNode>() {
+            @Override
+            public int compare(PriceNode o1, PriceNode o2) {
+                if (o1.getPriceTimeL() > o2.getPriceTimeL()) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        });
 
         if (priceNodes.size() > PRICE_HISTORY_SIZE) {
             priceNodes.subList(priceNodes.size() - PRICE_HISTORY_SIZE, priceNodes.size());
