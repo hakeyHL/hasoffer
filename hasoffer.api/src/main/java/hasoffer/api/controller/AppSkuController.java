@@ -2,6 +2,7 @@ package hasoffer.api.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import hasoffer.api.controller.vo.PriceCurveVo;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.JsonHelper;
@@ -11,9 +12,11 @@ import hasoffer.core.persistence.mongo.PriceNode;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
 import hasoffer.core.product.impl.CmpSkuServiceImpl;
+import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.utils.ImageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -40,6 +44,8 @@ public class AppSkuController {
     IPtmCmpSkuImageService ptmCmpSkuImageService;
     @Resource
     CmpSkuServiceImpl iCmpSkuService;
+    @Resource
+    ProductServiceImpl productService;
     Logger logger = LoggerFactory.getLogger(AppSkuController.class);
 
     public static List getImageArray(List<PtmCmpSkuImage> list) {
@@ -123,11 +129,73 @@ public class AppSkuController {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
+        Map<String, Float> priceXY = new HashMap<>();
         List<PriceNode> priceNodes = iCmpSkuService.queryHistoryPrice(id);
         System.out.println(priceNodes != null ? "  priceNodes  :" + priceNodes.size() : "null a .....");
-        jsonObject.put("data", JSONObject.toJSON(priceNodes));
+        if (priceNodes != null && priceNodes.size() > 0) {
+            for (PriceNode priceNode : priceNodes) {
+//            jsonObject.put("data", JSONObject.toJSON(priceNodes));
+                //查询到价格历史,开始分析
+                priceXY.put(this.getDateMMdd(priceNode.getPriceTimeL()), priceNode.getPrice());
+            }
+            //X轴  20天为间隔显示日期 , 格式为：　10-30
+            List<String> X = new ArrayList<>();
+            X.add("4-19");
+            X.add("5-11");
+            X.add("6-01");
+            X.add("7-12");
+            X.add("8-02");
+            X.add("8-22");
+
+            //Y轴
+            List<Long> Y = new ArrayList<>();
+            Y.add(3750l);
+            Y.add(3850l);
+            Y.add(3950l);
+            Y.add(4050l);
+            Y.add(4150l);
+            //两个数据点
+            PriceCurveVo priceCurveVo = new PriceCurveVo(X, Y, priceXY, 3799l, 4088l);
+            jsonObject.put("data", JSONObject.toJSON(priceCurveVo));
+        }
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
 
+    /**
+     * @param id
+     * @param response
+     * @return
+     */
+    @RequestMapping("offerTest")
+    public String getOffers(@RequestParam(defaultValue = "0") Long id, HttpServletResponse response) {
+        System.out.println(" get get get get  offers offers offers ");
+        PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, id);
+        if (ptmCmpSkuDescription != null) {
+            String offers = ptmCmpSkuDescription.getOffers();
+            System.out.println(" got it ,and offers is " + offers);
+            PtmCmpSku ptmCmpSku = cmpSkuService.getCmpSkuById(id);
+            if (ptmCmpSku != null) {
+                System.out.println("sku id is :" + id + " and productId is " + ptmCmpSku.getProductId());
+                PtmProduct product = productService.getProduct(ptmCmpSku.getProductId());
+                if (product != null) {
+                    System.out.println(" product is exist  and title is  " + product.getTitle());
+                    System.out.println(" price is :" + product.getPrice());
+                }
+            }
+        }
+        return null;
+    }
+
+    public String getDateMMdd(Long time) {
+        Date date = new Date();
+        date.setTime(time);
+        String format = null;
+        try {
+            format = new SimpleDateFormat("MM-dd").format(date);
+        } catch (Exception e) {
+            logger.error("transfer long date to MM-dd failed " + date);
+        }
+        return format;
+    }
 }

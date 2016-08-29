@@ -41,6 +41,7 @@ public class CmpProductListVo {
     }
 
     public CmpProductListVo(PtmCmpSku cmpSku, String logoImage) {
+        this.id = cmpSku.getId();
         this.coins = cmpSku.getWebsite() == Website.FLIPKART ? Math.round(0.015 * cmpSku.getPrice()) : 0;
         this.ratingNum = cmpSku.getWebsite().equals(Website.EBAY) ? 0 : cmpSku.getRatings();
         this.imageUrl = cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath());

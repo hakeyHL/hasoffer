@@ -685,27 +685,31 @@ public class Compare2Controller {
                 }
                 if (websiteSet.contains(cmpProductListVo.getWebsite())) {
                     websiteSet.remove(cmpProductListVo.getWebsite());
-                    //去除列表中除此之外的其他此site的数据
-                    if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
-                        System.out.println("not ebay ");
-                        //评论数*星级 累加 除以评论数和
-                        sum += cmpProductListVo.getTotalRatingsNum() * cmpProductListVo.getRatingNum();
-                        tempTotalComments += cmpProductListVo.getTotalRatingsNum();
-                    }
-                    //获取offers
-                    System.out.println(" get offers from mongoDb ");
-                    PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, cmpProductListVo.getId());
-                    if (ptmCmpSkuDescription != null) {
-                        String offers = ptmCmpSkuDescription.getOffers();
-                        System.out.println(" got it ,and offers is " + offers);
-                        if (!StringUtils.isEmpty(offers)) {
-                            String[] temps = offers.split(",");
-                            for (String str : temps) {
-                                cmpProductListVo.getOffers().add(str);
-                            }
+                //去除列表中除此之外的其他此site的数据
+                if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
+                    System.out.println("not ebay ");
+                    //评论数*星级 累加 除以评论数和
+                    sum += cmpProductListVo.getTotalRatingsNum() * cmpProductListVo.getRatingNum();
+                    tempTotalComments += cmpProductListVo.getTotalRatingsNum();
+                }
+                //获取offers
+                System.out.println(" get offers from mongoDb ");
+                System.out.println(" cmpProductListVo " + cmpProductListVo.getId() + "  : price : " + cmpProductListVo.getPrice());
+                PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, cmpProductListVo.getId());
+                if (ptmCmpSkuDescription != null) {
+                    System.out.println(" aha  aha  aha ");
+                    String offers = ptmCmpSkuDescription.getOffers();
+                    System.out.println(" got it ,and offers is " + offers);
+                    if (!StringUtils.isEmpty(offers)) {
+                        List<String> offer = new ArrayList<>();
+                        String[] temps = offers.split(",");
+                        for (String str : temps) {
+                            offer.add(str);
                         }
+                        cmpProductListVo.setOffers(offer);
                     }
-                    tempCmpProductListVos.add(cmpProductListVo);
+                }
+                tempCmpProductListVos.add(cmpProductListVo);
                 }
             }
             //移除之前加进列表的所有的sku列表

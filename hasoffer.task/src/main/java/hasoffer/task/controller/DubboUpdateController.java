@@ -11,6 +11,7 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
+import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchUrlResult;
 import hasoffer.spider.model.FetchedProduct;
 import hasoffer.task.worker.CmpSkuDubboUpdateWorker;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -77,7 +79,7 @@ public class DubboUpdateController {
         }
 
         for (int i = 0; i < 60; i++) {
-            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, productService, cmpSkuService));
+            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService));
         }
 
         taskRunning1.set(true);
@@ -101,7 +103,7 @@ public class DubboUpdateController {
         es.execute(new TopSellingListWorker(dbm, queue, fetchDubboService));
 
         for (int i = 0; i < 30; i++) {
-            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, productService, cmpSkuService));
+            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService));
         }
 
         taskRunning2.set(true);
@@ -151,6 +153,41 @@ public class DubboUpdateController {
         cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
 
         cmpSkuService.createPtmCmpSkuImage(skuid, fetchedProduct);
+
+        return "ok";
+    }
+
+    //dubbofetchtask/testListSingle
+    @RequestMapping(value = "/testListSingle/{websiteString}/{keyword}", method = RequestMethod.GET)
+    @ResponseBody
+    public String testListSingle(@PathVariable String websiteString, @PathVariable String keyword) {
+
+        Website website = Website.valueOf(websiteString.toUpperCase());
+
+        fetchDubboService.sendKeyWordTask(website, keyword);
+        System.out.println("send single list processor success for " + websiteString + " " + keyword);
+
+        while (true) {
+            TaskStatus taskStatus = fetchDubboService.getKeyWordTaskStatus(website, keyword);
+            if (TaskStatus.FINISH.equals(taskStatus)) {
+                break;
+            } else {
+                System.out.println(taskStatus);
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (InterruptedException e) {
+
+                }
+            }
+        }
+
+        FetchResult fetchResult = fetchDubboService.getProductsKeyWord(website, keyword);
+
+        List<FetchedProduct> products = fetchResult.getFetchProducts();
+
+        for (FetchedProduct product : products) {
+            System.out.println(product);
+        }
 
         return "ok";
     }
