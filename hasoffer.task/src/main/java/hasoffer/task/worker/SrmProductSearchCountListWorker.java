@@ -2,6 +2,7 @@ package hasoffer.task.worker;
 
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
@@ -43,9 +44,9 @@ public class SrmProductSearchCountListWorker implements Runnable {
         int page = 1;
         int pageSize = 1000;
 
-        String startDateString = TimeUtils.parse(TimeUtils.today() - TimeUtils.MILLISECONDS_OF_1_DAY * 1, "yyyyMMdd");
+        String startDateString = TimeUtils.parse(TimeUtils.today() - TimeUtils.MILLISECONDS_OF_1_DAY * 3, "yyyyMMdd");
 
-        String Q_LOG_BYUPDATETIME = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd = ?0 AND t.count > 5 ORDER BY t.id ASC";
+        String Q_LOG_BYUPDATETIME = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd > ?0 AND t.count > 5 ORDER BY t.id ASC";
 
         PageableResult<SrmProductSearchCount> pageableResult = dbm.queryPage(Q_LOG_BYUPDATETIME, page, pageSize, Arrays.asList(startDateString));
 
@@ -87,6 +88,11 @@ public class SrmProductSearchCountListWorker implements Runnable {
                             if (updateTime.compareTo(TimeUtils.toDate(TimeUtils.today())) > 0) {
                                 continue;
                             }
+                        }
+
+                        //offsale的不再更新
+                        if(SkuStatus.OFFSALE.equals(sku.getStatus())){
+                            continue;
                         }
 
                         Website website = sku.getWebsite();

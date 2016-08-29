@@ -1,13 +1,18 @@
 package hasoffer.core.test;
 
-import hasoffer.base.enums.SearchResultSort;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
+import hasoffer.core.bo.system.SearchCriteria;
+import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.mongo.PriceNode;
+import hasoffer.core.persistence.mongo.PtmCmpSkuHistoryPrice;
+import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmImage;
@@ -19,18 +24,19 @@ import hasoffer.core.search.ISearchService;
 import hasoffer.core.task.ListAndProcessTask2;
 import hasoffer.core.task.worker.IList;
 import hasoffer.core.task.worker.IProcess;
+import jodd.util.NameValue;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
@@ -72,6 +78,11 @@ public class ProductTest {
     IDealService dealService;
     @Resource
     ProductIndex2ServiceImpl productIndex2Service;
+    @Resource
+    IMongoDbManager mdm;
+
+    @Resource
+    MongoDbFactory mongoDbFactory;
     private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
 
     private void print(String str) {
@@ -79,8 +90,119 @@ public class ProductTest {
     }
 
     @Test
-    public void reimport111() {
+    public void testArray() {
+        List<Integer> list = new ArrayList<>();
+        list.add(1);
+        list.add(2);
+        list.add(3);
+        list.add(4);
+        list.add(5);
 
+        showList(list);
+
+        list.add(6);
+
+        if (list.size() > 5) {
+            list = list.subList(list.size() - 5, list.size());
+        }
+
+        showList(list);
+    }
+
+    private void showList(List<Integer> list) {
+        System.out.println("------------------");
+        for (Integer i : list) {
+            System.out.print(i + "\t");
+        }
+        System.out.println();
+    }
+
+    @Test
+    public void querySkuPrice2() {
+
+        Criteria baseCriteria = Criteria.where("id").is(30665);
+
+        Query q = new Query();
+        q.addCriteria(baseCriteria);
+
+        List<PtmCmpSkuHistoryPrice> datas = mdm.query(PtmCmpSkuHistoryPrice.class, q);
+
+        if (datas.size() > 0) {
+            PtmCmpSkuHistoryPrice historyPrice = datas.get(0);
+            PriceNode pn = historyPrice.getPriceNodes().get(0);
+
+            cmpSkuService.saveHistoryPrice(30665, pn.getPriceTime(), pn.getPrice());
+
+            System.out.println(historyPrice.getPriceNodes().size());
+        }
+    }
+
+    @Test
+    public void querySkuPrice0() {
+//        List<PtmCmpSkuLog> ptmCmpSkuLogs = cmpSkuService.listByPcsId(2966498L);
+//        for (PtmCmpSkuLog ptmCmpSkuLog : ptmCmpSkuLogs) {
+//            System.out.println(String.format("price : %f @ time : %s", ptmCmpSkuLog.getPrice(), TimeUtils.parse(ptmCmpSkuLog.getPriceTime(), "yyyy-MM-dd HH:mm:ss")));
+//        }
+
+        PtmCmpSkuHistoryPrice historyPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, 4L);
+        List<PriceNode> priceNodes = null;
+        if (historyPrice == null) {
+            priceNodes = new ArrayList<>();
+            historyPrice = new PtmCmpSkuHistoryPrice(4, priceNodes);
+            for (int i = 20; i > 0; i--) {
+                priceNodes.add(new PriceNode(TimeUtils.addDay(TimeUtils.nowDate(), -1 * i), 100 + (i % 5)));
+            }
+        } else {
+            historyPrice.getPriceNodes().add(new PriceNode(TimeUtils.addDay(TimeUtils.nowDate(), 1), 100));
+        }
+
+        mdm.save(historyPrice);
+    }
+
+    @Test
+    public void convertdatas() {
+        ListAndProcessTask2<PtmCmpSkuLog> listAndProcessTask2 = new ListAndProcessTask2<>(
+                new IList<PtmCmpSkuLog>() {
+                    @Override
+                    public PageableResult<PtmCmpSkuLog> getData(int page) {
+                        return mdm.queryPage(PtmCmpSkuLog.class, new Query(), page, 100);
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcess<PtmCmpSkuLog>() {
+                    @Override
+                    public void process(PtmCmpSkuLog o) {
+                        cmpSkuService.saveHistoryPrice(o.getPcsId(), o.getPriceTime(), o.getPrice());
+                    }
+                }
+        );
+
+        listAndProcessTask2.setQueueMaxSize(100);
+        listAndProcessTask2.setProcessorCount(1);
+
+        listAndProcessTask2.go();
+    }
+
+
+    @Test
+    public void querySkuPrice1() {
+        long id = 4L;
+        if (mdm.exists(PtmCmpSkuHistoryPrice.class, id)) {
+//            PtmCmpSkuHistoryPrice historyPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, id);
+//            System.out.println(historyPrice.getId());
+            System.out.println("yes");
+        } else {
+            System.out.println("no");
+        }
     }
 
     @Test
@@ -104,11 +226,27 @@ public class ProductTest {
 
     @Test
     public void testNewSolr() {
-        PageableResult<ProductModel2> pms = productIndex2Service.searchProductsByKey("redmi 2 mi", 1, 10, SearchResultSort.RELEVANCE);
+        SearchCriteria sc = new SearchCriteria();
+        sc.setKeyword("iphone 6s");//"iphone 6s", 1, 10, SearchResultSort.RELEVANCE
+        sc.setPage(1);
+        sc.setPageSize(10);
+        sc.setPivotFields(Arrays.asList("cate2", "cate3"));
+        PageableResult<ProductModel2> pms = productIndex2Service.searchProducts(sc);
         List<ProductModel2> pmList = pms.getData();
-        for (ProductModel2 pm : pmList) {
-            System.out.println(pm.toString());
-//            System.out.println(pm.getSearchCount() + "\t_" + pm.getBrand() + "_\t" + pm.getTitle() + "\t" + pm.getMinPrice());
+        Map<String, List<NameValue>> pfvs = pms.getPivotFieldVals();
+
+        for (Map.Entry<String, List<NameValue>> pfv : pfvs.entrySet()) {
+            String id = pfv.getKey();
+            List<NameValue> datas = pfv.getValue();
+            for (NameValue nv : datas) {
+
+                long cateId = (long) nv.getName();
+                PtmCategory category = categoryService.getCategory(cateId);
+                if (category == null) {
+                    continue;
+                }
+                System.out.println(nv.getValue() + "\t" + nv.getName() + "\t" + category.getName());
+            }
         }
     }
 

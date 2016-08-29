@@ -3,6 +3,7 @@ package hasoffer.core.product;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.core.bo.product.SkuPriceUpdateResultBo;
+import hasoffer.core.persistence.mongo.PriceNode;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku2;
@@ -12,12 +13,17 @@ import hasoffer.core.persistence.po.stat.StatSkuPriceUpdateResult;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.spider.model.FetchedProduct;
 
+import java.util.Date;
 import java.util.List;
 
 /**
  * Created on 2016/1/4.
  */
 public interface ICmpSkuService {
+
+    List<PriceNode> queryHistoryPrice(long id);
+
+    void saveHistoryPrice(long id, Date time, float price);
 
     void createDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct);
 
@@ -55,8 +61,6 @@ public interface ICmpSkuService {
     PtmCmpSku getCmpSkuById(long id);
 
     List<PtmCmpSku> listCmpSkus(long productId);
-
-    void updateCmpSkuPrice(Long id, float price);
 
     void downloadImage(PtmCmpSku sku);
 
