@@ -152,6 +152,7 @@ public class AppSkuController {
                 PtmProduct product = productService.getProduct(ptmCmpSku.getProductId());
                 if (product != null) {
                     System.out.println(" product is exist  and title is  " + product.getTitle());
+                    System.out.println(" price is :" + product.getPrice());
                 }
             }
         }
