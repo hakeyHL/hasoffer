@@ -1,6 +1,5 @@
 package hasoffer.core.test;
 
-import com.mongodb.DB;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
@@ -30,7 +29,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.data.mongodb.MongoDbFactory;
-import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ContextConfiguration;
@@ -122,27 +120,19 @@ public class ProductTest {
     @Test
     public void querySkuPrice2() {
 
-        DB db = mongoDbFactory.getDb("hasoffer");
-        db.getCollection("");
-
-        Criteria baseCriteria = Criteria.where("id").is(30665)
-                .and("priceNodes").elemMatch(Criteria.where("priceTimeL").gt(1466955309000L));
+        Criteria baseCriteria = Criteria.where("id").is(30665);
 
         Query q = new Query();
         q.addCriteria(baseCriteria);
 
-        //{"_id":30665, "priceNodes":{"$elemMatch":{"priceTimeL":{"$gte":1466352000000}}}}, {"priceNodes.$":1}
-
-        final String Q_CMD = "{\"priceNodes.$\":1}, {\"_id\":%s, \"priceNodes\":{\"$elemMatch\":{\"priceTimeL\":{\"$gte\":%d}}}}";
-
-//        mdm.executeCommand(String.format(Q_CMD, 30665, 1466955309000L));
-
-        BasicQuery basicQuery = new BasicQuery(String.format(Q_CMD, 30665, 1466955309000L));
-
-        List<PtmCmpSkuHistoryPrice> datas = mdm.query(PtmCmpSkuHistoryPrice.class, basicQuery);
+        List<PtmCmpSkuHistoryPrice> datas = mdm.query(PtmCmpSkuHistoryPrice.class, q);
 
         if (datas.size() > 0) {
             PtmCmpSkuHistoryPrice historyPrice = datas.get(0);
+            PriceNode pn = historyPrice.getPriceNodes().get(0);
+
+            cmpSkuService.saveHistoryPrice(30665, pn.getPriceTime(), pn.getPrice());
+
             System.out.println(historyPrice.getPriceNodes().size());
         }
     }

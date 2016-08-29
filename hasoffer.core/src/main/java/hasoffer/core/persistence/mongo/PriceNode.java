@@ -40,4 +40,20 @@ public class PriceNode {
     public void setPrice(float price) {
         this.price = price;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PriceNode priceNode = (PriceNode) o;
+
+        return priceTimeL == priceNode.priceTimeL;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (priceTimeL ^ (priceTimeL >>> 32));
+    }
 }

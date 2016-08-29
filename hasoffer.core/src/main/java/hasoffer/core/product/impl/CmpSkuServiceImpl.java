@@ -81,8 +81,21 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     private Logger logger = LoggerFactory.getLogger(CmpSkuServiceImpl.class);
 
     @Override
+    public List<PriceNode> queryHistoryPrice(long id) {
+        PtmCmpSkuHistoryPrice historyPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, id);
+        if (historyPrice == null) {
+            return null;
+        } else {
+            return historyPrice.getPriceNodes();
+        }
+    }
+
+    @Override
     public void saveHistoryPrice(long id, Date time, float price) {
         final int PRICE_HISTORY_SIZE = 90;
+
+        PriceNode priceNode = new PriceNode(time, price);
+
         PtmCmpSkuHistoryPrice historyPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, id);
         List<PriceNode> priceNodes = null;
         if (historyPrice == null) {
@@ -92,7 +105,11 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             priceNodes = historyPrice.getPriceNodes();
         }
 
-        priceNodes.add(new PriceNode(time, price));
+        if (!priceNodes.contains(priceNode)) {
+            priceNodes.add(priceNode);
+        } else {
+            return;
+        }
 
         if (priceNodes.size() > PRICE_HISTORY_SIZE) {
             priceNodes.subList(priceNodes.size() - PRICE_HISTORY_SIZE, priceNodes.size());

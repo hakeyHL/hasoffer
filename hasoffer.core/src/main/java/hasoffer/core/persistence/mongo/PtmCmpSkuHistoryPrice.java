@@ -41,4 +41,6 @@ public class PtmCmpSkuHistoryPrice {
     public void setPriceNodes(List<PriceNode> priceNodes) {
         this.priceNodes = priceNodes;
     }
+
+
 }
