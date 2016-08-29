@@ -13,6 +13,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
+import hasoffer.core.product.impl.CmpSkuServiceImpl;
 import hasoffer.core.utils.ImageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ public class AppSkuController {
     @Resource
     IPtmCmpSkuImageService ptmCmpSkuImageService;
     @Resource
-    ICmpSkuService iCmpSkuService;
+    CmpSkuServiceImpl iCmpSkuService;
     Logger logger = LoggerFactory.getLogger(AppSkuController.class);
 
     public static List getImageArray(List<PtmCmpSkuImage> list) {
