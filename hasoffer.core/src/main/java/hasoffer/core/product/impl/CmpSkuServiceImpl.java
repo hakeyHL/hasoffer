@@ -35,7 +35,6 @@ import hasoffer.fetch.sites.snapdeal.SnapdealHelper;
 import hasoffer.spider.model.FetchedProduct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -317,15 +316,6 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         long count = mdm.count(PtmCmpSkuLog.class, query);
 
         return new SkuPriceUpdateResultBo(ymd, count);
-    }
-
-    @Override
-    public List<PtmCmpSkuLog> listByPcsId(long pcsId) {
-
-        Query query = new Query(Criteria.where("pcsId").is(pcsId));
-        query.with(new Sort(Sort.Direction.ASC, "priceTime"));
-
-        return mdm.query(PtmCmpSkuLog.class, query);
     }
 
     @Override
@@ -636,39 +626,6 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         if (website != null) {
             ptmCmpSkuUpdater.getPo().setWebsite(website);
         }
-
-        dbm.update(ptmCmpSkuUpdater);
-    }
-
-    @Override
-    public void updateCmpSku(long id, String url, float price, SkuStatus skuStatus) {
-
-        PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(id);
-
-        ptmCmpSkuUpdater.getPo().setUpdateTime(TimeUtils.nowDate());
-        ptmCmpSkuUpdater.getPo().setUrl(url);
-        ptmCmpSkuUpdater.getPo().setPrice(price);
-        ptmCmpSkuUpdater.getPo().setStatus(skuStatus);
-
-        dbm.update(ptmCmpSkuUpdater);
-    }
-
-    @Override
-    public void updateCmpSku(long id, SkuStatus skuStatus, String skuTitle, float price, String imageUrl, String url, String deeplink) {
-
-        PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(id);
-
-        ptmCmpSkuUpdater.getPo().setStatus(skuStatus);
-        ptmCmpSkuUpdater.getPo().setSkuTitle(skuTitle);
-        ptmCmpSkuUpdater.getPo().setPrice(price);
-
-        if (!StringUtils.isEmpty(imageUrl)) {
-            ptmCmpSkuUpdater.getPo().setOriImageUrl(imageUrl);
-        }
-
-        ptmCmpSkuUpdater.getPo().setUpdateTime(TimeUtils.nowDate());
-        ptmCmpSkuUpdater.getPo().setUrl(url);
-        ptmCmpSkuUpdater.getPo().setDeeplink(deeplink);
 
         dbm.update(ptmCmpSkuUpdater);
     }

@@ -4,7 +4,6 @@ import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.core.bo.product.SkuPriceUpdateResultBo;
 import hasoffer.core.persistence.mongo.PriceNode;
-import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku2;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
@@ -38,13 +37,6 @@ public interface ICmpSkuService {
     void updateCmpSkuBySpiderFetchedProduct(long skuId, FetchedProduct fetchedProduct);
 
     void updateCmpSku(long id, String url, String color, String size, float price);
-
-    void updateCmpSku(long id, String url, float price, SkuStatus skuStatus);
-
-    void updateCmpSku(long id, SkuStatus skuStatus, String skuTitle, float price, String imageUrl, String url, String deeplink);
-
-    // 某 cmpsku 所有的历史价格
-    List<PtmCmpSkuLog> listByPcsId(long pcsId);
 
     SkuPriceUpdateResultBo countUpdate(String ymd);
 

@@ -556,6 +556,12 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     @Transactional
+    public void updateProduct(PtmProductUpdater ptmProductUpdater) {
+        dbm.update(ptmProductUpdater);
+    }
+
+    @Override
+    @Transactional
     public void updateProductBrandModel(long proId, String productBrand, String modelName) {
         PtmProductUpdater productUpdater = new PtmProductUpdater(proId);
 
