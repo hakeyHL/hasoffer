@@ -12,12 +12,15 @@ import hasoffer.core.persistence.po.stat.StatSkuPriceUpdateResult;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.spider.model.FetchedProduct;
 
+import java.util.Date;
 import java.util.List;
 
 /**
  * Created on 2016/1/4.
  */
 public interface ICmpSkuService {
+
+    void saveHistoryPrice(long id, Date time, float price);
 
     void createDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct);
 
@@ -55,8 +58,6 @@ public interface ICmpSkuService {
     PtmCmpSku getCmpSkuById(long id);
 
     List<PtmCmpSku> listCmpSkus(long productId);
-
-    void updateCmpSkuPrice(Long id, float price);
 
     void downloadImage(PtmCmpSku sku);
 
