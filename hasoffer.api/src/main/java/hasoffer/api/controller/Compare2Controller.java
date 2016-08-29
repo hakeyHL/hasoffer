@@ -694,8 +694,10 @@ public class Compare2Controller {
                 }
                 //获取offers
                 System.out.println(" get offers from mongoDb ");
+                System.out.println(" cmpProductListVo " + cmpProductListVo.getId() + "  : price : " + cmpProductListVo.getPrice());
                 PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, cmpProductListVo.getId());
                 if (ptmCmpSkuDescription != null) {
+                    System.out.println(" aha  aha  aha ");
                     String offers = ptmCmpSkuDescription.getOffers();
                     System.out.println(" got it ,and offers is " + offers);
                     if (!StringUtils.isEmpty(offers)) {
