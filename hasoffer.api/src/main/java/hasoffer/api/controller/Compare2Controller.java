@@ -680,10 +680,10 @@ public class Compare2Controller {
             int sum = 0;
             System.out.println("iterator  comparedSkuVos , and  it is size is " + comparedSkuVos.size());
             for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
-                if (websiteSet.size() <= 0) {
-                    break;
-                }
-                if (websiteSet.contains(cmpProductListVo.getWebsite())) {
+//                if (websiteSet.size() <= 0) {
+//                    break;
+//                }
+//                if (websiteSet.contains(cmpProductListVo.getWebsite())) {
                     websiteSet.remove(cmpProductListVo.getWebsite());
                     //去除列表中除此之外的其他此site的数据
                     if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
@@ -706,7 +706,7 @@ public class Compare2Controller {
                         }
                     }
                     tempCmpProductListVos.add(cmpProductListVo);
-                }
+//                }
             }
             //移除之前加进列表的所有的sku列表
             comparedSkuVos = null;

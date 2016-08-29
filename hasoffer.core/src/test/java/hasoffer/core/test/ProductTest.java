@@ -124,6 +124,37 @@ public class ProductTest {
     @Test
     public void querySku() {
 
+        final long cateId = 5L;
+
+        ListAndProcessTask2<PtmProduct> productListAndProcessTask2 = new ListAndProcessTask2<>(
+                new IList() {
+                    @Override
+                    public PageableResult getData(int page) {
+                        return productService.listPagedProducts(cateId, page, 1000);
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcess<PtmProduct>() {
+                    @Override
+                    public void process(PtmProduct o) {
+
+                    }
+                }
+        );
+
+        productListAndProcessTask2.setProcessorCount(10);
+        productListAndProcessTask2.setQueueMaxSize(1500);
+
+        productListAndProcessTask2.go();
     }
 
     @Test
