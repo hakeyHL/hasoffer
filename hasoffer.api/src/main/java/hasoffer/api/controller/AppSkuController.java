@@ -135,7 +135,7 @@ public class AppSkuController {
      * @param response
      * @return
      */
-    @RequestMapping("curve")
+    @RequestMapping("offerTest")
     public String getOffers(@RequestParam(defaultValue = "0") Long id, HttpServletResponse response) {
         System.out.println(" get get get get  offers offers offers ");
         PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, id);
