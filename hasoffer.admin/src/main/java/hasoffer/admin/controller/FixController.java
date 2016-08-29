@@ -341,6 +341,7 @@ public class FixController {
         }
     }
 
+    //fixdata/deleteproduct/
     @RequestMapping(value = "/deleteproduct/{proId}", method = RequestMethod.GET)
     public
     @ResponseBody
@@ -358,6 +359,7 @@ public class FixController {
         return "ok";
     }
 
+    //fixdata/deleteproductanyway/
     @RequestMapping(value = "/deleteproductanyway/{proId}", method = RequestMethod.GET)
     public
     @ResponseBody

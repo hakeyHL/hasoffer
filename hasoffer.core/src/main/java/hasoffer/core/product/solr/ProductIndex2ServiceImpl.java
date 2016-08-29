@@ -1,25 +1,34 @@
 package hasoffer.core.product.solr;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.config.AppConfig;
 import hasoffer.base.enums.SearchResultSort;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.system.SearchCriteria;
+import hasoffer.core.redis.ICacheService;
 import hasoffer.data.solr.*;
 import jodd.util.NameValue;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.solr.client.solrj.response.PivotField;
 import org.apache.solr.common.util.NamedList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.annotation.Resource;
+import java.util.*;
 
 
 @Service
 public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, ProductModel2> {
+    private final String SOLR_CACHE_KEY = "SOLR_";
+    @Resource
+    ICacheService pageableResultcacheService;
+    Logger logger = LoggerFactory.getLogger(ProductIndex2ServiceImpl.class);
     /*protected HttpSolrServer solrServer;
 
     public ProductIndex2ServiceImpl() {
@@ -95,84 +104,108 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
      * @return
      */
     public PageableResult<ProductModel2> searchProducts(SearchCriteria sc) {
-        List<String> pivotFields = sc.getPivotFields();
-        int pivotFieldSize = pivotFields == null ? 0 : pivotFields.size();
-
-        Sort[] sorts = null;
-
-        // sort by
-        SearchResultSort resultSort = sc.getSort();
-        if (resultSort != null) {
-            sorts = new Sort[1];
-            if (resultSort == SearchResultSort.POPULARITY) {
-                sorts[0] = new Sort(ProductModel2SortField.F_POPULARITY.getFieldName(), Order.DESC);
-            } else if (resultSort == SearchResultSort.PRICEL2H) {
-                sorts[0] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.ASC);
-            } else if (resultSort == SearchResultSort.PRICEH2L) {
-                sorts[0] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.DESC);
+        String key = this.getSearchCacheKey(sc);
+        PageableResult<ProductModel2> model2PageableResult = null;
+        String pageableResultString = pageableResultcacheService.get(key, 0);
+        if (pageableResultString != null) {
+            try {
+                JSONObject jsonObject = JSON.parseObject(pageableResultString);
+                Map<String, JSONArray> pivotFieldVals = jsonObject.getObject("pivotFieldVals", Map.class);
+                Map<String, List<NameValue>> pivotFieldVals2 = new HashMap<String, List<NameValue>>();
+                Set<Map.Entry<String, JSONArray>> entries = pivotFieldVals.entrySet();
+                Iterator<Map.Entry<String, JSONArray>> iterator = entries.iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<String, JSONArray> next = iterator.next();
+                    pivotFieldVals2.put(next.getKey(), JSONArray.parseArray(next.getValue().toJSONString(), NameValue.class));
+                }
+                model2PageableResult = new PageableResult<ProductModel2>(JSONArray.parseArray(jsonObject.getString("data"), ProductModel2.class), jsonObject.getLong("numFund"), jsonObject.getLong("currentPage"), jsonObject.getLong("pageSize"), pivotFieldVals2);
+                return model2PageableResult;
+            } catch (Exception e) {
+                logger.error(" search products , get products from cache :" + e.getMessage());
+                return null;
             }
-        }
-
-        // pivot fields
-        PivotFacet[] pivotFacets = new PivotFacet[pivotFieldSize];
-        if (pivotFieldSize > 0) {
-            for (int i = 0; i < pivotFieldSize; i++) {
-                // cate2 distinct 提取出来所有值
-                pivotFacets[i] = new PivotFacet(pivotFields.get(i));
-            }
-        }
-
-        // filter list
-        List<FilterQuery> fqList = new ArrayList<FilterQuery>();
-        if (NumberUtils.isNumber(sc.getCategoryId())) {
-            long cateId = Long.valueOf(sc.getCategoryId());
-            fqList.add(new FilterQuery("cate" + sc.getLevel(), sc.getCategoryId()));
-        }
-        int priceFrom = sc.getPriceFrom(), priceTo = sc.getPriceTo();
-        String priceFromStr = "*", priceToStr = "*";
-        if (priceFrom < 0) {
-            priceFrom = 0;
-        }
-        if (priceFrom < priceTo) {
-            priceFromStr = String.valueOf(priceFrom);
-            priceToStr = String.valueOf(priceTo);
         } else {
-            priceFromStr = String.valueOf(priceFrom);
-        }
-        fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", priceFromStr, priceToStr)));
+            List<String> pivotFields = sc.getPivotFields();
+            int pivotFieldSize = pivotFields == null ? 0 : pivotFields.size();
 
-        FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
+            Sort[] sorts = null;
 
-        String keyword = sc.getKeyword();
-        if (StringUtils.isEmpty(keyword)) {
-            keyword = "*:*";
-        }
-
-        // search by solr
-        SearchResult<ProductModel2> sr = searchObjs(keyword, fqs, sorts, pivotFacets, sc.getPage() <= 1 ? 1 : sc.getPage(), sc.getPageSize(), true);
-
-        //process pivot fields
-        Map<String, List<NameValue>> pivotFieldVals = new HashMap<>();
-        if (pivotFieldSize > 0) {
-            NamedList<List<PivotField>> nl = sr.getFacetPivot();
-
-            for (int i = 0; i < pivotFieldSize; i++) {
-                String field = pivotFields.get(i);
-
-                List<PivotField> cate2List = nl.get(field);
-                for (PivotField pf : cate2List) {// string - object - long
-                    System.out.println(pf.getValue() + "\t" + pf.getCount());
-                    List<NameValue> nvs = pivotFieldVals.get(field);
-                    if (nvs == null) {
-                        nvs = new ArrayList<>();
-                        pivotFieldVals.put(field, nvs);
-                    }
-                    nvs.add(new NameValue<Long, Long>((Long) pf.getValue(), Long.valueOf(pf.getCount())));
+            // sort by
+            SearchResultSort resultSort = sc.getSort();
+            if (resultSort != null) {
+                sorts = new Sort[1];
+                if (resultSort == SearchResultSort.POPULARITY) {
+                    sorts[0] = new Sort(ProductModel2SortField.F_POPULARITY.getFieldName(), Order.DESC);
+                } else if (resultSort == SearchResultSort.PRICEL2H) {
+                    sorts[0] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.ASC);
+                } else if (resultSort == SearchResultSort.PRICEH2L) {
+                    sorts[0] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.DESC);
                 }
             }
+
+            // pivot fields
+            PivotFacet[] pivotFacets = new PivotFacet[pivotFieldSize];
+            if (pivotFieldSize > 0) {
+                for (int i = 0; i < pivotFieldSize; i++) {
+                    // cate2 distinct 提取出来所有值
+                    pivotFacets[i] = new PivotFacet(pivotFields.get(i));
+                }
+            }
+
+            // filter list
+            List<FilterQuery> fqList = new ArrayList<FilterQuery>();
+            if (NumberUtils.isNumber(sc.getCategoryId())) {
+                long cateId = Long.valueOf(sc.getCategoryId());
+                fqList.add(new FilterQuery("cate" + sc.getLevel(), sc.getCategoryId()));
+            }
+            int priceFrom = sc.getPriceFrom(), priceTo = sc.getPriceTo();
+            String priceFromStr = "*", priceToStr = "*";
+            if (priceFrom < 0) {
+                priceFrom = 0;
+            }
+            if (priceFrom < priceTo) {
+                priceFromStr = String.valueOf(priceFrom);
+                priceToStr = String.valueOf(priceTo);
+            } else {
+                priceFromStr = String.valueOf(priceFrom);
+            }
+            fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", priceFromStr, priceToStr)));
+
+            FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
+
+            String keyword = sc.getKeyword();
+            if (StringUtils.isEmpty(keyword)) {
+                keyword = "*:*";
+            }
+
+            // search by solr
+            SearchResult<ProductModel2> sr = searchObjs(keyword, fqs, sorts, pivotFacets, sc.getPage() <= 1 ? 1 : sc.getPage(), sc.getPageSize(), true);
+
+            //process pivot fields
+            Map<String, List<NameValue>> pivotFieldVals = new HashMap<>();
+            if (pivotFieldSize > 0) {
+                NamedList<List<PivotField>> nl = sr.getFacetPivot();
+
+                for (int i = 0; i < pivotFieldSize; i++) {
+                    String field = pivotFields.get(i);
+
+                    List<PivotField> cate2List = nl.get(field);
+                    for (PivotField pf : cate2List) {// string - object - long
+                        System.out.println(pf.getValue() + "\t" + pf.getCount());
+                        List<NameValue> nvs = pivotFieldVals.get(field);
+                        if (nvs == null) {
+                            nvs = new ArrayList<>();
+                            pivotFieldVals.put(field, nvs);
+                        }
+                        nvs.add(new NameValue<Long, Long>((Long) pf.getValue(), Long.valueOf(pf.getCount())));
+                    }
+                }
+            }
+            model2PageableResult = new PageableResult<ProductModel2>(sr.getResult(), sr.getTotalCount(), sc.getPage(), sc.getPageSize(), pivotFieldVals);
+            pageableResultcacheService.add(key, JSON.toJSONString(model2PageableResult), TimeUtils.SECONDS_OF_1_DAY);
+            return model2PageableResult;
         }
 
-        return new PageableResult<ProductModel2>(sr.getResult(), sr.getTotalCount(), sc.getPage(), sc.getPageSize(), pivotFieldVals);
     }
 
     /**
@@ -424,4 +457,47 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
 
         return list;
     }*/
+    public String getSearchCacheKey(SearchCriteria sc) {
+        StringBuilder key = new StringBuilder();
+        key.append(SOLR_CACHE_KEY);
+        if (!StringUtils.isEmpty(sc.getKeyword())) {
+            key.append("_").append(sc.getKeyword());
+        }
+        if (!StringUtils.isEmpty(sc.getCategoryId())) {
+            key.append("_").append(sc.getCategoryId());
+        }
+        if (!StringUtils.isEmpty(sc.getLevel() + "")) {
+            key.append("_").append(sc.getLevel());
+        }
+        if (sc.getPriceFrom() != -1) {
+            key.append("_").append(sc.getPriceFrom());
+        }
+        if (sc.getPriceTo() != -1) {
+            key.append("_").append(sc.getPriceTo());
+        }
+        if (sc.getPivotFields() != null && sc.getPivotFields().size() > 0) {
+            for (String pivotField : sc.getPivotFields()) {
+                key.append("_").append(pivotField);
+            }
+
+        }
+        if (sc.getSort() != null) {
+            key.append("_").append(sc.getSort());
+        }
+        key.append("_").append(sc.getPage()).append("_").append(sc.getPageSize());
+        return key.toString();
+    }
+//
+//    public static void parseCacheString2Object(String jsonString, Class obj) {
+//        Method[] methods = obj.getMethods();
+//        for (Method method : methods) {
+//            if (method.getName().startsWith("set")) {
+//                System.out.println(method.getName());
+//            }
+//        }
+//    }
+//
+//    public static void main(String[] args) {
+//        ProductIndex2ServiceImpl.parseCacheString2Object("", PageableResult.class);
+//    }
 }
