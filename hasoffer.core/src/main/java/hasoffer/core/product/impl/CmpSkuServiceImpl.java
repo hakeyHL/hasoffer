@@ -13,9 +13,7 @@ import hasoffer.core.exception.CmpSkuUrlNotFoundException;
 import hasoffer.core.exception.MultiUrlException;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
-import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
-import hasoffer.core.persistence.mongo.PtmProductDescription;
+import hasoffer.core.persistence.mongo.*;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku2;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
@@ -44,6 +42,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -81,9 +80,42 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
     private Logger logger = LoggerFactory.getLogger(CmpSkuServiceImpl.class);
 
-    public static void main(String[] args) {
-        String ss = HexDigestUtil.md5("FLIPKART" + StringUtils.getCleanChars("Apple iPhone 6S (Gold, 64 GB)"));
-        System.out.print(ss);
+    @Override
+    public List<PriceNode> queryHistoryPrice(long id) {
+        PtmCmpSkuHistoryPrice historyPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, id);
+        if (historyPrice == null) {
+            return null;
+        } else {
+            return historyPrice.getPriceNodes();
+        }
+    }
+
+    @Override
+    public void saveHistoryPrice(long id, Date time, float price) {
+        final int PRICE_HISTORY_SIZE = 90;
+
+        PriceNode priceNode = new PriceNode(time, price);
+
+        PtmCmpSkuHistoryPrice historyPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, id);
+        List<PriceNode> priceNodes = null;
+        if (historyPrice == null) {
+            priceNodes = new ArrayList<>();
+            historyPrice = new PtmCmpSkuHistoryPrice(id, priceNodes);
+        } else {
+            priceNodes = historyPrice.getPriceNodes();
+        }
+
+        if (!priceNodes.contains(priceNode)) {
+            priceNodes.add(priceNode);
+        } else {
+            return;
+        }
+
+        if (priceNodes.size() > PRICE_HISTORY_SIZE) {
+            priceNodes.subList(priceNodes.size() - PRICE_HISTORY_SIZE, priceNodes.size());
+        }
+
+        mdm.save(historyPrice);
     }
 
     @Override
@@ -221,17 +253,6 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             dbm.update(ptmCmpSkuUpdater);
             logger.info(String.format("update sku [%d]..........OK ! ", sku.getId()));
         }
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateCmpSkuPrice(Long id, float price) {
-        PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(id);
-
-        ptmCmpSkuUpdater.getPo().setUpdateTime(TimeUtils.nowDate());
-        ptmCmpSkuUpdater.getPo().setPrice(price);
-
-        dbm.update(ptmCmpSkuUpdater);
     }
 
     @Override
@@ -716,8 +737,8 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             return;
         }
 //        更新mongodb
-        PtmCmpSkuLog ptmCmpSkuLog = new PtmCmpSkuLog(cmpSku);
-        mdm.save(ptmCmpSkuLog);
+//        PtmCmpSkuLog ptmCmpSkuLog = new PtmCmpSkuLog(cmpSku);
+//        mdm.save(ptmCmpSkuLog);
 
         PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(id);
         //获取商品的status
@@ -786,8 +807,13 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         }
 
 //        更新mongodb
-        PtmCmpSkuLog ptmCmpSkuLog = new PtmCmpSkuLog(cmpSku);
-        mdm.save(ptmCmpSkuLog);
+//        PtmCmpSkuLog ptmCmpSkuLog = new PtmCmpSkuLog(cmpSku);
+//        mdm.save(ptmCmpSkuLog);
+
+        //保存新抓来的价格
+        if (fetchedProduct.getPrice() != 0.0f) {
+            saveHistoryPrice(skuId, TimeUtils.nowDate(), fetchedProduct.getPrice());
+        }
 
         PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(skuId);
 

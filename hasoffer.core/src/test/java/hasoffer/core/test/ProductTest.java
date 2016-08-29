@@ -28,6 +28,8 @@ import jodd.util.NameValue;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -78,6 +80,9 @@ public class ProductTest {
     ProductIndex2ServiceImpl productIndex2Service;
     @Resource
     IMongoDbManager mdm;
+
+    @Resource
+    MongoDbFactory mongoDbFactory;
     private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
 
     private void print(String str) {
@@ -85,7 +90,55 @@ public class ProductTest {
     }
 
     @Test
-    public void querySkuPrice() {
+    public void testArray() {
+        List<Integer> list = new ArrayList<>();
+        list.add(1);
+        list.add(2);
+        list.add(3);
+        list.add(4);
+        list.add(5);
+
+        showList(list);
+
+        list.add(6);
+
+        if (list.size() > 5) {
+            list = list.subList(list.size() - 5, list.size());
+        }
+
+        showList(list);
+    }
+
+    private void showList(List<Integer> list) {
+        System.out.println("------------------");
+        for (Integer i : list) {
+            System.out.print(i + "\t");
+        }
+        System.out.println();
+    }
+
+    @Test
+    public void querySkuPrice2() {
+
+        Criteria baseCriteria = Criteria.where("id").is(30665);
+
+        Query q = new Query();
+        q.addCriteria(baseCriteria);
+
+        List<PtmCmpSkuHistoryPrice> datas = mdm.query(PtmCmpSkuHistoryPrice.class, q);
+
+        if (datas.size() > 0) {
+            PtmCmpSkuHistoryPrice historyPrice = datas.get(0);
+            PriceNode pn = historyPrice.getPriceNodes().get(0);
+
+            cmpSkuService.saveHistoryPrice(30665, pn.getPriceTime(), pn.getPrice());
+
+            System.out.println(historyPrice.getPriceNodes().size());
+        }
+    }
+
+    @Test
+    public void querySkuPrice0() {
 //        List<PtmCmpSkuLog> ptmCmpSkuLogs = cmpSkuService.listByPcsId(2966498L);
 //        for (PtmCmpSkuLog ptmCmpSkuLog : ptmCmpSkuLogs) {
 //            System.out.println(String.format("price : %f @ time : %s", ptmCmpSkuLog.getPrice(), TimeUtils.parse(ptmCmpSkuLog.getPriceTime(), "yyyy-MM-dd HH:mm:ss")));
@@ -128,7 +181,7 @@ public class ProductTest {
                 new IProcess<PtmCmpSkuLog>() {
                     @Override
                     public void process(PtmCmpSkuLog o) {
-                        savePrice(o.getPcsId(), o.getPriceTime(), o.getPrice());
+                        cmpSkuService.saveHistoryPrice(o.getPcsId(), o.getPriceTime(), o.getPrice());
                     }
                 }
         );
@@ -139,17 +192,6 @@ public class ProductTest {
         listAndProcessTask2.go();
     }
 
-    private void savePrice(long id, Date time, float price) {
-        PtmCmpSkuHistoryPrice historyPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, id);
-        List<PriceNode> priceNodes = null;
-        if (historyPrice == null) {
-            priceNodes = new ArrayList<>();
-            historyPrice = new PtmCmpSkuHistoryPrice(id, priceNodes);
-        }
-
-        historyPrice.getPriceNodes().add(new PriceNode(time, price));
-        mdm.save(historyPrice);
-    }
 
     @Test
     public void querySkuPrice1() {
