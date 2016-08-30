@@ -290,8 +290,8 @@ public class ProductTest {
                 }
         );
 
-        listAndProcessTask2.setQueueMaxSize(100);
-        listAndProcessTask2.setProcessorCount(1);
+        listAndProcessTask2.setQueueMaxSize(1500);
+        listAndProcessTask2.setProcessorCount(10);
 
         while (!pd.isEnd()) {
             listAndProcessTask2.go();
