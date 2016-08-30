@@ -96,6 +96,34 @@ public class AppSkuController {
         System.out.println(pointOne.longValue());
         System.out.println(pointTwo.longValue());
         System.out.println(pointThree.longValue());
+
+
+        List<String> X = new ArrayList<>();
+        Long priceTimeL = new Date().getTime();
+        int i = 4;
+        while (i > 0) {
+            Long tempPrice = priceTimeL;
+            String dateMMdd = AppSkuController.getDateMMdd(tempPrice);
+            System.out.println(dateMMdd);
+            X.add(dateMMdd);
+            priceTimeL = priceTimeL - 1000 * 60 * 60 * 24 * 20;
+            i--;
+        }
+        //反转
+        Collections.reverse(X);
+    }
+
+    public static String getDateMMdd(Long time) {
+        System.out.println("transfer date to MM-dd format ");
+        Date date = new Date();
+        date.setTime(time);
+        String format = null;
+        try {
+            format = new SimpleDateFormat("MM-dd").format(date);
+        } catch (Exception e) {
+            //logger.error("transfer long date to MM-dd failed " + date);
+        }
+        return format;
     }
 
     /**
@@ -155,53 +183,6 @@ public class AppSkuController {
         System.out.println(priceNodes != null ? "  priceNodes  :" + priceNodes.size() : "null a .....");
         if (priceNodes != null && priceNodes.size() > 1) {
             //如果有大于1个数据则代表其有价格变化
-
-        } else if (priceNodes != null && priceNodes.size() == 1) {
-            //只有一个代表价格未变化
-            // 若sku价格无变化则 则Y轴最小值为0 最高值为SKU价格*2
-            BigDecimal a = BigDecimal.ZERO;
-            //3.2 最大值 b
-//        BigDecimal b = (BigDecimal.valueOf(3).multiply(BigDecimal.valueOf(maxPrice)).subtract(BigDecimal.valueOf(minPrice)).divide(BigDecimal.valueOf(2)).subtract(BigDecimal.valueOf(2)));
-            BigDecimal b = BigDecimal.valueOf(priceNodes.get(0).getPrice() * 2);
-
-            //3.3 a+(b-a)/4
-            BigDecimal pointOne = a.add((b.subtract(a)).divide(BigDecimal.valueOf(4)));
-
-            //3.4 a+(b-a)/2
-            BigDecimal pointTwo = a.add((b.subtract(a)).divide(BigDecimal.valueOf(2)));
-
-            //3.5 a+3(b-a)/4）
-            BigDecimal pointThree = a.add((b.subtract(a)).multiply(BigDecimal.valueOf(0.75)));
-            //绘制x
-            List<String> X = new ArrayList<>();
-            Long priceTimeL = priceNodes.get(0).getPriceTimeL();
-            int i = 3;
-            while (i > 0) {
-                X.add(this.getDateMMdd(priceTimeL));
-                priceTimeL = priceTimeL - 60 * 60 * 24 * 20;
-                i--;
-            }
-            //反转
-            Collections.reverse(X);
-
-            //Y轴
-            List<Long> Y = new ArrayList<>();
-            Y.add(a.longValue());
-            Y.add(pointOne.longValue());
-            Y.add(pointTwo.longValue());
-            Y.add(pointThree.longValue());
-            Y.add(b.longValue());
-
-            //数据点,给两个数据点,起始和最终,都是同个值
-            priceXY.put(X.get(0), BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue());
-            priceXY.put(X.get(X.size() - 1), BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue());
-
-            PriceCurveVo priceCurveVo = new PriceCurveVo(X, Y, priceXY, BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue(), BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue());
-            jsonObject.put("data", JSONObject.toJSON(priceCurveVo));
-            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
-            return null;
-
-        } else {
             //1.1 按照日期剩升序给出
             Collections.sort(priceNodes, new Comparator<PriceNode>() {
                 @Override
@@ -233,7 +214,7 @@ public class AppSkuController {
             //2.3 遍历日期
             while (priceTimeL > priceNodes.get(0).getPriceTimeL()) {
                 X.add(this.getDateMMdd(priceTimeL));
-                priceTimeL = priceTimeL - 60 * 60 * 24 * 20;
+                priceTimeL = priceTimeL - 1000 * 60 * 60 * 24 * 20;
             }
             //反转,按日期从小到大来
             Collections.reverse(X);
@@ -304,20 +285,52 @@ public class AppSkuController {
             }
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
+        } else if (priceNodes != null && priceNodes.size() == 1) {
+            //只有一个代表价格未变化
+            // 若sku价格无变化则 则Y轴最小值为0 最高值为SKU价格*2
+            BigDecimal a = BigDecimal.ZERO;
+            //3.2 最大值 b
+//        BigDecimal b = (BigDecimal.valueOf(3).multiply(BigDecimal.valueOf(maxPrice)).subtract(BigDecimal.valueOf(minPrice)).divide(BigDecimal.valueOf(2)).subtract(BigDecimal.valueOf(2)));
+            BigDecimal b = BigDecimal.valueOf(priceNodes.get(0).getPrice() * 2);
+
+            //3.3 a+(b-a)/4
+            BigDecimal pointOne = a.add((b.subtract(a)).divide(BigDecimal.valueOf(4)));
+
+            //3.4 a+(b-a)/2
+            BigDecimal pointTwo = a.add((b.subtract(a)).divide(BigDecimal.valueOf(2)));
+
+            //3.5 a+3(b-a)/4）
+            BigDecimal pointThree = a.add((b.subtract(a)).multiply(BigDecimal.valueOf(0.75)));
+            //绘制x
+            List<String> X = new ArrayList<>();
+            Long priceTimeL = priceNodes.get(0).getPriceTimeL();
+            int i = 4;
+            while (i > 0) {
+                X.add(this.getDateMMdd(priceTimeL));
+                priceTimeL = priceTimeL - 1000 * 60 * 60 * 24 * 20;
+                i--;
+            }
+            //反转
+            Collections.reverse(X);
+
+            //Y轴
+            List<Long> Y = new ArrayList<>();
+            Y.add(a.longValue());
+            Y.add(pointOne.longValue());
+            Y.add(pointTwo.longValue());
+            Y.add(pointThree.longValue());
+            Y.add(b.longValue());
+
+            //数据点,给两个数据点,起始和最终,都是同个值
+            priceXY.put(X.get(0), BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue());
+            priceXY.put(X.get(X.size() - 1), BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue());
+
+            PriceCurveVo priceCurveVo = new PriceCurveVo(X, Y, priceXY, BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue(), BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue());
+            jsonObject.put("data", JSONObject.toJSON(priceCurveVo));
+            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            return null;
+
         }
         return null;
-    }
-
-    public String getDateMMdd(Long time) {
-        System.out.println("transfer date to MM-dd format ");
-        Date date = new Date();
-        date.setTime(time);
-        String format = null;
-        try {
-            format = new SimpleDateFormat("MM-dd").format(date);
-        } catch (Exception e) {
-            logger.error("transfer long date to MM-dd failed " + date);
-        }
-        return format;
     }
 }
