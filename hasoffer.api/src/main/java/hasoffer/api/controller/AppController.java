@@ -463,9 +463,11 @@ public class AppController {
      */
     @RequestMapping(value = "/dealInfo", method = RequestMethod.GET)
     public ModelAndView dealInfo(@RequestParam String id) {
+        System.out.println("dealId is :" + id);
         AppDeal appDeal = appService.getDealDetail(id);
         ModelAndView mv = new ModelAndView();
         if (appDeal != null) {
+            System.out.println("has this deal ");
             Map map = new HashMap();
             map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
             map.put("title", appDeal.getTitle());
