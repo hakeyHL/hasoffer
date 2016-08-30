@@ -182,6 +182,7 @@ public class AppSkuController {
         List<PriceNode> priceNodes = iCmpSkuService.queryHistoryPrice(id);
         System.out.println(priceNodes != null ? "  priceNodes  :" + priceNodes.size() : "null a .....");
         if (priceNodes != null && priceNodes.size() > 1) {
+            System.out.println("has more than one priceNode ");
             //如果有大于1个数据则代表其有价格变化
             //1.1 按照日期剩升序给出
             Collections.sort(priceNodes, new Comparator<PriceNode>() {
@@ -286,6 +287,7 @@ public class AppSkuController {
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         } else if (priceNodes != null && priceNodes.size() == 1) {
+            System.out.println("only has one priceNode ");
             //只有一个代表价格未变化
             // 若sku价格无变化则 则Y轴最小值为0 最高值为SKU价格*2
             BigDecimal a = BigDecimal.ZERO;
