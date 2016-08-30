@@ -3,6 +3,10 @@ package hasoffer.admin.controller;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
+import hasoffer.core.persistence.mongo.PriceNode;
+import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
@@ -15,6 +19,8 @@ import hasoffer.core.task.worker.IProcessor;
 import hasoffer.fetch.helper.WebsiteHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -32,6 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 1cleanUrl-/fix2/clean_url_sku?cateId=5
  * 2brand1-/fix2/tag_brand?cateId=5
  * 3brand2-/fix2/tag_brand_man 手工处理品牌
+ * 4price-/fix2/convert_price_log?start=20160801
  */
 @Controller
 @RequestMapping(value = "/fix2")
@@ -342,6 +350,87 @@ public class FixController2 {
     IProductService productService;
     @Resource
     ICmpSkuService cmpSkuService;
+    @Resource
+    IMongoDbManager mdm;
+
+    /**
+     * 转换价格历史数据格式
+     */
+    @RequestMapping(value = "/convert_price_log", method = RequestMethod.GET)
+    @ResponseBody
+    public String convert_price_log(@RequestParam String start) {
+        Date startD = TimeUtils.stringToDate(start, "yyyyMMdd");
+        Date endD = TimeUtils.addDay(startD, 1);
+        final ProcessDate pd = new ProcessDate(startD, endD);
+
+        final Set<Long> idSet = new HashSet<>();
+        final AtomicInteger count = new AtomicInteger(0);
+
+        final ConcurrentHashMap<Long, ConcurrentHashMap<String, PriceNode>> historyPriceMap = new ConcurrentHashMap<>();
+
+        ListProcessTask<PtmCmpSkuLog> listAndProcessTask2 = new ListProcessTask<>(
+                new ILister<PtmCmpSkuLog>() {
+                    @Override
+                    public PageableResult<PtmCmpSkuLog> getData(int page) {
+                        print("date=" + TimeUtils.parse(pd.startDate, "yyyyMMdd") + ", page=" + page + ", count=" + count.get() + ", id set=" + idSet.size());
+                        Query query = new Query(Criteria.where("priceTime").gt(pd.getStartDate()).lte(pd.getEndDate()));
+                        return mdm.queryPage(PtmCmpSkuLog.class, query, page, 2000);
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcessor<PtmCmpSkuLog>() {
+                    @Override
+                    public void process(PtmCmpSkuLog o) {
+                        count.addAndGet(1);
+
+                        long sid = o.getPcsId();
+                        Date priceTime = o.getPriceTime();
+                        String ymd = TimeUtils.parse(priceTime, "yyyyMMdd");
+
+                        ConcurrentHashMap<String, PriceNode> priceNodeMap = historyPriceMap.get(sid);
+                        if (priceNodeMap == null) {
+                            priceNodeMap = new ConcurrentHashMap<>();
+                            historyPriceMap.put(sid, priceNodeMap);
+                        }
+
+                        PriceNode pn = priceNodeMap.get(ymd);
+                        if (pn == null) {
+                            pn = new PriceNode(priceTime, o.getPrice());
+                            priceNodeMap.put(ymd, pn);
+                        } else {
+                            return;
+                        }
+
+                        idSet.add(sid);
+                    }
+                }
+        );
+
+        listAndProcessTask2.setQueueMaxSize(1500);
+        listAndProcessTask2.setProcessorCount(10);
+
+        while (!pd.isEnd()) {
+            listAndProcessTask2.go();
+            // save work
+            print(String.format("[%s]save map : %d", TimeUtils.parse(pd.startDate, "yyyyMMdd"), historyPriceMap.size()));
+            pd.save(historyPriceMap);
+
+            historyPriceMap.clear();
+            pd.addDay();
+        }
+
+        print("count=" + count.get() + ", id set=" + idSet.size());
+        return "ok";
+    }
 
     /**
      * 根据sku的品牌标记品牌 - 手工标记
@@ -520,5 +609,62 @@ public class FixController2 {
 
     private void print(String str) {
         System.out.println(str);
+    }
+
+    class ProcessDate {
+
+        private Date startDate;
+        private Date endDate;
+
+        public ProcessDate(Date startDate, Date endDate) {
+            this.startDate = startDate;
+            this.endDate = endDate;
+        }
+
+        public Date getStartDate() {
+            return startDate;
+        }
+
+        public void setStartDate(Date startDate) {
+            this.startDate = startDate;
+        }
+
+        public Date getEndDate() {
+            return endDate;
+        }
+
+        public void setEndDate(Date endDate) {
+            this.endDate = endDate;
+        }
+
+        public boolean isEnd() {
+            print(String.format("%s", TimeUtils.parse(startDate, "yyyy-MM-dd")));
+            return TimeUtils.today() < this.startDate.getTime();
+        }
+
+        public void addDay() {
+            this.startDate = TimeUtils.addDay(startDate, 1);
+            this.endDate = TimeUtils.addDay(endDate, 1);
+        }
+
+        public void save(ConcurrentHashMap<Long, ConcurrentHashMap<String, PriceNode>> historyPriceMap) {
+            Iterator<Long> it = historyPriceMap.keySet().iterator();
+            int total = historyPriceMap.size();
+            int count = 0;
+            while (it.hasNext()) {
+                Long sid = it.next();
+                ConcurrentHashMap<String, PriceNode> priceNodeMap = historyPriceMap.get(sid);
+                List<PriceNode> priceNodes = new ArrayList<>();
+                for (ConcurrentHashMap.Entry<String, PriceNode> priceNodeEntry : priceNodeMap.entrySet()) {
+                    priceNodes.add(priceNodeEntry.getValue());
+                }
+
+                cmpSkuService.saveHistoryPrice(sid, priceNodes);
+                count++;
+                if (count % 400 == 0) {
+                    print(String.format("save %d/%d", count, total));
+                }
+            }
+        }
     }
 }

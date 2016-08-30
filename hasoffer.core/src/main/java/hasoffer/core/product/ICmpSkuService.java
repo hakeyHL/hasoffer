@@ -24,6 +24,8 @@ public interface ICmpSkuService {
 
     void saveHistoryPrice(long id, Date time, float price);
 
+    void saveHistoryPrice(Long sid, List<PriceNode> priceNodes);
+
     void createDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct);
 
     void createPtmCmpSkuImage(long skuId, FetchedProduct fetchedProduct);
