@@ -88,11 +88,12 @@ public class CmpProductListVo {
     }
 
     public CmpProductListVo(PtmCmpSku cmpSku, float cliPrice) {
+        this.id = cmpSku.getId();
         this.status = cmpSku.getStatus();
         this.title = cmpSku.getTitle();
         this.imageUrl = cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath());
         this.cashBack = cmpSku.getCashBack();
-        this.saved = Math.round(cliPrice - cmpSku.getPrice());
+        this.saved = cliPrice == 0 ? 0 : Math.round(cliPrice - cmpSku.getPrice());
         String tempPrice = Math.round(cmpSku.getPrice()) + "";
         StringBuffer sb = new StringBuffer();
         for (int i = tempPrice.length() - 1; i >= 0; i--) {
@@ -117,6 +118,10 @@ public class CmpProductListVo {
         this.backRate = backRate;
         this.returnGuarantee = returnGuarantee;
         this.support = support;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Math.round(0 - 3.5));
     }
 
     public String getImage() {
@@ -288,10 +293,6 @@ public class CmpProductListVo {
         return offers;
     }
 
-    public void setOffers(List<String> offers) {
-        this.offers = offers;
-    }
-
 //    public int getMin_deliveryTime() {
 //        return min_deliveryTime;
 //    }
@@ -307,6 +308,10 @@ public class CmpProductListVo {
 //    public void setMax_deliveryTime(int max_deliveryTime) {
 //        this.max_deliveryTime = max_deliveryTime;
 //    }
+
+    public void setOffers(List<String> offers) {
+        this.offers = offers;
+    }
 
     @Override
     public boolean equals(Object o) {

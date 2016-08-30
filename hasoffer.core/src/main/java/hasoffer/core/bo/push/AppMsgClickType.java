@@ -12,5 +12,6 @@ public enum AppMsgClickType {
     WEBVIEW,
     GOOGLEPLAY,
     PRODUCT,
-    DEAL
+    DEAL,
+    SKU
 }
