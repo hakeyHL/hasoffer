@@ -89,6 +89,11 @@ public class ProductTest {
     private Pattern PATTERN_Brand = Pattern.compile("[\t*?]([a-zA-Z])[\t*?]");
 
     @Test
+    public void convertPrice() {
+
+    }
+
+    @Test
     public void fffff() throws Exception {
         List<String> lines = FileUtils.readLines(new File("d:/zzz/1.txt"));
 
@@ -253,56 +258,6 @@ public class ProductTest {
     @Test
     public void querySkuPrice0() {
         cmpSkuService.saveHistoryPrice(4L, TimeUtils.addDay(TimeUtils.nowDate(), -13), 200);
-    }
-
-    @Test
-    public void queryPrice() {
-        Date startD = TimeUtils.stringToDate("2016-08-10 00:00:00", "yyyy-MM-dd HH:mm:ss");
-        Date endD = TimeUtils.addDay(startD, 1);
-        final ProcessDate pd = new ProcessDate(startD, endD);
-
-        final Set<Long> idSet = new HashSet<>();
-        final AtomicInteger count = new AtomicInteger(0);
-
-        ListProcessTask<PtmCmpSkuLog> listAndProcessTask2 = new ListProcessTask<>(
-                new ILister<PtmCmpSkuLog>() {
-                    @Override
-                    public PageableResult<PtmCmpSkuLog> getData(int page) {
-                        print("count=" + count.get() + ", id set=" + idSet.size());
-                        Query query = new Query(Criteria.where("priceTime").gt(pd.getStartDate()).lte(pd.getEndDate()));
-                        return mdm.queryPage(PtmCmpSkuLog.class, query, page, 2000);
-                    }
-
-                    @Override
-                    public boolean isRunForever() {
-                        return false;
-                    }
-
-                    @Override
-                    public void setRunForever(boolean runForever) {
-
-                    }
-                },
-                new IProcessor<PtmCmpSkuLog>() {
-                    @Override
-                    public void process(PtmCmpSkuLog o) {
-//                        print(o.getPcsId() + "");
-//                        cmpSkuService.saveHistoryPrice(o.getPcsId(), o.getPriceTime(), o.getPrice());
-                        idSet.add(o.getPcsId());
-                        count.addAndGet(1);
-                    }
-                }
-        );
-
-        listAndProcessTask2.setQueueMaxSize(1500);
-        listAndProcessTask2.setProcessorCount(10);
-
-        while (!pd.isEnd()) {
-            listAndProcessTask2.go();
-            pd.addDay();
-        }
-
-        print("count=" + count.get() + ", id set=" + idSet.size());
     }
 
     @Test
@@ -771,42 +726,6 @@ public class ProductTest {
         image.setImageUrl(url);
         image.setId(123l);
         imageService.downloadImage(image);
-    }
-
-    class ProcessDate {
-        private Date startDate;
-        private Date endDate;
-
-        public ProcessDate(Date startDate, Date endDate) {
-            this.startDate = startDate;
-            this.endDate = endDate;
-        }
-
-        public Date getStartDate() {
-            return startDate;
-        }
-
-        public void setStartDate(Date startDate) {
-            this.startDate = startDate;
-        }
-
-        public Date getEndDate() {
-            return endDate;
-        }
-
-        public void setEndDate(Date endDate) {
-            this.endDate = endDate;
-        }
-
-        public boolean isEnd() {
-            print(String.format("%s", TimeUtils.parse(startDate, "yyyy-MM-dd")));
-            return TimeUtils.today() < this.startDate.getTime();
-        }
-
-        public void addDay() {
-            this.startDate = TimeUtils.addDay(startDate, 1);
-            this.endDate = TimeUtils.addDay(endDate, 1);
-        }
     }
 
     class SiteCount {
