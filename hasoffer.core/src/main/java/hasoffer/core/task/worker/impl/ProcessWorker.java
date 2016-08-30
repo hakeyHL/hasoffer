@@ -1,5 +1,6 @@
 package hasoffer.core.task.worker.impl;
 
+import hasoffer.core.task.worker.IListWorkerStatus;
 import hasoffer.core.task.worker.IProcessor;
 
 import java.util.concurrent.TimeUnit;
@@ -10,7 +11,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ProcessWorker<T> implements Runnable {
 
-    ListProcessWorkerStatus<T> ws;
+    IListWorkerStatus<T> ws;
     IProcessor<T> processor;
 
     public ProcessWorker(ListProcessWorkerStatus<T> ws,

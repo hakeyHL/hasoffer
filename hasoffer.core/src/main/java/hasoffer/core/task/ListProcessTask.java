@@ -55,16 +55,8 @@ public class ListProcessTask<T> {
         logger.debug("work finished.");
     }
 
-    public int getProcessorCount() {
-        return processorCount;
-    }
-
     public void setProcessorCount(int processorCount) {
         this.processorCount = processorCount;
-    }
-
-    public long getQueueMaxSize() {
-        return queueMaxSize;
     }
 
     public void setQueueMaxSize(long queueMaxSize) {

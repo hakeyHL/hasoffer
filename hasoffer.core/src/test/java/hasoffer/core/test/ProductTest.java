@@ -257,7 +257,7 @@ public class ProductTest {
 
     @Test
     public void queryPrice() {
-        Date startD = TimeUtils.stringToDate("2016-07-26 00:00:00", "yyyy-MM-dd HH:mm:ss");
+        Date startD = TimeUtils.stringToDate("2016-08-10 00:00:00", "yyyy-MM-dd HH:mm:ss");
         Date endD = TimeUtils.addDay(startD, 1);
         final ProcessDate pd = new ProcessDate(startD, endD);
 
