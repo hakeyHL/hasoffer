@@ -9,9 +9,9 @@ import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.persistence.po.ptm.updater.PtmProductUpdater;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
-import hasoffer.core.task.ListAndProcessTask2;
-import hasoffer.core.task.worker.IList;
-import hasoffer.core.task.worker.IProcess;
+import hasoffer.core.task.ListProcessTask;
+import hasoffer.core.task.worker.ILister;
+import hasoffer.core.task.worker.IProcessor;
 import hasoffer.fetch.helper.WebsiteHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -370,8 +370,8 @@ public class FixController2 {
     @RequestMapping(value = "/tag_brand", method = RequestMethod.GET)
     @ResponseBody
     public void tag_brand(@RequestParam final long cateId) {
-        ListAndProcessTask2<PtmProduct> productListAndProcessTask2 = new ListAndProcessTask2<>(
-                new IList() {
+        ListProcessTask<PtmProduct> productListAndProcessTask2 = new ListProcessTask<>(
+                new ILister() {
                     @Override
                     public PageableResult getData(int page) {
                         return productService.listPagedProducts(cateId, page, 1000);
@@ -387,7 +387,7 @@ public class FixController2 {
 
                     }
                 },
-                new IProcess<PtmProduct>() {
+                new IProcessor<PtmProduct>() {
                     @Override
                     public void process(PtmProduct o) {
                         List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(o.getId());
@@ -455,8 +455,8 @@ public class FixController2 {
 
         final AtomicInteger delCount = new AtomicInteger(0);
 
-        ListAndProcessTask2<PtmProduct> productListAndProcessTask2 = new ListAndProcessTask2<>(
-                new IList() {
+        ListProcessTask<PtmProduct> productListAndProcessTask2 = new ListProcessTask<>(
+                new ILister() {
                     @Override
                     public PageableResult getData(int page) {
                         return productService.listPagedProducts(cateId, page, 1000);
@@ -472,7 +472,7 @@ public class FixController2 {
 
                     }
                 },
-                new IProcess<PtmProduct>() {
+                new IProcessor<PtmProduct>() {
                     @Override
                     public void process(PtmProduct o) {
                         List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(o.getId());
