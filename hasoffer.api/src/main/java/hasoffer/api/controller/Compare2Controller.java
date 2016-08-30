@@ -220,6 +220,10 @@ public class Compare2Controller {
                 System.out.println(price + "    contains Rs. ");
                 price = price.replaceAll("Rs.", " ");
             }
+            if (price.contains("₹")) {
+                System.out.println(price + "    contains ₹ ");
+                price = price.replaceAll("₹", " ");
+            }
             price = price.replaceAll(" ", "");
             System.out.println(" price is " + price);
         }
