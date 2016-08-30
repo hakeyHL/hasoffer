@@ -39,8 +39,7 @@ import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import jodd.util.NameValue;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.annotations.common.util.impl.LoggerFactory;
-import org.jboss.logging.Logger;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -84,8 +83,7 @@ public class AppController {
     AppCacheManager appCacheManager;
     @Resource
     IPushService pushService;
-    private Logger logger = LoggerFactory.logger(AppController.class);
-
+    Logger logger = org.slf4j.LoggerFactory.getLogger(AppController.class);
     public static void main(String[] args) {
 //        String ss = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL, "http://www.snapdeal.com/product/micromax-canvas-a1-aq4502-8/630310793485", new String[]{"SHANCHUAN", "123"});
 //        System.out.print(ss);
