@@ -12,34 +12,34 @@ public class PriceCurveVo {
     List<Long> showY;
     private List<String> showX;
     private Map<String, Float> priceXY;
-    private Long minPoint;//最低点 ,起始数据点
-    private Long maxPoint;//终止数据点
+    private Long startPoint;//最低点 ,起始数据点
+    private Long endPoint;//终止数据点
 
-    public PriceCurveVo(List<String> showX, List<Long> showY, Map<String, Float> priceXY, Long minPoint, Long maxPoint) {
+    public PriceCurveVo(List<String> showX, List<Long> showY, Map<String, Float> priceXY, Long startPoint, Long endPoint) {
         this.showX = showX;
         this.showY = showY;
         this.priceXY = priceXY;
-        this.minPoint = minPoint;
-        this.maxPoint = maxPoint;
+        this.startPoint = startPoint;
+        this.endPoint = endPoint;
     }
 
     public PriceCurveVo() {
     }
 
-    public Long getMinPoint() {
-        return minPoint;
+    public Long getStartPoint() {
+        return startPoint;
     }
 
-    public void setMinPoint(Long minPoint) {
-        this.minPoint = minPoint;
+    public void setStartPoint(Long startPoint) {
+        this.startPoint = startPoint;
     }
 
-    public Long getMaxPoint() {
-        return maxPoint;
+    public Long getEndPoint() {
+        return endPoint;
     }
 
-    public void setMaxPoint(Long maxPoint) {
-        this.maxPoint = maxPoint;
+    public void setEndPoint(Long endPoint) {
+        this.endPoint = endPoint;
     }
 
     public List<Long> getShowY() {

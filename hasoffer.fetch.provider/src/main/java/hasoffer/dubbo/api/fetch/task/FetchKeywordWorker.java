@@ -63,7 +63,7 @@ public class FetchKeywordWorker implements Runnable {
             e.printStackTrace();
         }
         logger.info("Fetch Success:website:{}, Key :{}, success:{}", fetchResult.getWebsite(), fetchResult.getKeyword(), fetchResult.getFetchProducts().size());
-        fetchCacheService.setTaskStatusByKeyword(fetchResult.getKeyword(), fetchResult.getTaskStatus());
+        fetchCacheService.setTaskStatusByKeyword(FetchResult.getCacheKey(fetchResult), fetchResult.getTaskStatus());
         fetchCacheService.cacheResult(FetchResult.getCacheKey(fetchResult), fetchResult);
     }
 

@@ -12,7 +12,6 @@ import hasoffer.core.persistence.mongo.PriceNode;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
-import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
 import hasoffer.core.product.impl.CmpSkuServiceImpl;
@@ -162,32 +161,8 @@ public class AppSkuController {
         return null;
     }
 
-    /**
-     * @param id
-     * @param response
-     * @return
-     */
-    @RequestMapping("offerTest")
-    public String getOffers(@RequestParam(defaultValue = "0") Long id, HttpServletResponse response) {
-        System.out.println(" get get get get  offers offers offers ");
-        PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, id);
-        if (ptmCmpSkuDescription != null) {
-            String offers = ptmCmpSkuDescription.getOffers();
-            System.out.println(" got it ,and offers is " + offers);
-            PtmCmpSku ptmCmpSku = cmpSkuService.getCmpSkuById(id);
-            if (ptmCmpSku != null) {
-                System.out.println("sku id is :" + id + " and productId is " + ptmCmpSku.getProductId());
-                PtmProduct product = productService.getProduct(ptmCmpSku.getProductId());
-                if (product != null) {
-                    System.out.println(" product is exist  and title is  " + product.getTitle());
-                    System.out.println(" price is :" + product.getPrice());
-                }
-            }
-        }
-        return null;
-    }
-
     public String getDateMMdd(Long time) {
+        System.out.println("transfer date to MM-dd format ");
         Date date = new Date();
         date.setTime(time);
         String format = null;
