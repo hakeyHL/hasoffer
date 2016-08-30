@@ -297,7 +297,7 @@ public class AppSkuController {
                     priceXY.put(this.getDateMMdd(priceNode.getPriceTimeL()), BigDecimal.valueOf(priceNode.getPrice()).longValue());
                 }
                 //4. 辅助点   --价格变化点前一天的价格按照上一个价格点给出
-
+                //TODO 辅助点添加 , 假数据拼接测试
                 //两个数据点
                 PriceCurveVo priceCurveVo = new PriceCurveVo(X, Y, priceXY, BigDecimal.valueOf(minPrice).longValue(), BigDecimal.valueOf(maxPrice).longValue());
                 jsonObject.put("data", JSONObject.toJSON(priceCurveVo));
