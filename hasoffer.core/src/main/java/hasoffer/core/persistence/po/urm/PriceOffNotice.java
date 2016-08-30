@@ -34,13 +34,14 @@ public class PriceOffNotice implements Identifiable<Long> {
 
     @Override
     public Long getId() {
-        return null;
+        return id;
     }
 
     @Override
     public void setId(Long aLong) {
-
+        this.id = aLong;
     }
+
 
     public Date getCreateTime() {
         return createTime;

@@ -1,5 +1,7 @@
 package hasoffer.core.user.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.bo.push.*;
@@ -8,8 +10,10 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.urm.PriceOffNotice;
 import hasoffer.core.persistence.po.urm.UrmDevice;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
+import hasoffer.core.persistence.po.urm.updater.PriceOffNoticeUpdater;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.user.IPriceOffNoticeService;
+import hasoffer.fetch.helper.WebsiteHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,6 +86,18 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updatePriceOffNoticeStatus(long id, boolean lastPushStatus) {
+
+        PriceOffNoticeUpdater updater = new PriceOffNoticeUpdater(id);
+
+        updater.getPo().setLatestPushStatus(lastPushStatus);
+
+        dbm.update(updater);
+
+    }
+
+    @Override
     public void priceOffCheck(long skuid) {
 
         PtmCmpSku ptmCmpSku = dbm.get(PtmCmpSku.class, skuid);
@@ -128,14 +144,42 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
                         continue;
                     }
 
-                    //todo
+                    MarketChannel marketChannel = urmDevice.getMarketChannel();
+                    if (marketChannel == null) {
+                        continue;
+                    }
+
+                    String deepLinkUrl = WebsiteHelper.getDealUrlWithAff(ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), new String[]{marketChannel.name()});
+
+                    String title = "PRICE DROP :" + ptmCmpSku.getTitle();
+                    String content = "Now available at Rs." + ptmCmpSku.getPrice();
+
                     AppPushMessage message = new AppPushMessage(
-                            new AppMsgDisplay("Hurry on!Redmi 3S On Sale! 12:00 noon|Starts at Rs.6,999  ", "Hurry on!Redmi 3S On Sale!", "12:00 noon|Starts at Rs.6,999 "),
-                            new AppMsgClick(AppMsgClickType.DEAL, "99000154", "com.flipkart.android")
+                            new AppMsgDisplay(title + content, title, content),
+                            new AppMsgClick(AppMsgClickType.DEEPLINK, deepLinkUrl, WebsiteHelper.getPackage(ptmCmpSku.getWebsite()))
                     );
 
                     AppPushBo appPushBo = new AppPushBo("5x1", "15:10", message);
-                    pushService.push(gcmToken, appPushBo);
+
+                    //for test
+                    gcmToken = "cf1xQ0M3jE4:APA91bH1Sn9ajC7PZN7S0547o0LWXRtgqnE0xsj8kXlf8XqmJGmKQPLTRnHABcY6bOMxSGdXonlPt4vPIk6WwVK0-h5GmgRpTRfYW3Yd5yU0UQYdAO6Aun8IH8TZaURS3EXP4gDHj-Li";
+
+                    String response = pushService.push(gcmToken, appPushBo);
+
+                    JSONObject jsonResponse = JSONObject.parseObject(response.trim());
+
+                    Integer success = jsonResponse.getInteger("success");
+                    Integer failure = jsonResponse.getInteger("failure");
+                    if (success == 1) {
+                        //推送成功
+                        Long id = priceOffNotice.getId();
+                        updatePriceOffNoticeStatus(id, true);
+                    }
+
+                    if (failure == 1) {
+                        //推送失败
+                        updatePriceOffNoticeStatus(priceOffNotice.getId(), false);
+                    }
                 }
             }
             curpage++;

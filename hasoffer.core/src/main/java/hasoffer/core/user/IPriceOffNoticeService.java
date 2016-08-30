@@ -31,6 +31,7 @@ public interface IPriceOffNoticeService {
      */
     PriceOffNotice getPriceOffNotice(String userId, long skuid);
 
+    void updatePriceOffNoticeStatus(long id, boolean lastPushStatus);
 
     void priceOffCheck(long skuid);
 }
