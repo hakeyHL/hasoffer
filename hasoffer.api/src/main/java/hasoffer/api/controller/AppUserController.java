@@ -26,7 +26,7 @@ import java.util.Map;
  * Created by hs on 2016/7/8.
  */
 @Controller
-@RequestMapping("/app/common/")
+@RequestMapping("/app")
 public class AppUserController {
     Logger logger = LoggerFactory.getLogger(AppUserController.class);
     @Resource
@@ -40,8 +40,8 @@ public class AppUserController {
         System.out.println(affsUrl);
     }
 
-    @RequestMapping("/addUserId2DeepLink")
-    public ModelAndView get(@RequestParam String deepLink, @RequestParam String website) {
+    @RequestMapping("common/addUserId2DeepLink")
+    public ModelAndView addUserId2DeepLink(@RequestParam String deepLink, @RequestParam String website) {
         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
         ModelAndView modelAndView = new ModelAndView();
         Map map = new HashMap();
@@ -63,5 +63,10 @@ public class AppUserController {
         map.put("deeplink", affsUrl);
         modelAndView.addObject("data", map);
         return modelAndView;
+    }
+
+    @RequestMapping("user/priceAlert")
+    public ModelAndView setPriceAlert(@RequestParam String deepLink) {
+        return null;
     }
 }

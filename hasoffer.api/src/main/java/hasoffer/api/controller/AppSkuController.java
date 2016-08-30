@@ -162,6 +162,7 @@ public class AppSkuController {
     }
 
     public String getDateMMdd(Long time) {
+        System.out.println("transfer date to MM-dd format ");
         Date date = new Date();
         date.setTime(time);
         String format = null;
