@@ -8,8 +8,8 @@ import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
 import hasoffer.core.persistence.po.urm.UrmDevice;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import hasoffer.core.user.IDeviceService;
-import hasoffer.core.worker.ListAndProcessWorkerStatus;
 import hasoffer.core.worker.ListRequestLogsWorker;
 import hasoffer.core.worker.StatDeviceWorker;
 import org.hibernate.annotations.common.util.impl.LoggerFactory;
@@ -70,7 +70,7 @@ public class StatTest {
     }
 
     private void predeviceByLog(String logYmd, List<String> ymds) {
-        ListAndProcessWorkerStatus<UrmDevice> ws = new ListAndProcessWorkerStatus();
+        ListProcessWorkerStatus<UrmDevice> ws = new ListProcessWorkerStatus();
 
         ExecutorService es = Executors.newCachedThreadPool();
         es.execute(new ListRequestLogsWorker(deviceService, ws, logYmd));

@@ -4,6 +4,7 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.mongo.StatDevice;
 import hasoffer.core.persistence.po.urm.UrmDevice;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import hasoffer.core.user.IDeviceService;
 import hasoffer.core.worker.*;
 import org.slf4j.Logger;
@@ -84,7 +85,7 @@ public class StatDeviceController {
         List<String> ymds = new ArrayList<String>();
         TimeUtils.fillDays(ymds, start, end, TimeUtils.PATTERN_YMD);
 
-        ListAndProcessWorkerStatus<UrmDevice> ws = new ListAndProcessWorkerStatus();
+        ListProcessWorkerStatus<UrmDevice> ws = new ListProcessWorkerStatus();
 
         ExecutorService es = Executors.newCachedThreadPool();
         es.execute(new ListDeviceWorker(deviceService, ws, ymds));
@@ -109,7 +110,7 @@ public class StatDeviceController {
         List<String> ymds = new ArrayList<String>();
         TimeUtils.fillDays(ymds, start, end, TimeUtils.PATTERN_YMD);
 
-        ListAndProcessWorkerStatus<StatDevice> ws = new ListAndProcessWorkerStatus<StatDevice>();
+        ListProcessWorkerStatus<StatDevice> ws = new ListProcessWorkerStatus<StatDevice>();
         ExecutorService es = Executors.newCachedThreadPool();
 
         es.execute(new ListNeedUpdateBindAssistYmdWorker(mdm, ws, ymds));
@@ -133,7 +134,7 @@ public class StatDeviceController {
     }
 
     private void predeviceByLog(String logYmd, List<String> ymds) {
-        ListAndProcessWorkerStatus<UrmDevice> ws = new ListAndProcessWorkerStatus();
+        ListProcessWorkerStatus<UrmDevice> ws = new ListProcessWorkerStatus();
 
         ExecutorService es = Executors.newCachedThreadPool();
         es.execute(new ListRequestLogsWorker(deviceService, ws, logYmd));

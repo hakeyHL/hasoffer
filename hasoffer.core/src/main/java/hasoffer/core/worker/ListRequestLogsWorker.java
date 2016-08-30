@@ -5,6 +5,7 @@ import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
 import hasoffer.core.persistence.po.urm.UrmDevice;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import hasoffer.core.user.IDeviceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 public class ListRequestLogsWorker implements Runnable {
 
     IDeviceService deviceService;
-    ListAndProcessWorkerStatus ws;
+    ListProcessWorkerStatus ws;
     String ymd;
 
     Set<String> deviceSet = new HashSet<String>();
@@ -30,7 +31,7 @@ public class ListRequestLogsWorker implements Runnable {
     private Logger logger = LoggerFactory.getLogger(ListRequestLogsWorker.class);
 
     public ListRequestLogsWorker(IDeviceService deviceService,
-                                 ListAndProcessWorkerStatus ws,
+                                 ListProcessWorkerStatus ws,
                                  String ymd) {
         this.deviceService = deviceService;
         this.ws = ws;

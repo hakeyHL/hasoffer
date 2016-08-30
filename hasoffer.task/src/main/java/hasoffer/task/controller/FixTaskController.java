@@ -11,7 +11,7 @@ import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
-import hasoffer.core.worker.ListAndProcessWorkerStatus;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import hasoffer.task.worker.*;
@@ -56,7 +56,7 @@ public class FixTaskController {
 
         String queryString = "SELECT t FROM PtmProduct t WHERE t.title LIKE '%durex%' AND t.createTime > '2016-05-07 21:57:00' ";
 
-        ListAndProcessWorkerStatus<PtmProduct> ws = new ListAndProcessWorkerStatus<PtmProduct>();
+        ListProcessWorkerStatus<PtmProduct> ws = new ListProcessWorkerStatus<PtmProduct>();
 
         ExecutorService es = Executors.newCachedThreadPool();
 
@@ -79,7 +79,7 @@ public class FixTaskController {
 
         ExecutorService es = Executors.newCachedThreadPool();
 
-        ListAndProcessWorkerStatus<PtmCmpSku> ws = new ListAndProcessWorkerStatus<PtmCmpSku>();
+        ListProcessWorkerStatus<PtmCmpSku> ws = new ListProcessWorkerStatus<PtmCmpSku>();
 
         es.execute(new MysqlListWorker<PtmCmpSku>(Q_FLIPKART_SKU_SOURCESID_ISNULL, ws, dbm));
         es.execute(new MysqlListWorker<PtmCmpSku>(Q_FLIPKART_SKU_SOURCESID_LIKEITME, ws, dbm));
@@ -101,7 +101,7 @@ public class FixTaskController {
 
         final String Q_FLIPKART_SKU = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' AND t.oriUrl IS NOT NULL ";
 
-        ListAndProcessWorkerStatus<PtmCmpSku> ws = new ListAndProcessWorkerStatus<PtmCmpSku>();
+        ListProcessWorkerStatus<PtmCmpSku> ws = new ListProcessWorkerStatus<PtmCmpSku>();
         es.execute(new MysqlListWorker<PtmCmpSku>(Q_FLIPKART_SKU, ws, dbm));
 
         for (int i = 0; i < 10; i++) {

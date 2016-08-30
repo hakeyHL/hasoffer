@@ -21,11 +21,12 @@ import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.product.*;
 import hasoffer.core.product.solr.*;
 import hasoffer.core.search.ISearchService;
-import hasoffer.core.task.ListAndProcessTask2;
-import hasoffer.core.task.worker.IList;
-import hasoffer.core.task.worker.IProcess;
+import hasoffer.core.task.ListProcessTask;
+import hasoffer.core.task.worker.ILister;
+import hasoffer.core.task.worker.IProcessor;
 import jodd.util.NameValue;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.data.mongodb.MongoDbFactory;
@@ -88,13 +89,20 @@ public class ProductTest {
     private Pattern PATTERN_Brand = Pattern.compile("[\t*?]([a-zA-Z])[\t*?]");
 
     @Test
-    public void fffff() {
-        PtmCmpSku cmpSku = cmpSkuService.getCmpSkuById(682203L);
+    public void fffff() throws Exception {
+        List<String> lines = FileUtils.readLines(new File("d:/zzz/1.txt"));
 
-        String brand = cmpSku.getBrand();
+        Set<Long> idSet = new HashSet<>();
+        long count = 0;
 
+        for (String line : lines) {
+            if (NumberUtils.isNumber(line)) {
+                count++;
+                idSet.add(Long.valueOf(line));
+            }
+        }
 
-        print(brand + "111");
+        print("count=" + count + ", id count=" + idSet.size());
     }
 
     /**
@@ -109,8 +117,8 @@ public class ProductTest {
     @Test
     public void tag_brand() {
         final long cateId = 5L;
-        ListAndProcessTask2<PtmProduct> productListAndProcessTask2 = new ListAndProcessTask2<>(
-                new IList() {
+        ListProcessTask<PtmProduct> productListAndProcessTask2 = new ListProcessTask<>(
+                new ILister() {
                     @Override
                     public PageableResult getData(int page) {
                         return productService.listPagedProducts(cateId, page, 1000);
@@ -126,7 +134,7 @@ public class ProductTest {
 
                     }
                 },
-                new IProcess<PtmProduct>() {
+                new IProcessor<PtmProduct>() {
                     @Override
                     public void process(PtmProduct o) {
                         if (StringUtils.isEmpty(o.getBrand())) {
@@ -168,22 +176,11 @@ public class ProductTest {
 
     @Test
     public void testArray() {
-        List<Integer> list = new ArrayList<>();
-        list.add(1);
-        list.add(2);
-        list.add(3);
-        list.add(4);
-        list.add(5);
-
-        showList(list);
-
-        list.add(6);
-
-        if (list.size() > 5) {
-            list = list.subList(list.size() - 5, list.size());
-        }
-
-        showList(list);
+        Date date1 = TimeUtils.stringToDate("2016-07-15 08:00:00", "yyyy-MM-dd HH:mm:ss");
+        Date date2 = TimeUtils.addDay(date1, 1);
+        Query query = new Query(Criteria.where("pcsId").is(7134867L).and("priceTime").gt(date1).lte(date2));
+        List<PtmCmpSkuLog> cmpSkuLogs = mdm.query(PtmCmpSkuLog.class, query);
+        print(cmpSkuLogs.size() + "");
     }
 
     private void showList(List<Integer> list) {
@@ -202,8 +199,8 @@ public class ProductTest {
 
         final long cateId = 5L;
 
-        ListAndProcessTask2<PtmProduct> productListAndProcessTask2 = new ListAndProcessTask2<>(
-                new IList() {
+        ListProcessTask<PtmProduct> productListAndProcessTask2 = new ListProcessTask<>(
+                new ILister() {
                     @Override
                     public PageableResult getData(int page) {
                         return productService.listPagedProducts(cateId, page, 1000);
@@ -219,7 +216,7 @@ public class ProductTest {
 
                     }
                 },
-                new IProcess<PtmProduct>() {
+                new IProcessor<PtmProduct>() {
                     @Override
                     public void process(PtmProduct o) {
 
@@ -260,14 +257,18 @@ public class ProductTest {
 
     @Test
     public void queryPrice() {
-        Date startD = TimeUtils.stringToDate("2016-07-15 00:00:00", "yyyy-MM-dd HH:mm:ss");
+        Date startD = TimeUtils.stringToDate("2016-07-26 00:00:00", "yyyy-MM-dd HH:mm:ss");
         Date endD = TimeUtils.addDay(startD, 1);
         final ProcessDate pd = new ProcessDate(startD, endD);
 
-        ListAndProcessTask2<PtmCmpSkuLog> listAndProcessTask2 = new ListAndProcessTask2<>(
-                new IList<PtmCmpSkuLog>() {
+        final Set<Long> idSet = new HashSet<>();
+        final AtomicInteger count = new AtomicInteger(0);
+
+        ListProcessTask<PtmCmpSkuLog> listAndProcessTask2 = new ListProcessTask<>(
+                new ILister<PtmCmpSkuLog>() {
                     @Override
                     public PageableResult<PtmCmpSkuLog> getData(int page) {
+                        print("count=" + count.get() + ", id set=" + idSet.size());
                         Query query = new Query(Criteria.where("priceTime").gt(pd.getStartDate()).lte(pd.getEndDate()));
                         return mdm.queryPage(PtmCmpSkuLog.class, query, page, 2000);
                     }
@@ -282,10 +283,13 @@ public class ProductTest {
 
                     }
                 },
-                new IProcess<PtmCmpSkuLog>() {
+                new IProcessor<PtmCmpSkuLog>() {
                     @Override
                     public void process(PtmCmpSkuLog o) {
-                        cmpSkuService.saveHistoryPrice(o.getPcsId(), o.getPriceTime(), o.getPrice());
+//                        print(o.getPcsId() + "");
+//                        cmpSkuService.saveHistoryPrice(o.getPcsId(), o.getPriceTime(), o.getPrice());
+                        idSet.add(o.getPcsId());
+                        count.addAndGet(1);
                     }
                 }
         );
@@ -297,14 +301,16 @@ public class ProductTest {
             listAndProcessTask2.go();
             pd.addDay();
         }
+
+        print("count=" + count.get() + ", id set=" + idSet.size());
     }
 
     @Test
     public void convertdatas() {
         final Date startD = TimeUtils.stringToDate("2016-08-01 00:00:00", "yyyy-MM-dd HH:mm:ss");
         final Date endD = TimeUtils.add(startD, 1);
-        ListAndProcessTask2<PtmCmpSkuLog> listAndProcessTask2 = new ListAndProcessTask2<>(
-                new IList<PtmCmpSkuLog>() {
+        ListProcessTask<PtmCmpSkuLog> listAndProcessTask2 = new ListProcessTask<>(
+                new ILister<PtmCmpSkuLog>() {
                     @Override
                     public PageableResult<PtmCmpSkuLog> getData(int page) {
                         Query query = new Query(Criteria.where("priceTime").gt(startD).lte(endD));
@@ -323,7 +329,7 @@ public class ProductTest {
 
                     }
                 },
-                new IProcess<PtmCmpSkuLog>() {
+                new IProcessor<PtmCmpSkuLog>() {
                     @Override
                     public void process(PtmCmpSkuLog o) {
                         cmpSkuService.saveHistoryPrice(o.getPcsId(), o.getPriceTime(), o.getPrice());
@@ -517,8 +523,8 @@ public class ProductTest {
 
         final SiteCount siteCount = new SiteCount();
 
-        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<>(
-                new IList() {
+        ListProcessTask<PtmProduct> listAndProcessTask2 = new ListProcessTask<>(
+                new ILister() {
                     @Override
                     public PageableResult getData(int page) {
                         return dbm.queryPage(Q_PRODUCT_WEBSITE, page, 2000, Arrays.asList(siteCount.site.name()));
@@ -534,7 +540,7 @@ public class ProductTest {
 
                     }
                 },
-                new IProcess<PtmProduct>() {
+                new IProcessor<PtmProduct>() {
                     @Override
                     public void process(PtmProduct o) {
                         List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(o.getId());

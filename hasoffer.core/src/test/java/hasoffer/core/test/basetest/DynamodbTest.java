@@ -5,7 +5,7 @@ import hasoffer.core.persistence.aws.AwsSummaryProduct;
 import hasoffer.core.persistence.dbm.aws.AwsDynamoDbService;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.task.worker.IProcess;
+import hasoffer.core.task.worker.IProcessor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -94,7 +94,7 @@ public class DynamodbTest {
         params.add(20);
         params.add(Website.FLIPKART.name());
 
-        awsDynamoDbService.scanAll(AwsSummaryProduct.class, queryStr, params, new IProcess<AwsSummaryProduct>() {
+        awsDynamoDbService.scanAll(AwsSummaryProduct.class, queryStr, params, new IProcessor<AwsSummaryProduct>() {
             @Override
             public void process(AwsSummaryProduct asp) {
                 System.out.println(asp.getId() + "\t" + asp.getPrice());
