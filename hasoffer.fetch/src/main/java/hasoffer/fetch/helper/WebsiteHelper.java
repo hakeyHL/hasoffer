@@ -137,23 +137,28 @@ public class WebsiteHelper {
             case FLIPKART:
                 return FlipkartHelper.getDealUrlWithAff(url, affs);
             case PAYTM:
+                return url;
             case AMAZON:
+                return url;
             case SNAPDEAL:
                 return getUrlWithAff(website, url, affs);
             case SHOPCLUES:
                 return getUrlWithAff(website, url, affs);
             case EBAY:
+                return url;
             case INFIBEAM:
+                return url;
             case INDIATIMES:
+                return url;
             case CROMARETAIL:
+                return url;
             case THEITDEPOT:
+                return url;
             case ASKMEBAZAAR:
-                break;
+                return url;
             default:
-                break;
+                return url;
         }
-
-        return url;
     }
 
     public static String getUrlWithAff(Website website, String url, String[] affs) {
