@@ -11,11 +11,11 @@ import java.util.Map;
 public class PriceCurveVo {
     List<Long> showY;
     private List<String> showX;
-    private Map<String, Float> priceXY;
+    private Map<String, Long> priceXY;
     private Long startPoint;//最低点 ,起始数据点
     private Long endPoint;//终止数据点
 
-    public PriceCurveVo(List<String> showX, List<Long> showY, Map<String, Float> priceXY, Long startPoint, Long endPoint) {
+    public PriceCurveVo(List<String> showX, List<Long> showY, Map<String, Long> priceXY, Long startPoint, Long endPoint) {
         this.showX = showX;
         this.showY = showY;
         this.priceXY = priceXY;
@@ -58,11 +58,11 @@ public class PriceCurveVo {
         this.showX = showX;
     }
 
-    public Map<String, Float> getPriceXY() {
+    public Map<String, Long> getPriceXY() {
         return priceXY;
     }
 
-    public void setPriceXY(Map<String, Float> priceXY) {
+    public void setPriceXY(Map<String, Long> priceXY) {
         this.priceXY = priceXY;
     }
 }
