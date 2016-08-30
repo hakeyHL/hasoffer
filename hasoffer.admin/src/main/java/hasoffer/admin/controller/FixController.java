@@ -17,6 +17,7 @@ import hasoffer.core.analysis.ProductAnalysisService;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.HijackLog;
+import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
@@ -49,6 +50,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -1531,5 +1533,30 @@ public class FixController {
         }
 
         return "ok";
+    }
+
+    /**
+     * @param id
+     * @param response 查看一个sku的offer及其相关信息
+     * @return
+     */
+    @RequestMapping("offerTest")
+    public String getOffers(@RequestParam(defaultValue = "0") Long id, HttpServletResponse response) {
+        System.out.println(" get get get get  offers offers offers ");
+        PtmCmpSkuDescription ptmCmpSkuDescription = mdm.queryOne(PtmCmpSkuDescription.class, id);
+        if (ptmCmpSkuDescription != null) {
+            String offers = ptmCmpSkuDescription.getOffers();
+            System.out.println(" got it ,and offers is " + offers);
+            PtmCmpSku ptmCmpSku = cmpSkuService.getCmpSkuById(id);
+            if (ptmCmpSku != null) {
+                System.out.println("sku id is :" + id + " and productId is " + ptmCmpSku.getProductId());
+                PtmProduct product = productService.getProduct(ptmCmpSku.getProductId());
+                if (product != null) {
+                    System.out.println(" product is exist  and title is  " + product.getTitle());
+                    System.out.println(" price is :" + product.getPrice());
+                }
+            }
+        }
+        return null;
     }
 }
