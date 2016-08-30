@@ -227,21 +227,11 @@ public class AppSkuController {
 
         //3. 计算获得Y轴显示数据
 
-        // SKU的最低价格处于（a+3(b-a)/4，b）的区间
-        // 最高价格处于（a, a+(b-a)/4）
-        //由最大价格和最小价格算出a和b的值
-        float a = maxPrice;
-        float b = minPrice;
-        while (maxPrice <= a) {
-            a += 1;
-            if (maxPrice > (0.25 * b + 0.75 * a)) {
-
-            }
-        }
-        //3.1 最大值 a
-
-        //3.2 最小值 b
-
+        // SKU的最高价格处于（a+3(b-a)/4，b）的区间
+        // 最低价格处于（a, a+(b-a)/4）
+        //由最价格和最小价格算出a和b的值
+        //3.1 最小值 a
+        //3.2 最大值 b
         //3.3 a+(b-a)/4
         //3.4 a+(b-a)/2
         //3.5 a+3(b-a)/4）
