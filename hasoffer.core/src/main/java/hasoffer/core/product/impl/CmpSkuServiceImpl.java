@@ -442,7 +442,8 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             }
 
             //新的offers不为空，且和就得offers不相同
-            if (!StringUtils.isEmpty(offers) && !StringUtils.isEqual(offers, oldOffers)) {
+            //注意offer内容只要不相同就要更新，有的offer不在可用，需要更新成空
+            if (!StringUtils.isEqual(offers, oldOffers)) {
                 ptmCmpSkuDescription.setOffers(offers);
                 flagOffers = true;
             }
