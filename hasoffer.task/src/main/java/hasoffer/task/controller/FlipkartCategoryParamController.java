@@ -5,7 +5,7 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
-import hasoffer.core.worker.ListAndProcessWorkerStatus;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import hasoffer.task.worker.FKCateAndParamWorker;
 import hasoffer.task.worker.FlipkartBrandModelFetchWorker;
 import hasoffer.task.worker.MysqlListWorker;
@@ -50,7 +50,7 @@ public class FlipkartCategoryParamController {
 
         ExecutorService es = Executors.newCachedThreadPool();
 
-        ListAndProcessWorkerStatus<PtmCmpSku> ws = new ListAndProcessWorkerStatus<PtmCmpSku>();
+        ListProcessWorkerStatus<PtmCmpSku> ws = new ListProcessWorkerStatus<PtmCmpSku>();
 
         es.execute(new MysqlListWorker(Q_FLIPKART_CMP, ws, dbm));
 
@@ -74,7 +74,7 @@ public class FlipkartCategoryParamController {
 
         ExecutorService es = Executors.newCachedThreadPool();
 
-        ListAndProcessWorkerStatus<PtmCmpSku> ws = new ListAndProcessWorkerStatus<PtmCmpSku>();
+        ListProcessWorkerStatus<PtmCmpSku> ws = new ListProcessWorkerStatus<PtmCmpSku>();
 
         es.execute(new MysqlListWorker(Q_FLIPKART_SKU, ws, dbm));
 

@@ -6,9 +6,9 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.search.ISearchService;
-import hasoffer.core.task.ListAndProcessTask2;
-import hasoffer.core.task.worker.IList;
-import hasoffer.core.task.worker.IProcess;
+import hasoffer.core.task.ListProcessTask;
+import hasoffer.core.task.worker.ILister;
+import hasoffer.core.task.worker.IProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -42,8 +42,8 @@ public class AutoMatchController {
 
         final long stime = TimeUtils.now() - TimeUtils.MILLISECONDS_OF_1_HOUR;
 
-        ListAndProcessTask2<SrmAutoSearchResult> listAndProcessTask2 = new ListAndProcessTask2<SrmAutoSearchResult>(
-                new IList() {
+        ListProcessTask<SrmAutoSearchResult> listAndProcessTask2 = new ListProcessTask<SrmAutoSearchResult>(
+                new ILister() {
 
                     long startTime = stime;
                     boolean runForever = true;
@@ -79,7 +79,7 @@ public class AutoMatchController {
                     }
 
                 },
-                new IProcess<SrmAutoSearchResult>() {
+                new IProcessor<SrmAutoSearchResult>() {
                     @Override
                     public void process(SrmAutoSearchResult asr) {
                         try {

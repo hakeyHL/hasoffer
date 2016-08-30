@@ -16,9 +16,9 @@ import hasoffer.core.persistence.po.match.TagBrand;
 import hasoffer.core.persistence.po.match.TagCategory;
 import hasoffer.core.persistence.po.match.TagModel;
 import hasoffer.core.persistence.po.match.TagSkuVal;
-import hasoffer.core.task.ListAndProcessTask2;
-import hasoffer.core.task.worker.IList;
-import hasoffer.core.task.worker.IProcess;
+import hasoffer.core.task.ListProcessTask;
+import hasoffer.core.task.worker.ILister;
+import hasoffer.core.task.worker.IProcessor;
 import jodd.io.FileUtil;
 import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.junit.Test;
@@ -84,8 +84,8 @@ public class TagTest {
     public void getTags() {
         fillMaps();
 
-        ListAndProcessTask2<PtmCmpSkuDescription> listAndProcessTask2 = new ListAndProcessTask2<PtmCmpSkuDescription>(
-                new IList<PtmCmpSkuDescription>() {
+        ListProcessTask<PtmCmpSkuDescription> listAndProcessTask2 = new ListProcessTask<PtmCmpSkuDescription>(
+                new ILister<PtmCmpSkuDescription>() {
                     @Override
                     public PageableResult<PtmCmpSkuDescription> getData(int page) {
                         return mdm.queryPage(PtmCmpSkuDescription.class, new Query(), page, 100);
@@ -101,7 +101,7 @@ public class TagTest {
 
                     }
                 },
-                new IProcess<PtmCmpSkuDescription>() {
+                new IProcessor<PtmCmpSkuDescription>() {
                     @Override
                     public void process(PtmCmpSkuDescription o) {
 //                        getBrandSet(o);

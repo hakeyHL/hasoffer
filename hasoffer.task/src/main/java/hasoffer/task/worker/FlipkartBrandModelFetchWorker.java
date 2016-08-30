@@ -5,8 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import hasoffer.core.utils.Httphelper;
-import hasoffer.core.worker.ListAndProcessWorkerStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +22,10 @@ public class FlipkartBrandModelFetchWorker implements Runnable {
     private final String requestUrl = "https://www.flipkart.com/api/3/page/dynamic/product";
 
     private Logger logger = LoggerFactory.getLogger(FKCateAndParamWorker.class);
-    private ListAndProcessWorkerStatus<PtmCmpSku> ws;
+    private ListProcessWorkerStatus<PtmCmpSku> ws;
     private ICmpSkuService cmpSkuService;
 
-    public FlipkartBrandModelFetchWorker(ICmpSkuService cmpSkuService, ListAndProcessWorkerStatus<PtmCmpSku> ws) {
+    public FlipkartBrandModelFetchWorker(ICmpSkuService cmpSkuService, ListProcessWorkerStatus<PtmCmpSku> ws) {
         this.cmpSkuService = cmpSkuService;
         this.ws = ws;
     }

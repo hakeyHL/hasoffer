@@ -4,6 +4,7 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.po.urm.UrmDevice;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import hasoffer.core.user.IDeviceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,11 +20,11 @@ import java.util.concurrent.TimeUnit;
 public class ListDeviceWorker implements Runnable {
 
     IDeviceService deviceService;
-    ListAndProcessWorkerStatus ws;
+    ListProcessWorkerStatus ws;
     List<String> ymds;
     private Logger logger = LoggerFactory.getLogger(ListDeviceWorker.class);
 
-    public ListDeviceWorker(IDeviceService deviceService, ListAndProcessWorkerStatus ws, List<String> ymds) {
+    public ListDeviceWorker(IDeviceService deviceService, ListProcessWorkerStatus ws, List<String> ymds) {
         this.deviceService = deviceService;
         this.ws = ws;
         this.ymds = ymds;

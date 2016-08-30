@@ -6,7 +6,7 @@ import hasoffer.base.model.PageableResult;
  * Date : 2016/5/5
  * Function :
  */
-public interface IList<T> {
+public interface ILister<T> {
 
     PageableResult<T> getData(int page);
 
