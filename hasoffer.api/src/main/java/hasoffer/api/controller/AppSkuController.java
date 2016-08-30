@@ -72,9 +72,35 @@ public class AppSkuController {
     }
 
     public static void main(String[] args) {
-        String temp = "{\"Fabric Care:\":\"Hand wash at 30°C, Do not bleach, Mild Iron, Do not Tumble Dry, Line Dry in shade, wash separately, do not iron on decorations/print, Use mild detergents\",\"Sales Package\":\"1 Kurti\",\"Legging Available\":\"No\",\"Ideal For\":\"Women's\",\"Other details\":\"Stitched\",\"Neck\":\"Mandarin collar\"}";
-        String ss = "\\ysf";
-        System.out.println(ss.replaceAll("\\\\", ""));
+//        String temp = "{\"Fabric Care:\":\"Hand wash at 30°C, Do not bleach, Mild Iron, Do not Tumble Dry, Line Dry in shade, wash separately, do not iron on decorations/print, Use mild detergents\",\"Sales Package\":\"1 Kurti\",\"Legging Available\":\"No\",\"Ideal For\":\"Women's\",\"Other details\":\"Stitched\",\"Neck\":\"Mandarin collar\"}";
+//        String ss = "\\ysf";
+//        System.out.println(ss.replaceAll("\\\\", ""));
+        List<PtmCmpSku> ptmCmpSkus = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            PtmCmpSku ptmcmpSku = new PtmCmpSku();
+            ptmcmpSku.setPrice(new Random().nextFloat());
+            System.out.println("price " + i + "  " + ptmcmpSku.getPrice());
+            ptmCmpSkus.add(ptmcmpSku);
+        }
+        for (PtmCmpSku ptmCmpSku : ptmCmpSkus) {
+            System.out.println(ptmCmpSku.getPrice() + " a:");
+        }
+
+        Collections.sort(ptmCmpSkus, new Comparator<PtmCmpSku>() {
+            @Override
+            public int compare(PtmCmpSku o1, PtmCmpSku o2) {
+                if (o1.getPrice() < o2.getPrice()) {
+                    return -1;
+                }
+                if (o1.getPrice() > o2.getPrice()) {
+                    return 1;
+                }
+                return 0;
+            }
+        });
+        for (PtmCmpSku ptmCmpSku : ptmCmpSkus) {
+            System.out.println(ptmCmpSku.getPrice() + " b:");
+        }
     }
 
     /**
@@ -129,22 +155,99 @@ public class AppSkuController {
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
         Map<String, Float> priceXY = new HashMap<>();
+        //1. 先拿到所有的价格数据
         List<PriceNode> priceNodes = iCmpSkuService.queryHistoryPrice(id);
         System.out.println(priceNodes != null ? "  priceNodes  :" + priceNodes.size() : "null a .....");
+        //1.1 按照日升序给出
+        Collections.sort(priceNodes, new Comparator<PriceNode>() {
+            @Override
+            public int compare(PriceNode o1, PriceNode o2) {
+                if (o1.getPriceTimeL() < o2.getPriceTimeL()) {
+                    return -1;
+                } else if (o1.getPriceTimeL() > o2.getPriceTimeL()) {
+                    return 1;
+                }
+                return 0;
+            }
+        });
+        //1.2 过滤不合法数据
+        Iterator<PriceNode> iterator = priceNodes.iterator();
+        while (iterator.hasNext()) {
+            PriceNode next = iterator.next();
+            if (next.getPrice() <= 0) {
+                iterator.remove();
+            }
+        }
+
+        //2. 计算获得X轴显示数据
+        //X轴  20天为间隔显示日期 , 格式为：　10-30
+        List<String> X = new ArrayList<>();
+        //2.1 最小日期 [0]
+        X.add(this.getDateMMdd(priceNodes.get(0).getPriceTimeL()));
+        //2.2 最大日期(一般为当前日期) [length-1]
+        Long priceTimeL = priceNodes.get(priceNodes.size() - 1).getPriceTimeL();
+        //2.3 遍历日期
+        while (priceTimeL > priceNodes.get(0).getPriceTimeL()) {
+            X.add(this.getDateMMdd(priceTimeL));
+            priceTimeL = priceTimeL - 60 * 60 * 24 * 20;
+        }
+        //反转,按日期从小到大来
+        Collections.reverse(X);
+
+
+        for (PriceNode priceNode : priceNodes) {
+
+        }
+
+        Float maxPrice = Collections.max(priceNodes, new Comparator<PriceNode>() {
+            @Override
+            public int compare(PriceNode o1, PriceNode o2) {
+                if (o1.getPrice() < o2.getPrice()) {
+                    return -1;
+                }
+                if (o1.getPrice() > o2.getPrice()) {
+                    return 1;
+                }
+                return 0;
+            }
+        }).getPrice();
+
+        Float minPrice = Collections.max(priceNodes, new Comparator<PriceNode>() {
+            @Override
+            public int compare(PriceNode o1, PriceNode o2) {
+                if (o1.getPrice() < o2.getPrice()) {
+                    return -1;
+                }
+                if (o1.getPrice() > o2.getPrice()) {
+                    return 1;
+                }
+                return 0;
+            }
+        }).getPrice();
+
+        //3. 计算获得Y轴显示数据
+
+        // SKU的最高价格处于（a+3(b-a)/4，b）的区间
+        // 最低价格处于（a, a+(b-a)/4）
+        //由最价格和最小价格算出a和b的值
+        //3.1 最小值 a
+        //3.2 最大值 b
+        //3.3 a+(b-a)/4
+        //3.4 a+(b-a)/2
+        //3.5 a+3(b-a)/4）
+
+        //4. 辅助点   --价格变化点前一天的价格按照上一个价格点给出
+
+
+        // 若sku价格无变化则 则Y轴最小值为0 最高值为SKU价格
+
+        //5. 给出坐标集合
         if (priceNodes != null && priceNodes.size() > 0) {
             for (PriceNode priceNode : priceNodes) {
 //            jsonObject.put("data", JSONObject.toJSON(priceNodes));
-                //查询到价格历史,开始分析
+                //查询到价格历史,开始分析 ,过滤不合理的价格
                 priceXY.put(this.getDateMMdd(priceNode.getPriceTimeL()), priceNode.getPrice());
             }
-            //X轴  20天为间隔显示日期 , 格式为：　10-30
-            List<String> X = new ArrayList<>();
-            X.add("4-19");
-            X.add("5-11");
-            X.add("6-01");
-            X.add("7-12");
-            X.add("8-02");
-            X.add("8-22");
 
             //Y轴
             List<Long> Y = new ArrayList<>();
