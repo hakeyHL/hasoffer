@@ -141,7 +141,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
                     List<String> categoryPathList = fetchedProduct.getCategoryPathList();
 
-                    if (categoryPathList != null && categoryPathList.size() == 0) {
+                    if (categoryPathList != null && categoryPathList.size() != 0) {
 
                         String lastCategoryPath = categoryPathList.get(categoryPathList.size() - 1);
 
