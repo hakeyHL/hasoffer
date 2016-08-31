@@ -850,11 +850,11 @@ public class Compare2Controller {
                 if (!cmpSkuCacheManager.isFlowControlled(sio.getDeviceId(), sio.getCliSite())) {
                     System.out.println(" enter clientCmpSku get deepLink ");
                     System.out.println(" sku id is " + clientCmpSku.getId());
-                    System.out.println("  clientCmpSku.getSkuTitle()" + clientCmpSku.getSkuTitle());
-                    System.out.println("   sio.getCliQ()" + sio.getCliQ());
-                    System.out.println(" clientCmpSku.getPrice()  " + clientCmpSku.getPrice());
+                    System.out.println("  clientCmpSku.getSkuTitle()  : " + clientCmpSku.getSkuTitle());
+                    System.out.println("   sio.getCliQ() : " + sio.getCliQ());
+                    System.out.println(" clientCmpSku.getPrice() :   " + clientCmpSku.getPrice());
                     System.out.println("  cliPrice  " + cliPrice);
-                    if (StringUtils.isEqual(clientCmpSku.getSkuTitle(), sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
+                    if (clientCmpSku.getSkuTitle().equalsIgnoreCase(sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
                         currentDeeplink = WebsiteHelper.getDeeplinkWithAff(clientCmpSku.getWebsite(), clientCmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
                         System.out.println("currentDeeplink2  " + currentDeeplink);
                     }
