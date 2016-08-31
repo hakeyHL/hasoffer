@@ -1,5 +1,7 @@
 package hasoffer.core.persistence.mongo;
 
+import hasoffer.base.utils.TimeUtils;
+
 import java.util.Date;
 
 /**
@@ -7,6 +9,7 @@ import java.util.Date;
  */
 public class PriceNode {
 
+    private String ymd;
     private Date priceTime;
     private long priceTimeL;
     private float price;
@@ -15,6 +18,18 @@ public class PriceNode {
         this.priceTime = priceTime;
         this.price = price;
         this.priceTimeL = this.priceTime.getTime();
+        this.ymd = TimeUtils.parse(priceTime, "yyyyMMdd");
+    }
+
+    public PriceNode() {
+    }
+
+    public String getYmd() {
+        return ymd;
+    }
+
+    public void setYmd(String ymd) {
+        this.ymd = ymd;
     }
 
     public Date getPriceTime() {
@@ -48,12 +63,11 @@ public class PriceNode {
 
         PriceNode priceNode = (PriceNode) o;
 
-        return priceTimeL == priceNode.priceTimeL;
-
+        return ymd.equals(priceNode.ymd);
     }
 
     @Override
     public int hashCode() {
-        return (int) (priceTimeL ^ (priceTimeL >>> 32));
+        return ymd.hashCode();
     }
 }

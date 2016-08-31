@@ -1,10 +1,10 @@
 package hasoffer.core.task;
 
-import hasoffer.core.task.worker.IList;
-import hasoffer.core.task.worker.IProcess;
-import hasoffer.core.task.worker.ListxWorker;
-import hasoffer.core.task.worker.ProcessWorker;
-import hasoffer.core.worker.ListAndProcessWorkerStatus;
+import hasoffer.core.task.worker.ILister;
+import hasoffer.core.task.worker.IProcessor;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
+import hasoffer.core.task.worker.impl.ListWorker;
+import hasoffer.core.task.worker.impl.ProcessWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,25 +16,25 @@ import java.util.concurrent.TimeUnit;
  * Date : 2016/5/3
  * Function :
  */
-public class ListAndProcessTask2<T> {
+public class ListProcessTask<T> {
 
-    IList list;
-    IProcess processor;
+    ILister list;
+    IProcessor processor;
     int processorCount = 20;
     long queueMaxSize = 3000;
-    private Logger logger = LoggerFactory.getLogger(ListAndProcessTask2.class);
+    private Logger logger = LoggerFactory.getLogger(ListProcessTask.class);
 
-    public ListAndProcessTask2(IList list,
-                               IProcess processor) {
+    public ListProcessTask(ILister list,
+                           IProcessor processor) {
         this.list = list;
         this.processor = processor;
     }
 
     public void go() {
-        ListAndProcessWorkerStatus<T> ws = new ListAndProcessWorkerStatus<T>();
+        ListProcessWorkerStatus<T> ws = new ListProcessWorkerStatus<T>();
 
         ExecutorService es = Executors.newCachedThreadPool();
-        es.execute(new ListxWorker<T>(ws, list, queueMaxSize));
+        es.execute(new ListWorker<T>(ws, list, queueMaxSize));
 
         for (int i = 0; i < processorCount; i++) {
             es.execute(new ProcessWorker(ws, processor));
@@ -55,16 +55,8 @@ public class ListAndProcessTask2<T> {
         logger.debug("work finished.");
     }
 
-    public int getProcessorCount() {
-        return processorCount;
-    }
-
     public void setProcessorCount(int processorCount) {
         this.processorCount = processorCount;
-    }
-
-    public long getQueueMaxSize() {
-        return queueMaxSize;
     }
 
     public void setQueueMaxSize(long queueMaxSize) {

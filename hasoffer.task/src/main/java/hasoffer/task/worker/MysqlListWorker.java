@@ -2,7 +2,7 @@ package hasoffer.task.worker;
 
 import hasoffer.base.model.PageableResult;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.worker.ListAndProcessWorkerStatus;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,9 +17,9 @@ public class MysqlListWorker<T> implements Runnable {
     private Logger logger = LoggerFactory.getLogger(MysqlListWorker.class);
     private String queryString;
     private IDataBaseManager dbm;
-    private ListAndProcessWorkerStatus<T> ws;
+    private ListProcessWorkerStatus<T> ws;
 
-    public MysqlListWorker(String queryString, ListAndProcessWorkerStatus<T> ws, IDataBaseManager dbm) {
+    public MysqlListWorker(String queryString, ListProcessWorkerStatus<T> ws, IDataBaseManager dbm) {
         this.queryString = queryString;
         this.ws = ws;
         this.dbm = dbm;

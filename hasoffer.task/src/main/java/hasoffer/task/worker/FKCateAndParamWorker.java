@@ -7,8 +7,8 @@ import hasoffer.core.persistence.po.ptm.PtmCategory3;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import hasoffer.core.utils.Httphelper;
-import hasoffer.core.worker.ListAndProcessWorkerStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,12 +26,12 @@ public class FKCateAndParamWorker implements Runnable {
     private final String requestUrl = "https://www.flipkart.com/api/3/page/dynamic/product";
 
     private Logger logger = LoggerFactory.getLogger(FKCateAndParamWorker.class);
-    private ListAndProcessWorkerStatus<PtmCmpSku> ws;
+    private ListProcessWorkerStatus<PtmCmpSku> ws;
     private IDataBaseManager dbm;
     private ICategoryService categoryService;
     private ICmpSkuService cmpSkuService;
 
-    public FKCateAndParamWorker(IDataBaseManager dbm, ListAndProcessWorkerStatus<PtmCmpSku> ws, ICategoryService categoryService, ICmpSkuService cmpSkuService) {
+    public FKCateAndParamWorker(IDataBaseManager dbm, ListProcessWorkerStatus<PtmCmpSku> ws, ICategoryService categoryService, ICmpSkuService cmpSkuService) {
         this.dbm = dbm;
         this.ws = ws;
         this.categoryService = categoryService;

@@ -4,6 +4,7 @@ import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.mongo.StatDevice;
 import hasoffer.core.persistence.po.urm.UrmDevice;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import hasoffer.core.user.IDeviceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,13 +21,13 @@ import java.util.concurrent.TimeUnit;
 public class StatDeviceWorker implements Runnable {
 
     IDeviceService deviceService;
-    ListAndProcessWorkerStatus<UrmDevice> ws;
+    ListProcessWorkerStatus<UrmDevice> ws;
     List<String> ymds;
 
     private Logger logger = LoggerFactory.getLogger(StatDeviceWorker.class);
 
     public StatDeviceWorker(IDeviceService deviceService,
-                            ListAndProcessWorkerStatus<UrmDevice> ws,
+                            ListProcessWorkerStatus<UrmDevice> ws,
                             List<String> ymds) {
         this.deviceService = deviceService;
         this.ws = ws;
