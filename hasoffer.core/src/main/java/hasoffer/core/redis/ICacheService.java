@@ -32,8 +32,4 @@ public interface ICacheService<T> {
     Map<String, String> mapGetAll(final String mName);
 
     Set<String> keys(final String pattern);
-
-    Long lpush(String key, String... strings);
-
-    String rpop(String key);
 }

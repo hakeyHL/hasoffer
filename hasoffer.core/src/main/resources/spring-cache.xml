@@ -46,13 +46,4 @@
         <property name="connectionFactory" ref="jedisConnFactory"/>
     </bean>
 
-    <bean id="jedisPool" class="redis.clients.jedis.JedisPool">
-        <constructor-arg index="0" value="${cache.redis.hostname}"/>
-        <constructor-arg index="1" value="${cache.redis.port}"/>
-    </bean>
-
-    <bean id="jedisClient" class="redis.clients.jedis.Jedis">
-        <property name="dataSource" ref="jedisPool"/>
-    </bean>
-
 </beans>
