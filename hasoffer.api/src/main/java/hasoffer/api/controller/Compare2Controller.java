@@ -116,20 +116,24 @@ public class Compare2Controller {
 //        }
 //        System.out.println(s.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
 //        System.out.println(305 % 10);
-        String price = "Rs. 17,511";
-        if (!StringUtils.isEmpty(price)) {
-            //如果price不为空
-            if (price.contains(",")) {
-                System.out.println(price + "    contains , ");
-                price = price.replaceAll(",", " ");
-            }
-            if (price.contains("Rs.")) {
-                System.out.println(price + "    contains Rs. ");
-                price = price.replaceAll("Rs.", " ");
-            }
-            price = price.replaceAll(" ", "");
-            System.out.println(" price is " + price);
+//        String price = "Rs. 17,511";
+//        if (!StringUtils.isEmpty(price)) {
+//            //如果price不为空
+//            if (price.contains(",")) {
+//                System.out.println(price + "    contains , ");
+//                price = price.replaceAll(",", " ");
+//            }
+//            if (price.contains("Rs.")) {
+//                System.out.println(price + "    contains Rs. ");
+//                price = price.replaceAll("Rs.", " ");
+//            }
+//            price = price.replaceAll(" ", "");
+//            System.out.println(" price is " + price);
+//        }
+        if ("Samsung Tizen Z3 (8GB,Tizen OS)".equalsIgnoreCase("sumsung tizen z3 (8GB,Tizen OS)")) {
+            System.out.println("dd");
         }
+
     }
 
     // @Cacheable(value = "compare", key = "'getcmpskus_'+#q+'_'+#site+'_'+#price+'_'+#page+'_'+#size")

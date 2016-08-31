@@ -14,6 +14,8 @@ public class DownloadConfigVo {
     private boolean isBoot;
     //配置客户端检测哪些包
     private List<String> checkPackages = new ArrayList<String>();
+    //competingAndChannelPackages 竞品和渠道的包
+    private List<String> cmpAndchPackages = new ArrayList<String>();
     //优先下载渠道
     private String priorDownloadChannel = "9APP";
     //下载渠道及deeplink
@@ -25,11 +27,12 @@ public class DownloadConfigVo {
     public DownloadConfigVo() {
     }
 
-    public DownloadConfigVo(boolean isBoot, List<String> checkPackages, String priorDownloadChannel, List<Map<String, List<ThirdAppVo>>> apps) {
+    public DownloadConfigVo(boolean isBoot, List<String> checkPackages, String priorDownloadChannel, List<Map<String, List<ThirdAppVo>>> apps, List<String> cmpAndchPackages) {
         this.isBoot = isBoot;
         this.checkPackages = checkPackages;
         this.priorDownloadChannel = priorDownloadChannel;
         this.apps = apps;
+        this.cmpAndchPackages = cmpAndchPackages;
     }
 
     public static void main(String[] args) {
@@ -65,5 +68,13 @@ public class DownloadConfigVo {
 
     public void setApps(List<Map<String, List<ThirdAppVo>>> apps) {
         this.apps = apps;
+    }
+
+    public List<String> getCmpAndchPackages() {
+        return cmpAndchPackages;
+    }
+
+    public void setCmpAndchPackages(List<String> cmpAndchPackages) {
+        this.cmpAndchPackages = cmpAndchPackages;
     }
 }
