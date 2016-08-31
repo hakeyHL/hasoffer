@@ -8,7 +8,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.ScanResultPage;
 import com.amazonaws.services.dynamodbv2.model.*;
-import hasoffer.core.task.worker.IProcess;
+import hasoffer.core.task.worker.IProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -173,7 +173,7 @@ public class AwsDynamoDbService {
         return resultPage.getResults();
     }
 
-    public <T> boolean scanAll(Class<T> clazz, String expressionStr, List<Object> params, IProcess process) {
+    public <T> boolean scanAll(Class<T> clazz, String expressionStr, List<Object> params, IProcessor process) {
 
         Map<String, AttributeValue> eav = getParamMap(params);
 

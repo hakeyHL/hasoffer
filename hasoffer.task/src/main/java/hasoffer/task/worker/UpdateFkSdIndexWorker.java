@@ -11,7 +11,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.product.ICmpSkuService;
-import hasoffer.core.worker.ListAndProcessWorkerStatus;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,11 +24,11 @@ public class UpdateFkSdIndexWorker implements Runnable {
 
     private static Logger logger = LoggerFactory.getLogger(UpdateFkSdIndexWorker.class);
 
-    private ListAndProcessWorkerStatus<PtmCmpSku> ws;
+    private ListProcessWorkerStatus<PtmCmpSku> ws;
     private IDataBaseManager dbm;
     private ICmpSkuService cmpSkuService;
 
-    public UpdateFkSdIndexWorker(ListAndProcessWorkerStatus<PtmCmpSku> ws, IDataBaseManager dbm, ICmpSkuService cmpSkuService) {
+    public UpdateFkSdIndexWorker(ListProcessWorkerStatus<PtmCmpSku> ws, IDataBaseManager dbm, ICmpSkuService cmpSkuService) {
         this.ws = ws;
         this.dbm = dbm;
         this.cmpSkuService = cmpSkuService;

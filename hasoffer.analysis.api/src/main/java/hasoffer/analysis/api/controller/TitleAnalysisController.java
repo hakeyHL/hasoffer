@@ -11,9 +11,9 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.match.TagMatched;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.task.ListAndProcessTask2;
-import hasoffer.core.task.worker.IList;
-import hasoffer.core.task.worker.IProcess;
+import hasoffer.core.task.ListProcessTask;
+import hasoffer.core.task.worker.ILister;
+import hasoffer.core.task.worker.IProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -64,7 +64,7 @@ public class TitleAnalysisController {
     @ResponseBody
     String matchSkuTitles() {
 
-        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<PtmProduct>(new IList() {
+        ListProcessTask<PtmProduct> listAndProcessTask2 = new ListProcessTask<PtmProduct>(new ILister() {
             @Override
             public PageableResult getData(int page) {
 //                return dbm.queryPage("select t from PtmCmpSku t where t.title is not null", page, 2000);
@@ -80,7 +80,7 @@ public class TitleAnalysisController {
             public void setRunForever(boolean runForever) {
 
             }
-        }, new IProcess<PtmProduct>() {
+        }, new IProcessor<PtmProduct>() {
             @Override
             public void process(PtmProduct o) {
                 String title = o.getTitle();
@@ -116,7 +116,7 @@ public class TitleAnalysisController {
     @ResponseBody
     String matchSkuTitles2() {
 
-        ListAndProcessTask2<PtmCmpSku> listAndProcessTask2 = new ListAndProcessTask2<PtmCmpSku>(new IList() {
+        ListProcessTask<PtmCmpSku> listAndProcessTask2 = new ListProcessTask<PtmCmpSku>(new ILister() {
             @Override
             public PageableResult getData(int page) {
                 return dbm.queryPage("select t from PtmCmpSku t where t.title is not null", page, 2000);
@@ -132,7 +132,7 @@ public class TitleAnalysisController {
             public void setRunForever(boolean runForever) {
 
             }
-        }, new IProcess<PtmCmpSku>() {
+        }, new IProcessor<PtmCmpSku>() {
             @Override
             public void process(PtmCmpSku o) {
                 String title = o.getTitle();

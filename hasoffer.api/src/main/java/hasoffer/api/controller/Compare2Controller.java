@@ -116,20 +116,24 @@ public class Compare2Controller {
 //        }
 //        System.out.println(s.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
 //        System.out.println(305 % 10);
-        String price = "Rs. 17,511";
-        if (!StringUtils.isEmpty(price)) {
-            //如果price不为空
-            if (price.contains(",")) {
-                System.out.println(price + "    contains , ");
-                price = price.replaceAll(",", " ");
-            }
-            if (price.contains("Rs.")) {
-                System.out.println(price + "    contains Rs. ");
-                price = price.replaceAll("Rs.", " ");
-            }
-            price = price.replaceAll(" ", "");
-            System.out.println(" price is " + price);
+//        String price = "Rs. 17,511";
+//        if (!StringUtils.isEmpty(price)) {
+//            //如果price不为空
+//            if (price.contains(",")) {
+//                System.out.println(price + "    contains , ");
+//                price = price.replaceAll(",", " ");
+//            }
+//            if (price.contains("Rs.")) {
+//                System.out.println(price + "    contains Rs. ");
+//                price = price.replaceAll("Rs.", " ");
+//            }
+//            price = price.replaceAll(" ", "");
+//            System.out.println(" price is " + price);
+//        }
+        if ("Samsung Tizen Z3 (8GB,Tizen OS)".equalsIgnoreCase("sumsung tizen z3 (8GB,Tizen OS)")) {
+            System.out.println("dd");
         }
+
     }
 
     // @Cacheable(value = "compare", key = "'getcmpskus_'+#q+'_'+#site+'_'+#price+'_'+#page+'_'+#size")
@@ -689,31 +693,31 @@ public class Compare2Controller {
                 }
                 if (websiteSet.contains(cmpProductListVo.getWebsite())) {
                     websiteSet.remove(cmpProductListVo.getWebsite());
-                //去除列表中除此之外的其他此site的数据
-                if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
-                    System.out.println("not ebay ");
-                    //评论数*星级 累加 除以评论数和
-                    sum += cmpProductListVo.getTotalRatingsNum() * cmpProductListVo.getRatingNum();
-                    tempTotalComments += cmpProductListVo.getTotalRatingsNum();
-                }
-                //获取offers
-                System.out.println(" get offers from mongoDb ");
-                System.out.println(" cmpProductListVo " + cmpProductListVo.getId() + "  : price : " + cmpProductListVo.getPrice());
-                PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, cmpProductListVo.getId());
-                if (ptmCmpSkuDescription != null) {
-                    System.out.println(" aha  aha  aha ");
-                    String offers = ptmCmpSkuDescription.getOffers();
-                    System.out.println(" got it ,and offers is " + offers);
-                    if (!StringUtils.isEmpty(offers)) {
-                        List<String> offer = new ArrayList<>();
-                        String[] temps = offers.split(",");
-                        for (String str : temps) {
-                            offer.add(str);
-                        }
-                        cmpProductListVo.setOffers(offer);
+                    //去除列表中除此之外的其他此site的数据
+                    if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
+                        System.out.println("not ebay ");
+                        //评论数*星级 累加 除以评论数和
+                        sum += cmpProductListVo.getTotalRatingsNum() * cmpProductListVo.getRatingNum();
+                        tempTotalComments += cmpProductListVo.getTotalRatingsNum();
                     }
-                }
-                tempCmpProductListVos.add(cmpProductListVo);
+                    //获取offers
+                    System.out.println(" get offers from mongoDb ");
+                    System.out.println(" cmpProductListVo " + cmpProductListVo.getId() + "  : price : " + cmpProductListVo.getPrice());
+                    PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, cmpProductListVo.getId());
+                    if (ptmCmpSkuDescription != null) {
+                        System.out.println(" aha  aha  aha ");
+                        String offers = ptmCmpSkuDescription.getOffers();
+                        System.out.println(" got it ,and offers is " + offers);
+                        if (!StringUtils.isEmpty(offers)) {
+                            List<String> offer = new ArrayList<>();
+                            String[] temps = offers.split(",");
+                            for (String str : temps) {
+                                offer.add(str);
+                            }
+                            cmpProductListVo.setOffers(offer);
+                        }
+                    }
+                    tempCmpProductListVos.add(cmpProductListVo);
                 }
             }
             //移除之前加进列表的所有的sku列表
@@ -849,7 +853,12 @@ public class Compare2Controller {
             } else if (clientCmpSku != null) {
                 if (!cmpSkuCacheManager.isFlowControlled(sio.getDeviceId(), sio.getCliSite())) {
                     System.out.println(" enter clientCmpSku get deepLink ");
-                    if (StringUtils.isEqual(clientCmpSku.getSkuTitle(), sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
+                    System.out.println(" sku id is " + clientCmpSku.getId());
+                    System.out.println("  clientCmpSku.getSkuTitle()  : " + clientCmpSku.getSkuTitle());
+                    System.out.println("   sio.getCliQ() : " + sio.getCliQ());
+                    System.out.println(" clientCmpSku.getPrice() :   " + clientCmpSku.getPrice());
+                    System.out.println("  cliPrice  " + cliPrice);
+                    if (clientCmpSku.getSkuTitle().equalsIgnoreCase(sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
                         currentDeeplink = WebsiteHelper.getDeeplinkWithAff(clientCmpSku.getWebsite(), clientCmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
                         System.out.println("currentDeeplink2  " + currentDeeplink);
                     }

@@ -2,12 +2,14 @@ package hasoffer.api.controller.vo;
 
 import hasoffer.base.model.Website;
 
+import java.io.Serializable;
+
 /**
  * Created by hs on 2016年08月18日.
  * Time 11:06
  * app下载引导中引导下载的APP的信息
  */
-public class ThirdAppVo {
+public class ThirdAppVo implements Serializable {
 
     //deeplink、logo、简介、评分值、评论数、下载数(googleplay的下载链接需添加联盟id)
     private String packageName;
@@ -18,11 +20,12 @@ public class ThirdAppVo {
     private float ratings;//评分值
     private String comments;//评论数
     private String downloads;//下载量
+    private String packageSize;
 
     public ThirdAppVo() {
     }
 
-    public ThirdAppVo(Website website, String packageName, String downloadLink, String logoUrl, String introduction, float ratings, String comments, String downloads) {
+    public ThirdAppVo(Website website, String packageName, String downloadLink, String logoUrl, String introduction, float ratings, String comments, String downloads, String packageSize) {
         this.packageName = packageName;
         this.website = website;
         this.downloadLink = downloadLink;
@@ -31,6 +34,7 @@ public class ThirdAppVo {
         this.ratings = ratings;
         this.comments = comments;
         this.downloads = downloads;
+        this.packageSize = packageSize;
     }
 
     public String getPackageName() {
@@ -77,8 +81,8 @@ public class ThirdAppVo {
         return ratings;
     }
 
-    public void setRatings(float ratins) {
-        this.ratings = ratins;
+    public void setRatings(float ratings) {
+        this.ratings = ratings;
     }
 
     public String getComments() {
@@ -95,5 +99,13 @@ public class ThirdAppVo {
 
     public void setDownloads(String downloads) {
         this.downloads = downloads;
+    }
+
+    public String getPackageSize() {
+        return packageSize;
+    }
+
+    public void setPackageSize(String packageSize) {
+        this.packageSize = packageSize;
     }
 }

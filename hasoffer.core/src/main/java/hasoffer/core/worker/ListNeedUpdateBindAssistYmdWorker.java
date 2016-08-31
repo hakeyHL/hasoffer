@@ -3,6 +3,7 @@ package hasoffer.core.worker;
 import hasoffer.base.model.PageableResult;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.mongo.StatDevice;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -24,11 +25,11 @@ public class ListNeedUpdateBindAssistYmdWorker implements Runnable {
                     "       AND t.ymd=?0 ";
     //    IDataBaseManager dbm;
     IMongoDbManager mdm;
-    ListAndProcessWorkerStatus ws;
+    ListProcessWorkerStatus ws;
     List<String> ymds;
     private Logger logger = LoggerFactory.getLogger(ListNeedUpdateBindAssistYmdWorker.class);
 
-    public ListNeedUpdateBindAssistYmdWorker(IMongoDbManager mdm, ListAndProcessWorkerStatus ws, List<String> ymds) {
+    public ListNeedUpdateBindAssistYmdWorker(IMongoDbManager mdm, ListProcessWorkerStatus ws, List<String> ymds) {
         this.mdm = mdm;
         this.ws = ws;
         this.ymds = ymds;

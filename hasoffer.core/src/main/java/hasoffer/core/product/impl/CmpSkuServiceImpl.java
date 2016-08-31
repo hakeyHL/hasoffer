@@ -87,28 +87,31 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     }
 
     @Override
-    public void saveHistoryPrice(long id, Date time, float price) {
-        final int PRICE_HISTORY_SIZE = 90;
-
-        PriceNode priceNode = new PriceNode(time, price);
-
-        PtmCmpSkuHistoryPrice historyPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, id);
-        List<PriceNode> priceNodes = null;
-        if (historyPrice == null) {
-            priceNodes = new ArrayList<>();
-            historyPrice = new PtmCmpSkuHistoryPrice(id, priceNodes);
-        } else {
-            priceNodes = historyPrice.getPriceNodes();
-        }
-
-        if (!priceNodes.contains(priceNode)) {
-            priceNodes.add(priceNode);
-        } else {
+    public void saveHistoryPrice(Long sid, List<PriceNode> priceNodes) {
+        if (ArrayUtils.isNullOrEmpty(priceNodes)) {
             return;
         }
+        final int PRICE_HISTORY_SIZE = 90;
+
+        Set<PriceNode> priceNodeSet = new LinkedHashSet<>();
+        priceNodeSet.addAll(priceNodes);
+
+        PtmCmpSkuHistoryPrice historyPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, sid);
+        if (historyPrice != null) {
+            priceNodeSet.addAll(historyPrice.getPriceNodes());
+        }
+
+        List<PriceNode> priceNodes1 = new ArrayList<>();
+        priceNodes1.addAll(priceNodeSet);
+
+        if (historyPrice == null) {
+            historyPrice = new PtmCmpSkuHistoryPrice(sid, priceNodes1);
+        }
+
+        historyPrice.setPriceNodes(priceNodes1);
 
         // 排序
-        Collections.sort(priceNodes, new Comparator<PriceNode>() {
+        Collections.sort(priceNodes1, new Comparator<PriceNode>() {
             @Override
             public int compare(PriceNode o1, PriceNode o2) {
                 if (o1.getPriceTimeL() > o2.getPriceTimeL()) {
@@ -119,11 +122,16 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             }
         });
 
-        if (priceNodes.size() > PRICE_HISTORY_SIZE) {
-            priceNodes.subList(priceNodes.size() - PRICE_HISTORY_SIZE, priceNodes.size());
+        if (priceNodes1.size() > PRICE_HISTORY_SIZE) {
+            historyPrice.setPriceNodes(priceNodes1.subList(priceNodes1.size() - PRICE_HISTORY_SIZE, priceNodes1.size()));
         }
 
         mdm.save(historyPrice);
+    }
+
+    @Override
+    public void saveHistoryPrice(long id, Date time, float price) {
+        saveHistoryPrice(id, Arrays.asList(new PriceNode(time, price)));
     }
 
     @Override
