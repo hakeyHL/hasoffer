@@ -80,7 +80,6 @@ public class AppUserController {
 
     @RequestMapping("user/priceAlert")
     public String setPriceAlert(@RequestParam(defaultValue = "100") int type,
-                                @RequestParam(defaultValue = "") String userToken,
                                 @RequestParam(defaultValue = "0") long skuId,
                                 @RequestParam(defaultValue = "0") float skuPrice,
                                 HttpServletResponse response) {
@@ -88,6 +87,7 @@ public class AppUserController {
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
         //get user by userToken
+        String userToken = Context.currentContext().getHeader("usertoken");
         if (!StringUtils.isEmpty(userToken)) {
             System.out.println(" has userToken :" + userToken);
             UrmUser urmUser = appService.getUserByUserToken(userToken);
@@ -138,8 +138,30 @@ public class AppUserController {
                                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                                 return null;
                         }
-
                     }
+                }
+            }
+        }
+        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        return null;
+    }
+
+    @RequestMapping("user/check/priceOff")
+    public String checkPriceOff(@RequestParam(defaultValue = "0") long skuId,
+                                HttpServletResponse response) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("errorCode", "10001");
+        jsonObject.put("msg", "no");
+        String userToken = Context.currentContext().getHeader("usertoken");
+        if (!StringUtils.isEmpty(userToken)) {
+            System.out.println("userToken is :" + userToken);
+            UrmUser urmUser = appService.getUserByUserToken(userToken);
+            if (urmUser != null) {
+                System.out.println("this userToken has user ");
+                PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + "", skuId);
+                if (priceOffNotice != null) {
+                    jsonObject.put("errorCode", "00000");
+                    jsonObject.put("msg", "no");
                 }
             }
         }
