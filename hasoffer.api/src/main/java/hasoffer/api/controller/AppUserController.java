@@ -1,10 +1,18 @@
 package hasoffer.api.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import hasoffer.api.controller.vo.DeviceInfoVo;
 import hasoffer.api.controller.vo.SearchIO;
+import hasoffer.api.helper.Httphelper;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.StringUtils;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.urm.PriceOffNotice;
 import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.system.impl.AppServiceImpl;
+import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
@@ -16,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,6 +40,10 @@ public class AppUserController {
     Logger logger = LoggerFactory.getLogger(AppUserController.class);
     @Resource
     AppServiceImpl appService;
+    @Resource
+    ICmpSkuService cmpSkuService;
+    @Resource
+    IPriceOffNoticeService iPriceOffNoticeService;
 
     public static void main(String[] args) {
         String affs[] = null;
@@ -66,7 +79,93 @@ public class AppUserController {
     }
 
     @RequestMapping("user/priceAlert")
-    public ModelAndView setPriceAlert(@RequestParam String deepLink) {
+    public String setPriceAlert(@RequestParam(defaultValue = "100") int type,
+                                @RequestParam(defaultValue = "0") long skuId,
+                                @RequestParam(defaultValue = "0") float skuPrice,
+                                HttpServletResponse response) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("errorCode", "00000");
+        jsonObject.put("msg", "ok");
+        //get user by userToken
+        String userToken = Context.currentContext().getHeader("usertoken");
+        if (!StringUtils.isEmpty(userToken)) {
+            System.out.println(" has userToken :" + userToken);
+            UrmUser urmUser = appService.getUserByUserToken(userToken);
+            if (urmUser != null) {
+                System.out.println("get this user " + urmUser.getUserName() + " and id is :" + urmUser.getId());
+                //insert record into priceOffAlert
+                if (skuId != 0) {
+                    PtmCmpSku cmpSku = cmpSkuService.getCmpSkuById(skuId);
+                    if (cmpSku != null) {
+                        PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + "", cmpSku.getId());
+                        if (priceOffNotice != null) {
+                            System.out.println("delete record :" + priceOffNotice.toString());
+                            iPriceOffNoticeService.deletePriceOffNotice(urmUser.getId() + "", cmpSku.getId());
+                        }
+                        System.out.println("has this sku ,id is " + skuId + " and it's price in database is :" + cmpSku.getPrice());
+                        switch (type) {
+                            case 0:
+                                //cancel
+                                System.out.println("cancel ");
+                                if (priceOffNotice != null) {
+                                    iPriceOffNoticeService.deletePriceOffNotice(urmUser.getId() + "", cmpSku.getId());
+                                    Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                                    return null;
+                                } else {
+                                    Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                                    return null;
+                                }
+                            case 1:
+                                //set
+                                if (skuPrice <= 0) {
+                                    System.out.println("not permit set this price :" + skuPrice);
+                                    System.out.println("use sku currentPrice " + cmpSku.getPrice());
+                                    //not exist before
+                                    System.out.println("add record ");
+                                    boolean notice = iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", cmpSku.getId(), cmpSku.getPrice(), cmpSku.getPrice());
+                                    System.out.println(" result is :" + notice);
+                                } else {
+                                    System.out.println("price is lg than zero ");
+                                    //not exist before
+                                    boolean notice = iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", cmpSku.getId(), skuPrice, skuPrice);
+                                    System.out.println(" result is :" + notice);
+                                }
+                                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                                return null;
+                            default:
+                                jsonObject.put("errorCode", "10001");
+                                jsonObject.put("msg", "type error ");
+                                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                                return null;
+                        }
+                    }
+                }
+            }
+        }
+        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        return null;
+    }
+
+    @RequestMapping("user/check/priceOff")
+    public String checkPriceOff(@RequestParam(defaultValue = "0") long skuId,
+                                HttpServletResponse response) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("errorCode", "10001");
+        jsonObject.put("msg", "no");
+        String userToken = Context.currentContext().getHeader("usertoken");
+        if (!StringUtils.isEmpty(userToken)) {
+            System.out.println("userToken is :" + userToken);
+            UrmUser urmUser = appService.getUserByUserToken(userToken);
+            if (urmUser != null) {
+                System.out.println("this userToken has user ");
+                PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + "", skuId);
+                if (priceOffNotice != null) {
+                    jsonObject.put("errorCode", "00000");
+                    jsonObject.put("msg", "no");
+                }
+            }
+        }
+        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
 }

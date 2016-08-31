@@ -34,6 +34,7 @@ public class CmpProductListVo {
     private float saved;
     private Long id;
     private SkuStatus status;
+    private boolean isAlert = false;
 //    private int min_deliveryTime;
 //    private int max_deliveryTime;
 
@@ -313,6 +314,14 @@ public class CmpProductListVo {
         this.offers = offers;
     }
 
+    public boolean isAlert() {
+        return isAlert;
+    }
+
+    public void setIsAlert(boolean isAlert) {
+        this.isAlert = isAlert;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -327,8 +336,7 @@ public class CmpProductListVo {
         if (returnGuarantee != that.returnGuarantee) return false;
         if (Float.compare(that.cashBack, cashBack) != 0) return false;
         if (Float.compare(that.saved, saved) != 0) return false;
-//        if (min_deliveryTime != that.min_deliveryTime) return false;
-//        if (max_deliveryTime != that.max_deliveryTime) return false;
+        if (isAlert != that.isAlert) return false;
         if (support != null ? !support.equals(that.support) : that.support != null) return false;
         if (offers != null ? !offers.equals(that.offers) : that.offers != null) return false;
         if (imageUrl != null ? !imageUrl.equals(that.imageUrl) : that.imageUrl != null) return false;
@@ -371,8 +379,7 @@ public class CmpProductListVo {
         result = 31 * result + (saved != +0.0f ? Float.floatToIntBits(saved) : 0);
         result = 31 * result + (id != null ? id.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
-//        result = 31 * result + min_deliveryTime;
-//        result = 31 * result + max_deliveryTime;
+        result = 31 * result + (isAlert ? 1 : 0);
         return result;
     }
 }
