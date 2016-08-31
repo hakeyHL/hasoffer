@@ -6,9 +6,11 @@ import hasoffer.core.persistence.dbm.osql.Identifiable;
 import hasoffer.core.redis.ICacheService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import redis.clients.jedis.JedisPool;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -26,6 +28,10 @@ public class CacheServiceImpl<T extends Identifiable> implements ICacheService<T
 
     @Resource
     RedisTemplate redisTemplate;
+    @Resource
+    JedisPool jedisPool;
+    @Resource
+    JedisConnectionFactory connectionFactory;
 
     @Override
     public boolean expire(final String key, final long seconds) {
@@ -87,13 +93,10 @@ public class CacheServiceImpl<T extends Identifiable> implements ICacheService<T
                     String key = new String(array);
 
                     keySet.add(key);
-
                 }
-
                 return keySet;
             }
         });
-
     }
 
     @Override
