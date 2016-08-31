@@ -89,9 +89,10 @@ public class ProductTest {
     private Pattern PATTERN_Brand = Pattern.compile("[\t*?]([a-zA-Z])[\t*?]");
 
     @Test
-    public void convertPrice() {
+    public void countModel() {
 
     }
+
 
     @Test
     public void fffff() throws Exception {
