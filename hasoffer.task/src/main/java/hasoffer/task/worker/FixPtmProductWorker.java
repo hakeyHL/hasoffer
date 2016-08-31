@@ -6,7 +6,7 @@ import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.search.updater.SrmSearchLogUpdater;
 import hasoffer.core.product.IProductService;
-import hasoffer.core.worker.ListAndProcessWorkerStatus;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,11 +21,11 @@ public class FixPtmProductWorker implements Runnable {
 
     private static final String Q_SRMSEARCHLOG_BYID = "SELECT t FROM SrmSearchLog t WHERE t.ptmProductId = ?0 ";
     private Logger logger = LoggerFactory.getLogger(FixPtmProductWorker.class);
-    private ListAndProcessWorkerStatus<PtmProduct> ws;
+    private ListProcessWorkerStatus<PtmProduct> ws;
     private IDataBaseManager dbm;
     private IProductService productService;
 
-    public FixPtmProductWorker(ListAndProcessWorkerStatus<PtmProduct> ws, IDataBaseManager dbm, IProductService productService) {
+    public FixPtmProductWorker(ListProcessWorkerStatus<PtmProduct> ws, IDataBaseManager dbm, IProductService productService) {
         this.ws = ws;
         this.dbm = dbm;
         this.productService = productService;

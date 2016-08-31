@@ -2,7 +2,7 @@ package hasoffer.admin.worker;
 
 import hasoffer.base.model.PageableResult;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.worker.ListAndProcessWorkerStatus;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,9 +17,9 @@ public class FlipkartSkuCategory2GetListWorker implements Runnable {
     private Logger logger = LoggerFactory.getLogger(FlipkartSkuCategory2GetListWorker.class);
     private String queryString;
     private IDataBaseManager dbm;
-    private ListAndProcessWorkerStatus ws;
+    private ListProcessWorkerStatus ws;
 
-    public FlipkartSkuCategory2GetListWorker(String queryString, ListAndProcessWorkerStatus ws, IDataBaseManager dbm) {
+    public FlipkartSkuCategory2GetListWorker(String queryString, ListProcessWorkerStatus ws, IDataBaseManager dbm) {
         this.queryString = queryString;
         this.ws = ws;
         this.dbm = dbm;

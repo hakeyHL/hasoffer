@@ -5,9 +5,9 @@ import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.search.ISearchService;
-import hasoffer.core.task.ListAndProcessTask2;
-import hasoffer.core.task.worker.IList;
-import hasoffer.core.task.worker.IProcess;
+import hasoffer.core.task.ListProcessTask;
+import hasoffer.core.task.worker.ILister;
+import hasoffer.core.task.worker.IProcessor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -75,7 +75,7 @@ public class AutoSearchResultTest {
             countMap.put(i, new AtomicInteger(0));
         }
 
-        ListAndProcessTask2<SrmAutoSearchResult> listAndProcessTask2 = new ListAndProcessTask2<SrmAutoSearchResult>(new IList() {
+        ListProcessTask<SrmAutoSearchResult> listAndProcessTask2 = new ListProcessTask<SrmAutoSearchResult>(new ILister() {
             @Override
             public PageableResult getData(int page) {
                 Query query = Query.query(Criteria.where("relatedProId").gt(0));
@@ -94,7 +94,7 @@ public class AutoSearchResultTest {
             public void setRunForever(boolean runForever) {
 
             }
-        }, new IProcess<SrmAutoSearchResult>() {
+        }, new IProcessor<SrmAutoSearchResult>() {
             @Override
             public void process(SrmAutoSearchResult sr) {
                 if (sr.getFinalSkus().size() == 5) {

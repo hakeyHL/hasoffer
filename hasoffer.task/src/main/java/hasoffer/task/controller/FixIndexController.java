@@ -6,11 +6,11 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.StatHijackFetch;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
-import hasoffer.core.worker.ListAndProcessWorkerStatus;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import hasoffer.task.worker.MongoListStatHijackFetchWorker;
 import hasoffer.task.worker.MysqlListWorker2;
-import hasoffer.task.worker.UpdateFkSdIndexWorker;
 import hasoffer.task.worker.SaveOrUpdateIndexWorker;
+import hasoffer.task.worker.UpdateFkSdIndexWorker;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -77,7 +77,7 @@ public class FixIndexController {
 
         ExecutorService es = Executors.newCachedThreadPool();
 
-        ListAndProcessWorkerStatus<PtmCmpSku> ws = new ListAndProcessWorkerStatus<PtmCmpSku>();
+        ListProcessWorkerStatus<PtmCmpSku> ws = new ListProcessWorkerStatus<PtmCmpSku>();
 
         es.execute(new MysqlListWorker2<PtmCmpSku>(Q_SKU_INDEX_UPDATE, ws, dbm));
 

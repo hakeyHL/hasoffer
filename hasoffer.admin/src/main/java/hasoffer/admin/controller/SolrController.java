@@ -13,9 +13,9 @@ import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
-import hasoffer.core.task.ListAndProcessTask2;
-import hasoffer.core.task.worker.IList;
-import hasoffer.core.task.worker.IProcess;
+import hasoffer.core.task.ListProcessTask;
+import hasoffer.core.task.worker.ILister;
+import hasoffer.core.task.worker.IProcessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -70,8 +70,8 @@ public class SolrController {
     //1973863
     @RequestMapping(value = "/product/importbycategory3", method = RequestMethod.GET)
     public void importbycategory3(@RequestParam final long cate) {
-        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<>(
-                new IList() {
+        ListProcessTask<PtmProduct> listAndProcessTask2 = new ListProcessTask<>(
+                new ILister() {
                     @Override
                     public PageableResult<PtmProduct> getData(int page) {
                         System.out.println(String.format("importbycategory3, cate=%d page=%d", cate, page));
@@ -88,7 +88,7 @@ public class SolrController {
 
                     }
                 },
-                new IProcess<PtmProduct>() {
+                new IProcessor<PtmProduct>() {
                     @Override
                     public void process(PtmProduct o) {
                         try {
@@ -110,8 +110,8 @@ public class SolrController {
     @RequestMapping(value = "/product/importbycategory2", method = RequestMethod.GET)
     public void importNewAllProducts(@RequestParam final long minProId) {
         final String Q_PRO = "SELECT t FROM PtmProduct t where t.id > ?0";
-        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<>(
-                new IList() {
+        ListProcessTask<PtmProduct> listAndProcessTask2 = new ListProcessTask<>(
+                new ILister() {
                     @Override
                     public PageableResult getData(int page) {
                         System.out.println("importNewAllProducts page = " + page);
@@ -128,7 +128,7 @@ public class SolrController {
 
                     }
                 },
-                new IProcess<PtmProduct>() {
+                new IProcessor<PtmProduct>() {
                     @Override
                     public void process(PtmProduct o) {
                         try {
@@ -246,8 +246,8 @@ public class SolrController {
 
         final ProcessCate pc = new ProcessCate();
 
-        ListAndProcessTask2<PtmCmpSku> listAndProcessTask2 = new ListAndProcessTask2<>(
-                new IList() {
+        ListProcessTask<PtmCmpSku> listAndProcessTask2 = new ListProcessTask<>(
+                new ILister() {
                     @Override
                     public PageableResult getData(int page) {
                         PageableResult result = dbm.queryPage(Q_SKU, page, 500, Arrays.asList(Website.FLIPKART, pc.getCateId()));
@@ -265,7 +265,7 @@ public class SolrController {
 
                     }
                 },
-                new IProcess<PtmCmpSku>() {
+                new IProcessor<PtmCmpSku>() {
                     @Override
                     public void process(PtmCmpSku o) {
                         if (StringUtils.isEmpty(o.getSourceSid())) {
@@ -314,8 +314,8 @@ public class SolrController {
 
     @RequestMapping(value = "/product/reimportnew", method = RequestMethod.GET)
     public void reimportnew() {
-        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<>(
-                new IList() {
+        ListProcessTask<PtmProduct> listAndProcessTask2 = new ListProcessTask<>(
+                new ILister() {
                     @Override
                     public PageableResult getData(int page) {
                         return dbm.queryPage(Q_PRODUCT, page, 2000);
@@ -331,7 +331,7 @@ public class SolrController {
 
                     }
                 },
-                new IProcess<PtmProduct>() {
+                new IProcessor<PtmProduct>() {
                     @Override
                     public void process(PtmProduct o) {
                         productService.importProduct2Solr2(o);

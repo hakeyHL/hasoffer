@@ -127,7 +127,7 @@
     </bean>
     <bean id="statSearchLogTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="statSearchLogJob"/>
-        <property name="cronExpression" value="0 45 4 * * ?"/>
+        <property name="cronExpression" value="0 0 10 * * ?"/>
     </bean>
 
     <!--<bean name="statVisitSkuUpdateJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
