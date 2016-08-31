@@ -519,6 +519,7 @@ public class AppController {
             urmUser.setThirdId(userVO.getThirdId());
             int result = appService.addUser(urmUser);
             logger.debug("add user result is :" + result);
+            //TODO 关联用户和设备
             System.out.println(" insert data into urmUserDevice ");
 
         } else {
