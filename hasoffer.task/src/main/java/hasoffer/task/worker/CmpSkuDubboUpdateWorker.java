@@ -10,6 +10,7 @@ import hasoffer.core.persistence.po.ptm.PtmCategory3;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.user.IPriceOffNoticeService;
+import hasoffer.data.redis.IRedisListService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchUrlResult;
@@ -28,19 +29,22 @@ import java.util.concurrent.TimeUnit;
  */
 public class CmpSkuDubboUpdateWorker implements Runnable {
 
+    private static final String PRICEOFF_NOTICE_SKUID_QUEUE = "PRICEOFF_NOTICE_SKUID_QUEUE";
     private static Logger logger = LoggerFactory.getLogger(CmpSkuDubboUpdateWorker.class);
     private IDataBaseManager dbm;
     private ConcurrentLinkedQueue<PtmCmpSku> queue;
     private IFetchDubboService fetchDubboService;
     private ICmpSkuService cmpSkuService;
     private IPriceOffNoticeService priceOffNoticeService;
+    private IRedisListService redisListService;
 
-    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, ICmpSkuService cmpSkuService, IPriceOffNoticeService priceOffNoticeService) {
+    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, ICmpSkuService cmpSkuService, IPriceOffNoticeService priceOffNoticeService, IRedisListService redisListService) {
         this.dbm = dbm;
         this.queue = queue;
         this.fetchDubboService = fetchDubboService;
         this.cmpSkuService = cmpSkuService;
         this.priceOffNoticeService = priceOffNoticeService;
+        this.redisListService = redisListService;
     }
 
     @Override
@@ -138,12 +142,12 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             }
 
 
-//            如果价格发生变化，调用接口
+//            如果价格发生变化，加到redis队列中
             if (sku.getPrice() != fetchedProduct.getPrice()) {
-                long time1 = System.currentTimeMillis();
-                priceOffNoticeService.priceOffCheck(skuid);
-                long time2 = System.currentTimeMillis();
-                logger.info("push cast " + (time2 - time1));
+
+                redisListService.push(PRICEOFF_NOTICE_SKUID_QUEUE, skuid);
+
+                logger.info("push success for " + skuid);
             }
 
 //            对FLIPKART没有类目的数据进行更新,暂时注释掉
