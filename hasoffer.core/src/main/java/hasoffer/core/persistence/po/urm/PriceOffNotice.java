@@ -119,4 +119,17 @@ public class PriceOffNotice implements Identifiable<Long> {
         result = 31 * result + (latestPushStatus ? 1 : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "PriceOffNotice{" +
+                "id=" + id +
+                ", userid='" + userid + '\'' +
+                ", skuid=" + skuid +
+                ", originPrice=" + originPrice +
+                ", noticePrice=" + noticePrice +
+                ", createTime=" + createTime +
+                ", latestPushStatus=" + latestPushStatus +
+                '}';
+    }
 }
