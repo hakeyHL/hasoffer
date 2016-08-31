@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 2brand1-/fix2/tag_brand?cateId=5
  * 3brand2-/fix2/tag_brand_man 手工处理品牌
  * 4price-/fix2/convert_price_log?start=20160801
- * 5sku-/fix2/del_sku_by_brand_mobile 删除品牌不正确的sku
+ * 5del_sku-/fix2/del_sku_by_brand_mobile 删除品牌不正确的sku
  */
 @Controller
 @RequestMapping(value = "/fix2")
