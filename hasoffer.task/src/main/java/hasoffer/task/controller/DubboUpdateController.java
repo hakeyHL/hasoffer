@@ -11,6 +11,7 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
 import hasoffer.core.user.IPriceOffNoticeService;
+import hasoffer.data.redis.IRedisListService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchUrlResult;
@@ -58,6 +59,8 @@ public class DubboUpdateController {
     IPtmCmpSkuImageService ptmCmpSkuImageService;
     @Resource
     IPriceOffNoticeService priceOffNoticeService;
+    @Resource
+    IRedisListService redisListService;
 
     //dubbofetchtask/updatestart
     @RequestMapping(value = "/updatestart", method = RequestMethod.GET)
@@ -82,7 +85,7 @@ public class DubboUpdateController {
         }
 
         for (int i = 0; i < 60; i++) {
-            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, priceOffNoticeService));
+            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, priceOffNoticeService, redisListService));
         }
 
         taskRunning1.set(true);
@@ -106,7 +109,7 @@ public class DubboUpdateController {
         es.execute(new TopSellingListWorker(dbm, queue, fetchDubboService));
 
         for (int i = 0; i < 30; i++) {
-            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, priceOffNoticeService));
+            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, priceOffNoticeService, redisListService));
         }
 
         taskRunning2.set(true);

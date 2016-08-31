@@ -21,6 +21,9 @@ public class PriceNode {
         this.ymd = TimeUtils.parse(priceTime, "yyyyMMdd");
     }
 
+    public PriceNode() {
+    }
+
     public String getYmd() {
         return ymd;
     }
