@@ -43,6 +43,19 @@ public class RedisTest {
     private RedisTemplate<Serializable, Serializable> redisTemplate;
 
     @Test
+    public void testQueue() {
+
+        cacheService.lpush("PRICE_OFF_SKUID_QUEUE", "1");
+        cacheService.lpush("PRICE_OFF_SKUID_QUEUE", "2");
+        cacheService.lpush("PRICE_OFF_SKUID_QUEUE", "3");
+        cacheService.lpush("PRICE_OFF_SKUID_QUEUE", "4");
+        System.out.println(cacheService.rpop("PRICE_OFF_SKUID_QUEUE"));
+        System.out.println(cacheService.rpop("PRICE_OFF_SKUID_QUEUE"));
+        System.out.println(cacheService.rpop("PRICE_OFF_SKUID_QUEUE"));
+        System.out.println(cacheService.rpop("PRICE_OFF_SKUID_QUEUE"));
+    }
+
+    @Test
     public void stat() {
         Map<Long, Long> countMap = logCacheManager.getProductCount("20160627");
         for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {

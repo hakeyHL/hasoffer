@@ -9,6 +9,7 @@ import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import redis.clients.jedis.Jedis;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -26,6 +27,8 @@ public class CacheServiceImpl<T extends Identifiable> implements ICacheService<T
 
     @Resource
     RedisTemplate redisTemplate;
+    @Resource
+    Jedis jedisClient;
 
     @Override
     public boolean expire(final String key, final long seconds) {
@@ -87,13 +90,36 @@ public class CacheServiceImpl<T extends Identifiable> implements ICacheService<T
                     String key = new String(array);
 
                     keySet.add(key);
-
                 }
-
                 return keySet;
             }
         });
+    }
 
+    @Override
+    public Long lpush(final String key, final String... strings) {
+
+        return (Long) redisTemplate.execute(new RedisCallback() {
+            @Override
+            public Long doInRedis(RedisConnection redisConnection) throws DataAccessException {
+
+                long flag = 1;
+
+                for (String string : strings) {
+                    Long aLong = redisConnection.lPush(key.getBytes(), string.getBytes());
+                    if (aLong != 1) {
+                        flag = 0;
+                    }
+                }
+
+                return flag;
+            }
+        });
+    }
+
+    @Override
+    public String rpop(final String key) {
+        return jedisClient.rpop(key);
     }
 
     @Override

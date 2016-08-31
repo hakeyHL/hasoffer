@@ -6,6 +6,13 @@
 
     <description>Cache-Settings</description>
 
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:redis.properties</value>
+            </list>
+        </property>
+    </bean>
     <!--cacheManager工厂类，指定ehcache.xml的位置-->
     <!--<bean id="cacheManagerFactory" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">-->
     <!--<property name="configLocation" value="classpath:/cache/ehcache.xml"/>-->
@@ -37,6 +44,15 @@
     <bean id="redisTemplate"
           class="org.springframework.data.redis.core.RedisTemplate">
         <property name="connectionFactory" ref="jedisConnFactory"/>
+    </bean>
+
+    <bean id="jedisPool" class="redis.clients.jedis.JedisPool">
+        <constructor-arg index="0" value="${cache.redis.hostname}"/>
+        <constructor-arg index="1" value="${cache.redis.port}"/>
+    </bean>
+
+    <bean id="jedisClient" class="redis.clients.jedis.Jedis">
+        <property name="dataSource" ref="jedisPool"/>
     </bean>
 
 </beans>
