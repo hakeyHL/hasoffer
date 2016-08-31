@@ -9,6 +9,7 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory3;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
+import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchUrlResult;
@@ -32,12 +33,14 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
     private ConcurrentLinkedQueue<PtmCmpSku> queue;
     private IFetchDubboService fetchDubboService;
     private ICmpSkuService cmpSkuService;
+    private IPriceOffNoticeService priceOffNoticeService;
 
-    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, ICmpSkuService cmpSkuService) {
+    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, ICmpSkuService cmpSkuService, IPriceOffNoticeService priceOffNoticeService) {
         this.dbm = dbm;
         this.queue = queue;
         this.fetchDubboService = fetchDubboService;
         this.cmpSkuService = cmpSkuService;
+        this.priceOffNoticeService = priceOffNoticeService;
     }
 
     @Override
@@ -132,6 +135,15 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 cmpSkuService.createPtmCmpSkuImage(skuid, fetchedProduct);
             } catch (Exception e) {
                 logger.info("createPtmCmpSkuImage fail " + skuid);
+            }
+
+
+//            如果价格发生变化，调用接口
+            if (sku.getPrice() != fetchedProduct.getPrice()) {
+                long time1 = System.currentTimeMillis();
+                priceOffNoticeService.priceOffCheck(skuid);
+                long time2 = System.currentTimeMillis();
+                logger.info("push cast " + (time2 - time1));
             }
 
 //            对FLIPKART没有类目的数据进行更新,暂时注释掉
