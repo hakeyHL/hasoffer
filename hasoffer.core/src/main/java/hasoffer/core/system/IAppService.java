@@ -11,6 +11,7 @@ import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.persistence.po.urm.UrmUserDevice;
 
 import java.util.List;
 
@@ -41,7 +42,13 @@ public interface IAppService {
 
     List getProductByCriteria(SearchCriteria criteria);
 
+    List<String> getUserDevicesByUserId(String userId);
+
+    int addUrmUserDevice(List<UrmUserDevice> urmUserDevices);
+
     int addUser(UrmUser urmUser);
+
+    List<String> getUserDevices(String deviceId);
 
     void updateUserInfo(UrmUser uUser);
 
