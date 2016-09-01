@@ -216,6 +216,7 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
 
             String response = pushService.push(gcmToken, appPushBo);
 
+            System.out.println("response " + response);
             JSONObject jsonResponse = JSONObject.parseObject(response.trim());
 
             Integer success = jsonResponse.getInteger("success");
