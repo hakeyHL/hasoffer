@@ -107,6 +107,7 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
     public void priceOffCheck(long skuid) {
 
         PtmCmpSku ptmCmpSku = dbm.get(PtmCmpSku.class, skuid);
+        System.out.println("get sku success for " + skuid);
 
         //检测价格是否需要发push
         int curpage = 1;
@@ -114,21 +115,32 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
         PageableResult<PriceOffNotice> pageableResult = dbm.queryPage(QUERY_PRICEOFF_BY_SKUID, curpage, pagesize, Arrays.asList(skuid));
 
         long totalPage = pageableResult.getTotalPage();
+        System.out.println("totalpage " + totalPage);
 
         while (curpage <= totalPage) {
 
+            System.out.println("curpage " + curpage);
             if (curpage > 1) {
                 pageableResult = dbm.queryPage(QUERY_PRICEOFF_BY_SKUID, curpage, pagesize, Arrays.asList(skuid));
             }
 
             List<PriceOffNotice> priceOffNoticeList = pageableResult.getData();
+            if (priceOffNoticeList == null) {
+                System.out.println("priceoffnoticelist is null");
+            } else {
+                System.out.println("priceoffnoticelist size " + priceOffNoticeList.size());
+            }
 
             for (PriceOffNotice priceOffNotice : priceOffNoticeList) {
 
                 if (ptmCmpSku.getPrice() > priceOffNotice.getNoticePrice()) {
+                    System.out.println("ptmcmpsku price " + ptmCmpSku.getPrice());
+                    System.out.println("notice price " + priceOffNotice.getNoticePrice());
+                    System.out.println("skuprice > noticeprice continue");
                     continue;
                 }
 
+                System.out.println("skuprice < noticeprice push");
                 push(priceOffNotice, ptmCmpSku, true);
             }
             curpage++;
@@ -150,28 +162,38 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
     private void push(PriceOffNotice priceOffNotice, PtmCmpSku ptmCmpSku, boolean cacheFail) {
 
         String userid = priceOffNotice.getUserid();
+        System.out.println("userid " + userid);
 
         List<UrmUserDevice> urmUserDeviceList = dbm.query(QUERY_DEVICE_BY_USERID, Arrays.asList(userid));
+        if (urmUserDeviceList == null) {
+            System.out.println("urmuserdevicelist is null");
+        } else {
+            System.out.println("urmuserdevicelist size " + urmUserDeviceList.size());
+        }
 
         for (UrmUserDevice urmUserDevice : urmUserDeviceList) {
 
             String deviceId = urmUserDevice.getDeviceId();
             if (StringUtils.isEmpty(deviceId)) {
+                System.out.println("deviceId is empty for " + urmUserDevice.getId());
                 continue;
             }
 
             UrmDevice urmDevice = dbm.get(UrmDevice.class, deviceId);
             if (urmDevice == null) {
+                System.out.println("urmDevice is null for " + deviceId);
                 continue;
             }
 
             String gcmToken = urmDevice.getGcmToken();
             if (StringUtils.isEmpty(gcmToken)) {
+                System.out.println("gcmToken is null for urmdeviceid" + urmDevice.getId());
                 continue;
             }
 
             MarketChannel marketChannel = urmDevice.getMarketChannel();
             if (marketChannel == null) {
+                System.out.println("marketChannel is null for urmdeviceid " + urmDevice.getId());
                 continue;
             }
 
