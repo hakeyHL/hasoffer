@@ -30,6 +30,7 @@ public class PriceOffNoticeJobBean extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 
         Long size = redisListService.size(PRICE_OFF_SKUID_QUEUE);
+        System.out.println("PRICE_OFF_SKUID_QUEUE size = " + size);
 
         if (size > 0) {
 
