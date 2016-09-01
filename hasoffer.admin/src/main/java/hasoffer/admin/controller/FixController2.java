@@ -57,7 +57,7 @@ public class FixController2 {
     @Resource
     IMongoDbManager mdm;
 
-    @RequestMapping(value = "/tag_brand", method = RequestMethod.GET)
+    @RequestMapping(value = "/tag_model", method = RequestMethod.GET)
     @ResponseBody
     public String tag_model(@RequestParam final long cateId) {
         if (cateId != 5) {
