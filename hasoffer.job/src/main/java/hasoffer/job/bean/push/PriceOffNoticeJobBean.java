@@ -10,6 +10,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created on 2016/8/31.
@@ -43,6 +44,13 @@ public class PriceOffNoticeJobBean extends QuartzJobBean {
                 logger.info("price off push for " + skuid);
 
                 priceOffNoticeService.priceOffCheck(skuid);
+
+                //每条sku推送，间隔5s
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
