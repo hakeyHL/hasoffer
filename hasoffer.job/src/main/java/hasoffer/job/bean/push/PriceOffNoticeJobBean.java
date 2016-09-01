@@ -19,7 +19,7 @@ public class PriceOffNoticeJobBean extends QuartzJobBean {
      * Logger for this class
      */
     private static final Logger logger = LoggerFactory.getLogger(PriceOffNoticeJobBean.class);
-    private static final String PRICE_OFF_SKUID_QUEUE = "PRICE_OFF_SKUID_QUEUE";
+    private static final String PRICEOFF_NOTICE_SKUID_QUEUE = "PRICEOFF_NOTICE_SKUID_QUEUE";
 
     @Resource
     IRedisListService redisListService;
@@ -29,8 +29,8 @@ public class PriceOffNoticeJobBean extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 
-        Long size = redisListService.size(PRICE_OFF_SKUID_QUEUE);
-        System.out.println("PRICE_OFF_SKUID_QUEUE size = " + size);
+        Long size = redisListService.size(PRICEOFF_NOTICE_SKUID_QUEUE);
+        System.out.println("PRICEOFF_NOTICE_SKUID_QUEUE size = " + size);
 
         if (size > 0) {
 
@@ -39,7 +39,7 @@ public class PriceOffNoticeJobBean extends QuartzJobBean {
 
             for (int i = 0; i < size; i++) {
 
-                Long skuid = Long.parseLong((String) redisListService.pop(PRICE_OFF_SKUID_QUEUE));
+                Long skuid = Long.parseLong((String) redisListService.pop(PRICEOFF_NOTICE_SKUID_QUEUE));
                 logger.info("price off push for " + skuid);
 
                 priceOffNoticeService.priceOffCheck(skuid);
