@@ -131,6 +131,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
             } catch (Exception e) {
                 logger.info("updateCmpSkuBySpiderFetchedProduct fail " + skuid);
+                e.printStackTrace();
             }
 
             try {
