@@ -874,11 +874,9 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
                 }
             }
 
-            //更新skutitle
-            if (!StringUtils.isEmpty(fetchedProduct.getSubTitle())) {
-                if (StringUtils.isEmpty(cmpSku.getSkuTitle()) || !StringUtils.isEqual(cmpSku.getSkuTitle(), fetchedProduct.getSubTitle())) {
-                    ptmCmpSkuUpdater.getPo().setSkuTitle(fetchedProduct.getSubTitle());
-                }
+            //更新skutitle,只要新旧不一样就更新
+            if (!StringUtils.isEqual(cmpSku.getSkuTitle(), fetchedProduct.getSubTitle())) {
+                ptmCmpSkuUpdater.getPo().setSkuTitle(fetchedProduct.getSubTitle());
             }
 
             String imageUrl = fetchedProduct.getImageUrl();

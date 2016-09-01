@@ -1,7 +1,7 @@
 package hasoffer.api.controller.vo;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by hs on 2016年08月29日.
@@ -10,12 +10,13 @@ import java.util.Map;
  */
 public class PriceCurveVo {
     List<Long> showY;
+    List<PriceCurveXYVo> priceXY = new ArrayList<PriceCurveXYVo>();
     private List<String> showX;
-    private Map<String, Long> priceXY;
     private Long startPoint;//最低点 ,起始数据点
     private Long endPoint;//终止数据点
+    private int distanceX2X;
 
-    public PriceCurveVo(List<String> showX, List<Long> showY, Map<String, Long> priceXY, Long startPoint, Long endPoint) {
+    public PriceCurveVo(List<String> showX, List<Long> showY, List<PriceCurveXYVo> priceXY, Long startPoint, Long endPoint) {
         this.showX = showX;
         this.showY = showY;
         this.priceXY = priceXY;
@@ -58,11 +59,19 @@ public class PriceCurveVo {
         this.showX = showX;
     }
 
-    public Map<String, Long> getPriceXY() {
+    public List<PriceCurveXYVo> getPriceXY() {
         return priceXY;
     }
 
-    public void setPriceXY(Map<String, Long> priceXY) {
+    public void setPriceXY(List<PriceCurveXYVo> priceXY) {
         this.priceXY = priceXY;
+    }
+
+    public int getDistanceX2X() {
+        return distanceX2X;
+    }
+
+    public void setDistanceX2X(int distanceX2X) {
+        this.distanceX2X = distanceX2X;
     }
 }

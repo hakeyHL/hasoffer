@@ -161,6 +161,7 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
 
     private void push(PriceOffNotice priceOffNotice, PtmCmpSku ptmCmpSku, boolean cacheFail) {
 
+        Long id = priceOffNotice.getId();
         String userid = priceOffNotice.getUserid();
         System.out.println("userid " + userid);
 
@@ -170,6 +171,8 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
         } else {
             System.out.println("urmuserdevicelist size " + urmUserDeviceList.size());
         }
+
+        boolean pushStatus = false;
 
         for (UrmUserDevice urmUserDevice : urmUserDeviceList) {
 
@@ -198,6 +201,7 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
             }
 
             String deepLinkUrl = WebsiteHelper.getDealUrlWithAff(ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), new String[]{marketChannel.name()});
+            System.out.println("deepLinkUrl " + deepLinkUrl);
 
             String title = "PRICE DROP :" + ptmCmpSku.getTitle();
             String content = "Now available at Rs." + ptmCmpSku.getPrice();
@@ -210,9 +214,6 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
 
             AppPushBo appPushBo = new AppPushBo("5x1", "15:10", message);
 
-            //for test
-            gcmToken = "cf1xQ0M3jE4:APA91bH1Sn9ajC7PZN7S0547o0LWXRtgqnE0xsj8kXlf8XqmJGmKQPLTRnHABcY6bOMxSGdXonlPt4vPIk6WwVK0-h5GmgRpTRfYW3Yd5yU0UQYdAO6Aun8IH8TZaURS3EXP4gDHj-Li";
-
             String response = pushService.push(gcmToken, appPushBo);
 
             JSONObject jsonResponse = JSONObject.parseObject(response.trim());
@@ -221,18 +222,30 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
             Integer failure = jsonResponse.getInteger("failure");
             if (success == 1) {
                 //推送成功
-                Long id = priceOffNotice.getId();
-                updatePriceOffNoticeStatus(id, true);
+                pushStatus = true;
+                System.out.println("push success for priceOffNotice" + id);
+
             }
 
             if (failure == 1) {
                 //推送失败
-                updatePriceOffNoticeStatus(priceOffNotice.getId(), false);
-                //缓存失败队列
+                System.out.println("push fail for priceOffNotice" + id);
+                System.out.println("push fail urmdevice " + urmDevice.getId());
+            }
+
+            if (pushStatus) {
+                updatePriceOffNoticeStatus(id, true);
+                System.out.println("update lastpushstatus push success for priceOffNoticeid" + id);
+            } else {
+                updatePriceOffNoticeStatus(id, false);
+                System.out.println("update lastpushstatus push fail for priceOffNoticeid" + id);
+                //是否需要将失败写入缓存
                 if (cacheFail) {
                     redisListService.push(PUSH_FAIL_PRICEOFFNOTICE_ID, priceOffNotice.getId() + "");
+                    System.out.println("cache push fail success for " + priceOffNotice.getId());
                 }
             }
+
         }
     }
 }
