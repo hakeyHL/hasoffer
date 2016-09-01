@@ -32,7 +32,7 @@ public class PtmProductPriceUpdateWorker implements Runnable {
 
         while (true) {
 
-            System.out.println("product price udpateworker start time from " + t1 + "-to-" + t2);
+//            System.out.println("product price udpateworker start time from " + t1 + "-to-" + t2);
 
             //保证更新时间与当前时间有1小时时差
             if (TimeUtils.now() - t1.getTime() < TimeUtils.MILLISECONDS_OF_1_HOUR) {
@@ -48,7 +48,7 @@ public class PtmProductPriceUpdateWorker implements Runnable {
 
             for (long productid : productIdList) {
                 productService.updatePtmProductPrice(productid);
-                System.out.println("update Ptmproduct price success for " + productid);
+//                System.out.println("update Ptmproduct price success for " + productid);
             }
 
             t1 = t2;
