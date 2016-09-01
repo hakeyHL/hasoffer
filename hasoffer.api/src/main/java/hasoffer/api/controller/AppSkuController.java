@@ -3,6 +3,7 @@ package hasoffer.api.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.api.controller.vo.PriceCurveVo;
+import hasoffer.api.controller.vo.PriceCurveXYVo;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.JsonHelper;
@@ -111,23 +112,35 @@ public class AppSkuController {
 //        }
 //        //反转
 //        Collections.reverse(X);
-        LinkedList<String> lPriceNodes = new LinkedList();
-        lPriceNodes.add("a");
-        lPriceNodes.add("b");
-        lPriceNodes.add("c");
-        lPriceNodes.add("d");
-        Iterator<String> iterator = lPriceNodes.iterator();
-        while (iterator.hasNext()) {
-            String next = iterator.next();
-            System.out.println(next);
-        }
-        System.out.println("---------");
-        lPriceNodes.add(1, "e");
-        Iterator<String> iterator1 = lPriceNodes.iterator();
-        while (iterator1.hasNext()) {
-            String next = iterator1.next();
-            System.out.println(next);
-        }
+//        LinkedList<String> lPriceNodes = new LinkedList();
+//        lPriceNodes.add("a");
+//        lPriceNodes.add("b");
+//        lPriceNodes.add("c");
+//        lPriceNodes.add("d");
+//        Iterator<String> iterator = lPriceNodes.iterator();
+//        while (iterator.hasNext()) {
+//            String next = iterator.next();
+//            System.out.println(next);
+//        }
+//        System.out.println("---------");
+//        lPriceNodes.add(1, "e");
+//        Iterator<String> iterator1 = lPriceNodes.iterator();
+//        while (iterator1.hasNext()) {
+//            String next = iterator1.next();
+//            System.out.println(next);
+//        }
+        Long tempDateL = 1472608486682l - 1472452044987l;
+        System.out.println(BigDecimal.valueOf(tempDateL).divide(BigDecimal.valueOf(60 * 60 * 1000 * 24), BigDecimal.ROUND_HALF_UP).longValue());
+        Date date1 = new Date();
+        date1.setTime(1472452044987l);
+        Date date2 = new Date();
+        date2.setTime(1472608486682l);
+    }
+
+    //计算当前x距离x轴起始点的距离
+    public static int getDistance2X(Long priceX, Long wait2Consolve) {
+        Long tempDateL = wait2Consolve - priceX;
+        return BigDecimal.valueOf(tempDateL).divide(BigDecimal.valueOf(60 * 60 * 1000 * 24), BigDecimal.ROUND_HALF_UP).intValue();
     }
 
     public String getDateMMdd(Long time) {
@@ -194,21 +207,9 @@ public class AppSkuController {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
-        Map<String, Long> priceXY = new HashMap<>();
+        List<PriceCurveXYVo> priceXY = new ArrayList<PriceCurveXYVo>();
         //1. 先拿到所有的价格数据
         List<PriceNode> priceNodes = iCmpSkuService.queryHistoryPrice(id);
-//        List<PriceNode> priceNodes = new ArrayList<>();
-//        float price1 = 559f;
-//        float price2 = 799;
-//        Date date1 = new Date();
-//        date1.setTime(1472607932545l);
-//        Date date2 = new Date();
-//        date2.setTime(1472452305746l);
-//        PriceNode priceNode1 = new PriceNode(date1, price1);
-//        PriceNode priceNode2 = new PriceNode(date2, price2);
-//        priceNodes.add(priceNode1);
-//        priceNodes.add(priceNode2);
-
         System.out.println(priceNodes != null ? "  priceNodes  :" + priceNodes.size() : "null a .....");
         if (priceNodes != null && priceNodes.size() > 1) {
             System.out.println("has more than one priceNode ");
@@ -329,8 +330,9 @@ public class AppSkuController {
             //5. 给出坐标集合
             if (priceNodes != null && priceNodes.size() > 0) {
                 for (PriceNode priceNode : priceNodes) {
-                    //查询到价格历史,开始分析
-                    priceXY.put(this.getDateMMdd(priceNode.getPriceTimeL()), BigDecimal.valueOf(priceNode.getPrice()).longValue());
+                    //查询到价格历史,开始分析priceTimeL
+                    PriceCurveXYVo priceCurveXYVo = new PriceCurveXYVo(this.getDateMMdd(priceNode.getPriceTimeL()), BigDecimal.valueOf(priceNode.getPrice()).longValue(), getDistance2X(priceTimeL, priceNode.getPriceTimeL()));
+                    priceXY.add(priceCurveXYVo);
                 }
                 //4. 辅助点   --价格变化点前一天的价格按照上一个价格点给出
                 //两个数据点
@@ -360,7 +362,7 @@ public class AppSkuController {
             BigDecimal pointThree = a.add((b.subtract(a)).multiply(BigDecimal.valueOf(0.75)));
             //绘制x
             List<String> X = new ArrayList<>();
-            Long priceTimeL = priceNodes.get(0).getPriceTimeL();
+            Long priceTimeL = new Date().getTime();
             int i = 4;
             while (i > 0) {
                 X.add(this.getDateMMdd(priceTimeL));
@@ -379,9 +381,10 @@ public class AppSkuController {
             Y.add(b.longValue());
 
             //数据点,给两个数据点,起始和最终,都是同个值
-            priceXY.put(X.get(0), BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue());
-            priceXY.put(X.get(X.size() - 1), BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue());
-
+            PriceCurveXYVo priceCurveXYVoIndex = new PriceCurveXYVo(X.get(0), BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue(), getDistance2X(priceTimeL, priceNodes.get(0).getPriceTimeL()));
+            PriceCurveXYVo priceCurveXYVoEnd = new PriceCurveXYVo(X.get(X.size() - 1), BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue(), getDistance2X(priceTimeL, new Date().getTime()));
+            priceXY.add(priceCurveXYVoIndex);
+            priceXY.add(priceCurveXYVoEnd);
             PriceCurveVo priceCurveVo = new PriceCurveVo(X, Y, priceXY, BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue(), BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue());
             jsonObject.put("data", JSONObject.toJSON(priceCurveVo));
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
