@@ -244,11 +244,13 @@ public class AppSkuController {
                     String priorDate = getDateMMdd(priorDateLong);
                     System.out.println(" priorDate " + priorDate);
                     if (!priorDate.equals(index0Date)) {
-                        Date date = new Date();
-                        date.setTime(priorDateLong);
-                        PriceNode insertPriceNode = new PriceNode(date, priceNo.getPrice());
-                        insertPriceNode.setPriceTime(date);
-                        lPriceNodes.add(temp, insertPriceNode);
+                        if (!priorDate.equals(getDateMMdd(lPriceNodes.get(temp - 1).getPriceTimeL()))) {
+                            Date date = new Date();
+                            date.setTime(priorDateLong);
+                            PriceNode insertPriceNode = new PriceNode(date, priceNo.getPrice());
+                            insertPriceNode.setPriceTime(date);
+                            lPriceNodes.add(temp, insertPriceNode);
+                        }
                     }
                 }
                 temp++;
