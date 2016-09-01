@@ -89,7 +89,7 @@ public class AppController {
     Logger logger = LoggerFactory.getLogger(AppController.class);
 
     public static void main(String[] args) {
-        String ss = WebsiteHelper.getDealUrlWithAff(Website.AMAZON, "http://www.snapdeal.com/product/micromax-canvas-a1-aq4502-8/630310793485", new String[]{"SHANCHUAN", "123"});
+        String ss = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL, "http://www.snapdeal.com/offers/maggi-hamper", new String[]{"GOOGLEPLAY", "123"});
         System.out.print(ss);
 
         //Random random = new Random();
