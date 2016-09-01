@@ -337,6 +337,7 @@ public class AppSkuController {
                 //4. 辅助点   --价格变化点前一天的价格按照上一个价格点给出
                 //两个数据点
                 PriceCurveVo priceCurveVo = new PriceCurveVo(X, Y, priceXY, BigDecimal.valueOf(minPrice).longValue(), BigDecimal.valueOf(maxPrice).longValue());
+                priceCurveVo.setDistanceX2X(20);
                 jsonObject.put("data", priceCurveVo);
             }
             String string = JSON.toJSONString(jsonObject);
@@ -386,6 +387,7 @@ public class AppSkuController {
             priceXY.add(priceCurveXYVoIndex);
             priceXY.add(priceCurveXYVoEnd);
             PriceCurveVo priceCurveVo = new PriceCurveVo(X, Y, priceXY, BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue(), BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue());
+            priceCurveVo.setDistanceX2X(20);
             jsonObject.put("data", JSONObject.toJSON(priceCurveVo));
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;

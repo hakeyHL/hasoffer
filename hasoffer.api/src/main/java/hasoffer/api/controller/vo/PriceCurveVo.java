@@ -14,6 +14,7 @@ public class PriceCurveVo {
     private List<String> showX;
     private Long startPoint;//最低点 ,起始数据点
     private Long endPoint;//终止数据点
+    private int distanceX2X;
 
     public PriceCurveVo(List<String> showX, List<Long> showY, List<PriceCurveXYVo> priceXY, Long startPoint, Long endPoint) {
         this.showX = showX;
@@ -64,5 +65,13 @@ public class PriceCurveVo {
 
     public void setPriceXY(List<PriceCurveXYVo> priceXY) {
         this.priceXY = priceXY;
+    }
+
+    public int getDistanceX2X() {
+        return distanceX2X;
+    }
+
+    public void setDistanceX2X(int distanceX2X) {
+        this.distanceX2X = distanceX2X;
     }
 }
