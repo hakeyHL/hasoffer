@@ -63,11 +63,12 @@ public class PriceNode {
 
         PriceNode priceNode = (PriceNode) o;
 
-        return ymd.equals(priceNode.ymd);
+        return !(ymd != null ? !ymd.equals(priceNode.ymd) : priceNode.ymd != null);
+
     }
 
     @Override
     public int hashCode() {
-        return ymd.hashCode();
+        return ymd != null ? ymd.hashCode() : 0;
     }
 }
