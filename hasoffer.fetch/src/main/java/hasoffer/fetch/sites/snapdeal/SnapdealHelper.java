@@ -47,7 +47,7 @@ public class SnapdealHelper {
     }
 
     public static String getDeeplink(String url) {
-        url = getCleanUrl(url);
+        // url = getCleanUrl(url);
         if (url.contains("www.snapdeal.com")) {
             url = url.replace("www.snapdeal.com", "m.snapdeal.com");
         }
