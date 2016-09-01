@@ -39,8 +39,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 1cleanUrl-/fix2/clean_url_sku?cateId=5
  * 2brand1-/fix2/tag_brand?cateId=5
  * 3brand2-/fix2/tag_brand_man 手工处理品牌
- * 4price-/fix2/convert_price_log?start=20160801
+ * +4price-/fix2/convert_price_log?start=20160801
  * 5del_sku-/fix2/del_sku_by_brand_mobile 删除品牌不正确的sku
+ * 6tag_model - /fix2/tag_model?cateId=5
  */
 @Controller
 @RequestMapping(value = "/fix2")
@@ -55,6 +56,113 @@ public class FixController2 {
     ICmpSkuService cmpSkuService;
     @Resource
     IMongoDbManager mdm;
+
+    @RequestMapping(value = "/tag_brand", method = RequestMethod.GET)
+    @ResponseBody
+    public String tag_model(@RequestParam final long cateId) {
+        if (cateId != 5) {
+            return "cate id must be 5!";
+        }
+        ListProcessTask<PtmProduct> ptmCmpSkuListProcessTask = new ListProcessTask<>(
+                new ILister() {
+                    @Override
+                    public PageableResult getData(int page) {
+                        return productService.listPagedProducts(cateId, page, 2000);
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcessor<PtmProduct>() {
+                    @Override
+                    public void process(PtmProduct o) {
+                        String pro_title = o.getTitle();
+                        String pro_model = o.getModel();
+                        if (StringUtils.isEmpty(pro_title)) {
+//                            print("no title");
+                            return;
+                        }
+
+//                        if (!StringUtils.isEmpty(pro_model)) {
+////                            print("has model");
+//                            return;
+//                        }
+
+                        pro_title = pro_title.toLowerCase();
+                        String finalModel = "";
+
+                        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(o.getId());
+                        if (StringUtils.isEmpty(pro_model)) {
+                            Set<String> modelSet = new HashSet<>();
+
+                            StringBuffer sb = new StringBuffer("===========" + o.getTitle() + "=============\n");
+
+                            for (PtmCmpSku cmpSku : cmpSkus) {
+
+                                String modelStr = cmpSku.getModel();
+                                if (!StringUtils.isEmpty(modelStr)) {
+                                    modelSet.addAll(Arrays.asList(modelStr.split(",")));
+                                }
+
+                                sb.append(String.format("%s : [Brand-%s], [Model-%s], [%s]\n", cmpSku.getWebsite().name(), cmpSku.getBrand(), cmpSku.getModel(), cmpSku.getTitle()));
+                            }
+
+
+                            for (String model : modelSet) {
+                                model = model.trim();
+                                if (!StringUtils.isEmpty(model) && pro_title.contains(model.toLowerCase())) {
+                                    if (model.length() > finalModel.length()) {
+                                        finalModel = model;
+                                    }
+                                }
+                            }
+
+//                        print(sb.toString());
+                            if (finalModel.length() > 0) {
+                                print(pro_title + "\t[" + finalModel + "]");
+                                productService.updateProductBrandModel(o.getId(), o.getBrand(), finalModel);
+                            }
+                        } else {
+                            finalModel = pro_model;
+                        }
+
+//                        for (PtmCmpSku cmpSku : cmpSkus) {
+//                            String skuModel = cmpSku.getModel();
+//                            String skuTitle = cmpSku.getTitle();
+//                            if (!StringUtils.isEmpty(skuModel)) {
+//                                String finalModelx = finalModel.toLowerCase().trim().replaceAll("-", "").replaceAll("\\s", "");
+//                                String skuModelx = skuModel.toLowerCase().trim().replaceAll("-", "").replaceAll("\\s", "");
+//                                if (finalModelx.equalsIgnoreCase(skuModelx)) {
+//
+//                                } else {
+//                                    print(finalModel + " 1: " + cmpSku.getId() + "\t" + skuTitle + "\t" + skuModelx);
+//                                }
+//                            } else {
+//                                if (!StringUtils.isEmpty(skuTitle)) {
+//                                    String skuTitlex = skuTitle.toLowerCase().trim();
+//                                    if (!skuTitlex.contains(finalModel.toLowerCase())) {
+//                                        print(finalModel + " 2: " + cmpSku.getId() + "\t" + skuTitle);
+//                                    }
+//                                }
+//                            }
+//                        }
+                    }
+                }
+        );
+
+        ptmCmpSkuListProcessTask.setProcessorCount(20);
+        ptmCmpSkuListProcessTask.setQueueMaxSize(2000);
+
+        ptmCmpSkuListProcessTask.go();
+        return "ok";
+    }
 
     @RequestMapping(value = "/del_sku_by_brand_mobile", method = RequestMethod.GET)
     @ResponseBody

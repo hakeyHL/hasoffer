@@ -229,23 +229,22 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
 
             if (failure == 1) {
                 //推送失败
-                System.out.println("push fail for priceOffNotice" + id);
+                System.out.println("push fail for priceOffNotice " + id);
                 System.out.println("push fail urmdevice " + urmDevice.getId());
             }
+        }
 
-            if (pushStatus) {
-                updatePriceOffNoticeStatus(id, true);
-                System.out.println("update lastpushstatus push success for priceOffNoticeid" + id);
-            } else {
-                updatePriceOffNoticeStatus(id, false);
-                System.out.println("update lastpushstatus push fail for priceOffNoticeid" + id);
-                //是否需要将失败写入缓存
-                if (cacheFail) {
-                    redisListService.push(PUSH_FAIL_PRICEOFFNOTICE_ID, priceOffNotice.getId() + "");
-                    System.out.println("cache push fail success for " + priceOffNotice.getId());
-                }
+        if (pushStatus) {
+            updatePriceOffNoticeStatus(id, true);
+            System.out.println("update lastpushstatus push success for priceOffNoticeid" + id);
+        } else {
+            updatePriceOffNoticeStatus(id, false);
+            System.out.println("update lastpushstatus push fail for priceOffNoticeid" + id);
+            //是否需要将失败写入缓存
+            if (cacheFail) {
+                redisListService.push(PUSH_FAIL_PRICEOFFNOTICE_ID, priceOffNotice.getId() + "");
+                System.out.println("cache push fail success for " + priceOffNotice.getId());
             }
-
         }
     }
 }
