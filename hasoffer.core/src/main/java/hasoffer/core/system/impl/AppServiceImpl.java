@@ -13,9 +13,11 @@ import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.system.IAppService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -61,6 +63,15 @@ public class AppServiceImpl implements IAppService {
     private static final String Q_APP_GETUSERBYTHIRDID =
             "SELECT t FROM UrmUser t " +
                     " where t.thirdId=?0";
+
+    private static final String Q_APP_URMDEVICE_GETIDSBYDEVICEID =
+            "SELECT t.id FROM UrmDevice t " +
+                    " where t.deviceId=?0";
+
+    private static final String Q_APP_URMUSERDEVICE_GETIDSBYUSERID =
+            "SELECT t.deviceId FROM UrmUserDevice t " +
+                    " where t.userId=?0";
+
     private static final String Q_APP_GETDEALS =
             "SELECT t FROM AppDeal t where  t.display='1' and  t.expireTime >= ?0  order by id desc   ";
     private static final String Q_APP_GETBANNERS =
@@ -185,10 +196,27 @@ public class AppServiceImpl implements IAppService {
     }
 
     @Override
+    public List<String> getUserDevicesByUserId(String userId) {
+        return dbm.query(Q_APP_URMUSERDEVICE_GETIDSBYUSERID, Arrays.asList(userId));
+    }
+
+    @Override
+    @Transactional
+    public int addUrmUserDevice(List<UrmUserDevice> urmUserDevices) {
+        return dbm.batchSave(urmUserDevices);
+    }
+
+    @Override
     public int addUser(UrmUser user) {
         List li = new ArrayList();
         li.add(user);
         return dbm.batchSave(li);
+    }
+
+    @Override
+    public List<String> getUserDevices(String deviceId) {
+        //有的用户绑定设备列表
+        return dbm.query(Q_APP_URMDEVICE_GETIDSBYDEVICEID, Arrays.asList(deviceId));
     }
 
     @Override

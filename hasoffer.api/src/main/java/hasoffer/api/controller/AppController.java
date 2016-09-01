@@ -1,5 +1,6 @@
 package hasoffer.api.controller;
 
+import com.alibaba.fastjson.JSON;
 import hasoffer.api.controller.vo.*;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.ParseConfigHelper;
@@ -26,6 +27,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.urm.UrmDevice;
 import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.solr.*;
@@ -505,6 +507,13 @@ public class AppController {
         ModelAndView mv = new ModelAndView();
         Map map = new HashMap();
         String userToken = UUID.randomUUID().toString();
+        String deviceId = JSON.parseObject(request.getHeader("deviceinfo")).getString("deviceId");
+        //String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+        System.out.println(" get deviceId is : " + deviceId);
+        //1. 根据deviceId获得device 的id列表
+        List<String> ids = appService.getUserDevices(deviceId);
+        System.out.println(" get ids by deviceId :" + ids.size());
+
         UrmUser uUser = appService.getUserById(userVO.getThirdId() == null ? "-" : userVO.getThirdId());
         if (uUser == null) {
             logger.debug("user is not exist before");
@@ -519,8 +528,6 @@ public class AppController {
             urmUser.setThirdId(userVO.getThirdId());
             int result = appService.addUser(urmUser);
             logger.debug("add user result is :" + result);
-            //TODO 关联用户和设备
-            System.out.println(" insert data into urmUserDevice ");
 
         } else {
             logger.debug("user exist ,update userInfo");
@@ -532,6 +539,37 @@ public class AppController {
             uUser.setUserToken(userToken);
             appService.updateUserInfo(uUser);
             logger.debug("update userInfo over ");
+
+
+            System.out.println("update user and device relationship ");
+
+            List<String> deviceIds = appService.getUserDevicesByUserId(uUser.getId() + "");
+            System.out.println("get ids  by userId from urmUserDevice :" + deviceIds.size());
+            List<UrmUserDevice> urmUserDevices = new ArrayList<>();
+            for (String dId : deviceIds) {
+                for (String id : ids) {
+                    if (!id.equals(dId)) {
+                        System.out.println("dId by UserId :" + dId + " is not equal to id from deviceId :" + id);
+                        UrmUserDevice urmUserDevice = new UrmUserDevice();
+                        urmUserDevice.setDeviceId(id);
+                        urmUserDevice.setUserId(uUser.getId() + "");
+                        urmUserDevices.add(urmUserDevice);
+                    }
+                }
+            }
+            if (deviceIds == null || deviceIds.size() < 1) {
+                System.out.println("not exist records before ,add  this ");
+                for (String id : ids) {
+                    System.out.println(" id :" + id);
+                    UrmUserDevice urmUserDevice = new UrmUserDevice();
+                    urmUserDevice.setDeviceId(id);
+                    urmUserDevice.setUserId(uUser.getId() + "");
+                    urmUserDevices.add(urmUserDevice);
+                }
+            }
+            //将关联关系插入到关联表中
+            int count = appService.addUrmUserDevice(urmUserDevices);
+            System.out.println(" batch save  result size : " + count);
         }
         map.put("userToken", userToken);
         mv.addObject("data", map);

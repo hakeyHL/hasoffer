@@ -31,7 +31,19 @@ public interface IPriceOffNoticeService {
      */
     PriceOffNotice getPriceOffNotice(String userId, long skuid);
 
+    /**
+     * 根据id获取一条降价提醒记录
+     *
+     * @param priceOffNoticeId
+     * @return
+     */
+    PriceOffNotice getPriceOffNotice(long priceOffNoticeId);
+
     void updatePriceOffNoticeStatus(long id, boolean lastPushStatus);
 
+    //针对关注某个skuid的所有用户，检查价格是否需要推送
     void priceOffCheck(long skuid);
+
+    //针对push失败的用户重新发送
+    void pushFailRePush(long id);
 }

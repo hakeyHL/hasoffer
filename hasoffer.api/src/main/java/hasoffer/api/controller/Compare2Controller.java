@@ -7,6 +7,7 @@ import hasoffer.api.controller.vo.*;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.SearchHelper;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.AppDisplayMode;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
@@ -26,6 +27,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
+import hasoffer.core.persistence.po.urm.PriceOffNotice;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.solr.CategoryIndexServiceImpl;
@@ -35,6 +37,7 @@ import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.exception.NonMatchedProductException;
 import hasoffer.core.system.impl.AppServiceImpl;
+import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.core.utils.JsonHelper;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
@@ -80,10 +83,13 @@ public class Compare2Controller {
     IMongoDbManager mongoDbManager;
     @Resource
     AppServiceImpl appService;
+    @Resource
+    IPriceOffNoticeService iPriceOffNoticeService;
     private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
 
     public static void main(String[] args) {
-//        String dealUrlWithAff = WebsiteHelper.getDealUrlWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
+        String dealUrlWithAff = WebsiteHelper.getDealUrlWithAff(Website.SHOPCLUES, "http://www.shopclues.com/rupa-jon-sleeveless-vests-set-of-5.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "dfecc858243a616a"});
+        System.out.println(dealUrlWithAff);
 //        String urlWithAff = WebsiteHelper.getUrlWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
 //        System.out.println(urlWithAff);
 //        String flipkart = WebsiteHelper.getDealUrlWithAff(Website.FLIPKART, "https://www.flipkart.com/apple-iphone-6s-silver-16-gb/p/itmebysgupjepunx", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
@@ -296,13 +302,15 @@ public class Compare2Controller {
         PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"skuPrice", "deepLink", "saved", "id", "priceOff", "productVo", "pagedComparedSkuVos", "copywriting", "displayMode", "std", "cashBack"});
         CmpResult cr = null;
         PtmProduct product = productService.getProduct(Long.valueOf(id));
+        String userToken = Context.currentContext().getHeader("usertoken");
         if (product != null) {
             System.out.println("product is exist in our system " + product.getId());
             String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
             DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
             SearchIO sio = new SearchIO(product.getSourceId(), product.getTitle(), "", product.getSourceSite(), product.getPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, pageSize);
             try {
-                cr = getCmpProducts(sio, product);
+//                cr = getCmpProducts(sio, product);
+                cr = getCmpProducts(sio, product, userToken);
                 jsonObject.put("page", JSONObject.toJSON(PageHelper.getPageModel(request, cr.getPagedComparedSkuVos())));
             } catch (Exception e) {
                 logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, pageSize));
@@ -625,7 +633,7 @@ public class Compare2Controller {
      * @param sio
      * @return
      */
-    private CmpResult getCmpProducts(SearchIO sio, PtmProduct product) {
+    private CmpResult getCmpProducts(SearchIO sio, PtmProduct product, String userToken) {
         //初始化一个空的用于存放比价商品列表的List
         List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
         CmpResult cmpResult = new CmpResult();
@@ -661,6 +669,7 @@ public class Compare2Controller {
                     System.out.println("set properteis over l");
                     cplv.setDeepLinkUrl(WebsiteHelper.getDealUrlWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
                     cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name()}));
+                    cplv.setIsAlert(isPriceOffAlert(userToken, cplv.getId()));
                     comparedSkuVos.add(cplv);
                 }
                 if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {
@@ -880,5 +889,20 @@ public class Compare2Controller {
             return;
         }
         comparedSkuVos.add(comparedSkuVo);
+    }
+
+    public boolean isPriceOffAlert(String userToken, Long skuId) {
+        if (!StringUtils.isEmpty(userToken)) {
+            System.out.println("userToken is :" + userToken);
+            UrmUser urmUser = appService.getUserByUserToken(userToken);
+            if (urmUser != null) {
+                System.out.println("this userToken has user ");
+                PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + "", skuId);
+                if (priceOffNotice != null) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
