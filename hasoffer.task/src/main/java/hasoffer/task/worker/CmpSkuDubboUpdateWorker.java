@@ -35,7 +35,6 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
     private ConcurrentLinkedQueue<PtmCmpSku> queue;
     private IFetchDubboService fetchDubboService;
     private ICmpSkuService cmpSkuService;
-    private IPriceOffNoticeService priceOffNoticeService;
     private IRedisListService redisListService;
 
     public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, ICmpSkuService cmpSkuService, IPriceOffNoticeService priceOffNoticeService, IRedisListService redisListService) {
@@ -43,7 +42,6 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         this.queue = queue;
         this.fetchDubboService = fetchDubboService;
         this.cmpSkuService = cmpSkuService;
-        this.priceOffNoticeService = priceOffNoticeService;
         this.redisListService = redisListService;
     }
 
@@ -145,7 +143,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 //            如果价格发生变化，加到redis队列中
             if (sku.getPrice() != fetchedProduct.getPrice()) {
 
-                redisListService.push(PRICEOFF_NOTICE_SKUID_QUEUE, skuid);
+                redisListService.push(PRICEOFF_NOTICE_SKUID_QUEUE, skuid + "");
 
                 logger.info("push success for " + skuid);
             }

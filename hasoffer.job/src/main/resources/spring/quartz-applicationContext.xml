@@ -29,6 +29,7 @@
                 <ref bean="statHijackFetchTrigger"/>
                 <ref bean="statSearchLogTrigger"/>
                 <ref bean="skuImageListDownLoadTrigger"/>
+                <ref bean="priceOffNoticeTrigger"/>
                 <!--<ref bean="statVisitSkuUpdateTrigger"/>-->
             </list>
         </property>
@@ -111,6 +112,24 @@
     <bean id="skuImageListDownLoadTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="skuImageListDownLoadJob"/>
         <property name="cronExpression" value="0 30 12 * * ?"/>
+    </bean>
+
+    <bean name="priceOffNoticeJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.push.PriceOffNoticeJobBean"/>
+    </bean>
+
+    <bean id="priceOffNoticeTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="priceOffNoticeJob"/>
+        <property name="cronExpression" value="0 48 15 * * ?"/>
+    </bean>
+
+    <bean name="pushFailRePushJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.push.RePushPriceOffNoticeJobBean"/>
+    </bean>
+
+    <bean id="pushFailRePushTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="pushFailRePushJob"/>
+        <property name="cronExpression" value="0 30 11,14,22 * * ?"/>
     </bean>
 
     <!-- 定时统计 -->

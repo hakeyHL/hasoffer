@@ -338,6 +338,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteCmpSku(long id) {
+        System.out.println("del PtmCmpSku : " + id);
         dbm.delete(PtmCmpSku.class, id);
         cmpskuIndexService.remove(String.valueOf(id));
     }
@@ -873,11 +874,9 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
                 }
             }
 
-            //更新skutitle
-            if (!StringUtils.isEmpty(fetchedProduct.getSubTitle())) {
-                if (StringUtils.isEmpty(cmpSku.getSkuTitle()) || !StringUtils.isEqual(cmpSku.getSkuTitle(), fetchedProduct.getSubTitle())) {
-                    ptmCmpSkuUpdater.getPo().setSkuTitle(fetchedProduct.getSubTitle());
-                }
+            //更新skutitle,只要新旧不一样就更新
+            if (!StringUtils.isEqual(cmpSku.getSkuTitle(), fetchedProduct.getSubTitle())) {
+                ptmCmpSkuUpdater.getPo().setSkuTitle(fetchedProduct.getSubTitle());
             }
 
             String imageUrl = fetchedProduct.getImageUrl();

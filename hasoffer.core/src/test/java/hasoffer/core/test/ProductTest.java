@@ -89,9 +89,80 @@ public class ProductTest {
     private Pattern PATTERN_Brand = Pattern.compile("[\t*?]([a-zA-Z])[\t*?]");
 
     @Test
-    public void convertPrice() {
+    public void countModel() {
+        ListProcessTask<PtmProduct> ptmCmpSkuListProcessTask = new ListProcessTask<>(
+                new ILister() {
+                    @Override
+                    public PageableResult getData(int page) {
+                        return productService.listPagedProducts(5L, page, 2000);
+                    }
 
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcessor<PtmProduct>() {
+                    @Override
+                    public void process(PtmProduct o) {
+                        String pro_title = o.getTitle();
+                        String pro_model = o.getModel();
+                        if (StringUtils.isEmpty(pro_title)) {
+//                            print("no title");
+                            return;
+                        }
+
+                        if (!StringUtils.isEmpty(pro_model)) {
+//                            print("has model");
+                            return;
+                        }
+
+                        pro_title = pro_title.toLowerCase();
+
+                        Set<String> modelSet = new HashSet<>();
+
+                        StringBuffer sb = new StringBuffer("===========" + o.getTitle() + "=============\n");
+
+                        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(o.getId());
+                        for (PtmCmpSku cmpSku : cmpSkus) {
+
+                            String modelStr = cmpSku.getModel();
+                            if (!StringUtils.isEmpty(modelStr)) {
+                                modelSet.addAll(Arrays.asList(modelStr.split(",")));
+                            }
+
+                            sb.append(String.format("%s : [Brand-%s], [Model-%s], [%s]\n", cmpSku.getWebsite().name(), cmpSku.getBrand(), cmpSku.getModel(), cmpSku.getTitle()));
+                        }
+
+                        String finalModel = "";
+                        for (String model : modelSet) {
+                            model = model.toLowerCase().trim();
+                            if (!StringUtils.isEmpty(model) && pro_title.contains(model)) {
+                                if (model.length() > finalModel.length()) {
+                                    finalModel = model;
+                                }
+                            }
+                        }
+
+//                        print(sb.toString());
+                        if (finalModel.length() > 0) {
+                            print(pro_title + "\t[" + finalModel + "]");
+                        }
+                    }
+                }
+        );
+
+        ptmCmpSkuListProcessTask.setProcessorCount(20);
+        ptmCmpSkuListProcessTask.setQueueMaxSize(2000);
+
+        ptmCmpSkuListProcessTask.go();
     }
+
 
     @Test
     public void fffff() throws Exception {
