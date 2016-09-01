@@ -30,6 +30,7 @@
                 <ref bean="statSearchLogTrigger"/>
                 <ref bean="skuImageListDownLoadTrigger"/>
                 <ref bean="priceOffNoticeTrigger"/>
+                <ref bean="pushFailRePushTrigger"/>
                 <!--<ref bean="statVisitSkuUpdateTrigger"/>-->
             </list>
         </property>
