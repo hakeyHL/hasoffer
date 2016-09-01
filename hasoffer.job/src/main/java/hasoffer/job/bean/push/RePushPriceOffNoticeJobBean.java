@@ -30,8 +30,10 @@ public class RePushPriceOffNoticeJobBean extends QuartzJobBean {
         logger.info("RePushPriceOffNoticeJobBean will start at {}", new Date());
         //此处需要将缓存中的push失败的priceOffId重新push一遍
         Object pop = redisListService.pop(PUSH_FAIL_PRICEOFFNOTICE_ID);
+        System.out.println("repush pop get null");
         while (pop != null) {
             long priceOffNoticeId = Long.parseLong((String) pop);
+            System.out.println("send repush for " + priceOffNoticeId);
             priceOffNoticeService.pushFailRePush(priceOffNoticeId);
         }
 
