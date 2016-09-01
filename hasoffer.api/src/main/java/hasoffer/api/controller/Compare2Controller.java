@@ -822,7 +822,16 @@ public class Compare2Controller {
                         return 0;
                     }
                 });
-
+                //如果客户端传价格无法解析则重新计算save
+                if (sio.getCliPrice() <= 0) {
+                    int maxPrice = comparedSkuVos.get(comparedSkuVos.size() - 1).getPrice();
+                    System.out.println(" can not analysis client's price ,use maxPrice instead of it " + maxPrice);
+                    Iterator<CmpProductListVo> iterator = comparedSkuVos.iterator();
+                    while (iterator.hasNext()) {
+                        CmpProductListVo next = iterator.next();
+                        next.setSaved(Math.round(cliPrice - maxPrice));
+                    }
+                }
             } else {
                 logger.debug("Found skus size is 0 .");
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
