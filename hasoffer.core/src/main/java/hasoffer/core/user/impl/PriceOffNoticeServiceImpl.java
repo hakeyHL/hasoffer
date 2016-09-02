@@ -148,7 +148,7 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
     }
 
     @Override
-    public void pushFailRePush(long id) {
+    public void pushFailRePush(long id, boolean cacheFail) {
 
         PriceOffNotice priceOffNotice = getPriceOffNotice(id);
 
@@ -156,7 +156,7 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
 
         PtmCmpSku ptmCmpSku = dbm.get(PtmCmpSku.class, skuid);
 
-        push(priceOffNotice, ptmCmpSku, false);
+        push(priceOffNotice, ptmCmpSku, cacheFail);
     }
 
     private void push(PriceOffNotice priceOffNotice, PtmCmpSku ptmCmpSku, boolean cacheFail) {
