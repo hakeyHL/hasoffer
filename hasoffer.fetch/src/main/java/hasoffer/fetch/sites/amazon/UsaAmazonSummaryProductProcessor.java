@@ -29,13 +29,19 @@ public class UsaAmazonSummaryProductProcessor implements ISummaryProductProcesso
 
         String title = StringUtils.filterAndTrim(titleNode.getText().toString(), null);
 
-        TagNode imageNode = getSubNodeByXPath(root, "//div[@id='imgTagWrapperId']", new ContentParseException("image node not found"));
+        String imageUrl = "";
 
-        String imageUrl = imageNode.getAttributeByName("src");
+        TagNode imageNode = getSubNodeByXPath(root, "//img[@id='landingImage']", null);
 
-//        File file = ;
-
-//        HttpUtils.getImage(imageUrl,file);
+        if (imageNode != null) {
+            imageUrl = imageNode.getAttributeByName("data-old-hires");
+            if(StringUtils.isEmpty(imageUrl)){
+                imageUrl = imageNode.getAttributeByName("data-a-dynamic-image");
+            }
+            if(!StringUtils.isEmpty(imageUrl)){
+                imageUrl = imageUrl.substring(imageUrl.indexOf("http"), imageUrl.indexOf(".jpg") + 4);
+            }
+        }
 
         float price = 0.0f;
 
@@ -48,10 +54,10 @@ public class UsaAmazonSummaryProductProcessor implements ISummaryProductProcesso
         }
 
         String priceString = StringUtils.filterAndTrim(priceNode.getText().toString(), Arrays.asList(",", "$"));
-        if(NumberUtils.isNumber(priceString)){
+        if (NumberUtils.isNumber(priceString)) {
             price = Float.parseFloat(priceString);
-        }else{
-            System.out.println("priceString is "+priceString+" parse fail");
+        } else {
+            System.out.println("priceString is " + priceString + " parse fail");
         }
 
         oriFetchedProduct.setTitle(title);
