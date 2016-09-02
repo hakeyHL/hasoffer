@@ -887,7 +887,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             if (!StringUtils.isEqual(cmpSku.getSkuTitle(), fetchedProduct.getSubTitle())) {
                 ptmCmpSkuUpdater.getPo().setSkuTitle(fetchedProduct.getSubTitle());
                 System.out.println(" fetchedProduct 2:" + fetchedProduct.getSubTitle());
-                System.out.println("get skutitle :" + ptmCmpSkuUpdater.getPo().getSkuTitle());
+                System.out.println("get skutitle :" + ptmCmpSkuUpdater.getParameter().get("skuTitle"));
             }
         }
 
@@ -918,6 +918,8 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 //        String deliveryTime = fetchedProduct.getDeliveryTime();
         String deliveryTime = "1-5";
         ptmCmpSkuUpdater.getPo().setDeliveryTime(deliveryTime);
+
+        System.out.println(ptmCmpSkuUpdater.getParameter().toString());
 
         dbm.update(ptmCmpSkuUpdater);
 
