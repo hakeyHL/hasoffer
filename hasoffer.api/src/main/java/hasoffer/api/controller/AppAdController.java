@@ -42,14 +42,34 @@ public class AppAdController {
     @Resource
     AdvertiseService advertiseService;
 
-    public static void main(String[] args) throws Exception {
-        Sender sender = new Sender("AIzaSyCZrHjOkZ57j3Dvq_TpvYW8Mt38Ej1dzQA");
-        String userMessage = "";
-        Message message = new Message.Builder().timeToLive(30).delayWhileIdle(true).addData("m", userMessage).build();
-        Result result = sender.send(message, "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd", 2);
-        String errorCodeName = result.getErrorCodeName();
-        Integer success = result.getSuccess();
-        System.out.println(success);
+    public static void main(String[] args) {
+        try {
+            Sender sender = new Sender("AIzaSyCZrHjOkZ57j3Dvq_TpvYW8Mt38Ej1dzQA");
+            String userMessage = "{\n" +
+                    "        \"score\": \"5x1\",\n" +
+                    "        \"time\": \"15:10\",\n" +
+                    "        \"message\": {\n" +
+                    "            \"display\": {\n" +
+                    "                \"outTitle\": \"Lenovo Vibe K5 Note at Rs. 13,499 + Exchange Offer\",\n" +
+                    "                \"title\": \"Lenovo Vibe K5 Note at Rs. 13,499 + Exchange Offer\",\n" +
+                    "                \"content\": \"Lenovo Vibe K5 Note at Rs. 13,499 + Exchange Offer\"\n" +
+                    "            },\n" +
+                    "            \"click\": {\n" +
+                    "                \"type\": \"DEAL\",\n" +
+                    "                \"url\": \"99000085\",\n" +
+                    "                \"packageName\": \"com.flipkart.android\"\n" +
+                    "            }\n" +
+                    "        }\n" +
+                    "    }";
+            Message message = new Message.Builder().timeToLive(30).delayWhileIdle(true).addData("m", userMessage).build();
+//            Result result = sender.send(message, "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd", 2);
+            Result result = sender.sendNoRetry(message, "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd");
+            String errorCodeName = result.getErrorCodeName();
+            System.out.println(errorCodeName);
+        } catch (Exception e) {
+            System.out.println(" get exception ");
+            System.out.println(e.getMessage());
+        }
     }
 
     /**
@@ -81,9 +101,11 @@ public class AppAdController {
     @RequestMapping("tPush")
     public ModelAndView tt() throws Exception {
         ModelAndView modelAndView = new ModelAndView();
-        Sender sender = new Sender("AIzaSyCZrHjOkZ57j3Dvq_TpvYW8Mt38Ej1dzQA");
-        String userMessage = "";
+        Sender sender = new Sender("key=AIzaSyCZrHjOkZ57j3Dvq_TpvYW8Mt38Ej1dzQA");
+        String userMessage = "{\"errorCode\":\"00000\"}";
         Message message = new Message.Builder().timeToLive(30).delayWhileIdle(true).addData("m", userMessage).build();
+//        String regId="e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd";
+//        Result result  = sender.send(message, regId, 1);
         Result result = sender.send(message, "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd", 2);
         String errorCodeName = result.getErrorCodeName();
         Integer success = result.getSuccess();
