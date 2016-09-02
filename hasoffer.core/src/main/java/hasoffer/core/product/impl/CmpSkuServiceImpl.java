@@ -882,8 +882,11 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             }
 
             //更新skutitle,只要新旧不一样就更新
+            System.out.println(cmpSku.getSkuTitle());
+            System.out.println(fetchedProduct.getSubTitle());
             if (!StringUtils.isEqual(cmpSku.getSkuTitle(), fetchedProduct.getSubTitle())) {
                 ptmCmpSkuUpdater.getPo().setSkuTitle(fetchedProduct.getSubTitle());
+                System.out.println("set success");
             }
         }
 
@@ -917,7 +920,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         dbm.update(ptmCmpSkuUpdater);
 
-        return;
+        System.out.println("update success");
     }
 
     private void createOrUpdatePtmCmpSkuImage(long id, List<String> imageUrlList) {
