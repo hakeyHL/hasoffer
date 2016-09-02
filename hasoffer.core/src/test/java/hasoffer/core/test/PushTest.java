@@ -35,7 +35,7 @@ public class PushTest {
 
         AppPushMessage message = new AppPushMessage(
                 new AppMsgDisplay("56456  ", "767", "67878788786868"),
-                new AppMsgClick(AppMsgClickType.DEEPLINK, "8768678", "com.78678678.android")
+                new AppMsgClick(AppMsgClickType.DEAL, "8768678", "com.78678678.android")
         );
 
         /*AppPushMessage message = new AppPushMessage(
