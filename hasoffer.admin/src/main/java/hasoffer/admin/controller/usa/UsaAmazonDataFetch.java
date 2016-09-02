@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.plaf.synth.SynthTextAreaUI;
+import java.io.File;
 
 /**
  * Created by Administrator on 2016/9/2.
@@ -19,12 +19,17 @@ import javax.swing.plaf.synth.SynthTextAreaUI;
 @RequestMapping(value = "/useamazondatafetch")
 public class UsaAmazonDataFetch {
 
-    @RequestMapping(value = "/start",method = RequestMethod.GET)
+    //useamazondatafetch/start
+    @RequestMapping(value = "/start", method = RequestMethod.GET)
     public String start(HttpServletRequest request) throws HttpFetchException, ContentParseException {
 
-        String path = request.getContextPath();
+        String separator = File.separator;
 
-        System.out.println(path);
+        File file = new File("home" + separator + "hasoffer" + separator + "uploads" + separator + "2016" + separator + "08" + separator + "30");
+
+        boolean mkdir = file.mkdir();
+
+        System.out.println("mkdie " + mkdir);
 
         ISummaryProductProcessor summaryProductProcessor = new UsaAmazonSummaryProductProcessor();
 
