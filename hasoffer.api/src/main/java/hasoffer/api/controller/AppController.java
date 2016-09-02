@@ -571,16 +571,25 @@ public class AppController {
                     urmUserDevices.add(urmUserDevice);
                 }
             }
-            if (deviceIds == null || deviceIds.size() < 1) {
-                System.out.println("not exist records before ,add  this ");
-                for (String id : ids) {
-                    System.out.println(" id :" + id);
-                    UrmUserDevice urmUserDevice = new UrmUserDevice();
-                    urmUserDevice.setDeviceId(id);
-                    urmUserDevice.setUserId(uUser.getId() + "");
-                    urmUserDevices.add(urmUserDevice);
-                }
-            }
+//            if (deviceIds == null || deviceIds.size() < 1) {
+//                System.out.println("not exist records before ,add  this ");
+//                for (String id : ids) {
+//                    boolean flag = false;
+//                    for (String dId : deviceIds) {
+//                        if (id.equals(dId)) {
+//                            flag = true;
+//                            System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);
+//                        }
+//                    }
+//                    if (!flag) {
+//                        System.out.println("id :" + id + " is not exist before ");
+//                        UrmUserDevice urmUserDevice = new UrmUserDevice();
+//                        urmUserDevice.setDeviceId(id);
+//                        urmUserDevice.setUserId(uUser.getId() + "");
+//                        urmUserDevices.add(urmUserDevice);
+//                    }
+//                }
+//            }
             //将关联关系插入到关联表中
             int count = appService.addUrmUserDevice(urmUserDevices);
             System.out.println(" batch save  result size : " + count);
