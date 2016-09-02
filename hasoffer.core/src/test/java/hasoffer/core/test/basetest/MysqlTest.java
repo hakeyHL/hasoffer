@@ -80,7 +80,7 @@ public class MysqlTest {
     private ConcurrentLinkedQueue<PtmCmpSku> skuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
 
     @Test
-    public void testSkuUpdate(){
+    public void testSkuUpdate() {
 
         FetchedProduct fetchedProduct = new FetchedProduct();
 //     \\\\\\N":"13810840","Duration":"1 year","UPC":"does not apply"}', description='null', model='Redmi Note 3S,', offers='null', categoryPathList=null}
@@ -93,7 +93,7 @@ public class MysqlTest {
         fetchedProduct.setPrice(11999);
         fetchedProduct.setUrl("http://www.ebay.in/itm/Xiaomi-Redmi-Note-3-Gold-32-GB-");
 
-        cmpSkuService.updateCmpSkuBySpiderFetchedProduct(123L,fetchedProduct);
+        cmpSkuService.updateCmpSkuBySpiderFetchedProduct(123L, fetchedProduct);
 
     }
 
