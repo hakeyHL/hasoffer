@@ -2,6 +2,7 @@ package hasoffer.admin.controller.usa;
 
 import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.exception.HttpFetchException;
+import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.sites.amazon.UsaAmazonSummaryProductProcessor;
@@ -27,7 +28,7 @@ public class UsaAmazonDataFetch {
 
         System.out.println(path);
 
-        File file = new File(path,"uploads");
+        File file = new File(path+"/uploads","/2016/08/30");
 
         boolean mkdir = file.mkdir();
 
@@ -40,6 +41,8 @@ public class UsaAmazonDataFetch {
         System.out.println(oriFetchedProduct.getTitle());
         System.out.println(oriFetchedProduct.getImageUrl());
         System.out.println(oriFetchedProduct.getPrice());
+
+        HttpUtils.getImage(oriFetchedProduct.getImageUrl(),new File(file,"test.jpg"));
 
         return "ok";
     }
