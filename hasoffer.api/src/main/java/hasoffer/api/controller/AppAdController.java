@@ -1,6 +1,7 @@
 package hasoffer.api.controller;
 
 import com.google.android.gcm.server.Message;
+import com.google.android.gcm.server.MulticastResult;
 import com.google.android.gcm.server.Result;
 import com.google.android.gcm.server.Sender;
 import hasoffer.base.model.Website;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,27 +48,26 @@ public class AppAdController {
         try {
             Sender sender = new Sender("AIzaSyCZrHjOkZ57j3Dvq_TpvYW8Mt38Ej1dzQA");
             String userMessage = "{\n" +
-                    "        \"score\": \"5x1\",\n" +
-                    "        \"time\": \"15:10\",\n" +
-                    "        \"message\": {\n" +
-                    "            \"display\": {\n" +
-                    "                \"outTitle\": \"Lenovo Vibe K5 Note at Rs. 13,499 + Exchange Offer\",\n" +
-                    "                \"title\": \"Lenovo Vibe K5 Note at Rs. 13,499 + Exchange Offer\",\n" +
-                    "                \"content\": \"Lenovo Vibe K5 Note at Rs. 13,499 + Exchange Offer\"\n" +
-                    "            },\n" +
-                    "            \"click\": {\n" +
-                    "                \"type\": \"DEAL\",\n" +
-                    "                \"url\": \"99000085\",\n" +
-                    "                \"packageName\": \"com.flipkart.android\"\n" +
-                    "            }\n" +
-                    "        }\n" +
-                    "    }";
-            Message message = new Message.Builder().timeToLive(30).delayWhileIdle(true).addData("m", userMessage).build();
+                    "    \"display\": {\n" +
+                    "        \"outTitle\": \" Sony 16GB USB Pen Drive  , 25% OFF at Rs.270.Hurry up! \",\n" +
+                    "        \"title\": \"Sony 16GB USB Pen Drive \",\n" +
+                    "        \"content\": \"25% OFF at Rs.270.Hurry up!\n \"\n" +
+                    "    },\n" +
+                    "    \"click\": {\n" +
+                    "        \"type\": \"DEAL\",\n" +
+                    "        \"url\": \"99000238\",\n" +
+                    "        \"packageName\": \"com.flipkart.android\"\n" +
+                    "    }\n" +
+                    "}";
+            Message message = new Message.Builder().timeToLive(30).delayWhileIdle(true).addData("message", userMessage).build();
 //            Result result = sender.send(message, "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd", 2);
-            Result result = sender.sendNoRetry(message, "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd");
-            String errorCodeName = result.getErrorCodeName();
-            System.out.println(errorCodeName);
+            MulticastResult result = sender.send(message, Arrays.asList("cWkpvtsRBd4:APA91bFxIK8S3M_ZRzkEBrm6fx2aSk183GdG4nF5U9CkuBpxp4mlyoKYISI1uqbs-H8r-_oHiLdrrnYVgcviUf4T-J9G4HxtLnWbD2whRAaqBoos-I8jp48Ye6z0cJ0rXk6MAARZMVaH", "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd"), 1);
+            System.out.println("123");
+//            Result result = sender.sendNoRetry(message, "cWkpvtsRBd4:APA91bFxIK8S3M_ZRzkEBrm6fx2aSk183GdG4nF5U9CkuBpxp4mlyoKYISI1uqbs-H8r-_oHiLdrrnYVgcviUf4T-J9G4HxtLnWbD2whRAaqBoos-I8jp48Ye6z0cJ0rXk6MAARZMVaH");
+//            String errorCodeName = result.getErrorCodeName();
+//            System.out.println(errorCodeName);
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println(" get exception ");
             System.out.println(e.getMessage());
         }
@@ -108,7 +109,6 @@ public class AppAdController {
 //        Result result  = sender.send(message, regId, 1);
         Result result = sender.send(message, "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd", 2);
         String errorCodeName = result.getErrorCodeName();
-        Integer success = result.getSuccess();
         System.out.println(errorCodeName);
         return modelAndView;
     }
