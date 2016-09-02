@@ -86,6 +86,7 @@ public class AppUserController {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
+        System.out.println("get info : type " + type + " skuId :" + skuId + " skuPrice " + skuPrice);
         //get user by userToken
         String userToken = Context.currentContext().getHeader("usertoken");
         if (!StringUtils.isEmpty(userToken)) {
