@@ -23,6 +23,7 @@ import hasoffer.core.product.IProductService;
 import hasoffer.core.product.exception.ProductNotFoundException;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
+import hasoffer.core.redis.ICacheService;
 import hasoffer.core.search.ISearchService;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.webcommon.context.Context;
@@ -60,6 +61,8 @@ public class ProductController {
     ICmpSkuService cmpSkuService;
     @Resource
     IFetchService fetchService;
+    @Resource
+    ICacheService cacheServiceImpl;
 
     @RequestMapping(value = "/cmp/del/{id}", method = RequestMethod.GET)
     public ModelAndView delCompare(@PathVariable long id) {
@@ -432,5 +435,31 @@ public class ProductController {
         ModelAndView mav = new ModelAndView();
 
         return true;
+    }
+
+    @RequestMapping(value = "/removeCache/{productId}", method = RequestMethod.POST)
+    @ResponseBody
+    public Map removeCache(@PathVariable Long productId) {
+
+        Map<String, String> statusMap = new HashMap<>();
+
+        try {
+
+            //清除商品缓存
+            cacheServiceImpl.del("PRODUCT_" + productId);
+            //清除sku缓存        PRODUCT__listPagedCmpSkus_3198_1_10
+            Set<String> keys = cacheServiceImpl.keys("PRODUCT__listPagedCmpSkus_" + productId + "_*");
+
+            for (String key : keys) {
+                cacheServiceImpl.del(key);
+            }
+
+            statusMap.put("status", "success");
+
+        } catch (Exception e) {
+            statusMap.put("status", "fail");
+        }
+
+        return statusMap;
     }
 }
