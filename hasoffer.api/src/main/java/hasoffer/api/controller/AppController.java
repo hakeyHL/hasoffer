@@ -1,8 +1,10 @@
 package hasoffer.api.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import hasoffer.api.controller.vo.*;
 import hasoffer.api.helper.ClientHelper;
+import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.ParseConfigHelper;
 import hasoffer.api.worker.SearchLogQueue;
 import hasoffer.base.enums.AppType;
@@ -52,6 +54,7 @@ import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -503,8 +506,14 @@ public class AppController {
      * @return
      */
     @RequestMapping(value = "/bindUserInfo", method = RequestMethod.POST)
-    public ModelAndView bindUserInfo(UserVo userVO, HttpServletRequest request) {
-        ModelAndView mv = new ModelAndView();
+    public String bindUserInfo(UserVo userVO,
+                               HttpServletRequest request,
+                               HttpServletResponse response) {
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("errorCode", "00000");
+        jsonObject.put("msg", "ok");
+
         Map map = new HashMap();
         String userToken = UUID.randomUUID().toString();
         String deviceId = JSON.parseObject(request.getHeader("deviceinfo")).getString("deviceId");
@@ -572,8 +581,9 @@ public class AppController {
             System.out.println(" batch save  result size : " + count);
         }
         map.put("userToken", userToken);
-        mv.addObject("data", map);
-        return mv;
+        jsonObject.put("data", map);
+        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        return null;
     }
 
     /**
