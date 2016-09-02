@@ -1,8 +1,9 @@
-package hasoffer.core.task.worker;
+package hasoffer.core.task.worker.impl;
 
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.ArrayUtils;
-import hasoffer.core.worker.ListAndProcessWorkerStatus;
+import hasoffer.core.task.worker.IListWorkerStatus;
+import hasoffer.core.task.worker.ILister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,14 +14,14 @@ import java.util.concurrent.TimeUnit;
  * Date : 2016/5/3
  * Function :
  */
-public class ListxWorker<T> implements Runnable {
+public class ListWorker<T> implements Runnable {
 
-    ListAndProcessWorkerStatus<T> ws;
-    IList list;
+    IListWorkerStatus<T> ws;
+    ILister list;
     long queueMaxSize = 3000;
-    private Logger logger = LoggerFactory.getLogger(ListxWorker.class);
+    private Logger logger = LoggerFactory.getLogger(ListWorker.class);
 
-    public ListxWorker(ListAndProcessWorkerStatus<T> ws, IList list, long queueMaxSize) {
+    public ListWorker(IListWorkerStatus<T> ws, ILister list, long queueMaxSize) {
         this.ws = ws;
         this.list = list;
         this.queueMaxSize = queueMaxSize;

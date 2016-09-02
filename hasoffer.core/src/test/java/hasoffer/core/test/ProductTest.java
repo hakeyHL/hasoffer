@@ -21,13 +21,16 @@ import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.product.*;
 import hasoffer.core.product.solr.*;
 import hasoffer.core.search.ISearchService;
-import hasoffer.core.task.ListAndProcessTask2;
-import hasoffer.core.task.worker.IList;
-import hasoffer.core.task.worker.IProcess;
+import hasoffer.core.task.ListProcessTask;
+import hasoffer.core.task.worker.ILister;
+import hasoffer.core.task.worker.IProcessor;
 import jodd.util.NameValue;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -78,41 +81,53 @@ public class ProductTest {
     ProductIndex2ServiceImpl productIndex2Service;
     @Resource
     IMongoDbManager mdm;
+
+    @Resource
+    MongoDbFactory mongoDbFactory;
     private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
 
-    private void print(String str) {
-        System.out.println(str);
-    }
+    private Pattern PATTERN_Brand = Pattern.compile("[\t*?]([a-zA-Z])[\t*?]");
 
     @Test
-    public void querySkuPrice() {
-//        List<PtmCmpSkuLog> ptmCmpSkuLogs = cmpSkuService.listByPcsId(2966498L);
-//        for (PtmCmpSkuLog ptmCmpSkuLog : ptmCmpSkuLogs) {
-//            System.out.println(String.format("price : %f @ time : %s", ptmCmpSkuLog.getPrice(), TimeUtils.parse(ptmCmpSkuLog.getPriceTime(), "yyyy-MM-dd HH:mm:ss")));
-//        }
+    public void countModel() {
 
-        PtmCmpSkuHistoryPrice historyPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, 4L);
-        List<PriceNode> priceNodes = null;
-        if (historyPrice == null) {
-            priceNodes = new ArrayList<>();
-            historyPrice = new PtmCmpSkuHistoryPrice(4, priceNodes);
-            for (int i = 20; i > 0; i--) {
-                priceNodes.add(new PriceNode(TimeUtils.addDay(TimeUtils.nowDate(), -1 * i), 100 + (i % 5)));
+    }
+
+
+    @Test
+    public void fffff() throws Exception {
+        List<String> lines = FileUtils.readLines(new File("d:/zzz/1.txt"));
+
+        Set<Long> idSet = new HashSet<>();
+        long count = 0;
+
+        for (String line : lines) {
+            if (NumberUtils.isNumber(line)) {
+                count++;
+                idSet.add(Long.valueOf(line));
             }
-        } else {
-            historyPrice.getPriceNodes().add(new PriceNode(TimeUtils.addDay(TimeUtils.nowDate(), 1), 100));
         }
 
-        mdm.save(historyPrice);
+        print("count=" + count + ", id count=" + idSet.size());
     }
 
+    /**
+     * 根据sku的品牌标记品牌
+     * 规则：查询sku的品牌，如果都相同，同时商品的品牌为空，则取该品牌作为商品的品牌
+     * <p>
+     * param cateId
+     */
+//    @RequestMapping(value = "/del_sku_diff_brand", method = RequestMethod.GET)
+//    @ResponseBody
+//    public void tag_brand(@RequestParam final long cateId) {
     @Test
-    public void convertdatas() {
-        ListAndProcessTask2<PtmCmpSkuLog> listAndProcessTask2 = new ListAndProcessTask2<>(
-                new IList<PtmCmpSkuLog>() {
+    public void tag_brand() {
+        final long cateId = 5L;
+        ListProcessTask<PtmProduct> productListAndProcessTask2 = new ListProcessTask<>(
+                new ILister() {
                     @Override
-                    public PageableResult<PtmCmpSkuLog> getData(int page) {
-                        return mdm.queryPage(PtmCmpSkuLog.class, new Query(), page, 100);
+                    public PageableResult getData(int page) {
+                        return productService.listPagedProducts(cateId, page, 1000);
                     }
 
                     @Override
@@ -125,10 +140,155 @@ public class ProductTest {
 
                     }
                 },
-                new IProcess<PtmCmpSkuLog>() {
+                new IProcessor<PtmProduct>() {
+                    @Override
+                    public void process(PtmProduct o) {
+                        if (StringUtils.isEmpty(o.getBrand())) {
+                            return;
+                        }
+                        String proBrand = o.getBrand().toLowerCase();
+
+                        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(o.getId());
+
+                        if (ArrayUtils.hasObjs(cmpSkus)) {
+                            for (PtmCmpSku cmpSku : cmpSkus) {
+                                String skuBrand = cmpSku.getBrand();
+                                if (!StringUtils.isEmpty(skuBrand)) {
+                                    skuBrand = skuBrand.replaceAll("\t", "").trim();
+
+                                    if (skuBrand.equalsIgnoreCase(proBrand) || skuBrand.contains(proBrand) || proBrand.contains(skuBrand)) {
+
+                                    } else {
+                                        print(o.getId() + "\t" + o.getBrand() + "\t" + cmpSku.getId() + "\t" + cmpSku.getBrand());
+                                    }
+                                }
+                            }
+                        } else {
+                            print(o.getId() + "\t no skus.");
+                        }
+                    }
+                }
+        );
+
+        productListAndProcessTask2.setProcessorCount(10);
+        productListAndProcessTask2.setQueueMaxSize(1500);
+
+        productListAndProcessTask2.go();
+    }
+
+    private void print(String str) {
+        System.out.println(str);
+    }
+
+    @Test
+    public void testArray() {
+        Date date1 = TimeUtils.stringToDate("2016-07-15 08:00:00", "yyyy-MM-dd HH:mm:ss");
+        Date date2 = TimeUtils.addDay(date1, 1);
+        Query query = new Query(Criteria.where("pcsId").is(7134867L).and("priceTime").gt(date1).lte(date2));
+        List<PtmCmpSkuLog> cmpSkuLogs = mdm.query(PtmCmpSkuLog.class, query);
+        print(cmpSkuLogs.size() + "");
+    }
+
+    private void showList(List<Integer> list) {
+        System.out.println("------------------");
+        for (Integer i : list) {
+            System.out.print(i + "\t");
+        }
+        System.out.println();
+    }
+
+    /**
+     * 1- sku 有多少有brand，model，同时都有
+     */
+    @Test
+    public void querySku() {
+
+        final long cateId = 5L;
+
+        ListProcessTask<PtmProduct> productListAndProcessTask2 = new ListProcessTask<>(
+                new ILister() {
+                    @Override
+                    public PageableResult getData(int page) {
+                        return productService.listPagedProducts(cateId, page, 1000);
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcessor<PtmProduct>() {
+                    @Override
+                    public void process(PtmProduct o) {
+
+                    }
+                }
+        );
+
+        productListAndProcessTask2.setProcessorCount(10);
+        productListAndProcessTask2.setQueueMaxSize(1500);
+
+        productListAndProcessTask2.go();
+    }
+
+    @Test
+    public void querySkuPrice2() {
+
+        Criteria baseCriteria = Criteria.where("id").is(30665);
+
+        Query q = new Query();
+        q.addCriteria(baseCriteria);
+
+        List<PtmCmpSkuHistoryPrice> datas = mdm.query(PtmCmpSkuHistoryPrice.class, q);
+
+        if (datas.size() > 0) {
+            PtmCmpSkuHistoryPrice historyPrice = datas.get(0);
+            PriceNode pn = historyPrice.getPriceNodes().get(0);
+
+            cmpSkuService.saveHistoryPrice(30665, pn.getPriceTime(), pn.getPrice());
+
+            System.out.println(historyPrice.getPriceNodes().size());
+        }
+    }
+
+    @Test
+    public void querySkuPrice0() {
+        cmpSkuService.saveHistoryPrice(4L, TimeUtils.addDay(TimeUtils.nowDate(), -13), 200);
+    }
+
+    @Test
+    public void convertdatas() {
+        final Date startD = TimeUtils.stringToDate("2016-08-01 00:00:00", "yyyy-MM-dd HH:mm:ss");
+        final Date endD = TimeUtils.add(startD, 1);
+        ListProcessTask<PtmCmpSkuLog> listAndProcessTask2 = new ListProcessTask<>(
+                new ILister<PtmCmpSkuLog>() {
+                    @Override
+                    public PageableResult<PtmCmpSkuLog> getData(int page) {
+                        Query query = new Query(Criteria.where("priceTime").gt(startD).lte(endD));
+                        PageableResult<PtmCmpSkuLog> datas = mdm.queryPage(PtmCmpSkuLog.class, new Query(), page, 200);
+                        print("page=" + page + ", datas=");
+                        return datas;
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcessor<PtmCmpSkuLog>() {
                     @Override
                     public void process(PtmCmpSkuLog o) {
-                        savePrice(o.getPcsId(), o.getPriceTime(), o.getPrice());
+                        cmpSkuService.saveHistoryPrice(o.getPcsId(), o.getPriceTime(), o.getPrice());
                     }
                 }
         );
@@ -137,18 +297,6 @@ public class ProductTest {
         listAndProcessTask2.setProcessorCount(1);
 
         listAndProcessTask2.go();
-    }
-
-    private void savePrice(long id, Date time, float price) {
-        PtmCmpSkuHistoryPrice historyPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, id);
-        List<PriceNode> priceNodes = null;
-        if (historyPrice == null) {
-            priceNodes = new ArrayList<>();
-            historyPrice = new PtmCmpSkuHistoryPrice(id, priceNodes);
-        }
-
-        historyPrice.getPriceNodes().add(new PriceNode(time, price));
-        mdm.save(historyPrice);
     }
 
     @Test
@@ -331,8 +479,8 @@ public class ProductTest {
 
         final SiteCount siteCount = new SiteCount();
 
-        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<>(
-                new IList() {
+        ListProcessTask<PtmProduct> listAndProcessTask2 = new ListProcessTask<>(
+                new ILister() {
                     @Override
                     public PageableResult getData(int page) {
                         return dbm.queryPage(Q_PRODUCT_WEBSITE, page, 2000, Arrays.asList(siteCount.site.name()));
@@ -348,7 +496,7 @@ public class ProductTest {
 
                     }
                 },
-                new IProcess<PtmProduct>() {
+                new IProcessor<PtmProduct>() {
                     @Override
                     public void process(PtmProduct o) {
                         List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(o.getId());

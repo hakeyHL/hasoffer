@@ -1,9 +1,9 @@
 package hasoffer.dubbo.api.fetch.task;
 
 import hasoffer.base.utils.JSONUtil;
-import hasoffer.spider.api.IFetchService;
-import hasoffer.spider.api.impl.FetchServiceImpl;
-import hasoffer.spider.common.RedisKeysUtils;
+import hasoffer.spider.api.ISpiderService;
+import hasoffer.spider.api.impl.SpiderServiceImpl;
+import hasoffer.spider.constants.RedisKeysUtils;
 import hasoffer.spider.exception.UnSupportWebsiteException;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.redis.service.IFetchCacheService;
@@ -21,7 +21,7 @@ public class FetchKeywordWorker implements Runnable {
 
     private IFetchCacheService fetchCacheService;
 
-    private IFetchService fetchService = new FetchServiceImpl();
+    private ISpiderService fetchService = new SpiderServiceImpl();
 
     public FetchKeywordWorker(WebApplicationContext springContext) {
         fetchCacheService = (IFetchCacheService) springContext.getBean("fetchCacheService");
@@ -57,12 +57,13 @@ public class FetchKeywordWorker implements Runnable {
             return;
         }
         try {
-            fetchResult = fetchService.getProductSetByKeyword(fetchResult, 10);
+            fetchResult = fetchService.spiderProductSetByKeyword(fetchResult, 10);
         } catch (UnSupportWebsiteException e) {
             logger.error("don't support this website.", e);
             e.printStackTrace();
         }
         logger.info("Fetch Success:website:{}, Key :{}, success:{}", fetchResult.getWebsite(), fetchResult.getKeyword(), fetchResult.getFetchProducts().size());
+        fetchCacheService.setTaskStatusByKeyword(FetchResult.getCacheKey(fetchResult), fetchResult.getTaskStatus());
         fetchCacheService.cacheResult(FetchResult.getCacheKey(fetchResult), fetchResult);
     }
 

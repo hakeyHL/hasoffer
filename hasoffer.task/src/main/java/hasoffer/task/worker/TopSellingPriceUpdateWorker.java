@@ -3,7 +3,7 @@ package hasoffer.task.worker;
 import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.redis.ICacheService;
-import hasoffer.core.worker.ListAndProcessWorkerStatus;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 
 import java.util.concurrent.TimeUnit;
 
@@ -13,10 +13,10 @@ import java.util.concurrent.TimeUnit;
 public class TopSellingPriceUpdateWorker implements Runnable {
 
     private IProductService productService;
-    private ListAndProcessWorkerStatus<PtmTopSelling> ws;
+    private ListProcessWorkerStatus<PtmTopSelling> ws;
     private ICacheService cacheService;
 
-    public TopSellingPriceUpdateWorker(ListAndProcessWorkerStatus<PtmTopSelling> ws, IProductService productService, ICacheService cacheService) {
+    public TopSellingPriceUpdateWorker(ListProcessWorkerStatus<PtmTopSelling> ws, IProductService productService, ICacheService cacheService) {
         this.ws = ws;
         this.productService = productService;
         this.cacheService = cacheService;

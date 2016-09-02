@@ -3,7 +3,7 @@ package hasoffer.task.worker;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
-import hasoffer.core.worker.ListAndProcessWorkerStatus;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +17,10 @@ public class FixFlipkartSourceSidWorker implements Runnable {
 
     private Logger logger = LoggerFactory.getLogger(FixFlipkartSourceSidWorker.class);
 
-    private ListAndProcessWorkerStatus<PtmCmpSku> ws;
+    private ListProcessWorkerStatus<PtmCmpSku> ws;
     private IDataBaseManager dbm;
 
-    public FixFlipkartSourceSidWorker(ListAndProcessWorkerStatus<PtmCmpSku> ws, IDataBaseManager dbm) {
+    public FixFlipkartSourceSidWorker(ListProcessWorkerStatus<PtmCmpSku> ws, IDataBaseManager dbm) {
         this.ws = ws;
         this.dbm = dbm;
     }

@@ -7,6 +7,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.PtmTopSelling;
+import hasoffer.core.persistence.po.ptm.updater.PtmProductUpdater;
 import hasoffer.core.product.solr.ProductModel;
 import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.fetch.model.ListProduct;
@@ -97,6 +98,8 @@ public interface IProductService {
     void reimport2Solr(long productId);
 
     void updateProductBrandModel(long proId, String productBrand, String modelName);
+
+    void updateProduct(PtmProductUpdater ptmProductUpdater);
 
     void importProduct2Solr2(long proId);
 

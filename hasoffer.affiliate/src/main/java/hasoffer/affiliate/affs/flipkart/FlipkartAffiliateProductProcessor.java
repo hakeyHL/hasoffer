@@ -172,7 +172,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
 
             for (AffiliateOrder order : orderList) {
                 order.setAffID(headerMap.get("Fk-Affiliate-Id"));
-                logger.info("order.setAffID({})", headerMap.get("Fk-Affiliate-Id"));
+                logger.info("order.affId={}, order.title={})", headerMap.get("Fk-Affiliate-Id"), order.getTitle().length());
                 if (order.getStatus() == null) {
                     order.setStatus(parameterMap.get(R_ORDER_STATUS));
                 }

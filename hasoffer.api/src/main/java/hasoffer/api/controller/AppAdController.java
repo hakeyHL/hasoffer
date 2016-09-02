@@ -1,5 +1,9 @@
 package hasoffer.api.controller;
 
+import com.google.android.gcm.server.Message;
+import com.google.android.gcm.server.MulticastResult;
+import com.google.android.gcm.server.Result;
+import com.google.android.gcm.server.Sender;
 import hasoffer.base.model.Website;
 import hasoffer.core.app.AdvertiseService;
 import org.slf4j.Logger;
@@ -10,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,6 +44,35 @@ public class AppAdController {
     @Resource
     AdvertiseService advertiseService;
 
+    public static void main(String[] args) {
+        try {
+            Sender sender = new Sender("AIzaSyCZrHjOkZ57j3Dvq_TpvYW8Mt38Ej1dzQA");
+            String userMessage = "{\n" +
+                    "    \"display\": {\n" +
+                    "        \"outTitle\": \" Sony 16GB USB Pen Drive  , 25% OFF at Rs.270.Hurry up! \",\n" +
+                    "        \"title\": \"Sony 16GB USB Pen Drive \",\n" +
+                    "        \"content\": \"25% OFF at Rs.270.Hurry up!\n \"\n" +
+                    "    },\n" +
+                    "    \"click\": {\n" +
+                    "        \"type\": \"DEAL\",\n" +
+                    "        \"url\": \"99000238\",\n" +
+                    "        \"packageName\": \"com.flipkart.android\"\n" +
+                    "    }\n" +
+                    "}";
+            Message message = new Message.Builder().timeToLive(30).delayWhileIdle(true).addData("message", userMessage).build();
+//            Result result = sender.send(message, "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd", 2);
+            MulticastResult result = sender.send(message, Arrays.asList("cWkpvtsRBd4:APA91bFxIK8S3M_ZRzkEBrm6fx2aSk183GdG4nF5U9CkuBpxp4mlyoKYISI1uqbs-H8r-_oHiLdrrnYVgcviUf4T-J9G4HxtLnWbD2whRAaqBoos-I8jp48Ye6z0cJ0rXk6MAARZMVaH", "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd"), 1);
+            System.out.println("123");
+//            Result result = sender.sendNoRetry(message, "cWkpvtsRBd4:APA91bFxIK8S3M_ZRzkEBrm6fx2aSk183GdG4nF5U9CkuBpxp4mlyoKYISI1uqbs-H8r-_oHiLdrrnYVgcviUf4T-J9G4HxtLnWbD2whRAaqBoos-I8jp48Ye6z0cJ0rXk6MAARZMVaH");
+//            String errorCodeName = result.getErrorCodeName();
+//            System.out.println(errorCodeName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(" get exception ");
+            System.out.println(e.getMessage());
+        }
+    }
+
     /**
      * 根据商品id获取category
      * 根据category匹配广告
@@ -49,19 +83,33 @@ public class AppAdController {
     public ModelAndView getAdsByProductId(@RequestParam(defaultValue = "0") Long productId, @RequestParam(defaultValue = "") String website) {
         ModelAndView modelAndView = new ModelAndView();
         logger.info(" get advertisement ");
-        //Map map = new HashMap<>();
+//        Map map = new HashMap<>();
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
-        /*List<Adt> adt = advertiseService.getAdByCategory();
-        if (adt != null && adt.size() > 0) {
-            System.out.println(" get  ..");
-            Adt adt1 = adt.get(0);
-            if (!StringUtils.isEmpty(website)) {
-                adt1.setPackageName(packageMap.get(Website.valueOf(website)));
-            }
-            map.put("ads", Arrays.asList(adt1));
-            modelAndView.addObject("data", map);
-        }*/
+//        List<Adt> adt = advertiseService.getAdByCategory();
+//        if (adt != null && adt.size() > 0) {
+//            System.out.println(" get  ..");
+//            Adt adt1 = adt.get(0);
+//            if (!StringUtils.isEmpty(website)) {
+//                adt1.setPackageName(packageMap.get(Website.valueOf(website)));
+//            }
+//            map.put("ads", Arrays.asList(adt1));
+//            modelAndView.addObject("data", map);
+//        }
+        return modelAndView;
+    }
+
+    @RequestMapping("tPush")
+    public ModelAndView tt() throws Exception {
+        ModelAndView modelAndView = new ModelAndView();
+        Sender sender = new Sender("key=AIzaSyCZrHjOkZ57j3Dvq_TpvYW8Mt38Ej1dzQA");
+        String userMessage = "{\"errorCode\":\"00000\"}";
+        Message message = new Message.Builder().timeToLive(30).delayWhileIdle(true).addData("m", userMessage).build();
+//        String regId="e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd";
+//        Result result  = sender.send(message, regId, 1);
+        Result result = sender.send(message, "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd", 2);
+        String errorCodeName = result.getErrorCodeName();
+        System.out.println(errorCodeName);
         return modelAndView;
     }
 }

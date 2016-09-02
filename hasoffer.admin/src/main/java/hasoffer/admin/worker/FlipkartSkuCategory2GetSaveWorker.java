@@ -7,7 +7,7 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory2;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.worker.ListAndProcessWorkerStatus;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import org.htmlcleaner.TagNode;
 
 import java.util.ArrayList;
@@ -23,10 +23,10 @@ import static hasoffer.base.utils.http.XPathUtils.getSubNodesByXPath;
 public class FlipkartSkuCategory2GetSaveWorker implements Runnable {
 
     private final String Q_CATEGORY_BYNAME = "SELECT t FROM PtmCategory2 t WHERE t.name = ?0 ";
-    private ListAndProcessWorkerStatus<PtmCmpSku> ws;
+    private ListProcessWorkerStatus<PtmCmpSku> ws;
     private IDataBaseManager dbm;
 
-    public FlipkartSkuCategory2GetSaveWorker(IDataBaseManager dbm, ListAndProcessWorkerStatus<PtmCmpSku> ws) {//ICategoryService categoryService
+    public FlipkartSkuCategory2GetSaveWorker(IDataBaseManager dbm, ListProcessWorkerStatus<PtmCmpSku> ws) {//ICategoryService categoryService
         this.dbm = dbm;
         this.ws = ws;
 //        this.categoryService = categoryService;

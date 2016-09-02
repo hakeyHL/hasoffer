@@ -6,6 +6,13 @@
 
     <description>Cache-Settings</description>
 
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:redis.properties</value>
+            </list>
+        </property>
+    </bean>
     <!--cacheManager工厂类，指定ehcache.xml的位置-->
     <!--<bean id="cacheManagerFactory" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">-->
     <!--<property name="configLocation" value="classpath:/cache/ehcache.xml"/>-->
@@ -34,9 +41,20 @@
         <property name="password" value="${cache.redis.password}"/>
         <property name="poolConfig" ref="jedisPoolConfig"/>
     </bean>
-    <bean id="redisTemplate"
-          class="org.springframework.data.redis.core.RedisTemplate">
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
         <property name="connectionFactory" ref="jedisConnFactory"/>
+        <property name="keySerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+        </property>
+        <property name="valueSerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+        </property>
+        <property name="hashKeySerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+        </property>
+        <property name="hashValueSerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+        </property>
     </bean>
 
 </beans>

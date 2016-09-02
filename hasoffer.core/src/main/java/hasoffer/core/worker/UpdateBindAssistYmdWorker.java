@@ -1,6 +1,7 @@
 package hasoffer.core.worker;
 
 import hasoffer.core.persistence.mongo.StatDevice;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import hasoffer.core.user.IDeviceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,10 +15,10 @@ import java.util.concurrent.TimeUnit;
 public class UpdateBindAssistYmdWorker implements Runnable {
 
     IDeviceService deviceService;
-    ListAndProcessWorkerStatus ws;
+    ListProcessWorkerStatus ws;
     private Logger logger = LoggerFactory.getLogger(UpdateBindAssistYmdWorker.class);
 
-    public UpdateBindAssistYmdWorker(IDeviceService deviceService, ListAndProcessWorkerStatus ws) {
+    public UpdateBindAssistYmdWorker(IDeviceService deviceService, ListProcessWorkerStatus ws) {
         this.deviceService = deviceService;
         this.ws = ws;
     }

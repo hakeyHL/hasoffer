@@ -17,6 +17,7 @@ import hasoffer.core.analysis.ProductAnalysisService;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.HijackLog;
+import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
@@ -29,12 +30,12 @@ import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.search.ISearchService;
-import hasoffer.core.task.ListAndProcessTask2;
-import hasoffer.core.task.worker.IList;
-import hasoffer.core.task.worker.IProcess;
+import hasoffer.core.task.ListProcessTask;
+import hasoffer.core.task.worker.ILister;
+import hasoffer.core.task.worker.IProcessor;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import hasoffer.core.user.IDeviceService;
 import hasoffer.core.utils.Httphelper;
-import hasoffer.core.worker.ListAndProcessWorkerStatus;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import hasoffer.fetch.sites.paytm.PaytmHelper;
@@ -49,6 +50,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -170,7 +172,7 @@ public class FixController {
         String queryString = "SELECT t FROM PtmCmpSku t WHERE t.website = 'FLIPKART' AND t.categoryid = 0";
 //        String queryString = ;
 
-        ListAndProcessWorkerStatus ws = new ListAndProcessWorkerStatus();
+        ListProcessWorkerStatus ws = new ListProcessWorkerStatus();
 
         ExecutorService es = Executors.newCachedThreadPool();
 
@@ -341,6 +343,7 @@ public class FixController {
         }
     }
 
+    //fixdata/deleteproduct/
     @RequestMapping(value = "/deleteproduct/{proId}", method = RequestMethod.GET)
     public
     @ResponseBody
@@ -358,6 +361,7 @@ public class FixController {
         return "ok";
     }
 
+    //fixdata/deleteproductanyway/
     @RequestMapping(value = "/deleteproductanyway/{proId}", method = RequestMethod.GET)
     public
     @ResponseBody
@@ -373,8 +377,8 @@ public class FixController {
     @ResponseBody
     String cleansearchlogs() {
 
-        ListAndProcessTask2<SrmSearchLog> listAndProcessTask2 = new ListAndProcessTask2<SrmSearchLog>(
-                new IList<SrmSearchLog>() {
+        ListProcessTask<SrmSearchLog> listAndProcessTask2 = new ListProcessTask<SrmSearchLog>(
+                new ILister<SrmSearchLog>() {
                     @Override
                     public PageableResult<SrmSearchLog> getData(int page) {
                         return searchService.listSearchLogs(page, 1000);
@@ -390,7 +394,7 @@ public class FixController {
 
                     }
                 },
-                new IProcess<SrmSearchLog>() {
+                new IProcessor<SrmSearchLog>() {
                     @Override
                     public void process(SrmSearchLog o) {
                         long proId = o.getPtmProductId();
@@ -533,8 +537,8 @@ public class FixController {
         final String Q_PRODUCT_WEBSITE =
                 "SELECT t FROM PtmProduct t WHERE t.sourceSite=?0";
 
-        ListAndProcessTask2<PtmProduct> listAndProcessTask2 = new ListAndProcessTask2<PtmProduct>(
-                new IList<PtmProduct>() {
+        ListProcessTask<PtmProduct> listAndProcessTask2 = new ListProcessTask<PtmProduct>(
+                new ILister<PtmProduct>() {
                     @Override
                     public PageableResult getData(int page) {
                         return dbm.queryPage(Q_PRODUCT_WEBSITE, page, 500, Arrays.asList(site));
@@ -550,7 +554,7 @@ public class FixController {
 
                     }
                 },
-                new IProcess<PtmProduct>() {
+                new IProcessor<PtmProduct>() {
                     @Override
                     public void process(PtmProduct o) {
                         try {
@@ -588,7 +592,7 @@ public class FixController {
     public
     @ResponseBody
     String createskuindex() {
-        ListAndProcessTask2<PtmCmpSku> listAndProcessTask2 = new ListAndProcessTask2<PtmCmpSku>(new IList() {
+        ListProcessTask<PtmCmpSku> listAndProcessTask2 = new ListProcessTask<PtmCmpSku>(new ILister() {
             @Override
             public PageableResult getData(int page) {
                 return dbm.queryPage(Q_PTMCMPSKU, page, 2000);
@@ -603,7 +607,7 @@ public class FixController {
             public void setRunForever(boolean runForever) {
 
             }
-        }, new IProcess<PtmCmpSku>() {
+        }, new IProcessor<PtmCmpSku>() {
             @Override
             public void process(PtmCmpSku cmpSku) {
                 try {
@@ -1529,5 +1533,30 @@ public class FixController {
         }
 
         return "ok";
+    }
+
+    /**
+     * @param id
+     * @param response 查看一个sku的offer及其相关信息
+     * @return
+     */
+    @RequestMapping("offerTest")
+    public String getOffers(@RequestParam(defaultValue = "0") Long id, HttpServletResponse response) {
+        System.out.println(" get get get get  offers offers offers ");
+        PtmCmpSkuDescription ptmCmpSkuDescription = mdm.queryOne(PtmCmpSkuDescription.class, id);
+        if (ptmCmpSkuDescription != null) {
+            String offers = ptmCmpSkuDescription.getOffers();
+            System.out.println(" got it ,and offers is " + offers);
+            PtmCmpSku ptmCmpSku = cmpSkuService.getCmpSkuById(id);
+            if (ptmCmpSku != null) {
+                System.out.println("sku id is :" + id + " and productId is " + ptmCmpSku.getProductId());
+                PtmProduct product = productService.getProduct(ptmCmpSku.getProductId());
+                if (product != null) {
+                    System.out.println(" product is exist  and title is  " + product.getTitle());
+                    System.out.println(" price is :" + product.getPrice());
+                }
+            }
+        }
+        return null;
     }
 }

@@ -11,7 +11,7 @@ import java.util.Random;
 public class AffliIdHelper {
     final static String[] FLIDS = new String[]{"xyangryrg", "zhouxixi0", "harveyouo", "allenooou", "747306881", "hlhakeygm", "oliviersl", "wuningSFg"};
     final static String[] SNIDS = new String[]{"89037", "104658", "82856"};
-    final static String[] SHIDS = new String[]{"none", "123", "123", "123", "123", "123"};
+    final static String[] SHIDS = new String[]{"none", "123"};
 
     public static String getAffiIds() {
         Random random = new Random();

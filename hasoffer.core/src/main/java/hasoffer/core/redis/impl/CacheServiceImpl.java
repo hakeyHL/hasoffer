@@ -87,13 +87,10 @@ public class CacheServiceImpl<T extends Identifiable> implements ICacheService<T
                     String key = new String(array);
 
                     keySet.add(key);
-
                 }
-
                 return keySet;
             }
         });
-
     }
 
     @Override

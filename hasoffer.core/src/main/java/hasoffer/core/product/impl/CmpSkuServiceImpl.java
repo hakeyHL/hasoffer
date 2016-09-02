@@ -13,9 +13,7 @@ import hasoffer.core.exception.CmpSkuUrlNotFoundException;
 import hasoffer.core.exception.MultiUrlException;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
-import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
-import hasoffer.core.persistence.mongo.PtmProductDescription;
+import hasoffer.core.persistence.mongo.*;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku2;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
@@ -37,16 +35,13 @@ import hasoffer.fetch.sites.snapdeal.SnapdealHelper;
 import hasoffer.spider.model.FetchedProduct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created on 2016/1/4.
@@ -81,9 +76,62 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
     private Logger logger = LoggerFactory.getLogger(CmpSkuServiceImpl.class);
 
-    public static void main(String[] args) {
-        String ss = HexDigestUtil.md5("FLIPKART" + StringUtils.getCleanChars("Apple iPhone 6S (Gold, 64 GB)"));
-        System.out.print(ss);
+    @Override
+    public List<PriceNode> queryHistoryPrice(long id) {
+        PtmCmpSkuHistoryPrice historyPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, id);
+        if (historyPrice == null) {
+            return null;
+        } else {
+            return historyPrice.getPriceNodes();
+        }
+    }
+
+    @Override
+    public void saveHistoryPrice(Long sid, List<PriceNode> priceNodes) {
+        if (ArrayUtils.isNullOrEmpty(priceNodes)) {
+            return;
+        }
+        final int PRICE_HISTORY_SIZE = 90;
+
+        Set<PriceNode> priceNodeSet = new LinkedHashSet<>();
+        priceNodeSet.addAll(priceNodes);
+
+        PtmCmpSkuHistoryPrice historyPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, sid);
+        if (historyPrice != null) {
+            priceNodeSet.addAll(historyPrice.getPriceNodes());
+        }
+
+        List<PriceNode> priceNodes1 = new ArrayList<>();
+        priceNodes1.addAll(priceNodeSet);
+
+        if (historyPrice == null) {
+            historyPrice = new PtmCmpSkuHistoryPrice(sid, priceNodes1);
+        }
+
+        historyPrice.setPriceNodes(priceNodes1);
+
+        // 排序
+        Collections.sort(priceNodes1, new Comparator<PriceNode>() {
+            @Override
+            public int compare(PriceNode o1, PriceNode o2) {
+                if (o1.getPriceTimeL() > o2.getPriceTimeL()) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        });
+
+        if (priceNodes1.size() > PRICE_HISTORY_SIZE) {
+            historyPrice.setPriceNodes(priceNodes1.subList(priceNodes1.size() - PRICE_HISTORY_SIZE, priceNodes1.size()));
+        }
+
+        mdm.save(historyPrice);
+    }
+
+    @Override
+    public void saveHistoryPrice(long id, Date time, float price) {
+        saveHistoryPrice(id, Arrays.asList(new PriceNode(time, price)));
     }
 
     @Override
@@ -224,17 +272,6 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateCmpSkuPrice(Long id, float price) {
-        PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(id);
-
-        ptmCmpSkuUpdater.getPo().setUpdateTime(TimeUtils.nowDate());
-        ptmCmpSkuUpdater.getPo().setPrice(price);
-
-        dbm.update(ptmCmpSkuUpdater);
-    }
-
-    @Override
     public List<PtmCmpSku> listCmpSkus(long productId) {
         return dbm.query(Q_CMPSKU_BY_PRODUCTID, Arrays.asList(productId));
     }
@@ -299,17 +336,9 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     }
 
     @Override
-    public List<PtmCmpSkuLog> listByPcsId(long pcsId) {
-
-        Query query = new Query(Criteria.where("pcsId").is(pcsId));
-        query.with(new Sort(Sort.Direction.ASC, "priceTime"));
-
-        return mdm.query(PtmCmpSkuLog.class, query);
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteCmpSku(long id) {
+        System.out.println("del PtmCmpSku : " + id);
         dbm.delete(PtmCmpSku.class, id);
         cmpskuIndexService.remove(String.valueOf(id));
     }
@@ -431,7 +460,8 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             }
 
             //新的offers不为空，且和就得offers不相同
-            if (!StringUtils.isEmpty(offers) && !StringUtils.isEqual(offers, oldOffers)) {
+            //注意offer内容只要不相同就要更新，有的offer不在可用，需要更新成空
+            if (!StringUtils.isEqual(offers, oldOffers)) {
                 ptmCmpSkuDescription.setOffers(offers);
                 flagOffers = true;
             }
@@ -620,39 +650,6 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     }
 
     @Override
-    public void updateCmpSku(long id, String url, float price, SkuStatus skuStatus) {
-
-        PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(id);
-
-        ptmCmpSkuUpdater.getPo().setUpdateTime(TimeUtils.nowDate());
-        ptmCmpSkuUpdater.getPo().setUrl(url);
-        ptmCmpSkuUpdater.getPo().setPrice(price);
-        ptmCmpSkuUpdater.getPo().setStatus(skuStatus);
-
-        dbm.update(ptmCmpSkuUpdater);
-    }
-
-    @Override
-    public void updateCmpSku(long id, SkuStatus skuStatus, String skuTitle, float price, String imageUrl, String url, String deeplink) {
-
-        PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(id);
-
-        ptmCmpSkuUpdater.getPo().setStatus(skuStatus);
-        ptmCmpSkuUpdater.getPo().setSkuTitle(skuTitle);
-        ptmCmpSkuUpdater.getPo().setPrice(price);
-
-        if (!StringUtils.isEmpty(imageUrl)) {
-            ptmCmpSkuUpdater.getPo().setOriImageUrl(imageUrl);
-        }
-
-        ptmCmpSkuUpdater.getPo().setUpdateTime(TimeUtils.nowDate());
-        ptmCmpSkuUpdater.getPo().setUrl(url);
-        ptmCmpSkuUpdater.getPo().setDeeplink(deeplink);
-
-        dbm.update(ptmCmpSkuUpdater);
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public void createPtmCmpSkuIndexToMysql(PtmCmpSku2 ptmCmpSku) {
 
@@ -716,8 +713,8 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             return;
         }
 //        更新mongodb
-        PtmCmpSkuLog ptmCmpSkuLog = new PtmCmpSkuLog(cmpSku);
-        mdm.save(ptmCmpSkuLog);
+//        PtmCmpSkuLog ptmCmpSkuLog = new PtmCmpSkuLog(cmpSku);
+//        mdm.save(ptmCmpSkuLog);
 
         PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(id);
         //获取商品的status
@@ -786,8 +783,13 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         }
 
 //        更新mongodb
-        PtmCmpSkuLog ptmCmpSkuLog = new PtmCmpSkuLog(cmpSku);
-        mdm.save(ptmCmpSkuLog);
+//        PtmCmpSkuLog ptmCmpSkuLog = new PtmCmpSkuLog(cmpSku);
+//        mdm.save(ptmCmpSkuLog);
+
+        //保存新抓来的价格
+        if (fetchedProduct.getPrice() != 0.0f) {
+            saveHistoryPrice(skuId, TimeUtils.nowDate(), fetchedProduct.getPrice());
+        }
 
         PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(skuId);
 
@@ -872,18 +874,16 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
                 }
             }
 
-            //更新skutitle
-            if (!StringUtils.isEmpty(fetchedProduct.getSubTitle())) {
-                if (StringUtils.isEmpty(cmpSku.getSkuTitle()) || !StringUtils.isEqual(cmpSku.getSkuTitle(), fetchedProduct.getSubTitle())) {
-                    ptmCmpSkuUpdater.getPo().setSkuTitle(fetchedProduct.getSubTitle());
-                }
-            }
-
             String imageUrl = fetchedProduct.getImageUrl();
             if (StringUtils.isEmpty(cmpSku.getOriImageUrl()) || !StringUtils.isEqual(imageUrl, cmpSku.getOriImageUrl())) {
                 if (!StringUtils.isEmpty(imageUrl)) {
                     ptmCmpSkuUpdater.getPo().setOriImageUrl(imageUrl);
                 }
+            }
+
+            //更新skutitle,只要新旧不一样就更新
+            if (!StringUtils.isEqual(cmpSku.getSkuTitle(), fetchedProduct.getSubTitle())) {
+                ptmCmpSkuUpdater.getPo().setSkuTitle(fetchedProduct.getSubTitle());
             }
         }
 
@@ -892,10 +892,6 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             if (website != null) {
                 ptmCmpSkuUpdater.getPo().setWebsite(fetchedProduct.getWebsite());
             }
-        }
-
-        if (!StringUtils.isEmpty(fetchedProduct.getSubTitle())) {
-            ptmCmpSkuUpdater.getPo().setSkuTitle(fetchedProduct.getTitle() + fetchedProduct.getSubTitle());
         }
 
         //更新brand
@@ -916,8 +912,6 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         ptmCmpSkuUpdater.getPo().setDeliveryTime(deliveryTime);
 
         dbm.update(ptmCmpSkuUpdater);
-
-        return;
     }
 
     private void createOrUpdatePtmCmpSkuImage(long id, List<String> imageUrlList) {

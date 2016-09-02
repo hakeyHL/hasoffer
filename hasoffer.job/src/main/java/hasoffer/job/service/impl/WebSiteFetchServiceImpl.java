@@ -23,19 +23,15 @@ import java.util.concurrent.TimeUnit;
 @Service("webSiteFetchService")
 public class WebSiteFetchServiceImpl implements IWebSiteFetchService {
 
-    private Logger logger = LoggerFactory.getLogger(WebSiteFetchServiceImpl.class);
-
     @Resource
     ISearchService searchService;
-
     @Resource
     IDataBaseManager dbm;
-
     @Resource
     SearchProductService searchProductService;
-
     @Resource
     IFetchDubboService fetchDubboService;
+    private Logger logger = LoggerFactory.getLogger(WebSiteFetchServiceImpl.class);
 
     @Override
     public void fetchProduct2Mongodb() {

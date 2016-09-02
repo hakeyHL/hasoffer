@@ -34,6 +34,7 @@ public class CmpProductListVo {
     private float saved;
     private Long id;
     private SkuStatus status;
+    private boolean isAlert = false;
 //    private int min_deliveryTime;
 //    private int max_deliveryTime;
 
@@ -41,6 +42,7 @@ public class CmpProductListVo {
     }
 
     public CmpProductListVo(PtmCmpSku cmpSku, String logoImage) {
+        this.id = cmpSku.getId();
         this.coins = cmpSku.getWebsite() == Website.FLIPKART ? Math.round(0.015 * cmpSku.getPrice()) : 0;
         this.ratingNum = cmpSku.getWebsite().equals(Website.EBAY) ? 0 : cmpSku.getRatings();
         this.imageUrl = cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath());
@@ -87,11 +89,12 @@ public class CmpProductListVo {
     }
 
     public CmpProductListVo(PtmCmpSku cmpSku, float cliPrice) {
+        this.id = cmpSku.getId();
         this.status = cmpSku.getStatus();
         this.title = cmpSku.getTitle();
         this.imageUrl = cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath());
         this.cashBack = cmpSku.getCashBack();
-        this.saved = Math.round(cliPrice - cmpSku.getPrice());
+        this.saved = cliPrice == 0 ? 0 : Math.round(cliPrice - cmpSku.getPrice());
         String tempPrice = Math.round(cmpSku.getPrice()) + "";
         StringBuffer sb = new StringBuffer();
         for (int i = tempPrice.length() - 1; i >= 0; i--) {
@@ -116,6 +119,10 @@ public class CmpProductListVo {
         this.backRate = backRate;
         this.returnGuarantee = returnGuarantee;
         this.support = support;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Math.round(0 - 3.5));
     }
 
     public String getImage() {
@@ -287,10 +294,6 @@ public class CmpProductListVo {
         return offers;
     }
 
-    public void setOffers(List<String> offers) {
-        this.offers = offers;
-    }
-
 //    public int getMin_deliveryTime() {
 //        return min_deliveryTime;
 //    }
@@ -307,6 +310,18 @@ public class CmpProductListVo {
 //        this.max_deliveryTime = max_deliveryTime;
 //    }
 
+    public void setOffers(List<String> offers) {
+        this.offers = offers;
+    }
+
+    public boolean isAlert() {
+        return isAlert;
+    }
+
+    public void setIsAlert(boolean isAlert) {
+        this.isAlert = isAlert;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -321,8 +336,7 @@ public class CmpProductListVo {
         if (returnGuarantee != that.returnGuarantee) return false;
         if (Float.compare(that.cashBack, cashBack) != 0) return false;
         if (Float.compare(that.saved, saved) != 0) return false;
-//        if (min_deliveryTime != that.min_deliveryTime) return false;
-//        if (max_deliveryTime != that.max_deliveryTime) return false;
+        if (isAlert != that.isAlert) return false;
         if (support != null ? !support.equals(that.support) : that.support != null) return false;
         if (offers != null ? !offers.equals(that.offers) : that.offers != null) return false;
         if (imageUrl != null ? !imageUrl.equals(that.imageUrl) : that.imageUrl != null) return false;
@@ -365,8 +379,7 @@ public class CmpProductListVo {
         result = 31 * result + (saved != +0.0f ? Float.floatToIntBits(saved) : 0);
         result = 31 * result + (id != null ? id.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
-//        result = 31 * result + min_deliveryTime;
-//        result = 31 * result + max_deliveryTime;
+        result = 31 * result + (isAlert ? 1 : 0);
         return result;
     }
 }

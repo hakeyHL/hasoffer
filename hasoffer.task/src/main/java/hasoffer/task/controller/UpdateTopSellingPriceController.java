@@ -4,7 +4,7 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.redis.ICacheService;
-import hasoffer.core.worker.ListAndProcessWorkerStatus;
+import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import hasoffer.task.worker.MysqlListWorker;
 import hasoffer.task.worker.TopSellingPriceUpdateWorker;
 import org.springframework.stereotype.Controller;
@@ -46,7 +46,7 @@ public class UpdateTopSellingPriceController {
 
         ExecutorService es = Executors.newCachedThreadPool();
 
-        ListAndProcessWorkerStatus<PtmTopSelling> ws = new ListAndProcessWorkerStatus<PtmTopSelling>();
+        ListProcessWorkerStatus<PtmTopSelling> ws = new ListProcessWorkerStatus<PtmTopSelling>();
 
         es.execute(new MysqlListWorker<PtmTopSelling>(queryString, ws, dbm));
 

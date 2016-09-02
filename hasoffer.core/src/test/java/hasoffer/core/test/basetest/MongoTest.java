@@ -21,6 +21,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -38,6 +40,70 @@ public class MongoTest {
     @Resource
     ICmpSkuService cmpSkuService;
 
+    @Test
+    public void test() {
+
+        long count1 = 0;
+        long count2 = 0;
+
+
+        Query query = new Query();
+        query.with(new Sort(Sort.Direction.ASC, "_id"));
+
+        int curPage = 1;
+        int pageSize = 1000;
+
+        PageableResult<PtmCmpSkuHistoryPrice> pageableResult = mdm.queryPage(PtmCmpSkuHistoryPrice.class, query, curPage, pageSize);
+
+        long totalPage = pageableResult.getTotalPage();
+
+        while (curPage <= totalPage) {
+
+            System.out.println("curPage =" + curPage);
+
+            if (curPage > 1) {
+                pageableResult = mdm.queryPage(PtmCmpSkuHistoryPrice.class, query, curPage, pageSize);
+            }
+
+            List<PtmCmpSkuHistoryPrice> historyPriceList = pageableResult.getData();
+
+            for (PtmCmpSkuHistoryPrice historyPrice : historyPriceList) {
+
+                List<PriceNode> priceNodes = historyPrice.getPriceNodes();
+
+                if (priceNodes.size() <= 1) {
+                    continue;
+                }
+
+                count2++;
+
+                Collections.sort(priceNodes, new Comparator<PriceNode>() {
+                    @Override
+                    public int compare(PriceNode o1, PriceNode o2) {
+                        if (o1.getPriceTimeL() > o2.getPriceTimeL()) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    }
+                });
+
+                long newPriceTime = priceNodes.get(0).getPriceTimeL();
+                long oldPriceTime = priceNodes.get(1).getPriceTimeL();
+                float newPrice = priceNodes.get(0).getPrice();
+                float oldPrice = priceNodes.get(1).getPrice();
+
+                if (newPriceTime > TimeUtils.today() && oldPriceTime < TimeUtils.today() && newPrice < oldPrice) {
+                    count1++;
+                }
+            }
+
+            curPage++;
+        }
+
+        System.out.println("count1 = " + count1);
+        System.out.println("count2 = " + count2);
+    }
 
     @Test
     public void table() {
