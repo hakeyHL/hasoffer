@@ -86,6 +86,7 @@ public class AppUserController {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
+        System.out.println("get info : type " + type + " skuId :" + skuId + " skuPrice " + skuPrice);
         //get user by userToken
         String userToken = Context.currentContext().getHeader("usertoken");
         if (!StringUtils.isEmpty(userToken)) {
@@ -158,13 +159,16 @@ public class AppUserController {
             UrmUser urmUser = appService.getUserByUserToken(userToken);
             if (urmUser != null) {
                 System.out.println("this userToken has user ");
+                System.out.println("check :  " + urmUser.getId() + "  skuId: " + skuId);
                 PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + "", skuId);
                 if (priceOffNotice != null) {
+                    System.out.println("user has concerned this sku :" + skuId);
                     jsonObject.put("errorCode", "00000");
-                    jsonObject.put("msg", "no");
+                    jsonObject.put("msg", "ok");
                 }
             }
         }
+        System.out.println(" response result is : " + JSON.toJSONString(jsonObject));
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }

@@ -1,5 +1,8 @@
 package hasoffer.api.controller;
 
+import com.google.android.gcm.server.Message;
+import com.google.android.gcm.server.Result;
+import com.google.android.gcm.server.Sender;
 import hasoffer.base.model.Website;
 import hasoffer.core.app.AdvertiseService;
 import org.slf4j.Logger;
@@ -39,6 +42,16 @@ public class AppAdController {
     @Resource
     AdvertiseService advertiseService;
 
+    public static void main(String[] args) throws Exception {
+        Sender sender = new Sender("AIzaSyCZrHjOkZ57j3Dvq_TpvYW8Mt38Ej1dzQA");
+        String userMessage = "";
+        Message message = new Message.Builder().timeToLive(30).delayWhileIdle(true).addData("m", userMessage).build();
+        Result result = sender.send(message, "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd", 2);
+        String errorCodeName = result.getErrorCodeName();
+        Integer success = result.getSuccess();
+        System.out.println(success);
+    }
+
     /**
      * 根据商品id获取category
      * 根据category匹配广告
@@ -62,6 +75,19 @@ public class AppAdController {
 //            map.put("ads", Arrays.asList(adt1));
 //            modelAndView.addObject("data", map);
 //        }
+        return modelAndView;
+    }
+
+    @RequestMapping("tPush")
+    public ModelAndView tt() throws Exception {
+        ModelAndView modelAndView = new ModelAndView();
+        Sender sender = new Sender("AIzaSyCZrHjOkZ57j3Dvq_TpvYW8Mt38Ej1dzQA");
+        String userMessage = "";
+        Message message = new Message.Builder().timeToLive(30).delayWhileIdle(true).addData("m", userMessage).build();
+        Result result = sender.send(message, "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd", 2);
+        String errorCodeName = result.getErrorCodeName();
+        Integer success = result.getSuccess();
+        System.out.println(errorCodeName);
         return modelAndView;
     }
 }
