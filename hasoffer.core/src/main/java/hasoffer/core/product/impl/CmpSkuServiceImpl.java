@@ -882,11 +882,12 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             }
 
             //更新skutitle,只要新旧不一样就更新
-            System.out.println(cmpSku.getSkuTitle());
-            System.out.println(fetchedProduct.getSubTitle());
+            System.out.println(" cmpSku.getSkuTitle()  : " + cmpSku.getSkuTitle());
+            System.out.println(" fetchedProduct 1:" + fetchedProduct.getSubTitle());
             if (!StringUtils.isEqual(cmpSku.getSkuTitle(), fetchedProduct.getSubTitle())) {
                 ptmCmpSkuUpdater.getPo().setSkuTitle(fetchedProduct.getSubTitle());
-                System.out.println("set success");
+                System.out.println(" fetchedProduct 2:" + fetchedProduct.getSubTitle());
+                System.out.println("get skutitle :" + ptmCmpSkuUpdater.getPo().getSkuTitle());
             }
         }
 
