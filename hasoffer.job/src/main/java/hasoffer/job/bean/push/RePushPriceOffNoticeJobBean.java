@@ -1,5 +1,6 @@
 package hasoffer.job.bean.push;
 
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.data.redis.IRedisListService;
 import org.quartz.JobExecutionContext;
@@ -34,7 +35,17 @@ public class RePushPriceOffNoticeJobBean extends QuartzJobBean {
         while (pop != null) {
             long priceOffNoticeId = Long.parseLong((String) pop);
             System.out.println("send repush for " + priceOffNoticeId);
-            priceOffNoticeService.pushFailRePush(priceOffNoticeId);
+
+            //每天11,14,22点重发，最后一次失败不在缓存key
+            if (TimeUtils.getHour() < 20) {
+                priceOffNoticeService.pushFailRePush(priceOffNoticeId, true);
+                System.out.println("repush cache fail true " + TimeUtils.nowDate());
+            }
+            {
+                priceOffNoticeService.pushFailRePush(priceOffNoticeId, false);
+                System.out.println("repush don't cache fail true " + TimeUtils.nowDate());
+            }
+
         }
 
         logger.info("RePushPriceOffNoticeJobBean will stop at {}", new Date());
