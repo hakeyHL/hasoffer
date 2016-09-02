@@ -23,13 +23,15 @@ public class UsaAmazonDataFetch {
     @RequestMapping(value = "/start", method = RequestMethod.GET)
     public String start(HttpServletRequest request) throws HttpFetchException, ContentParseException {
 
-        String separator = File.separator;
+        String path = request.getSession().getServletContext().getRealPath("/");
 
-        File file = new File("home" + separator + "hasoffer" + separator + "uploads" + separator + "2016" + separator + "08" + separator + "30");
+        System.out.println(path);
+
+        File file = new File(path,"uploads");
 
         boolean mkdir = file.mkdir();
 
-        System.out.println("mkdie " + mkdir);
+        System.out.println(mkdir);
 
         ISummaryProductProcessor summaryProductProcessor = new UsaAmazonSummaryProductProcessor();
 
