@@ -70,6 +70,7 @@
         <dubbo.version>2.5.3</dubbo.version>
         <httpclient.version>4.5.2</httpclient.version>
         <zookeeper.version>3.4.6</zookeeper.version>
+        <gcm.version>1.0.0</gcm.version>
     </properties>
 
     <!--<distributionManagement>
