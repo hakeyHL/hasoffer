@@ -161,7 +161,7 @@ public class AppUserController {
                 PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + "", skuId);
                 if (priceOffNotice != null) {
                     jsonObject.put("errorCode", "00000");
-                    jsonObject.put("msg", "no");
+                    jsonObject.put("msg", "ok");
                 }
             }
         }

@@ -64,4 +64,15 @@ public class AppAdController {
 //        }
         return modelAndView;
     }
+
+//    @RequestMapping("tPush")
+//    public ModelAndView tt(@RequestParam(defaultValue = "0") Long productId, @RequestParam(defaultValue = "") String website) {
+//        ModelAndView modelAndView = new ModelAndView();
+//        return modelAndView;
+//    }
+//
+//    Result result = null;
+//    Sender sender = new Sender("AIzaSyCZrHjOkZ57j3Dvq_TpvYW8Mt38Ej1dzQA");
+//    Message message = new Message.Builder().timeToLive(30).delayWhileIdle(true).addData("m", "")
+//            .build();
 }
