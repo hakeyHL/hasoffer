@@ -882,12 +882,8 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             }
 
             //更新skutitle,只要新旧不一样就更新
-            System.out.println(" cmpSku.getSkuTitle()  : " + cmpSku.getSkuTitle());
-            System.out.println(" fetchedProduct 1:" + fetchedProduct.getSubTitle());
             if (!StringUtils.isEqual(cmpSku.getSkuTitle(), fetchedProduct.getSubTitle())) {
                 ptmCmpSkuUpdater.getPo().setSkuTitle(fetchedProduct.getSubTitle());
-                System.out.println(" fetchedProduct 2:" + fetchedProduct.getSubTitle());
-                System.out.println("get skutitle :" + ptmCmpSkuUpdater.getParameter().get("skuTitle"));
             }
         }
 
@@ -896,10 +892,6 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             if (website != null) {
                 ptmCmpSkuUpdater.getPo().setWebsite(fetchedProduct.getWebsite());
             }
-        }
-
-        if (!StringUtils.isEmpty(fetchedProduct.getSubTitle())) {
-            ptmCmpSkuUpdater.getPo().setSkuTitle(fetchedProduct.getTitle() + fetchedProduct.getSubTitle());
         }
 
         //更新brand
@@ -919,11 +911,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         String deliveryTime = "1-5";
         ptmCmpSkuUpdater.getPo().setDeliveryTime(deliveryTime);
 
-        System.out.println(ptmCmpSkuUpdater.getParameter().toString());
-
         dbm.update(ptmCmpSkuUpdater);
-
-        System.out.println("update success");
     }
 
     private void createOrUpdatePtmCmpSkuImage(long id, List<String> imageUrlList) {
