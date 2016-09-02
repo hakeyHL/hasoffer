@@ -129,7 +129,7 @@ public class AppUserController {
                                     System.out.println("price is lg than zero ");
                                     //not exist before
                                     boolean notice = iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", cmpSku.getId(), skuPrice, skuPrice);
-                                    System.out.println(" result is :" + notice);
+                                    System.out.println("   is :" + notice);
                                 }
                                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                                 return null;
