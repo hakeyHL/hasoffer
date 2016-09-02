@@ -91,6 +91,12 @@
                                     </button>
                                 </div>
                                 <div class="col-lg-12">
+                                    <button type="button" class="btn btn-primary"
+                                            onclick="removeCache(${pId})"
+                                            data-toggle="modal" data-target="#confirm-delete">清除缓存
+                                    </button>
+                                </div>
+                                <div class="col-lg-12">
 
                                 </div>
                                 <div class="col-lg-12">
@@ -317,6 +323,21 @@
 </script>
 
 <script>
+
+    //清除缓存
+    function removeCache(productId) {
+
+        url = "/p/removeCache/" + productId;
+
+        http.doPost(url, {productId: productId}, function (data) {
+            if (data.status == 'success') {
+                BootstrapDialog.alert("成功");
+            }
+            if (data.status == 'fail') {
+                BootstrapDialog.warning("失败");
+            }
+        });
+    }
 
     //状态切换
     function change(topSellingId) {

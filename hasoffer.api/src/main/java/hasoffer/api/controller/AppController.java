@@ -1,8 +1,10 @@
 package hasoffer.api.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import hasoffer.api.controller.vo.*;
 import hasoffer.api.helper.ClientHelper;
+import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.ParseConfigHelper;
 import hasoffer.api.worker.SearchLogQueue;
 import hasoffer.base.enums.AppType;
@@ -52,6 +54,7 @@ import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -503,8 +506,14 @@ public class AppController {
      * @return
      */
     @RequestMapping(value = "/bindUserInfo", method = RequestMethod.POST)
-    public ModelAndView bindUserInfo(UserVo userVO, HttpServletRequest request) {
-        ModelAndView mv = new ModelAndView();
+    public String bindUserInfo(UserVo userVO,
+                               HttpServletRequest request,
+                               HttpServletResponse response) {
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("errorCode", "00000");
+        jsonObject.put("msg", "ok");
+
         Map map = new HashMap();
         String userToken = UUID.randomUUID().toString();
         String deviceId = JSON.parseObject(request.getHeader("deviceinfo")).getString("deviceId");
@@ -546,34 +555,49 @@ public class AppController {
             List<String> deviceIds = appService.getUserDevicesByUserId(uUser.getId() + "");
             System.out.println("get ids  by userId from urmUserDevice :" + deviceIds.size());
             List<UrmUserDevice> urmUserDevices = new ArrayList<>();
-            for (String dId : deviceIds) {
-                for (String id : ids) {
-                    if (!id.equals(dId)) {
-                        System.out.println("dId by UserId :" + dId + " is not equal to id from deviceId :" + id);
-                        UrmUserDevice urmUserDevice = new UrmUserDevice();
-                        urmUserDevice.setDeviceId(id);
-                        urmUserDevice.setUserId(uUser.getId() + "");
-                        urmUserDevices.add(urmUserDevice);
+            for (String id : ids) {
+                boolean flag = false;
+                for (String dId : deviceIds) {
+                    if (id.equals(dId)) {
+                        flag = true;
+                        System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);
                     }
                 }
-            }
-            if (deviceIds == null || deviceIds.size() < 1) {
-                System.out.println("not exist records before ,add  this ");
-                for (String id : ids) {
-                    System.out.println(" id :" + id);
+                if (!flag) {
+                    System.out.println("id :" + id + " is not exist before ");
                     UrmUserDevice urmUserDevice = new UrmUserDevice();
                     urmUserDevice.setDeviceId(id);
                     urmUserDevice.setUserId(uUser.getId() + "");
                     urmUserDevices.add(urmUserDevice);
                 }
             }
+//            if (deviceIds == null || deviceIds.size() < 1) {
+//                System.out.println("not exist records before ,add  this ");
+//                for (String id : ids) {
+//                    boolean flag = false;
+//                    for (String dId : deviceIds) {
+//                        if (id.equals(dId)) {
+//                            flag = true;
+//                            System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);
+//                        }
+//                    }
+//                    if (!flag) {
+//                        System.out.println("id :" + id + " is not exist before ");
+//                        UrmUserDevice urmUserDevice = new UrmUserDevice();
+//                        urmUserDevice.setDeviceId(id);
+//                        urmUserDevice.setUserId(uUser.getId() + "");
+//                        urmUserDevices.add(urmUserDevice);
+//                    }
+//                }
+//            }
             //将关联关系插入到关联表中
             int count = appService.addUrmUserDevice(urmUserDevices);
             System.out.println(" batch save  result size : " + count);
         }
         map.put("userToken", userToken);
-        mv.addObject("data", map);
-        return mv;
+        jsonObject.put("data", map);
+        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        return null;
     }
 
     /**
