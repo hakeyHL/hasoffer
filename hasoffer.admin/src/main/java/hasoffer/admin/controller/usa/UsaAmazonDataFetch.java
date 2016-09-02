@@ -30,7 +30,7 @@ public class UsaAmazonDataFetch {
 
         File file = new File(path+"/uploads","/2016/08/30");
 
-        boolean mkdir = file.mkdir();
+        boolean mkdir = file.mkdirs();
 
         System.out.println(mkdir);
 
