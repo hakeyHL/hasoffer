@@ -233,6 +233,7 @@ public class AppSkuController {
             String index0Date = getDateMMdd(priceNodes.get(0).getPriceTimeL());
             for (int i = 0; i < lPriceNodesSize; i++) {
                 PriceNode priceNo = lPriceNodes.get(i);
+                System.out.println("array " + temp + "  is " + getDateMMdd(priceNo.getPriceTimeL()));
                 if (priceNo.getPrice() <= 0) {
                     lPriceNodes.remove(priceNo);
                     continue;
