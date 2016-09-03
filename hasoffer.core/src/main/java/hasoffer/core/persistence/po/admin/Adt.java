@@ -13,12 +13,13 @@ import java.util.Date;
 @Entity
 public class Adt implements Identifiable<Long> {
 
+    Date date = new Date();
     @Id
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Date startTime;
-    private Date endTime;
+    private Date startTime = date;
+    private Date endTime = getTimeAfterNDays(date, 7);
     private int count;
     private String aderLogoUrl;
     private String aderName;
@@ -210,5 +211,10 @@ public class Adt implements Identifiable<Long> {
 
     public void setIsShow(boolean isShow) {
         this.isShow = isShow;
+    }
+
+    public Date getTimeAfterNDays(Date date, int n) {
+        date.setTime(date.getTime() + 1000 * 60 * 60 * 24 * n);
+        return date;
     }
 }
