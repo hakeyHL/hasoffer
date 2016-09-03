@@ -247,7 +247,7 @@ public class AppSkuController {
                         if (!priorDate.equals(getDateMMdd(lPriceNodes.get(temp - 1).getPriceTimeL()))) {
                             Date date = new Date();
                             date.setTime(priorDateLong);
-                            PriceNode insertPriceNode = new PriceNode(date, priceNo.getPrice());
+                            PriceNode insertPriceNode = new PriceNode(date, lPriceNodes.get(temp - 1).getPrice());
                             insertPriceNode.setPriceTime(date);
                             lPriceNodes.add(temp, insertPriceNode);
                         }
