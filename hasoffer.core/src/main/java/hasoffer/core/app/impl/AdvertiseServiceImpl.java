@@ -18,7 +18,7 @@ import java.util.List;
 public class AdvertiseServiceImpl implements AdvertiseService {
     private static final String Q_AD_GET_CATEGORY =
             "SELECT t FROM Adt t " +
-                    " where t.isShow='1' ORDER BY t.startTime DESC";
+                    " where t.isShow='true' ORDER BY t.startTime DESC";
     Logger logger = LoggerFactory.getLogger(AdvertiseServiceImpl.class);
     @Resource
     IDataBaseManager dbm;
