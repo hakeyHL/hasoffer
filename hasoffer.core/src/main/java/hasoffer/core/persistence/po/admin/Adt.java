@@ -2,10 +2,7 @@ package hasoffer.core.persistence.po.admin;
 
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -18,6 +15,7 @@ public class Adt implements Identifiable<Long> {
 
     @Id
     @Column(unique = true, nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Date startTime;
     private Date endTime;
@@ -30,6 +28,7 @@ public class Adt implements Identifiable<Long> {
     private String adLink;
     private String adBtnContent;
     private String aderSiteUrl;
+    private boolean isShow = false;
     @Transient
     private String packageName;
     private int adLocation;
@@ -154,27 +153,27 @@ public class Adt implements Identifiable<Long> {
         this.adLocation = adLocation;
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Adt that = (Adt) o;
+        Adt adt = (Adt) o;
 
-        if (count != that.count) return false;
-        if (adLocation != that.adLocation) return false;
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (startTime != null ? !startTime.equals(that.startTime) : that.startTime != null) return false;
-        if (endTime != null ? !endTime.equals(that.endTime) : that.endTime != null) return false;
-        if (aderLogoUrl != null ? !aderLogoUrl.equals(that.aderLogoUrl) : that.aderLogoUrl != null) return false;
-        if (aderName != null ? !aderName.equals(that.aderName) : that.aderName != null) return false;
-        if (adMinmage != null ? !adMinmage.equals(that.adMinmage) : that.adMinmage != null) return false;
-        if (adMaxmage != null ? !adMaxmage.equals(that.adMaxmage) : that.adMaxmage != null) return false;
-        if (adSlogan != null ? !adSlogan.equals(that.adSlogan) : that.adSlogan != null) return false;
-        if (adLink != null ? !adLink.equals(that.adLink) : that.adLink != null) return false;
-        if (adBtnContent != null ? !adBtnContent.equals(that.adBtnContent) : that.adBtnContent != null) return false;
-        return !(aderSiteUrl != null ? !aderSiteUrl.equals(that.aderSiteUrl) : that.aderSiteUrl != null);
+        if (count != adt.count) return false;
+        if (isShow != adt.isShow) return false;
+        if (adLocation != adt.adLocation) return false;
+        if (id != null ? !id.equals(adt.id) : adt.id != null) return false;
+        if (startTime != null ? !startTime.equals(adt.startTime) : adt.startTime != null) return false;
+        if (endTime != null ? !endTime.equals(adt.endTime) : adt.endTime != null) return false;
+        if (aderLogoUrl != null ? !aderLogoUrl.equals(adt.aderLogoUrl) : adt.aderLogoUrl != null) return false;
+        if (aderName != null ? !aderName.equals(adt.aderName) : adt.aderName != null) return false;
+        if (adMinmage != null ? !adMinmage.equals(adt.adMinmage) : adt.adMinmage != null) return false;
+        if (adMaxmage != null ? !adMaxmage.equals(adt.adMaxmage) : adt.adMaxmage != null) return false;
+        if (adSlogan != null ? !adSlogan.equals(adt.adSlogan) : adt.adSlogan != null) return false;
+        if (adLink != null ? !adLink.equals(adt.adLink) : adt.adLink != null) return false;
+        if (adBtnContent != null ? !adBtnContent.equals(adt.adBtnContent) : adt.adBtnContent != null) return false;
+        return !(aderSiteUrl != null ? !aderSiteUrl.equals(adt.aderSiteUrl) : adt.aderSiteUrl != null);
 
     }
 
@@ -192,6 +191,7 @@ public class Adt implements Identifiable<Long> {
         result = 31 * result + (adLink != null ? adLink.hashCode() : 0);
         result = 31 * result + (adBtnContent != null ? adBtnContent.hashCode() : 0);
         result = 31 * result + (aderSiteUrl != null ? aderSiteUrl.hashCode() : 0);
+        result = 31 * result + (isShow ? 1 : 0);
         result = 31 * result + adLocation;
         return result;
     }
@@ -202,5 +202,13 @@ public class Adt implements Identifiable<Long> {
 
     public void setPackageName(String packageName) {
         this.packageName = packageName;
+    }
+
+    public boolean isShow() {
+        return isShow;
+    }
+
+    public void setIsShow(boolean isShow) {
+        this.isShow = isShow;
     }
 }

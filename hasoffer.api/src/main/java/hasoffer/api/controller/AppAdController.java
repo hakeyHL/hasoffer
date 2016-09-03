@@ -5,7 +5,10 @@ import com.google.android.gcm.server.MulticastResult;
 import com.google.android.gcm.server.Result;
 import com.google.android.gcm.server.Sender;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.core.app.AdvertiseService;
+import hasoffer.core.persistence.po.admin.Adt;
+import hasoffer.fetch.helper.WebsiteHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -16,6 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -80,22 +84,27 @@ public class AppAdController {
      * @return
      */
     @RequestMapping("product")
-    public ModelAndView getAdsByProductId(@RequestParam(defaultValue = "0") Long productId, @RequestParam(defaultValue = "") String website) {
+    public ModelAndView getAdsByProductId(@RequestParam(defaultValue = "0") Long productId) {
         ModelAndView modelAndView = new ModelAndView();
         logger.info(" get advertisement ");
-//        Map map = new HashMap<>();
+        Map map = new HashMap<>();
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
-//        List<Adt> adt = advertiseService.getAdByCategory();
-//        if (adt != null && adt.size() > 0) {
-//            System.out.println(" get  ..");
-//            Adt adt1 = adt.get(0);
-//            if (!StringUtils.isEmpty(website)) {
-//                adt1.setPackageName(packageMap.get(Website.valueOf(website)));
-//            }
-//            map.put("ads", Arrays.asList(adt1));
-//            modelAndView.addObject("data", map);
-//        }
+        List<Adt> adt = advertiseService.getAdByCategory();
+        if (adt != null && adt.size() > 0) {
+            System.out.println(" get  index 0");
+            Adt adt1 = adt.get(0);
+            if (adt1 != null) {
+                if (!StringUtils.isEmpty(adt1.getAderName())) {
+                    adt1.setPackageName(packageMap.get(Website.valueOf(adt1.getAderName())));
+                }
+                if (!StringUtils.isEmpty(adt1.getAdLink())) {
+                    adt1.setAdLink(WebsiteHelper.getAdtUrlByWebSite(Website.valueOf(adt1.getAderName()), adt1.getAdLink()));
+                }
+            }
+            map.put("ads", Arrays.asList(adt1));
+            modelAndView.addObject("data", map);
+        }
         return modelAndView;
     }
 
