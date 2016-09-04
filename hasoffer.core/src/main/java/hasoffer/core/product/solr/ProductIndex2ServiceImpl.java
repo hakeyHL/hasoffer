@@ -233,17 +233,18 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
             fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", priceFromStr, priceToStr)));
         }
 //        Sort[] sorts = null;
-        Sort[] sorts = new Sort[2];
-        sorts[0] = new Sort("searchCount", Order.DESC);
+        Sort[] sorts = new Sort[1];
         // sort by
         SearchResultSort resultSort = criteria.getSort();
-        if (resultSort != null) {
+        if (resultSort == null) {
+            sorts[0] = new Sort("searchCount", Order.DESC);
+        } else {
             if (resultSort == SearchResultSort.POPULARITY) {
-                sorts[1] = new Sort(ProductModel2SortField.F_POPULARITY.getFieldName(), Order.DESC);
+                sorts[0] = new Sort(ProductModel2SortField.F_POPULARITY.getFieldName(), Order.DESC);
             } else if (resultSort == SearchResultSort.PRICEL2H) {
-                sorts[1] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.ASC);
+                sorts[0] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.ASC);
             } else if (resultSort == SearchResultSort.PRICEH2L) {
-                sorts[1] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.DESC);
+                sorts[0] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.DESC);
             }
         }
         String q = "*:*";
