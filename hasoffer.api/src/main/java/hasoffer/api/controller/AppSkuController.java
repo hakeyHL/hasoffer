@@ -231,14 +231,17 @@ public class AppSkuController {
             //1.2 过滤不合法数据和添加辅助点
             LinkedList<PriceNode> lPriceNodes = new LinkedList();
             lPriceNodes.addAll(priceNodes);
-            int lPriceNodesSize = lPriceNodes.size();
-            System.out.println(" lPriceNodesSize " + lPriceNodesSize);
+            for (PriceNode priceNode : lPriceNodes) {
+                System.out.println(" lPriceNodes  Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
+            }
+            int priceNodesSize = priceNodes.size();
+            System.out.println(" lPriceNodesSize " + priceNodesSize);
             int temp = 0;
             String index0Date = getDateMMdd(priceNodes.get(0).getPriceTimeL());
-            for (int i = 0; i < lPriceNodesSize; i++) {
+            for (int i = 0; i < priceNodesSize; i++) {
                 System.out.println(" i " + i);
                 System.out.println(" temp " + temp);
-                PriceNode priceNo = lPriceNodes.get(i);
+                PriceNode priceNo = priceNodes.get(i);
                 System.out.println("array " + temp + "  is  " + getDateMMdd(priceNo.getPriceTimeL()) + "  and price is :" + priceNo.getPrice());
                 if (priceNo.getPrice() <= 0) {
                     lPriceNodes.remove(priceNo);
