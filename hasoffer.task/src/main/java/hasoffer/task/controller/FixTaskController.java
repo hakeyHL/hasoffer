@@ -27,9 +27,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
@@ -70,9 +70,9 @@ public class FixTaskController {
     /**
      * 转换价格历史数据格式
      */
-    @RequestMapping(value = "/convert_price_log", method = RequestMethod.GET)
+    @RequestMapping(value = "/convert_price_log/{start}/{end}", method = RequestMethod.GET)
     @ResponseBody
-    public String convert_price_log(@RequestParam String start, @RequestParam String end) {
+    public String convert_price_log(@PathVariable String start, @PathVariable String end) {
         final Date END_DATE = TimeUtils.stringToDate(end, "yyyyMMdd");
 
         Date startD = TimeUtils.stringToDate(start, "yyyyMMdd");
