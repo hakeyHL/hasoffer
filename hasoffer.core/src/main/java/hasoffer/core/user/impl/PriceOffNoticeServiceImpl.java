@@ -200,8 +200,10 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
                 continue;
             }
 
-            String deepLinkUrl = WebsiteHelper.getDeeplinkWithAff(ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), new String[]{marketChannel.name()});
+            //deeplink
+            String deepLinkUrl = WebsiteHelper.getDeeplinkWithAff(ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), new String[]{marketChannel.name(), deviceId});
             System.out.println("deepLinkUrl " + deepLinkUrl);
+
 
             String title = "PRICE DROP ALERT! " + ptmCmpSku.getTitle();
             String content = "Now available at Rs." + (int) ptmCmpSku.getPrice() + ". Check details now.";
