@@ -230,17 +230,10 @@ public class AppSkuController {
             });
             //1.2 过滤不合法数据和添加辅助点
             LinkedList<PriceNode> lPriceNodes = new LinkedList();
-            lPriceNodes.addAll(priceNodes);
-            for (PriceNode priceNode : lPriceNodes) {
-                System.out.println(" lPriceNodes  Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
-            }
             int priceNodesSize = priceNodes.size();
-            System.out.println(" lPriceNodesSize " + priceNodesSize);
             int temp = 0;
             String index0Date = getDateMMdd(priceNodes.get(0).getPriceTimeL());
             for (int i = 0; i < priceNodesSize; i++) {
-                System.out.println(" i " + i);
-                System.out.println(" temp " + temp);
                 PriceNode priceNo = priceNodes.get(i);
                 System.out.println("array " + temp + "  is  " + getDateMMdd(priceNo.getPriceTimeL()) + "  and price is :" + priceNo.getPrice());
                 if (priceNo.getPrice() <= 0) {
@@ -257,7 +250,6 @@ public class AppSkuController {
                             System.out.println("not equal ");
                             Date date = new Date();
                             date.setTime(priorDateLong);
-                            System.out.println("date :" + getDateMMdd(date.getTime()));
                             System.out.println("add node :  " + priorDate + " price " + lPriceNodes.get(temp - 1).getPrice());
                             PriceNode insertPriceNode = new PriceNode(date, lPriceNodes.get(temp - 1).getPrice());
                             lPriceNodes.add(temp, insertPriceNode);
@@ -269,16 +261,8 @@ public class AppSkuController {
             priceNodes = null;
             System.gc();
             priceNodes = new ArrayList<>();
-            System.out.println(" priceNodes " + priceNodes.size());
-            System.out.println(" lPriceNodes " + lPriceNodes.size());
-            for (PriceNode priceNode : lPriceNodes) {
-                System.out.println(" lPriceNodes  Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
-            }
             priceNodes.addAll(lPriceNodes);
             System.out.println(" priceNodes " + priceNodes.size());
-            for (PriceNode priceNode : priceNodes) {
-                System.out.println("priceNodes  Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
-            }
             //2. 计算获得X轴显示数据
             //X轴  20天为间隔显示日期 , 格式为：　10-30
             List<String> X = new ArrayList<>();
