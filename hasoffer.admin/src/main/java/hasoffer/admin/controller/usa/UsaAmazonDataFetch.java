@@ -624,7 +624,7 @@ public class UsaAmazonDataFetch {
 
         System.out.println(path);
 
-        File file = new File(path + "/uploads", "/2016/08/30");
+            File file = new File(path + "/Uploads", "/2016/08/30");
 
         File sqlFile = new File(path + "sql.txt");
 
