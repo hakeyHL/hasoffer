@@ -9,8 +9,6 @@ import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.Product;
 import hasoffer.fetch.sites.amazon.AmazonCategoryProcessor;
 import hasoffer.fetch.sites.amazon.AmazonProductProcessor;
-import hasoffer.fetch.sites.amazon.AmazonSummaryProductProcessor;
-import hasoffer.fetch.sites.amazon.UsaAmazonSummaryProductProcessor;
 import hasoffer.fetch.sites.shopclues.ShopCluesSummaryProductProcessor;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.htmlcleaner.XPatherException;
@@ -63,19 +61,6 @@ public class AmazonProcessorTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @Test
-    public void testamazonupdate() throws HttpFetchException, ContentParseException {
-
-        String url = "https://www.amazon.com/gp/product/B00TKFDKMQ";
-
-        UsaAmazonSummaryProductProcessor summaryProductProcessor = new UsaAmazonSummaryProductProcessor();
-
-        OriFetchedProduct fetchedProduct = summaryProductProcessor.getSummaryProductByUrl(url);
-
-        System.out.println(fetchedProduct);
-
     }
 
 }
