@@ -47,18 +47,29 @@ public class UsaAmazonSummaryProductProcessor {
         TagNode disPriceNode = getSubNodeByXPath(root, "//span[@id='priceblock_dealprice']", null);
         if (disPriceNode == null) {
             disPriceNode = getSubNodeByXPath(root, "//span[@id='priceblock_ourprice']", null);
+            if (disPriceNode == null) {
+                disPriceNode = getSubNodeByXPath(root, "//span[@id='priceblock_saleprice']", null);
+            }
         }
 
         TagNode priceNode = getSubNodeByXPath(root, "//span[@class='a-text-strike']", null);
         if (priceNode == null) {
-            priceNode = getSubNodeByXPath(root, "//span[@id='priceblock_ourprice']", new ContentParseException("price node not found"));
+            priceNode = getSubNodeByXPath(root, "//span[@id='priceblock_ourprice']", null);
         }
 
-        String priceString = StringUtils.filterAndTrim(priceNode.getText().toString(), Arrays.asList(",", "$"));
-        if (NumberUtils.isNumber(priceString)) {
-            price = Float.parseFloat(priceString);
-        } else {
-            System.out.println("priceString is " + priceString + " parse fail");
+        if (priceNode != null) {
+            String priceString = StringUtils.filterAndTrim(priceNode.getText().toString(), Arrays.asList(",", "$"));
+
+            if (priceString.contains("-")) {
+                priceString = priceString.split("-")[1];
+                StringUtils.filterAndTrim(priceString, null);
+            }
+
+            if (NumberUtils.isNumber(priceString)) {
+                price = Float.parseFloat(priceString);
+            } else {
+                System.out.println("priceString is " + priceString + " parse fail");
+            }
         }
 
         if (disPriceNode == null) {
@@ -72,11 +83,26 @@ public class UsaAmazonSummaryProductProcessor {
             }
         }
 
+        if (priceNode == null) {
+            price = disPrice;
+        }
+
         //先将gp/product换成
         url = url.replace("/gp/product/", "/dp/");
         String[] urlParamArray = url.split("/dp/");
         String sourceIdString = urlParamArray[1];
-        String secondUrl = "://www.amazon.com/dp/" + sourceIdString.substring(0, sourceIdString.indexOf("/")) + "/";
+        int index = -1;
+        if (sourceIdString.contains("/")) {
+            index = sourceIdString.indexOf("/");
+        } else {
+            index = sourceIdString.indexOf("?");
+        }
+
+        if (index == -1) {
+            throw new RuntimeException("subString don't hava / or ?");
+        }
+
+        String secondUrl = "://www.amazon.com/dp/" + sourceIdString.substring(0, index) + "/";
 
         if (url.startsWith("https:")) {
             url = "https" + secondUrl;
