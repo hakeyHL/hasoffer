@@ -60,8 +60,7 @@ public class ProductServiceImpl implements IProductService {
 //                    "   AND t.status = 'ONSALE' or  t.status = 'OUTSTOCK'  " +
 //                    " ORDER BY t.price ASC ";
     private static final String Q_ONSALE_PTM_CMPSKU =
-            "SELECT t FROM PtmCmpSku t " +
-                    " WHERE t.productId = ?0  AND  t.price >?1  AND t.status <> 'OFFSALE'  ORDER BY t.price ASC  ";
+            "SELECT t distinct website,price FROM PtmCmpSku t  WHERE t.productId = 3198  AND  t.price >1  AND t.status <> 'OFFSALE'  ORDER BY t.price ASC limit 10;";
 
 
     private static final String Q_NOTOFFSALE_PTM_CMPSKU =

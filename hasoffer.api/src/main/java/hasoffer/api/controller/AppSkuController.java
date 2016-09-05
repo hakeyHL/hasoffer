@@ -362,24 +362,27 @@ public class AppSkuController {
             //只有一个代表价格未变化
             // 若sku价格无变化则 则Y轴最小值为0 最高值为SKU价格*2
             BigDecimal a = BigDecimal.ZERO;
+            System.out.println(" a " + a.intValue());
             //3.2 最大值 b
 //        BigDecimal b = (BigDecimal.valueOf(3).multiply(BigDecimal.valueOf(maxPrice)).subtract(BigDecimal.valueOf(minPrice)).divide(BigDecimal.valueOf(2)).subtract(BigDecimal.valueOf(2)));
             BigDecimal b = BigDecimal.valueOf(priceNodes.get(0).getPrice() * 2);
-
+            System.out.println(" b " + b.intValue());
             //3.3 a+(b-a)/4
             BigDecimal pointOne = a.add((b.subtract(a)).divide(BigDecimal.valueOf(4)));
-
+            System.out.println(" pointOne " + pointOne.intValue());
             //3.4 a+(b-a)/2
             BigDecimal pointTwo = a.add((b.subtract(a)).divide(BigDecimal.valueOf(2)));
-
+            System.out.println(" pointTwo " + pointTwo.intValue());
             //3.5 a+3(b-a)/4）
             BigDecimal pointThree = a.add((b.subtract(a)).multiply(BigDecimal.valueOf(0.75)));
+            System.out.println(" pointThree " + pointThree.intValue());
             //绘制x
             List<String> X = new ArrayList<>();
             Long priceTimeL = new Date().getTime();
             int i = 4;
             while (i > 0) {
-                X.add(this.getDateMMdd(priceTimeL));
+                System.out.println(getDateMMdd(priceTimeL));
+                X.add(getDateMMdd(priceTimeL));
                 priceTimeL = priceTimeL - 1000 * 60 * 60 * 24 * 20;
                 i--;
             }
