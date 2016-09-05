@@ -10,6 +10,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +18,14 @@ import java.util.regex.Pattern;
  * Created on 2016/5/16.
  */
 public class StringTest {
+
+    @Test
+    public void testuuid() {
+
+        System.out.println(UUID.randomUUID().toString());
+
+    }
+
     @Test
     public void test() {
 
