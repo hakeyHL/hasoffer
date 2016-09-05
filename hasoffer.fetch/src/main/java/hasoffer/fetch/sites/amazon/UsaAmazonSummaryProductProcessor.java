@@ -45,7 +45,10 @@ public class UsaAmazonSummaryProductProcessor {
         float disPrice = -1f;
 
         TagNode disPriceNode = getSubNodeByXPath(root, "//span[@id='priceblock_dealprice']", null);
-        TagNode priceNode = getSubNodeByXPath(root, "//span[@class='a-text-strike']", new ContentParseException("price node not found"));
+        TagNode priceNode = getSubNodeByXPath(root, "//span[@class='a-text-strike']", null);
+        if (priceNode == null) {
+            priceNode = getSubNodeByXPath(root, "//span[@id='priceblock_ourprice']", new ContentParseException("price node not found"));
+        }
 
         String priceString = StringUtils.filterAndTrim(priceNode.getText().toString(), Arrays.asList(",", "$"));
         if (NumberUtils.isNumber(priceString)) {
