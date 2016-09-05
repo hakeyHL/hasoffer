@@ -262,8 +262,14 @@ public class AppSkuController {
             priceNodes = new ArrayList<>();
             System.out.println(" priceNodes " + priceNodes.size());
             System.out.println(" lPriceNodes " + lPriceNodes.size());
+            for (PriceNode priceNode : lPriceNodes) {
+                System.out.println(" lPriceNodes  Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
+            }
             priceNodes.addAll(lPriceNodes);
             System.out.println(" priceNodes " + priceNodes.size());
+            for (PriceNode priceNode : priceNodes) {
+                System.out.println("priceNodes  Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
+            }
             //2. 计算获得X轴显示数据
             //X轴  20天为间隔显示日期 , 格式为：　10-30
             List<String> X = new ArrayList<>();
