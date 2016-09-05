@@ -210,6 +210,9 @@ public class AppSkuController {
         //1. 先拿到所有的价格数据
         List<PriceNode> priceNodes = iCmpSkuService.queryHistoryPrice(id);
         System.out.println(priceNodes != null ? "  priceNodes  :" + priceNodes.size() : "null a .....");
+        for (PriceNode priceNode : priceNodes) {
+            System.out.println("priceNodes  Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
+        }
         if (priceNodes != null && priceNodes.size() > 1) {
             System.out.println("has more than one priceNode ");
             //如果有大于1个数据则代表其有价格变化
@@ -226,39 +229,45 @@ public class AppSkuController {
                 }
             });
             //1.2 过滤不合法数据和添加辅助点
+            Iterator<PriceNode> iterator = priceNodes.iterator();
+            while (iterator.hasNext()) {
+                PriceNode priceNode = iterator.next();
+                if (priceNode.getPrice() <= 0) {
+                    iterator.remove();
+                }
+            }
             LinkedList<PriceNode> lPriceNodes = new LinkedList();
-            lPriceNodes.addAll(priceNodes);
-            int lPriceNodesSize = lPriceNodes.size();
+            int priceNodesSize = priceNodes.size();
             int temp = 0;
-            String index0Date = getDateMMdd(priceNodes.get(0).getPriceTimeL());
-            for (int i = 0; i < lPriceNodesSize; i++) {
-                PriceNode priceNo = lPriceNodes.get(i);
-                System.out.println("array " + temp + "  is " + getDateMMdd(priceNo.getPriceTimeL()));
-                if (priceNo.getPrice() <= 0) {
-                    lPriceNodes.remove(priceNo);
-                    continue;
-                }
+            lPriceNodes.add(new PriceNode(priceNodes.get(0).getPriceTime(), priceNodes.get(0).getPrice()));
+
+            for (int i = 1; i < priceNodesSize; i++) {
+                PriceNode priceNo = priceNodes.get(i);
+                System.out.println("array " + temp + "  is  " + getDateMMdd(priceNo.getPriceTimeL()) + "  and price is :" + priceNo.getPrice());
                 //除了第一个,如果当前的前一天与上一个值不相同则增加前一天这个点
-                if (temp > 0) {
-                    long priorDateLong = priceNo.getPriceTimeL() - 1000 * 60 * 60 * 24;
-                    String priorDate = getDateMMdd(priorDateLong);
-                    System.out.println(" priorDate " + priorDate);
-                    if (!priorDate.equals(index0Date)) {
-                        if (!priorDate.equals(getDateMMdd(lPriceNodes.get(temp - 1).getPriceTimeL()))) {
-                            Date date = new Date();
-                            date.setTime(priorDateLong);
-                            PriceNode insertPriceNode = new PriceNode(date, lPriceNodes.get(temp - 1).getPrice());
-                            insertPriceNode.setPriceTime(date);
-                            lPriceNodes.add(temp, insertPriceNode);
-                        }
-                    }
+                long priorDateLong = priceNo.getPriceTimeL() - 1000 * 60 * 60 * 24;
+                String priorDate = getDateMMdd(priorDateLong);
+                System.out.println(" priorDate " + priorDate);
+                if (!priorDate.equals(getDateMMdd(priceNodes.get(i - 1).getPriceTimeL()))) {
+                    System.out.println("not equal ");
+                    Date date = new Date();
+                    date.setTime(priorDateLong);
+                    System.out.println("add node :  " + priorDate + " price " + priceNodes.get(i - 1).getPrice());
+                    PriceNode insertPriceNode = new PriceNode(date, priceNodes.get(i - 1).getPrice());
+                    lPriceNodes.add(insertPriceNode);
+
+                    PriceNode tempPriceNode = new PriceNode(priceNo.getPriceTime(), priceNo.getPrice());
+                    lPriceNodes.add(tempPriceNode);
+                } else {
+                    PriceNode tempPriceNode = new PriceNode(priceNo.getPriceTime(), priceNo.getPrice());
+                    lPriceNodes.add(tempPriceNode);
                 }
-                temp++;
             }
             priceNodes = null;
             System.gc();
             priceNodes = new ArrayList<>();
             priceNodes.addAll(lPriceNodes);
+            System.out.println(" priceNodes " + priceNodes.size());
             //2. 计算获得X轴显示数据
             //X轴  20天为间隔显示日期 , 格式为：　10-30
             List<String> X = new ArrayList<>();
@@ -266,6 +275,7 @@ public class AppSkuController {
             //X.add(this.getDateMMdd(priceNodes.get(0).getPriceTimeL()));
             //2.2 最大日期(一般为当前日期) [length-1]
             Long priceTimeL = priceNodes.get(priceNodes.size() - 1).getPriceTimeL();
+            System.out.println(" priceTimeL" + getDateMMdd(priceTimeL));
             //2.3 遍历日期
             int i = 4;
 //            while (priceTimeL > priceNodes.get(0).getPriceTimeL()) {
@@ -328,10 +338,11 @@ public class AppSkuController {
             Y.add(pointTwo.longValue());
             Y.add(pointThree.longValue());
             Y.add(b.longValue());
-
+            System.out.println("priceNodes " + priceNodes.size());
             //5. 给出坐标集合
             if (priceNodes != null && priceNodes.size() > 0) {
                 for (PriceNode priceNode : priceNodes) {
+                    System.out.println(" Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
                     //查询到价格历史,开始分析priceTimeL
                     PriceCurveXYVo priceCurveXYVo = new PriceCurveXYVo(this.getDateMMdd(priceNode.getPriceTimeL()), BigDecimal.valueOf(priceNode.getPrice()).longValue(), getDistance2X(priceTimeL, priceNode.getPriceTimeL()));
                     priceXY.add(priceCurveXYVo);
