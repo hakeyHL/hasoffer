@@ -17,6 +17,20 @@ import java.util.regex.Pattern;
  * Created on 2016/5/16.
  */
 public class StringTest {
+
+    @Test
+    public void testuuid() {
+
+        String url = "https://www.amazon.com/gp/product/B000MXKMG2/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B000MXKMG2&linkCode=as2&tag=ascsubtag-20&linkId=0d86b0ec42f12cc0ed8f9e9c58965ade";
+
+        url = url.replace("/gp/product/", "/dp/");
+        String[] urlParamArray = url.split("/dp/");
+        String sourceIdString = urlParamArray[1];
+        url = "https://www.amazon.com/dp/" + sourceIdString.substring(0, sourceIdString.indexOf("/")) + "/";
+
+        System.out.println(url);
+    }
+
     @Test
     public void test() {
 
