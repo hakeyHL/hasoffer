@@ -132,7 +132,7 @@ public class FixTaskController {
         );
 
         listAndProcessTask2.setQueueMaxSize(1500);
-        listAndProcessTask2.setProcessorCount(10);
+        listAndProcessTask2.setProcessorCount(20);
 
         while (!pd.isEnd()) {
             listAndProcessTask2.go();
