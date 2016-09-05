@@ -210,7 +210,7 @@ public class WebsiteHelper {
             case FLIPKART:
                 return FlipkartHelper.getUrlWithAff(FlipkartHelper.getDeeplink(url), affs);
             case PAYTM:
-                break;
+                return PaytmHelper.getUrlWithAff(url);
 //                return PaytmHelper.getDeeplink(url);
             case AMAZON:
                 return getUrlWithAff(website, url, affs);
@@ -228,6 +228,7 @@ public class WebsiteHelper {
             case SHOPCLUES:
                 return ShopcluesHelper.getDeeplinkWithAff(url, affs);
             case EBAY:
+                return EbayHelper.getUrlWithAff(url);
             case INFIBEAM:
             case ASKMEBAZAAR:
             case INDIATIMES:
