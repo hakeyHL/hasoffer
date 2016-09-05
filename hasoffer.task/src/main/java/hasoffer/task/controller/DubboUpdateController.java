@@ -86,7 +86,7 @@ public class DubboUpdateController {
         }
 
         for (int i = 0; i < 60; i++) {
-            es.execute(new PriceOffNoticeProcessorWorker(queue, fetchDubboService, redisListService));
+            es.execute(new PriceOffNoticeProcessorWorker(queue, fetchDubboService, redisListService, cmpSkuService));
         }
 
         taskRunning1.set(true);
