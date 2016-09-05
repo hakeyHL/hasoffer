@@ -229,34 +229,38 @@ public class AppSkuController {
                 }
             });
             //1.2 过滤不合法数据和添加辅助点
+            Iterator<PriceNode> iterator = priceNodes.iterator();
+            while (iterator.hasNext()) {
+                PriceNode priceNode = iterator.next();
+                if (priceNode.getPrice() <= 0) {
+                    iterator.remove();
+                }
+            }
             LinkedList<PriceNode> lPriceNodes = new LinkedList();
             int priceNodesSize = priceNodes.size();
             int temp = 0;
-            String index0Date = getDateMMdd(priceNodes.get(0).getPriceTimeL());
-            for (int i = 0; i < priceNodesSize; i++) {
+            Date date = new Date();
+            date.setTime(lPriceNodes.get(0).getPriceTimeL());
+            lPriceNodes.add(new PriceNode(date, lPriceNodes.get(temp - 1).getPrice()));
+
+            for (int i = 1; i < priceNodesSize; i++) {
                 PriceNode priceNo = priceNodes.get(i);
                 System.out.println("array " + temp + "  is  " + getDateMMdd(priceNo.getPriceTimeL()) + "  and price is :" + priceNo.getPrice());
-                if (priceNo.getPrice() <= 0) {
-                    lPriceNodes.remove(priceNo);
-                    continue;
-                }
                 //除了第一个,如果当前的前一天与上一个值不相同则增加前一天这个点
-                if (temp > 0) {
-                    long priorDateLong = priceNo.getPriceTimeL() - 1000 * 60 * 60 * 24;
-                    String priorDate = getDateMMdd(priorDateLong);
-                    System.out.println(" priorDate " + priorDate);
-                    if (!priorDate.equals(index0Date)) {
-                        if (!priorDate.equals(getDateMMdd(lPriceNodes.get(temp - 1).getPriceTimeL()))) {
-                            System.out.println("not equal ");
-                            Date date = new Date();
-                            date.setTime(priorDateLong);
-                            System.out.println("add node :  " + priorDate + " price " + lPriceNodes.get(temp - 1).getPrice());
-                            PriceNode insertPriceNode = new PriceNode(date, lPriceNodes.get(temp - 1).getPrice());
-                            lPriceNodes.add(temp, insertPriceNode);
-                        }
-                    }
+                long priorDateLong = priceNo.getPriceTimeL() - 1000 * 60 * 60 * 24;
+                String priorDate = getDateMMdd(priorDateLong);
+                System.out.println(" priorDate " + priorDate);
+                if (!priorDate.equals(getDateMMdd(priceNodes.get(i - 1).getPriceTimeL()))) {
+                    System.out.println("not equal ");
+                    date.setTime(priorDateLong);
+                    System.out.println("add node :  " + priorDate + " price " + priceNodes.get(i - 1).getPrice());
+                    PriceNode insertPriceNode = new PriceNode(date, priceNodes.get(i - 1).getPrice());
+                    lPriceNodes.add(insertPriceNode);
+
+
+                    PriceNode tempPriceNode = new PriceNode(priceNo.getPriceTime(), priceNo.getPrice());
+                    lPriceNodes.add(tempPriceNode);
                 }
-                temp++;
             }
             priceNodes = null;
             System.gc();
