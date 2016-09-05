@@ -326,9 +326,9 @@ public class AppSkuController {
                 //获得平均值
                 Long middlePrice = (BigDecimal.valueOf(maxPrice).add(BigDecimal.valueOf(minPrice))).divide(BigDecimal.valueOf(2), BigDecimal.ROUND_HALF_UP).longValue();
                 //3. 计算获得Y轴显示数据
-                BigDecimal a = BigDecimal.valueOf(minPrice).multiply(BigDecimal.valueOf(0.8));
+                BigDecimal a = BigDecimal.valueOf(minPrice).subtract((BigDecimal.valueOf(middlePrice).subtract(BigDecimal.valueOf(minPrice))).multiply((BigDecimal.ONE.divide(BigDecimal.valueOf(3)))));
                 BigDecimal b = BigDecimal.valueOf(maxPrice).divide(BigDecimal.valueOf(0.8), BigDecimal.ROUND_HALF_UP);
-                BigDecimal pointOne = BigDecimal.valueOf(middlePrice).multiply(BigDecimal.valueOf(0.85));
+                BigDecimal pointOne = ((BigDecimal.valueOf(middlePrice).subtract(BigDecimal.valueOf(minPrice))).multiply((BigDecimal.ONE.divide(BigDecimal.valueOf(3))))).add(BigDecimal.valueOf(minPrice));
                 BigDecimal pointTwo = BigDecimal.valueOf(middlePrice);
                 BigDecimal pointThree = b.multiply(BigDecimal.valueOf(0.85));
                 // SKU的最高价格处于（a+3(b-a)/4，b）的区间
