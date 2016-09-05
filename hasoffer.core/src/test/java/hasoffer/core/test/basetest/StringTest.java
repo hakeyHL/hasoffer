@@ -1,5 +1,7 @@
 package hasoffer.core.test.basetest;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.StringUtils;
@@ -8,6 +10,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +18,50 @@ import java.util.regex.Pattern;
  * Created on 2016/5/16.
  */
 public class StringTest {
+
+    @Test
+    public void testuuid() {
+
+        System.out.println(UUID.randomUUID().toString());
+
+    }
+
+    @Test
+    public void test() {
+
+        String json = "{\n" +
+                "    \"records\": [\n" +
+                "        {\n" +
+                "            \"domain\": \"hotel.elong.com \\n\\n\",\n" +
+                "            \"VIP\": \"211.151.110.32\",\n" +
+                "            \"aos_node\": 144\n" +
+                "        },\n" +
+                "        {\n" +
+                "            \"domain\": \"hotel.elong.com \\n\\n\",\n" +
+                "            \"VIP\": \"123.59.30.10\",\n" +
+                "            \"aos_node\": 156\n" +
+                "        }\n" +
+                "    ]\n" +
+                "}";
+
+        JSONObject jsonObject = JSONObject.parseObject(json);
+
+        JSONArray jsonArray = jsonObject.getJSONArray("records");
+
+        for (int i = 0; i < jsonArray.size(); i++) {
+
+            JSONObject jsonObject1 = jsonArray.getJSONObject(i);
+
+            String domain = jsonObject1.getString("domain");
+            String vipCode = jsonObject1.getString("VIP");
+            int aos_code = jsonObject1.getIntValue("aos_node");
+
+            System.out.println(domain + "_" + vipCode + "_" + aos_code);
+            System.out.println();
+
+        }
+
+    }
 
     @Test
     public void test12() {

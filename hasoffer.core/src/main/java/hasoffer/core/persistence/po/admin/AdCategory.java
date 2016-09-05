@@ -2,9 +2,7 @@ package hasoffer.core.persistence.po.admin;
 
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * Created by hs on 2016年07月26日.
@@ -15,6 +13,7 @@ public class AdCategory implements Identifiable<Long> {
 
     @Id
     @Column(unique = true, nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long categgoryId;
     private Long advertisementId;
