@@ -61,7 +61,8 @@ public class UsaAmazonSummaryProductProcessor {
             String priceString = StringUtils.filterAndTrim(priceNode.getText().toString(), Arrays.asList(",", "$"));
 
             if (priceString.contains("-")) {
-                priceString = priceString.split("-")[1];
+                priceString = priceString.split("-")[0];
+                System.out.println("subString priceString " + priceString);
                 StringUtils.filterAndTrim(priceString, null);
             }
 
