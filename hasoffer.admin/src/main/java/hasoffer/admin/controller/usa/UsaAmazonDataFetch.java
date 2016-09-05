@@ -107,9 +107,9 @@ public class UsaAmazonDataFetch {
 
             HttpUtils.getImage(oriFetchedProduct.getImageUrl(), new File(file, fileName));
 
-            stringBuilder.append("insert into cb_goods (link,title,cover,price) values (");
+            stringBuilder.append("insert into cb_goods (link,title,cover,price) values (\"");
 
-            stringBuilder.append(url + "," + oriFetchedProduct.getTitle() + "," + fileName + "," + oriFetchedProduct.getPrice() + ");");
+            stringBuilder.append(url + "\",\"" + oriFetchedProduct.getTitle() + "\",\"" + fileName + "\"," + oriFetchedProduct.getPrice() + ");");
 
             System.out.println(stringBuilder.toString());
 
