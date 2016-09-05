@@ -644,6 +644,7 @@ public class UsaAmazonDataFetch {
                 usaAmazonData = usaAmazonSummaryProductProcessor.getSummaryProductByUrl(url);
             } catch (Exception e) {
                 System.out.println("error for " + url);
+                    e.printStackTrace();
                 continue;
             }
 
