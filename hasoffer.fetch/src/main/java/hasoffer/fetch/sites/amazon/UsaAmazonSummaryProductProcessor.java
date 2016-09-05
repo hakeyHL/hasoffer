@@ -77,6 +77,13 @@ public class UsaAmazonSummaryProductProcessor {
             disPrice = price;
         } else {
             String disPriceString = StringUtils.filterAndTrim(disPriceNode.getText().toString(), Arrays.asList(",", "$"));
+
+            if (disPriceString.contains("-")) {
+                disPriceString = disPriceString.split("-")[0];
+                System.out.println("subString disPriceString " + disPriceString);
+                disPriceString = StringUtils.filterAndTrim(disPriceString, null);
+            }
+
             if (NumberUtils.isNumber(disPriceString)) {
                 disPrice = Float.parseFloat(disPriceString);
             } else {
