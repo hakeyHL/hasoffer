@@ -6,6 +6,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.product.ICmpSkuService;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
@@ -28,11 +29,13 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
     private ConcurrentLinkedQueue<PtmCmpSku> queue;
     private IFetchDubboService fetchDubboService;
     private IRedisListService redisListService;
+    private ICmpSkuService cmpSkuService;
 
-    public PriceOffNoticeProcessorWorker(ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, IRedisListService redisListService) {
+    public PriceOffNoticeProcessorWorker(ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, IRedisListService redisListService, ICmpSkuService cmpSkuService) {
         this.queue = queue;
         this.fetchDubboService = fetchDubboService;
         this.redisListService = redisListService;
+        this.cmpSkuService = cmpSkuService;
     }
 
     @Override
@@ -110,6 +113,24 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
 
             System.out.println(JSONUtil.toJSON(fetchedProduct).toString() + "id=" + skuid);
 
+            try {
+                cmpSkuService.createDescription(sku, fetchedProduct);
+            } catch (Exception e) {
+                logger.info("createDescription fail " + skuid);
+            }
+
+            try {
+                cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
+            } catch (Exception e) {
+                logger.info("updateCmpSkuBySpiderFetchedProduct fail " + skuid);
+                e.printStackTrace();
+            }
+
+            try {
+                cmpSkuService.createPtmCmpSkuImage(skuid, fetchedProduct);
+            } catch (Exception e) {
+                logger.info("createPtmCmpSkuImage fail " + skuid);
+            }
 
 //            如果价格发生变化，加到redis队列中
             if (sku.getPrice() != fetchedProduct.getPrice()) {
