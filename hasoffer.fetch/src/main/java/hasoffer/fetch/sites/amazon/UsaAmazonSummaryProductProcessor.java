@@ -61,8 +61,9 @@ public class UsaAmazonSummaryProductProcessor {
             String priceString = StringUtils.filterAndTrim(priceNode.getText().toString(), Arrays.asList(",", "$"));
 
             if (priceString.contains("-")) {
-                priceString = priceString.split("-")[1];
-                StringUtils.filterAndTrim(priceString, null);
+                priceString = priceString.split("-")[0];
+                System.out.println("subString priceString " + priceString);
+                priceString = StringUtils.filterAndTrim(priceString, null);
             }
 
             if (NumberUtils.isNumber(priceString)) {
@@ -76,6 +77,13 @@ public class UsaAmazonSummaryProductProcessor {
             disPrice = price;
         } else {
             String disPriceString = StringUtils.filterAndTrim(disPriceNode.getText().toString(), Arrays.asList(",", "$"));
+
+            if (disPriceString.contains("-")) {
+                disPriceString = disPriceString.split("-")[0];
+                System.out.println("subString disPriceString " + disPriceString);
+                disPriceString = StringUtils.filterAndTrim(disPriceString, null);
+            }
+
             if (NumberUtils.isNumber(disPriceString)) {
                 disPrice = Float.parseFloat(disPriceString);
             } else {

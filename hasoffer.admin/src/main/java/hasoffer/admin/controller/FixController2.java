@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 1cleanUrl-/fix2/clean_url_sku?cateId=5
  * 2brand1-/fix2/tag_brand?cateId=5
  * 3brand2-/fix2/tag_brand_man 手工处理品牌
- * +4price-/fix2/convert_price_log?start=20160801
+ * +4price-/fix2/convert_price_log?start=20160801&end=20160802
  * 5del_sku-/fix2/del_sku_by_brand_mobile 删除品牌不正确的sku
  * 6tag_model - /fix2/tag_model?cateId=5
  */
@@ -268,7 +268,9 @@ public class FixController2 {
      */
     @RequestMapping(value = "/convert_price_log", method = RequestMethod.GET)
     @ResponseBody
-    public String convert_price_log(@RequestParam String start) {
+    public String convert_price_log(@RequestParam String start, @RequestParam String end) {
+        final Date END_DATE = TimeUtils.stringToDate(end, "yyyyMMdd");
+
         Date startD = TimeUtils.stringToDate(start, "yyyyMMdd");
         Date endD = TimeUtils.addDay(startD, 1);
         final ProcessDate pd = new ProcessDate(startD, endD);
@@ -336,6 +338,10 @@ public class FixController2 {
 
             historyPriceMap.clear();
             pd.addDay();
+
+            if (pd.getStartDate().compareTo(END_DATE) > 0) {
+                break;
+            }
         }
 
         print("count=" + count.get() + ", id set=" + idSet.size());

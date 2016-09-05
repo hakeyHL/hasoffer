@@ -19,6 +19,15 @@ import java.util.regex.Pattern;
 public class StringTest {
 
     @Test
+    public void testFloatToInt() {
+
+        float price = 1231.123f;
+
+        System.out.println((int) price);
+
+    }
+
+    @Test
     public void testuuid() {
 
         String url = "https://www.amazon.com/gp/product/B000MXKMG2/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B000MXKMG2&linkCode=as2&tag=ascsubtag-20&linkId=0d86b0ec42f12cc0ed8f9e9c58965ade";
