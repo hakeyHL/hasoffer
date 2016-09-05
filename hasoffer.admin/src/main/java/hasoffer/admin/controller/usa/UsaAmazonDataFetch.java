@@ -4,9 +4,8 @@ import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.http.HttpUtils;
-import hasoffer.fetch.core.ISummaryProductProcessor;
-import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.sites.amazon.UsaAmazonSummaryProductProcessor;
+import hasoffer.fetch.sites.amazon.ext.model.UsaAmazonData;
 import jodd.io.FileUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -95,21 +94,21 @@ public class UsaAmazonDataFetch {
 
             StringBuilder stringBuilder = new StringBuilder();
 
-            ISummaryProductProcessor summaryProductProcessor = new UsaAmazonSummaryProductProcessor();
+            UsaAmazonSummaryProductProcessor usaAmazonSummaryProductProcessor = new UsaAmazonSummaryProductProcessor();
 
-            OriFetchedProduct oriFetchedProduct = summaryProductProcessor.getSummaryProductByUrl(url);
+            UsaAmazonData usaAmazonData = usaAmazonSummaryProductProcessor.getSummaryProductByUrl(url);
 
-            System.out.println(oriFetchedProduct.getTitle());
-            System.out.println(oriFetchedProduct.getImageUrl());
-            System.out.println(oriFetchedProduct.getPrice());
+            System.out.println(usaAmazonData.getTitle());
+            System.out.println(usaAmazonData.getImageUrl());
+            System.out.println(usaAmazonData.getPrice());
 
             String fileName = StringUtils.filterAndTrim(UUID.randomUUID().toString(), Arrays.asList("-")) + ".jpg";
 
-            HttpUtils.getImage(oriFetchedProduct.getImageUrl(), new File(file, fileName));
+            HttpUtils.getImage(usaAmazonData.getImageUrl(), new File(file, fileName));
 
-            stringBuilder.append("insert into cb_goods (link,title,cover,price) values (\"");
+            stringBuilder.append("insert into cb_goods (link,title,cover,price,discount_price) values (\"");
 
-            stringBuilder.append(url + "\",\"" + oriFetchedProduct.getTitle() + "\",\"" + fileName + "\"," + oriFetchedProduct.getPrice() + ");");
+            stringBuilder.append(url + "\",\"" + usaAmazonData.getTitle() + "\",\"uploads/2016/08/30/" + fileName + "\"," + usaAmazonData.getPrice() + "," + usaAmazonData.getDisPrice() + ");");
 
             System.out.println(stringBuilder.toString());
 
