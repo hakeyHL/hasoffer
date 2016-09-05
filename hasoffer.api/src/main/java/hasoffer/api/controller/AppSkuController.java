@@ -323,24 +323,29 @@ public class AppSkuController {
                         return 0;
                     }
                 }).getPrice();
-
+                //获得平均值
+                Long middlePrice = (BigDecimal.valueOf(maxPrice).add(BigDecimal.valueOf(minPrice))).divide(BigDecimal.valueOf(2), BigDecimal.ROUND_HALF_UP).longValue();
                 //3. 计算获得Y轴显示数据
-
+                BigDecimal a = BigDecimal.valueOf(minPrice).multiply(BigDecimal.valueOf(0.8));
+                BigDecimal b = BigDecimal.valueOf(maxPrice).divide(BigDecimal.valueOf(0.8), BigDecimal.ROUND_HALF_UP);
+                BigDecimal pointOne = BigDecimal.valueOf(middlePrice).multiply(BigDecimal.valueOf(0.8));
+                BigDecimal pointTwo = BigDecimal.valueOf(middlePrice);
+                BigDecimal pointThree = BigDecimal.valueOf(middlePrice).divide(BigDecimal.valueOf(0.8), BigDecimal.ROUND_HALF_UP);
                 // SKU的最高价格处于（a+3(b-a)/4，b）的区间
                 // 最低价格处于（a, a+(b-a)/4）
                 //由最价格和最小价格算出a和b的值
                 //3.1 最小值 a
-                BigDecimal a = (BigDecimal.valueOf(3).multiply(BigDecimal.valueOf(minPrice)).subtract(BigDecimal.valueOf(maxPrice)).divide(BigDecimal.valueOf(2)).add(BigDecimal.ONE));
+//                BigDecimal a = (BigDecimal.valueOf(3).multiply(BigDecimal.valueOf(minPrice)).subtract(BigDecimal.valueOf(maxPrice)).divide(BigDecimal.valueOf(2)).add(BigDecimal.ONE));
                 //3.2 最大值 b
-                BigDecimal b = (BigDecimal.valueOf(3).multiply(BigDecimal.valueOf(maxPrice)).subtract(BigDecimal.valueOf(minPrice)).divide(BigDecimal.valueOf(2)).subtract(BigDecimal.ONE));
+//                BigDecimal b = (BigDecimal.valueOf(3).multiply(BigDecimal.valueOf(maxPrice)).subtract(BigDecimal.valueOf(minPrice)).divide(BigDecimal.valueOf(2)).subtract(BigDecimal.ONE));
                 //3.3 a+(b-a)/4
-                BigDecimal pointOne = a.add((b.subtract(a)).divide(BigDecimal.valueOf(4)));
+//                BigDecimal pointOne = a.add((b.subtract(a)).divide(BigDecimal.valueOf(4)));
 
                 //3.4 a+(b-a)/2
-                BigDecimal pointTwo = a.add((b.subtract(a)).divide(BigDecimal.valueOf(2)));
+//                BigDecimal pointTwo = a.add((b.subtract(a)).divide(BigDecimal.valueOf(2)));
 
                 //3.5 a+3(b-a)/4）
-                BigDecimal pointThree = a.add((b.subtract(a)).multiply(BigDecimal.valueOf(0.75)));
+//                BigDecimal pointThree = a.add((b.subtract(a)).multiply(BigDecimal.valueOf(0.75)));
 
                 //Y轴
                 List<Long> Y = new ArrayList<>();
