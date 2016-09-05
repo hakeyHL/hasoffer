@@ -239,9 +239,7 @@ public class AppSkuController {
             LinkedList<PriceNode> lPriceNodes = new LinkedList();
             int priceNodesSize = priceNodes.size();
             int temp = 0;
-            Date date = new Date();
-            date.setTime(lPriceNodes.get(0).getPriceTimeL());
-            lPriceNodes.add(new PriceNode(date, lPriceNodes.get(temp - 1).getPrice()));
+            lPriceNodes.add(new PriceNode(priceNodes.get(0).getPriceTime(), priceNodes.get(0).getPrice()));
 
             for (int i = 1; i < priceNodesSize; i++) {
                 PriceNode priceNo = priceNodes.get(i);
@@ -252,6 +250,7 @@ public class AppSkuController {
                 System.out.println(" priorDate " + priorDate);
                 if (!priorDate.equals(getDateMMdd(priceNodes.get(i - 1).getPriceTimeL()))) {
                     System.out.println("not equal ");
+                    Date date = new Date();
                     date.setTime(priorDateLong);
                     System.out.println("add node :  " + priorDate + " price " + priceNodes.get(i - 1).getPrice());
                     PriceNode insertPriceNode = new PriceNode(date, priceNodes.get(i - 1).getPrice());
