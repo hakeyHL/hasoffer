@@ -103,7 +103,7 @@ public class UsaAmazonDataFetch {
             System.out.println(oriFetchedProduct.getImageUrl());
             System.out.println(oriFetchedProduct.getPrice());
 
-            String fileName = StringUtils.filterAndTrim(UUID.randomUUID().toString(), Arrays.asList("-"));
+            String fileName = StringUtils.filterAndTrim(UUID.randomUUID().toString(), Arrays.asList("-")) + ".jpg";
 
             HttpUtils.getImage(oriFetchedProduct.getImageUrl(), new File(file, fileName));
 
