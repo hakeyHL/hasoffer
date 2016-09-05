@@ -267,6 +267,7 @@ public class AppSkuController {
             //X.add(this.getDateMMdd(priceNodes.get(0).getPriceTimeL()));
             //2.2 最大日期(一般为当前日期) [length-1]
             Long priceTimeL = priceNodes.get(priceNodes.size() - 1).getPriceTimeL();
+            System.out.println(" priceTimeL" + getDateMMdd(priceTimeL));
             //2.3 遍历日期
             int i = 4;
 //            while (priceTimeL > priceNodes.get(0).getPriceTimeL()) {
@@ -329,10 +330,11 @@ public class AppSkuController {
             Y.add(pointTwo.longValue());
             Y.add(pointThree.longValue());
             Y.add(b.longValue());
-
+            System.out.println("priceNodes " + priceNodes.size());
             //5. 给出坐标集合
             if (priceNodes != null && priceNodes.size() > 0) {
                 for (PriceNode priceNode : priceNodes) {
+                    System.out.println(" Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
                     //查询到价格历史,开始分析priceTimeL
                     PriceCurveXYVo priceCurveXYVo = new PriceCurveXYVo(this.getDateMMdd(priceNode.getPriceTimeL()), BigDecimal.valueOf(priceNode.getPrice()).longValue(), getDistance2X(priceTimeL, priceNode.getPriceTimeL()));
                     priceXY.add(priceCurveXYVo);
