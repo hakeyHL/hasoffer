@@ -256,7 +256,9 @@ public class AppSkuController {
                     PriceNode insertPriceNode = new PriceNode(date, priceNodes.get(i - 1).getPrice());
                     lPriceNodes.add(insertPriceNode);
 
-
+                    PriceNode tempPriceNode = new PriceNode(priceNo.getPriceTime(), priceNo.getPrice());
+                    lPriceNodes.add(tempPriceNode);
+                } else {
                     PriceNode tempPriceNode = new PriceNode(priceNo.getPriceTime(), priceNo.getPrice());
                     lPriceNodes.add(tempPriceNode);
                 }
