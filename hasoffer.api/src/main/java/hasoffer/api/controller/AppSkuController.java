@@ -243,7 +243,11 @@ public class AppSkuController {
                         iterator.remove();
                     }
                 }
+                //如果历史价格数据中的最后一个点不是当前日期,则将当前日期作为作为一个点,价格为历史价格的最后一个点的价格
                 LinkedList<PriceNode> lPriceNodes = new LinkedList();
+                if (getDateMMdd(priceNodes.get(priceNodes.size() - 1).getPriceTimeL()).equals(getDateMMdd(new Date().getTime()))) {
+                    priceNodes.add(new PriceNode(new Date(), priceNodes.get(priceNodes.size() - 1).getPrice()));
+                }
                 int priceNodesSize = priceNodes.size();
                 int temp = 0;
                 lPriceNodes.add(new PriceNode(priceNodes.get(0).getPriceTime(), priceNodes.get(0).getPrice()));
@@ -285,7 +289,7 @@ public class AppSkuController {
                 System.out.println(" priceTimeL" + getDateMMdd(priceTimeL));
                 //2.3 遍历日期
                 int i = 4;
-//            while (priceTimeL > priceNodes.get(0).getPriceTimeL()) {
+                //while (priceTimeL > priceNodes.get(0).getPriceTimeL()) {
                 while (i > 0) {
                     X.add(this.getDateMMdd(priceTimeL));
                     priceTimeL = priceTimeL - 1000 * 60 * 60 * 24 * 20;
@@ -371,7 +375,7 @@ public class AppSkuController {
                 BigDecimal a = BigDecimal.ZERO;
                 System.out.println(" a " + a.intValue());
                 //3.2 最大值 b
-//        BigDecimal b = (BigDecimal.valueOf(3).multiply(BigDecimal.valueOf(maxPrice)).subtract(BigDecimal.valueOf(minPrice)).divide(BigDecimal.valueOf(2)).subtract(BigDecimal.valueOf(2)));
+                //BigDecimal b = (BigDecimal.valueOf(3).multiply(BigDecimal.valueOf(maxPrice)).subtract(BigDecimal.valueOf(minPrice)).divide(BigDecimal.valueOf(2)).subtract(BigDecimal.valueOf(2)));
                 BigDecimal b = BigDecimal.valueOf(priceNodes.get(0).getPrice() * 2);
                 System.out.println(" b " + b.intValue());
                 //3.3 a+(b-a)/4
@@ -403,7 +407,6 @@ public class AppSkuController {
                 Y.add(pointTwo.longValue());
                 Y.add(pointThree.longValue());
                 Y.add(b.longValue());
-
                 //数据点,给两个数据点,起始和最终,都是同个值
                 PriceCurveXYVo priceCurveXYVoIndex = new PriceCurveXYVo(X.get(0), BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue(), getDistance2X(priceTimeL, priceNodes.get(0).getPriceTimeL()));
                 PriceCurveXYVo priceCurveXYVoEnd = new PriceCurveXYVo(X.get(X.size() - 1), BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue(), getDistance2X(priceTimeL, new Date().getTime()));

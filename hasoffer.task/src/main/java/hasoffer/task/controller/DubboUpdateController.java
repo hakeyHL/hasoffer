@@ -16,10 +16,7 @@ import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchUrlResult;
 import hasoffer.spider.model.FetchedProduct;
-import hasoffer.task.worker.CmpSkuDubboUpdateWorker;
-import hasoffer.task.worker.PriceOffNoticeProcessorWorker;
-import hasoffer.task.worker.SrmProductSearchCountListWorker;
-import hasoffer.task.worker.TopSellingListWorker;
+import hasoffer.task.worker.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -76,7 +73,7 @@ public class DubboUpdateController {
 
         ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
 
-        es.execute(new SrmProductSearchCountListWorker(dbm, queue, fetchDubboService));
+        es.execute(new PriceOffNoticeListWorker(dbm, queue, fetchDubboService));
 
         //保证list任务优先执行
         try {
