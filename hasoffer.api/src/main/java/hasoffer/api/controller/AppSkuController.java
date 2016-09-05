@@ -248,7 +248,7 @@ public class AppSkuController {
                             System.out.println("not equal ");
                             Date date = new Date();
                             date.setTime(priorDateLong);
-                            System.out.println("add node :  " + getDateMMdd(lPriceNodes.get(temp - 1).getPriceTimeL()) + " lPriceNodes.get(temp - 1).getPrice()");
+                            System.out.println("add node :  " + priorDate + " price " + lPriceNodes.get(temp - 1).getPrice());
                             PriceNode insertPriceNode = new PriceNode(date, lPriceNodes.get(temp - 1).getPrice());
                             lPriceNodes.add(temp, insertPriceNode);
                         }
