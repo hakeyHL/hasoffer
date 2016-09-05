@@ -113,7 +113,7 @@ public class UsaAmazonDataFetch {
 
             System.out.println(stringBuilder.toString());
 
-            FileUtil.appendString(sqlFile, stringBuilder.toString());
+            FileUtil.appendString(sqlFile, stringBuilder.toString() + "\n");
         }
 
 
