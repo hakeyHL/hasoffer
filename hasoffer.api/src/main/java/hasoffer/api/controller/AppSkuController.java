@@ -245,7 +245,7 @@ public class AppSkuController {
                 }
                 //如果历史价格数据中的最后一个点不是当前日期,则将当前日期作为作为一个点,价格为历史价格的最后一个点的价格
                 LinkedList<PriceNode> lPriceNodes = new LinkedList();
-                if (getDateMMdd(priceNodes.get(priceNodes.size() - 1).getPriceTimeL()).equals(getDateMMdd(new Date().getTime()))) {
+                if (!getDateMMdd(priceNodes.get(priceNodes.size() - 1).getPriceTimeL()).equals(getDateMMdd(new Date().getTime()))) {
                     priceNodes.add(new PriceNode(new Date(), priceNodes.get(priceNodes.size() - 1).getPrice()));
                 }
                 int priceNodesSize = priceNodes.size();
