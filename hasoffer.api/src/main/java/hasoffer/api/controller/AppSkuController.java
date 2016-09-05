@@ -233,7 +233,7 @@ public class AppSkuController {
             String index0Date = getDateMMdd(priceNodes.get(0).getPriceTimeL());
             for (int i = 0; i < lPriceNodesSize; i++) {
                 PriceNode priceNo = lPriceNodes.get(i);
-                System.out.println("array " + temp + "  is " + getDateMMdd(priceNo.getPriceTimeL()));
+                System.out.println("array " + temp + "  is  " + getDateMMdd(priceNo.getPriceTimeL()) + "  and price is :" + priceNo.getPrice());
                 if (priceNo.getPrice() <= 0) {
                     lPriceNodes.remove(priceNo);
                     continue;
@@ -245,10 +245,11 @@ public class AppSkuController {
                     System.out.println(" priorDate " + priorDate);
                     if (!priorDate.equals(index0Date)) {
                         if (!priorDate.equals(getDateMMdd(lPriceNodes.get(temp - 1).getPriceTimeL()))) {
+                            System.out.println("not equal ");
                             Date date = new Date();
                             date.setTime(priorDateLong);
+                            System.out.println("add node :  " + getDateMMdd(lPriceNodes.get(temp - 1).getPriceTimeL()) + " lPriceNodes.get(temp - 1).getPrice()");
                             PriceNode insertPriceNode = new PriceNode(date, lPriceNodes.get(temp - 1).getPrice());
-                            insertPriceNode.setPriceTime(date);
                             lPriceNodes.add(temp, insertPriceNode);
                         }
                     }
