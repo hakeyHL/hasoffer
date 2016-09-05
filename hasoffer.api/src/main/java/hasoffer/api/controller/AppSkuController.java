@@ -260,6 +260,7 @@ public class AppSkuController {
             priceNodes = null;
             System.gc();
             priceNodes = new ArrayList<>();
+            System.out.println(" priceNodes " + priceNodes.size());
             System.out.println(" lPriceNodes " + lPriceNodes.size());
             priceNodes.addAll(lPriceNodes);
             System.out.println(" priceNodes " + priceNodes.size());
