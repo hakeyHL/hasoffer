@@ -45,6 +45,10 @@ public class UsaAmazonSummaryProductProcessor {
         float disPrice = -1f;
 
         TagNode disPriceNode = getSubNodeByXPath(root, "//span[@id='priceblock_dealprice']", null);
+        if (disPriceNode == null) {
+            disPriceNode = getSubNodeByXPath(root, "//span[@id='priceblock_ourprice']", null);
+        }
+
         TagNode priceNode = getSubNodeByXPath(root, "//span[@class='a-text-strike']", null);
         if (priceNode == null) {
             priceNode = getSubNodeByXPath(root, "//span[@id='priceblock_ourprice']", new ContentParseException("price node not found"));
