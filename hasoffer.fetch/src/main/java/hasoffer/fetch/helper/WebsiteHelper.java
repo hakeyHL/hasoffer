@@ -396,4 +396,22 @@ public class WebsiteHelper {
                 return "";
         }
     }
+
+    public static String getAdtUrlByWebSite(Website website, String url) {
+        switch (website) {
+            case FLIPKART:
+                if (url.contains("?")) {
+                    url += "&affid=" + AffliIdHelper.getAffiIdByWebsite(website);
+                } else {
+                    url += "?affid=" + AffliIdHelper.getAffiIdByWebsite(website);
+                }
+                return url;
+//            case SNAPDEAL:
+//                return AmazonHelper.getProductIdByUrl(url);
+//            case SHOPCLUES:
+//                return SnapdealHelper.getProductIdByUrl(url);
+            default:
+                return url;
+        }
+    }
 }
