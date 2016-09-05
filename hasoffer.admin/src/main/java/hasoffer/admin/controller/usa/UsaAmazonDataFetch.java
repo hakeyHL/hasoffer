@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Administrator on 2016/9/2.
@@ -378,6 +379,14 @@ public class UsaAmazonDataFetch {
             System.out.println(stringBuilder.toString());
 
             FileUtil.appendString(sqlFile, stringBuilder.toString() + "\n");
+
+                try {
+                        System.out.println("sleeping");
+                        TimeUnit.MINUTES.sleep(1);
+                } catch (InterruptedException e) {
+                        e.printStackTrace();
+                }
+
         }
 
 

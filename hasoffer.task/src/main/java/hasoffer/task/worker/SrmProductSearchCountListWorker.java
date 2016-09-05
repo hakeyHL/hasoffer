@@ -119,7 +119,7 @@ public class SrmProductSearchCountListWorker implements Runnable {
                             }
 
                             queue.add(sku);
-                            fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_2);
+                            fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_3);
                         } else {
                             queue.add(sku);
                             fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_5);
