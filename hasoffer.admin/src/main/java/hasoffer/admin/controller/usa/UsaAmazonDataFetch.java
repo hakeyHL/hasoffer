@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Administrator on 2016/9/2.
@@ -62,7 +63,6 @@ public class UsaAmazonDataFetch {
                 "https://www.amazon.com/BERTELLI-Ultra-Cusioned-Flipflop-Sandal/dp/B01C3C0ZEI/ref=pd_sim_309_2?ie=UTF8&refRID=ZPNYKANM043Q1DF9KNJF",
                 "https://www.amazon.com/Bertelli-New-Sandals-Bright-Bi-layered/dp/B00KAGVYYU/ref=pd_sim_309_4?ie=UTF8&refRID=VD9AMVX4VP6XG59TCSQP",
                 "https://www.amazon.com/Bertelli-New-Classic-Sandal-Colors/dp/B00KAHVPZC/ref=pd_sim_309_2?ie=UTF8&refRID=2EHF51AKKH9PKTV07A5C",
-                "https://www.amazon.com/Hanes-Label-3-Pack-Comfort-Assortedashirt/dp/B01BLUM7SA/ref=pd_sim_193_5?ie=UTF8&refRID=49XCJ1VWEYR5W7JX876W",
                 "https://www.amazon.com/Hanes-Mens-4-Pack-Assorted-A-Shirt/dp/B00LVJ8JPW/ref=pd_sbs_193_2?ie=UTF8&refRID=HS0JQCHMFZSANESDFFX2",
                 "https://www.amazon.com/Andrew-Scott-Sleeveless-Muscle-Shirts/dp/B01HXB05DK/ref=pd_sbs_193_5?ie=UTF8&refRID=HS0JQCHMFZSANESDFFX2",
                 "https://www.amazon.com/Kanu-Surf-Mens-Voyage-Trunks/dp/B015VLNDVU/ref=pd_sim_193_4?ie=UTF8&refRID=RFTY6N92C1WX02PWAKG1",
@@ -75,7 +75,6 @@ public class UsaAmazonDataFetch {
                 "https://www.amazon.com/Eurosocks-Cool-Ghost-Black-X-Large/dp/B003L5CBFS/ref=sr_1_2522?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472976432&sr=1-2522&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/ExOfficio-Give-n-Go-Brief-Hemlock-Large/dp/B00ZI5L1I2/ref=sr_1_4?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472976873&sr=1-4&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/Bell-7071185-Darth-Multisport-Helmet/dp/B018NKIWKI/ref=sr_1_12?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472976873&sr=1-12&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
-                "https://www.amazon.com/CamelBak-Glass-Water-Bottle-7-Liter/dp/B00NXQL0PM/ref=sr_1_10?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472976873&sr=1-10&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/Zippo-12-Hour-Warmer-Realtree-Camouflage/dp/B013HLGUDE/ref=sr_1_14?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472976873&sr=1-14&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/Sawyer-Products-SP714-Maxi-DEET-Repellent/dp/B005SO8JRO/ref=sr_1_16?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472976873&sr=1-16&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/NeoSport-Neoprene-Snorkel-Low-top-Socks/dp/B00S0WMQU2/ref=sr_1_22?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472976873&sr=1-22&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
@@ -120,9 +119,7 @@ public class UsaAmazonDataFetch {
                 "https://www.amazon.com/Aeroskin-Polypropylene-Shorts-Stripes-Pocket/dp/B003TW5HA4/ref=sr_1_772?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977795&sr=1-772&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Oakley-Mens-Beanie-Copper-Canyon/dp/B00TS48IEY/ref=sr_1_778?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977795&sr=1-778&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Zippo-Hendrix-Pocket-Lighter-Street/dp/B019U5X5AW/ref=sr_1_779?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977795&sr=1-779&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
-                "https://www.amazon.com/STAGE-STGT-007-Stage-Steel-Scraper/dp/B00GSLE2JU/ref=sr_1_781?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977795&sr=1-781&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Texsport-Aluminum-Percolator-Outdoor-Camping/dp/B001DZQYJW/ref=sr_1_782?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977795&sr=1-782&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
-                "https://www.amazon.com/Helly-Hansen-Daybreaker-Fleece-Sunrise/dp/B00L4HFP1W/ref=sr_1_786?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977795&sr=1-786&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Craft-Shield-Finger-Waterproof-Flumino/dp/B00XC860OW/ref=sr_1_789?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977795&sr=1-789&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/FU-R-Headwear-Striped-Fleece-Beanie/dp/B00UC5NXPM/ref=sr_1_791?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977795&sr=1-791&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/NP-Surf-Jigsaw-Rashguard-X-Large/dp/B00GXFYY9Y/ref=sr_1_800?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977861&sr=1-800&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
@@ -130,7 +127,6 @@ public class UsaAmazonDataFetch {
                 "https://www.amazon.com/Hyperflex-ACCESS-3mm-Round-Boot/dp/B00IMJA6PU/ref=sr_1_803?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977861&sr=1-803&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Life-Crusher-Range-Nantucket-Small/dp/B00M0DITX0/ref=sr_1_809?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977861&sr=1-809&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Mountain-Khakis-Shoreline-Sleeve-X-Large/dp/B00LUXXF12/ref=sr_1_805?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977861&sr=1-805&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
-                "https://www.amazon.com/ExOfficio-Mens-Sleeve-Loden-Small/dp/B00HV14X9K/ref=sr_1_818?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977896&sr=1-818&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Ibex-Outdoor-Clothing-Mosaic-Kohlrabi/dp/B011YQ8CZ8/ref=sr_1_819?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977896&sr=1-819&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Mountain-Khakis-Genevieve-Classic-Regular/dp/B00S5P7LJA/ref=sr_1_820?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977896&sr=1-820&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/KAVU-Womens-Skort-Terrain-Medium/dp/B0113P9XD0/ref=sr_1_824?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977896&sr=1-824&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
@@ -139,13 +135,10 @@ public class UsaAmazonDataFetch {
                 "https://www.amazon.com/Life-Womens-Crusher-Jackie-T-Shirt/dp/B00EA7KKW2/ref=sr_1_829?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977896&sr=1-829&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Life-Places-Motorcycle-Crusher-Medium/dp/B01593ZR3M/ref=sr_1_827?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977896&sr=1-827&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Eurosocks-0122-DryStat-Mountaineering-X-Large/dp/B0089HSVB6/ref=sr_1_845?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977947&sr=1-845&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
-                "https://www.amazon.com/Manzella-Hybrid-Gloves-Charcoal-Medium/dp/B00KZCXVPO/ref=sr_1_851?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977947&sr=1-851&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Dakine-Jax-Beanie-Burgundy-Size/dp/B00I84JV0K/ref=sr_1_855?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977947&sr=1-855&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Life-Womens-Night-Black-Medium/dp/B00LV4VDSC/ref=sr_1_857?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977947&sr=1-857&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
-                "https://www.amazon.com/ExOfficio-Pisco-Sleeve-Jacket-X-Large/dp/B00RQWQMW0/ref=sr_1_854?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977947&sr=1-854&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Mountain-Khakis-Rendezvous-Micro-XX-Large/dp/B00S0Z4B5C/ref=sr_1_861?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977947&sr=1-861&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Life-Unplug-Rainbow-X-Large-Copper/dp/B01599KQ5A/ref=sr_1_863?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977947&sr=1-863&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
-                "https://www.amazon.com/Craghoppers-Corey-Sweaters-Granite-XX-Large/dp/B00LNAHAOA/ref=sr_1_871?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472977997&sr=1-871&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Dakine-Mens-Cutter-Beanie-Charcoal/dp/B00W5WXA7G/ref=sr_1_890?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978008&sr=1-890&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Life-Sleeve-Newbury-Simplify-Night/dp/B00TVJRG8U/ref=sr_1_897?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978008&sr=1-897&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Mountain-Khakis-Flannel-Engine-Medium/dp/B00KLXON6I/ref=sr_1_899?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978008&sr=1-899&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
@@ -164,17 +157,13 @@ public class UsaAmazonDataFetch {
                 "https://www.amazon.com/Body-Glove-Five-Finger-Small/dp/B004E95GAC/ref=sr_1_983?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978098&sr=1-983&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Columbia-Silver-Ridge-Plaid-Sleeve/dp/B00L1R6HQ2/ref=sr_1_990?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978147&sr=1-990&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Royal-Robbins-Vista-Sleeve-XX-Large/dp/B010161TMU/ref=sr_1_996?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978147&sr=1-996&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
-                "https://www.amazon.com/Liberty-Bottle-Works-Mass-Transit/dp/B002R0MP0E/ref=sr_1_1022?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978173&sr=1-1022&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Sector-Junior-Pursuit-Protective-X-Large/dp/B00KM5IA00/ref=sr_1_1027?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978173&sr=1-1027&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/ICEBREAKER-Sierra-Gloves-Infinity-X-Large/dp/B00KXU0PCA/ref=sr_1_1055?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978208&sr=1-1055&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Pearl-Izumi-Journey-Shadow-Small/dp/B00F1JU87U/ref=sr_1_1066?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978230&sr=1-1066&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Industries-Lightweight-Mountain-Sleeve-X-Small/dp/B00XATD758/ref=sr_1_1084?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978245&sr=1-1084&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
-                "https://www.amazon.com/Cyclops-Titan-Lumen-Headlamp-Tree/dp/B00ICTMJ28/ref=sr_1_1091?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978245&sr=1-1091&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
-                "https://www.amazon.com/Royal-Racing-Gloves-Electric-Large/dp/B016UWJ8PY/ref=sr_1_1094?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978245&sr=1-1094&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/DECKY-Neon-Jeep-Cap-Yellow/dp/B00L534TY4/ref=sr_1_1123?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978271&sr=1-1123&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/HippyTree-Homebrew-Small-Heather-Charcoal/dp/B018AAMDT2/ref=sr_1_1170?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978297&sr=1-1170&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/PZ-Racing-CR5-3S-Al7075-Coating/dp/B00EP6JZ42/ref=sr_1_1183?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978316&sr=1-1183&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
-                "https://www.amazon.com/UST-20-STL0004-Emergency-Candle-Silver/dp/B00YPD802S/ref=sr_1_1206?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978333&sr=1-1206&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Heat-Factory-Deluxe-Balaclava-Pockets/dp/B0049HU2HG/ref=sr_1_1221?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978333&sr=1-1221&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Dakine-Kids-Tracker-Gloves-Large/dp/B00ZRQH29O/ref=sr_1_1231?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978368&sr=1-1231&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Celtek-Mens-Meltdown-Face-Black/dp/B00UL1NRMG/ref=sr_1_1247?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978368&sr=1-1247&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
@@ -182,7 +171,6 @@ public class UsaAmazonDataFetch {
                 "https://www.amazon.com/BONEShieldz-Tarmac-Combo-Protective-Youth/dp/B00AEBI8XQ/ref=sr_1_1371?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978475&sr=1-1371&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Manzella-Womens-Ranger-Gloves-Infinity/dp/B00EV66FRQ/ref=sr_1_1418?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978498&sr=1-1418&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Aervoe-Surveyor-Safety-Florida-Yellow/dp/B008APX3NS/ref=sr_1_1433?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978498&sr=1-1433&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
-                "https://www.amazon.com/Life-good-Mens-Creamy-Large/dp/B00M06TOLI/ref=sr_1_1448?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978559&sr=1-1448&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Oakley-Mens-Rockslide-Beanie-Aurora/dp/B00TS48M4A/ref=sr_1_1511?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978600&sr=1-1511&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Eurosocks-Marathon-Supreme-Black-Large/dp/B000NA5HWS/ref=sr_1_1625?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978683&sr=1-1625&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Life-good-Cloud-White-Medium/dp/B00M0CKDUS/ref=sr_1_1637?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472978714&sr=1-1637&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
@@ -197,18 +185,12 @@ public class UsaAmazonDataFetch {
                 "https://www.amazon.com/Clockwork-Gears-Snake-Cycling-T-Shirt/dp/B00GZEZCL2/ref=sr_1_2056?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472979054&sr=1-2056&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Victorinox-Classic-Chocolate-Clam-Multi-Tool/dp/B00JVYYL42/ref=sr_1_2116?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472979106&sr=1-2116&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Canari-Cyclewear-Womens-Evolution-Breakaway/dp/B00H8LSFC4/ref=sr_1_2122?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472979106&sr=1-2122&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
-                "https://www.amazon.com/Cycle-Force-Kids-Helmet-52-56cm/dp/B00IGRQZD0/ref=sr_1_2131?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472979106&sr=1-2131&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Great-Eastern-Entertainment-Durarara-Messenger/dp/B007AAN7GM/ref=sr_1_2192?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472979178&sr=1-2192&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
-                "https://www.amazon.com/Manzella-Mens-Ranger-Beanie-Realtree/dp/B00KZD0KNE/ref=sr_1_2232?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472979194&sr=1-2232&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Innate-Portal-Travel-Pouch-Charcoal/dp/B004XZ2ZSS/ref=sr_1_2237?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472979225&sr=1-2237&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Highlander-Outdoor-Micro-Towel-Olive/dp/B008QW51KS/ref=sr_1_2259?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472979238&sr=1-2259&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Skateboards-Baseball-Skateboard-32-Inch-14-5-Inch/dp/B00EFOKEJY/ref=sr_1_2323?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472979277&sr=1-2323&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/ZtuntZ-Skateboards-Skateboard-32-Inch-14-5-Inch/dp/B00EFOC51E/ref=sr_1_2324?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472979277&sr=1-2324&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
-                "https://www.amazon.com/Bula-Flannigan-Beanie-Black-Size/dp/B00LCSVMY2/ref=sr_1_2336?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472979303&sr=1-2336&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
-                "https://www.amazon.com/Ambler-Mens-Kootenay-Beanie-Black/dp/B00EQ1024I/ref=sr_1_2338?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472979303&sr=1-2338&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Rip-Curl-Sleeve-Guard-Shirt/dp/B00CZ8SYSA/ref=sr_1_2345?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472979303&sr=1-2345&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
-                "https://www.amazon.com/Skateboards-Barbara-Skateboard-32-Inch-14-5-Inch/dp/B00EFOFZNY/ref=sr_1_2360?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472979338&sr=1-2360&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
-                "https://www.amazon.com/Body-Glove-Deluxe-Rashguard-White/dp/B004CJD926/ref=sr_1_2546?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472979442&sr=1-2546&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000%2Cp_72%3A1248957011",
                 "https://www.amazon.com/Shortsleeve-T-Shirt-Under-Armour-Midnight/dp/B00783KT9Y/ref=sr_1_1?s=sports-and-fitness-clothing&ie=UTF8&qid=1472979526&sr=1-1&refinements=p_36%3A600-2000",
                 "https://www.amazon.com/Under-Armour-V-Neck-T-Shirt-X-Large/dp/B00KWK1O30/ref=sr_1_2?s=sports-and-fitness-clothing&ie=UTF8&qid=1472979526&sr=1-2&refinements=p_36%3A600-2000",
                 "https://www.amazon.com/TM-R34-BO_X-Large-Tesla-Coldgear-Compression-Baselayer/dp/B01833X868/ref=sr_1_4?s=sports-and-fitness-clothing&ie=UTF8&qid=1472979526&sr=1-4&refinements=p_36%3A600-2000",
@@ -229,18 +211,14 @@ public class UsaAmazonDataFetch {
                 "https://www.amazon.com/Antishock-OuTera-Adjustable-Ultralight-Telescopic/dp/B01ACT4MTI/ref=gbph_img_m-2_4942_7f276ceb?smid=A2H38VIKKDKMJM&pf_rd_p=2530804942&pf_rd_s=merchandised-search-2&pf_rd_t=101&pf_rd_i=9927316011&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=FHKJ89YQ22GM0F3SQZZZ",
                 "https://www.amazon.com/Liveup-SPORTS-Support-Sporting-Varvious/dp/B01H3ANDLW/ref=gbph_img_m-2_4942_4d80293c?smid=A3W4OSAX1VMRR3&pf_rd_p=2530804942&pf_rd_s=merchandised-search-2&pf_rd_t=101&pf_rd_i=9927316011&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=FHKJ89YQ22GM0F3SQZZZ",
                 "https://www.amazon.com/dp/B01IJ50P2A/ref=gbph_img_m-2_4942_8a32a966?pf_rd_p=2530804942&pf_rd_s=merchandised-search-2&pf_rd_t=101&pf_rd_i=9927316011&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=BAE4RS5VCZRGE555N9NZ",
-                "https://www.amazon.com/dp/B016OCGHBI/ref=gbph_img_m-2_4942_2ea34188?pf_rd_p=2530804942&pf_rd_s=merchandised-search-2&pf_rd_t=101&pf_rd_i=9927316011&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=BAE4RS5VCZRGE555N9NZ",
                 "https://www.amazon.com/dp/B01ECSCSK0/ref=gbph_img_m-2_4942_bfe3fd5d?pf_rd_p=2530804942&pf_rd_s=merchandised-search-2&pf_rd_t=101&pf_rd_i=9927316011&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=BAE4RS5VCZRGE555N9NZ",
                 "https://www.amazon.com/dp/B00EAKCGRG/ref=gbph_img_m-2_4942_c4de3f91?pf_rd_p=2530804942&pf_rd_s=merchandised-search-2&pf_rd_t=101&pf_rd_i=9927316011&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=BAE4RS5VCZRGE555N9NZ",
                 "https://www.amazon.com/dp/B01EWIKXUW?psc=1",
                 "https://www.amazon.com/dp/B016X939EU?psc=1",
-                "https://www.amazon.com/Football-Ultra-Cooler-Holder-2-Pack/dp/B00EMX8EQI/ref=pd_sim_sbs_200_1?ie=UTF8&refRID=HPVX96VAQCQNRPFNAZWH",
                 "https://www.amazon.com/Bright-Sales-Strip-Lantern-Pack/dp/B00BNAMGOY/ref=sr_1_8?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472971500&sr=1-8&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/Ryder-Radian-Front-White-Light/dp/B00REGYVAS/ref=sr_1_13?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472971500&sr=1-13&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/M-Wave-Alloy-Water-Bottle-Yellow/dp/B004XSBVY4/ref=sr_1_57?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472971550&sr=1-57&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/Ultimate-Survival-Technologies-Whistle-Bracelet/dp/B00B0D2F1S/ref=sr_1_101?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472971633&sr=1-101&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
-                "https://www.amazon.com/Stansport-Emergency-Day-Pack-Orange/dp/B00LWMRWME/ref=sr_1_140?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472971920&sr=1-140&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
-                "https://www.amazon.com/M-Wave-Mobi-System-Navigation-Holder-Magellan/dp/B001KX1EZ6/ref=sr_1_194?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472972237&sr=1-194&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/Sector-Patches-Leather-Brown-Medium/dp/B009ZCG3BO/ref=sr_1_221?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472972404&sr=1-221&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/M-Wave-Alloy-Water-Bottle-Cage/dp/B004XSBVVC/ref=sr_1_234?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472972404&sr=1-234&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/Avenir-Urban-Watt-Headlight-1-LED/dp/B0047IJ9IU/ref=sr_1_309?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472972471&sr=1-309&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
@@ -257,7 +235,7 @@ public class UsaAmazonDataFetch {
                 "https://www.amazon.com/Stansport-180-Backpackers-IsoButane-Stove/dp/B001B8UY0G/ref=sr_1_829?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472973894&sr=1-829&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/Liberty-Bottle-Boston-Medium-Almond/dp/B01A0N7AK4/ref=sr_1_835?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472973894&sr=1-835&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/Equinox-Hellbender-Map-Case-Medium/dp/B002WJBVY6/ref=sr_1_883?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472974108&sr=1-883&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
-                "https://www.amazon.com/Ventura-220951-5-LED-Bicycle-Flashlight/dp/B001NGBG8K/ref=sr_1_890?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472974178&sr=1-890&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
+
                 "https://www.amazon.com/Serfas-Womens-Chromoly-Performance-Saddle/dp/B00LW69ID6/ref=sr_1_925?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472974201&sr=1-925&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/Moneysworth-Best-Professional-Triangular-Cleaning/dp/B01AJNAJLM/ref=sr_1_1037?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472974278&sr=1-1037&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/Ventura-420035-RD-Bicycle-Bell-Red/dp/B01A0G4NRE/ref=sr_1_1039?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472974278&sr=1-1039&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
@@ -282,13 +260,11 @@ public class UsaAmazonDataFetch {
                 "https://www.amazon.com/NIKW4-Womens-Cable-Pants-Large/dp/B00M2HO8H0/ref=sr_1_1850?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472976115&sr=1-1850&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/Lucky-Bums-Dynamo-Flashlight-Green/dp/B009PXJUEU/ref=sr_1_1868?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472976115&sr=1-1868&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/Coleman-2000016435-Utensil-Set/dp/B001TSC6MM/ref=sr_1_1899?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472976162&sr=1-1899&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
-                "https://www.amazon.com/Retrospec-Bicycles-Button-Track-Saddle/dp/B00HWVMCC4/ref=sr_1_1914?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472976162&sr=1-1914&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/Peak-Performance-Folding-Camping-Stool/dp/B0143ENURS/ref=sr_1_1915?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472976162&sr=1-1915&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/Krown-KRHEL-WHT-Helmet-White/dp/B004UOL8E4/ref=sr_1_1987?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472976202&sr=1-1987&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/Super-B-Three-Way-Torx-Wrench/dp/B00HFC0NY4/ref=sr_1_2324?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472976324&sr=1-2324&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/GSI-Outdoors-Glacier-Stainless-Flask/dp/B001LF3IHK/ref=sr_1_2386?m=ATVPDKIKX0DER&s=sporting-goods&ie=UTF8&qid=1472976360&sr=1-2386&refinements=p_6%3AATVPDKIKX0DER%2Cp_36%3A600-2000",
                 "https://www.amazon.com/Allegra-Stylish-Sleeve-Solid-Sweater/dp/B00901HFFI/ref=sr_1_44?s=apparel&ie=UTF8&qid=1473043912&sr=1-44&nodeID=1044442&refinements=p_36%3A200-1998",
-                "https://www.amazon.com/Keral-Knited-Pullover-High-Necked-Sweater/dp/B00JBENVI4/ref=pd_sim_193_1?ie=UTF8&refRID=HEW7MM9EQ2RWHPM3GM6H",
                 "https://www.amazon.com/Ohoo-Mens-Casual-V-Neck-DCV010-BLACK-L/dp/B01CWRQQRY/ref=sr_1_3?s=apparel&ie=UTF8&qid=1473044060&sr=1-3&nodeID=1044442&refinements=p_36%3A200-1998",
                 "https://www.amazon.com/Ohoo-Mens-Slim-Casual-V-Neck/dp/B01CWS7EPG/ref=pd_sbs_193_1?ie=UTF8&refRID=GEDPYFQFCGKSY36CR2Q3",
                 "https://www.amazon.com/Allegra-Turtle-Neck-Slim-T-Shirt/dp/B00NWDWNZ2/ref=pd_sim_193_3?ie=UTF8&refRID=TFTJ8FNNV2DCJZM6DPMY",
@@ -297,7 +273,6 @@ public class UsaAmazonDataFetch {
                 "https://www.amazon.com/Super-Light-Weight-Pullover-Medusa/dp/B01BHCWU2U/ref=sr_1_53?s=apparel&ie=UTF8&qid=1473045035&sr=1-53&nodeID=1044442&refinements=p_36%3A200-1998",
                 "https://www.amazon.com/Guide-Gear-Turtleneck/dp/B0040AT2LO/ref=pd_sim_193_3?ie=UTF8&refRID=SZ8TBH8A03Y398W4EE0G",
                 "https://www.amazon.com/UNRESTRAINED-Hipster-Longline-Hooded-Zipper/dp/B01ER83J3K/ref=pd_rhf_dp_s_cp_2?ie=UTF8&pd_rd_i=B01ER83J3K&pd_rd_r=F46HC5C48FVED204QP8F&pd_rd_w=22vJh&pd_rd_wg=4wW92&refRID=F46HC5C48FVED204QP8F",
-                "https://www.amazon.com/Match-Knited-Casual-Pullover-Sweaters/dp/B00WEE1F4U/ref=sr_1_51?s=apparel&ie=UTF8&qid=1473045035&sr=1-51&nodeID=1044442&refinements=p_36%3A200-1998",
                 "https://www.amazon.com/Henley-Sleeve-Button-Cotton-Casual/dp/B01JPFUAPK/ref=pd_d0_nib_v2_cwb_ap_3?ie=UTF8&refRID=Y5SBHK9CQD4Q6C1QH89W",
                 "https://www.amazon.com/Ardorrs-100-Cotton-PullOver-Hoodie/dp/B01JMQB8US/ref=pd_d0_nib_v2_cwb_ap_2?ie=UTF8&refRID=Y5SBHK9CQD4Q6C1QH89W",
                 "https://www.amazon.com/Ardorr-Mens-100-Cotton-Sweater/dp/B01JMIV9ZU/ref=pd_d0_recs_v2_cwb_ap_1?ie=UTF8&refRID=C7VG2D08JJDYV4DEP7BZ",
@@ -322,7 +297,6 @@ public class UsaAmazonDataFetch {
                 "https://www.amazon.com/PACKGOUT-PAIRS-Breathable-Comfortable-Running/dp/B019NZ0ZZC/ref=pd_sim_sbs_193_1?ie=UTF8&refRID=1VQ780ME1NE43VCW77VX",
                 "https://www.amazon.com/SDBING-Unisex-Fingers-Separate-Assorted/dp/B00UTAM1XA/ref=pd_sbs_468_5?ie=UTF8&psc=1&refRID=ZD42ERTQ00TSN9RC9D5S",
                 "https://www.amazon.com/RSG-Hosiery-Womens-Shorties-Length/dp/B00IRJKJ34/ref=pd_sim_193_3?ie=UTF8&refRID=SFKMCKZM52BPB4KFW98X",
-                "https://www.amazon.com/RSG-Hosiery-Striped-Assorted-Colors/dp/B00SPZTWFQ/ref=pd_sbs_193_5?ie=UTF8&refRID=3WQSHZ1S8GE6NWRCPPME",
                 "https://www.amazon.com/Foot-Traffic-Striped-Toe-Socks/dp/B014RHY2RI/ref=pd_sim_193_5?ie=UTF8&refRID=VSK8RTDAQ2SZ75VFD05J",
         };
 
@@ -378,6 +352,14 @@ public class UsaAmazonDataFetch {
             System.out.println(stringBuilder.toString());
 
             FileUtil.appendString(sqlFile, stringBuilder.toString() + "\n");
+
+                try {
+                        System.out.println("sleeping");
+                        TimeUnit.MINUTES.sleep(1);
+                } catch (InterruptedException e) {
+                        e.printStackTrace();
+                }
+
         }
 
 

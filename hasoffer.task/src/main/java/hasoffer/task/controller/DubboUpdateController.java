@@ -17,6 +17,7 @@ import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchUrlResult;
 import hasoffer.spider.model.FetchedProduct;
 import hasoffer.task.worker.CmpSkuDubboUpdateWorker;
+import hasoffer.task.worker.PriceOffNoticeProcessorWorker;
 import hasoffer.task.worker.SrmProductSearchCountListWorker;
 import hasoffer.task.worker.TopSellingListWorker;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -61,6 +62,38 @@ public class DubboUpdateController {
     IPriceOffNoticeService priceOffNoticeService;
     @Resource
     IRedisListService redisListService;
+
+    //dubbofetchtask/priceoffnotice
+    @RequestMapping(value = "/priceoffnotice", method = RequestMethod.GET)
+    @ResponseBody
+    public String priceoffnotice() {
+
+        if (taskRunning1.get()) {
+            return "task running.";
+        }
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
+
+        es.execute(new SrmProductSearchCountListWorker(dbm, queue, fetchDubboService));
+
+        //保证list任务优先执行
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        for (int i = 0; i < 60; i++) {
+            es.execute(new PriceOffNoticeProcessorWorker(queue, fetchDubboService, redisListService, cmpSkuService));
+        }
+
+        taskRunning1.set(true);
+
+        return "ok";
+    }
+
 
     //dubbofetchtask/updatestart
     @RequestMapping(value = "/updatestart", method = RequestMethod.GET)
