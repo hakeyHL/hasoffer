@@ -324,13 +324,13 @@ public class AppSkuController {
                     }
                 }).getPrice();
                 //获得平均值
-                Long middlePrice = (BigDecimal.valueOf(maxPrice).add(BigDecimal.valueOf(minPrice))).divide(BigDecimal.valueOf(2), BigDecimal.ROUND_HALF_UP).longValue();
+                BigDecimal middlePrice = (BigDecimal.valueOf(maxPrice).add(BigDecimal.valueOf(minPrice))).divide(BigDecimal.valueOf(2), BigDecimal.ROUND_HALF_UP);
                 //3. 计算获得Y轴显示数据
-                BigDecimal a = BigDecimal.valueOf(minPrice).subtract((BigDecimal.valueOf(middlePrice).subtract(BigDecimal.valueOf(minPrice))).multiply((BigDecimal.ONE.divide(BigDecimal.valueOf(3)))));
-                BigDecimal b = BigDecimal.valueOf(maxPrice).divide(BigDecimal.valueOf(0.8), BigDecimal.ROUND_HALF_UP);
-                BigDecimal pointOne = ((BigDecimal.valueOf(middlePrice).subtract(BigDecimal.valueOf(minPrice))).multiply((BigDecimal.ONE.divide(BigDecimal.valueOf(3))))).add(BigDecimal.valueOf(minPrice));
-                BigDecimal pointTwo = BigDecimal.valueOf(middlePrice);
-                BigDecimal pointThree = b.multiply(BigDecimal.valueOf(0.85));
+                BigDecimal of3 = (middlePrice.subtract(BigDecimal.valueOf(minPrice))).multiply(BigDecimal.valueOf(1).divide(BigDecimal.valueOf(3), 2, BigDecimal.ROUND_HALF_UP));
+                BigDecimal minY = BigDecimal.valueOf(minPrice).subtract(of3);
+                BigDecimal maxY = middlePrice.subtract(minY).add(middlePrice);
+                BigDecimal pointOne = BigDecimal.valueOf(minPrice).add(of3);
+                BigDecimal pointThree = middlePrice.subtract(pointOne).add(middlePrice);
                 // SKU的最高价格处于（a+3(b-a)/4，b）的区间
                 // 最低价格处于（a, a+(b-a)/4）
                 //由最价格和最小价格算出a和b的值
@@ -349,11 +349,11 @@ public class AppSkuController {
 
                 //Y轴
                 List<Long> Y = new ArrayList<>();
-                Y.add(a.longValue());
+                Y.add(minY.longValue());
                 Y.add(pointOne.longValue());
-                Y.add(pointTwo.longValue());
+                Y.add(middlePrice.longValue());
                 Y.add(pointThree.longValue());
-                Y.add(b.longValue());
+                Y.add(maxY.longValue());
                 System.out.println("priceNodes " + priceNodes.size());
                 //5. 给出坐标集合
                 if (priceNodes != null && priceNodes.size() > 0) {
@@ -427,4 +427,6 @@ public class AppSkuController {
         }
         return null;
     }
+
+
 }
