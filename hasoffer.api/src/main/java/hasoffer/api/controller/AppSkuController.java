@@ -210,6 +210,9 @@ public class AppSkuController {
         //1. 先拿到所有的价格数据
         List<PriceNode> priceNodes = iCmpSkuService.queryHistoryPrice(id);
         System.out.println(priceNodes != null ? "  priceNodes  :" + priceNodes.size() : "null a .....");
+        for (PriceNode priceNode : priceNodes) {
+            System.out.println("priceNodes  Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
+        }
         if (priceNodes != null && priceNodes.size() > 1) {
             System.out.println("has more than one priceNode ");
             //如果有大于1个数据则代表其有价格变化
@@ -229,6 +232,7 @@ public class AppSkuController {
             LinkedList<PriceNode> lPriceNodes = new LinkedList();
             lPriceNodes.addAll(priceNodes);
             int lPriceNodesSize = lPriceNodes.size();
+            System.out.println(" lPriceNodesSize " + lPriceNodesSize);
             int temp = 0;
             String index0Date = getDateMMdd(priceNodes.get(0).getPriceTimeL());
             for (int i = 0; i < lPriceNodesSize; i++) {
