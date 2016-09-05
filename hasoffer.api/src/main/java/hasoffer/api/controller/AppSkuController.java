@@ -328,9 +328,9 @@ public class AppSkuController {
                 //3. 计算获得Y轴显示数据
                 BigDecimal a = BigDecimal.valueOf(minPrice).multiply(BigDecimal.valueOf(0.8));
                 BigDecimal b = BigDecimal.valueOf(maxPrice).divide(BigDecimal.valueOf(0.8), BigDecimal.ROUND_HALF_UP);
-                BigDecimal pointOne = BigDecimal.valueOf(middlePrice).multiply(BigDecimal.valueOf(0.8));
+                BigDecimal pointOne = BigDecimal.valueOf(middlePrice).multiply(BigDecimal.valueOf(0.85));
                 BigDecimal pointTwo = BigDecimal.valueOf(middlePrice);
-                BigDecimal pointThree = BigDecimal.valueOf(middlePrice).divide(BigDecimal.valueOf(0.8), BigDecimal.ROUND_HALF_UP);
+                BigDecimal pointThree = b.multiply(BigDecimal.valueOf(0.85));
                 // SKU的最高价格处于（a+3(b-a)/4，b）的区间
                 // 最低价格处于（a, a+(b-a)/4）
                 //由最价格和最小价格算出a和b的值
