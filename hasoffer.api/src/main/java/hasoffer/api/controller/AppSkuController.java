@@ -169,7 +169,13 @@ public class AppSkuController {
             for (PriceNode priceNode : priceNodes) {
                 System.out.println(" T" + getDateMMdd(priceNode.getPriceTimeL()) + " P " + priceNode.getPrice());
             }
-
+            float referencePrice = priceNodes.get(0).getPrice();
+            for (PriceNode priceNode : priceNodes) {
+                if (referencePrice != priceNode.getPrice()) {
+                    flag = true;
+                }
+                System.out.println("priceNodes  Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
+            }
             Float maxPrice = Collections.max(priceNodes, new Comparator<PriceNode>() {
                 @Override
                 public int compare(PriceNode o1, PriceNode o2) {
