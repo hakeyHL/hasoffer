@@ -493,7 +493,7 @@ public class AppController {
             DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
             System.out.println("link url is  :" + appDeal.getLinkUrl());
             String s = appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId});
-            System.out.println("deep deep :" + s);
+            logger.info(" dealInfo record deal deepLink :" + s);
             map.put("deeplink", s);
             mv.addObject("data", map);
         }
