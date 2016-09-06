@@ -373,12 +373,21 @@ public class AppSkuController {
         System.out.println(" priceNodes " + priceNodes.size());
         BigDecimal middlePrice = (maxPrice.add(minPrice)).divide(BigDecimal.valueOf(2), BigDecimal.ROUND_HALF_UP);
         if (isYSpecial) {
-            BigDecimal a = BigDecimal.ZERO;
+            BigDecimal minY = BigDecimal.ZERO;
             //3.2 最大值 b
-            BigDecimal b = BigDecimal.valueOf(priceNodes.get(0).getPrice() * 2);
-            Y.add(a.longValue());
+            BigDecimal maxY = BigDecimal.valueOf(priceNodes.get(0).getPrice() * 2);
+
+            //比最小Y大一级的Y
+            BigDecimal maxMinY = middlePrice.divide(BigDecimal.valueOf(2));
+            //比最大Y小一级的Y
+            BigDecimal minMaxY = middlePrice.add(maxMinY);
+
+            Y.add(minY.longValue());
             Y.add(middlePrice.longValue());
-            Y.add(b.longValue());
+            Y.add(maxY.longValue());
+            Y.add(minMaxY.longValue());
+            Y.add(maxMinY.longValue());
+
         } else {
             //3. 计算获得Y轴显示数据
             BigDecimal DIF = (middlePrice.subtract(minPrice)).multiply(BigDecimal.valueOf(1).divide(BigDecimal.valueOf(3), 2, BigDecimal.ROUND_HALF_UP));
