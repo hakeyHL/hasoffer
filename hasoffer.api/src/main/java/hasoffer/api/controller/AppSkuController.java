@@ -263,10 +263,10 @@ public class AppSkuController {
         BigDecimal minPrice = BigDecimal.valueOf(Collections.max(priceNodes, new Comparator<PriceNode>() {
             @Override
             public int compare(PriceNode o1, PriceNode o2) {
-                if (o1.getPrice() < o2.getPrice()) {
+                if (o1.getPrice() > o2.getPrice()) {
                     return -1;
                 }
-                if (o1.getPrice() > o2.getPrice()) {
+                if (o1.getPrice() < o2.getPrice()) {
                     return 1;
                 }
                 return 0;
