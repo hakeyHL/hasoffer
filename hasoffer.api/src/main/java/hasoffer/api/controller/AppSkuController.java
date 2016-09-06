@@ -299,7 +299,7 @@ public class AppSkuController {
             long priorDateLong = priceNo.getPriceTimeL() - 1000 * 60 * 60 * 24;
             String priorDate = getDateMMdd(priorDateLong);
             System.out.println(" priorDate " + priorDate);
-            if (!priorDate.equals(getDateMMdd(priceNodes.get(i - 1).getPriceTimeL()))) {
+            if (!priorDate.equals(getDateMMdd(priceNodes.get(j - 1).getPriceTimeL()))) {
                 //3.1 如果如果当前元素的前一天日期与前一个元素的日期不相等,
                 System.out.println("not equal ");
                 Date date = new Date();
