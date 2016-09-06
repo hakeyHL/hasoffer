@@ -2,6 +2,7 @@ package hasoffer.core.persistence.po.app;
 
 import hasoffer.base.model.Website;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
+import hasoffer.core.persistence.enums.AppdealSource;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -20,6 +21,9 @@ public class AppDeal implements Identifiable<Long> {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Website website;//deal来源网站
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AppdealSource appdealSource = AppdealSource.MANUAL_INPUT;
 
     private String title;//deal标题
     @Column(columnDefinition = "text", nullable = false)
@@ -188,6 +192,14 @@ public class AppDeal implements Identifiable<Long> {
         this.dealCategoryId = dealCategoryId;
     }
 
+    public AppdealSource getAppdealSource() {
+        return appdealSource;
+    }
+
+    public void setAppdealSource(AppdealSource appdealSource) {
+        this.appdealSource = appdealSource;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -200,6 +212,7 @@ public class AppDeal implements Identifiable<Long> {
         if (discount != appDeal.discount) return false;
         if (id != null ? !id.equals(appDeal.id) : appDeal.id != null) return false;
         if (website != appDeal.website) return false;
+        if (appdealSource != appDeal.appdealSource) return false;
         if (title != null ? !title.equals(appDeal.title) : appDeal.title != null) return false;
         if (linkUrl != null ? !linkUrl.equals(appDeal.linkUrl) : appDeal.linkUrl != null) return false;
         if (imageUrl != null ? !imageUrl.equals(appDeal.imageUrl) : appDeal.imageUrl != null) return false;
@@ -222,6 +235,7 @@ public class AppDeal implements Identifiable<Long> {
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (website != null ? website.hashCode() : 0);
+        result = 31 * result + (appdealSource != null ? appdealSource.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (linkUrl != null ? linkUrl.hashCode() : 0);
         result = 31 * result + (imageUrl != null ? imageUrl.hashCode() : 0);

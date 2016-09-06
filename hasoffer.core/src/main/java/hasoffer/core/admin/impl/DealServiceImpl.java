@@ -34,7 +34,8 @@ public class DealServiceImpl implements IDealService {
 
     private static final long EXPIRE_TIME_MS = 7 * 24 * 60 * 60 * 1000;
 
-    private static final String IMPORT_SQL = "insert into appdeal(website, title, linkUrl, expireTime, priceDescription ,description, createTime,  push ,display ,imageUrl,discount,dealCategoryId,dealClickCount) values(?,?, ?, ?, ?, ? ,?, ?, ?, ?,?,?,?)";
+    //手动导入deal的sql
+    private static final String IMPORT_SQL = "insert into appdeal(website, title, linkUrl, expireTime, priceDescription ,description, createTime,  push ,display ,imageUrl,discount,dealCategoryId,dealClickCount,appdealSource) values(?,?, ?, ?, ?, ? ,?, ?, ?, ?,?,?,?,'MANUAL_INPUT')";
 
     private static final String Q_DEALS = "SELECT t FROM AppDeal t";
 
@@ -178,6 +179,16 @@ public class DealServiceImpl implements IDealService {
         ).importExcelFile(multipartFile);
 
         return importResult;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public AppDeal createAppDealByPriceOff(AppDeal appDeal) {
+
+        Long aLong = dbm.create(appDeal);
+        appDeal.setId(aLong);
+
+        return appDeal;
     }
 
     @Override
