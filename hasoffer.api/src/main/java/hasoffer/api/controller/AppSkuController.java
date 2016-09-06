@@ -171,9 +171,13 @@ public class AppSkuController {
             for (PriceNode priceNode : priceNodes) {
                 if (referencePrice != priceNode.getPrice()) {
                     flag = true;
+                    break;
                 }
             }
 
+            for (PriceNode priceNode : priceNodes) {
+                System.out.println(" T" + getDateMMdd(priceNode.getPriceTimeL()) + " P " + priceNode.getPrice());
+            }
 
             Float maxPrice = Collections.max(priceNodes, new Comparator<PriceNode>() {
                 @Override
@@ -211,6 +215,7 @@ public class AppSkuController {
                 PriceCurveVo priceCurveVo = getPriceCurveVo(priceNodes, false);
                 priceCurveVo.setDistanceX2X(20);
                 jsonObject.put("data", JSONObject.toJSON(priceCurveVo));
+                System.out.println("  JSON.toJSONString(jsonObject)  " + JSON.toJSONString(jsonObject));
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             } else {
@@ -219,6 +224,7 @@ public class AppSkuController {
                 PriceCurveVo priceCurveVo = getPriceCurveVo(priceNodes, true);
                 priceCurveVo.setDistanceX2X(20);
                 jsonObject.put("data", JSONObject.toJSON(priceCurveVo));
+                System.out.println("  JSON.toJSONString(jsonObject)  " + JSON.toJSONString(jsonObject));
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             }
@@ -307,14 +313,20 @@ public class AppSkuController {
                 System.out.println("add node :  " + priorDate + " price " + priceNodes.get(j - 1).getPrice());
                 PriceNode insertPriceNode = new PriceNode(date, priceNodes.get(j - 1).getPrice());
                 //3.2 添加此辅助点,价格与前一个元素的价格相同
-                tempPriceNodes.add(insertPriceNode);
+                if (!ifExistTime(getDateMMdd(date.getTime()), tempPriceNodes)) {
+                    tempPriceNodes.add(insertPriceNode);
+                }
                 //3.3 将当前元素添加至临时列表中
                 PriceNode tempPriceNode = new PriceNode(priceNo.getPriceTime(), priceNo.getPrice());
-                tempPriceNodes.add(tempPriceNode);
+                if (!ifExistTime(getDateMMdd(priceNo.getPriceTimeL()), tempPriceNodes)) {
+                    tempPriceNodes.add(tempPriceNode);
+                }
             } else {
                 //如果如果当前元素的前一天日期与前一个元素的日期相等,直接添加当前元素
                 PriceNode tempPriceNode = new PriceNode(priceNo.getPriceTime(), priceNo.getPrice());
-                tempPriceNodes.add(tempPriceNode);
+                if (!ifExistTime(getDateMMdd(priceNo.getPriceTimeL()), tempPriceNodes)) {
+                    tempPriceNodes.add(tempPriceNode);
+                }
             }
         }
         priceNodes = null;
@@ -355,7 +367,6 @@ public class AppSkuController {
                 PriceCurveXYVo priceCurveXYVo = new PriceCurveXYVo(this.getDateMMdd(priceNode.getPriceTimeL()), BigDecimal.valueOf(priceNode.getPrice()).longValue(), getDistance2X(priceTimeL, priceNode.getPriceTimeL()));
                 priceXY.add(priceCurveXYVo);
             }
-            //4. 辅助点   --价格变化点前一天的价格按照上一个价格点给出
             priceCurveVo = new PriceCurveVo(X, Y, priceXY, minPrice.longValue(), maxPrice.longValue());
             priceCurveVo.setDistanceX2X(20);
         }
@@ -384,5 +395,15 @@ public class AppSkuController {
             }
         });
         return priceNodes;
+    }
+
+    public boolean ifExistTime(String time, List<PriceNode> priceNodes) {
+        boolean flag = false;
+        for (PriceNode priceNode : priceNodes) {
+            if (getDateMMdd(priceNode.getPriceTimeL()).equals(time)) {
+                flag = true;
+            }
+        }
+        return flag;
     }
 }
