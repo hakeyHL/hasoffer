@@ -383,10 +383,10 @@ public class AppSkuController {
             BigDecimal minMaxY = middlePrice.add(maxMinY);
 
             Y.add(minY.longValue());
-            Y.add(middlePrice.longValue());
-            Y.add(maxY.longValue());
-            Y.add(minMaxY.longValue());
             Y.add(maxMinY.longValue());
+            Y.add(middlePrice.longValue());
+            Y.add(minMaxY.longValue());
+            Y.add(maxY.longValue());
 
         } else {
             //3. 计算获得Y轴显示数据
