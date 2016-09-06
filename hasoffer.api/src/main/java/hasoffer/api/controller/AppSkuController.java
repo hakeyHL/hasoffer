@@ -240,6 +240,12 @@ public class AppSkuController {
      * @return
      */
     public PriceCurveVo getPriceCurveVo(List<PriceNode> priceNodes, boolean isYSpecial) {
+
+        for (PriceNode priceNode : priceNodes) {
+            System.out.println(" TTT " + getDateMMdd(priceNode.getPriceTimeL()) + " PPP " + priceNode.getPrice());
+        }
+
+
         List<Long> Y = new ArrayList<>();
         BigDecimal maxPrice = BigDecimal.valueOf(Collections.max(priceNodes, new Comparator<PriceNode>() {
             @Override
@@ -272,6 +278,7 @@ public class AppSkuController {
         List<PriceNode> tempPriceNodes = new ArrayList<>();
         //2. 将当期日期作为最后一个元素加入到列表中
         if (!getDateMMdd(priceNodes.get(priceNodes.size() - 1).getPriceTimeL()).equals(getDateMMdd(new Date().getTime()))) {
+            System.out.println(" add current date ");
             priceNodes.add(new PriceNode(new Date(), priceNodes.get(priceNodes.size() - 1).getPrice()));
         }
 
@@ -296,7 +303,10 @@ public class AppSkuController {
         tempPriceNodes.add(new PriceNode(priceNodes.get(0).getPriceTime(), priceNodes.get(0).getPrice()));
         //2.2 获取其长度
         int priceNodesSize = priceNodes.size();
-
+        System.out.println(" priceNodesSize  " + priceNodesSize);
+        for (PriceNode priceNode : priceNodes) {
+            System.out.println(" TAAA  " + getDateMMdd(priceNode.getPriceTimeL()) + " PAAAA " + priceNode.getPrice());
+        }
         //3.处理,添加辅助点
         for (int j = 1; j < priceNodesSize; j++) {
             PriceNode priceNo = priceNodes.get(i);
