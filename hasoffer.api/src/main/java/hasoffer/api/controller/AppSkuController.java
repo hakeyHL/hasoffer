@@ -210,205 +210,223 @@ public class AppSkuController {
         //1. 先拿到所有的价格数据
         List<PriceNode> priceNodes = iCmpSkuService.queryHistoryPrice(id);
         System.out.println(priceNodes != null ? "  priceNodes  :" + priceNodes.size() : "null a .....");
-        for (PriceNode priceNode : priceNodes) {
-            System.out.println("priceNodes  Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
-        }
-        if (priceNodes != null && priceNodes.size() > 1) {
-            System.out.println("has more than one priceNode ");
-            //如果有大于1个数据则代表其有价格变化
-            //1.1 按照日期剩升序给出
-            Collections.sort(priceNodes, new Comparator<PriceNode>() {
-                @Override
-                public int compare(PriceNode o1, PriceNode o2) {
-                    if (o1.getPriceTimeL() < o2.getPriceTimeL()) {
-                        return -1;
-                    } else if (o1.getPriceTimeL() > o2.getPriceTimeL()) {
-                        return 1;
-                    }
-                    return 0;
+        boolean flag = false;
+        if (priceNodes != null && priceNodes.size() != 0) {
+            float referencePrice = priceNodes.get(0).getPrice();
+            for (PriceNode priceNode : priceNodes) {
+                if (referencePrice != priceNode.getPrice()) {
+                    flag = true;
                 }
-            });
-            //1.2 过滤不合法数据和添加辅助点
-            Iterator<PriceNode> iterator = priceNodes.iterator();
-            while (iterator.hasNext()) {
-                PriceNode priceNode = iterator.next();
-                if (priceNode.getPrice() <= 0) {
-                    iterator.remove();
-                }
+                System.out.println("priceNodes  Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
             }
-            LinkedList<PriceNode> lPriceNodes = new LinkedList();
-            int priceNodesSize = priceNodes.size();
-            int temp = 0;
-            lPriceNodes.add(new PriceNode(priceNodes.get(0).getPriceTime(), priceNodes.get(0).getPrice()));
-
-            for (int i = 1; i < priceNodesSize; i++) {
-                PriceNode priceNo = priceNodes.get(i);
-                System.out.println("array " + temp + "  is  " + getDateMMdd(priceNo.getPriceTimeL()) + "  and price is :" + priceNo.getPrice());
-                //除了第一个,如果当前的前一天与上一个值不相同则增加前一天这个点
-                long priorDateLong = priceNo.getPriceTimeL() - 1000 * 60 * 60 * 24;
-                String priorDate = getDateMMdd(priorDateLong);
-                System.out.println(" priorDate " + priorDate);
-                if (!priorDate.equals(getDateMMdd(priceNodes.get(i - 1).getPriceTimeL()))) {
-                    System.out.println("not equal ");
-                    Date date = new Date();
-                    date.setTime(priorDateLong);
-                    System.out.println("add node :  " + priorDate + " price " + priceNodes.get(i - 1).getPrice());
-                    PriceNode insertPriceNode = new PriceNode(date, priceNodes.get(i - 1).getPrice());
-                    lPriceNodes.add(insertPriceNode);
-
-                    PriceNode tempPriceNode = new PriceNode(priceNo.getPriceTime(), priceNo.getPrice());
-                    lPriceNodes.add(tempPriceNode);
-                } else {
-                    PriceNode tempPriceNode = new PriceNode(priceNo.getPriceTime(), priceNo.getPrice());
-                    lPriceNodes.add(tempPriceNode);
-                }
-            }
-            priceNodes = null;
-            System.gc();
-            priceNodes = new ArrayList<>();
-            priceNodes.addAll(lPriceNodes);
-            System.out.println(" priceNodes " + priceNodes.size());
-            //2. 计算获得X轴显示数据
-            //X轴  20天为间隔显示日期 , 格式为：　10-30
-            List<String> X = new ArrayList<>();
-            //2.1 最小日期 [0]
-            //X.add(this.getDateMMdd(priceNodes.get(0).getPriceTimeL()));
-            //2.2 最大日期(一般为当前日期) [length-1]
-            Long priceTimeL = priceNodes.get(priceNodes.size() - 1).getPriceTimeL();
-            System.out.println(" priceTimeL" + getDateMMdd(priceTimeL));
-            //2.3 遍历日期
-            int i = 4;
-//            while (priceTimeL > priceNodes.get(0).getPriceTimeL()) {
-            while (i > 0) {
-                X.add(this.getDateMMdd(priceTimeL));
-                priceTimeL = priceTimeL - 1000 * 60 * 60 * 24 * 20;
-                i--;
-            }
-            //反转,按日期从小到大来
-            Collections.reverse(X);
-
-            Float maxPrice = Collections.max(priceNodes, new Comparator<PriceNode>() {
-                @Override
-                public int compare(PriceNode o1, PriceNode o2) {
-                    if (o1.getPrice() < o2.getPrice()) {
-                        return -1;
+            if (flag) {
+                //有变化点
+                System.out.println("has more than one priceNode ");
+                //如果有大于1个数据则代表其有价格变化
+                //1.1 按照日期剩升序给出
+                Collections.sort(priceNodes, new Comparator<PriceNode>() {
+                    @Override
+                    public int compare(PriceNode o1, PriceNode o2) {
+                        if (o1.getPriceTimeL() < o2.getPriceTimeL()) {
+                            return -1;
+                        } else if (o1.getPriceTimeL() > o2.getPriceTimeL()) {
+                            return 1;
+                        }
+                        return 0;
                     }
-                    if (o1.getPrice() > o2.getPrice()) {
-                        return 1;
+                });
+                //1.2 过滤不合法数据和添加辅助点
+                Iterator<PriceNode> iterator = priceNodes.iterator();
+                while (iterator.hasNext()) {
+                    PriceNode priceNode = iterator.next();
+                    if (priceNode.getPrice() <= 0) {
+                        iterator.remove();
                     }
-                    return 0;
                 }
-            }).getPrice();
+                //如果历史价格数据中的最后一个点不是当前日期,则将当前日期作为作为一个点,价格为历史价格的最后一个点的价格
+                LinkedList<PriceNode> lPriceNodes = new LinkedList();
+                if (!getDateMMdd(priceNodes.get(priceNodes.size() - 1).getPriceTimeL()).equals(getDateMMdd(new Date().getTime()))) {
+                    priceNodes.add(new PriceNode(new Date(), priceNodes.get(priceNodes.size() - 1).getPrice()));
+                }
+                int priceNodesSize = priceNodes.size();
+                int temp = 0;
+                lPriceNodes.add(new PriceNode(priceNodes.get(0).getPriceTime(), priceNodes.get(0).getPrice()));
 
-            Float minPrice = Collections.min(priceNodes, new Comparator<PriceNode>() {
-                @Override
-                public int compare(PriceNode o1, PriceNode o2) {
-                    if (o1.getPrice() < o2.getPrice()) {
-                        return -1;
+                for (int i = 1; i < priceNodesSize; i++) {
+                    PriceNode priceNo = priceNodes.get(i);
+                    System.out.println("array " + temp + "  is  " + getDateMMdd(priceNo.getPriceTimeL()) + "  and price is :" + priceNo.getPrice());
+                    //除了第一个,如果当前的前一天与上一个值不相同则增加前一天这个点
+                    long priorDateLong = priceNo.getPriceTimeL() - 1000 * 60 * 60 * 24;
+                    String priorDate = getDateMMdd(priorDateLong);
+                    System.out.println(" priorDate " + priorDate);
+                    if (!priorDate.equals(getDateMMdd(priceNodes.get(i - 1).getPriceTimeL()))) {
+                        System.out.println("not equal ");
+                        Date date = new Date();
+                        date.setTime(priorDateLong);
+                        System.out.println("add node :  " + priorDate + " price " + priceNodes.get(i - 1).getPrice());
+                        PriceNode insertPriceNode = new PriceNode(date, priceNodes.get(i - 1).getPrice());
+                        lPriceNodes.add(insertPriceNode);
+
+                        PriceNode tempPriceNode = new PriceNode(priceNo.getPriceTime(), priceNo.getPrice());
+                        lPriceNodes.add(tempPriceNode);
+                    } else {
+                        PriceNode tempPriceNode = new PriceNode(priceNo.getPriceTime(), priceNo.getPrice());
+                        lPriceNodes.add(tempPriceNode);
                     }
-                    if (o1.getPrice() > o2.getPrice()) {
-                        return 1;
+                }
+                priceNodes = null;
+                System.gc();
+                priceNodes = new ArrayList<>();
+                priceNodes.addAll(lPriceNodes);
+                System.out.println(" priceNodes " + priceNodes.size());
+                //2. 计算获得X轴显示数据
+                //X轴  20天为间隔显示日期 , 格式为：　10-30
+                List<String> X = new ArrayList<>();
+                //2.1 最小日期 [0]
+                //X.add(this.getDateMMdd(priceNodes.get(0).getPriceTimeL()));
+                //2.2 最大日期(一般为当前日期) [length-1]
+                Long priceTimeL = priceNodes.get(priceNodes.size() - 1).getPriceTimeL();
+                System.out.println(" priceTimeL" + getDateMMdd(priceTimeL));
+                //2.3 遍历日期
+                int i = 4;
+                //while (priceTimeL > priceNodes.get(0).getPriceTimeL()) {
+                while (i > 0) {
+                    X.add(this.getDateMMdd(priceTimeL));
+                    priceTimeL = priceTimeL - 1000 * 60 * 60 * 24 * 20;
+                    i--;
+                }
+                //反转,按日期从小到大来
+                Collections.reverse(X);
+
+                Float maxPrice = Collections.max(priceNodes, new Comparator<PriceNode>() {
+                    @Override
+                    public int compare(PriceNode o1, PriceNode o2) {
+                        if (o1.getPrice() < o2.getPrice()) {
+                            return -1;
+                        }
+                        if (o1.getPrice() > o2.getPrice()) {
+                            return 1;
+                        }
+                        return 0;
                     }
-                    return 0;
+                }).getPrice();
+
+                Float minPrice = Collections.min(priceNodes, new Comparator<PriceNode>() {
+                    @Override
+                    public int compare(PriceNode o1, PriceNode o2) {
+                        if (o1.getPrice() < o2.getPrice()) {
+                            return -1;
+                        }
+                        if (o1.getPrice() > o2.getPrice()) {
+                            return 1;
+                        }
+                        return 0;
+                    }
+                }).getPrice();
+                //获得平均值
+                BigDecimal middlePrice = (BigDecimal.valueOf(maxPrice).add(BigDecimal.valueOf(minPrice))).divide(BigDecimal.valueOf(2), BigDecimal.ROUND_HALF_UP);
+                //3. 计算获得Y轴显示数据
+                BigDecimal of3 = (middlePrice.subtract(BigDecimal.valueOf(minPrice))).multiply(BigDecimal.valueOf(1).divide(BigDecimal.valueOf(3), 2, BigDecimal.ROUND_HALF_UP));
+                BigDecimal minY = BigDecimal.valueOf(minPrice).subtract(of3);
+                BigDecimal maxY = middlePrice.subtract(minY).add(middlePrice);
+                BigDecimal pointOne = BigDecimal.valueOf(minPrice).add(of3);
+                BigDecimal pointThree = middlePrice.subtract(pointOne).add(middlePrice);
+                // SKU的最高价格处于（a+3(b-a)/4，b）的区间
+                // 最低价格处于（a, a+(b-a)/4）
+                //由最价格和最小价格算出a和b的值
+                //3.1 最小值 a
+//                BigDecimal a = (BigDecimal.valueOf(3).multiply(BigDecimal.valueOf(minPrice)).subtract(BigDecimal.valueOf(maxPrice)).divide(BigDecimal.valueOf(2)).add(BigDecimal.ONE));
+                //3.2 最大值 b
+//                BigDecimal b = (BigDecimal.valueOf(3).multiply(BigDecimal.valueOf(maxPrice)).subtract(BigDecimal.valueOf(minPrice)).divide(BigDecimal.valueOf(2)).subtract(BigDecimal.ONE));
+                //3.3 a+(b-a)/4
+//                BigDecimal pointOne = a.add((b.subtract(a)).divide(BigDecimal.valueOf(4)));
+
+                //3.4 a+(b-a)/2
+//                BigDecimal pointTwo = a.add((b.subtract(a)).divide(BigDecimal.valueOf(2)));
+
+                //3.5 a+3(b-a)/4）
+//                BigDecimal pointThree = a.add((b.subtract(a)).multiply(BigDecimal.valueOf(0.75)));
+
+                //Y轴
+                List<Long> Y = new ArrayList<>();
+                Y.add(minY.longValue());
+                Y.add(pointOne.longValue());
+                Y.add(middlePrice.longValue());
+                Y.add(pointThree.longValue());
+                Y.add(maxY.longValue());
+                System.out.println("priceNodes " + priceNodes.size());
+                //5. 给出坐标集合
+                if (priceNodes != null && priceNodes.size() > 0) {
+                    for (PriceNode priceNode : priceNodes) {
+                        System.out.println(" Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
+                        //查询到价格历史,开始分析priceTimeL
+                        PriceCurveXYVo priceCurveXYVo = new PriceCurveXYVo(this.getDateMMdd(priceNode.getPriceTimeL()), BigDecimal.valueOf(priceNode.getPrice()).longValue(), getDistance2X(priceTimeL, priceNode.getPriceTimeL()));
+                        priceXY.add(priceCurveXYVo);
+                    }
+                    //4. 辅助点   --价格变化点前一天的价格按照上一个价格点给出
+                    //两个数据点
+                    PriceCurveVo priceCurveVo = new PriceCurveVo(X, Y, priceXY, BigDecimal.valueOf(minPrice).longValue(), BigDecimal.valueOf(maxPrice).longValue());
+                    priceCurveVo.setDistanceX2X(20);
+                    jsonObject.put("data", priceCurveVo);
                 }
-            }).getPrice();
-
-            //3. 计算获得Y轴显示数据
-
-            // SKU的最高价格处于（a+3(b-a)/4，b）的区间
-            // 最低价格处于（a, a+(b-a)/4）
-            //由最价格和最小价格算出a和b的值
-            //3.1 最小值 a
-            BigDecimal a = (BigDecimal.valueOf(3).multiply(BigDecimal.valueOf(minPrice)).subtract(BigDecimal.valueOf(maxPrice)).divide(BigDecimal.valueOf(2)).add(BigDecimal.ONE));
-            //3.2 最大值 b
-            BigDecimal b = (BigDecimal.valueOf(3).multiply(BigDecimal.valueOf(maxPrice)).subtract(BigDecimal.valueOf(minPrice)).divide(BigDecimal.valueOf(2)).subtract(BigDecimal.ONE));
-            //3.3 a+(b-a)/4
-            BigDecimal pointOne = a.add((b.subtract(a)).divide(BigDecimal.valueOf(4)));
-
-            //3.4 a+(b-a)/2
-            BigDecimal pointTwo = a.add((b.subtract(a)).divide(BigDecimal.valueOf(2)));
-
-            //3.5 a+3(b-a)/4）
-            BigDecimal pointThree = a.add((b.subtract(a)).multiply(BigDecimal.valueOf(0.75)));
-
-            //Y轴
-            List<Long> Y = new ArrayList<>();
-            Y.add(a.longValue());
-            Y.add(pointOne.longValue());
-            Y.add(pointTwo.longValue());
-            Y.add(pointThree.longValue());
-            Y.add(b.longValue());
-            System.out.println("priceNodes " + priceNodes.size());
-            //5. 给出坐标集合
-            if (priceNodes != null && priceNodes.size() > 0) {
-                for (PriceNode priceNode : priceNodes) {
-                    System.out.println(" Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
-                    //查询到价格历史,开始分析priceTimeL
-                    PriceCurveXYVo priceCurveXYVo = new PriceCurveXYVo(this.getDateMMdd(priceNode.getPriceTimeL()), BigDecimal.valueOf(priceNode.getPrice()).longValue(), getDistance2X(priceTimeL, priceNode.getPriceTimeL()));
-                    priceXY.add(priceCurveXYVo);
+                String string = JSON.toJSONString(jsonObject);
+                System.out.println(string);
+                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                return null;
+            } else {
+                System.out.println("only has one priceNode ");
+                //只有一个代表价格未变化
+                // 若sku价格无变化则 则Y轴最小值为0 最高值为SKU价格*2
+                BigDecimal a = BigDecimal.ZERO;
+                System.out.println(" a " + a.intValue());
+                //3.2 最大值 b
+                //BigDecimal b = (BigDecimal.valueOf(3).multiply(BigDecimal.valueOf(maxPrice)).subtract(BigDecimal.valueOf(minPrice)).divide(BigDecimal.valueOf(2)).subtract(BigDecimal.valueOf(2)));
+                BigDecimal b = BigDecimal.valueOf(priceNodes.get(0).getPrice() * 2);
+                System.out.println(" b " + b.intValue());
+                //3.3 a+(b-a)/4
+                BigDecimal pointOne = a.add((b.subtract(a)).divide(BigDecimal.valueOf(4)));
+                System.out.println(" pointOne " + pointOne.intValue());
+                //3.4 a+(b-a)/2
+                BigDecimal pointTwo = a.add((b.subtract(a)).divide(BigDecimal.valueOf(2)));
+                System.out.println(" pointTwo " + pointTwo.intValue());
+                //3.5 a+3(b-a)/4）
+                BigDecimal pointThree = a.add((b.subtract(a)).multiply(BigDecimal.valueOf(0.75)));
+                System.out.println(" pointThree " + pointThree.intValue());
+                //绘制x
+                List<String> X = new ArrayList<>();
+                Long priceTimeL = new Date().getTime();
+                int i = 4;
+                while (i > 0) {
+                    System.out.println(getDateMMdd(priceTimeL));
+                    X.add(getDateMMdd(priceTimeL));
+                    priceTimeL = priceTimeL - 1000 * 60 * 60 * 24 * 20;
+                    i--;
                 }
-                //4. 辅助点   --价格变化点前一天的价格按照上一个价格点给出
-                //两个数据点
-                PriceCurveVo priceCurveVo = new PriceCurveVo(X, Y, priceXY, BigDecimal.valueOf(minPrice).longValue(), BigDecimal.valueOf(maxPrice).longValue());
+                //反转
+                Collections.reverse(X);
+
+                //Y轴
+                List<Long> Y = new ArrayList<>();
+                Y.add(a.longValue());
+                Y.add(pointOne.longValue());
+                Y.add(pointTwo.longValue());
+                Y.add(pointThree.longValue());
+                Y.add(b.longValue());
+                //数据点,给两个数据点,起始和最终,都是同个值
+                PriceCurveXYVo priceCurveXYVoIndex = new PriceCurveXYVo(X.get(0), BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue(), getDistance2X(priceTimeL, priceNodes.get(0).getPriceTimeL()));
+                PriceCurveXYVo priceCurveXYVoEnd = new PriceCurveXYVo(X.get(X.size() - 1), BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue(), getDistance2X(priceTimeL, new Date().getTime()));
+                priceXY.add(priceCurveXYVoIndex);
+                priceXY.add(priceCurveXYVoEnd);
+                PriceCurveVo priceCurveVo = new PriceCurveVo(X, Y, priceXY, BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue(), BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue());
                 priceCurveVo.setDistanceX2X(20);
-                jsonObject.put("data", priceCurveVo);
+                jsonObject.put("data", JSONObject.toJSON(priceCurveVo));
+                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                return null;
+
             }
-            String string = JSON.toJSONString(jsonObject);
-            System.out.println(string);
-            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
-            return null;
-        } else if (priceNodes != null && priceNodes.size() == 1) {
-            System.out.println("only has one priceNode ");
-            //只有一个代表价格未变化
-            // 若sku价格无变化则 则Y轴最小值为0 最高值为SKU价格*2
-            BigDecimal a = BigDecimal.ZERO;
-            System.out.println(" a " + a.intValue());
-            //3.2 最大值 b
-//        BigDecimal b = (BigDecimal.valueOf(3).multiply(BigDecimal.valueOf(maxPrice)).subtract(BigDecimal.valueOf(minPrice)).divide(BigDecimal.valueOf(2)).subtract(BigDecimal.valueOf(2)));
-            BigDecimal b = BigDecimal.valueOf(priceNodes.get(0).getPrice() * 2);
-            System.out.println(" b " + b.intValue());
-            //3.3 a+(b-a)/4
-            BigDecimal pointOne = a.add((b.subtract(a)).divide(BigDecimal.valueOf(4)));
-            System.out.println(" pointOne " + pointOne.intValue());
-            //3.4 a+(b-a)/2
-            BigDecimal pointTwo = a.add((b.subtract(a)).divide(BigDecimal.valueOf(2)));
-            System.out.println(" pointTwo " + pointTwo.intValue());
-            //3.5 a+3(b-a)/4）
-            BigDecimal pointThree = a.add((b.subtract(a)).multiply(BigDecimal.valueOf(0.75)));
-            System.out.println(" pointThree " + pointThree.intValue());
-            //绘制x
-            List<String> X = new ArrayList<>();
-            Long priceTimeL = new Date().getTime();
-            int i = 4;
-            while (i > 0) {
-                System.out.println(getDateMMdd(priceTimeL));
-                X.add(getDateMMdd(priceTimeL));
-                priceTimeL = priceTimeL - 1000 * 60 * 60 * 24 * 20;
-                i--;
-            }
-            //反转
-            Collections.reverse(X);
-
-            //Y轴
-            List<Long> Y = new ArrayList<>();
-            Y.add(a.longValue());
-            Y.add(pointOne.longValue());
-            Y.add(pointTwo.longValue());
-            Y.add(pointThree.longValue());
-            Y.add(b.longValue());
-
-            //数据点,给两个数据点,起始和最终,都是同个值
-            PriceCurveXYVo priceCurveXYVoIndex = new PriceCurveXYVo(X.get(0), BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue(), getDistance2X(priceTimeL, priceNodes.get(0).getPriceTimeL()));
-            PriceCurveXYVo priceCurveXYVoEnd = new PriceCurveXYVo(X.get(X.size() - 1), BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue(), getDistance2X(priceTimeL, new Date().getTime()));
-            priceXY.add(priceCurveXYVoIndex);
-            priceXY.add(priceCurveXYVoEnd);
-            PriceCurveVo priceCurveVo = new PriceCurveVo(X, Y, priceXY, BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue(), BigDecimal.valueOf(priceNodes.get(0).getPrice()).longValue());
-            priceCurveVo.setDistanceX2X(20);
-            jsonObject.put("data", JSONObject.toJSON(priceCurveVo));
-            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
-            return null;
-
         }
         return null;
     }
+
+
 }
