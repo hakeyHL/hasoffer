@@ -52,15 +52,13 @@ public class AppDeal implements Identifiable<Long> {
     @Column(columnDefinition = "text")
     private String infoPageImage;//deal详情页图片
 
-    @Column
     private Long dealClickCount = 0l;//deal的点击次数
 
-    @Column
     private Long dealCategoryId = -1l;//deal的目录id
 
-    @Column
     private int discount = 50;//deal的折扣额度
 
+    private long ptmcmpskuid;//如果是PRICE_OFF生成的deal，保留skuid
 
     @Override
     public Long getId() {
@@ -200,6 +198,14 @@ public class AppDeal implements Identifiable<Long> {
         this.appdealSource = appdealSource;
     }
 
+    public long getPtmcmpskuid() {
+        return ptmcmpskuid;
+    }
+
+    public void setPtmcmpskuid(long ptmcmpskuid) {
+        this.ptmcmpskuid = ptmcmpskuid;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -210,6 +216,7 @@ public class AppDeal implements Identifiable<Long> {
         if (push != appDeal.push) return false;
         if (display != appDeal.display) return false;
         if (discount != appDeal.discount) return false;
+        if (ptmcmpskuid != appDeal.ptmcmpskuid) return false;
         if (id != null ? !id.equals(appDeal.id) : appDeal.id != null) return false;
         if (website != appDeal.website) return false;
         if (appdealSource != appDeal.appdealSource) return false;
@@ -250,6 +257,7 @@ public class AppDeal implements Identifiable<Long> {
         result = 31 * result + (dealClickCount != null ? dealClickCount.hashCode() : 0);
         result = 31 * result + (dealCategoryId != null ? dealCategoryId.hashCode() : 0);
         result = 31 * result + discount;
+        result = 31 * result + (int) (ptmcmpskuid ^ (ptmcmpskuid >>> 32));
         return result;
     }
 }
