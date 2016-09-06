@@ -304,8 +304,8 @@ public class AppSkuController {
                 System.out.println("not equal ");
                 Date date = new Date();
                 date.setTime(priorDateLong);
-                System.out.println("add node :  " + priorDate + " price " + priceNodes.get(i - 1).getPrice());
-                PriceNode insertPriceNode = new PriceNode(date, priceNodes.get(i - 1).getPrice());
+                System.out.println("add node :  " + priorDate + " price " + priceNodes.get(j - 1).getPrice());
+                PriceNode insertPriceNode = new PriceNode(date, priceNodes.get(j - 1).getPrice());
                 //3.2 添加此辅助点,价格与前一个元素的价格相同
                 tempPriceNodes.add(insertPriceNode);
                 //3.3 将当前元素添加至临时列表中
