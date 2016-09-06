@@ -230,10 +230,15 @@ public class WebsiteHelper {
             case EBAY:
                 return EbayHelper.getUrlWithAff(url);
             case INFIBEAM:
+                return url;
             case ASKMEBAZAAR:
+                return url;
             case INDIATIMES:
+                return url;
             case CROMARETAIL:
+                return url;
             case THEITDEPOT:
+                return url;
             default:
                 break;
         }
