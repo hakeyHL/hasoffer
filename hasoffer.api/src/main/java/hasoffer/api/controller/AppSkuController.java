@@ -309,7 +309,7 @@ public class AppSkuController {
         }
         //3.处理,添加辅助点
         for (int j = 1; j < priceNodesSize; j++) {
-            PriceNode priceNo = priceNodes.get(i);
+            PriceNode priceNo = priceNodes.get(j);
             System.out.println("array " + j + "  is  " + getDateMMdd(priceNo.getPriceTimeL()) + "  and price is :" + priceNo.getPrice());
             //除了第一个,如果当前的前一天与上一个值不相同则增加前一天这个点
             long priorDateLong = priceNo.getPriceTimeL() - 1000 * 60 * 60 * 24;
