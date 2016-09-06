@@ -148,7 +148,6 @@ public class AppSkuController {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
-        List<PriceCurveXYVo> priceXY = new ArrayList<PriceCurveXYVo>();
         //1. 先拿到所有的价格数据
         List<PriceNode> priceNodes = cmpSkuService.queryHistoryPrice(id);
         System.out.println(priceNodes != null ? "  priceNodes  :" + priceNodes.size() : "null a .....");
@@ -167,14 +166,6 @@ public class AppSkuController {
 
         boolean flag = false;
         if (priceNodes != null && priceNodes.size() != 0) {
-            float referencePrice = priceNodes.get(0).getPrice();
-            for (PriceNode priceNode : priceNodes) {
-                if (referencePrice != priceNode.getPrice()) {
-                    flag = true;
-                    break;
-                }
-            }
-
             for (PriceNode priceNode : priceNodes) {
                 System.out.println(" T" + getDateMMdd(priceNode.getPriceTimeL()) + " P " + priceNode.getPrice());
             }
@@ -209,6 +200,7 @@ public class AppSkuController {
                 //如果最大值与最小值相差小于6则不能很好地形成Y轴,视为一个价格
                 flag = false;
             }
+
             if (flag) {
                 //有变化点
                 System.out.println("has more than one priceNode ");
@@ -235,6 +227,34 @@ public class AppSkuController {
     }
 
     /**
+     * 按照是价格去重
+     *
+     * @return
+     */
+    public void distinctListByPrice(List<PriceNode> priceNodes) {
+        //去重
+        Set<Float> priceSet = new HashSet<>();
+        for (PriceNode priceNode : priceNodes) {
+            priceSet.add(priceNode.getPrice());
+        }
+
+        List<PriceNode> priceListNodes = new ArrayList<>();
+        for (PriceNode priceNode : priceNodes) {
+            if (priceSet.size() < 1) {
+                break;
+            }
+            if (priceSet.contains(priceNode.getPrice())) {
+                priceListNodes.add(priceNode);
+                priceSet.remove(priceNode.getPrice());
+            }
+        }
+        priceNodes = null;
+        System.gc();
+        priceNodes = priceListNodes;
+        System.out.println(" after disctinct by price ,size is " + priceNodes.size());
+    }
+
+    /**
      * 将给定集合整理出Y轴和坐标数据
      *
      * @return
@@ -245,7 +265,8 @@ public class AppSkuController {
             System.out.println(" TTT " + getDateMMdd(priceNode.getPriceTimeL()) + " PPP " + priceNode.getPrice());
         }
 
-
+        System.out.println(" distinct list by price ");
+        distinctListByPrice(priceNodes);
         List<Long> Y = new ArrayList<>();
         BigDecimal maxPrice = BigDecimal.valueOf(Collections.max(priceNodes, new Comparator<PriceNode>() {
             @Override
