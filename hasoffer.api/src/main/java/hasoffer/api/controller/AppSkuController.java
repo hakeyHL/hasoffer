@@ -251,7 +251,7 @@ public class AppSkuController {
         priceNodes = null;
         System.gc();
         priceNodes = priceListNodes;
-        System.out.println(" after disctinct by price ,size is " + priceNodes.size());
+        System.out.println(" after distinct by price ,size is " + priceNodes.size());
     }
 
     /**
@@ -265,8 +265,8 @@ public class AppSkuController {
             System.out.println(" TTT " + getDateMMdd(priceNode.getPriceTimeL()) + " PPP " + priceNode.getPrice());
         }
 
-        System.out.println(" distinct list by price ");
-        distinctListByPrice(priceNodes);
+//        System.out.println(" distinct list by price ");
+//        distinctListByPrice(priceNodes);
         List<Long> Y = new ArrayList<>();
         BigDecimal maxPrice = BigDecimal.valueOf(Collections.max(priceNodes, new Comparator<PriceNode>() {
             @Override
