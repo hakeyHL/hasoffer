@@ -370,6 +370,7 @@ public class AppSkuController {
         }
         PriceCurveVo priceCurveVo = null;
         List<PriceCurveXYVo> priceXY = new ArrayList<PriceCurveXYVo>();
+        sortPriceNoedesDateASC(priceNodes);
         if (priceNodes != null && priceNodes.size() > 0) {
             for (PriceNode priceNode : priceNodes) {
                 System.out.println(" Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
