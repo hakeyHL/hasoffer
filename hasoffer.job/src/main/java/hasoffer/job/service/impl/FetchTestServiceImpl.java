@@ -39,7 +39,7 @@ public class FetchTestServiceImpl implements IFetchTestService {
 
     @Override
     public void commitTask() {
-        String hql = "select p.* from PtmCmpSku p left join SrmProductSearchCount s on p.productId = s.productId   where s.ymd=?0 and p.website=?1 order by s.count desc";
+        String hql = "select p.* from SrmProductSearchCount s left join PtmCmpSku p on p.productId = s.productId   where s.ymd=?0 and p.website=?1 and s.productId is not null order by s.count desc";
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -1);
         String dateStr = sdf.format(calendar.getTime());
