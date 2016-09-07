@@ -89,6 +89,13 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
                 fetchCacheService.pushTaskList(redisKey, JSONUtil.toJSON(fetchUrlResult));
                 SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} success", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), redisKey);
                 fetchCacheService.setTaskStatusByUrl(key, TaskStatus.START);
+            } else if (TaskStatus.FINISH.equals(taskStatusByUrl)) {
+                FetchUrlResult temp = getFetchUrlResult(website, url, seconds);
+                if (temp == null || temp.getTaskStatus().equals(TaskStatus.EXCEPTION)) {
+                    fetchCacheService.pushTaskList(redisKey, JSONUtil.toJSON(fetchUrlResult));
+                    SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} success", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), redisKey);
+                    fetchCacheService.setTaskStatusByUrl(key, TaskStatus.START);
+                }
             }
         } catch (Exception e) {
             SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} fail", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), redisKey, e);
