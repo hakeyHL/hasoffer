@@ -545,6 +545,7 @@ public class Compare2Controller {
                 // 忽略前台返回的价格
                 List<String> affs = getAffs(sio);
                 ComparedSkuVo csv = new ComparedSkuVo(cmpSku, affs.toArray(new String[0]));
+                logger.info(" getCmpResult(sio, cmpSkuIndex) record deepLink " + csv.getDeeplink());
                 csv.setPriceOff(cliPrice - cmpSku.getPrice());
 
                 addVo(comparedSkuVos, csv);
@@ -668,7 +669,11 @@ public class Compare2Controller {
                     System.out.println("after set , imageUrl is  " + cplv.getImageUrl());
                     System.out.println("set properteis over l");
                     cplv.setDeepLinkUrl(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()}));
+
+                    logger.info(" getCmpProducts record deepLinkUrl :" + cplv.getDeepLinkUrl());
                     cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()}));
+                    logger.info(" getCmpProducts record deepLink :" + cplv.getDeepLinkUrl());
+
                     cplv.setIsAlert(isPriceOffAlert(userToken, cplv.getId()));
                     comparedSkuVos.add(cplv);
                 }
@@ -805,6 +810,7 @@ public class Compare2Controller {
                     System.out.println("id :  " + cmpSku.getId() + " imagePath " + cmpSku.getSmallImagePath());
                     CmpProductListVo cplv = new CmpProductListVo(cmpSku, sio.getCliPrice());
                     cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()}));
+                    logger.info(" getCmpProducts(ptmCmpSkuIndex2, sio) record deepLink :" + cplv.getDeepLink());
                     comparedSkuVos.add(cplv);
                 }
                 if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {

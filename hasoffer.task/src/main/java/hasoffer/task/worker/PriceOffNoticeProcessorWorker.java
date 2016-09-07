@@ -12,6 +12,7 @@ import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchUrlResult;
 import hasoffer.spider.model.FetchedProduct;
+import hasoffer.task.controller.DubboUpdateController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +70,11 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
             } catch (Exception e) {
                 System.out.println(TimeUtils.nowDate());
                 e.printStackTrace();
+            }
+
+            if (DubboUpdateController.Price_OFF_LIST_THREAD_NUM == 0 && queue.size() == 0) {
+                System.out.println("price off process queue has no object ,thread going to die");
+                break;
             }
         }
     }

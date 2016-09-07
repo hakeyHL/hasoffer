@@ -140,15 +140,6 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 logger.info("createPtmCmpSkuImage fail " + skuid);
             }
 
-
-//            如果价格发生变化，加到redis队列中
-            if (sku.getPrice() != fetchedProduct.getPrice()) {
-
-                redisListService.push(PRICEOFF_NOTICE_SKUID_QUEUE, skuid + "");
-
-                logger.info("push success for " + skuid);
-            }
-
 //            对FLIPKART没有类目的数据进行更新,暂时注释掉
             if (Website.FLIPKART.equals(sku.getWebsite())) {
 
