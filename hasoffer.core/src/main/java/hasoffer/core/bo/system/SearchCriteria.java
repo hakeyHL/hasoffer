@@ -14,7 +14,7 @@ public class SearchCriteria {
     private String keyword;
     private String categoryId;
     private int page = 1;
-    private int pageSize = 20;
+    private int pageSize = 10;
     private int level;
     private int priceFrom = -1;
     private int priceTo = -1;
