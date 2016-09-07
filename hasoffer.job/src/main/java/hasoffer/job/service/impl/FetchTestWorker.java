@@ -46,10 +46,12 @@ public class FetchTestWorker implements Runnable {
                         logger.error(e.getMessage());
                     }
 
-                } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
+                } else if (TaskStatus.EXCEPTION.equals(taskStatus)||TaskStatus.STOPPED.equals(taskStatus)) {
                     FetchUrlResult fetchUrlResult = fetchDubboService.getProductsByUrl(
                             ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), expireSeconds);
                     logger.error(fetchUrlResult.toString());
+                }else{
+                    queue.add(ptmCmpSku);
                 }
             }
         }
