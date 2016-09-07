@@ -98,6 +98,11 @@ public class AmazonHelper {
         return sb.toString();*/
     }
 
+    public static String getDealUrlWithAff(String url, String aff) {
+
+        return null;
+    }
+
     public static String getUrlWithAff(String url) {
         int win = url.indexOf("?");
         if (win > 0) {
@@ -125,7 +130,7 @@ public class AmazonHelper {
     private static String getUrlWithAff_IN(String url) {
         String pid = AmazonHelper.getProductIdByUrl(url);
         if (StringUtils.isEmpty(pid)) {
-            return "";
+            return url + "&tag=hasoffer0c-21";
         }
 
         if (!url.endsWith("/")) {
@@ -142,6 +147,11 @@ public class AmazonHelper {
 
     public static String getCleanUrl(String url) {
         return url;
+    }
+
+    public static void main(String[] args) {
+        String url = "https://www.amazon.in/b/ref=IN_SH_JanART_Desktop_Hero?_encoding=UTF8&node=4091094031";
+        System.out.println(url.indexOf("?"));
     }
     //http://www.amazon.in/gp/product/9350946661/ref=as_li_tl?ie=UTF8&camp=3626&creative=24790&creativeASIN=9350946661&linkCode=as2&tag=
 }

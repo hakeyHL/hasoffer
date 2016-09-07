@@ -1,5 +1,6 @@
 package hasoffer.api.interceptor;
 
+import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import hasoffer.api.controller.vo.DeviceEventVo;
 import hasoffer.api.controller.vo.DeviceInfoVo;
@@ -9,6 +10,7 @@ import hasoffer.api.worker.DeviceRequestQueue;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.utils.DeviceUtils;
 import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
 import hasoffer.webcommon.context.Context;
@@ -23,6 +25,8 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class RequestInterceptor implements HandlerInterceptor {
@@ -106,19 +110,37 @@ public class RequestInterceptor implements HandlerInterceptor {
             modelAndView.getModel().remove("searchCriteria");
         }
         if (modelAndView != null) {
+            String deviceId = JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).getString("deviceId");
+            List<String> ids = appService.getUserDevices(deviceId);
             UrmUser urmUser = appService.getUserByUserToken((String) Context.currentContext().get(StaticContext.USER_TOKEN));
             if (urmUser == null) {
                 modelAndView.addObject("result", new ResultVo("10010", "login expired"));
-//            new StringBuilder().append("{\n" +
-//                    "    \"errorCode\": \"10010\",\n" +
-//                    "    \"msg\": \"login expired \"\n" +
-//                    "}"));
             } else {
+                System.out.println("update user and device relationship ");
+
+                List<String> deviceIds = appService.getUserDevicesByUserId(urmUser.getId() + "");
+                System.out.println("get ids  by userId from urmUserDevice :" + deviceIds.size());
+                List<UrmUserDevice> urmUserDevices = new ArrayList<>();
+                for (String id : ids) {
+                    boolean flag = false;
+                    for (String dId : deviceIds) {
+                        if (id.equals(dId)) {
+                            flag = true;
+                            System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);
+                        }
+                    }
+                    if (!flag) {
+                        System.out.println("id :" + id + " is not exist before ");
+                        UrmUserDevice urmUserDevice = new UrmUserDevice();
+                        urmUserDevice.setDeviceId(id);
+                        urmUserDevice.setUserId(urmUser.getId() + "");
+                        urmUserDevices.add(urmUserDevice);
+                    }
+                }
+                //将关联关系插入到关联表中
+                int count = appService.addUrmUserDevice(urmUserDevices);
+                System.out.println(" batch save  result size : " + count);
                 modelAndView.addObject("result", new ResultVo("00000", "ok"));
-//            modelAndView.addObject("result", new StringBuilder().append("{\n" +
-//                    "    \"errorCode\": \"00000\",\n" +
-//                    "    \"msg\": \"ok \"\n" +
-//                    "}"));
             }
         }
     }
