@@ -1,5 +1,6 @@
 package hasoffer.core.cache;
 
+import com.alibaba.fastjson.JSON;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.*;
 
 /**
  * Date : 2016/5/7
@@ -26,6 +28,10 @@ public class CmpSkuCacheManager {
     private static final long CACHE_EXPIRE_TIME = TimeUtils.SECONDS_OF_1_HOUR;
     @Resource
     ICacheService<PtmCmpSku> cacheService;
+
+    @Resource
+    ICacheService<Map> skuCacheServiceMap;
+
     @Resource
     ICmpSkuService cmpSkuService;
 
@@ -123,5 +129,31 @@ public class CmpSkuCacheManager {
         if (StringUtils.isEmpty(deviceFlowControllRecord)) {
             cacheService.add(key, JSONUtil.toJSON(new DeviceFlowControllRecord(deviceId, cliSite.name(), true)), TimeUtils.SECONDS_OF_1_DAY);
         }
+    }
+
+    public List<PtmCmpSku> getCmpSkusBySiteAndPrice(float price, Website website) {
+        List<PtmCmpSku> ptmCmpSkus = null;
+        String key = CACHE_KEY_PRE + "getSkuByPriceAndSite" + price + "_" + website.name();
+        String s = skuCacheServiceMap.get(key, 0);
+        if (StringUtils.isEmpty(s)) {
+            ptmCmpSkus = cmpSkuService.getCmpSkusBySiteAndPrice(Float.valueOf(price + ""), website);
+            Map<String, List> map = new HashMap();
+            map.put(key, ptmCmpSkus);
+            skuCacheServiceMap.add(key, JSONUtil.toJSON(map), TimeUtils.SECONDS_OF_1_HOUR * 4);
+        } else {
+            try {
+                Map map = JSONUtil.toObject(s, Map.class);
+                List<LinkedHashMap> li = (List) map.get(key);
+                ptmCmpSkus = new ArrayList<>();
+                for (LinkedHashMap linkedHashMap1 : li) {
+                    String string = JSON.toJSONString(linkedHashMap1);
+                    PtmCmpSku ptmCmpSku = JSONUtil.toObject(string, PtmCmpSku.class);
+                    ptmCmpSkus.add(ptmCmpSku);
+                }
+            } catch (Exception e) {
+                System.out.println("getCmpSkusBySiteAndPrice  get skus by siteAndPrice exception " + e.getMessage());
+            }
+        }
+        return ptmCmpSkus;
     }
 }

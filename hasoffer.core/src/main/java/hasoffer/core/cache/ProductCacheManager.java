@@ -34,6 +34,8 @@ public class ProductCacheManager {
     @Resource
     ICacheService<PtmProduct> cacheService;
     @Resource
+    CmpSkuCacheManager skuCacheService;
+    @Resource
     IProductService productService;
     @Resource
     ICmpSkuService cmpSkuService;
@@ -267,12 +269,13 @@ public class ProductCacheManager {
         List<PtmCmpSku> tempPtmCmpSkus = new ArrayList<>();
         int i = 0;
         for (Object object : data) {
-            System.out.println(" i " + i);
+            System.out.println(" get onsale ptmcmpsku : i " + i);
             JSONArray jsonArray = JSONArray.parseArray(JSONArray.toJSONString(object));
             String website = (String) jsonArray.get(0);
             int price = (Integer) jsonArray.get(1);
             //根据price和site定位需要的sku
-            List<PtmCmpSku> cmpSkus = cmpSkuService.getCmpSkusBySiteAndPrice(Float.valueOf(price + ""), Website.valueOf(website));
+            List<PtmCmpSku> cmpSkus = skuCacheService.getCmpSkusBySiteAndPrice(Float.valueOf(price + ""), Website.valueOf(website));
+//            List<PtmCmpSku> cmpSkus = cmpSkuService.getCmpSkusBySiteAndPrice(Float.valueOf(price + ""), Website.valueOf(website));
             PtmCmpSku onsaleSku = getOnsaleSku(cmpSkus);
             if (onsaleSku != null) {
                 tempPtmCmpSkus.add(onsaleSku);
