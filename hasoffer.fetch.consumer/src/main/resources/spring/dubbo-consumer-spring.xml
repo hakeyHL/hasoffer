@@ -15,5 +15,8 @@
     <dubbo:provider timeout="5000"/>
     <!-- 要暴露的服务接口 check默认为true，表示启动是检查服务是否已经提供。 -->
     <dubbo:reference id="fetchDubboService" interface="hasoffer.dubbo.api.fetch.service.IFetchDubboService"
-                     version="1.0" check="false"/>
+                     version="1.0" check="false" group="fetch" />
+
+    <dubbo:reference id="fetchTimerDubboService" interface="hasoffer.dubbo.api.fetch.service.IFetchDubboService"
+                     version="1.0" check="false" group="timer"/>
 </beans>
