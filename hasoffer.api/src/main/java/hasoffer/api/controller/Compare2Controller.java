@@ -209,7 +209,7 @@ public class Compare2Controller {
                           @RequestParam(defaultValue = "") String site,
                           @RequestParam(defaultValue = "0") String price,
                           @RequestParam(defaultValue = "1") int page,
-                          @RequestParam(defaultValue = "10") int pageSize,
+                          @RequestParam(defaultValue = "20") int pageSize,
                           HttpServletResponse response) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
@@ -292,7 +292,7 @@ public class Compare2Controller {
     @RequestMapping(value = "/cmpsku", method = RequestMethod.GET)
     public ModelAndView cmpsku(@RequestParam(defaultValue = "0") final String id,
                                @RequestParam(defaultValue = "1") int page,
-                               @RequestParam(defaultValue = "20") int pageSize,
+                               @RequestParam(defaultValue = "10") int pageSize,
                                HttpServletResponse response,
                                HttpServletRequest request
     ) {
