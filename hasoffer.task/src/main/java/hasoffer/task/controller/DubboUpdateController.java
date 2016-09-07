@@ -39,9 +39,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RequestMapping(value = "/dubbofetchtask")
 public class DubboUpdateController {
 
+    public static int Price_OFF_LIST_THREAD_NUM = 1;
     private static AtomicBoolean taskRunning1 = new AtomicBoolean(false);
     private static AtomicBoolean taskRunning2 = new AtomicBoolean(false);
-
     @Resource
     @Qualifier("fetchDubboService")
     IFetchDubboService fetchDubboService;
@@ -82,7 +82,7 @@ public class DubboUpdateController {
             e.printStackTrace();
         }
 
-        for (int i = 0; i < 60; i++) {
+        for (int i = 0; i < 10; i++) {
             es.execute(new PriceOffNoticeProcessorWorker(queue, fetchDubboService, redisListService, cmpSkuService));
         }
 
