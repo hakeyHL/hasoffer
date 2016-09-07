@@ -296,6 +296,8 @@ public class Compare2Controller {
                                HttpServletResponse response,
                                HttpServletRequest request
     ) {
+        long l = System.currentTimeMillis();
+        System.out.println("enter ");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
@@ -323,6 +325,7 @@ public class Compare2Controller {
             SearchHelper.addToLog(sio);
             logger.debug(sio.toString());
             jsonObject.put("data", JSONObject.toJSON(cr));
+            System.out.println("time " + (System.currentTimeMillis() - l) / 1000);
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
             return null;
         }
@@ -639,7 +642,7 @@ public class Compare2Controller {
         List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
         CmpResult cmpResult = new CmpResult();
         //从ptmCmpSku表获取 productId为指定值、且状态为ONSALE 按照价格升序排列
-        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(product.getId(), sio.getPage(), sio.getSize());
+        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(product.getId(), sio.getPage(), 6);
         if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
             System.out.println("get skus size is " + pagedCmpskus.getData().size());
             List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
