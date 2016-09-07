@@ -88,7 +88,7 @@ public class Compare2Controller {
     private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
 
     public static void main(String[] args) {
-        String dealUrlWithAff = WebsiteHelper.getDeeplinkWithAff(Website.AMAZON, "https://www.amazon.in/b/ref=IN_SH_JanART_Desktop_Hero?_encoding=UTF8&node=4091094031", new String[]{MarketChannel.GOOGLEPLAY.name(), "dfecc858243a616a"});
+        String dealUrlWithAff = WebsiteHelper.getDealUrlWithAff(Website.FLIPKART, "https://www.flipkart.com/mens-clothing/jeans/~40-80-per-off/pr?sid=2oq%2Cs9b%2C94h", new String[]{MarketChannel.GOOGLEPLAY.name(), "dfecc858243a616a"});
         System.out.println(dealUrlWithAff);
 //        String urlWithAff = WebsiteHelper.getUrlWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
 //        System.out.println(urlWithAff);

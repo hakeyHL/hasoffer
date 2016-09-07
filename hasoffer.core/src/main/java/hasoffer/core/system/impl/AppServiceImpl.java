@@ -197,7 +197,7 @@ public class AppServiceImpl implements IAppService {
 
     @Override
     public List<String> getUserDevicesByUserId(String userId) {
-        return dbm.query(Q_APP_URMUSERDEVICE_GETIDSBYUSERID, Arrays.asList(userId));
+        return dbm.query(Q_APP_URMUSERDEVICE_GETIDSBYUSERID, 1, 5, Arrays.asList(userId));
     }
 
     @Override
@@ -216,7 +216,7 @@ public class AppServiceImpl implements IAppService {
     @Override
     public List<String> getUserDevices(String deviceId) {
         //有的用户绑定设备列表
-        return dbm.query(Q_APP_URMDEVICE_GETIDSBYDEVICEID, Arrays.asList(deviceId));
+        return dbm.query(Q_APP_URMDEVICE_GETIDSBYDEVICEID, 1, 5, Arrays.asList(deviceId));
     }
 
     @Override
