@@ -45,7 +45,7 @@ public class FetchTestServiceImpl implements IFetchTestService {
         String timeStr = DateFormatUtils.format(new Date(), "HH");
         String baseOutFolder = "/home/hasoffer/logs/testFetch/" + dateStr + "/" + timeStr;
 
-        ExecutorService service = Executors.newFixedThreadPool(websiteList.size());
+        ExecutorService executorService = Executors.newFixedThreadPool(websiteList.size());
         int seconds = 60 * 20;
         for (Website website : websiteList) {
             PageableResult<FetchTestTaskDTO> page = dbm.queryPage(hql, 1, 1000, Arrays.asList(dateStr, website));
@@ -63,16 +63,16 @@ public class FetchTestServiceImpl implements IFetchTestService {
             }
             //启动结果轮询线程
             File resultFile = new File(baseOutFolder + "/" + website.toString() + "_result.txt");
-            service.execute(new FetchTestWorker(list, fetchDubboService, resultFile));
+            executorService.execute(new FetchTestWorker(list, fetchDubboService, resultFile));
         }
 
-        service.shutdown();
+        executorService.shutdown();
         while (true) {
-            if (service.isTerminated()) {
+            if (executorService.isTerminated()) {
                 break;
             }
             try {
-                Thread.sleep(2000);
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
