@@ -98,9 +98,13 @@ public class AmazonHelper {
         return sb.toString();*/
     }
 
-    public static String getDealUrlWithAff(String url, String aff) {
-
-        return null;
+    public static String getDealUrlWithAff(String url) {
+        if (url.contains("?")) {
+            url = url + "&tag=hasoffer0c-21";
+        } else {
+            url = url + "?tag=hasoffer0c-21";
+        }
+        return url;
     }
 
     public static String getUrlWithAff(String url) {
