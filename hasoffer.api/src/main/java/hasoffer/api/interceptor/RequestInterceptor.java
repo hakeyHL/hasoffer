@@ -1,6 +1,5 @@
 package hasoffer.api.interceptor;
 
-import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import hasoffer.api.controller.vo.DeviceEventVo;
 import hasoffer.api.controller.vo.DeviceInfoVo;
@@ -24,7 +23,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 
 @Component
 public class RequestInterceptor implements HandlerInterceptor {
@@ -108,8 +106,8 @@ public class RequestInterceptor implements HandlerInterceptor {
             modelAndView.getModel().remove("searchCriteria");
         }
         if (modelAndView != null) {
-            String deviceId = JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).getString("deviceId");
-            List<String> ids = appService.getUserDevices(deviceId);
+//            String deviceId = JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).getString("deviceId");
+//            List<String> ids = appService.getUserDevices(deviceId);
             UrmUser urmUser = appService.getUserByUserToken((String) Context.currentContext().get(StaticContext.USER_TOKEN));
             if (urmUser == null) {
                 modelAndView.addObject("result", new ResultVo("10010", "login expired"));
