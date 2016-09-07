@@ -94,7 +94,7 @@ public class CmpSkuUpdateWorker implements Runnable {
 
             FetchedProduct fetchedProduct = null;
             try {
-                FetchUrlResult productsByUrl = fetchService.getProductsByUrl(sku.getId(), null, url);
+                FetchUrlResult productsByUrl = fetchService.getProductsByUrl(null, url, TimeUtils.SECONDS_OF_1_DAY);
                 if (productsByUrl != null) {
                     fetchedProduct = productsByUrl.getFetchProduct();
                 }

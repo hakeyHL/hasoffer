@@ -1,5 +1,18 @@
 package hasoffer.job.service.impl;
 
+import hasoffer.base.enums.TaskLevel;
+import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.Website;
+import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
+import hasoffer.job.dto.FetchTestTaskDTO;
+import hasoffer.job.service.IFetchTestService;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -8,21 +21,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
-import hasoffer.base.enums.TaskLevel;
-import hasoffer.base.model.PageableResult;
-import hasoffer.base.model.Website;
-import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
-import hasoffer.job.dto.FetchTestTaskDTO;
-import hasoffer.job.service.IFetchTestService;
 
 @Service("fetchTestService")
 public class FetchTestServiceImpl implements IFetchTestService {
@@ -34,9 +32,9 @@ public class FetchTestServiceImpl implements IFetchTestService {
     @Resource
     IDataBaseManager dbm;
 
-    @Resource
+    @Resource(name = "fetchTimerDubboService")
     IFetchDubboService fetchDubboService;
- 
+
     @Override
     public void commitTask() {
         String hql = "select new hasoffer.job.dto.FetchTestTaskDTO(p.id,p.website,p.url) from SrmProductSearchCount s , PtmCmpSku p where p.productId=s.productId and s.ymd=?0 and p.website=?1 and s.productId is not null order by s.count desc";
@@ -49,14 +47,14 @@ public class FetchTestServiceImpl implements IFetchTestService {
         String baseOutFolder = "/home/hasoffer/logs/testFetch/" + dateStr + "/" + batch;
 
         ExecutorService service = Executors.newFixedThreadPool(websiteList.size());
-
+        int seconds = 60 * 20;
         for (Website website : websiteList) {
             PageableResult<FetchTestTaskDTO> page = dbm.queryPage(hql, 1, 1000, Arrays.asList(dateStr, website));
             logger.debug("Fetch Test start: website:{},count:{}", website.toString(), page.getNumFund());
             List<FetchTestTaskDTO> list = page.getData();
             File file = new File(baseOutFolder + "/" + website.toString() + "_task.txt");
             for (FetchTestTaskDTO ptmCmpSku : list) {
-                fetchDubboService.sendUrlTask(ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), TaskLevel.LEVEL_3);
+                fetchDubboService.sendUrlTask(ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), seconds, TaskLevel.LEVEL_1);
                 try {
                     FileUtils.write(file, ptmCmpSku.toString() + "\r\n", "utf-8", true);
                 } catch (IOException e) {

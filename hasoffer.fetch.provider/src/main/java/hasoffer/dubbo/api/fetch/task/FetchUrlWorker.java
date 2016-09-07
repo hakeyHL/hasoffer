@@ -70,7 +70,8 @@ public class FetchUrlWorker implements Runnable {
         } catch (UnSupportWebsiteException e) {
             fetchUrlResult.setTaskStatus(TaskStatus.STOPPED);
             fetchUrlResult.setErrMsg("un able support website.");
-            fetchCacheService.cacheResult(FetchUrlResult.getCacheKey(fetchUrlResult), fetchUrlResult);
+            String cacheKey = FetchUrlResult.getCacheKey(fetchUrlResult);
+            fetchCacheService.cacheResult(cacheKey, fetchUrlResult, fetchUrlResult.getExpireSeconds());
             logger.error("FetchKeywordWorker is error. Error Msg: un able support website.", e);
         }
     }
