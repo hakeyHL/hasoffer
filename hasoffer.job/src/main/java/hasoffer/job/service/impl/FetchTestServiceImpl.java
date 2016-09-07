@@ -38,7 +38,7 @@ public class FetchTestServiceImpl implements IFetchTestService {
     public void commitTask() {
         String hql = "select new hasoffer.job.dto.FetchTestTaskDTO(p.id,p.website,p.url) from SrmProductSearchCount s , PtmCmpSku p where p.productId=s.productId and s.ymd=?0 and p.website=?1 and s.productId is not null order by s.count desc";
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, -1);
+        calendar.add(Calendar.DATE, -2);
         String dateStr = DateFormatUtils.format(calendar, "yyyyMMdd");
         List<Website> websiteList = Arrays.asList(Website.AMAZON, Website.FLIPKART, Website.SNAPDEAL, Website.SHOPCLUES,
                 Website.PAYTM);
