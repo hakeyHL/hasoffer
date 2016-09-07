@@ -4,6 +4,7 @@ import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
@@ -162,11 +163,11 @@ public class DubboUpdateController {
         Website website = ptmCmpSku.getWebsite();
         String url = ptmCmpSku.getUrl();
 
-        fetchDubboService.sendUrlTask(website, url, TaskLevel.LEVEL_1);
+        fetchDubboService.sendUrlTask(website, url, TimeUtils.SECONDS_OF_1_DAY, TaskLevel.LEVEL_1);
         System.out.println("send single url success for " + skuid);
 
         while (true) {
-            TaskStatus taskStatus = fetchDubboService.getUrlTaskStatus(website, url);
+            TaskStatus taskStatus = fetchDubboService.getUrlTaskStatus(website, url, TimeUtils.SECONDS_OF_1_DAY);
             if (TaskStatus.FINISH.equals(taskStatus) || TaskStatus.EXCEPTION.equals(taskStatus)) {
                 break;
             } else {
@@ -179,7 +180,7 @@ public class DubboUpdateController {
             }
         }
 
-        FetchUrlResult fetchUrlResult = fetchDubboService.getProductsByUrl(skuid, website, url);
+        FetchUrlResult fetchUrlResult = fetchDubboService.getProductsByUrl(website, url, TimeUtils.SECONDS_OF_1_DAY);
 
         FetchedProduct fetchedProduct = fetchUrlResult.getFetchProduct();
 

@@ -91,7 +91,7 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
             return;
         }
 
-        TaskStatus taskStatus = fetchDubboService.getUrlTaskStatus(website, url);
+        TaskStatus taskStatus = fetchDubboService.getUrlTaskStatus(website, url, TimeUtils.SECONDS_OF_1_DAY);
 
         FetchUrlResult fetchUrlResult = null;
 
@@ -115,7 +115,7 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
             logger.info("taskstatus NONE for [" + skuid + "] , resend success");
         } else {//(TaskStatus.FINISH.equals(taskStatus)))
             logger.info("taskstatus FINISH for [" + skuid + "]");
-            fetchUrlResult = fetchDubboService.getProductsByUrl(skuid, sku.getWebsite(), sku.getUrl());
+            fetchUrlResult = fetchDubboService.getProductsByUrl(sku.getWebsite(), sku.getUrl(), TimeUtils.SECONDS_OF_1_DAY);
 
             FetchedProduct fetchedProduct = fetchUrlResult.getFetchProduct();
 

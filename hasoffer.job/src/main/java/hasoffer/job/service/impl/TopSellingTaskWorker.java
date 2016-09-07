@@ -1,12 +1,5 @@
 package hasoffer.job.service.impl;
 
-import java.util.Date;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
@@ -20,6 +13,12 @@ import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.job.dto.TopSellingTaskDTO;
 import hasoffer.spider.model.FetchUrlResult;
 import hasoffer.spider.model.FetchedProduct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Date;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created on 2015/12/21.
@@ -42,7 +41,7 @@ public class TopSellingTaskWorker implements Runnable {
 
         while (true) {
             try {
-            	TopSellingTaskDTO sku = queue.poll();
+                TopSellingTaskDTO sku = queue.poll();
                 if (sku == null) {
                     try {
                         TimeUnit.SECONDS.sleep(3);
@@ -77,7 +76,8 @@ public class TopSellingTaskWorker implements Runnable {
             return;
         }
 
-        TaskStatus taskStatus = fetchDubboService.getUrlTaskStatus(website, url);
+        int expireSeconds = 60 * 20;
+        TaskStatus taskStatus = fetchDubboService.getUrlTaskStatus(website, url, expireSeconds);
 
         FetchUrlResult fetchUrlResult = null;
 
@@ -101,18 +101,18 @@ public class TopSellingTaskWorker implements Runnable {
             logger.info("taskstatus NONE for [" + skuid + "] , resend success");
         } else {//(TaskStatus.FINISH.equals(taskStatus)))
             logger.info("taskstatus FINISH for [" + skuid + "]");
-            fetchUrlResult = fetchDubboService.getProductsByUrl(skuid, sku.getWebsite(), sku.getUrl());
+            fetchUrlResult = fetchDubboService.getProductsByUrl(sku.getWebsite(), sku.getUrl(), expireSeconds);
 
             FetchedProduct fetchedProduct = fetchUrlResult.getFetchProduct();
 
             System.out.println(JSONUtil.toJSON(fetchedProduct).toString() + "id=" + skuid);
 
             try {
-            	PtmCmpSku ptmCmpSku = new PtmCmpSku();
-            	ptmCmpSku.setId(sku.getId());
-            	ptmCmpSku.setProductId(sku.getProductId());
-            	ptmCmpSku.setUrl(sku.getUrl());
-            	ptmCmpSku.setUpdateTime(sku.getUpdateTime());
+                PtmCmpSku ptmCmpSku = new PtmCmpSku();
+                ptmCmpSku.setId(sku.getId());
+                ptmCmpSku.setProductId(sku.getProductId());
+                ptmCmpSku.setUrl(sku.getUrl());
+                ptmCmpSku.setUpdateTime(sku.getUpdateTime());
                 cmpSkuService.createDescription(ptmCmpSku, fetchedProduct);
             } catch (Exception e) {
                 logger.info("createDescription fail " + skuid);

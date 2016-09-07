@@ -13,6 +13,7 @@
     <dubbo:protocol name="dubbo" port="20880"/>
     <dubbo:provider weight="50" timeout="5000"/>
     <!-- 要暴露的服务接口 -->
-    <dubbo:service interface="hasoffer.dubbo.api.fetch.service.IFetchDubboService" version="1.0"  ref="fetchDubboService"/>
+    <!--<dubbo:service interface="hasoffer.dubbo.api.fetch.service.IFetchDubboService" version="1.0"  ref="fetchDubboService" group="fetch"/>-->
+    <dubbo:service interface="hasoffer.dubbo.api.fetch.service.IFetchDubboService" version="1.0"  ref="fetchDubboService" group="timer"/>
     <bean id="fetchDubboService" class="hasoffer.dubbo.api.fetch.service.impl.FetchDubboServiceImpl" />
 </beans>
