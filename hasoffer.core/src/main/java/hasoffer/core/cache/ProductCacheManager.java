@@ -98,11 +98,11 @@ public class ProductCacheManager {
         try {
             if (StringUtils.isEmpty(cmpSkusJson)) {
                 pagedCmpskus = productService.listOnsaleCmpSkus(proId, page, size);
-                List<PtmCmpSku> data = pagedCmpskus.getData();
-                if (data != null && data.size() > 0) {
+//                List<PtmCmpSku> data = pagedCmpskus.getData();
+//                if (data != null && data.size() > 0) {
 //                    pagedCmpskus.setData(getOnsaleSkuList(data, proId));
-                    cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
-                }
+//                }
+                cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
             } else {
                 PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
 
