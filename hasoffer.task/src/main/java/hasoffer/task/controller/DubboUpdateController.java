@@ -42,6 +42,7 @@ public class DubboUpdateController {
     public static int Price_OFF_LIST_THREAD_NUM = 1;
     private static AtomicBoolean taskRunning1 = new AtomicBoolean(false);
     private static AtomicBoolean taskRunning2 = new AtomicBoolean(false);
+    private static AtomicBoolean taskRunning3 = new AtomicBoolean(false);
     @Resource
     @Qualifier("fetchDubboService")
     IFetchDubboService fetchDubboService;
@@ -65,7 +66,7 @@ public class DubboUpdateController {
     @ResponseBody
     public String priceoffnotice() {
 
-        if (taskRunning1.get()) {
+        if (taskRunning3.get()) {
             return "task running.";
         }
 
@@ -86,7 +87,7 @@ public class DubboUpdateController {
             es.execute(new PriceOffNoticeProcessorWorker(queue, fetchDubboService, redisListService, cmpSkuService));
         }
 
-        taskRunning1.set(true);
+        taskRunning3.set(true);
 
         return "ok";
     }
