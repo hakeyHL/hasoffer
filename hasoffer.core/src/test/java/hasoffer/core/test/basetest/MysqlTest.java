@@ -68,6 +68,9 @@ public class MysqlTest {
     private static final String Q_SRMSEARCHLOG_TIMERSET2 = "SELECT t FROM SrmSearchLog t WHERE t.precise = 'TIMERSET2' ";
 
     private static final String Q_PTMCMPSKU_PRODUCTID = "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ";
+
+    private static final String Q_WITH_STAR = "SELECT s FROM SrmProductSearchCount s LEFT JOIN PtmCmpSku p on p.productId = s.productId   where s.ymd=?0 and p.website=?1 and s.productId is not null order by s.count desc";
+
     @Resource
     IDataBaseManager dbm;
     @Resource
@@ -80,11 +83,20 @@ public class MysqlTest {
     private ConcurrentLinkedQueue<PtmCmpSku> skuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
 
     @Test
+    public void testQueryWithStar() {
+
+        List<Object> query = dbm.query(Q_WITH_STAR, Arrays.asList("20160815", Website.FLIPKART));
+
+        System.out.println(query);
+
+    }
+
+    @Test
     public void testSkuUpdate() {
 
         FetchedProduct fetchedProduct = new FetchedProduct();
 //     \\\\\\N":"13810840","Duration":"1 year","UPC":"does not apply"}', description='null', model='Redmi Note 3S,', offers='null', categoryPathList=null}
-        fetchedProduct.setBrand("Xiaomi");
+//        fetchedProduct.setBrand("Xiaomi");
         fetchedProduct.setTitle("Xiaomi Redmi 3S PRIME 32GB 3GB RAM - Sealed Pack");
         fetchedProduct.setWebsite(Website.EBAY);
         fetchedProduct.setSubTitle("One Year Manufacturer Warranty");
