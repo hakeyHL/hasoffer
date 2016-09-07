@@ -143,7 +143,6 @@ public class CmpSkuCacheManager {
         } else {
             try {
                 Map map = JSONUtil.toObject(s, Map.class);
-                LinkedHashMap linkedHashMap = new LinkedHashMap();
                 List<LinkedHashMap> li = (List) map.get(key);
                 ptmCmpSkus = new ArrayList<>();
                 for (LinkedHashMap linkedHashMap1 : li) {
