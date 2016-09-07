@@ -38,7 +38,7 @@ public class FetchTestServiceImpl implements IFetchTestService {
     IFetchDubboService fetchDubboService;
 
     @Override
-    public void initTask() {
+    public void commitTask() {
         String hql = "select p.* from PtmCmpSku p left join SrmProductSearchCount s on p.productId = s.productId   where s.ymd=?0 and p.website=?1 order by s.count desc";
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -1);
