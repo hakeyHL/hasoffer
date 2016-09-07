@@ -73,6 +73,8 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
             }
 
             if (DubboUpdateController.Price_OFF_LIST_THREAD_NUM == 0 && queue.size() == 0) {
+                System.out.println("Price_OFF_LIST_THREAD_NUM == " + DubboUpdateController.Price_OFF_LIST_THREAD_NUM);
+                System.out.println("queue size is " + queue.size());
                 System.out.println("price off process queue has no object ,thread going to die");
                 break;
             }
