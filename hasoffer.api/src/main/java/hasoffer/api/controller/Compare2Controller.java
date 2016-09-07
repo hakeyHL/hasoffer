@@ -292,7 +292,7 @@ public class Compare2Controller {
     @RequestMapping(value = "/cmpsku", method = RequestMethod.GET)
     public ModelAndView cmpsku(@RequestParam(defaultValue = "0") final String id,
                                @RequestParam(defaultValue = "1") int page,
-                               @RequestParam(defaultValue = "20") int pageSize,
+                               @RequestParam(defaultValue = "10") int pageSize,
                                HttpServletResponse response,
                                HttpServletRequest request
     ) {
