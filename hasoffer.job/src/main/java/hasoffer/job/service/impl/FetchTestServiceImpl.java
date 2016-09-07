@@ -49,7 +49,7 @@ public class FetchTestServiceImpl implements IFetchTestService {
         int seconds = 60 * 20;
         for (Website website : websiteList) {
             PageableResult<FetchTestTaskDTO> page = dbm.queryPage(hql, 1, 1000, Arrays.asList(dateStr, website));
-            logger.debug("Fetch Test start: website:{},count:{}", website.toString(), page.getNumFund());
+            logger.info("Fetch Test start: website:{},count:{}", website.toString(), page.getNumFund());
             List<FetchTestTaskDTO> list = page.getData();
             File file = new File(baseOutFolder + "/" + website.toString() + "_task.txt");
             for (FetchTestTaskDTO ptmCmpSku : list) {
