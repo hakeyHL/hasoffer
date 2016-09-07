@@ -15,7 +15,7 @@ import java.util.List;
 
 public class FetchTestWorker implements Runnable {
 
-    private Logger logger = LoggerFactory.getLogger(FetchTestWorker.class);
+    private final Logger logger = LoggerFactory.getLogger(FetchTestWorker.class);
 
     private List<FetchTestTaskDTO> list;
     private IFetchDubboService fetchDubboService;
@@ -46,6 +46,10 @@ public class FetchTestWorker implements Runnable {
                     }
 
                     resultList.add(ptmCmpSku);
+                } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
+                    FetchUrlResult fetchUrlResult = fetchDubboService.getProductsByUrl(
+                            ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), expireSeconds);
+                    logger.error(fetchUrlResult.toString());
                 }
             }
             if (!resultList.isEmpty()) {

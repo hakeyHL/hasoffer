@@ -53,12 +53,36 @@
         </encoder>
     </appender>
 
+    <appender name="ErrorLoggerFileOut"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.base}/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${log.base}/error.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <MaxHistory>10</MaxHistory>
+                <!-- or whenever the file size reaches 100MB -->
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%date [%thread][%-8level%logger{80}] %msg%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
     <!-- logger -->
 
-    <logger name="hasoffer" level="INFO"/>
+    <logger name="hasoffer" level="DEBUG">
+        <appender-ref ref="ErrorLoggerFileOut"/>
+    </logger>
     <!-- code info log -->
     <logger name="hasoffer.job" level="INFO">
-        <appender-ref ref="InfoLoggerFileOut"/>
+        <!--<appender-ref ref="InfoLoggerFileOut"/>-->
         <appender-ref ref="ErrorLoggerFileOut"/>
     </logger>
 

@@ -8,6 +8,7 @@ import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.job.dto.FetchTestTaskDTO;
 import hasoffer.job.service.IFetchTestService;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -15,9 +16,9 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -26,8 +27,6 @@ import java.util.concurrent.Executors;
 public class FetchTestServiceImpl implements IFetchTestService {
 
     private Logger logger = LoggerFactory.getLogger(FetchTestServiceImpl.class);
-
-    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
     @Resource
     IDataBaseManager dbm;
@@ -40,11 +39,11 @@ public class FetchTestServiceImpl implements IFetchTestService {
         String hql = "select new hasoffer.job.dto.FetchTestTaskDTO(p.id,p.website,p.url) from SrmProductSearchCount s , PtmCmpSku p where p.productId=s.productId and s.ymd=?0 and p.website=?1 and s.productId is not null order by s.count desc";
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -1);
-        String dateStr = sdf.format(calendar.getTime());
+        String dateStr = DateFormatUtils.format(new Date(), "yyyyMMdd");
         List<Website> websiteList = Arrays.asList(Website.AMAZON, Website.FLIPKART, Website.SNAPDEAL, Website.SHOPCLUES,
                 Website.PAYTM);
-        long batch = System.currentTimeMillis();
-        String baseOutFolder = "/home/hasoffer/logs/testFetch/" + dateStr + "/" + batch;
+        String timeStr = DateFormatUtils.format(new Date(), "HH");
+        String baseOutFolder = "/home/hasoffer/logs/testFetch/" + dateStr + "/" + timeStr;
 
         ExecutorService service = Executors.newFixedThreadPool(websiteList.size());
         int seconds = 60 * 20;
@@ -57,6 +56,7 @@ public class FetchTestServiceImpl implements IFetchTestService {
                 fetchDubboService.sendUrlTask(ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), seconds, TaskLevel.LEVEL_1);
                 try {
                     FileUtils.write(file, ptmCmpSku.toString() + "\r\n", "utf-8", true);
+                    logger.info("save task success ! " + file.getAbsolutePath() + "," + ptmCmpSku.toString());
                 } catch (IOException e) {
                     logger.error("save task error ! " + file.getAbsolutePath() + "," + ptmCmpSku.toString(), e);
                 }
