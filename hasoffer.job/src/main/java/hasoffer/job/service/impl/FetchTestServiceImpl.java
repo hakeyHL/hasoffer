@@ -20,8 +20,8 @@ import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
+import hasoffer.job.dto.FetchTestTaskDTO;
 import hasoffer.job.service.IFetchTestService;
 
 @Service("fetchTestService")
@@ -39,7 +39,7 @@ public class FetchTestServiceImpl implements IFetchTestService {
  
     @Override
     public void commitTask() {
-        String hql = "select p.* from SrmProductSearchCount s left join PtmCmpSku p on p.productId = s.productId   where s.ymd=?0 and p.website=?1 and s.productId is not null order by s.count desc";
+        String hql = "select new hasoffer.job.dto.FetchTestTaskDTO(p.id,p.website,p.url) from SrmProductSearchCount s , PtmCmpSku p where p.productId=s.productId and s.ymd=?0 and p.website=?1 and s.productId is not null order by s.count desc";
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -1);
         String dateStr = sdf.format(calendar.getTime());
@@ -51,11 +51,11 @@ public class FetchTestServiceImpl implements IFetchTestService {
         ExecutorService service = Executors.newFixedThreadPool(websiteList.size());
 
         for (Website website : websiteList) {
-            PageableResult<PtmCmpSku> page = dbm.queryPage(hql, 1, 1000, Arrays.asList(dateStr, website));
+            PageableResult<FetchTestTaskDTO> page = dbm.queryPage(hql, 1, 1000, Arrays.asList(dateStr, website));
             logger.debug("Fetch Test start: website:{},count:{}", website.toString(), page.getNumFund());
-            List<PtmCmpSku> list = page.getData();
+            List<FetchTestTaskDTO> list = page.getData();
             File file = new File(baseOutFolder + "/" + website.toString() + "_task.txt");
-            for (PtmCmpSku ptmCmpSku : list) {
+            for (FetchTestTaskDTO ptmCmpSku : list) {
                 fetchDubboService.sendUrlTask(ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), TaskLevel.LEVEL_3);
                 try {
                     FileUtils.write(file, ptmCmpSku.toString() + "\r\n", "utf-8", true);

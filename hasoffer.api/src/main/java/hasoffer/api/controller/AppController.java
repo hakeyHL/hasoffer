@@ -649,6 +649,8 @@ public class AppController {
      */
     @RequestMapping(value = "/productsList")
     public ModelAndView productsList(SearchCriteria criteria, @RequestParam(defaultValue = "4") int type) {
+        long l = System.currentTimeMillis();
+        System.out.println("enter ");
         System.out.println(Thread.currentThread().getName() + " :  criteria : " + criteria.toString());
         ModelAndView mv = new ModelAndView();
         List li = new ArrayList();
@@ -656,9 +658,9 @@ public class AppController {
         PageableResult<ProductModel2> products;
         String data = "";
         //查询热卖商品
-        List<PtmProduct> products2s = productCacheManager.getTopSellins(criteria.getPage(), criteria.getPageSize());
         switch (type) {
             case 0:
+                List<PtmProduct> products2s = productCacheManager.getTopSellins(criteria.getPage(), criteria.getPageSize());
                 addProductVo2List(li, products2s);
                 if (products2s != null && products2s.size() > 4) {
                     li = li.subList(0, 5);
@@ -666,7 +668,8 @@ public class AppController {
                 map.put("product", li);
                 break;
             case 1:
-                addProductVo2List(li, products2s);
+                List<PtmProduct> topSellins = productCacheManager.getTopSellins(criteria.getPage(), criteria.getPageSize());
+                addProductVo2List(li, topSellins);
                 map.put("product", li);
                 break;
             case 2:
@@ -816,6 +819,7 @@ public class AppController {
             map.put("product", li);
         }
         mv.addObject("data", map);
+        System.out.println("time " + (System.currentTimeMillis() - l) / 1000);
         return mv;
     }
 //    public ModelAndView productsList(SearchCriteria criteria, @RequestParam(defaultValue = "3") int type) {
@@ -929,7 +933,7 @@ public class AppController {
     }
 
     public void setCommentNumAndRatins(ProductListVo productListVo) {
-        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productListVo.getId(), 1, 10);
+        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productListVo.getId(), 1, 6);
         if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
             List<PtmCmpSku> tempSkuList = pagedCmpskus.getData();
             //计算评论数*星级的总和
