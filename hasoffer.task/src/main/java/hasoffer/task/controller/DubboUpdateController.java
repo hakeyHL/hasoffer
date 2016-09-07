@@ -166,7 +166,7 @@ public class DubboUpdateController {
 
         while (true) {
             TaskStatus taskStatus = fetchDubboService.getUrlTaskStatus(website, url);
-            if (TaskStatus.FINISH.equals(taskStatus)) {
+            if (TaskStatus.FINISH.equals(taskStatus) || TaskStatus.EXCEPTION.equals(taskStatus)) {
                 break;
             } else {
                 System.out.println(taskStatus);
@@ -205,7 +205,7 @@ public class DubboUpdateController {
 
         while (true) {
             TaskStatus taskStatus = fetchDubboService.getKeyWordTaskStatus(website, keyword);
-            if (TaskStatus.FINISH.equals(taskStatus)) {
+            if (TaskStatus.FINISH.equals(taskStatus) || TaskStatus.EXCEPTION.equals(taskStatus)) {
                 break;
             } else {
                 System.out.println(taskStatus);

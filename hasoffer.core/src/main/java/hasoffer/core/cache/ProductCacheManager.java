@@ -1,5 +1,6 @@
 package hasoffer.core.cache;
 
+import com.alibaba.fastjson.JSONArray;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
@@ -9,6 +10,7 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.PtmTopSelling;
+import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.redis.ICacheService;
 import org.slf4j.Logger;
@@ -33,6 +35,8 @@ public class ProductCacheManager {
     ICacheService<PtmProduct> cacheService;
     @Resource
     IProductService productService;
+    @Resource
+    ICmpSkuService cmpSkuService;
     Logger logger = LoggerFactory.getLogger(ProductCacheManager.class);
 
     /**
@@ -92,7 +96,11 @@ public class ProductCacheManager {
         try {
             if (StringUtils.isEmpty(cmpSkusJson)) {
                 pagedCmpskus = productService.listOnsaleCmpSkus(proId, page, size);
-                cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
+                List<PtmCmpSku> data = pagedCmpskus.getData();
+                if (data != null && data.size() > 0) {
+                    pagedCmpskus.setData(getOnsaleSkuList(data));
+                    cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
+                }
             } else {
                 PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
 
@@ -253,5 +261,39 @@ public class ProductCacheManager {
             return null;
         }
         return pagedCmpskus;
+    }
+
+    public List<PtmCmpSku> getOnsaleSkuList(List data) {
+        List<PtmCmpSku> tempPtmCmpSkus = new ArrayList<>();
+        int i = 0;
+        for (Object object : data) {
+            System.out.println(" i " + i);
+            JSONArray jsonArray = JSONArray.parseArray(JSONArray.toJSONString(object));
+            String website = (String) jsonArray.get(0);
+            int price = (Integer) jsonArray.get(1);
+            //根据price和site定位需要的sku
+            List<PtmCmpSku> cmpSkus = cmpSkuService.getCmpSkusBySiteAndPrice(Float.valueOf(price + ""), Website.valueOf(website));
+            PtmCmpSku onsaleSku = getOnsaleSku(cmpSkus);
+            if (onsaleSku != null) {
+                tempPtmCmpSkus.add(onsaleSku);
+            }
+            i++;
+        }
+        return tempPtmCmpSkus;
+    }
+
+    public PtmCmpSku getOnsaleSku(List<PtmCmpSku> ptmCmpSkus) {
+
+        PtmCmpSku OnsalePtmCmpSku = null;
+        PtmCmpSku OutStockPtmCmpSku = null;
+        for (PtmCmpSku ptmCmpSku : ptmCmpSkus) {
+            if (ptmCmpSku.getStatus().name().equals("ONSALE")) {
+                OnsalePtmCmpSku = ptmCmpSku;
+                break;
+            } else {
+                OutStockPtmCmpSku = ptmCmpSku;
+            }
+        }
+        return OnsalePtmCmpSku == null ? OutStockPtmCmpSku : OnsalePtmCmpSku;
     }
 }

@@ -2,6 +2,7 @@ package hasoffer.core.persistence.po.app;
 
 import hasoffer.base.model.Website;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
+import hasoffer.core.persistence.enums.AppdealSource;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -20,6 +21,9 @@ public class AppDeal implements Identifiable<Long> {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Website website;//deal来源网站
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AppdealSource appdealSource = AppdealSource.MANUAL_INPUT;
 
     private String title;//deal标题
     @Column(columnDefinition = "text", nullable = false)
@@ -48,15 +52,13 @@ public class AppDeal implements Identifiable<Long> {
     @Column(columnDefinition = "text")
     private String infoPageImage;//deal详情页图片
 
-    @Column
     private Long dealClickCount = 0l;//deal的点击次数
 
-    @Column
     private Long dealCategoryId = -1l;//deal的目录id
 
-    @Column
     private int discount = 50;//deal的折扣额度
 
+    private long ptmcmpskuid;//如果是PRICE_OFF生成的deal，保留skuid
 
     @Override
     public Long getId() {
@@ -188,6 +190,22 @@ public class AppDeal implements Identifiable<Long> {
         this.dealCategoryId = dealCategoryId;
     }
 
+    public AppdealSource getAppdealSource() {
+        return appdealSource;
+    }
+
+    public void setAppdealSource(AppdealSource appdealSource) {
+        this.appdealSource = appdealSource;
+    }
+
+    public long getPtmcmpskuid() {
+        return ptmcmpskuid;
+    }
+
+    public void setPtmcmpskuid(long ptmcmpskuid) {
+        this.ptmcmpskuid = ptmcmpskuid;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -198,8 +216,10 @@ public class AppDeal implements Identifiable<Long> {
         if (push != appDeal.push) return false;
         if (display != appDeal.display) return false;
         if (discount != appDeal.discount) return false;
+        if (ptmcmpskuid != appDeal.ptmcmpskuid) return false;
         if (id != null ? !id.equals(appDeal.id) : appDeal.id != null) return false;
         if (website != appDeal.website) return false;
+        if (appdealSource != appDeal.appdealSource) return false;
         if (title != null ? !title.equals(appDeal.title) : appDeal.title != null) return false;
         if (linkUrl != null ? !linkUrl.equals(appDeal.linkUrl) : appDeal.linkUrl != null) return false;
         if (imageUrl != null ? !imageUrl.equals(appDeal.imageUrl) : appDeal.imageUrl != null) return false;
@@ -222,6 +242,7 @@ public class AppDeal implements Identifiable<Long> {
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (website != null ? website.hashCode() : 0);
+        result = 31 * result + (appdealSource != null ? appdealSource.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (linkUrl != null ? linkUrl.hashCode() : 0);
         result = 31 * result + (imageUrl != null ? imageUrl.hashCode() : 0);
@@ -236,6 +257,7 @@ public class AppDeal implements Identifiable<Long> {
         result = 31 * result + (dealClickCount != null ? dealClickCount.hashCode() : 0);
         result = 31 * result + (dealCategoryId != null ? dealCategoryId.hashCode() : 0);
         result = 31 * result + discount;
+        result = 31 * result + (int) (ptmcmpskuid ^ (ptmcmpskuid >>> 32));
         return result;
     }
 }
