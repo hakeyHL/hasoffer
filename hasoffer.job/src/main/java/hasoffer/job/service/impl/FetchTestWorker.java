@@ -10,19 +10,20 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.ArrayDeque;
 import java.util.List;
+import java.util.Queue;
 
 public class FetchTestWorker implements Runnable {
 
     private final Logger logger = LoggerFactory.getLogger(FetchTestWorker.class);
 
-    private List<FetchTestTaskDTO> list;
+    private Queue<FetchTestTaskDTO> queue;
     private IFetchDubboService fetchDubboService;
     private File file;
 
     public FetchTestWorker(List<FetchTestTaskDTO> list, IFetchDubboService fetchDubboService, File file) {
-        this.list = list;
+        this.queue = new ArrayDeque<>(list);
         this.fetchDubboService = fetchDubboService;
         this.file = file;
     }
@@ -30,9 +31,9 @@ public class FetchTestWorker implements Runnable {
     @Override
     public void run() {
         long expireSeconds = 20 * 60;
-        while (list != null && !list.isEmpty()) {
-            List<FetchTestTaskDTO> resultList = new ArrayList<FetchTestTaskDTO>();
-            for (FetchTestTaskDTO ptmCmpSku : list) {
+        while (queue.size() > 0) {
+            FetchTestTaskDTO ptmCmpSku = queue.poll();
+            if (ptmCmpSku != null) {
                 TaskStatus taskStatus = fetchDubboService.getUrlTaskStatus(ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), expireSeconds);
                 if (TaskStatus.FINISH.equals(taskStatus)) {
                     FetchUrlResult fetchUrlResult = fetchDubboService.getProductsByUrl(
@@ -45,16 +46,11 @@ public class FetchTestWorker implements Runnable {
                         logger.error(e.getMessage());
                     }
 
-                    resultList.add(ptmCmpSku);
                 } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
                     FetchUrlResult fetchUrlResult = fetchDubboService.getProductsByUrl(
                             ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), expireSeconds);
                     logger.error(fetchUrlResult.toString());
                 }
-            }
-            if (!resultList.isEmpty()) {
-                list.removeAll(resultList);
-                resultList.clear();
             }
         }
     }

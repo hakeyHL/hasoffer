@@ -130,7 +130,7 @@ public class AmazonHelper {
     private static String getUrlWithAff_IN(String url) {
         String pid = AmazonHelper.getProductIdByUrl(url);
         if (StringUtils.isEmpty(pid)) {
-            return url + "&tag=hasoffer0c-21";
+            return url + "?tag=hasoffer0c-21";
         }
 
         if (!url.endsWith("/")) {
@@ -150,8 +150,14 @@ public class AmazonHelper {
     }
 
     public static void main(String[] args) {
-        String url = "https://www.amazon.in/b/ref=IN_SH_JanART_Desktop_Hero?_encoding=UTF8&node=4091094031";
-        System.out.println(url.indexOf("?"));
+        //String url = "https://www.amazon.in/b/ref=IN_SH_JanART_Desktop_Hero?_encoding=UTF8&node=4091094031";
+        String url = "http://www.amazon.in/gp/goldbox?ie=UTF8";
+        //String url = "http://www.amazon.in/gp/offer-listing/B01BK92AMK";
+        int win = url.indexOf("?");
+        if (win > 0) {
+            url = url.substring(0, win);
+        }
+        System.out.println(getUrlWithAff_IN(url));
     }
     //http://www.amazon.in/gp/product/9350946661/ref=as_li_tl?ie=UTF8&camp=3626&creative=24790&creativeASIN=9350946661&linkCode=as2&tag=
 }
