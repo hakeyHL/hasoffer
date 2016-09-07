@@ -1,6 +1,5 @@
 package hasoffer.job.bean.fetch;
 
-import hasoffer.job.service.IFetchTestService;
 import hasoffer.job.service.ITopSellingTaskService;
 
 import org.quartz.JobExecutionContext;
