@@ -54,6 +54,8 @@ public interface ICmpSkuService {
 
     PtmCmpSku getCmpSkuById(long id);
 
+    List<PtmCmpSku> getCmpSkusBySiteAndPrice(float price, Website website);
+
     List<PtmCmpSku> listCmpSkus(long productId);
 
     void downloadImage(PtmCmpSku sku);

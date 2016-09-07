@@ -16,7 +16,16 @@ public interface IDealService {
 
     PageableResult<AppDeal> findDealList(int page, int size);
 
+    /**
+     * admin后台手动导入deal
+     *
+     * @param multipartFile
+     * @return
+     * @throws Exception
+     */
     Map<String, Object> importExcelFile(MultipartFile multipartFile) throws Exception;
+
+    AppDeal createAppDealByPriceOff(AppDeal appDeal);
 
     AppDeal getDealById(Long dealId);
 

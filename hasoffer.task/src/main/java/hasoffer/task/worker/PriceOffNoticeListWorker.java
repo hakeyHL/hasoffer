@@ -10,6 +10,7 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
+import hasoffer.task.controller.DubboUpdateController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,6 +118,7 @@ public class PriceOffNoticeListWorker implements Runnable {
             page++;
         }
 
+        DubboUpdateController.Price_OFF_LIST_THREAD_NUM--;
         logger.info("send url finish");
     }
 }
