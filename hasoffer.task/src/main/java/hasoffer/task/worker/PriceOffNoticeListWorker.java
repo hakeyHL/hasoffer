@@ -9,6 +9,7 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.urm.PriceOffNotice;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.task.controller.DubboUpdateController;
 import org.slf4j.Logger;
@@ -44,7 +45,7 @@ public class PriceOffNoticeListWorker implements Runnable {
         int page = 1;
         int pageSize = 1000;
 
-        PageableResult<PtmCmpSku> pageableResult = dbm.queryPage(Q_PRICEOFFNOTICE, page, pageSize);
+        PageableResult<PriceOffNotice> pageableResult = dbm.queryPage(Q_PRICEOFFNOTICE, page, pageSize);
 
         long totalPage = pageableResult.getTotalPage();
         logger.info("totalPage :" + totalPage);
@@ -66,12 +67,21 @@ public class PriceOffNoticeListWorker implements Runnable {
                 pageableResult = dbm.queryPage(Q_PRICEOFFNOTICE, page, pageSize);
             }
 
-            List<PtmCmpSku> dataList = pageableResult.getData();
+            List<PriceOffNotice> dataList = pageableResult.getData();
 
             if (ArrayUtils.hasObjs(dataList)) {
 
                 //暂时先拼凑一个srmsearchlog用于适配更新的接口
-                for (PtmCmpSku sku : dataList) {
+                for (PriceOffNotice priceOffNotice : dataList) {
+
+                    long skuid = priceOffNotice.getSkuid();
+
+                    PtmCmpSku sku = dbm.get(PtmCmpSku.class, skuid);
+
+                    if (sku == null) {
+                        System.out.println("notice sku is null");
+                        continue;
+                    }
 
                     //判断，如果该sku 当天更新过价格, 直接跳过
                     Date updateTime = sku.getUpdateTime();

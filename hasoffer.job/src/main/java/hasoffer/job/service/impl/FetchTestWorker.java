@@ -15,9 +15,9 @@ import java.util.List;
 
 public class FetchTestWorker implements Runnable {
 
-    List<PtmCmpSku> list;
-    IFetchDubboService fetchDubboService;
-    File file;
+    private List<PtmCmpSku> list;
+    private IFetchDubboService fetchDubboService;
+    private File file;
     private Logger logger = LoggerFactory.getLogger(FetchTestWorker.class);
 
     public FetchTestWorker(List<PtmCmpSku> list, IFetchDubboService fetchDubboService, File file) {
