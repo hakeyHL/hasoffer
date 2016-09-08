@@ -39,8 +39,9 @@ public class FetchTestWorker implements Runnable {
                     FetchUrlResult fetchUrlResult = fetchDubboService.getProductsByUrl(
                             ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), expireSeconds);
                     try {
+                    	// taskId getTaskStatus url	skuId	price	website
                         FileUtils.write(file,
-                                fetchUrlResult.toString().replace("\r", " ").replace("\n", " ") + "\r\n", "utf-8",
+                        		fetchUrlResult.getTaskId()+"\t"+fetchUrlResult.getTaskStatus().toString()+"\t"+ptmCmpSku.getUrl()+"\t"+ptmCmpSku.getId()+"\t"+fetchUrlResult.getFetchProduct().getPrice()+"\t"+fetchUrlResult.getWebsite().toString() + "\r\n", "utf-8",
                                 true);
                     } catch (IOException e) {
                         logger.error(e.getMessage());
