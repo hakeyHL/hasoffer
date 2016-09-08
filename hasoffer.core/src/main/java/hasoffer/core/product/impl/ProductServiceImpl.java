@@ -900,7 +900,7 @@ public class ProductServiceImpl implements IProductService {
 
     public void setCommentNumAndRatins(ProductModel2 productModel2) {
         int count = cmpSkuService.getSkuSoldStoreNum(productModel2.getId());
-        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productModel2.getId(), 1, 6);
+        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productModel2.getId(), 1, 100);
         if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
             List<PtmCmpSku> tempSkuList = pagedCmpskus.getData();
 
