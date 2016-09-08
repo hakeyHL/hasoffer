@@ -53,6 +53,7 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
 
         if (skuList.size() == 0) {
             System.out.println("updateTime bigger than " + startDate + " small than " + endDate + "get zero sku");
+            return;
         } else {
 
             for (PtmCmpSku sku : skuList) {
