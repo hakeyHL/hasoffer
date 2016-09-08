@@ -807,6 +807,9 @@ public class ProductServiceImpl implements IProductService {
         if (product == null) {
             return;
         }
+
+        productIndex2Service.remove(String.valueOf(product.getId()));
+
         ProductModel2 productModel2 = getProductModel2(product);
         if (productModel2 != null) {
             productIndex2Service.createOrUpdate(productModel2);
