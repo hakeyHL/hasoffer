@@ -703,6 +703,9 @@ public class ProductServiceImpl implements IProductService {
         ProductModel2 tempProductModel2 = new ProductModel2();
         tempProductModel2.setId(product.getId());
         setRatingComStore(tempProductModel2);
+        System.out.println("tempProductModel2  getRating " + tempProductModel2.getRating());
+        System.out.println("tempProductModel2  getReview " + tempProductModel2.getReview());
+        System.out.println("tempProductModel2  getStoreCount " + tempProductModel2.getStoreCount());
         // 类目关键词
         long cate1 = 0L, cate2 = 0L, cate3 = 0L;
         String cate1name = "", cate2name = "", cate3name = "", cateTag = "";
@@ -751,15 +754,12 @@ public class ProductServiceImpl implements IProductService {
                 cate1name,
                 cate2name,
                 cate3name,
-                0,
-                0,
-                product.getRating(),
+                tempProductModel2.getMinPrice(),
+                tempProductModel2.getMaxPrice(),
+                tempProductModel2.getRating(),
                 searchCount);
-        productModel.setRating(tempProductModel2.getRating());
         productModel.setReview(tempProductModel2.getReview());
         productModel.setStoreCount(tempProductModel2.getStoreCount());
-        productModel.setMinPrice(tempProductModel2.getMinPrice());
-        productModel.setMaxPrice(tempProductModel2.getMaxPrice());
         return productModel;
     }
 
@@ -770,7 +770,6 @@ public class ProductServiceImpl implements IProductService {
         }
         // new import
         importProduct2Solr2(product);
-
         ProductModel productModel = getProductModel(product);
 
         if (productModel != null) {
