@@ -53,6 +53,7 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
 
         if (skuList.size() == 0) {
             System.out.println("updateTime bigger than " + startDate + " small than " + endDate + "get zero sku");
+            return;
         } else {
 
             for (PtmCmpSku sku : skuList) {
@@ -130,6 +131,7 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
                             }
                         }
                         aliveThreadCount--;
+                        System.out.println("CheckGetPriceOffDealJobBean process thread die -1");
                     }
                 });
             }
@@ -144,6 +146,7 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
 
             }
             if (aliveThreadCount == 0) {
+                System.out.println("CheckGetPriceOffDealJobBean alive process threadNum " + aliveThreadCount);
                 break;
             }
         }
