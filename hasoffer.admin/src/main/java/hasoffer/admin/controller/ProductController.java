@@ -421,6 +421,7 @@ public class ProductController {
             PtmCmpSku cmpSku = cmpSkuService.getCmpSkuById(id);
             if (cmpSku == null) {
                 cmpskuIndexService.remove(String.valueOf(id));
+                continue;
             } else {
                 cmpSkuService.deleteCmpSku(id);
             }
