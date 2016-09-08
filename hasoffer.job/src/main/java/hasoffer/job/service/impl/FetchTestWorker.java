@@ -31,6 +31,7 @@ public class FetchTestWorker implements Runnable {
     @Override
     public void run() {
         long expireSeconds = 20 * 60;
+        String lineSeparator = System.getProperty("line.separator");
         while (!queue.isEmpty()) {
             FetchTestTaskDTO ptmCmpSku = queue.poll();
             if (ptmCmpSku != null) {
@@ -41,7 +42,7 @@ public class FetchTestWorker implements Runnable {
                     try {
                     	// taskId getTaskStatus url	skuId	price	website
                         FileUtils.write(file,
-                        		fetchUrlResult.getTaskId()+"\t"+fetchUrlResult.getTaskStatus().toString()+"\t"+ptmCmpSku.getUrl()+"\t"+ptmCmpSku.getId()+"\t"+fetchUrlResult.getFetchProduct().getPrice()+"\t"+fetchUrlResult.getWebsite().toString() + "\r\n", "utf-8",
+                        		fetchUrlResult.getTaskId()+"\t"+fetchUrlResult.getTaskStatus().toString()+"\t"+ptmCmpSku.getUrl()+"\t"+ptmCmpSku.getId()+"\t"+fetchUrlResult.getFetchProduct().getPrice()+"\t"+fetchUrlResult.getWebsite().toString() + lineSeparator, "utf-8",
                                 true);
                     } catch (IOException e) {
                         logger.error(e.getMessage());
