@@ -98,14 +98,14 @@ public class AmazonHelper {
         return sb.toString();*/
     }
 
-    public static String getDealUrlWithAff(String url) {
-        if (url.contains("?")) {
-            url = url + "&tag=hasoffer0c-21";
-        } else {
-            url = url + "?tag=hasoffer0c-21";
-        }
-        return url;
-    }
+//    public static String getDealUrlWithAff(String url) {
+//        if (url.contains("?")) {
+//            url = url + "&tag=hasoffer0c-21";
+//        } else {
+//            url = url + "?tag=hasoffer0c-21";
+//        }
+//        return url;
+//    }
 
     public static String getUrlWithAff(String url) {
         int win = url.indexOf("?");
@@ -134,7 +134,11 @@ public class AmazonHelper {
     private static String getUrlWithAff_IN(String url) {
         String pid = AmazonHelper.getProductIdByUrl(url);
         if (StringUtils.isEmpty(pid)) {
-            return url + "?tag=hasoffer0c-21";
+            if (url.contains("?")) {
+                return url + "&tag=hasoffer0c-21";
+            } else {
+                return url + "?tag=hasoffer0c-21";
+            }
         }
 
         if (!url.endsWith("/")) {
