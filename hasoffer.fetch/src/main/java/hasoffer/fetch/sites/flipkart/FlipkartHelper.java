@@ -37,8 +37,12 @@ public class FlipkartHelper {
         }
 
         String pid = UrlUtils.getParam(url, "pid");
-
-        return url.substring(0, index) + "?pid=" + pid;
+        if (StringUtils.isEmpty(pid)) {
+            //如果不存在pid直接返回
+            return url;
+        } else {
+            return url.substring(0, index) + "?pid=" + pid;
+        }
     }
 
     /**
