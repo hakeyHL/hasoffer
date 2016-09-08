@@ -862,7 +862,6 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
                 if (returnDays > 0) {
                     ptmCmpSkuUpdater.getPo().setReturnDays(returnDays);
                 }
-
             }
 
             //更新 price
@@ -872,6 +871,12 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
                 if (cmpSku.getPrice() != fetchedProduct.getPrice()) {
                     ptmCmpSkuUpdater.getPo().setPrice(price);
                 }
+            }
+            //更新原价
+            //策略    sku中的原价为0，且新抓的原价不为0
+            float oriPrice = fetchedProduct.getOriPrice();
+            if (cmpSku.getOriPrice() == 0.0 && oriPrice != 0.0) {
+                ptmCmpSkuUpdater.getPo().setOriPrice(oriPrice);
             }
 
             if (!StringUtils.isEmpty(fetchedProduct.getTitle())) {

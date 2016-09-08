@@ -62,6 +62,11 @@ public class DubboUpdateController {
     @Resource
     IRedisListService redisListService;
 
+    /**
+     * 该任务用来更新用户订阅的sku，如果价格变化加入缓存队列，等待push
+     *
+     * @return
+     */
     //dubbofetchtask/priceoffnotice
     @RequestMapping(value = "/priceoffnotice", method = RequestMethod.GET)
     @ResponseBody
@@ -94,6 +99,10 @@ public class DubboUpdateController {
     }
 
 
+    /**
+     * sku的日常更新（目前策略热搜）
+     * @return
+     */
     //dubbofetchtask/updatestart
     @RequestMapping(value = "/updatestart", method = RequestMethod.GET)
     @ResponseBody

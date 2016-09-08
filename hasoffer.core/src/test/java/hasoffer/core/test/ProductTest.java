@@ -88,6 +88,12 @@ public class ProductTest {
     private Pattern PATTERN_Brand = Pattern.compile("[\t*?]([a-zA-Z])[\t*?]");
 
     @Test
+    public void testSolr() {
+        long proId = 6467L;
+        productService.importProduct2Solr2(proId);
+    }
+
+    @Test
     public void countModel() throws Exception {
         List<Object[]> datas = dbm.query(Q_SEARCH_COUNT);
 

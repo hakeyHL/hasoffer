@@ -12,5 +12,9 @@ public class Test {
         //}
         String timeStr= DateFormatUtils.format(new Date(),"HH");
         System.out.println(timeStr);
+
+        System.out.println("x"+ System.getProperty("line.separator")+"Y");
+        System.out.println("12345678\tY");
+        System.out.println("1\tY");
     }
 }
