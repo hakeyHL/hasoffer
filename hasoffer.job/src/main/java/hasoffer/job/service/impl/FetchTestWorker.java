@@ -31,7 +31,7 @@ public class FetchTestWorker implements Runnable {
     @Override
     public void run() {
         long expireSeconds = 20 * 60;
-        while (queue.size() > 0) {
+        while (!queue.isEmpty()) {
             FetchTestTaskDTO ptmCmpSku = queue.poll();
             if (ptmCmpSku != null) {
                 TaskStatus taskStatus = fetchDubboService.getUrlTaskStatus(ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), expireSeconds);
@@ -46,11 +46,11 @@ public class FetchTestWorker implements Runnable {
                         logger.error(e.getMessage());
                     }
 
-                } else if (TaskStatus.EXCEPTION.equals(taskStatus)||TaskStatus.STOPPED.equals(taskStatus)) {
+                } else if (TaskStatus.EXCEPTION.equals(taskStatus) || TaskStatus.STOPPED.equals(taskStatus)) {
                     FetchUrlResult fetchUrlResult = fetchDubboService.getProductsByUrl(
                             ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), expireSeconds);
                     logger.error(fetchUrlResult.toString());
-                }else{
+                } else {
                     queue.add(ptmCmpSku);
                 }
             }
