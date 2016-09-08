@@ -119,10 +119,8 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
 
                                 appdeal.setDescription(description);
                                 appdeal.setPriceDescription("Rs." + (int) newPrice);
-
-
-                                //todo 抓完原价回来记得写折扣价
-//                                appdeal.setDiscount();
+                                appdeal.setOriginPrice(oriPrice);
+                                appdeal.setDiscount((int) (1 - newPrice / oriPrice) * 100);
 
                                 if (appdeal != null) {
                                     dealService.createAppDealByPriceOff(appdeal);
