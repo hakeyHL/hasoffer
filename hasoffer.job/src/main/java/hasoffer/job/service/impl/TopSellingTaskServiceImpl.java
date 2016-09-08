@@ -40,11 +40,13 @@ public class TopSellingTaskServiceImpl implements ITopSellingTaskService {
     public void commitTask() {
         String hql = "select new hasoffer.job.dto.TopSellingTaskDTO(p.id,p.productId,p.website,p.url,p.updateTime) from PtmTopSelling s , PtmCmpSku p  where  p.productId = s.id and s.status='"
                 + TopSellStatus.ONLINE.toString() + "' and p.id is not null order by s.count desc";
-        List<TopSellingTaskDTO> page = new ArrayList<TopSellingTaskDTO>();
+        List<TopSellingTaskDTO> page = new ArrayList<>();
 
         ExecutorService service = Executors.newCachedThreadPool();
-        for (int i = 1; i < 2; i++) {
+
+        for (int i = 1; ; i++) {
             page = dbm.query(hql, i, 2000);
+            logger.debug("top selling size=" + page.size());
             if (page.isEmpty()) {
                 break;
             }
