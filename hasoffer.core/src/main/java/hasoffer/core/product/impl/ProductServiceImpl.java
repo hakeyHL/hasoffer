@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -702,6 +703,7 @@ public class ProductServiceImpl implements IProductService {
     }
 
     private ProductModel2 getProductModel2(PtmProduct product, List<PtmCmpSku> cmpSkus) {
+        ProductModel2 tempProductModel2 = new ProductModel2();
         if (product == null || ArrayUtils.isNullOrEmpty(cmpSkus)) {
             return null;
         }
@@ -725,8 +727,8 @@ public class ProductServiceImpl implements IProductService {
             if (maxPrice < skuPrice) {
                 maxPrice = skuPrice;
             }
-//            ProductModel2 tempProductModel2 = new ProductModel2();
-//            setRatingComStore(tempProductModel2, cmpSkus);
+            tempProductModel2.setId(product.getId());
+            setRatingComStore(tempProductModel2);
         }
 
         if (minPrice < 0) {
@@ -786,7 +788,9 @@ public class ProductServiceImpl implements IProductService {
                 maxPrice,
                 product.getRating(),
                 searchCount);
-
+        productModel.setRating(tempProductModel2.getRating());
+        productModel.setReview(tempProductModel2.getReview());
+        productModel.setStoreCount(tempProductModel2.getStoreCount());
         return productModel;
     }
 
@@ -921,41 +925,41 @@ public class ProductServiceImpl implements IProductService {
         return pagedResult;
     }
 
-    public void setRatingComStore(ProductModel2 productModel2, List<PtmCmpSku> cmpSkus) {
-
+    public void setRatingComStore(ProductModel2 productModel2) {
+        setCommentNumAndRatins(productModel2);
     }
 
     public void setCommentNumAndRatins(ProductModel2 productModel2) {
-        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productModel2.getId(), 1, 20);
+        int count = cmpSkuService.getSkuSoldStoreNum(productModel2.getId());
+        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productModel2.getId(), 1, 6);
         if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
             List<PtmCmpSku> tempSkuList = pagedCmpskus.getData();
             //计算评论数*星级的总和
             int sum = 0;
-            //统计site
-            Set<Website> websiteSet = new HashSet<Website>();
-            for (PtmCmpSku ptmCmpSku : tempSkuList) {
-                websiteSet.add(ptmCmpSku.getWebsite());
-            }
             Long totalCommentNum = Long.valueOf(0);
             for (PtmCmpSku ptmCmpSku2 : tempSkuList) {
-                if (websiteSet.size() <= 0) {
-                    break;
-                }
-                if (websiteSet.contains(ptmCmpSku2.getWebsite())) {
-                    websiteSet.remove(ptmCmpSku2.getWebsite());
-                    System.out.println("count comment ans stats exclude  ebay ");
-                    if (!ptmCmpSku2.getWebsite().equals(Website.EBAY)) {
-                        //评论数*星级 累加 除以评论数和
-                        sum += ptmCmpSku2.getRatings() * ptmCmpSku2.getCommentsNumber();
-                        //去除列表中除此之外的其他此site的数据
-                        totalCommentNum += ptmCmpSku2.getCommentsNumber();
-                    }
+                if (!ptmCmpSku2.getWebsite().equals(Website.EBAY)) {
+                    //评论数*星级 累加 除以评论数和
+                    sum += ptmCmpSku2.getRatings() * ptmCmpSku2.getCommentsNumber();
+                    //去除列表中除此之外的其他此site的数据
+                    totalCommentNum += ptmCmpSku2.getCommentsNumber();
                 }
             }
-            System.out.println("totalCommentNum   " + totalCommentNum);
-//            productModel2.setCommentNum(totalCommentNum);
-//            int rating = ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(totalCommentNum == 0 ? 1 : totalCommentNum), 0, BigDecimal.ROUND_HALF_UP).longValue());
-//            productModel2.setRatingNum(rating <= 0 ? 90 : rating);
+            productModel2.setReview(totalCommentNum.intValue());
+            int rating = returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(totalCommentNum == 0 ? 1 : totalCommentNum), 0, BigDecimal.ROUND_HALF_UP).longValue());
+            productModel2.setRating(rating <= 0 ? 90 : rating);
+            productModel2.setStoreCount(count);
         }
+    }
+
+    public int returnNumberBetween0And5(Long number) {
+        //取得其余数
+        Long tempNumber = number % 10;
+        if (tempNumber > 0 && tempNumber <= 5) {
+            number = (number / 10) * 10 + 5;
+        } else if (tempNumber > 5) {
+            number = (number / 10) * 10 + 10;
+        }
+        return number.intValue();
     }
 }

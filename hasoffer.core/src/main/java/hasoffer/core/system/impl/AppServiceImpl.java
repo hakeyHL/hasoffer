@@ -4,6 +4,7 @@ import hasoffer.base.enums.AppType;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.ArrayUtils;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
@@ -142,8 +143,7 @@ public class AppServiceImpl implements IAppService {
 
     @Override
     public PageableResult getDeals(Long page, Long pageSize) {
-//        return dbm.queryPage(Q_APP_GETDEALS, page.intValue() <= 1 ? 1 : page.intValue(), pageSize.intValue(), Arrays.asList(TimeUtils.getDayStart()));
-        return dbm.queryPage(Q_APP_GETDEALS, page.intValue() <= 1 ? 1 : page.intValue(), pageSize.intValue(), Arrays.asList(new Date()));
+        return dbm.queryPage(Q_APP_GETDEALS, page.intValue() <= 1 ? 1 : page.intValue(), pageSize.intValue(), Arrays.asList(TimeUtils.getDayStart()));
     }
 
     @Override
