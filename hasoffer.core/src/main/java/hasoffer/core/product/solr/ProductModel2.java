@@ -33,6 +33,8 @@ public class ProductModel2 implements IIdentifiable<Long> {
     private long searchCount = 0; // 搜索次数，表示商品热度
 
     public ProductModel2() {
+        this.review = 0;
+        this.storeCount = 0;
     }
 
     public ProductModel2(Long id, String title, String tag, String cateTag,
@@ -41,6 +43,7 @@ public class ProductModel2 implements IIdentifiable<Long> {
                          String cate1Name, String cate2Name, String cate3Name,
                          float minPrice, float maxPrice,
                          int rating, long searchCount) {
+        this();
         this.id = id;
         this.title = title;
         this.tag = tag;
