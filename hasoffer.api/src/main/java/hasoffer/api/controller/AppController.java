@@ -405,7 +405,7 @@ public class AppController {
         List<AppBanner> list = appService.getBanners();
         for (AppBanner appBanner : list) {
             Banners banner = new Banners();
-            banner.setLink(appBanner.getLinkUrl() == null ? "" : appBanner.getLinkUrl());
+//          banner.setLink(appBanner.getLinkUrl() == null ? "" : appBanner.getLinkUrl());
             banner.setRank(appBanner.getRank());
             banner.setSource(1);
             banner.setSourceUrl(appBanner.getImageUrl() == null ? "" : ImageUtil.getImageUrl(appBanner.getImageUrl()));
