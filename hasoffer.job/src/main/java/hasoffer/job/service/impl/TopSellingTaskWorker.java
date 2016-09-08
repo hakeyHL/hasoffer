@@ -16,9 +16,10 @@ import hasoffer.spider.model.FetchedProduct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayDeque;
 import java.util.Date;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
+import java.util.Queue;
 
 /**
  * Created on 2015/12/21.
@@ -26,12 +27,12 @@ import java.util.concurrent.TimeUnit;
 public class TopSellingTaskWorker implements Runnable {
 
     private static Logger logger = LoggerFactory.getLogger(TopSellingTaskWorker.class);
-    private ConcurrentLinkedQueue<TopSellingTaskDTO> queue;
+    private Queue<TopSellingTaskDTO> queue;
     private IFetchDubboService fetchDubboService;
     private ICmpSkuService cmpSkuService;
 
-    public TopSellingTaskWorker(ConcurrentLinkedQueue<TopSellingTaskDTO> queue, IFetchDubboService fetchDubboService, ICmpSkuService cmpSkuService, IPriceOffNoticeService priceOffNoticeService) {
-        this.queue = queue;
+    public TopSellingTaskWorker(List<TopSellingTaskDTO> queue, IFetchDubboService fetchDubboService, ICmpSkuService cmpSkuService, IPriceOffNoticeService priceOffNoticeService) {
+        this.queue = new ArrayDeque<>(queue);
         this.fetchDubboService = fetchDubboService;
         this.cmpSkuService = cmpSkuService;
     }
@@ -39,18 +40,9 @@ public class TopSellingTaskWorker implements Runnable {
     @Override
     public void run() {
 
-        while (true) {
+        while (!queue.isEmpty()) {
             try {
                 TopSellingTaskDTO sku = queue.poll();
-                if (sku == null) {
-                    try {
-                        TimeUnit.SECONDS.sleep(3);
-                        logger.info("task update get null sleep 3 seconds");
-                    } catch (InterruptedException e) {
-                        return;
-                    }
-                    continue;
-                }
                 Date updateTime = sku.getUpdateTime();
                 if (updateTime != null) {
                     if (updateTime.compareTo(TimeUtils.toDate(TimeUtils.today())) > 0) {
@@ -92,10 +84,8 @@ public class TopSellingTaskWorker implements Runnable {
         } else if (TaskStatus.NONE.equals(taskStatus)) {
             queue.add(sku);
             if (Website.SNAPDEAL.equals(website) || Website.FLIPKART.equals(website) || Website.AMAZON.equals(website)) {
-                queue.add(sku);
                 fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_2);
             } else {
-                queue.add(sku);
                 fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_5);
             }
             logger.info("taskstatus NONE for [" + skuid + "] , resend success");
