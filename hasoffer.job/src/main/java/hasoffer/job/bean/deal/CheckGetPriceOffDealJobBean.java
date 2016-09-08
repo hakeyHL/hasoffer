@@ -130,6 +130,7 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
                             }
                         }
                         aliveThreadCount--;
+                        System.out.println("CheckGetPriceOffDealJobBean process thread die -1");
                     }
                 });
             }
@@ -144,6 +145,7 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
 
             }
             if (aliveThreadCount == 0) {
+                System.out.println("CheckGetPriceOffDealJobBean alive process threadNum " + aliveThreadCount);
                 break;
             }
         }
