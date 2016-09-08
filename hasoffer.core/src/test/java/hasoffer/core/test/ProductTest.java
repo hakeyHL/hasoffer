@@ -56,6 +56,7 @@ public class ProductTest {
                     "GROUP BY t.productId " +
                     "HAVING COUNT(t.id)>50 " +
                     "ORDER BY COUNT(t.id) DESC";
+    private final static String Q_SEARCH_COUNT = "SELECT t.productId,COUNT(t.id) FROM SrmProductSearchCount t GROUP BY t.productId HAVING COUNT(t.id) > 10";
     private static String Q_PRODUCT_WEBSITE = "SELECT t from PtmProduct t where t.sourceSite = ?0";
     @Resource
     ProductIndexServiceImpl productIndexService;
@@ -81,16 +82,35 @@ public class ProductTest {
     ProductIndex2ServiceImpl productIndex2Service;
     @Resource
     IMongoDbManager mdm;
-
     @Resource
     MongoDbFactory mongoDbFactory;
     private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
-
     private Pattern PATTERN_Brand = Pattern.compile("[\t*?]([a-zA-Z])[\t*?]");
 
     @Test
-    public void countModel() {
+    public void countModel() throws Exception {
+        List<Object[]> datas = dbm.query(Q_SEARCH_COUNT);
 
+        StringBuffer sb = new StringBuffer();
+
+        for (Object[] data : datas) {
+
+            long proId = (Long) data[0];
+            long count = (Long) data[1];
+//            print(String.format("product : [%d], count : [%d]", proId, count));
+
+            PtmProduct product = productService.getProduct(proId);
+            if (product == null || product.getCategoryId() != 5) {
+                continue;
+            }
+
+            sb.append(String.format("http://admin.hasoffer.cn/p/cmp/%d\n", proId));
+
+            print(String.format("product : [%s], brand : [%s], model : [%s]", product.getTitle(), product.getBrand(), product.getModel()));
+        }
+
+        File f = new File("d:/tmp/p.txt");
+        FileUtils.writeStringToFile(f, sb.toString());
     }
 
 
