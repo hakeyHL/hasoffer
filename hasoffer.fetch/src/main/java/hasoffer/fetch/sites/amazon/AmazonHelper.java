@@ -135,7 +135,7 @@ public class AmazonHelper {
         String pid = AmazonHelper.getProductIdByUrl(url);
         if (StringUtils.isEmpty(pid)) {
             if (url.contains("?")) {
-                return url + "&tag=hasoffer0c-21";
+                return url + "_encoding=UTF8&camp=3626&creative=24790&linkCode=ur2&node=4091094031&tag=hasoffer0c-21";
             } else {
                 return url + "?_encoding=UTF8&camp=3626&creative=24790&linkCode=ur2&node=4091094031&tag=hasoffer0c-21";
             }
