@@ -4,6 +4,7 @@ import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.spider.common.SpiderLogger;
 import hasoffer.spider.constants.RedisKeysUtils;
@@ -32,8 +33,8 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
 
 
     @Override
-    public FetchUrlResult getProductsByUrl(Long skuId, Website webSite, String url) {
-        FetchUrlResult fetchUrlResult = getFetchUrlResult(webSite, url);
+    public FetchUrlResult getProductsByUrl(Website webSite, String url, long expireSeconds) {
+        FetchUrlResult fetchUrlResult = getFetchUrlResult(webSite, url, expireSeconds);
         logger.info("FetchDubboServiceImpl.getProductsByUrl(webSite,url):{}, {} . Now is {} ", webSite, url, fetchUrlResult);
         return fetchUrlResult;
     }
@@ -69,7 +70,12 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
 
     @Override
     public void sendUrlTask(Website website, String url, TaskLevel taskLevel) {
-        FetchUrlResult fetchUrlResult = new FetchUrlResult(website, url);
+        sendUrlTask(website, url, TimeUtils.SECONDS_OF_1_DAY, taskLevel);
+    }
+
+    @Override
+    public void sendUrlTask(Website website, String url, long seconds, TaskLevel taskLevel) {
+        FetchUrlResult fetchUrlResult = new FetchUrlResult(website, url, seconds);
         fetchUrlResult.setTaskStatus(TaskStatus.START);
         fetchUrlResult.setDate(new Date());
         String redisKey = RedisKeysUtils.getWaitUrlListKey(taskLevel);
@@ -90,11 +96,10 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     }
 
     @Override
-    public TaskStatus getUrlTaskStatus(Website website, String url) {
-        String cacheKey = FetchUrlResult.getCacheKey(website, url);
+    public TaskStatus getUrlTaskStatus(Website website, String url, long expireSeconds) {
+        String cacheKey = FetchUrlResult.getCacheKey(website, url, expireSeconds);
         TaskStatus taskStatusByUrl = fetchCacheService.getTaskStatusByUrl(cacheKey);
         SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.getUrlTaskStatus(website,url) -->website:{}, url:{}, taskState:{}", website, url, taskStatusByUrl);
-
         return taskStatusByUrl;
     }
 
@@ -105,8 +110,8 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     }
 
 
-    private FetchUrlResult getFetchUrlResult(Website webSite, String url) {
-        String fetchResultKey = FetchUrlResult.getCacheKey(webSite, url);
+    private FetchUrlResult getFetchUrlResult(Website webSite, String url, long expireSeconds) {
+        String fetchResultKey = FetchUrlResult.getCacheKey(webSite, url, expireSeconds);
         return fetchCacheService.getProductByUrl(fetchResultKey);
     }
 

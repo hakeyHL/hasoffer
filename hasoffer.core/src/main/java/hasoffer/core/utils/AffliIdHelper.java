@@ -9,7 +9,7 @@ import java.util.Random;
  * Time 10:30
  */
 public class AffliIdHelper {
-    final static String[] FLIDS = new String[]{"xyangryrg", "zhouxixi0", "harveyouo", "allenooou", "747306881", "hlhakeygm", "oliviersl", "wuningSFg"};
+    final static String[] FLIDS = new String[]{"115377600", "120527343", "160082642", "286867656", "289063282", "514330076", "602074420", "943546560", "Sunyukunj", "gczyfw201", "xyangryrg", "zhouxixi0", "harveyouo", "allenooou", "747306881", "hlhakeygm", "oliviersl", "wuningSFg"};
     final static String[] SNIDS = new String[]{"89037", "104658", "82856"};
     final static String[] SHIDS = new String[]{"none", "123"};
 

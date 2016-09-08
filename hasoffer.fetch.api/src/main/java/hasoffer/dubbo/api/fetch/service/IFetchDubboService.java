@@ -52,23 +52,33 @@ public interface IFetchDubboService {
     void sendUrlTask(Website website, String url, TaskLevel taskLevel);
 
     /**
+     * 提交URL更新任务
+     *
+     * @param website
+     * @param url
+     * @param seconds   缓存时间是多少
+     * @param taskLevel 任务优先度，分为5级，TaskLevel.LEVEL_1(最高)，TaskLevel.LEVEL_5(最低)。
+     */
+    void sendUrlTask(Website website, String url, long seconds, TaskLevel taskLevel);
+
+    /**
      * 获取URL任务的状态。
      *
      * @param website
      * @param url
      * @return
      */
-    TaskStatus getUrlTaskStatus(Website website, String url);
+    TaskStatus getUrlTaskStatus(Website website, String url, long expireSeconds);
 
     /**
      * 获取URL任务的结果
      *
-     * @param skuId
      * @param webSite
      * @param url
+     * @param expireSeconds 过期时间
      * @return
      */
-    FetchUrlResult getProductsByUrl(Long skuId, Website webSite, String url);
+    FetchUrlResult getProductsByUrl(Website webSite, String url, long expireSeconds);
 
 
 }

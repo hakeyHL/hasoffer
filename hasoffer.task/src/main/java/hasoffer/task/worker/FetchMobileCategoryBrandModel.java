@@ -4,6 +4,7 @@ import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
@@ -53,7 +54,7 @@ public class FetchMobileCategoryBrandModel implements Runnable {
                 String url = ptmcmpsku.getUrl();
 
                 System.out.println(skuid + "_" + website + "_" + url);
-                TaskStatus taskStatus = fetchDubboService.getUrlTaskStatus(website, url);
+                TaskStatus taskStatus = fetchDubboService.getUrlTaskStatus(website, url, TimeUtils.SECONDS_OF_1_DAY);
                 System.out.println(taskStatus);
 
                 FetchUrlResult fetchUrlResult = null;
@@ -79,7 +80,7 @@ public class FetchMobileCategoryBrandModel implements Runnable {
                     continue;
                 } else {//(TaskStatus.FINISH.equals(taskStatus)))
                     System.out.println("taskstatus FINISH for [" + skuid + "]");
-                    fetchUrlResult = fetchDubboService.getProductsByUrl(skuid, ptmcmpsku.getWebsite(), ptmcmpsku.getUrl());
+                    fetchUrlResult = fetchDubboService.getProductsByUrl(ptmcmpsku.getWebsite(), ptmcmpsku.getUrl(), TimeUtils.SECONDS_OF_1_DAY);
 
                     FetchedProduct fetchedProduct = fetchUrlResult.getFetchProduct();
 
