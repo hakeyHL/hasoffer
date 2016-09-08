@@ -12,6 +12,7 @@ import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.product.Banners;
 import hasoffer.core.bo.product.CategoryVo;
 import hasoffer.core.bo.push.*;
@@ -432,35 +433,83 @@ public class AppController {
         Map map = new HashMap();
         List li = new ArrayList();
         List<AppDeal> deals = Result.getData();
-        Date date = new Date();
+        Date tommorrowDayStart = TimeUtils.getDayStart();
+        tommorrowDayStart.setTime(tommorrowDayStart.getTime() + 1000 * 60 * 60 * 24);
         for (AppDeal appDeal : deals) {
-//            int dateCmpResult = appDeal.getExpireTime().compareTo(date);
-//
-//            //需要筛选deal,不是sku的deal当天过期也为过期
-//            if (appDeal.getAppdealSource().name().equals("MANUAL_INPUT")) {
-//                //手动导入
-//
-//            } else if (appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
-//                //降价生成
-//
-//            }
-            DealVo dealVo = new DealVo();
-            dealVo.setId(appDeal.getId());
-            dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
-            String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-            DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-            dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
-            dealVo.setExtra(0d);
-            dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-            if (appDeal.getWebsite().name().equals("FLIPKART")) {
-                dealVo.setExtra(1.5);
+            int dateCmpResult = appDeal.getExpireTime().compareTo(tommorrowDayStart);
+            //需要筛选deal,不是sku的deal当天过期也为过期
+            if (appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
+                //降价生成,过期时间是今天的要返回
+                if (dateCmpResult <= 0) {
+                    //deal的过期时间小于等于明天的凌晨,返回
+                    DealVo dealVo = new DealVo();
+                    dealVo.setId(appDeal.getId());
+                    dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
+                    String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+                    DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+                    dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+                    dealVo.setExtra(0d);
+                    dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                    if (appDeal.getWebsite().name().equals("FLIPKART")) {
+                        dealVo.setExtra(1.5);
+                    }
+                    dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                    dealVo.setExp(appDeal.getExpireTime());
+                    dealVo.setTitle(appDeal.getTitle());
+                    dealVo.setOriginPrice(appDeal.getOriginPrice());
+                    dealVo.setIsExpired(true);
+                    dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
+                    dealVo.setWebsite(appDeal.getWebsite());
+                    li.add(dealVo);
+                } else {
+                    DealVo dealVo = new DealVo();
+                    dealVo.setId(appDeal.getId());
+                    dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
+                    String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+                    DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+                    dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+                    dealVo.setExtra(0d);
+                    dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                    if (appDeal.getWebsite().name().equals("FLIPKART")) {
+                        dealVo.setExtra(1.5);
+                    }
+                    dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                    dealVo.setExp(appDeal.getExpireTime());
+                    dealVo.setTitle(appDeal.getTitle());
+                    dealVo.setOriginPrice(appDeal.getOriginPrice());
+                    dealVo.setIsExpired(false);
+                    dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
+                    dealVo.setWebsite(appDeal.getWebsite());
+                    li.add(dealVo);
+                }
+            } else if (appDeal.getAppdealSource().name().equals("MANUAL_INPUT")) {
+                //手动导入,
+                Date date = new Date();
+                int result = date.compareTo(appDeal.getExpireTime());
+                //只有过期时间大于当前时间才返回
+                if (result <= 0) {
+                    DealVo dealVo = new DealVo();
+                    dealVo.setId(appDeal.getId());
+                    dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
+                    String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+                    DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+                    dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+                    dealVo.setExtra(0d);
+                    dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                    if (appDeal.getWebsite().name().equals("FLIPKART")) {
+                        dealVo.setExtra(1.5);
+                    }
+                    dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                    dealVo.setExp(appDeal.getExpireTime());
+                    dealVo.setTitle(appDeal.getTitle());
+                    dealVo.setIsExpired(false);
+                    dealVo.setOriginPrice(appDeal.getOriginPrice());
+                    dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
+                    dealVo.setWebsite(appDeal.getWebsite());
+                    li.add(dealVo);
+                }
             }
-            dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-            dealVo.setExp(appDeal.getExpireTime());
-            dealVo.setTitle(appDeal.getTitle());
-            dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
-            dealVo.setWebsite(appDeal.getWebsite());
-            li.add(dealVo);
+
         }
         map.put("deals", li);
         map.put("currentPage", Result.getCurrentPage());
