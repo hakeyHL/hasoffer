@@ -460,7 +460,7 @@ public class AppController {
                     dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
                     dealVo.setExp(appDeal.getExpireTime());
                     dealVo.setTitle(appDeal.getTitle());
-                    dealVo.setOriginPrice(appDeal.getOriginPrice());
+                    dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
                     dealVo.setIsExpired(true);
                     dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
                     dealVo.setWebsite(appDeal.getWebsite());
@@ -480,7 +480,7 @@ public class AppController {
                     dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
                     dealVo.setExp(appDeal.getExpireTime());
                     dealVo.setTitle(appDeal.getTitle());
-                    dealVo.setOriginPrice(appDeal.getOriginPrice());
+                    dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
                     dealVo.setIsExpired(false);
                     dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
                     dealVo.setWebsite(appDeal.getWebsite());
@@ -507,7 +507,7 @@ public class AppController {
                     dealVo.setExp(appDeal.getExpireTime());
                     dealVo.setTitle(appDeal.getTitle());
                     dealVo.setIsExpired(false);
-                    dealVo.setOriginPrice(appDeal.getOriginPrice());
+                    dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
                     dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
                     dealVo.setWebsite(appDeal.getWebsite());
                     li.add(dealVo);
