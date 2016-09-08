@@ -36,6 +36,7 @@
                 <ref bean="topSellingTaskTrigger"/>
                 <!--监测价格变化如果价格符合要求产生为deal-->
                 <ref bean="priceOffGetDealTrigger"/>
+                <ref bean="priceOffDealUpdateTrigger"/>
                 <!--<ref bean="statVisitSkuUpdateTrigger"/>-->
             </list>
         </property>
@@ -189,5 +190,15 @@
     <bean id="priceOffGetDealTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="priceOffGetDealJob"/>
         <property name="cronExpression" value="0 0/10 * * * ?"/>
+    </bean>
+
+    <!--price off deal update-->
+    <bean name="priceOffDealUpdateJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.deal.CheckPriceOffDealStatusJobBean"/>
+    </bean>
+
+    <bean id="priceOffDealUpdateTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="priceOffDealUpdateJob"/>
+        <property name="cronExpression" value="0 0 0/1 * * ?"/>
     </bean>
 </beans>
