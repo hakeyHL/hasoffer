@@ -148,7 +148,7 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
     }
 
     @Override
-    public void pushFailRePush(long id, boolean cacheFail) {
+    public boolean pushFailRePush(long id, boolean cacheFail) {
 
         PriceOffNotice priceOffNotice = getPriceOffNotice(id);
 
@@ -156,10 +156,12 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
 
         PtmCmpSku ptmCmpSku = dbm.get(PtmCmpSku.class, skuid);
 
-        push(priceOffNotice, ptmCmpSku, cacheFail);
+        boolean pushStatus = push(priceOffNotice, ptmCmpSku, cacheFail);
+
+        return pushStatus;
     }
 
-    private void push(PriceOffNotice priceOffNotice, PtmCmpSku ptmCmpSku, boolean cacheFail) {
+    private boolean push(PriceOffNotice priceOffNotice, PtmCmpSku ptmCmpSku, boolean cacheFail) {
 
         Long id = priceOffNotice.getId();
         String userid = priceOffNotice.getUserid();
@@ -249,5 +251,7 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
                 System.out.println("cache push fail success for " + priceOffNotice.getId());
             }
         }
+
+        return pushStatus;
     }
 }

@@ -30,8 +30,7 @@
                 <ref bean="statSearchLogTrigger"/>
                 <ref bean="skuImageListDownLoadTrigger"/>
                 <ref bean="priceOffNoticeTrigger"/>
-                <!--todo 有问题，先注释掉-->
-                <!--<ref bean="pushFailRePushTrigger"/>-->
+                <ref bean="pushFailRePushTrigger"/>
                 <ref bean="fetchTestTrigger"/>
                 <ref bean="topSellingTaskTrigger"/>
                 <!--监测价格变化如果价格符合要求产生为deal-->
@@ -130,14 +129,15 @@
         <property name="cronExpression" value="0 48 15 * * ?"/>
     </bean>
 
-    <!--<bean name="pushFailRePushJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+    <!--push重新发送的任务-->
+    <bean name="pushFailRePushJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="hasoffer.job.bean.push.RePushPriceOffNoticeJobBean"/>
     </bean>
 
     <bean id="pushFailRePushTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="pushFailRePushJob"/>
         <property name="cronExpression" value="0 30 11,14,22 * * ?"/>
-    </bean>-->
+    </bean>
 
     <!-- 定时统计 -->
     <bean name="statHijackFetchJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
