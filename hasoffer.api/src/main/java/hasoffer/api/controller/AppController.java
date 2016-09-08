@@ -440,7 +440,11 @@ public class AppController {
             //需要筛选deal,不是sku的deal当天过期也为过期
             if (appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
                 //降价生成,过期时间是今天的要返回
-                if (dateCmpResult <= 0) {
+                Date expireTime = appDeal.getExpireTime();
+                Date date = new Date();
+                int result = date.compareTo(expireTime);
+                if (result == 1) {
+                    //过期
                     //deal的过期时间小于等于明天的凌晨,返回
                     DealVo dealVo = new DealVo();
                     dealVo.setId(appDeal.getId());
