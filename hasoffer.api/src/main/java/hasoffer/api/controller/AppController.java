@@ -210,7 +210,9 @@ public class AppController {
                 break;
             case HOMEPAGE:
                 Map map = new HashMap();
-                map.put("info", AffliIdHelper.getAffiIds());
+                DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+                MarketChannel marketChannel = deviceInfoVo.getMarketChannel();
+                map.put("info", AffliIdHelper.getAffiIds(marketChannel));
                 modelAndView.addObject("data", map);
                 break;
             case CLICKDEAL:
@@ -430,7 +432,18 @@ public class AppController {
         Map map = new HashMap();
         List li = new ArrayList();
         List<AppDeal> deals = Result.getData();
+        Date date = new Date();
         for (AppDeal appDeal : deals) {
+//            int dateCmpResult = appDeal.getExpireTime().compareTo(date);
+//
+//            //需要筛选deal,不是sku的deal当天过期也为过期
+//            if (appDeal.getAppdealSource().name().equals("MANUAL_INPUT")) {
+//                //手动导入
+//
+//            } else if (appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
+//                //降价生成
+//
+//            }
             DealVo dealVo = new DealVo();
             dealVo.setId(appDeal.getId());
             dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
