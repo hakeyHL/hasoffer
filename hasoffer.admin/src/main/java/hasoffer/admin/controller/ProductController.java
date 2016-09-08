@@ -73,6 +73,7 @@ public class ProductController {
         } else {
             cmpSkuService.deleteCmpSku(id);
 
+            productService.updatePtmProductPrice(cmpSku.getProductId());
             productService.reimport2Solr(cmpSku.getProductId());
         }
 
@@ -431,9 +432,8 @@ public class ProductController {
             }
         }
 
+        productService.updatePtmProductPrice(productId);
         productService.reimport2Solr(productId);
-
-        ModelAndView mav = new ModelAndView();
 
         return true;
     }

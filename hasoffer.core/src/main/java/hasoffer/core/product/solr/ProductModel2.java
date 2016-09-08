@@ -26,7 +26,9 @@ public class ProductModel2 implements IIdentifiable<Long> {
     private float minPrice;
     private float maxPrice;
 
-    private int rating;
+    private int rating;// 评分
+    private int review;// 评论
+    private int storeCount;// site 数量
 
     private long searchCount = 0; // 搜索次数，表示商品热度
 
@@ -202,6 +204,22 @@ public class ProductModel2 implements IIdentifiable<Long> {
 
     public void setCateTag(String cateTag) {
         this.cateTag = cateTag;
+    }
+
+    public int getReview() {
+        return review;
+    }
+
+    public void setReview(int review) {
+        this.review = review;
+    }
+
+    public int getStoreCount() {
+        return storeCount;
+    }
+
+    public void setStoreCount(int storeCount) {
+        this.storeCount = storeCount;
     }
 
     @Override
