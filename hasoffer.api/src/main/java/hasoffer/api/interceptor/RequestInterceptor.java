@@ -1,6 +1,5 @@
 package hasoffer.api.interceptor;
 
-import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import hasoffer.api.controller.vo.DeviceEventVo;
 import hasoffer.api.controller.vo.DeviceInfoVo;
@@ -9,7 +8,9 @@ import hasoffer.api.controller.vo.ResultVo;
 import hasoffer.api.worker.DeviceRequestQueue;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.utils.DeviceUtils;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
 import hasoffer.webcommon.context.Context;
@@ -24,7 +25,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
+import java.util.Map;
 
 @Component
 public class RequestInterceptor implements HandlerInterceptor {
@@ -33,6 +34,11 @@ public class RequestInterceptor implements HandlerInterceptor {
     IDeviceService deviceService;
     @Resource
     IAppService appService;
+    @Resource
+    ICacheService<UrmUser> userICacheService;
+
+    @Resource
+    ICacheService<Map> urmDeviceService;
 
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
         Gson gson = new Gson();
@@ -108,14 +114,40 @@ public class RequestInterceptor implements HandlerInterceptor {
             modelAndView.getModel().remove("searchCriteria");
         }
         if (modelAndView != null) {
-            String deviceId = JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).getString("deviceId");
-            List<String> ids = appService.getUserDevices(deviceId);
-            UrmUser urmUser = appService.getUserByUserToken((String) Context.currentContext().get(StaticContext.USER_TOKEN));
+            UrmUser urmUser = null;
+            String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
+            String key = "user_" + userToken;
+            urmUser = userICacheService.get(UrmUser.class, key, 0);
+
+            if (urmUser == null) {
+                urmUser = appService.getUserByUserToken(userToken);
+                userICacheService.add(key, urmUser, TimeUtils.SECONDS_OF_1_DAY);
+            }
+
             if (urmUser == null) {
                 modelAndView.addObject("result", new ResultVo("10010", "login expired"));
             } else {
-//                System.out.println("update user and device relationship ");
+//                List<String> ids = null;
+//                String deviceId = JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).getString("deviceId");
+//                String deviceKey = "urmDevice_ids_mapKey_" + deviceId;
+//                Map map = null;
+//                String deviceValue = urmDeviceService.get(deviceKey, 0);
 //
+//                if (!StringUtils.isEmpty(deviceValue)) {
+//                    ids = new ArrayList<>();
+//                    JSONObject jsonObject = JSONObject.parseObject(deviceValue);
+//                    JSONArray urmDevice_ids1 = jsonObject.getJSONArray("urmDevice_ids");
+//                    String[] strings = urmDevice_ids1.toArray(new String[]{});
+//                    for (String str : strings) {
+//                        ids.add(str);
+//                    }
+//                } else {
+//                    ids = appService.getUserDevices(deviceId);
+//                    map = new HashMap();
+//                    map.put("urmDevice_ids", ids);
+//                    urmDeviceService.add(deviceKey, JSONUtil.toJSON(map), TimeUtils.SECONDS_OF_1_DAY);
+//                }
+//                System.out.println("update user and device relationship ");
 //                List<String> deviceIds = appService.getUserDevicesByUserId(urmUser.getId() + "");
 //                System.out.println("get ids  by userId from urmUserDevice :" + deviceIds.size());
 //                List<UrmUserDevice> urmUserDevices = new ArrayList<>();
