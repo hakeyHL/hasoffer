@@ -559,7 +559,7 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public void importProduct2Solr2(PtmProduct o, List<PtmCmpSku> cmpSkus) {
-        ProductModel2 productModel2 = getProductModel2(o, cmpSkus);
+        ProductModel2 productModel2 = getProductModel2(o, false);
         if (productModel2 != null) {
             productIndex2Service.createOrUpdate(productModel2);
         }
@@ -696,45 +696,13 @@ public class ProductServiceImpl implements IProductService {
         if (product == null) {
             return null;
         }
-
-        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(product.getId());
-
-        return getProductModel2(product, cmpSkus);
+        return getProductModel2(product, false);
     }
 
-    private ProductModel2 getProductModel2(PtmProduct product, List<PtmCmpSku> cmpSkus) {
+    public ProductModel2 getProductModel2(PtmProduct product, boolean noMean) {
         ProductModel2 tempProductModel2 = new ProductModel2();
-        if (product == null || ArrayUtils.isNullOrEmpty(cmpSkus)) {
-            return null;
-        }
-
-        float minPrice = -1f, maxPrice = -1f;
-        for (PtmCmpSku cmpSku : cmpSkus) {
-            float skuPrice = cmpSku.getPrice();
-            if (skuPrice <= 0 || cmpSku.getStatus() == SkuStatus.OFFSALE) {
-                continue;
-            }
-
-            if (minPrice <= 0) {
-                minPrice = skuPrice;
-                maxPrice = minPrice;
-                continue;
-            }
-
-            if (minPrice > skuPrice) {
-                minPrice = skuPrice;
-            }
-            if (maxPrice < skuPrice) {
-                maxPrice = skuPrice;
-            }
-            tempProductModel2.setId(product.getId());
-            setRatingComStore(tempProductModel2);
-        }
-
-        if (minPrice < 0) {
-            return null;
-        }
-
+        tempProductModel2.setId(product.getId());
+        setRatingComStore(tempProductModel2);
         // 类目关键词
         long cate1 = 0L, cate2 = 0L, cate3 = 0L;
         String cate1name = "", cate2name = "", cate3name = "", cateTag = "";
@@ -761,7 +729,6 @@ public class ProductServiceImpl implements IProductService {
                 cate3 = cate.getId();
                 cate3name = cate.getName();
             }
-
             cateTag = categoryCacheManager.getCategoryTag(product.getCategoryId());
         }
 
@@ -784,13 +751,15 @@ public class ProductServiceImpl implements IProductService {
                 cate1name,
                 cate2name,
                 cate3name,
-                minPrice,
-                maxPrice,
+                0,
+                0,
                 product.getRating(),
                 searchCount);
         productModel.setRating(tempProductModel2.getRating());
         productModel.setReview(tempProductModel2.getReview());
         productModel.setStoreCount(tempProductModel2.getStoreCount());
+        productModel.setMinPrice(tempProductModel2.getMinPrice());
+        productModel.setMaxPrice(tempProductModel2.getMaxPrice());
         return productModel;
     }
 
@@ -934,6 +903,32 @@ public class ProductServiceImpl implements IProductService {
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productModel2.getId(), 1, 6);
         if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
             List<PtmCmpSku> tempSkuList = pagedCmpskus.getData();
+
+            float maxPrice = Collections.max(tempSkuList, new Comparator<PtmCmpSku>() {
+                @Override
+                public int compare(PtmCmpSku o1, PtmCmpSku o2) {
+                    if (o1.getPrice() < o2.getPrice()) {
+                        return -1;
+                    }
+                    if (o1.getPrice() > o2.getPrice()) {
+                        return 1;
+                    }
+                    return 0;
+                }
+            }).getPrice();
+
+            float minPrice = Collections.min(tempSkuList, new Comparator<PtmCmpSku>() {
+                @Override
+                public int compare(PtmCmpSku o1, PtmCmpSku o2) {
+                    if (o1.getPrice() > o2.getPrice()) {
+                        return -1;
+                    }
+                    if (o1.getPrice() < o2.getPrice()) {
+                        return 1;
+                    }
+                    return 0;
+                }
+            }).getPrice();
             //计算评论数*星级的总和
             int sum = 0;
             Long totalCommentNum = Long.valueOf(0);
@@ -949,6 +944,8 @@ public class ProductServiceImpl implements IProductService {
             int rating = returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(totalCommentNum == 0 ? 1 : totalCommentNum), 0, BigDecimal.ROUND_HALF_UP).longValue());
             productModel2.setRating(rating <= 0 ? 90 : rating);
             productModel2.setStoreCount(count);
+            productModel2.setMaxPrice(maxPrice);
+            productModel2.setMinPrice(minPrice);
         }
     }
 
