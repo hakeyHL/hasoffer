@@ -929,6 +929,9 @@ public class AppController {
                 Iterator<ProductModel2> ptmList = sourceList.iterator();
                 while (ptmList.hasNext()) {
                     ProductModel2 ptmProduct = ptmList.next();
+                    System.out.println("ptmProduct.getRating() " + ptmProduct.getRating());
+                    System.out.println("ptmProduct.getReview() " + ptmProduct.getReview());
+                    System.out.println("ptmProduct.getStoreCount() " + ptmProduct.getStoreCount());
 //                    int count = cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
 //                    if (count > 0) {
                     ProductListVo productListVo = new ProductListVo();
