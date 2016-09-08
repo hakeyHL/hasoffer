@@ -56,22 +56,22 @@ public class ProductServiceImpl implements IProductService {
                     " WHERE t.productId = ?0   " +
                     " ORDER BY t.price ASC ";
 
-    private static final String Q_ONSALE_PTM_CMPSKU =
-            "SELECT t FROM PtmCmpSku t " +
-                    " WHERE t.productId = ?0  AND  t.price >?1  AND t.status <> 'OFFSALE'  ORDER BY t.price ASC  ";
-
 //    private static final String Q_ONSALE_PTM_CMPSKU =
-//            "SELECT  DISTINCT " +
-//                    " website, " +
-//                    " price " +
-//                    "FROM " +
-//                    " PtmCmpSku t " +
-//                    "WHERE " +
-//                    " t.productId = ?0 " +
-//                    "AND t.price > ?1 " +
-//                    "AND t.status  <> 'OFFSALE' " +
-//                    "ORDER BY " +
-//                    " t.price ASC";
+//            "SELECT t FROM PtmCmpSku t " +
+//                    " WHERE t.productId = ?0  AND  t.price >?1  AND t.status <> 'OFFSALE'  ORDER BY t.price ASC  ";
+
+    private static final String Q_ONSALE_PTM_CMPSKU =
+            "SELECT  DISTINCT " +
+                    " website, " +
+                    " price " +
+                    "FROM " +
+                    " PtmCmpSku t " +
+                    "WHERE " +
+                    " t.productId = ?0 " +
+                    "AND t.price > ?1 " +
+                    "AND t.status  <> 'OFFSALE' " +
+                    "ORDER BY " +
+                    " t.price ASC";
 
     private static final String Q_NOTOFFSALE_PTM_CMPSKU =
             "SELECT t FROM PtmCmpSku t " +
