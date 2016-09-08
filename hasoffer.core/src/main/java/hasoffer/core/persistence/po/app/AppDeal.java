@@ -60,6 +60,8 @@ public class AppDeal implements Identifiable<Long> {
 
     private long ptmcmpskuid;//如果是PRICE_OFF生成的deal，保留skuid
 
+    private Float originPrice;//deal的原价
+
     @Override
     public Long getId() {
         return id;
@@ -206,8 +208,17 @@ public class AppDeal implements Identifiable<Long> {
         this.ptmcmpskuid = ptmcmpskuid;
     }
 
+    public Float getOriginPrice() {
+        return originPrice;
+    }
+
+    public void setOriginPrice(Float originPrice) {
+        this.originPrice = originPrice;
+    }
+
     @Override
     public boolean equals(Object o) {
+
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
@@ -234,8 +245,11 @@ public class AppDeal implements Identifiable<Long> {
             return false;
         if (dealClickCount != null ? !dealClickCount.equals(appDeal.dealClickCount) : appDeal.dealClickCount != null)
             return false;
-        return !(dealCategoryId != null ? !dealCategoryId.equals(appDeal.dealCategoryId) : appDeal.dealCategoryId != null);
+        if (dealCategoryId != null ? !dealCategoryId.equals(appDeal.dealCategoryId) : appDeal.dealCategoryId != null)
+            return false;
+        if (originPrice != null ? !originPrice.equals(appDeal.originPrice) : appDeal.originPrice != null) return false;
 
+        return true;
     }
 
     @Override
@@ -258,6 +272,7 @@ public class AppDeal implements Identifiable<Long> {
         result = 31 * result + (dealCategoryId != null ? dealCategoryId.hashCode() : 0);
         result = 31 * result + discount;
         result = 31 * result + (int) (ptmcmpskuid ^ (ptmcmpskuid >>> 32));
+        result = 31 * result + (originPrice != null ? originPrice.hashCode() : 0);
         return result;
     }
 }
