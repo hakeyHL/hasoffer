@@ -925,20 +925,24 @@ public class AppController {
                     }
                 }
             } else if (ProductModel2.class.isInstance(sourceList.get(0))) {
+                System.out.println("enter enter enter .....");
                 Iterator<ProductModel2> ptmList = sourceList.iterator();
                 while (ptmList.hasNext()) {
                     ProductModel2 ptmProduct = ptmList.next();
-                    int count = cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
-                    if (count > 0) {
-                        ProductListVo productListVo = new ProductListVo();
-                        productListVo.setId(ptmProduct.getId());
-                        productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
-                        productListVo.setName(ptmProduct.getTitle());
-                        productListVo.setPrice(Math.round(ptmProduct.getMinPrice()));
-                        productListVo.setStoresNum(count);
-                        setCommentNumAndRatins(productListVo);
-                        desList.add(productListVo);
-                    }
+//                    int count = cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
+//                    if (count > 0) {
+                    ProductListVo productListVo = new ProductListVo();
+                    productListVo.setId(ptmProduct.getId());
+                    productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
+                    productListVo.setName(ptmProduct.getTitle());
+                    productListVo.setPrice(Math.round(ptmProduct.getMinPrice()));
+//                        productListVo.setStoresNum(count);
+//                        setCommentNumAndRatins(productListVo);
+                    productListVo.setRatingNum(ptmProduct.getRating());
+                    productListVo.setCommentNum(Long.valueOf(ptmProduct.getReview()));
+                    productListVo.setStoresNum(ptmProduct.getStoreCount());
+                    desList.add(productListVo);
+//                    }
                 }
             }
         }
