@@ -929,6 +929,7 @@ public class AppController {
                 Iterator<ProductModel2> ptmList = sourceList.iterator();
                 while (ptmList.hasNext()) {
                     ProductModel2 ptmProduct = ptmList.next();
+                    System.out.println(" title " + ptmProduct.getTitle() + " price " + ptmProduct.getMinPrice());
                     System.out.println("ptmProduct.getRating() " + ptmProduct.getRating());
                     System.out.println("ptmProduct.getReview() " + ptmProduct.getReview());
                     System.out.println("ptmProduct.getStoreCount() " + ptmProduct.getStoreCount());

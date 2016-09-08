@@ -900,6 +900,7 @@ public class ProductServiceImpl implements IProductService {
 
     public void setCommentNumAndRatins(ProductModel2 productModel2) {
         int count = cmpSkuService.getSkuSoldStoreNum(productModel2.getId());
+        System.out.println(" count :" + count + " id :" + productModel2.getId());
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productModel2.getId(), 1, 100);
         if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
             List<PtmCmpSku> tempSkuList = pagedCmpskus.getData();
@@ -916,7 +917,7 @@ public class ProductServiceImpl implements IProductService {
                     return 0;
                 }
             }).getPrice();
-
+            System.out.println(" maxPrice " + maxPrice);
             float minPrice = Collections.min(tempSkuList, new Comparator<PtmCmpSku>() {
                 @Override
                 public int compare(PtmCmpSku o1, PtmCmpSku o2) {
@@ -929,6 +930,7 @@ public class ProductServiceImpl implements IProductService {
                     return 0;
                 }
             }).getPrice();
+            System.out.println(" minPrice " + minPrice);
             //计算评论数*星级的总和
             int sum = 0;
             Long totalCommentNum = Long.valueOf(0);
@@ -940,6 +942,7 @@ public class ProductServiceImpl implements IProductService {
                     totalCommentNum += ptmCmpSku2.getCommentsNumber();
                 }
             }
+            System.out.println("totalCommentNum  " + totalCommentNum);
             productModel2.setReview(totalCommentNum.intValue());
             int rating = returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(totalCommentNum == 0 ? 1 : totalCommentNum), 0, BigDecimal.ROUND_HALF_UP).longValue());
             productModel2.setRating(rating <= 0 ? 90 : rating);
