@@ -1,6 +1,7 @@
 package hasoffer.fetch.helper;
 
 import hasoffer.base.config.AppConfig;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.UrlUtils;
@@ -124,7 +125,6 @@ public class WebsiteHelper {
     }
 
     public static String getDealUrlWithAff(Website website, String url, String[] affs) {
-
         if (StringUtils.isEmpty(url)) {
             return StringUtils.EMPTY_STRING;
         }
@@ -404,13 +404,13 @@ public class WebsiteHelper {
         }
     }
 
-    public static String getAdtUrlByWebSite(Website website, String url) {
+    public static String getAdtUrlByWebSite(Website website, String url, MarketChannel marketChannel) {
         switch (website) {
             case FLIPKART:
                 if (url.contains("?")) {
-                    url += "&affid=" + AffliIdHelper.getAffiIdByWebsite(website);
+                    url += "&affid=" + AffliIdHelper.getAffiIdByWebsite(website, marketChannel);
                 } else {
-                    url += "?affid=" + AffliIdHelper.getAffiIdByWebsite(website);
+                    url += "?affid=" + AffliIdHelper.getAffiIdByWebsite(website, marketChannel);
                 }
                 return url;
 //            case SNAPDEAL:

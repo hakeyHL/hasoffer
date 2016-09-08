@@ -45,5 +45,5 @@ public interface IPriceOffNoticeService {
     void priceOffCheck(long skuid);
 
     //针对push失败的用户重新发送
-    void pushFailRePush(long id, boolean cacheFail);
+    boolean pushFailRePush(long id, boolean cacheFail);
 }

@@ -4,11 +4,14 @@ import com.google.android.gcm.server.Message;
 import com.google.android.gcm.server.MulticastResult;
 import com.google.android.gcm.server.Result;
 import com.google.android.gcm.server.Sender;
+import hasoffer.api.controller.vo.DeviceInfoVo;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.app.AdvertiseService;
 import hasoffer.core.persistence.po.admin.Adt;
 import hasoffer.fetch.helper.WebsiteHelper;
+import hasoffer.webcommon.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -91,6 +94,8 @@ public class AppAdController {
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
         List<Adt> adt = advertiseService.getAdByCategory();
+        DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        MarketChannel marketChannel = deviceInfo.getMarketChannel();
         if (adt != null && adt.size() > 0) {
             System.out.println(" get  index 0");
             Adt adt1 = adt.get(0);
@@ -99,7 +104,7 @@ public class AppAdController {
                     adt1.setPackageName(packageMap.get(Website.valueOf(adt1.getAderName())));
                 }
                 if (!StringUtils.isEmpty(adt1.getAdLink())) {
-                    adt1.setAdLink(WebsiteHelper.getAdtUrlByWebSite(Website.valueOf(adt1.getAderName()), adt1.getAdLink()));
+                    adt1.setAdLink(WebsiteHelper.getAdtUrlByWebSite(Website.valueOf(adt1.getAderName()), adt1.getAdLink(), marketChannel));
                 }
             }
             map.put("ads", Arrays.asList(adt1));
