@@ -21,6 +21,8 @@ public class DealVo {
     private String priceDescription;
     private String deepLink;
     private int discount;
+    private boolean isExpired;
+    private float originPrice;
 
     public String getPriceDescription() {
         return priceDescription;
@@ -108,5 +110,21 @@ public class DealVo {
 
     public void setDeepLink(String deepLink) {
         this.deepLink = deepLink;
+    }
+
+    public boolean isExpired() {
+        return isExpired;
+    }
+
+    public void setIsExpired(boolean isExpired) {
+        this.isExpired = isExpired;
+    }
+
+    public float getOriginPrice() {
+        return originPrice;
+    }
+
+    public void setOriginPrice(float originPrice) {
+        this.originPrice = originPrice;
     }
 }

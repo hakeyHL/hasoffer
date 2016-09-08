@@ -73,7 +73,10 @@ public class AppServiceImpl implements IAppService {
                     " where t.userId=?0";
 
     private static final String Q_APP_GETDEALS =
-            "SELECT t FROM AppDeal t where  t.display='1' and  t.expireTime >= ?0  order by id desc   ";
+            "SELECT t FROM AppDeal t where  t.display='1' and    t.expireTime >= ?0   and t.listPageImage is not null  order by id desc   ";
+
+    //    private static final String Q_APP_GETDEALS =
+//            "SELECT t FROM AppDeal t where  t.display='1' and  and t.originPrice >0  and   t.expireTime >= ?0   and t.listPageImage is not null  order by id desc   ";
     private static final String Q_APP_GETBANNERS =
             " SELECT t from AppBanner t where t.deadline >=?0 ORDER BY t.id desc";
 
@@ -139,6 +142,7 @@ public class AppServiceImpl implements IAppService {
 
     @Override
     public PageableResult getDeals(Long page, Long pageSize) {
+//        return dbm.queryPage(Q_APP_GETDEALS, page.intValue() <= 1 ? 1 : page.intValue(), pageSize.intValue(), Arrays.asList(TimeUtils.getDayStart()));
         return dbm.queryPage(Q_APP_GETDEALS, page.intValue() <= 1 ? 1 : page.intValue(), pageSize.intValue(), Arrays.asList(new Date()));
     }
 

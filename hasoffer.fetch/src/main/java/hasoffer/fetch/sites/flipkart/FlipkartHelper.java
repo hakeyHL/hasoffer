@@ -1,5 +1,6 @@
 package hasoffer.fetch.sites.flipkart;
 
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.UrlUtils;
@@ -100,9 +101,19 @@ public class FlipkartHelper {
     }
 
     private static String appendAff(String url, String[] affs) {
+        MarketChannel marketChannelName = null;
+        for (String str : affs) {
+            MarketChannel[] values = MarketChannel.values();
+            for (MarketChannel marketChannel : values) {
+                if (marketChannel.name().equals("str")) {
+                    marketChannelName = marketChannel;
+                    break;
+                }
+            }
+        }
         StringBuffer sb = new StringBuffer(url);
 
-        String affid = AffliIdHelper.getAffiIdByWebsite(Website.FLIPKART);
+        String affid = AffliIdHelper.getAffiIdByWebsite(Website.FLIPKART, marketChannelName);
 
         if (sb.indexOf("?") > 0) {
             sb.append("&affid=").append(affid);
