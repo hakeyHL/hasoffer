@@ -74,9 +74,14 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
 
                             Long skuId = sku.getId();
                             float newPrice = sku.getPrice();
+                            float oriPrice = sku.getOriPrice();
 
+                            //如果没有原价，不创建deal
+                            if (oriPrice <= 0.0) {
+                                continue;
+                            }
                             //对当前价格进行判断，小于等于0，下一个
-                            if (newPrice <= 0) {
+                            if (newPrice <= 0.0) {
                                 continue;
                             }
 
@@ -114,6 +119,7 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
 
                                 appdeal.setDescription(description);
                                 appdeal.setPriceDescription("Rs." + (int) newPrice);
+
 
                                 //todo 抓完原价回来记得写折扣价
 //                                appdeal.setDiscount();
