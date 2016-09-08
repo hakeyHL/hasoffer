@@ -99,7 +99,8 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
                                 appdeal.setAppdealSource(AppdealSource.PRICE_OFF);
                                 appdeal.setCreateTime(TimeUtils.nowDate());
                                 appdeal.setDisplay(true);
-                                appdeal.setExpireTime(TimeUtils.add(TimeUtils.nowDate(), 1));
+                                //question 这种deal只有涨价才失效，加他个365天
+                                appdeal.setExpireTime(TimeUtils.add(TimeUtils.nowDate(), 365));
                                 appdeal.setLinkUrl(sku.getUrl());
                                 appdeal.setPush(false);
                                 appdeal.setTitle(sku.getTitle());
