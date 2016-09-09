@@ -14,6 +14,8 @@ public class Test {
         System.out.println(timeStr);
 
         System.out.println("x"+ System.getProperty("line.separator")+"Y");
+        String homeFolder = System.getProperty("user.home");
+        System.out.println(homeFolder);
         System.out.println("12345678\tY");
         System.out.println("1\tY");
     }

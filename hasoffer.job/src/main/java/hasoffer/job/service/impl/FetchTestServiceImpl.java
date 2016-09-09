@@ -38,12 +38,13 @@ public class FetchTestServiceImpl implements IFetchTestService {
     public void commitTask() {
         String hql = "select new hasoffer.job.dto.FetchTestTaskDTO(p.id,p.website,p.url) from SrmProductSearchCount s , PtmCmpSku p where p.productId=s.productId and s.ymd=?0 and p.website=?1 and s.productId is not null order by s.count desc";
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, -2);
+        calendar.add(Calendar.DATE, -5);
         String dateStr = DateFormatUtils.format(calendar, "yyyyMMdd");
         List<Website> websiteList = Arrays.asList(Website.AMAZON, Website.FLIPKART, Website.SNAPDEAL, Website.SHOPCLUES,
                 Website.PAYTM);
         String timeStr = DateFormatUtils.format(new Date(), "HH");
-        String baseOutFolder = "/home/hasoffer/logs/testFetch/" + dateStr + "/" + timeStr;
+        String homeFolder = System.getProperty("user.home");
+        String baseOutFolder = homeFolder + File.separator + "logs" + File.separator + "testFetch" + File.separator + dateStr + File.separator + timeStr;
 
         ExecutorService executorService = Executors.newFixedThreadPool(websiteList.size());
         int seconds = 60 * 20;
