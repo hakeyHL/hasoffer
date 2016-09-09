@@ -72,14 +72,17 @@ public class ProductController {
             cmpskuIndexService.remove(String.valueOf(id));
         } else {
             try {
+                System.out.println("cmpSkuService.deleteCmpSku start" + System.currentTimeMillis());
                 cmpSkuService.deleteCmpSku(id);
+                System.out.println("cmpSkuService.deleteCmpSku end" + System.currentTimeMillis());
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-
             //更新完价格有重新导入solr的动作
+            System.out.println("productService.updatePtmProductPrice start" + System.currentTimeMillis());
             productService.updatePtmProductPrice(cmpSku.getProductId());
+            System.out.println("productService.updatePtmProductPrice end" + System.currentTimeMillis());
         }
 
         ModelAndView mav = new ModelAndView();

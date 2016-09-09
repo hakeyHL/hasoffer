@@ -341,7 +341,9 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     public void deleteCmpSku(long id) {
         System.out.println("del PtmCmpSku : " + id);
         dbm.delete(PtmCmpSku.class, id);
+        System.out.println("deleteCmpSku cmpskuIndexService.remove start" + System.currentTimeMillis());
         cmpskuIndexService.remove(String.valueOf(id));
+        System.out.println("deleteCmpSku cmpskuIndexService.remove end" + System.currentTimeMillis());
     }
 
     @Override

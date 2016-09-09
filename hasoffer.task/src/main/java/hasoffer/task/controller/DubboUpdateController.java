@@ -126,7 +126,7 @@ public class DubboUpdateController {
         }
 
         for (int i = 0; i < 60; i++) {
-            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, priceOffNoticeService, redisListService));
+            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService));
         }
 
         taskRunning1.set(true);
@@ -150,7 +150,7 @@ public class DubboUpdateController {
         es.execute(new TopSellingListWorker(dbm, queue, fetchDubboService));
 
         for (int i = 0; i < 30; i++) {
-            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, priceOffNoticeService, redisListService));
+            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService));
         }
 
         taskRunning2.set(true);
