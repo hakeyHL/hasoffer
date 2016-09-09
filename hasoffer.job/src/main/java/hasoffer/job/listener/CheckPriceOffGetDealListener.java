@@ -1,11 +1,9 @@
 package hasoffer.job.listener;
 
-import hasoffer.base.utils.DaemonThreadFactory;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.dbm.Hibernate4DataBaseManager;
 import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
 import hasoffer.data.redis.IRedisListService;
-import hasoffer.job.bean.deal.CheckGetPriceOffDealWorker;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -37,7 +35,7 @@ public class CheckPriceOffGetDealListener extends ContextLoaderListener {
 
         ExecutorService es = Executors.newCachedThreadPool();
 
-        es.execute(DaemonThreadFactory.create(new CheckGetPriceOffDealWorker(mdm, dbm, dealService, redisListService)));
+//        es.execute(DaemonThreadFactory.create(new CheckGetPriceOffDealWorker(mdm, dbm, dealService, redisListService)));
     }
 
     @Override
