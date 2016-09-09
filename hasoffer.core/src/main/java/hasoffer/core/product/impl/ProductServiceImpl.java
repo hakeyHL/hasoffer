@@ -702,10 +702,7 @@ public class ProductServiceImpl implements IProductService {
     public ProductModel2 getProductModel2(PtmProduct product, boolean noMean) {
         ProductModel2 tempProductModel2 = new ProductModel2();
         tempProductModel2.setId(product.getId());
-        setRatingComStore(tempProductModel2);
-        System.out.println("tempProductModel2  getRating " + tempProductModel2.getRating());
-        System.out.println("tempProductModel2  getReview " + tempProductModel2.getReview());
-        System.out.println("tempProductModel2  getStoreCount " + tempProductModel2.getStoreCount());
+        setCommentNumAndRatins(tempProductModel2);
         // 类目关键词
         long cate1 = 0L, cate2 = 0L, cate3 = 0L;
         String cate1name = "", cate2name = "", cate3name = "", cateTag = "";
@@ -754,12 +751,15 @@ public class ProductServiceImpl implements IProductService {
                 cate1name,
                 cate2name,
                 cate3name,
-                tempProductModel2.getMinPrice(),
-                tempProductModel2.getMaxPrice(),
-                tempProductModel2.getRating(),
+                0,
+                0,
+                product.getRating(),
                 searchCount);
+        productModel.setRating(tempProductModel2.getRating());
         productModel.setReview(tempProductModel2.getReview());
         productModel.setStoreCount(tempProductModel2.getStoreCount());
+        productModel.setMinPrice(tempProductModel2.getMinPrice());
+        productModel.setMaxPrice(tempProductModel2.getMaxPrice());
         return productModel;
     }
 
@@ -770,6 +770,7 @@ public class ProductServiceImpl implements IProductService {
         }
         // new import
         importProduct2Solr2(product);
+
         ProductModel productModel = getProductModel(product);
 
         if (productModel != null) {
@@ -891,10 +892,6 @@ public class ProductServiceImpl implements IProductService {
         //outstock的sku也返回
         PageableResult<PtmCmpSku> pagedResult = dbm.queryPage(Q_ONSALE_PTM_CMPSKU, page, size, Arrays.asList(proId, 1.0f));
         return pagedResult;
-    }
-
-    public void setRatingComStore(ProductModel2 productModel2) {
-        setCommentNumAndRatins(productModel2);
     }
 
     public void setCommentNumAndRatins(ProductModel2 productModel2) {
