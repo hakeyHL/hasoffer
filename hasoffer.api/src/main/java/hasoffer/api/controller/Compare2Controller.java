@@ -721,7 +721,6 @@ public class Compare2Controller {
                     PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, cmpProductListVo.getId());
                     List<String> offer = new ArrayList<>();
                     if (ptmCmpSkuDescription != null) {
-                        System.out.println(" aha  aha  aha ");
                         String offers = ptmCmpSkuDescription.getOffers();
                         System.out.println(" got it ,and offers is " + offers);
                         if (!StringUtils.isEmpty(offers)) {
