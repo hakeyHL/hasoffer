@@ -543,8 +543,8 @@ public class AppController {
             map.put("website", appDeal.getWebsite());
             map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
             map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-            String description = (String) map.get("description");
             StringBuilder sb = new StringBuilder();
+            String description = appDeal.getDescription();
             sb.append(description == null ? "" : description);
             sb.append("How to get the deal: \n");
             sb.append("1 Click \"Activate Deal\" button.\n");
