@@ -97,9 +97,19 @@ public class AppController {
     Logger logger = LoggerFactory.getLogger(AppController.class);
 
     public static void main(String[] args) {
-        String ss = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL, "http://www.snapdeal.com/offers/maggi-hamper", new String[]{"GOOGLEPLAY", "123"});
-        System.out.print(ss);
-
+//        String ss = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL, "http://www.snapdeal.com/offers/maggi-hamper", new String[]{"GOOGLEPLAY", "123"});
+//        System.out.print(ss);
+        String as = "Refer and earn Rs. 200 for each friend who signs up at Amazon.in and makes a purchase of Rs. 300 or more. Person who " +
+                "signs up also gets Rs. 100. No coupon " +
+                "code required to avail of this offer.\n";
+        System.out.println(as.lastIndexOf("\n"));
+        System.out.println(as.length());
+        if (as.lastIndexOf("\n") == as.length() - 1) {
+            System.out.println(" 最后有换行 ");
+        }
+//        if ()) {
+//            System.out.println("asdfaserqwerwerwer ");
+//        }
         //Random random = new Random();
         //for (int i = 0; i < 100; i++) {
         //   int nextInt = random.nextInt(8);
@@ -546,7 +556,16 @@ public class AppController {
             StringBuilder sb = new StringBuilder();
             String description = appDeal.getDescription();
             sb.append(description == null ? "" : description);
-            sb.append("\n");
+            if (description.lastIndexOf("\n") > 0) {
+                if (description.lastIndexOf("\n") == description.length() - 1) {
+                    //最后有换行,再加一个换行
+                    sb.append("\n");
+                } else {
+                    //最后无换行,加两个
+                    sb.append("\n");
+                    sb.append("\n");
+                }
+            }
             sb.append("How to get the deal: \n");
             sb.append("1 Click \"Activate Deal\" button.\n");
             sb.append("2 Add the product of your choice to cart.\n");
