@@ -9,7 +9,6 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory3;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
-import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
@@ -37,7 +36,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
     private ICmpSkuService cmpSkuService;
     private IRedisListService redisListService;
 
-    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, ICmpSkuService cmpSkuService, IPriceOffNoticeService priceOffNoticeService, IRedisListService redisListService) {
+    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, ICmpSkuService cmpSkuService, IRedisListService redisListService) {
         this.dbm = dbm;
         this.queue = queue;
         this.fetchDubboService = fetchDubboService;

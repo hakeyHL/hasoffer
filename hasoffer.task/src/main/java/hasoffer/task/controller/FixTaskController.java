@@ -1,7 +1,11 @@
 package hasoffer.task.controller;
 
+import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.SkuStatus;
+import hasoffer.base.model.Website;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
@@ -19,6 +23,7 @@ import hasoffer.core.task.ListProcessTask;
 import hasoffer.core.task.worker.ILister;
 import hasoffer.core.task.worker.IProcessor;
 import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
+import hasoffer.data.redis.IRedisListService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import hasoffer.task.worker.*;
@@ -60,6 +65,8 @@ public class FixTaskController {
     IProductService productService;
     @Resource
     IFetchDubboService fetchDubboService;
+    @Resource
+    IRedisListService redisListService;
 
     private Logger logger = LoggerFactory.getLogger(FixTaskController.class);
 
@@ -152,6 +159,8 @@ public class FixTaskController {
         return "ok";
     }
 
+
+    //fixtask/fixtitlelikedurex
     @RequestMapping(value = "/fixtitlelikedurex", method = RequestMethod.GET)
     public String fixtitlelikedurex() {
 
@@ -326,6 +335,87 @@ public class FixTaskController {
         return "ok";
     }
 
+    //fixtask/fixMobileTitle
+    @RequestMapping(value = "/fixMobileTitle")
+    @ResponseBody
+    public String fixMobileTitle() {
+
+        final String Q_MOBILE_SKU = "SELECT t FROM PtmCmpSku t WHERE t.categoryId = 5 ORDER BY t.id ";
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        final ConcurrentLinkedQueue<PtmCmpSku> cmpSkuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
+
+        es.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                int curPage = 1;
+                int pageSize = 1000;
+                PageableResult<PtmCmpSku> pageableResult = dbm.queryPage(Q_MOBILE_SKU, curPage, pageSize);
+
+                long totalPage = pageableResult.getTotalPage();
+
+                while (curPage <= totalPage) {
+
+                    if (curPage > 1) {
+                        pageableResult = dbm.queryPage(Q_MOBILE_SKU, curPage, pageSize);
+                    }
+
+                    List<PtmCmpSku> skuList = pageableResult.getData();
+
+                    for (PtmCmpSku sku : skuList) {
+
+                        //判断，如果该sku 当天更新过价格, 直接跳过
+                        Date updateTime = sku.getUpdateTime();
+                        if (updateTime != null) {
+                            if (updateTime.compareTo(TimeUtils.toDate(TimeUtils.today())) > 0) {
+                                continue;
+                            }
+                        }
+
+                        //offsale的不再更新
+                        if (SkuStatus.OFFSALE.equals(sku.getStatus())) {
+                            continue;
+                        }
+
+                        Website website = sku.getWebsite();
+
+                        //暂时过滤掉myntra
+                        if (Website.MYNTRA.equals(website)) {
+                            continue;
+                        }
+
+
+                        //过滤掉snapdeal中viewAllSeller的情况
+                        if (Website.SNAPDEAL.equals(website)) {
+                            String url = sku.getUrl();
+                            url = StringUtils.filterAndTrim(url, Arrays.asList("/viewAllSellers"));
+                            sku.setUrl(url);
+                        }
+                        //过滤掉amazon中gp/offer-listing的url,该url没有描述等信息
+                        if (Website.AMAZON.equals(website)) {
+                            String url = sku.getUrl();
+                            url = url.replace("gp/offer-listing", "dp");
+                            sku.setUrl(url);
+                        }
+
+                        cmpSkuQueue.add(sku);
+                        fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_1);
+
+                        logger.info("send url request succes for " + sku.getWebsite() + " sku id is [" + sku.getId() + "]");
+                    }
+                }
+            }
+        });
+
+        for (int i = 0; i < 20; i++) {
+            es.execute(new CmpSkuDubboUpdateWorker(dbm, cmpSkuQueue, fetchDubboService, cmpSkuService, redisListService));
+        }
+
+        return "ok";
+    }
+
     class ProcessDate {
 
         private Date startDate;
@@ -382,4 +472,5 @@ public class FixTaskController {
             }
         }
     }
+
 }
