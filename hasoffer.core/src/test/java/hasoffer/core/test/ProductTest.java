@@ -230,6 +230,7 @@ public class ProductTest {
     public void querySku() {
 
         final long cateId = 5L;
+        final Map<Website, Map<String, PtmCmpSku>> cmpSkuMap = new HashMap<>();
 
         ListProcessTask<PtmProduct> productListAndProcessTask2 = new ListProcessTask<>(
                 new ILister() {
@@ -251,7 +252,27 @@ public class ProductTest {
                 new IProcessor<PtmProduct>() {
                     @Override
                     public void process(PtmProduct o) {
+                        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(o.getId());
 
+                        for (PtmCmpSku cmpSku : cmpSkus) {
+                            if (cmpSku.getStatus() == SkuStatus.OFFSALE || cmpSku.getPrice() <= 0 || cmpSku.getWebsite() == null) {
+//                                System.out.println(cmpSku.getId() + "\t" + cmpSku.getStatus().name() + "\t" + cmpSku.getPrice() + "\t" + cmpSku.getWebsite());
+                                continue;
+                            }
+
+                            Map<String, PtmCmpSku> cmpSkuMap1 = cmpSkuMap.get(cmpSku.getWebsite());
+                            if (cmpSkuMap1 == null) {
+                                cmpSkuMap1 = new HashMap<>();
+                                cmpSkuMap.put(cmpSku.getWebsite(), cmpSkuMap1);
+                            }
+
+                            PtmCmpSku cmpSku1 = cmpSkuMap1.get(cmpSku.getTitle());
+                            if (cmpSku1 == null) {
+                                cmpSkuMap1.put(cmpSku.getTitle(), cmpSku1);
+                            } else {
+                                System.out.println(cmpSku.getId() + "\t" + cmpSku.getTitle());
+                            }
+                        }
                     }
                 }
         );
