@@ -543,7 +543,6 @@ public class AppController {
             map.put("website", appDeal.getWebsite());
             map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
             map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-            map.put("description", appDeal.getDescription() == null ? "" : appDeal.getDescription());
             String description = (String) map.get("description");
             StringBuilder sb = new StringBuilder();
             sb.append(description == null ? "" : description);
@@ -564,6 +563,7 @@ public class AppController {
                     sb.append(next.getKey()).append("\n");
                 }
             }
+            map.put("description", sb.toString());
             map.put("extra", 0);
             if (appDeal.getWebsite() == Website.FLIPKART) {
                 map.put("extra", 1.5);
