@@ -786,15 +786,13 @@ public class ProductServiceImpl implements IProductService {
                 cate1name,
                 cate2name,
                 cate3name,
-                0,
-                0,
+                tempProductModel2.getMinPrice(),
+                tempProductModel2.getMaxPrice(),
                 product.getRating(),
                 searchCount);
         productModel.setRating(tempProductModel2.getRating());
         productModel.setReview(tempProductModel2.getReview());
         productModel.setStoreCount(tempProductModel2.getStoreCount());
-        productModel.setMinPrice(tempProductModel2.getMinPrice());
-        productModel.setMaxPrice(tempProductModel2.getMaxPrice());
         return productModel;
     }
 
