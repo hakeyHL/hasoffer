@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class CmpSkuDubboUpdateWorker implements Runnable {
 
-    private static final String PRICEOFF_NOTICE_SKUID_QUEUE = "PRICEOFF_NOTICE_SKUID_QUEUE";
+    private static final String PRICE_DROP_SKUID_QUEUE = "PRICE_DROP_SKUID_QUEUE";
     private static Logger logger = LoggerFactory.getLogger(CmpSkuDubboUpdateWorker.class);
     private IDataBaseManager dbm;
     private ConcurrentLinkedQueue<PtmCmpSku> queue;
@@ -85,6 +85,8 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         // try update sku
         Long skuid = sku.getId();
         String url = sku.getUrl();
+        float price = sku.getPrice();
+
         Website website = WebsiteHelper.getWebSite(url);
 
         if (website == null) {
@@ -138,6 +140,11 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 cmpSkuService.createPtmCmpSkuImage(skuid, fetchedProduct);
             } catch (Exception e) {
                 logger.info("createPtmCmpSkuImage fail " + skuid);
+            }
+
+//            如果降价，写入队列
+            if (price > fetchedProduct.getPrice()) {
+                redisListService.push(PRICE_DROP_SKUID_QUEUE, skuid + "");
             }
 
 //            对FLIPKART没有类目的数据进行更新,暂时注释掉
