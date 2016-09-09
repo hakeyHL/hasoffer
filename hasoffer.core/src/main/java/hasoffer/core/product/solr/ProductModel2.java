@@ -76,6 +76,9 @@ public class ProductModel2 implements IIdentifiable<Long> {
 //        }
 //    }
 
+    public ProductModel2() {
+    }
+
     @Override
     public Long getId() {
         return id;

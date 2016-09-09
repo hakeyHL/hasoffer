@@ -59,7 +59,7 @@ public class CheckGetPriceOffDealWorker implements Runnable {
 
     @Override
     public void run() {
-        logger.info("FetchJobBean is run at {}", new Date());
+        logger.info("CheckGetPriceOffDealWorker is run at {}", new Date());
 
         while (true) {
 
