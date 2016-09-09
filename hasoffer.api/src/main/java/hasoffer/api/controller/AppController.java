@@ -546,6 +546,7 @@ public class AppController {
             StringBuilder sb = new StringBuilder();
             String description = appDeal.getDescription();
             sb.append(description == null ? "" : description);
+            sb.append("\n");
             sb.append("How to get the deal: \n");
             sb.append("1 Click \"Activate Deal\" button.\n");
             sb.append("2 Add the product of your choice to cart.\n");
