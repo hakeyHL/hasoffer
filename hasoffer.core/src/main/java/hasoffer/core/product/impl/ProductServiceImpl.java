@@ -212,7 +212,7 @@ public class ProductServiceImpl implements IProductService {
             }
 
             product.setPrice(price);
-
+            System.out.println("minPrice =" + price);
             importProduct2Solr(product);
         }
 
