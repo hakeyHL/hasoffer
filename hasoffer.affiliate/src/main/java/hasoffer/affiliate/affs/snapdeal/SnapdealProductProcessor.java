@@ -183,6 +183,8 @@ public class SnapdealProductProcessor implements IAffiliateProcessor<SnapDealAff
                     //    order.setStatus(R_ORDER_STATUS_APPROVED);
                     //}
                 }
+            }else{
+                productDetails = new ArrayList<>();
             }
             return productDetails;
         } catch (Exception e) {
