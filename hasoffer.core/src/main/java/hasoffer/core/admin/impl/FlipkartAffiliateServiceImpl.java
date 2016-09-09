@@ -3,6 +3,7 @@ package hasoffer.core.admin.impl;
 import hasoffer.affiliate.affs.IAffiliateProcessor;
 import hasoffer.affiliate.affs.flipkart.FlipkartAffiliateProductProcessor;
 import hasoffer.affiliate.model.AffiliateOrder;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
 import hasoffer.core.admin.IFlipkartAffiliateService;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
@@ -93,19 +94,19 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
             orderList.addAll(getOrderList("120527343", "56dfb6e061e8410a936acf4081e19e4f", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
             logger.info("over 120527343: order.size={}", orderList.size());
             TimeUnit.SECONDS.sleep(2);
-            orderList.addAll(getOrderList("1600826426", "997ec82cf2a445f2bd19b541d4514569", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
+            orderList.addAll(getOrderList("160082642", "997ec82cf2a445f2bd19b541d4514569", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
             TimeUnit.SECONDS.sleep(2);
-            orderList.addAll(getOrderList("1600826426", "997ec82cf2a445f2bd19b541d4514569", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
-            logger.info("over 1600826426: order.size={}", orderList.size());
+            orderList.addAll(getOrderList("160082642", "997ec82cf2a445f2bd19b541d4514569", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
+            logger.info("over 160082642: order.size={}", orderList.size());
             TimeUnit.SECONDS.sleep(2);
-            orderList.addAll(getOrderList("2868676566", "cc0326abeff94e8493ef2d8888eac75d", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
+            orderList.addAll(getOrderList("286867656", "cc0326abeff94e8493ef2d8888eac75d", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
             TimeUnit.SECONDS.sleep(2);
-            orderList.addAll(getOrderList("2868676566", "cc0326abeff94e8493ef2d8888eac75d", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
-            logger.info("over 2868676566: order.size={}", orderList.size());
+            orderList.addAll(getOrderList("286867656", "cc0326abeff94e8493ef2d8888eac75d", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
+            logger.info("over 286867656: order.size={}", orderList.size());
             TimeUnit.SECONDS.sleep(2);
-            orderList.addAll(getOrderList("289063282", "cc0326abeff94e8493ef2d8888eac75d", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
+            orderList.addAll(getOrderList("289063282", "3f6f61bf3142475a9ab9a990fb51dcf0", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
             TimeUnit.SECONDS.sleep(2);
-            orderList.addAll(getOrderList("289063282", "cc0326abeff94e8493ef2d8888eac75d", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
+            orderList.addAll(getOrderList("289063282", "3f6f61bf3142475a9ab9a990fb51dcf0", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
             logger.info("over 289063282: order.size={}", orderList.size());
             TimeUnit.SECONDS.sleep(2);
             orderList.addAll(getOrderList("514330076", "1fa77bd9ed754b27966704a30caea9a6", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
@@ -118,9 +119,9 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
             orderList.addAll(getOrderList("602074420", "32b388fcd7a945478510208ef7f60300", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
             logger.info("over 602074420: order.size={}", orderList.size());
             TimeUnit.SECONDS.sleep(2);
-            orderList.addAll(getOrderList("943546560", "04bece2ed64945a3bce45c2f51293ef0", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
+            orderList.addAll(getOrderList("943546560", "a344714f1aef45449e779fa8511686f8", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
             TimeUnit.SECONDS.sleep(2);
-            orderList.addAll(getOrderList("943546560", "04bece2ed64945a3bce45c2f51293ef0", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
+            orderList.addAll(getOrderList("943546560", "a344714f1aef45449e779fa8511686f8", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
             logger.info("over 943546560: order.size={}", orderList.size());
             TimeUnit.SECONDS.sleep(2);
             orderList.addAll(getOrderList("sunyukunj", "74140dfa56194bc4abab5c2d105fd12c", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
@@ -164,10 +165,20 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
             po.setWebSite(Website.FLIPKART.toString());
             po.setOrderId(order.getAffiliateOrderItemId());
             po.setAffID(order.getAffID());
-            String channel = order.getAffExtParam1();
-            po.setChannel(channel == null || "".equals(channel) ? "NONE" : channel);
             try {
                 po.setOrderTime(DateUtils.parseDate(order.getOrderDate(), "dd-MM-yyyy HH:mm:ss"));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            String extParam1 = order.getAffExtParam1();
+            String channel = extParam1 == null || "".equals(extParam1) ? "NONE" : extParam1;
+            po.setChannel(channel);
+            po.setChannelSrc(channel);
+            try {
+                if (("NONE".equals(po.getChannel()) || "LeoMaster".equals(po.getChannel())) && po.getOrderTime().after(DateUtils.parseDate("2016-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"))) {
+                    MarketChannel channelByAffId = getChannelByAffId(po.getAffID());
+                    po.setChannel(channelByAffId.toString());
+                }
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -331,6 +342,31 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
 //        }
 //        return result;
 //    }
+
+    private static MarketChannel getChannelByAffId(String affId) {
+        if (affId == null) {
+            return MarketChannel.NONE;
+        }
+        String[] leomasterFields = new String[]{"hlhakeygm", "oliviersl", "wuningSFg"};
+        String[] nineAppsFields = new String[]{"Sunyukunj", "gczyfw201", "xyangryrg", "zhouxixi0", "harveyouo", "allenooou"};
+        String[] shanchuanFields = new String[]{"160082642", "286867656", "289063282", "514330076", "602074420", "943546560"};
+        String[] googleplayFields = new String[]{"115377600"};
+        //String[] otherFields = new String[]{"120527343"};
+        String[] zukFields = new String[]{"747306881"};
+        if (Arrays.asList(leomasterFields).contains(affId)) {
+            return MarketChannel.LeoMaster;
+        } else if (Arrays.asList(nineAppsFields).contains(affId)) {
+            return MarketChannel.NINEAPPS;
+        } else if (Arrays.asList(shanchuanFields).contains(affId)) {
+            return MarketChannel.SHANCHUAN;
+        } else if (Arrays.asList(googleplayFields).contains(affId)) {
+            return MarketChannel.GOOGLEPLAY;
+        } else if (Arrays.asList(zukFields).contains(affId)) {
+            return MarketChannel.ZUK;
+        }
+        return MarketChannel.NONE;
+
+    }
 
 
 }
