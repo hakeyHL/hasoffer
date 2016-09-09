@@ -860,17 +860,12 @@ public class ProductServiceImpl implements IProductService {
         if (product == null) {
             return;
         }
-//        productIndex2Service.remove(String.valueOf(product.getId()));
-        System.out.println("importProduct2Solr2 - 1");
         ProductModel2 productModel2 = getProductModel2(product);
         if (productModel2 != null) {
-            System.out.println("importProduct2Solr2 - 2");
             productIndex2Service.createOrUpdate(productModel2);
         } else {
-            System.out.println("importProduct2Solr2 - 3");
             productIndex2Service.remove(String.valueOf(product.getId()));
         }
-        System.out.println("importProduct2Solr2 - 4");
     }
 
     private void addOrUpdateSolr(final String queryString, List params) {

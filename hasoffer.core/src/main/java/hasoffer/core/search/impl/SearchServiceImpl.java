@@ -25,7 +25,6 @@ import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.search.updater.SrmSearchLogUpdater;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
-import hasoffer.core.product.solr.ProductModel;
 import hasoffer.core.search.ISearchService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.model.ListProduct;
@@ -175,14 +174,15 @@ public class SearchServiceImpl implements ISearchService {
                 spscs.clear();
             }
 
-            ProductModel pm = productService.getProductModel(product);
-
-            if (pm == null) {
-                continue;
-            }
-
-            pm.setSearchCount(searchCount);
-            productService.import2Solr(pm);
+            productService.importProduct2Solr2(productId);
+//            ProductModel pm = productService.getProductModel(product);
+//
+//            if (pm == null) {
+//                continue;
+//            }
+//
+//            pm.setSearchCount(searchCount);
+//            productService.import2Solr(pm);
         }
 
         if (ArrayUtils.hasObjs(spscs)) {
