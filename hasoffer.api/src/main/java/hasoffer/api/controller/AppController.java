@@ -551,7 +551,7 @@ public class AppController {
             sb.append("1 Click \"Activate Deal\" button.\n");
             sb.append("2 Add the product of your choice to cart.\n");
             sb.append("3 And no coupon code required.\n");
-            PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, Long.valueOf(id));
+            PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
             if (ptmCmpSkuDescription != null) {
                 String jsonParam = ptmCmpSkuDescription.getJsonParam();
                 Map jsonMap = JsonHelper.getJsonMap(jsonParam);
