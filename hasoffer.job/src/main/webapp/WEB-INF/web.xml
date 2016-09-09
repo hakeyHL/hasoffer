@@ -60,10 +60,10 @@
         <listener-class>hasoffer.job.listener.PtmProductPriceUpdateListener</listener-class>
     </listener>
 
-    <listener>
-        <display-name>priceOffGetDeal_listener</display-name>
-        <listener-class>hasoffer.job.listener.CheckPriceOffGetDealListener</listener-class>
-    </listener>
+    <!--<listener>-->
+    <!--<display-name>priceOffGetDeal_listener</display-name>-->
+    <!--<listener-class>hasoffer.job.listener.CheckPriceOffGetDealListener</listener-class>-->
+    <!--</listener>-->
     <!-- -->
     <!--<listener>-->
     <!--<listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>-->

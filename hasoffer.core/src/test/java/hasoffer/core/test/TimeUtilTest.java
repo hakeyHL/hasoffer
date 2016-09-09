@@ -18,7 +18,7 @@ public class TimeUtilTest {
     @Test
     public void test3() {
 
-        System.out.println(TimeUtils.getHour());
+        System.out.println(TimeUtils.addDay(TimeUtils.nowDate(), 365));
 
     }
 
