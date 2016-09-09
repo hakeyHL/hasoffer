@@ -9,7 +9,6 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory3;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
-import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
@@ -37,7 +36,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
     private ICmpSkuService cmpSkuService;
     private IRedisListService redisListService;
 
-    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, ICmpSkuService cmpSkuService, IPriceOffNoticeService priceOffNoticeService, IRedisListService redisListService) {
+    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, ICmpSkuService cmpSkuService, IRedisListService redisListService) {
         this.dbm = dbm;
         this.queue = queue;
         this.fetchDubboService = fetchDubboService;
@@ -145,6 +144,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 //            如果降价，写入队列
             if (price > fetchedProduct.getPrice()) {
                 redisListService.push(PRICE_DROP_SKUID_QUEUE, skuid + "");
+                System.out.println("price drop add to queue success " + skuid);
             }
 
 //            对FLIPKART没有类目的数据进行更新,暂时注释掉

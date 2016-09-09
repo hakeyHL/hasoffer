@@ -213,6 +213,7 @@ public class ProductServiceImpl implements IProductService {
 
             product.setPrice(price);
             System.out.println("minPrice =" + price);
+
             importProduct2Solr(product);
         }
 
@@ -845,13 +846,13 @@ public class ProductServiceImpl implements IProductService {
         // new import
         importProduct2Solr2(product);
 
-        ProductModel productModel = getProductModel(product);
-
-        if (productModel != null) {
-            productIndexService.createOrUpdate(productModel);
-        } else {
-            productIndexService.remove(String.valueOf(product.getId()));
-        }
+//        ProductModel productModel = getProductModel(product);
+//
+//        if (productModel != null) {
+//            productIndexService.createOrUpdate(productModel);
+//        } else {
+//            productIndexService.remove(String.valueOf(product.getId()));
+//        }
     }
 
     @Override
@@ -859,8 +860,6 @@ public class ProductServiceImpl implements IProductService {
         if (product == null) {
             return;
         }
-//        productIndex2Service.remove(String.valueOf(product.getId()));
-
         ProductModel2 productModel2 = getProductModel2(product);
         if (productModel2 != null) {
             productIndex2Service.createOrUpdate(productModel2);

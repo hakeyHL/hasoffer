@@ -21,8 +21,11 @@ public class OrderStatsAnalysisPO implements Identifiable<Integer> {
     private String webSite;
 
 
-    @Column(length = 20, nullable = false)
+    @Column(length = 30, nullable = false)
     private String channel;
+
+    @Column(length = 30)
+    private String channelSrc;
 
     @Column(length = 100)
     private String userId;
@@ -97,6 +100,14 @@ public class OrderStatsAnalysisPO implements Identifiable<Integer> {
 
     public void setChannel(String channel) {
         this.channel = channel;
+    }
+
+    public String getChannelSrc() {
+        return channelSrc;
+    }
+
+    public void setChannelSrc(String channelSrc) {
+        this.channelSrc = channelSrc;
     }
 
     public String getUserId() {

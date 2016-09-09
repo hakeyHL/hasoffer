@@ -107,7 +107,7 @@ public class SolrController {
     }
 
     //1973863
-    @RequestMapping(value = "/product/importbycategory2", method = RequestMethod.GET)
+    @RequestMapping(value = "/product/importbyminid", method = RequestMethod.GET)
     public void importNewAllProducts(@RequestParam final long minProId) {
         final String Q_PRO = "SELECT t FROM PtmProduct t where t.id > ?0";
         ListProcessTask<PtmProduct> listAndProcessTask2 = new ListProcessTask<>(
@@ -132,7 +132,7 @@ public class SolrController {
                     @Override
                     public void process(PtmProduct o) {
                         try {
-                            import2Solr(o);
+                            productService.importProduct2Solr2(o);
                         } catch (Exception e) {
                             System.out.println("ERROR " + o.getId() + "\t" + e.getMessage());
                         }
