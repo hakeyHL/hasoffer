@@ -565,6 +565,10 @@ public class AppController {
                     sb.append("\n");
                     sb.append("\n");
                 }
+            } else {
+                //无换行
+                sb.append("\n");
+                sb.append("\n");
             }
             sb.append("How to get the deal: \n");
             sb.append("1 Click \"Activate Deal\" button.\n");
