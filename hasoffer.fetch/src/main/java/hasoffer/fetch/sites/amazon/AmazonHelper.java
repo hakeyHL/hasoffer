@@ -108,6 +108,15 @@ public class AmazonHelper {
 //    }
 
     public static String getUrlWithAff(String url) {
+        String pid = AmazonHelper.getProductIdByUrl(url);
+        if (StringUtils.isEmpty(pid)) {
+            if (url.contains("?")) {
+                return url + "&tag=hasoffer0c-21";
+            } else {
+                return url + "?tag=hasoffer0c-21";
+            }
+        }
+
         int win = url.indexOf("?");
         if (win > 0) {
             url = url.substring(0, win);
@@ -133,13 +142,6 @@ public class AmazonHelper {
 
     private static String getUrlWithAff_IN(String url) {
         String pid = AmazonHelper.getProductIdByUrl(url);
-        if (StringUtils.isEmpty(pid)) {
-            if (url.contains("?")) {
-                return url + "_encoding=UTF8&camp=3626&creative=24790&linkCode=ur2&node=4091094031&tag=hasoffer0c-21";
-            } else {
-                return url + "?_encoding=UTF8&camp=3626&creative=24790&linkCode=ur2&node=4091094031&tag=hasoffer0c-21";
-            }
-        }
 
         if (!url.endsWith("/")) {
             url = url + "/";
