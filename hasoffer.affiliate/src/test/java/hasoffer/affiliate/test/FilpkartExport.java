@@ -51,10 +51,13 @@ public class FilpkartExport {
 
         Map<String, String> headerMap = new HashMap<String, String>();
         Map<String, String> parameterMap = new HashMap<String, String>();
-        parameterMap.put("startDate", "2016-08-01");
-        parameterMap.put("endDate", "2016-08-02");
+        parameterMap.put("startDate", "2016-09-06");
+        parameterMap.put("endDate", "2016-09-06");
         parameterMap.put("status", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE);
         parameterMap.put("offset", "0");
+        //"affiliate357", "56e46c994b92488c91e43fad138d5c71"
+        headerMap.put("Fk-Affiliate-Id", "affiliate357");
+        headerMap.put("Fk-Affiliate-Token", "56e46c994b92488c91e43fad138d5c71");
         List<AffiliateOrder> affiliateOrderList = processor.getAffiliateOrderList(headerMap, parameterMap);
         //parameterMap.put("startDate", "2016-04-01");
         //parameterMap.put("endDate", "2016-04-30");
