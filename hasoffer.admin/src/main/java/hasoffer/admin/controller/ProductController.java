@@ -73,8 +73,8 @@ public class ProductController {
         } else {
             cmpSkuService.deleteCmpSku(id);
 
+            //更新完价格有重新导入solr的动作
             productService.updatePtmProductPrice(cmpSku.getProductId());
-            productService.reimport2Solr(cmpSku.getProductId());
         }
 
         ModelAndView mav = new ModelAndView();
@@ -432,8 +432,8 @@ public class ProductController {
             }
         }
 
+        //更新完价格会有reimport的动作
         productService.updatePtmProductPrice(productId);
-        productService.reimport2Solr(productId);
 
         return true;
     }
