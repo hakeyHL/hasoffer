@@ -17,6 +17,6 @@
     <dubbo:reference id="fetchDubboService" interface="hasoffer.dubbo.api.fetch.service.IFetchDubboService"
                      version="1.0" check="false" group="fetch" />
 
-    <dubbo:reference id="fetchTimerDubboService" interface="hasoffer.dubbo.api.fetch.service.IFetchDubboService"
-                     version="1.0" check="false" group="timer"/>
+    <!--<dubbo:reference id="fetchTimerDubboService" interface="hasoffer.dubbo.api.fetch.service.IFetchDubboService"
+                     version="1.0" check="false" group="timer"/>-->
 </beans>
