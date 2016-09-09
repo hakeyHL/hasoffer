@@ -464,6 +464,7 @@ public class AppController {
                     DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
                     dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
                     dealVo.setExtra(0d);
+                    dealVo.setDiscount(appDeal.getDiscount());
                     dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
                     if (appDeal.getWebsite().name().equals("FLIPKART")) {
                         dealVo.setExtra(1.5);
@@ -473,6 +474,7 @@ public class AppController {
                     dealVo.setTitle(appDeal.getTitle());
                     dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
                     dealVo.setIsExpired(true);
+                    dealVo.setDiscount(appDeal.getDiscount());
                     dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
                     dealVo.setWebsite(appDeal.getWebsite());
                     li.add(dealVo);
@@ -491,6 +493,7 @@ public class AppController {
                     dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
                     dealVo.setExp(appDeal.getExpireTime());
                     dealVo.setTitle(appDeal.getTitle());
+                    dealVo.setDiscount(appDeal.getDiscount());
                     dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
                     dealVo.setIsExpired(false);
                     dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
@@ -508,6 +511,7 @@ public class AppController {
                     DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
                     dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
                     dealVo.setExtra(0d);
+                    dealVo.setDiscount(appDeal.getDiscount());
                     dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
                     if (appDeal.getWebsite().name().equals("FLIPKART")) {
                         dealVo.setExtra(1.5);
@@ -516,6 +520,7 @@ public class AppController {
                     dealVo.setExp(appDeal.getExpireTime());
                     dealVo.setTitle(appDeal.getTitle());
                     dealVo.setIsExpired(false);
+                    dealVo.setDiscount(appDeal.getDiscount());
                     dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
                     dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
                     dealVo.setWebsite(appDeal.getWebsite());
