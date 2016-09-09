@@ -428,6 +428,7 @@ public class AppController {
      */
     @RequestMapping(value = "/deals", method = RequestMethod.GET)
     public ModelAndView deals(@RequestParam(defaultValue = "0") String page, @RequestParam(defaultValue = "20") String pageSize) {
+        //TODO 再梳理和优化下逻辑,自己测试下
         ModelAndView mv = new ModelAndView();
         PageableResult Result = appService.getDeals(Long.valueOf(page), Long.valueOf(pageSize));
         Map map = new HashMap();
