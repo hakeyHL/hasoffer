@@ -25,6 +25,7 @@ public class AppDeal implements Identifiable<Long> {
     @Column(nullable = false)
     private AppdealSource appdealSource = AppdealSource.MANUAL_INPUT;
 
+    @Column(columnDefinition = "text")
     private String title;//deal标题
     @Column(columnDefinition = "text", nullable = false)
     private String linkUrl;//deal跳转地址
