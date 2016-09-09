@@ -71,7 +71,12 @@ public class ProductController {
         if (cmpSku == null) {
             cmpskuIndexService.remove(String.valueOf(id));
         } else {
-            cmpSkuService.deleteCmpSku(id);
+            try {
+                cmpSkuService.deleteCmpSku(id);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
 
             //更新完价格有重新导入solr的动作
             productService.updatePtmProductPrice(cmpSku.getProductId());
