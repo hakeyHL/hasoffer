@@ -112,6 +112,41 @@ public class ProductServiceImpl implements IProductService {
     private ProductCacheManager productCacheManager;
     private Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
+    public static void main(String[] args) {
+        List<PtmCmpSku> tempSkuList = new ArrayList<>();
+        PtmCmpSku ptm = new PtmCmpSku();
+        ptm.setPrice(100f);
+        tempSkuList.add(ptm);
+        PtmCmpSku ptmC = new PtmCmpSku();
+        ptmC.setPrice(200f);
+        tempSkuList.add(ptmC);
+        PtmCmpSku min = Collections.min(tempSkuList, new Comparator<PtmCmpSku>() {
+            @Override
+            public int compare(PtmCmpSku o1, PtmCmpSku o2) {
+                if (o1.getPrice() > o2.getPrice()) {
+                    return 1;
+                } else if (o1.getPrice() < o2.getPrice()) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
+
+        PtmCmpSku max = Collections.max(tempSkuList, new Comparator<PtmCmpSku>() {
+            @Override
+            public int compare(PtmCmpSku o1, PtmCmpSku o2) {
+                if (o1.getPrice() > o2.getPrice()) {
+                    return 1;
+                } else if (o1.getPrice() < o2.getPrice()) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
+        System.out.println(min.getPrice());
+        System.out.println(max.getPrice());
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateProductImage2(Long productId, String oriImageUrl) {
@@ -904,11 +939,10 @@ public class ProductServiceImpl implements IProductService {
             float maxPrice = Collections.max(tempSkuList, new Comparator<PtmCmpSku>() {
                 @Override
                 public int compare(PtmCmpSku o1, PtmCmpSku o2) {
-                    if (o1.getPrice() < o2.getPrice()) {
-                        return -1;
-                    }
                     if (o1.getPrice() > o2.getPrice()) {
                         return 1;
+                    } else if (o1.getPrice() < o2.getPrice()) {
+                        return -1;
                     }
                     return 0;
                 }
@@ -918,10 +952,9 @@ public class ProductServiceImpl implements IProductService {
                 @Override
                 public int compare(PtmCmpSku o1, PtmCmpSku o2) {
                     if (o1.getPrice() > o2.getPrice()) {
-                        return -1;
-                    }
-                    if (o1.getPrice() < o2.getPrice()) {
                         return 1;
+                    } else if (o1.getPrice() < o2.getPrice()) {
+                        return -1;
                     }
                     return 0;
                 }
