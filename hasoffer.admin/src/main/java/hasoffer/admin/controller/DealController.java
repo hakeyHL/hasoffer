@@ -99,7 +99,7 @@ public class DealController {
                 mav.addObject("bannerImageUrl", ImageUtil.getImageUrl(appBanner.getImageUrl()));
             }
         }
-        dealServiceImple.reimportAllDeals2Solr();
+
         mav.addObject("deal", deal);
         return mav;
     }
