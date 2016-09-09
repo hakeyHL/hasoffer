@@ -666,11 +666,9 @@ public class Compare2Controller {
                         websiteSet.add(cmpSku.getWebsite());
                     }
                     // 忽略前台返回的价格
-                    System.out.println(" Enter cmpProductListVO set area ");
                     System.out.println("sku smallImagePath is " + cmpSku.getSmallImagePath());
                     CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
                     System.out.println("after set , imageUrl is  " + cplv.getImageUrl());
-                    System.out.println("set properteis over l");
                     cplv.setDeepLinkUrl(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()}));
 
                     logger.info(" getCmpProducts record deepLinkUrl :" + cplv.getDeepLinkUrl());
@@ -721,18 +719,24 @@ public class Compare2Controller {
                     System.out.println(" get offers from mongoDb ");
                     System.out.println(" cmpProductListVo " + cmpProductListVo.getId() + "  : price : " + cmpProductListVo.getPrice());
                     PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, cmpProductListVo.getId());
+                    List<String> offer = new ArrayList<>();
                     if (ptmCmpSkuDescription != null) {
                         System.out.println(" aha  aha  aha ");
                         String offers = ptmCmpSkuDescription.getOffers();
                         System.out.println(" got it ,and offers is " + offers);
                         if (!StringUtils.isEmpty(offers)) {
-                            List<String> offer = new ArrayList<>();
                             String[] temps = offers.split(",");
                             for (String str : temps) {
                                 offer.add(str);
                             }
                             cmpProductListVo.setOffers(offer);
                         }
+                    }
+                    //将hasoffer coin拼接返回
+                    if (cmpProductListVo.getWebsite().name().equals("FLIPKART")) {
+                        //如果是flipkart,则添加hasoffer coin
+                        offer.add("Extra " + cmpProductListVo.getCoins() + " Hasoffer Coins");
+
                     }
                     tempCmpProductListVos.add(cmpProductListVo);
                 }

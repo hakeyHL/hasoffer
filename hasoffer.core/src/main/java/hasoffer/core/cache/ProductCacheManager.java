@@ -277,6 +277,7 @@ public class ProductCacheManager {
             if (cmpSkus != null) {
                 tempPtmCmpSkus.add(cmpSkus.get(0));
             }
+            //TODO  优选选择onsale的sku,否则返回outstock的sku
 //            PtmCmpSku onsaleSku = getOnsaleSku(cmpSkus);
 //            if (onsaleSku != null) {
 //                tempPtmCmpSkus.add(onsaleSku);
