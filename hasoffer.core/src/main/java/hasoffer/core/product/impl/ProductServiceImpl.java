@@ -735,9 +735,7 @@ public class ProductServiceImpl implements IProductService {
     }
 
     public ProductModel2 getProductModel2(PtmProduct product, boolean noMean) {
-        ProductModel2 tempProductModel2 = new ProductModel2();
-        tempProductModel2.setId(product.getId());
-        setCommentNumAndRatins(tempProductModel2);
+
         // 类目关键词
         long cate1 = 0L, cate2 = 0L, cate3 = 0L;
         String cate1name = "", cate2name = "", cate3name = "", cateTag = "";
@@ -767,6 +765,49 @@ public class ProductServiceImpl implements IProductService {
             cateTag = categoryCacheManager.getCategoryTag(product.getCategoryId());
         }
 
+        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(product.getId());
+        Map<Website, PtmCmpSku> cmpSkuMap = new HashMap<>();
+        for (PtmCmpSku cmpSku : cmpSkus) {
+            if (cmpSku.getStatus() == SkuStatus.OFFSALE || cmpSku.getPrice() <= 0) {
+                continue;
+            }
+
+            Website website = cmpSku.getWebsite();
+            if (website == null) {
+                continue;
+            }
+
+            PtmCmpSku mSku = cmpSkuMap.get(website);
+            if (mSku == null || cmpSku.getPrice() < mSku.getPrice()) {
+                cmpSkuMap.put(website, cmpSku);
+            }
+        }
+
+        int review = 0;
+        Long rating = 0L;
+        float minPrice = 0.0f, maxPrice = 0.0f;
+
+        for (Map.Entry<Website, PtmCmpSku> kv : cmpSkuMap.entrySet()) {
+            Website website = kv.getKey();
+            PtmCmpSku cmpSku = kv.getValue();
+
+            float price = cmpSku.getPrice();
+
+            if (minPrice > price || minPrice <= 0) {
+                minPrice = price;
+            }
+
+            if (maxPrice < price) {
+                maxPrice = price;
+            }
+
+            review += cmpSku.getCommentsNumber();
+            rating += cmpSku.getRatings() * cmpSku.getCommentsNumber();
+        }
+
+        int rating2 = returnNumberBetween0And5(BigDecimal.valueOf(rating).divide(BigDecimal.valueOf(review == 0 ? 1 : review), 0, BigDecimal.ROUND_HALF_UP).longValue());
+        rating2 = rating2 <= 0 ? 90 : rating2;
+
         long searchCount = 0;
         SrmProductSearchCount productSearchCount = searchService.findSearchCountByProductId(product.getId());
         if (productSearchCount != null) {
@@ -786,13 +827,13 @@ public class ProductServiceImpl implements IProductService {
                 cate1name,
                 cate2name,
                 cate3name,
-                tempProductModel2.getMinPrice(),
-                tempProductModel2.getMaxPrice(),
-                product.getRating(),
+                minPrice,
+                maxPrice,
+                rating2,
+                review,
+                cmpSkuMap.size(),
                 searchCount);
-        productModel.setRating(tempProductModel2.getRating());
-        productModel.setReview(tempProductModel2.getReview());
-        productModel.setStoreCount(tempProductModel2.getStoreCount());
+
         return productModel;
     }
 
