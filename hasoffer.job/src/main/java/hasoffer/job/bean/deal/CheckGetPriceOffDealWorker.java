@@ -112,7 +112,7 @@ public class CheckGetPriceOffDealWorker implements Runnable {
                     appdeal.setCreateTime(TimeUtils.nowDate());
                     appdeal.setDisplay(true);
                     //question 这种deal只有涨价才失效，加他个365天
-                    appdeal.setExpireTime(TimeUtils.add(TimeUtils.nowDate(), 365));
+                    appdeal.setExpireTime(TimeUtils.addDay(TimeUtils.nowDate(), 365));
                     appdeal.setLinkUrl(sku.getUrl());
                     appdeal.setPush(false);
                     appdeal.setTitle(sku.getTitle());
