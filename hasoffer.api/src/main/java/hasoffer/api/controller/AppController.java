@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import hasoffer.api.controller.vo.*;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
+import hasoffer.api.helper.JsonHelper;
 import hasoffer.api.helper.ParseConfigHelper;
 import hasoffer.api.worker.SearchLogQueue;
 import hasoffer.base.enums.AppType;
@@ -12,7 +13,6 @@ import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
-import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.product.Banners;
 import hasoffer.core.bo.product.CategoryVo;
 import hasoffer.core.bo.push.*;
@@ -20,6 +20,8 @@ import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.cache.AppCacheManager;
 import hasoffer.core.cache.CmpSkuCacheManager;
 import hasoffer.core.cache.ProductCacheManager;
+import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
+import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
@@ -90,6 +92,8 @@ public class AppController {
     AppCacheManager appCacheManager;
     @Resource
     IPushService pushService;
+    @Resource
+    MongoDbManager mongoDbManager;
     Logger logger = LoggerFactory.getLogger(AppController.class);
 
     public static void main(String[] args) {
@@ -428,23 +432,19 @@ public class AppController {
      */
     @RequestMapping(value = "/deals", method = RequestMethod.GET)
     public ModelAndView deals(@RequestParam(defaultValue = "0") String page, @RequestParam(defaultValue = "20") String pageSize) {
-        //TODO 再梳理和优化下逻辑,自己测试下
+        //1. 从数据库中查询到
         ModelAndView mv = new ModelAndView();
         PageableResult Result = appService.getDeals(Long.valueOf(page), Long.valueOf(pageSize));
         Map map = new HashMap();
         List li = new ArrayList();
         List<AppDeal> deals = Result.getData();
-        Date tommorrowDayStart = TimeUtils.getDayStart();
-        tommorrowDayStart.setTime(tommorrowDayStart.getTime() + 1000 * 60 * 60 * 24);
+        Date currentDate = new Date();
         for (AppDeal appDeal : deals) {
-            int dateCmpResult = appDeal.getExpireTime().compareTo(tommorrowDayStart);
+            int dateCmpResult = currentDate.compareTo(appDeal.getExpireTime());
             //需要筛选deal,不是sku的deal当天过期也为过期
             if (appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
                 //降价生成,过期时间是今天的要返回
-                Date expireTime = appDeal.getExpireTime();
-                Date date = new Date();
-                int result = date.compareTo(expireTime);
-                if (result == 1) {
+                if (dateCmpResult == 1) {
                     //过期
                     //deal的过期时间小于等于明天的凌晨,返回
                     DealVo dealVo = new DealVo();
@@ -489,10 +489,8 @@ public class AppController {
                 }
             } else if (appDeal.getAppdealSource().name().equals("MANUAL_INPUT")) {
                 //手动导入,
-                Date date = new Date();
-                int result = date.compareTo(appDeal.getExpireTime());
                 //只有过期时间大于当前时间才返回
-                if (result <= 0) {
+                if (dateCmpResult <= 0) {
                     DealVo dealVo = new DealVo();
                     dealVo.setId(appDeal.getId());
                     dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
@@ -546,6 +544,26 @@ public class AppController {
             map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
             map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
             map.put("description", appDeal.getDescription() == null ? "" : appDeal.getDescription());
+            String description = (String) map.get("description");
+            StringBuilder sb = new StringBuilder();
+            sb.append(description == null ? "" : description);
+            sb.append("How to get the deal: \n");
+            sb.append("1 Click \"Activate Deal\" button.\n");
+            sb.append("2 Add the product of your choice to cart.\n");
+            sb.append("3 And no coupon code required.\n");
+            PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, Long.valueOf(id));
+            if (ptmCmpSkuDescription != null) {
+                String jsonParam = ptmCmpSkuDescription.getJsonParam();
+                Map jsonMap = JsonHelper.getJsonMap(jsonParam);
+                //遍历map
+                Set<Map.Entry> set = jsonMap.entrySet();
+                Iterator<Map.Entry> iterator = set.iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry next = iterator.next();
+                    sb.append(next.getKey()).append(" : ");
+                    sb.append(next.getKey()).append("\n");
+                }
+            }
             map.put("extra", 0);
             if (appDeal.getWebsite() == Website.FLIPKART) {
                 map.put("extra", 1.5);
