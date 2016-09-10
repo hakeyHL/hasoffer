@@ -88,12 +88,16 @@ public class CheckGetPriceOffDealWorker implements Runnable {
                 float newPrice = sku.getPrice();
                 float oriPrice = sku.getOriPrice();
 
-                //如果没有原价，不创建deal
+                //SKU的原价不为空
                 if (oriPrice <= 0.0) {
                     continue;
                 }
-                //对当前价格进行判断，小于等于0，下一个
+                //SKU现价不为0
                 if (newPrice <= 0.0) {
+                    continue;
+                }
+                //SKU的现价小于原价
+                if (newPrice >= oriPrice) {
                     continue;
                 }
 
