@@ -647,21 +647,19 @@ public class Compare2Controller {
             //评论数按照加权平均值展示
             Long tempTotalComments = Long.valueOf(0);
             //统计site
-            Set<Website> websiteSet = new HashSet<Website>();
-            //统计site
 //            Set<Website> websiteSet = new HashSet<Website>();
             //初始化price为客户端传输的price
             if (ArrayUtils.hasObjs(cmpSkus)) {
                 // 获取vo list
                 for (PtmCmpSku cmpSku : cmpSkus) {
-                    if (cmpSku.getWebsite() == null
-                            || cmpSku.getPrice() <= 0
-                            ) {
-                        continue;
-                    }
-                    if (cmpSku.getWebsite() != null) {
-                        websiteSet.add(cmpSku.getWebsite());
-                    }
+//                    if (cmpSku.getWebsite() == null
+//                            || cmpSku.getPrice() <= 0
+//                            ) {
+//                        continue;
+//                    }
+//                    if (cmpSku.getWebsite() != null) {
+//                        websiteSet.add(cmpSku.getWebsite());
+//                    }
                     // 忽略前台返回的价格
                     System.out.println("sku smallImagePath is " + cmpSku.getSmallImagePath());
                     CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
@@ -700,42 +698,42 @@ public class Compare2Controller {
             int sum = 0;
             System.out.println("iterator  comparedSkuVos , and  it is size is " + comparedSkuVos.size());
             for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
-                if (websiteSet.size() <= 0) {
-                    break;
+//                if (websiteSet.size() <= 0) {
+//                    break;
+//                }
+//                if (websiteSet.contains(cmpProductListVo.getWebsite())) {
+//                    websiteSet.remove(cmpProductListVo.getWebsite());
+                //去除列表中除此之外的其他此site的数据
+                if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
+                    System.out.println("not ebay ");
+                    //评论数*星级 累加 除以评论数和
+                    sum += cmpProductListVo.getTotalRatingsNum() * cmpProductListVo.getRatingNum();
+                    tempTotalComments += cmpProductListVo.getTotalRatingsNum();
                 }
-                if (websiteSet.contains(cmpProductListVo.getWebsite())) {
-                    websiteSet.remove(cmpProductListVo.getWebsite());
-                    //去除列表中除此之外的其他此site的数据
-                    if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
-                        System.out.println("not ebay ");
-                        //评论数*星级 累加 除以评论数和
-                        sum += cmpProductListVo.getTotalRatingsNum() * cmpProductListVo.getRatingNum();
-                        tempTotalComments += cmpProductListVo.getTotalRatingsNum();
-                    }
-                    //获取offers
-                    System.out.println(" get offers from mongoDb ");
-                    System.out.println(" cmpProductListVo " + cmpProductListVo.getId() + "  : price : " + cmpProductListVo.getPrice());
-                    PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, cmpProductListVo.getId());
-                    List<String> offer = new ArrayList<>();
-                    if (ptmCmpSkuDescription != null) {
-                        String offers = ptmCmpSkuDescription.getOffers();
-                        System.out.println(" got it ,and offers is " + offers);
-                        if (!StringUtils.isEmpty(offers)) {
-                            String[] temps = offers.split(",");
-                            for (String str : temps) {
-                                offer.add(str);
-                            }
-                            cmpProductListVo.setOffers(offer);
+                //获取offers
+                System.out.println(" get offers from mongoDb ");
+                System.out.println(" cmpProductListVo " + cmpProductListVo.getId() + "  : price : " + cmpProductListVo.getPrice());
+                PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, cmpProductListVo.getId());
+                List<String> offer = new ArrayList<>();
+                if (ptmCmpSkuDescription != null) {
+                    String offers = ptmCmpSkuDescription.getOffers();
+                    System.out.println(" got it ,and offers is " + offers);
+                    if (!StringUtils.isEmpty(offers)) {
+                        String[] temps = offers.split(",");
+                        for (String str : temps) {
+                            offer.add(str);
                         }
+                        cmpProductListVo.setOffers(offer);
                     }
-                    //将hasoffer coin拼接返回
-                    if (cmpProductListVo.getWebsite().name().equals("FLIPKART")) {
-                        //如果是flipkart,则添加hasoffer coin
-                        offer.add("Extra " + cmpProductListVo.getCoins() + " Hasoffer Coins");
-
-                    }
-                    tempCmpProductListVos.add(cmpProductListVo);
                 }
+                //将hasoffer coin拼接返回
+                if (cmpProductListVo.getWebsite().name().equals("FLIPKART")) {
+                    //如果是flipkart,则添加hasoffer coin
+                    offer.add("Extra " + cmpProductListVo.getCoins() + " Hasoffer Coins");
+
+                }
+                tempCmpProductListVos.add(cmpProductListVo);
+//                }
             }
             //移除之前加进列表的所有的sku列表
             comparedSkuVos = null;

@@ -154,6 +154,7 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
 
         Map<String, UrmDevice> deviceRegTime = getDeviceRegTime(deviceSet);
 
+        // 因为导出Excel需要按照时间降序排列，所以要排序。
         Collections.sort(orderList, new Comparator<AffiliateOrder>() {
             public int compare(AffiliateOrder arg0, AffiliateOrder arg1) {
                 return arg0.getOrderDate().compareTo(arg1.getOrderDate());
@@ -295,14 +296,10 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
     }
 
     private Map<String, UrmDevice> getDeviceRegTime(Set<String> deviceSet) {
-
-
         Map<String, UrmDevice> deviceMap = new HashMap<String, UrmDevice>();
-
         List<UrmDevice> deviceByIdList = deviceService.findDeviceByIdList(new ArrayList<String>(deviceSet));
         if (deviceByIdList == null) {
             return deviceMap;
-
         }
         for (UrmDevice device : deviceByIdList) {
             deviceMap.put(device.getId(), device);
@@ -354,7 +351,7 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
         //String[] otherFields = new String[]{"120527343"};
         String[] zukFields = new String[]{"747306881"};
         if (Arrays.asList(leomasterFields).contains(affId)) {
-            return MarketChannel.LeoMaster;
+            return MarketChannel.SHANCHUAN;
         } else if (Arrays.asList(nineAppsFields).contains(affId)) {
             return MarketChannel.NINEAPPS;
         } else if (Arrays.asList(shanchuanFields).contains(affId)) {

@@ -34,6 +34,8 @@ public interface IAppService {
 
     PageableResult getDeals(Long page, Long pageSize);
 
+    PageableResult getDeals(Long page, Long pageSize, int temp);
+
     List<PtmCategory> getCategory();
 
     AppDeal getDealDetail(String id);

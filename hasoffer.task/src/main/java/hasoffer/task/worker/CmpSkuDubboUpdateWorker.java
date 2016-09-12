@@ -144,6 +144,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 //            如果降价，写入队列
             if (price > fetchedProduct.getPrice()) {
                 redisListService.push(PRICE_DROP_SKUID_QUEUE, skuid + "");
+                System.out.println("price drop add to queue success " + skuid);
             }
 
 //            对FLIPKART没有类目的数据进行更新,暂时注释掉
