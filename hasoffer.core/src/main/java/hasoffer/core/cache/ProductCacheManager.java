@@ -267,7 +267,7 @@ public class ProductCacheManager {
         return pagedCmpskus;
     }
 
-    public List<PtmCmpSku> getOnsaleSkuList(List data, Long productId) {
+    public List<PtmCmpSku> getOnsaleSkuList(List data, long productId) {
         List<PtmCmpSku> tempPtmCmpSkus = new ArrayList<>();
         int i = 0;
         for (Object object : data) {
@@ -279,8 +279,8 @@ public class ProductCacheManager {
             List<PtmCmpSku> cmpSkus = skuCacheService.getCmpSkusBySiteAndPrice(Float.valueOf(price + ""), Website.valueOf(website), productId);
             if (cmpSkus != null) {
                 //TODO  优选选择onsale的sku,否则返回outstock的sku
-                PtmCmpSku onsaleSku = getOnsaleSku(cmpSkus);
-                if (onsaleSku != null) {
+                PtmCmpSku onsaleSku = getOnsaleSku(cmpSkus, productId);
+                if (onsaleSku != null && onsaleSku.getProductId() == productId) {
                     tempPtmCmpSkus.add(onsaleSku);
                     System.out.println("title " + onsaleSku.getTitle() + " price " + onsaleSku.getPrice() + " productId  " + onsaleSku.getProductId());
                 }
@@ -291,12 +291,12 @@ public class ProductCacheManager {
         return tempPtmCmpSkus;
     }
 
-    public PtmCmpSku getOnsaleSku(List<PtmCmpSku> ptmCmpSkus) {
+    public PtmCmpSku getOnsaleSku(List<PtmCmpSku> ptmCmpSkus, long ProductId) {
 
         PtmCmpSku OnsalePtmCmpSku = null;
         PtmCmpSku OutStockPtmCmpSku = null;
         for (PtmCmpSku ptmCmpSku : ptmCmpSkus) {
-            if (ptmCmpSku.getStatus().name().equals("ONSALE")) {
+            if (ptmCmpSku.getStatus().name().equals("ONSALE") && ptmCmpSku.getProductId() == ProductId) {
                 OnsalePtmCmpSku = ptmCmpSku;
                 break;
             } else {
