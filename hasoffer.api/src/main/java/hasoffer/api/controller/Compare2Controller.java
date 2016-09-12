@@ -30,7 +30,6 @@ import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.urm.PriceOffNotice;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.product.impl.ProductServiceImpl;
-import hasoffer.core.product.solr.CategoryIndexServiceImpl;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndexServiceImpl;
@@ -67,8 +66,6 @@ public class Compare2Controller {
     CmpskuIndexServiceImpl cmpskuIndexService;
     @Resource
     ProductIndexServiceImpl productIndexService;
-    @Resource
-    CategoryIndexServiceImpl categoryIndexService;
     @Resource
     ProductCacheManager productCacheManager;
     @Resource
