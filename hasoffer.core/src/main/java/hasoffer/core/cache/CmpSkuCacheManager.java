@@ -139,7 +139,9 @@ public class CmpSkuCacheManager {
 //        String s = skuCacheServiceMap.get(key, 0);
 //        ptmCmpSkus = cmpSkuService.getCmpSkusBySiteAndPrice(Float.valueOf(price + ""), website, productId);
         if (StringUtils.isEmpty(s)) {
+            System.out.println(" get productId porducdtId : " + productId);
             ptmCmpSkus = cmpSkuService.getCmpSkusBySiteAndPrice(Float.valueOf(price + ""), website, productId);
+            System.out.println(" ptmCmpskus : prmcmpskus :" + ptmCmpSkus.size());
             Map<String, List> map = new HashMap();
             map.put(key, ptmCmpSkus);
 //            skuCacheServiceMap.add(key, JSONUtil.toJSON(map), TimeUtils.SECONDS_OF_1_HOUR * 4);
