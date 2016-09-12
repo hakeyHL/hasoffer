@@ -1,5 +1,8 @@
 package hasoffer.api.interceptor;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import hasoffer.api.controller.vo.DeviceEventVo;
 import hasoffer.api.controller.vo.DeviceInfoVo;
@@ -8,8 +11,10 @@ import hasoffer.api.controller.vo.ResultVo;
 import hasoffer.api.worker.DeviceRequestQueue;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.utils.DeviceUtils;
+import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
@@ -25,6 +30,9 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -127,49 +135,49 @@ public class RequestInterceptor implements HandlerInterceptor {
             if (urmUser == null) {
                 modelAndView.addObject("result", new ResultVo("10010", "login expired"));
             } else {
-//                List<String> ids = null;
-//                String deviceId = JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).getString("deviceId");
-//                String deviceKey = "urmDevice_ids_mapKey_" + deviceId;
-//                Map map = null;
-//                String deviceValue = urmDeviceService.get(deviceKey, 0);
-//
-//                if (!StringUtils.isEmpty(deviceValue)) {
-//                    ids = new ArrayList<>();
-//                    JSONObject jsonObject = JSONObject.parseObject(deviceValue);
-//                    JSONArray urmDevice_ids1 = jsonObject.getJSONArray("urmDevice_ids");
-//                    String[] strings = urmDevice_ids1.toArray(new String[]{});
-//                    for (String str : strings) {
-//                        ids.add(str);
-//                    }
-//                } else {
-//                    ids = appService.getUserDevices(deviceId);
-//                    map = new HashMap();
-//                    map.put("urmDevice_ids", ids);
-//                    urmDeviceService.add(deviceKey, JSONUtil.toJSON(map), TimeUtils.SECONDS_OF_1_DAY);
-//                }
-//                System.out.println("update user and device relationship ");
-//                List<String> deviceIds = appService.getUserDevicesByUserId(urmUser.getId() + "");
-//                System.out.println("get ids  by userId from urmUserDevice :" + deviceIds.size());
-//                List<UrmUserDevice> urmUserDevices = new ArrayList<>();
-//                for (String id : ids) {
-//                    boolean flag = false;
-//                    for (String dId : deviceIds) {
-//                        if (id.equals(dId)) {
-//                            flag = true;
-//                            System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);
-//                        }
-//                    }
-//                    if (!flag) {
-//                        System.out.println("id :" + id + " is not exist before ");
-//                        UrmUserDevice urmUserDevice = new UrmUserDevice();
-//                        urmUserDevice.setDeviceId(id);
-//                        urmUserDevice.setUserId(urmUser.getId() + "");
-//                        urmUserDevices.add(urmUserDevice);
-//                    }
-//                }
-//                //将关联关系插入到关联表中
-//                int count = appService.addUrmUserDevice(urmUserDevices);
-//                System.out.println(" batch save  result size : " + count);
+                List<String> ids = null;
+                String deviceId = JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).getString("deviceId");
+                String deviceKey = "urmDevice_ids_mapKey_" + deviceId;
+                Map map = null;
+                String deviceValue = urmDeviceService.get(deviceKey, 0);
+
+                if (!StringUtils.isEmpty(deviceValue)) {
+                    ids = new ArrayList<>();
+                    JSONObject jsonObject = JSONObject.parseObject(deviceValue);
+                    JSONArray urmDevice_ids1 = jsonObject.getJSONArray("urmDevice_ids");
+                    String[] strings = urmDevice_ids1.toArray(new String[]{});
+                    for (String str : strings) {
+                        ids.add(str);
+                    }
+                } else {
+                    ids = appService.getUserDevices(deviceId);
+                    map = new HashMap();
+                    map.put("urmDevice_ids", ids);
+                    urmDeviceService.add(deviceKey, JSONUtil.toJSON(map), TimeUtils.SECONDS_OF_1_DAY);
+                }
+                System.out.println("update user and device relationship ");
+                List<String> deviceIds = appService.getUserDevicesByUserId(urmUser.getId() + "");
+                System.out.println("get ids  by userId from urmUserDevice :" + deviceIds.size());
+                List<UrmUserDevice> urmUserDevices = new ArrayList<>();
+                for (String id : ids) {
+                    boolean flag = false;
+                    for (String dId : deviceIds) {
+                        if (id.equals(dId)) {
+                            flag = true;
+                            System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);
+                        }
+                    }
+                    if (!flag) {
+                        System.out.println("id :" + id + " is not exist before ");
+                        UrmUserDevice urmUserDevice = new UrmUserDevice();
+                        urmUserDevice.setDeviceId(id);
+                        urmUserDevice.setUserId(urmUser.getId() + "");
+                        urmUserDevices.add(urmUserDevice);
+                    }
+                }
+                //将关联关系插入到关联表中
+                int count = appService.addUrmUserDevice(urmUserDevices);
+                System.out.println(" batch save  result size : " + count);
                 modelAndView.addObject("result", new ResultVo("00000", "ok"));
             }
         }

@@ -1,9 +1,12 @@
 package hasoffer.core.test;
 
+import hasoffer.base.enums.MarketChannel;
+import hasoffer.base.model.Website;
 import hasoffer.core.bo.push.*;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.push.impl.PushServiceImpl;
 import hasoffer.core.user.IDeviceService;
+import hasoffer.fetch.helper.WebsiteHelper;
 import org.junit.Test;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -21,6 +24,13 @@ public class PushTest {
     IDeviceService deviceService;
     @Resource
     IPushService pushService;
+
+    @Test
+    public void f1() {
+        String deeplinkWithAff = WebsiteHelper.getDeeplinkWithAff(Website.AMAZON, "http://www.amazon.in/dp/B00FXLC9V4", new String[]{MarketChannel.GOOGLEPLAY.name(), ""});
+
+        System.out.println(deeplinkWithAff);
+    }
 
     @Test
     public void f() {
