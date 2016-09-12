@@ -242,6 +242,7 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
         if (pushStatus) {
             updatePriceOffNoticeStatus(id, true);
             System.out.println("update lastpushstatus push success for priceOffNoticeid" + id);
+            System.out.println("");
         } else {
             updatePriceOffNoticeStatus(id, false);
             System.out.println("update lastpushstatus push fail for priceOffNoticeid" + id);

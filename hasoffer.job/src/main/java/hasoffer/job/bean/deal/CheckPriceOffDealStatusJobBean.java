@@ -37,7 +37,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
      * Logger for this class
      */
     private static final Logger logger = LoggerFactory.getLogger(CheckPriceOffDealStatusJobBean.class);
-    private static final String Q_PRICEOFF_DEAL = "SELECT t From Appdeal t WHERE t.appdealSource = 'PRICE_OFF' AND t.expireTime > ?0 ORDER BY t.createTime DESC";
+    private static final String Q_PRICEOFF_DEAL = "SELECT t From AppDeal t WHERE t.appdealSource = 'PRICE_OFF' AND t.expireTime > ?0 ORDER BY t.createTime DESC";
     private static int PRICEOFF_DEAL_LIST_THREAD_NUM = 1;
 
     @Resource
