@@ -1,23 +1,18 @@
 package hasoffer.core.product.impl;
 
+import com.alibaba.fastjson.JSON;
 import hasoffer.base.exception.ImageDownloadOrUploadException;
 import hasoffer.base.model.ImagePath;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
-import hasoffer.base.utils.ArrayUtils;
-import hasoffer.base.utils.HexDigestUtil;
-import hasoffer.base.utils.StringUtils;
-import hasoffer.base.utils.TimeUtils;
+import hasoffer.base.utils.*;
 import hasoffer.core.bo.product.SkuPriceUpdateResultBo;
 import hasoffer.core.exception.CmpSkuUrlNotFoundException;
 import hasoffer.core.exception.MultiUrlException;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.*;
-import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.persistence.po.ptm.PtmCmpSku2;
-import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
-import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
+import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.persistence.po.stat.StatSkuPriceUpdateResult;
 import hasoffer.core.persistence.po.stat.updater.StatSkuPriceUpdateResultUpdater;
@@ -41,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -481,6 +477,32 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         }
 
         //save productDescription
+        PtmProduct ptmProduct = dbm.get(PtmProduct.class, ptmCmpSku.getProductId());
+        String productTitle = ptmProduct.getTitle();
+
+        try {
+            HashMap<String, String> hashMap = JSONUtil.toObject(jsonParam, HashMap.class);
+
+            String color = hashMap.get("Color");
+            String memory = hashMap.get("Memory");
+            String model = hashMap.get("Model");
+
+            if (!productTitle.contains(color)) {
+                hashMap.remove("Color");
+            }
+            if (!productTitle.contains(memory)) {
+                hashMap.remove("Memory");
+            }
+            if (!productTitle.contains(model)) {
+                hashMap.remove("Model");
+            }
+
+            jsonParam = JSON.toJSONString(hashMap);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         PtmProductDescription ptmProductDescription = mdm.queryOne(PtmProductDescription.class, ptmCmpSku.getProductId());
 
         if (ptmProductDescription == null) {//如果不存在该记录

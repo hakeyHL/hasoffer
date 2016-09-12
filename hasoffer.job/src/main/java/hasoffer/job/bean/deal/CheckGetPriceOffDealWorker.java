@@ -13,6 +13,7 @@ import hasoffer.data.redis.IRedisListService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -139,7 +140,14 @@ public class CheckGetPriceOffDealWorker implements Runnable {
                     appdeal.setOriginPrice(oriPrice);
                     appdeal.setDiscount((int) ((1 - newPrice / oriPrice) * 100));
 
-                    if (appdeal != null) {
+                    //url重复不创建
+                    boolean repeatUrl = true;
+                    List<PtmCmpSku> repeatUrlList = dbm.query("SELECT t FROM AppDeal t WHERE t.url = ?0", Arrays.asList(sku.getUrl()));
+                    if (repeatUrlList != null) {
+                        repeatUrl = false;
+                    }
+
+                    if (appdeal != null && repeatUrl) {
                         dealService.createAppDealByPriceOff(appdeal);
                     }
 
