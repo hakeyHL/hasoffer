@@ -120,6 +120,11 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
 
                         if (deal == null) {
                             System.out.println("CheckPriceOffDealStatusJobBean poll get null sleep 5 seconds");
+
+                            if (CheckPriceOffDealStatusJobBean.PRICEOFF_DEAL_LIST_THREAD_NUM == 0 && priceOffDealQueue.size() == 0) {
+                                System.out.println("CheckPriceOffDealStatusJobBean list thread is die and queue size is 0 ,process thread go die");
+                                break;
+                            }
                             try {
                                 TimeUnit.SECONDS.sleep(5);
                             } catch (InterruptedException e) {
@@ -179,13 +184,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                                 dealService.deleteDeal(deal.getId());
                             }
                         }
-
-
-                        if (CheckPriceOffDealStatusJobBean.PRICEOFF_DEAL_LIST_THREAD_NUM == 0 && priceOffDealQueue.size() == 0) {
-                            break;
-                        }
                     }
-                    System.out.println("CheckPriceOffDealStatusJobBean list thread is die and queue size is 0 ,process thread go die");
                 }
             });
 
