@@ -92,17 +92,20 @@ public class ProductCacheManager {
      * @return
      */
     public PageableResult<PtmCmpSku> listPagedCmpSkus(long proId, int page, int size) {
+        System.out.println(" proId proId proId :" + proId);
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_" + String.valueOf(proId) + "_" + page + "_" + size;
-        String cmpSkusJson = cacheService.get(key, 0);
+//        String cmpSkusJson = cacheService.get(key, 0);
+        //先不读缓存,也不存缓存
+        String cmpSkusJson = null;
         PageableResult<PtmCmpSku> pagedCmpskus = null;
         try {
             if (StringUtils.isEmpty(cmpSkusJson)) {
                 pagedCmpskus = productService.listOnsaleCmpSkus(proId, page, size);
-//                List<PtmCmpSku> data = pagedCmpskus.getData();
-//                if (data != null && data.size() > 0) {
-//                    pagedCmpskus.setData(getOnsaleSkuList(data, proId));
-//                }
-                cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
+                List<PtmCmpSku> data = pagedCmpskus.getData();
+                if (data != null && data.size() > 0) {
+                    pagedCmpskus.setData(getOnsaleSkuList(data, proId));
+                }
+//                cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
             } else {
                 PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
 
