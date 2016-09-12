@@ -223,8 +223,8 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         int priceFrom = criteria.getPriceFrom(), priceTo = criteria.getPriceTo();
         String priceFromStr = "*", priceToStr = "*";
         if (priceFrom < priceTo && priceFrom >= 0) {
-            if (priceFrom < 0) {
-                priceFrom = 0;
+            if (priceFrom <= 0) {
+                priceFrom = 1;
             }
             priceFromStr = String.valueOf(priceFrom);
             if (priceTo > 0) {
