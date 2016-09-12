@@ -35,7 +35,10 @@ import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.impl.ProductServiceImpl;
-import hasoffer.core.product.solr.*;
+import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
+import hasoffer.core.product.solr.ProductIndexServiceImpl;
+import hasoffer.core.product.solr.ProductModel;
+import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
@@ -78,8 +81,6 @@ public class AppController {
     ProductCacheManager productCacheManager;
     @Resource
     ContentNegotiatingViewResolver jsonViewResolver;
-    @Resource
-    CategoryIndexServiceImpl categoryIndexService;
     @Resource
     ProductIndexServiceImpl productIndexServiceImpl;
     @Resource
