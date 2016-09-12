@@ -19,6 +19,16 @@ import java.util.regex.Pattern;
 public class StringTest {
 
     @Test
+    public void testDiscount() {
+        float newPrice = 54090;
+        float oriOrice = 54169;
+
+        int i = (int) ((1 - newPrice / oriOrice) * 100);
+
+        System.out.println(i);
+    }
+
+    @Test
     public void testFloatToInt() {
 
         float price = 1231.123f;
