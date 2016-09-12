@@ -708,7 +708,8 @@ public class AppController {
             sb.append("How to get the deal: \n");
             sb.append("1 Click \"Activate Deal\" button.\n");
             sb.append("2 Add the product of your choice to cart.\n");
-            sb.append("3 And no coupon code required.\n");
+            sb.append("3 And no coupon code required.\n\n");
+            sb.append("Key Features: \n");
             PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
             if (ptmCmpSkuDescription != null) {
                 String jsonParam = ptmCmpSkuDescription.getJsonParam();
@@ -719,7 +720,7 @@ public class AppController {
                 while (iterator.hasNext()) {
                     Map.Entry next = iterator.next();
                     sb.append(next.getKey()).append(" : ");
-                    sb.append(next.getKey()).append("\n");
+                    sb.append(next.getValue()).append("\n");
                 }
             }
             map.put("description", sb.toString());
