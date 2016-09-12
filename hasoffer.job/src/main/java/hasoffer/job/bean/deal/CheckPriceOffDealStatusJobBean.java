@@ -59,46 +59,53 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
             @Override
             public void run() {
 
-                int curPage = 1;
-                int pageSize = 1000;
+                try {
 
-                PageableResult<AppDeal> pageableResult = dbm.queryPage(Q_PRICEOFF_DEAL, curPage, pageSize, Arrays.asList(TimeUtils.nowDate()));
 
-                long totalPage = pageableResult.getTotalPage();
+                    int curPage = 1;
+                    int pageSize = 1000;
 
-                while (curPage <= totalPage) {
+                    PageableResult<AppDeal> pageableResult = dbm.queryPage(Q_PRICEOFF_DEAL, curPage, pageSize, Arrays.asList(TimeUtils.nowDate()));
 
-                    if (priceOffDealQueue.size() > 1000) {
-                        try {
-                            TimeUnit.SECONDS.sleep(5);
-                        } catch (InterruptedException e) {
+                    long totalPage = pageableResult.getTotalPage();
+
+                    while (curPage <= totalPage) {
+
+                        if (priceOffDealQueue.size() > 1000) {
+                            try {
+                                TimeUnit.SECONDS.sleep(5);
+                            } catch (InterruptedException e) {
+
+                            }
+                            continue;
+                        }
+
+                        if (curPage > 1) {
+                            pageableResult = dbm.queryPage(Q_PRICEOFF_DEAL, curPage, pageSize, Arrays.asList(TimeUtils.nowDate()));
+                        }
+
+                        List<AppDeal> dealList = pageableResult.getData();
+
+                        for (AppDeal deal : dealList) {
+
+                            long ptmcmpskuid = deal.getPtmcmpskuid();
+                            PtmCmpSku ptmCmpSku = dbm.get(PtmCmpSku.class, ptmcmpskuid);
+                            Website website = ptmCmpSku.getWebsite();
+                            String url = ptmCmpSku.getUrl();
+                            fetchDubboService.sendUrlTask(website, url, TimeUtils.SECONDS_OF_1_MINUTE * 45, TaskLevel.LEVEL_2);
+
+                            priceOffDealQueue.add(deal);
 
                         }
-                        continue;
+
+                        curPage++;
                     }
 
-                    if (curPage > 1) {
-                        pageableResult = dbm.queryPage(Q_PRICEOFF_DEAL, curPage, pageSize, Arrays.asList(TimeUtils.nowDate()));
-                    }
-
-                    List<AppDeal> dealList = pageableResult.getData();
-
-                    for (AppDeal deal : dealList) {
-
-                        long ptmcmpskuid = deal.getPtmcmpskuid();
-                        PtmCmpSku ptmCmpSku = dbm.get(PtmCmpSku.class, ptmcmpskuid);
-                        Website website = ptmCmpSku.getWebsite();
-                        String url = ptmCmpSku.getUrl();
-                        fetchDubboService.sendUrlTask(website, url, TimeUtils.SECONDS_OF_1_MINUTE * 45, TaskLevel.LEVEL_2);
-
-                        priceOffDealQueue.add(deal);
-
-                    }
-
-                    curPage++;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    CheckPriceOffDealStatusJobBean.PRICEOFF_DEAL_LIST_THREAD_NUM--;
                 }
-
-                CheckPriceOffDealStatusJobBean.PRICEOFF_DEAL_LIST_THREAD_NUM--;
             }
         });
 
