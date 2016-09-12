@@ -278,13 +278,14 @@ public class ProductCacheManager {
             //根据price和site定位需要的sku
             List<PtmCmpSku> cmpSkus = skuCacheService.getCmpSkusBySiteAndPrice(Float.valueOf(price + ""), Website.valueOf(website), productId);
             if (cmpSkus != null) {
-                tempPtmCmpSkus.add(cmpSkus.get(0));
+                //TODO  优选选择onsale的sku,否则返回outstock的sku
+                PtmCmpSku onsaleSku = getOnsaleSku(cmpSkus);
+                if (onsaleSku != null) {
+                    tempPtmCmpSkus.add(onsaleSku);
+                    System.out.println("title " + onsaleSku.getTitle() + " price " + onsaleSku.getPrice());
+                }
+//                tempPtmCmpSkus.add(cmpSkus.get(0));
             }
-            //TODO  优选选择onsale的sku,否则返回outstock的sku
-//            PtmCmpSku onsaleSku = getOnsaleSku(cmpSkus);
-//            if (onsaleSku != null) {
-//                tempPtmCmpSkus.add(onsaleSku);
-//            }
             i++;
         }
         return tempPtmCmpSkus;
