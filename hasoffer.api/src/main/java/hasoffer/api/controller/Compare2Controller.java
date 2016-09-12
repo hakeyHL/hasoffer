@@ -309,7 +309,7 @@ public class Compare2Controller {
             System.out.println("product is exist in our system " + product.getId());
             String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
             DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-            SearchIO sio = new SearchIO(product.getSourceId(), product.getTitle(), "", product.getSourceSite(), product.getPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, pageSize);
+            SearchIO sio = new SearchIO(product.getSourceId(), product.getTitle(), "", product.getSourceSite() == null ? null : product.getSourceSite(), product.getPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, pageSize);
             try {
 //                cr = getCmpProducts(sio, product);
                 cr = getCmpProducts(sio, product, userToken);
