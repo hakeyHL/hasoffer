@@ -282,7 +282,7 @@ public class ProductCacheManager {
                 PtmCmpSku onsaleSku = getOnsaleSku(cmpSkus);
                 if (onsaleSku != null) {
                     tempPtmCmpSkus.add(onsaleSku);
-                    System.out.println("title " + onsaleSku.getTitle() + " price " + onsaleSku.getPrice());
+                    System.out.println("title " + onsaleSku.getTitle() + " price " + onsaleSku.getPrice() + " productId  " + onsaleSku.getProductId());
                 }
 //                tempPtmCmpSkus.add(cmpSkus.get(0));
             }
