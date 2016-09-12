@@ -137,7 +137,7 @@ public class CheckGetPriceOffDealWorker implements Runnable {
                     appdeal.setDescription(description);
                     appdeal.setPriceDescription("Rs." + (int) newPrice);
                     appdeal.setOriginPrice(oriPrice);
-                    appdeal.setDiscount((int) (1 - newPrice / oriPrice) * 100);
+                    appdeal.setDiscount((int) ((1 - newPrice / oriPrice) * 100));
 
                     if (appdeal != null) {
                         dealService.createAppDealByPriceOff(appdeal);
