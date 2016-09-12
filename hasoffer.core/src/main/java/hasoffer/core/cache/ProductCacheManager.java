@@ -101,6 +101,7 @@ public class ProductCacheManager {
         try {
             if (StringUtils.isEmpty(cmpSkusJson)) {
                 pagedCmpskus = productService.listOnsaleCmpSkus(proId, page, size);
+                System.out.println("--------- pagedCmpskus  -----------" + pagedCmpskus.getData().size());
                 List<PtmCmpSku> data = pagedCmpskus.getData();
                 if (data != null && data.size() > 0) {
                     pagedCmpskus.setData(getOnsaleSkuList(data, proId));
@@ -268,6 +269,7 @@ public class ProductCacheManager {
     }
 
     public List<PtmCmpSku> getOnsaleSkuList(List data, long productId) {
+        System.out.println("get productId is : " + productId);
         List<PtmCmpSku> tempPtmCmpSkus = new ArrayList<>();
         int i = 0;
         for (Object object : data) {
