@@ -104,7 +104,7 @@ public class CheckGetPriceOffDealWorker implements Runnable {
                 PtmCmpSkuHistoryPrice historyPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, skuid);
 
                 float minPrice = getMinPrice(historyPrice);
-                if (newPrice < 1.1 * minPrice) {//符合条件，创建deal
+                if (newPrice < minPrice) {//符合条件，创建deal
 
                     AppDeal appdeal = new AppDeal();
 
