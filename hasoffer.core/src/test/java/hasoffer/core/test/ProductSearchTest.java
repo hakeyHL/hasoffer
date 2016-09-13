@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by chevy on 2015/12/16.
@@ -22,6 +23,19 @@ public class ProductSearchTest {
 
     @Resource
     ProductIndex2ServiceImpl productIndex2Service;
+
+    @Test
+    public void testSpellCheck() {
+        String brand = "aple";
+        Map<String, List<String>> strs = productIndex2Service.spellCheck(brand);
+        for (Map.Entry<String, List<String>> str : strs.entrySet()) {
+            System.out.println("input : " + str.getKey() + "\nout : ");
+            for (String s : str.getValue()) {
+                System.out.print(s + "\t");
+            }
+            System.out.println("\t");
+        }
+    }
 
     @Test
     public void testSearchKeyword() {

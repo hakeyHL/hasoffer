@@ -310,6 +310,7 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
             }
         } catch (SolrServerException e) {
             logger.error(e.getMessage());
+            e.printStackTrace();
         } finally {
             return map;
         }
