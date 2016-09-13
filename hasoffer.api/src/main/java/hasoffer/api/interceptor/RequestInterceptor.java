@@ -93,18 +93,10 @@ public class RequestInterceptor implements HandlerInterceptor {
                     e.getMessage(), requestUri, queryStr, deviceInfoStr));
             // + e.getMessage() + " , device = [" + deviceInfoStr + "]"
             return false;
-        }
+                }
 
         return true;
-    }
-
-//    private void addLogToDB(DeviceRequestBo requestVo) {
-//        ActorRef defaultActorRef = AkkaActorRef.getDefaultActorRef();
-//        AkkaJobConfigMessage message = new AkkaJobConfigMessage(DeviceLogActor.class, 1);
-//        defaultActorRef.tell(message, ActorRef.noSender());
-//        AkkaJobMessage akkaJobMessage = new AkkaJobMessage(DeviceLogActor.class, requestVo);
-//        defaultActorRef.tell(akkaJobMessage, ActorRef.noSender());
-//    }
+            }
 
     private void recordClientEvent(DeviceRequestVo requestVo, HttpServletRequest request) {
         if (requestVo.getRequestUri().equals("/app/log")) {
@@ -113,7 +105,7 @@ public class RequestInterceptor implements HandlerInterceptor {
 
             requestVo.setDeviceEvent(new DeviceEventVo(event, info));
         }
-    }
+        }
 
     public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o,
                            ModelAndView modelAndView) throws Exception {
