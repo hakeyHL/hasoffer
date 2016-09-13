@@ -32,7 +32,6 @@ import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
-import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.exception.NonMatchedProductException;
 import hasoffer.core.system.impl.AppServiceImpl;
@@ -64,8 +63,6 @@ import java.util.*;
 public class Compare2Controller {
     @Resource
     CmpskuIndexServiceImpl cmpskuIndexService;
-    @Resource
-    ProductIndexServiceImpl productIndexService;
     @Resource
     ProductCacheManager productCacheManager;
     @Resource
@@ -355,42 +352,6 @@ public class Compare2Controller {
      *
      * @param sio
      */
-    private void searchForResult_old(SearchIO sio) {
-        String _q = StringUtils.getSearchKey(sio.getCliQ());
-
-        long cateId = 0L;
-        int level = 0, index_for;
-
-        // 搜索商品
-        PageableResult<Long> pagedProIds = productIndexService.searchPro(cateId, level, StringUtils.toLowerCase(_q), 1, 5);
-
-        List<Long> proIds = pagedProIds.getData();
-
-        if (ArrayUtils.isNullOrEmpty(proIds)) {
-            throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, "", 0);
-        }
-
-        long proId = proIds.get(0);
-        PtmProduct product = productCacheManager.getProduct(proId); //productService.getProduct(proId);
-
-        float mc = StringUtils.wordMatchD(StringUtils.toLowerCase(product.getTitle()), _q);
-        if (!StringUtils.isEmpty(product.getTag())) {
-            mc = (mc + StringUtils.wordMatchD(StringUtils.toLowerCase(product.getTag()), _q) * 2) / 2;
-        }
-
-        // 匹配度如果小于40%, 则认为不匹配
-        if (mc <= 0.4) {
-            throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, product.getTitle(), mc);
-        }
-
-        sio.set(cateId, proId, 0L);
-    }
-
-    /**
-     * 从solr中搜索
-     *
-     * @param sio
-     */
     private void searchForResult(SearchIO sio) throws NonMatchedProductException {
         String _q = StringUtils.getSearchKey(sio.getCliQ());
 
@@ -462,7 +423,6 @@ public class Compare2Controller {
                 System.out.println(" searchForResult result  " + sio.getHsProId());
             } catch (NonMatchedProductException e) {
                 System.out.println("searchForResult_old  ");
-                searchForResult_old(sio);
                 System.out.println(" searchForResult_old result  " + sio.getHsProId());
             }
         }

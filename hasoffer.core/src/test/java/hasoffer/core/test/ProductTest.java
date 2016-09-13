@@ -19,7 +19,10 @@ import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.product.*;
-import hasoffer.core.product.solr.*;
+import hasoffer.core.product.solr.CmpSkuModel;
+import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
+import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
+import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.task.ListProcessTask;
 import hasoffer.core.task.worker.ILister;
@@ -58,8 +61,6 @@ public class ProductTest {
                     "ORDER BY COUNT(t.id) DESC";
     private final static String Q_SEARCH_COUNT = "SELECT t.productId,COUNT(t.id) FROM SrmProductSearchCount t GROUP BY t.productId HAVING COUNT(t.id) > 10";
     private static String Q_PRODUCT_WEBSITE = "SELECT t from PtmProduct t where t.sourceSite = ?0";
-    @Resource
-    ProductIndexServiceImpl productIndexService;
     @Resource
     CmpskuIndexServiceImpl cmpskuIndexService;
     @Resource
@@ -596,62 +597,6 @@ public class ProductTest {
     }
 
     @Test
-    public void stat() {
-        long cateId = 459;
-
-        int page = 1, PAGE_SIZE = 500;
-
-        PageableResult<PtmProduct> pagedProducts = productService.listPagedProducts(cateId, 1, 500);
-
-        List<PtmProduct> products = pagedProducts.getData();
-        long totalPage = pagedProducts.getTotalPage();
-//        totalPage = 5;
-        Map<String, Long> statMap = new HashMap<String, Long>();
-
-        long productCount = 0;
-        while (page <= totalPage) {
-            if (page > 1) {
-                products = dbm.query(Q_PRODUCT_BY_CATEGORY, page, PAGE_SIZE, Arrays.asList(cateId));
-            }
-            if (ArrayUtils.hasObjs(products)) {
-                for (PtmProduct product : products) {
-                    analysis(statMap, product.getTitle());
-                    productCount++;
-                }
-            }
-            page++;
-        }
-
-        double t = productCount * 0.1;
-        for (Map.Entry<String, Long> kv : statMap.entrySet()) {
-            if (kv.getValue() <= t) {
-                continue;
-            }
-            System.out.println(kv.getKey() + "\t\t" + kv.getValue());
-        }
-
-        System.out.println("products : " + productCount + ",total found products : " + pagedProducts.getNumFund());
-    }
-
-    @Test
-    public void createCateIndex() {
-        List<PtmCategory> cates = categoryService.listSubCategories(0L);
-        for (PtmCategory cate : cates) {
-            System.out.println(cate.toString());
-
-            List<PtmCategory> subCates = categoryService.listSubCategories(cate.getId());
-
-            for (PtmCategory subCate : subCates) {
-                System.out.println("----" + subCate.toString());
-                String keys = statForSolr(subCate.getId(), subCate.getLevel());
-                if (!StringUtils.isEmpty(keys)) {
-                    categoryService.updateCategoryIndex(subCate.getId(), keys);
-                }
-            }
-        }
-    }
-
-    @Test
     public void countCate() {
         List<PtmCategory> cates = categoryService.listSubCategories(0L);
         int count1 = 0, count2 = 0;
@@ -670,83 +615,6 @@ public class ProductTest {
         }
 
         System.out.println(count1 + "\t" + count2);
-    }
-
-    @Test
-    public void statForSolr() {
-        statForSolr(39, 2);
-    }
-
-    public String statForSolr(long cateId, int level) {
-
-        int page = 1, PAGE_SIZE = 500;
-        PageableResult<Long> pagedIds = productIndexService.searchPro(cateId, level, null, page, PAGE_SIZE);
-        List<PtmProduct> products = productService.getProducts(pagedIds.getData());
-
-        long totalPage = pagedIds.getTotalPage();
-
-        Map<String, Long> statMap = new HashMap<String, Long>();
-
-        long productCount = 0;
-        while (page <= totalPage) {
-            if (page > 1) {
-                pagedIds = productIndexService.searchPro(cateId, level, null, page, PAGE_SIZE);
-                products = productService.getProducts(pagedIds.getData());
-            }
-            if (ArrayUtils.hasObjs(products)) {
-                for (PtmProduct product : products) {
-                    analysis(statMap, product.getTitle());
-                    productCount++;
-                }
-            }
-            page++;
-        }
-
-        double t = productCount * 0.05;
-        StringBuffer sb = new StringBuffer();
-        for (Map.Entry<String, Long> kv : statMap.entrySet()) {
-            if (kv.getValue() <= t) {
-                continue;
-            }
-            sb.append(kv.getKey()).append(" ");
-            System.out.println(kv.getKey() + "\t\t" + kv.getValue());
-        }
-
-        System.out.println("category: " + cateId + ", products : " + productCount + ",total found products : " + pagedIds.getNumFund());
-        return sb.toString();
-    }
-
-    private void analysis(Map<String, Long> statMap, String title) {
-        String[] words = title.split(" ");
-        for (String w : words) {
-            w = w.toLowerCase().trim();
-            if (PATTERN_IN_WORD.matcher(w).find()) {
-//                System.out.println(w);
-                continue;
-            }
-            Long count = statMap.get(w);
-            if (count == null) {
-                count = new Long(1);
-                statMap.put(w, count);
-            } else {
-                count++;
-                statMap.put(w, count);
-            }
-        }
-    }
-
-    @Test
-    public void solr() {
-        productService.reimport2Solr(true);
-    }
-
-    @Test
-    public void image() {
-        PtmImage image = dbm.get(PtmImage.class, 20L);
-
-        boolean t = imageService.downloadImage(image);
-
-        t = false;
     }
 
     @Test

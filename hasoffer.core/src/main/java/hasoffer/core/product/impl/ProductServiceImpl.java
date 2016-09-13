@@ -20,10 +20,12 @@ import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
-import hasoffer.core.product.solr.*;
+import hasoffer.core.product.solr.CmpSkuModel;
+import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
+import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
+import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.utils.ImageUtil;
-import hasoffer.data.solr.*;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.model.ListProduct;
 import org.slf4j.Logger;
@@ -91,9 +93,6 @@ public class ProductServiceImpl implements IProductService {
 
     @Resource
     ISearchService searchService;
-
-    @Resource
-    ProductIndexServiceImpl productIndexService;
     @Resource
     ProductIndex2ServiceImpl productIndex2Service;
     @Resource
@@ -214,7 +213,7 @@ public class ProductServiceImpl implements IProductService {
             product.setPrice(price);
             System.out.println("minPrice =" + price);
 
-            importProduct2Solr(product);
+            importProduct2Solr2(product);
         }
 
     }
@@ -258,17 +257,6 @@ public class ProductServiceImpl implements IProductService {
         }
 
         dbm.batchSave(topSellings);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updatePtmProductCategoryId(long ptmProductId, long categoryId) {
-
-        PtmProductUpdater updater = new PtmProductUpdater(ptmProductId);
-
-        updater.getPo().setCategoryId(categoryId);
-
-        dbm.update(updater);
     }
 
     @Override
@@ -353,7 +341,7 @@ public class ProductServiceImpl implements IProductService {
         dbm.update(productUpdater);
 
         product.setCategoryId(targetCate);
-        importProduct2Solr(product);
+        importProduct2Solr2(product);
     }
 
     @Override
@@ -373,7 +361,7 @@ public class ProductServiceImpl implements IProductService {
         dbm.update(ptmProductUpdater);
 
         product.setTag(tag);
-        importProduct2Solr(product);
+        importProduct2Solr2(product);
 
         return true;
     }
@@ -526,7 +514,6 @@ public class ProductServiceImpl implements IProductService {
             dbm.delete(PtmProduct.class, ptmProductId);
         }
 
-        productIndexService.remove(String.valueOf(ptmProductId));
         productIndex2Service.remove(String.valueOf(ptmProductId));
 
         // 删除searchlog 以及 缓存
@@ -565,26 +552,9 @@ public class ProductServiceImpl implements IProductService {
 //        List skuList = new ArrayList();
 //        skuList.add(cmpSku);
 
-        importProduct2Solr(product);
+        importProduct2Solr2(product);
 
         return new ProductBo(product, new ArrayList<PtmCmpSku>(), ptmImage);
-    }
-
-    @Override
-    public void reimport2Solr(boolean removeFirst) {
-        updateProductIndex2Solr();
-//        if (removeFirst) {
-//            try {
-//                productIndexService.removeAll();
-//            } catch (SolrServerException e) {
-//                logger.error("{}", e);
-//            } catch (IOException e) {
-//                logger.error("{}", e);
-//            }
-//    }
-//
-//        addOrUpdateSolr(Q_PRODUCT, null);
-
     }
 
     @Override
@@ -619,22 +589,6 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public void reimport2Solr(long productId) {
-        PtmProduct ptmProduct = getProduct(productId);
-        if (ptmProduct != null) {
-            importProduct2Solr(ptmProduct);
-        }
-    }
-
-    @Override
-    public void import2Solr(ProductModel pm) {
-        if (pm == null) {
-            return;
-        }
-        productIndexService.createOrUpdate(pm);
-    }
-
-    @Override
     @Transactional
     public void updateProductStd(Long proId, boolean std) {
         PtmProductUpdater productUpdater = new PtmProductUpdater(proId);
@@ -646,85 +600,6 @@ public class ProductServiceImpl implements IProductService {
     public PageableResult<PtmCmpSku> listNotOffSaleCmpSkus(long proId, int page, int size) {
         PageableResult<PtmCmpSku> pagedResult = dbm.queryPage(Q_NOTOFFSALE_PTM_CMPSKU, page, size, Arrays.asList(proId));
         return pagedResult;
-    }
-
-    @Override
-    public ProductModel getProductModel(PtmProduct product) {
-        if (product == null) {
-            return null;
-        }
-
-        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(product.getId());
-        float minPrice = -1f, maxPrice = -1f;
-        for (PtmCmpSku cmpSku : cmpSkus) {
-            float skuPrice = cmpSku.getPrice();
-            if (skuPrice <= 0 || cmpSku.getStatus() == SkuStatus.OFFSALE) {
-                continue;
-            }
-
-            if (minPrice <= 0) {
-                minPrice = skuPrice;
-                maxPrice = minPrice;
-                continue;
-            }
-
-            if (minPrice > skuPrice) {
-                minPrice = skuPrice;
-            }
-            if (maxPrice < skuPrice) {
-                maxPrice = skuPrice;
-            }
-        }
-
-        if (minPrice < 0) {
-            productIndexService.remove(String.valueOf(product.getId()));
-            productIndex2Service.remove(String.valueOf(product.getId()));
-            return null;
-        }
-
-//        PtmCategory category = dbm.get(PtmCategory.class, product.getCategoryId());
-        List<PtmCategory> categories = categoryCacheManager.getRouterCategoryList(product.getCategoryId());
-
-        long cate1 = 0L, cate2 = 0L, cate3 = 0L;
-        String cate3name = "";
-
-        // 目前仅支持3级类目
-        if (ArrayUtils.hasObjs(categories)) {
-            cate1 = categories.get(0).getId();
-
-            int cateSize = categories.size();
-
-            if (cateSize > 1) {
-                cate2 = categories.get(1).getId();
-            }
-
-            if (cateSize > 2) {
-                cate3 = categories.get(2).getId();
-            }
-        }
-
-        long searchCount = 0;
-        SrmProductSearchCount productSearchCount = searchService.findSearchCountByProductId(product.getId());
-        if (productSearchCount != null) {
-            searchCount = productSearchCount.getCount();
-        }
-
-        ProductModel productModel = new ProductModel(product.getId(),
-                product.getTitle(),
-                product.getTag(),
-                cate3,
-                cate3name,
-                minPrice,
-                product.getDescription(),
-                product.getColor(),
-                product.getSize(),
-                product.getRating(),
-                cate1,
-                cate2,
-                cate3,
-                searchCount);
-
-        return productModel;
     }
 
     @Override
@@ -839,23 +714,6 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public void importProduct2Solr(PtmProduct product) {
-        if (product == null) {
-            return;
-        }
-        // new import
-        importProduct2Solr2(product);
-
-//        ProductModel productModel = getProductModel(product);
-//
-//        if (productModel != null) {
-//            productIndexService.createOrUpdate(productModel);
-//        } else {
-//            productIndexService.remove(String.valueOf(product.getId()));
-//        }
-    }
-
-    @Override
     public void importProduct2Solr2(PtmProduct product) {
         if (product == null) {
             return;
@@ -895,62 +753,12 @@ public class ProductServiceImpl implements IProductService {
                 continue;
             } else {
                 for (PtmProduct product : products) {
-                    importProduct2Solr(product);
+                    importProduct2Solr2(product);
                 }
             }
 
             pageNum++;
         }
-    }
-
-    private void updateProductIndex2Solr() {
-        long id = 1L;
-
-        final String Q_MAX_PROID = "SELECT MAX(t.id) FROM PtmProduct t";
-        final long maxId = dbm.querySingle(Q_MAX_PROID);
-
-        while (id <= maxId) {
-            PtmProduct product = getProduct(id);
-
-            if (id++ % 500 == 0) {
-                System.out.println("addOrUpdateSolr2, id = " + id);
-            }
-
-            if (product == null || product.getPrice() <= 0) {
-                productIndexService.remove(String.valueOf(id));
-                continue;
-            }
-
-            List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(id);
-            int validCount = 0;
-            for (PtmCmpSku cmpSku : cmpSkus) {
-                if (cmpSku.getStatus() == SkuStatus.OFFSALE || cmpSku.getPrice() <= 0) {
-                    continue;
-                }
-                validCount++;
-            }
-
-            if (validCount <= 0) {
-                // remove from solr
-                productIndexService.remove(String.valueOf(id));
-            }
-
-        }
-    }
-
-    @Override
-    public void append2Solr() {
-        FilterQuery[] fqs = null;
-        Sort[] sorts = new Sort[]{
-                new Sort("id", Order.DESC)
-        };
-        PivotFacet[] pivotFacets = null;
-
-        SearchResult<Long> sr = productIndexService.search("*", fqs, sorts, pivotFacets, 1, 1);
-
-        long maxId = sr.getResult().get(0);
-
-        addOrUpdateSolr(Q_PRODUCT_BY_CMPID, Arrays.asList(maxId));
     }
 
     @Override
