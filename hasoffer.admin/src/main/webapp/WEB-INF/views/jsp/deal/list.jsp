@@ -104,6 +104,22 @@
 
     <div class="col-lg-12" style="margin: 10px"></div>
 
+
+    <div class="col-lg-2">
+        <div name="appType" class="input-group">
+            <span class="input-group-addon">deal类型</span>
+
+            <form id="reListDealByType" action="/deal/list" method="get">
+                <select id="typeSelect" class="form-control" name="type" onchange="reListDealByType()">
+                    <option value="">选择类型</option>
+                    <option value="1">手动导入</option>
+                    <option value="2">降价生成</option>
+                </select>
+            </form>
+        </div>
+    </div>
+
+
     <div class="row">
         <div class="col-lg-12">
             <button type="button" class="btn btn-primary" onclick="batchDelete('<%=contextPath%>/deal/batchDelete')"
@@ -178,6 +194,11 @@
     </div>
 
     <script>
+
+        function reListDealByType() {
+            $("#reListDealByType").submit();
+        }
+
         $(function () {
             $('#multiFile').change(function () {
                 $("#form").ajaxSubmit({
