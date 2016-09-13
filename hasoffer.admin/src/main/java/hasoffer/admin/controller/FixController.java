@@ -584,30 +584,39 @@ public class FixController {
 
         for (PtmProduct product : productList) {
 
+            List<PtmImage> productImageList = dbm.query("SELECT t FROM PtmImage t WHERE t.productId = ?0 ", Arrays.asList(product.getId()));
+
+            if (productImageList != null && productImageList.size() != 0) {
+                continue;
+            }
+
             List<PtmCmpSku> skuList = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ORDER BY t.id", Arrays.asList(product.getId()));
 
             if (skuList == null || skuList.size() == 0) {
                 continue;
             }
 
-            Website website = skuList.get(0).getWebsite();
-            String url = skuList.get(0).getUrl();
+            for (PtmCmpSku sku : skuList) {
 
-            String imageUrl = "";
-            try {
-                imageUrl = fetchService.fetchWebsiteImageUrl(website, url);
-            } catch (Exception e) {
-                e.printStackTrace();
+                Website website = sku.getWebsite();
+                String url = sku.getUrl();
+
+                String imageUrl = "";
+                try {
+                    imageUrl = fetchService.fetchWebsiteImageUrl(website, url);
+
+                    if (StringUtils.isEmpty(imageUrl)) {
+                        continue;
+                    }
+
+                    productService.updateProductImage2(product.getId(), imageUrl);
+
+                    break;
+                } catch (Exception e) {
+                    continue;
+                }
             }
-
-            if (StringUtils.isEmpty(imageUrl)) {
-                continue;
-            }
-            productService.updateProductImage2(product.getId(), imageUrl);
-
-
         }
-
         return "ok";
     }
 
