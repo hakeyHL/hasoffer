@@ -35,7 +35,7 @@ public class SearchIO {
                     int page, int size) {
         this.cliSourceId = sourceId;
         this.cliQ = q.trim();
-        this.cliSite = Website.valueOf(site);
+        this.cliSite = StringUtils.isEmpty(site) == true ? null : Website.valueOf(site);
         this.cliPrice = (float) PriceUtil.getPrice(price);
         this.cliQBrand = brand;
 
