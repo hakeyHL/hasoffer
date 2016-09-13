@@ -281,7 +281,7 @@ public class SearchServiceImpl implements ISearchService {
 
         productService.deleteProduct(product.getId());
 
-        productService.importProduct2Solr(finalProduct);
+        productService.importProduct2Solr2(finalProduct);
     }
 
     @Override

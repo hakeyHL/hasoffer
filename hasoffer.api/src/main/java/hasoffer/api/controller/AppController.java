@@ -36,7 +36,6 @@ import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
-import hasoffer.core.product.solr.ProductModel;
 import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.system.IAppService;
@@ -1121,7 +1120,7 @@ public class AppController {
     public void addProductVo2List(List desList, List sourceList) {
 
         if (sourceList != null && sourceList.size() > 0) {
-            if (ProductModel.class.isInstance(sourceList.get(0))) {
+            /*if (ProductModel.class.isInstance(sourceList.get(0))) {
                 Iterator<ProductModel> modelList = sourceList.iterator();
                 while (modelList.hasNext()) {
                     ProductModel productModel = modelList.next();
@@ -1137,7 +1136,8 @@ public class AppController {
                         desList.add(productListVo);
                     }
                 }
-            } else if (PtmProduct.class.isInstance(sourceList.get(0))) {
+            } else*/
+            if (PtmProduct.class.isInstance(sourceList.get(0))) {
                 Iterator<PtmProduct> ptmList = sourceList.iterator();
                 while (ptmList.hasNext()) {
                     PtmProduct ptmProduct = ptmList.next();

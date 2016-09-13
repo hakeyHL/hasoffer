@@ -12,8 +12,6 @@ import hasoffer.core.product.IProductService;
 import hasoffer.core.product.exception.CategoryDeleteException;
 import hasoffer.core.product.solr.CategoryIndexServiceImpl;
 import hasoffer.core.product.solr.CategoryModel;
-import hasoffer.core.product.solr.ProductIndexServiceImpl;
-import hasoffer.core.product.solr.ProductModel;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +21,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -37,8 +34,6 @@ public class CategoryController {
 
     @Resource
     ICategoryService categoryService;
-    @Resource
-    ProductIndexServiceImpl productIndexService;
     @Resource
     CategoryIndexServiceImpl categoryIndexService;
     @Resource
@@ -121,11 +116,6 @@ public class CategoryController {
         }
 
         List<PtmCategory> routerCates = categoryService.getRouterCategoryList(id);
-        PageableResult<ProductModel> pros = productIndexService.searchPro(id, routerCates.size(), 1, 1);
-
-        if (pros.getNumFund() > 0) {
-            throw new CategoryDeleteException("商品不为空");
-        }
 
         categoryService.deleteCategory(id);
 
@@ -159,89 +149,6 @@ public class CategoryController {
         return mav;
     }
 
-    @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
-    public ModelAndView cateDetail(@PathVariable long id) {
-
-        ModelAndView mav = new ModelAndView("product/catedetail");
-
-        List<PtmCategory> categories = categoryService.getRouterCategoryList(id);
-        List<CategoryVo> categoryVos = CategoryHelper.getCategoryVos(categories);
-        statProductCountForRouterCategories(categoryVos);
-
-        mav.addObject("cates", categoryVos);
-        mav.addObject("currentCate", categoryVos.get(categoryVos.size() - 1));
-
-        return mav;
-    }
-
-    @RequestMapping(value = "/statTitleKeywords", method = RequestMethod.GET)
-    public ModelAndView statTitleKeywords(HttpServletRequest request,
-                                          @RequestParam(defaultValue = "0") int c1,
-                                          @RequestParam(defaultValue = "0") int c2,
-                                          @RequestParam(defaultValue = "0") int c3,
-                                          @RequestParam(defaultValue = "0") int cateId,
-                                          @RequestParam(defaultValue = "0.1") float percent) {
-
-        ModelAndView mav = new ModelAndView("product/stat_title_keyword");
-
-        int level = 3;
-        if (cateId > 0) {
-            List<PtmCategory> cates = categoryService.getRouterCategoryList(cateId);
-            level = cates.size();
-        } else {
-            cateId = c3;
-        }
-
-        if (cateId <= 0) {
-            if (c2 > 0) {
-                cateId = c2;
-                level = 2;
-            } else {
-                cateId = c1;
-                level = 1;
-            }
-        }
-
-        int page = 1, size = 500;
-
-        PageableResult<ProductModel> pagedProducts = productIndexService.searchPro(cateId, level, page, size);
-
-        List<ProductModel> products = pagedProducts.getData();
-        long totalPage = pagedProducts.getTotalPage();
-        Map<String, Long> statMap = new HashMap<String, Long>();
-
-        long productCount = 0;
-        while (page <= totalPage) {
-            if (page > 1) {
-                pagedProducts = productIndexService.searchPro(cateId, level, page, size);
-                products = pagedProducts.getData();
-            }
-            if (ArrayUtils.hasObjs(products)) {
-                for (ProductModel product : products) {
-                    analysis(statMap, product.getTitle());
-                    productCount++;
-                }
-            }
-            page++;
-        }
-
-        Map<String, Long> statMap2 = new HashMap<String, Long>();
-
-        double t = productCount * percent;
-        for (Map.Entry<String, Long> kv : statMap.entrySet()) {
-            if (kv.getValue() <= t) {
-                continue;
-            }
-            statMap2.put(kv.getKey(), kv.getValue());
-        }
-
-        String name = "stats";
-
-        mav.addObject(name, statMap2);
-
-        return mav;
-    }
-
     private void analysis(Map<String, Long> statMap, String title) {
         String[] words = title.split(" ");
         for (String w : words) {
@@ -258,60 +165,6 @@ public class CategoryController {
                 count++;
                 statMap.put(w, count);
             }
-        }
-    }
-
-    @RequestMapping(value = "/main", method = RequestMethod.GET)
-    public ModelAndView catelist(HttpServletRequest request,
-                                 @RequestParam(defaultValue = "0") int c1,
-                                 @RequestParam(defaultValue = "0") int c2) {
-        ModelAndView mav = new ModelAndView("product/category");
-
-        List<PtmCategory> routeCates = null;
-
-        List<PtmCategory> categories = categoryService.listSubCategories(0L);
-        List<CategoryVo> c1s = CategoryHelper.getCategoryVos(categories);
-        statProductCount(c1s, 1);
-        mav.addObject("c1s", c1s);
-
-        String keyword = "";
-        if (c1 > 0) {
-            List<PtmCategory> categories2 = categoryService.listSubCategories(Long.valueOf(c1));
-            List<CategoryVo> c2s = CategoryHelper.getCategoryVos(categories2);
-            statProductCount(c2s, 2);
-            mav.addObject("c2s", c2s);
-
-            if (c2 > 0) {
-                List<PtmCategory> categories3 = categoryService.listSubCategories(Long.valueOf(c2));
-                List<CategoryVo> c3s = CategoryHelper.getCategoryVos(categories3);
-                statProductCount(c3s, 3);
-                mav.addObject("c3s", c3s);
-            }
-
-            routeCates = categoryService.getRouterCategoryList(c2 > 0 ? c2 : c1);
-            keyword = routeCates.get(routeCates.size() - 1).getKeyword();
-        }
-
-        mav.addObject("sc1", c1);
-        mav.addObject("sc2", c2);
-        mav.addObject("routeCates", routeCates);
-        mav.addObject("keyword", keyword);
-        return mav;
-    }
-
-    private void statProductCountForRouterCategories(List<CategoryVo> cates) {
-        int size = cates.size();
-        for (int i = 0; i < size; i++) {
-            CategoryVo cate = cates.get(i);
-            PageableResult<ProductModel> pros = productIndexService.searchPro(cate.getId(), i + 1, 1, 1);
-            cate.setProductCount(pros.getNumFund());
-        }
-    }
-
-    private void statProductCount(List<CategoryVo> cates, int level) {
-        for (CategoryVo categoryVo : cates) {
-            PageableResult<ProductModel> pros = productIndexService.searchPro(categoryVo.getId(), level, 1, 1);
-            categoryVo.setProductCount(pros.getNumFund());
         }
     }
 
