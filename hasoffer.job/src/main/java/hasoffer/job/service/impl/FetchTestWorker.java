@@ -1,18 +1,17 @@
 package hasoffer.job.service.impl;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.spider.model.FetchUrlResult;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FetchTestWorker implements Runnable {
 
@@ -39,7 +38,7 @@ public class FetchTestWorker implements Runnable {
                             ptmCmpSku.getWebsite(), ptmCmpSku.getUrl());
                     try {
                         FileUtils.write(file,
-                                fetchUrlResult.toStringByTab().replace("\r", " ").replace("\n", " ") + "\r\n", "utf-8",
+                                fetchUrlResult.toString().replace("\r", " ").replace("\n", " ") + "\r\n", "utf-8",
                                 true);
                     } catch (IOException e) {
                         logger.error(e.getMessage());
