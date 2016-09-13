@@ -163,12 +163,13 @@ public class CheckGetPriceOffDealWorker implements Runnable {
                     //url重复不创建
                     boolean repeatUrl = true;
                     List<PtmCmpSku> repeatUrlList = dbm.query("SELECT t FROM AppDeal t WHERE t.linkUrl = ?0", Arrays.asList(sku.getUrl()));
-                    if (repeatUrlList != null) {
+                    if (repeatUrlList != null && repeatUrlList.size() != 0) {
                         System.out.println("query by url get " + repeatUrlList.size() + " sku");
                         repeatUrl = false;
                     }
 
-                    if (appdeal != null && repeatUrl) {
+                    System.out.println("repeatUrl flag " + repeatUrl);
+                    if (repeatUrl) {
                         dealService.createAppDealByPriceOff(appdeal);
                     }
                 }
