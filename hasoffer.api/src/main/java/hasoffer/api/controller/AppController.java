@@ -275,6 +275,10 @@ public class AppController {
                 DownloadConfigVo downloadConfigVo = new DownloadConfigVo(false, Arrays.asList("com.snapdeal.main", "com.flipkart.android", "in.amazon.mShop.android.shopping", "net.one97.paytm", "com.ebay.mobile", "com.shopclues", "com.infibeam.infibeamapp", "com.myntra.android", "com.jabong.android", "com.alibaba.aliexpresshd"), "NINEAPP", apps, Arrays.asList("com.voonik.android", "cn.xender", "com.india.hasoffer", "com.lenovo.anyshare,gps", "com.mobile.indiapp", "com.leo.appmaster", "com.voodoo.android", "com.app.buyhatke"));
                 modelAndView.addObject("data", downloadConfigVo);
                 break;
+            case COMADD:
+                Map nMap = new HashMap();
+                nMap.put("op", false);
+                modelAndView.addObject("data", nMap);
             default:
                 break;
         }

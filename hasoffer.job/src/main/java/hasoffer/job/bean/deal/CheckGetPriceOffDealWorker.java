@@ -1,5 +1,6 @@
 package hasoffer.job.bean.deal;
 
+import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
@@ -88,7 +89,7 @@ public class CheckGetPriceOffDealWorker implements Runnable {
                     continue;
                 }
 
-                //主商品被访问超过40次创建deal
+                //主商品被访问超过50次创建deal
                 long productId = sku.getProductId();
 
                 System.out.println("CheckGetPriceOffDealJobBean pop get product id is " + productId);
@@ -99,7 +100,7 @@ public class CheckGetPriceOffDealWorker implements Runnable {
                 System.out.println("CheckGetPriceOffDealJobBean pop get SrmProductSearchCount is " + productSearchCount.getId());
                 System.out.println("CheckGetPriceOffDealJobBean pop get SrmProductSearchCount count is " + productSearchCount.getCount());
 
-                if (productSearchCount.getCount() < 40) {
+                if (productSearchCount.getCount() < 50) {
                     continue;
                 }
 
@@ -161,15 +162,24 @@ public class CheckGetPriceOffDealWorker implements Runnable {
                     appdeal.setDiscount((int) ((1 - newPrice / oriPrice) * 100));
 
                     //url重复不创建
-                    boolean repeatUrl = true;
-                    List<PtmCmpSku> repeatUrlList = dbm.query("SELECT t FROM AppDeal t WHERE t.linkUrl = ?0", Arrays.asList(sku.getUrl()));
-                    if (repeatUrlList != null && repeatUrlList.size() != 0) {
-                        System.out.println("query by url get " + repeatUrlList.size() + " sku");
-                        repeatUrl = false;
+                    boolean flag = true;
+                    List<AppDeal> appdealList = dbm.query("SELECT t FROM AppDeal t WHERE t.linkUrl = ?0", Arrays.asList(sku.getUrl()));
+                    if (appdealList != null && appdealList.size() != 0) {
+                        System.out.println("query by url get " + appdealList.size() + " sku");
+                        flag = false;
                     }
 
-                    System.out.println("repeatUrl flag " + repeatUrl);
-                    if (repeatUrl) {
+                    //当天title不能重名
+                    String title = sku.getTitle();
+                    Website website = sku.getWebsite();
+                    appdealList = dbm.query("SELECT t FROM Appdeal t WHERE t.title = ?0 AND t.website = ?1 ", Arrays.asList(title, website));
+                    if (appdealList != null && appdealList.size() != 0) {
+                        System.out.println("query by title website get " + appdealList.size() + " sku");
+                        flag = false;
+                    }
+
+                    System.out.println("flag " + flag);
+                    if (flag) {
                         dealService.createAppDealByPriceOff(appdeal);
                     }
                 }
