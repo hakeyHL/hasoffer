@@ -702,7 +702,9 @@ public class AppController {
             List<UrmUserDevice> urmUserDevices = new ArrayList<>();
             for (String id : ids) {
                 boolean flag = false;
+                System.out.println(" id_id_id " + id);
                 for (String dId : deviceIds) {
+                    System.out.println(" dId_dId_dId " + dId);
                     if (id.equals(dId)) {
                         flag = true;
                         System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);

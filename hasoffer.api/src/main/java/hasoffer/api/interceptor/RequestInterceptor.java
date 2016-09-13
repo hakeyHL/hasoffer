@@ -93,10 +93,10 @@ public class RequestInterceptor implements HandlerInterceptor {
                     e.getMessage(), requestUri, queryStr, deviceInfoStr));
             // + e.getMessage() + " , device = [" + deviceInfoStr + "]"
             return false;
-                }
+        }
 
         return true;
-            }
+    }
 
     private void recordClientEvent(DeviceRequestVo requestVo, HttpServletRequest request) {
         if (requestVo.getRequestUri().equals("/app/log")) {
@@ -105,7 +105,7 @@ public class RequestInterceptor implements HandlerInterceptor {
 
             requestVo.setDeviceEvent(new DeviceEventVo(event, info));
         }
-        }
+    }
 
     public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o,
                            ModelAndView modelAndView) throws Exception {
@@ -152,8 +152,10 @@ public class RequestInterceptor implements HandlerInterceptor {
                 System.out.println("get ids  by userId from urmUserDevice :" + deviceIds.size());
                 List<UrmUserDevice> urmUserDevices = new ArrayList<>();
                 for (String id : ids) {
+                    System.out.println(" id id id :" + id);
                     boolean flag = false;
                     for (String dId : deviceIds) {
+                        System.out.println(" dId dId dId :" + dId);
                         if (id.equals(dId)) {
                             flag = true;
                             System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);
