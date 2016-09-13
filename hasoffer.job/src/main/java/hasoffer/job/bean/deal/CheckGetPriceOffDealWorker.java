@@ -66,7 +66,6 @@ public class CheckGetPriceOffDealWorker implements Runnable {
 
             try {
 
-
                 Object pop = redisListService.pop(PRICE_DROP_SKUID_QUEUE);
 
                 if (pop == null) {
