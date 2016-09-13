@@ -80,18 +80,24 @@ public class CheckGetPriceOffDealWorker implements Runnable {
                 }
 
                 long skuid = Long.parseLong((String) pop);
+                System.out.println("CheckGetPriceOffDealJobBean pop get " + skuid);
 
                 PtmCmpSku sku = dbm.get(PtmCmpSku.class, skuid);
                 if (sku == null) {
+                    System.out.println("CheckGetPriceOffDealJobBean pop get " + skuid + " is null");
                     continue;
                 }
 
                 //主商品被访问超过40次创建deal
                 long productId = sku.getProductId();
 
+                System.out.println("CheckGetPriceOffDealJobBean pop get product id is " + productId);
                 String yesterdayYmd = TimeUtils.parse(TimeUtils.addDay(TimeUtils.nowDate(), -1), "yyyyMMdd");
+                System.out.println("CheckGetPriceOffDealJobBean pop get yesterday is " + yesterdayYmd);
 
                 SrmProductSearchCount productSearchCount = dbm.querySingle("SELECT t FROM SrmProductSearchCount t WHERE t.productId = ?0 AND t.ymd = ?1", Arrays.asList(productId, yesterdayYmd));
+                System.out.println("CheckGetPriceOffDealJobBean pop get SrmProductSearchCount is " + productSearchCount.getId());
+                System.out.println("CheckGetPriceOffDealJobBean pop get SrmProductSearchCount count is " + productSearchCount.getCount());
 
                 if (productSearchCount.getCount() < 40) {
                     continue;
@@ -116,6 +122,9 @@ public class CheckGetPriceOffDealWorker implements Runnable {
                 PtmCmpSkuHistoryPrice historyPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, skuid);
 
                 float minPrice = getMinPrice(historyPrice);
+                System.out.println("minPrice " + minPrice);
+                System.out.println("newPrice " + newPrice);
+
                 if (newPrice < minPrice) {//符合条件，创建deal
 
                     AppDeal appdeal = new AppDeal();
@@ -155,13 +164,13 @@ public class CheckGetPriceOffDealWorker implements Runnable {
                     boolean repeatUrl = true;
                     List<PtmCmpSku> repeatUrlList = dbm.query("SELECT t FROM AppDeal t WHERE t.url = ?0", Arrays.asList(sku.getUrl()));
                     if (repeatUrlList != null) {
+                        System.out.println("query by url get " + repeatUrlList.size() + " sku");
                         repeatUrl = false;
                     }
 
                     if (appdeal != null && repeatUrl) {
                         dealService.createAppDealByPriceOff(appdeal);
                     }
-
                 }
 
             } catch (Exception e) {
