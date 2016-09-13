@@ -125,7 +125,7 @@ public class CheckGetPriceOffDealWorker implements Runnable {
                 System.out.println("minPrice " + minPrice);
                 System.out.println("newPrice " + newPrice);
 
-                if (newPrice < minPrice) {//符合条件，创建deal
+                if (newPrice < minPrice * 1.1) {//符合条件，创建deal
 
                     AppDeal appdeal = new AppDeal();
 
