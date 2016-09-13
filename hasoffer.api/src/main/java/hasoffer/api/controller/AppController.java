@@ -36,7 +36,6 @@ import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
-import hasoffer.core.product.solr.ProductIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel;
 import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.push.IPushService;
@@ -82,9 +81,7 @@ public class AppController {
     @Resource
     ContentNegotiatingViewResolver jsonViewResolver;
     @Resource
-    ProductIndexServiceImpl productIndexServiceImpl;
-    @Resource
-    ProductIndex2ServiceImpl ProductIndex2ServiceImpl;
+    ProductIndex2ServiceImpl productIndex2Service;
     @Resource
     ProductServiceImpl productService;
     @Resource
@@ -920,7 +917,7 @@ public class AppController {
                 //search by title
                 System.out.println("  sort " + criteria.getSort().name());
                 criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
-                PageableResult p = ProductIndex2ServiceImpl.searchProducts(criteria);
+                PageableResult p = productIndex2Service.searchProducts(criteria);
                 if (p != null && p.getData().size() > 0) {
                     System.out.println("getPivotFieldVals  " + p.getPivotFieldVals().size());
                     if (p.getPivotFieldVals() != null && p.getPivotFieldVals().size() > 0) {
@@ -1035,7 +1032,7 @@ public class AppController {
                 //category level page size
                 if (StringUtils.isNotBlank(criteria.getCategoryId())) {
                     //search by category
-                    products = ProductIndex2ServiceImpl.searchPro(criteria);
+                    products = productIndex2Service.searchPro(criteria);
                     if (products != null && products.getData().size() > 0) {
                         addProductVo2List(li, products.getData());
                     }
@@ -1045,12 +1042,12 @@ public class AppController {
                 //如果是默认值,则判断类目id和level是否传递了,传了就是类目搜索,适配老接口
                 if (StringUtils.isNotBlank(criteria.getCategoryId())) {
                     //search by category
-                    products = ProductIndex2ServiceImpl.searchPro(criteria);
+                    products = productIndex2Service.searchPro(criteria);
                     if (products != null && products.getData().size() > 0) {
                         addProductVo2List(li, products.getData());
                     }
                 } else if (StringUtils.isNotBlank(criteria.getKeyword())) {
-                    PageableResult pKeywordResult = ProductIndex2ServiceImpl.searchProducts(criteria);
+                    PageableResult pKeywordResult = productIndex2Service.searchProducts(criteria);
                     if (pKeywordResult != null && pKeywordResult.getData().size() > 0) {
                         addProductVo2List(li, pKeywordResult.getData());
                         map.put("product", li);
