@@ -584,23 +584,27 @@ public class FixController {
 
         for (PtmProduct product : productList) {
 
+            System.out.println("fix product " + product.getId());
+
             List<PtmImage> productImageList = dbm.query("SELECT t FROM PtmImage t WHERE t.productId = ?0 ", Arrays.asList(product.getId()));
 
             if (productImageList != null && productImageList.size() != 0) {
+                System.out.println("product " + product.getId() + " already fix " + productImageList.size());
                 continue;
             }
 
             List<PtmCmpSku> skuList = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ORDER BY t.id", Arrays.asList(product.getId()));
-
             if (skuList == null || skuList.size() == 0) {
+                System.out.println("reday to fix " + product.getId() + " has " + skuList.size() + " sku contiue");
                 continue;
             }
 
+            System.out.println("reday to fix " + product.getId() + " has " + skuList.size() + " sku");
             for (PtmCmpSku sku : skuList) {
 
                 Website website = sku.getWebsite();
                 String url = sku.getUrl();
-
+                System.out.println("website = " + website.name());
                 String imageUrl = "";
                 try {
                     imageUrl = fetchService.fetchWebsiteImageUrl(website, url);
@@ -610,9 +614,10 @@ public class FixController {
                     }
 
                     productService.updateProductImage2(product.getId(), imageUrl);
-
+                    System.out.println("update success for " + product.getId());
                     break;
                 } catch (Exception e) {
+                    System.out.println("update fail for " + product.getId() + " use " + sku.getId());
                     continue;
                 }
             }
