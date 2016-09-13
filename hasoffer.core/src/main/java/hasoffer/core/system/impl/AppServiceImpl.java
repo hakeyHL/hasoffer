@@ -164,10 +164,8 @@ public class AppServiceImpl implements IAppService {
     }
 
     @Override
-    public AppDeal getDealDetail(String id) {
-        List li = new ArrayList();
-        li.add(Long.valueOf(id));
-        return dbm.querySingle(Q_APP_GEDEALDETAIL, li);
+    public AppDeal getDealDetail(long id) {
+        return dbm.querySingle(Q_APP_GEDEALDETAIL, Arrays.asList(id));
     }
 
     @Override
