@@ -456,9 +456,9 @@ public class AppController {
                 DealVo dealVo = new DealVo();
                 dealVo.setId(appDeal.getId());
                 dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
-                String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-                DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-                dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+//                String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+//                DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+//                dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
                 dealVo.setExtra(0d);
                 dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
                 if (appDeal.getWebsite().name().equals("FLIPKART")) {
@@ -567,9 +567,17 @@ public class AppController {
      */
     @RequestMapping(value = "/dealInfo", method = RequestMethod.GET)
     public ModelAndView dealInfo(@RequestParam String id) {
-        System.out.println("dealId is :" + id);
-        AppDeal appDeal = appService.getDealDetail(id);
         ModelAndView mv = new ModelAndView();
+        mv.addObject("errorCode", "00000");
+        mv.addObject("msg", "ok");
+        System.out.println("dealId is :" + id);
+        if (StringUtils.isEmpty(id)) {
+            //空,完毕
+            return mv;
+        } else {
+            mv.addObject("data", null);
+        }
+        AppDeal appDeal = appService.getDealDetail(id);
         if (appDeal != null) {
             System.out.println("has this deal ");
             Map map = new HashMap();

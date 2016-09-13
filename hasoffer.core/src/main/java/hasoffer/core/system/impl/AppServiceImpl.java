@@ -213,7 +213,7 @@ public class AppServiceImpl implements IAppService {
 
     @Override
     public List<String> getUserDevicesByUserId(String userId) {
-        return dbm.query(Q_APP_URMUSERDEVICE_GETIDSBYUSERID, 1, 5, Arrays.asList(userId));
+        return dbm.query(Q_APP_URMUSERDEVICE_GETIDSBYUSERID, 1, 8, Arrays.asList(userId));
     }
 
     @Override
