@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public interface IDealService {
 
-    PageableResult<AppDeal> findDealList(int page, int size);
+    PageableResult<AppDeal> findDealList(int page, int size, int type);
 
     /**
      * admin后台手动导入deal

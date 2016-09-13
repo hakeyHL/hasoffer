@@ -48,9 +48,9 @@ public class DealController {
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ModelAndView listDealData(HttpServletRequest request, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "50") int size) {
+    public ModelAndView listDealData(HttpServletRequest request, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "50") int size, @RequestParam(defaultValue = "1") int type) {
         ModelAndView mav = new ModelAndView("deal/list");
-        PageableResult<AppDeal> pageableResult = dealService.findDealList(page, size);
+        PageableResult<AppDeal> pageableResult = dealService.findDealList(page, size, type);
         for (AppDeal appDeal : pageableResult.getData()) {
             appDeal.setListPageImage(ImageUtil.getImageUrl(appDeal.getListPageImage()));
         }
