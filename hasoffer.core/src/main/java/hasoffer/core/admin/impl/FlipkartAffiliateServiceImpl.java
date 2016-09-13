@@ -33,6 +33,89 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
     @Resource
     private IDeviceService deviceService;
 
+    private static MarketChannel getChannelByAffId(String affId) {
+        if (affId == null) {
+            return MarketChannel.TEST;
+        }
+        String[] leomasterFields = new String[]{"hlhakeygm", "oliviersl", "wuningSFg"};
+        String[] nineAppsFields = new String[]{"Sunyukunj", "gczyfw201", "xyangryrg", "zhouxixi0", "harveyouo", "allenooou"};
+        String[] shanchuanFields = new String[]{"160082642", "286867656", "289063282", "514330076", "602074420", "943546560"};
+        String[] googleplayFields = new String[]{"115377600"};
+        //String[] otherFields = new String[]{"120527343"};
+        String[] zukFields = new String[]{"747306881"};
+        if (Arrays.asList(leomasterFields).contains(affId)) {
+            return MarketChannel.SHANCHUAN;
+        } else if (Arrays.asList(nineAppsFields).contains(affId)) {
+            return MarketChannel.NINEAPPS;
+        } else if (Arrays.asList(shanchuanFields).contains(affId)) {
+            return MarketChannel.SHANCHUAN;
+        } else if (Arrays.asList(googleplayFields).contains(affId)) {
+            return MarketChannel.GOOGLEPLAY;
+        } else if (Arrays.asList(zukFields).contains(affId)) {
+            return MarketChannel.ZUK;
+        }
+        return MarketChannel.TEST;
+
+    }
+
+//    private List<UrmDeviceRequestLog> getLogMap(String deviceId, Date before24H, Date endTime) {
+//
+//        List<UrmDeviceRequestLog> rediToAffiliateList = getRediToAffiliateTime(deviceId, before24H, endTime);
+//        List<UrmDeviceRequestLog> shopList = getShopTime(deviceId, before24H, endTime);
+//        List<UrmDeviceRequestLog> logList = new ArrayList<UrmDeviceRequestLog>();
+//
+//        for (UrmDeviceRequestLog log : rediToAffiliateList) {
+//            logList.add(log);
+//        }
+//        for (UrmDeviceRequestLog log : shopList) {
+//            logList.add(log);
+//        }
+//
+//        Collections.sort(logList, new Comparator<UrmDeviceRequestLog>() {
+//            public int compare(UrmDeviceRequestLog arg0, UrmDeviceRequestLog arg1) {
+//                return arg0.getCreateTime().compareTo(arg1.getCreateTime());
+//            }
+//        });
+//        return logList;
+//    }
+//
+//    private String getOrderType(String orderDate, List<UrmDeviceRequestLog> logList) {
+//
+//        String result = "NONE";
+//        if (logList == null || orderDate == null) {
+//            return result;
+//        }
+//        for (UrmDeviceRequestLog log : logList) {
+//            if (log.getQuery().contains("action=shop")) {
+//                result = "SHOP";
+//            } else if (log.getQuery().contains("action=rediToAffiliateUrl")) {
+//                result = "REDI";
+//            }
+//            break;
+//        }
+//        try {
+//            Date tempDate = DateUtils.parseDate(orderDate, "dd-MM-yyyy hh:mm:ss");
+//
+//            Iterator<UrmDeviceRequestLog> sListIterator = logList.iterator();
+//            while (sListIterator.hasNext()) {
+//                UrmDeviceRequestLog log = sListIterator.next();
+//                if (log.getCreateTime().compareTo(tempDate) < 0) {
+//                    sListIterator.remove();
+//                }
+//            }
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return result;
+//    }
+//
+//
+//    private String getUsertype(String affExtParam2, Map<String, UrmDevice> startTime) {
+//
+//        return "OLD";
+//    }
+
     @Override
     public List<OrderStatsAnalysisPO> countOrderList(Date startTime, Date endTime) {
         List<OrderStatsAnalysisPO> orderPOList = new ArrayList<OrderStatsAnalysisPO>();
@@ -223,65 +306,6 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
 
     }
 
-//    private List<UrmDeviceRequestLog> getLogMap(String deviceId, Date before24H, Date endTime) {
-//
-//        List<UrmDeviceRequestLog> rediToAffiliateList = getRediToAffiliateTime(deviceId, before24H, endTime);
-//        List<UrmDeviceRequestLog> shopList = getShopTime(deviceId, before24H, endTime);
-//        List<UrmDeviceRequestLog> logList = new ArrayList<UrmDeviceRequestLog>();
-//
-//        for (UrmDeviceRequestLog log : rediToAffiliateList) {
-//            logList.add(log);
-//        }
-//        for (UrmDeviceRequestLog log : shopList) {
-//            logList.add(log);
-//        }
-//
-//        Collections.sort(logList, new Comparator<UrmDeviceRequestLog>() {
-//            public int compare(UrmDeviceRequestLog arg0, UrmDeviceRequestLog arg1) {
-//                return arg0.getCreateTime().compareTo(arg1.getCreateTime());
-//            }
-//        });
-//        return logList;
-//    }
-//
-//    private String getOrderType(String orderDate, List<UrmDeviceRequestLog> logList) {
-//
-//        String result = "NONE";
-//        if (logList == null || orderDate == null) {
-//            return result;
-//        }
-//        for (UrmDeviceRequestLog log : logList) {
-//            if (log.getQuery().contains("action=shop")) {
-//                result = "SHOP";
-//            } else if (log.getQuery().contains("action=rediToAffiliateUrl")) {
-//                result = "REDI";
-//            }
-//            break;
-//        }
-//        try {
-//            Date tempDate = DateUtils.parseDate(orderDate, "dd-MM-yyyy hh:mm:ss");
-//
-//            Iterator<UrmDeviceRequestLog> sListIterator = logList.iterator();
-//            while (sListIterator.hasNext()) {
-//                UrmDeviceRequestLog log = sListIterator.next();
-//                if (log.getCreateTime().compareTo(tempDate) < 0) {
-//                    sListIterator.remove();
-//                }
-//            }
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return result;
-//    }
-//
-//
-//    private String getUsertype(String affExtParam2, Map<String, UrmDevice> startTime) {
-//
-//        return "OLD";
-//    }
-
-
     private List<AffiliateOrder> getOrderList(String affId, String token, String orderState, Date startTime, Date endTime) {
         logger.info("countOrderList: affid={},token={},startTime={},endTime={}", affId, token, startTime, endTime);
         Map<String, String> headerMap = new HashMap<>();
@@ -293,18 +317,6 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
         approvedParamMap.put(FlipkartAffiliateProductProcessor.R_ORDER_STATUS, orderState);
         approvedParamMap.put(FlipkartAffiliateProductProcessor.R_OFFSET, "0");
         return flipProcessor.getAffiliateOrderList(headerMap, approvedParamMap);
-    }
-
-    private Map<String, UrmDevice> getDeviceRegTime(Set<String> deviceSet) {
-        Map<String, UrmDevice> deviceMap = new HashMap<String, UrmDevice>();
-        List<UrmDevice> deviceByIdList = deviceService.findDeviceByIdList(new ArrayList<String>(deviceSet));
-        if (deviceByIdList == null) {
-            return deviceMap;
-        }
-        for (UrmDevice device : deviceByIdList) {
-            deviceMap.put(device.getId(), device);
-        }
-        return deviceMap;
     }
 
 //    private List<UrmDeviceRequestLog> getShopTime(String deviceId, Date startTime, Date endTime) {
@@ -340,29 +352,16 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
 //        return result;
 //    }
 
-    private static MarketChannel getChannelByAffId(String affId) {
-        if (affId == null) {
-            return MarketChannel.NONE;
+    private Map<String, UrmDevice> getDeviceRegTime(Set<String> deviceSet) {
+        Map<String, UrmDevice> deviceMap = new HashMap<String, UrmDevice>();
+        List<UrmDevice> deviceByIdList = deviceService.findDeviceByIdList(new ArrayList<String>(deviceSet));
+        if (deviceByIdList == null) {
+            return deviceMap;
         }
-        String[] leomasterFields = new String[]{"hlhakeygm", "oliviersl", "wuningSFg"};
-        String[] nineAppsFields = new String[]{"Sunyukunj", "gczyfw201", "xyangryrg", "zhouxixi0", "harveyouo", "allenooou"};
-        String[] shanchuanFields = new String[]{"160082642", "286867656", "289063282", "514330076", "602074420", "943546560"};
-        String[] googleplayFields = new String[]{"115377600"};
-        //String[] otherFields = new String[]{"120527343"};
-        String[] zukFields = new String[]{"747306881"};
-        if (Arrays.asList(leomasterFields).contains(affId)) {
-            return MarketChannel.SHANCHUAN;
-        } else if (Arrays.asList(nineAppsFields).contains(affId)) {
-            return MarketChannel.NINEAPPS;
-        } else if (Arrays.asList(shanchuanFields).contains(affId)) {
-            return MarketChannel.SHANCHUAN;
-        } else if (Arrays.asList(googleplayFields).contains(affId)) {
-            return MarketChannel.GOOGLEPLAY;
-        } else if (Arrays.asList(zukFields).contains(affId)) {
-            return MarketChannel.ZUK;
+        for (UrmDevice device : deviceByIdList) {
+            deviceMap.put(device.getId(), device);
         }
-        return MarketChannel.NONE;
-
+        return deviceMap;
     }
 
 
