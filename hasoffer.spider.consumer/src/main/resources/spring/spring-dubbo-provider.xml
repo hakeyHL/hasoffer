@@ -7,12 +7,21 @@
         http://code.alibabatech.com/schema/dubbo
         http://code.alibabatech.com/schema/dubbo/dubbo.xsd"
        default-lazy-init="false">
-    <dubbo:application name="third-provider"/>
+    <dubbo:application name="spider-consumer"/>
     <!-- 使用zookeeper注册中心暴露服务地址 -->
-    <dubbo:registry address="zookeeper://zookeeper_server:2181" check="false" subscribe="false" register=""/>
+    <dubbo:registry address="zookeeper://zookeeper_server:2181" check="false"/>
+
     <dubbo:protocol name="dubbo" port="20880"/>
-    <dubbo:provider weight="50" timeout="5000"/>
+
+    <dubbo:provider timeout="5000"/>
+
     <!-- 要暴露的服务接口 -->
-    <dubbo:service interface="hasoffer.dubbo.api.fetch.service.IFetchDubboService" version="1.0"  ref="fetchDubboService" cluster="broadcast" />
-    <bean id="fetchDubboService" class="hasoffer.dubbo.api.fetch.service.impl.FetchDubboServiceImpl" />
+    <dubbo:service interface="hasoffer.dubbo.spider.result.api.ISkuResultDubboService" version="1.0"
+                   ref="skuResultDubboService" />
+    <bean id="skuResultDubboService" class="hasoffer.spider.result.service.impl.SkuResultDubboServiceImpl"/>
+
+    <!-- 要引用的服务接口 -->
+    <dubbo:reference id="skuTaskDubboService" interface="hasoffer.dubbo.spider.task.api.ISkuTaskDubboService"
+                     version="1.0" check="false"/>
+
 </beans>

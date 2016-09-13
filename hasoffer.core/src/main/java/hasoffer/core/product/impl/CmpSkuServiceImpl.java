@@ -43,6 +43,7 @@ import java.util.*;
  * Created on 2016/1/4.
  */
 @Service
+@Transactional
 public class CmpSkuServiceImpl implements ICmpSkuService {
 
     private static final String Q_CMPSKU_BY_PRODUCTID =

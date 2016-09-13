@@ -42,6 +42,7 @@
         <property name="timeout" value="${cache.redis.timeout}"/>
         <property name="password" value="${cache.redis.password}"/>
         <property name="poolConfig" ref="jedisPoolConfig"/>
+        <property name="database" value="1"/>
     </bean>
     <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
         <property name="connectionFactory" ref="jedisConnFactory"/>
