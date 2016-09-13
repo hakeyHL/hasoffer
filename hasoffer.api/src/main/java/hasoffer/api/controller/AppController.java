@@ -36,8 +36,6 @@ import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
-import hasoffer.core.product.solr.ProductIndexServiceImpl;
-import hasoffer.core.product.solr.ProductModel;
 import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.system.IAppService;
@@ -82,9 +80,7 @@ public class AppController {
     @Resource
     ContentNegotiatingViewResolver jsonViewResolver;
     @Resource
-    ProductIndexServiceImpl productIndexServiceImpl;
-    @Resource
-    ProductIndex2ServiceImpl ProductIndex2ServiceImpl;
+    ProductIndex2ServiceImpl productIndex2Service;
     @Resource
     ProductServiceImpl productService;
     @Resource
@@ -578,85 +574,53 @@ public class AppController {
         List li = new ArrayList();
         List<AppDeal> deals = Result.getData();
         Date currentDate = new Date();
+        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+        DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         for (AppDeal appDeal : deals) {
             int dateCmpResult = currentDate.compareTo(appDeal.getExpireTime());
-            //需要筛选deal,不是sku的deal当天过期也为过期
-            if (appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
-                //降价生成,过期时间是今天的要返回
-                if (dateCmpResult == 1) {
-                    //过期
-                    //deal的过期时间小于等于明天的凌晨,返回
-                    DealVo dealVo = new DealVo();
-                    dealVo.setId(appDeal.getId());
-                    dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
-                    String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-                    DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-                    dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
-                    dealVo.setExtra(0d);
-                    dealVo.setDiscount(appDeal.getDiscount());
-                    dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                    if (appDeal.getWebsite().name().equals("FLIPKART")) {
-                        dealVo.setExtra(1.5);
-                    }
-                    dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                    dealVo.setExp(appDeal.getExpireTime());
-                    dealVo.setTitle(appDeal.getTitle());
-                    dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
-                    dealVo.setIsExpired(true);
-                    dealVo.setDiscount(appDeal.getDiscount());
-                    dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
-                    dealVo.setWebsite(appDeal.getWebsite());
-                    li.add(dealVo);
-                } else {
-                    DealVo dealVo = new DealVo();
-                    dealVo.setId(appDeal.getId());
-                    dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
-                    String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-                    DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-                    dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
-                    dealVo.setExtra(0d);
-                    dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                    if (appDeal.getWebsite().name().equals("FLIPKART")) {
-                        dealVo.setExtra(1.5);
-                    }
-                    dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                    dealVo.setExp(appDeal.getExpireTime());
-                    dealVo.setTitle(appDeal.getTitle());
-                    dealVo.setDiscount(appDeal.getDiscount());
-                    dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
-                    dealVo.setIsExpired(false);
-                    dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
-                    dealVo.setWebsite(appDeal.getWebsite());
-                    li.add(dealVo);
+            if (dateCmpResult == 1) {
+                //小于当前日期
+                DealVo dealVo = new DealVo();
+                dealVo.setId(appDeal.getId());
+                dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
+                dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+                dealVo.setExtra(0d);
+                dealVo.setDiscount(appDeal.getDiscount());
+                dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                if (appDeal.getWebsite().name().equals("FLIPKART")) {
+                    dealVo.setExtra(1.5);
                 }
-            } else if (appDeal.getAppdealSource().name().equals("MANUAL_INPUT")) {
-                //手动导入,
-                //只有过期时间大于当前时间才返回
-                if (dateCmpResult <= 0) {
-                    DealVo dealVo = new DealVo();
-                    dealVo.setId(appDeal.getId());
-                    dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
-                    String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-                    DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-                    dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
-                    dealVo.setExtra(0d);
-                    dealVo.setDiscount(appDeal.getDiscount());
-                    dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                    if (appDeal.getWebsite().name().equals("FLIPKART")) {
-                        dealVo.setExtra(1.5);
-                    }
-                    dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                    dealVo.setExp(appDeal.getExpireTime());
-                    dealVo.setTitle(appDeal.getTitle());
-                    dealVo.setIsExpired(false);
-                    dealVo.setDiscount(appDeal.getDiscount());
-                    dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
-                    dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
-                    dealVo.setWebsite(appDeal.getWebsite());
-                    li.add(dealVo);
+                dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                dealVo.setExp(appDeal.getExpireTime());
+                dealVo.setTitle(appDeal.getTitle());
+                dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
+                dealVo.setIsExpired(true);
+                dealVo.setDiscount(appDeal.getDiscount());
+                dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
+                dealVo.setWebsite(appDeal.getWebsite());
+                li.add(dealVo);
+            } else {
+                //d大于等于当前时间,未过期
+                DealVo dealVo = new DealVo();
+                dealVo.setId(appDeal.getId());
+                dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
+                dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+                dealVo.setExtra(0d);
+                dealVo.setDiscount(appDeal.getDiscount());
+                dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                if (appDeal.getWebsite().name().equals("FLIPKART")) {
+                    dealVo.setExtra(1.5);
                 }
+                dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                dealVo.setExp(appDeal.getExpireTime());
+                dealVo.setTitle(appDeal.getTitle());
+                dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
+                dealVo.setIsExpired(false);
+                dealVo.setDiscount(appDeal.getDiscount());
+                dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
+                dealVo.setWebsite(appDeal.getWebsite());
+                li.add(dealVo);
             }
-
         }
         map.put("deals", li);
         map.put("currentPage", Result.getCurrentPage());
@@ -709,20 +673,23 @@ public class AppController {
             sb.append("1 Click \"Activate Deal\" button.\n");
             sb.append("2 Add the product of your choice to cart.\n");
             sb.append("3 And no coupon code required.\n\n");
-            sb.append("Key Features: \n");
-            PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
-            if (ptmCmpSkuDescription != null) {
-                String jsonParam = ptmCmpSkuDescription.getJsonParam();
-                Map jsonMap = JsonHelper.getJsonMap(jsonParam);
-                //遍历map
-                Set<Map.Entry> set = jsonMap.entrySet();
-                Iterator<Map.Entry> iterator = set.iterator();
-                while (iterator.hasNext()) {
-                    Map.Entry next = iterator.next();
-                    sb.append(next.getKey()).append(" : ");
-                    sb.append(next.getValue()).append("\n");
+            if (appDeal.getPtmcmpskuid() > 0) {
+                PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
+                if (ptmCmpSkuDescription != null) {
+                    sb.append("Key Features: \n");
+                    String jsonParam = ptmCmpSkuDescription.getJsonParam();
+                    Map jsonMap = JsonHelper.getJsonMap(jsonParam);
+                    //遍历map
+                    Set<Map.Entry> set = jsonMap.entrySet();
+                    Iterator<Map.Entry> iterator = set.iterator();
+                    while (iterator.hasNext()) {
+                        Map.Entry next = iterator.next();
+                        sb.append(next.getKey()).append(" : ");
+                        sb.append(next.getValue()).append("\n");
+                    }
                 }
             }
+
             map.put("description", sb.toString());
             map.put("extra", 0);
             if (appDeal.getWebsite() == Website.FLIPKART) {
@@ -920,7 +887,7 @@ public class AppController {
                 //search by title
                 System.out.println("  sort " + criteria.getSort().name());
                 criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
-                PageableResult p = ProductIndex2ServiceImpl.searchProducts(criteria);
+                PageableResult p = productIndex2Service.searchProducts(criteria);
                 if (p != null && p.getData().size() > 0) {
                     System.out.println("getPivotFieldVals  " + p.getPivotFieldVals().size());
                     if (p.getPivotFieldVals() != null && p.getPivotFieldVals().size() > 0) {
@@ -1035,7 +1002,7 @@ public class AppController {
                 //category level page size
                 if (StringUtils.isNotBlank(criteria.getCategoryId())) {
                     //search by category
-                    products = ProductIndex2ServiceImpl.searchPro(criteria);
+                    products = productIndex2Service.searchPro(criteria);
                     if (products != null && products.getData().size() > 0) {
                         addProductVo2List(li, products.getData());
                     }
@@ -1045,12 +1012,12 @@ public class AppController {
                 //如果是默认值,则判断类目id和level是否传递了,传了就是类目搜索,适配老接口
                 if (StringUtils.isNotBlank(criteria.getCategoryId())) {
                     //search by category
-                    products = ProductIndex2ServiceImpl.searchPro(criteria);
+                    products = productIndex2Service.searchPro(criteria);
                     if (products != null && products.getData().size() > 0) {
                         addProductVo2List(li, products.getData());
                     }
                 } else if (StringUtils.isNotBlank(criteria.getKeyword())) {
-                    PageableResult pKeywordResult = ProductIndex2ServiceImpl.searchProducts(criteria);
+                    PageableResult pKeywordResult = productIndex2Service.searchProducts(criteria);
                     if (pKeywordResult != null && pKeywordResult.getData().size() > 0) {
                         addProductVo2List(li, pKeywordResult.getData());
                         map.put("product", li);
@@ -1124,7 +1091,7 @@ public class AppController {
     public void addProductVo2List(List desList, List sourceList) {
 
         if (sourceList != null && sourceList.size() > 0) {
-            if (ProductModel.class.isInstance(sourceList.get(0))) {
+            /*if (ProductModel.class.isInstance(sourceList.get(0))) {
                 Iterator<ProductModel> modelList = sourceList.iterator();
                 while (modelList.hasNext()) {
                     ProductModel productModel = modelList.next();
@@ -1140,7 +1107,8 @@ public class AppController {
                         desList.add(productListVo);
                     }
                 }
-            } else if (PtmProduct.class.isInstance(sourceList.get(0))) {
+            } else*/
+            if (PtmProduct.class.isInstance(sourceList.get(0))) {
                 Iterator<PtmProduct> ptmList = sourceList.iterator();
                 while (ptmList.hasNext()) {
                     PtmProduct ptmProduct = ptmList.next();

@@ -211,6 +211,7 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
     /**
      * 根据类目搜索商品
      */
+    @Deprecated
     public PageableResult<ProductModel2> searchPro(SearchCriteria criteria) {
         int level = criteria.getLevel();
         String cateId = criteria.getCategoryId();
@@ -247,6 +248,7 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
                 sorts[0] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.DESC);
             }
         }
+
         String q = "*:*";
         PivotFacet[] pivotFacets = null;
         fqList.add(new FilterQuery("cate" + level, String.valueOf(cateId)));

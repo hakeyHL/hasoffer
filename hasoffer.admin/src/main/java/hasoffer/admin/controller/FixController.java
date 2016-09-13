@@ -26,8 +26,6 @@ import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.*;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
-import hasoffer.core.product.solr.ProductIndexServiceImpl;
-import hasoffer.core.product.solr.ProductModel;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.task.ListProcessTask;
@@ -98,8 +96,6 @@ public class FixController {
     @Resource
     ICategoryService categoryservice;
     @Resource
-    ProductIndexServiceImpl productIndexServiceImpl;
-    @Resource
     ICacheService cacheServiceImpl;
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
 
@@ -149,7 +145,7 @@ public class FixController {
         for (Long proId : proIdSet) {
             PtmProduct pro = dbm.get(PtmProduct.class, proId);
             if (pro != null) {
-                productService.importProduct2Solr(pro);
+                productService.importProduct2Solr2(pro);
             } else {
                 productService.deleteProduct(proId);
             }
@@ -431,7 +427,7 @@ public class FixController {
             PtmProduct product = productService.getProduct(id);
 
             if (product != null) {
-                productService.importProduct2Solr(product);
+                productService.importProduct2Solr2(product);
             }
         }
         return "ok";
@@ -967,46 +963,6 @@ public class FixController {
         }
 
         return "ok";
-    }
-
-    //fixdata/testcategoryresult
-    @RequestMapping("/testcategoryresult")
-    @ResponseBody
-    public String testcategoryresult() {
-
-        List<PtmCategory> secondCategoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.level = 2 ");
-
-        for (PtmCategory category : secondCategoryList) {
-
-            List<Object> thirdCategoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.parentId = ?0 ", Arrays.asList(category.getId()));
-
-            if (thirdCategoryList == null || thirdCategoryList.size() == 0) {
-                PageableResult<ProductModel> pageableResult = productIndexServiceImpl.searchPro(category.getId(), 2, 1, 20);
-                if (pageableResult.getNumFund() != 0) {
-                    continue;
-                } else {
-                    System.out.println(category.getId());
-                }
-            } else {
-                continue;
-            }
-
-        }
-
-        List<PtmCategory> thirdCategoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.level = 3 ");
-
-        for (PtmCategory category : thirdCategoryList) {
-
-            PageableResult<ProductModel> pageableResult = productIndexServiceImpl.searchPro(category.getId(), 3, 1, 20);
-            if (pageableResult.getNumFund() != 0) {
-                continue;
-            } else {
-                System.out.println(category.getId());
-            }
-
-        }
-
-        return "";
     }
 
     //fixdata/fixproductprice

@@ -13,6 +13,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
@@ -26,7 +27,7 @@ import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IFetchService;
 import hasoffer.core.product.IProductService;
-import hasoffer.core.product.solr.ProductIndexServiceImpl;
+import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
 import hasoffer.core.search.ISearchService;
 import hasoffer.fetch.core.IProductProcessor;
 import hasoffer.fetch.core.ISummaryProductProcessor;
@@ -64,8 +65,6 @@ public class SearchController {
     @Resource
     IProductService productService;
     @Resource
-    ProductIndexServiceImpl productIndexService;
-    @Resource
     ISearchService searchService;
     @Resource
     ICategoryService categoryService;
@@ -77,6 +76,8 @@ public class SearchController {
     ICmpSkuService cmpSkuService;
     @Resource
     SearchLogCacheManager logCacheManager;
+    @Resource
+    ProductIndex2ServiceImpl productIndex2Service;
     @Resource
     IMongoDbManager mdm;
 
@@ -274,7 +275,13 @@ public class SearchController {
         if (StringUtils.isEmpty(title)) {
             title = srmSearchLog.getKeyword();
         }
-        pagedResults = productIndexService.searchPro(0, 0, 0, title, page, size);
+
+        SearchCriteria sc = new SearchCriteria();
+        sc.setKeyword(title);
+        sc.setPage(page);
+        sc.setPageSize(size);
+        pagedResults = productIndex2Service.searchProducts(sc);
+        
         List<PtmProduct> indexProducts = productService.getProducts(pagedResults.getData());
         indexProducts.remove(firstProduct);
 
