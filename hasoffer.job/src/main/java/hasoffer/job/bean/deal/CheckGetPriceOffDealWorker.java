@@ -9,6 +9,7 @@ import hasoffer.core.persistence.mongo.PriceNode;
 import hasoffer.core.persistence.mongo.PtmCmpSkuHistoryPrice;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.data.redis.IRedisListService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +83,17 @@ public class CheckGetPriceOffDealWorker implements Runnable {
 
                 PtmCmpSku sku = dbm.get(PtmCmpSku.class, skuid);
                 if (sku == null) {
+                    continue;
+                }
+
+                //主商品被访问超过40次创建deal
+                long productId = sku.getProductId();
+
+                String yesterdayYmd = TimeUtils.parse(TimeUtils.addDay(TimeUtils.nowDate(), -1), "yyyyMMdd");
+
+                SrmProductSearchCount productSearchCount = dbm.querySingle("SELECT t FROM SrmProductSearchCount t WHERE t.productId = ?0 AND t.ymd = ?1", Arrays.asList(productId, yesterdayYmd));
+
+                if (productSearchCount.getCount() < 40) {
                     continue;
                 }
 
