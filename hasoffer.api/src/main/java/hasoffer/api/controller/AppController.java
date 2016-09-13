@@ -676,17 +676,25 @@ public class AppController {
             if (appDeal.getPtmcmpskuid() > 0) {
                 PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
                 if (ptmCmpSkuDescription != null) {
-                    sb.append("Key Features: \n");
                     String jsonParam = ptmCmpSkuDescription.getJsonParam();
-                    Map jsonMap = JsonHelper.getJsonMap(jsonParam);
-                    //遍历map
-                    Set<Map.Entry> set = jsonMap.entrySet();
-                    Iterator<Map.Entry> iterator = set.iterator();
-                    while (iterator.hasNext()) {
-                        Map.Entry next = iterator.next();
-                        sb.append(next.getKey()).append(" : ");
-                        sb.append(next.getValue()).append("\n");
+                    if (StringUtils.isNotBlank(jsonParam)) {
+                        Map jsonMap = JsonHelper.getJsonMap(jsonParam);
+                        if (jsonMap != null) {
+                            //遍历map
+                            Set<Map.Entry> set = jsonMap.entrySet();
+                            Iterator<Map.Entry> iterator = set.iterator();
+                            if (iterator.hasNext()) {
+                                sb.append("Key Features: \n");
+                            }
+                            while (iterator.hasNext()) {
+                                Map.Entry next = iterator.next();
+                                sb.append(next.getKey()).append(" : ");
+                                sb.append(next.getValue()).append("\n");
+                            }
+                        }
+
                     }
+
                 }
             }
 
@@ -782,25 +790,6 @@ public class AppController {
                     urmUserDevices.add(urmUserDevice);
                 }
             }
-//            if (deviceIds == null || deviceIds.size() < 1) {
-//                System.out.println("not exist records before ,add  this ");
-//                for (String id : ids) {
-//                    boolean flag = false;
-//                    for (String dId : deviceIds) {
-//                        if (id.equals(dId)) {
-//                            flag = true;
-//                            System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);
-//                        }
-//                    }
-//                    if (!flag) {
-//                        System.out.println("id :" + id + " is not exist before ");
-//                        UrmUserDevice urmUserDevice = new UrmUserDevice();
-//                        urmUserDevice.setDeviceId(id);
-//                        urmUserDevice.setUserId(uUser.getId() + "");
-//                        urmUserDevices.add(urmUserDevice);
-//                    }
-//                }
-//            }
             //将关联关系插入到关联表中
             int count = appService.addUrmUserDevice(urmUserDevices);
             System.out.println(" batch save  result size : " + count);
