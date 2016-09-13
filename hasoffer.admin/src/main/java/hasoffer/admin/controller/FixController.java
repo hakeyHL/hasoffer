@@ -62,11 +62,7 @@ import java.util.concurrent.*;
 @RequestMapping(value = "/fixdata")
 public class FixController {
 
-    private static final String Q_SHOPCLUES_OFFSALE = "SELECT t FROM PtmCmpSku t WHERE t.website = 'SHOPCLUES' AND t.status = 'OFFSALE' ORDER BY t.id";
-    private static final String Q_SHOPCLUES_STOCKOUT = "SELECT t FROM PtmCmpSku t WHERE t.website = 'SHOPCLUES' AND t.status = 'OUTSTOCK' ORDER BY t.id";
-
-    private static final String Q_PTMCATEGORY_BYPARENTID = "SELECT t FROM PtmCategory t WHERE t.parentId = ?0 ";
-    private static final String Q_PTMCMPSKU_BYCATEGORYID = "SELECT t FROM PtmCmpSku t WHERE t.categoryId = ?0 ";
+    private static final String Q_SKU_PRODUCTID = "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ORDER BY t.id";
 
     private static final String Q_PTMCMPSKU = "SELECT t FROM PtmCmpSku t WHERE t.productId < 100000";
     private static final String Q_INDEX = "SELECT t FROM PtmCmpSkuIndex2 t ORDER BY t.id ASC";
@@ -523,7 +519,96 @@ public class FixController {
         for (int i = 1; i < size; i++) {
             searchService.mergeProducts(finalProduct, cmpSkuMap, products.get(i));
         }
+    }
 
+    //fixdata/fixProductSkusRepeatUrl
+    @RequestMapping(value = "/fixProductSkusRepeatUrl/{productId}", method = RequestMethod.GET)
+    @ResponseBody
+    public String fixProductSkusRepeatUrl(@PathVariable long productId) {
+
+        System.out.println("productid = " + productId);
+        cleanProductSkusByUrl(productId);
+
+        return "ok";
+    }
+
+    private void cleanProductSkusByUrl(long productId) {
+
+        Set<String> urlSet = new HashSet<>();
+
+        List<PtmCmpSku> skuList = dbm.query(Q_SKU_PRODUCTID, Arrays.asList(productId));
+        if (skuList == null) {
+            System.out.println("skuList is null");
+        } else {
+            System.out.println("get skuList size =  " + skuList.size());
+        }
+
+        boolean flag = false;
+
+        for (int i = 0; i < skuList.size(); i++) {
+
+            PtmCmpSku ptmCmpSku = skuList.get(i);
+
+            String url = ptmCmpSku.getUrl();
+            System.out.println("sku [" + i + "] url is " + url);
+            if (urlSet.contains(url)) {
+                System.out.println("sku [" + i + "] url is already saved remove");
+                cmpSkuService.deleteCmpSku(ptmCmpSku.getId());
+                System.out.println("remove succes");
+                flag = true;
+            } else {
+                urlSet.add(url);
+                System.out.println("sku [" + i + "] url not in set add success");
+            }
+        }
+
+        if (flag) {
+            System.out.println("reimport product " + productId + " to solr start");
+            productService.importProduct2Solr2(productId);
+            System.out.println("reimport product " + productId + " to solr end");
+        }
+
+    }
+
+    /**
+     * 修复sorceSite为空的商品的图片
+     *
+     * @return
+     */
+    //fixdata/fixSourceUrlNullProductImage
+    @RequestMapping(value = "/fixSourceUrlNullProductImage", method = RequestMethod.GET)
+    @ResponseBody
+    public String fixSourceUrlNullProductImage() {
+
+        List<PtmProduct> productList = dbm.query("SELECT t FROM PtmProduct t WHERE t.sourceSite = ''");
+
+        for (PtmProduct product : productList) {
+
+            List<PtmCmpSku> skuList = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ORDER BY t.id", Arrays.asList(product.getId()));
+
+            if (skuList == null || skuList.size() == 0) {
+                continue;
+            }
+
+            Website website = skuList.get(0).getWebsite();
+            String url = skuList.get(0).getUrl();
+
+            String imageUrl = "";
+            try {
+                imageUrl = fetchService.fetchWebsiteImageUrl(website, url);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (StringUtils.isEmpty(imageUrl)) {
+                continue;
+            }
+            productService.updateProductImage2(product.getId(), imageUrl);
+
+
+        }
+
+        return "ok";
     }
 
     @RequestMapping(value = "/fiximages/{site}", method = RequestMethod.GET)

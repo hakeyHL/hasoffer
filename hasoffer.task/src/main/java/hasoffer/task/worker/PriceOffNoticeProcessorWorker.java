@@ -55,7 +55,12 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
                     } catch (InterruptedException e) {
                         return;
                     }
-                    continue;
+                    if (DubboUpdateController.Price_OFF_LIST_THREAD_NUM == 0 && queue.size() == 0) {
+                        System.out.println("price off process queue has no object ,thread going to die");
+                        break;
+                    } else {
+                        continue;
+                    }
                 }
 
                 Date updateTime = sku.getUpdateTime();
@@ -75,10 +80,6 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
             System.out.println("Price_OFF_LIST_THREAD_NUM == " + DubboUpdateController.Price_OFF_LIST_THREAD_NUM);
             System.out.println("queue size is " + queue.size());
             System.out.println("sku ex: " + sku.getId());
-            if (DubboUpdateController.Price_OFF_LIST_THREAD_NUM == 0 && queue.size() == 0) {
-                System.out.println("price off process queue has no object ,thread going to die");
-                break;
-            }
         }
     }
 
