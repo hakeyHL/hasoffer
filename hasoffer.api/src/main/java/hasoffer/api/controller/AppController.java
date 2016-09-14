@@ -1157,4 +1157,13 @@ public class AppController {
         return mv;
     }
 
+    //搜索词提示
+    @RequestMapping(value = "candidateKeyword", method = RequestMethod.GET)
+    public ModelAndView getSearchKeyWordsTip(String keyWord) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("errorCode", "00000");
+        modelAndView.addObject("msg", "ok");
+        modelAndView.addObject("data", Arrays.asList("hasoffer", "very", "good", "!"));
+        return modelAndView;
+    }
 }
