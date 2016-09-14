@@ -119,23 +119,6 @@
         </encoder>
     </appender>
 
-    <appender name="ThirdPartLoggerFileOut"
-              class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.base}/thirdPart.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/thirdPart.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy
-                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <MaxHistory>10</MaxHistory>
-                <!-- or whenever the file size reaches 100MB -->
-                <maxFileSize>100MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-        </rollingPolicy>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%date [%thread][%-8level%logger{80}] %msg%n</pattern>
-        </encoder>
-    </appender>
-
     <appender name="fetchLoggerFileOut"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/fetch.log</file>

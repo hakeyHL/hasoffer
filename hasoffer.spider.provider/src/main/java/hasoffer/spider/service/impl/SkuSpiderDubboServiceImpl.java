@@ -23,7 +23,6 @@ public class SkuSpiderDubboServiceImpl implements ISkuTaskDubboService {
         if (redisKeyName == null || "".equals(redisKeyName)) {
             return;
         }
-        System.out.println(redisKeyName);
         redisListService.push(redisKeyName, JSONUtil.toJSON(skuTask));
     }
 
