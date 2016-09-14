@@ -67,7 +67,7 @@ public class SpiderSkuWorker implements Runnable {
             spiderSkuScheduler.pushRequest(skuTask.getUrl(), extraMap);
 
             if (Spider.Status.Stopped.equals(spiderSkuScheduler.runStatus())) {
-                System.out.println("start " + spiderConfig.getWebsite() + ":" + i++);
+                logger.debug("start " + spiderConfig.getWebsite() + ":" + i++);
                 spiderSkuScheduler.startSpiderTask();
             }
         }
