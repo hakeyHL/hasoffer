@@ -208,6 +208,8 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
                 priceToStr = String.valueOf(priceTo);
             }
             fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", priceFromStr, priceToStr)));
+        } else {
+            fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", "1", "*")));
         }
 //        Sort[] sorts = null;
         Sort[] sorts = new Sort[1];
