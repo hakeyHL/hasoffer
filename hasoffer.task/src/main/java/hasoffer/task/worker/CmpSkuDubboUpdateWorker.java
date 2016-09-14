@@ -141,8 +141,8 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 logger.info("createPtmCmpSkuImage fail " + skuid);
             }
 
-//            如果降价且评论大于40写入队列
-            if (price > fetchedProduct.getPrice() && fetchedProduct.getRatings() > 40) {
+//            如果降价且CommentsNumber 大于40写入队列
+            if (price > fetchedProduct.getPrice() && fetchedProduct.getCommentsNumber() > 40) {
                 redisListService.push(PRICE_DROP_SKUID_QUEUE, skuid + "");
                 System.out.println("price drop add to queue success " + skuid);
             }
