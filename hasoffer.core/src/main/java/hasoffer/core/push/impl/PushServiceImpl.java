@@ -1,5 +1,8 @@
 package hasoffer.core.push.impl;
 
+import com.google.android.gcm.server.Message;
+import com.google.android.gcm.server.MulticastResult;
+import com.google.android.gcm.server.Sender;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.core.bo.push.AppPushBo;
@@ -80,5 +83,14 @@ public class PushServiceImpl implements IPushService {
     public List<String> getAllAppVersions() {
 
         return dbm.query(Q_APPVERSION_GET_ALLVERSIONS);
+    }
+
+    @Override
+    public MulticastResult GroupPush(List<String> gcmTokens, AppPushBo pushBo) throws Exception {
+        Sender sender = new Sender("AIzaSyCZrHjOkZ57j3Dvq_TpvYW8Mt38Ej1dzQA");
+        String userMessage = JSONUtil.toJSON(pushBo);
+        Message message = new Message.Builder().timeToLive(30).delayWhileIdle(true).addData("message", userMessage).build();
+        MulticastResult result = sender.send(message, gcmTokens, 1);
+        return result;
     }
 }
