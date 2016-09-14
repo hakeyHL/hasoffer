@@ -172,7 +172,7 @@ public class CheckGetPriceOffDealWorker implements Runnable {
                     //当天title不能重名
                     String title = sku.getTitle();
                     Website website = sku.getWebsite();
-                    appdealList = dbm.query("SELECT t FROM Appdeal t WHERE t.title = ?0 AND t.website = ?1 ", Arrays.asList(title, website));
+                    appdealList = dbm.query("SELECT t FROM AppDeal t WHERE t.title = ?0 AND t.website = ?1 ", Arrays.asList(title, website));
                     if (appdealList != null && appdealList.size() != 0) {
                         System.out.println("query by title website get " + appdealList.size() + " sku");
                         flag = false;
