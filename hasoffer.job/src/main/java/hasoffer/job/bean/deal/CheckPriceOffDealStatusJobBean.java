@@ -121,6 +121,8 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                         if (deal == null) {
                             System.out.println("CheckPriceOffDealStatusJobBean poll get null sleep 5 seconds");
 
+                            System.out.println("thread size " + CheckPriceOffDealStatusJobBean.PRICEOFF_DEAL_LIST_THREAD_NUM);
+                            System.out.println("queue size " + priceOffDealQueue.size());
                             if (CheckPriceOffDealStatusJobBean.PRICEOFF_DEAL_LIST_THREAD_NUM == 0 && priceOffDealQueue.size() == 0) {
                                 System.out.println("CheckPriceOffDealStatusJobBean list thread is die and queue size is 0 ,process thread go die");
                                 break;
