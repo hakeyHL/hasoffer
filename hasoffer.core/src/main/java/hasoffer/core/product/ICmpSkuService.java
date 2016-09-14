@@ -36,6 +36,11 @@ public interface ICmpSkuService {
 
     void updateCmpSkuByOriFetchedProduct(long skuId, OriFetchedProduct oriFetchedProduct);
 
+    /**
+     * SKU更新，通过spider 更新数据。
+     * @param skuId
+     * @param fetchedProduct
+     */
     void updateCmpSkuBySpiderFetchedProduct(long skuId, FetchedProduct fetchedProduct);
 
     void updateCmpSku(long id, String url, String color, String size, float price);
