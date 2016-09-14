@@ -20,7 +20,9 @@ public class FeedbackController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ModelAndView feedback(HttpServletRequest request) {
-
+        //type 0. 代表用户卸载反馈
+        //content代表反馈内容
+        //pos代表具体不爽原因 ,list...
         String type = request.getParameter("type");
         String pos = request.getParameter("pos");
         String content = request.getParameter("content");

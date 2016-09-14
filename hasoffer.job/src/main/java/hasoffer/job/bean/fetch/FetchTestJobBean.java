@@ -1,18 +1,20 @@
 package hasoffer.job.bean.fetch;
 
-import hasoffer.job.service.IFetchTestService;
+import java.util.Date;
+
+import javax.annotation.Resource;
+
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import javax.annotation.Resource;
-import java.util.Date;
+import hasoffer.job.service.IFetchTestService;
 
 public class FetchTestJobBean extends QuartzJobBean {
     /**
-     * Logger for this class 
+     * Logger for this class
      */
     private static final Logger logger = LoggerFactory.getLogger(FetchTestJobBean.class);
 
