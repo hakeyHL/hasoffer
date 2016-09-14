@@ -88,7 +88,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
 
                 <configuration>
-                    <finalName>hasoffer.spider.provider</finalName>
+                    <finalName>hasoffer.spider.consumer</finalName>
                     <descriptor>src/main/assembly/assembly.xml</descriptor>
                 </configuration>
                 <executions>
