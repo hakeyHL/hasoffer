@@ -33,7 +33,6 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
      */
     private static final Logger logger = LoggerFactory.getLogger(CheckGetPriceOffDealWorker.class);
     private static final String PRICE_DROP_SKUID_QUEUE = "PRICE_DROP_SKUID_QUEUE";
-    private static int CREATE_DEAL_SUCCESS_NUMBER = 0;
 
     private IMongoDbManager mdm;
     private IDataBaseManager dbm;
@@ -76,12 +75,6 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
         while (true) {
 
             try {
-
-                System.out.println("create deal success number = " + CREATE_DEAL_SUCCESS_NUMBER);
-
-                if (CREATE_DEAL_SUCCESS_NUMBER == 10) {
-                    break;
-                }
 
                 Object pop = redisListService.pop(PRICE_DROP_SKUID_QUEUE);
 
@@ -196,7 +189,8 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
                     System.out.println("flag " + flag);
                     if (flag) {
                         dealService.createAppDealByPriceOff(appdeal);
-                        CREATE_DEAL_SUCCESS_NUMBER++;
+                        //创建成功一个就跳出
+                        break;
                     }
                 }
 
