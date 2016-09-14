@@ -71,12 +71,14 @@ public class AppSkuController {
     }
 
     public static void main(String[] args) {
-        Long tempDateL = 1472608486682l - 1472452044987l;
-        System.out.println(BigDecimal.valueOf(tempDateL).divide(BigDecimal.valueOf(60 * 60 * 1000 * 24), BigDecimal.ROUND_HALF_UP).longValue());
-        Date date1 = new Date();
-        date1.setTime(1472452044987l);
-        Date date2 = new Date();
-        date2.setTime(1472608486682l);
+//        Long tempDateL = 1472608486682l - 1472452044987l;
+//        System.out.println(BigDecimal.valueOf(tempDateL).divide(BigDecimal.valueOf(60 * 60 * 1000 * 24), BigDecimal.ROUND_HALF_UP).longValue());
+//        Date date1 = new Date();
+//        date1.setTime(1472452044987l);
+//        Date date2 = new Date();
+//        date2.setTime(1472608486682l);
+//        String dateMMdd = AppSkuController.getDateMMdd(new Date().getTime());
+//        System.out.println(dateMMdd);
     }
 
     //计算当前x距离x轴起始点的距离
@@ -90,7 +92,7 @@ public class AppSkuController {
         date.setTime(time);
         String format = null;
         try {
-            format = new SimpleDateFormat("dd-MM", Locale.ENGLISH).format(date);
+            format = new SimpleDateFormat("dd-MMM", Locale.ENGLISH).format(date);
         } catch (Exception e) {
             logger.error("transfer long date to MM-dd failed " + date);
         }
