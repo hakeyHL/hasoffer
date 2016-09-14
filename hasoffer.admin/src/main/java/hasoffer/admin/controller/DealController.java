@@ -1,8 +1,10 @@
 package hasoffer.admin.controller;
 
+import hasoffer.admin.controller.vo.AppdealVo;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.IDUtil;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.admin.impl.DealServiceImpl;
 import hasoffer.core.persistence.enums.BannerFrom;
@@ -24,9 +26,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by lihongde on 2016/6/21 12:47
@@ -51,11 +51,29 @@ public class DealController {
     public ModelAndView listDealData(HttpServletRequest request, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "50") int size, @RequestParam(defaultValue = "1") int type) {
         ModelAndView mav = new ModelAndView("deal/list");
         PageableResult<AppDeal> pageableResult = dealService.findDealList(page, size, type);
+        List<AppdealVo> appdealVoList = new ArrayList<>();
         for (AppDeal appDeal : pageableResult.getData()) {
-            appDeal.setListPageImage(ImageUtil.getImageUrl(appDeal.getListPageImage()));
+            AppdealVo appdealVo = new AppdealVo();
+
+            appdealVo.setId(appDeal.getId());
+            appdealVo.setWebsite(appDeal.getWebsite());
+            appdealVo.setCreateTime(appDeal.getCreateTime());
+            appdealVo.setListPageImage(ImageUtil.getImageUrl(appDeal.getListPageImage()));
+            appdealVo.setPush(appDeal.isPush());
+            appdealVo.setDisplay(appDeal.isDisplay());
+            appdealVo.setTitle(appDeal.getTitle());
+            appdealVo.setPriceDescription(appDeal.getPriceDescription());
+            appdealVo.setExpireTime(appDeal.getExpireTime());
+            appdealVo.setDealClickCount(appDeal.getDealClickCount());
+            if (TimeUtils.nowDate().getTime() > appDeal.getExpireTime().getTime()) {
+                appdealVo.setExpireStatus(0);//已经失效
+            } else {
+                appdealVo.setExpireStatus(1);//有效
+            }
+            appdealVoList.add(appdealVo);
         }
         mav.addObject("page", PageHelper.getPageModel(request, pageableResult));
-        mav.addObject("datas", pageableResult.getData());
+        mav.addObject("datas", appdealVoList);
         return mav;
     }
 

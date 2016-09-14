@@ -98,14 +98,6 @@ public class RequestInterceptor implements HandlerInterceptor {
         return true;
     }
 
-//    private void addLogToDB(DeviceRequestBo requestVo) {
-//        ActorRef defaultActorRef = AkkaActorRef.getDefaultActorRef();
-//        AkkaJobConfigMessage message = new AkkaJobConfigMessage(DeviceLogActor.class, 1);
-//        defaultActorRef.tell(message, ActorRef.noSender());
-//        AkkaJobMessage akkaJobMessage = new AkkaJobMessage(DeviceLogActor.class, requestVo);
-//        defaultActorRef.tell(akkaJobMessage, ActorRef.noSender());
-//    }
-
     private void recordClientEvent(DeviceRequestVo requestVo, HttpServletRequest request) {
         if (requestVo.getRequestUri().equals("/app/log")) {
             String event = request.getParameter("event");
@@ -160,8 +152,10 @@ public class RequestInterceptor implements HandlerInterceptor {
                 System.out.println("get ids  by userId from urmUserDevice :" + deviceIds.size());
                 List<UrmUserDevice> urmUserDevices = new ArrayList<>();
                 for (String id : ids) {
+                    System.out.println(" id id id :" + id);
                     boolean flag = false;
                     for (String dId : deviceIds) {
+                        System.out.println(" dId dId dId :" + dId);
                         if (id.equals(dId)) {
                             flag = true;
                             System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);

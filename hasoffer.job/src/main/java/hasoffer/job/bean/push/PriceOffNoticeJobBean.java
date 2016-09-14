@@ -40,16 +40,23 @@ public class PriceOffNoticeJobBean extends QuartzJobBean {
 
             for (int i = 0; i < size; i++) {
 
-                Long skuid = Long.parseLong((String) redisListService.pop(PRICEOFF_NOTICE_SKUID_QUEUE));
-                logger.info("price off push for " + skuid);
-
-                priceOffNoticeService.priceOffCheck(skuid);
-
-                //每条sku推送，间隔5s
                 try {
-                    TimeUnit.SECONDS.sleep(5);
-                } catch (InterruptedException e) {
+
+                    Long skuid = Long.parseLong((String) redisListService.pop(PRICEOFF_NOTICE_SKUID_QUEUE));
+                    logger.info("price off push for " + skuid);
+
+                    priceOffNoticeService.priceOffCheck(skuid);
+
+                    //每条sku推送，间隔5s
+                    try {
+                        TimeUnit.SECONDS.sleep(5);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                } catch (Exception e) {
                     e.printStackTrace();
+                    continue;
                 }
             }
         }
