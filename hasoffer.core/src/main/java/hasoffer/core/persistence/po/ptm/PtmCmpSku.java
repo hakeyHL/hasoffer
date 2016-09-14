@@ -1,17 +1,5 @@
 package hasoffer.core.persistence.po.ptm;
 
-import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
-import org.hibernate.annotations.ColumnDefault;
-
 import hasoffer.base.enums.IndexNeed;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
@@ -19,6 +7,10 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.sites.mysmartprice.model.MySmartPriceCmpSku;
+import org.hibernate.annotations.ColumnDefault;
+
+import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 public class PtmCmpSku implements Identifiable<Long> {
@@ -41,7 +33,8 @@ public class PtmCmpSku implements Identifiable<Long> {
     private String skuTitle;// 带商品的color，size属性的
     private String title;
 
-    private float price;
+    private float price;//sku的现价
+    private float oriPrice;//sku的原价
 
     private float cashBack = -1;
 
@@ -428,88 +421,66 @@ public class PtmCmpSku implements Identifiable<Long> {
         this.model = model;
     }
 
+    public float getOriPrice() {
+        return oriPrice;
+    }
+
+    public void setOriPrice(float oriPrice) {
+        this.oriPrice = oriPrice;
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        PtmCmpSku sku = (PtmCmpSku) o;
+        PtmCmpSku ptmCmpSku = (PtmCmpSku) o;
 
-        if (productId != sku.productId)
+        if (productId != ptmCmpSku.productId) return false;
+        if (Float.compare(ptmCmpSku.price, price) != 0) return false;
+        if (Float.compare(ptmCmpSku.oriPrice, oriPrice) != 0) return false;
+        if (Float.compare(ptmCmpSku.cashBack, cashBack) != 0) return false;
+        if (checked != ptmCmpSku.checked) return false;
+        if (failLoadImage != ptmCmpSku.failLoadImage) return false;
+        if (commentsNumber != ptmCmpSku.commentsNumber) return false;
+        if (ratings != ptmCmpSku.ratings) return false;
+        if (Float.compare(ptmCmpSku.shipping, shipping) != 0) return false;
+        if (returnDays != ptmCmpSku.returnDays) return false;
+        if (id != null ? !id.equals(ptmCmpSku.id) : ptmCmpSku.id != null) return false;
+        if (categoryId != null ? !categoryId.equals(ptmCmpSku.categoryId) : ptmCmpSku.categoryId != null) return false;
+        if (categoryId2 != null ? !categoryId2.equals(ptmCmpSku.categoryId2) : ptmCmpSku.categoryId2 != null)
             return false;
-        if (Float.compare(sku.price, price) != 0)
+        if (website != ptmCmpSku.website) return false;
+        if (seller != null ? !seller.equals(ptmCmpSku.seller) : ptmCmpSku.seller != null) return false;
+        if (skuTitle != null ? !skuTitle.equals(ptmCmpSku.skuTitle) : ptmCmpSku.skuTitle != null) return false;
+        if (title != null ? !title.equals(ptmCmpSku.title) : ptmCmpSku.title != null) return false;
+        if (rating != null ? !rating.equals(ptmCmpSku.rating) : ptmCmpSku.rating != null) return false;
+        if (imagePath != null ? !imagePath.equals(ptmCmpSku.imagePath) : ptmCmpSku.imagePath != null) return false;
+        if (smallImagePath != null ? !smallImagePath.equals(ptmCmpSku.smallImagePath) : ptmCmpSku.smallImagePath != null)
             return false;
-        if (Float.compare(sku.cashBack, cashBack) != 0)
+        if (bigImagePath != null ? !bigImagePath.equals(ptmCmpSku.bigImagePath) : ptmCmpSku.bigImagePath != null)
             return false;
-        if (checked != sku.checked)
+        if (oriImageUrl != null ? !oriImageUrl.equals(ptmCmpSku.oriImageUrl) : ptmCmpSku.oriImageUrl != null)
             return false;
-        if (failLoadImage != sku.failLoadImage)
+        if (deeplink != null ? !deeplink.equals(ptmCmpSku.deeplink) : ptmCmpSku.deeplink != null) return false;
+        if (url != null ? !url.equals(ptmCmpSku.url) : ptmCmpSku.url != null) return false;
+        if (oriUrl != null ? !oriUrl.equals(ptmCmpSku.oriUrl) : ptmCmpSku.oriUrl != null) return false;
+        if (color != null ? !color.equals(ptmCmpSku.color) : ptmCmpSku.color != null) return false;
+        if (size != null ? !size.equals(ptmCmpSku.size) : ptmCmpSku.size != null) return false;
+        if (updateTime != null ? !updateTime.equals(ptmCmpSku.updateTime) : ptmCmpSku.updateTime != null) return false;
+        if (createTime != null ? !createTime.equals(ptmCmpSku.createTime) : ptmCmpSku.createTime != null) return false;
+        if (titleUpdateTime != null ? !titleUpdateTime.equals(ptmCmpSku.titleUpdateTime) : ptmCmpSku.titleUpdateTime != null)
             return false;
-        if (commentsNumber != sku.commentsNumber)
+        if (sourcePid != null ? !sourcePid.equals(ptmCmpSku.sourcePid) : ptmCmpSku.sourcePid != null) return false;
+        if (sourceSid != null ? !sourceSid.equals(ptmCmpSku.sourceSid) : ptmCmpSku.sourceSid != null) return false;
+        if (indexNeed != ptmCmpSku.indexNeed) return false;
+        if (status != ptmCmpSku.status) return false;
+        if (supportPayMethod != null ? !supportPayMethod.equals(ptmCmpSku.supportPayMethod) : ptmCmpSku.supportPayMethod != null)
             return false;
-        if (ratings != sku.ratings)
+        if (deliveryTime != null ? !deliveryTime.equals(ptmCmpSku.deliveryTime) : ptmCmpSku.deliveryTime != null)
             return false;
-        if (Float.compare(sku.shipping, shipping) != 0)
-            return false;
-        if (returnDays != sku.returnDays)
-            return false;
-        if (id != null ? !id.equals(sku.id) : sku.id != null)
-            return false;
-        if (categoryId != null ? !categoryId.equals(sku.categoryId) : sku.categoryId != null)
-            return false;
-        if (categoryId2 != null ? !categoryId2.equals(sku.categoryId2) : sku.categoryId2 != null)
-            return false;
-        if (website != sku.website)
-            return false;
-        if (seller != null ? !seller.equals(sku.seller) : sku.seller != null)
-            return false;
-        if (skuTitle != null ? !skuTitle.equals(sku.skuTitle) : sku.skuTitle != null)
-            return false;
-        if (title != null ? !title.equals(sku.title) : sku.title != null)
-            return false;
-        if (rating != null ? !rating.equals(sku.rating) : sku.rating != null)
-            return false;
-        if (imagePath != null ? !imagePath.equals(sku.imagePath) : sku.imagePath != null)
-            return false;
-        if (smallImagePath != null ? !smallImagePath.equals(sku.smallImagePath) : sku.smallImagePath != null)
-            return false;
-        if (bigImagePath != null ? !bigImagePath.equals(sku.bigImagePath) : sku.bigImagePath != null)
-            return false;
-        if (oriImageUrl != null ? !oriImageUrl.equals(sku.oriImageUrl) : sku.oriImageUrl != null)
-            return false;
-        if (deeplink != null ? !deeplink.equals(sku.deeplink) : sku.deeplink != null)
-            return false;
-        if (url != null ? !url.equals(sku.url) : sku.url != null)
-            return false;
-        if (oriUrl != null ? !oriUrl.equals(sku.oriUrl) : sku.oriUrl != null)
-            return false;
-        if (color != null ? !color.equals(sku.color) : sku.color != null)
-            return false;
-        if (size != null ? !size.equals(sku.size) : sku.size != null)
-            return false;
-        if (updateTime != null ? !updateTime.equals(sku.updateTime) : sku.updateTime != null)
-            return false;
-        if (createTime != null ? !createTime.equals(sku.createTime) : sku.createTime != null)
-            return false;
-        if (titleUpdateTime != null ? !titleUpdateTime.equals(sku.titleUpdateTime) : sku.titleUpdateTime != null)
-            return false;
-        if (sourcePid != null ? !sourcePid.equals(sku.sourcePid) : sku.sourcePid != null)
-            return false;
-        if (sourceSid != null ? !sourceSid.equals(sku.sourceSid) : sku.sourceSid != null)
-            return false;
-        if (indexNeed != sku.indexNeed)
-            return false;
-        if (status != sku.status)
-            return false;
-        if (supportPayMethod != null ? !supportPayMethod.equals(sku.supportPayMethod) : sku.supportPayMethod != null)
-            return false;
-        if (deliveryTime != null ? !deliveryTime.equals(sku.deliveryTime) : sku.deliveryTime != null)
-            return false;
-        if (brand != null ? !brand.equals(sku.brand) : sku.brand != null)
-            return false;
-        return !(model != null ? !model.equals(sku.model) : sku.model != null);
+        if (brand != null ? !brand.equals(ptmCmpSku.brand) : ptmCmpSku.brand != null) return false;
+        return !(model != null ? !model.equals(ptmCmpSku.model) : ptmCmpSku.model != null);
 
     }
 
@@ -524,6 +495,7 @@ public class PtmCmpSku implements Identifiable<Long> {
         result = 31 * result + (skuTitle != null ? skuTitle.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (price != +0.0f ? Float.floatToIntBits(price) : 0);
+        result = 31 * result + (oriPrice != +0.0f ? Float.floatToIntBits(oriPrice) : 0);
         result = 31 * result + (cashBack != +0.0f ? Float.floatToIntBits(cashBack) : 0);
         result = 31 * result + (rating != null ? rating.hashCode() : 0);
         result = 31 * result + (imagePath != null ? imagePath.hashCode() : 0);
@@ -553,16 +525,5 @@ public class PtmCmpSku implements Identifiable<Long> {
         result = 31 * result + (brand != null ? brand.hashCode() : 0);
         result = 31 * result + (model != null ? model.hashCode() : 0);
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return id + "\t" + productId + "\t" + categoryId + "\t" + categoryId2 + "\t" + website + "\t" + seller + "\t"
-                + skuTitle + "\t" + title + "\t" + price + "\t" + cashBack + "\t" + rating + "\t" + imagePath + "\t"
-                + smallImagePath + "\t" + bigImagePath + "\t" + oriImageUrl + "\t" + deeplink + "\t" + url + "\t"
-                + oriUrl + "\t" + color + "\t" + size + "\t" + updateTime + "\t" + createTime + "\t" + titleUpdateTime
-                + "\t" + checked + "\t" + failLoadImage + "\t" + sourcePid + "\t" + sourceSid + "\t" + indexNeed + "\t"
-                + status + "\t" + commentsNumber + "\t" + ratings + "\t" + shipping + "\t" + supportPayMethod + "\t"
-                + deliveryTime + "\t" + returnDays + "\t" + brand + "\t" + model;
     }
 }

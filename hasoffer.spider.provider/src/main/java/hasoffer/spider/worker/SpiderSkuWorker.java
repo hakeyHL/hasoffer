@@ -12,6 +12,7 @@ import hasoffer.spider.service.impl.SpiderSkuScheduleServiceImpl;
 import hasoffer.spring.context.SpringContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.pipeline.Pipeline;
 
 import java.io.IOException;
@@ -25,6 +26,8 @@ public class SpiderSkuWorker implements Runnable {
 
     private SpiderConfig spiderConfig;
 
+    private int i = 0;
+
     private ISpiderScheduleService spiderSkuScheduler;
 
     private IRedisListService<String> redisListService;
@@ -32,15 +35,14 @@ public class SpiderSkuWorker implements Runnable {
 
     public SpiderSkuWorker(SpiderConfig spiderConfig, AbstractPageProcessor pageProcessor, Pipeline pipeline) {
         this.spiderConfig = spiderConfig;
-        spiderSkuScheduler = new SpiderSkuScheduleServiceImpl(spiderConfig, pageProcessor, pipeline);
         redisListService = (IRedisListService<String>) SpringContextHolder.getBean(RedisListServiceImpl.class);
+        spiderSkuScheduler = new SpiderSkuScheduleServiceImpl(spiderConfig, pageProcessor, pipeline);
         spiderSkuScheduler.startSpiderTask();
     }
 
     @Override
     public void run() {
         String redisListName = SpiderConfigInitContext.getRedisListName(spiderConfig.getWebsite());
-        System.out.println("SpiderSkuWorker.run():"+redisListName);
         if (redisListName == null || "".equals(redisListName)) {
             return;
         }
@@ -56,7 +58,6 @@ public class SpiderSkuWorker implements Runnable {
             }
             SpiderSkuTask skuTask = null;
             try {
-                System.out.println(skuTaskStr);
                 skuTask = JSONUtil.toObject(skuTaskStr, SpiderSkuTask.class);
             } catch (IOException e) {
                 logger.error("Json parse error. error msg {}", e);
@@ -64,6 +65,11 @@ public class SpiderSkuWorker implements Runnable {
             Map<String, Object> extraMap = new HashMap<>();
             extraMap.put("skuId", skuTask.getSkuId());
             spiderSkuScheduler.pushRequest(skuTask.getUrl(), extraMap);
+
+            if (Spider.Status.Stopped.equals(spiderSkuScheduler.runStatus())) {
+                System.out.println("start " + spiderConfig.getWebsite() + ":" + i++);
+                spiderSkuScheduler.startSpiderTask();
+            }
         }
     }
 }

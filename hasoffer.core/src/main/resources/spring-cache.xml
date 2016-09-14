@@ -8,13 +8,6 @@
 
     <context:component-scan base-package="hasoffer.data.redis"/>
 
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations">
-            <list>
-                <value>classpath:redis.properties</value>
-            </list>
-        </property>
-    </bean>
     <!--cacheManager工厂类，指定ehcache.xml的位置-->
     <!--<bean id="cacheManagerFactory" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">-->
     <!--<property name="configLocation" value="classpath:/cache/ehcache.xml"/>-->
@@ -42,7 +35,6 @@
         <property name="timeout" value="${cache.redis.timeout}"/>
         <property name="password" value="${cache.redis.password}"/>
         <property name="poolConfig" ref="jedisPoolConfig"/>
-        <property name="database" value="1"/>
     </bean>
     <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
         <property name="connectionFactory" ref="jedisConnFactory"/>

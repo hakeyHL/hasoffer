@@ -4,7 +4,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <description>spring-context-holder</description>
+    <description>application</description>
 
     <context:annotation-config/>
     <context:component-scan base-package="hasoffer">

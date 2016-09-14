@@ -4,6 +4,8 @@ import hasoffer.spider.task.service.SpiderTaskService;
 import hasoffer.spring.context.SpringContextHolder;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.util.concurrent.TimeUnit;
+
 public class Main {
     public static void main(String[] args) throws InterruptedException {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
@@ -19,10 +21,10 @@ public class Main {
 
         Thread.sleep(10000);
 
-        SpiderTaskService taskInitContext = SpringContextHolder.getBean(SpiderTaskService.class);
-        taskInitContext.initTask();
         while (true) {
-            Thread.sleep(1000);
+            SpiderTaskService taskInitContext = SpringContextHolder.getBean(SpiderTaskService.class);
+            taskInitContext.initTask();
+            TimeUnit.HOURS.sleep(1);
         }
     }
 }
