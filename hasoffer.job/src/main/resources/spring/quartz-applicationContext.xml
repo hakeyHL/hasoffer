@@ -34,6 +34,7 @@
                 <!--<ref bean="fetchTestTrigger"/>-->
                 <!--<ref bean="topSellingTaskTrigger"/>-->
                 <ref bean="priceOffDealUpdateTrigger"/>
+                <ref bean="priceOffGetDealTrigger"/>
                 <!--<ref bean="statVisitSkuUpdateTrigger"/>-->
             </list>
         </property>
@@ -181,14 +182,13 @@
     <!--</bean>-->
 
     <!--price off create deal -->
-    <!--有守护进程的worker，如果测试可用，走守护进程这个job可以注释掉-->
-    <bean name="priceOffGetDeal" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+    <bean name="priceOffGetDealJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="hasoffer.job.bean.deal.CheckGetPriceOffDealJobBean"/>
     </bean>
 
-    <bean id="priceOffGetDealJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-        <property name="jobDetail" ref="priceOffGetDeal"/>
-        <property name="cronExpression" value="0 0 1 1 1 ? 2066 "/>
+    <bean id="priceOffGetDealTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="priceOffGetDealJob"/>
+        <property name="cronExpression" value="0 0/10 * * * ?"/>
     </bean>
 
     <!--price off deal update-->
