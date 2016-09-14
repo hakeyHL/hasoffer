@@ -90,7 +90,7 @@ public class AppSkuController {
         date.setTime(time);
         String format = null;
         try {
-            format = new SimpleDateFormat("MM-dd").format(date);
+            format = new SimpleDateFormat("dd-MM", Locale.ENGLISH).format(date);
         } catch (Exception e) {
             logger.error("transfer long date to MM-dd failed " + date);
         }
