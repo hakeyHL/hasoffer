@@ -1,8 +1,13 @@
 package hasoffer.spider.main;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Main {
+
+    private static final Logger logger = LoggerFactory.getLogger("spider.consumer");
+
     public static void main(String[] args) throws InterruptedException {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
                 new String[]{
@@ -14,7 +19,7 @@ public class Main {
                 });
         context.start();
 
-        System.out.println("start finish.");
+        logger.info("start finish.");
         while (true) {
             Thread.sleep(1000);
         }

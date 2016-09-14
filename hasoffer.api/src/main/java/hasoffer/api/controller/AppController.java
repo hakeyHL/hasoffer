@@ -1020,23 +1020,6 @@ public class AppController {
     public void addProductVo2List(List desList, List sourceList) {
 
         if (sourceList != null && sourceList.size() > 0) {
-            /*if (ProductModel.class.isInstance(sourceList.get(0))) {
-                Iterator<ProductModel> modelList = sourceList.iterator();
-                while (modelList.hasNext()) {
-                    ProductModel productModel = modelList.next();
-                    int count = cmpSkuService.getSkuSoldStoreNum(productModel.getId());
-                    if (count > 0) {
-                        ProductListVo productListVo = new ProductListVo();
-                        productListVo.setStoresNum(count);
-                        productListVo.setId(productModel.getId());
-                        setCommentNumAndRatins(productListVo);
-                        productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
-                        productListVo.setName(productModel.getTitle());
-                        productListVo.setPrice(Math.round(productModel.getPrice()));
-                        desList.add(productListVo);
-                    }
-                }
-            } else*/
             if (PtmProduct.class.isInstance(sourceList.get(0))) {
                 Iterator<PtmProduct> ptmList = sourceList.iterator();
                 while (ptmList.hasNext()) {
@@ -1062,15 +1045,11 @@ public class AppController {
                     System.out.println("ptmProduct.getRating() " + ptmProduct.getRating());
                     System.out.println("ptmProduct.getReview() " + ptmProduct.getReview());
                     System.out.println("ptmProduct.getStoreCount() " + ptmProduct.getStoreCount());
-//                    int count = cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
-//                    if (count > 0) {
                     ProductListVo productListVo = new ProductListVo();
                     productListVo.setId(ptmProduct.getId());
                     productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
                     productListVo.setName(ptmProduct.getTitle());
                     productListVo.setPrice(Math.round(ptmProduct.getMinPrice()));
-//                        productListVo.setStoresNum(count);
-//                        setCommentNumAndRatins(productListVo);
                     productListVo.setRatingNum(ptmProduct.getRating());
                     productListVo.setCommentNum(Long.valueOf(ptmProduct.getReview()));
                     productListVo.setStoresNum(ptmProduct.getStoreCount());
@@ -1165,5 +1144,26 @@ public class AppController {
         modelAndView.addObject("msg", "ok");
         modelAndView.addObject("data", Arrays.asList("hasoffer", "very", "good", "!"));
         return modelAndView;
+    }
+
+    public boolean FilterProducts(String title, String keyword) {
+        String[] filterWords = new String[]{"case", "cover", "glass", "battery", "for", "back", "phone", "guard", "cable"};
+        boolean flag = true;
+        for (String str : filterWords) {
+            if (title.trim().contains(str)) {
+                //如果搜索结果中以后配件名称,看关键词中有没有
+                if (keyword.trim().contains(str)) {
+                    //如果关键词中也有,那就是
+                    flag = true;
+                } else {
+                    flag = false;
+                }
+            } else {
+                //如果不包含,放行
+                flag = true;
+            }
+        }
+        //默认放行
+        return flag;
     }
 }
