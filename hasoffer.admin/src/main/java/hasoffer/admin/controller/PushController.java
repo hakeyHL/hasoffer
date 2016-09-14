@@ -4,11 +4,16 @@ import com.alibaba.fastjson.JSONObject;
 import hasoffer.admin.controller.vo.PushVo;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.core.bo.push.*;
+import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.enums.PushSourceType;
+import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.push.IPushService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -42,7 +47,31 @@ public class PushController {
 
     @Resource
     IPushService pushService;
+    @Resource
+    IDataBaseManager dbm;
     private Logger logger = LoggerFactory.getLogger(PushController.class);
+
+    @RequestMapping(value = "/pushInit/{pushSourceTypeString}/{sourceId}")
+    public ModelAndView pushInit(@PathVariable String pushSourceTypeString, @PathVariable String sourceId) {
+        ModelAndView mav = new ModelAndView("push/pushInit");
+
+        PushSourceType pushSourceType = null;
+
+        if (StringUtils.isEmpty(pushSourceTypeString)) {
+            pushSourceTypeString = "DEAL";
+            pushSourceType = PushSourceType.valueOf(pushSourceTypeString);
+        }
+
+        if (PushSourceType.DEAL.equals(pushSourceType)) {
+
+            AppDeal appDeal = dbm.get(AppDeal.class, Long.valueOf(sourceId));
+
+
+        }
+
+
+        return mav;
+    }
 
     @RequestMapping(value = "/pushIndex")
     public ModelAndView PushIndex() {
