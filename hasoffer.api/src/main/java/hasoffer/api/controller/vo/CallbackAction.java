@@ -8,5 +8,6 @@ public enum CallbackAction {
     CLICKDEAL, //点击deal
     FLOWCTRLSUCCESS, //流量控制成功
     HOMEPAGE,  //首页jiechi
-    DOWNLOADBOOTCONFIG //APP下载引导配置
+    DOWNLOADBOOTCONFIG,//APP下载引导配置
+    COMADD //是否开启sdk下载google赚取佣金
 }

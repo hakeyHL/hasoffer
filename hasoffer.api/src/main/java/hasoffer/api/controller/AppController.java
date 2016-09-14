@@ -228,7 +228,9 @@ public class AppController {
                 modelAndView.addObject("data", map);
                 break;
             case CLICKDEAL:
-                AppDeal appDeal = appService.getDealDetail(request.getParameter("id"));
+                String id = request.getParameter("value");
+                System.out.println(" id  id  deal  " + id);
+                AppDeal appDeal = appService.getDealDetail(Long.valueOf(id));
                 if (appDeal != null) {
                     appService.countDealClickCount(appDeal);
                 }
@@ -275,6 +277,10 @@ public class AppController {
                 DownloadConfigVo downloadConfigVo = new DownloadConfigVo(false, Arrays.asList("com.snapdeal.main", "com.flipkart.android", "in.amazon.mShop.android.shopping", "net.one97.paytm", "com.ebay.mobile", "com.shopclues", "com.infibeam.infibeamapp", "com.myntra.android", "com.jabong.android", "com.alibaba.aliexpresshd"), "NINEAPP", apps, Arrays.asList("com.voonik.android", "cn.xender", "com.india.hasoffer", "com.lenovo.anyshare,gps", "com.mobile.indiapp", "com.leo.appmaster", "com.voodoo.android", "com.app.buyhatke"));
                 modelAndView.addObject("data", downloadConfigVo);
                 break;
+            case COMADD:
+                Map nMap = new HashMap();
+                nMap.put("op", true);
+                modelAndView.addObject("data", nMap);
             default:
                 break;
         }
@@ -452,9 +458,9 @@ public class AppController {
                 DealVo dealVo = new DealVo();
                 dealVo.setId(appDeal.getId());
                 dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
-                String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-                DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-                dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+//                String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+//                DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+//                dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
                 dealVo.setExtra(0d);
                 dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
                 if (appDeal.getWebsite().name().equals("FLIPKART")) {
@@ -470,84 +476,6 @@ public class AppController {
                 dealVo.setWebsite(appDeal.getWebsite());
                 li.add(dealVo);
             }
-//            int dateCmpResult = currentDate.compareTo(appDeal.getExpireTime());
-//            //需要筛选deal,不是sku的deal当天过期也为过期
-//            if (appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
-//                //降价生成,过期时间是今天的要返回
-//                if (dateCmpResult == 1) {
-//                    //过期
-//                    //deal的过期时间小于等于明天的凌晨,返回
-//                    DealVo dealVo = new DealVo();
-//                    dealVo.setId(appDeal.getId());
-//                    dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
-//                    String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-//                    DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-//                    dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
-//                    dealVo.setExtra(0d);
-//                    dealVo.setDiscount(appDeal.getDiscount());
-//                    dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-//                    if (appDeal.getWebsite().name().equals("FLIPKART")) {
-//                        dealVo.setExtra(1.5);
-//                    }
-//                    dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-//                    dealVo.setExp(appDeal.getExpireTime());
-//                    dealVo.setTitle(appDeal.getTitle());
-//                    dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
-//                    dealVo.setIsExpired(true);
-//                    dealVo.setDiscount(appDeal.getDiscount());
-//                    dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
-//                    dealVo.setWebsite(appDeal.getWebsite());
-//                    li.add(dealVo);
-//                } else {
-//                    DealVo dealVo = new DealVo();
-//                    dealVo.setId(appDeal.getId());
-//                    dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
-//                    String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-//                    DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-//                    dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
-//                    dealVo.setExtra(0d);
-//                    dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-//                    if (appDeal.getWebsite().name().equals("FLIPKART")) {
-//                        dealVo.setExtra(1.5);
-//                    }
-//                    dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-//                    dealVo.setExp(appDeal.getExpireTime());
-//                    dealVo.setTitle(appDeal.getTitle());
-//                    dealVo.setDiscount(appDeal.getDiscount());
-//                    dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
-//                    dealVo.setIsExpired(false);
-//                    dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
-//                    dealVo.setWebsite(appDeal.getWebsite());
-//                    li.add(dealVo);
-//                }
-//            } else if (appDeal.getAppdealSource().name().equals("MANUAL_INPUT")) {
-//                //手动导入,
-//                //只有过期时间大于当前时间才返回
-//                if (dateCmpResult <= 0) {
-//                    DealVo dealVo = new DealVo();
-//                    dealVo.setId(appDeal.getId());
-//                    dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
-//                    String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-//                    DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-//                    dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
-//                    dealVo.setExtra(0d);
-//                    dealVo.setDiscount(appDeal.getDiscount());
-//                    dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-//                    if (appDeal.getWebsite().name().equals("FLIPKART")) {
-//                        dealVo.setExtra(1.5);
-//                    }
-//                    dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-//                    dealVo.setExp(appDeal.getExpireTime());
-//                    dealVo.setTitle(appDeal.getTitle());
-//                    dealVo.setIsExpired(false);
-//                    dealVo.setDiscount(appDeal.getDiscount());
-//                    dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
-//                    dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
-//                    dealVo.setWebsite(appDeal.getWebsite());
-//                    li.add(dealVo);
-//                }
-//            }
-
         }
         map.put("deals", li);
         map.put("currentPage", Result.getCurrentPage());
@@ -564,7 +492,7 @@ public class AppController {
      * deal列表
      *
      * @return
-     */
+     *//*
     @RequestMapping(value = "/temp/deals", method = RequestMethod.GET)
     public ModelAndView tempDeals(@RequestParam(defaultValue = "0") String page, @RequestParam(defaultValue = "20") String pageSize) {
         //1. 从数据库中查询到
@@ -631,7 +559,7 @@ public class AppController {
         mv.addObject("data", map);
         return mv;
     }
-
+*/
 
     /**
      * deal详情
@@ -641,80 +569,90 @@ public class AppController {
      */
     @RequestMapping(value = "/dealInfo", method = RequestMethod.GET)
     public ModelAndView dealInfo(@RequestParam String id) {
-        System.out.println("dealId is :" + id);
-        AppDeal appDeal = appService.getDealDetail(id);
         ModelAndView mv = new ModelAndView();
-        if (appDeal != null) {
-            System.out.println("has this deal ");
-            Map map = new HashMap();
-            map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
-            map.put("title", appDeal.getTitle());
-            map.put("website", appDeal.getWebsite());
-            map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
-            map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-            StringBuilder sb = new StringBuilder();
-            String description = appDeal.getDescription();
-            sb.append(description == null ? "" : description);
-            if (description.lastIndexOf("\n") > 0) {
-                if (description.lastIndexOf("\n") == description.length() - 1) {
-                    //最后有换行,再加一个换行
-                    sb.append("\n");
+        mv.addObject("errorCode", "00000");
+        mv.addObject("msg", "ok");
+        System.out.println("dealId is :" + id);
+        if (StringUtils.isEmpty(id)) {
+            //空,完毕
+            System.out.println("no deal id ");
+            mv.addObject("data", null);
+            return mv;
+        } else {
+            Long dealId = Long.valueOf(id);
+            AppDeal appDeal = appService.getDealDetail(dealId);
+            if (appDeal != null) {
+                System.out.println("has this deal ");
+                Map map = new HashMap();
+                map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
+                map.put("title", appDeal.getTitle());
+                map.put("website", appDeal.getWebsite());
+                map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
+                map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                StringBuilder sb = new StringBuilder();
+                String description = appDeal.getDescription();
+                sb.append(description == null ? "" : description);
+                if (description.lastIndexOf("\n") > 0) {
+                    if (description.lastIndexOf("\n") == description.length() - 1) {
+                        //最后有换行,再加一个换行
+                        sb.append("\n");
+                    } else {
+                        //最后无换行,加两个
+                        sb.append("\n");
+                        sb.append("\n");
+                    }
                 } else {
-                    //最后无换行,加两个
+                    //无换行
                     sb.append("\n");
                     sb.append("\n");
                 }
-            } else {
-                //无换行
-                sb.append("\n");
-                sb.append("\n");
-            }
-            sb.append("How to get the deal: \n");
-            sb.append("1 Click \"Activate Deal\" button.\n");
-            sb.append("2 Add the product of your choice to cart.\n");
-            sb.append("3 And no coupon code required.\n\n");
-            if (appDeal.getPtmcmpskuid() > 0) {
-                PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
-                if (ptmCmpSkuDescription != null) {
-                    String jsonParam = ptmCmpSkuDescription.getJsonParam();
-                    if (StringUtils.isNotBlank(jsonParam)) {
-                        Map jsonMap = JsonHelper.getJsonMap(jsonParam);
-                        if (jsonMap != null) {
-                            //遍历map
-                            Set<Map.Entry> set = jsonMap.entrySet();
-                            Iterator<Map.Entry> iterator = set.iterator();
-                            if (iterator.hasNext()) {
-                                sb.append("Key Features: \n");
+                sb.append("How to get the deal: \n");
+                sb.append("1 Click \"Activate Deal\" button.\n");
+                sb.append("2 Add the product of your choice to cart.\n");
+                sb.append("3 And no coupon code required.\n\n");
+                if (appDeal.getPtmcmpskuid() > 0) {
+                    PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
+                    if (ptmCmpSkuDescription != null) {
+                        String jsonParam = ptmCmpSkuDescription.getJsonParam();
+                        if (StringUtils.isNotBlank(jsonParam)) {
+                            Map jsonMap = JsonHelper.getJsonMap(jsonParam);
+                            if (jsonMap != null) {
+                                //遍历map
+                                Set<Map.Entry> set = jsonMap.entrySet();
+                                Iterator<Map.Entry> iterator = set.iterator();
+                                if (iterator.hasNext()) {
+                                    sb.append("Key Features: \n");
+                                }
+                                while (iterator.hasNext()) {
+                                    Map.Entry next = iterator.next();
+                                    sb.append(next.getKey()).append(" : ");
+                                    sb.append(next.getValue()).append("\n");
+                                }
                             }
-                            while (iterator.hasNext()) {
-                                Map.Entry next = iterator.next();
-                                sb.append(next.getKey()).append(" : ");
-                                sb.append(next.getValue()).append("\n");
-                            }
+
                         }
 
                     }
-
                 }
-            }
 
-            map.put("description", sb.toString());
-            map.put("extra", 0);
-            if (appDeal.getWebsite() == Website.FLIPKART) {
-                map.put("extra", 1.5);
-                map.put("cashbackInfo", "1. Offer valid for a limited time only while stocks last\n" +
-                        "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +
-                        "3. Rewards may not paid on purchases made using store credits/gift vouchers\n" +
-                        "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
-                        "5  Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
+                map.put("description", sb.toString());
+                map.put("extra", 0);
+                if (appDeal.getWebsite() == Website.FLIPKART) {
+                    map.put("extra", 1.5);
+                    map.put("cashbackInfo", "1. Offer valid for a limited time only while stocks last\n" +
+                            "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +
+                            "3. Rewards may not paid on purchases made using store credits/gift vouchers\n" +
+                            "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
+                            "5  Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
+                }
+                String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+                DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+                System.out.println("link url is  :" + appDeal.getLinkUrl());
+                String s = appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId});
+                logger.info(" dealInfo record deal deepLink :" + s);
+                map.put("deeplink", s);
+                mv.addObject("data", map);
             }
-            String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-            DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-            System.out.println("link url is  :" + appDeal.getLinkUrl());
-            String s = appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId});
-            logger.info(" dealInfo record deal deepLink :" + s);
-            map.put("deeplink", s);
-            mv.addObject("data", map);
         }
         return mv;
     }
@@ -776,7 +714,9 @@ public class AppController {
             List<UrmUserDevice> urmUserDevices = new ArrayList<>();
             for (String id : ids) {
                 boolean flag = false;
+                System.out.println(" id_id_id " + id);
                 for (String dId : deviceIds) {
+                    System.out.println(" dId_dId_dId " + dId);
                     if (id.equals(dId)) {
                         flag = true;
                         System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);
