@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
+import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -34,17 +35,14 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
     private static final Logger logger = LoggerFactory.getLogger(CheckGetPriceOffDealWorker.class);
     private static final String PRICE_DROP_SKUID_QUEUE = "PRICE_DROP_SKUID_QUEUE";
 
-    private IMongoDbManager mdm;
-    private IDataBaseManager dbm;
-    private IDealService dealService;
-    private IRedisListService redisListService;
-
-    public CheckGetPriceOffDealJobBean(IMongoDbManager mdm, IDataBaseManager dbm, IDealService dealService, IRedisListService redisListService) {
-        this.mdm = mdm;
-        this.dbm = dbm;
-        this.dealService = dealService;
-        this.redisListService = redisListService;
-    }
+    @Resource
+    IMongoDbManager mdm;
+    @Resource
+    IDataBaseManager dbm;
+    @Resource
+    IDealService dealService;
+    @Resource
+    IRedisListService redisListService;
 
     private float getMinPrice(PtmCmpSkuHistoryPrice historyPrice) {
 
