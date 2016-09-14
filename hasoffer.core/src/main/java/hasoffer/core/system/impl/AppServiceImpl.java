@@ -164,10 +164,8 @@ public class AppServiceImpl implements IAppService {
     }
 
     @Override
-    public AppDeal getDealDetail(String id) {
-        List li = new ArrayList();
-        li.add(Long.valueOf(id));
-        return dbm.querySingle(Q_APP_GEDEALDETAIL, li);
+    public AppDeal getDealDetail(long id) {
+        return dbm.querySingle(Q_APP_GEDEALDETAIL, Arrays.asList(id));
     }
 
     @Override
@@ -213,7 +211,7 @@ public class AppServiceImpl implements IAppService {
 
     @Override
     public List<String> getUserDevicesByUserId(String userId) {
-        return dbm.query(Q_APP_URMUSERDEVICE_GETIDSBYUSERID, 1, 5, Arrays.asList(userId));
+        return dbm.query(Q_APP_URMUSERDEVICE_GETIDSBYUSERID, 1, 8, Arrays.asList(userId));
     }
 
     @Override

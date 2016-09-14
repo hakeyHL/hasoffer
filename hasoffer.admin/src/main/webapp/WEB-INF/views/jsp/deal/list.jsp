@@ -143,7 +143,9 @@
                     <td>价格描述</td>
                     <td>生效时间</td>
                     <td>失效时间</td>
-                    <td colspan="2">操作</td>
+                    <td>点击次数</td>
+                    <td colspan="3">操作</td>
+                    <td>当前状态</td>
                 </tr>
                 </thead>
                 <tbody>
@@ -181,10 +183,20 @@
                         <td>${data.priceDescription}</td>
                         <td>${fn:substring(data.createTime, 0, 10)}</td>
                         <td>${fn:substring(data.expireTime, 0, 10)}</td>
+                        <td>${data.dealClickCount}</td>
                         <td><a href="detail/${data.id}">编辑</a></td>
                         <td><a href="javascript:void(0)"
                                onclick="deleteById('<%=contextPath%>/deal/delete/${data.id}')"
                                data-toggle="modal" data-target="#confirm-delete">删除</a></td>
+                        <td><a href="#">推送</a></td>
+                        <td>
+                            <c:if test="${data.expireStatus==1}">
+                                有效
+                            </c:if>
+                            <c:if test="${data.expireStatus==0}">
+                                已经失效
+                            </c:if>
+                        </td>
                     </tr>
                 </c:forEach>
                 </tbody>
