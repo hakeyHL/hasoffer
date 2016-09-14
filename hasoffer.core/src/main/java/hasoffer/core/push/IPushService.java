@@ -3,6 +3,7 @@ package hasoffer.core.push;
 import com.google.android.gcm.server.MulticastResult;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.core.bo.push.AppPushBo;
+import hasoffer.core.persistence.po.app.AppPush;
 import hasoffer.core.persistence.po.urm.UrmDevice;
 
 import java.util.List;
@@ -24,5 +25,7 @@ public interface IPushService {
     List<String> getAllAppVersions();
 
     MulticastResult GroupPush(List<String> gcmTokens, AppPushBo pushBo) throws Exception;
+
+    AppPush createAppPush(AppPush appPush);
 
 }
