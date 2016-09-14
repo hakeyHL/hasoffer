@@ -228,7 +228,7 @@ public class AppController {
                 modelAndView.addObject("data", map);
                 break;
             case CLICKDEAL:
-                String id = request.getParameter("id");
+                String id = request.getParameter("value");
                 System.out.println(" id  id  deal  " + id);
                 AppDeal appDeal = appService.getDealDetail(Long.valueOf(id));
                 if (appDeal != null) {
