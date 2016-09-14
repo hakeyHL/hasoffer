@@ -314,6 +314,7 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         } finally {
             return map;
         }
+
     }
 
     // ************************父类实现*******************************
