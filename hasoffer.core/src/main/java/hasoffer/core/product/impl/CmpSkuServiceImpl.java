@@ -43,6 +43,7 @@ import java.util.*;
  * Created on 2016/1/4.
  */
 @Service
+@Transactional
 public class CmpSkuServiceImpl implements ICmpSkuService {
 
     private static final String Q_CMPSKU_BY_PRODUCTID =
@@ -479,7 +480,8 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         //save productDescription
         PtmProduct ptmProduct = dbm.get(PtmProduct.class, ptmCmpSku.getProductId());
         String productTitle = ptmProduct.getTitle();
-
+        System.out.println(fetchedProduct.toString());
+        System.out.println("createDescription:" + jsonParam);
         try {
             HashMap<String, String> hashMap = JSONUtil.toObject(jsonParam, HashMap.class);
 
