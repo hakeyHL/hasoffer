@@ -37,12 +37,12 @@ public class SpiderSkuWorker implements Runnable {
         this.spiderConfig = spiderConfig;
         redisListService = (IRedisListService<String>) SpringContextHolder.getBean(RedisListServiceImpl.class);
         spiderSkuScheduler = new SpiderSkuScheduleServiceImpl(spiderConfig, pageProcessor, pipeline);
-        spiderSkuScheduler.startSpiderTask();
     }
 
     @Override
     public void run() {
         String redisListName = SpiderConfigInitContext.getRedisListName(spiderConfig.getWebsite());
+        logger.info("Website:{}, Redis List Name:{}", spiderConfig.getWebsite(), redisListName);
         if (redisListName == null || "".equals(redisListName)) {
             return;
         }

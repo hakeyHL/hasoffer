@@ -1,4 +1,4 @@
-package hasoffer.spider.main;
+package hasoffer.test;
 
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.spider.task.service.SpiderTaskService;
@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -16,24 +18,18 @@ public class Main {
     private static final Logger logger = LoggerFactory.getLogger("spider.consumer");
 
     public static void main(String[] args) throws InterruptedException {
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
-                new String[]{
-                        "classpath:/spring/application.xml",
-                        "classpath:/spring-beans.xml",
-                        "classpath:/spring/spring-context-holder.xml",
-                        "classpath:/spring/spring-dubbo-provider.xml"
-                });
-        context.start();
-        logger.info("start finish!");
         Timer timer = new Timer();
-        timer.schedule(new SpiderTask(), 10000, TimeUtils.MILLISECONDS_OF_1_DAY);
+        timer.schedule(new SpiderTask(), 1000, 2000);
     }
 
     private static class SpiderTask extends TimerTask {
         @Override
         public void run() {
-            SpiderTaskService taskInitContext = SpringContextHolder.getBean(SpiderTaskService.class);
-            taskInitContext.initTask();
+            Map<String, String> x = new HashMap<>();
+            x.put("a", "A");
+            x.put("b", "B");
+            System.out.println(x.values());
+            System.out.println("ttt");
         }
     }
 }
