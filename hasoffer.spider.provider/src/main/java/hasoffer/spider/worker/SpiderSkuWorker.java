@@ -37,6 +37,7 @@ public class SpiderSkuWorker implements Runnable {
         this.spiderConfig = spiderConfig;
         redisListService = (IRedisListService<String>) SpringContextHolder.getBean(RedisListServiceImpl.class);
         spiderSkuScheduler = new SpiderSkuScheduleServiceImpl(spiderConfig, pageProcessor, pipeline);
+        spiderSkuScheduler.startSpiderTask();
     }
 
     @Override
@@ -62,8 +63,15 @@ public class SpiderSkuWorker implements Runnable {
             } catch (IOException e) {
                 logger.error("Json parse error. error msg {}", e);
             }
+            if (skuTask == null) {
+                return;
+            }
             Map<String, Object> extraMap = new HashMap<>();
-            extraMap.put("skuId", skuTask.getSkuId());
+            Long skuId = skuTask.getSkuId();
+            if (skuId == null) {
+                return;
+            }
+            extraMap.put("skuId", skuId);
             spiderSkuScheduler.pushRequest(skuTask.getUrl(), extraMap);
 
             if (Spider.Status.Stopped.equals(spiderSkuScheduler.runStatus())) {
