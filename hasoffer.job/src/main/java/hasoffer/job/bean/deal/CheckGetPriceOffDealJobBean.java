@@ -77,13 +77,8 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
                 Object pop = redisListService.pop(PRICE_DROP_SKUID_QUEUE);
 
                 if (pop == null) {
-                    try {
-                        TimeUnit.MINUTES.sleep(10);
-                    } catch (InterruptedException e) {
-
-                    }
-                    System.out.println("CheckGetPriceOffDealJobBean has no more skuid sleep 10 min");
-                    continue;
+                    System.out.println("CheckGetPriceOffDealJobBean pop get 0 skuid go to die");
+                    break;
                 }
 
                 long skuid = Long.parseLong((String) pop);
