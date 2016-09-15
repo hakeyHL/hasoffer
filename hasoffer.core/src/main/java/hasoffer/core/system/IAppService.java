@@ -38,7 +38,7 @@ public interface IAppService {
 
     List<PtmCategory> getCategory();
 
-    AppDeal getDealDetail(String id);
+    AppDeal getDealDetail(long id);
 
     UrmUser getUserById(String thirdId);
 

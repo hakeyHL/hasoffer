@@ -1,8 +1,8 @@
 package hasoffer.job.service.impl;
 
 import hasoffer.base.enums.TaskStatus;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
-import hasoffer.job.dto.FetchTestTaskDTO;
 import hasoffer.spider.model.FetchUrlResult;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -18,11 +18,11 @@ public class FetchTestWorker implements Runnable {
 
     private final Logger logger = LoggerFactory.getLogger(FetchTestWorker.class);
 
-    private Queue<FetchTestTaskDTO> queue;
+    private Queue<PtmCmpSku> queue;
     private IFetchDubboService fetchDubboService;
     private File file;
 
-    public FetchTestWorker(List<FetchTestTaskDTO> list, IFetchDubboService fetchDubboService, File file) {
+    public FetchTestWorker(List<PtmCmpSku> list, IFetchDubboService fetchDubboService, File file) {
         this.queue = new ArrayDeque<>(list);
         this.fetchDubboService = fetchDubboService;
         this.file = file;
@@ -33,16 +33,16 @@ public class FetchTestWorker implements Runnable {
         long expireSeconds = 20 * 60;
         String lineSeparator = System.getProperty("line.separator");
         while (!queue.isEmpty()) {
-            FetchTestTaskDTO ptmCmpSku = queue.poll();
+            PtmCmpSku ptmCmpSku = queue.poll();
             if (ptmCmpSku != null) {
                 TaskStatus taskStatus = fetchDubboService.getUrlTaskStatus(ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), expireSeconds);
                 if (TaskStatus.FINISH.equals(taskStatus)) {
                     FetchUrlResult fetchUrlResult = fetchDubboService.getProductsByUrl(
                             ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), expireSeconds);
                     try {
-                    	// taskId getTaskStatus url	skuId	price	website
+                        // taskId getTaskStatus url	skuId	price	website
                         FileUtils.write(file,
-                        		fetchUrlResult.getTaskId()+"\t"+fetchUrlResult.getTaskStatus().toString()+"\t"+ptmCmpSku.getUrl()+"\t"+ptmCmpSku.getId()+"\t"+fetchUrlResult.getFetchProduct().getPrice()+"\t"+fetchUrlResult.getWebsite().toString() + lineSeparator, "utf-8",
+                                fetchUrlResult.getTaskId()+"\t"+fetchUrlResult.getTaskStatus().toString()+"\t"+ptmCmpSku.getUrl()+"\t"+ptmCmpSku.getId()+"\t"+fetchUrlResult.getFetchProduct().getPrice()+"\t"+fetchUrlResult.getWebsite().toString() + lineSeparator, "utf-8",
                                 true);
                     } catch (IOException e) {
                         logger.error(e.getMessage());

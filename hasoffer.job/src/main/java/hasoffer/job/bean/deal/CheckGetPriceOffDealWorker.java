@@ -136,7 +136,7 @@ public class CheckGetPriceOffDealWorker implements Runnable {
                     appdeal.setWebsite(sku.getWebsite());
                     appdeal.setAppdealSource(AppdealSource.PRICE_OFF);
                     appdeal.setCreateTime(TimeUtils.nowDate());
-                    appdeal.setDisplay(false);
+                    appdeal.setDisplay(true);
                     //question 这种deal只有涨价才失效，加他个365天
                     appdeal.setExpireTime(TimeUtils.addDay(TimeUtils.nowDate(), 365));
                     appdeal.setLinkUrl(sku.getUrl());
@@ -172,7 +172,7 @@ public class CheckGetPriceOffDealWorker implements Runnable {
                     //当天title不能重名
                     String title = sku.getTitle();
                     Website website = sku.getWebsite();
-                    appdealList = dbm.query("SELECT t FROM Appdeal t WHERE t.title = ?0 AND t.website = ?1 ", Arrays.asList(title, website));
+                    appdealList = dbm.query("SELECT t FROM AppDeal t WHERE t.title = ?0 AND t.website = ?1 ", Arrays.asList(title, website));
                     if (appdealList != null && appdealList.size() != 0) {
                         System.out.println("query by title website get " + appdealList.size() + " sku");
                         flag = false;

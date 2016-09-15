@@ -108,6 +108,10 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
 
         PtmCmpSku ptmCmpSku = dbm.get(PtmCmpSku.class, skuid);
         System.out.println("get sku success for " + skuid);
+        if (ptmCmpSku == null) {
+            System.out.println("sku has bean removed " + skuid);
+            return;
+        }
 
         //检测价格是否需要发push
         int curpage = 1;

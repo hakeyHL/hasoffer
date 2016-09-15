@@ -1,13 +1,18 @@
 package hasoffer.core.push.impl;
 
+import com.google.android.gcm.server.Message;
+import com.google.android.gcm.server.MulticastResult;
+import com.google.android.gcm.server.Sender;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.core.bo.push.AppPushBo;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.po.app.AppPush;
 import hasoffer.core.persistence.po.urm.UrmDevice;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.utils.Httphelper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -80,5 +85,22 @@ public class PushServiceImpl implements IPushService {
     public List<String> getAllAppVersions() {
 
         return dbm.query(Q_APPVERSION_GET_ALLVERSIONS);
+    }
+
+    @Override
+    public MulticastResult GroupPush(List<String> gcmTokens, AppPushBo pushBo) throws Exception {
+        Sender sender = new Sender("AIzaSyCZrHjOkZ57j3Dvq_TpvYW8Mt38Ej1dzQA");
+        String userMessage = JSONUtil.toJSON(pushBo);
+        Message message = new Message.Builder().timeToLive(30).delayWhileIdle(true).addData("message", userMessage).build();
+        MulticastResult result = sender.send(message, gcmTokens, 1);
+        return result;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public AppPush createAppPush(AppPush appPush) {
+        Long aLong = dbm.create(appPush);
+        appPush.setId(aLong);
+        return appPush;
     }
 }

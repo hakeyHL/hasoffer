@@ -228,7 +228,9 @@ public class AppController {
                 modelAndView.addObject("data", map);
                 break;
             case CLICKDEAL:
-                AppDeal appDeal = appService.getDealDetail(request.getParameter("id"));
+                String id = request.getParameter("value");
+                System.out.println(" id  id  deal  " + id);
+                AppDeal appDeal = appService.getDealDetail(Long.valueOf(id));
                 if (appDeal != null) {
                     appService.countDealClickCount(appDeal);
                 }
@@ -456,9 +458,9 @@ public class AppController {
                 DealVo dealVo = new DealVo();
                 dealVo.setId(appDeal.getId());
                 dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
-                String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-                DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-                dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+//                String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+//                DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+//                dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
                 dealVo.setExtra(0d);
                 dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
                 if (appDeal.getWebsite().name().equals("FLIPKART")) {
@@ -490,7 +492,7 @@ public class AppController {
      * deal列表
      *
      * @return
-     */
+     *//*
     @RequestMapping(value = "/temp/deals", method = RequestMethod.GET)
     public ModelAndView tempDeals(@RequestParam(defaultValue = "0") String page, @RequestParam(defaultValue = "20") String pageSize) {
         //1. 从数据库中查询到
@@ -557,7 +559,7 @@ public class AppController {
         mv.addObject("data", map);
         return mv;
     }
-
+*/
 
     /**
      * deal详情
@@ -567,80 +569,90 @@ public class AppController {
      */
     @RequestMapping(value = "/dealInfo", method = RequestMethod.GET)
     public ModelAndView dealInfo(@RequestParam String id) {
-        System.out.println("dealId is :" + id);
-        AppDeal appDeal = appService.getDealDetail(id);
         ModelAndView mv = new ModelAndView();
-        if (appDeal != null) {
-            System.out.println("has this deal ");
-            Map map = new HashMap();
-            map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
-            map.put("title", appDeal.getTitle());
-            map.put("website", appDeal.getWebsite());
-            map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
-            map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-            StringBuilder sb = new StringBuilder();
-            String description = appDeal.getDescription();
-            sb.append(description == null ? "" : description);
-            if (description.lastIndexOf("\n") > 0) {
-                if (description.lastIndexOf("\n") == description.length() - 1) {
-                    //最后有换行,再加一个换行
-                    sb.append("\n");
+        mv.addObject("errorCode", "00000");
+        mv.addObject("msg", "ok");
+        System.out.println("dealId is :" + id);
+        if (StringUtils.isEmpty(id)) {
+            //空,完毕
+            System.out.println("no deal id ");
+            mv.addObject("data", null);
+            return mv;
+        } else {
+            Long dealId = Long.valueOf(id);
+            AppDeal appDeal = appService.getDealDetail(dealId);
+            if (appDeal != null) {
+                System.out.println("has this deal ");
+                Map map = new HashMap();
+                map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
+                map.put("title", appDeal.getTitle());
+                map.put("website", appDeal.getWebsite());
+                map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
+                map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                StringBuilder sb = new StringBuilder();
+                String description = appDeal.getDescription();
+                sb.append(description == null ? "" : description);
+                if (description.lastIndexOf("\n") > 0) {
+                    if (description.lastIndexOf("\n") == description.length() - 1) {
+                        //最后有换行,再加一个换行
+                        sb.append("\n");
+                    } else {
+                        //最后无换行,加两个
+                        sb.append("\n");
+                        sb.append("\n");
+                    }
                 } else {
-                    //最后无换行,加两个
+                    //无换行
                     sb.append("\n");
                     sb.append("\n");
                 }
-            } else {
-                //无换行
-                sb.append("\n");
-                sb.append("\n");
-            }
-            sb.append("How to get the deal: \n");
-            sb.append("1 Click \"Activate Deal\" button.\n");
-            sb.append("2 Add the product of your choice to cart.\n");
-            sb.append("3 And no coupon code required.\n\n");
-            if (appDeal.getPtmcmpskuid() > 0) {
-                PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
-                if (ptmCmpSkuDescription != null) {
-                    String jsonParam = ptmCmpSkuDescription.getJsonParam();
-                    if (StringUtils.isNotBlank(jsonParam)) {
-                        Map jsonMap = JsonHelper.getJsonMap(jsonParam);
-                        if (jsonMap != null) {
-                            //遍历map
-                            Set<Map.Entry> set = jsonMap.entrySet();
-                            Iterator<Map.Entry> iterator = set.iterator();
-                            if (iterator.hasNext()) {
-                                sb.append("Key Features: \n");
+                sb.append("How to get the deal: \n");
+                sb.append("1 Click \"Activate Deal\" button.\n");
+                sb.append("2 Add the product of your choice to cart.\n");
+                sb.append("3 And no coupon code required.\n\n");
+                if (appDeal.getPtmcmpskuid() > 0) {
+                    PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
+                    if (ptmCmpSkuDescription != null) {
+                        String jsonParam = ptmCmpSkuDescription.getJsonParam();
+                        if (StringUtils.isNotBlank(jsonParam)) {
+                            Map jsonMap = JsonHelper.getJsonMap(jsonParam);
+                            if (jsonMap != null) {
+                                //遍历map
+                                Set<Map.Entry> set = jsonMap.entrySet();
+                                Iterator<Map.Entry> iterator = set.iterator();
+                                if (iterator.hasNext()) {
+                                    sb.append("Key Features: \n");
+                                }
+                                while (iterator.hasNext()) {
+                                    Map.Entry next = iterator.next();
+                                    sb.append(next.getKey()).append(" : ");
+                                    sb.append(next.getValue()).append("\n");
+                                }
                             }
-                            while (iterator.hasNext()) {
-                                Map.Entry next = iterator.next();
-                                sb.append(next.getKey()).append(" : ");
-                                sb.append(next.getValue()).append("\n");
-                            }
+
                         }
 
                     }
-
                 }
-            }
 
-            map.put("description", sb.toString());
-            map.put("extra", 0);
-            if (appDeal.getWebsite() == Website.FLIPKART) {
-                map.put("extra", 1.5);
-                map.put("cashbackInfo", "1. Offer valid for a limited time only while stocks last\n" +
-                        "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +
-                        "3. Rewards may not paid on purchases made using store credits/gift vouchers\n" +
-                        "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
-                        "5  Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
+                map.put("description", sb.toString());
+                map.put("extra", 0);
+                if (appDeal.getWebsite() == Website.FLIPKART) {
+                    map.put("extra", 1.5);
+                    map.put("cashbackInfo", "1. Offer valid for a limited time only while stocks last\n" +
+                            "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +
+                            "3. Rewards may not paid on purchases made using store credits/gift vouchers\n" +
+                            "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
+                            "5  Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
+                }
+                String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+                DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+                System.out.println("link url is  :" + appDeal.getLinkUrl());
+                String s = appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId});
+                logger.info(" dealInfo record deal deepLink :" + s);
+                map.put("deeplink", s);
+                mv.addObject("data", map);
             }
-            String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-            DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-            System.out.println("link url is  :" + appDeal.getLinkUrl());
-            String s = appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId});
-            logger.info(" dealInfo record deal deepLink :" + s);
-            map.put("deeplink", s);
-            mv.addObject("data", map);
         }
         return mv;
     }
@@ -702,7 +714,9 @@ public class AppController {
             List<UrmUserDevice> urmUserDevices = new ArrayList<>();
             for (String id : ids) {
                 boolean flag = false;
+                System.out.println(" id_id_id " + id);
                 for (String dId : deviceIds) {
+                    System.out.println(" dId_dId_dId " + dId);
                     if (id.equals(dId)) {
                         flag = true;
                         System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);
@@ -1006,23 +1020,6 @@ public class AppController {
     public void addProductVo2List(List desList, List sourceList) {
 
         if (sourceList != null && sourceList.size() > 0) {
-            /*if (ProductModel.class.isInstance(sourceList.get(0))) {
-                Iterator<ProductModel> modelList = sourceList.iterator();
-                while (modelList.hasNext()) {
-                    ProductModel productModel = modelList.next();
-                    int count = cmpSkuService.getSkuSoldStoreNum(productModel.getId());
-                    if (count > 0) {
-                        ProductListVo productListVo = new ProductListVo();
-                        productListVo.setStoresNum(count);
-                        productListVo.setId(productModel.getId());
-                        setCommentNumAndRatins(productListVo);
-                        productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(productModel.getId()));
-                        productListVo.setName(productModel.getTitle());
-                        productListVo.setPrice(Math.round(productModel.getPrice()));
-                        desList.add(productListVo);
-                    }
-                }
-            } else*/
             if (PtmProduct.class.isInstance(sourceList.get(0))) {
                 Iterator<PtmProduct> ptmList = sourceList.iterator();
                 while (ptmList.hasNext()) {
@@ -1048,15 +1045,11 @@ public class AppController {
                     System.out.println("ptmProduct.getRating() " + ptmProduct.getRating());
                     System.out.println("ptmProduct.getReview() " + ptmProduct.getReview());
                     System.out.println("ptmProduct.getStoreCount() " + ptmProduct.getStoreCount());
-//                    int count = cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
-//                    if (count > 0) {
                     ProductListVo productListVo = new ProductListVo();
                     productListVo.setId(ptmProduct.getId());
                     productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
                     productListVo.setName(ptmProduct.getTitle());
                     productListVo.setPrice(Math.round(ptmProduct.getMinPrice()));
-//                        productListVo.setStoresNum(count);
-//                        setCommentNumAndRatins(productListVo);
                     productListVo.setRatingNum(ptmProduct.getRating());
                     productListVo.setCommentNum(Long.valueOf(ptmProduct.getReview()));
                     productListVo.setStoresNum(ptmProduct.getStoreCount());
@@ -1143,4 +1136,34 @@ public class AppController {
         return mv;
     }
 
+    //搜索词提示
+    @RequestMapping(value = "candidateKeyword", method = RequestMethod.GET)
+    public ModelAndView getSearchKeyWordsTip(String keyWord) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("errorCode", "00000");
+        modelAndView.addObject("msg", "ok");
+        modelAndView.addObject("data", Arrays.asList("hasoffer", "very", "good", "!"));
+        return modelAndView;
+    }
+
+    public boolean FilterProducts(String title, String keyword) {
+        String[] filterWords = new String[]{"case", "cover", "glass", "battery", "for", "back", "phone", "guard", "cable"};
+        boolean flag = true;
+        for (String str : filterWords) {
+            if (title.trim().contains(str)) {
+                //如果搜索结果中以后配件名称,看关键词中有没有
+                if (keyword.trim().contains(str)) {
+                    //如果关键词中也有,那就是
+                    flag = true;
+                } else {
+                    flag = false;
+                }
+            } else {
+                //如果不包含,放行
+                flag = true;
+            }
+        }
+        //默认放行
+        return flag;
+    }
 }

@@ -34,6 +34,7 @@
                 <!--<ref bean="fetchTestTrigger"/>-->
                 <!--<ref bean="topSellingTaskTrigger"/>-->
                 <ref bean="priceOffDealUpdateTrigger"/>
+                <ref bean="priceOffGetDealTrigger"/>
                 <!--<ref bean="statVisitSkuUpdateTrigger"/>-->
             </list>
         </property>
@@ -163,22 +164,32 @@
     <!--</bean>-->
     <!-- fetchTest job -->
     <!--<bean name="fetchTestJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
-        <!--<property name="jobClass" value="hasoffer.job.bean.fetch.FetchTestJobBean"/>-->
+    <!--<property name="jobClass" value="hasoffer.job.bean.fetch.FetchTestJobBean"/>-->
     <!--</bean>-->
 
     <!--<bean id="fetchTestTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
-        <!--<property name="jobDetail" ref="fetchTestJob"/>-->
-        <!--<property name="cronExpression" value="0 0 0/1 * * ?"/>-->
+    <!--<property name="jobDetail" ref="fetchTestJob"/>-->
+    <!--<property name="cronExpression" value="0 0 0/1 * * ?"/>-->
     <!--</bean>-->
 
     <!--<bean name="topSellingTaskJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
-        <!--<property name="jobClass" value="hasoffer.job.bean.fetch.TopSellingTaskJobBean"/>-->
+    <!--<property name="jobClass" value="hasoffer.job.bean.fetch.TopSellingTaskJobBean"/>-->
     <!--</bean>-->
 
     <!--<bean id="topSellingTaskTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
-        <!--<property name="jobDetail" ref="topSellingTaskJob"/>-->
-        <!--<property name="cronExpression" value="0 0 0/1 * * ?"/>-->
+    <!--<property name="jobDetail" ref="topSellingTaskJob"/>-->
+    <!--<property name="cronExpression" value="0 0 0/1 * * ?"/>-->
     <!--</bean>-->
+
+    <!--price off create deal -->
+    <bean name="priceOffGetDealJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.deal.CheckGetPriceOffDealJobBean"/>
+    </bean>
+
+    <bean id="priceOffGetDealTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="priceOffGetDealJob"/>
+        <property name="cronExpression" value="0 0/10 * * * ?"/>
+    </bean>
 
     <!--price off deal update-->
     <bean name="priceOffDealUpdateJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
