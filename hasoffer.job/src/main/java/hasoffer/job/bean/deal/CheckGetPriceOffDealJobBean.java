@@ -22,7 +22,6 @@ import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created on 2016/9/14.
@@ -32,7 +31,7 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
     /**
      * Logger for this class
      */
-    private static final Logger logger = LoggerFactory.getLogger(CheckGetPriceOffDealWorker.class);
+    private static final Logger logger = LoggerFactory.getLogger(CheckGetPriceOffDealJobBean.class);
     private static final String PRICE_DROP_SKUID_QUEUE = "PRICE_DROP_SKUID_QUEUE";
 
     @Resource
@@ -77,6 +76,7 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
                 Object pop = redisListService.pop(PRICE_DROP_SKUID_QUEUE);
 
                 if (pop == null) {
+                    System.out.println("queue size =" + redisListService.size(PRICE_DROP_SKUID_QUEUE));
                     System.out.println("CheckGetPriceOffDealJobBean pop get 0 skuid go to die");
                     break;
                 }
