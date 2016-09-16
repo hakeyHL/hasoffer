@@ -10,7 +10,7 @@
         </encoder>
     </appender>
 
-    <appender name="StdoutFile"
+    <appender name="stdoutFile"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/stdout.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -165,6 +165,6 @@
     <root>
         <level value="DEBUG"/>
         <appender-ref ref="stdout"/>
-        <appender-ref ref="StdoutFile"/>
+        <appender-ref ref="stdoutFile"/>
     </root>
 </configuration>
