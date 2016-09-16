@@ -9,7 +9,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 public class Main {
 
@@ -21,7 +20,7 @@ public class Main {
                         "classpath:/spring/application.xml",
                         "classpath:/spring-beans.xml",
                         "classpath:/spring/spring-context-holder.xml",
-                        "classpath:/spring/spring-dubbo-provider.xml"
+                        "classpath:/spring/spring-dubbo-task.xml"
                 });
         context.start();
         logger.info("start finish!");

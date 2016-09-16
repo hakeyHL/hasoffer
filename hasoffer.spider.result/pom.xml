@@ -9,27 +9,33 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hasoffer.spider.provider</artifactId>
+    <artifactId>hasoffer.spider.result</artifactId>
 
     <dependencies>
 
         <dependency>
             <groupId>hasoffer</groupId>
-            <artifactId>hasoffer.dubbo.spider.task.api</artifactId>
+            <artifactId>hasoffer.base</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>hasoffer</groupId>
+            <artifactId>hasoffer.model.spider</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>hasoffer</groupId>
-            <artifactId>hasoffer.spider.schedule</artifactId>
+            <artifactId>hasoffer.core</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>hasoffer</groupId>
-            <artifactId>hasoffer.spider.india</artifactId>
+            <artifactId>hasoffer.dubbo.spider.result.api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+
 
         <dependency>
             <groupId>hasoffer</groupId>
@@ -37,15 +43,6 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -66,13 +63,8 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -81,7 +73,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
 
                 <configuration>
-                    <finalName>hasoffer.hasoffer.spider.provider</finalName>
+                    <finalName>hasoffer.hasoffer.spider.consumer</finalName>
                     <descriptor>src/main/assembly/assembly.xml</descriptor>
                 </configuration>
                 <executions>
@@ -96,4 +88,6 @@
             </plugin>
         </plugins>
     </build>
+
+
 </project>

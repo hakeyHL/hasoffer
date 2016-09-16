@@ -10,7 +10,7 @@
         </encoder>
     </appender>
 
-    <appender name="StdoutFile"
+    <appender name="stdoutFile"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/stdout.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -119,23 +119,6 @@
         </encoder>
     </appender>
 
-    <appender name="ThirdPartLoggerFileOut"
-              class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.base}/thirdPart.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/thirdPart.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy
-                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <MaxHistory>10</MaxHistory>
-                <!-- or whenever the file size reaches 100MB -->
-                <maxFileSize>100MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-        </rollingPolicy>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%date [%thread][%-8level%logger{80}] %msg%n</pattern>
-        </encoder>
-    </appender>
-
     <appender name="fetchLoggerFileOut"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/fetch.log</file>
@@ -153,39 +136,6 @@
         </encoder>
     </appender>
 
-    <appender name="SpiderUrlTaskOut"
-              class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.base}/spiderUrlTask.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/spiderUrlTask.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy
-                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <MaxHistory>10</MaxHistory>
-                <!-- or whenever the file size reaches 100MB -->
-                <maxFileSize>500MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-        </rollingPolicy>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%date [%thread][%-8level%logger{80}] %msg%n</pattern>
-        </encoder>
-    </appender>
-    <appender name="SpiderListTaskOut"
-              class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.base}/spiderListTask.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/spiderListTask.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy
-                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <MaxHistory>10</MaxHistory>
-                <!-- or whenever the file size reaches 100MB -->
-                <maxFileSize>500MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-        </rollingPolicy>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%date [%thread][%-8level%logger{80}] %msg%n</pattern>
-        </encoder>
-    </appender>
-
 
     <!-- logger -->
 
@@ -195,14 +145,6 @@
         <appender-ref ref="ErrorLoggerFileOut"/>
     </logger>
 
-    <!-- third part log -->
-    <logger name="org" level="INFO">
-        <appender-ref ref="ThirdPartLoggerFileOut"/>
-    </logger>
-
-    <logger name="com" level="INFO">
-        <appender-ref ref="ThirdPartLoggerFileOut"/>
-    </logger>
 
     <logger name="sites" level="DEBUG">
         <appender-ref ref="fetchLoggerFileOut"/>
@@ -220,29 +162,9 @@
         <appender-ref ref="fetchLoggerFileOut"/>
     </logger>
 
-    <logger name="fetchFlowLogger" level="DEBUG">
-        <appender-ref ref="FetchFlowLoggerFileOut"/>
-    </logger>
-
-    <logger name="searchListLogger" level="DEBUG">
-        <appender-ref ref="SpiderListTaskOut"/>
-    </logger>
-
-    <logger name="spiderUrlLogger" level="DEBUG">
-        <appender-ref ref="SpiderUrlTaskOut"/>
-    </logger>
-
-    <logger name="hasoffer.dubbo.api.fetch.service.impl.FetchDubboServiceImpl" level="DEBUG">
-        <appender-ref ref="FetchRequestLoggerFileOut"/>
-    </logger>
-
-    <logger name="hasoffer.hasoffer.spider.webmagic.pipeline.RedisPagePipeline" level="DEBUG">
-        <appender-ref ref="FetchTaskResultLoggerFileOut"/>
-    </logger>
-
     <root>
         <level value="DEBUG"/>
         <appender-ref ref="stdout"/>
-        <appender-ref ref="StdoutFile"/>
+        <appender-ref ref="stdoutFile"/>
     </root>
 </configuration>
