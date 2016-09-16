@@ -73,7 +73,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
 
                 <configuration>
-                    <finalName>hasoffer.hasoffer.spider.consumer</finalName>
+                    <finalName>hasoffer.spider.task</finalName>
                     <descriptor>src/main/assembly/assembly.xml</descriptor>
                 </configuration>
                 <executions>
