@@ -1,13 +1,8 @@
 package hasoffer.spider.main;
 
-import hasoffer.base.utils.TimeUtils;
-import hasoffer.spring.context.SpringContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class Main {
 
