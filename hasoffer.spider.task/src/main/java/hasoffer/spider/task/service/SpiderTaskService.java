@@ -40,7 +40,7 @@ public class SpiderTaskService {
         int page = 1;
         int pageSize = 1000;
 
-        String startDateString = TimeUtils.parse(TimeUtils.today() - TimeUtils.MILLISECONDS_OF_1_DAY * 2, "yyyyMMdd");
+        String startDateString = TimeUtils.parse(TimeUtils.today() - TimeUtils.MILLISECONDS_OF_1_DAY * 1, "yyyyMMdd");
 
         String Q_LOG_BYUPDATETIME = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd = ?0 AND t.count > 5 ORDER BY t.count desc";
 

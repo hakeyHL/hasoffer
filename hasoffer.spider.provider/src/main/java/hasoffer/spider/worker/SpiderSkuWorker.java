@@ -71,13 +71,16 @@ public class SpiderSkuWorker implements Runnable {
             if (skuId == null) {
                 return;
             }
+
+            //为任务附加初始默认参数。
             extraMap.put("skuId", skuId);
-            spiderSkuScheduler.pushRequest(skuTask.getUrl(), extraMap);
+            extraMap.put("parseTimes", 0);
 
             if (Spider.Status.Stopped.equals(spiderSkuScheduler.runStatus())) {
                 logger.debug("start " + spiderConfig.getWebsite() + ":" + i++);
                 spiderSkuScheduler.startSpiderTask();
             }
+            spiderSkuScheduler.pushRequest(skuTask.getUrl(), extraMap);
         }
     }
 }
