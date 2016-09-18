@@ -118,7 +118,7 @@ public class ClientHelper {
     public static boolean FilterProducts(String title, String keyword) {
         String[] filterWords = new String[]{"case", "cover", "glass", "battery", "for", "back", "phone", "guard", "cable"};
         for (String str : filterWords) {
-            if (title.trim().contains(str)) {
+            if (title.trim().toLowerCase().contains(str)) {
                 //如果搜索结果中包含配件名称,看关键词中有没有
                 if (keyword.trim().contains(str)) {
                     //如果关键词中也有,ok
@@ -129,7 +129,7 @@ public class ClientHelper {
                 }
             } else {
                 //如果搜索结果中不包含配件名称,看关键词中有没有
-                if (keyword.trim().contains(str)) {
+                if (keyword.trim().toLowerCase().contains(str)) {
                     //如果关键词中有,filter
                     return false;
                 } else {
