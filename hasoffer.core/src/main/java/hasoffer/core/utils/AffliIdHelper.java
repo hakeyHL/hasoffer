@@ -46,9 +46,9 @@ public class AffliIdHelper {
     //}
 
     public static void main(String[] args) {
-        for (int i = 0; i < 10000; i++) {
-//            String affiIds = AffliIdHelper.getAffiIdByWebsite(Website.SHOPCLUES);
-//            System.out.printf(affiIds);
+        for (int i = 0; i < 100; i++) {
+            String shanchuan = getFKid("NINEAPPS");
+            System.out.println(shanchuan);
         }
     }
 
