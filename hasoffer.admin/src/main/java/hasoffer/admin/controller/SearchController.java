@@ -83,11 +83,20 @@ public class SearchController {
     IMongoDbManager mdm;
 
     @RequestMapping(value = "/spell", method = RequestMethod.GET)
-    public ModelAndView spell(@RequestParam String text) {
-        ModelAndView mav = new ModelAndView();
+    public ModelAndView spell(HttpServletRequest request) {
+        ModelAndView mav = new ModelAndView("search/spell");
+        String text = request.getParameter("text");
+
+        if (StringUtils.isEmpty(text)) {
+            mav.addObject("text", "");
+            return mav;
+        }
+
+        mav.addObject("text", text);
 
         try {
 
+//            List<String> sugs = Arrays.asList("1", "2", "3");
             List<String> sugs = GoogleSpellChecker.check(text);
 
             mav.addObject("sugs", sugs);
