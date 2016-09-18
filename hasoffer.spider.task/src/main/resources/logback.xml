@@ -2,7 +2,7 @@
 
 <configuration>
 
-    <substitutionProperty name="log.base" value="${user.home}/logs/spider-provider-logs"/>
+    <substitutionProperty name="log.base" value="${user.home}/logs/spider-task-logs"/>
 
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
@@ -10,7 +10,7 @@
         </encoder>
     </appender>
 
-    <appender name="StdoutFile"
+    <appender name="stdoutFile"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/stdout.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -165,6 +165,6 @@
     <root>
         <level value="DEBUG"/>
         <appender-ref ref="stdout"/>
-        <appender-ref ref="StdoutFile"/>
+        <appender-ref ref="stdoutFile"/>
     </root>
 </configuration>

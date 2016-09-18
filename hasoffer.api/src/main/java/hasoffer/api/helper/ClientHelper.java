@@ -58,6 +58,41 @@ public class ClientHelper {
     public static void main(String[] args) {
         int i = ClientHelper.returnNumberBetween0And5(Long.valueOf(0));
         System.out.println(i);
+        String title = "samsung case";
+        String keyword = "samsung";
+        boolean b = FilterProducts(title, keyword);
+        if (b) {
+            System.out.println("搜索结果的title中有配件,关键词中没有的判断结果是 true, 要");
+        } else {
+            System.out.println("搜索结果的title中有配件,关键词中没有的判断结果是 true, 不要");
+        }
+
+        String title1 = "samsung case";
+        String keyword1 = "samsungcase";
+        boolean b1 = FilterProducts(title1, keyword1);
+        if (b1) {
+            System.out.println("搜索结果的title中有配件,关键词中有的判断结果是 true, 要");
+        } else {
+            System.out.println("搜索结果的title中有配件,关键词中有的判断结果是 false, 不要");
+        }
+
+        String title2 = "samsung";
+        String keyword2 = "samsungcase";
+        boolean b2 = FilterProducts(title2, keyword2);
+        if (b2) {
+            System.out.println("搜索结果的title中无配件,关键词中有的判断结果是 true, 要");
+        } else {
+            System.out.println("搜索结果的title中无配件,关键词中有的判断结果是 false, 不要");
+        }
+
+        String title3 = "samsung";
+        String keyword3 = "samsung as";
+        boolean b3 = FilterProducts(title3, keyword3);
+        if (b3) {
+            System.out.println("搜索结果的title中无配件,关键词中无的判断结果是 true, 要");
+        } else {
+            System.out.println("搜索结果的title中无配件,关键词中无的判断结果是 false, 不要");
+        }
     }
 
     public static String delHTMLTag(String htmlStr) {
@@ -78,5 +113,32 @@ public class ClientHelper {
         htmlStr = m_html.replaceAll(""); //过滤html标签
 
         return htmlStr.trim(); //返回文本字符串
+    }
+
+    public static boolean FilterProducts(String title, String keyword) {
+        String[] filterWords = new String[]{"case", "cover", "glass", "battery", "for", "back", "phone", "guard", "cable"};
+        for (String str : filterWords) {
+            if (title.trim().contains(str)) {
+                //如果搜索结果中包含配件名称,看关键词中有没有
+                if (keyword.trim().contains(str)) {
+                    //如果关键词中也有,ok
+                    return true;
+                } else {
+                    //关键词中没有,filter
+                    return false;
+                }
+            } else {
+                //如果搜索结果中不包含配件名称,看关键词中有没有
+                if (keyword.trim().contains(str)) {
+                    //如果关键词中有,filter
+                    return false;
+                } else {
+                    //关键词中没有,ok
+                    return true;
+                }
+            }
+        }
+        //默认放行
+        return true;
     }
 }

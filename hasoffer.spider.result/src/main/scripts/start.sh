@@ -30,7 +30,7 @@ if [ ! -d $LOGS_DIR ]; then
     mkdir -p $LOGS_DIR
     chown -R $USER.$GROUP $LOGS_DIR
 fi
-STDOUT_FILE=$LOGS_DIR/`basename $DEPLOY_DIR`.log
+#STDOUT_FILE=$LOGS_DIR/`basename $DEPLOY_DIR`.log
 LIB_DIR=$DEPLOY_DIR/lib
 LIB_JARS=`ls $LIB_DIR|grep .jar|awk '{print "'$LIB_DIR'/"$0}'|tr "\n" ":"`
 JAVA_OPTS=" -Djava.awt.headless=true -Djava.net.preferIPv4Stack=true "
@@ -45,12 +45,12 @@ fi
 JAVA_MEM_OPTS=""
 BITS=`java -version 2>&1 | grep -i 64-bit`
 if [ -n "$BITS" ]; then
-    JAVA_MEM_OPTS=" -server -Xmx2g -Xms2g -Xmn720m -XX:PermSize=128m -Xss256k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSCompactAtFullCollection -XX:LargePageSiz    eInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 "
+    JAVA_MEM_OPTS=" -server -Xmx256m -Xms128m -Xmn128m -Xss256k"
 else
-    JAVA_MEM_OPTS=" -server -Xms2g -Xmx2g -XX:PermSize=128m -XX:SurvivorRatio=2 -XX:+UseParallelGC "
+    JAVA_MEM_OPTS=" -server -Xms256m -Xmx128m -XX:SurvivorRatio=2 -XX:+UseParallelGC "
 fi
 echo -e "Starting the $SERVER_NAME ...\c"
-nohup java $JAVA_OPTS $JAVA_MEM_OPTS $JAVA_DEBUG_OPTS $JAVA_JMX_OPTS -classpath $CONF_DIR:$LIB_JARS hasoffer.spider.main.Main > $STDOUT_FILE 2>&1 &
+nohup java $JAVA_OPTS $JAVA_MEM_OPTS $JAVA_DEBUG_OPTS $JAVA_JMX_OPTS -classpath $CONF_DIR:$LIB_JARS hasoffer.spider.main.Main >&1 &
 COUNT=0
 while [ $COUNT -lt 1 ]; do
     echo -e ".\c"
@@ -71,5 +71,5 @@ done
 echo "OK!"
 PIDS=`ps -f | grep java | grep "$DEPLOY_DIR" | awk '{print $2}'`
 echo "PID: $PIDS"
-echo "STDOUT: $STDOUT_FILE"
+#echo "STDOUT: $STDOUT_FILE"
 echo "Start Success."
