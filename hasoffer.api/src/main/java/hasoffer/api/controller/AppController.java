@@ -458,9 +458,6 @@ public class AppController {
                 DealVo dealVo = new DealVo();
                 dealVo.setId(appDeal.getId());
                 dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
-//                String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-//                DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-//                dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
                 dealVo.setExtra(0d);
                 dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
                 if (appDeal.getWebsite().name().equals("FLIPKART")) {
@@ -470,6 +467,24 @@ public class AppController {
                 dealVo.setExp(appDeal.getExpireTime());
                 dealVo.setTitle(appDeal.getTitle());
                 dealVo.setIsExpired(false);
+                dealVo.setDiscount(appDeal.getDiscount());
+                dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
+                dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
+                dealVo.setWebsite(appDeal.getWebsite());
+                li.add(dealVo);
+            } else {
+                DealVo dealVo = new DealVo();
+                dealVo.setId(appDeal.getId());
+                dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
+                dealVo.setExtra(0d);
+                dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                if (appDeal.getWebsite().name().equals("FLIPKART")) {
+                    dealVo.setExtra(1.5);
+                }
+                dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                dealVo.setExp(appDeal.getExpireTime());
+                dealVo.setTitle(appDeal.getTitle());
+                dealVo.setIsExpired(true);
                 dealVo.setDiscount(appDeal.getDiscount());
                 dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
                 dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
