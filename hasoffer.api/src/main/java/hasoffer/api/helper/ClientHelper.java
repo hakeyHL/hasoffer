@@ -135,7 +135,7 @@ public class ClientHelper {
                     return false;
                 } else {
                     //关键词中没有,ok
-                    flag = true;
+                    return true;
                 }
             }
         }
