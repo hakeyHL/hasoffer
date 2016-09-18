@@ -35,6 +35,7 @@
                 <!--<ref bean="topSellingTaskTrigger"/>-->
                 <ref bean="priceOffDealUpdateTrigger"/>
                 <ref bean="priceOffGetDealTrigger"/>
+                <ref bean="adminPushTrigger"/>
                 <!--<ref bean="statVisitSkuUpdateTrigger"/>-->
             </list>
         </property>
@@ -199,5 +200,15 @@
     <bean id="priceOffDealUpdateTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="priceOffDealUpdateJob"/>
         <property name="cronExpression" value="0 0 0/1 * * ?"/>
+    </bean>
+
+    <!--admin push -->
+    <bean name="adminPushJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.push.AdminPushJobBean"/>
+    </bean>
+
+    <bean id="adminPushTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="adminPushJob"/>
+        <property name="cronExpression" value="0 0 1 1 1 ? 2066 "/>
     </bean>
 </beans>

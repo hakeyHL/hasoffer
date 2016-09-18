@@ -56,13 +56,19 @@ public class DealServiceImpl implements IDealService {
     }
 
     @Override
-    public PageableResult<AppDeal> findDealList(int page, int size, int type) {
+    public PageableResult<AppDeal> findDealList(int page, int size, int type, String orderByField) {
+
+        String querySql = "select t from AppDeal t WHERE t.appdealSource = 'AppDealSourceType' order by t." + orderByField + " desc";
+
         if (type == 1) {
-            return dbm.queryPage("select t from AppDeal t WHERE t.appdealSource = 'MANUAL_INPUT' order by t.id desc", page, size);
+            querySql = querySql.replace("AppDealSourceType", "MANUAL_INPUT");
+            return dbm.queryPage(querySql, page, size);
         } else if (type == 2) {
-            return dbm.queryPage("select t from AppDeal t WHERE t.appdealSource = 'PRICE_OFF' order by t.id desc", page, size);
+            querySql = querySql.replace("AppDealSourceType", "PRICE_OFF");
+            return dbm.queryPage(querySql, page, size);
         } else {
-            return dbm.queryPage("select t from AppDeal t order by t.id desc", page, size);
+            querySql = querySql.replace("WHERE t.appdealSource = 'AppDealSourceType'", "");
+            return dbm.queryPage(querySql, page, size);
         }
     }
 

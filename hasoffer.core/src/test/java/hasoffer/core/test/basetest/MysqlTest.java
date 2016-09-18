@@ -2,6 +2,7 @@ package hasoffer.core.test.basetest;
 
 import hasoffer.affiliate.affs.flipkart.FlipkartAffiliateProductProcessor;
 import hasoffer.affiliate.model.AffiliateProduct;
+import hasoffer.base.enums.AppType;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
@@ -14,9 +15,11 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.updater.PtmImageUpdater;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
+import hasoffer.core.persistence.po.urm.UrmDevice;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
 import hasoffer.core.search.ISearchService;
+import hasoffer.core.user.IDeviceService;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.ProductStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
@@ -79,8 +82,19 @@ public class MysqlTest {
     ISearchService searchService;
     @Resource
     IPtmCmpSkuImageService ptmCmpSkuImageService;
+    @Resource
+    IDeviceService deviceService;
     private Logger logger = LoggerFactory.getLogger(MysqlTest.class);
     private ConcurrentLinkedQueue<PtmCmpSku> skuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
+
+    @Test
+    public void testQueryUrmDevice() {
+
+        PageableResult<UrmDevice> pagedUrmDeviceByAppType = deviceService.findPagedUrmDeviceByAppType(AppType.APP, 1, 1000);
+
+        pagedUrmDeviceByAppType.getData();
+
+    }
 
     @Test
     public void testQueryWithStar() {

@@ -111,9 +111,15 @@
 
             <form id="reListDealByType" action="/deal/list" method="get">
                 <select id="typeSelect" class="form-control" name="type" onchange="reListDealByType()">
-                    <option value="">选择类型</option>
-                    <option value="1">手动导入</option>
-                    <option value="2">降价生成</option>
+                    <option
+                            <c:if test="${type==0}">selected</c:if> value="0">选择类型
+                    </option>
+                    <option
+                            <c:if test="${type==1}">selected</c:if> value="1">手动导入
+                    </option>
+                    <option
+                            <c:if test="${type==2}">selected</c:if> value="2">降价生成
+                    </option>
                 </select>
             </form>
         </div>
@@ -143,7 +149,9 @@
                     <td>价格描述</td>
                     <td>生效时间</td>
                     <td>失效时间</td>
-                    <td>点击次数</td>
+                    <td>
+                        <a href="#" onclick="orderByCount()">点击次数</a>
+                    </td>
                     <td colspan="3">操作</td>
                     <td>当前状态</td>
                 </tr>
@@ -152,7 +160,7 @@
                 <c:forEach items="${datas}" var="data">
                     <tr>
                         <td><input type="checkbox" name="subBox" value="${data.id}"/></td>
-                        <td>${fn:substring(data.createTime, 0, 10)}</td>
+                        <td>${data.createTime}</td>
                         <td>${data.website}</td>
                         <td>
                             <img src="${data.listPageImage}" class="img-rounded">
@@ -183,9 +191,11 @@
                             <a href="${data.linkUrl}">${data.title}</a>
                         </td>
                         <td>${data.priceDescription}</td>
-                        <td>${fn:substring(data.createTime, 0, 10)}</td>
-                        <td>${fn:substring(data.expireTime, 0, 10)}</td>
-                        <td>${data.dealClickCount}</td>
+                        <td>${data.createTime}</td>
+                        <td>${data.expireTime}</td>
+                        <td>
+                                ${data.dealClickCount}
+                        </td>
                         <td><a href="detail/${data.id}">编辑</a></td>
                         <td><a href="javascript:void(0)"
                                onclick="deleteById('<%=contextPath%>/deal/delete/${data.id}')"
@@ -208,6 +218,15 @@
     </div>
 
     <script>
+
+        function orderByCount() {
+
+            var type = $("#typeSelect").val();
+
+            var url = "/deal/list?type=" + type + "&orderByField=dealClickCount";
+
+            window.location.href = url;
+        }
 
         function reListDealByType() {
             $("#reListDealByType").submit();
