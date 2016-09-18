@@ -4,9 +4,11 @@ import com.google.android.gcm.server.Message;
 import com.google.android.gcm.server.MulticastResult;
 import com.google.android.gcm.server.Sender;
 import hasoffer.base.enums.MarketChannel;
+import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.core.bo.push.AppPushBo;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.enums.PushSourceType;
 import hasoffer.core.persistence.po.app.AppPush;
 import hasoffer.core.persistence.po.urm.UrmDevice;
 import hasoffer.core.push.IPushService;
@@ -15,10 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Date : 2016/4/27
@@ -102,5 +101,10 @@ public class PushServiceImpl implements IPushService {
         Long aLong = dbm.create(appPush);
         appPush.setId(aLong);
         return appPush;
+    }
+
+    @Override
+    public PageableResult getPagedAppPush(PushSourceType pushSourceType, Date date, int curPage, int pageSize) {
+        return dbm.queryPage("SELECT t FROM AppPush t WHERE t.pushSourceType = ?0 AND t.createTime = ?1 ORDER BY t.id ASC", curPage, pageSize, Arrays.asList(pushSourceType, date));
     }
 }

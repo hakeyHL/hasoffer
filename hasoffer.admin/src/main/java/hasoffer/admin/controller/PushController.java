@@ -3,6 +3,8 @@ package hasoffer.admin.controller;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.admin.controller.vo.PushVo;
 import hasoffer.base.enums.MarketChannel;
+import hasoffer.base.model.PageModel;
+import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
@@ -14,17 +16,17 @@ import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppPush;
 import hasoffer.core.push.IPushService;
 import hasoffer.data.redis.IRedisListService;
+import hasoffer.webcommon.helper.PageHelper;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 /**
  * Created on 2016/6/21 12:47
@@ -56,6 +58,34 @@ public class PushController {
     IDataBaseManager dbm;
     @Resource
     IRedisListService redisListService;
+
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public ModelAndView list(HttpServletRequest request,
+                             @RequestParam(required = false) Date createTime,
+                             @RequestParam(defaultValue = "DEAL") String pushSourceTypeString,
+                             @RequestParam(defaultValue = "1") int curPage,
+                             @RequestParam(defaultValue = "20") int pageSize) {
+
+        ModelAndView modelAndView = new ModelAndView("push/list");
+
+        PushSourceType pushSourceType = PushSourceType.valueOf(pushSourceTypeString);
+
+        if (createTime == null) {
+            createTime = TimeUtils.nowDate();
+        }
+
+        PageableResult pagedAppPush = pushService.getPagedAppPush(pushSourceType, createTime, curPage, pageSize);
+
+        List<AppPush> appPushList = pagedAppPush.getData();
+
+        PageModel pageModel = PageHelper.getPageModel(request, pagedAppPush);
+
+        modelAndView.addObject("appPushList", appPushList);
+        modelAndView.addObject("page", pageModel);
+        modelAndView.addObject("createTime", createTime);
+
+        return modelAndView;
+    }
 
     @RequestMapping(value = "/pushInit/{pushSourceTypeString}/{sourceId}", method = RequestMethod.GET)
     public ModelAndView pushInit(@PathVariable String pushSourceTypeString, @PathVariable String sourceId) {
