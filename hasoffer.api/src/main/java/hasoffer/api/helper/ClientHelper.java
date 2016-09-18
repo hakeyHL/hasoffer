@@ -56,10 +56,10 @@ public class ClientHelper {
     }
 
     public static void main(String[] args) {
-        int i = ClientHelper.returnNumberBetween0And5(Long.valueOf(0));
-        System.out.println(i);
-        String title = "samsung case";
-        String keyword = "samsung";
+//        int i = ClientHelper.returnNumberBetween0And5(Long.valueOf(0));
+//        System.out.println(i);
+        String title = "Big Mango Multi-purpose Fashion Crocodile Print Cellphone Pu Leather Bag and Clutch Zipper Wallet for Apple Iphone 4 4s Iphone 5 Iphone 5s 5c Samsung Galaxy S4 S3 HTC Blackberry Mp3 with Wristlet and Inner Multiple Card Holders ( Black )";
+        String keyword = "iphone";
         boolean b = FilterProducts(title, keyword);
         if (b) {
             System.out.println("搜索结果的title中有配件,关键词中没有的判断结果是 true, 要");
@@ -117,6 +117,7 @@ public class ClientHelper {
 
     public static boolean FilterProducts(String title, String keyword) {
         String[] filterWords = new String[]{"case", "cover", "glass", "battery", "for", "back", "phone", "guard", "cable"};
+        boolean flag = true;
         for (String str : filterWords) {
             if (title.trim().toLowerCase().contains(str)) {
                 //如果搜索结果中包含配件名称,看关键词中有没有
@@ -134,11 +135,11 @@ public class ClientHelper {
                     return false;
                 } else {
                     //关键词中没有,ok
-                    return true;
+                    flag = true;
                 }
             }
         }
         //默认放行
-        return true;
+        return flag;
     }
 }
