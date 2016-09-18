@@ -1039,14 +1039,9 @@ public class AppController {
                     }
                 }
             } else if (ProductModel2.class.isInstance(sourceList.get(0))) {
-                System.out.println("enter enter enter .....");
                 Iterator<ProductModel2> ptmList = sourceList.iterator();
                 while (ptmList.hasNext()) {
                     ProductModel2 ptmProduct = ptmList.next();
-                    System.out.println(" title " + ptmProduct.getTitle() + " price " + ptmProduct.getMinPrice());
-                    System.out.println("ptmProduct.getRating() " + ptmProduct.getRating());
-                    System.out.println("ptmProduct.getReview() " + ptmProduct.getReview());
-                    System.out.println("ptmProduct.getStoreCount() " + ptmProduct.getStoreCount());
                     ProductListVo productListVo = new ProductListVo();
                     productListVo.setId(ptmProduct.getId());
                     productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
