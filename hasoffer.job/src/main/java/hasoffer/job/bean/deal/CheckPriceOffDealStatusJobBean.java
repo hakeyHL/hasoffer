@@ -183,7 +183,8 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                             float newPrice = fetchedProduct.getPrice();
 
                             if (newPrice > sku.getPrice()) {
-                                dealService.deleteDeal(deal.getId());
+//                                dealService.deleteDeal(deal.getId());
+                                dealService.updateDealExpire(deal.getId());
                             }
                         }
                     }

@@ -8,6 +8,7 @@ import hasoffer.core.persistence.dbm.HibernateDao;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
+import hasoffer.core.persistence.po.app.updater.AppDealUpdater;
 import hasoffer.core.product.solr.DealIndexServiceImpl;
 import hasoffer.core.product.solr.DealModel;
 import hasoffer.core.task.ListProcessTask;
@@ -206,6 +207,18 @@ public class DealServiceImpl implements IDealService {
     @Override
     public AppBanner getBannerByDealId(Long dealId) {
         return (AppBanner) dbm.querySingle("SELECT t FROM AppBanner t WHERE t.sourceId = ?0 ", Arrays.asList(dealId.toString()));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateDealExpire(Long id) {
+
+        AppDeal deal = dbm.get(AppDeal.class, id);
+
+        AppDealUpdater updater = new AppDealUpdater(id);
+        updater.getPo().setExpireTime(deal.getCreateTime());
+
+        dbm.update(updater);
     }
 
     @Override

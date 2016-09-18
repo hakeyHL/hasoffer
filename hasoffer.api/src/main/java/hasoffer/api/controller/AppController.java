@@ -96,14 +96,14 @@ public class AppController {
     public static void main(String[] args) {
 //        String ss = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL, "http://www.snapdeal.com/offers/maggi-hamper", new String[]{"GOOGLEPLAY", "123"});
 //        System.out.print(ss);
-        String as = "Refer and earn Rs. 200 for each friend who signs up at Amazon.in and makes a purchase of Rs. 300 or more. Person who " +
+        /*String as = "Refer and earn Rs. 200 for each friend who signs up at Amazon.in and makes a purchase of Rs. 300 or more. Person who " +
                 "signs up also gets Rs. 100. No coupon " +
                 "code required to avail of this offer.\n";
         System.out.println(as.lastIndexOf("\n"));
         System.out.println(as.length());
         if (as.lastIndexOf("\n") == as.length() - 1) {
             System.out.println(" 最后有换行 ");
-        }
+        }*/
 //        if ()) {
 //            System.out.println("asdfaserqwerwerwer ");
 //        }
@@ -922,6 +922,7 @@ public class AppController {
                         }
                         map.put("categorys", categorys);
                     }
+                    filterProducts(p.getData(), criteria.getKeyword());
                     addProductVo2List(li, p.getData());
                 }
                 map.put("product", li);
@@ -948,6 +949,7 @@ public class AppController {
                 } else if (StringUtils.isNotBlank(criteria.getKeyword())) {
                     PageableResult pKeywordResult = productIndex2Service.searchProducts(criteria);
                     if (pKeywordResult != null && pKeywordResult.getData().size() > 0) {
+                        filterProducts(pKeywordResult.getData(), criteria.getKeyword());
                         addProductVo2List(li, pKeywordResult.getData());
                         map.put("product", li);
                     }
@@ -1037,14 +1039,9 @@ public class AppController {
                     }
                 }
             } else if (ProductModel2.class.isInstance(sourceList.get(0))) {
-                System.out.println("enter enter enter .....");
                 Iterator<ProductModel2> ptmList = sourceList.iterator();
                 while (ptmList.hasNext()) {
                     ProductModel2 ptmProduct = ptmList.next();
-                    System.out.println(" title " + ptmProduct.getTitle() + " price " + ptmProduct.getMinPrice());
-                    System.out.println("ptmProduct.getRating() " + ptmProduct.getRating());
-                    System.out.println("ptmProduct.getReview() " + ptmProduct.getReview());
-                    System.out.println("ptmProduct.getStoreCount() " + ptmProduct.getStoreCount());
                     ProductListVo productListVo = new ProductListVo();
                     productListVo.setId(ptmProduct.getId());
                     productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
@@ -1146,24 +1143,22 @@ public class AppController {
         return modelAndView;
     }
 
-    public boolean FilterProducts(String title, String keyword) {
-        String[] filterWords = new String[]{"case", "cover", "glass", "battery", "for", "back", "phone", "guard", "cable"};
-        boolean flag = true;
-        for (String str : filterWords) {
-            if (title.trim().contains(str)) {
-                //如果搜索结果中以后配件名称,看关键词中有没有
-                if (keyword.trim().contains(str)) {
-                    //如果关键词中也有,那就是
-                    flag = true;
-                } else {
-                    flag = false;
+    public void filterProducts(List productList, String keyord) {
+        if (productList != null && productList.size() > 0) {
+            if (ProductModel2.class.isInstance(productList.get(0))) {
+                System.out.println("enter enter enter .....");
+                Iterator<ProductModel2> ptmList = productList.iterator();
+                while (ptmList.hasNext()) {
+                    //筛选title
+                    ProductModel2 next = ptmList.next();
+                    boolean b = ClientHelper.FilterProducts(next.getTitle(), keyord);
+                    if (!b) {
+                        //false移除
+                        ptmList.remove();
+                    }
                 }
-            } else {
-                //如果不包含,放行
-                flag = true;
             }
         }
-        //默认放行
-        return flag;
     }
+
 }
