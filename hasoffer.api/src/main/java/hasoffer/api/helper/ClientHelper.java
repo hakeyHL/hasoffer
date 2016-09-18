@@ -116,7 +116,7 @@ public class ClientHelper {
     }
 
     public static boolean FilterProducts(String title, String keyword) {
-        String[] filterWords = new String[]{"case", "cover", "glass", "battery", "for", "back", "phone", "guard", "cable"};
+        String[] filterWords = new String[]{"case", "cover", "glass", "battery", "for", "back", "guard", "cable"};
         boolean flag = true;
         for (String str : filterWords) {
             if (title.trim().toLowerCase().contains(str)) {
@@ -135,7 +135,7 @@ public class ClientHelper {
                     return false;
                 } else {
                     //关键词中没有,ok
-                    flag = true;
+                    continue;
                 }
             }
         }

@@ -36,6 +36,7 @@ import hasoffer.fetch.helper.WebsiteProcessorFactory;
 import hasoffer.fetch.helper.WebsiteSummaryProductProcessorFactory;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.Product;
+import hasoffer.nlp.core.google.GoogleSpellChecker;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import hasoffer.webcommon.helper.PageHelper;
@@ -80,6 +81,27 @@ public class SearchController {
     ProductIndex2ServiceImpl productIndex2Service;
     @Resource
     IMongoDbManager mdm;
+
+    @RequestMapping(value = "/spell", method = RequestMethod.GET)
+    public ModelAndView spell(@RequestParam String text) {
+        ModelAndView mav = new ModelAndView();
+
+        try {
+
+            List<String> sugs = GoogleSpellChecker.check(text);
+
+            mav.addObject("sugs", sugs);
+
+            mav.addObject("result", "ok");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            mav.addObject("result", "error");
+        }
+
+        return mav;
+    }
 
     @RequestMapping(value = "/rematch/{logId}", method = RequestMethod.GET)
     public ModelAndView rematch(@PathVariable String logId) {
@@ -281,7 +303,7 @@ public class SearchController {
         sc.setPage(page);
         sc.setPageSize(size);
         pagedResults = productIndex2Service.searchProducts(sc);
-        
+
         List<PtmProduct> indexProducts = productService.getProducts(pagedResults.getData());
         indexProducts.remove(firstProduct);
 
