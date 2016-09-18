@@ -6,7 +6,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Main {
 
-    private static final Logger logger = LoggerFactory.getLogger("spider.consumer");
+    private static final Logger logger = LoggerFactory.getLogger("spider.provider");
 
     public static void main(String[] args) throws InterruptedException {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
@@ -21,7 +21,8 @@ public class Main {
 
         logger.info("start finish.");
         while (true) {
-            Thread.sleep(1000);
+            Thread.sleep(60000);
+            logger.info("continue");
         }
     }
 }

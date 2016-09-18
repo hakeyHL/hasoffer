@@ -236,7 +236,7 @@
         <appender-ref ref="FetchRequestLoggerFileOut"/>
     </logger>
 
-    <logger name="hasoffer.spider.webmagic.pipeline.RedisPagePipeline" level="DEBUG">
+    <logger name="hasoffer.hasoffer.spider.webmagic.pipeline.RedisPagePipeline" level="DEBUG">
         <appender-ref ref="FetchTaskResultLoggerFileOut"/>
     </logger>
 

@@ -8,6 +8,8 @@ import hasoffer.spider.model.SpiderConfig;
 import hasoffer.spider.service.ISpiderConfigService;
 import hasoffer.spider.worker.SpiderSkuWorker;
 import hasoffer.spring.context.SpringContextHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +18,9 @@ import java.util.concurrent.Executors;
 
 public class SpiderConfigInitContext {
 
-    public static final String WAIT_SKU_URL_SET = "WAIT_SKU_SPIDER_SET";
+    private static final Logger logger = LoggerFactory.getLogger(SpiderConfigInitContext.class);
+
+    private static final String WAIT_SKU_URL_SET = "WAIT_SKU_SPIDER_SET";
 
     private static Map<Website, String> redisNameMap = new HashMap<>();
 
@@ -59,6 +63,8 @@ public class SpiderConfigInitContext {
         if (spiderConfig != null) {
             redisNameMap.put(Website.EBAY, WAIT_SKU_URL_SET + "_" + Website.EBAY);
         }
+
+        logger.info("cache sku task redis map:{}" + redisNameMap.values());
 
     }
 

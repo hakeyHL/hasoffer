@@ -188,7 +188,7 @@
                         <td><a href="javascript:void(0)"
                                onclick="deleteById('<%=contextPath%>/deal/delete/${data.id}')"
                                data-toggle="modal" data-target="#confirm-delete">删除</a></td>
-                        <td><a href="#">推送</a></td>
+                        <td><a href="/push/pushInit/DEAL/${data.id}">推送</a></td>
                         <td>
                             <c:if test="${data.expireStatus==1}">
                                 有效
