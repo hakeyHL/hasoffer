@@ -179,7 +179,9 @@
                             </c:choose>
                         </td>
 
-                        <td>${data.title}</td>
+                        <td>
+                            <a href="${data.linkUrl}">${data.title}</a>
+                        </td>
                         <td>${data.priceDescription}</td>
                         <td>${fn:substring(data.createTime, 0, 10)}</td>
                         <td>${fn:substring(data.expireTime, 0, 10)}</td>

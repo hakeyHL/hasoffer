@@ -36,6 +36,7 @@ import hasoffer.fetch.helper.WebsiteProcessorFactory;
 import hasoffer.fetch.helper.WebsiteSummaryProductProcessorFactory;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.Product;
+import hasoffer.nlp.core.google.GoogleSpellChecker;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import hasoffer.webcommon.helper.PageHelper;
@@ -80,6 +81,36 @@ public class SearchController {
     ProductIndex2ServiceImpl productIndex2Service;
     @Resource
     IMongoDbManager mdm;
+
+    @RequestMapping(value = "/spell", method = RequestMethod.GET)
+    public ModelAndView spell(HttpServletRequest request) {
+        ModelAndView mav = new ModelAndView("search/spell");
+        String text = request.getParameter("text");
+
+        if (StringUtils.isEmpty(text)) {
+            mav.addObject("text", "");
+            return mav;
+        }
+
+        mav.addObject("text", text);
+
+        try {
+
+//            List<String> sugs = Arrays.asList("1", "2", "3");
+            List<String> sugs = GoogleSpellChecker.check(text);
+
+            mav.addObject("sugs", sugs);
+
+            mav.addObject("result", "ok");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            mav.addObject("result", "error");
+        }
+
+        return mav;
+    }
 
     @RequestMapping(value = "/rematch/{logId}", method = RequestMethod.GET)
     public ModelAndView rematch(@PathVariable String logId) {
@@ -281,7 +312,7 @@ public class SearchController {
         sc.setPage(page);
         sc.setPageSize(size);
         pagedResults = productIndex2Service.searchProducts(sc);
-        
+
         List<PtmProduct> indexProducts = productService.getProducts(pagedResults.getData());
         indexProducts.remove(firstProduct);
 
