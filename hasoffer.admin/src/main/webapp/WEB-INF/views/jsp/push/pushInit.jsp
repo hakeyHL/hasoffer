@@ -28,35 +28,37 @@
             <label for="pushType" class="col-sm-2 control-label">推送类型</label>
 
             <div class="col-sm-10">
-                <input type="text" class="form-control" id="pushType" name="pushType" placeholder="Deal" disabled>
+                <input type="text" class="form-control" id="pushType" name="pushType" placeholder="Deal"
+                       value="${pushType}" disabled>
             </div>
         </div>
         <div class="form-group">
             <label for="crowd" class="col-sm-2 control-label">推送人群</label>
 
             <div class="col-sm-10">
-                <input type="text" class="form-control" id="crowd" name="crowd" placeholder="所有设备" disabled>
+                <input type="text" class="form-control" id="crowd" name="crowd" placeholder="所有设备" value="${crowd}"
+                       disabled>
             </div>
         </div>
         <div class="form-group">
             <label for="pushSourceId" class="col-sm-2 control-label">配置跳转参数</label>
 
             <div class="col-sm-10">
-                <input type="text" class="form-control" id="pushSourceId">
+                <input type="text" class="form-control" id="pushSourceId" value="${pushSourceId}">
             </div>
         </div>
         <div class="form-group">
             <label for="pushTitle" class="col-sm-2 control-label">推送文案标题</label>
 
             <div class="col-sm-10">
-                <input type="text" class="form-control" id="pushTitle">
+                <input type="text" class="form-control" id="pushTitle" value="${pushTitle}">
             </div>
         </div>
         <div class="form-group">
             <label for="pushContent" class="col-sm-2 control-label">推送文案详情</label>
 
             <div class="col-sm-10">
-                <textarea class="form-control" id="pushContent" name="pushContent" rows="13"></textarea>
+                <textarea class="form-control" id="pushContent" name="pushContent" rows="13">${pushContent}</textarea>
             </div>
         </div>
         <div class="form-group">

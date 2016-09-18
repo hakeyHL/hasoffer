@@ -43,6 +43,7 @@ public class SpiderSkuWorker implements Runnable {
     @Override
     public void run() {
         String redisListName = SpiderConfigInitContext.getRedisListName(spiderConfig.getWebsite());
+        logger.info("Website:{}, Redis List Name:{}", spiderConfig.getWebsite(), redisListName);
         if (redisListName == null || "".equals(redisListName)) {
             return;
         }
@@ -62,14 +63,24 @@ public class SpiderSkuWorker implements Runnable {
             } catch (IOException e) {
                 logger.error("Json parse error. error msg {}", e);
             }
+            if (skuTask == null) {
+                return;
+            }
             Map<String, Object> extraMap = new HashMap<>();
-            extraMap.put("skuId", skuTask.getSkuId());
-            spiderSkuScheduler.pushRequest(skuTask.getUrl(), extraMap);
+            Long skuId = skuTask.getSkuId();
+            if (skuId == null) {
+                return;
+            }
+
+            //为任务附加初始默认参数。
+            extraMap.put("skuId", skuId);
+            extraMap.put("parseTimes", 0);
 
             if (Spider.Status.Stopped.equals(spiderSkuScheduler.runStatus())) {
                 logger.debug("start " + spiderConfig.getWebsite() + ":" + i++);
                 spiderSkuScheduler.startSpiderTask();
             }
+            spiderSkuScheduler.pushRequest(skuTask.getUrl(), extraMap);
         }
     }
 }

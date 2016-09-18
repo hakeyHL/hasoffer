@@ -15,15 +15,13 @@
 
     <dubbo:protocol name="dubbo" port="20881"/>
 
-    <dubbo:provider timeout="5000"/>
-
     <!-- 要引用的服务接口 check表示启动是检查服务是否已经提供。 -->
     <dubbo:reference id="skuResultDubboService" registry="consumer_reg" interface="hasoffer.dubbo.spider.result.api.ISkuResultDubboService"
-                     version="1.0" check="false"/>
+                     version="1.0" check="false" timeout="10000"/>
 
 
     <!-- 要暴露的服务接口 -->
     <dubbo:service interface="hasoffer.dubbo.spider.task.api.ISkuTaskDubboService" registry="provider_reg" version="1.0"
-                   ref="skuTaskDubboService"/>
+                   ref="skuTaskDubboService" timeout="10000"/>
     <bean id="skuTaskDubboService" class="hasoffer.spider.service.impl.SkuSpiderDubboServiceImpl"/>
 </beans>

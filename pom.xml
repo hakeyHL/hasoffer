@@ -27,7 +27,8 @@
         <module>hasoffer.fetch.consumer</module>
         <module>hasoffer.analysis.api</module>
         <module>hasoffer.spider.provider</module>
-        <module>hasoffer.spider.consumer</module>
+        <module>hasoffer.spider.task</module>
+        <module>hasoffer.spider.result</module>
     </modules>
 
     <properties>
@@ -107,6 +108,12 @@
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>${logback.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
