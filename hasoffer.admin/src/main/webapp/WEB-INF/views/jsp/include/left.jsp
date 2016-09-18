@@ -155,7 +155,7 @@
                                     <a href="/topselling/list">top selling</a>
                                 </li>
                                 <li class="active">
-                                    <a href="/push/pushIndex">push Manager</a>
+                                    <a href="/push/list">push Manager</a>
                                 </li>
                             </ul>
                         </li>

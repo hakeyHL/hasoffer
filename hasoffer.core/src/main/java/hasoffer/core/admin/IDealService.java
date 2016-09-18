@@ -31,6 +31,14 @@ public interface IDealService {
 
     AppBanner getBannerByDealId(Long dealId);
 
+    /**
+     * 将deal设置为过期
+     * 过期时间为创建时间
+     *
+     * @param id
+     */
+    void updateDealExpire(Long id);
+
     void saveOrUpdateBanner(AppBanner banner);
 
     void updateDeal(AppDeal deal);
