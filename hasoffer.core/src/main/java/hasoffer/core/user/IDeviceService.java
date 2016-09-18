@@ -91,6 +91,7 @@ public interface IDeviceService {
 
     PageableResult<StatDayAlive> findAliveStats(String startYmd, String endYmd, String marketChannel, String brand, String osVersion, int page, int size, String order);
 
-
     List<StatDevice> findCmpskuStat(String marketChannel, int days, String startYmd, String endYmd);
+
+    PageableResult<UrmDevice> findPagedUrmDeviceByAppType(AppType appType, int curPage, int pageSize);
 }
