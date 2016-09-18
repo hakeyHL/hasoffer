@@ -48,9 +48,9 @@ public class DealController {
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ModelAndView listDealData(HttpServletRequest request, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "50") int size, @RequestParam(defaultValue = "1") int type) {
+    public ModelAndView listDealData(HttpServletRequest request, @RequestParam(defaultValue = "createTime") String orderByField, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "50") int size, @RequestParam(defaultValue = "0") int type) {
         ModelAndView mav = new ModelAndView("deal/list");
-        PageableResult<AppDeal> pageableResult = dealService.findDealList(page, size, type);
+        PageableResult<AppDeal> pageableResult = dealService.findDealList(page, size, type, orderByField);
         List<AppdealVo> appdealVoList = new ArrayList<>();
         for (AppDeal appDeal : pageableResult.getData()) {
             AppdealVo appdealVo = new AppdealVo();
@@ -75,6 +75,7 @@ public class DealController {
         }
         mav.addObject("page", PageHelper.getPageModel(request, pageableResult));
         mav.addObject("datas", appdealVoList);
+        mav.addObject("type", type);
         return mav;
     }
 
