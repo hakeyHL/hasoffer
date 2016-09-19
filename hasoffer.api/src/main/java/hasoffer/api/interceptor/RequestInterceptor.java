@@ -113,10 +113,14 @@ public class RequestInterceptor implements HandlerInterceptor {
             urmUser = appService.getUserByUserToken(userToken);
 //                userICacheService.add(key, urmUser, TimeUtils.SECONDS_OF_1_DAY);
         }
+        if (modelAndView == null) {
+            modelAndView = new ModelAndView();
+        }
         if (urmUser == null) {
             modelAndView.addObject("result", new ResultVo("10010", "login expired"));
         } else {
             String gcmToken = JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).getString("gcmtoken");
+            System.out.println("get gcmtoken ++++++++++++++++++++++++++++++++++++" + gcmToken + "++++++++++++++++++++++++++++++++");
             //用户与gcmtoken绑定
             //1. 获取gcmtoken
             if (!StringUtils.isEmpty(gcmToken)) {
