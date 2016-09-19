@@ -23,7 +23,7 @@
     <div class="row" style="margin-bottom: 10px">
     </div>
 
-    <form class="form-horizontal" role="form">
+    <form action="/push/create/${pushSourceType}/${sourceId}" class="form-horizontal" role="form" method="post">
         <div class="form-group">
             <label for="pushType" class="col-sm-2 control-label">推送类型</label>
 
