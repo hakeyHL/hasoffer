@@ -10,6 +10,7 @@ import java.util.Map;
 /**
  * Created on 2016/4/11.
  */
+@Deprecated
 public interface HibernateDao {
 
     /** Get holded {@link SessionFactory} */
