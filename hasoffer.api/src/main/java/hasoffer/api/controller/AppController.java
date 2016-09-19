@@ -1150,11 +1150,13 @@ public class AppController {
 
     //搜索词提示
     @RequestMapping(value = "candidateKeyword", method = RequestMethod.GET)
-    public ModelAndView getSearchKeyWordsTip(String keyWord) {
+    public ModelAndView getSearchKeyWordsTip(@RequestParam(defaultValue = "") String keyWord) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
-        modelAndView.addObject("data", Arrays.asList("hasoffer", "very", "good", "!"));
+        Map map = new HashMap();
+        map.put("words", Arrays.asList("hasoffer", "very", "good", "!"));
+        modelAndView.addObject("data", map);
         return modelAndView;
     }
 
