@@ -11,8 +11,6 @@ import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.exception.CategoryDeleteException;
-import hasoffer.core.product.solr.CategoryIndexServiceImpl;
-import hasoffer.core.product.solr.CategoryModel;
 import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
 import org.springframework.stereotype.Controller;
@@ -37,8 +35,6 @@ public class CategoryController {
 
     @Resource
     ICategoryService categoryService;
-    @Resource
-    CategoryIndexServiceImpl categoryIndexService;
     @Resource
     IProductService productService;
     @Resource
@@ -113,17 +109,6 @@ public class CategoryController {
         mav.addObject("cates", categoryVos);
         mav.addObject("currentCate", categoryVos.get(categoryVos.size() - 1));
 
-        return mav;
-    }
-
-    @RequestMapping(value = "/testsolr", method = RequestMethod.GET)
-    public ModelAndView testSolr(@RequestParam(defaultValue = "") String q) {
-
-        List<CategoryModel> cms = categoryIndexService.simpleSearch(q);
-
-        ModelAndView mav = new ModelAndView("product/catesolr");
-        mav.addObject("cms", cms);
-        mav.addObject("q", q);
         return mav;
     }
 

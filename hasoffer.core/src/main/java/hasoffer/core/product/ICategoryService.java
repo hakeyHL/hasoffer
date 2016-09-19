@@ -17,8 +17,6 @@ public interface ICategoryService {
 
     List<PtmCategory> listSubCategories(Long parentId);
 
-    void reimportCategoryIndex();
-
     void updateCategoryIndex(long cateId, String keyword);
 
     void updateCategoryLevel(long cateId, int level);
@@ -29,14 +27,11 @@ public interface ICategoryService {
 
     PtmCategory getCategory(long cateId);
 
-    void deleteCategory(long id);
-
     PtmCategory3 createAppCategory(PtmCategory3 category);
-
-    //使用完成记得删除
-    void tempDeleteCategoryForCategoryUpdate(long id);
 
     List<PtmCategory> listCates();
 
     List<PtmCateTag> listAllCategoryTags();
+
+    void deleteCategory(long id);
 }

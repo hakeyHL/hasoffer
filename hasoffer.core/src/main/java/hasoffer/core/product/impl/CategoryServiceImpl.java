@@ -7,8 +7,6 @@ import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCategory3;
 import hasoffer.core.persistence.po.ptm.updater.PtmCategoryUpdater;
 import hasoffer.core.product.ICategoryService;
-import hasoffer.core.product.solr.CategoryIndexServiceImpl;
-import hasoffer.core.product.solr.CategoryModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -28,12 +26,16 @@ public class CategoryServiceImpl implements ICategoryService {
             "SELECT t FROM PtmCategory t WHERE t.parentId = ?0";
     private final static String CACHE_KEY = "category";
     @Resource
-    CategoryIndexServiceImpl categoryIndexService;
-    @Resource
     IDataBaseManager dbm;
     private Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
     /*@Resource
     private EhCacheCacheManager cacheManager;*/
+
+    @Override
+    @Transactional
+    public void deleteCategory(long id) {
+        dbm.delete(PtmCategory.class, id);
+    }
 
     @Override
     public PtmCategory getCategory(long cateId) {
@@ -62,9 +64,6 @@ public class CategoryServiceImpl implements ICategoryService {
         PtmCategoryUpdater ptmCategoryUpdater = new PtmCategoryUpdater(cateId);
         ptmCategoryUpdater.getPo().setName(categoryName);
         dbm.update(ptmCategoryUpdater);
-
-        category.setName(categoryName);
-        categoryIndexService.createOrUpdate(new CategoryModel(category));
     }
 
     @Override
@@ -78,16 +77,6 @@ public class CategoryServiceImpl implements ICategoryService {
         PtmCategoryUpdater ptmCategoryUpdater = new PtmCategoryUpdater(cateId);
         ptmCategoryUpdater.getPo().setKeyword(key);
         dbm.update(ptmCategoryUpdater);
-
-        category.setKeyword(key);
-        categoryIndexService.createOrUpdate(new CategoryModel(category));
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void deleteCategory(long id) {
-        dbm.delete(PtmCategory.class, id);
-        categoryIndexService.remove(String.valueOf(id));
     }
 
     @Override
@@ -96,12 +85,6 @@ public class CategoryServiceImpl implements ICategoryService {
         Long aLong = dbm.create(category);
         category.setId(aLong);
         return category;
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void tempDeleteCategoryForCategoryUpdate(long id) {
-        dbm.delete(PtmCategory.class, id);
     }
 
     @Override
@@ -124,25 +107,6 @@ public class CategoryServiceImpl implements ICategoryService {
         PtmCategoryUpdater ptmCategoryUpdater = new PtmCategoryUpdater(cateId);
         ptmCategoryUpdater.getPo().setKeyword(keyword);
         dbm.update(ptmCategoryUpdater);
-
-        // update solr
-        categoryIndexService.createOrUpdate(new CategoryModel(category));
-    }
-
-    @Override
-    public void reimportCategoryIndex() {
-        try {
-            categoryIndexService.removeAll();
-        } catch (Exception e) {
-        }
-
-        List<PtmCategory> categories = dbm.query(Q_CATEGORY);
-
-        for (PtmCategory category : categories) {
-            if (category.getLevel() == 2) {
-                categoryIndexService.createOrUpdate(new CategoryModel(category));
-            }
-        }
     }
 
     @Override
