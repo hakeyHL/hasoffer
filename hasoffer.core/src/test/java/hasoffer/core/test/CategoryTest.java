@@ -4,8 +4,6 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCategory3;
 import hasoffer.core.product.ICategoryService;
-import hasoffer.core.product.solr.CategoryIndexServiceImpl;
-import hasoffer.core.product.solr.CategoryModel;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -32,8 +30,6 @@ public class CategoryTest {
     IDataBaseManager dbm;
     @Resource
     ICategoryService categoryService;
-    @Resource
-    CategoryIndexServiceImpl categoryIndexService;
 
     @Test
     public void showCate1() {
@@ -155,24 +151,6 @@ public class CategoryTest {
         String keyword = "headphones";
 
         categoryService.getRouterCategoryList(cateId);
-    }
-
-    @Test
-    public void updateIndex() {
-        categoryService.reimportCategoryIndex();
-    }
-
-    @Test
-    public void search() {
-//        String title = "CS2 Sony Mh750 Wired Headset Sony Mh750 Wired Headset Wired Headphones"; N
-//        String title = "Enfin Homes M4XPBS Barbeque Black ";// Barbeque Y
-        String title = "Adidas SPRINGBLADE DRIVE 2 M Running Shoes ";
-
-        List<CategoryModel> categories = categoryIndexService.simpleSearch(title);
-
-        for (CategoryModel cate : categories) {
-            System.out.println(cate);
-        }
     }
 
 }

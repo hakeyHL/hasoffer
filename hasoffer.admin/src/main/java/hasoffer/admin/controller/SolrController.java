@@ -21,10 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -338,15 +336,6 @@ public class SolrController {
         );
 
         listAndProcessTask2.go();
-    }
-
-    @RequestMapping(value = "/category/reimport", method = RequestMethod.GET)
-    public ModelAndView reimportCategory(HttpServletRequest request) {
-        categoryService.reimportCategoryIndex();
-
-        ModelAndView mav = new ModelAndView();
-        mav.addObject("result", "ok");
-        return mav;
     }
 
     @RequestMapping(value = "/product/reimportsolrindexbycategory", method = RequestMethod.GET)
