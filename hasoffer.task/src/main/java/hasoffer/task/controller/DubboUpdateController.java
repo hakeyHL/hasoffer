@@ -101,6 +101,7 @@ public class DubboUpdateController {
 
     /**
      * sku的日常更新（目前策略热搜）
+     *
      * @return
      */
     //dubbofetchtask/updatestart
@@ -195,11 +196,23 @@ public class DubboUpdateController {
 
         System.out.println(JSONUtil.toJSON(fetchedProduct).toString() + "id=" + skuid);
 
-        cmpSkuService.createDescription(ptmCmpSku, fetchedProduct);
+        try {
+            cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
+        try {
+            cmpSkuService.createPtmCmpSkuImage(skuid, fetchedProduct);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        cmpSkuService.createPtmCmpSkuImage(skuid, fetchedProduct);
+        try {
+            cmpSkuService.createDescription(ptmCmpSku, fetchedProduct);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return "ok";
     }
