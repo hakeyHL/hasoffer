@@ -43,6 +43,7 @@ import hasoffer.core.user.IDeviceService;
 import hasoffer.core.utils.AffliIdHelper;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
+import hasoffer.nlp.core.google.GoogleSpellChecker;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import jodd.util.NameValue;
@@ -1150,11 +1151,13 @@ public class AppController {
 
     //搜索词提示
     @RequestMapping(value = "candidateKeyword", method = RequestMethod.GET)
-    public ModelAndView getSearchKeyWordsTip(String keyWord) {
+    public ModelAndView getSearchKeyWordsTip(@RequestParam(defaultValue = "") String keyWord) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
-        modelAndView.addObject("data", Arrays.asList("hasoffer", "very", "good", "!"));
+        Map map = new HashMap();
+        map.put("words", GoogleSpellChecker.check(keyWord));
+        modelAndView.addObject("data", map);
         return modelAndView;
     }
 
