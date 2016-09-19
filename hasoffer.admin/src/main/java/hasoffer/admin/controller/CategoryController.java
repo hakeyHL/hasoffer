@@ -145,11 +145,11 @@ public class CategoryController {
         String category3Str = request.getParameter("category3");
 
         long targetCateId = 0L;
-        if (StringUtils.isEmpty(category3Str) && Long.valueOf(category3Str) > 0) {
+        if (!StringUtils.isEmpty(category3Str) && Long.valueOf(category3Str) > 0) {
             targetCateId = Long.valueOf(category3Str);
-        } else if (StringUtils.isEmpty(category2Str) && Long.valueOf(category2Str) > 0) {
+        } else if (!StringUtils.isEmpty(category2Str) && Long.valueOf(category2Str) > 0) {
             targetCateId = Long.valueOf(category2Str);
-        } else if (StringUtils.isEmpty(category1Str) && Long.valueOf(category1Str) > 0) {
+        } else if (!StringUtils.isEmpty(category1Str) && Long.valueOf(category1Str) > 0) {
             targetCateId = Long.valueOf(category1Str);
         }
 
@@ -158,7 +158,7 @@ public class CategoryController {
         }
 
         String currentCateIdStr = request.getParameter("currentCateId");
-        moveProducts(Long.valueOf(currentCateIdStr), Long.valueOf(category3Str));
+        moveProducts(Long.valueOf(currentCateIdStr), targetCateId);
 
         return new ModelAndView("redirect:/cate/detail/" + currentCateIdStr);
     }
