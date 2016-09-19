@@ -18,10 +18,7 @@ import hasoffer.core.push.IPushService;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.webcommon.helper.PageHelper;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
@@ -117,17 +114,49 @@ public class PushController {
         appPush.setPushSourceType(PushSourceType.DEAL);
         appPush.setSourceId(sourceId);
 
-        //创建apppush对象
-        pushService.createAppPush(appPush);
-        //加入队列,由别的线程来完成push操作
-        redisListService.push(ADMIN_PUSH_QUEUE, JSONUtil.toJSON(appPush));
-
         mav.addObject("pushSourceType", pushSourceType);
         mav.addObject("pushSourceId", pushSourceId);
         mav.addObject("pushTitle", pushTitle);
         mav.addObject("pushContent", pushContent);
 
         return mav;
+    }
+
+    @RequestMapping(value = "/create/{pushSourceTypeString}/{sourceId}", method = RequestMethod.POST)
+    @ResponseBody
+    public String create(@PathVariable String pushSourceTypeString, @PathVariable String sourceId) {
+
+        if (StringUtils.isEmpty(pushSourceTypeString)) {
+            pushSourceTypeString = "DEAL";
+        }
+
+        PushSourceType pushSourceType = PushSourceType.valueOf(pushSourceTypeString.toUpperCase());
+//        crowd
+        String pushTitle = "";
+        String pushContent = "";
+
+        if (PushSourceType.DEAL.equals(pushSourceType)) {
+
+            AppDeal appDeal = dbm.get(AppDeal.class, Long.valueOf(sourceId));
+
+            pushTitle = appDeal.getTitle();
+            pushContent = appDeal.getPriceDescription();
+
+        }
+
+        AppPush appPush = new AppPush();
+        appPush.setTitle(pushTitle);
+        appPush.setContent(pushContent);
+        appPush.setCreateTime(TimeUtils.nowDate());
+        appPush.setPushSourceType(PushSourceType.DEAL);
+        appPush.setSourceId(sourceId);
+
+        //创建apppush对象
+        pushService.createAppPush(appPush);
+        //加入队列,由别的线程来完成push操作
+        redisListService.push(ADMIN_PUSH_QUEUE, JSONUtil.toJSON(appPush));
+
+        return "ok";
     }
 
     @RequestMapping(value = "/pushIndex")
