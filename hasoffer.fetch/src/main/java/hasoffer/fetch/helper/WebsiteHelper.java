@@ -227,7 +227,8 @@ public class WebsiteHelper {
 //                return getUrlWithAff(website, url, 0);
 //                return SnapdealHelper.getDeeplink(url);
             case SHOPCLUES:
-                return ShopcluesHelper.getDeeplinkWithAff(url, affs);
+                String deeplinkWithAff = ShopcluesHelper.getDeeplinkWithAff(url, affs);
+                return deeplinkWithAff;
             case EBAY:
                 return EbayHelper.getUrlWithAff(url);
             case INFIBEAM:

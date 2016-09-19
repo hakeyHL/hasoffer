@@ -75,6 +75,8 @@ public class ShopcluesHelper {
         }
         String cleanUrl = getCleanUrl(url);
         return cleanUrl + "?ty=0&id=111438445&mcid=aff&utm_source=Hasoffer&OfferId=15";
+//        String tempStr = "http://affiliateshopclues.com/?a=2892&c=69&p=r&s1=&ckmrdr=" + cleanUrl;
+//        return tempStr;
         /*if (affs == null) {
             if (url.contains("affiliateshopclues")) {
                 url = url.replace("affiliateshopclues", "www.shopclues");

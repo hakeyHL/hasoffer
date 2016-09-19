@@ -105,7 +105,7 @@ public class FlipkartHelper {
         for (String str : affs) {
             MarketChannel[] values = MarketChannel.values();
             for (MarketChannel marketChannel : values) {
-                if (marketChannel.name().equals("str")) {
+                if (marketChannel.name().equals(str)) {
                     marketChannelName = marketChannel;
                     break;
                 }

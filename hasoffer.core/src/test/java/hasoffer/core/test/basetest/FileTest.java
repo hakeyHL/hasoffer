@@ -25,6 +25,26 @@ import java.util.regex.Pattern;
 public class FileTest {
 
     @Test
+    public void washLog() throws IOException {
+
+        File file = new File("C:/Users/wing/Desktop/logbak9.txt");
+        File log = new File("C:/Users/wing/Desktop/log.txt");
+
+        String[] strings = FileUtil.readLines(file);
+
+        FileUtil.appendString(log, "logbak9.txt-------------------------\r\n");
+
+        for (String str : strings) {
+
+            if (str.contains("push success for priceOffNotice") || str.contains("update lastpushstatus push fail for")) {
+                FileUtil.appendString(log, str + "\r\n");
+            }
+
+        }
+
+    }
+
+    @Test
     public void show() {
         String path = "D:\\tmp\\po";
         File file = new File(path);
