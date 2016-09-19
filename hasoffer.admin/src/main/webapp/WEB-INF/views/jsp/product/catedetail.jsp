@@ -76,20 +76,6 @@
                         </div>
                     </form>
 
-                    <c:if test="${currentCate.productCount > 0}">
-                        <div class="col-lg-8" style="margin-top: 10px">
-                            <div class="input-group">
-                                <span class="input-group-addon">关键字密度(≥)</span>
-                                <input type="text" class="form-control" aria-describedby="basic-addon1"
-                                       id="analysis_percent" value="0.1">
-                            </div>
-                        </div>
-
-                        <div class="col-lg-4" style="margin-top: 10px">
-                            <button class="btn btn-default" onclick="statTitles()">分析类目关键词</button>
-                        </div>
-                    </c:if>
-
                     <div class="col-lg-8">
                         <table class="table table-condensed" id="table_keyword" style="margin-top: 10px">
                         </table>
