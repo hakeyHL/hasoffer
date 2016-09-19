@@ -287,7 +287,7 @@ public class AppController {
                 break;
             case COMADD:
                 Map nMap = new HashMap();
-                nMap.put("op", true);
+                nMap.put("op", false);
                 modelAndView.addObject("data", nMap);
             default:
                 break;
