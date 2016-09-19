@@ -6,6 +6,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.product.ProductBo;
+import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.cache.CategoryCacheManager;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
@@ -25,6 +26,9 @@ import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.search.ISearchService;
+import hasoffer.core.task.ListProcessTask;
+import hasoffer.core.task.worker.ILister;
+import hasoffer.core.task.worker.IProcessor;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.model.ListProduct;
@@ -42,11 +46,10 @@ import java.util.*;
 public class ProductServiceImpl implements IProductService {
     private static final String Q_PRODUCT =
             "SELECT t FROM PtmProduct t";
+
     private static final String Q_PRODUCT_BY_CATEGORY =
             "SELECT t FROM PtmProduct t WHERE t.categoryId = ?0";
-    private static final String Q_PRODUCT_BY_CMPID =
-            "SELECT t FROM PtmProduct t " +
-                    " WHERE t.id > ?0 ";
+
     private static final String Q_PRODUCT_BY_CREATETIME =
             "SELECT t FROM PtmProduct t " +
                     " WHERE t.createTime > ?0 " +
@@ -57,10 +60,6 @@ public class ProductServiceImpl implements IProductService {
             "SELECT t FROM PtmCmpSku t " +
                     " WHERE t.productId = ?0   " +
                     " ORDER BY t.price ASC ";
-
-//    private static final String Q_ONSALE_PTM_CMPSKU =
-//            "SELECT t FROM PtmCmpSku t " +
-//                    " WHERE t.productId = ?0  AND  t.price >?1  AND t.status <> 'OFFSALE'  ORDER BY t.price ASC  ";
 
     private static final String Q_ONSALE_PTM_CMPSKU =
             "SELECT  DISTINCT " +
@@ -84,9 +83,6 @@ public class ProductServiceImpl implements IProductService {
     private static final String Q_PTM_IMAGE =
             "SELECT t FROM PtmImage t " +
                     " WHERE t.productId = ?0  ";
-    private static final String Q_PTM_BASICATTRIBUTE =
-            "SELECT t FROM PtmBasicAttribute t " +
-                    " WHERE t.productId = ?0 ";
 
     private static final String Q_PTM_TOPSEELLING =
             "select t from PtmTopSelling t where   t.status='ONLINE'  order by t.lUpdateTime desc , t.count desc ";
@@ -109,11 +105,51 @@ public class ProductServiceImpl implements IProductService {
     private ICmpSkuService cmpSkuService;
     @Resource
     private ProductCacheManager productCacheManager;
+
     private Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     @Override
-    public void importProduct2SolrByCategory(long cateId) {
+    public void importProduct2SolrByCategory(final long cateId) {
 
+        PtmCategory category = dbm.get(PtmCategory.class, cateId);
+        if (category == null) {
+            return;
+        }
+
+        ListProcessTask<ProductModel2> productListProcessTask = new ListProcessTask<>(
+                new ILister() {
+                    @Override
+                    public PageableResult<ProductModel2> getData(int page) {
+                        SearchCriteria sc = new SearchCriteria();
+                        sc.setPage(page);
+                        sc.setPageSize(200);
+                        sc.setCategoryId(String.valueOf(cateId));
+                        sc.setLevel(sc.getLevel());
+                        return productIndex2Service.searchProducts(sc);
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcessor<ProductModel2>() {
+                    @Override
+                    public void process(ProductModel2 o) {
+                        importProduct2Solr2(o.getId());
+                    }
+                }
+        );
+
+        productListProcessTask.setQueueMaxSize(300);
+        productListProcessTask.setProcessorCount(2);
+
+        productListProcessTask.go();
     }
 
     /*public static void main(String[] args) {
