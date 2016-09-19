@@ -111,7 +111,12 @@ public class ProductServiceImpl implements IProductService {
     private ProductCacheManager productCacheManager;
     private Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
-    public static void main(String[] args) {
+    @Override
+    public void importProduct2SolrByCategory(long cateId) {
+
+    }
+
+    /*public static void main(String[] args) {
         List<PtmCmpSku> tempSkuList = new ArrayList<>();
         PtmCmpSku ptm = new PtmCmpSku();
         ptm.setPrice(100f);
@@ -144,7 +149,7 @@ public class ProductServiceImpl implements IProductService {
         });
         System.out.println(min.getPrice());
         System.out.println(max.getPrice());
-    }
+    }*/
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -638,7 +643,7 @@ public class ProductServiceImpl implements IProductService {
                 cate3 = cate.getId();
                 cate3name = cate.getName();
             }
-            cateTag = categoryCacheManager.getCategoryTag(product.getCategoryId());
+            cateTag = cate.getKeyword();
         }
 
         List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(product.getId());
@@ -664,7 +669,7 @@ public class ProductServiceImpl implements IProductService {
         float minPrice = 0.0f, maxPrice = 0.0f;
 
         for (Map.Entry<Website, PtmCmpSku> kv : cmpSkuMap.entrySet()) {
-            Website website = kv.getKey();
+//            Website website = kv.getKey();
             PtmCmpSku cmpSku = kv.getValue();
 
             float price = cmpSku.getPrice();

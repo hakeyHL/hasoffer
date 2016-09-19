@@ -168,12 +168,6 @@ public class CategoryController {
         }
     }
 
-    @RequestMapping(value = "/moveCategoryToNewCategory", method = RequestMethod.GET)
-    public ModelAndView moveCategoryToNewCategory(HttpServletRequest request) {
-
-        return null;
-    }
-
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
     public ModelAndView delete(@PathVariable long id) throws CategoryDeleteException {
 
@@ -209,12 +203,23 @@ public class CategoryController {
                                    @RequestParam(defaultValue = "") String categoryTag) {
         ModelAndView mav = new ModelAndView("redirect:/cate/detail/" + id);
 
+        boolean reimport2solr = false;
+
         if (!StringUtils.isEmpty(categoryName)) {
             categoryService.updateCategoryName(id, categoryName);
+            reimport2solr = true;
         }
 
         if (!StringUtils.isEmpty(categoryTag)) {
+            if (categoryTag.equalsIgnoreCase("000000")) {
+                categoryTag = "";
+            }
             categoryService.updateCategoryKeyword(id, categoryTag);
+            reimport2solr = true;
+        }
+
+        if (reimport2solr) {
+            productService.importProduct2SolrByCategory(id);
         }
 
         return mav;

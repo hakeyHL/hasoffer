@@ -91,4 +91,6 @@ public interface IProductService {
     void importProduct2Solr2(PtmProduct o, List<PtmCmpSku> cmpSkus);
 
     void importProduct2Solr2(PtmProduct product);
+
+    void importProduct2SolrByCategory(long cateId);
 }
