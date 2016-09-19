@@ -95,6 +95,13 @@ public class AppController {
     Logger logger = LoggerFactory.getLogger(AppController.class);
 
     public static void main(String[] args) {
+        List li = new ArrayList();
+        li.add("1");
+        li.add("2");
+        li.add("3");
+        li.add("4");
+        li.add("5");
+        System.out.println(li.subList(0, 3).size());
 //        String ss = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL, "http://www.snapdeal.com/offers/maggi-hamper", new String[]{"GOOGLEPLAY", "123"});
 //        System.out.print(ss);
         /*String as = "Refer and earn Rs. 200 for each friend who signs up at Amazon.in and makes a purchase of Rs. 300 or more. Person who " +
@@ -1156,7 +1163,7 @@ public class AppController {
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
         Map map = new HashMap();
-        map.put("words", GoogleSpellChecker.check(keyWord));
+        map.put("words", GoogleSpellChecker.check(keyWord).subList(0, 3));
         modelAndView.addObject("data", map);
         return modelAndView;
     }
