@@ -11,8 +11,6 @@ import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.exception.CategoryDeleteException;
-import hasoffer.core.product.solr.CategoryIndexServiceImpl;
-import hasoffer.core.product.solr.CategoryModel;
 import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
 import org.springframework.stereotype.Controller;
@@ -37,8 +35,6 @@ public class CategoryController {
 
     @Resource
     ICategoryService categoryService;
-    @Resource
-    CategoryIndexServiceImpl categoryIndexService;
     @Resource
     IProductService productService;
     @Resource
@@ -116,17 +112,6 @@ public class CategoryController {
         return mav;
     }
 
-    @RequestMapping(value = "/testsolr", method = RequestMethod.GET)
-    public ModelAndView testSolr(@RequestParam(defaultValue = "") String q) {
-
-        List<CategoryModel> cms = categoryIndexService.simpleSearch(q);
-
-        ModelAndView mav = new ModelAndView("product/catesolr");
-        mav.addObject("cms", cms);
-        mav.addObject("q", q);
-        return mav;
-    }
-
     @RequestMapping(value = "/create", method = RequestMethod.GET)
     public ModelAndView createCategory(@RequestParam long parentId,
                                        @RequestParam String name) {
@@ -183,12 +168,6 @@ public class CategoryController {
         }
     }
 
-    @RequestMapping(value = "/moveCategoryToNewCategory", method = RequestMethod.GET)
-    public ModelAndView moveCategoryToNewCategory(HttpServletRequest request) {
-
-        return null;
-    }
-
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
     public ModelAndView delete(@PathVariable long id) throws CategoryDeleteException {
 
@@ -224,12 +203,23 @@ public class CategoryController {
                                    @RequestParam(defaultValue = "") String categoryTag) {
         ModelAndView mav = new ModelAndView("redirect:/cate/detail/" + id);
 
+        boolean reimport2solr = false;
+
         if (!StringUtils.isEmpty(categoryName)) {
             categoryService.updateCategoryName(id, categoryName);
+            reimport2solr = true;
         }
 
         if (!StringUtils.isEmpty(categoryTag)) {
+            if (categoryTag.equalsIgnoreCase("000000")) {
+                categoryTag = "";
+            }
             categoryService.updateCategoryKeyword(id, categoryTag);
+            reimport2solr = true;
+        }
+
+        if (reimport2solr) {
+            productService.importProduct2SolrByCategory(id);
         }
 
         return mav;
