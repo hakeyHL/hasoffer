@@ -23,6 +23,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -90,6 +91,7 @@ public class AdminPushJobBean extends QuartzJobBean {
 
             while (curPage <= totalPage) {
 
+                List<String> gcmTokenList = new ArrayList<>();
 
                 if (curPage > 1) {
                     pageableResult = deviceService.findPagedUrmDeviceByAppType(AppType.APP, curPage, pageSize);
@@ -107,9 +109,15 @@ public class AdminPushJobBean extends QuartzJobBean {
                         //按照gcmtoken过滤
                         String gcmToken = urmDevice.getGcmToken();
                         if (!StringUtils.isEmpty(gcmToken)) {
-                            pushService.push(gcmToken, pushBo);
+                            gcmTokenList.add(gcmToken);
                         }
                     }
+                }
+
+                try {
+                    pushService.GroupPush(gcmTokenList, pushBo);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
                 curPage++;
