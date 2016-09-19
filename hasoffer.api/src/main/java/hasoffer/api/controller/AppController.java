@@ -43,6 +43,7 @@ import hasoffer.core.user.IDeviceService;
 import hasoffer.core.utils.AffliIdHelper;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
+import hasoffer.nlp.core.google.GoogleSpellChecker;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import jodd.util.NameValue;
@@ -1155,7 +1156,7 @@ public class AppController {
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
         Map map = new HashMap();
-        map.put("words", Arrays.asList("hasoffer", "very", "good", "!"));
+        map.put("words", GoogleSpellChecker.check(keyWord));
         modelAndView.addObject("data", map);
         return modelAndView;
     }
