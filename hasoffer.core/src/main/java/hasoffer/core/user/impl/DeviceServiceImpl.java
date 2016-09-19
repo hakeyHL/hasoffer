@@ -145,6 +145,11 @@ public class DeviceServiceImpl implements IDeviceService {
     }
 
     @Override
+    public PageableResult<UrmDevice> findPagedUrmDeviceByAppType(AppType appType, int curPage, int pageSize) {
+        return dbm.queryPage("SELECT t FROM UrmDevice t WHERE t.appType = ?0 ORDER BY t.id", curPage, pageSize, Arrays.asList(appType));
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateFirstBindAssistYmd(String deviceId) {
         List<StatDevice> stats = listDeviceStats(deviceId);

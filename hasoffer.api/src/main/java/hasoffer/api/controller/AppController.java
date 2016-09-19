@@ -43,6 +43,7 @@ import hasoffer.core.user.IDeviceService;
 import hasoffer.core.utils.AffliIdHelper;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
+import hasoffer.nlp.core.google.GoogleSpellChecker;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import jodd.util.NameValue;
@@ -458,9 +459,6 @@ public class AppController {
                 DealVo dealVo = new DealVo();
                 dealVo.setId(appDeal.getId());
                 dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
-//                String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-//                DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-//                dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
                 dealVo.setExtra(0d);
                 dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
                 if (appDeal.getWebsite().name().equals("FLIPKART")) {
@@ -470,6 +468,24 @@ public class AppController {
                 dealVo.setExp(appDeal.getExpireTime());
                 dealVo.setTitle(appDeal.getTitle());
                 dealVo.setIsExpired(false);
+                dealVo.setDiscount(appDeal.getDiscount());
+                dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
+                dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
+                dealVo.setWebsite(appDeal.getWebsite());
+                li.add(dealVo);
+            } else {
+                DealVo dealVo = new DealVo();
+                dealVo.setId(appDeal.getId());
+                dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
+                dealVo.setExtra(0d);
+                dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                if (appDeal.getWebsite().name().equals("FLIPKART")) {
+                    dealVo.setExtra(1.5);
+                }
+                dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                dealVo.setExp(appDeal.getExpireTime());
+                dealVo.setTitle(appDeal.getTitle());
+                dealVo.setIsExpired(true);
                 dealVo.setDiscount(appDeal.getDiscount());
                 dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
                 dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
@@ -1135,11 +1151,13 @@ public class AppController {
 
     //搜索词提示
     @RequestMapping(value = "candidateKeyword", method = RequestMethod.GET)
-    public ModelAndView getSearchKeyWordsTip(String keyWord) {
+    public ModelAndView getSearchKeyWordsTip(@RequestParam(defaultValue = "") String keyWord) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
-        modelAndView.addObject("data", Arrays.asList("hasoffer", "very", "good", "!"));
+        Map map = new HashMap();
+        map.put("words", GoogleSpellChecker.check(keyWord));
+        modelAndView.addObject("data", map);
         return modelAndView;
     }
 
