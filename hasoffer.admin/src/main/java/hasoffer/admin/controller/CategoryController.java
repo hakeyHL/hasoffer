@@ -5,6 +5,7 @@ import hasoffer.admin.controller.vo.CategoryVo;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.product.ICategoryService;
@@ -12,6 +13,8 @@ import hasoffer.core.product.IProductService;
 import hasoffer.core.product.exception.CategoryDeleteException;
 import hasoffer.core.product.solr.CategoryIndexServiceImpl;
 import hasoffer.core.product.solr.CategoryModel;
+import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
+import hasoffer.core.product.solr.ProductModel2;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,8 +41,80 @@ public class CategoryController {
     CategoryIndexServiceImpl categoryIndexService;
     @Resource
     IProductService productService;
+    @Resource
+    ProductIndex2ServiceImpl productIndex2Service;
 
     private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
+
+    @RequestMapping(value = "/main", method = RequestMethod.GET)
+    public ModelAndView catelist(HttpServletRequest request,
+                                 @RequestParam(defaultValue = "0") int c1,
+                                 @RequestParam(defaultValue = "0") int c2) {
+        ModelAndView mav = new ModelAndView("product/category");
+
+        List<PtmCategory> routeCates = null;
+
+        List<PtmCategory> categories = categoryService.listSubCategories(0L);
+        List<CategoryVo> c1s = CategoryHelper.getCategoryVos(categories);
+        statProductCount(c1s);
+        mav.addObject("c1s", c1s);
+
+        String keyword = "";
+        if (c1 > 0) {
+            List<PtmCategory> categories2 = categoryService.listSubCategories(Long.valueOf(c1));
+            List<CategoryVo> c2s = CategoryHelper.getCategoryVos(categories2);
+            statProductCount(c2s);
+            mav.addObject("c2s", c2s);
+
+            if (c2 > 0) {
+                List<PtmCategory> categories3 = categoryService.listSubCategories(Long.valueOf(c2));
+                List<CategoryVo> c3s = CategoryHelper.getCategoryVos(categories3);
+                statProductCount(c3s);
+                mav.addObject("c3s", c3s);
+            }
+
+            routeCates = categoryService.getRouterCategoryList(c2 > 0 ? c2 : c1);
+            keyword = routeCates.get(routeCates.size() - 1).getKeyword();
+        }
+
+        mav.addObject("sc1", c1);
+        mav.addObject("sc2", c2);
+        mav.addObject("routeCates", routeCates);
+        mav.addObject("keyword", keyword);
+        return mav;
+    }
+
+    /**
+     * @param cates
+     */
+    private void statProductCount(List<CategoryVo> cates) {
+
+        for (CategoryVo cate : cates) {
+            SearchCriteria sc = new SearchCriteria();
+            sc.setCategoryId(String.valueOf(cate.getId()));
+            sc.setLevel(cate.getLevel());
+            sc.setPage(1);
+            sc.setPageSize(1);
+
+            PageableResult<ProductModel2> pros = productIndex2Service.searchProducts(sc);
+            cate.setProductCount(pros.getNumFund());
+        }
+    }
+
+    @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
+    public ModelAndView cateDetail(@PathVariable long id) {
+
+        ModelAndView mav = new ModelAndView("product/catedetail");
+
+        List<PtmCategory> categories = categoryService.getRouterCategoryList(id);
+        List<CategoryVo> categoryVos = CategoryHelper.getCategoryVos(categories);
+        statProductCount(categoryVos);
+
+        mav.addObject("cates", categoryVos);
+        mav.addObject("currentCate", categoryVos.get(categoryVos.size() - 1));
+
+        return mav;
+    }
 
     @RequestMapping(value = "/testsolr", method = RequestMethod.GET)
     public ModelAndView testSolr(@RequestParam(defaultValue = "") String q) {
@@ -65,12 +140,23 @@ public class CategoryController {
     @RequestMapping(value = "/moveProductsToNewCategory", method = RequestMethod.POST)
     public ModelAndView moveProductsToNewCategory(HttpServletRequest request) {
 
+        String category1Str = request.getParameter("category1");
+        String category2Str = request.getParameter("category2");
         String category3Str = request.getParameter("category3");
-        if (StringUtils.isEmpty(category3Str) || category3Str.equals("-1")) {
-            // todo 抛出异常
+
+        long targetCateId = 0L;
+        if (StringUtils.isEmpty(category3Str) && Long.valueOf(category3Str) > 0) {
+            targetCateId = Long.valueOf(category3Str);
+        } else if (StringUtils.isEmpty(category2Str) && Long.valueOf(category2Str) > 0) {
+            targetCateId = Long.valueOf(category2Str);
+        } else if (StringUtils.isEmpty(category1Str) && Long.valueOf(category1Str) > 0) {
+            targetCateId = Long.valueOf(category1Str);
         }
 
-        // 当前的类目，目前限定为只能是第三级目录
+        if (targetCateId <= 0) {
+            return new ModelAndView("system/error");
+        }
+
         String currentCateIdStr = request.getParameter("currentCateId");
         moveProducts(Long.valueOf(currentCateIdStr), Long.valueOf(category3Str));
 

@@ -9,6 +9,7 @@ public class CategoryVo {
 
 	private Long id;
 	private long parentId;
+	private int level;
 
 	private String name;
 	private String imageUrl;
@@ -23,6 +24,7 @@ public class CategoryVo {
 		this.name = category.getName();
 		this.imageUrl = category.getImageUrl();
 		this.keyword = category.getKeyword();
+		this.level = category.getLevel();
 	}
 
 	public Long getId() {
@@ -71,5 +73,13 @@ public class CategoryVo {
 
 	public void setProductCount(long productCount) {
 		this.productCount = productCount;
+	}
+
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
 	}
 }
