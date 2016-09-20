@@ -37,7 +37,7 @@ public class RePushPriceOffNoticeJobBean extends QuartzJobBean {
 
             Object pop = null;
 
-            if (TimeUtils.getHour() < 14) {
+            if (TimeUtils.getHour() < 18) {
                 pop = redisListService.pop(PUSH_FAIL_PRICEOFFNOTICE_ID);
             } else if (TimeUtils.getHour() > 20) {
                 pop = redisListService.pop(PUSH_FAIL_PRICEOFFNOTICE_ID_22);
