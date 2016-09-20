@@ -112,6 +112,8 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public List<String> spellcheck(String text) {
+        boolean onlyByGoogle = true;
+
         if (StringUtils.isEmpty(text)) {
             return null;
         }
@@ -122,7 +124,7 @@ public class ProductServiceImpl implements IProductService {
         String[] ts = text.split("\\s");
 
         List<String> sugs = null;
-        if (ts.length > 1) {
+        if (onlyByGoogle || ts.length > 1) {
             System.out.println(String.format("spellcheck[%s] by google.", text));
             sugs = GoogleSpellChecker.check(text);
         } else {
