@@ -1,8 +1,6 @@
 package hasoffer.api.interceptor;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import hasoffer.api.controller.vo.DeviceEventVo;
 import hasoffer.api.controller.vo.DeviceInfoVo;
@@ -11,10 +9,7 @@ import hasoffer.api.controller.vo.ResultVo;
 import hasoffer.api.worker.DeviceRequestQueue;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.utils.DeviceUtils;
-import hasoffer.base.utils.JSONUtil;
-import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.po.urm.UrmUser;
-import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
@@ -30,9 +25,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -113,21 +105,41 @@ public class RequestInterceptor implements HandlerInterceptor {
         if (modelAndView != null && modelAndView.getModel().containsKey("searchCriteria")) {
             modelAndView.getModel().remove("searchCriteria");
         }
-        if (modelAndView != null) {
-            UrmUser urmUser = null;
-            String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
-            String key = "user_" + userToken;
-            urmUser = userICacheService.get(UrmUser.class, key, 0);
-
-            if (urmUser == null) {
-                urmUser = appService.getUserByUserToken(userToken);
-                userICacheService.add(key, urmUser, TimeUtils.SECONDS_OF_1_DAY);
+        UrmUser urmUser = null;
+        String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
+//            String key = "user_" + userToken;
+//            urmUser = userICacheService.get(UrmUser.class, key, 0);
+        if (urmUser == null) {
+            urmUser = appService.getUserByUserToken(userToken);
+//                userICacheService.add(key, urmUser, TimeUtils.SECONDS_OF_1_DAY);
+        }
+        if (modelAndView == null) {
+            modelAndView = new ModelAndView();
+        }
+        if (urmUser == null) {
+            modelAndView.addObject("result", new ResultVo("10010", "login expired"));
+        } else {
+            System.out.println("----------------------------------" + JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).toJSONString() + "-------------------");
+            String gcmToken = JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).getString("gcmToken");
+            System.out.println("get gcmtoken ++++++++++++++++++++++++++++++++++++" + gcmToken + "++++++++++++++++++++++++++++++++");
+            //用户与gcmtoken绑定
+            //1. 获取gcmtoken
+            if (!StringUtils.isEmpty(gcmToken)) {
+                //3. 不为空,比对
+                if (urmUser.getGcmToken() == null) {
+                    //5. 更新
+                    urmUser.setGcmToken(gcmToken);
+                    appService.updateUserInfo(urmUser);
+                } else if (!urmUser.getGcmToken().equals(gcmToken)) {
+                    //5. 更新
+                    urmUser.setGcmToken(gcmToken);
+                    appService.updateUserInfo(urmUser);
+                }
+                //4. 相等,过
             }
-
-            if (urmUser == null) {
-                modelAndView.addObject("result", new ResultVo("10010", "login expired"));
-            } else {
-                List<String> ids = null;
+            //2. 为空,过
+            modelAndView.addObject("result", new ResultVo("00000", "ok"));
+                /*List<String> ids = null;
                 String deviceId = JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).getString("deviceId");
                 String deviceKey = "urmDevice_ids_mapKey_" + deviceId;
                 Map map = null;
@@ -171,9 +183,7 @@ public class RequestInterceptor implements HandlerInterceptor {
                 }
                 //将关联关系插入到关联表中
                 int count = appService.addUrmUserDevice(urmUserDevices);
-                System.out.println(" batch save  result size : " + count);
-                modelAndView.addObject("result", new ResultVo("00000", "ok"));
-            }
+                System.out.println(" batch save  result size : " + count);*/
         }
     }
 

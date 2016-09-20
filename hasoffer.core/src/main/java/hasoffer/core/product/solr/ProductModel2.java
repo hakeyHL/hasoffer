@@ -6,8 +6,6 @@ public class ProductModel2 implements IIdentifiable<Long> {
     private Long id;
 
     private String title;
-//    private String key0;// title 前3个单词
-//    private String key1;// title word 3+
 
     private String tag;
     private String cateTag;
