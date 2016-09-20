@@ -43,7 +43,6 @@ import hasoffer.core.user.IDeviceService;
 import hasoffer.core.utils.AffliIdHelper;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
-import hasoffer.nlp.core.google.GoogleSpellChecker;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import jodd.util.NameValue;
@@ -94,15 +93,8 @@ public class AppController {
     MongoDbManager mongoDbManager;
     Logger logger = LoggerFactory.getLogger(AppController.class);
 
-    public static void main(String[] args) {
-        List li = new ArrayList();
-        li.add("1");
-        li.add("2");
-        li.add("3");
-        li.add("4");
-        li.add("5");
-        System.out.println(li.subList(0, 3).size());
-//        String ss = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL, "http://www.snapdeal.com/offers/maggi-hamper", new String[]{"GOOGLEPLAY", "123"});
+    public static void main(String[] args) throws Exception {
+        //        String ss = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL, "http://www.snapdeal.com/offers/maggi-hamper", new String[]{"GOOGLEPLAY", "123"});
 //        System.out.print(ss);
         /*String as = "Refer and earn Rs. 200 for each friend who signs up at Amazon.in and makes a purchase of Rs. 300 or more. Person who " +
                 "signs up also gets Rs. 100. No coupon " +
@@ -512,79 +504,6 @@ public class AppController {
 
 
     /**
-     * deal列表
-     *
-     * @return
-     *//*
-    @RequestMapping(value = "/temp/deals", method = RequestMethod.GET)
-    public ModelAndView tempDeals(@RequestParam(defaultValue = "0") String page, @RequestParam(defaultValue = "20") String pageSize) {
-        //1. 从数据库中查询到
-        ModelAndView mv = new ModelAndView();
-        PageableResult Result = appService.getDeals(Long.valueOf(page), Long.valueOf(pageSize), 1);
-        Map map = new HashMap();
-        List li = new ArrayList();
-        List<AppDeal> deals = Result.getData();
-        Date currentDate = new Date();
-        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-        DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-        for (AppDeal appDeal : deals) {
-            int dateCmpResult = currentDate.compareTo(appDeal.getExpireTime());
-            if (dateCmpResult == 1) {
-                //小于当前日期
-                DealVo dealVo = new DealVo();
-                dealVo.setId(appDeal.getId());
-                dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
-                dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
-                dealVo.setExtra(0d);
-                dealVo.setDiscount(appDeal.getDiscount());
-                dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                if (appDeal.getWebsite().name().equals("FLIPKART")) {
-                    dealVo.setExtra(1.5);
-                }
-                dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                dealVo.setExp(appDeal.getExpireTime());
-                dealVo.setTitle(appDeal.getTitle());
-                dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
-                dealVo.setIsExpired(true);
-                dealVo.setDiscount(appDeal.getDiscount());
-                dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
-                dealVo.setWebsite(appDeal.getWebsite());
-                li.add(dealVo);
-            } else {
-                //d大于等于当前时间,未过期
-                DealVo dealVo = new DealVo();
-                dealVo.setId(appDeal.getId());
-                dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
-                dealVo.setLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
-                dealVo.setExtra(0d);
-                dealVo.setDiscount(appDeal.getDiscount());
-                dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                if (appDeal.getWebsite().name().equals("FLIPKART")) {
-                    dealVo.setExtra(1.5);
-                }
-                dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                dealVo.setExp(appDeal.getExpireTime());
-                dealVo.setTitle(appDeal.getTitle());
-                dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
-                dealVo.setIsExpired(false);
-                dealVo.setDiscount(appDeal.getDiscount());
-                dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
-                dealVo.setWebsite(appDeal.getWebsite());
-                li.add(dealVo);
-            }
-        }
-        map.put("deals", li);
-        map.put("currentPage", Result.getCurrentPage());
-        map.put("NumFund", Result.getNumFund());
-        map.put("page", Result.getPageSize());
-        map.put("pageSize", Result.getPageSize());
-        map.put("totalPage", Result.getTotalPage());
-        mv.addObject("data", map);
-        return mv;
-    }
-*/
-
-    /**
      * deal详情
      *
      * @param id
@@ -678,6 +597,117 @@ public class AppController {
             }
         }
         return mv;
+    }
+
+    /**
+     * deal详情
+     *
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "temp/dealInfo", method = RequestMethod.GET)
+    public ModelAndView tempGetdealInfo(@RequestParam String id) {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("errorCode", "00000");
+        mv.addObject("msg", "ok");
+        System.out.println("dealId is :" + id);
+        if (StringUtils.isEmpty(id)) {
+            //空,完毕
+            System.out.println("no deal id ");
+            mv.addObject("data", null);
+            return mv;
+        } else {
+            Long dealId = Long.valueOf(id);
+            AppDeal appDeal = appService.getDealDetail(dealId);
+            if (appDeal != null) {
+                System.out.println("has this deal ");
+                Map map = new HashMap();
+                map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
+                map.put("title", appDeal.getTitle());
+                map.put("createTime", getDifference2Date(new Date(), appDeal.getCreateTime()));
+                map.put("website", appDeal.getWebsite());
+                //降价生成deal无失效日期
+                if (!appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
+                    map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
+                }
+                map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                StringBuilder sb = new StringBuilder();
+                String description = appDeal.getDescription();
+                sb.append(description == null ? "" : description);
+                if (description.lastIndexOf("\n") > 0) {
+                    if (description.lastIndexOf("\n") == description.length() - 1) {
+                        //最后有换行,再加一个换行
+                        sb.append("\n");
+                    } else {
+                        //最后无换行,加两个
+                        sb.append("\n");
+                        sb.append("\n");
+                    }
+                } else {
+                    //无换行
+                    sb.append("\n");
+                    sb.append("\n");
+                }
+                sb.append("How to get the deal: \n");
+                sb.append("1 Click \"Activate Deal\" button.\n");
+                sb.append("2 Add the product of your choice to cart.\n");
+                sb.append("3 And no coupon code required.\n\n");
+                if (appDeal.getPtmcmpskuid() > 0) {
+                    PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
+                    if (ptmCmpSkuDescription != null) {
+                        String jsonParam = ptmCmpSkuDescription.getJsonParam();
+                        if (StringUtils.isNotBlank(jsonParam)) {
+                            Map jsonMap = JsonHelper.getJsonMap(jsonParam);
+                            if (jsonMap != null) {
+                                //遍历map
+                                Set<Map.Entry> set = jsonMap.entrySet();
+                                Iterator<Map.Entry> iterator = set.iterator();
+                                if (iterator.hasNext()) {
+                                    sb.append("Key Features: \n");
+                                }
+                                while (iterator.hasNext()) {
+                                    Map.Entry next = iterator.next();
+                                    sb.append(next.getKey()).append(" : ");
+                                    sb.append(next.getValue()).append("\n");
+                                }
+                            }
+
+                        }
+
+                    }
+                }
+
+                map.put("description", sb.toString());
+                map.put("extra", 0);
+                if (appDeal.getWebsite() == Website.FLIPKART) {
+                    map.put("extra", 1.5);
+                    map.put("cashbackInfo", "1. Offer valid for a limited time only while stocks last\n" +
+                            "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +
+                            "3. Rewards may not paid on purchases made using store credits/gift vouchers\n" +
+                            "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
+                            "5  Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
+                }
+                String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+                DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+                System.out.println("link url is  :" + appDeal.getLinkUrl());
+                String s = appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId});
+                logger.info(" dealInfo record deal deepLink :" + s);
+                map.put("deeplink", s);
+                mv.addObject("data", map);
+            }
+        }
+        return mv;
+    }
+
+    public String getDifference2Date(Date maxDate, Date comparedDate) {
+        Long tempResult = maxDate.getTime() - comparedDate.getTime();
+        long nd = 1000 * 24 * 60 * 60;//一天的毫秒数
+        long nh = 1000 * 60 * 60;//一小时的毫秒数
+        long nm = 1000 * 60;//一分钟的毫秒数
+        int day = BigDecimal.valueOf(tempResult).divide(BigDecimal.valueOf(nd), BigDecimal.ROUND_HALF_UP).intValue();//计算差多少天
+        int hour = BigDecimal.valueOf(tempResult).divide(BigDecimal.valueOf(nh), BigDecimal.ROUND_HALF_UP).intValue();//计算差多少天
+        int min = BigDecimal.valueOf(tempResult).divide(BigDecimal.valueOf(nm), BigDecimal.ROUND_HALF_UP).intValue();//计算差多少天
+        return day <= 0 ? hour <= 0 ? min + " mins ago " : hour + " hours ago " : day + " days ago ";
     }
 
     /**
@@ -1163,7 +1193,7 @@ public class AppController {
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
         Map map = new HashMap();
-        map.put("words", GoogleSpellChecker.check(keyWord).subList(0, 3));
+        map.put("words", productService.spellcheck(keyWord).subList(0, 3));
         modelAndView.addObject("data", map);
         return modelAndView;
     }
