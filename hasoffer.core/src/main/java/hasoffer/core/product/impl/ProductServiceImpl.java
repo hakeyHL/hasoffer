@@ -4,6 +4,7 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.product.ProductBo;
 import hasoffer.core.bo.system.SearchCriteria;
@@ -32,6 +33,7 @@ import hasoffer.core.task.worker.IProcessor;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.model.ListProduct;
+import hasoffer.nlp.core.google.GoogleSpellChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -107,6 +109,27 @@ public class ProductServiceImpl implements IProductService {
     private ProductCacheManager productCacheManager;
 
     private Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
+
+    @Override
+    public List<String> spellcheck(String text) {
+        if (StringUtils.isEmpty(text)) {
+            return null;
+        }
+
+        text = text.trim().replaceAll("\\s+", " ");
+
+        String[] ts = text.split("\\s");
+
+        List<String> sugs = null;
+        if (ts.length > 1) {
+            sugs = GoogleSpellChecker.check(text);
+        } else {
+            Map<String, List<String>> sugMap = productIndex2Service.spellCheck(text);
+            sugs = sugMap.get(text);
+        }
+
+        return sugs;
+    }
 
     @Override
     public void importProduct2SolrByCategory(final long cateId) {
