@@ -201,7 +201,7 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
             System.out.println("gcmToken:" + gcmToken);
             if (!StringUtils.isEmpty(gcmToken)) {
 
-                List<UrmUserDevice> userDeviceList = dbm.query("SELECT t FROM UrmUserDevice t WHERE t.userid = ?0", Arrays.asList(userid));
+                List<UrmUserDevice> userDeviceList = dbm.query("SELECT t FROM UrmUserDevice t WHERE t.userId = ?0", Arrays.asList(userid));
 
                 if (userDeviceList == null) {
                     System.out.println("userDeviceList is null");
