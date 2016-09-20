@@ -117,13 +117,16 @@ public class ProductServiceImpl implements IProductService {
         }
 
         text = text.trim().replaceAll("\\s+", " ");
+        System.out.println(text);
 
         String[] ts = text.split("\\s");
 
         List<String> sugs = null;
         if (ts.length > 1) {
+            System.out.println(String.format("spellcheck[%s] by google.", text));
             sugs = GoogleSpellChecker.check(text);
         } else {
+            System.out.println(String.format("spellcheck[%s] by solr.", text));
             Map<String, List<String>> sugMap = productIndex2Service.spellCheck(text);
             sugs = sugMap.get(text);
         }
