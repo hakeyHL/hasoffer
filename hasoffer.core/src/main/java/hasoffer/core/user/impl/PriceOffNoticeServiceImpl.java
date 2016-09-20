@@ -157,6 +157,11 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
 
         PriceOffNotice priceOffNotice = getPriceOffNotice(id);
 
+        if (priceOffNotice == null) {
+            System.out.println("priceOffNotice is null " + id);
+            return false;
+        }
+
         long skuid = priceOffNotice.getSkuid();
 
         PtmCmpSku ptmCmpSku = dbm.get(PtmCmpSku.class, skuid);
