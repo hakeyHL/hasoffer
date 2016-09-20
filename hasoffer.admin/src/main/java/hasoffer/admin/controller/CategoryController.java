@@ -23,7 +23,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -223,25 +222,6 @@ public class CategoryController {
         }
 
         return mav;
-    }
-
-    private void analysis(Map<String, Long> statMap, String title) {
-        String[] words = title.split(" ");
-        for (String w : words) {
-            w = w.toLowerCase().trim();
-            if (PATTERN_IN_WORD.matcher(w).find()) {
-//                System.out.println(w);
-                continue;
-            }
-            Long count = statMap.get(w);
-            if (count == null) {
-                count = new Long(1);
-                statMap.put(w, count);
-            } else {
-                count++;
-                statMap.put(w, count);
-            }
-        }
     }
 
     @RequestMapping(value = "/updatekeyword", method = RequestMethod.GET)

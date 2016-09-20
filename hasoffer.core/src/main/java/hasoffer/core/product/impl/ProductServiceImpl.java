@@ -111,7 +111,7 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public void importProduct2SolrByCategory(final long cateId) {
 
-        PtmCategory category = dbm.get(PtmCategory.class, cateId);
+        final PtmCategory category = dbm.get(PtmCategory.class, cateId);
         if (category == null) {
             return;
         }
@@ -124,7 +124,7 @@ public class ProductServiceImpl implements IProductService {
                         sc.setPage(page);
                         sc.setPageSize(200);
                         sc.setCategoryId(String.valueOf(cateId));
-                        sc.setLevel(sc.getLevel());
+                        sc.setLevel(category.getLevel());
                         return productIndex2Service.searchProducts(sc);
                     }
 
