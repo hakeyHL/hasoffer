@@ -184,6 +184,7 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
         //获取用户信息
         UrmUser urmUser = dbm.get(UrmUser.class, userid);
 
+        System.out.println("userid:skuid__" + useridString + ":" + ptmCmpSku.getId());
         boolean pushStatus = false;
 
         if (urmUser == null) {
@@ -192,9 +193,16 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
 
             String gcmToken = urmUser.getGcmToken();
 
+            System.out.println("gcmToken:" + gcmToken);
             if (!StringUtils.isEmpty(gcmToken)) {
 
                 List<UrmUserDevice> userDeviceList = dbm.query("SELECT t FROM UrmUserDevice t WHERE t.userid = ?0", Arrays.asList(userid));
+
+                if (userDeviceList == null) {
+                    System.out.println("userDeviceList is null");
+                } else {
+                    System.out.println("userDeviceList size " + userDeviceList.size());
+                }
 
                 if (userDeviceList != null && userDeviceList.size() != 0) {
 
