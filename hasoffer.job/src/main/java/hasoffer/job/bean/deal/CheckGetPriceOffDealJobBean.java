@@ -144,20 +144,18 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
                     appdeal.setPush(false);
                     appdeal.setTitle(sku.getTitle());
                     appdeal.setPtmcmpskuid(sku.getId());
-
-                    String description = "";
-                    if (newPrice > minPrice) {//100%-110%
-                        //网站名// is offering //deal标题// for Rs.//SKU价格//. The price is nearly the history lowest price Rs.(//SKU最低价格//).It’s good time to get the item.
-                        description = sku.getWebsite().toString() + " is offering " + sku.getTitle() + " for Rs." + (int) sku.getPrice() + ". The price is nearly the history lowest price Rs." + (int) minPrice + ".It’s good time to get the item.";
-                    } else if (newPrice == minPrice) {//等于100%
-                        //网站名// is offering //deal标题// for Rs.//SKU价格//. The price is the history lowest price. Good offer always expire soon.Hurry up!
-                        description = sku.getWebsite().toString() + " is offering " + sku.getTitle() + " for Rs." + (int) sku.getPrice() + ".The price is the history lowest price. Good offer always expire soon.Hurry up!";
+                    StringBuilder sb = new StringBuilder();
+                    if (newPrice >= minPrice) {//100%-110%
+                        //如果现价不低于史低价
+                        //文案 Rs.现价 is almost history lowest price(History lowest price is Rs.更新前的史低价). Click here to check price history（点击此行展示价格走势浮层）. Good offer always expire in hours.Good time to get it,Hurry up!
+                        sb.append("Rs.").append(newPrice).append(" is almost history lowest price(History lowest price is Rs.").append(minPrice).append(").Click here to check price history.Good offer always expire in hours.Good time to get it,Hurry up!");
                     } else {//小于100%
-                        //网站名// is offering //deal标题// for Rs.//SKU价格//. The price is new history lowest price !  Good offer always expire soon.Hurry up!
-                        description = sku.getWebsite().toString() + " is offering " + sku.getTitle() + " for Rs." + (int) sku.getPrice() + ".The price is new history lowest price !  Good offer always expire soon.Hurry up!";
+                        //否则
+                        //Rs.现价 is the newest history lowest price(Previous lowest price is Rs.更新前的史低价).Click here to check price history（以高亮可点击文案展示点击唤出价格走势浮层 具体逻辑见price history）. Good offer always expire in hours.Good time to get it,Hurry up!
+                        sb.append("Rs.").append(newPrice).append(" is newest history lowest price(Previous lowest price is Rs.").append(minPrice).append(").Click here to check price history.Good offer always expire in hours.Good time to get it,Hurry up!");
                     }
 
-                    appdeal.setDescription(description);
+                    appdeal.setDescription(sb.toString());
                     appdeal.setPriceDescription("Rs." + (int) newPrice);
                     appdeal.setOriginPrice(oriPrice);
                     appdeal.setDiscount((int) ((1 - newPrice / oriPrice) * 100));
