@@ -247,7 +247,7 @@ public class Compare2Controller {
                     //未匹配,结束操作
                 } else {
                     cr = getCmpProducts(cmpSkuIndex, sio);
-                    if (cr != null && cr.getPriceList().size() > 0 && cr.getPriceList().size() > 0) {
+                    if (cr != null && cr.getPriceList().size() > 0) {
                         cr.setPriceOff(cr.getPriceList().get(0).getSaved());
                     }
 //                    if (cr == null) {
@@ -796,7 +796,7 @@ public class Compare2Controller {
                     Iterator<CmpProductListVo> iterator = comparedSkuVos.iterator();
                     while (iterator.hasNext()) {
                         CmpProductListVo next = iterator.next();
-                        next.setSaved(Math.round(cliPrice - maxPrice));
+                        next.setSaved(Math.round(maxPrice - next.getPrice()));
                     }
                 }
             } else {
