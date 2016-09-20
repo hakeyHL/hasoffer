@@ -93,4 +93,6 @@ public interface IProductService {
     void importProduct2Solr2(PtmProduct product);
 
     void importProduct2SolrByCategory(long cateId);
+
+    List<String> spellcheck(String text);
 }

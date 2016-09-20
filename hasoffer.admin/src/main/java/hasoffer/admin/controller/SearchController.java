@@ -36,7 +36,6 @@ import hasoffer.fetch.helper.WebsiteProcessorFactory;
 import hasoffer.fetch.helper.WebsiteSummaryProductProcessorFactory;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.Product;
-import hasoffer.nlp.core.google.GoogleSpellChecker;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import hasoffer.webcommon.helper.PageHelper;
@@ -97,7 +96,7 @@ public class SearchController {
         try {
 
 //            List<String> sugs = Arrays.asList("1", "2", "3");
-            List<String> sugs = GoogleSpellChecker.check(text);
+            List<String> sugs = productService.spellcheck(text);
 
             mav.addObject("sugs", sugs);
 
