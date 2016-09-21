@@ -19,4 +19,7 @@
     <dubbo:reference id="skuTaskDubboService" interface="hasoffer.dubbo.spider.task.api.ISkuTaskDubboService"
                      version="1.0" check="false" timeout="10000"/>
 
+    <dubbo:reference id="productTaskDubboService" interface="hasoffer.dubbo.spider.task.api.IProductTaskDubboService"
+                     version="1.0" check="false" timeout="10000"/>
+
 </beans>

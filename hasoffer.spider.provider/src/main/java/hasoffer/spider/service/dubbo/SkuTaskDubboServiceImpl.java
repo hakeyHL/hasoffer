@@ -1,25 +1,26 @@
-package hasoffer.spider.service.impl;
+package hasoffer.spider.service.dubbo;
 
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.data.redis.impl.RedisListServiceImpl;
 import hasoffer.dubbo.spider.task.api.ISkuTaskDubboService;
 import hasoffer.spider.context.SpiderConfigInitContext;
+import hasoffer.spider.enums.PageType;
 import hasoffer.spider.model.SpiderSkuTask;
 import hasoffer.spring.context.SpringContextHolder;
 
-public class SkuSpiderDubboServiceImpl implements ISkuTaskDubboService {
+public class SkuTaskDubboServiceImpl implements ISkuTaskDubboService {
 
     private IRedisListService<String> redisListService;
 
-    public SkuSpiderDubboServiceImpl() {
+    public SkuTaskDubboServiceImpl() {
         this.redisListService = (IRedisListService<String>) SpringContextHolder.getBean(RedisListServiceImpl.class);
     }
 
     @Override
-    public void sendTaskUrl(SpiderSkuTask skuTask) {
+    public void sendTask(SpiderSkuTask skuTask) {
 
-        String redisKeyName = SpiderConfigInitContext.getRedisListName(skuTask.getWebsite());
+        String redisKeyName = SpiderConfigInitContext.getRedisListName(skuTask.getWebsite(), PageType.DETAIL);
         if (redisKeyName == null || "".equals(redisKeyName)) {
             return;
         }

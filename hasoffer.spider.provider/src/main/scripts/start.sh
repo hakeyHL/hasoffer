@@ -50,7 +50,7 @@ else
     JAVA_MEM_OPTS=" -server -Xms256m -Xmx128m -XX:SurvivorRatio=2 -XX:+UseParallelGC "
 fi
 echo -e "Starting the $SERVER_NAME ...\c"
-nohup java $JAVA_OPTS $JAVA_MEM_OPTS $JAVA_DEBUG_OPTS $JAVA_JMX_OPTS -classpath $CONF_DIR:$LIB_JARS hasoffer.spider.main.Main >&1 &
+nohup java $JAVA_OPTS $JAVA_MEM_OPTS $JAVA_DEBUG_OPTS $JAVA_JMX_OPTS -classpath $CONF_DIR:$LIB_JARS hasoffer.spider.main.Main >/dev/null 2>&1 &
 COUNT=0
 while [ $COUNT -lt 1 ]; do
     echo -e ".\c"
