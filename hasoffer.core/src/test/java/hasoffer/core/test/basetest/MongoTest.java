@@ -1,5 +1,6 @@
 package hasoffer.core.test.basetest;
 
+import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
@@ -11,6 +12,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.user.IDeviceService;
+import hasoffer.fetch.model.WebFetchResult;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.data.domain.Sort;
@@ -160,6 +162,19 @@ public class MongoTest {
         update.set("ptmProductId", 100);
         update.set("title", "iPhone 5s1111");
         int count = mdm.update(UrmDeviceBuyLog.class, "56d4ea8ae4b0a11a45930a1b", update);
+        System.out.println(count);
+    }
+
+
+    @Test
+    public void testSrmUpdate() {
+        Update update = new Update();
+        WebFetchResult webFetchResult = new WebFetchResult();
+        webFetchResult.setProductList(null);
+        webFetchResult.setTaskStatus(TaskStatus.RUNNING);
+        webFetchResult.setUpdateDate(new Date());
+        update.set("sitePros.EBAY", webFetchResult);
+        int count = mdm.update(SrmAutoSearchResult.class, "04f1caf388b8cedee328a5056a6ac75b", update);
         System.out.println(count);
     }
 

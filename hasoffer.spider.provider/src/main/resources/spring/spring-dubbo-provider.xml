@@ -23,5 +23,5 @@
     <!-- 要暴露的服务接口 -->
     <dubbo:service interface="hasoffer.dubbo.spider.task.api.ISkuTaskDubboService" registry="provider_reg" version="1.0"
                    ref="skuTaskDubboService" timeout="10000"/>
-    <bean id="skuTaskDubboService" class="hasoffer.spider.service.impl.SkuSpiderDubboServiceImpl"/>
+    <bean id="skuTaskDubboService" class="hasoffer.spider.service.dubbo.SkuTaskDubboServiceImpl"/>
 </beans>

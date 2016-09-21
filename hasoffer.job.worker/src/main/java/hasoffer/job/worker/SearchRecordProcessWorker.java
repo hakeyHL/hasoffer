@@ -162,7 +162,7 @@ public class SearchRecordProcessWorker implements Runnable {
                 }
                 return fetchService.getProductsKeyWord(website, keyword);
             } catch (Exception e) {
-                return FetchResult.createFetchResult(website, keyword, TaskStatus.RUNNING);
+                return FetchResult.createFetchResult(website, keyword, TaskStatus.EXCEPTION);
             }
         }
         return null;
