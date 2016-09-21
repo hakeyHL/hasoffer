@@ -1,5 +1,6 @@
 package hasoffer.job.bean.push;
 
+import com.google.android.gcm.server.MulticastResult;
 import hasoffer.base.enums.AppType;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
@@ -115,7 +116,11 @@ public class AdminPushJobBean extends QuartzJobBean {
                 }
 
                 try {
-                    pushService.GroupPush(gcmTokenList, pushBo);
+
+                    MulticastResult multicastResult = pushService.GroupPush(gcmTokenList, pushBo);
+
+                    System.out.println(multicastResult.toString());
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
