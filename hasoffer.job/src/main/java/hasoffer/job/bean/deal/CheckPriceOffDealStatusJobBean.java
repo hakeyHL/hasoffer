@@ -165,7 +165,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                         //如果返回结果状态为running，那么将sku返回队列
                         if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
                             priceOffDealQueue.add(deal);
-                            logger.info("taskstatus RUNNING for [" + skuid + "]");
+//                            logger.info("taskstatus RUNNING for [" + skuid + "]");
                         } else if (TaskStatus.STOPPED.equals(taskStatus)) {
                             logger.info("taskstatus STOPPED for [" + skuid + "]");
                         } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
