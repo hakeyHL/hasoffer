@@ -68,8 +68,11 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                     PageableResult<AppDeal> pageableResult = dbm.queryPage(Q_PRICEOFF_DEAL, curPage, pageSize, Arrays.asList(TimeUtils.nowDate()));
 
                     long totalPage = pageableResult.getTotalPage();
+                    System.out.println("price off deal status total page =" + totalPage);
 
                     while (curPage <= totalPage) {
+
+                        System.out.println("price off deal status curpage =" + curPage);
 
                         if (priceOffDealQueue.size() > 1000) {
                             try {
@@ -95,7 +98,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                             fetchDubboService.sendUrlTask(website, url, TimeUtils.SECONDS_OF_1_MINUTE * 45, TaskLevel.LEVEL_2);
 
                             priceOffDealQueue.add(deal);
-
+                            System.out.println("add price off deal to update queue success " + deal.getId());
                         }
 
                         curPage++;
