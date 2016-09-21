@@ -634,58 +634,60 @@ public class AppController {
                 map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
                 StringBuilder sb = new StringBuilder();
                 String description = appDeal.getDescription();
-                sb.append(description == null ? "" : description);
-                if (description.lastIndexOf("\n") > 0) {
-                    if (description.lastIndexOf("\n") == description.length() - 1) {
-                        //最后有换行,再加一个换行
-                        sb.append("\n");
-                    } else {
-                        //最后无换行,加两个
-                        sb.append("\n");
-                        sb.append("\n");
+                //网站名 is offering 商品名 for Rs.现价.
+                //当支持货到付款时展示 : Cash On Delivery is available
+                sb.append(appDeal.getWebsite().name()).append("is offering ").append(appDeal.getTitle()).append(" for ").append(appDeal.getPriceDescription()).append(".");
+                //是否支持COD
+                PtmCmpSku cmpSkuById = cmpSkuCacheManager.getCmpSkuById(appDeal.getPtmcmpskuid());
+                if (cmpSkuById != null) {
+                    //如果存在此sku
+                    String supportPayMethod = cmpSkuById.getSupportPayMethod();
+                    if (!StringUtils.isBlank(supportPayMethod) && supportPayMethod.contains("COD")) {
+                        sb.append("Cash On Delivery is available.");
                     }
-                } else {
-                    //无换行
-                    sb.append("\n");
-                    sb.append("\n");
                 }
-                sb.append("How to get the deal: \n");
-                sb.append("1 Click \"Activate Deal\" button.\n");
-                sb.append("2 Add the product of your choice to cart.\n");
-                sb.append("3 And no coupon code required.\n\n");
+                //描述拼接完成
+                map.put("description", sb.toString());
+                //拼接Price Research
+                if (StringUtils.isNoneBlank(description)) {
+                    //如果描述不为空,拼接描述然后换行,空行
+                    sb = new StringBuilder();
+                    sb.append(description).append("\n\n");
+                }
                 if (appDeal.getPtmcmpskuid() > 0) {
                     //如果存在skuId,将skuId返回
                     map.put("skuId", appDeal.getPtmcmpskuid());
-                    //配置点击弹出价格曲线的文字以及文字的颜色
-                    Map priceCurveDesc = new HashMap();
-                    priceCurveDesc.put("clickableContent", "Click here to check price history.");
-                    priceCurveDesc.put("fontColor", "#0000FF");
-                    map.put("clickConfig", priceCurveDesc);
                     PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
                     if (ptmCmpSkuDescription != null) {
+                        //查看是否存在offer,如果存在将offer拼接
+                        //“网站名” also provides “SKU当前生效的offer数量“ extra offer（offer数量为1时 展示offer 大于1时 展示offers）: “按服务端排序展示offer列表 以分号间隔”
+                        String offers = ptmCmpSkuDescription.getOffers();
+                        if (!hasoffer.base.utils.StringUtils.isEmpty(offers)) {
+                            String[] temps = offers.split(",");
+                            if (temps.length > 1) {
+                                sb.append(appDeal.getWebsite().name()).append(" also provides ").append(temps.length).append(" extra offer :");
+                            }
+                            for (String str : temps) {
+                                sb.append(str).append(";");
+                            }
+                            //拼完之后换行,空一行
+                            sb.append("\n\n");
+                        }
+                        map.put("priceResearch", sb.toString());
+                        Map priceCurveDesc = new HashMap();
+                        //配置点击弹出价格曲线的文字以及文字的颜色
+                        priceCurveDesc.put("clickableContent", "Click here to check price history.");
+                        priceCurveDesc.put("fontColor", "#0000FF");
+                        map.put("clickConfig", priceCurveDesc);
+                        //设置Key Features
                         String jsonParam = ptmCmpSkuDescription.getJsonParam();
                         if (StringUtils.isNotBlank(jsonParam)) {
                             Map jsonMap = JsonHelper.getJsonMap(jsonParam);
-                            if (jsonMap != null) {
-                                //遍历map
-                                Set<Map.Entry> set = jsonMap.entrySet();
-                                Iterator<Map.Entry> iterator = set.iterator();
-                                if (iterator.hasNext()) {
-                                    sb.append("Key Features: \n");
-                                }
-                                while (iterator.hasNext()) {
-                                    Map.Entry next = iterator.next();
-                                    sb.append(next.getKey()).append(" : ");
-                                    sb.append(next.getValue()).append("\n");
-                                }
-                            }
-
+                            map.put("KeyFeatures", jsonMap);
                         }
 
                     }
                 }
-
-                map.put("description", sb.toString());
                 map.put("extra", 0);
                 if (appDeal.getWebsite() == Website.FLIPKART) {
                     map.put("extra", 1.5);
