@@ -153,6 +153,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
                     if (StringUtils.isEqual(productTitle, sku.getTitle())) {
                         cmpSkuService.createDescription(sku, fetchedProduct);
+                        System.out.println("update product spec success for " + ptmProduct.getId());
                     } else {
                         System.out.println("product spec should remove " + ptmProduct.getId());
                     }
