@@ -33,7 +33,7 @@ public class SrmAutoSearchResult implements Serializable {
     private String title;
     private float price;
 
-    private Map<Website, WebFetchResult> sitePros = new HashMap<Website, WebFetchResult>();
+    private Map<Website, WebFetchResult> sitePros = new HashMap<>();
     private Map<Website, List<SearchedSku>> finalSkus;
 
     private long lRelateTime = 0;

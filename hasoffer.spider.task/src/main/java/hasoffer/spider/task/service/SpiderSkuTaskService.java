@@ -24,9 +24,9 @@ import java.util.List;
 
 @Service
 @Transactional
-public class SpiderTaskService {
+public class SpiderSkuTaskService {
 
-    private static Logger logger = LoggerFactory.getLogger(SpiderTaskService.class);
+    private static Logger logger = LoggerFactory.getLogger(SpiderSkuTaskService.class);
 
     private static final String Q_PTMCMPSKU_BYPRODUCTID = "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ORDER BY t.id ASC";
 
@@ -108,7 +108,7 @@ public class SpiderTaskService {
 
                         }
                         try {
-                            skuTaskDubboService.sendTaskUrl(new SpiderSkuTask(sku.getId(), sku.getUrl(), sku.getWebsite(), TaskLevel.LEVEL_3));
+                            skuTaskDubboService.sendTask(new SpiderSkuTask(sku.getId(), sku.getUrl(), sku.getWebsite(), TaskLevel.LEVEL_3));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
