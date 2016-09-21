@@ -624,6 +624,7 @@ public class AppController {
                 Map map = new HashMap();
                 map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
                 map.put("title", appDeal.getTitle());
+                //返回deal的处境时间距离现在时间的时间,多少天,小时,分钟..
                 map.put("createTime", getDifference2Date(new Date(), appDeal.getCreateTime()));
                 map.put("website", appDeal.getWebsite());
                 //降价生成deal无失效日期
@@ -653,6 +654,13 @@ public class AppController {
                 sb.append("2 Add the product of your choice to cart.\n");
                 sb.append("3 And no coupon code required.\n\n");
                 if (appDeal.getPtmcmpskuid() > 0) {
+                    //如果存在skuId,将skuId返回
+                    map.put("skuId", appDeal.getPtmcmpskuid());
+                    //配置点击弹出价格曲线的文字以及文字的颜色
+                    Map priceCurveDesc = new HashMap();
+                    priceCurveDesc.put("clickableContent", "Click here to check price history.");
+                    priceCurveDesc.put("fontColor", "#0000FF");
+                    map.put("clickConfig", priceCurveDesc);
                     PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
                     if (ptmCmpSkuDescription != null) {
                         String jsonParam = ptmCmpSkuDescription.getJsonParam();
