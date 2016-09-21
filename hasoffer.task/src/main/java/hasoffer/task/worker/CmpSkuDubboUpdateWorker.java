@@ -4,10 +4,12 @@ import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory3;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
@@ -123,12 +125,6 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             System.out.println(JSONUtil.toJSON(fetchedProduct).toString() + "id=" + skuid);
 
             try {
-                cmpSkuService.createDescription(sku, fetchedProduct);
-            } catch (Exception e) {
-                logger.info("createDescription fail " + skuid);
-            }
-
-            try {
                 cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
             } catch (Exception e) {
                 logger.info("updateCmpSkuBySpiderFetchedProduct fail " + skuid);
@@ -145,6 +141,27 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             if (price > fetchedProduct.getPrice() && fetchedProduct.getCommentsNumber() > 40) {
                 redisListService.push(PRICE_DROP_SKUID_QUEUE, skuid + "");
                 System.out.println("price drop add to queue success " + skuid);
+            }
+
+            try {
+
+                PtmProduct ptmProduct = dbm.get(PtmProduct.class, sku.getProductId());
+
+                if (ptmProduct != null) {
+
+                    String productTitle = ptmProduct.getTitle();
+
+                    if (StringUtils.isEqual(productTitle, sku.getTitle())) {
+                        cmpSkuService.createDescription(sku, fetchedProduct);
+                        System.out.println("update product spec success for " + ptmProduct.getId());
+                    } else {
+                        System.out.println("product spec should remove " + ptmProduct.getId());
+                    }
+                } else {
+                    System.out.println(skuid + " product is null");
+                }
+            } catch (Exception e) {
+                logger.info("createDescription fail " + skuid);
             }
 
 //            对FLIPKART没有类目的数据进行更新,暂时注释掉
