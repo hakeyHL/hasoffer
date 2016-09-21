@@ -38,7 +38,11 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
      */
     private static final Logger logger = LoggerFactory.getLogger(CheckPriceOffDealStatusJobBean.class);
     private static final String Q_PRICEOFF_DEAL = "SELECT t From AppDeal t WHERE t.appdealSource = 'PRICE_OFF' AND t.expireTime > ?0 ORDER BY t.createTime DESC";
-    private static int PRICEOFF_DEAL_LIST_THREAD_NUM = 1;
+    private static int PRICEOFF_DEAL_LIST_THREAD_NUM = 0;
+
+    static {
+        CheckPriceOffDealStatusJobBean.PRICEOFF_DEAL_LIST_THREAD_NUM++;
+    }
 
     @Resource
     IFetchDubboService fetchDubboService;
@@ -161,7 +165,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                         //如果返回结果状态为running，那么将sku返回队列
                         if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
                             priceOffDealQueue.add(deal);
-//            logger.info("taskstatus RUNNING for [" + skuid + "]");
+                            logger.info("taskstatus RUNNING for [" + skuid + "]");
                         } else if (TaskStatus.STOPPED.equals(taskStatus)) {
                             logger.info("taskstatus STOPPED for [" + skuid + "]");
                         } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
