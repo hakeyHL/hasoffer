@@ -88,6 +88,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                         }
 
                         List<AppDeal> dealList = pageableResult.getData();
+                        System.out.println("find appdeal size =" + dealList.size());
 
                         for (AppDeal deal : dealList) {
 
@@ -196,9 +197,8 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
 
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("executeInternal(CheckPriceOffDealStatusJobBean context={}) - end", context);
-        }
+        logger.debug("executeInternal(CheckPriceOffDealStatusJobBean context={}) - end", context);
+
     }
 }
 
