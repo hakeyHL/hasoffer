@@ -89,8 +89,11 @@ public class AdminPushJobBean extends QuartzJobBean {
             PageableResult<UrmDevice> pageableResult = deviceService.findPagedUrmDeviceByAppType(AppType.APP, curPage, pageSize);
 
             long totalPage = pageableResult.getTotalPage();
+            System.out.println("totalpage = " + totalPage);
 
             while (curPage <= totalPage) {
+
+                System.out.println("curPage = " + curPage);
 
                 List<String> gcmTokenList = new ArrayList<>();
 
