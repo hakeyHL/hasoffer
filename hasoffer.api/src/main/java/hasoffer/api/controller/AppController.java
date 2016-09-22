@@ -636,7 +636,7 @@ public class AppController {
                 String description = appDeal.getDescription();
                 //网站名 is offering 商品名 for Rs.现价.
                 //当支持货到付款时展示 : Cash On Delivery is available
-                sb.append(appDeal.getWebsite().name()).append("is offering ").append(appDeal.getTitle()).append(" for ").append(appDeal.getPriceDescription()).append(".");
+                sb.append(appDeal.getWebsite().name()).append(" is offering ").append(appDeal.getTitle()).append(" for ").append(appDeal.getPriceDescription()).append(".");
                 //是否支持COD
                 PtmCmpSku cmpSkuById = cmpSkuCacheManager.getCmpSkuById(appDeal.getPtmcmpskuid());
                 if (cmpSkuById != null) {
@@ -649,8 +649,14 @@ public class AppController {
                 //描述拼接完成
                 map.put("description", sb.toString());
                 //拼接Price Research
-                if (StringUtils.isNoneBlank(description)) {
+                if (StringUtils.isNotBlank(description)) {
                     //如果描述不为空,拼接描述然后换行,空行
+                    sb = new StringBuilder();
+//                    sb.append(description).append("\n\n");
+                    sb.append("\n\n");
+                } else {
+                    //给个临时的
+                    description = "Rs.123 is the newest history lowest price(Previous lowest price is Rs.140).Click here to check price history.Good offer always expire in hours.Good time to get it,Hurry up!";
                     sb = new StringBuilder();
                     sb.append(description).append("\n\n");
                 }
@@ -672,13 +678,12 @@ public class AppController {
                             }
                             //拼完之后换行,空一行
                             sb.append("\n\n");
+                        } else {
+                            //没有offer先手写几个
+                            sb.append(appDeal.getWebsite().name()).append(" also provides ").append(2).append(" extra offer :");
+                            sb.append("offer 1 ").append(";");
+                            sb.append("offer 2 ").append(";");
                         }
-                        map.put("priceResearch", sb.toString());
-                        Map priceCurveDesc = new HashMap();
-                        //配置点击弹出价格曲线的文字以及文字的颜色
-                        priceCurveDesc.put("clickableContent", "Click here to check price history.");
-                        priceCurveDesc.put("fontColor", "#0000FF");
-                        map.put("clickConfig", priceCurveDesc);
                         //设置Key Features
                         String jsonParam = ptmCmpSkuDescription.getJsonParam();
                         if (StringUtils.isNotBlank(jsonParam)) {
@@ -686,7 +691,23 @@ public class AppController {
                             map.put("KeyFeatures", jsonMap);
                         }
 
+                    } else {
+                        //无数据,自己拼接
+                        sb.append(appDeal.getWebsite().name()).append(" also provides ").append(2).append(" extra offer :");
+                        sb.append("offer 3 ").append(";");
+                        sb.append("offer 4 ").append(";");
+                        //拼接参数
+                        Map jsonMap = new HashMap();
+                        jsonMap.put("color", "red");
+                        jsonMap.put("memory", "16G");
+                        map.put("KeyFeatures", jsonMap);
                     }
+                    map.put("priceResearch", sb.toString());
+                    Map priceCurveDesc = new HashMap();
+                    //配置点击弹出价格曲线的文字以及文字的颜色
+                    priceCurveDesc.put("clickableContent", "Click here to check price history.");
+                    priceCurveDesc.put("fontColor", "#0000FF");
+                    map.put("clickConfig", priceCurveDesc);
                 }
                 map.put("extra", 0);
                 if (appDeal.getWebsite() == Website.FLIPKART) {
