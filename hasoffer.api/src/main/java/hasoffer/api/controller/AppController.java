@@ -683,6 +683,7 @@ public class AppController {
                             sb.append(appDeal.getWebsite().name()).append(" also provides ").append(2).append(" extra offer :");
                             sb.append("offer 1 ").append(";");
                             sb.append("offer 2 ").append(";");
+                            sb.append("\n\n");
                         }
                         //设置Key Features
                         String jsonParam = ptmCmpSkuDescription.getJsonParam();
@@ -696,6 +697,7 @@ public class AppController {
                         sb.append(appDeal.getWebsite().name()).append(" also provides ").append(2).append(" extra offer :");
                         sb.append("offer 3 ").append(";");
                         sb.append("offer 4 ").append(";");
+                        sb.append("\n\n");
                         //拼接参数
                         Map jsonMap = new HashMap();
                         jsonMap.put("color", "red");
