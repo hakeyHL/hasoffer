@@ -6,6 +6,7 @@
 
     <description>spring-init</description>
 
-    <bean class="hasoffer.spider.context.SpiderProductTaskInitBean" init-method="queryProduct"/>
+    <bean class="hasoffer.spider.context.SpiderProductTaskInitBean" init-method="runTask"/>
+    <bean class="hasoffer.spider.context.SpiderSkuTaskInitBean" init-method="runTask"/>
 
 </beans>

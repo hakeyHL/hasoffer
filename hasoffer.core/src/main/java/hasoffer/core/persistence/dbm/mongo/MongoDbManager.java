@@ -3,6 +3,8 @@ package hasoffer.core.persistence.dbm.mongo;
 import com.mongodb.WriteResult;
 import hasoffer.base.model.PageableResult;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
@@ -20,6 +22,8 @@ import java.util.List;
  */
 @Component
 public class MongoDbManager implements IMongoDbManager {
+
+    private final Logger logger = LoggerFactory.getLogger(MongoDbManager.class);
 
     @Resource
     MongoTemplate mongoTemplate;
@@ -77,8 +81,15 @@ public class MongoDbManager implements IMongoDbManager {
     @Override
     public <T> int update(Class<T> clazz, Object id, Update update) {
         Query query = new Query(Criteria.where("id").is(id));
-        WriteResult wr = mongoTemplate.updateMulti(query, update, clazz);
-        return wr.getN();
+        try {
+            WriteResult wr = mongoTemplate.updateMulti(query, update, clazz);
+            return wr.getN();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("MongoDbManager.update() is failed. _id:{}", id, e);
+            return 0;
+        }
     }
 
     @Override
