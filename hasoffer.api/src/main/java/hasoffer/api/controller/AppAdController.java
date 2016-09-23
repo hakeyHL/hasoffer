@@ -100,7 +100,7 @@ public class AppAdController {
             System.out.println(" get  index 0");
             Adt adt1 = adt.get(0);
             if (adt1 != null) {
-                if (adt1.getPackageName().equals("HASOFFER")) {
+                if (adt1.getAderName().equals("HASOFFER")) {
                     adt1.setPackageName("com.india.hasoffer");
                 } else {
                     if (!StringUtils.isEmpty(adt1.getAderName())) {
