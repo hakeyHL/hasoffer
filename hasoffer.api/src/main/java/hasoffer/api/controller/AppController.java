@@ -1226,7 +1226,9 @@ public class AppController {
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
         Map map = new HashMap();
-        map.put("words", productService.spellcheck(keyWord).subList(0, 3));
+        List<String> spellcheck = productService.spellcheck(keyWord);
+        int size = spellcheck.size() > 2 ? 3 : spellcheck.size();
+        map.put("words", spellcheck.subList(0, size));
         modelAndView.addObject("data", map);
         return modelAndView;
     }

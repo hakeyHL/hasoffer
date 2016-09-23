@@ -492,7 +492,7 @@ public class Compare2Controller {
                 if (cmpSku.getWebsite() == null
                         || cmpSku.getPrice() <= 0
                         || cmpSku.getStatus() != SkuStatus.ONSALE) { // 临时过滤掉不能更新价格的商品
-                    logger.error(cmpSku.getId() + ", price=" + cmpSku.getPrice() + ", status=" + cmpSku.getStatus());
+                    logger.info(cmpSku.getId() + ", price=" + cmpSku.getPrice() + ", status=" + cmpSku.getStatus());
                     continue;
                 }
                 if (minPrice <= 0 || minPrice > cmpSku.getPrice()) {

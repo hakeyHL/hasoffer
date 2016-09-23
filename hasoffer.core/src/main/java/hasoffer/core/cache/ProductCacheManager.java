@@ -151,10 +151,10 @@ public class ProductCacheManager {
                     cmpSku.setStatus(SkuStatus.valueOf((String) map.get("status")));
                     cmpSkus.add(cmpSku);
                 }
-                pagedCmpskus = new PageableResult<PtmCmpSku>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
+                pagedCmpskus = new PageableResult<>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
             }
         } catch (Exception e) {
-            logger.error(" deal skus from cache error " + e.getMessage());
+            logger.error("deal skus from cache error:{}", e.getMessage(), e);
             return null;
         }
         return pagedCmpskus;
@@ -226,7 +226,7 @@ public class ProductCacheManager {
             } else {
                 PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
 
-                List<PtmCmpSku> cmpSkus = new ArrayList<PtmCmpSku>();
+                List<PtmCmpSku> cmpSkus = new ArrayList<>();
                 List<Map> data = datas.getData();
 
                 for (Map<String, Object> map : data) {
@@ -259,10 +259,10 @@ public class ProductCacheManager {
                     cmpSku.setStatus(SkuStatus.valueOf((String) map.get("status")));
                     cmpSkus.add(cmpSku);
                 }
-                pagedCmpskus = new PageableResult<PtmCmpSku>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
+                pagedCmpskus = new PageableResult<>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
             }
         } catch (Exception e) {
-            logger.error(" deal skus from cache error " + e.getMessage());
+            logger.error("deal skus from cache error {}", e.getMessage(), e);
             return null;
         }
         return pagedCmpskus;
