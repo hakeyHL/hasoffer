@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -40,6 +41,14 @@ public class ProductCacheManager {
     @Resource
     ICmpSkuService cmpSkuService;
     Logger logger = LoggerFactory.getLogger(ProductCacheManager.class);
+
+    public static void main(String[] args) {
+        BigDecimal a = BigDecimal.valueOf(10);
+        String price = a + "";
+        System.out.println(price);
+        float floatAblePrice = Float.valueOf(price);
+        System.out.println(floatAblePrice);
+    }
 
     /**
      * 根据商品ID查询商品
@@ -159,7 +168,6 @@ public class ProductCacheManager {
         }
         return pagedCmpskus;
     }
-
 
     public List<PtmProduct> getTopSellins(int page, int size) {
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_TopSelling" + "_" + page + "_" + size;
