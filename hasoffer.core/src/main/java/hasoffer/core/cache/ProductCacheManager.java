@@ -276,9 +276,9 @@ public class ProductCacheManager {
             System.out.println(" get onsale ptmcmpsku : i " + i);
             JSONArray jsonArray = JSONArray.parseArray(JSONArray.toJSONString(object));
             String website = (String) jsonArray.get(0);
-            int price = (Integer) jsonArray.get(1);
+            String price = jsonArray.get(1) + "";
             //根据price和site定位需要的sku
-            List<PtmCmpSku> cmpSkus = skuCacheService.getCmpSkusBySiteAndPrice(Float.valueOf(price + ""), Website.valueOf(website), productId);
+            List<PtmCmpSku> cmpSkus = skuCacheService.getCmpSkusBySiteAndPrice(Float.valueOf(price), Website.valueOf(website), productId);
             if (cmpSkus != null) {
                 //TODO  优选选择onsale的sku,否则返回outstock的sku
                 PtmCmpSku onsaleSku = getOnsaleSku(cmpSkus, productId);
