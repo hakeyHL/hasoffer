@@ -100,12 +100,17 @@ public class AppAdController {
             System.out.println(" get  index 0");
             Adt adt1 = adt.get(0);
             if (adt1 != null) {
-                if (!StringUtils.isEmpty(adt1.getAderName())) {
-                    adt1.setPackageName(packageMap.get(Website.valueOf(adt1.getAderName())));
+                if (adt1.getPackageName().equals("HASOFFER")) {
+                    adt1.setPackageName("com.india.hasoffer");
+                } else {
+                    if (!StringUtils.isEmpty(adt1.getAderName())) {
+                        adt1.setPackageName(packageMap.get(Website.valueOf(adt1.getAderName())));
+                    }
+                    if (!StringUtils.isEmpty(adt1.getAdLink())) {
+                        adt1.setAdLink(WebsiteHelper.getAdtUrlByWebSite(Website.valueOf(adt1.getAderName()), adt1.getAdLink(), marketChannel));
+                    }
                 }
-                if (!StringUtils.isEmpty(adt1.getAdLink())) {
-                    adt1.setAdLink(WebsiteHelper.getAdtUrlByWebSite(Website.valueOf(adt1.getAderName()), adt1.getAdLink(), marketChannel));
-                }
+
             }
             map.put("ads", Arrays.asList(adt1));
             modelAndView.addObject("data", map);
