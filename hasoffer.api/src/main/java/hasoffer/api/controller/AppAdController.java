@@ -97,22 +97,21 @@ public class AppAdController {
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         MarketChannel marketChannel = deviceInfo.getMarketChannel();
         if (adt != null && adt.size() > 0) {
-            System.out.println(" get  index 0");
-            Adt adt1 = adt.get(0);
-            if (adt1 != null) {
-                if (adt1.getAderName().equals("HASOFFER")) {
-                    adt1.setPackageName("com.india.hasoffer");
-                } else {
-                    if (!StringUtils.isEmpty(adt1.getAderName())) {
-                        adt1.setPackageName(packageMap.get(Website.valueOf(adt1.getAderName())));
-                    }
-                    if (!StringUtils.isEmpty(adt1.getAdLink())) {
-                        adt1.setAdLink(WebsiteHelper.getAdtUrlByWebSite(Website.valueOf(adt1.getAderName()), adt1.getAdLink(), marketChannel));
+            for (Adt ad : adt) {
+                if (ad != null) {
+                    if (ad.getAderName().equals("HASOFFER")) {
+                        ad.setPackageName("com.india.hasoffer");
+                    } else {
+                        if (!StringUtils.isEmpty(ad.getAderName())) {
+                            ad.setPackageName(packageMap.get(Website.valueOf(ad.getAderName())));
+                        }
+                        if (!StringUtils.isEmpty(ad.getAdLink())) {
+                            ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(Website.valueOf(ad.getAderName()), ad.getAdLink(), marketChannel));
+                        }
                     }
                 }
-
             }
-            map.put("ads", Arrays.asList(adt1));
+            map.put("ads", adt);
             modelAndView.addObject("data", map);
         }
         return modelAndView;
