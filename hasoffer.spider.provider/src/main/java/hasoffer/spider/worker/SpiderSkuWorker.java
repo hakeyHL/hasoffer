@@ -78,11 +78,12 @@ public class SpiderSkuWorker implements Runnable {
             extraMap.put(Constants.SPIDER_EXTRA_SKU_ID, skuId);
             extraMap.put(Constants.SPIDER_PARSE_TRY_TIMES, 0);
 
+            spiderSkuScheduler.pushRequest(skuTask.getUrl(), extraMap);
+
             if (Spider.Status.Stopped.equals(spiderSkuScheduler.runStatus())) {
                 logger.debug("start " + spiderConfig.getWebsite() + ":" + i++);
                 spiderSkuScheduler.startSpiderTask();
             }
-            spiderSkuScheduler.pushRequest(skuTask.getUrl(), extraMap);
         }
     }
 }

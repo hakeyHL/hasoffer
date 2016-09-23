@@ -197,6 +197,6 @@ public class SearchProductService {
 
     public void update(String id, Update update) {
         int count = mdm.update(SrmAutoSearchResult.class, id, update);
-        logger.debug("update result:{}, id:{}, update:{}", count, id, update.getUpdateObject());
+        logger.debug("update result:{}, id:{}", count, id);
     }
 }

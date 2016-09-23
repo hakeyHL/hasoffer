@@ -8,7 +8,7 @@ import hasoffer.spider.context.SpiderConfigInitContext;
 import hasoffer.spider.enums.PageType;
 import hasoffer.spider.model.SpiderConfig;
 import hasoffer.spider.model.SpiderProductTask;
-import hasoffer.spider.pp.common.AbstractPageProcessor;
+import hasoffer.spider.pp.common.AbstractListProcessor;
 import hasoffer.spider.service.ISpiderScheduleService;
 import hasoffer.spider.service.impl.SpiderProductScheduleServiceImpl;
 import hasoffer.spring.context.SpringContextHolder;
@@ -35,7 +35,7 @@ public class SpiderProductWorker implements Runnable {
     private IRedisListService<String> redisListService;
 
 
-    public SpiderProductWorker(SpiderConfig spiderConfig, AbstractPageProcessor pageProcessor, Pipeline pipeline) {
+    public SpiderProductWorker(SpiderConfig spiderConfig, AbstractListProcessor pageProcessor, Pipeline pipeline) {
         this.spiderConfig = spiderConfig;
         redisListService = (IRedisListService<String>) SpringContextHolder.getBean(RedisListServiceImpl.class);
         spiderProductScheduler = new SpiderProductScheduleServiceImpl(spiderConfig, pageProcessor, pipeline);
@@ -79,11 +79,12 @@ public class SpiderProductWorker implements Runnable {
             extraMap.put(Constants.SPIDER_EXTRA_WEB_SITE, spiderConfig.getWebsite());
             extraMap.put(Constants.SPIDER_PARSE_TRY_TIMES, 0);
 
+            spiderProductScheduler.pushRequest(productTask.getUrl(), extraMap);
+
             if (Spider.Status.Stopped.equals(spiderProductScheduler.runStatus())) {
                 logger.debug("start " + spiderConfig.getWebsite() + ":" + i++);
                 spiderProductScheduler.startSpiderTask();
             }
-            spiderProductScheduler.pushRequest(productTask.getUrl(), extraMap);
         }
     }
 }

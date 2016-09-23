@@ -8,9 +8,11 @@ import hasoffer.spider.context.SpiderConfigInitContext;
 import hasoffer.spider.enums.PageType;
 import hasoffer.spider.model.SpiderProductTask;
 import hasoffer.spring.context.SpringContextHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ProductTaskDubboServiceImpl implements IProductTaskDubboService {
-
+    private final Logger logger = LoggerFactory.getLogger(ProductTaskDubboServiceImpl.class);
     private IRedisListService<String> redisListService;
 
     public ProductTaskDubboServiceImpl() {
@@ -23,6 +25,7 @@ public class ProductTaskDubboServiceImpl implements IProductTaskDubboService {
         if (redisKeyName == null || "".equals(redisKeyName)) {
             return;
         }
+        logger.info("ProductTaskDubboServiceImpl.sendTask(): product.url={}", product.getUrl());
         redisListService.push(redisKeyName, JSONUtil.toJSON(product));
     }
 }
