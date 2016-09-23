@@ -13,7 +13,7 @@
     <appender name="rollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/stdout.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/stdout.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+            <FileNamePattern>${log.base}/stdout.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <!-- or whenever the file size reaches 100MB -->
                 <maxFileSize>100MB</maxFileSize>
@@ -27,7 +27,7 @@
     <appender name="ActionAccessLoggerFileOut" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/action-access.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/action-access.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+            <FileNamePattern>${log.base}/action-access.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <!-- or whenever the file size reaches 100MB -->
                 <maxFileSize>100MB</maxFileSize>
@@ -41,7 +41,7 @@
     <appender name="ExceptionLoggerFileOut" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/exception.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/exception.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+            <FileNamePattern>${log.base}/exception.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <!-- or whenever the file size reaches 100MB -->
                 <maxFileSize>100MB</maxFileSize>
@@ -55,7 +55,7 @@
     <appender name="PerformanceStatisticsReportLoggerFileOut" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/performance-statistics.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/performance-statistics.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+            <FileNamePattern>${log.base}/performance-statistics.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <!-- or whenever the file size reaches 100MB -->
                 <maxFileSize>10MB</maxFileSize>
