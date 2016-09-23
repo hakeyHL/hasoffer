@@ -2,6 +2,7 @@ package hasoffer.api.helper;
 
 import hasoffer.api.controller.vo.DeviceInfoVo;
 import hasoffer.base.utils.HexDigestUtil;
+import hasoffer.base.utils.StringUtils;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -118,24 +119,26 @@ public class ClientHelper {
     public static boolean FilterProducts(String title, String keyword) {
         String[] filterWords = new String[]{"case", "cover", "glass", "battery", "for", "back", "guard", "cable"};
         boolean flag = true;
-        for (String str : filterWords) {
-            if (title.trim().toLowerCase().contains(str)) {
-                //如果搜索结果中包含配件名称,看关键词中有没有
-                if (keyword.trim().contains(str)) {
-                    //如果关键词中也有,ok
-                    return true;
+        if (!StringUtils.isEmpty(title) && !StringUtils.isEmpty(keyword)) {
+            for (String str : filterWords) {
+                if (title.trim().toLowerCase().contains(str)) {
+                    //如果搜索结果中包含配件名称,看关键词中有没有
+                    if (keyword.trim().contains(str)) {
+                        //如果关键词中也有,ok
+                        return true;
+                    } else {
+                        //关键词中没有,filter
+                        return false;
+                    }
                 } else {
-                    //关键词中没有,filter
-                    return false;
-                }
-            } else {
-                //如果搜索结果中不包含配件名称,看关键词中有没有
-                if (keyword.trim().toLowerCase().contains(str)) {
-                    //如果关键词中有,filter
-                    return false;
-                } else {
-                    //关键词中没有,ok
-                    continue;
+                    //如果搜索结果中不包含配件名称,看关键词中有没有
+                    if (keyword.trim().toLowerCase().contains(str)) {
+                        //如果关键词中有,filter
+                        return false;
+                    } else {
+                        //关键词中没有,ok
+                        continue;
+                    }
                 }
             }
         }
