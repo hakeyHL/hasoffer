@@ -38,7 +38,7 @@ public class DubboUpdate {
      *
      * @return
      */
-    @Scheduled(cron = "0 00 22 * * ?")
+    @Scheduled(cron = "0 0 19 * * ?")
     public void updatestart() {
 
         ExecutorService es = Executors.newCachedThreadPool();
