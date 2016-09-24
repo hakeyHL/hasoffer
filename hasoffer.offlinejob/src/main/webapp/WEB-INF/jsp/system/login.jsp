@@ -39,7 +39,7 @@
 <body class="login">
 <div class="col-center">
     <div class="well no-padding">
-        <h1 class="main-title">Jobs 登录</h1>
+        <h1 class="main-title">离线Jobs管理</h1>
         <!-- use param.error assuming FormLoginConfigurer#failureUrl contains the query parameter error -->
         <form role="form" action="${ctx}/login" method="post">
             <fieldset>

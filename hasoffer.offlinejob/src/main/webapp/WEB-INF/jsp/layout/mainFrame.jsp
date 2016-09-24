@@ -105,20 +105,20 @@
         <tbody>
         <c:forEach items="${infos}" var="quartzJobInfo">
             <tr class="odd">
-                <td style="vertical-align: middle; text-align: center;">
+                <td style="vertical-align: middle; text-align: left;">
                     <input type="radio" name="job" value="${quartzJobInfo.triggerName}"/>
                 </td>
                 <td style="vertical-align: middle; text-align: center;">${quartzJobInfo.state}</td>
-                <td style="vertical-align: middle; text-align: center;"
+                <td style="vertical-align: middle; text-align: left;"
                     class="triggerClass">${quartzJobInfo.triggerName}</td>
                 <td style="vertical-align: middle; text-align: center;">${quartzJobInfo.triggerGroup}</td>
                 <td style="vertical-align: middle; text-align: center;"><fmt:formatDate
                         value="${quartzJobInfo.lastFireTime}" pattern="yyyy-MM-dd HH:mm:ss.S"/></td>
                 <td style="vertical-align: middle; text-align: center;"><fmt:formatDate
                         value="${quartzJobInfo.nextFireTime}" pattern="yyyy-MM-dd HH:mm:ss.S"/></td>
-                <td style="vertical-align: middle; text-align: center;">${quartzJobInfo.jobName}</td>
+                <td style="vertical-align: middle; text-align: left;">${quartzJobInfo.jobName}</td>
                 <td style="vertical-align: middle; text-align: center;">${quartzJobInfo.jobGroup}</td>
-                <td style="vertical-align: middle; text-align: center;">${quartzJobInfo.jobClass}</td>
+                <td style="vertical-align: middle; text-align: left;">${quartzJobInfo.jobClass}</td>
                 <td style="vertical-align: middle; text-align: center;">${quartzJobInfo.data}</td>
             </tr>
         </c:forEach>
