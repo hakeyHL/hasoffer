@@ -1,40 +1,32 @@
 package hasoffer.spider.context;
 
-import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.search.ISearchService;
-import hasoffer.core.search.SearchProductService;
-import hasoffer.spider.thread.SearchRecordListWorker;
+import hasoffer.base.utils.TimeUtils;
+import hasoffer.spider.task.service.SpiderProductTaskService;
+import hasoffer.spring.context.SpringContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Resource;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class SpiderProductTaskInitBean {
-    private Logger logger = LoggerFactory.getLogger(SpiderProductTaskInitBean.class);
+    private final Logger logger = LoggerFactory.getLogger(SpiderProductTaskInitBean.class);
 
-    @Resource
-    ISearchService searchService;
-    @Resource
-    IDataBaseManager dbm;
-    @Resource
-    SearchProductService searchProductService;
+    public void runTask() {
+        Timer timer = new Timer();
+        timer.schedule(new SpiderProductTimerTask(), 10000, TimeUtils.MILLISECONDS_OF_1_HOUR * 2);
+        logger.debug("SpiderProductTaskInitBean.queryProduct() be call.");
+    }
 
-    public void queryProduct() {
-        logger.debug("queryProduct()");
-        ExecutorService es = Executors.newCachedThreadPool();
+    private static class SpiderProductTimerTask extends TimerTask {
 
-        //LinkedBlockingQueue<SrmAutoSearchResult> searchLogQueue = new LinkedBlockingQueue<SrmAutoSearchResult>();
+        private final Logger logger = LoggerFactory.getLogger(SpiderProductTaskInitBean.class);
 
-        es.execute(new SearchRecordListWorker(searchProductService, dbm));
-
-        //String threadName = "SearchRecordProcessWorker-Thread";
-        //HasofferThreadFactory factory = new HasofferThreadFactory(threadName);
-        //es = Executors.newCachedThreadPool(factory);
-        //for (int i = 0; i < 10; i++) {
-        //    es.execute(new SearchRecordProcessWorker(searchProductService, fetchDubboService, searchLogQueue));
-        //}
-
+        @Override
+        public void run() {
+            logger.info("SpiderProductTimerTask.run() be call.");
+            SpiderProductTaskService taskInitContext = SpringContextHolder.getBean(SpiderProductTaskService.class);
+            taskInitContext.initTask();
+        }
     }
 }

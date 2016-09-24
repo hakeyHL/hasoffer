@@ -33,23 +33,6 @@ public class ProductResultDubboServiceImpl implements IProductResultDubboService
     public ProductResultDubboServiceImpl() {
     }
 
-    //@Override
-    //public void cacheProductTask(SpiderProductTask spiderProductTask) {
-    //    // 1. 在mongo中缓存该对象。
-    //    Query query = new Query();
-    //    query.addCriteria(Criteria.where("_id").is(spiderProductTask.getTitle()));//2.使用flipkart网站过滤，
-    //    List<SrmAutoSearchResult> searchResultTemp = mdm.query(SrmAutoSearchResult.class, query);
-    //    if (ArrayUtils.isNullOrEmpty(searchResultTemp)) {
-    //        SrmAutoSearchResult searchResult = new SrmAutoSearchResult();
-    //        searchResult.setTitle(spiderProductTask.getTitle());
-    //        searchResult.setFromWebsite(spiderProductTask.getWebsite().toString());
-    //
-    //    } else {
-    //
-    //    }
-    //
-    //}
-
     @Override
     public void updateListProduct(String productId, Website website, List<FetchedProduct> productList) {
 

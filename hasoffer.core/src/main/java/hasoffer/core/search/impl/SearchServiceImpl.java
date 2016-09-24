@@ -208,6 +208,7 @@ public class SearchServiceImpl implements ISearchService {
      * @param asr
      */
     @Override
+    @Transactional
     public void analysisAndRelate(SrmAutoSearchResult asr) {
         ProductBo productBo = null;
 

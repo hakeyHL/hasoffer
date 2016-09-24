@@ -19,9 +19,15 @@
     <dubbo:reference id="skuResultDubboService" registry="consumer_reg" interface="hasoffer.dubbo.spider.result.api.ISkuResultDubboService"
                      version="1.0" check="false" timeout="10000"/>
 
+    <dubbo:reference id="productResultDubboService" registry="consumer_reg" interface="hasoffer.dubbo.spider.result.api.IProductResultDubboService"
+                     version="1.0" check="false" timeout="10000"/>
+
 
     <!-- 要暴露的服务接口 -->
     <dubbo:service interface="hasoffer.dubbo.spider.task.api.ISkuTaskDubboService" registry="provider_reg" version="1.0"
                    ref="skuTaskDubboService" timeout="10000"/>
     <bean id="skuTaskDubboService" class="hasoffer.spider.service.dubbo.SkuTaskDubboServiceImpl"/>
+    <dubbo:service interface="hasoffer.dubbo.spider.task.api.IProductTaskDubboService" registry="provider_reg" version="1.0"
+                   ref="productTaskDubboService" timeout="10000"/>
+    <bean id="productTaskDubboService" class="hasoffer.spider.service.dubbo.ProductTaskDubboServiceImpl"/>
 </beans>
