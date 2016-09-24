@@ -29,6 +29,7 @@
         <module>hasoffer.spider.provider</module>
         <module>hasoffer.spider.task</module>
         <module>hasoffer.spider.result</module>
+        <module>hasoffer.offlinejob</module>
     </modules>
 
     <properties>
