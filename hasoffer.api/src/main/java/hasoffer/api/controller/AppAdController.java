@@ -5,6 +5,7 @@ import com.google.android.gcm.server.MulticastResult;
 import com.google.android.gcm.server.Result;
 import com.google.android.gcm.server.Sender;
 import hasoffer.api.controller.vo.DeviceInfoVo;
+import hasoffer.base.enums.AppType;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
@@ -20,10 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hs on 2016/7/25.
@@ -95,19 +93,61 @@ public class AppAdController {
         modelAndView.addObject("msg", "ok");
         List<Adt> adt = advertiseService.getAdByCategory();
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-        MarketChannel marketChannel = deviceInfo.getMarketChannel();
-        if (adt != null && adt.size() > 0) {
-            System.out.println(" get  index 0");
-            Adt adt1 = adt.get(0);
-            if (adt1 != null) {
-                if (!StringUtils.isEmpty(adt1.getAderName())) {
-                    adt1.setPackageName(packageMap.get(Website.valueOf(adt1.getAderName())));
+        if (deviceInfo != null) {
+            //判断一下如果appType是APP的不展示
+            AppType appType = deviceInfo.getAppType();
+            MarketChannel marketChannel = deviceInfo.getMarketChannel();
+            if (adt != null && adt.size() > 0) {
+                Iterator<Adt> iterator = adt.iterator();
+                while (iterator.hasNext()) {
+                    Adt ad = iterator.next();
+                    if (appType != null && appType.name().equals("APP")) {
+                        //如果是appType是APP判断当前是否为hasoffer自己
+                        if (ad.getAderName().equals("HASOFFER")) {
+                            //如果是自己，跳过
+                            iterator.remove();
+                            continue;
+                        } else {
+                            //否则处理返回
+                            if (!StringUtils.isEmpty(ad.getAderName())) {
+                                ad.setPackageName(packageMap.get(Website.valueOf(ad.getAderName())));
+                            }
+                            if (!StringUtils.isEmpty(ad.getAdLink())) {
+                                ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(Website.valueOf(ad.getAderName()), ad.getAdLink(), marketChannel));
+                            }
+                        }
+                    } else if (appType != null && !appType.name().equals("APP")) {
+                        //如果不是APP，直接处理返回
+                        if (ad.getAderName().equals("HASOFFER")) {
+                            ad.setPackageName("com.india.hasoffer");
+                        } else {
+                            if (!StringUtils.isEmpty(ad.getAderName())) {
+                                ad.setPackageName(packageMap.get(Website.valueOf(ad.getAderName())));
+                            }
+                            if (!StringUtils.isEmpty(ad.getAdLink())) {
+                                ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(Website.valueOf(ad.getAderName()), ad.getAdLink(), marketChannel));
+                            }
+                        }
+                    } else {
+                        //如果AppType为空，就不过滤hasoffer了
+                        if (ad.getAderName().equals("HASOFFER")) {
+                            ad.setPackageName("com.india.hasoffer");
+                        } else {
+                            if (!StringUtils.isEmpty(ad.getAderName())) {
+                                ad.setPackageName(packageMap.get(Website.valueOf(ad.getAderName())));
+                            }
+                            if (!StringUtils.isEmpty(ad.getAdLink())) {
+                                ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(Website.valueOf(ad.getAderName()), ad.getAdLink(), marketChannel));
+                            }
+                        }
+                    }
                 }
-                if (!StringUtils.isEmpty(adt1.getAdLink())) {
-                    adt1.setAdLink(WebsiteHelper.getAdtUrlByWebSite(Website.valueOf(adt1.getAderName()), adt1.getAdLink(), marketChannel));
-                }
+                map.put("ads", adt);
+                modelAndView.addObject("data", map);
             }
-            map.put("ads", Arrays.asList(adt1));
+        } else {
+            //如果deviceInfo为null的话就不返回了
+            map.put("ads", null);
             modelAndView.addObject("data", map);
         }
         return modelAndView;

@@ -19,7 +19,7 @@
         </dependency>
         <dependency>
             <groupId>hasoffer</groupId>
-            <artifactId>hasoffer.fetch.consumer</artifactId>
+            <artifactId>hasoffer.fetch.api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
@@ -47,6 +47,19 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>dubbo</artifactId>
+        </dependency>
 
+        <dependency>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.sgroschupf</groupId>
+            <artifactId>zkclient</artifactId>
+        </dependency>
     </dependencies>
 </project>

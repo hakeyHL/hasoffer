@@ -22,6 +22,17 @@ public class ListProduct implements Serializable {
     public ListProduct() {
     }
 
+    public ListProduct(String sourceId, String url, String imageUrl,
+                       String title, float price, Website website, ProductStatus status) {
+        this.sourceId = sourceId;
+        this.url = url;
+        this.imageUrl = imageUrl;
+        this.title = title;
+        this.price = price;
+        this.website = website;
+        this.status = status;
+    }
+
     public ListProduct(long categoryId, String sourceId, String url, String imageUrl,
                        String title, float price, Website website, ProductStatus status) {
         this.categoryId = categoryId;

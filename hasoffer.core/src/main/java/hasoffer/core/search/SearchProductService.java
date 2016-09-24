@@ -21,6 +21,7 @@ import hasoffer.fetch.sites.mysmartprice.model.MySmartPriceCmpSku;
 import hasoffer.fetch.sites.mysmartprice.model.MySmartPriceProduct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -192,5 +193,10 @@ public class SearchProductService {
 
     public SrmAutoSearchResult getSearchResultById(String id) {
         return mdm.queryOne(SrmAutoSearchResult.class, id);
+    }
+
+    public void update(String id, Update update) {
+        int count = mdm.update(SrmAutoSearchResult.class, id, update);
+        logger.debug("update result:{}, id:{}", count, id);
     }
 }

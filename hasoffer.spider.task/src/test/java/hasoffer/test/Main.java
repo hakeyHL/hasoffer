@@ -1,17 +1,12 @@
 package hasoffer.test;
 
-import hasoffer.base.utils.TimeUtils;
-import hasoffer.spider.task.service.SpiderTaskService;
-import hasoffer.spring.context.SpringContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 public class Main {
 
