@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          id="WebApp_ID" version="2.5">
 
-    <display-name>base-job-war</display-name>
+    <display-name>base-offline-job-war</display-name>
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
@@ -55,15 +55,7 @@
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
 
-    <listener>
-        <display-name>productPriceUpdate_listener</display-name>
-        <listener-class>hasoffer.job.listener.PtmProductPriceUpdateListener</listener-class>
-    </listener>
 
-    <listener>
-        <display-name>priceOffGetDeal_listener</display-name>
-        <listener-class>hasoffer.job.listener.CheckPriceOffGetDealListener</listener-class>
-    </listener>
     <!-- -->
     <!--<listener>-->
     <!--<listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>-->

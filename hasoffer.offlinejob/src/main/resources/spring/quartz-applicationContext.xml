@@ -109,4 +109,12 @@
         <property name="cronExpression" value="0 30 12 * * ?"/>
     </bean>
 
+    <!--<bean name="topSellingTaskJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
+    <!--<property name="jobClass" value="hasoffer.job.bean.fetch.TopSellingTaskJobBean"/>-->
+    <!--</bean>-->
+
+    <!--<bean id="topSellingTaskTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
+    <!--<property name="jobDetail" ref="topSellingTaskJob"/>-->
+    <!--<property name="cronExpression" value="0 0 0/1 * * ?"/>-->
+    <!--</bean>-->
 </beans>
