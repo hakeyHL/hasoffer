@@ -3,6 +3,7 @@ package hasoffer.job.bean.deal;
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.TimeUtils;
@@ -122,7 +123,17 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
             es.execute(new Runnable() {
                 @Override
                 public void run() {
+
+                    long startTime = TimeUtils.now();
+
                     while (true) {
+
+                        long now = TimeUtils.now();
+
+                        //如果当前时间和启动时间相差超过50分钟，就自杀了吧少年
+                        if (now - startTime > TimeUtils.MILLISECONDS_OF_1_MINUTE * 50) {
+                            break;
+                        }
 
                         AppDeal deal = priceOffDealQueue.poll();
 
@@ -190,7 +201,8 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
 
                             float newPrice = fetchedProduct.getPrice();
 
-                            if (newPrice > sku.getPrice()) {
+                            //涨价了或者状态不是onsale失效
+                            if (newPrice > sku.getPrice() || SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
 //                                dealService.deleteDeal(deal.getId());
                                 dealService.updateDealExpire(deal.getId());
                             }

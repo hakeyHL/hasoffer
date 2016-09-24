@@ -2,6 +2,7 @@ package hasoffer.task.worker;
 
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
+import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
@@ -137,8 +138,8 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 logger.info("createPtmCmpSkuImage fail " + skuid);
             }
 
-//            如果降价且CommentsNumber 大于40写入队列
-            if (price > fetchedProduct.getPrice() && fetchedProduct.getCommentsNumber() > 40) {
+//            如果降价且CommentsNumber 大于40写入队列，并且状态必须是onsale
+            if (price > fetchedProduct.getPrice() && fetchedProduct.getCommentsNumber() > 40 && SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
                 redisListService.push(PRICE_DROP_SKUID_QUEUE, skuid + "");
                 System.out.println("price drop add to queue success " + skuid);
             }
