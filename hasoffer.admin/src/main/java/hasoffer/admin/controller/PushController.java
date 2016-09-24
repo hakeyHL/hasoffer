@@ -124,8 +124,8 @@ public class PushController {
 
     @RequestMapping(value = "/create/{pushSourceTypeString}/{sourceId}", method = RequestMethod.POST)
     @ResponseBody
-    public String create(@PathVariable String pushSourceTypeString, @PathVariable String sourceId) {
-
+    public String create(HttpServletRequest request, @PathVariable String pushSourceTypeString, @PathVariable String sourceId) {
+        String pushContent = request.getParameter("pushContent");
         if (StringUtils.isEmpty(pushSourceTypeString)) {
             pushSourceTypeString = "DEAL";
         }
@@ -133,14 +133,18 @@ public class PushController {
         PushSourceType pushSourceType = PushSourceType.valueOf(pushSourceTypeString.toUpperCase());
 //        crowd
         String pushTitle = "";
-        String pushContent = "";
+        if (pushContent == null) {
+            pushContent = "";
+        }
 
         if (PushSourceType.DEAL.equals(pushSourceType)) {
 
             AppDeal appDeal = dbm.get(AppDeal.class, Long.valueOf(sourceId));
 
             pushTitle = appDeal.getTitle();
-            pushContent = appDeal.getPriceDescription();
+            if (StringUtils.isEmpty(pushContent)) {
+                pushContent = appDeal.getPriceDescription();
+            }
 
         }
 

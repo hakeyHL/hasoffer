@@ -4,8 +4,6 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.DaemonThreadFactory;
 import hasoffer.base.utils.TimeUtils;
-import hasoffer.core.analysis.ProductAnalysisService;
-import hasoffer.core.bo.product.ProductBo;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.enums.SearchPrecise;
@@ -16,7 +14,6 @@ import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.SearchProductService;
 import hasoffer.task.worker.UnmatchedSearchRecordListWorker;
 import hasoffer.task.worker.UnmatchedSearchRecordProcessWorker;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -102,17 +99,18 @@ public class AutoSearchMatchController {
 
                     for (SrmAutoSearchResult autoSearchResult : autoSearchResults) {
 
-                        ProductBo productBo = null;
-
-                        String proIdStr = autoSearchResult.getId();
-
-                        if (NumberUtils.isNumber(proIdStr)) {
-                            long proId = Long.valueOf(proIdStr);
-                            productBo = productService.getProductBo(proId);
-                        }
-
-                        ProductAnalysisService.analysisProducts(autoSearchResult, productBo);
-                        searchService.relateUnmatchedSearchLogx(autoSearchResult);
+                        //ProductBo productBo = null;
+                        //
+                        //String proIdStr = autoSearchResult.getId();
+                        //
+                        //if (NumberUtils.isNumber(proIdStr)) {
+                        //    long proId = Long.valueOf(proIdStr);
+                        //    productBo = productService.getProductBo(proId);
+                        //}
+                        //
+                        //ProductAnalysisService.analysisProducts(autoSearchResult, productBo);
+                        //searchService.relateUnmatchedSearchLogx(autoSearchResult);
+                        searchService.analysisAndRelate(autoSearchResult);
                     }
 
                     startTime = autoSearchResults.get(autoSearchResults.size() - 1).getlUpdateTime();

@@ -20,4 +20,8 @@
                    ref="skuResultDubboService" timeout="10000" />
     <bean id="skuResultDubboService" class="hasoffer.spider.result.service.impl.SkuResultDubboServiceImpl"/>
 
+    <dubbo:service interface="hasoffer.dubbo.spider.result.api.IProductResultDubboService" version="1.0"
+                   ref="productResultDubboService" timeout="10000" />
+    <bean id="productResultDubboService" class="hasoffer.spider.result.service.impl.ProductResultDubboServiceImpl"/>
+
 </beans>

@@ -1,14 +1,8 @@
 package hasoffer.spider.main;
 
-import hasoffer.base.utils.TimeUtils;
-import hasoffer.spider.task.service.SpiderSkuTaskService;
-import hasoffer.spring.context.SpringContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class Main {
 
@@ -25,15 +19,8 @@ public class Main {
                 });
         context.start();
         logger.info("start finish!");
-        Timer timer = new Timer();
-        timer.schedule(new SpiderTask(), 10000, TimeUtils.MILLISECONDS_OF_1_DAY);
+
     }
 
-    private static class SpiderTask extends TimerTask {
-        @Override
-        public void run() {
-            SpiderSkuTaskService taskInitContext = SpringContextHolder.getBean(SpiderSkuTaskService.class);
-            taskInitContext.initTask();
-        }
-    }
+
 }
