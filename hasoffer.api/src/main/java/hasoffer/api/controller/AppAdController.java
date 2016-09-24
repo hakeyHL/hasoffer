@@ -5,6 +5,7 @@ import com.google.android.gcm.server.MulticastResult;
 import com.google.android.gcm.server.Result;
 import com.google.android.gcm.server.Sender;
 import hasoffer.api.controller.vo.DeviceInfoVo;
+import hasoffer.base.enums.AppType;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
@@ -95,25 +96,51 @@ public class AppAdController {
         modelAndView.addObject("msg", "ok");
         List<Adt> adt = advertiseService.getAdByCategory();
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-        MarketChannel marketChannel = deviceInfo.getMarketChannel();
-        if (adt != null && adt.size() > 0) {
-            for (Adt ad : adt) {
-                if (ad != null) {
-                    if (ad.getAderName().equals("HASOFFER")) {
-                        ad.setPackageName("com.india.hasoffer");
-                    } else {
-                        if (!StringUtils.isEmpty(ad.getAderName())) {
-                            ad.setPackageName(packageMap.get(Website.valueOf(ad.getAderName())));
-                        }
-                        if (!StringUtils.isEmpty(ad.getAdLink())) {
-                            ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(Website.valueOf(ad.getAderName()), ad.getAdLink(), marketChannel));
+        if (deviceInfo != null) {
+            //判断一下如果appType是APP的不展示
+            AppType appType = deviceInfo.getAppType();
+
+            MarketChannel marketChannel = deviceInfo.getMarketChannel();
+            if (adt != null && adt.size() > 0) {
+                for (Adt ad : adt) {
+                    if (ad != null) {
+                        if (appType != null && appType.name().equals("APP")) {
+                            //如果是appType是APP判断当前是否为hasoffer自己
+                            if (ad.getAderName().equals("HASOFFER")) {
+                                //如果是自己，跳过
+                                continue;
+                            } else {
+                                //否则处理返回
+                                if (!StringUtils.isEmpty(ad.getAderName())) {
+                                    ad.setPackageName(packageMap.get(Website.valueOf(ad.getAderName())));
+                                }
+                                if (!StringUtils.isEmpty(ad.getAdLink())) {
+                                    ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(Website.valueOf(ad.getAderName()), ad.getAdLink(), marketChannel));
+                                }
+                            }
+                        } else if (appType != null && !appType.name().equals("APP")) {
+                            //如果不是APP，直接处理返回
+                            if (ad.getAderName().equals("HASOFFER")) {
+                                ad.setPackageName("com.india.hasoffer");
+                            } else {
+                                if (!StringUtils.isEmpty(ad.getAderName())) {
+                                    ad.setPackageName(packageMap.get(Website.valueOf(ad.getAderName())));
+                                }
+                                if (!StringUtils.isEmpty(ad.getAdLink())) {
+                                    ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(Website.valueOf(ad.getAderName()), ad.getAdLink(), marketChannel));
+                                }
+                            }
+                        } else {
+                            //appType是null
+
                         }
                     }
                 }
+                map.put("ads", adt);
+                modelAndView.addObject("data", map);
             }
-            map.put("ads", adt);
-            modelAndView.addObject("data", map);
         }
+
         return modelAndView;
     }
 
