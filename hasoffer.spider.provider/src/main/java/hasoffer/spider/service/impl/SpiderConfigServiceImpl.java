@@ -3,6 +3,7 @@ package hasoffer.spider.service.impl;
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.exception.WebSiteException;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.spider.enums.PageType;
 import hasoffer.spider.model.SpiderConfig;
 import hasoffer.spider.service.ISpiderConfigService;
@@ -26,7 +27,7 @@ public class SpiderConfigServiceImpl implements ISpiderConfigService {
     public SpiderConfig findByWebsite(Website website, PageType pageType) {
         if (null != website) {
             SpiderConfig spiderConfig = null;
-            String sql = "select id, website,thread_num, time_out,  retry_times, interval_times,task_level from spider_config where website=? and page_type=?";
+            String sql = "select id, website,thread_num, time_out,  retry_times, interval_times, task_level, page_type, apply from spider_config where website=? and page_type=?";
             Connection conn = JdbcUtil.getConnection();
             if (null != conn) {
                 PreparedStatement stmt = null;
@@ -44,7 +45,8 @@ public class SpiderConfigServiceImpl implements ISpiderConfigService {
                         int retryTimes = rs.getInt("retry_times");
                         int intervalTimes = rs.getInt("interval_times");
                         TaskLevel taskLevel = TaskLevel.valueOfString(rs.getString("task_level"));
-                        spiderConfig = new SpiderConfig(websiteTemp, threadNum, timeOut, retryTimes, intervalTimes, taskLevel);
+                        boolean b = char2Boolean(rs.getString("apply"));
+                        spiderConfig = new SpiderConfig(websiteTemp, threadNum, timeOut, retryTimes, intervalTimes, taskLevel, b);
                         spiderConfig.setId(rId);
                     }
                 } catch (SQLException e) {
@@ -64,4 +66,14 @@ public class SpiderConfigServiceImpl implements ISpiderConfigService {
         return null;
     }
 
+    private boolean char2Boolean(String chars) {
+        if (StringUtils.isEmpty(chars)) {
+            return true;
+        }
+        if ("Y".equals(chars.toUpperCase())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
