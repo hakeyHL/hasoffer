@@ -8,15 +8,15 @@
         http://code.alibabatech.com/schema/dubbo/dubbo.xsd"
        default-lazy-init="false">
     <!-- 提供方应用名称信息，这个相当于起一个名字，我们dubbo管理页面比较清晰是哪个应用暴露出来的 -->
-    <dubbo:application name="hasoffer-job-consumer"/>
+    <dubbo:application name="hasoffer-job-offline-consumer"/>
     <!-- 使用zookeeper注册中心暴露服务地址 -->
     <dubbo:registry address="zookeeper://zookeeper_server:2181"/>
 
     <dubbo:provider timeout="5000"/>
 
     <dubbo:reference id="fetchDubboService" interface="hasoffer.dubbo.api.fetch.service.IFetchDubboService"
-                     version="1.0" check="false" group="fetch" />
+                     version="1.0" check="false" group="fetch"/>
 
-    <!--<dubbo:reference id="fetchTimerDubboService" interface="hasoffer.dubbo.api.fetch.service.IFetchDubboService"-->
-                     <!--version="1.0" check="false" group="timer"/>-->
+    <dubbo:reference id="fetchTimerDubboService" interface="hasoffer.dubbo.api.fetch.service.IFetchDubboService"
+                     version="1.0" check="false" group="timer"/>
 </beans>
