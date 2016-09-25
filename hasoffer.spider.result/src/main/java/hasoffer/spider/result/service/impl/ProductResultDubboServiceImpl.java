@@ -10,19 +10,17 @@ import hasoffer.dubbo.spider.result.api.IProductResultDubboService;
 import hasoffer.fetch.model.ListProduct;
 import hasoffer.fetch.model.ProductStatus;
 import hasoffer.spider.model.FetchedProduct;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ProductResultDubboServiceImpl implements IProductResultDubboService {
 
     private final Logger logger = LoggerFactory.getLogger(ProductResultDubboServiceImpl.class);
+    private final Logger successLogger = LoggerFactory.getLogger("spider.success");
 
     @Resource
     private SearchProductService searchProductService;
@@ -39,12 +37,8 @@ public class ProductResultDubboServiceImpl implements IProductResultDubboService
         // 由于更新有问题，只是记录一下结果。
         if (hasoffer.base.utils.ArrayUtils.hasObjs(productList)) {
             for (FetchedProduct fetchedProduct : productList) {
-                try {
-                    FileUtils.writeStringToFile(new File(userHome + File.separator + "logs" + File.separator + "spider-logs" + File.separator + "result.txt"), JSONUtil.toJSON(fetchedProduct) + System.getProperty("line.separator", "\n"));
-                } catch (IOException e) {
-                    logger.error("write to the result.txt fail. ", e);
-                }
-
+                    //FileUtils.writeStringToFile(new File(userHome + File.separator + "logs" + File.separator + "spider-logs" + File.separator + "result.txt"), JSONUtil.toJSON(fetchedProduct) + System.getProperty("line.separator", "\n"));
+                successLogger.info(JSONUtil.toJSON(fetchedProduct));
             }
 
         }
