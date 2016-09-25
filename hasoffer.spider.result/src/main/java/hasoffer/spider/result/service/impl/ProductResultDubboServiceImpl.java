@@ -2,6 +2,7 @@ package hasoffer.spider.result.service.impl;
 
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.search.ISearchService;
@@ -33,9 +34,8 @@ public class ProductResultDubboServiceImpl implements IProductResultDubboService
 
     @Override
     public void updateListProduct(String productId, Website website, List<FetchedProduct> productList) {
-        String userHome = System.getProperty("user.home");
         // 由于更新有问题，只是记录一下结果。
-        if (hasoffer.base.utils.ArrayUtils.hasObjs(productList)) {
+        if (ArrayUtils.hasObjs(productList)) {
             for (FetchedProduct fetchedProduct : productList) {
                     //FileUtils.writeStringToFile(new File(userHome + File.separator + "logs" + File.separator + "spider-logs" + File.separator + "result.txt"), JSONUtil.toJSON(fetchedProduct) + System.getProperty("line.separator", "\n"));
                 successLogger.info(JSONUtil.toJSON(fetchedProduct));
