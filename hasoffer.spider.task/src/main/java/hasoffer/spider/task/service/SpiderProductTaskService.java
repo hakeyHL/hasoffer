@@ -39,10 +39,10 @@ public class SpiderProductTaskService {
 
 
     public void initTask() {
-        String SQL_SEARCHLOG = "select t from SrmSearchLog t where t.updateTime >?0 and site=?1  order by t.updateTime ASC ";
+        String SQL_SEARCHLOG = "select t from SrmSearchLog t where t.updateTime >?0  order by t.updateTime ASC ";
         try {
             Date searchTime = new Date(TimeUtils.now() - TimeUtils.MILLISECONDS_OF_1_HOUR);
-            PageableResult<SrmSearchLog> pagedSearchLog = dbm.queryPage(SQL_SEARCHLOG, 1, 1000, Arrays.asList(searchTime, Website.AMAZON.toString()));
+            PageableResult<SrmSearchLog> pagedSearchLog = dbm.queryPage(SQL_SEARCHLOG, 1, 1000, Arrays.asList(searchTime));
             List<SrmSearchLog> searchLogs = pagedSearchLog.getData();
             if (ArrayUtils.hasObjs(searchLogs)) {
                 for (SrmSearchLog searchLog : searchLogs) {
