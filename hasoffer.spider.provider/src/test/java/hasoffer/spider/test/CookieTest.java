@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 public class CookieTest {
     private static long currentTime = 0;
 
-
     public static void main(String[] args) {
         while (true) {
             test();
