@@ -86,11 +86,12 @@ public class FetchMobileCategoryBrandModel implements Runnable {
 
                     System.out.println(JSONUtil.toJSON(fetchedProduct).toString() + "id=" + skuid);
 
-                    try {
-                        cmpSkuService.createDescription(ptmcmpsku, fetchedProduct);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+//                    该更新方法已经过时
+//                    try {
+//                        cmpSkuService.createDescription(ptmcmpsku, fetchedProduct);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
 
                     try {
                         cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
