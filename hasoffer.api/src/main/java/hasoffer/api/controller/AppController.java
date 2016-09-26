@@ -1227,7 +1227,7 @@ public class AppController {
                     orderVo.setWebsite(orderStatsAnalysisPO.getWebSite());
                     orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
                     transcations.add(orderVo);
-                    if (!orderStatsAnalysisPO.getOrderStatus().equals("cancelled") && orderStatsAnalysisPO.getOrderStatus().equals("disapproved")) {
+                    if (!orderStatsAnalysisPO.getOrderStatus().equals("cancelled") && !orderStatsAnalysisPO.getOrderStatus().equals("disapproved")) {
                         PendingCoins = PendingCoins.add(tempPrice);
                     }
                     if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
