@@ -159,10 +159,14 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
                 if (ptmProduct != null) {
 
+                    //保存sku的描述信息
+                    cmpSkuService.createSkuDescription(sku, fetchedProduct);
+
                     String productTitle = ptmProduct.getTitle();
 
                     if (StringUtils.isEqual(productTitle, sku.getTitle())) {
-                        cmpSkuService.createDescription(sku, fetchedProduct);
+                        //保存product的描述信息
+                        cmpSkuService.createProductDescription(sku, fetchedProduct);
                         System.out.println("update product spec success for " + ptmProduct.getId());
                     } else {
                         System.out.println("product spec should remove " + ptmProduct.getId());

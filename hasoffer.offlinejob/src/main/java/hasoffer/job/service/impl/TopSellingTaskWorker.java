@@ -5,7 +5,6 @@ import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.TimeUtils;
-import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
@@ -97,16 +96,17 @@ public class TopSellingTaskWorker implements Runnable {
 
             System.out.println(JSONUtil.toJSON(fetchedProduct).toString() + "id=" + skuid);
 
-            try {
-                PtmCmpSku ptmCmpSku = new PtmCmpSku();
-                ptmCmpSku.setId(sku.getId());
-                ptmCmpSku.setProductId(sku.getProductId());
-                ptmCmpSku.setUrl(sku.getUrl());
-                ptmCmpSku.setUpdateTime(sku.getUpdateTime());
-                cmpSkuService.createDescription(ptmCmpSku, fetchedProduct);
-            } catch (Exception e) {
-                logger.info("createDescription fail " + skuid);
-            }
+//            该更新方法已经过时
+//            try {
+//                PtmCmpSku ptmCmpSku = new PtmCmpSku();
+//                ptmCmpSku.setId(sku.getId());
+//                ptmCmpSku.setProductId(sku.getProductId());
+//                ptmCmpSku.setUrl(sku.getUrl());
+//                ptmCmpSku.setUpdateTime(sku.getUpdateTime());
+//                cmpSkuService.createDescription(ptmCmpSku, fetchedProduct);
+//            } catch (Exception e) {
+//                logger.info("createDescription fail " + skuid);
+//            }
 
             try {
                 cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
