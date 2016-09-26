@@ -39,7 +39,6 @@ public class SpiderSkuWorker implements Runnable {
         this.spiderConfig = spiderConfig;
         redisListService = (IRedisListService<String>) SpringContextHolder.getBean(RedisListServiceImpl.class);
         spiderSkuScheduler = new SpiderSkuScheduleServiceImpl(spiderConfig, pageProcessor, pipeline);
-        spiderSkuScheduler.startSpiderTask();
     }
 
     @Override
@@ -80,7 +79,7 @@ public class SpiderSkuWorker implements Runnable {
 
             spiderSkuScheduler.pushRequest(skuTask.getUrl(), extraMap);
 
-            if (Spider.Status.Stopped.equals(spiderSkuScheduler.runStatus())) {
+            if (!Spider.Status.Running.equals(spiderSkuScheduler.runStatus())) {
                 logger.debug("start " + spiderConfig.getWebsite() + ":" + i++);
                 spiderSkuScheduler.startSpiderTask();
             }

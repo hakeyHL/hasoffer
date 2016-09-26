@@ -14,7 +14,7 @@ public class SpiderProductTaskInitBean {
 
     public void runTask() {
         Timer timer = new Timer();
-        timer.schedule(new SpiderProductTimerTask(), 10000, TimeUtils.MILLISECONDS_OF_1_HOUR * 2);
+        timer.schedule(new SpiderProductTimerTask(), 10000, TimeUtils.MILLISECONDS_OF_1_HOUR * 1);
         logger.debug("SpiderProductTaskInitBean.queryProduct() be call.");
     }
 
