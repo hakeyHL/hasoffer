@@ -622,6 +622,9 @@ public class AppController {
             if (appDeal != null) {
                 System.out.println("has this deal ");
                 Map map = new HashMap();
+                map.put("discount", appDeal.getDiscount());
+                map.put("originPrice", appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
+                map.put("priceDescription", appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
                 map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
                 map.put("title", appDeal.getTitle());
                 //返回deal的处境时间距离现在时间的时间,多少天,小时,分钟..
@@ -685,6 +688,11 @@ public class AppController {
                             sb.append("offer 1 ").append(";");
                             sb.append("offer 2 ").append(";");
                             sb.append("\n\n");
+
+
+                            sb.append("Please note: offers and price may vary by location.");
+
+
                         }
                         //设置Key Features
                         String jsonParam = ptmCmpSkuDescription.getJsonParam();
@@ -699,6 +707,7 @@ public class AppController {
                         sb.append("offer 3 ").append(";");
                         sb.append("offer 4 ").append(";");
                         sb.append("\n\n");
+                        sb.append("Please note: offers and price may vary by location.");
                         //拼接参数
                         Map jsonMap = new HashMap();
                         jsonMap.put("color", "red");
