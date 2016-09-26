@@ -45,7 +45,7 @@ public class SpiderProductTaskService {
             PageableResult<SrmSearchLog> pagedSearchLog = dbm.queryPage(SQL_SEARCHLOG, 1, 1000, Arrays.asList(searchTime));
             List<SrmSearchLog> searchLogs = pagedSearchLog.getData();
             if (ArrayUtils.hasObjs(searchLogs)) {
-                logger.info("SpiderProductTaskService.initTask() be call. Size:{}", searchLogs.size());
+                logger.info("SpiderProductTaskService.initTask() be call. Time:{}, Size:{}", searchTime, searchLogs.size());
                 for (SrmSearchLog searchLog : searchLogs) {
                     if (searchLog.getPrecise() == SearchPrecise.MANUALSET) {
                         continue;
