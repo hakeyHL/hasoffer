@@ -104,7 +104,7 @@ public class PushServiceImpl implements IPushService {
     }
 
     @Override
-    public PageableResult getPagedAppPush(PushSourceType pushSourceType, Date date, int curPage, int pageSize) {
-        return dbm.queryPage("SELECT t FROM AppPush t WHERE t.pushSourceType = ?0 AND t.createTime = ?1 ORDER BY t.id ASC", curPage, pageSize, Arrays.asList(pushSourceType, date));
+    public PageableResult getPagedAppPush(PushSourceType pushSourceType, Date startDate, Date endDate, int curPage, int pageSize) {
+        return dbm.queryPage("SELECT t FROM AppPush t WHERE t.pushSourceType = ?0 AND t.createTime > ?1 AND t.createTime < ?2  ORDER BY t.id ASC", curPage, pageSize, Arrays.asList(pushSourceType, startDate, endDate));
     }
 }
