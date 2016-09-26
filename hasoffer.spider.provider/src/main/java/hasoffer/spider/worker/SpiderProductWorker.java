@@ -39,7 +39,6 @@ public class SpiderProductWorker implements Runnable {
         this.spiderConfig = spiderConfig;
         redisListService = (IRedisListService<String>) SpringContextHolder.getBean(RedisListServiceImpl.class);
         spiderProductScheduler = new SpiderProductScheduleServiceImpl(spiderConfig, pageProcessor, pipeline);
-        spiderProductScheduler.startSpiderTask();
     }
 
     @Override
@@ -81,7 +80,7 @@ public class SpiderProductWorker implements Runnable {
 
             spiderProductScheduler.pushRequest(productTask.getUrl(), extraMap);
 
-            if (Spider.Status.Stopped.equals(spiderProductScheduler.runStatus())) {
+            if (!Spider.Status.Running.equals(spiderProductScheduler.runStatus())) {
                 logger.debug("start " + spiderConfig.getWebsite() + ":" + i++);
                 spiderProductScheduler.startSpiderTask();
             }
