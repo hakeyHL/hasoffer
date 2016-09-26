@@ -32,7 +32,9 @@ public class FetchUpdateServiceImpl implements IFetchUpdateService {
         //多图
         cmpSkuService.createPtmCmpSkuImage(skuId, fetchedProduct);
         //描述
-        cmpSkuService.createDescription(ptmCmpSku, fetchedProduct);
+//        cmpSkuService.createDescription(ptmCmpSku, fetchedProduct);该方法已经替换为下面俩部分
+        cmpSkuService.createSkuDescription(ptmCmpSku, fetchedProduct);
+        cmpSkuService.createProductDescription(ptmCmpSku, fetchedProduct);
 
     }
 }

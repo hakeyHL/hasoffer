@@ -1,7 +1,10 @@
 package hasoffer.core.persistence.mongo;
 
+import hasoffer.spider.model.FetchedProductReview;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
 
 /**
  * Created on 2016/6/20.
@@ -21,6 +24,8 @@ public class PtmCmpSkuDescription {
     private String jsonDescription;
 
     private String offers;
+
+    private List<FetchedProductReview> fetchedProductReviewList;
 
     public long getId() {
         return id;
@@ -54,6 +59,14 @@ public class PtmCmpSkuDescription {
         this.offers = offers;
     }
 
+    public List<FetchedProductReview> getFetchedProductReviewList() {
+        return fetchedProductReviewList;
+    }
+
+    public void setFetchedProductReviewList(List<FetchedProductReview> fetchedProductReviewList) {
+        this.fetchedProductReviewList = fetchedProductReviewList;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -65,7 +78,8 @@ public class PtmCmpSkuDescription {
         if (jsonParam != null ? !jsonParam.equals(that.jsonParam) : that.jsonParam != null) return false;
         if (jsonDescription != null ? !jsonDescription.equals(that.jsonDescription) : that.jsonDescription != null)
             return false;
-        return !(offers != null ? !offers.equals(that.offers) : that.offers != null);
+        if (offers != null ? !offers.equals(that.offers) : that.offers != null) return false;
+        return !(fetchedProductReviewList != null ? !fetchedProductReviewList.equals(that.fetchedProductReviewList) : that.fetchedProductReviewList != null);
 
     }
 
@@ -75,13 +89,15 @@ public class PtmCmpSkuDescription {
         result = 31 * result + (jsonParam != null ? jsonParam.hashCode() : 0);
         result = 31 * result + (jsonDescription != null ? jsonDescription.hashCode() : 0);
         result = 31 * result + (offers != null ? offers.hashCode() : 0);
+        result = 31 * result + (fetchedProductReviewList != null ? fetchedProductReviewList.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
         return "PtmCmpSkuDescription{" +
-                "id=" + id +
+                "fetchedProductReviewList=" + fetchedProductReviewList +
+                ", id=" + id +
                 ", jsonParam='" + jsonParam + '\'' +
                 ", jsonDescription='" + jsonDescription + '\'' +
                 ", offers='" + offers + '\'' +

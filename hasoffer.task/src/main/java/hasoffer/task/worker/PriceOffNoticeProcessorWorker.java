@@ -4,8 +4,11 @@ import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
@@ -31,12 +34,14 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
     private IFetchDubboService fetchDubboService;
     private IRedisListService redisListService;
     private ICmpSkuService cmpSkuService;
+    private IDataBaseManager dbm;
 
-    public PriceOffNoticeProcessorWorker(ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, IRedisListService redisListService, ICmpSkuService cmpSkuService) {
+    public PriceOffNoticeProcessorWorker(ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, IRedisListService redisListService, ICmpSkuService cmpSkuService, IDataBaseManager dbm) {
         this.queue = queue;
         this.fetchDubboService = fetchDubboService;
         this.redisListService = redisListService;
         this.cmpSkuService = cmpSkuService;
+        this.dbm = dbm;
     }
 
     @Override
@@ -124,9 +129,28 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
             System.out.println(JSONUtil.toJSON(fetchedProduct).toString() + "id=" + skuid);
 
             try {
-                cmpSkuService.createDescription(sku, fetchedProduct);
+
+                PtmProduct ptmProduct = dbm.get(PtmProduct.class, sku.getProductId());
+
+                if (ptmProduct != null) {
+
+                    //保存sku的描述信息
+                    cmpSkuService.createSkuDescription(sku, fetchedProduct);
+
+                    String productTitle = ptmProduct.getTitle();
+
+                    if (StringUtils.isEqual(productTitle, sku.getTitle())) {
+                        //保存product的描述信息
+                        cmpSkuService.createProductDescription(sku, fetchedProduct);
+                        System.out.println("update product spec success for " + ptmProduct.getId());
+                    } else {
+                        System.out.println("product spec should remove " + ptmProduct.getId());
+                    }
+                } else {
+                    System.out.println(skuid + " product is null");
+                }
             } catch (Exception e) {
-                logger.info("createDescription fail " + skuid);
+                System.out.println("createDescription fail " + skuid);
             }
 
             try {
