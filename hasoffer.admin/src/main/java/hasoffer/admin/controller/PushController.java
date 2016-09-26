@@ -58,20 +58,31 @@ public class PushController {
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public ModelAndView list(HttpServletRequest request,
-                             @RequestParam(required = false) Date createTime,
+                             @RequestParam(defaultValue = "") String startTime,
+                             @RequestParam(defaultValue = "") String endTime,
                              @RequestParam(defaultValue = "DEAL") String pushSourceTypeString,
                              @RequestParam(defaultValue = "1") int curPage,
                              @RequestParam(defaultValue = "20") int pageSize) {
 
         ModelAndView modelAndView = new ModelAndView("push/list");
 
-        PushSourceType pushSourceType = PushSourceType.valueOf(pushSourceTypeString);
+        final String YMD_WEB_PATTERN = "yyyy-MM-dd";
 
-        if (createTime == null) {
-            createTime = TimeUtils.nowDate();
+        Date startDate = null;
+        Date endDate = null;
+        if (StringUtils.isEmpty(startTime)) {
+            startDate = new Date(TimeUtils.today());
+            endDate = new Date();
+            startTime = TimeUtils.parse(startDate, YMD_WEB_PATTERN);
+            endTime = startTime;
+        } else {
+            startDate = TimeUtils.stringToDate(startTime, YMD_WEB_PATTERN);
+            endDate = TimeUtils.addDay(TimeUtils.stringToDate(endTime, YMD_WEB_PATTERN), 1);
         }
 
-        PageableResult pagedAppPush = pushService.getPagedAppPush(pushSourceType, createTime, curPage, pageSize);
+        PushSourceType pushSourceType = PushSourceType.valueOf(pushSourceTypeString);
+
+        PageableResult pagedAppPush = pushService.getPagedAppPush(pushSourceType, startDate, endDate, curPage, pageSize);
 
         List<AppPush> appPushList = pagedAppPush.getData();
 
@@ -79,7 +90,8 @@ public class PushController {
 
         modelAndView.addObject("appPushList", appPushList);
         modelAndView.addObject("page", pageModel);
-        modelAndView.addObject("createTime", createTime);
+        modelAndView.addObject("startTime", startTime);
+        modelAndView.addObject("endTime", endTime);
 
         return modelAndView;
     }

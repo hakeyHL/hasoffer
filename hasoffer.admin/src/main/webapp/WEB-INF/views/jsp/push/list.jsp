@@ -13,7 +13,7 @@
 
         <div class="row" style="margin-bottom: 10px">
 
-            <form action="/topselling/list" method="get">
+            <form action="/push/list" method="get">
 
                 <div class="col-lg-2">
                     <div class="input-group">
@@ -26,12 +26,23 @@
 
                 <div class="col-lg-2">
                     <div class="input-group">
-                        <span class="input-group-addon">创建日期</span>
+                        <span class="input-group-addon">起始日期</span>
                         <input size="16" type="text" class="form-control form_datetime"
-                               id="createTime" name="createTime" value="${createTime}">
+                               id="startTime" name="startTime" value="${startTime}">
                     </div>
                     <script>
                         $("#startTime").datepicker();
+                    </script>
+                </div>
+
+                <div class="col-lg-2">
+                    <div class="input-group">
+                        <span class="input-group-addon">结束日期</span>
+                        <input size="16" type="text" class="form-control form_datetime"
+                               id="endTime" name="endTime" value="${endTime}">
+                    </div>
+                    <script>
+                        $("#endTime").datepicker();
                     </script>
                 </div>
 
