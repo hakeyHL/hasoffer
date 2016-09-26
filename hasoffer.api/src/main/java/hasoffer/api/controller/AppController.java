@@ -627,6 +627,7 @@ public class AppController {
                 //返回deal的处境时间距离现在时间的时间,多少天,小时,分钟..
                 map.put("createTime", getDifference2Date(new Date(), appDeal.getCreateTime()));
                 map.put("website", appDeal.getWebsite());
+                map.put("comments", Arrays.asList("Back with Bang", "Everything is good ..except display on 5 days is far better than this reset ", "Good one and hats off to the courier service who delivered the in the the hasoffer ."));
                 //降价生成deal无失效日期
                 if (!appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
                     map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
