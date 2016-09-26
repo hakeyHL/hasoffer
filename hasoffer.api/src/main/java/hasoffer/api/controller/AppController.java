@@ -346,7 +346,7 @@ public class AppController {
      *
      * @return
      */
-    @RequestMapping(value = "/backDetail", method = RequestMethod.GET)
+  /*  @RequestMapping(value = "/backDetail", method = RequestMethod.GET)
     public ModelAndView backDetail() {
         ModelAndView mv = new ModelAndView();
         BackDetailVo data = new BackDetailVo();
@@ -356,6 +356,45 @@ public class AppController {
             //查询到用户后还要查询名字与当前用户为同名且平台一致(facebook)的用户列表查询其订单
             List<UrmUser> users = appService.getUsersByUserName(user.getUserName());
             calculateHasofferCoin(users, data);
+        }
+        mv.addObject("data", data);
+        return mv;
+    }*/
+    @RequestMapping(value = "/backDetail", method = RequestMethod.GET)
+    public ModelAndView backDetail() {
+        ModelAndView mv = new ModelAndView();
+        BackDetailVo data = new BackDetailVo();
+        String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
+        List<OrderVo> transcations = new ArrayList<OrderVo>();
+        BigDecimal PendingCoins = BigDecimal.ZERO;
+        BigDecimal VericiedCoins = BigDecimal.ZERO;
+        UrmUser user = appService.getUserByUserToken(userToken);
+        if (user != null) {
+            List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
+            for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
+                if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
+                    OrderVo orderVo = new OrderVo();
+                    BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.015)).min(orderStatsAnalysisPO.getTentativeAmount());
+                    orderVo.setAccount(tempPrice.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+                    orderVo.setChannel(orderStatsAnalysisPO.getChannel());
+                    orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
+                    orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
+                    orderVo.setWebsite(orderStatsAnalysisPO.getWebSite());
+                    orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
+                    transcations.add(orderVo);
+                    if (!orderStatsAnalysisPO.getOrderStatus().equals("cancelled") && !orderStatsAnalysisPO.getOrderStatus().equals("disapproved")) {
+                        PendingCoins = PendingCoins.add(tempPrice);
+                    }
+                    if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
+                        VericiedCoins = VericiedCoins.add(tempPrice);
+                    }
+                }
+            }
+            //待定的
+            data.setPendingCoins(PendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+            //可以使用的
+            data.setVericiedCoins(VericiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+            data.setTranscations(transcations);
         }
         mv.addObject("data", data);
         return mv;
