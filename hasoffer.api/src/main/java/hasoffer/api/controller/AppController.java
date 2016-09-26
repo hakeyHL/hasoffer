@@ -350,68 +350,16 @@ public class AppController {
     public ModelAndView backDetail() {
         ModelAndView mv = new ModelAndView();
         BackDetailVo data = new BackDetailVo();
-        List<OrderVo> transcations = new ArrayList<OrderVo>();
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
         UrmUser user = appService.getUserByUserToken(userToken);
-        BigDecimal PendingCoins = BigDecimal.ZERO;
-        BigDecimal VericiedCoins = BigDecimal.ZERO;
         if (user != null) {
-            List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
-            for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
-                if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
-                    OrderVo orderVo = new OrderVo();
-                    BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.015)).min(orderStatsAnalysisPO.getTentativeAmount());
-                    orderVo.setAccount(tempPrice.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
-                    orderVo.setChannel(orderStatsAnalysisPO.getChannel());
-                    orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
-                    orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
-                    orderVo.setWebsite(orderStatsAnalysisPO.getWebSite());
-                    //返利比率=tentativeAmount*rate/SaleAmount
-                    orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
-                    transcations.add(orderVo);
-                    if (orderStatsAnalysisPO.getOrderStatus() != "cancelled" && orderStatsAnalysisPO.getOrderStatus() != "disapproved") {
-                        PendingCoins = PendingCoins.add(tempPrice);
-                    }
-                    if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
-                        VericiedCoins = VericiedCoins.add(tempPrice);
-                    }
-                }
-            }
+            //查询到用户后还要查询名字与当前用户为同名且平台一致(facebook)的用户列表查询其订单
+            List<UrmUser> users = appService.getUsersByUserName(user.getUserName());
+            calculateHasofferCoin(users, data);
         }
-        //待定的
-        data.setPendingCoins(PendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
-        //可以使用的
-        data.setVericiedCoins(VericiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
-        data.setTranscations(transcations);
         mv.addObject("data", data);
         return mv;
     }
-
-    /**
-     * 订单详情
-     *
-     * @param orderId
-     * @return
-     */
-    /*@RequestMapping(value = "/orderDetail", method = RequestMethod.GET)
-    public ModelAndView orderDetail(@RequestParam String orderId) {
-        String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
-        ModelAndView mv = new ModelAndView();
-        UrmUser user = appService.getUserByUserToken(userToken);
-        OrderStatsAnalysisPO orderStatsAnalysisPO = appService.getOrderDetail(orderId, user.getId().toString());
-        if (orderStatsAnalysisPO != null) {
-            OrderVo orderVo = new OrderVo();
-            orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
-            orderVo.setRate(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.015)).divide(orderStatsAnalysisPO.getSaleAmount(), 2, BigDecimal.ROUND_HALF_UP));
-            orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
-            orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
-            orderVo.setChannel(orderStatsAnalysisPO.getChannel());
-            orderVo.setTotal(orderStatsAnalysisPO.getSaleAmount());
-            orderVo.setAccount(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.015)));
-            mv.addObject("data", orderVo);
-        }
-        return mv;
-    }*/
 
     /**
      * banners列表
@@ -622,11 +570,15 @@ public class AppController {
             if (appDeal != null) {
                 System.out.println("has this deal ");
                 Map map = new HashMap();
+                map.put("discount", appDeal.getDiscount());
+                map.put("originPrice", appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
+                map.put("priceDescription", appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
                 map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
                 map.put("title", appDeal.getTitle());
                 //返回deal的处境时间距离现在时间的时间,多少天,小时,分钟..
                 map.put("createTime", getDifference2Date(new Date(), appDeal.getCreateTime()));
                 map.put("website", appDeal.getWebsite());
+                map.put("comments", Arrays.asList("Back with Bang", "Everything is good ..except display on 5 days is far better than this reset ", "Good one and hats off to the courier service who delivered the in the the hasoffer ."));
                 //降价生成deal无失效日期
                 if (!appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
                     map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
@@ -652,8 +604,9 @@ public class AppController {
                 if (StringUtils.isNotBlank(description)) {
                     //如果描述不为空,拼接描述然后换行,空行
                     sb = new StringBuilder();
-//                    sb.append(description).append("\n\n");
-                    sb.append("\n\n");
+                    description = "Rs.123 is the newest history lowest price(Previous lowest price is Rs.140).Click here to check price history.Good offer always expire in hours.Good time to get it,Hurry up!";
+                    sb.append(description).append("\n\n");
+//                    sb.append("\n\n");
                 } else {
                     //给个临时的
                     description = "Rs.123 is the newest history lowest price(Previous lowest price is Rs.140).Click here to check price history.Good offer always expire in hours.Good time to get it,Hurry up!";
@@ -684,6 +637,11 @@ public class AppController {
                             sb.append("offer 1 ").append(";");
                             sb.append("offer 2 ").append(";");
                             sb.append("\n\n");
+
+
+                            sb.append("Please note: offers and price may vary by location.");
+
+
                         }
                         //设置Key Features
                         String jsonParam = ptmCmpSkuDescription.getJsonParam();
@@ -698,6 +656,7 @@ public class AppController {
                         sb.append("offer 3 ").append(";");
                         sb.append("offer 4 ").append(";");
                         sb.append("\n\n");
+                        sb.append("Please note: offers and price may vary by location.");
                         //拼接参数
                         Map jsonMap = new HashMap();
                         jsonMap.put("color", "red");
@@ -1251,4 +1210,36 @@ public class AppController {
         }
     }
 
+    public void calculateHasofferCoin(List<UrmUser> users, BackDetailVo data) {
+        List<OrderVo> transcations = new ArrayList<OrderVo>();
+        BigDecimal PendingCoins = BigDecimal.ZERO;
+        BigDecimal VericiedCoins = BigDecimal.ZERO;
+        for (UrmUser user : users) {
+            List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
+            for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
+                if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
+                    OrderVo orderVo = new OrderVo();
+                    BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.015)).min(orderStatsAnalysisPO.getTentativeAmount());
+                    orderVo.setAccount(tempPrice.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+                    orderVo.setChannel(orderStatsAnalysisPO.getChannel());
+                    orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
+                    orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
+                    orderVo.setWebsite(orderStatsAnalysisPO.getWebSite());
+                    orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
+                    transcations.add(orderVo);
+                    if (!orderStatsAnalysisPO.getOrderStatus().equals("cancelled") && orderStatsAnalysisPO.getOrderStatus().equals("disapproved")) {
+                        PendingCoins = PendingCoins.add(tempPrice);
+                    }
+                    if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
+                        VericiedCoins = VericiedCoins.add(tempPrice);
+                    }
+                }
+            }
+        }
+        //待定的
+        data.setPendingCoins(PendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+        //可以使用的
+        data.setVericiedCoins(VericiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+        data.setTranscations(transcations);
+    }
 }
