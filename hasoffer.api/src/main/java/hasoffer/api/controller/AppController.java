@@ -350,68 +350,16 @@ public class AppController {
     public ModelAndView backDetail() {
         ModelAndView mv = new ModelAndView();
         BackDetailVo data = new BackDetailVo();
-        List<OrderVo> transcations = new ArrayList<OrderVo>();
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
         UrmUser user = appService.getUserByUserToken(userToken);
-        BigDecimal PendingCoins = BigDecimal.ZERO;
-        BigDecimal VericiedCoins = BigDecimal.ZERO;
         if (user != null) {
-            List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
-            for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
-                if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
-                    OrderVo orderVo = new OrderVo();
-                    BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.015)).min(orderStatsAnalysisPO.getTentativeAmount());
-                    orderVo.setAccount(tempPrice.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
-                    orderVo.setChannel(orderStatsAnalysisPO.getChannel());
-                    orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
-                    orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
-                    orderVo.setWebsite(orderStatsAnalysisPO.getWebSite());
-                    //返利比率=tentativeAmount*rate/SaleAmount
-                    orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
-                    transcations.add(orderVo);
-                    if (orderStatsAnalysisPO.getOrderStatus() != "cancelled" && orderStatsAnalysisPO.getOrderStatus() != "disapproved") {
-                        PendingCoins = PendingCoins.add(tempPrice);
-                    }
-                    if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
-                        VericiedCoins = VericiedCoins.add(tempPrice);
-                    }
-                }
-            }
+            //查询到用户后还要查询名字与当前用户为同名且平台一致(facebook)的用户列表查询其订单
+            List<UrmUser> users = appService.getUsersByUserName(user.getUserName());
+            calculateHasofferCoin(users, data);
         }
-        //待定的
-        data.setPendingCoins(PendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
-        //可以使用的
-        data.setVericiedCoins(VericiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
-        data.setTranscations(transcations);
         mv.addObject("data", data);
         return mv;
     }
-
-    /**
-     * 订单详情
-     *
-     * @param orderId
-     * @return
-     */
-    /*@RequestMapping(value = "/orderDetail", method = RequestMethod.GET)
-    public ModelAndView orderDetail(@RequestParam String orderId) {
-        String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
-        ModelAndView mv = new ModelAndView();
-        UrmUser user = appService.getUserByUserToken(userToken);
-        OrderStatsAnalysisPO orderStatsAnalysisPO = appService.getOrderDetail(orderId, user.getId().toString());
-        if (orderStatsAnalysisPO != null) {
-            OrderVo orderVo = new OrderVo();
-            orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
-            orderVo.setRate(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.015)).divide(orderStatsAnalysisPO.getSaleAmount(), 2, BigDecimal.ROUND_HALF_UP));
-            orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
-            orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
-            orderVo.setChannel(orderStatsAnalysisPO.getChannel());
-            orderVo.setTotal(orderStatsAnalysisPO.getSaleAmount());
-            orderVo.setAccount(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.015)));
-            mv.addObject("data", orderVo);
-        }
-        return mv;
-    }*/
 
     /**
      * banners列表
@@ -1262,4 +1210,36 @@ public class AppController {
         }
     }
 
+    public void calculateHasofferCoin(List<UrmUser> users, BackDetailVo data) {
+        List<OrderVo> transcations = new ArrayList<OrderVo>();
+        BigDecimal PendingCoins = BigDecimal.ZERO;
+        BigDecimal VericiedCoins = BigDecimal.ZERO;
+        for (UrmUser user : users) {
+            List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
+            for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
+                if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
+                    OrderVo orderVo = new OrderVo();
+                    BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.015)).min(orderStatsAnalysisPO.getTentativeAmount());
+                    orderVo.setAccount(tempPrice.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+                    orderVo.setChannel(orderStatsAnalysisPO.getChannel());
+                    orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
+                    orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
+                    orderVo.setWebsite(orderStatsAnalysisPO.getWebSite());
+                    orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
+                    transcations.add(orderVo);
+                    if (!orderStatsAnalysisPO.getOrderStatus().equals("cancelled") && orderStatsAnalysisPO.getOrderStatus().equals("disapproved")) {
+                        PendingCoins = PendingCoins.add(tempPrice);
+                    }
+                    if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
+                        VericiedCoins = VericiedCoins.add(tempPrice);
+                    }
+                }
+            }
+        }
+        //待定的
+        data.setPendingCoins(PendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+        //可以使用的
+        data.setVericiedCoins(VericiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+        data.setTranscations(transcations);
+    }
 }
