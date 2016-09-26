@@ -162,6 +162,11 @@
         <appender-ref ref="fetchLoggerFileOut"/>
     </logger>
 
+    <logger name="spider.success" level="DEBUG">
+        <appender-ref ref="FetchTaskResultLoggerFileOut"/>
+    </logger>
+
+
     <root>
         <level value="DEBUG"/>
         <appender-ref ref="stdout"/>
