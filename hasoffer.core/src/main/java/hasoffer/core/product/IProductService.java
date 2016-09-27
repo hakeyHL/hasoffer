@@ -68,6 +68,8 @@ public interface IProductService {
 
     void updateProductStd(Long proId, boolean std);
 
+    void updateProductBrand(long proId, String productBrand);
+
     void updateProductBrandModel(long proId, String productBrand, String modelName);
 
     void updateProduct(PtmProductUpdater ptmProductUpdater);
