@@ -48,13 +48,14 @@
                     <td>ID</td>
                     <td>图片</td>
                     <td>标题</td>
+                    <td>品牌</td>
                     <td>Tag</td>
                     <%----%>
                     <%--<td>价格(Rs.)</td>--%>
                     <%--<td>评论数</td>--%>
 
                     <td>来源</td>
-                    <td>创建时间</td>
+                    <%--<td>创建时间</td>--%>
                     <%--<td>颜色</td>--%>
                     <%--<td>大小</td>--%>
                     <%--<td></td>--%>
@@ -77,8 +78,12 @@
                                 </c:forEach>
                             </p>
                         </td>
+                        <td>${thd.brand}
+                            <a name="modifyBtn${thd.id}" href="javascript:void(0);" style="display: none"
+                               onclick="pCtrl.modifyBrand('${thd.id}', '${thd.brand}')">编辑</a>
+                        </td>
                         <td>${thd.tag}
-                            <a id="modifyBtn${thd.id}" href="javascript:void(0);" style="display: none"
+                            <a name="modifyBtn${thd.id}" href="javascript:void(0);" style="display: none"
                                onclick="pCtrl.modifyTag('${thd.id}', '${thd.tag}')">编辑</a>
                         </td>
                             <%--<td>${product.price}</td>
@@ -115,10 +120,22 @@
             }
         },
         onPro: function (id) {
-            $("#modifyBtn" + id).css("display", "block");
+//            $("#modifyBtn" + id).css("display", "block");
+            $("a[name='modifyBtn" + id + "']").css("display", "block");
         },
         outPro: function (id) {
-            $("#modifyBtn" + id).css("display", "none");
+//            $("#modifyBtn" + id).css("display", "none");
+            $("a[name='modifyBtn" + id + "']").css("display", "none");
+        },
+        modifyBrand: function (id, brand) {
+            console.log(id + "\t" + brand);
+            var newBrand = prompt('编辑品牌', brand);
+            if (newBrand != null && newBrand != brand) {
+                // 更新tag
+                http.doPost('/p/updateBrand', {id: id, brand: newBrand}, function (data) {
+                    console.log(data);
+                });
+            }
         }
     };
 </script>
