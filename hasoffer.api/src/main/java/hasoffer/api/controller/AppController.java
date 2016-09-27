@@ -706,7 +706,7 @@ public class AppController {
                     Map priceCurveDesc = new HashMap();
                     //配置点击弹出价格曲线的文字以及文字的颜色
                     priceCurveDesc.put("clickableContent", "Click here to check price history.");
-                    priceCurveDesc.put("fontColor", "#0000FF");
+                    priceCurveDesc.put("fontColor", "#108ee9");
                     map.put("clickConfig", priceCurveDesc);
                 }
                 map.put("extra", 0);
