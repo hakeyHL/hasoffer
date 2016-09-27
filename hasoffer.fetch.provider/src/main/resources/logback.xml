@@ -236,10 +236,6 @@
         <appender-ref ref="FetchRequestLoggerFileOut"/>
     </logger>
 
-    <logger name="hasoffer.spider.detail.pp.IndiaFlipKartPageProcessor" level="DEBUG">
-        <appender-ref ref="FetchRequestLoggerFileOut"/>
-    </logger>
-
     <logger name="hasoffer.hasoffer.spider.webmagic.pipeline.RedisPagePipeline" level="DEBUG">
         <appender-ref ref="FetchTaskResultLoggerFileOut"/>
     </logger>
