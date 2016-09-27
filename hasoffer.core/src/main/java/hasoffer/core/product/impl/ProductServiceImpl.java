@@ -647,6 +647,7 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    @Deprecated
     @Transactional
     public void updateProductBrandModel(long proId, String productBrand, String modelName) {
         PtmProductUpdater productUpdater = new PtmProductUpdater(proId);
@@ -655,6 +656,16 @@ public class ProductServiceImpl implements IProductService {
         productUpdater.getPo().setBrand(productBrand);
 
         dbm.update(productUpdater);
+    }
+
+    @Override
+    @Transactional
+    public void updateProductBrand(long proId, String productBrand) {
+        PtmProductUpdater productUpdater = new PtmProductUpdater(proId);
+        productUpdater.getPo().setBrand(productBrand);
+        dbm.update(productUpdater);
+
+        importProduct2Solr2(proId);
     }
 
     @Override
