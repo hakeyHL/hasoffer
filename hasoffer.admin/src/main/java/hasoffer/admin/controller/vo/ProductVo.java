@@ -18,6 +18,7 @@ public class ProductVo {
 	private List<CategoryVo> categories;
 
 	private String title;// 标题
+	private String brand; // 品牌
 	private String tag;
 	private float price;
 
@@ -180,5 +181,13 @@ public class ProductVo {
 
 	public void setSourceId(String sourceId) {
 		this.sourceId = sourceId;
+	}
+
+	public String getBrand() {
+		return brand;
+	}
+
+	public void setBrand(String brand) {
+		this.brand = brand;
 	}
 }

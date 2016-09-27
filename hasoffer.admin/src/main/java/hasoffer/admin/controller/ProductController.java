@@ -345,6 +345,8 @@ public class ProductController {
         vo.setTag(p.getTag());
         vo.setPrice(p.getMinPrice());
 
+        vo.setBrand(p.getBrand());
+
         vo.setMasterImageUrl(productService.getProductMasterImageUrl(p.getId()));
 
         return vo;
@@ -358,6 +360,20 @@ public class ProductController {
         String tag = request.getParameter("tag");
 
         productService.updateProductTag(proId, tag);
+
+        mav.addObject("result", "ok");
+
+        return mav;
+    }
+
+    @RequestMapping(value = "/updateBrand", method = RequestMethod.POST)
+    public ModelAndView updateBrand(HttpServletRequest request) {
+        ModelAndView mav = new ModelAndView("product/list");
+
+        String proId = request.getParameter("id");
+        String brand = request.getParameter("brand");
+
+        productService.updateProductBrand(Long.valueOf(proId), brand);
 
         mav.addObject("result", "ok");
 
