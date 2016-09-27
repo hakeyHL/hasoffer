@@ -5,7 +5,7 @@ import hasoffer.base.thread.HasofferThreadFactory;
 import hasoffer.spider.detail.pp.*;
 import hasoffer.spider.detail.ppl.SkuPagePipeline;
 import hasoffer.spider.enums.PageType;
-import hasoffer.spider.list.pp.IndiaAmazonListProcessor;
+import hasoffer.spider.list.pp.*;
 import hasoffer.spider.list.ppl.ProductListPipeline;
 import hasoffer.spider.model.SpiderConfig;
 import hasoffer.spider.service.ISpiderConfigService;
@@ -117,11 +117,49 @@ public class SpiderConfigInitContext {
 
         HasofferThreadFactory factory = new HasofferThreadFactory("SpiderProductWorker");
         ExecutorService es = Executors.newCachedThreadPool(factory);
-        SpiderConfig spiderConfig = spiderConfigService.findByWebsite(Website.AMAZON, PageType.LIST);
 
+        // 1. 初始化Amazon
+        SpiderConfig spiderConfig = spiderConfigService.findByWebsite(Website.AMAZON, PageType.LIST);
         if (isInitWebsite(spiderConfig)) {
             es.execute(new SpiderProductWorker(spiderConfig, new IndiaAmazonListProcessor(), new ProductListPipeline()));
         }
+
+        // 2. 初始化Flipkart
+        spiderConfig = spiderConfigService.findByWebsite(Website.FLIPKART, PageType.LIST);
+        if (isInitWebsite(spiderConfig)) {
+            es.execute(new SpiderProductWorker(spiderConfig, new IndiaFlipkartListProcessor(), new ProductListPipeline()));
+        }
+
+        // 3. 初始化SnapDeal
+        spiderConfig = spiderConfigService.findByWebsite(Website.SNAPDEAL, PageType.LIST);
+        if (isInitWebsite(spiderConfig)) {
+            es.execute(new SpiderProductWorker(spiderConfig, new IndiaSnapdealListProcessor(), new ProductListPipeline()));
+        }
+
+        //// 4. 初始化HomeShop18
+        //spiderConfig = spiderConfigService.findByWebsite(Website.HOMESHOP18, PageType.LIST);
+        //if (isInitWebsite(spiderConfig)) {
+        //    es.execute(new SpiderProductWorker(spiderConfig, new IndiaHomeShop18ListProcessor(), new ProductListPipeline()));
+        //}
+
+        //// 5. 初始化JABONG
+        //spiderConfig = spiderConfigService.findByWebsite(Website.JABONG, PageType.LIST);
+        //if (isInitWebsite(spiderConfig)) {
+        //    es.execute(new SpiderProductWorker(spiderConfig, new IndiaJabongListProcessor(), new ProductListPipeline()));
+        //}
+
+        //// 5. 初始化LimeRoad
+        //spiderConfig = spiderConfigService.findByWebsite(Website.LIMEROAD, PageType.LIST);
+        //if (isInitWebsite(spiderConfig)) {
+        //    es.execute(new SpiderProductWorker(spiderConfig, new IndiaLimeRoadListProcessor(), new ProductListPipeline()));
+        //}
+
+        //// 6. 初始化Voonik
+        //spiderConfig = spiderConfigService.findByWebsite(Website.VOONIK, PageType.LIST);
+        //if (isInitWebsite(spiderConfig)) {
+        //    es.execute(new SpiderProductWorker(spiderConfig, new IndiaVoonikListProcessor(), new ProductListPipeline()));
+        //}
+
 
     }
 
