@@ -65,6 +65,10 @@ public class AppServiceImpl implements IAppService {
             "SELECT t FROM UrmUser t " +
                     " where t.thirdId=?0";
 
+    private static final String Q_APP_USER_GET_BY_NAME =
+            "SELECT t FROM UrmUser t " +
+                    " where t.userName=?0";
+
     private static final String Q_APP_URMDEVICE_GETIDSBYDEVICEID =
             "SELECT t.id FROM UrmDevice t " +
                     " where t.deviceId=?0";
@@ -268,6 +272,11 @@ public class AppServiceImpl implements IAppService {
         appDeal.setDealClickCount(appDeal.getDealClickCount() + 1);
         List deals = Arrays.asList(appDeal);
         dbm.update(deals);
+    }
+
+    @Override
+    public List<UrmUser> getUsersByUserName(String userName) {
+        return dbm.query(Q_APP_USER_GET_BY_NAME, Arrays.asList(userName));
     }
 
     public PtmCategory getCategoryInfo(Long cateId) {

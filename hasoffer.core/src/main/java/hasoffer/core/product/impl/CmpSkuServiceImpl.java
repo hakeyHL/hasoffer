@@ -28,6 +28,8 @@ import hasoffer.fetch.model.ProductStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import hasoffer.fetch.sites.snapdeal.SnapdealHelper;
 import hasoffer.spider.model.FetchedProduct;
+import hasoffer.spider.model.FetchedProductReview;
+import org.apache.commons.collections.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -415,12 +417,160 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         return ptmCmpSku;
     }
 
+//    @Override
+//    public void createDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct) {
+//
+//        String jsonParam = fetchedProduct.getJsonParam();
+//        String description = fetchedProduct.getDescription();
+//        String offers = fetchedProduct.getOffers();
+//        List<FetchedProductReview> fetchedProductReviewList = fetchedProduct.getFetchedProductReviewList();
+//
+//        if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description) && StringUtils.isEmpty(offers) && (fetchedProductReviewList == null || fetchedProductReviewList.size() == 0)) {
+//            return;
+//        }
+//
+//        //在fetch包暂时无法跟新升级的时候，先在这里回避掉这种错误
+//        if (StringUtils.isEqual("[]", description)) {
+//            description = "";
+//        }
+//
+//        //save ptmcmpskuDescription
+//        PtmCmpSkuDescription ptmCmpSkuDescription = mdm.queryOne(PtmCmpSkuDescription.class, ptmCmpSku.getId());
+//        if (ptmCmpSkuDescription == null) {//不存在该条记录
+//
+//            ptmCmpSkuDescription = new PtmCmpSkuDescription();
+//
+//            ptmCmpSkuDescription.setId(ptmCmpSku.getId());
+//            ptmCmpSkuDescription.setJsonParam(jsonParam);
+//            ptmCmpSkuDescription.setJsonDescription(description);
+//            ptmCmpSkuDescription.setOffers(offers);
+//            ptmCmpSkuDescription.setFetchedProductReviewList(fetchedProductReviewList);
+//
+//            mdm.save(ptmCmpSkuDescription);
+//        } else {//存在该条记录
+//
+//            boolean flagDescription = false;
+//            boolean flagJsonParam = false;
+//            boolean flagOffers = false;
+//            boolean flagReviewList = false;
+//
+//            String oldJsonDescription = ptmCmpSkuDescription.getJsonDescription();
+//            String oldJsonParam = ptmCmpSkuDescription.getJsonParam();
+//            String oldOffers = ptmCmpSkuDescription.getOffers();
+//            List<FetchedProductReview> oldFetchedProductReviewList = ptmCmpSkuDescription.getFetchedProductReviewList();
+//
+//            //新的参数不为空，且新的参数和原有的不相同，更新
+//            if (!StringUtils.isEmpty(jsonParam) && !StringUtils.isEqual(jsonParam, oldJsonParam)) {
+//                ptmCmpSkuDescription.setJsonParam(jsonParam);
+//                flagDescription = true;
+//            }
+//
+//            //新的描述不为空，且和旧的参数不相同
+//            if (!StringUtils.isEmpty(description) && !StringUtils.isEqual(description, oldJsonDescription)) {
+//                ptmCmpSkuDescription.setJsonDescription(description);
+//                flagJsonParam = true;
+//            }
+//
+//            //新的offers不为空，且和就得offers不相同
+//            //注意offer内容只要不相同就要更新，有的offer不在可用，需要更新成空
+//            if (!StringUtils.isEqual(offers, oldOffers)) {
+//                ptmCmpSkuDescription.setOffers(offers);
+//                flagOffers = true;
+//            }
+//
+//            //新的评论和旧的评论不一样就更新
+//            if (!ListUtils.isEqualList(oldFetchedProductReviewList, fetchedProductReviewList)) {
+//                ptmCmpSkuDescription.setFetchedProductReviewList(fetchedProductReviewList);
+//                flagReviewList = true;
+//            }
+//
+//            if (flagDescription || flagJsonParam || flagOffers || flagReviewList) {
+//                mdm.save(ptmCmpSkuDescription);
+//            }
+//        }
+//
+//        //save productDescription
+//        PtmProduct ptmProduct = dbm.get(PtmProduct.class, ptmCmpSku.getProductId());
+//        String productTitle = ptmProduct.getTitle();
+//        System.out.println(fetchedProduct.toString());
+//        System.out.println("createDescription:" + jsonParam);
+//        try {
+//            HashMap<String, String> hashMap = JSONUtil.toObject(jsonParam, HashMap.class);
+//
+//            String color = hashMap.get("Color");
+//            String memory = hashMap.get("Memory");
+//            String model = hashMap.get("Model");
+//
+//            if (!productTitle.contains(color)) {
+//                hashMap.remove("Color");
+//            }
+//            if (!productTitle.contains(memory)) {
+//                hashMap.remove("Memory");
+//            }
+//            if (!productTitle.contains(model)) {
+//                hashMap.remove("Model");
+//            }
+//
+//            jsonParam = JSON.toJSONString(hashMap);
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        PtmProductDescription ptmProductDescription = mdm.queryOne(PtmProductDescription.class, ptmCmpSku.getProductId());
+//
+//        if (ptmProductDescription == null) {//如果不存在该记录
+//
+//            ptmProductDescription = new PtmProductDescription();
+//
+//            ptmProductDescription.setId(ptmCmpSku.getProductId());
+//            //最开始需求没说明白描述和参数问题，字段写错了，修改通知前台
+//            ptmProductDescription.setJsonDescription(jsonParam);
+//            ptmProductDescription.setJsonParam(description);
+//
+//            if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
+//                return;
+//            }
+//
+//            mdm.save(ptmProductDescription);
+//        } else {//如果存在
+//
+//            boolean flagDescription = false;
+//            boolean flagJsonParam = false;
+//
+//            //最一开始设计的错误，修改需要通知api
+//            String oldJsonDescription = ptmProductDescription.getJsonParam();//product 描述
+//            String oldJsonParam = ptmCmpSkuDescription.getJsonDescription();//product 参数
+//
+//            //新的参数不为空，且新的参数和原有的不相同，更新
+//            if (!StringUtils.isEmpty(jsonParam) && !StringUtils.isEqual(jsonParam, oldJsonParam)) {
+//                ptmProductDescription.setJsonDescription(jsonParam);
+//                flagDescription = true;
+//            }
+//
+//            //新的描述不为空，且和旧的参数不相同
+//            if (!StringUtils.isEmpty(description) && StringUtils.isEqual(description, oldJsonDescription)) {
+//                ptmCmpSkuDescription.setJsonParam(description);
+//                flagJsonParam = true;
+//            }
+//
+//            if (flagDescription || flagJsonParam) {
+//                mdm.save(ptmProductDescription);
+//            }
+//        }
+//    }
+
     @Override
-    public void createDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct) {
+    public void createSkuDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct) {
 
         String jsonParam = fetchedProduct.getJsonParam();
         String description = fetchedProduct.getDescription();
         String offers = fetchedProduct.getOffers();
+        List<FetchedProductReview> fetchedProductReviewList = fetchedProduct.getFetchedProductReviewList();
+
+        if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description) && StringUtils.isEmpty(offers) && (fetchedProductReviewList == null || fetchedProductReviewList.size() == 0)) {
+            return;
+        }
 
         //在fetch包暂时无法跟新升级的时候，先在这里回避掉这种错误
         if (StringUtils.isEqual("[]", description)) {
@@ -437,20 +587,20 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             ptmCmpSkuDescription.setJsonParam(jsonParam);
             ptmCmpSkuDescription.setJsonDescription(description);
             ptmCmpSkuDescription.setOffers(offers);
+            ptmCmpSkuDescription.setFetchedProductReviewList(fetchedProductReviewList);
 
-            if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
-                return;
-            }
             mdm.save(ptmCmpSkuDescription);
         } else {//存在该条记录
 
             boolean flagDescription = false;
             boolean flagJsonParam = false;
             boolean flagOffers = false;
+            boolean flagReviewList = false;
 
             String oldJsonDescription = ptmCmpSkuDescription.getJsonDescription();
             String oldJsonParam = ptmCmpSkuDescription.getJsonParam();
             String oldOffers = ptmCmpSkuDescription.getOffers();
+            List<FetchedProductReview> oldFetchedProductReviewList = ptmCmpSkuDescription.getFetchedProductReviewList();
 
             //新的参数不为空，且新的参数和原有的不相同，更新
             if (!StringUtils.isEmpty(jsonParam) && !StringUtils.isEqual(jsonParam, oldJsonParam)) {
@@ -471,10 +621,33 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
                 flagOffers = true;
             }
 
+            //新的评论和旧的评论不一样就更新
+            if (!ListUtils.isEqualList(oldFetchedProductReviewList, fetchedProductReviewList)) {
+                ptmCmpSkuDescription.setFetchedProductReviewList(fetchedProductReviewList);
+                flagReviewList = true;
+            }
 
-            if (flagDescription || flagJsonParam || flagOffers) {
+            if (flagDescription || flagJsonParam || flagOffers || flagReviewList) {
                 mdm.save(ptmCmpSkuDescription);
             }
+        }
+    }
+
+    @Override
+    public void createProductDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct) {
+
+        String jsonParam = fetchedProduct.getJsonParam();
+        String description = fetchedProduct.getDescription();
+        String offers = fetchedProduct.getOffers();
+        List<FetchedProductReview> fetchedProductReviewList = fetchedProduct.getFetchedProductReviewList();
+
+        if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description) && StringUtils.isEmpty(offers) && (fetchedProductReviewList == null || fetchedProductReviewList.size() == 0)) {
+            return;
+        }
+
+        //在fetch包暂时无法跟新升级的时候，先在这里回避掉这种错误
+        if (StringUtils.isEqual("[]", description)) {
+            description = "";
         }
 
         //save productDescription
@@ -528,7 +701,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
             //最一开始设计的错误，修改需要通知api
             String oldJsonDescription = ptmProductDescription.getJsonParam();//product 描述
-            String oldJsonParam = ptmCmpSkuDescription.getJsonDescription();//product 参数
+            String oldJsonParam = ptmProductDescription.getJsonDescription();//product 参数
 
             //新的参数不为空，且新的参数和原有的不相同，更新
             if (!StringUtils.isEmpty(jsonParam) && !StringUtils.isEqual(jsonParam, oldJsonParam)) {
@@ -538,7 +711,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
             //新的描述不为空，且和旧的参数不相同
             if (!StringUtils.isEmpty(description) && StringUtils.isEqual(description, oldJsonDescription)) {
-                ptmCmpSkuDescription.setJsonParam(description);
+                ptmProductDescription.setJsonParam(description);
                 flagJsonParam = true;
             }
 

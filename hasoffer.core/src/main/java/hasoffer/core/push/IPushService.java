@@ -31,6 +31,6 @@ public interface IPushService {
 
     AppPush createAppPush(AppPush appPush);
 
-    PageableResult getPagedAppPush(PushSourceType pushSourceType, Date date, int curPage, int pageSize);
+    PageableResult getPagedAppPush(PushSourceType pushSourceType, Date startDate, Date endDate, int curPage, int pageSize);
 
 }

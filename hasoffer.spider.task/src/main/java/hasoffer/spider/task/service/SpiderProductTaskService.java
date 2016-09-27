@@ -41,10 +41,11 @@ public class SpiderProductTaskService {
     public void initTask() {
         String SQL_SEARCHLOG = "select t from SrmSearchLog t where t.updateTime >?0  order by t.updateTime ASC ";
         try {
-            Date searchTime = new Date(TimeUtils.now() - TimeUtils.MILLISECONDS_OF_1_HOUR);
+            Date searchTime = new Date(TimeUtils.now() - TimeUtils.MILLISECONDS_OF_1_MINUTE);
             PageableResult<SrmSearchLog> pagedSearchLog = dbm.queryPage(SQL_SEARCHLOG, 1, 1000, Arrays.asList(searchTime));
             List<SrmSearchLog> searchLogs = pagedSearchLog.getData();
             if (ArrayUtils.hasObjs(searchLogs)) {
+                logger.info("SpiderProductTaskService.initTask() be call. Time:{}, Size:{}", searchTime, searchLogs.size());
                 for (SrmSearchLog searchLog : searchLogs) {
                     if (searchLog.getPrecise() == SearchPrecise.MANUALSET) {
                         continue;
@@ -56,9 +57,9 @@ public class SpiderProductTaskService {
 
                     SrmAutoSearchResult historyData = findSearchResult(searchLog);
                     sendProductTask(Website.AMAZON, historyData);
-                    sendProductTask(Website.FLIPKART, historyData);
-                    sendProductTask(Website.SNAPDEAL, historyData);
-                    sendProductTask(Website.SHOPCLUES, historyData);
+                    //sendProductTask(Website.FLIPKART, historyData);
+                    //sendProductTask(Website.SNAPDEAL, historyData);
+                    //sendProductTask(Website.SHOPCLUES, historyData);
                 }
             }
 
