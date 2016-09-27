@@ -118,7 +118,7 @@ public class PriceOffNoticeListWorker implements Runnable {
                     }
 
                     queue.add(sku);
-                    fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_1);
+                    fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_2);
 
 
                     logger.info("send url request succes for " + sku.getWebsite() + " sku id is [" + sku.getId() + "]");
