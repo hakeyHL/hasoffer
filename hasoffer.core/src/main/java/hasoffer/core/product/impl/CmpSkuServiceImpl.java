@@ -587,7 +587,9 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             ptmCmpSkuDescription.setJsonParam(jsonParam);
             ptmCmpSkuDescription.setJsonDescription(description);
             ptmCmpSkuDescription.setOffers(offers);
-            ptmCmpSkuDescription.setFetchedProductReviewList(fetchedProductReviewList);
+            if (fetchedProductReviewList != null) {
+                ptmCmpSkuDescription.setFetchedProductReviewList(fetchedProductReviewList);
+            }
 
             mdm.save(ptmCmpSkuDescription);
         } else {//存在该条记录
