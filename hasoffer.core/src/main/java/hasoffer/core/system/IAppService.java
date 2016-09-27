@@ -61,4 +61,6 @@ public interface IAppService {
     int isHasChildNode(Long id);
 
     void countDealClickCount(AppDeal appDeal);
+
+    List<UrmUser> getUsersByUserName(String userName);
 }
