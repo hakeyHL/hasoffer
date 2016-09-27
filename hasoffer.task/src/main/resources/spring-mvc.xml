@@ -9,11 +9,10 @@
 		http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/mvc
 		http://www.springframework.org/schema/mvc/spring-mvc.xsd">
-
+    <mvc:annotation-driven/>
     <mvc:resources location="/static/" mapping="/static/**"/>
 
-    <context:component-scan
-            base-package="hasoffer.task.controller"/>
+    <context:component-scan base-package="hasoffer.task.controller"/>
 
     <bean id="jsonViewResolver" class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
         <property name="mediaTypes">

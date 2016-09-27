@@ -17,16 +17,13 @@
 		http://www.springframework.org/schema/task/spring-task.xsd">
 
 
-    <mvc:annotation-driven/>
+
     <aop:aspectj-autoproxy/>
 
     <import resource="classpath*:spring-beans.xml"/>
     <import resource="classpath*:spring/*.xml"/>
     <!--<context:component-scan base-package="hasoffer.timer.controller"/>-->
-    <context:component-scan base-package="hasoffer.task.*" use-default-filters="false">
-        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
-    </context:component-scan>
-
+    <!--<context:component-scan base-package="hasoffer.task.worker"/>-->
     <task:annotation-driven scheduler="qbScheduler" mode="proxy"/>
     <task:scheduler id="qbScheduler" pool-size="10"/>
 
