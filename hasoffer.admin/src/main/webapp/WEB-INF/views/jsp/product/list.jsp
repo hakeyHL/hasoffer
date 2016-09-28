@@ -36,6 +36,20 @@
             </div>
 
             <div class="col-lg-2">
+                <select id="sort" name="sort" class="form-control">
+                    <option value="RELEVANCE"
+                            <c:if test="${page.pageParams.sort=='RELEVANCE'}">selected</c:if> >默认排序
+                    </option>
+                    <option value="PRICEL2H" <c:if test="${page.pageParams.sort=='PRICEL2H'}">selected</c:if>>价格从低到高
+                    </option>
+                    <option value="PRICEH2L" <c:if test="${page.pageParams.sort=='PRICEH2L'}">selected</c:if>>价格从高到低
+                    </option>
+                    <option value="POPULARITY" <c:if test="${page.pageParams.sort=='POPULARITY'}">selected</c:if>>热度
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-lg-2">
                 <button type="submit" class="btn btn-primary">查询</button>
             </div>
         </form>
@@ -48,6 +62,7 @@
                     <td>ID</td>
                     <td>图片</td>
                     <td>标题</td>
+                    <td>最低价</td>
                     <td>品牌</td>
                     <td>Tag</td>
                     <%----%>
@@ -78,6 +93,7 @@
                                 </c:forEach>
                             </p>
                         </td>
+                        <td>${thd.minPrice}</td>
                         <td>${thd.brand}
                             <a name="modifyBtn${thd.id}" href="javascript:void(0);" style="display: none"
                                onclick="pCtrl.modifyBrand('${thd.id}', '${thd.brand}')">编辑</a>
