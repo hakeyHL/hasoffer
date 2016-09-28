@@ -109,13 +109,16 @@ public class RequestInterceptor implements HandlerInterceptor {
         UrmUser urmUser = null;
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
         System.out.println("userToken is : " + userToken);
-        String key = "user_" + userToken;
-        urmUser = userICacheService.get(UrmUser.class, key, 0);
-        if (urmUser == null) {
-            System.out.println("user not exist in cache ,query it from database ");
-            urmUser = appService.getUserByUserToken(userToken);
-            userICacheService.add(key, urmUser, TimeUtils.SECONDS_OF_1_DAY);
+        if (StringUtils.isNotBlank(userToken)) {
+            String key = "user_" + userToken;
+            urmUser = userICacheService.get(UrmUser.class, key, 0);
+            if (urmUser == null) {
+                System.out.println("user not exist in cache ,query it from database ");
+                urmUser = appService.getUserByUserToken(userToken);
+                userICacheService.add(key, urmUser, TimeUtils.SECONDS_OF_1_DAY);
+            }
         }
+
         if (modelAndView == null) {
             modelAndView = new ModelAndView();
         }
