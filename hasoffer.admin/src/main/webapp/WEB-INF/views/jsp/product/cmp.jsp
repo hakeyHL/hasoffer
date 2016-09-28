@@ -136,8 +136,9 @@
                             </thead>
                             <tbody>
                             <c:forEach items="${cmpSkus}" var="cmpSku">
-                                <tr>
-                                    <td><input type="checkbox" name="subBox" value="${cmpSku.id}"/></td>
+                                <tr onclick="clickOnTr(${cmpSku.id})">
+                                    <td><input id="subBox${cmpSku.id}" type="checkbox" name="subBox"
+                                               value="${cmpSku.id}"/></td>
                                     <td>${cmpSku.id}</td>
                                     <td>${cmpSku.website}</td>
                                     <td>
@@ -382,6 +383,11 @@
     $subBox.click(function () {
         $("#checkAll").prop("checked", $subBox.length == $("input[name='subBox']:checked").length ? true : false);
     });
+
+    function clickOnTr(skuId) {
+        var checked = $("#subBox" + skuId).prop("checked");
+        $("#subBox" + skuId).prop("checked", !checked);
+    }
 
     function batchUrlSubmit() {
         var url = $.trim($("#batchUrl").val());//获取会话中的隐藏属性URL
