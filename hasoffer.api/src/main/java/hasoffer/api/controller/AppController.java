@@ -645,12 +645,13 @@ public class AppController {
                     sb = new StringBuilder();
                     sb.append(description).append("\n\n");
 //                    sb.append("\n\n");
-                } else {
+                }
+                /*else {
                     //给个临时的
                     description = "Rs.123 is the newest history lowest price(Previous lowest price is Rs.140).Click here to check price history.Good offer always expire in hours.Good time to get it,Hurry up!";
                     sb = new StringBuilder();
                     sb.append(description).append("\n\n");
-                }
+                }*/
                 if (appDeal.getPtmcmpskuid() > 0) {
                     //如果存在skuId,将skuId返回
                     map.put("skuId", appDeal.getPtmcmpskuid());
