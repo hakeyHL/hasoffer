@@ -15,7 +15,6 @@ import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchUrlResult;
 import hasoffer.spider.model.FetchedProduct;
-import hasoffer.task.controller.DubboUpdateController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,11 +46,18 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
     @Override
     public void run() {
 
+        long startTime = TimeUtils.now();
+
         while (true) {
 
             PtmCmpSku sku = queue.poll();
 
             try {
+
+                if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_1_HOUR * 3) {
+                    System.out.println("price off process thred has live above 3 hours ,thread going to die");
+                    break;
+                }
 
                 if (sku == null) {
                     try {
@@ -59,12 +65,6 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
                         logger.info("task update get null sleep 3 seconds");
                     } catch (InterruptedException e) {
                         return;
-                    }
-                    if (DubboUpdateController.Price_OFF_LIST_THREAD_NUM == 0 && queue.size() == 0) {
-                        System.out.println("price off process queue has no object ,thread going to die");
-                        break;
-                    } else {
-                        continue;
                     }
                 }
 
@@ -82,7 +82,6 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
                 e.printStackTrace();
             }
 
-            System.out.println("Price_OFF_LIST_THREAD_NUM == " + DubboUpdateController.Price_OFF_LIST_THREAD_NUM);
             System.out.println("queue size is " + queue.size());
             System.out.println("sku ex: " + sku.getId());
         }

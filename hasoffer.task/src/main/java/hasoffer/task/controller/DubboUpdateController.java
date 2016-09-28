@@ -119,7 +119,7 @@ public class DubboUpdateController {
 
         ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
 
-        es.execute(new SrmProductSearchCountListWorker(dbm, queue, fetchDubboService));
+        es.execute(new SrmProductSearchCountListWorker(dbm, queue, fetchDubboService, redisListService));
 
         //保证list任务优先执行
         try {

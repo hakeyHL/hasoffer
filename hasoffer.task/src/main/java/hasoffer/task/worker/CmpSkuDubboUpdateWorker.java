@@ -54,10 +54,9 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
 
         while (true) {
 
-            long nowTime = TimeUtils.now();
-
-            //如果当前线程已经运行超过18小时，自杀吧孩子
-            if (nowTime - startTime > TimeUtils.MILLISECONDS_OF_1_HOUR * 18) {
+            //如果当前线程已经运行超过5小时，自杀吧孩子
+            if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_1_HOUR * 5) {
+                System.out.println("dubbo update thred has live above 3 hours ,thread going to die");
                 break;
             }
 

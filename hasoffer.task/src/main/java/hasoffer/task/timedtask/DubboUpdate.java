@@ -6,6 +6,8 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.task.worker.CmpSkuDubboUpdateWorker;
+import hasoffer.task.worker.PriceOffNoticeListWorker;
+import hasoffer.task.worker.PriceOffNoticeProcessorWorker;
 import hasoffer.task.worker.SrmProductSearchCountListWorker;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -38,14 +40,14 @@ public class DubboUpdate {
      *
      * @return
      */
-    @Scheduled(cron = "00 05 18 * * ?")
+    @Scheduled(cron = "00 30 14 * * ?")
     public void updatestart() {
 
         ExecutorService es = Executors.newCachedThreadPool();
 
         ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
 
-        es.execute(new SrmProductSearchCountListWorker(dbm, queue, fetchDubboService));
+        es.execute(new SrmProductSearchCountListWorker(dbm, queue, fetchDubboService, redisListService));
 
         //保证list任务优先执行
         try {
@@ -56,6 +58,33 @@ public class DubboUpdate {
 
         for (int i = 0; i < 60; i++) {
             es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService));
+        }
+
+    }
+
+    /**
+     * price off notice
+     *
+     * @return
+     */
+    @Scheduled(cron = "00 30 11 * * ?")
+    public void priceOffNotieUpdatestart() {
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
+
+        es.execute(new PriceOffNoticeListWorker(dbm, queue, fetchDubboService));
+
+        //保证list任务优先执行
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        for (int i = 0; i < 10; i++) {
+            es.execute(new PriceOffNoticeProcessorWorker(queue, fetchDubboService, redisListService, cmpSkuService, dbm));
         }
 
     }
