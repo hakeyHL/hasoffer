@@ -765,7 +765,7 @@ public class AppController {
         List<String> ids = appService.getUserDevices(deviceId);
         System.out.println(" get ids by deviceId :" + ids.size());
 
-        UrmUser uUser = appService.getUserById(userVO.getThirdId() == null ? "-" : userVO.getThirdId());
+        UrmUser uUser = appService.getUserById(StringUtils.isEmpty(userVO.getThirdId()) ? "-" : userVO.getThirdId());
         if (uUser == null) {
             logger.debug("user is not exist before");
             UrmUser urmUser = new UrmUser();
