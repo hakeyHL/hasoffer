@@ -26,6 +26,12 @@ public class UrmUser implements Identifiable<Long> {
     private Date createTime;
     private String telephone;
     private String gcmToken;
+    //用户的coin
+    private Long signCoin;
+    //当前最大连续签到次数
+    private Integer conSignNum;
+    //上次签到时间
+    private Long lastSignTime;
 
     @Override
     public boolean equals(Object o) {
