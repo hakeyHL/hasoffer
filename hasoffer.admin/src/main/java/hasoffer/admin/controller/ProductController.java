@@ -4,6 +4,7 @@ import hasoffer.admin.common.chart.ChartHelper;
 import hasoffer.admin.controller.vo.CategoryVo;
 import hasoffer.admin.controller.vo.CmpSkuVo;
 import hasoffer.admin.controller.vo.ProductVo;
+import hasoffer.base.enums.SearchResultSort;
 import hasoffer.base.model.PageModel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
@@ -288,6 +289,7 @@ public class ProductController {
                                      @RequestParam(defaultValue = "0") int category1,
                                      @RequestParam(defaultValue = "0") int category2,
                                      @RequestParam(defaultValue = "0") int category3,
+                                     @RequestParam(defaultValue = "RELEVANCE") SearchResultSort sort,
                                      @RequestParam(defaultValue = "1") int page,
                                      @RequestParam(defaultValue = "20") int size) {
 
@@ -311,6 +313,7 @@ public class ProductController {
         sc.setKeyword(title);
         sc.setPageSize(size);
         sc.setPage(page);
+        sc.setSort(sort);
 
         pagedResults = productIndex2Service.searchProducts(sc);
 
@@ -343,7 +346,9 @@ public class ProductController {
 
         vo.setTitle(p.getTitle());
         vo.setTag(p.getTag());
+
         vo.setPrice(p.getMinPrice());
+        vo.setMinPrice(p.getMinPrice());
 
         vo.setBrand(p.getBrand());
 
