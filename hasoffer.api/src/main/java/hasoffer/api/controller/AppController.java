@@ -366,37 +366,22 @@ public class AppController {
         ModelAndView mv = new ModelAndView();
         BackDetailVo data = new BackDetailVo();
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
-        List<OrderVo> transcations = new ArrayList<OrderVo>();
-        BigDecimal PendingCoins = BigDecimal.ZERO;
-        BigDecimal VericiedCoins = BigDecimal.ZERO;
         UrmUser user = appService.getUserByUserToken(userToken);
         if (user != null) {
-            List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
-            for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
-                if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
-                    OrderVo orderVo = new OrderVo();
-                    BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.015)).min(orderStatsAnalysisPO.getTentativeAmount());
-                    orderVo.setAccount(tempPrice.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
-                    orderVo.setChannel(orderStatsAnalysisPO.getChannel());
-                    orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
-                    orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
-                    orderVo.setWebsite(orderStatsAnalysisPO.getWebSite());
-                    orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
-                    transcations.add(orderVo);
-                    if (!orderStatsAnalysisPO.getOrderStatus().equals("cancelled") && !orderStatsAnalysisPO.getOrderStatus().equals("disapproved")) {
-                        PendingCoins = PendingCoins.add(tempPrice);
-                    }
-                    if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
-                        VericiedCoins = VericiedCoins.add(tempPrice);
-                    }
-                }
-            }
-            //待定的
-            data.setPendingCoins(PendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
-            //可以使用的
-            data.setVericiedCoins(VericiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
-            data.setTranscations(transcations);
+            calculateHasofferCoin(Arrays.asList(user), data);
         }
+        //添加返回:
+        //1. 从订单记录中查询直接乘以10
+        data.setPendingCoins(data.getPendingCoins().multiply(BigDecimal.valueOf(10)));
+        data.setVerifiedCoins(data.getVerifiedCoins().multiply(BigDecimal.valueOf(10)));
+        //2. 本次签到奖励
+        data.setThisTimeCoin(10);
+        //3. 下次签到奖励
+        data.setNextTimeCoin(10);
+        //4. verified coin = approved*10+签到获得.
+        data.setVerifiedCoins(data.getVerifiedCoins().add(BigDecimal.valueOf(user.getSignCoin())));
+        //5. 当前最大连续签到次数
+        data.setMaxConSignNum(new Random().nextInt(7) + 1);
         mv.addObject("data", data);
         return mv;
     }
@@ -1294,7 +1279,7 @@ public class AppController {
         //待定的
         data.setPendingCoins(PendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         //可以使用的
-        data.setVericiedCoins(VericiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+        data.setVerifiedCoins(VericiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
     }
 }

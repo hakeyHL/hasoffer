@@ -26,47 +26,37 @@ public class UrmUser implements Identifiable<Long> {
     private Date createTime;
     private String telephone;
     private String gcmToken;
-   /* //用户的coin
-    private Long signCoin;
+    //用户的coin
+    @Column(columnDefinition = "0")
+    private Long signCoin = 0l;
     //当前最大连续签到次数
+    @Column(columnDefinition = "0")
     private Integer conSignNum;
     //上次签到时间
-    private Long lastSignTime;*/
+    private Long lastSignTime;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        UrmUser urmUser = (UrmUser) o;
-
-        if (id != null ? !id.equals(urmUser.id) : urmUser.id != null) return false;
-        if (thirdId != null ? !thirdId.equals(urmUser.thirdId) : urmUser.thirdId != null) return false;
-        if (userToken != null ? !userToken.equals(urmUser.userToken) : urmUser.userToken != null) return false;
-        if (userName != null ? !userName.equals(urmUser.userName) : urmUser.userName != null) return false;
-        if (thirdToken != null ? !thirdToken.equals(urmUser.thirdToken) : urmUser.thirdToken != null) return false;
-        if (thirdPlatform != null ? !thirdPlatform.equals(urmUser.thirdPlatform) : urmUser.thirdPlatform != null)
-            return false;
-        if (avatarPath != null ? !avatarPath.equals(urmUser.avatarPath) : urmUser.avatarPath != null) return false;
-        if (createTime != null ? !createTime.equals(urmUser.createTime) : urmUser.createTime != null) return false;
-        if (telephone != null ? !telephone.equals(urmUser.telephone) : urmUser.telephone != null) return false;
-        return !(gcmToken != null ? !gcmToken.equals(urmUser.gcmToken) : urmUser.gcmToken != null);
-
+    public Long getSignCoin() {
+        return signCoin;
     }
 
-    @Override
-    public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (thirdId != null ? thirdId.hashCode() : 0);
-        result = 31 * result + (userToken != null ? userToken.hashCode() : 0);
-        result = 31 * result + (userName != null ? userName.hashCode() : 0);
-        result = 31 * result + (thirdToken != null ? thirdToken.hashCode() : 0);
-        result = 31 * result + (thirdPlatform != null ? thirdPlatform.hashCode() : 0);
-        result = 31 * result + (avatarPath != null ? avatarPath.hashCode() : 0);
-        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
-        result = 31 * result + (telephone != null ? telephone.hashCode() : 0);
-        result = 31 * result + (gcmToken != null ? gcmToken.hashCode() : 0);
-        return result;
+    public void setSignCoin(Long signCoin) {
+        this.signCoin = signCoin;
+    }
+
+    public Integer getConSignNum() {
+        return conSignNum;
+    }
+
+    public void setConSignNum(Integer conSignNum) {
+        this.conSignNum = conSignNum;
+    }
+
+    public Long getLastSignTime() {
+        return lastSignTime;
+    }
+
+    public void setLastSignTime(Long lastSignTime) {
+        this.lastSignTime = lastSignTime;
     }
 
     public String getTelephone() {
@@ -147,5 +137,47 @@ public class UrmUser implements Identifiable<Long> {
 
     public void setGcmToken(String gcmToken) {
         this.gcmToken = gcmToken;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        UrmUser urmUser = (UrmUser) o;
+
+        if (id != null ? !id.equals(urmUser.id) : urmUser.id != null) return false;
+        if (thirdId != null ? !thirdId.equals(urmUser.thirdId) : urmUser.thirdId != null) return false;
+        if (userToken != null ? !userToken.equals(urmUser.userToken) : urmUser.userToken != null) return false;
+        if (userName != null ? !userName.equals(urmUser.userName) : urmUser.userName != null) return false;
+        if (thirdToken != null ? !thirdToken.equals(urmUser.thirdToken) : urmUser.thirdToken != null) return false;
+        if (thirdPlatform != null ? !thirdPlatform.equals(urmUser.thirdPlatform) : urmUser.thirdPlatform != null)
+            return false;
+        if (avatarPath != null ? !avatarPath.equals(urmUser.avatarPath) : urmUser.avatarPath != null) return false;
+        if (createTime != null ? !createTime.equals(urmUser.createTime) : urmUser.createTime != null) return false;
+        if (telephone != null ? !telephone.equals(urmUser.telephone) : urmUser.telephone != null) return false;
+        if (gcmToken != null ? !gcmToken.equals(urmUser.gcmToken) : urmUser.gcmToken != null) return false;
+        if (signCoin != null ? !signCoin.equals(urmUser.signCoin) : urmUser.signCoin != null) return false;
+        if (conSignNum != null ? !conSignNum.equals(urmUser.conSignNum) : urmUser.conSignNum != null) return false;
+        return !(lastSignTime != null ? !lastSignTime.equals(urmUser.lastSignTime) : urmUser.lastSignTime != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (thirdId != null ? thirdId.hashCode() : 0);
+        result = 31 * result + (userToken != null ? userToken.hashCode() : 0);
+        result = 31 * result + (userName != null ? userName.hashCode() : 0);
+        result = 31 * result + (thirdToken != null ? thirdToken.hashCode() : 0);
+        result = 31 * result + (thirdPlatform != null ? thirdPlatform.hashCode() : 0);
+        result = 31 * result + (avatarPath != null ? avatarPath.hashCode() : 0);
+        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
+        result = 31 * result + (telephone != null ? telephone.hashCode() : 0);
+        result = 31 * result + (gcmToken != null ? gcmToken.hashCode() : 0);
+        result = 31 * result + (signCoin != null ? signCoin.hashCode() : 0);
+        result = 31 * result + (conSignNum != null ? conSignNum.hashCode() : 0);
+        result = 31 * result + (lastSignTime != null ? lastSignTime.hashCode() : 0);
+        return result;
     }
 }
