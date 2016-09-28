@@ -224,4 +224,29 @@ public class AppUserController {
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
+
+    /**
+     * 签到
+     *
+     * @param response
+     * @return
+     */
+    @RequestMapping("user/sign")
+    public String userSign(HttpServletResponse response) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("errorCode", "10001");
+        jsonObject.put("msg", "no");
+        String userToken = Context.currentContext().getHeader("usertoken");
+        if (!StringUtils.isEmpty(userToken)) {
+            System.out.println("userToken is :" + userToken);
+            UrmUser urmUser = appService.getUserByUserToken(userToken);
+            if (urmUser != null) {
+                System.out.println("this userToken has user ");
+            }
+        }
+        System.out.println(" response result is : " + JSON.toJSONString(jsonObject));
+        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        return null;
+    }
+
 }
