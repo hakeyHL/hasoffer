@@ -46,6 +46,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -355,13 +356,15 @@ public class FixController {
 
     //fixdata/deleteproductanyway/
     @RequestMapping(value = "/deleteproductanyway/{proId}", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String deleteproduct2(@PathVariable Long proId) {
+    public ModelAndView
+    deleteproduct2(@PathVariable Long proId) {
         if (proId > 0) {
             productService.deleteProduct(proId);
         }
-        return "ok";
+
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("result", "ok");
+        return mav;
     }
 
     @RequestMapping(value = "/cleansearchlogs", method = RequestMethod.GET)
