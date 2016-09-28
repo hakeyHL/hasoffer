@@ -140,7 +140,7 @@ public class RequestInterceptor implements HandlerInterceptor {
                     urmUser.setGcmToken(gcmToken);
                     appService.updateUserInfo(urmUser);
                 } else if (!urmUser.getGcmToken().equals(gcmToken)) {
-                    System.out.println(" not equal ");
+                    System.out.println("update , not equal ");
                     //5. 更新
                     urmUser.setGcmToken(gcmToken);
                     appService.updateUserInfo(urmUser);
