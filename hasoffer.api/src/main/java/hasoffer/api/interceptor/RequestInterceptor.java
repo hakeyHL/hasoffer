@@ -9,6 +9,7 @@ import hasoffer.api.controller.vo.ResultVo;
 import hasoffer.api.worker.DeviceRequestQueue;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.utils.DeviceUtils;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.IAppService;
@@ -107,11 +108,13 @@ public class RequestInterceptor implements HandlerInterceptor {
         }
         UrmUser urmUser = null;
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
-//            String key = "user_" + userToken;
-//            urmUser = userICacheService.get(UrmUser.class, key, 0);
+        System.out.println("userToken is : " + userToken);
+        String key = "user_" + userToken;
+        urmUser = userICacheService.get(UrmUser.class, key, 0);
         if (urmUser == null) {
+            System.out.println("user not exist in cache ,query it from database ");
             urmUser = appService.getUserByUserToken(userToken);
-//                userICacheService.add(key, urmUser, TimeUtils.SECONDS_OF_1_DAY);
+            userICacheService.add(key, urmUser, TimeUtils.SECONDS_OF_1_DAY);
         }
         if (modelAndView == null) {
             modelAndView = new ModelAndView();
@@ -122,15 +125,18 @@ public class RequestInterceptor implements HandlerInterceptor {
             System.out.println("----------------------------------" + JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).toJSONString() + "-------------------");
             String gcmToken = JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).getString("gcmToken");
             System.out.println("get gcmtoken ++++++++++++++++++++++++++++++++++++" + gcmToken + "++++++++++++++++++++++++++++++++");
+            System.out.println("gcmtoken from database :" + urmUser.getGcmToken() == null ? "is null .." : urmUser.getGcmToken());
             //用户与gcmtoken绑定
             //1. 获取gcmtoken
             if (!StringUtils.isEmpty(gcmToken)) {
                 //3. 不为空,比对
                 if (urmUser.getGcmToken() == null) {
+                    System.out.println("not exist before ");
                     //5. 更新
                     urmUser.setGcmToken(gcmToken);
                     appService.updateUserInfo(urmUser);
                 } else if (!urmUser.getGcmToken().equals(gcmToken)) {
+                    System.out.println(" not equal ");
                     //5. 更新
                     urmUser.setGcmToken(gcmToken);
                     appService.updateUserInfo(urmUser);
