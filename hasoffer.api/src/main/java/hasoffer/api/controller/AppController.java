@@ -43,6 +43,7 @@ import hasoffer.core.user.IDeviceService;
 import hasoffer.core.utils.AffliIdHelper;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
+import hasoffer.spider.model.FetchedProductReview;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import jodd.util.NameValue;
@@ -617,7 +618,6 @@ public class AppController {
                 //返回deal的处境时间距离现在时间的时间,多少天,小时,分钟..
                 map.put("createTime", getDifference2Date(new Date(), appDeal.getCreateTime()));
                 map.put("website", appDeal.getWebsite());
-                map.put("comments", Arrays.asList("Back with Bang", "Everything is good ..except display on 5 days is far better than this reset ", "Good one and hats off to the courier service who delivered the in the the hasoffer ."));
                 //降价生成deal无失效日期
                 if (!appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
                     map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
@@ -657,6 +657,19 @@ public class AppController {
                     map.put("skuId", appDeal.getPtmcmpskuid());
                     PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
                     if (ptmCmpSkuDescription != null) {
+                        List<FetchedProductReview> fetchedProductReviewList = ptmCmpSkuDescription.getFetchedProductReviewList();
+                        if (fetchedProductReviewList != null && fetchedProductReviewList.size() > 0) {
+                            List<String> commentList = new ArrayList<>();
+                            for (FetchedProductReview fec : fetchedProductReviewList) {
+                                String reviewContent = fec.getReviewContent();
+                                if (!StringUtils.isEmpty(reviewContent)) {
+                                    if (commentList.size() < 4) {
+                                        commentList.add(reviewContent);
+                                    }
+                                }
+                            }
+                            map.put("comments", commentList);
+                        }
                         //查看是否存在offer,如果存在将offer拼接
                         //“网站名” also provides “SKU当前生效的offer数量“ extra offer（offer数量为1时 展示offer 大于1时 展示offers）: “按服务端排序展示offer列表 以分号间隔”
                         String offers = ptmCmpSkuDescription.getOffers();
@@ -670,7 +683,9 @@ public class AppController {
                             }
                             //拼完之后换行,空一行
                             sb.append("\n\n");
-                        } else {
+                            sb.append("Please note: offers and price may vary by location.");
+                        }
+                       /* else {
                             //没有offer先手写几个
                             sb.append(appDeal.getWebsite().name()).append(" also provides ").append(2).append(" extra offer :");
                             sb.append("offer 1 ").append(";");
@@ -681,7 +696,7 @@ public class AppController {
                             sb.append("Please note: offers and price may vary by location.");
 
 
-                        }
+                        }*/
                         //设置Key Features
                         String jsonParam = ptmCmpSkuDescription.getJsonParam();
                         if (StringUtils.isNotBlank(jsonParam)) {
@@ -689,7 +704,8 @@ public class AppController {
                             map.put("KeyFeatures", jsonMap);
                         }
 
-                    } else {
+                    }
+                    /*else {
                         //无数据,自己拼接
                         sb.append(appDeal.getWebsite().name()).append(" also provides ").append(2).append(" extra offer :");
                         sb.append("offer 3 ").append(";");
@@ -701,7 +717,7 @@ public class AppController {
                         jsonMap.put("color", "red");
                         jsonMap.put("memory", "16G");
                         map.put("KeyFeatures", jsonMap);
-                    }
+                    }*/
                     map.put("priceResearch", sb.toString());
                     Map priceCurveDesc = new HashMap();
                     //配置点击弹出价格曲线的文字以及文字的颜色
