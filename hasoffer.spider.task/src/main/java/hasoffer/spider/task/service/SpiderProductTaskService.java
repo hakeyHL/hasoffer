@@ -57,9 +57,9 @@ public class SpiderProductTaskService {
 
                     SrmAutoSearchResult historyData = findSearchResult(searchLog);
                     sendProductTask(Website.AMAZON, historyData);
-                    //sendProductTask(Website.FLIPKART, historyData);
-                    //sendProductTask(Website.SNAPDEAL, historyData);
-                    //sendProductTask(Website.SHOPCLUES, historyData);
+                    sendProductTask(Website.FLIPKART, historyData);
+                    sendProductTask(Website.SNAPDEAL, historyData);
+                    sendProductTask(Website.SHOPCLUES, historyData);
                 }
             }
 
