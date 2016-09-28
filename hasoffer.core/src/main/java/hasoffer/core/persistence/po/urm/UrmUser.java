@@ -27,11 +27,11 @@ public class UrmUser implements Identifiable<Long> {
     private String telephone;
     private String gcmToken;
     //用户的coin
-    @Column(columnDefinition = "0")
+    @Column(columnDefinition = "bigint default 0")
     private Long signCoin = 0l;
     //当前最大连续签到次数
-    @Column(columnDefinition = "0")
-    private Integer conSignNum;
+    @Column(columnDefinition = "int default 0")
+    private Integer conSignNum = 0;
     //上次签到时间
     private Long lastSignTime;
 
