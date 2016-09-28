@@ -17,7 +17,7 @@ public class DownloadConfigVo {
     //competingAndChannelPackages 竞品和渠道的包
     private List<String> cmpAndchPackages = new ArrayList<String>();
     //优先下载渠道
-    private String priorDownloadChannel = "9APP";
+    private String priorDownloadChannel = "NINEAPP";
     //下载渠道及deeplink
 //    private List<DownLoadConfigChannle> channels = new ArrayList<DownLoadConfigChannle>();
     //APP在不同下载渠道的deeplink、logo、简介、评分值、评论数、下载数(googleplay的下载链接需添加联盟id)
