@@ -47,7 +47,7 @@ public class DubboUpdate {
 
         ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
 
-        es.execute(new SrmProductSearchCountListWorker(dbm, queue, fetchDubboService));
+        es.execute(new SrmProductSearchCountListWorker(dbm, queue, fetchDubboService, redisListService));
 
         //保证list任务优先执行
         try {
@@ -63,7 +63,7 @@ public class DubboUpdate {
     }
 
     /**
-     * sku的日常更新（目前策略热搜）
+     * price off notice
      *
      * @return
      */
