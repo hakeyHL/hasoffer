@@ -87,7 +87,7 @@
                                 <div class="col-lg-12">
                                     <button type="button" class="btn btn-primary"
                                             onclick="batchDelete('<%=contextPath%>/p/batchDelete')"
-                                            data-toggle="modal" data-target="#confirm-delete">批量删除
+                                            data-toggle="modal" data-target="#confirm-delete">批量删除SKU
                                     </button>
                                     <%--</div>--%>
                                     <%--<div class="col-lg-12">--%>
