@@ -23,6 +23,7 @@ import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
+import hasoffer.core.persistence.po.sys.SysAdmin;
 import hasoffer.core.product.*;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
@@ -38,6 +39,8 @@ import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import hasoffer.fetch.sites.paytm.PaytmHelper;
 import hasoffer.fetch.sites.shopclues.ShopcluesHelper;
+import hasoffer.webcommon.context.Context;
+import hasoffer.webcommon.context.StaticContext;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -358,11 +361,19 @@ public class FixController {
     @RequestMapping(value = "/deleteproductanyway/{proId}", method = RequestMethod.GET)
     public ModelAndView
     deleteproduct2(@PathVariable Long proId) {
+        ModelAndView mav = new ModelAndView();
+
+        SysAdmin admin = (SysAdmin) Context.currentContext().get(StaticContext.USER);
+
+        if (admin == null || !admin.getUname().equals("chevy")) {
+            mav.addObject("result", "error!");
+            return mav;
+        }
+
         if (proId > 0) {
             productService.deleteProduct(proId);
         }
 
-        ModelAndView mav = new ModelAndView();
         mav.addObject("result", "ok");
         return mav;
     }
