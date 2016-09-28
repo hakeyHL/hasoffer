@@ -202,7 +202,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                             float newPrice = fetchedProduct.getPrice();
 
                             //涨价了或者状态不是onsale失效
-                            if (newPrice > sku.getPrice() || SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
+                            if (newPrice > sku.getPrice() || !SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
 //                                dealService.deleteDeal(deal.getId());
                                 dealService.updateDealExpire(deal.getId());
                             }

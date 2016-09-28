@@ -66,6 +66,7 @@ public class DealController {
             appdealVo.setExpireTime(appDeal.getExpireTime());
             appdealVo.setDealClickCount(appDeal.getDealClickCount());
             appdealVo.setLinkUrl(appDeal.getLinkUrl());
+            appdealVo.setDiscount(appDeal.getDiscount());
             if (TimeUtils.nowDate().getTime() > appDeal.getExpireTime().getTime()) {
                 appdealVo.setExpireStatus(0);//已经失效
             } else {
