@@ -89,21 +89,17 @@
                                             onclick="batchDelete('<%=contextPath%>/p/batchDelete')"
                                             data-toggle="modal" data-target="#confirm-delete">批量删除
                                     </button>
-                                </div>
-                                <div class="col-lg-12">
+                                    <%--</div>--%>
+                                    <%--<div class="col-lg-12">--%>
                                     <button type="button" class="btn btn-primary"
                                             onclick="removeCache(${pId})"
                                             data-toggle="modal" data-target="#confirm-delete">清除缓存
                                     </button>
-                                </div>
-                                <div class="col-lg-12">
-
-                                </div>
-                                <div class="col-lg-12">
-                                    <p>
-                                        <button id="changeStatus" class="btn btn-info" onclick="change(${pId})">切换状态
-                                        </button>
-                                    </p>
+                                    <button id="changeStatus" class="btn btn-info" onclick="change(${pId})">切换状态
+                                    </button>
+                                    <button id="delBtn" class="btn btn-danger" onclick="delProduct(${pId})">
+                                        删除商品
+                                    </button>
                                 </div>
 
                             </div>
@@ -337,6 +333,17 @@
                 BootstrapDialog.warning("失败");
             }
         });
+    }
+
+    function delProduct(pid) {
+
+        if (!confirm("您正在删除商品\n这是一个危险的操作\n删除商品会导致与商品关联的搜索日志会被置为初始状态\n请确认")) {
+            return;
+        }
+
+        http.doGet("/fixdata/deleteproductanyway/" + pid, function (data) {
+            alert(data.result);
+        })
     }
 
     //状态切换

@@ -31,10 +31,6 @@
 			<mvc:mapping path="/**" />
 			<bean class="hasoffer.admin.interceptor.VisitInterceptor"/>
 		</mvc:interceptor>
-		<mvc:interceptor>
-			<mvc:mapping path="/**" />
-			<bean class="hasoffer.admin.interceptor.Visit2Interceptor"/>
-		</mvc:interceptor>
 	</mvc:interceptors>
 
 	<mvc:resources location="/static/" mapping="/static/**"/>
