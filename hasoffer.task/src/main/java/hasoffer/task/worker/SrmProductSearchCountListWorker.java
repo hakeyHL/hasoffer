@@ -10,6 +10,7 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
+import hasoffer.data.redis.IRedisListService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,21 +26,27 @@ import java.util.concurrent.TimeUnit;
  */
 public class SrmProductSearchCountListWorker implements Runnable {
 
+    private static final String PRICE_DROP_SKUID_QUEUE = "PRICE_DROP_SKUID_QUEUE";
     private static final String Q_PTMCMPSKU_BYPRODUCTID = "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ORDER BY t.id ASC";
     private static Logger logger = LoggerFactory.getLogger(SrmProductSearchCountListWorker.class);
 
     private IFetchDubboService fetchDubboService;
     private IDataBaseManager dbm;
     private ConcurrentLinkedQueue<PtmCmpSku> queue;
+    private IRedisListService redisListService;
 
-    public SrmProductSearchCountListWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService) {
+    public SrmProductSearchCountListWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, IRedisListService redisListService) {
         this.dbm = dbm;
         this.queue = queue;
         this.fetchDubboService = fetchDubboService;
+        this.redisListService = redisListService;
     }
 
     @Override
     public void run() {
+
+        //clear queue used
+        redisListService.deleteAll(PRICE_DROP_SKUID_QUEUE);
 
         int page = 1;
         int pageSize = 1000;
