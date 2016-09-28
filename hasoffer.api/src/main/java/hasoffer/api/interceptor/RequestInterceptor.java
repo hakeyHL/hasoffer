@@ -122,6 +122,7 @@ public class RequestInterceptor implements HandlerInterceptor {
         if (urmUser == null) {
             modelAndView.addObject("result", new ResultVo("10010", "login expired"));
         } else {
+            System.out.println("userName  is " + urmUser.getUserName());
             System.out.println("----------------------------------" + JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).toJSONString() + "-------------------");
             String gcmToken = JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).getString("gcmToken");
             System.out.println("get gcmtoken ++++++++++++++++++++++++++++++++++++" + gcmToken + "++++++++++++++++++++++++++++++++");
