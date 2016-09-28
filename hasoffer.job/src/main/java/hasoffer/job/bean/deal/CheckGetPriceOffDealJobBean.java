@@ -98,6 +98,9 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
                 System.out.println("CheckGetPriceOffDealJobBean pop get yesterday is " + yesterdayYmd);
 
                 SrmProductSearchCount productSearchCount = dbm.querySingle("SELECT t FROM SrmProductSearchCount t WHERE t.productId = ?0 AND t.ymd = ?1", Arrays.asList(productId, yesterdayYmd));
+                if (productSearchCount == null) {//这种情况用来应付超过0点后的情况
+                    productSearchCount = dbm.querySingle("SELECT t FROM SrmProductSearchCount t WHERE t.productId = ?0 AND t.ymd = ?1", Arrays.asList(productId, TimeUtils.parse(TimeUtils.addDay(TimeUtils.nowDate(), -2), "yyyyMMdd")));
+                }
                 System.out.println("CheckGetPriceOffDealJobBean pop get SrmProductSearchCount is " + productSearchCount.getId());
                 System.out.println("CheckGetPriceOffDealJobBean pop get SrmProductSearchCount count is " + productSearchCount.getCount());
 
