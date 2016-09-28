@@ -643,7 +643,6 @@ public class AppController {
                 if (StringUtils.isNotBlank(description)) {
                     //如果描述不为空,拼接描述然后换行,空行
                     sb = new StringBuilder();
-                    description = "Rs.123 is the newest history lowest price(Previous lowest price is Rs.140).Click here to check price history.Good offer always expire in hours.Good time to get it,Hurry up!";
                     sb.append(description).append("\n\n");
 //                    sb.append("\n\n");
                 } else {
