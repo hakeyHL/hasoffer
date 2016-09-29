@@ -34,6 +34,17 @@ public class UrmUser implements Identifiable<Long> {
     private Integer conSignNum = 0;
     //上次签到时间
     private Long lastSignTime;
+    //最高连续签到记录
+    private Long maxConSignNum;
+
+    @Column(columnDefinition = "bigint default 0")
+    public Long getMaxConSignNum() {
+        return maxConSignNum;
+    }
+
+    public void setMaxConSignNum(Long maxConSignNum) {
+        this.maxConSignNum = maxConSignNum;
+    }
 
     public Long getSignCoin() {
         return signCoin;
@@ -159,7 +170,9 @@ public class UrmUser implements Identifiable<Long> {
         if (gcmToken != null ? !gcmToken.equals(urmUser.gcmToken) : urmUser.gcmToken != null) return false;
         if (signCoin != null ? !signCoin.equals(urmUser.signCoin) : urmUser.signCoin != null) return false;
         if (conSignNum != null ? !conSignNum.equals(urmUser.conSignNum) : urmUser.conSignNum != null) return false;
-        return !(lastSignTime != null ? !lastSignTime.equals(urmUser.lastSignTime) : urmUser.lastSignTime != null);
+        if (lastSignTime != null ? !lastSignTime.equals(urmUser.lastSignTime) : urmUser.lastSignTime != null)
+            return false;
+        return !(maxConSignNum != null ? !maxConSignNum.equals(urmUser.maxConSignNum) : urmUser.maxConSignNum != null);
 
     }
 
@@ -178,6 +191,7 @@ public class UrmUser implements Identifiable<Long> {
         result = 31 * result + (signCoin != null ? signCoin.hashCode() : 0);
         result = 31 * result + (conSignNum != null ? conSignNum.hashCode() : 0);
         result = 31 * result + (lastSignTime != null ? lastSignTime.hashCode() : 0);
+        result = 31 * result + (maxConSignNum != null ? maxConSignNum.hashCode() : 0);
         return result;
     }
 }
