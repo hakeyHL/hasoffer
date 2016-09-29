@@ -13,6 +13,7 @@ import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
+import hasoffer.core.persistence.po.urm.UrmSignAwdCfg;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.system.IAppService;
@@ -68,6 +69,9 @@ public class AppServiceImpl implements IAppService {
     private static final String Q_APP_USER_GET_BY_NAME =
             "SELECT t FROM UrmUser t " +
                     " where t.userName=?0";
+
+    private static final String Q_APP_URM_GET_SIGNCONFIG =
+            "SELECT t FROM UrmSignAwdCfg t order by t.count desc  ";
 
     private static final String Q_APP_URMDEVICE_GETIDSBYDEVICEID =
             "SELECT t.id FROM UrmDevice t " +
@@ -277,6 +281,11 @@ public class AppServiceImpl implements IAppService {
     @Override
     public List<UrmUser> getUsersByUserName(String userName) {
         return dbm.query(Q_APP_USER_GET_BY_NAME, Arrays.asList(userName));
+    }
+
+    @Override
+    public List<UrmSignAwdCfg> getSignAwardNum() {
+        return dbm.query(Q_APP_URM_GET_SIGNCONFIG);
     }
 
     public PtmCategory getCategoryInfo(Long cateId) {
