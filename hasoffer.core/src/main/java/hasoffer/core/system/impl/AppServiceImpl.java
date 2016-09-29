@@ -8,10 +8,7 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
-import hasoffer.core.persistence.po.app.AppBanner;
-import hasoffer.core.persistence.po.app.AppDeal;
-import hasoffer.core.persistence.po.app.AppVersion;
-import hasoffer.core.persistence.po.app.AppWebsite;
+import hasoffer.core.persistence.po.app.*;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.urm.UrmSignAwdCfg;
 import hasoffer.core.persistence.po.urm.UrmUser;
@@ -107,6 +104,10 @@ public class AppServiceImpl implements IAppService {
 
     private static final String Q_APP_CATEGORY_BYID =
             "SELECT t FROM PtmCategory t where t.id=?0 ";
+
+    private static final String Q_APP_GIFT_LIST =
+            "SELECT t FROM HasofferCoinsExchangeGift t order by t.coinPrice asc ";
+
     @Resource
     IDataBaseManager dbm;
     private String Q_APP_GETPRODUCTS =
@@ -286,6 +287,11 @@ public class AppServiceImpl implements IAppService {
     @Override
     public List<UrmSignAwdCfg> getSignAwardNum() {
         return dbm.query(Q_APP_URM_GET_SIGNCONFIG);
+    }
+
+    @Override
+    public List<HasofferCoinsExchangeGift> getGiftList() {
+        return dbm.query(Q_APP_GIFT_LIST);
     }
 
     public PtmCategory getCategoryInfo(Long cateId) {
