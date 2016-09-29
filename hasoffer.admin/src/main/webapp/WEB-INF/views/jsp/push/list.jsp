@@ -31,7 +31,7 @@
                                id="startTime" name="startTime" value="${startTime}">
                     </div>
                     <script>
-                        $("#startTime").datepicker();
+                        $("#startTime").datepicker({dateFormat: 'yy-mm-dd'});
                     </script>
                 </div>
 
@@ -42,7 +42,7 @@
                                id="endTime" name="endTime" value="${endTime}">
                     </div>
                     <script>
-                        $("#endTime").datepicker();
+                        $("#endTime").datepicker({dateFormat: 'yy-mm-dd'});
                     </script>
                 </div>
 

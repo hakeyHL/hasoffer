@@ -21,6 +21,8 @@
         <input type="hidden" name="listPageImage" value="${deal.listPageImage}">
         <input type="hidden" name="infoPageImage" value="${deal.infoPageImage}">
         <input type="hidden" name="website" value="${deal.website}">
+        <input type="hidden" name="appdealSource" value="${deal.appdealSource}">
+        <input type="hidden" name="dealClickCount" value="${deal.dealClickCount}">
 
         <div class="form-group">
             <label class="col-sm-3 control-label">Deal标题：</label>
@@ -143,7 +145,7 @@
             <label class="col-sm-3 control-label">生效时间：</label>
 
             <div class="col-sm-6">
-                <input type="text" name="createTime" id="createTime" value="${fn:substring(deal.createTime, 0, 10)}"
+                <input type="text" name="createTime" id="createTime" value="${deal.createTime}"
                        class="form-control form_datetime">
             </div>
         </div>
@@ -155,7 +157,8 @@
             <label class="col-sm-3 control-label">失效时间：</label>
 
             <div class="col-sm-6">
-                <input type="text" name="expireTime" id="expireTime" value="${fn:substring(deal.expireTime, 0, 10)}"
+                <input type="text" name="expireTime" id="expireTime" value="${deal.expireTime}"
+                <%--<input type="text" name="expireTime" id="expireTime" value="${fn:substring(deal.expireTime, 0, 10)}"--%>
                        class="form-control form_datetime">
             </div>
         </div>
