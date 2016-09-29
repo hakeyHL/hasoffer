@@ -1,5 +1,6 @@
 package hasoffer.task.timedtask;
 
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
@@ -14,6 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -43,6 +45,8 @@ public class DubboUpdate {
     @Scheduled(cron = "00 30 14 * * ?")
     public void updatestart() {
 
+        long startTime = TimeUtils.now();
+
         ExecutorService es = Executors.newCachedThreadPool();
 
         ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
@@ -60,6 +64,20 @@ public class DubboUpdate {
             es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService));
         }
 
+        while (true) {
+            //如果当前线程已经运行超过10小时，自杀吧孩子
+            if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_1_HOUR * 10) {
+                System.out.println("dubbo update executorService has live above 10 hours ,thread going to die");
+                es.shutdown();
+                break;
+            }
+        }
+
+        List<Runnable> runnables = es.shutdownNow();
+        if (runnables != null) {
+            System.out.println(runnables.size());
+        }
+
     }
 
     /**
@@ -67,8 +85,10 @@ public class DubboUpdate {
      *
      * @return
      */
-    @Scheduled(cron = "00 30 11 * * ?")
+    @Scheduled(cron = "00 00 11 * * ?")
     public void priceOffNotieUpdatestart() {
+
+        long startTime = TimeUtils.now();
 
         ExecutorService es = Executors.newCachedThreadPool();
 
@@ -87,6 +107,19 @@ public class DubboUpdate {
             es.execute(new PriceOffNoticeProcessorWorker(queue, fetchDubboService, redisListService, cmpSkuService, dbm));
         }
 
+        while (true) {
+            //如果当前线程已经运行超过3小时，自杀吧孩子
+            if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_1_HOUR * 3) {
+                System.out.println("price off notice update executorService has live above 3 hours ,thread going to die");
+                es.shutdown();
+                break;
+            }
+        }
+
+        List<Runnable> runnables = es.shutdownNow();
+        if (runnables != null) {
+            System.out.println(runnables.size());
+        }
     }
 
 }

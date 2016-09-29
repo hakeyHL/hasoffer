@@ -146,6 +146,7 @@
                     <td>是否在banner展示</td>
                     <td>是否在前台展示</td>
                     <td>Deal标题</td>
+                    <td>折扣</td>
                     <td>价格描述</td>
                     <td>生效时间</td>
                     <td>失效时间</td>
@@ -189,6 +190,9 @@
 
                         <td>
                             <a href="${data.linkUrl}">${data.title}</a>
+                        </td>
+                        <td>
+                                ${data.discount}
                         </td>
                         <td>${data.priceDescription}</td>
                         <td>${data.createTime}</td>
