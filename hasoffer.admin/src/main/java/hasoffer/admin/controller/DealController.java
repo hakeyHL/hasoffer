@@ -205,7 +205,7 @@ public class DealController {
             deal.setListPageImage(dealSmallPath);
         }
         dealService.updateDeal(deal);
-//        dealServiceImple.reimportAllDeals2Solr();
+        dealServiceImple.reimportAllDeals2Solr();
         return new ModelAndView("redirect:/deal/list");
     }
 
