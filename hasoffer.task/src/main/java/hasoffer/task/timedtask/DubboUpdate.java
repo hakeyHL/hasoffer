@@ -70,6 +70,12 @@ public class DubboUpdate {
                 System.out.println("dubbo update executorService has live above 10 hours ,thread going to die");
                 es.shutdown();
                 break;
+            } else {
+                try {
+                    TimeUnit.MINUTES.sleep(20);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -113,6 +119,12 @@ public class DubboUpdate {
                 System.out.println("price off notice update executorService has live above 3 hours ,thread going to die");
                 es.shutdown();
                 break;
+            } else {
+                try {
+                    TimeUnit.MINUTES.sleep(20);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
