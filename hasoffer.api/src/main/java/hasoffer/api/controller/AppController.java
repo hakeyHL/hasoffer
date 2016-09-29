@@ -393,6 +393,7 @@ public class AppController {
                         data.setNextTimeCoin(map.get(2));
                     }
                 } else {
+                    data.setEverSign(false);
                     //判断今天是否已经签过
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
                     String currentDate = simpleDateFormat.format(new Date());

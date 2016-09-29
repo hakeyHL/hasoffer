@@ -28,12 +28,23 @@ public class BackDetailVo {
     //今日是否已经签到
     private boolean hasSign = false;
 
+    //是否从未签到过,默认是
+    private boolean everSign = true;
+
     public boolean isHasSign() {
         return hasSign;
     }
 
     public void setHasSign(boolean hasSign) {
         this.hasSign = hasSign;
+    }
+
+    public boolean isEverSign() {
+        return everSign;
+    }
+
+    public void setEverSign(boolean everSign) {
+        this.everSign = everSign;
     }
 
     public BigDecimal getPendingCoins() {
