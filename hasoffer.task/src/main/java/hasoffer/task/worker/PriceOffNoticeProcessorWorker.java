@@ -46,18 +46,11 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
     @Override
     public void run() {
 
-        long startTime = TimeUtils.now();
-
         while (true) {
 
             PtmCmpSku sku = queue.poll();
 
             try {
-
-                if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_1_HOUR * 3) {
-                    System.out.println("price off process thred has live above 3 hours ,thread going to die");
-                    break;
-                }
 
                 if (sku == null) {
                     try {

@@ -39,10 +39,10 @@ public class SpiderProductTaskService {
 
 
     public void initTask() {
-        String SQL_SEARCHLOG = "select t from SrmSearchLog t where t.updateTime >?0  order by t.updateTime ASC ";
+        String SQL_SEARCHLOG = "select t from SrmSearchLog t where t.updateTime >?0  and site in (?1, ?2, ?3) order by t.updateTime ASC ";
         try {
             Date searchTime = new Date(TimeUtils.now() - TimeUtils.MILLISECONDS_OF_1_MINUTE);
-            PageableResult<SrmSearchLog> pagedSearchLog = dbm.queryPage(SQL_SEARCHLOG, 1, 1000, Arrays.asList(searchTime));
+            PageableResult<SrmSearchLog> pagedSearchLog = dbm.queryPage(SQL_SEARCHLOG, 1, 1000, Arrays.asList(searchTime, Website.AMAZON.toString(), Website.FLIPKART.toString(), Website.SNAPDEAL.toString()));
             List<SrmSearchLog> searchLogs = pagedSearchLog.getData();
             if (ArrayUtils.hasObjs(searchLogs)) {
                 logger.info("SpiderProductTaskService.initTask() be call. Time:{}, Size:{}", searchTime, searchLogs.size());
@@ -65,7 +65,7 @@ public class SpiderProductTaskService {
 
 
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("can't execute this sql.", e);
         }
     }
 
