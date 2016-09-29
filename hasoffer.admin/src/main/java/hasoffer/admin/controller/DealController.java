@@ -11,6 +11,7 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.enums.BannerFrom;
 import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
+import hasoffer.core.product.solr.DealModel;
 import hasoffer.core.utils.DateEditor;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.webcommon.helper.PageHelper;
@@ -205,6 +206,8 @@ public class DealController {
             deal.setListPageImage(dealSmallPath);
         }
         dealService.updateDeal(deal);
+        DealModel dm = new DealModel(deal);
+        dealServiceImple.importDeal2Solr(dm);
 //        dealServiceImple.reimportAllDeals2Solr();
         return new ModelAndView("redirect:/deal/list");
     }
