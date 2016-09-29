@@ -10,6 +10,7 @@ import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppVersion;
 import hasoffer.core.persistence.po.app.AppWebsite;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
+import hasoffer.core.persistence.po.urm.UrmSignAwdCfg;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 
@@ -63,4 +64,6 @@ public interface IAppService {
     void countDealClickCount(AppDeal appDeal);
 
     List<UrmUser> getUsersByUserName(String userName);
+
+    List<UrmSignAwdCfg> getSignAwardNum();
 }

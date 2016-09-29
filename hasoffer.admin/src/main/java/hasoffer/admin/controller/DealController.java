@@ -7,6 +7,7 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.admin.impl.DealServiceImpl;
+import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.enums.BannerFrom;
 import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
@@ -40,6 +41,8 @@ public class DealController {
     IDealService dealService;
     @Resource
     DealServiceImpl dealServiceImple;
+    @Resource
+    IDataBaseManager dbm;
     private Logger logger = LoggerFactory.getLogger(DealController.class);
 
     @InitBinder
@@ -67,6 +70,7 @@ public class DealController {
             appdealVo.setDealClickCount(appDeal.getDealClickCount());
             appdealVo.setLinkUrl(appDeal.getLinkUrl());
             appdealVo.setDiscount(appDeal.getDiscount());
+            appdealVo.setAppdealSource(appDeal.getAppdealSource());
             if (TimeUtils.nowDate().getTime() > appDeal.getExpireTime().getTime()) {
                 appdealVo.setExpireStatus(0);//已经失效
             } else {
@@ -127,6 +131,7 @@ public class DealController {
 
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
     public ModelAndView edit(AppDeal deal, MultipartFile dealFile, MultipartFile bannerFile, String bannerImageUrl) throws IOException {
+
         String dealPath = "";
         String dealSmallPath = "";
         String dealBigPath = "";
@@ -200,7 +205,7 @@ public class DealController {
             deal.setListPageImage(dealSmallPath);
         }
         dealService.updateDeal(deal);
-        dealServiceImple.reimportAllDeals2Solr();
+//        dealServiceImple.reimportAllDeals2Solr();
         return new ModelAndView("redirect:/deal/list");
     }
 
