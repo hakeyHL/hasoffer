@@ -393,15 +393,29 @@ public class AppController {
                         data.setNextTimeCoin(map.get(2));
                     }
                 } else {
-                    //如果已经签到过
-                    //返回已签到+1作为本次,已连续+2作为下次返回
-                    Integer conSignNum = user.getConSignNum();
-                    if (map.get(conSignNum + 1) != null) {
-                        data.setThisTimeCoin(map.get(conSignNum + 1));
+                    //判断今天是否已经签过
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    String currentDate = simpleDateFormat.format(new Date());
+                    String lastSignDate = simpleDateFormat.format(new Date(user.getLastSignTime()));
+                    if (currentDate.equals(lastSignDate)) {
+                        //如果今天已经签到过,返回已签到标识
+                        data.setHasSign(true);
+                        //明天签到的奖励
+                        Integer conSignNum = user.getConSignNum();
+                        if (map.get(conSignNum + 1) != null) {
+                            data.setThisTimeCoin(map.get(conSignNum + 1));
+                        }
+                    } else {
+                        //返回已签到+1作为本次,已连续+2作为下次返回
+                        Integer conSignNum = user.getConSignNum();
+                        if (map.get(conSignNum + 1) != null) {
+                            data.setThisTimeCoin(map.get(conSignNum + 1));
+                        }
+                        if (map.get(conSignNum + 2) != null) {
+                            data.setNextTimeCoin(map.get(conSignNum + 2));
+                        }
                     }
-                    if (map.get(conSignNum + 2) != null) {
-                        data.setNextTimeCoin(map.get(conSignNum + 2));
-                    }
+
                 }
             } else {
                 data.setThisTimeCoin(0);
