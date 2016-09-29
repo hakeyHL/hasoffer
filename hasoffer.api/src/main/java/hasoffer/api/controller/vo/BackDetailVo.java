@@ -25,6 +25,17 @@ public class BackDetailVo {
     //当前最大连续签到数
     private Integer maxConSignNum;
 
+    //今日是否已经签到
+    private boolean hasSign = false;
+
+    public boolean isHasSign() {
+        return hasSign;
+    }
+
+    public void setHasSign(boolean hasSign) {
+        this.hasSign = hasSign;
+    }
+
     public BigDecimal getPendingCoins() {
         return PendingCoins;
     }
