@@ -35,6 +35,7 @@ public class UrmUser implements Identifiable<Long> {
     //上次签到时间
     private Long lastSignTime;
     //最高连续签到记录
+    @Column(columnDefinition = "int default 0")
     private Long maxConSignNum;
 
     @Column(columnDefinition = "bigint default 0")

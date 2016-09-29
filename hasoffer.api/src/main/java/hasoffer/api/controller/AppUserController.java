@@ -251,12 +251,28 @@ public class AppUserController {
                 System.out.println("get User " + urmUser.getUserName());
                 System.out.println("sign action ");
                 //2.1 上一次签到时间
-                Long lastSignTime = urmUser.getLastSignTime();
+                Long lastSignTime = null;
                 //2.2 当前时间
                 Date currentDate = new Date();
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 currentDate.setTime(currentDate.getTime() - 60 * 60 * 1000 * 24);
                 String currentDateFor = simpleDateFormat.format(currentDate);
+                if (urmUser.getLastSignTime() == null) {
+                    //之前未签到过
+                    lastSignTime = new Date().getTime();
+                    urmUser.setLastSignTime(lastSignTime);
+                } else {
+                    //判断今天是否已经签到
+                    String lstTime = simpleDateFormat.format(urmUser.getLastSignTime());
+                    String today = simpleDateFormat.format(new Date());
+                    if (lstTime.equals(today)) {
+                        //如果今天已经签到,over
+                        System.out.println(" repetitive  operation , has been  signed today  !");
+                        jsonObject.put("msg", "you have signed today , please come tomorrow . ");
+                        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                        return null;
+                    }
+                }
                 String lastSignTimeDateFor = simpleDateFormat.format(new Date(lastSignTime));
                 //按照连续次数降序查询奖励配置表
                 List<UrmSignAwdCfg> signConfigs = appService.getSignAwardNum();
@@ -284,11 +300,22 @@ public class AppUserController {
                 } else {
                     //断掉了,将本次最高签到数与上次相比
                     Long maxConSignNum = urmUser.getMaxConSignNum();
-                    if (urmUser.getConSignNum() > maxConSignNum) {
+                    Integer conSignNum = urmUser.getConSignNum();
+                    if (conSignNum == 0) {
+                        //之前未签到过
+                        urmUser.setMaxConSignNum(1l);
+                        urmUser.setConSignNum(1);
+                    } else if (urmUser.getConSignNum() > maxConSignNum) {
                         //比之前高,更新最高签到记录
                         urmUser.setMaxConSignNum(Long.valueOf(urmUser.getConSignNum()));
                     }
-                    //比之前低,只是连续重置
+                    //比之前低,重置连续数,给coin
+                    for (UrmSignAwdCfg urmSign : signConfigs) {
+                        if (urmSign.getCount() == urmUser.getConSignNum()) {
+                            //匹配到
+                            urmUser.setSignCoin(urmUser.getSignCoin() + urmSign.getAwardCoin());
+                        }
+                    }
                     urmUser.setConSignNum(1);
                 }
                 //执行更新

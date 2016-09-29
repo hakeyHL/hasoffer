@@ -71,7 +71,7 @@ public class AppServiceImpl implements IAppService {
                     " where t.userName=?0";
 
     private static final String Q_APP_URM_GET_SIGNCONFIG =
-            "SELECT t FROM UrmSignAwdCfg t order by count desc  ";
+            "SELECT t FROM UrmSignAwdCfg t order by t.count desc  ";
 
     private static final String Q_APP_URMDEVICE_GETIDSBYDEVICEID =
             "SELECT t.id FROM UrmDevice t " +
