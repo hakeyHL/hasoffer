@@ -31,6 +31,7 @@ import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.urm.UrmDevice;
+import hasoffer.core.persistence.po.urm.UrmSignAwdCfg;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.ICmpSkuService;
@@ -369,19 +370,48 @@ public class AppController {
         UrmUser user = appService.getUserByUserToken(userToken);
         if (user != null) {
             calculateHasofferCoin(Arrays.asList(user), data);
+            //添加返回:
+            //1. 从订单记录中查询直接乘以10
+            data.setPendingCoins(data.getPendingCoins().multiply(BigDecimal.valueOf(10)));
+            data.setVerifiedCoins(data.getVerifiedCoins().multiply(BigDecimal.valueOf(10)));
+            //2. 本次签到奖励
+            List<UrmSignAwdCfg> signAwardNum = appService.getSignAwardNum();
+            if (signAwardNum != null && signAwardNum.size() > 0) {
+                //转为map更好,key是连续天数,value是奖励
+                Map<Integer, Integer> map = new HashMap();
+                for (UrmSignAwdCfg urmSignAwdCfg : signAwardNum) {
+                    map.put(urmSignAwdCfg.getCount(), urmSignAwdCfg.getAwardCoin());
+                }
+
+                Long lastSignTime = user.getLastSignTime();
+                if (lastSignTime == null) {
+                    //如果为空,代表还没有签到过
+                    if (map.get(1) != null) {
+                        data.setThisTimeCoin(map.get(1));
+                    }
+                    if (map.get(2) != null) {
+                        data.setNextTimeCoin(map.get(2));
+                    }
+                } else {
+                    //如果已经签到过
+                    //返回已签到+1作为本次,已连续+2作为下次返回
+                    Integer conSignNum = user.getConSignNum();
+                    if (map.get(conSignNum + 1) != null) {
+                        data.setThisTimeCoin(map.get(conSignNum + 1));
+                    }
+                    if (map.get(conSignNum + 2) != null) {
+                        data.setNextTimeCoin(map.get(conSignNum + 2));
+                    }
+                }
+            } else {
+                data.setThisTimeCoin(0);
+                data.setNextTimeCoin(0);
+            }
+            //4. verified coin = approved*10+签到获得.
+            data.setVerifiedCoins(data.getVerifiedCoins().add(BigDecimal.valueOf(user.getSignCoin())));
+            //5. 当前最大连续签到次数
+            data.setMaxConSignNum(user.getConSignNum());
         }
-        //添加返回:
-        //1. 从订单记录中查询直接乘以10
-        data.setPendingCoins(data.getPendingCoins().multiply(BigDecimal.valueOf(10)));
-        data.setVerifiedCoins(data.getVerifiedCoins().multiply(BigDecimal.valueOf(10)));
-        //2. 本次签到奖励
-        data.setThisTimeCoin(10);
-        //3. 下次签到奖励
-        data.setNextTimeCoin(10);
-        //4. verified coin = approved*10+签到获得.
-        data.setVerifiedCoins(data.getVerifiedCoins().add(BigDecimal.valueOf(user.getSignCoin())));
-        //5. 当前最大连续签到次数
-        data.setMaxConSignNum(new Random().nextInt(7) + 1);
         mv.addObject("data", data);
         return mv;
     }
