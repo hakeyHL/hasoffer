@@ -670,6 +670,7 @@ public class AppController {
                             List<String> commentList = new ArrayList<>();
                             for (FetchedProductReview fec : fetchedProductReviewList) {
                                 String reviewContent = fec.getReviewContent();
+                                reviewContent = ClientHelper.delHTMLTag(reviewContent);
                                 if (!StringUtils.isEmpty(reviewContent)) {
                                     if (commentList.size() < 4) {
                                         commentList.add(reviewContent);
@@ -683,7 +684,7 @@ public class AppController {
                         String offers = ptmCmpSkuDescription.getOffers();
                         if (!hasoffer.base.utils.StringUtils.isEmpty(offers)) {
                             String[] temps = offers.split(",");
-                            if (temps.length > 1) {
+                            if (temps.length >= 1) {
                                 sb.append(appDeal.getWebsite().name()).append(" also provides ").append(temps.length).append(" extra offer :");
                             }
                             for (String str : temps) {
@@ -693,18 +694,6 @@ public class AppController {
                             sb.append("\n\n");
                             sb.append("Please note: offers and price may vary by location.");
                         }
-                       /* else {
-                            //没有offer先手写几个
-                            sb.append(appDeal.getWebsite().name()).append(" also provides ").append(2).append(" extra offer :");
-                            sb.append("offer 1 ").append(";");
-                            sb.append("offer 2 ").append(";");
-                            sb.append("\n\n");
-
-
-                            sb.append("Please note: offers and price may vary by location.");
-
-
-                        }*/
                         //设置Key Features
                         String jsonParam = ptmCmpSkuDescription.getJsonParam();
                         if (StringUtils.isNotBlank(jsonParam)) {
@@ -713,19 +702,6 @@ public class AppController {
                         }
 
                     }
-                    /*else {
-                        //无数据,自己拼接
-                        sb.append(appDeal.getWebsite().name()).append(" also provides ").append(2).append(" extra offer :");
-                        sb.append("offer 3 ").append(";");
-                        sb.append("offer 4 ").append(";");
-                        sb.append("\n\n");
-                        sb.append("Please note: offers and price may vary by location.");
-                        //拼接参数
-                        Map jsonMap = new HashMap();
-                        jsonMap.put("color", "red");
-                        jsonMap.put("memory", "16G");
-                        map.put("KeyFeatures", jsonMap);
-                    }*/
                     map.put("priceResearch", sb.toString());
                     Map priceCurveDesc = new HashMap();
                     //配置点击弹出价格曲线的文字以及文字的颜色
