@@ -23,10 +23,7 @@ import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
-import hasoffer.core.persistence.po.app.AppBanner;
-import hasoffer.core.persistence.po.app.AppDeal;
-import hasoffer.core.persistence.po.app.AppVersion;
-import hasoffer.core.persistence.po.app.AppWebsite;
+import hasoffer.core.persistence.po.app.*;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
@@ -96,34 +93,6 @@ public class AppController {
     Logger logger = LoggerFactory.getLogger(AppController.class);
 
     public static void main(String[] args) throws Exception {
-        //        String ss = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL, "http://www.snapdeal.com/offers/maggi-hamper", new String[]{"GOOGLEPLAY", "123"});
-//        System.out.print(ss);
-        /*String as = "Refer and earn Rs. 200 for each friend who signs up at Amazon.in and makes a purchase of Rs. 300 or more. Person who " +
-                "signs up also gets Rs. 100. No coupon " +
-                "code required to avail of this offer.\n";
-        System.out.println(as.lastIndexOf("\n"));
-        System.out.println(as.length());
-        if (as.lastIndexOf("\n") == as.length() - 1) {
-            System.out.println(" 最后有换行 ");
-        }*/
-//        if ()) {
-//            System.out.println("asdfaserqwerwerwer ");
-//        }
-        //Random random = new Random();
-        //for (int i = 0; i < 100; i++) {
-        //   int nextInt = random.nextInt(8);
-        //    System.out.println(nextInt);
-        // }
-//        String dealUrlWithAff = WebsiteHelper.getDealUrlWithAff(Website.SHOPCLUES, "http://www.shopclues.com/reach-allure-speed.html", new String[]{MarketChannel.GOOGLEPLAY.name(), "asd123gfd654"});
-//        System.out.println(dealUrlWithAff);
-        // String ss = WebsiteHelper.getDealUrlWithAff(Website.FLIPKART, "http://www.flipkart.com/philips-mix-4-gb-sa5mxx04wf-97-16-mp3-player/p/itmdmfndygbz3wfd?pid=AUDDMFMAC4WSSGGH&al=TQCV0eQ7m7uScf%2FCbjC3PcldugMWZuE7sHPMhtl4IOoHmf27YkMOEISwRAaogpJNxY67buiFvno%3D&offer=nb%3Amp%3A06e1fc0e26&ref=L%3A5882205368552411071&srno=b_1&findingMethod=Deals%20of%20the%20Day&otracker=hp_omu_Deals%20of%20the%20Day_1_39fdd0fe-e2e3-4176-9cf4-15ca32404fe5_0", new String[]{"GOOGLEPLAY", "aaaadfdfdfdf"});
-        //System.out.println(ss);
-        //System.out.println(WebsiteHelper.getUrlWithAff("http://dl.flipkart.com/dl/all/~intex-speakers/pr?sid=all&p%5B%5D=facets.filter_standard%255B%255D%3D1"));
-//        String ss = "<div id='mini_nav_qq'><li><a target='_top' " +
-//                "href='http:// lady.qq.com/emo/emotio.shtml'>情感</a></li><li>" +
-//                "<a target='_top' href='http://lady.qq.com/beauty/beauty.shtml'>美容</a></li></div>";
-//        String s = ClientHelper.delHTMLTag(ss);
-//        System.out.println(s);
     }
 
     @RequestMapping(value = "/newconfig", method = RequestMethod.GET)
@@ -139,17 +108,7 @@ public class AppController {
 
         Website[] noSelfJump = {Website.FLIPKART};
 
-//        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-
         AppConfigVo configVo = new AppConfigVo();
-//        if (!StringUtils.isEmpty(deviceId)) {
-//            UrmDeviceConfig deviceConfig = deviceService.getDeviceConfig(deviceId);
-//            if (deviceConfig != null) {
-//                configVo.setShowToast(deviceConfig.isShowToast());
-////                configVo.setShowPrice(deviceConfig.isShowPrice());
-//                configVo.setShowPrice(true);
-//            }
-//        }
         // 打开新的价格视图
         configVo.setShowPrice(true);
 
@@ -197,6 +156,24 @@ public class AppController {
         }
 
         return new ModelAndView();
+    }
+
+    @RequestMapping(value = "/giftList", method = RequestMethod.GET)
+    public ModelAndView getGiftList() {
+        ModelAndView modelAndView = new ModelAndView();
+        List<HasofferCoinsExchangeGift> gifts = appService.getGiftList();
+        //查询用户是否已登录
+        String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
+        UrmUser user = appService.getUserByUserToken(userToken);
+        if (user != null) {
+            modelAndView.addObject("id", user.getId());
+        }
+        modelAndView.addObject("errorCode", "00000");
+        modelAndView.addObject("msg", "ok");
+        Map map = new HashMap();
+        map.put("gList", gifts == null ? null : gifts);
+        modelAndView.addObject("data", map);
+        return modelAndView;
     }
 
     /**

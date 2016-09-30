@@ -5,10 +5,7 @@ import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
-import hasoffer.core.persistence.po.app.AppBanner;
-import hasoffer.core.persistence.po.app.AppDeal;
-import hasoffer.core.persistence.po.app.AppVersion;
-import hasoffer.core.persistence.po.app.AppWebsite;
+import hasoffer.core.persistence.po.app.*;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.urm.UrmSignAwdCfg;
 import hasoffer.core.persistence.po.urm.UrmUser;
@@ -66,4 +63,6 @@ public interface IAppService {
     List<UrmUser> getUsersByUserName(String userName);
 
     List<UrmSignAwdCfg> getSignAwardNum();
+
+    List<HasofferCoinsExchangeGift> getGiftList();
 }
