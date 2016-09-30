@@ -66,7 +66,7 @@ public class DubboUpdate {
 
         while (true) {
             //如果当前线程已经运行超过23小时，自杀吧孩子
-            if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_1_HOUR * 23) {
+            if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_1_HOUR * 20) {
                 System.out.println("dubbo update executorService has live above 10 hours ,thread going to die");
                 es.shutdown();
                 break;
