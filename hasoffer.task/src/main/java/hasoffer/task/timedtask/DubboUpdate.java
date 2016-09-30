@@ -115,8 +115,8 @@ public class DubboUpdate {
 
         while (true) {
             //如果当前线程已经运行超过3小时，自杀吧孩子
-            if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_1_HOUR * 3) {
-                System.out.println("price off notice update executorService has live above 3 hours ,thread going to die");
+            if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_1_HOUR * 1 && PriceOffNoticeProcessorWorker.PRICEOFFNOTICE_PRICESSOR_WORKER_THREADNUMBER == 0) {
+                System.out.println("price off notice update executorService has live above 1 hours ,thread going to die");
                 es.shutdown();
                 break;
             } else {
