@@ -405,6 +405,7 @@ public class AppController {
             data.setMaxConSignNum(user.getConSignNum());
         }
         mv.addObject("data", data);
+        mv.addObject("auxiliaryCheck", true);
         return mv;
     }
 
