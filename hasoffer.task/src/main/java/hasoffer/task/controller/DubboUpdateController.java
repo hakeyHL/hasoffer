@@ -80,7 +80,7 @@ public class DubboUpdateController {
 
         ExecutorService es = Executors.newCachedThreadPool();
 
-        ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
+        ConcurrentLinkedQueue<Long> queue = new ConcurrentLinkedQueue<>();
 
         es.execute(new PriceOffNoticeListWorker(dbm, queue, fetchDubboService));
 
