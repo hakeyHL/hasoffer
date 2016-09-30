@@ -83,7 +83,7 @@ public class Compare2Controller {
 
     public static void main(String[] args) {
         for (int i = 0; i < 10; i++) {
-            String dealUrlWithAff = WebsiteHelper.getDeeplinkWithAff(Website.FLIPKART, "https://www.flipkart.com/philips-qt4000-15-pro-skin-advanced-trimmer-men/p/itmdpgxmahh9kujg?pid=SHVDPGXHU2XNTYHC&fm=merchandising&iid=M_85bae8f1-8b0c-4279-86d0-75a3423cef65.2644f0e4-5ed4-4f66-be7f-54cc5e3478fd&otracker=hp_omu_Flipkart+Assured_1_2644f0e4-5ed4-4f66-be7f-54cc5e3478fd_2644f0e4-5ed4-4f66-be7f-54cc5e3478fd_1", new String[]{MarketChannel.GOOGLEPLAY.name(), "dfecc858243a616a", "huliId"});
+            String dealUrlWithAff = WebsiteHelper.getDeeplinkWithAff(Website.FLIPKART, "https://www.flipkart.com/philips-qt4000-15-pro-skin-advanced-trimmer-men/p/itmdpgxmahh9kujg?pid=SHVDPGXHU2XNTYHC&fm=merchandising&iid=M_85bae8f1-8b0c-4279-86d0-75a3423cef65.2644f0e4-5ed4-4f66-be7f-54cc5e3478fd&otracker=hp_omu_Flipkart+Assured_1_2644f0e4-5ed4-4f66-be7f-54cc5e3478fd_2644f0e4-5ed4-4f66-be7f-54cc5e3478fd_1", new String[]{MarketChannel.SHANCHUAN.name(), "dfecc858243a616a"});
             System.out.println(dealUrlWithAff);
         }
     }

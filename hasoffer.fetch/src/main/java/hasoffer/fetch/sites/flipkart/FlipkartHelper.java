@@ -132,12 +132,31 @@ public class FlipkartHelper {
                 //affExtParam2 是 channel_deviceId_userid
 
                 sb.append("&affExtParam1=").append("103662");
+
                 String channel_deviceId_userid = "";
-                for (String aff : affs) {
+                //按照第一个是渠道,第二个是设备id,第三个是用户id去拼接,如果不存在就是0
+                //渠道要用特殊符号表示
+
+                //要判断第一个是什么,第二个是什么,第三个是什么
+
+                //暂时按照约定顺序 1 渠道 2设备 3  用户id
+
+                //如果size 是2 是没有用户id
+                switch (affs.length) {
+                    case 2:
+                        channel_deviceId_userid += AffliIdHelper.getAffAlia(affs[0]) + "_" + affs[1] + "_0";
+                        break;
+                    case 3:
+                        channel_deviceId_userid += AffliIdHelper.getAffAlia(affs[0]) + "_" + affs[1] + "_" + affs[2];
+                        break;
+                    default:
+                }
+                sb.append("&affExtParam2=").append(channel_deviceId_userid);
+            /*    for (String aff : affs) {
                     channel_deviceId_userid += aff + "_";
                 }
                 channel_deviceId_userid = channel_deviceId_userid.substring(0, channel_deviceId_userid.lastIndexOf("_"));
-                sb.append("&affExtParam2=").append(channel_deviceId_userid);
+                sb.append("&affExtParam2=").append(channel_deviceId_userid);*/
             }
 
         } else {
