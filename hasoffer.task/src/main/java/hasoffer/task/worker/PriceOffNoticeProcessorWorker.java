@@ -85,10 +85,9 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
                 System.out.println(TimeUtils.nowDate());
                 e.printStackTrace();
             }
-
-            System.out.println("queue size is " + queue.size());
-            System.out.println("sku ex: " + sku.getId());
         }
+
+        System.out.println("queue size is " + queue.size());
     }
 
     private void updatePtmCmpSku(PtmCmpSku sku) {
