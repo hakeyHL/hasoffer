@@ -59,7 +59,7 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
                 if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_1_HOUR * 1) {
                     PRICEOFFNOTICE_PRICESSOR_WORKER_THREADNUMBER--;
                     System.out.println("price off notice processor worker thread has live above 1 hours ,thread going to die ");
-                    System.out.println("alive thread number" + PRICEOFFNOTICE_PRICESSOR_WORKER_THREADNUMBER);
+                    System.out.println("alive thread number " + PRICEOFFNOTICE_PRICESSOR_WORKER_THREADNUMBER);
                     break;
                 }
 
@@ -85,10 +85,9 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
                 System.out.println(TimeUtils.nowDate());
                 e.printStackTrace();
             }
-
-            System.out.println("queue size is " + queue.size());
-            System.out.println("sku ex: " + sku.getId());
         }
+
+        System.out.println("queue size is " + queue.size());
     }
 
     private void updatePtmCmpSku(PtmCmpSku sku) {
