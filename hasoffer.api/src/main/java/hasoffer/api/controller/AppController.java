@@ -1030,7 +1030,18 @@ public class AppController {
                         }
                         map.put("categorys", categorys);
                     }
-                    filterProducts(p.getData(), criteria.getKeyword());
+                    //如果是价格由低到高排序或者按照价格区间排序不过滤配件信息
+                    boolean filterProductFlag = true;
+                    if (criteria.getSort().name().equals("PRICEL2H")) {
+                        filterProductFlag = false;
+                    }
+                    //如果最低价和最高价有值,且是有效区间,不执行配件过滤
+                    if (criteria.getMaxPrice() == null || criteria.getMaxPrice() <= 0) {
+                        filterProductFlag = false;
+                    }
+                    if (filterProductFlag) {
+                        filterProducts(p.getData(), criteria.getKeyword());
+                    }
                     addProductVo2List(li, p.getData());
                 }
                 map.put("product", li);
@@ -1159,7 +1170,6 @@ public class AppController {
                     productListVo.setCommentNum(Long.valueOf(ptmProduct.getReview()));
                     productListVo.setStoresNum(ptmProduct.getStoreCount());
                     desList.add(productListVo);
-//                    }
                 }
             }
         }
