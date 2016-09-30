@@ -505,7 +505,7 @@ public class AppController {
      * @param id
      * @return
      */
-    @RequestMapping(value = "/dealInfo", method = RequestMethod.GET)
+   /* @RequestMapping(value = "/dealInfo", method = RequestMethod.GET)
     public ModelAndView dealInfo(@RequestParam String id) {
         ModelAndView mv = new ModelAndView();
         mv.addObject("errorCode", "00000");
@@ -593,7 +593,7 @@ public class AppController {
             }
         }
         return mv;
-    }
+    }*/
 
     /**
      * deal详情
@@ -601,7 +601,7 @@ public class AppController {
      * @param id
      * @return
      */
-    @RequestMapping(value = "temp/dealInfo", method = RequestMethod.GET)
+    @RequestMapping(value = "/dealInfo", method = RequestMethod.GET)
     public ModelAndView tempGetdealInfo(@RequestParam String id) {
         ModelAndView mv = new ModelAndView();
         mv.addObject("errorCode", "00000");
