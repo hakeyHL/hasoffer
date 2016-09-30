@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 public class PriceOffNoticeProcessorWorker implements Runnable {
 
     private static final String PRICEOFF_NOTICE_SKUID_QUEUE = "PRICEOFF_NOTICE_SKUID_QUEUE";
+    public static Integer PRICEOFFNOTICE_PRICESSOR_WORKER_THREADNUMBER = 0;
     private static Logger logger = LoggerFactory.getLogger(PriceOffNoticeProcessorWorker.class);
     private ConcurrentLinkedQueue<PtmCmpSku> queue;
     private IFetchDubboService fetchDubboService;
@@ -41,16 +42,26 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
         this.redisListService = redisListService;
         this.cmpSkuService = cmpSkuService;
         this.dbm = dbm;
+        PRICEOFFNOTICE_PRICESSOR_WORKER_THREADNUMBER++;
     }
 
     @Override
     public void run() {
+
+        long startTime = TimeUtils.now();
 
         while (true) {
 
             PtmCmpSku sku = queue.poll();
 
             try {
+
+                if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_1_HOUR * 1) {
+                    PRICEOFFNOTICE_PRICESSOR_WORKER_THREADNUMBER--;
+                    System.out.println("price off notice processor worker thread has live above 1 hours ,thread going to die ");
+                    System.out.println("alive thread number " + PRICEOFFNOTICE_PRICESSOR_WORKER_THREADNUMBER);
+                    break;
+                }
 
                 if (sku == null) {
                     try {
@@ -71,17 +82,12 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
                 updatePtmCmpSku(sku);
 
             } catch (Exception e) {
-                if (e instanceof InterruptedException) {
-                    System.out.println("InterruptedException break");
-                    break;
-                }
                 System.out.println(TimeUtils.nowDate());
                 e.printStackTrace();
             }
-
-            System.out.println("queue size is " + queue.size());
-            System.out.println("sku ex: " + sku.getId());
         }
+
+        System.out.println("queue size is " + queue.size());
     }
 
     private void updatePtmCmpSku(PtmCmpSku sku) {
