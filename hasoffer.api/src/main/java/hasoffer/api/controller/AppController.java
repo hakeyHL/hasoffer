@@ -944,10 +944,10 @@ public class AppController {
                                 Long cateId = Long.valueOf(nameValue.getName() + "");
                                 //可能是二级也可能是三级 ,二级的放一块,三级的放一块
                                 if (cateId > 0) {
-                                    System.out.println("  cate id " + cateId + " check  ");
+//                                    System.out.println("  cate id " + cateId + " check  ");
                                     PtmCategory ptmCategory = appCacheManager.getCategoryById(cateId);
                                     if (ptmCategory != null && ptmCategory.getLevel() == 2) {
-                                        System.out.println(i + " cate2  cate id " + cateId + " have ");
+//                                        System.out.println(i + " cate2  cate id " + cateId + " have ");
                                         //处理二级类目
                                         CategoryVo categoryVo = new CategoryVo();
                                         categoryVo.setId(ptmCategory.getId());
@@ -959,7 +959,7 @@ public class AppController {
                                         secondCategoryList.add(categoryVo);
                                     } else if (ptmCategory != null && ptmCategory.getLevel() == 3) {
                                         //处理三级类目
-                                        System.out.println(i + " cate3  cate id " + cateId + " have ");
+//                                        System.out.println(i + " cate3  cate id " + cateId + " have ");
                                         CategoryVo categoryVo3 = new CategoryVo();
                                         categoryVo3.setId(ptmCategory.getId());
                                         categoryVo3.setLevel(ptmCategory.getLevel());

@@ -160,7 +160,8 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
 
         // search by solr
         SearchResult<ProductModel2> sr = searchObjs(keyword, fqs, sorts, pivotFacets, sc.getPage() <= 1 ? 1 : sc.getPage(), sc.getPageSize(), true);
-
+        System.out.println("page  " + sc.getPage() + " size " + sc.getPageSize());
+        System.out.println(" sr  getResult " + sr.getResult().size());
         //process pivot fields
         Map<String, List<NameValue>> pivotFieldVals = new HashMap<>();
         if (pivotFieldSize > 0) {
