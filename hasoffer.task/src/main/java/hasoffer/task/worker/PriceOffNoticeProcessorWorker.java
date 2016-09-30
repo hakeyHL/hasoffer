@@ -30,13 +30,13 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
     private static final String PRICEOFF_NOTICE_SKUID_QUEUE = "PRICEOFF_NOTICE_SKUID_QUEUE";
     public static Integer PRICEOFFNOTICE_PRICESSOR_WORKER_THREADNUMBER = 0;
     private static Logger logger = LoggerFactory.getLogger(PriceOffNoticeProcessorWorker.class);
-    private ConcurrentLinkedQueue<PtmCmpSku> queue;
+    private ConcurrentLinkedQueue<Long> queue;
     private IFetchDubboService fetchDubboService;
     private IRedisListService redisListService;
     private ICmpSkuService cmpSkuService;
     private IDataBaseManager dbm;
 
-    public PriceOffNoticeProcessorWorker(ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, IRedisListService redisListService, ICmpSkuService cmpSkuService, IDataBaseManager dbm) {
+    public PriceOffNoticeProcessorWorker(ConcurrentLinkedQueue<Long> queue, IFetchDubboService fetchDubboService, IRedisListService redisListService, ICmpSkuService cmpSkuService, IDataBaseManager dbm) {
         this.queue = queue;
         this.fetchDubboService = fetchDubboService;
         this.redisListService = redisListService;
@@ -52,7 +52,7 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
 
         while (true) {
 
-            PtmCmpSku sku = queue.poll();
+            Long skuid = queue.poll();
 
             try {
 
@@ -63,7 +63,7 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
                     break;
                 }
 
-                if (sku == null) {
+                if (skuid == null) {
                     try {
                         TimeUnit.SECONDS.sleep(3);
                         logger.info("task update get null sleep 3 seconds");
@@ -71,6 +71,8 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
                         return;
                     }
                 }
+
+                PtmCmpSku sku = dbm.get(PtmCmpSku.class, skuid);
 
                 Date updateTime = sku.getUpdateTime();
                 if (updateTime != null) {
@@ -106,19 +108,19 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
 
         //如果返回结果状态为running，那么将sku返回队列
         if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
-            queue.add(sku);
+            queue.add(skuid);
 //            logger.info("taskstatus RUNNING for [" + skuid + "]");
         } else if (TaskStatus.STOPPED.equals(taskStatus)) {
             logger.info("taskstatus STOPPED for [" + skuid + "]");
         } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
             logger.info("taskstatus EXCEPTION for [" + skuid + "]");
         } else if (TaskStatus.NONE.equals(taskStatus)) {
-            queue.add(sku);
+            queue.add(skuid);
             if (Website.SNAPDEAL.equals(website) || Website.FLIPKART.equals(website) || Website.AMAZON.equals(website)) {
-                queue.add(sku);
+                queue.add(skuid);
                 fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_2);
             } else {
-                queue.add(sku);
+                queue.add(skuid);
                 fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_5);
             }
             logger.info("taskstatus NONE for [" + skuid + "] , resend success");
