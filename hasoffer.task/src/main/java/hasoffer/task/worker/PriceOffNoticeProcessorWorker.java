@@ -71,6 +71,10 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
                 updatePtmCmpSku(sku);
 
             } catch (Exception e) {
+                if (e instanceof InterruptedException) {
+                    System.out.println("InterruptedException break");
+                    break;
+                }
                 System.out.println(TimeUtils.nowDate());
                 e.printStackTrace();
             }
