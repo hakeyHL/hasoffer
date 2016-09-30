@@ -944,10 +944,10 @@ public class AppController {
                                 Long cateId = Long.valueOf(nameValue.getName() + "");
                                 //可能是二级也可能是三级 ,二级的放一块,三级的放一块
                                 if (cateId > 0) {
-                                    System.out.println("  cate id " + cateId + " check  ");
+//                                    System.out.println("  cate id " + cateId + " check  ");
                                     PtmCategory ptmCategory = appCacheManager.getCategoryById(cateId);
                                     if (ptmCategory != null && ptmCategory.getLevel() == 2) {
-                                        System.out.println(i + " cate2  cate id " + cateId + " have ");
+//                                        System.out.println(i + " cate2  cate id " + cateId + " have ");
                                         //处理二级类目
                                         CategoryVo categoryVo = new CategoryVo();
                                         categoryVo.setId(ptmCategory.getId());
@@ -959,7 +959,7 @@ public class AppController {
                                         secondCategoryList.add(categoryVo);
                                     } else if (ptmCategory != null && ptmCategory.getLevel() == 3) {
                                         //处理三级类目
-                                        System.out.println(i + " cate3  cate id " + cateId + " have ");
+//                                        System.out.println(i + " cate3  cate id " + cateId + " have ");
                                         CategoryVo categoryVo3 = new CategoryVo();
                                         categoryVo3.setId(ptmCategory.getId());
                                         categoryVo3.setLevel(ptmCategory.getLevel());
@@ -1030,7 +1030,18 @@ public class AppController {
                         }
                         map.put("categorys", categorys);
                     }
-                    filterProducts(p.getData(), criteria.getKeyword());
+                    //如果是价格由低到高排序或者按照价格区间排序不过滤配件信息
+                    boolean filterProductFlag = true;
+                    if (criteria.getSort().name().equals("PRICEL2H")) {
+                        filterProductFlag = false;
+                    }
+                    //如果最低价和最高价有值,且是有效区间,不执行配件过滤
+                    if (criteria.getMaxPrice() == null || criteria.getMaxPrice() <= 0) {
+                        filterProductFlag = false;
+                    }
+                    if (filterProductFlag) {
+                        filterProducts(p.getData(), criteria.getKeyword());
+                    }
                     addProductVo2List(li, p.getData());
                 }
                 map.put("product", li);
@@ -1159,7 +1170,6 @@ public class AppController {
                     productListVo.setCommentNum(Long.valueOf(ptmProduct.getReview()));
                     productListVo.setStoresNum(ptmProduct.getStoreCount());
                     desList.add(productListVo);
-//                    }
                 }
             }
         }
