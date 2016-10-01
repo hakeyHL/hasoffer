@@ -9,6 +9,7 @@ import hasoffer.core.persistence.dbm.HibernateDao;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.admin.updater.OrderStatsAnalysisPOUpdater;
+import hasoffer.core.persistence.po.urm.PriceOffNotice;
 import hasoffer.core.persistence.po.urm.UrmUserOrderBak;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -132,5 +133,12 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
         urmUserOrderBak.setOrderIdStrig(sb.toString());
 
         dbm.create(urmUserOrderBak);
+        //将老用户的降价提醒更新到新用户
+        List<PriceOffNotice> notices = dbm.query(" SELECT t FROM PriceOffNotice t WHERE t.userid = ?0 ", Arrays.asList(oldUserId));
+        for (PriceOffNotice notice : notices) {
+            OrderStatsAnalysisPOUpdater updater = new OrderStatsAnalysisPOUpdater(notice.getId().intValue());
+            updater.getPo().setUserId(newUserId);
+            dbm.update(updater);
+        }
     }
 }
