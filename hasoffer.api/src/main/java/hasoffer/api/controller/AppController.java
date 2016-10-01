@@ -869,8 +869,7 @@ public class AppController {
             }
 
         }
-
-
+        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
 
@@ -1327,12 +1326,17 @@ public class AppController {
                     orderVo.setWebsite(orderStatsAnalysisPO.getWebSite());
                     orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
                     transcations.add(orderVo);
-                    if (!orderStatsAnalysisPO.getOrderStatus().equals("cancelled") && !orderStatsAnalysisPO.getOrderStatus().equals("disapproved")) {
-                        PendingCoins = PendingCoins.add(tempPrice);
+                    if (orderStatsAnalysisPO.getOrderStatus() != null) {
+                        if (!orderStatsAnalysisPO.getOrderStatus().equals("cancelled") && !orderStatsAnalysisPO.getOrderStatus().equals("disapproved")) {
+                            if (!orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
+                                PendingCoins = PendingCoins.add(tempPrice);
+                            }
+                        }
+                        if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
+                            VericiedCoins = VericiedCoins.add(tempPrice);
+                        }
                     }
-                    if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
-                        VericiedCoins = VericiedCoins.add(tempPrice);
-                    }
+
                 }
             }
         }
