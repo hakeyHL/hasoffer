@@ -755,6 +755,7 @@ public class AppController {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
+        String lastTimeUserToken = request.getHeader("oldUserToken");
 
         Map map = new HashMap();
         String userToken = UUID.randomUUID().toString();
@@ -790,7 +791,10 @@ public class AppController {
             uUser.setUserToken(userToken);
             appService.updateUserInfo(uUser);
             logger.debug("update userInfo over ");
-
+            //把最新的usertoken放进去
+            if (!StringUtils.isEmpty(lastTimeUserToken)) {
+                lastTimeUserToken = userToken;
+            }
 
             System.out.println("update user and device relationship ");
 
@@ -824,7 +828,7 @@ public class AppController {
 //        return null;
 
         //在此处合并同一用户的数据
-        String lastTimeUserToken = request.getHeader("oldUserToken");
+//        String lastTimeUserToken = request.getHeader("oldUserToken");
 //        String lastTimeUserToken = Context.currentContext().getHeader("oldUserToken");//上一次的userToken
         String thirdId = userVO.getThirdId();
 
@@ -834,7 +838,7 @@ public class AppController {
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
-
+        //如果是third不变的情况下,usertoken已经被更新了,应该用新的usertoken操作
         UrmUser userByLastUserToken = appService.getUserByUserToken(lastTimeUserToken);
 
         if (userByLastUserToken != null) {
@@ -851,6 +855,7 @@ public class AppController {
             }
 
             if (StringUtils.equals(thirdId, oldThirdId)) {//如果同样的userToken对应的记录只有一条并且thirdId一致，认为是正确的用户信息
+                //如果老的thirdId和新的thirdId一样的话要清除此third下的多个记录的问题
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             }
