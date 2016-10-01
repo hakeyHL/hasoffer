@@ -766,16 +766,16 @@ public class AppController {
         UrmUser uUser = appService.getUserById(StringUtils.isEmpty(userVO.getThirdId()) ? "-" : userVO.getThirdId());
         if (uUser == null) {
             logger.debug("user is not exist before");
-            UrmUser urmUser = new UrmUser();
-            urmUser.setUserToken(userToken);
-            urmUser.setAvatarPath(userVO.getUserIcon());
-            urmUser.setCreateTime(new Date());
-            urmUser.setTelephone(userVO.getTelephone() == null ? "" : userVO.getTelephone());
-            urmUser.setThirdPlatform(userVO.getPlatform());
-            urmUser.setThirdToken(userVO.getToken());
-            urmUser.setUserName(userVO.getUserName());
-            urmUser.setThirdId(userVO.getThirdId());
-            int result = appService.addUser(urmUser);
+            uUser = new UrmUser();
+            uUser.setUserToken(userToken);
+            uUser.setAvatarPath(userVO.getUserIcon());
+            uUser.setCreateTime(new Date());
+            uUser.setTelephone(userVO.getTelephone() == null ? "" : userVO.getTelephone());
+            uUser.setThirdPlatform(userVO.getPlatform());
+            uUser.setThirdToken(userVO.getToken());
+            uUser.setUserName(userVO.getUserName());
+            uUser.setThirdId(userVO.getThirdId());
+            int result = appService.addUser(uUser);
             logger.debug("add user result is :" + result);
 
         } else {
@@ -847,9 +847,16 @@ public class AppController {
                 return null;
             }
 
-            if (StringUtils.equals(thirdId, oldThirdId) || oldUserList.size() == 1) {//如果同样的userToken对应的记录只有一条并且thirdId一致，认为是正确的用户信息
+            if (StringUtils.equals(thirdId, oldThirdId)) {//如果同样的userToken对应的记录只有一条并且thirdId一致，认为是正确的用户信息
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
+            }
+            if (!StringUtils.equals(thirdId, oldThirdId) && oldUserList.size() == 1) {
+                //可能是老版本的用户升级,要将老版本用户的订单迁移到新版本
+                for (int i = 0; i < oldUserList.size(); i++) {
+                    orderService.mergeOldUserOrderToNewUser(oldUserList.get(i).getId() + "", uUser.getId() + "");//转移订单
+                    appService.bakUserInfo(oldUserList.get(i));//备份用户数据
+                }
             } else {
                 //size一定是大于1的
                 for (int i = 1; i < oldUserList.size(); i++) {
