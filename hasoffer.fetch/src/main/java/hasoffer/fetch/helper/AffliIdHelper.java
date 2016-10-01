@@ -16,7 +16,8 @@ public class AffliIdHelper {
     final static String[] LEOMASTER_FLIDS = new String[]{"hlhakeygm", "oliviersl", "wuningSFg"};
     final static String[] NINEAPPS_FLIDS = new String[]{"Sunyukunj", "gczyfw201", "xyangryrg", "zhouxixi0", "harveyouo", "allenooou"};
     //    final static String[] SHANCHUAN_FLIDS = new String[]{"160082642", "286867656", "289063282", "514330076", "602074420", "943546560"};
-    final static String[] SHANCHUAN_FLIDS = new String[]{"huangmint", "huangmint", "wangshuom", "514330076", "602074420", "943546560"};
+//    final static String[] SHANCHUAN_FLIDS = new String[]{"huangmint", "zhangchen", "wangshuom", "514330076", "602074420", "943546560"};
+    final static String[] SHANCHUAN_FLIDS = new String[]{"160082642", "zhangchen", "wangshuom", "514330076", "602074420", "943546560"};
     final static String[] GOOGLEPLAY_FLIDS = new String[]{"115377600"};
     final static String[] OTHER_FLIDS = new String[]{"120527343"};
     final static String[] ZUK_FLIDS = new String[]{"747306881"};

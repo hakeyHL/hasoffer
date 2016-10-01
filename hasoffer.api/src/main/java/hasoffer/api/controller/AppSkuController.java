@@ -122,8 +122,8 @@ public class AppSkuController {
                 //去除html标签
                 if (!StringUtils.isEmpty(tempJsonParam)) {
                     tempJsonParam = ClientHelper.delHTMLTag(tempJsonParam);
+                    map.put("specs", JsonHelper.getJsonMap(tempJsonParam));//参数
                 }
-                map.put("specs", JsonHelper.getJsonMap(tempJsonParam));//参数
             }
             List<PtmCmpSkuImage> ptmCmpSkuImages = ptmCmpSkuImageService.findPtmCmpSkuImages(ptmCmpSku.getId());
             if (ptmCmpSkuImages != null && ptmCmpSkuImages.size() > 0) {

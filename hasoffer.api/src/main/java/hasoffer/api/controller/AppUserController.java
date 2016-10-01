@@ -273,6 +273,7 @@ public class AppUserController {
                         return null;
                     }
                 }
+                lastSignTime = urmUser.getLastSignTime();
                 String lastSignTimeDateFor = simpleDateFormat.format(new Date(lastSignTime));
                 //按照连续次数降序查询奖励配置表
                 List<UrmSignAwdCfg> signConfigs = appService.getSignAwardNum();

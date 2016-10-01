@@ -632,6 +632,11 @@ public class AppController {
                 //降价生成deal无失效日期
                 if (!appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
                     map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
+                } else {
+                    //是降价生成的deal，失效时间设置创建时间七天后
+                    Date createTime = appDeal.getCreateTime();
+                    createTime.setTime(createTime.getTime() + 1000 * 60 * 60 * 24 * 7);
+                    map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(createTime));
                 }
                 map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
                 StringBuilder sb = new StringBuilder();
@@ -674,6 +679,8 @@ public class AppController {
                             for (FetchedProductReview fec : fetchedProductReviewList) {
                                 String reviewContent = fec.getReviewContent();
                                 reviewContent = ClientHelper.delHTMLTag(reviewContent);
+                                //处理下换行符号
+                                reviewContent.replaceAll("\n", "");
                                 if (!StringUtils.isEmpty(reviewContent)) {
                                     if (commentList.size() < 4) {
                                         commentList.add(reviewContent);
