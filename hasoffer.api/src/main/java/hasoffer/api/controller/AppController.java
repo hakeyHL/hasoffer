@@ -819,7 +819,6 @@ public class AppController {
         }
         map.put("userToken", userToken);
         jsonObject.put("data", map);
-        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
 //        return null;
 
         //在此处合并同一用户的数据
@@ -827,8 +826,9 @@ public class AppController {
         String thirdId = userVO.getThirdId();
 
         if (StringUtils.isEmpty(lastTimeUserToken) || StringUtils.isEmpty(thirdId)) {//如果userToken或者thirdId为空
-            System.out.println("lastTimeUserToken is " + lastTimeUserToken);
-            System.out.println("lastTimeUserToken is " + thirdId);
+            System.out.println("lastTimeUserToken is :" + lastTimeUserToken);
+            System.out.println("current user thirdId is : " + thirdId);
+            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
 
@@ -843,34 +843,19 @@ public class AppController {
             List<UrmUser> oldUserList = appService.getIdDescUserListByThirdId(oldThirdId);
 
             if (oldUserList == null || oldUserList.size() == 0) {
+                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             }
 
             if (StringUtils.equals(thirdId, oldThirdId) || oldUserList.size() == 1) {//如果同样的userToken对应的记录只有一条并且thirdId一致，认为是正确的用户信息
+                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             } else {
-
-                for (int i = 0; i < oldUserList.size(); i++) {
-
-                    if (i == 0) {
-                        //取出id最大的用户记录更新用户信息
-                        UrmUser user = oldUserList.get(i);
-
-                        user.setUserName(userVO.getUserName());
-                        user.setThirdPlatform(userVO.getPlatform());
-                        user.setTelephone(uUser.getTelephone());
-                        user.setAvatarPath(uUser.getAvatarPath());
-                        user.setThirdToken(uUser.getThirdToken());
-                        user.setUserToken(userToken);
-
-                        appService.updateUserInfo(user);
-                    } else {
-
-                        appService.bakUserInfo(oldUserList.get(i));//备份用户数据
-                        orderService.mergeOldUserOrderToNewUser(oldUserList.get(i).getId() + "", oldUserList.get(0).getId() + "");//转移订单
-
-                    }
-
+                //size一定是大于1的
+                for (int i = 1; i < oldUserList.size(); i++) {
+                    //取出id最大的用户记录,将其他记录的订单数据都更新到此记录中
+                    orderService.mergeOldUserOrderToNewUser(oldUserList.get(i).getId() + "", oldUserList.get(0).getId() + "");//转移订单
+                    appService.bakUserInfo(oldUserList.get(i));//备份用户数据
                 }
 
             }

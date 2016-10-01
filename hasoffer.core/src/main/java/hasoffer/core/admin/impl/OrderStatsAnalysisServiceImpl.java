@@ -113,7 +113,7 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
 
         UrmUserOrderBak urmUserOrderBak = new UrmUserOrderBak();
 
-        List<OrderStatsAnalysisPO> orderList = dbm.query("SELECT t FROM report_ordersatas t WHERE t.userid = ?0 ", Arrays.asList(oldUserId));
+        List<OrderStatsAnalysisPO> orderList = dbm.query("SELECT t FROM OrderStatsAnalysisPO t WHERE t.userId = ?0 ", Arrays.asList(oldUserId));
 
         StringBuffer sb = new StringBuffer();
 
