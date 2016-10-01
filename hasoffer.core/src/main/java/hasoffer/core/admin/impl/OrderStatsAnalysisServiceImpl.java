@@ -136,9 +136,7 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
         //将老用户的降价提醒更新到新用户
         List<PriceOffNotice> notices = dbm.query(" SELECT t FROM PriceOffNotice t WHERE t.userid = ?0 ", Arrays.asList(oldUserId));
         for (PriceOffNotice notice : notices) {
-            OrderStatsAnalysisPOUpdater updater = new OrderStatsAnalysisPOUpdater(notice.getId().intValue());
-            updater.getPo().setUserId(newUserId);
-            dbm.update(updater);
+            dbm.updateBySQL("update PriceOffNotice t set t.userid=" + newUserId + " where t.userid=" + notice.getUserid());
         }
     }
 }
