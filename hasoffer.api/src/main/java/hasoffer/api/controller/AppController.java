@@ -831,8 +831,9 @@ public class AppController {
         map.put("userToken", userToken);
         jsonObject.put("data", map);
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        return null;
 
-        //在此处合并同一用户的数据
+       /* //在此处合并同一用户的数据
         String lastTimeUserToken = JSON.parseObject(request.getHeader("deviceinfo")).getString("userToken");//上一次的userToken
         String thirdId = JSON.parseObject(request.getHeader("deviceinfo")).getString("thirdId");//把本次最新的thirdId
 
@@ -886,7 +887,7 @@ public class AppController {
         }
 
 
-        return null;
+        return null;*/
     }
 
     /**
