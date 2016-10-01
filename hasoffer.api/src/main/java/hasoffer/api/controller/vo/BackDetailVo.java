@@ -30,6 +30,15 @@ public class BackDetailVo {
 
     //是否从未签到过,默认是
     private boolean everSign = true;
+    private boolean auxiliaryCheck = false;
+
+    public boolean isAuxiliaryCheck() {
+        return auxiliaryCheck;
+    }
+
+    public void setAuxiliaryCheck(boolean auxiliaryCheck) {
+        this.auxiliaryCheck = auxiliaryCheck;
+    }
 
     public boolean isHasSign() {
         return hasSign;

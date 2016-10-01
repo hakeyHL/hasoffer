@@ -345,6 +345,8 @@ public class AppController {
     @RequestMapping(value = "/backDetail", method = RequestMethod.GET)
     public ModelAndView backDetail() {
         ModelAndView mv = new ModelAndView();
+        mv.addObject("errorCode", "00000");
+        mv.addObject("errorCode", "msg");
         BackDetailVo data = new BackDetailVo();
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
         UrmUser user = appService.getUserByUserToken(userToken);
@@ -423,8 +425,8 @@ public class AppController {
             //5. 当前最大连续签到次数
             data.setMaxConSignNum(user.getConSignNum());
         }
+        data.setAuxiliaryCheck(true);
         mv.addObject("data", data);
-        mv.addObject("auxiliaryCheck", true);
         return mv;
     }
 
