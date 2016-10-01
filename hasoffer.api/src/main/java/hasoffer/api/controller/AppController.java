@@ -822,7 +822,8 @@ public class AppController {
 //        return null;
 
         //在此处合并同一用户的数据
-        String lastTimeUserToken = Context.currentContext().getHeader("oldUserToken");//上一次的userToken
+        String lastTimeUserToken = request.getHeader("oldUserToken");
+//        String lastTimeUserToken = Context.currentContext().getHeader("oldUserToken");//上一次的userToken
         String thirdId = userVO.getThirdId();
 
         if (StringUtils.isEmpty(lastTimeUserToken) || StringUtils.isEmpty(thirdId)) {//如果userToken或者thirdId为空
