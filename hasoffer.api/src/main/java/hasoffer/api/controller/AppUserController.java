@@ -292,6 +292,7 @@ public class AppUserController {
                                 }
                             }
                         }
+                        urmUser.setLastSignTime(new Date().getTime());
                     } else {
                         //未查询到配置表,无法计算,结束,报错
                         System.out.println(" no award config data ,over !");
