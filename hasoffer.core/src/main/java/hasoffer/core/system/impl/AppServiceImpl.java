@@ -12,6 +12,7 @@ import hasoffer.core.persistence.po.app.*;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.urm.UrmSignAwdCfg;
 import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.persistence.po.urm.UrmUserBak;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.system.IAppService;
 import org.apache.commons.lang3.StringUtils;
@@ -188,6 +189,11 @@ public class AppServiceImpl implements IAppService {
     }
 
     @Override
+    public List<UrmUser> getIdDescUserListByThirdId(String thirdId) {
+        return dbm.query("SELECT t FROM UrmUser t WHERE t.thirdId = ?0 ORDER BY t.id DESC", Arrays.asList(thirdId));
+    }
+
+    @Override
     public List getProductByCriteria(SearchCriteria criteria) {
         StringBuilder sb = new StringBuilder();
         int i = 0;
@@ -292,6 +298,31 @@ public class AppServiceImpl implements IAppService {
     @Override
     public List<HasofferCoinsExchangeGift> getGiftList() {
         return dbm.query(Q_APP_GIFT_LIST);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void bakUserInfo(UrmUser urmUser) {
+
+        UrmUserBak userBak = new UrmUserBak();
+
+        userBak.setId(urmUser.getId());
+        userBak.setAvatarPath(urmUser.getAvatarPath());
+        userBak.setConSignNum(urmUser.getConSignNum());
+        userBak.setCreateTime(urmUser.getCreateTime());
+        userBak.setGcmToken(urmUser.getGcmToken());
+        userBak.setLastSignTime(urmUser.getLastSignTime());
+        userBak.setMaxConSignNum(urmUser.getMaxConSignNum());
+        userBak.setSignCoin(urmUser.getSignCoin());
+        userBak.setTelephone(urmUser.getTelephone());
+        userBak.setThirdId(urmUser.getThirdId());
+        userBak.setThirdPlatform(urmUser.getThirdPlatform());
+        userBak.setThirdToken(urmUser.getThirdToken());
+        userBak.setUserName(urmUser.getUserName());
+        userBak.setUserToken(urmUser.getUserToken());
+
+        dbm.create(userBak);
+        dbm.delete(UrmUser.class, urmUser.getId());
     }
 
     public PtmCategory getCategoryInfo(Long cateId) {

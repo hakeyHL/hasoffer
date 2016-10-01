@@ -40,6 +40,8 @@ public interface IAppService {
 
     UrmUser getUserById(String thirdId);
 
+    List<UrmUser> getIdDescUserListByThirdId(String thirdId);
+
     List getProductByCriteria(SearchCriteria criteria);
 
     List<String> getUserDevicesByUserId(String userId);
@@ -65,4 +67,6 @@ public interface IAppService {
     List<UrmSignAwdCfg> getSignAwardNum();
 
     List<HasofferCoinsExchangeGift> getGiftList();
+
+    void bakUserInfo(UrmUser urmUser);
 }
