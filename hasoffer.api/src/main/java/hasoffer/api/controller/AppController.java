@@ -649,7 +649,7 @@ public class AppController {
                                                         reviewTitle = ClientHelper.delHTMLTag(reviewTitle);
                                                         //处理下换行符号
                                                         reviewTitle.replaceAll("\n", "");
-                                                        commentList.add(reviewTitle == null ? "" : reviewTitle + reviewContent);
+                                                        commentList.add(reviewTitle == null ? "" : reviewTitle + "." + reviewContent);
                                                     } else {
                                                         commentList.add(reviewContent);
                                                     }
