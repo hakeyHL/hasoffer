@@ -509,7 +509,7 @@ public class AppController {
      * @return
      */
     @RequestMapping(value = "/dealInfo", method = RequestMethod.GET)
-    public ModelAndView tempGetdealInfo(@RequestParam String id) {
+    public ModelAndView getdealInfo(@RequestParam String id) {
         //临时按照appVersion区分返回描述
         ModelAndView mv = new ModelAndView();
         mv.addObject("errorCode", "00000");
@@ -636,12 +636,23 @@ public class AppController {
                                         List<String> commentList = new ArrayList<>();
                                         for (FetchedProductReview fec : fetchedProductReviewList) {
                                             String reviewContent = fec.getReviewContent();
-                                            reviewContent = ClientHelper.delHTMLTag(reviewContent);
-                                            //处理下换行符号
-                                            reviewContent.replaceAll("\n", "");
+                                            if (!StringUtils.isEmpty(reviewContent)) {
+                                                reviewContent = ClientHelper.delHTMLTag(reviewContent);
+                                                //处理下换行符号
+                                                reviewContent.replaceAll("\n", "");
+                                            }
                                             if (!StringUtils.isEmpty(reviewContent)) {
                                                 if (commentList.size() < 4) {
-                                                    commentList.add(reviewContent);
+                                                    //拼接评论标题
+                                                    String reviewTitle = fec.getReviewTitle();
+                                                    if (!StringUtils.isEmpty(reviewTitle)) {
+                                                        reviewTitle = ClientHelper.delHTMLTag(reviewTitle);
+                                                        //处理下换行符号
+                                                        reviewTitle.replaceAll("\n", "");
+                                                        commentList.add(reviewTitle == null ? "" : reviewTitle + reviewContent);
+                                                    } else {
+                                                        commentList.add(reviewContent);
+                                                    }
                                                 }
                                             }
                                         }
