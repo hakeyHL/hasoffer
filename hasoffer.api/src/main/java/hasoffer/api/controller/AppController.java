@@ -362,7 +362,8 @@ public class AppController {
                 for (UrmSignAwdCfg urmSignAwdCfg : signAwardNum) {
                     map.put(urmSignAwdCfg.getCount(), urmSignAwdCfg.getAwardCoin());
                 }
-
+                Set<Integer> integers = map.keySet();
+                Integer max = Collections.max(integers);
                 Long lastSignTime = user.getLastSignTime();
                 if (lastSignTime == null) {
                     //如果为空,代表还没有签到过
@@ -383,17 +384,32 @@ public class AppController {
                         data.setHasSign(true);
                         //明天签到的奖励
                         Integer conSignNum = user.getConSignNum();
-                        if (map.get(conSignNum + 1) != null) {
-                            data.setThisTimeCoin(map.get(conSignNum + 1));
+                        //最大连续签到数会大于连续奖励数
+                        //需要知道Map中的最大key值
+                        if (conSignNum + 1 >= max) {
+                            data.setThisTimeCoin(map.get(max));
+                        } else {
+                            if (map.get(conSignNum + 1) != null) {
+                                data.setThisTimeCoin(map.get(conSignNum + 1));
+                            }
                         }
                     } else {
                         //返回已签到+1作为本次,已连续+2作为下次返回
                         Integer conSignNum = user.getConSignNum();
-                        if (map.get(conSignNum + 1) != null) {
-                            data.setThisTimeCoin(map.get(conSignNum + 1));
+                        //需要知道Map中的最大key值
+                        if (conSignNum + 1 >= max) {
+                            data.setThisTimeCoin(map.get(max));
+                        } else {
+                            if (map.get(conSignNum + 1) != null) {
+                                data.setThisTimeCoin(map.get(conSignNum + 1));
+                            }
                         }
-                        if (map.get(conSignNum + 2) != null) {
-                            data.setNextTimeCoin(map.get(conSignNum + 2));
+                        if (conSignNum + 2 >= max) {
+                            data.setNextTimeCoin(map.get(max));
+                        } else {
+                            if (map.get(conSignNum + 2) != null) {
+                                data.setNextTimeCoin(map.get(conSignNum + 2));
+                            }
                         }
                     }
 

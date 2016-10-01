@@ -273,10 +273,12 @@ public class AppUserController {
                         return null;
                     }
                 }
+                //如果之前未签到,那么上次签到时间已经被更新为当前时间
                 lastSignTime = urmUser.getLastSignTime();
                 String lastSignTimeDateFor = simpleDateFormat.format(new Date(lastSignTime));
                 //按照连续次数降序查询奖励配置表
                 List<UrmSignAwdCfg> signConfigs = appService.getSignAwardNum();
+                //currentDateFor为当前日期-1
                 if (currentDateFor.equals(lastSignTimeDateFor)) {
                     //如果两个相等,代表是连续的,连续+1
                     urmUser.setConSignNum(urmUser.getConSignNum() + 1);
