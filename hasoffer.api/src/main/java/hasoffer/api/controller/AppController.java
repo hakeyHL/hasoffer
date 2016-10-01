@@ -793,11 +793,11 @@ public class AppController {
         map.put("userToken", userToken);
         jsonObject.put("data", map);
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
-        return null;
+//        return null;
 
-       /* //在此处合并同一用户的数据
-        String lastTimeUserToken = JSON.parseObject(request.getHeader("deviceinfo")).getString("userToken");//上一次的userToken
-        String thirdId = JSON.parseObject(request.getHeader("deviceinfo")).getString("thirdId");//把本次最新的thirdId
+        //在此处合并同一用户的数据
+        String lastTimeUserToken = Context.currentContext().getHeader("oldUserToken");//上一次的userToken
+        String thirdId = userVO.getThirdId();
 
         if (StringUtils.isEmpty(lastTimeUserToken) || StringUtils.isEmpty(thirdId)) {//如果userToken或者thirdId为空
             System.out.println("lastTimeUserToken is " + lastTimeUserToken);
@@ -808,6 +808,8 @@ public class AppController {
         UrmUser userByLastUserToken = appService.getUserByUserToken(lastTimeUserToken);
 
         if (userByLastUserToken != null) {
+            //如果老token有对应用户,存起来,方便二次处理
+            logger.error("old userInfo and this thirdId is  : " + thirdId + " InfoInfo " + JSON.toJSONString(userByLastUserToken));
 
             String oldThirdId = userByLastUserToken.getThirdId();
 
@@ -849,7 +851,7 @@ public class AppController {
         }
 
 
-        return null;*/
+        return null;
     }
 
     /**
