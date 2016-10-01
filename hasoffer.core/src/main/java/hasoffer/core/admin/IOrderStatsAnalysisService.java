@@ -15,4 +15,6 @@ public interface IOrderStatsAnalysisService {
     void updateOrder(String webSite, Date startTime, Date endTime);
 
     PageableResult<Map<String, Object>> selectPageableResult(String webSite, String channel, String orderStatus, Date startYmd, Date endYmd, int page, int size);
+
+    void mergeOldUserOrderToNewUser(String oldUserId,String newUserId);
 }

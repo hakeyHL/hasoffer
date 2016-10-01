@@ -13,6 +13,7 @@ import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
+import hasoffer.core.admin.IOrderStatsAnalysisService;
 import hasoffer.core.bo.product.Banners;
 import hasoffer.core.bo.product.CategoryVo;
 import hasoffer.core.bo.push.*;
@@ -90,6 +91,8 @@ public class AppController {
     IPushService pushService;
     @Resource
     MongoDbManager mongoDbManager;
+    @Resource
+    IOrderStatsAnalysisService orderService;
     Logger logger = LoggerFactory.getLogger(AppController.class);
 
     public static void main(String[] args) throws Exception {
@@ -629,6 +632,11 @@ public class AppController {
                 //降价生成deal无失效日期
                 if (!appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
                     map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
+                } else {
+                    //是降价生成的deal，失效时间设置创建时间七天后
+                    Date createTime = appDeal.getCreateTime();
+                    createTime.setTime(createTime.getTime() + 1000 * 60 * 60 * 24 * 7);
+                    map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(createTime));
                 }
                 map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
                 StringBuilder sb = new StringBuilder();
@@ -671,6 +679,8 @@ public class AppController {
                             for (FetchedProductReview fec : fetchedProductReviewList) {
                                 String reviewContent = fec.getReviewContent();
                                 reviewContent = ClientHelper.delHTMLTag(reviewContent);
+                                //处理下换行符号
+                                reviewContent.replaceAll("\n", "");
                                 if (!StringUtils.isEmpty(reviewContent)) {
                                     if (commentList.size() < 4) {
                                         commentList.add(reviewContent);
@@ -821,6 +831,61 @@ public class AppController {
         map.put("userToken", userToken);
         jsonObject.put("data", map);
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+
+        //在此处合并同一用户的数据
+        String lastTimeUserToken = JSON.parseObject(request.getHeader("deviceinfo")).getString("userToken");//上一次的userToken
+        String thirdId = JSON.parseObject(request.getHeader("deviceinfo")).getString("thirdId");//把本次最新的thirdId
+
+        if (StringUtils.isEmpty(lastTimeUserToken) || StringUtils.isEmpty(thirdId)) {//如果userToken或者thirdId为空
+            System.out.println("lastTimeUserToken is " + lastTimeUserToken);
+            System.out.println("lastTimeUserToken is " + thirdId);
+            return null;
+        }
+
+        UrmUser userByLastUserToken = appService.getUserByUserToken(lastTimeUserToken);
+
+        if (userByLastUserToken != null) {
+
+            String oldThirdId = userByLastUserToken.getThirdId();
+
+            List<UrmUser> oldUserList = appService.getIdDescUserListByThirdId(oldThirdId);
+
+            if (oldUserList == null || oldUserList.size() == 0) {
+                return null;
+            }
+
+            if (StringUtils.equals(thirdId, oldThirdId) || oldUserList.size() == 1) {//如果同样的userToken对应的记录只有一条并且thirdId一致，认为是正确的用户信息
+                return null;
+            } else {
+
+                for (int i = 0; i < oldUserList.size(); i++) {
+
+                    if (i == 0) {
+                        //取出id最大的用户记录更新用户信息
+                        UrmUser user = oldUserList.get(i);
+
+                        user.setUserName(userVO.getUserName());
+                        user.setThirdPlatform(userVO.getPlatform());
+                        user.setTelephone(uUser.getTelephone());
+                        user.setAvatarPath(uUser.getAvatarPath());
+                        user.setThirdToken(uUser.getThirdToken());
+                        user.setUserToken(userToken);
+
+                        appService.updateUserInfo(user);
+                    } else {
+
+                        appService.bakUserInfo(oldUserList.get(i));//备份用户数据
+                        orderService.mergeOldUserOrderToNewUser(oldUserList.get(i).getId() + "", oldUserList.get(0).getId() + "");//转移订单
+
+                    }
+
+                }
+
+            }
+
+        }
+
+
         return null;
     }
 
