@@ -2,9 +2,9 @@ package hasoffer.fetch.sites.flipkart;
 
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.AffliIdHelper;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.UrlUtils;
-import hasoffer.fetch.helper.AffliIdHelper;
 
 import java.util.Random;
 
@@ -113,12 +113,12 @@ public class FlipkartHelper {
                 }
             }
         }
-        StringBuffer sb = new StringBuffer(url);
+        StringBuilder sb = new StringBuilder(url);
 
         String affid = AffliIdHelper.getAffiIdByWebsite(Website.FLIPKART, marketChannelName);
         //在这里设置一个随机,网盟占1/10 概率
         int randomInt = new Random().nextInt(10);
-        if (randomInt == 5) {
+        if (randomInt == 5|| randomInt == 6) {
             //https://dl.flipkart.com/dl/yonex-carbonex-6000df-g4-strung-badminton-racquet/p/itmdfyr9jwgzd9dv?pid=RAQDFYR9JWGZD9DV&affid=raymondzh&affExtParam1=103662&affExtParam2=channel_deviceId_userid
             //raymondzh  103662  channel_deviceId_userid
             affid = "raymondzh";
@@ -127,7 +127,7 @@ public class FlipkartHelper {
             } else {
                 sb.append("?affid=").append(affid);
             }
-            if (affs != null && affs.length >= 1) {
+            if (affs.length >= 1) {
                 //affExtParam1 目前是固定的 103662
                 //affExtParam2 是 channel_deviceId_userid
 
@@ -166,7 +166,7 @@ public class FlipkartHelper {
                 sb.append("?affid=").append(affid);
             }
 
-            if (affs != null && affs.length >= 1) {
+            if (affs.length >= 1) {
 //            int i = 1;
 //            for (String aff : affs) {
 //                sb.append("&affExtParam").append(i++).append("=").append(aff);

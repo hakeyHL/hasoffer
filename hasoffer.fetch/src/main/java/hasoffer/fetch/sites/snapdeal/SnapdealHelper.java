@@ -1,8 +1,8 @@
 package hasoffer.fetch.sites.snapdeal;
 
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.AffliIdHelper;
 import hasoffer.base.utils.StringUtils;
-import hasoffer.fetch.helper.AffliIdHelper;
 
 import java.util.Random;
 import java.util.regex.Matcher;
