@@ -2,9 +2,9 @@ package hasoffer.fetch.sites.flipkart;
 
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.AffliIdHelper;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.UrlUtils;
-import hasoffer.fetch.helper.AffliIdHelper;
 
 import java.util.Random;
 
@@ -113,12 +113,12 @@ public class FlipkartHelper {
                 }
             }
         }
-        StringBuffer sb = new StringBuffer(url);
+        StringBuilder sb = new StringBuilder(url);
 
         String affid = AffliIdHelper.getAffiIdByWebsite(Website.FLIPKART, marketChannelName);
         //在这里设置一个随机,网盟占1/10 概率
         int randomInt = new Random().nextInt(10);
-        if (randomInt == 5) {
+        if (randomInt > 5) {
             //https://dl.flipkart.com/dl/yonex-carbonex-6000df-g4-strung-badminton-racquet/p/itmdfyr9jwgzd9dv?pid=RAQDFYR9JWGZD9DV&affid=raymondzh&affExtParam1=103662&affExtParam2=channel_deviceId_userid
             //raymondzh  103662  channel_deviceId_userid
             affid = "raymondzh";
@@ -127,7 +127,7 @@ public class FlipkartHelper {
             } else {
                 sb.append("?affid=").append(affid);
             }
-            if (affs != null && affs.length >= 1) {
+            if (affs.length >= 1) {
                 //affExtParam1 目前是固定的 103662
                 //affExtParam2 是 channel_deviceId_userid
 
@@ -166,7 +166,7 @@ public class FlipkartHelper {
                 sb.append("?affid=").append(affid);
             }
 
-            if (affs != null && affs.length >= 1) {
+            if (affs.length >= 1) {
 //            int i = 1;
 //            for (String aff : affs) {
 //                sb.append("&affExtParam").append(i++).append("=").append(aff);
@@ -186,9 +186,13 @@ public class FlipkartHelper {
     }
 
     public static void main(String[] args) {
-        String url = "https://www.flipkart.com/philips-qt4000-15-pro-skin-advanced-trimmer-men/p/itmdpgxmahh9kujg?pid=SHVDPGXHU2XNTYHC&fm=merchandising&iid=M_85bae8f1-8b0c-4279-86d0-75a3423cef65.2644f0e4-5ed4-4f66-be7f-54cc5e3478fd&otracker=hp_omu_Flipkart+Assured_1_2644f0e4-5ed4-4f66-be7f-54cc5e3478fd_2644f0e4-5ed4-4f66-be7f-54cc5e3478fd_1";
-        String[] ss = new String[]{"a", "b", "c"};
-        String s = getUrlWithAff(url, ss);
-        System.out.println(s);
+        //String url = "https://www.flipkart.com/philips-qt4000-15-pro-skin-advanced-trimmer-men/p/itmdpgxmahh9kujg?pid=SHVDPGXHU2XNTYHC&fm=merchandising&iid=M_85bae8f1-8b0c-4279-86d0-75a3423cef65.2644f0e4-5ed4-4f66-be7f-54cc5e3478fd&otracker=hp_omu_Flipkart+Assured_1_2644f0e4-5ed4-4f66-be7f-54cc5e3478fd_2644f0e4-5ed4-4f66-be7f-54cc5e3478fd_1";
+        //String[] ss = new String[]{"a", "b", "c"};
+        //String s = getUrlWithAff(url, ss);
+        //System.out.println(s);
+        for (int i = 0; i < 100; i++) {
+            System.out.println(new Random().nextInt(10));
+
+        }
     }
 }

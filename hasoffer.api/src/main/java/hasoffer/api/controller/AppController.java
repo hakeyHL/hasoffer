@@ -12,7 +12,9 @@ import hasoffer.base.enums.AppType;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.AffliIdHelper;
 import hasoffer.base.utils.ArrayUtils;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IOrderStatsAnalysisService;
 import hasoffer.core.bo.product.Banners;
 import hasoffer.core.bo.product.CategoryVo;
@@ -39,7 +41,6 @@ import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
-import hasoffer.core.utils.AffliIdHelper;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchedProductReview;
@@ -47,6 +48,7 @@ import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import jodd.util.NameValue;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -69,6 +71,9 @@ import java.util.*;
 @Controller
 @RequestMapping(value = "/app")
 public class AppController {
+
+    private Logger logger = LoggerFactory.getLogger(AppController.class);
+
     @Resource
     IAppService appService;
     @Resource
@@ -93,9 +98,14 @@ public class AppController {
     MongoDbManager mongoDbManager;
     @Resource
     IOrderStatsAnalysisService orderService;
-    Logger logger = LoggerFactory.getLogger(AppController.class);
 
     public static void main(String[] args) throws Exception {
+
+        Date date1 = DateUtils.parseDate("2016-10-05 19:11:00", "yyyy-MM-dd HH:mm:ss");
+        Date date2 = DateUtils.parseDate("2016-10-02 21:11:00", "yyyy-MM-dd HH:mm:ss");
+        long days = date1.getTime() / TimeUtils.MILLISECONDS_OF_1_DAY - date2.getTime() / TimeUtils.MILLISECONDS_OF_1_DAY;
+        System.out.println(days);
+
     }
 
     @RequestMapping(value = "/newconfig", method = RequestMethod.GET)
@@ -356,78 +366,86 @@ public class AppController {
             //1. 从订单记录中查询直接乘以10
             data.setPendingCoins(data.getPendingCoins().multiply(BigDecimal.valueOf(10)));
             data.setVerifiedCoins(data.getVerifiedCoins().multiply(BigDecimal.valueOf(10)));
-            //2. 本次签到奖励
-            List<UrmSignAwdCfg> signAwardNum = appService.getSignAwardNum();
-            if (signAwardNum != null && signAwardNum.size() > 0) {
-                //转为map更好,key是连续天数,value是奖励
-                Map<Integer, Integer> afwCfgmap = new HashMap<>();
-                for (UrmSignAwdCfg urmSignAwdCfg : signAwardNum) {
-                    afwCfgmap.put(urmSignAwdCfg.getCount(), urmSignAwdCfg.getAwardCoin());
-                }
-                Set<Integer> integers = afwCfgmap.keySet();
-                Integer max = Collections.max(integers);
-                Long lastSignTime = user.getLastSignTime();
-                if (lastSignTime == null) {
-                    //如果为空,代表还没有签到过
-                    if (afwCfgmap.get(1) != null) {
-                        data.setThisTimeCoin(afwCfgmap.get(1));
-                    }
-                    if (afwCfgmap.get(2) != null) {
-                        data.setNextTimeCoin(afwCfgmap.get(2));
-                    }
-                } else {
-                    data.setEverSign(false);
-                    //判断今天是否已经签过
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    String currentDate = simpleDateFormat.format(new Date());
-                    String lastSignDate = simpleDateFormat.format(new Date(user.getLastSignTime()));
-                    if (currentDate.equals(lastSignDate)) {
-                        //如果今天已经签到过,返回已签到标识
-                        data.setHasSign(true);
-                        //明天签到的奖励
-                        Integer conSignNum = user.getConSignNum();
-                        //最大连续签到数会大于连续奖励数
-                        //需要知道Map中的最大key值
-                        if (conSignNum + 1 >= max) {
-                            data.setThisTimeCoin(afwCfgmap.get(max));
-                        } else {
-                            if (afwCfgmap.get(conSignNum + 1) != null) {
-                                data.setThisTimeCoin(afwCfgmap.get(conSignNum + 1));
-                            }
-                        }
-                    } else {
-                        //返回已签到+1作为本次,已连续+2作为下次返回
-                        Integer conSignNum = user.getConSignNum();
-                        //需要知道Map中的最大key值
-                        if (conSignNum + 1 >= max) {
-                            data.setThisTimeCoin(afwCfgmap.get(max));
-                        } else {
-                            if (afwCfgmap.get(conSignNum + 1) != null) {
-                                data.setThisTimeCoin(afwCfgmap.get(conSignNum + 1));
-                            }
-                        }
-                        if (conSignNum + 2 >= max) {
-                            data.setNextTimeCoin(afwCfgmap.get(max));
-                        } else {
-                            if (afwCfgmap.get(conSignNum + 2) != null) {
-                                data.setNextTimeCoin(afwCfgmap.get(conSignNum + 2));
-                            }
-                        }
-                    }
 
-                }
+            // 获取基本配置
+            Map<Integer, Integer> afwCfgMap = initDefaultValue();
+
+            //2. 本次签到奖励
+            Set<Integer> integers = afwCfgMap.keySet();
+            Integer max = Collections.max(integers);
+            Long lastSignTime = user.getLastSignTime();
+            if (lastSignTime == null) {
+                //如果为空,代表还没有签到过
+                data.setThisTimeCoin(afwCfgMap.get(1));
+                data.setNextTimeCoin(afwCfgMap.get(2));
             } else {
-                data.setThisTimeCoin(0);
-                data.setNextTimeCoin(0);
+                data.setEverSign(false);
+                //判断今天是否已经签过
+                //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                //String currentDate = simpleDateFormat.format(new Date());
+                //String lastSignDate = simpleDateFormat.format(new Date(user.getLastSignTime()));
+                long current = new Date().getTime();
+                long days = current / TimeUtils.MILLISECONDS_OF_1_DAY - lastSignTime / TimeUtils.MILLISECONDS_OF_1_DAY;
+                if (days == 0) {
+                    //如果今天已经签到过,返回已签到标识
+                    data.setHasSign(true);
+                    //明天签到的奖励
+                    Integer conSignNum = user.getConSignNum();
+                    //最大连续签到数会大于连续奖励数
+                    //需要知道Map中的最大key值
+                    if (conSignNum + 1 >= max) {
+                        data.setThisTimeCoin(afwCfgMap.get(max));
+                    } else {
+                        data.setThisTimeCoin(afwCfgMap.get(conSignNum + 1));
+                    }
+                    data.setMaxConSignNum(user.getConSignNum());
+                } else if (days == 1) {// 如果是连续签单，则按照连续签到返回数据；
+                    //返回已签到+1作为本次,已连续+2作为下次返回
+                    Integer conSignNum = user.getConSignNum();
+                    //需要知道Map中的最大key值
+                    if (conSignNum + 1 >= max) {
+                        data.setThisTimeCoin(afwCfgMap.get(max));
+                    } else {
+                        data.setThisTimeCoin(afwCfgMap.get(conSignNum + 1));
+                    }
+                    if (conSignNum + 2 >= max) {
+                        data.setNextTimeCoin(afwCfgMap.get(max));
+                    } else {
+                        data.setNextTimeCoin(afwCfgMap.get(conSignNum + 2));
+                    }
+                    data.setMaxConSignNum(user.getConSignNum());
+                } else if (days > 1) {// 如果不是，则重新从0开始；
+                    data.setThisTimeCoin(afwCfgMap.get(1));
+                    data.setNextTimeCoin(afwCfgMap.get(2));
+                    // 当前最大连续签到次数
+                    data.setMaxConSignNum(0);
+                }
             }
             //4. verified coin = approved*10+签到获得.
             data.setVerifiedCoins(data.getVerifiedCoins().add(BigDecimal.valueOf(user.getSignCoin())));
-            //5. 当前最大连续签到次数
-            data.setMaxConSignNum(user.getConSignNum());
+
         }
         data.setAuxiliaryCheck(true);
         mv.addObject("data", data);
         return mv;
+    }
+
+    private Map<Integer, Integer> initDefaultValue() {
+        List<UrmSignAwdCfg> signAwardNum = appService.getSignAwardNum();
+        Map<Integer, Integer> afwCfgMap = new HashMap<>();
+
+        if (signAwardNum != null) {
+            for (UrmSignAwdCfg urmSignAwdCfg : signAwardNum) {
+                afwCfgMap.put(urmSignAwdCfg.getCount(), urmSignAwdCfg.getAwardCoin());
+            }
+        }
+        for (int i = 1; i < 8; i++) {
+            if (afwCfgMap.get(i) == null) {
+                afwCfgMap.put(i, 5 + 5 * i);
+            }
+        }
+
+        return afwCfgMap;
     }
 
     /**
