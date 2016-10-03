@@ -54,7 +54,7 @@ public class SpiderSkuTaskService {
 
             logger.info("current page:" + page);
 
-            if (page > 0) {
+            if (page > 1) {
                 pageableResult = dbm.queryPage(Q_LOG_BYUPDATETIME, page, pageSize, Arrays.asList(startDateString));
             }
 

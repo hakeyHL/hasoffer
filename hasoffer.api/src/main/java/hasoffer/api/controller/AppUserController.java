@@ -56,11 +56,13 @@ public class AppUserController {
     MongoDbManager mongoDbManager;
 
     public static void main(String[] args) {
-        String affs[] = null;
-        affs = new String[]{"GOOGLEPLAY", "240a00b4f81c11da"};
-        String affsUrl = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL,
-                "http://m.snapdeal.com?utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_id=82856", affs);
-        System.out.println(affsUrl);
+        //String affs[] = null;
+        //affs = new String[]{"GOOGLEPLAY", "240a00b4f81c11da"};
+        //String affsUrl = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL,
+        //        "http://m.snapdeal.com?utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_id=82856", affs);
+        //System.out.println(affsUrl);
+        System.out.println(new SimpleDateFormat("yyyy-MM-dd").format(1475226587161L));
+        System.out.println((System.currentTimeMillis() - 1475226587161L) / 1000 / 60 / 60);
     }
 
     @RequestMapping("common/addUserId2DeepLink")
@@ -288,7 +290,7 @@ public class AppUserController {
                             urmUser.setSignCoin(urmUser.getSignCoin() + signConfigs.get(0).getAwardCoin());
                         } else {
                             for (UrmSignAwdCfg urmSign : signConfigs) {
-                                if (urmSign.getCount() == urmUser.getConSignNum()) {
+                                if (urmSign.getCount().equals(urmUser.getConSignNum())) {
                                     //匹配到
                                     urmUser.setSignCoin(urmUser.getSignCoin() + urmSign.getAwardCoin());
                                 }
@@ -307,7 +309,7 @@ public class AppUserController {
                     Integer conSignNum = urmUser.getConSignNum();
                     if (conSignNum == 0) {
                         //之前未签到过
-                        urmUser.setMaxConSignNum(1l);
+                        urmUser.setMaxConSignNum(1L);
                         urmUser.setConSignNum(1);
                     } else if (urmUser.getConSignNum() > maxConSignNum) {
                         //比之前高,更新最高签到记录
@@ -315,12 +317,13 @@ public class AppUserController {
                     }
                     //比之前低,重置连续数,给coin
                     for (UrmSignAwdCfg urmSign : signConfigs) {
-                        if (urmSign.getCount() == urmUser.getConSignNum()) {
+                        if (urmSign.getCount().equals(urmUser.getConSignNum())) {
                             //匹配到
                             urmUser.setSignCoin(urmUser.getSignCoin() + urmSign.getAwardCoin());
                         }
                     }
                     urmUser.setConSignNum(1);
+                    urmUser.setLastSignTime(new Date().getTime());
                 }
                 //执行更新
                 try {
