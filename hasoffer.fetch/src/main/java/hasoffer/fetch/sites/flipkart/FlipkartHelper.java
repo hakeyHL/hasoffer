@@ -118,7 +118,7 @@ public class FlipkartHelper {
         String affid = AffliIdHelper.getAffiIdByWebsite(Website.FLIPKART, marketChannelName);
         //在这里设置一个随机,网盟占1/10 概率
         int randomInt = new Random().nextInt(10);
-        if (randomInt == 5|| randomInt == 6) {
+        if (randomInt > 5) {
             //https://dl.flipkart.com/dl/yonex-carbonex-6000df-g4-strung-badminton-racquet/p/itmdfyr9jwgzd9dv?pid=RAQDFYR9JWGZD9DV&affid=raymondzh&affExtParam1=103662&affExtParam2=channel_deviceId_userid
             //raymondzh  103662  channel_deviceId_userid
             affid = "raymondzh";
@@ -186,9 +186,13 @@ public class FlipkartHelper {
     }
 
     public static void main(String[] args) {
-        String url = "https://www.flipkart.com/philips-qt4000-15-pro-skin-advanced-trimmer-men/p/itmdpgxmahh9kujg?pid=SHVDPGXHU2XNTYHC&fm=merchandising&iid=M_85bae8f1-8b0c-4279-86d0-75a3423cef65.2644f0e4-5ed4-4f66-be7f-54cc5e3478fd&otracker=hp_omu_Flipkart+Assured_1_2644f0e4-5ed4-4f66-be7f-54cc5e3478fd_2644f0e4-5ed4-4f66-be7f-54cc5e3478fd_1";
-        String[] ss = new String[]{"a", "b", "c"};
-        String s = getUrlWithAff(url, ss);
-        System.out.println(s);
+        //String url = "https://www.flipkart.com/philips-qt4000-15-pro-skin-advanced-trimmer-men/p/itmdpgxmahh9kujg?pid=SHVDPGXHU2XNTYHC&fm=merchandising&iid=M_85bae8f1-8b0c-4279-86d0-75a3423cef65.2644f0e4-5ed4-4f66-be7f-54cc5e3478fd&otracker=hp_omu_Flipkart+Assured_1_2644f0e4-5ed4-4f66-be7f-54cc5e3478fd_2644f0e4-5ed4-4f66-be7f-54cc5e3478fd_1";
+        //String[] ss = new String[]{"a", "b", "c"};
+        //String s = getUrlWithAff(url, ss);
+        //System.out.println(s);
+        for (int i = 0; i < 100; i++) {
+            System.out.println(new Random().nextInt(10));
+
+        }
     }
 }
