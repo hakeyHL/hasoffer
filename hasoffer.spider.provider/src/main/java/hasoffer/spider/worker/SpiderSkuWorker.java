@@ -47,7 +47,7 @@ public class SpiderSkuWorker implements Runnable {
         if (redisListName == null || "".equals(redisListName)) {
             return;
         }
-        logger.info("Website:{}, Redis List Name:{}", spiderConfig.getWebsite(), redisListName);
+        logger.info("NEW Website:{}, Redis List Name:{}", spiderConfig.getWebsite(), redisListName);
         while (true) {
             String skuTaskStr = redisListService.pop(redisListName);
             logger.info("Get a task:{}", skuTaskStr);
