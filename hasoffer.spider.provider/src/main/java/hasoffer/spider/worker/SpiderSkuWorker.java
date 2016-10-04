@@ -50,6 +50,7 @@ public class SpiderSkuWorker implements Runnable {
         }
         while (true) {
             String skuTaskStr = redisListService.pop(redisListName);
+            logger.info("Get a task:{}", skuTaskStr);
             if (skuTaskStr == null) {
                 try {
                     TimeUnit.SECONDS.sleep(10);
