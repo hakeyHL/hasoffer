@@ -44,10 +44,10 @@ public class SpiderSkuWorker implements Runnable {
     @Override
     public void run() {
         String redisListName = SpiderConfigInitContext.getRedisListName(spiderConfig.getWebsite(), PageType.DETAIL);
-        logger.info("Website:{}, Redis List Name:{}", spiderConfig.getWebsite(), redisListName);
         if (redisListName == null || "".equals(redisListName)) {
             return;
         }
+        logger.info("Website:{}, Redis List Name:{}", spiderConfig.getWebsite(), redisListName);
         while (true) {
             String skuTaskStr = redisListService.pop(redisListName);
             logger.info("Get a task:{}", skuTaskStr);
