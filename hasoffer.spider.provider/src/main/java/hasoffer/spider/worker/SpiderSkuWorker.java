@@ -64,6 +64,7 @@ public class SpiderSkuWorker implements Runnable {
             } catch (IOException e) {
                 logger.error("Json parse error. error msg {}", e);
             }
+            logger.info("execute this task:{}", skuTask);
             if (skuTask == null) {
                 return;
             }
@@ -79,10 +80,7 @@ public class SpiderSkuWorker implements Runnable {
 
             spiderSkuScheduler.pushRequest(skuTask.getUrl(), extraMap);
 
-            if (!Spider.Status.Running.equals(spiderSkuScheduler.runStatus())) {
-                logger.debug("start " + spiderConfig.getWebsite() + ":" + i++);
-                spiderSkuScheduler.startSpiderTask();
-            }
+            spiderSkuScheduler.startSpiderTask();
         }
     }
 }
