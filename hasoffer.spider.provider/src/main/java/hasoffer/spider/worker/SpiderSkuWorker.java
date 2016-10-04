@@ -49,7 +49,12 @@ public class SpiderSkuWorker implements Runnable {
         }
         logger.info("NEW Website:{}, Redis List Name:{}", spiderConfig.getWebsite(), redisListName);
         while (true) {
-            String skuTaskStr = redisListService.pop(redisListName);
+            String skuTaskStr = null;
+            try {
+                skuTaskStr = redisListService.pop(redisListName);
+            } catch (Exception e) {
+                logger.error("Get task error.", e);
+            }
             logger.info("Get a task:{}", skuTaskStr);
             if (skuTaskStr == null) {
                 try {
