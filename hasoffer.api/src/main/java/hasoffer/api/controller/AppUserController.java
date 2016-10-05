@@ -333,7 +333,7 @@ public class AppUserController {
                     appService.updateUserInfo(urmUser);
                 } catch (Exception e) {
                     //异常,结束
-                    logger.error("userSign(): update sign fail ,messge is :{}", e.getMessage(), e);
+                    logger.error("userSign(): update sign fail ,message is :{}", e.getMessage(), e);
                     Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                     return null;
                 }
