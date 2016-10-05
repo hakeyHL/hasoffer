@@ -246,15 +246,14 @@ public class AppUserController {
         // 无论用户是否存在，应该记住用户签到记录，防止由于某些信息错误，丢失用户签到记录。
         String userToken = Context.currentContext().getHeader("usertoken");
         String deviceInfo = Context.currentContext().getHeader("deviceinfo");
-        logger.info("User sign log. userToken:{}, deviceInfo:{}", userToken, deviceInfo);
+        logger.info("userSign(): User sign log. userToken:{}, deviceInfo:{}", userToken, deviceInfo);
         //1. 用户是否存在
         if (!StringUtils.isEmpty(userToken)) {
-            System.out.println("userToken is :" + userToken);
+            logger.info("userSign(): userToken is :" + userToken);
             UrmUser urmUser = appService.getUserByUserToken(userToken);
             if (urmUser != null) {
                 //2. 存在则签到,加钱
-                System.out.println("get User " + urmUser.getUserName());
-                System.out.println("sign action ");
+                logger.info("userSign():get User " + urmUser.getUserName() + ":sign action ");
                 //2.1 上一次签到时间
                 Long lastSignTime = null;
                 //2.2 当前时间
@@ -272,7 +271,7 @@ public class AppUserController {
                     String today = simpleDateFormat.format(new Date());
                     if (lstTime.equals(today)) {
                         //如果今天已经签到,over
-                        System.out.println(" repetitive  operation , has been  signed today  !");
+                        logger.info("userSign(): repetitive  operation , has been  signed today  !");
                         jsonObject.put("msg", "you have signed today , please come tomorrow . ");
                         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                         return null;
@@ -302,7 +301,7 @@ public class AppUserController {
                         urmUser.setLastSignTime(new Date().getTime());
                     } else {
                         //未查询到配置表,无法计算,结束,报错
-                        System.out.println(" no award config data ,over !");
+                        logger.info("userSign():No award config data, over !");
                         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                         return null;
                     }
@@ -327,13 +326,14 @@ public class AppUserController {
                     }
                     urmUser.setLastSignTime(new Date().getTime());
                 }
+                logger.info("userSign(): user sign info{ID:{}, userName:{}, sign Time:{}, signCoin{}}", urmUser.getId(), urmUser.getUserName(), new Date(), urmUser.getSignCoin());
                 //执行更新
                 try {
                     //由于此方法不返回操作结果,只能判断异常来处理操作为成功的情况
                     appService.updateUserInfo(urmUser);
                 } catch (Exception e) {
                     //异常,结束
-                    System.out.println("update sign fail ,messge is :" + e.getMessage());
+                    logger.error("userSign(): update sign fail ,message is :{}", e.getMessage(), e);
                     Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                     return null;
                 }
@@ -344,17 +344,17 @@ public class AppUserController {
                 mongoDbManager.save(userSignLog);
             } else {
                 //token未查询到用户
-                System.out.println("this userToken not get record " + userToken);
+                logger.info("userSign(): this userToken not get record " + userToken);
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             }
         } else {
             //无token,over
-            System.out.println(" userToken is empty ,over  !");
+            logger.info("userSign(): userToken is empty ,over  !");
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
-        System.out.println(" response result is : " + JSON.toJSONString(jsonObject));
+        logger.info("userSign(): response result is : " + JSON.toJSONString(jsonObject));
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
