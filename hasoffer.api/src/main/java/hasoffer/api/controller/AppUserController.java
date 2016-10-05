@@ -43,7 +43,7 @@ import java.util.*;
 @Controller
 @RequestMapping("/app")
 public class AppUserController {
-    Logger logger = LoggerFactory.getLogger(AppUserController.class);
+    private final Logger logger = LoggerFactory.getLogger(AppUserController.class);
     @Resource
     AppServiceImpl appService;
     @Resource
@@ -243,8 +243,11 @@ public class AppUserController {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "10001");
         jsonObject.put("msg", "sign  fail ");
-        //1. 用户是否存在
+        // 无论用户是否存在，应该记住用户签到记录，防止由于某些信息错误，丢失用户签到记录。
         String userToken = Context.currentContext().getHeader("usertoken");
+        String deviceInfo = Context.currentContext().getHeader("deviceinfo");
+        logger.info("User sign log. userToken:{}, deviceInfo:{}", userToken, deviceInfo);
+        //1. 用户是否存在
         if (!StringUtils.isEmpty(userToken)) {
             System.out.println("userToken is :" + userToken);
             UrmUser urmUser = appService.getUserByUserToken(userToken);
