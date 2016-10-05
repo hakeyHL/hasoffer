@@ -5,6 +5,7 @@ import org.apache.poi.ss.formula.functions.T;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by glx on 2015/5/20.
@@ -41,6 +42,8 @@ public interface IDataBaseManager {
     <ID extends Serializable, T extends Identifiable<ID>> void delete(Class<T> tClass, ID id);
 
     List queryByIds(String jpaSql, String[] ids);
+
+    List queryBySql(final String queryString, final Map<String, Object> paramsMap);
 
     void update(final List<T> array);
 

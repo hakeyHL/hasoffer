@@ -14,7 +14,6 @@ import hasoffer.spider.service.impl.SpiderSkuScheduleServiceImpl;
 import hasoffer.spring.context.SpringContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.pipeline.Pipeline;
 
 import java.io.IOException;
