@@ -1,6 +1,7 @@
 package hasoffer.core.persistence.mongo;
 
 import hasoffer.core.persistence.po.urm.UrmUser;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,6 +18,8 @@ public class UserSignLog {
     private Long userId;
     private Long signDate;
 
+    private String signDateStr;
+
     @PersistenceConstructor
     public UserSignLog() {
     }
@@ -24,6 +27,7 @@ public class UserSignLog {
     public UserSignLog(UrmUser urmUser) {
         this.userId = urmUser.getId();
         this.signDate = urmUser.getLastSignTime();
+        this.signDateStr = DateFormatUtils.format(urmUser.getLastSignTime(), "yyyy-MM-dd hh:mm:ss");
     }
 
 
@@ -41,6 +45,22 @@ public class UserSignLog {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public Long getSignDate() {
+        return signDate;
+    }
+
+    public void setSignDate(Long signDate) {
+        this.signDate = signDate;
+    }
+
+    public String getSignDateStr() {
+        return signDateStr;
+    }
+
+    public void setSignDateStr(String signDateStr) {
+        this.signDateStr = signDateStr;
     }
 
     @Override

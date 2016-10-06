@@ -7,6 +7,7 @@ import hasoffer.api.controller.vo.DeviceInfoVo;
 import hasoffer.api.controller.vo.SearchIO;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.base.model.Website;
+import hasoffer.base.redis.RedisKey;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
@@ -43,7 +44,11 @@ import java.util.*;
 @Controller
 @RequestMapping("/app")
 public class AppUserController {
+
     private final Logger logger = LoggerFactory.getLogger(AppUserController.class);
+
+    private final Long jotLag = TimeUtils.MILLISECONDS_OF_1_MINUTE * 150;
+
     @Resource
     AppServiceImpl appService;
     @Resource
@@ -84,7 +89,7 @@ public class AppUserController {
             return modelAndView;
         }
         String affsUrl = WebsiteHelper.getDealUrlWithAff(Website.valueOf(website), deepLink, affs);
-        logger.info(" success ,time : " + currentTime + "  userId : " + urmUser.getId() + " ,sourceLink : " + deepLink + " ,result : " + affsUrl);
+        logger.info("addUserId2DeepLink(): success ,time : " + currentTime + "  userId : " + urmUser.getId() + " ,sourceLink : " + deepLink + " ,result : " + affsUrl);
         map.put("deeplink", affsUrl);
         modelAndView.addObject("data", map);
         return modelAndView;
@@ -250,40 +255,44 @@ public class AppUserController {
         //1. 用户是否存在
         if (!StringUtils.isEmpty(userToken)) {
             logger.info("userSign(): userToken is :" + userToken);
+            Date currentDate = new Date();
+            Long nowTime = currentDate.getTime();
+            String s = urmDeviceService.get(RedisKey.USER_SIGN_LAST_OP_TIME + userToken, 0);
+            //注意：此处加一层Redis缓存，拦截。
+            if (s != null) {
+                logger.info("userSign(): repetitive  operation ,UserToken:{} has been  signed today  !", userToken);
+                jsonObject.put("msg", "Request is being processed, please wait 5 seconds and try again later. ");
+                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                return null;
+            }
+            urmDeviceService.add(RedisKey.USER_SIGN_LAST_OP_TIME + userToken, "true", 5);
+            long startTime = System.currentTimeMillis();
             UrmUser urmUser = appService.getUserByUserToken(userToken);
             if (urmUser != null) {
-                //2. 存在则签到,加钱
                 logger.info("userSign():get User " + urmUser.getUserName() + ":sign action ");
-                //2.1 上一次签到时间
-                Long lastSignTime = null;
-                //2.2 当前时间
-                Date currentDate = new Date();
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                currentDate.setTime(currentDate.getTime() - 60 * 60 * 1000 * 24);
-                String currentDateFor = simpleDateFormat.format(currentDate);
+
                 if (urmUser.getLastSignTime() == null) {
                     //之前未签到过
-                    lastSignTime = new Date().getTime();
-                    urmUser.setLastSignTime(lastSignTime);
-                } else {
-                    //判断今天是否已经签到
-                    String lstTime = simpleDateFormat.format(urmUser.getLastSignTime());
-                    String today = simpleDateFormat.format(new Date());
-                    if (lstTime.equals(today)) {
-                        //如果今天已经签到,over
-                        logger.info("userSign(): repetitive  operation , has been  signed today  !");
-                        jsonObject.put("msg", "you have signed today , please come tomorrow . ");
-                        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
-                        return null;
-                    }
+                    urmUser.setLastSignTime(0L);
+                }
+                //判断今天是否已经签到
+                long indiaSignTime = TimeUtils.getIndiaTime(urmUser.getLastSignTime());
+                long indiaCurrentTime = TimeUtils.getIndiaTime(nowTime);
+                long indiaSignDay = indiaSignTime / TimeUtils.MILLISECONDS_OF_1_DAY + 1;
+                long indiaCurrentDay = indiaCurrentTime / TimeUtils.MILLISECONDS_OF_1_DAY + 1;
+
+                long daysAfterLastSing = indiaCurrentDay - indiaSignDay;
+                if (daysAfterLastSing < 1) {
+                    //如果今天已经签到,over
+                    logger.info("userSign(): repetitive  operation , has been  signed today  !");
+                    jsonObject.put("msg", "you have signed today , please come tomorrow. ");
+                    Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                    return null;
                 }
                 //如果之前未签到,那么上次签到时间已经被更新为当前时间
-                lastSignTime = urmUser.getLastSignTime();
-                String lastSignTimeDateFor = simpleDateFormat.format(new Date(lastSignTime));
-                //按照连续次数降序查询奖励配置表
                 List<UrmSignAwdCfg> signConfigs = appService.getSignAwardNum();
-                //currentDateFor为当前日期-1
-                if (currentDateFor.equals(lastSignTimeDateFor)) {
+                //按照连续次数降序查询奖励配置表
+                if (daysAfterLastSing == 1) {
                     //如果两个相等,代表是连续的,连续+1
                     urmUser.setConSignNum(urmUser.getConSignNum() + 1);
                     if (signConfigs != null && signConfigs.size() > 0) {
@@ -337,6 +346,8 @@ public class AppUserController {
                     Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                     return null;
                 }
+                long endTime = System.currentTimeMillis();
+                logger.info("userSign(): user: {} sign, and cost {} ms. ", urmUser.getId(), startTime - endTime);
                 jsonObject.put("errorCode", "00000");
                 jsonObject.put("msg", "sign success ! ");
                 //插入记录到签到历史表
