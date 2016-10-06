@@ -385,7 +385,7 @@ public class AppController {
                 //String currentDate = simpleDateFormat.format(new Date());
                 //String lastSignDate = simpleDateFormat.format(new Date(user.getLastSignTime()));
                 long current = new Date().getTime();
-                long days = current / TimeUtils.MILLISECONDS_OF_1_DAY - lastSignTime / TimeUtils.MILLISECONDS_OF_1_DAY;
+                long days = TimeUtils.getIndiaTime(current) / TimeUtils.MILLISECONDS_OF_1_DAY - TimeUtils.getIndiaTime(lastSignTime) / TimeUtils.MILLISECONDS_OF_1_DAY;
                 if (days == 0) {
                     //如果今天已经签到过,返回已签到标识
                     data.setHasSign(true);
