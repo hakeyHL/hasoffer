@@ -27,7 +27,7 @@ public class UserSignLog {
     public UserSignLog(UrmUser urmUser) {
         this.userId = urmUser.getId();
         this.signDate = urmUser.getLastSignTime();
-        this.signDateStr = DateFormatUtils.format(urmUser.getLastSignTime(), "yyyy-MM-dd hh:mm:ss");
+        this.signDateStr = DateFormatUtils.format(urmUser.getLastSignTime(), "yyyy-MM-dd HH:mm:ss");
     }
 
 
