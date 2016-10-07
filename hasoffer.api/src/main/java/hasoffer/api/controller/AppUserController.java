@@ -335,7 +335,7 @@ public class AppUserController {
                     }
                     urmUser.setLastSignTime(new Date().getTime());
                 }
-                logger.info("userSign(): user sign info{ID:{}, userName:{}, sign Time:{}, signCoin{}}", urmUser.getId(), urmUser.getUserName(), new Date(), urmUser.getSignCoin());
+                logger.info("userSign(): user sign info{ID:{}, userName:{}, sign Time:{}, signCoin:{}}", urmUser.getId(), urmUser.getUserName(), new Date(), urmUser.getSignCoin());
                 //执行更新
                 try {
                     //由于此方法不返回操作结果,只能判断异常来处理操作为成功的情况

@@ -47,6 +47,8 @@ public interface IDataBaseManager {
 
     void update(final List<T> array);
 
+    void update(Object t);
+
     void deleteBySQL(final String sql);
 
     void updateBySQL(final String sql);
