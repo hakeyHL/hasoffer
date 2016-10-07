@@ -351,7 +351,7 @@ public class AppController {
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
         UrmUser user = appService.getUserByUserToken(userToken);
         if (user != null) {
-            calculateHasofferCoin(Arrays.asList(user), data);
+            calculateHasofferCoin(Collections.singletonList(user), data);
             //添加返回:
             //1. 从订单记录中查询直接乘以10
             data.setPendingCoins(data.getPendingCoins().multiply(BigDecimal.valueOf(10)));
@@ -360,20 +360,20 @@ public class AppController {
             List<UrmSignAwdCfg> signAwardNum = appService.getSignAwardNum();
             if (signAwardNum != null && signAwardNum.size() > 0) {
                 //转为map更好,key是连续天数,value是奖励
-                Map<Integer, Integer> map = new HashMap();
+                Map<Integer, Integer> afwCfgmap = new HashMap<>();
                 for (UrmSignAwdCfg urmSignAwdCfg : signAwardNum) {
-                    map.put(urmSignAwdCfg.getCount(), urmSignAwdCfg.getAwardCoin());
+                    afwCfgmap.put(urmSignAwdCfg.getCount(), urmSignAwdCfg.getAwardCoin());
                 }
-                Set<Integer> integers = map.keySet();
+                Set<Integer> integers = afwCfgmap.keySet();
                 Integer max = Collections.max(integers);
                 Long lastSignTime = user.getLastSignTime();
                 if (lastSignTime == null) {
                     //如果为空,代表还没有签到过
-                    if (map.get(1) != null) {
-                        data.setThisTimeCoin(map.get(1));
+                    if (afwCfgmap.get(1) != null) {
+                        data.setThisTimeCoin(afwCfgmap.get(1));
                     }
-                    if (map.get(2) != null) {
-                        data.setNextTimeCoin(map.get(2));
+                    if (afwCfgmap.get(2) != null) {
+                        data.setNextTimeCoin(afwCfgmap.get(2));
                     }
                 } else {
                     data.setEverSign(false);
@@ -389,10 +389,10 @@ public class AppController {
                         //最大连续签到数会大于连续奖励数
                         //需要知道Map中的最大key值
                         if (conSignNum + 1 >= max) {
-                            data.setThisTimeCoin(map.get(max));
+                            data.setThisTimeCoin(afwCfgmap.get(max));
                         } else {
-                            if (map.get(conSignNum + 1) != null) {
-                                data.setThisTimeCoin(map.get(conSignNum + 1));
+                            if (afwCfgmap.get(conSignNum + 1) != null) {
+                                data.setThisTimeCoin(afwCfgmap.get(conSignNum + 1));
                             }
                         }
                     } else {
@@ -400,17 +400,17 @@ public class AppController {
                         Integer conSignNum = user.getConSignNum();
                         //需要知道Map中的最大key值
                         if (conSignNum + 1 >= max) {
-                            data.setThisTimeCoin(map.get(max));
+                            data.setThisTimeCoin(afwCfgmap.get(max));
                         } else {
-                            if (map.get(conSignNum + 1) != null) {
-                                data.setThisTimeCoin(map.get(conSignNum + 1));
+                            if (afwCfgmap.get(conSignNum + 1) != null) {
+                                data.setThisTimeCoin(afwCfgmap.get(conSignNum + 1));
                             }
                         }
                         if (conSignNum + 2 >= max) {
-                            data.setNextTimeCoin(map.get(max));
+                            data.setNextTimeCoin(afwCfgmap.get(max));
                         } else {
-                            if (map.get(conSignNum + 2) != null) {
-                                data.setNextTimeCoin(map.get(conSignNum + 2));
+                            if (afwCfgmap.get(conSignNum + 2) != null) {
+                                data.setNextTimeCoin(afwCfgmap.get(conSignNum + 2));
                             }
                         }
                     }
