@@ -61,7 +61,7 @@ public class AppUserController {
         //String affsUrl = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL,
         //        "http://m.snapdeal.com?utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_id=82856", affs);
         //System.out.println(affsUrl);
-        System.out.println(new SimpleDateFormat("yyyy-MM-dd").format(1475226587161L));
+        System.out.println(new SimpleDateFormat("yyyy-MM-dd").format(1475397136114L));
         System.out.println((System.currentTimeMillis() - 1475226587161L) / 1000 / 60 / 60);
     }
 
@@ -310,19 +310,18 @@ public class AppUserController {
                     if (conSignNum == 0) {
                         //之前未签到过
                         urmUser.setMaxConSignNum(1L);
-                        urmUser.setConSignNum(1);
                     } else if (urmUser.getConSignNum() > maxConSignNum) {
                         //比之前高,更新最高签到记录
                         urmUser.setMaxConSignNum(Long.valueOf(urmUser.getConSignNum()));
                     }
                     //比之前低,重置连续数,给coin
+                    urmUser.setConSignNum(1);
                     for (UrmSignAwdCfg urmSign : signConfigs) {
                         if (urmSign.getCount().equals(urmUser.getConSignNum())) {
                             //匹配到
                             urmUser.setSignCoin(urmUser.getSignCoin() + urmSign.getAwardCoin());
                         }
                     }
-                    urmUser.setConSignNum(1);
                     urmUser.setLastSignTime(new Date().getTime());
                 }
                 //执行更新
