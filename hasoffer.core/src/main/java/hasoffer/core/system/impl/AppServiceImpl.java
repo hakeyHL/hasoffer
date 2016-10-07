@@ -113,6 +113,7 @@ public class AppServiceImpl implements IAppService {
 
     @Resource
     IDataBaseManager dbm;
+
     private String Q_APP_GETPRODUCTS =
             "SELECT t FROM PtmProduct t " +
                     " where 1=1 and ";
@@ -261,9 +262,10 @@ public class AppServiceImpl implements IAppService {
 
     @Override
     public void updateUserInfo(UrmUser uUser) {
-        List li = new ArrayList();
-        li.add(uUser);
-        dbm.update(li);
+        //List li = new ArrayList();
+        //li.add(uUser);
+        //dbm.update(li);
+        dbm.update(uUser);
     }
 
     @Override

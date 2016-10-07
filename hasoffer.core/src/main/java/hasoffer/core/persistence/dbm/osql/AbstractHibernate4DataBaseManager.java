@@ -357,10 +357,16 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
                         session.update(array.get(0));
                         session.flush();
 //                        session.clear();
+                        // why close? zwd.
                         session.close();
                         return null;
                     }
                 });
+    }
+
+    @Override
+    public void update(final Object t) {
+        getHibernate4Template().getSessionFactory().getCurrentSession().update(t);
     }
 
     @Override
