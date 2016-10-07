@@ -347,7 +347,7 @@ public class AppUserController {
                     return null;
                 }
                 long endTime = System.currentTimeMillis();
-                logger.info("userSign(): user: {} sign, and cost {} ms. ", urmUser.getId(), startTime - endTime);
+                logger.info("userSign(): user: {} sign, and cost {} ms. ", urmUser.getId(), endTime - startTime);
                 jsonObject.put("errorCode", "00000");
                 jsonObject.put("msg", "sign success ! ");
                 //插入记录到签到历史表
