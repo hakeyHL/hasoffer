@@ -35,14 +35,14 @@ public class UrmUserBak implements Identifiable<Long> {
     private Long lastSignTime;
     //最高连续签到记录
     @Column(columnDefinition = "int default 0")
-    private Long maxConSignNum;
+    private Integer maxConSignNum;
 
-    @Column(columnDefinition = "bigint default 0")
-    public Long getMaxConSignNum() {
+    @Column(columnDefinition = "int default 0")
+    public Integer getMaxConSignNum() {
         return maxConSignNum;
     }
 
-    public void setMaxConSignNum(Long maxConSignNum) {
+    public void setMaxConSignNum(Integer maxConSignNum) {
         this.maxConSignNum = maxConSignNum;
     }
 

@@ -316,14 +316,14 @@ public class AppUserController {
                     }
                 } else {
                     //断掉了,将本次最高签到数与上次相比
-                    Long maxConSignNum = urmUser.getMaxConSignNum();
+                    Integer maxConSignNum = urmUser.getMaxConSignNum();
                     Integer conSignNum = urmUser.getConSignNum();
                     if (conSignNum == 0) {
                         //之前未签到过
-                        urmUser.setMaxConSignNum(1L);
+                        urmUser.setMaxConSignNum(1);
                     } else if (urmUser.getConSignNum() > maxConSignNum) {
                         //比之前高,更新最高签到记录
-                        urmUser.setMaxConSignNum(Long.valueOf(urmUser.getConSignNum()));
+                        urmUser.setMaxConSignNum(urmUser.getConSignNum());
                     }
                     //比之前低,重置连续数,给coin
                     urmUser.setConSignNum(1);

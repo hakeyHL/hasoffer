@@ -75,29 +75,29 @@ public class AppController {
     private Logger logger = LoggerFactory.getLogger(AppController.class);
 
     @Resource
-    IAppService appService;
+    private IAppService appService;
     @Resource
-    IDeviceService deviceService;
+    private IDeviceService deviceService;
     @Resource
-    CmpSkuCacheManager cmpSkuCacheManager;
+    private CmpSkuCacheManager cmpSkuCacheManager;
     @Resource
-    ProductCacheManager productCacheManager;
+    private ProductCacheManager productCacheManager;
     @Resource
-    ContentNegotiatingViewResolver jsonViewResolver;
+    private ContentNegotiatingViewResolver jsonViewResolver;
     @Resource
-    ProductIndex2ServiceImpl productIndex2Service;
+    private ProductIndex2ServiceImpl productIndex2Service;
     @Resource
-    ProductServiceImpl productService;
+    private ProductServiceImpl productService;
     @Resource
-    ICmpSkuService cmpSkuService;
+    private ICmpSkuService cmpSkuService;
     @Resource
-    AppCacheManager appCacheManager;
+    private AppCacheManager appCacheManager;
     @Resource
-    IPushService pushService;
+    private IPushService pushService;
     @Resource
-    MongoDbManager mongoDbManager;
+    private MongoDbManager mongoDbManager;
     @Resource
-    IOrderStatsAnalysisService orderService;
+    private IOrderStatsAnalysisService orderService;
 
     public static void main(String[] args) throws Exception {
 
@@ -784,7 +784,7 @@ public class AppController {
         List<String> ids = appService.getUserDevices(deviceId);
         System.out.println(" get ids by deviceId :" + ids.size());
 
-        UrmUser uUser = appService.getUserById(StringUtils.isEmpty(userVO.getThirdId()) ? "-" : userVO.getThirdId());
+        UrmUser uUser = appService.getUserByThirdId(StringUtils.isEmpty(userVO.getThirdId()) ? "-" : userVO.getThirdId());
         if (uUser == null) {
             logger.debug("user is not exist before");
             uUser = new UrmUser();

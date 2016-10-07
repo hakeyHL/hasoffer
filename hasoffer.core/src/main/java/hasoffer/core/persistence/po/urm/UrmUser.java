@@ -28,7 +28,7 @@ public class UrmUser implements Identifiable<Long> {
     private String gcmToken;
     //用户的coin
     @Column(columnDefinition = "bigint default 0")
-    private Long signCoin = 0l;
+    private Long signCoin = 0L;
     //当前最大连续签到次数
     @Column(columnDefinition = "int default 0")
     private Integer conSignNum = 0;
@@ -36,14 +36,14 @@ public class UrmUser implements Identifiable<Long> {
     private Long lastSignTime;
     //最高连续签到记录
     @Column(columnDefinition = "int default 0")
-    private Long maxConSignNum;
+    private Integer maxConSignNum;
 
-    @Column(columnDefinition = "bigint default 0")
-    public Long getMaxConSignNum() {
+    @Column(columnDefinition = "int default 0")
+    public Integer getMaxConSignNum() {
         return maxConSignNum;
     }
 
-    public void setMaxConSignNum(Long maxConSignNum) {
+    public void setMaxConSignNum(Integer maxConSignNum) {
         this.maxConSignNum = maxConSignNum;
     }
 
