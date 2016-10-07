@@ -38,7 +38,9 @@ public interface IAppService {
 
     AppDeal getDealDetail(long id);
 
-    UrmUser getUserById(String thirdId);
+    UrmUser getUserByThirdId(String thirdId);
+
+    UrmUser getUserById(Long Id);
 
     List<UrmUser> getIdDescUserListByThirdId(String thirdId);
 

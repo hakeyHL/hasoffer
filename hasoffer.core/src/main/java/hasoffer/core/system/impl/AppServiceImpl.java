@@ -20,15 +20,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created on 2015/12/30.
  */
 @Service
+@Transactional
 public class AppServiceImpl implements IAppService {
 
     private static final String Q_APP_VERSION =
@@ -63,6 +61,10 @@ public class AppServiceImpl implements IAppService {
     private static final String Q_APP_GETUSERBYTHIRDID =
             "SELECT t FROM UrmUser t " +
                     " where t.thirdId=?0";
+
+    private static final String Q_APP_GETUSER_BY_ID =
+            "SELECT t FROM UrmUser t " +
+                    " where t.id=?0";
 
     private static final String Q_APP_USER_GET_BY_NAME =
             "SELECT t FROM UrmUser t " +
@@ -179,9 +181,18 @@ public class AppServiceImpl implements IAppService {
     }
 
     @Override
-    public UrmUser getUserById(String thirdId) {
+    public UrmUser getUserByThirdId(String thirdId) {
         List li = Arrays.asList(thirdId);
         List<UrmUser> urmUsers = dbm.query(Q_APP_GETUSERBYTHIRDID, li);
+        if (urmUsers != null && urmUsers.size() > 0) {
+            return urmUsers.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public UrmUser getUserById(Long id) {
+        List<UrmUser> urmUsers = dbm.query(Q_APP_GETUSER_BY_ID, Collections.singletonList(id));
         if (urmUsers != null && urmUsers.size() > 0) {
             return urmUsers.get(0);
         }
