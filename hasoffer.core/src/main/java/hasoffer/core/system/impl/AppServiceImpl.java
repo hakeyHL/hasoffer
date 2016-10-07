@@ -264,6 +264,7 @@ public class AppServiceImpl implements IAppService {
     public void updateUserInfo(UrmUser uUser) {
         //List li = new ArrayList();
         //li.add(uUser);
+        //dbm.update(li);
         dbm.update(uUser);
     }
 
