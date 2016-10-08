@@ -27,22 +27,22 @@
         </encoder>
     </appender>
 
-    <appender name="SqlLoggerFileOut"
-              class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.base}/sql-access.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/sql-access.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy
-                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <MaxHistory>10</MaxHistory>
-                <!-- or whenever the file size reaches 100MB -->
-                <maxFileSize>100MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-        </rollingPolicy>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%date [%thread][IP:%X{ip}|USER:%X{user}][%-8level%logger{80}] %msg%n</pattern>
-        </encoder>
-    </appender>
+    <!--<appender name="SqlLoggerFileOut"-->
+              <!--class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+        <!--<file>${log.base}/sql-access.log</file>-->
+        <!--<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+            <!--<FileNamePattern>${log.base}/sql-access.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>-->
+            <!--<timeBasedFileNamingAndTriggeringPolicy-->
+                    <!--class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">-->
+                <!--<MaxHistory>10</MaxHistory>-->
+                <!--&lt;!&ndash; or whenever the file size reaches 100MB &ndash;&gt;-->
+                <!--<maxFileSize>100MB</maxFileSize>-->
+            <!--</timeBasedFileNamingAndTriggeringPolicy>-->
+        <!--</rollingPolicy>-->
+        <!--<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">-->
+            <!--<pattern>%date [%thread][IP:%X{ip}|USER:%X{user}][%-8level%logger{80}] %msg%n</pattern>-->
+        <!--</encoder>-->
+    <!--</appender>-->
 
     <appender name="SpringExceptionLoggerFileOut"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -175,24 +175,24 @@
     </logger>
 
     <!-- Hibernate SQL -->
-    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="ERROR">
-        <appender-ref ref="SqlLoggerFileOut"/>
-    </logger>
-    <logger name="org.hibernate.type.descriptor.sql.BasicExtractor" level="ERROR">
-        <appender-ref ref="SqlLoggerFileOut"/>
-    </logger>
-    <logger name="org.hibernate.SQL" level="ERROR">
-        <appender-ref ref="SqlLoggerFileOut"/>
-    </logger>
-    <logger name="org.hibernate.engine.QueryParameters" level="ERROR">
-        <appender-ref ref="SqlLoggerFileOut"/>
-    </logger>
-    <logger name="org.hibernate.engine.query.HQLQueryPlan" level="ERROR">
-        <appender-ref ref="SqlLoggerFileOut"/>
-    </logger>
-    <logger name="org.hibernate.engine.transaction.spi.AbstractTransactionImpl" level="DEBUG">
-        <appender-ref ref="SqlLoggerFileOut"/>
-    </logger>
+    <!--<logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="ERROR">-->
+        <!--<appender-ref ref="SqlLoggerFileOut"/>-->
+    <!--</logger>-->
+    <!--<logger name="org.hibernate.type.descriptor.sql.BasicExtractor" level="ERROR">-->
+        <!--<appender-ref ref="SqlLoggerFileOut"/>-->
+    <!--</logger>-->
+    <!--<logger name="org.hibernate.SQL" level="ERROR">-->
+        <!--<appender-ref ref="SqlLoggerFileOut"/>-->
+    <!--</logger>-->
+    <!--<logger name="org.hibernate.engine.QueryParameters" level="ERROR">-->
+        <!--<appender-ref ref="SqlLoggerFileOut"/>-->
+    <!--</logger>-->
+    <!--<logger name="org.hibernate.engine.query.HQLQueryPlan" level="ERROR">-->
+        <!--<appender-ref ref="SqlLoggerFileOut"/>-->
+    <!--</logger>-->
+    <!--<logger name="org.hibernate.engine.transaction.spi.AbstractTransactionImpl" level="DEBUG">-->
+        <!--<appender-ref ref="SqlLoggerFileOut"/>-->
+    <!--</logger>-->
 
     <!-- mongodb log -->
     <logger name="com.mongodb" level="INFO">
