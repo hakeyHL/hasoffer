@@ -138,9 +138,9 @@ public class AppServiceImpl implements IAppService {
     }
 
     @Override
-    public List<OrderStatsAnalysisPO> getBackDetails(String userToken) {
+    public List<OrderStatsAnalysisPO> getBackDetails(String userId) {
         List li = new ArrayList();
-        li.add(userToken);
+        li.add(userId);
         return dbm.query(Q_APP_ORDERS, li);
     }
 

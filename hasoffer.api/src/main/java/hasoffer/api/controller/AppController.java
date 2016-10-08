@@ -892,7 +892,7 @@ public class AppController {
     public ModelAndView userInfo() {
         //TODO 具体hasoffer coin 计算返回
         ModelAndView mv = new ModelAndView();
-        BigDecimal PendingCoins = BigDecimal.ZERO;
+        BigDecimal coins = BigDecimal.ZERO;
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
         UrmUser user = appService.getUserByUserToken(userToken);
         if (user != null) {
@@ -900,12 +900,23 @@ public class AppController {
             userVo.setName(user.getUserName());
             List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
-                if (orderStatsAnalysisPO.getOrderStatus() != "cancelled") {
-                    PendingCoins = PendingCoins.add(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)));
+                String orderStatus = orderStatsAnalysisPO.getOrderStatus();
+                if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name()) && orderStatus != null && (orderStatus.equals("tentative") || orderStatus.equals("approved"))) {
+                    // BigDecimal.min()
+                    BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.015)).min(orderStatsAnalysisPO.getTentativeAmount());
+                    if (orderStatus.equals("tentative")) {
+                        coins = coins.add(tempPrice);
+                    }
+
                 }
             }
-            PendingCoins = PendingCoins.setScale(2, BigDecimal.ROUND_HALF_UP);
-            userVo.setConis(PendingCoins);
+            coins = coins.multiply(BigDecimal.TEN);
+            UrmSignCoin urmSignCoin = appService.getSignCoinByUserId(user.getId());
+            if (urmSignCoin != null) {
+                coins = coins.add(BigDecimal.valueOf(urmSignCoin.getSignCoin()));
+            }
+            coins = coins.setScale(1, BigDecimal.ROUND_HALF_UP);
+            userVo.setCoins(coins);
             userVo.setUserIcon(user.getAvatarPath());
             mv.addObject("data", userVo);
         }
@@ -1321,13 +1332,14 @@ public class AppController {
 
     public void calculateHasofferCoin(List<UrmUser> users, BackDetailVo data) {
         List<OrderVo> transcations = new ArrayList<OrderVo>();
-        BigDecimal PendingCoins = BigDecimal.ZERO;
-        BigDecimal VericiedCoins = BigDecimal.ZERO;
+        BigDecimal pendingCoins = BigDecimal.ZERO;
+        BigDecimal verifiedCoins = BigDecimal.ZERO;
         for (UrmUser user : users) {
             List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
                 if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
                     OrderVo orderVo = new OrderVo();
+                    // BigDecimal.min()
                     BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.015)).min(orderStatsAnalysisPO.getTentativeAmount());
                     orderVo.setAccount(tempPrice.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
                     orderVo.setChannel(orderStatsAnalysisPO.getChannel());
@@ -1339,11 +1351,11 @@ public class AppController {
                     if (orderStatsAnalysisPO.getOrderStatus() != null) {
                         if (!orderStatsAnalysisPO.getOrderStatus().equals("cancelled") && !orderStatsAnalysisPO.getOrderStatus().equals("disapproved")) {
                             if (!orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
-                                PendingCoins = PendingCoins.add(tempPrice);
+                                pendingCoins = pendingCoins.add(tempPrice);
                             }
                         }
                         if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
-                            VericiedCoins = VericiedCoins.add(tempPrice);
+                            verifiedCoins = verifiedCoins.add(tempPrice);
                         }
                     }
 
@@ -1351,9 +1363,9 @@ public class AppController {
             }
         }
         //待定的
-        data.setPendingCoins(PendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+        data.setPendingCoins(pendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         //可以使用的
-        data.setVerifiedCoins(VericiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+        data.setVerifiedCoins(verifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
     }
 }

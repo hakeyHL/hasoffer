@@ -6,14 +6,14 @@ import java.math.BigDecimal;
  * Created by hs on 2016/6/20.
  */
 public class UserVo {
-    private  String userName;
+    private String userName;
     private String thirdId;
-    private  String userIcon;
+    private String userIcon;
     private String token;
     private String platform;
     private String telephone;
-    private  String name;
-    private BigDecimal conis;
+    private String name;
+    private BigDecimal coins;
 
     public String getName() {
         return name;
@@ -23,12 +23,12 @@ public class UserVo {
         this.name = name;
     }
 
-    public BigDecimal getConis() {
-        return conis;
+    public BigDecimal getCoins() {
+        return coins;
     }
 
-    public void setConis(BigDecimal conis) {
-        this.conis = conis;
+    public void setCoins(BigDecimal coins) {
+        this.coins = coins;
     }
 
     public String getThirdId() {
