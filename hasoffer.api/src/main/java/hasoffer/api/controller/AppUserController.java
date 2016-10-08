@@ -309,6 +309,7 @@ public class AppUserController {
                     } else {
                         urmSignCoin.setSignCoin(urmSignCoin.getSignCoin() + afwCfgMap.get(conSignNum));
                     }
+                    urmSignCoin.setSumSignNum(urmSignCoin.getSumSignNum() + 1);
                     urmSignCoin.setConSignNum(conSignNum);
                     urmSignCoin.setLastSignTime(new Date().getTime());
                 } else {
@@ -324,6 +325,7 @@ public class AppUserController {
                     }
                     //比之前低,重置连续数,给coin
                     urmSignCoin.setConSignNum(1);
+                    urmSignCoin.setSumSignNum(urmSignCoin.getSumSignNum() + 1);
                     urmSignCoin.setSignCoin(urmSignCoin.getSignCoin() + afwCfgMap.get(min));
                     urmSignCoin.setLastSignTime(new Date().getTime());
                 }
