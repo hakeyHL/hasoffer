@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -20,8 +19,8 @@ public class SpiderSkuTaskInitBean {
     public void runTask() {
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 15); //凌晨1点
-        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, 22);
+        calendar.set(Calendar.MINUTE, 30);
         calendar.set(Calendar.SECOND, 0);
         long runTime = calendar.getTimeInMillis();
         long nowTime = new Date().getTime();
@@ -31,9 +30,9 @@ public class SpiderSkuTaskInitBean {
         } else {
             delay = runTime - nowTime;
         }
+        logger.debug("Current Date:{}, delay {} ms  SpiderSkuTaskInitBean.queryProduct() be call.");
         // 第二个参数为首次执行的延时时间，第三个参数为定时执行的间隔时间
         service.scheduleAtFixedRate(new SpiderSkuTimerTask(), delay, TimeUtils.MILLISECONDS_OF_1_DAY, TimeUnit.MILLISECONDS);
-        logger.debug("SpiderSkuTaskInitBean.queryProduct() be call.");
     }
 
     private static class SpiderSkuTimerTask extends TimerTask {
