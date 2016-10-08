@@ -19,7 +19,6 @@ public class SkuResultDubboServiceImpl implements ISkuResultDubboService {
     ICmpSkuService cmpSkuService;
     @Resource
     IDataBaseManager dbm;
-    private int i;
 
     @Override
     public void updateSku(FetchedProduct fetchedProduct) {
@@ -27,7 +26,7 @@ public class SkuResultDubboServiceImpl implements ISkuResultDubboService {
         long skuId = fetchedProduct.getSkuId();
         PtmCmpSku ptmCmpSku = cmpSkuService.getCmpSkuById(skuId);
 
-        logger.info(fetchedProduct.getWebsite() + " " + (i++) + ":" + fetchedProduct.toString().replace("\r", ""));
+        logger.info("update sku:{}, detail:{}", skuId, fetchedProduct.toString().replace("\r", ""));
 
         try {
             //更新ptmcmpsku
