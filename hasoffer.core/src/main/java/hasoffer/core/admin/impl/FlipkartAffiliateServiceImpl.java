@@ -246,7 +246,7 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
 
         for (AffiliateOrder order : orderList) {
             OrderStatsAnalysisPO po = new OrderStatsAnalysisPO();
-            po.setWebSite(Website.FLIPKART.toString());
+            po.setWebSite(Website.FLIPKART.name());
             po.setOrderId(order.getAffiliateOrderItemId());
             po.setAffID(order.getAffID());
             try {

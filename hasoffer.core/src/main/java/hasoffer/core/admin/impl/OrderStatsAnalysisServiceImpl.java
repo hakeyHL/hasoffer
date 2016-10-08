@@ -61,20 +61,20 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
             e.printStackTrace();
         }
         Date delEndTime = TimeUtils.addDay(endTime, 1);
-        if (Website.FLIPKART.toString().equals(webSite)) {
+        if (Website.FLIPKART.name().equals(webSite)) {
             List<OrderStatsAnalysisPO> flipkartPOList = flipkartAffiliateService.countOrderList(startTime, endTime);
             if (flipkartPOList != null && flipkartPOList.size() > 0) {
-                delete(Website.FLIPKART.toString(), startTime, delEndTime);
+                delete(Website.FLIPKART.name(), startTime, delEndTime);
                 for (OrderStatsAnalysisPO po : flipkartPOList) {
                     insert(po);
                 }
             }
         }
 
-        if (Website.SNAPDEAL.toString().equals(webSite)) {
+        if (Website.SNAPDEAL.name().equals(webSite)) {
             List<OrderStatsAnalysisPO> snapDealPoList = snapdealAffiliateService.countOrderList(startTime, endTime);
             if (snapDealPoList != null && snapDealPoList.size() > 0) {
-                delete(Website.SNAPDEAL.toString(), startTime, delEndTime);
+                delete(Website.SNAPDEAL.name(), startTime, delEndTime);
                 for (OrderStatsAnalysisPO po : snapDealPoList) {
                     insert(po);
                 }
