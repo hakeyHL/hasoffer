@@ -19,8 +19,8 @@ public class SpiderSkuTaskInitBean {
     public void runTask() {
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 22);
-        calendar.set(Calendar.MINUTE, 40);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         long runTime = calendar.getTimeInMillis();
         long nowTime = new Date().getTime();
