@@ -31,7 +31,7 @@ import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.urm.UrmDevice;
-import hasoffer.core.persistence.po.urm.UrmSignAwdCfg;
+import hasoffer.core.persistence.po.urm.UrmSignCoin;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.ICmpSkuService;
@@ -333,25 +333,6 @@ public class AppController {
         return mav;
     }
 
-    /**
-     * 查看返利
-     *
-     * @return
-     */
-  /*  @RequestMapping(value = "/backDetail", method = RequestMethod.GET)
-    public ModelAndView backDetail() {
-        ModelAndView mv = new ModelAndView();
-        BackDetailVo data = new BackDetailVo();
-        String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
-        UrmUser user = appService.getUserByUserToken(userToken);
-        if (user != null) {
-            //查询到用户后还要查询名字与当前用户为同名且平台一致(facebook)的用户列表查询其订单
-            List<UrmUser> users = appService.getUsersByUserName(user.getUserName());
-            calculateHasofferCoin(users, data);
-        }
-        mv.addObject("data", data);
-        return mv;
-    }*/
     @RequestMapping(value = "/backDetail", method = RequestMethod.GET)
     public ModelAndView backDetail() {
         ModelAndView mv = new ModelAndView();
@@ -361,20 +342,22 @@ public class AppController {
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
         UrmUser user = appService.getUserByUserToken(userToken);
         if (user != null) {
+
+            // 获取基本配置
+            Map<Integer, Integer> afwCfgMap = appService.getSignAwardNum();
+
             calculateHasofferCoin(Collections.singletonList(user), data);
             //添加返回:
             //1. 从订单记录中查询直接乘以10
             data.setPendingCoins(data.getPendingCoins().multiply(BigDecimal.valueOf(10)));
             data.setVerifiedCoins(data.getVerifiedCoins().multiply(BigDecimal.valueOf(10)));
 
-            // 获取基本配置
-            Map<Integer, Integer> afwCfgMap = initDefaultValue();
+            UrmSignCoin urmSignCoin = appService.getSignCoinByUserId(user.getId());
 
             //2. 本次签到奖励
             Set<Integer> integers = afwCfgMap.keySet();
             Integer max = Collections.max(integers);
-            Long lastSignTime = user.getLastSignTime();
-            if (lastSignTime == null) {
+            if (urmSignCoin == null) {
                 //如果为空,代表还没有签到过
                 data.setThisTimeCoin(afwCfgMap.get(1));
                 data.setNextTimeCoin(afwCfgMap.get(2));
@@ -385,12 +368,12 @@ public class AppController {
                 //String currentDate = simpleDateFormat.format(new Date());
                 //String lastSignDate = simpleDateFormat.format(new Date(user.getLastSignTime()));
                 long current = new Date().getTime();
-                long days = TimeUtils.getIndiaTime(current) / TimeUtils.MILLISECONDS_OF_1_DAY - TimeUtils.getIndiaTime(lastSignTime) / TimeUtils.MILLISECONDS_OF_1_DAY;
+                long days = TimeUtils.getIndiaTime(current) / TimeUtils.MILLISECONDS_OF_1_DAY - TimeUtils.getIndiaTime(urmSignCoin.getLastSignTime()) / TimeUtils.MILLISECONDS_OF_1_DAY;
                 if (days == 0) {
                     //如果今天已经签到过,返回已签到标识
                     data.setHasSign(true);
                     //明天签到的奖励
-                    Integer conSignNum = user.getConSignNum();
+                    Integer conSignNum = urmSignCoin.getConSignNum();
                     //最大连续签到数会大于连续奖励数
                     //需要知道Map中的最大key值
                     if (conSignNum + 1 >= max) {
@@ -398,10 +381,10 @@ public class AppController {
                     } else {
                         data.setThisTimeCoin(afwCfgMap.get(conSignNum + 1));
                     }
-                    data.setMaxConSignNum(user.getConSignNum());
+                    data.setMaxConSignNum(urmSignCoin.getConSignNum());
                 } else if (days == 1) {// 如果是连续签单，则按照连续签到返回数据；
                     //返回已签到+1作为本次,已连续+2作为下次返回
-                    Integer conSignNum = user.getConSignNum();
+                    Integer conSignNum = urmSignCoin.getConSignNum();
                     //需要知道Map中的最大key值
                     if (conSignNum + 1 >= max) {
                         data.setThisTimeCoin(afwCfgMap.get(max));
@@ -413,16 +396,17 @@ public class AppController {
                     } else {
                         data.setNextTimeCoin(afwCfgMap.get(conSignNum + 2));
                     }
-                    data.setMaxConSignNum(user.getConSignNum());
-                } else if (days > 1) {// 如果不是，则重新从0开始；
+                    data.setMaxConSignNum(urmSignCoin.getConSignNum());
+                } else if (days > 1) {
+                    // 如果不是，则重新从0开始；
                     data.setThisTimeCoin(afwCfgMap.get(1));
                     data.setNextTimeCoin(afwCfgMap.get(2));
                     // 当前最大连续签到次数
                     data.setMaxConSignNum(0);
                 }
+                //4. verified coin = approved*10+签到获得.
+                data.setVerifiedCoins(data.getVerifiedCoins().add(BigDecimal.valueOf(urmSignCoin.getSignCoin())));
             }
-            //4. verified coin = approved*10+签到获得.
-            data.setVerifiedCoins(data.getVerifiedCoins().add(BigDecimal.valueOf(user.getSignCoin())));
 
         }
         data.setAuxiliaryCheck(true);
@@ -430,23 +414,6 @@ public class AppController {
         return mv;
     }
 
-    private Map<Integer, Integer> initDefaultValue() {
-        List<UrmSignAwdCfg> signAwardNum = appService.getSignAwardNum();
-        Map<Integer, Integer> afwCfgMap = new HashMap<>();
-
-        if (signAwardNum != null) {
-            for (UrmSignAwdCfg urmSignAwdCfg : signAwardNum) {
-                afwCfgMap.put(urmSignAwdCfg.getCount(), urmSignAwdCfg.getAwardCoin());
-            }
-        }
-        for (int i = 1; i < 8; i++) {
-            if (afwCfgMap.get(i) == null) {
-                afwCfgMap.put(i, 5 + 5 * i);
-            }
-        }
-
-        return afwCfgMap;
-    }
 
     /**
      * banners列表
@@ -821,9 +788,9 @@ public class AppController {
             List<UrmUserDevice> urmUserDevices = new ArrayList<>();
             for (String id : ids) {
                 boolean flag = false;
-                System.out.println(" id_id_id " + id);
+//                System.out.println(" id_id_id " + id);
                 for (String dId : deviceIds) {
-                    System.out.println(" dId_dId_dId " + dId);
+//                    System.out.println(" dId_dId_dId " + dId);
                     if (id.equals(dId)) {
                         flag = true;
                         System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);
@@ -900,27 +867,39 @@ public class AppController {
 
     /**
      * 用户信息获取
+     * 计算用户签到和返利总额
      *
      * @return
      */
     @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
     public ModelAndView userInfo() {
-        //TODO 具体hasoffer coin 计算返回
         ModelAndView mv = new ModelAndView();
-        BigDecimal PendingCoins = BigDecimal.ZERO;
+        BigDecimal coins = BigDecimal.ZERO;
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
         UrmUser user = appService.getUserByUserToken(userToken);
         if (user != null) {
+//            BackDetailVo backDetailVo = new BackDetailVo();
+//            calculateHasofferCoin(Collections.singletonList(user), backDetailVo);
             UserVo userVo = new UserVo();
             userVo.setName(user.getUserName());
             List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
-                if (orderStatsAnalysisPO.getOrderStatus() != "cancelled") {
-                    PendingCoins = PendingCoins.add(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)));
+                String orderStatus = orderStatsAnalysisPO.getOrderStatus();
+                if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name()) && orderStatus != null && (orderStatus.equals("tentative") || orderStatus.equals("approved"))) {
+                    BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.015)).min(orderStatsAnalysisPO.getTentativeAmount());
+                    coins = coins.add(tempPrice);
                 }
             }
-            PendingCoins = PendingCoins.setScale(2, BigDecimal.ROUND_HALF_UP);
-            userVo.setConis(PendingCoins);
+            coins = coins.multiply(BigDecimal.TEN);
+//            coins = coins.add(backDetailVo.getPendingCoins());
+//            coins = coins.add(backDetailVo.getVerifiedCoins());
+//            coins = coins.multiply(BigDecimal.TEN);
+            UrmSignCoin urmSignCoin = appService.getSignCoinByUserId(user.getId());
+            if (urmSignCoin != null) {
+                coins = coins.add(BigDecimal.valueOf(urmSignCoin.getSignCoin()));
+            }
+            coins = coins.setScale(1, BigDecimal.ROUND_HALF_UP);
+            userVo.setCoins(coins);
             userVo.setUserIcon(user.getAvatarPath());
             mv.addObject("data", userVo);
         }
@@ -1134,60 +1113,6 @@ public class AppController {
         System.out.println("time " + (System.currentTimeMillis() - l) / 1000);
         return mv;
     }
-//    public ModelAndView productsList(SearchCriteria criteria, @RequestParam(defaultValue = "3") int type) {
-//        ModelAndView mv = new ModelAndView();
-//        List li = new ArrayList();
-//        Map map = new HashMap();
-//        PageableResult<ProductModel> products;
-//        //category level page size
-//        // PageableResult <ProductModel> products=productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()),criteria.getLevel(),criteria.getPage(),criteria.getPageSize());
-//        if (StringUtils.isNotBlank(criteria.getCategoryId())) {
-//            //search by category
-//            products = productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
-//            //products = productIndexServiceImpl.searchPro(Long.valueOf(2), 2, 1, 10);
-//            if (products != null && products.getData().size() > 0) {
-//                addProductVo2List(li, products.getData());
-//            }
-//        } else if (StringUtils.isNotEmpty(criteria.getKeyword())) {
-//            //search by title
-//            //productIndexServiceImpl.simpleSearch(criteria.getKeyword(),1,10);
-//            PageableResult p = productIndexServiceImpl.searchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
-//            if (p != null && p.getData().size() > 0) {
-//                addProductVo2List(li, p.getData());
-//            }
-//        }
-//        String data = "";
-//        //查询热卖商品
-//        List<PtmProduct> products2s = productCacheManager.getTopSellins(criteria.getPage(), criteria.getPageSize());
-//        switch (type) {
-//            case 0:
-//                addProductVo2List(li, products2s);
-//                if (products2s != null && products2s.size() > 4) {
-//                    li = li.subList(0, 5);
-//                }
-//                map.put("product", li);
-//                break;
-//            case 1:
-//                addProductVo2List(li, products2s);
-//                map.put("product", li);
-//                break;
-//            case 2:
-//                PageableResult p = productIndexServiceImpl.searchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
-//                if (p != null && p.getData().size() > 0) {
-//                    addProductVo2List(li, p.getData());
-//                }
-//                map.put("product", li);
-//                break;
-//            default:
-//                map.put("product", null);
-//        }
-//        if (li != null && li.size() > 0) {
-//            map.put("product", li);
-//        }
-//        mv.addObject("data", map);
-//        return mv;
-//    }
-
 
     public void addProductVo2List(List desList, List sourceList) {
 
@@ -1336,8 +1261,8 @@ public class AppController {
 
     public void calculateHasofferCoin(List<UrmUser> users, BackDetailVo data) {
         List<OrderVo> transcations = new ArrayList<OrderVo>();
-        BigDecimal PendingCoins = BigDecimal.ZERO;
-        BigDecimal VericiedCoins = BigDecimal.ZERO;
+        BigDecimal pendingCoins = BigDecimal.ZERO;
+        BigDecimal verifiedCoins = BigDecimal.ZERO;
         for (UrmUser user : users) {
             List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
@@ -1354,11 +1279,11 @@ public class AppController {
                     if (orderStatsAnalysisPO.getOrderStatus() != null) {
                         if (!orderStatsAnalysisPO.getOrderStatus().equals("cancelled") && !orderStatsAnalysisPO.getOrderStatus().equals("disapproved")) {
                             if (!orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
-                                PendingCoins = PendingCoins.add(tempPrice);
+                                pendingCoins = pendingCoins.add(tempPrice);
                             }
                         }
                         if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
-                            VericiedCoins = VericiedCoins.add(tempPrice);
+                            verifiedCoins = verifiedCoins.add(tempPrice);
                         }
                     }
 
@@ -1366,9 +1291,9 @@ public class AppController {
             }
         }
         //待定的
-        data.setPendingCoins(PendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+        data.setPendingCoins(pendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         //可以使用的
-        data.setVerifiedCoins(VericiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+        data.setVerifiedCoins(verifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
     }
 }

@@ -26,50 +26,50 @@ public class UrmUser implements Identifiable<Long> {
     private Date createTime;
     private String telephone;
     private String gcmToken;
-    //用户的coin
-    @Column(columnDefinition = "bigint default 0")
-    private Long signCoin = 0L;
-    //当前最大连续签到次数
-    @Column(columnDefinition = "int default 0")
-    private Integer conSignNum = 0;
-    //上次签到时间
-    private Long lastSignTime;
-    //最高连续签到记录
-    @Column(columnDefinition = "int default 0")
-    private Integer maxConSignNum;
+    ////用户的coin
+    //@Column(columnDefinition = "bigint default 0")
+    //private Long signCoin = 0L;
+    ////当前最大连续签到次数
+    //@Column(columnDefinition = "int default 0")
+    //private Integer conSignNum = 0;
+    ////上次签到时间
+    //private Long lastSignTime;
+    ////最高连续签到记录
+    //@Column(columnDefinition = "int default 0")
+    //private Integer maxConSignNum;
 
-    @Column(columnDefinition = "int default 0")
-    public Integer getMaxConSignNum() {
-        return maxConSignNum;
-    }
-
-    public void setMaxConSignNum(Integer maxConSignNum) {
-        this.maxConSignNum = maxConSignNum;
-    }
-
-    public Long getSignCoin() {
-        return signCoin;
-    }
-
-    public void setSignCoin(Long signCoin) {
-        this.signCoin = signCoin;
-    }
-
-    public Integer getConSignNum() {
-        return conSignNum;
-    }
-
-    public void setConSignNum(Integer conSignNum) {
-        this.conSignNum = conSignNum;
-    }
-
-    public Long getLastSignTime() {
-        return lastSignTime;
-    }
-
-    public void setLastSignTime(Long lastSignTime) {
-        this.lastSignTime = lastSignTime;
-    }
+    //@Column(columnDefinition = "int default 0")
+    //public Integer getMaxConSignNum() {
+    //    return maxConSignNum;
+    //}
+    //
+    //public void setMaxConSignNum(Integer maxConSignNum) {
+    //    this.maxConSignNum = maxConSignNum;
+    //}
+    //
+    //public Long getSignCoin() {
+    //    return signCoin;
+    //}
+    //
+    //public void setSignCoin(Long signCoin) {
+    //    this.signCoin = signCoin;
+    //}
+    //
+    //public Integer getConSignNum() {
+    //    return conSignNum;
+    //}
+    //
+    //public void setConSignNum(Integer conSignNum) {
+    //    this.conSignNum = conSignNum;
+    //}
+    //
+    //public Long getLastSignTime() {
+    //    return lastSignTime;
+    //}
+    //
+    //public void setLastSignTime(Long lastSignTime) {
+    //    this.lastSignTime = lastSignTime;
+    //}
 
     public String getTelephone() {
         return telephone;
@@ -168,12 +168,7 @@ public class UrmUser implements Identifiable<Long> {
         if (avatarPath != null ? !avatarPath.equals(urmUser.avatarPath) : urmUser.avatarPath != null) return false;
         if (createTime != null ? !createTime.equals(urmUser.createTime) : urmUser.createTime != null) return false;
         if (telephone != null ? !telephone.equals(urmUser.telephone) : urmUser.telephone != null) return false;
-        if (gcmToken != null ? !gcmToken.equals(urmUser.gcmToken) : urmUser.gcmToken != null) return false;
-        if (signCoin != null ? !signCoin.equals(urmUser.signCoin) : urmUser.signCoin != null) return false;
-        if (conSignNum != null ? !conSignNum.equals(urmUser.conSignNum) : urmUser.conSignNum != null) return false;
-        if (lastSignTime != null ? !lastSignTime.equals(urmUser.lastSignTime) : urmUser.lastSignTime != null)
-            return false;
-        return !(maxConSignNum != null ? !maxConSignNum.equals(urmUser.maxConSignNum) : urmUser.maxConSignNum != null);
+        return gcmToken != null ? gcmToken.equals(urmUser.gcmToken) : urmUser.gcmToken == null;
 
     }
 
@@ -189,10 +184,6 @@ public class UrmUser implements Identifiable<Long> {
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (telephone != null ? telephone.hashCode() : 0);
         result = 31 * result + (gcmToken != null ? gcmToken.hashCode() : 0);
-        result = 31 * result + (signCoin != null ? signCoin.hashCode() : 0);
-        result = 31 * result + (conSignNum != null ? conSignNum.hashCode() : 0);
-        result = 31 * result + (lastSignTime != null ? lastSignTime.hashCode() : 0);
-        result = 31 * result + (maxConSignNum != null ? maxConSignNum.hashCode() : 0);
         return result;
     }
 }

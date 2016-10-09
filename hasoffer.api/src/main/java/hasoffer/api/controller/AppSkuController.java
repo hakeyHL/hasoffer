@@ -122,6 +122,7 @@ public class AppSkuController {
                 //去除html标签
                 if (!StringUtils.isEmpty(tempJsonParam)) {
                     tempJsonParam = ClientHelper.delHTMLTag(tempJsonParam);
+                    //TODO error parse true
                     map.put("specs", JsonHelper.getJsonMap(tempJsonParam));//参数
                 }
             }

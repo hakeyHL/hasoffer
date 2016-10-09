@@ -370,6 +370,11 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
     }
 
     @Override
+    public void saveOrUpdate(Object it) {
+        getHibernate4Template().getSessionFactory().getCurrentSession().saveOrUpdate(it);
+    }
+
+    @Override
     public void deleteBySQL(final String sql) {
         exeSQL(sql);
     }

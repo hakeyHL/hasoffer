@@ -49,6 +49,8 @@ public interface IDataBaseManager {
 
     void update(Object t);
 
+    void saveOrUpdate(Object it);
+
     void deleteBySQL(final String sql);
 
     void updateBySQL(final String sql);

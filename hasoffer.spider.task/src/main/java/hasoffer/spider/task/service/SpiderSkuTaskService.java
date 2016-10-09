@@ -45,17 +45,20 @@ public class SpiderSkuTaskService {
         String pageSql = "SELECT sku.id,sku.url,sku.website,sku.productId as countNum FROM SrmProductSearchCount psc LEFT JOIN ptmcmpsku sku ON psc.productId = sku.productId WHERE psc.ymd = :ymd AND psc.count > :sum AND sku.website = :website AND sku.`status` <> 'OFFSALE' limit :begin,:end";
         int pageSize = 1000;
         int count = 0;
+
         Map<String, Object> paramsMap = new HashMap<>();
         paramsMap.put("ymd", dateStr);
         paramsMap.put("sum", num);
-        paramsMap.put("website", webSite.toString());
+        paramsMap.put("website", webSite.name());
         List list = dbm.queryBySql(countSql, paramsMap);
+        logger.info("Query Sql:SELECT count(*) as countNum FROM SrmProductSearchCount psc LEFT JOIN ptmcmpsku sku ON psc.productId = sku.productId WHERE psc.ymd = {} AND psc.count > {} AND sku.website = '{}' AND sku.`status` <> 'OFFSALE'", dateStr, num, webSite.name());
         for (Object obj : list) {
             if (obj != null) {
                 Map<String, Object> temp = (Map<String, Object>) obj;
                 count = (int) temp.get("countNum");
             }
         }
+        logger.info("Count Amazon:page count:{} and pageSize:1000", count);
 
         int countPage = count / pageSize;
         if (count % pageSize > 0) {
@@ -91,6 +94,7 @@ public class SpiderSkuTaskService {
                     }
                     try {
                         skuTaskDubboService.sendTask(new SpiderSkuTask(Long.valueOf(skuIdTmp.toString()), url, webSite, TaskLevel.LEVEL_3));
+                        logger.info("Send Task success:{}", url);
                     } catch (Exception e) {
                         logger.error("Send Task error.", e);
                     }
@@ -100,7 +104,6 @@ public class SpiderSkuTaskService {
         }
 
     }
-
 
 
     //public void initTask() {

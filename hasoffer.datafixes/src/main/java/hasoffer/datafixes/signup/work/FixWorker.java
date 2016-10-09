@@ -3,7 +3,7 @@ package hasoffer.datafixes.signup.work;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
 import hasoffer.core.persistence.mongo.UserSignLog;
-import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.persistence.po.urm.UrmSignCoin;
 import hasoffer.core.system.IAppService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,21 +58,21 @@ public class FixWorker {
             });
 
             // 计算签到用户的实际签到天数及连续性
-            UrmUser user = appService.getUserById(key);
-            if (user != null) {
-                calSignUpCoin(user, signList);
-                appService.updateUserInfo(user);
-            }
+            UrmSignCoin urmSignCoin = new UrmSignCoin();
+            urmSignCoin.setUserId(key);
+            calSignUpCoin(urmSignCoin, signList);
+            appService.updateUrmSignCoin(urmSignCoin);
         }
 
     }
 
-    private void calSignUpCoin(UrmUser user, List<Long> signTimes) {
+    private void calSignUpCoin(UrmSignCoin user, List<Long> signTimes) {
         //Long userId = user.getKey();
         //List<Long> signTimes = user.getValue();
         long signCoin = 0L;
         Long lastSignTime = 0L;
         int conSignNum = 0;
+        int sumSignNum = 0;
         user.setMaxConSignNum(1);
         for (Long signTime : signTimes) {
             long x = (signTime + TimeUtils.MILLISECONDS_OF_1_HOUR * 8) / TimeUtils.MILLISECONDS_OF_1_DAY - (lastSignTime + TimeUtils.MILLISECONDS_OF_1_HOUR * 8) / TimeUtils.MILLISECONDS_OF_1_DAY;
@@ -82,16 +82,19 @@ public class FixWorker {
                 continue;
             } else if (x == 1) {
                 conSignNum++;
+                sumSignNum++;
             } else if (x > 1) {
                 if (user.getMaxConSignNum() < conSignNum) {
                     user.setMaxConSignNum(conSignNum);
                 }
                 conSignNum = 1;
+                sumSignNum++;
             }
-            logger.info("user:{}, Sign time:{}, conSignUp:{}, Day jet lag:{}", user.getId(), new Date(signTime), conSignNum, x);
+            logger.info("user:{}, Sign time:{}, conSignUp:{}, Day jet lag:{}", user.getUserId(), new Date(signTime), conSignNum, x);
             signCoin += getThisCoin(conSignNum);
 
         }
+        user.setSumSignNum(sumSignNum);
         user.setSignCoin(signCoin);
         user.setConSignNum(conSignNum);
     }
