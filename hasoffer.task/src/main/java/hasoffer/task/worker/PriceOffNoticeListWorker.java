@@ -9,7 +9,6 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.persistence.po.urm.PriceOffNotice;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,7 +114,7 @@ public class PriceOffNoticeListWorker implements Runnable {
                     }
 
                     queue.add(skuid);
-                    fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_2);
+                    fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TimeUtils.SECONDS_OF_1_MINUTE * 30, TaskLevel.LEVEL_2);
 
 
                     logger.info("send url request succes for " + sku.getWebsite() + " sku id is [" + sku.getId() + "]");
