@@ -74,6 +74,7 @@ public class SpiderSkuTaskService {
             paramsMap.put("begin", begin);
             paramsMap.put("end", end);
             List detailList = dbm.queryBySql(pageSql, paramsMap);
+            logger.info("Count Amazon page rows:{}", detailList.size());
             for (Object obj : detailList) {
                 if (obj != null) {
                     Map<String, Object> temp = (Map<String, Object>) obj;
