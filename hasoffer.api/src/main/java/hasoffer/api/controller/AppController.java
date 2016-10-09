@@ -348,10 +348,6 @@ public class AppController {
 
             calculateHasofferCoin(Collections.singletonList(user), data);
             //添加返回:
-            //1. 从订单记录中查询直接乘以10
-            data.setPendingCoins(data.getPendingCoins().multiply(BigDecimal.valueOf(10)));
-            data.setVerifiedCoins(data.getVerifiedCoins().multiply(BigDecimal.valueOf(10)));
-
             UrmSignCoin urmSignCoin = appService.getSignCoinByUserId(user.getId());
 
             //2. 本次签到奖励
@@ -1295,6 +1291,7 @@ public class AppController {
         //待定的
         data.setPendingCoins(pendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         //可以使用的
+        verifiedCoins = verifiedCoins.multiply(BigDecimal.TEN);
         data.setVerifiedCoins(verifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
     }
