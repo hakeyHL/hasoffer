@@ -6,7 +6,6 @@ import hasoffer.spring.context.SpringContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.TimerTask;
 import java.util.concurrent.Executors;
@@ -18,11 +17,11 @@ public class SpiderSkuTaskInitBean {
 
     public void runTask() {
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 12);
-        calendar.set(Calendar.MINUTE, 10);
-        calendar.set(Calendar.SECOND, 0);
-        long runTime = calendar.getTimeInMillis();
+        //Calendar calendar = Calendar.getInstance();
+        //calendar.set(Calendar.HOUR_OF_DAY, 12);
+        //calendar.set(Calendar.MINUTE, 10);
+        //calendar.set(Calendar.SECOND, 0);
+        long runTime = new Date().getTime() + 10000;
         long nowTime = new Date().getTime();
         long delay;
         if (runTime < nowTime) {
