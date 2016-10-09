@@ -7,6 +7,7 @@ import hasoffer.api.controller.vo.DeviceInfoVo;
 import hasoffer.api.controller.vo.SearchIO;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.base.model.Website;
+import hasoffer.base.redis.RedisKey;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
@@ -14,7 +15,7 @@ import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
 import hasoffer.core.persistence.mongo.UserSignLog;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.urm.PriceOffNotice;
-import hasoffer.core.persistence.po.urm.UrmSignAwdCfg;
+import hasoffer.core.persistence.po.urm.UrmSignCoin;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.ICmpSkuService;
@@ -43,7 +44,11 @@ import java.util.*;
 @Controller
 @RequestMapping("/app")
 public class AppUserController {
-    Logger logger = LoggerFactory.getLogger(AppUserController.class);
+
+    private final Logger logger = LoggerFactory.getLogger(AppUserController.class);
+
+    private final Long jotLag = TimeUtils.MILLISECONDS_OF_1_MINUTE * 150;
+
     @Resource
     AppServiceImpl appService;
     @Resource
@@ -56,11 +61,13 @@ public class AppUserController {
     MongoDbManager mongoDbManager;
 
     public static void main(String[] args) {
-        String affs[] = null;
-        affs = new String[]{"GOOGLEPLAY", "240a00b4f81c11da"};
-        String affsUrl = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL,
-                "http://m.snapdeal.com?utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_id=82856", affs);
-        System.out.println(affsUrl);
+        //String affs[] = null;
+        //affs = new String[]{"GOOGLEPLAY", "240a00b4f81c11da"};
+        //String affsUrl = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL,
+        //        "http://m.snapdeal.com?utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_id=82856", affs);
+        //System.out.println(affsUrl);
+        System.out.println(new SimpleDateFormat("yyyy-MM-dd").format(1475397136114L));
+        System.out.println((System.currentTimeMillis() - 1475226587161L) / 1000 / 60 / 60);
     }
 
     @RequestMapping("common/addUserId2DeepLink")
@@ -82,7 +89,7 @@ public class AppUserController {
             return modelAndView;
         }
         String affsUrl = WebsiteHelper.getDealUrlWithAff(Website.valueOf(website), deepLink, affs);
-        logger.info(" success ,time : " + currentTime + "  userId : " + urmUser.getId() + " ,sourceLink : " + deepLink + " ,result : " + affsUrl);
+        logger.info("addUserId2DeepLink(): success ,time : " + currentTime + "  userId : " + urmUser.getId() + " ,sourceLink : " + deepLink + " ,result : " + affsUrl);
         map.put("deeplink", affsUrl);
         modelAndView.addObject("data", map);
         return modelAndView;
@@ -238,114 +245,123 @@ public class AppUserController {
      */
     @RequestMapping("user/sign")
     public String userSign(HttpServletResponse response) {
+        String signFailMsg = "Unable to sign in, please contact customer service.";
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "10001");
-        jsonObject.put("msg", "sign  fail ");
-        //1. 用户是否存在
+        jsonObject.put("msg", signFailMsg);
+        // 无论用户是否存在，应该记住用户签到记录，防止由于某些信息错误，丢失用户签到记录。
         String userToken = Context.currentContext().getHeader("usertoken");
+        String deviceInfo = Context.currentContext().getHeader("deviceinfo");
+        logger.info("userSign(): User sign log. userToken:{}, deviceInfo:{}", userToken, deviceInfo);
+        //1. 用户是否存在
         if (!StringUtils.isEmpty(userToken)) {
-            System.out.println("userToken is :" + userToken);
+            logger.info("userSign(): userToken is :" + userToken);
+            Date currentDate = new Date();
+            Long nowTime = currentDate.getTime();
+            String s = urmDeviceService.get(RedisKey.USER_SIGN_LAST_OP_TIME + userToken, 0);
+            //注意：此处加一层Redis缓存，拦截。
+            if (s != null) {
+                logger.info("userSign(): repetitive  operation ,UserToken:{} has been  signed today  !", userToken);
+                jsonObject.put("msg", "Request is being processed, please wait 5 seconds and try again later. ");
+                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                return null;
+            }
+            urmDeviceService.add(RedisKey.USER_SIGN_LAST_OP_TIME + userToken, "true", 5);
+            Map<Integer, Integer> afwCfgMap = appService.getSignAwardNum();
+            if (afwCfgMap.size() == 0) {
+                logger.info("userSign():No award config data, over !");
+                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                return null;
+            }
+            Set<Integer> integers = afwCfgMap.keySet();
+            Integer max = Collections.max(integers);
+            Integer min = Collections.min(integers);
+            long startTime = System.currentTimeMillis();
             UrmUser urmUser = appService.getUserByUserToken(userToken);
             if (urmUser != null) {
-                //2. 存在则签到,加钱
-                System.out.println("get User " + urmUser.getUserName());
-                System.out.println("sign action ");
-                //2.1 上一次签到时间
-                Long lastSignTime = null;
-                //2.2 当前时间
-                Date currentDate = new Date();
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                currentDate.setTime(currentDate.getTime() - 60 * 60 * 1000 * 24);
-                String currentDateFor = simpleDateFormat.format(currentDate);
-                if (urmUser.getLastSignTime() == null) {
+                logger.info("userSign():get User " + urmUser.getUserName() + ":sign action ");
+
+                UrmSignCoin urmSignCoin = appService.getSignCoinByUserId(urmUser.getId());
+
+                if (urmSignCoin == null) {
                     //之前未签到过
-                    lastSignTime = new Date().getTime();
-                    urmUser.setLastSignTime(lastSignTime);
-                } else {
-                    //判断今天是否已经签到
-                    String lstTime = simpleDateFormat.format(urmUser.getLastSignTime());
-                    String today = simpleDateFormat.format(new Date());
-                    if (lstTime.equals(today)) {
-                        //如果今天已经签到,over
-                        System.out.println(" repetitive  operation , has been  signed today  !");
-                        jsonObject.put("msg", "you have signed today , please come tomorrow . ");
-                        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
-                        return null;
-                    }
+                    urmSignCoin = new UrmSignCoin();
+                    urmSignCoin.setUserId(urmUser.getId());
                 }
-                String lastSignTimeDateFor = simpleDateFormat.format(new Date(lastSignTime));
-                //按照连续次数降序查询奖励配置表
-                List<UrmSignAwdCfg> signConfigs = appService.getSignAwardNum();
-                if (currentDateFor.equals(lastSignTimeDateFor)) {
-                    //如果两个相等,代表是连续的,连续+1
-                    urmUser.setConSignNum(urmUser.getConSignNum() + 1);
-                    if (signConfigs != null && signConfigs.size() > 0) {
-                        //如果当前连续大于等于最大连续奖励数,按最大来
-                        if (urmUser.getConSignNum() >= signConfigs.get(0).getCount()) {
-                            urmUser.setSignCoin(urmUser.getSignCoin() + signConfigs.get(0).getAwardCoin());
-                        } else {
-                            for (UrmSignAwdCfg urmSign : signConfigs) {
-                                if (urmSign.getCount() == urmUser.getConSignNum()) {
-                                    //匹配到
-                                    urmUser.setSignCoin(urmUser.getSignCoin() + urmSign.getAwardCoin());
-                                }
-                            }
-                        }
+                //判断今天是否已经签到
+                long indiaSignTime = TimeUtils.getIndiaTime(urmSignCoin.getLastSignTime());
+                long indiaCurrentTime = TimeUtils.getIndiaTime(nowTime);
+                long indiaSignDay = indiaSignTime / TimeUtils.MILLISECONDS_OF_1_DAY + 1;
+                long indiaCurrentDay = indiaCurrentTime / TimeUtils.MILLISECONDS_OF_1_DAY + 1;
+
+                long daysAfterLastSing = indiaCurrentDay - indiaSignDay;
+                if (daysAfterLastSing < 1) {
+                    //如果今天已经签到,over
+                    logger.info("userSign(): repetitive  operation , has been  signed today  !");
+                    jsonObject.put("msg", "you have signed today , please come tomorrow. ");
+                    Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                    return null;
+                } else if (daysAfterLastSing == 1) {//相隔一天,代表是连续的,连续+1
+                    Integer conSignNum = urmSignCoin.getConSignNum() + 1;
+                    //如果当前连续大于等于最大连续奖励数,按最大来
+                    if (conSignNum >= max) {
+                        urmSignCoin.setSignCoin(urmSignCoin.getSignCoin() + afwCfgMap.get(max));
                     } else {
-                        //未查询到配置表,无法计算,结束,报错
-                        System.out.println(" no award config data ,over !");
-                        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
-                        return null;
+                        urmSignCoin.setSignCoin(urmSignCoin.getSignCoin() + afwCfgMap.get(conSignNum));
                     }
+                    urmSignCoin.setSumSignNum(urmSignCoin.getSumSignNum() + 1);
+                    urmSignCoin.setConSignNum(conSignNum);
+                    urmSignCoin.setLastSignTime(new Date().getTime());
                 } else {
                     //断掉了,将本次最高签到数与上次相比
-                    Long maxConSignNum = urmUser.getMaxConSignNum();
-                    Integer conSignNum = urmUser.getConSignNum();
+                    Integer maxConSignNum = urmSignCoin.getMaxConSignNum();
+                    Integer conSignNum = urmSignCoin.getConSignNum();
                     if (conSignNum == 0) {
                         //之前未签到过
-                        urmUser.setMaxConSignNum(1l);
-                        urmUser.setConSignNum(1);
-                    } else if (urmUser.getConSignNum() > maxConSignNum) {
+                        urmSignCoin.setMaxConSignNum(1);
+                    } else if (urmSignCoin.getConSignNum() > maxConSignNum) {
                         //比之前高,更新最高签到记录
-                        urmUser.setMaxConSignNum(Long.valueOf(urmUser.getConSignNum()));
+                        urmSignCoin.setMaxConSignNum(urmSignCoin.getConSignNum());
                     }
                     //比之前低,重置连续数,给coin
-                    for (UrmSignAwdCfg urmSign : signConfigs) {
-                        if (urmSign.getCount() == urmUser.getConSignNum()) {
-                            //匹配到
-                            urmUser.setSignCoin(urmUser.getSignCoin() + urmSign.getAwardCoin());
-                        }
-                    }
-                    urmUser.setConSignNum(1);
+                    urmSignCoin.setConSignNum(1);
+                    urmSignCoin.setSumSignNum(urmSignCoin.getSumSignNum() + 1);
+                    urmSignCoin.setSignCoin(urmSignCoin.getSignCoin() + afwCfgMap.get(min));
+                    urmSignCoin.setLastSignTime(new Date().getTime());
                 }
+                logger.info("userSign(): user sign info{ID:{}, userName:{}, sign Time:{}, signCoin:{}}", urmUser.getId(), urmUser.getUserName(), new Date(), urmSignCoin.getSignCoin());
                 //执行更新
                 try {
                     //由于此方法不返回操作结果,只能判断异常来处理操作为成功的情况
-                    appService.updateUserInfo(urmUser);
+                    //appService.updateUserInfo(urmUser);
+                    appService.updateUrmSignCoin(urmSignCoin);
                 } catch (Exception e) {
                     //异常,结束
-                    System.out.println("update sign fail ,messge is :" + e.getMessage());
+                    logger.error("userSign(): update sign fail ,message is :{}", e.getMessage(), e);
                     Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                     return null;
                 }
+                long endTime = System.currentTimeMillis();
+                logger.info("userSign(): user: {} sign, and cost {} ms. ", urmUser.getId(), endTime - startTime);
                 jsonObject.put("errorCode", "00000");
                 jsonObject.put("msg", "sign success ! ");
                 //插入记录到签到历史表
-                UserSignLog userSignLog = new UserSignLog(urmUser);
+                UserSignLog userSignLog = new UserSignLog(urmSignCoin.getUserId(), urmSignCoin.getLastSignTime());
                 mongoDbManager.save(userSignLog);
             } else {
                 //token未查询到用户
-                System.out.println("this userToken not get record " + userToken);
+                logger.info("userSign(): this userToken not get record " + userToken);
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             }
         } else {
             //无token,over
-            System.out.println(" userToken is empty ,over  !");
+            logger.info("userSign(): userToken is empty ,over  !");
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
-        System.out.println(" response result is : " + JSON.toJSONString(jsonObject));
+
+        logger.info("userSign(): response result is : " + JSON.toJSONString(jsonObject));
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }

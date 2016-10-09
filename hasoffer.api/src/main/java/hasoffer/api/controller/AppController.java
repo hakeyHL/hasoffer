@@ -12,7 +12,10 @@ import hasoffer.base.enums.AppType;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.AffliIdHelper;
 import hasoffer.base.utils.ArrayUtils;
+import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.admin.IOrderStatsAnalysisService;
 import hasoffer.core.bo.product.Banners;
 import hasoffer.core.bo.product.CategoryVo;
 import hasoffer.core.bo.push.*;
@@ -28,7 +31,7 @@ import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.urm.UrmDevice;
-import hasoffer.core.persistence.po.urm.UrmSignAwdCfg;
+import hasoffer.core.persistence.po.urm.UrmSignCoin;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.ICmpSkuService;
@@ -38,7 +41,6 @@ import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
-import hasoffer.core.utils.AffliIdHelper;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchedProductReview;
@@ -46,6 +48,7 @@ import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import jodd.util.NameValue;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -68,31 +71,41 @@ import java.util.*;
 @Controller
 @RequestMapping(value = "/app")
 public class AppController {
+
+    private Logger logger = LoggerFactory.getLogger(AppController.class);
+
     @Resource
-    IAppService appService;
+    private IAppService appService;
     @Resource
-    IDeviceService deviceService;
+    private IDeviceService deviceService;
     @Resource
-    CmpSkuCacheManager cmpSkuCacheManager;
+    private CmpSkuCacheManager cmpSkuCacheManager;
     @Resource
-    ProductCacheManager productCacheManager;
+    private ProductCacheManager productCacheManager;
     @Resource
-    ContentNegotiatingViewResolver jsonViewResolver;
+    private ContentNegotiatingViewResolver jsonViewResolver;
     @Resource
-    ProductIndex2ServiceImpl productIndex2Service;
+    private ProductIndex2ServiceImpl productIndex2Service;
     @Resource
-    ProductServiceImpl productService;
+    private ProductServiceImpl productService;
     @Resource
-    ICmpSkuService cmpSkuService;
+    private ICmpSkuService cmpSkuService;
     @Resource
-    AppCacheManager appCacheManager;
+    private AppCacheManager appCacheManager;
     @Resource
-    IPushService pushService;
+    private IPushService pushService;
     @Resource
-    MongoDbManager mongoDbManager;
-    Logger logger = LoggerFactory.getLogger(AppController.class);
+    private MongoDbManager mongoDbManager;
+    @Resource
+    private IOrderStatsAnalysisService orderService;
 
     public static void main(String[] args) throws Exception {
+
+        Date date1 = DateUtils.parseDate("2016-10-05 19:11:00", "yyyy-MM-dd HH:mm:ss");
+        Date date2 = DateUtils.parseDate("2016-10-02 21:11:00", "yyyy-MM-dd HH:mm:ss");
+        long days = date1.getTime() / TimeUtils.MILLISECONDS_OF_1_DAY - date2.getTime() / TimeUtils.MILLISECONDS_OF_1_DAY;
+        System.out.println(days);
+
     }
 
     @RequestMapping(value = "/newconfig", method = RequestMethod.GET)
@@ -320,94 +333,87 @@ public class AppController {
         return mav;
     }
 
-    /**
-     * 查看返利
-     *
-     * @return
-     */
-  /*  @RequestMapping(value = "/backDetail", method = RequestMethod.GET)
-    public ModelAndView backDetail() {
-        ModelAndView mv = new ModelAndView();
-        BackDetailVo data = new BackDetailVo();
-        String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
-        UrmUser user = appService.getUserByUserToken(userToken);
-        if (user != null) {
-            //查询到用户后还要查询名字与当前用户为同名且平台一致(facebook)的用户列表查询其订单
-            List<UrmUser> users = appService.getUsersByUserName(user.getUserName());
-            calculateHasofferCoin(users, data);
-        }
-        mv.addObject("data", data);
-        return mv;
-    }*/
     @RequestMapping(value = "/backDetail", method = RequestMethod.GET)
     public ModelAndView backDetail() {
         ModelAndView mv = new ModelAndView();
+        mv.addObject("errorCode", "00000");
+        mv.addObject("errorCode", "msg");
         BackDetailVo data = new BackDetailVo();
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
         UrmUser user = appService.getUserByUserToken(userToken);
         if (user != null) {
-            calculateHasofferCoin(Arrays.asList(user), data);
+
+            // 获取基本配置
+            Map<Integer, Integer> afwCfgMap = appService.getSignAwardNum();
+
+            calculateHasofferCoin(Collections.singletonList(user), data);
             //添加返回:
             //1. 从订单记录中查询直接乘以10
             data.setPendingCoins(data.getPendingCoins().multiply(BigDecimal.valueOf(10)));
             data.setVerifiedCoins(data.getVerifiedCoins().multiply(BigDecimal.valueOf(10)));
+
+            UrmSignCoin urmSignCoin = appService.getSignCoinByUserId(user.getId());
+
             //2. 本次签到奖励
-            List<UrmSignAwdCfg> signAwardNum = appService.getSignAwardNum();
-            if (signAwardNum != null && signAwardNum.size() > 0) {
-                //转为map更好,key是连续天数,value是奖励
-                Map<Integer, Integer> map = new HashMap();
-                for (UrmSignAwdCfg urmSignAwdCfg : signAwardNum) {
-                    map.put(urmSignAwdCfg.getCount(), urmSignAwdCfg.getAwardCoin());
-                }
-
-                Long lastSignTime = user.getLastSignTime();
-                if (lastSignTime == null) {
-                    //如果为空,代表还没有签到过
-                    if (map.get(1) != null) {
-                        data.setThisTimeCoin(map.get(1));
-                    }
-                    if (map.get(2) != null) {
-                        data.setNextTimeCoin(map.get(2));
-                    }
-                } else {
-                    data.setEverSign(false);
-                    //判断今天是否已经签过
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    String currentDate = simpleDateFormat.format(new Date());
-                    String lastSignDate = simpleDateFormat.format(new Date(user.getLastSignTime()));
-                    if (currentDate.equals(lastSignDate)) {
-                        //如果今天已经签到过,返回已签到标识
-                        data.setHasSign(true);
-                        //明天签到的奖励
-                        Integer conSignNum = user.getConSignNum();
-                        if (map.get(conSignNum + 1) != null) {
-                            data.setThisTimeCoin(map.get(conSignNum + 1));
-                        }
-                    } else {
-                        //返回已签到+1作为本次,已连续+2作为下次返回
-                        Integer conSignNum = user.getConSignNum();
-                        if (map.get(conSignNum + 1) != null) {
-                            data.setThisTimeCoin(map.get(conSignNum + 1));
-                        }
-                        if (map.get(conSignNum + 2) != null) {
-                            data.setNextTimeCoin(map.get(conSignNum + 2));
-                        }
-                    }
-
-                }
+            Set<Integer> integers = afwCfgMap.keySet();
+            Integer max = Collections.max(integers);
+            if (urmSignCoin == null) {
+                //如果为空,代表还没有签到过
+                data.setThisTimeCoin(afwCfgMap.get(1));
+                data.setNextTimeCoin(afwCfgMap.get(2));
             } else {
-                data.setThisTimeCoin(0);
-                data.setNextTimeCoin(0);
+                data.setEverSign(false);
+                //判断今天是否已经签过
+                //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                //String currentDate = simpleDateFormat.format(new Date());
+                //String lastSignDate = simpleDateFormat.format(new Date(user.getLastSignTime()));
+                long current = new Date().getTime();
+                long days = TimeUtils.getIndiaTime(current) / TimeUtils.MILLISECONDS_OF_1_DAY - TimeUtils.getIndiaTime(urmSignCoin.getLastSignTime()) / TimeUtils.MILLISECONDS_OF_1_DAY;
+                if (days == 0) {
+                    //如果今天已经签到过,返回已签到标识
+                    data.setHasSign(true);
+                    //明天签到的奖励
+                    Integer conSignNum = urmSignCoin.getConSignNum();
+                    //最大连续签到数会大于连续奖励数
+                    //需要知道Map中的最大key值
+                    if (conSignNum + 1 >= max) {
+                        data.setThisTimeCoin(afwCfgMap.get(max));
+                    } else {
+                        data.setThisTimeCoin(afwCfgMap.get(conSignNum + 1));
+                    }
+                    data.setMaxConSignNum(urmSignCoin.getConSignNum());
+                } else if (days == 1) {// 如果是连续签单，则按照连续签到返回数据；
+                    //返回已签到+1作为本次,已连续+2作为下次返回
+                    Integer conSignNum = urmSignCoin.getConSignNum();
+                    //需要知道Map中的最大key值
+                    if (conSignNum + 1 >= max) {
+                        data.setThisTimeCoin(afwCfgMap.get(max));
+                    } else {
+                        data.setThisTimeCoin(afwCfgMap.get(conSignNum + 1));
+                    }
+                    if (conSignNum + 2 >= max) {
+                        data.setNextTimeCoin(afwCfgMap.get(max));
+                    } else {
+                        data.setNextTimeCoin(afwCfgMap.get(conSignNum + 2));
+                    }
+                    data.setMaxConSignNum(urmSignCoin.getConSignNum());
+                } else if (days > 1) {
+                    // 如果不是，则重新从0开始；
+                    data.setThisTimeCoin(afwCfgMap.get(1));
+                    data.setNextTimeCoin(afwCfgMap.get(2));
+                    // 当前最大连续签到次数
+                    data.setMaxConSignNum(0);
+                }
+                //4. verified coin = approved*10+签到获得.
+                data.setVerifiedCoins(data.getVerifiedCoins().add(BigDecimal.valueOf(urmSignCoin.getSignCoin())));
             }
-            //4. verified coin = approved*10+签到获得.
-            data.setVerifiedCoins(data.getVerifiedCoins().add(BigDecimal.valueOf(user.getSignCoin())));
-            //5. 当前最大连续签到次数
-            data.setMaxConSignNum(user.getConSignNum());
+
         }
+        data.setAuxiliaryCheck(true);
         mv.addObject("data", data);
-        mv.addObject("auxiliaryCheck", true);
         return mv;
     }
+
 
     /**
      * banners列表
@@ -506,249 +512,205 @@ public class AppController {
      * @return
      */
     @RequestMapping(value = "/dealInfo", method = RequestMethod.GET)
-    public ModelAndView dealInfo(@RequestParam String id) {
+    public ModelAndView getdealInfo(@RequestParam String id) {
+        //临时按照appVersion区分返回描述
         ModelAndView mv = new ModelAndView();
         mv.addObject("errorCode", "00000");
         mv.addObject("msg", "ok");
-        System.out.println("dealId is :" + id);
-        if (StringUtils.isEmpty(id)) {
-            //空,完毕
-            System.out.println("no deal id ");
-            mv.addObject("data", null);
-            return mv;
-        } else {
-            Long dealId = Long.valueOf(id);
-            AppDeal appDeal = appService.getDealDetail(dealId);
-            if (appDeal != null) {
-                System.out.println("has this deal ");
-                Map map = new HashMap();
-                map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
-                map.put("title", appDeal.getTitle());
-                map.put("website", appDeal.getWebsite());
-                map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
-                map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                StringBuilder sb = new StringBuilder();
-                String description = appDeal.getDescription();
-                sb.append(description == null ? "" : description);
-                if (description.lastIndexOf("\n") > 0) {
-                    if (description.lastIndexOf("\n") == description.length() - 1) {
-                        //最后有换行,再加一个换行
-                        sb.append("\n");
-                    } else {
-                        //最后无换行,加两个
-                        sb.append("\n");
-                        sb.append("\n");
-                    }
+        Map map = new HashMap();
+        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        if (deviceInfoVo != null) {
+            String appVersion = deviceInfoVo.getAppVersion();
+            if (!StringUtils.isEmpty(appVersion)) {
+                //暂时只是去除空格,未来要加上正则匹配,希望根林不要坑我...
+                appVersion = appVersion.trim();
+                Integer vsion = Integer.valueOf(appVersion);
+                System.out.println("dealId is :" + id);
+                if (StringUtils.isEmpty(id)) {
+                    //空,完毕
+                    System.out.println("no deal id ");
+                    mv.addObject("data", null);
+                    return mv;
                 } else {
-                    //无换行
-                    sb.append("\n");
-                    sb.append("\n");
-                }
-                sb.append("How to get the deal: \n");
-                sb.append("1 Click \"Activate Deal\" button.\n");
-                sb.append("2 Add the product of your choice to cart.\n");
-                sb.append("3 And no coupon code required.\n\n");
-                if (appDeal.getPtmcmpskuid() > 0) {
-                    PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
-                    if (ptmCmpSkuDescription != null) {
-                        String jsonParam = ptmCmpSkuDescription.getJsonParam();
-                        if (StringUtils.isNotBlank(jsonParam)) {
-                            Map jsonMap = JsonHelper.getJsonMap(jsonParam);
-                            if (jsonMap != null) {
-                                //遍历map
-                                Set<Map.Entry> set = jsonMap.entrySet();
-                                Iterator<Map.Entry> iterator = set.iterator();
-                                if (iterator.hasNext()) {
-                                    sb.append("Key Features: \n");
+                    Long dealId = Long.valueOf(id);
+                    AppDeal appDeal = appService.getDealDetail(dealId);
+                    if (appDeal != null) {
+                        if (vsion < 23) {
+                            System.out.println("has this deal ");
+                            map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
+                            map.put("title", appDeal.getTitle());
+                            map.put("website", appDeal.getWebsite());
+                            map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
+                            map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                            StringBuilder sb = new StringBuilder();
+                            String description = appDeal.getDescription();
+                            sb.append(description == null ? "" : description);
+                            if (description.lastIndexOf("\n") > 0) {
+                                if (description.lastIndexOf("\n") == description.length() - 1) {
+                                    //最后有换行,再加一个换行
+                                    sb.append("\n");
+                                } else {
+                                    //最后无换行,加两个
+                                    sb.append("\n");
+                                    sb.append("\n");
                                 }
-                                while (iterator.hasNext()) {
-                                    Map.Entry next = iterator.next();
-                                    sb.append(next.getKey()).append(" : ");
-                                    sb.append(next.getValue()).append("\n");
-                                }
+                            } else {
+                                //无换行
+                                sb.append("\n");
+                                sb.append("\n");
                             }
+                            sb.append("How to get the deal: \n");
+                            sb.append("1 Click \"Activate Deal\" button.\n");
+                            sb.append("2 Add the product of your choice to cart.\n");
+                            sb.append("3 And no coupon code required.\n\n");
+                            if (appDeal.getPtmcmpskuid() > 0) {
+                                PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
+                                if (ptmCmpSkuDescription != null) {
+                                    String jsonParam = ptmCmpSkuDescription.getJsonParam();
+                                    if (StringUtils.isNotBlank(jsonParam)) {
+                                        Map jsonMap = JsonHelper.getJsonMap(jsonParam);
+                                        if (jsonMap != null) {
+                                            //遍历map
+                                            Set<Map.Entry> set = jsonMap.entrySet();
+                                            Iterator<Map.Entry> iterator = set.iterator();
+                                            if (iterator.hasNext()) {
+                                                sb.append("Key Features: \n");
+                                            }
+                                            while (iterator.hasNext()) {
+                                                Map.Entry next = iterator.next();
+                                                sb.append(next.getKey()).append(" : ");
+                                                sb.append(next.getValue()).append("\n");
+                                            }
+                                        }
 
-                        }
-
-                    }
-                }
-
-                map.put("description", sb.toString());
-                map.put("extra", 0);
-                if (appDeal.getWebsite() == Website.FLIPKART) {
-                    map.put("extra", 1.5);
-                    map.put("cashbackInfo", "1. Offer valid for a limited time only while stocks last\n" +
-                            "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +
-                            "3. Rewards may not paid on purchases made using store credits/gift vouchers\n" +
-                            "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
-                            "5  Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
-                }
-                String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-                DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-                System.out.println("link url is  :" + appDeal.getLinkUrl());
-                String s = appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId});
-                logger.info(" dealInfo record deal deepLink :" + s);
-                map.put("deeplink", s);
-                mv.addObject("data", map);
-            }
-        }
-        return mv;
-    }
-
-    /**
-     * deal详情
-     *
-     * @param id
-     * @return
-     */
-    @RequestMapping(value = "temp/dealInfo", method = RequestMethod.GET)
-    public ModelAndView tempGetdealInfo(@RequestParam String id) {
-        ModelAndView mv = new ModelAndView();
-        mv.addObject("errorCode", "00000");
-        mv.addObject("msg", "ok");
-        System.out.println("dealId is :" + id);
-        if (StringUtils.isEmpty(id)) {
-            //空,完毕
-            System.out.println("no deal id ");
-            mv.addObject("data", null);
-            return mv;
-        } else {
-            Long dealId = Long.valueOf(id);
-            AppDeal appDeal = appService.getDealDetail(dealId);
-            if (appDeal != null) {
-                System.out.println("has this deal ");
-                Map map = new HashMap();
-                map.put("discount", appDeal.getDiscount());
-                map.put("originPrice", appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
-                map.put("priceDescription", appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
-                map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
-                map.put("title", appDeal.getTitle());
-                //返回deal的处境时间距离现在时间的时间,多少天,小时,分钟..
-                map.put("createTime", getDifference2Date(new Date(), appDeal.getCreateTime()));
-                map.put("website", appDeal.getWebsite());
-                //降价生成deal无失效日期
-                if (!appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
-                    map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
-                }
-                map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                StringBuilder sb = new StringBuilder();
-                String description = appDeal.getDescription();
-                //网站名 is offering 商品名 for Rs.现价.
-                //当支持货到付款时展示 : Cash On Delivery is available
-                sb.append(appDeal.getWebsite().name()).append(" is offering ").append(appDeal.getTitle()).append(" for ").append(appDeal.getPriceDescription()).append(".");
-                //是否支持COD
-                PtmCmpSku cmpSkuById = cmpSkuCacheManager.getCmpSkuById(appDeal.getPtmcmpskuid());
-                if (cmpSkuById != null) {
-                    //如果存在此sku
-                    String supportPayMethod = cmpSkuById.getSupportPayMethod();
-                    if (!StringUtils.isBlank(supportPayMethod) && supportPayMethod.contains("COD")) {
-                        sb.append("Cash On Delivery is available.");
-                    }
-                }
-                //描述拼接完成
-                map.put("description", sb.toString());
-                //拼接Price Research
-                if (StringUtils.isNotBlank(description)) {
-                    //如果描述不为空,拼接描述然后换行,空行
-                    sb = new StringBuilder();
-                    sb.append(description).append("\n\n");
-//                    sb.append("\n\n");
-                }
-                /*else {
-                    //给个临时的
-                    description = "Rs.123 is the newest history lowest price(Previous lowest price is Rs.140).Click here to check price history.Good offer always expire in hours.Good time to get it,Hurry up!";
-                    sb = new StringBuilder();
-                    sb.append(description).append("\n\n");
-                }*/
-                if (appDeal.getPtmcmpskuid() > 0) {
-                    //如果存在skuId,将skuId返回
-                    map.put("skuId", appDeal.getPtmcmpskuid());
-                    PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
-                    if (ptmCmpSkuDescription != null) {
-                        List<FetchedProductReview> fetchedProductReviewList = ptmCmpSkuDescription.getFetchedProductReviewList();
-                        if (fetchedProductReviewList != null && fetchedProductReviewList.size() > 0) {
-                            List<String> commentList = new ArrayList<>();
-                            for (FetchedProductReview fec : fetchedProductReviewList) {
-                                String reviewContent = fec.getReviewContent();
-                                if (!StringUtils.isEmpty(reviewContent)) {
-                                    if (commentList.size() < 4) {
-                                        commentList.add(reviewContent);
                                     }
+
                                 }
                             }
-                            map.put("comments", commentList);
-                        }
-                        //查看是否存在offer,如果存在将offer拼接
-                        //“网站名” also provides “SKU当前生效的offer数量“ extra offer（offer数量为1时 展示offer 大于1时 展示offers）: “按服务端排序展示offer列表 以分号间隔”
-                        String offers = ptmCmpSkuDescription.getOffers();
-                        if (!hasoffer.base.utils.StringUtils.isEmpty(offers)) {
-                            String[] temps = offers.split(",");
-                            if (temps.length > 1) {
-                                sb.append(appDeal.getWebsite().name()).append(" also provides ").append(temps.length).append(" extra offer :");
+                            map.put("description", sb.toString());
+                        } else {
+                            map.put("discount", appDeal.getDiscount());
+                            map.put("originPrice", appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
+                            map.put("priceDescription", appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
+                            map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
+                            map.put("title", appDeal.getTitle());
+                            //返回deal的处境时间距离现在时间的时间,多少天,小时,分钟..
+                            map.put("createTime", getDifference2Date(new Date(), appDeal.getCreateTime()));
+                            map.put("website", appDeal.getWebsite());
+                            //降价生成deal无失效日期
+                            if (!appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
+                                map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
+                            } else {
+                                //是降价生成的deal，失效时间设置创建时间七天后
+                                Date createTime = appDeal.getCreateTime();
+                                createTime.setTime(createTime.getTime() + 1000 * 60 * 60 * 24 * 7);
+                                map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(createTime));
                             }
-                            for (String str : temps) {
-                                sb.append(str).append(";");
+                            map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                            StringBuilder sb = new StringBuilder();
+                            String description = appDeal.getDescription();
+                            //网站名 is offering 商品名 for Rs.现价.
+                            //当支持货到付款时展示 : Cash On Delivery is available
+                            sb.append(appDeal.getWebsite().name()).append(" is offering ").append(appDeal.getTitle()).append(" for ").append(appDeal.getPriceDescription()).append(".");
+                            //是否支持COD
+                            PtmCmpSku cmpSkuById = cmpSkuCacheManager.getCmpSkuById(appDeal.getPtmcmpskuid());
+                            if (cmpSkuById != null) {
+                                //如果存在此sku
+                                String supportPayMethod = cmpSkuById.getSupportPayMethod();
+                                if (!StringUtils.isBlank(supportPayMethod) && supportPayMethod.contains("COD")) {
+                                    sb.append("Cash On Delivery is available.");
+                                }
                             }
-                            //拼完之后换行,空一行
-                            sb.append("\n\n");
-                            sb.append("Please note: offers and price may vary by location.");
+                            //描述拼接完成
+                            map.put("description", sb.toString());
+                            //拼接Price Research
+                            if (StringUtils.isNotBlank(description)) {
+                                //如果描述不为空,拼接描述然后换行,空行
+                                sb = new StringBuilder();
+                                sb.append(description).append("\n\n");
+                            }
+                            if (appDeal.getPtmcmpskuid() > 0) {
+                                //如果存在skuId,将skuId返回
+                                map.put("skuId", appDeal.getPtmcmpskuid());
+                                PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
+                                if (ptmCmpSkuDescription != null) {
+                                    List<FetchedProductReview> fetchedProductReviewList = ptmCmpSkuDescription.getFetchedProductReviewList();
+                                    if (fetchedProductReviewList != null && fetchedProductReviewList.size() > 0) {
+                                        List<String> commentList = new ArrayList<>();
+                                        for (FetchedProductReview fec : fetchedProductReviewList) {
+                                            String reviewContent = fec.getReviewContent();
+                                            if (!StringUtils.isEmpty(reviewContent)) {
+                                                reviewContent = ClientHelper.delHTMLTag(reviewContent);
+                                                //处理下换行符号
+                                                reviewContent.replaceAll("\n", "");
+                                            }
+                                            if (!StringUtils.isEmpty(reviewContent)) {
+                                                if (commentList.size() < 4) {
+                                                    //拼接评论标题
+                                                    String reviewTitle = fec.getReviewTitle();
+                                                    if (!StringUtils.isEmpty(reviewTitle)) {
+                                                        reviewTitle = ClientHelper.delHTMLTag(reviewTitle);
+                                                        //处理下换行符号
+                                                        reviewTitle.replaceAll("\n", "");
+                                                        commentList.add(reviewTitle == null ? "" : reviewTitle + "." + reviewContent);
+                                                    } else {
+                                                        commentList.add(reviewContent);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        map.put("comments", commentList);
+                                    }
+                                    //查看是否存在offer,如果存在将offer拼接
+                                    //“网站名” also provides “SKU当前生效的offer数量“ extra offer（offer数量为1时 展示offer 大于1时 展示offers）: “按服务端排序展示offer列表 以分号间隔”
+                                    String offers = ptmCmpSkuDescription.getOffers();
+                                    if (!hasoffer.base.utils.StringUtils.isEmpty(offers)) {
+                                        String[] temps = offers.split(",");
+                                        if (temps.length >= 1) {
+                                            sb.append(appDeal.getWebsite().name()).append(" also provides ").append(temps.length).append(" extra offer :");
+                                        }
+                                        for (String str : temps) {
+                                            sb.append(str).append(";");
+                                        }
+                                        //拼完之后换行,空一行
+                                        sb.append("\n\n");
+                                        sb.append("Please note: offers and price may vary by location.");
+                                    }
+                                    //设置Key Features
+                                    String jsonParam = ptmCmpSkuDescription.getJsonParam();
+                                    if (StringUtils.isNotBlank(jsonParam)) {
+                                        Map jsonMap = JsonHelper.getJsonMap(jsonParam);
+                                        map.put("KeyFeatures", jsonMap);
+                                    }
+
+                                }
+                                map.put("priceResearch", sb.toString());
+                                Map priceCurveDesc = new HashMap();
+                                //配置点击弹出价格曲线的文字以及文字的颜色
+                                priceCurveDesc.put("clickableContent", "Click here to check price history.");
+                                priceCurveDesc.put("fontColor", "#108ee9");
+                                map.put("clickConfig", priceCurveDesc);
+                            }
                         }
-                       /* else {
-                            //没有offer先手写几个
-                            sb.append(appDeal.getWebsite().name()).append(" also provides ").append(2).append(" extra offer :");
-                            sb.append("offer 1 ").append(";");
-                            sb.append("offer 2 ").append(";");
-                            sb.append("\n\n");
-
-
-                            sb.append("Please note: offers and price may vary by location.");
-
-
-                        }*/
-                        //设置Key Features
-                        String jsonParam = ptmCmpSkuDescription.getJsonParam();
-                        if (StringUtils.isNotBlank(jsonParam)) {
-                            Map jsonMap = JsonHelper.getJsonMap(jsonParam);
-                            map.put("KeyFeatures", jsonMap);
+                        map.put("extra", 0);
+                        if (appDeal.getWebsite() == Website.FLIPKART) {
+                            map.put("extra", 1.5);
+                            map.put("cashbackInfo", "1. Offer valid for a limited time only while stocks last\n" +
+                                    "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +
+                                    "3. Rewards may not paid on purchases made using store credits/gift vouchers\n" +
+                                    "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
+                                    "5  Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
                         }
-
+                        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+                        DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+                        System.out.println("link url is  :" + appDeal.getLinkUrl());
+                        String s = appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId});
+                        logger.info(" dealInfo record deal deepLink :" + s);
+                        map.put("deeplink", s);
+                        mv.addObject("data", map);
+                        return mv;
                     }
-                    /*else {
-                        //无数据,自己拼接
-                        sb.append(appDeal.getWebsite().name()).append(" also provides ").append(2).append(" extra offer :");
-                        sb.append("offer 3 ").append(";");
-                        sb.append("offer 4 ").append(";");
-                        sb.append("\n\n");
-                        sb.append("Please note: offers and price may vary by location.");
-                        //拼接参数
-                        Map jsonMap = new HashMap();
-                        jsonMap.put("color", "red");
-                        jsonMap.put("memory", "16G");
-                        map.put("KeyFeatures", jsonMap);
-                    }*/
-                    map.put("priceResearch", sb.toString());
-                    Map priceCurveDesc = new HashMap();
-                    //配置点击弹出价格曲线的文字以及文字的颜色
-                    priceCurveDesc.put("clickableContent", "Click here to check price history.");
-                    priceCurveDesc.put("fontColor", "#108ee9");
-                    map.put("clickConfig", priceCurveDesc);
                 }
-                map.put("extra", 0);
-                if (appDeal.getWebsite() == Website.FLIPKART) {
-                    map.put("extra", 1.5);
-                    map.put("cashbackInfo", "1. Offer valid for a limited time only while stocks last\n" +
-                            "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +
-                            "3. Rewards may not paid on purchases made using store credits/gift vouchers\n" +
-                            "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
-                            "5  Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
-                }
-                String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-                DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-                System.out.println("link url is  :" + appDeal.getLinkUrl());
-                String s = appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId});
-                logger.info(" dealInfo record deal deepLink :" + s);
-                map.put("deeplink", s);
-                mv.addObject("data", map);
             }
         }
         return mv;
@@ -778,6 +740,7 @@ public class AppController {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
+        String lastTimeUserToken = request.getHeader("oldUserToken");
 
         Map map = new HashMap();
         String userToken = UUID.randomUUID().toString();
@@ -788,19 +751,19 @@ public class AppController {
         List<String> ids = appService.getUserDevices(deviceId);
         System.out.println(" get ids by deviceId :" + ids.size());
 
-        UrmUser uUser = appService.getUserById(StringUtils.isEmpty(userVO.getThirdId()) ? "-" : userVO.getThirdId());
+        UrmUser uUser = appService.getUserByThirdId(StringUtils.isEmpty(userVO.getThirdId()) ? "-" : userVO.getThirdId());
         if (uUser == null) {
             logger.debug("user is not exist before");
-            UrmUser urmUser = new UrmUser();
-            urmUser.setUserToken(userToken);
-            urmUser.setAvatarPath(userVO.getUserIcon());
-            urmUser.setCreateTime(new Date());
-            urmUser.setTelephone(userVO.getTelephone() == null ? "" : userVO.getTelephone());
-            urmUser.setThirdPlatform(userVO.getPlatform());
-            urmUser.setThirdToken(userVO.getToken());
-            urmUser.setUserName(userVO.getUserName());
-            urmUser.setThirdId(userVO.getThirdId());
-            int result = appService.addUser(urmUser);
+            uUser = new UrmUser();
+            uUser.setUserToken(userToken);
+            uUser.setAvatarPath(userVO.getUserIcon());
+            uUser.setCreateTime(new Date());
+            uUser.setTelephone(userVO.getTelephone() == null ? "" : userVO.getTelephone());
+            uUser.setThirdPlatform(userVO.getPlatform());
+            uUser.setThirdToken(userVO.getToken());
+            uUser.setUserName(userVO.getUserName());
+            uUser.setThirdId(userVO.getThirdId());
+            int result = appService.addUser(uUser);
             logger.debug("add user result is :" + result);
 
         } else {
@@ -813,7 +776,10 @@ public class AppController {
             uUser.setUserToken(userToken);
             appService.updateUserInfo(uUser);
             logger.debug("update userInfo over ");
-
+            //把最新的usertoken放进去
+            if (!StringUtils.isEmpty(lastTimeUserToken)) {
+                lastTimeUserToken = userToken;
+            }
 
             System.out.println("update user and device relationship ");
 
@@ -822,9 +788,9 @@ public class AppController {
             List<UrmUserDevice> urmUserDevices = new ArrayList<>();
             for (String id : ids) {
                 boolean flag = false;
-                System.out.println(" id_id_id " + id);
+//                System.out.println(" id_id_id " + id);
                 for (String dId : deviceIds) {
-                    System.out.println(" dId_dId_dId " + dId);
+//                    System.out.println(" dId_dId_dId " + dId);
                     if (id.equals(dId)) {
                         flag = true;
                         System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);
@@ -844,32 +810,96 @@ public class AppController {
         }
         map.put("userToken", userToken);
         jsonObject.put("data", map);
+//        return null;
+
+        //在此处合并同一用户的数据
+//        String lastTimeUserToken = request.getHeader("oldUserToken");
+//        String lastTimeUserToken = Context.currentContext().getHeader("oldUserToken");//上一次的userToken
+        String thirdId = userVO.getThirdId();
+
+        if (StringUtils.isEmpty(lastTimeUserToken) || StringUtils.isEmpty(thirdId)) {//如果userToken或者thirdId为空
+            System.out.println("lastTimeUserToken is :" + lastTimeUserToken);
+            System.out.println("current user thirdId is : " + thirdId);
+            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            return null;
+        }
+        //如果是third不变的情况下,usertoken已经被更新了,应该用新的usertoken操作
+        UrmUser userByLastUserToken = appService.getUserByUserToken(lastTimeUserToken);
+
+        if (userByLastUserToken != null) {
+            //如果老token有对应用户,存起来,方便二次处理
+            logger.error("old userInfo and this thirdId is  : " + thirdId + " InfoInfo " + JSON.toJSONString(userByLastUserToken));
+
+            String oldThirdId = userByLastUserToken.getThirdId();
+
+            List<UrmUser> oldUserList = appService.getIdDescUserListByThirdId(oldThirdId);
+
+            if (oldUserList == null || oldUserList.size() == 0) {
+                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                return null;
+            }
+
+            if (StringUtils.equals(thirdId, oldThirdId)) {//如果同样的userToken对应的记录只有一条并且thirdId一致，认为是正确的用户信息
+                //如果老的thirdId和新的thirdId一样的话要清除此third下的多个记录的问题
+                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                return null;
+            }
+            if (!StringUtils.equals(thirdId, oldThirdId) && oldUserList.size() == 1) {
+                //可能是老版本的用户升级,要将老版本用户的订单迁移到新版本
+                for (int i = 0; i < oldUserList.size(); i++) {
+                    orderService.mergeOldUserOrderToNewUser(oldUserList.get(i).getId() + "", uUser.getId() + "");//转移订单
+                    appService.bakUserInfo(oldUserList.get(i));//备份用户数据
+                }
+            } else {
+                //size一定是大于1的
+                for (int i = 1; i < oldUserList.size(); i++) {
+                    //取出id最大的用户记录,将其他记录的订单数据都更新到此记录中
+                    orderService.mergeOldUserOrderToNewUser(oldUserList.get(i).getId() + "", oldUserList.get(0).getId() + "");//转移订单
+                    appService.bakUserInfo(oldUserList.get(i));//备份用户数据
+                }
+
+            }
+
+        }
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
 
     /**
      * 用户信息获取
+     * 计算用户签到和返利总额
      *
      * @return
      */
     @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
     public ModelAndView userInfo() {
         ModelAndView mv = new ModelAndView();
-        BigDecimal PendingCoins = BigDecimal.ZERO;
+        BigDecimal coins = BigDecimal.ZERO;
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
         UrmUser user = appService.getUserByUserToken(userToken);
         if (user != null) {
+//            BackDetailVo backDetailVo = new BackDetailVo();
+//            calculateHasofferCoin(Collections.singletonList(user), backDetailVo);
             UserVo userVo = new UserVo();
             userVo.setName(user.getUserName());
             List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
-                if (orderStatsAnalysisPO.getOrderStatus() != "cancelled") {
-                    PendingCoins = PendingCoins.add(orderStatsAnalysisPO.getTentativeAmount().multiply(BigDecimal.valueOf(0.03)));
+                String orderStatus = orderStatsAnalysisPO.getOrderStatus();
+                if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name()) && orderStatus != null && (orderStatus.equals("tentative") || orderStatus.equals("approved"))) {
+                    BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.015)).min(orderStatsAnalysisPO.getTentativeAmount());
+                    coins = coins.add(tempPrice);
                 }
             }
-            PendingCoins = PendingCoins.setScale(2, BigDecimal.ROUND_HALF_UP);
-            userVo.setConis(PendingCoins);
+            coins = coins.multiply(BigDecimal.TEN);
+//            coins = coins.add(backDetailVo.getPendingCoins());
+//            coins = coins.add(backDetailVo.getVerifiedCoins());
+//            coins = coins.multiply(BigDecimal.TEN);
+            UrmSignCoin urmSignCoin = appService.getSignCoinByUserId(user.getId());
+            if (urmSignCoin != null) {
+                coins = coins.add(BigDecimal.valueOf(urmSignCoin.getSignCoin()));
+            }
+            coins = coins.setScale(1, BigDecimal.ROUND_HALF_UP);
+            userVo.setCoins(coins);
             userVo.setUserIcon(user.getAvatarPath());
             mv.addObject("data", userVo);
         }
@@ -944,10 +974,10 @@ public class AppController {
                                 Long cateId = Long.valueOf(nameValue.getName() + "");
                                 //可能是二级也可能是三级 ,二级的放一块,三级的放一块
                                 if (cateId > 0) {
-                                    System.out.println("  cate id " + cateId + " check  ");
+//                                    System.out.println("  cate id " + cateId + " check  ");
                                     PtmCategory ptmCategory = appCacheManager.getCategoryById(cateId);
                                     if (ptmCategory != null && ptmCategory.getLevel() == 2) {
-                                        System.out.println(i + " cate2  cate id " + cateId + " have ");
+//                                        System.out.println(i + " cate2  cate id " + cateId + " have ");
                                         //处理二级类目
                                         CategoryVo categoryVo = new CategoryVo();
                                         categoryVo.setId(ptmCategory.getId());
@@ -959,7 +989,7 @@ public class AppController {
                                         secondCategoryList.add(categoryVo);
                                     } else if (ptmCategory != null && ptmCategory.getLevel() == 3) {
                                         //处理三级类目
-                                        System.out.println(i + " cate3  cate id " + cateId + " have ");
+//                                        System.out.println(i + " cate3  cate id " + cateId + " have ");
                                         CategoryVo categoryVo3 = new CategoryVo();
                                         categoryVo3.setId(ptmCategory.getId());
                                         categoryVo3.setLevel(ptmCategory.getLevel());
@@ -1030,7 +1060,18 @@ public class AppController {
                         }
                         map.put("categorys", categorys);
                     }
-                    filterProducts(p.getData(), criteria.getKeyword());
+                    //如果是价格由低到高排序或者按照价格区间排序不过滤配件信息
+                    boolean filterProductFlag = true;
+                    if (criteria.getSort().name().equals("PRICEL2H")) {
+                        filterProductFlag = false;
+                    }
+                    //如果最低价和最高价有值,且是有效区间,不执行配件过滤
+                    if (criteria.getMaxPrice() == null || criteria.getMaxPrice() <= 0) {
+                        filterProductFlag = false;
+                    }
+                    if (filterProductFlag) {
+                        filterProducts(p.getData(), criteria.getKeyword());
+                    }
                     addProductVo2List(li, p.getData());
                 }
                 map.put("product", li);
@@ -1072,60 +1113,6 @@ public class AppController {
         System.out.println("time " + (System.currentTimeMillis() - l) / 1000);
         return mv;
     }
-//    public ModelAndView productsList(SearchCriteria criteria, @RequestParam(defaultValue = "3") int type) {
-//        ModelAndView mv = new ModelAndView();
-//        List li = new ArrayList();
-//        Map map = new HashMap();
-//        PageableResult<ProductModel> products;
-//        //category level page size
-//        // PageableResult <ProductModel> products=productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()),criteria.getLevel(),criteria.getPage(),criteria.getPageSize());
-//        if (StringUtils.isNotBlank(criteria.getCategoryId())) {
-//            //search by category
-//            products = productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
-//            //products = productIndexServiceImpl.searchPro(Long.valueOf(2), 2, 1, 10);
-//            if (products != null && products.getData().size() > 0) {
-//                addProductVo2List(li, products.getData());
-//            }
-//        } else if (StringUtils.isNotEmpty(criteria.getKeyword())) {
-//            //search by title
-//            //productIndexServiceImpl.simpleSearch(criteria.getKeyword(),1,10);
-//            PageableResult p = productIndexServiceImpl.searchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
-//            if (p != null && p.getData().size() > 0) {
-//                addProductVo2List(li, p.getData());
-//            }
-//        }
-//        String data = "";
-//        //查询热卖商品
-//        List<PtmProduct> products2s = productCacheManager.getTopSellins(criteria.getPage(), criteria.getPageSize());
-//        switch (type) {
-//            case 0:
-//                addProductVo2List(li, products2s);
-//                if (products2s != null && products2s.size() > 4) {
-//                    li = li.subList(0, 5);
-//                }
-//                map.put("product", li);
-//                break;
-//            case 1:
-//                addProductVo2List(li, products2s);
-//                map.put("product", li);
-//                break;
-//            case 2:
-//                PageableResult p = productIndexServiceImpl.searchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
-//                if (p != null && p.getData().size() > 0) {
-//                    addProductVo2List(li, p.getData());
-//                }
-//                map.put("product", li);
-//                break;
-//            default:
-//                map.put("product", null);
-//        }
-//        if (li != null && li.size() > 0) {
-//            map.put("product", li);
-//        }
-//        mv.addObject("data", map);
-//        return mv;
-//    }
-
 
     public void addProductVo2List(List desList, List sourceList) {
 
@@ -1159,7 +1146,6 @@ public class AppController {
                     productListVo.setCommentNum(Long.valueOf(ptmProduct.getReview()));
                     productListVo.setStoresNum(ptmProduct.getStoreCount());
                     desList.add(productListVo);
-//                    }
                 }
             }
         }
@@ -1275,8 +1261,8 @@ public class AppController {
 
     public void calculateHasofferCoin(List<UrmUser> users, BackDetailVo data) {
         List<OrderVo> transcations = new ArrayList<OrderVo>();
-        BigDecimal PendingCoins = BigDecimal.ZERO;
-        BigDecimal VericiedCoins = BigDecimal.ZERO;
+        BigDecimal pendingCoins = BigDecimal.ZERO;
+        BigDecimal verifiedCoins = BigDecimal.ZERO;
         for (UrmUser user : users) {
             List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
@@ -1290,19 +1276,24 @@ public class AppController {
                     orderVo.setWebsite(orderStatsAnalysisPO.getWebSite());
                     orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
                     transcations.add(orderVo);
-                    if (!orderStatsAnalysisPO.getOrderStatus().equals("cancelled") && !orderStatsAnalysisPO.getOrderStatus().equals("disapproved")) {
-                        PendingCoins = PendingCoins.add(tempPrice);
+                    if (orderStatsAnalysisPO.getOrderStatus() != null) {
+                        if (!orderStatsAnalysisPO.getOrderStatus().equals("cancelled") && !orderStatsAnalysisPO.getOrderStatus().equals("disapproved")) {
+                            if (!orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
+                                pendingCoins = pendingCoins.add(tempPrice);
+                            }
+                        }
+                        if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
+                            verifiedCoins = verifiedCoins.add(tempPrice);
+                        }
                     }
-                    if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
-                        VericiedCoins = VericiedCoins.add(tempPrice);
-                    }
+
                 }
             }
         }
         //待定的
-        data.setPendingCoins(PendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+        data.setPendingCoins(pendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         //可以使用的
-        data.setVerifiedCoins(VericiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+        data.setVerifiedCoins(verifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
     }
 }

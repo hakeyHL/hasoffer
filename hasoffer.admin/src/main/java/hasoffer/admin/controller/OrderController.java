@@ -40,19 +40,19 @@ public class OrderController {
             //头一天
             Date day1AgoTime =  TimeUtils.addDay(todayTime, -1);
             //当天
-            if (webSite == null || "".equals(webSite) || "ALL".equals(webSite) || Website.SNAPDEAL.toString().equals(webSite.toUpperCase())) {
-                orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day15AgoTime, day15AgoTime);
-                orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day3AgoTime, day3AgoTime);
-                orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day2AgoTime, day2AgoTime);
-                orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day1AgoTime, day1AgoTime);
-                orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), todayTime, todayTime);
+            if (webSite == null || "".equals(webSite) || "ALL".equals(webSite) || Website.SNAPDEAL.name().equals(webSite.toUpperCase())) {
+                orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.name(), day15AgoTime, day15AgoTime);
+                orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.name(), day3AgoTime, day3AgoTime);
+                orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.name(), day2AgoTime, day2AgoTime);
+                orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.name(), day1AgoTime, day1AgoTime);
+                orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.name(), todayTime, todayTime);
             }
-            if (webSite == null || "".equals(webSite) || "ALL".equals(webSite) || Website.FLIPKART.toString().equals(webSite.toUpperCase())) {
-                orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), day15AgoTime, day15AgoTime);
-                orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), day3AgoTime, day3AgoTime);
-                orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), day2AgoTime, day2AgoTime);
-                orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), day1AgoTime, day1AgoTime);
-                orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), todayTime, todayTime);
+            if (webSite == null || "".equals(webSite) || "ALL".equals(webSite) || Website.FLIPKART.name().equals(webSite.toUpperCase())) {
+                orderStatsAnalysisService.updateOrder(Website.FLIPKART.name(), day15AgoTime, day15AgoTime);
+                orderStatsAnalysisService.updateOrder(Website.FLIPKART.name(), day3AgoTime, day3AgoTime);
+                orderStatsAnalysisService.updateOrder(Website.FLIPKART.name(), day2AgoTime, day2AgoTime);
+                orderStatsAnalysisService.updateOrder(Website.FLIPKART.name(), day1AgoTime, day1AgoTime);
+                orderStatsAnalysisService.updateOrder(Website.FLIPKART.name(), todayTime, todayTime);
             }
         } catch (Exception e) {
             logger.debug("reportOrderStatistic:任务失败,   DATE:" + new Date() + ":具体如下");

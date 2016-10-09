@@ -111,12 +111,15 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         // sort by
         SearchResultSort resultSort = sc.getSort();
         if (resultSort != null) {
-            sorts = new Sort[1];
             if (resultSort == SearchResultSort.POPULARITY) {
+                sorts = new Sort[2];
                 sorts[0] = new Sort(ProductModel2SortField.F_POPULARITY.getFieldName(), Order.DESC);
+                sorts[1] = new Sort("review", Order.DESC);
             } else if (resultSort == SearchResultSort.PRICEL2H) {
+                sorts = new Sort[1];
                 sorts[0] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.ASC);
             } else if (resultSort == SearchResultSort.PRICEH2L) {
+                sorts = new Sort[1];
                 sorts[0] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.DESC);
             }
         }
@@ -160,7 +163,6 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
 
         // search by solr
         SearchResult<ProductModel2> sr = searchObjs(keyword, fqs, sorts, pivotFacets, sc.getPage() <= 1 ? 1 : sc.getPage(), sc.getPageSize(), true);
-
         //process pivot fields
         Map<String, List<NameValue>> pivotFieldVals = new HashMap<>();
         if (pivotFieldSize > 0) {

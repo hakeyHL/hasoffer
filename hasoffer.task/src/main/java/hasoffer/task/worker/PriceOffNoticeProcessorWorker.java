@@ -28,31 +28,42 @@ import java.util.concurrent.TimeUnit;
 public class PriceOffNoticeProcessorWorker implements Runnable {
 
     private static final String PRICEOFF_NOTICE_SKUID_QUEUE = "PRICEOFF_NOTICE_SKUID_QUEUE";
+    public static Integer PRICEOFFNOTICE_PRICESSOR_WORKER_THREADNUMBER = 0;
     private static Logger logger = LoggerFactory.getLogger(PriceOffNoticeProcessorWorker.class);
-    private ConcurrentLinkedQueue<PtmCmpSku> queue;
+    private ConcurrentLinkedQueue<Long> queue;
     private IFetchDubboService fetchDubboService;
     private IRedisListService redisListService;
     private ICmpSkuService cmpSkuService;
     private IDataBaseManager dbm;
 
-    public PriceOffNoticeProcessorWorker(ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, IRedisListService redisListService, ICmpSkuService cmpSkuService, IDataBaseManager dbm) {
+    public PriceOffNoticeProcessorWorker(ConcurrentLinkedQueue<Long> queue, IFetchDubboService fetchDubboService, IRedisListService redisListService, ICmpSkuService cmpSkuService, IDataBaseManager dbm) {
         this.queue = queue;
         this.fetchDubboService = fetchDubboService;
         this.redisListService = redisListService;
         this.cmpSkuService = cmpSkuService;
         this.dbm = dbm;
+        PRICEOFFNOTICE_PRICESSOR_WORKER_THREADNUMBER++;
     }
 
     @Override
     public void run() {
 
+        long startTime = TimeUtils.now();
+
         while (true) {
 
-            PtmCmpSku sku = queue.poll();
+            Long skuid = queue.poll();
 
             try {
 
-                if (sku == null) {
+                if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_1_HOUR * 1) {
+                    PRICEOFFNOTICE_PRICESSOR_WORKER_THREADNUMBER--;
+                    System.out.println("price off notice processor worker thread has live above 1 hours ,thread going to die ");
+                    System.out.println("alive thread number " + PRICEOFFNOTICE_PRICESSOR_WORKER_THREADNUMBER);
+                    break;
+                }
+
+                if (skuid == null) {
                     try {
                         TimeUnit.SECONDS.sleep(3);
                         logger.info("task update get null sleep 3 seconds");
@@ -60,6 +71,8 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
                         return;
                     }
                 }
+
+                PtmCmpSku sku = dbm.get(PtmCmpSku.class, skuid);
 
                 Date updateTime = sku.getUpdateTime();
                 if (updateTime != null) {
@@ -71,17 +84,12 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
                 updatePtmCmpSku(sku);
 
             } catch (Exception e) {
-                if (e instanceof InterruptedException) {
-                    System.out.println("InterruptedException break");
-                    break;
-                }
                 System.out.println(TimeUtils.nowDate());
                 e.printStackTrace();
             }
-
-            System.out.println("queue size is " + queue.size());
-            System.out.println("sku ex: " + sku.getId());
         }
+
+        System.out.println("queue size is " + queue.size());
     }
 
     private void updatePtmCmpSku(PtmCmpSku sku) {
@@ -94,31 +102,31 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
             return;
         }
 
-        TaskStatus taskStatus = fetchDubboService.getUrlTaskStatus(website, url, TimeUtils.SECONDS_OF_1_DAY);
+        TaskStatus taskStatus = fetchDubboService.getUrlTaskStatus(website, url, TimeUtils.SECONDS_OF_1_MINUTE * 30);
 
         FetchUrlResult fetchUrlResult = null;
 
         //如果返回结果状态为running，那么将sku返回队列
         if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
-            queue.add(sku);
+            queue.add(skuid);
 //            logger.info("taskstatus RUNNING for [" + skuid + "]");
         } else if (TaskStatus.STOPPED.equals(taskStatus)) {
             logger.info("taskstatus STOPPED for [" + skuid + "]");
         } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
             logger.info("taskstatus EXCEPTION for [" + skuid + "]");
         } else if (TaskStatus.NONE.equals(taskStatus)) {
-            queue.add(sku);
+            queue.add(skuid);
             if (Website.SNAPDEAL.equals(website) || Website.FLIPKART.equals(website) || Website.AMAZON.equals(website)) {
-                queue.add(sku);
+                queue.add(skuid);
                 fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_2);
             } else {
-                queue.add(sku);
+                queue.add(skuid);
                 fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_5);
             }
             logger.info("taskstatus NONE for [" + skuid + "] , resend success");
         } else {//(TaskStatus.FINISH.equals(taskStatus)))
             logger.info("taskstatus FINISH for [" + skuid + "]");
-            fetchUrlResult = fetchDubboService.getProductsByUrl(sku.getWebsite(), sku.getUrl(), TimeUtils.SECONDS_OF_1_DAY);
+            fetchUrlResult = fetchDubboService.getProductsByUrl(sku.getWebsite(), sku.getUrl(), TimeUtils.SECONDS_OF_1_MINUTE * 30);
 
             FetchedProduct fetchedProduct = fetchUrlResult.getFetchProduct();
 

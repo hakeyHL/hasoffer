@@ -1,6 +1,7 @@
 package hasoffer.core.persistence.mongo;
 
-import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.base.utils.TimeUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,13 +18,19 @@ public class UserSignLog {
     private Long userId;
     private Long signDate;
 
+    private String signDateStr;
+
+    private String signIndDateStr;
+
     @PersistenceConstructor
     public UserSignLog() {
     }
 
-    public UserSignLog(UrmUser urmUser) {
-        this.userId = urmUser.getId();
-        this.signDate = urmUser.getLastSignTime();
+    public UserSignLog(long userId, long signDate) {
+        this.userId = userId;
+        this.signDate = signDate;
+        this.signDateStr = DateFormatUtils.format(signDate, "yyyy-MM-dd HH:mm:ss");
+        this.signIndDateStr = DateFormatUtils.format(signDate - TimeUtils.MILLISECONDS_OF_1_MINUTE * 150, "yyyy-MM-dd HH:mm:ss");
     }
 
 
@@ -41,6 +48,30 @@ public class UserSignLog {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public Long getSignDate() {
+        return signDate;
+    }
+
+    public void setSignDate(Long signDate) {
+        this.signDate = signDate;
+    }
+
+    public String getSignDateStr() {
+        return signDateStr;
+    }
+
+    public void setSignDateStr(String signDateStr) {
+        this.signDateStr = signDateStr;
+    }
+
+    public String getSignIndDateStr() {
+        return signIndDateStr;
+    }
+
+    public void setSignIndDateStr(String signIndDateStr) {
+        this.signIndDateStr = signIndDateStr;
     }
 
     @Override

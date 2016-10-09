@@ -3,6 +3,7 @@ package hasoffer.fetch.helper;
 import hasoffer.base.config.AppConfig;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.AffliIdHelper;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.UrlUtils;
 import hasoffer.fetch.sites.amazon.AmazonHelper;

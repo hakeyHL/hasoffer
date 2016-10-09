@@ -44,11 +44,28 @@
         </encoder>
     </appender>
 
-    <appender name="FetchTaskResultLoggerFileOut"
+    <appender name="SpiderSkuResultLoggerFileOut"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.base}/fetch-task-result.log</file>
+        <file>${log.base}/spider-sku-result.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/fetch-task-result.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
+            <FileNamePattern>${log.base}/spider-sku-result.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <MaxHistory>10</MaxHistory>
+                <!-- or whenever the file size reaches 100MB -->
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%date [%thread][%-8level%logger{80}] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="SpiderProductResultLoggerFileOut"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.base}/spider-product-result.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${log.base}/spider-product-result.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <MaxHistory>10</MaxHistory>
@@ -162,8 +179,12 @@
         <appender-ref ref="fetchLoggerFileOut"/>
     </logger>
 
-    <logger name="spider.success" level="DEBUG">
-        <appender-ref ref="FetchTaskResultLoggerFileOut"/>
+    <logger name="spider.product.success" level="DEBUG">
+        <appender-ref ref="SpiderProductResultLoggerFileOut"/>
+    </logger>
+
+    <logger name="spider.sku.success" level="DEBUG">
+        <appender-ref ref="SpiderSkuResultLoggerFileOut"/>
     </logger>
 
 
