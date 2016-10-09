@@ -39,7 +39,7 @@ public class SpiderSkuTaskInitBean {
         public void run() {
             SpiderSkuTaskService taskInitContext = SpringContextHolder.getBean(SpiderSkuTaskService.class);
             String dateStr = TimeUtils.parse(TimeUtils.today() - TimeUtils.MILLISECONDS_OF_1_DAY, "yyyyMMdd");
-            taskInitContext.initAmazonTask("20160814", "5");
+            taskInitContext.initAmazonTask(dateStr, "5");
         }
     }
 }
