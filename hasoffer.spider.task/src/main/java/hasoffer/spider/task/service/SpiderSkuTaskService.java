@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -55,7 +56,7 @@ public class SpiderSkuTaskService {
         for (Object obj : list) {
             if (obj != null) {
                 Map<String, Object> temp = (Map<String, Object>) obj;
-                count = (int) temp.get("countNum");
+                count = new BigInteger(temp.get("countNum").toString()).intValue();
             }
         }
         logger.info("Count Amazon:page count:{} and pageSize:1000", count);

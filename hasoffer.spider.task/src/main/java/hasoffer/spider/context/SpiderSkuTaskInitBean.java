@@ -21,7 +21,7 @@ public class SpiderSkuTaskInitBean {
         //calendar.set(Calendar.HOUR_OF_DAY, 12);
         //calendar.set(Calendar.MINUTE, 10);
         //calendar.set(Calendar.SECOND, 0);
-        long runTime = new Date().getTime() + 10000;
+        long runTime = new Date().getTime() + 5000;
         long nowTime = new Date().getTime();
         long delay;
         if (runTime < nowTime) {
@@ -39,7 +39,7 @@ public class SpiderSkuTaskInitBean {
         public void run() {
             SpiderSkuTaskService taskInitContext = SpringContextHolder.getBean(SpiderSkuTaskService.class);
             String dateStr = TimeUtils.parse(TimeUtils.today() - TimeUtils.MILLISECONDS_OF_1_DAY, "yyyyMMdd");
-            taskInitContext.initAmazonTask(dateStr, "5");
+            taskInitContext.initAmazonTask("20160814", "5");
         }
     }
 }
