@@ -51,7 +51,7 @@ public class SpiderSkuTaskService {
         paramsMap.put("sum", num);
         paramsMap.put("website", webSite.name());
         List list = dbm.queryBySql(countSql, paramsMap);
-        logger.info("Query Sql:SELECT count(*) as countNum FROM SrmProductSearchCount psc LEFT JOIN ptmcmpsku sku ON psc.productId = sku.productId WHERE psc.ymd = {} AND psc.count > {} AND sku.website = '{}' AND sku.`status` <> 'OFFSALE'", dateStr, num, webSite.name());
+        logger.info("Query Sql:SELECT count(*) as countNum FROM SrmProductSearchCount psc LEFT JOIN ptmcmpsku sku ON psc.productId = sku.productId WHERE psc.ymd = '{}' AND psc.count > {} AND sku.website = '{}' AND sku.`status` <> 'OFFSALE'", dateStr, num, webSite.name());
         for (Object obj : list) {
             if (obj != null) {
                 Map<String, Object> temp = (Map<String, Object>) obj;
