@@ -333,25 +333,6 @@ public class AppController {
         return mav;
     }
 
-    /**
-     * 查看返利
-     *
-     * @return
-     */
-  /*  @RequestMapping(value = "/backDetail", method = RequestMethod.GET)
-    public ModelAndView backDetail() {
-        ModelAndView mv = new ModelAndView();
-        BackDetailVo data = new BackDetailVo();
-        String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
-        UrmUser user = appService.getUserByUserToken(userToken);
-        if (user != null) {
-            //查询到用户后还要查询名字与当前用户为同名且平台一致(facebook)的用户列表查询其订单
-            List<UrmUser> users = appService.getUsersByUserName(user.getUserName());
-            calculateHasofferCoin(users, data);
-        }
-        mv.addObject("data", data);
-        return mv;
-    }*/
     @RequestMapping(value = "/backDetail", method = RequestMethod.GET)
     public ModelAndView backDetail() {
         ModelAndView mv = new ModelAndView();
@@ -416,7 +397,8 @@ public class AppController {
                         data.setNextTimeCoin(afwCfgMap.get(conSignNum + 2));
                     }
                     data.setMaxConSignNum(urmSignCoin.getConSignNum());
-                } else if (days > 1) {// 如果不是，则重新从0开始；
+                } else if (days > 1) {
+                    // 如果不是，则重新从0开始；
                     data.setThisTimeCoin(afwCfgMap.get(1));
                     data.setNextTimeCoin(afwCfgMap.get(2));
                     // 当前最大连续签到次数
@@ -806,9 +788,9 @@ public class AppController {
             List<UrmUserDevice> urmUserDevices = new ArrayList<>();
             for (String id : ids) {
                 boolean flag = false;
-                System.out.println(" id_id_id " + id);
+//                System.out.println(" id_id_id " + id);
                 for (String dId : deviceIds) {
-                    System.out.println(" dId_dId_dId " + dId);
+//                    System.out.println(" dId_dId_dId " + dId);
                     if (id.equals(dId)) {
                         flag = true;
                         System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);
@@ -885,32 +867,33 @@ public class AppController {
 
     /**
      * 用户信息获取
+     * 计算用户签到和返利总额
      *
      * @return
      */
     @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
     public ModelAndView userInfo() {
-        //TODO 具体hasoffer coin 计算返回
         ModelAndView mv = new ModelAndView();
         BigDecimal coins = BigDecimal.ZERO;
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
         UrmUser user = appService.getUserByUserToken(userToken);
         if (user != null) {
+//            BackDetailVo backDetailVo = new BackDetailVo();
+//            calculateHasofferCoin(Collections.singletonList(user), backDetailVo);
             UserVo userVo = new UserVo();
             userVo.setName(user.getUserName());
             List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
                 String orderStatus = orderStatsAnalysisPO.getOrderStatus();
                 if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name()) && orderStatus != null && (orderStatus.equals("tentative") || orderStatus.equals("approved"))) {
-                    // BigDecimal.min()
                     BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.015)).min(orderStatsAnalysisPO.getTentativeAmount());
-                    if (orderStatus.equals("tentative")) {
-                        coins = coins.add(tempPrice);
-                    }
-
+                    coins = coins.add(tempPrice);
                 }
             }
             coins = coins.multiply(BigDecimal.TEN);
+//            coins = coins.add(backDetailVo.getPendingCoins());
+//            coins = coins.add(backDetailVo.getVerifiedCoins());
+//            coins = coins.multiply(BigDecimal.TEN);
             UrmSignCoin urmSignCoin = appService.getSignCoinByUserId(user.getId());
             if (urmSignCoin != null) {
                 coins = coins.add(BigDecimal.valueOf(urmSignCoin.getSignCoin()));
@@ -1130,60 +1113,6 @@ public class AppController {
         System.out.println("time " + (System.currentTimeMillis() - l) / 1000);
         return mv;
     }
-//    public ModelAndView productsList(SearchCriteria criteria, @RequestParam(defaultValue = "3") int type) {
-//        ModelAndView mv = new ModelAndView();
-//        List li = new ArrayList();
-//        Map map = new HashMap();
-//        PageableResult<ProductModel> products;
-//        //category level page size
-//        // PageableResult <ProductModel> products=productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()),criteria.getLevel(),criteria.getPage(),criteria.getPageSize());
-//        if (StringUtils.isNotBlank(criteria.getCategoryId())) {
-//            //search by category
-//            products = productIndexServiceImpl.searchPro(Long.valueOf(criteria.getCategoryId()), criteria.getLevel(), criteria.getPage(), criteria.getPageSize());
-//            //products = productIndexServiceImpl.searchPro(Long.valueOf(2), 2, 1, 10);
-//            if (products != null && products.getData().size() > 0) {
-//                addProductVo2List(li, products.getData());
-//            }
-//        } else if (StringUtils.isNotEmpty(criteria.getKeyword())) {
-//            //search by title
-//            //productIndexServiceImpl.simpleSearch(criteria.getKeyword(),1,10);
-//            PageableResult p = productIndexServiceImpl.searchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
-//            if (p != null && p.getData().size() > 0) {
-//                addProductVo2List(li, p.getData());
-//            }
-//        }
-//        String data = "";
-//        //查询热卖商品
-//        List<PtmProduct> products2s = productCacheManager.getTopSellins(criteria.getPage(), criteria.getPageSize());
-//        switch (type) {
-//            case 0:
-//                addProductVo2List(li, products2s);
-//                if (products2s != null && products2s.size() > 4) {
-//                    li = li.subList(0, 5);
-//                }
-//                map.put("product", li);
-//                break;
-//            case 1:
-//                addProductVo2List(li, products2s);
-//                map.put("product", li);
-//                break;
-//            case 2:
-//                PageableResult p = productIndexServiceImpl.searchProductsByKey(criteria.getKeyword(), criteria.getPage(), criteria.getPageSize());
-//                if (p != null && p.getData().size() > 0) {
-//                    addProductVo2List(li, p.getData());
-//                }
-//                map.put("product", li);
-//                break;
-//            default:
-//                map.put("product", null);
-//        }
-//        if (li != null && li.size() > 0) {
-//            map.put("product", li);
-//        }
-//        mv.addObject("data", map);
-//        return mv;
-//    }
-
 
     public void addProductVo2List(List desList, List sourceList) {
 
@@ -1339,7 +1268,6 @@ public class AppController {
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
                 if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
                     OrderVo orderVo = new OrderVo();
-                    // BigDecimal.min()
                     BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.015)).min(orderStatsAnalysisPO.getTentativeAmount());
                     orderVo.setAccount(tempPrice.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
                     orderVo.setChannel(orderStatsAnalysisPO.getChannel());

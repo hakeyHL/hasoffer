@@ -312,7 +312,7 @@ public class AppServiceImpl implements IAppService {
                 afwCfgMap.put(urmSignAwdCfg.getCount(), urmSignAwdCfg.getAwardCoin());
             }
         }
-
+        //TODO 考虑加缓存
         //for (int i = 1; i < 8; i++) {
         //    if (afwCfgMap.get(i) == null) {
         //        afwCfgMap.put(i, 5 + 5 * i);
