@@ -32,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 public class CmpSkuDubboUpdateWorker implements Runnable {
 
     private static final String PRICE_DROP_SKUID_QUEUE = "PRICE_DROP_SKUID_QUEUE";
+    public static Integer CMPSKU_DUBBOUPDATE_WORKER_THREAD_NUMBER = 0;
     private static Logger logger = LoggerFactory.getLogger(CmpSkuDubboUpdateWorker.class);
     private IDataBaseManager dbm;
     private ConcurrentLinkedQueue<PtmCmpSku> queue;
@@ -45,14 +46,24 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         this.fetchDubboService = fetchDubboService;
         this.cmpSkuService = cmpSkuService;
         this.redisListService = redisListService;
+        CMPSKU_DUBBOUPDATE_WORKER_THREAD_NUMBER++;
     }
 
     @Override
     public void run() {
 
+        long startTime = TimeUtils.now();
+
         while (true) {
 
             try {
+
+                if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_1_HOUR * 20) {
+                    CMPSKU_DUBBOUPDATE_WORKER_THREAD_NUMBER--;
+                    System.out.println("cmpsku dubboupdate worker thread has live above 20 hours ,thread going to die ");
+                    System.out.println("alive thread number " + CMPSKU_DUBBOUPDATE_WORKER_THREAD_NUMBER);
+                    break;
+                }
 
                 PtmCmpSku sku = queue.poll();
 

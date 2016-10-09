@@ -14,7 +14,6 @@ import hasoffer.spider.service.impl.SpiderSkuScheduleServiceImpl;
 import hasoffer.spring.context.SpringContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.pipeline.Pipeline;
 
 import java.io.IOException;
@@ -44,12 +43,18 @@ public class SpiderSkuWorker implements Runnable {
     @Override
     public void run() {
         String redisListName = SpiderConfigInitContext.getRedisListName(spiderConfig.getWebsite(), PageType.DETAIL);
-        logger.info("Website:{}, Redis List Name:{}", spiderConfig.getWebsite(), redisListName);
         if (redisListName == null || "".equals(redisListName)) {
             return;
         }
+        logger.info("NEW Website:{}, Redis List Name:{}", spiderConfig.getWebsite(), redisListName);
         while (true) {
-            String skuTaskStr = redisListService.pop(redisListName);
+            String skuTaskStr = null;
+            try {
+                skuTaskStr = redisListService.pop(redisListName);
+            } catch (Exception e) {
+                logger.error("Get task error.", e);
+            }
+            logger.info("Get a task:{}", skuTaskStr);
             if (skuTaskStr == null) {
                 try {
                     TimeUnit.SECONDS.sleep(10);
@@ -64,6 +69,7 @@ public class SpiderSkuWorker implements Runnable {
             } catch (IOException e) {
                 logger.error("Json parse error. error msg {}", e);
             }
+            logger.info("execute this task:{}", skuTask);
             if (skuTask == null) {
                 return;
             }
@@ -79,10 +85,7 @@ public class SpiderSkuWorker implements Runnable {
 
             spiderSkuScheduler.pushRequest(skuTask.getUrl(), extraMap);
 
-            if (!Spider.Status.Running.equals(spiderSkuScheduler.runStatus())) {
-                logger.debug("start " + spiderConfig.getWebsite() + ":" + i++);
-                spiderSkuScheduler.startSpiderTask();
-            }
+            spiderSkuScheduler.startSpiderTask();
         }
     }
 }

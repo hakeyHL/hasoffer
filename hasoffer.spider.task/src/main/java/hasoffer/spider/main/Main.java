@@ -10,13 +10,11 @@ public class Main {
 
     public static void main(String[] args) throws InterruptedException {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
-                new String[]{
-                        "classpath:/spring/application.xml",
-                        "classpath:/spring-beans.xml",
-                        "classpath:/spring/spring-context-holder.xml",
-                        "classpath:/spring/spring-init.xml",
-                        "classpath:/spring/spring-dubbo-task.xml"
-                });
+                "classpath:/spring/application.xml",
+                "classpath:/spring-beans.xml",
+                "classpath:/spring/spring-context-holder.xml",
+                "classpath:/spring/spring-init.xml",
+                "classpath:/spring/spring-dubbo-task.xml");
         context.start();
         logger.info("start finish!");
 

@@ -43,8 +43,8 @@ public class OrderSAsisJobBean extends QuartzJobBean {
 
             for (int i : days) {
                 Date day = TimeUtils.addDay(todayTime, -i);
-                orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day, day);
-                orderStatsAnalysisService.updateOrder(Website.FLIPKART.toString(), day, day);
+                orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.name(), day, day);
+                orderStatsAnalysisService.updateOrder(Website.FLIPKART.name(), day, day);
 
             }
 

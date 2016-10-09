@@ -126,7 +126,7 @@ public class MysqlTest {
     @Test
     public void testDistinctQuery() {
 
-        List<String> skuList = dbm.query("SELECT distinct t.title FROM PtmCmpSku t WHERE t.productId = ?0", Arrays.asList(12312L));
+        List skuList = dbm.query("SELECT distinct t.skuid FROM PriceOffNotice t ORDER BY t.skuid ASC");
 
         System.out.println(skuList);
 

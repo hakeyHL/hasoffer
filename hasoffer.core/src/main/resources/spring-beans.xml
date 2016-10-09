@@ -117,8 +117,6 @@
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
-    <context:component-scan base-package="hasoffer.core"/>
-
     <!-- 事务管理器配置, Hibernate单数据源事务 -->
     <bean id="defaultTransactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
         <property name="sessionFactory" ref="sessionFactory"/>
@@ -140,6 +138,7 @@
         <aop:advisor pointcut-ref="allEditMethod" advice-ref="txAdvice"/>
     </aop:config>-->
 
+    <context:component-scan base-package="hasoffer.core"/>
     <!-- cache 配置 -->
     <import resource="spring-cache.xml"/>
 

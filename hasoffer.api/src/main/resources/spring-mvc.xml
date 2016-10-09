@@ -15,11 +15,7 @@
 
 
     <mvc:annotation-driven/>
-
-
-    <import resource="classpath*:spring-beans.xml"/>
-    <context:component-scan base-package="hasoffer.api.*"/>
-    <aop:aspectj-autoproxy/>
+    <context:component-scan base-package="hasoffer.api.controller"/>
 
     <mvc:resources location="/static/" mapping="/static/**"/>
     <mvc:resources location="/m/" mapping="/m/**"/>

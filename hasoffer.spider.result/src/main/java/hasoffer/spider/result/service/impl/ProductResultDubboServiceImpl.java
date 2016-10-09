@@ -25,7 +25,7 @@ import java.util.Map;
 public class ProductResultDubboServiceImpl implements IProductResultDubboService {
 
     private final Logger logger = LoggerFactory.getLogger(ProductResultDubboServiceImpl.class);
-    private final Logger successLogger = LoggerFactory.getLogger("spider.success");
+    private final Logger spiderLogger = LoggerFactory.getLogger("spider.product.success");
 
     @Resource
     private SearchProductService searchProductService;
@@ -42,7 +42,7 @@ public class ProductResultDubboServiceImpl implements IProductResultDubboService
         if (ArrayUtils.hasObjs(productList)) {
             for (FetchedProduct fetchedProduct : productList) {
                     //FileUtils.writeStringToFile(new File(userHome + File.separator + "logs" + File.separator + "spider-logs" + File.separator + "result.txt"), JSONUtil.toJSON(fetchedProduct) + System.getProperty("line.separator", "\n"));
-                successLogger.info(JSONUtil.toJSON(fetchedProduct));
+                spiderLogger.info(JSONUtil.toJSON(fetchedProduct));
             }
 
         }
