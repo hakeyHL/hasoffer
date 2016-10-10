@@ -170,6 +170,30 @@ public class Compare2Controller {
                           @RequestParam(defaultValue = "1") int page,
                           @RequestParam(defaultValue = "20") int pageSize,
                           HttpServletResponse response) {
+        /*1. 判断和处理客户端传送的价格,使其合法化
+        1.1 是否可以使用正则或者别的方法把除数字外的东西去掉.
+
+        2. 初始化匹配条件到sio对象中
+
+        3. 匹配sku
+        3.1 查看是否存在以deviceId和cliSite联合组成的key,此数据是在dot和流量拦截时存入的.(AppController)PtmCmpSkuIndex2
+        3.2 如果存在则返回null
+        3.3 不存在则以cliSite sourceId keyword 为及其他组成的key查询缓存中是否存在
+        3.4 存在则转为对象然后返回,流程结束
+        3.5 不存在则通过cliSite sourceId keyword 从数据库中查询,然后放入缓存,返回,流程结束
+
+        4. 匹配商品 getSioBySearch
+        4.1 获取查询Q , 根据q,cliSite使用HexDigestUtil.md5生成log的key.
+        4.2 从searchLog中获取此商品,如果有则set进sio中
+        4.3 如果无sio.setFirstSearch(true),然后再使用searchForResult方法获取该商品
+        4.4 具体为从solr中按照title搜索该商品,只有匹配度大于0.4的才会被认为是一个商品
+
+        5. 比价列表
+        5.1 库中是否有此商品
+        5.2 无则直接结束流程
+        5.3 有则查询和处理比价列表返回*/
+
+
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
