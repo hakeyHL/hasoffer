@@ -52,10 +52,19 @@ public class PriceOffNoticeListWorker implements Runnable {
 
             if (queue.size() > 50000) {
                 logger.info("queue size =" + queue.size());
+
                 try {
-                    TimeUnit.MINUTES.sleep(1);
+                    TimeUnit.MINUTES.sleep(10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                }
+
+                if (queue.size() > 50000) {
+                    //临时解决锁死的办法，丢弃最前面的1w个数据
+                    for (int i = 0; i < 10000; i++) {
+                        queue.poll();
+                    }
+                    logger.info("drop 10000 ptmcmpsku");
                 }
                 continue;
             }
@@ -119,6 +128,8 @@ public class PriceOffNoticeListWorker implements Runnable {
 
                     logger.info("send url request succes for " + sku.getWebsite() + " sku id is [" + sku.getId() + "]");
                 }
+            } else {
+                break;
             }
 
             page++;
