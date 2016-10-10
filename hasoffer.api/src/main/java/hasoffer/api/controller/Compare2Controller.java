@@ -228,6 +228,7 @@ public class Compare2Controller {
                         cr.setProductVo(new ProductVo(sio.getHsProId(), sio.getCliQ(), productCacheManager.getProductMasterImageUrl(sio.getHsProId()), 0.0f, currentDeeplink));
                         cr.setDisplayMode(AppDisplayMode.NONE);
                         cr.setStd(true);
+                        cr.setPriceList(new ArrayList<CmpProductListVo>());
                         jsonObject.put("data", JSONObject.toJSON(cr));
                     }
                     Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
