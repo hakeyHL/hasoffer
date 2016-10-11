@@ -231,12 +231,19 @@ public class Compare2Controller {
                         cr.setPriceList(new ArrayList<CmpProductListVo>());
                         jsonObject.put("data", JSONObject.toJSON(cr));
                     }
+                    if (cr.getPriceList() == null) {
+                        cr.setPriceList(new ArrayList<CmpProductListVo>());
+                    }
+                    jsonObject.put("data", JSONObject.toJSON(cr));
                     Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
                     return null;
                 } else {
                     cr = getCmpProducts(cmpSkuIndex, sio);
                     if (cr != null && cr.getPriceList().size() > 0) {
                         cr.setPriceOff(cr.getPriceList().get(0).getSaved());
+                    }
+                    if (cr.getPriceList() == null) {
+                        cr.setPriceList(new ArrayList<CmpProductListVo>());
                     }
                     cr.setProductId(sio.getHsProId());
                     //cr.setCopywriting(ptmProduct != null && ptmProduct.isStd() ? "Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you." : "Looked around Myntre,Jabong & 5 other apps,thought you might like these items as well..");
@@ -253,12 +260,18 @@ public class Compare2Controller {
             } else {
                 //小于等于0,直接返回
                 logger.info("productid is " + sio.getHsProId() + " ls than zero");
+                if (cr.getPriceList() == null) {
+                    cr.setPriceList(new ArrayList<CmpProductListVo>());
+                }
                 jsonObject.put("data", JSONObject.toJSON(cr));
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
                 return null;
             }
         } catch (Exception e) {
             logger.error(String.format("sdk_cmp_  [NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, pageSize));
+            if (cr.getPriceList() == null) {
+                cr.setPriceList(new ArrayList<CmpProductListVo>());
+            }
             jsonObject.put("data", JSONObject.toJSON(cr));
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
             return null;
