@@ -215,6 +215,18 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
             orderList.addAll(getOrderList("gczyfw201", "608e87ce80ca40d197b6ffa86bee3c39", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
             TimeUnit.SECONDS.sleep(2);
             orderList.addAll(getOrderList("gczyfw201", "608e87ce80ca40d197b6ffa86bee3c39", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
+            TimeUnit.SECONDS.sleep(2);
+            orderList.addAll(getOrderList("huangmint", "d098f6096fbd40048741b7673f1391bc", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
+            TimeUnit.SECONDS.sleep(2);
+            orderList.addAll(getOrderList("huangmint", "d098f6096fbd40048741b7673f1391bc", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
+            TimeUnit.SECONDS.sleep(2);
+            orderList.addAll(getOrderList("zhangchen", "e50a16f7a9ac4ef396097806ffe18e7a", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
+            TimeUnit.SECONDS.sleep(2);
+            orderList.addAll(getOrderList("zhangchen", "e50a16f7a9ac4ef396097806ffe18e7a", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
+            TimeUnit.SECONDS.sleep(2);
+            orderList.addAll(getOrderList("wangshuom", "fb22aa12b24249ab88a051070c314ab5", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
+            TimeUnit.SECONDS.sleep(2);
+            orderList.addAll(getOrderList("wangshuom", "fb22aa12b24249ab88a051070c314ab5", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
             logger.info("over gczyfw201: order.size={}", orderList.size());
 
 
