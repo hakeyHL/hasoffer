@@ -25,8 +25,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<AffiliateOrder> {
 
-    private static Logger logger = LoggerFactory.getLogger(FlipkartAffiliateProductProcessor.class);
-
     public static final String R_START_DATE = "startDate";
     public static final String R_END_DATE = "endDate";
     public static final String R_OFFSET = "offset";
@@ -39,6 +37,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
     private static final String AFFILIATE_BASE_URL = "https://affiliate-api.flipkart.net/affiliate/api/" + TRACKINGID + ".json";
     private static final String AFFILIATE_KEYWORDQUERY_URL = "https://affiliate-api.flipkart.net/affiliate/search/json";
     private static final String AFFILIATE_PRODUCTID_URL = "https://affiliate-api.flipkart.net/affiliate/1.0/product.json?id=";
+    private static Logger logger = LoggerFactory.getLogger(FlipkartAffiliateProductProcessor.class);
     //    private static final String TOKEN_URL = "https://affiliate.flipkart.com/api/a_generateToken";
     private static String TOKEN = "56e46c994b92488c91e43fad138d5c71";
 
@@ -150,6 +149,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
         try {
             String respJson = sendRequest(url, headerMap, parameterMap);
             Gson gson = new Gson();
+            logger.info("Resp json={}", respJson);
             AffiliateOrderReport report = gson.fromJson(respJson, AffiliateOrderReport.class);
             List<AffiliateOrder> orderList = new ArrayList<AffiliateOrder>();
             if (report.getOrderList() != null) {

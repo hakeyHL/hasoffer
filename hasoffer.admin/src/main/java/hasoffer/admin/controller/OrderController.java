@@ -31,28 +31,20 @@ public class OrderController {
         try {
 
             Date todayTime = new Date();
-            //头15天
-            Date day15AgoTime = TimeUtils.addDay(todayTime, -15);
-            //头三天
-            Date day3AgoTime =  TimeUtils.addDay(todayTime, -3);
-            //头两天
-            Date day2AgoTime =  TimeUtils.addDay(todayTime, -2);
+
             //头一天
-            Date day1AgoTime =  TimeUtils.addDay(todayTime, -1);
+            //Date day1AgoTime = TimeUtils.addDay(todayTime, -1);
             //当天
             if (webSite == null || "".equals(webSite) || "ALL".equals(webSite) || Website.SNAPDEAL.name().equals(webSite.toUpperCase())) {
-                orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.name(), day15AgoTime, day15AgoTime);
-                orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.name(), day3AgoTime, day3AgoTime);
-                orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.name(), day2AgoTime, day2AgoTime);
-                orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.name(), day1AgoTime, day1AgoTime);
-                orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.name(), todayTime, todayTime);
+                //orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.name(), todayTime, todayTime);
+                for (int i = 0; i < 15; i++) {
+                    orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.name(), TimeUtils.addDay(todayTime, -i), TimeUtils.addDay(todayTime, -i));
+                }
             }
             if (webSite == null || "".equals(webSite) || "ALL".equals(webSite) || Website.FLIPKART.name().equals(webSite.toUpperCase())) {
-                orderStatsAnalysisService.updateOrder(Website.FLIPKART.name(), day15AgoTime, day15AgoTime);
-                orderStatsAnalysisService.updateOrder(Website.FLIPKART.name(), day3AgoTime, day3AgoTime);
-                orderStatsAnalysisService.updateOrder(Website.FLIPKART.name(), day2AgoTime, day2AgoTime);
-                orderStatsAnalysisService.updateOrder(Website.FLIPKART.name(), day1AgoTime, day1AgoTime);
-                orderStatsAnalysisService.updateOrder(Website.FLIPKART.name(), todayTime, todayTime);
+                for (int i = 0; i < 15; i++) {
+                    orderStatsAnalysisService.updateOrder(Website.FLIPKART.name(), TimeUtils.addDay(todayTime, -i), TimeUtils.addDay(todayTime, -i));
+                }
             }
         } catch (Exception e) {
             logger.debug("reportOrderStatistic:任务失败,   DATE:" + new Date() + ":具体如下");
