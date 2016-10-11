@@ -108,12 +108,12 @@ public class RequestInterceptor implements HandlerInterceptor {
         }
         UrmUser urmUser = null;
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
-        logger.info("userToken is : " + userToken);
+//        logger.info("userToken is : " + userToken);
         if (StringUtils.isNotBlank(userToken)) {
             String key = "user_" + userToken;
             urmUser = userICacheService.get(UrmUser.class, key, 0);
             if (urmUser == null) {
-                System.out.println("user not exist in cache ,query it from database ");
+//                System.out.println("user not exist in cache ,query it from database ");
                 urmUser = appService.getUserByUserToken(userToken);
                 userICacheService.add(key, urmUser, TimeUtils.SECONDS_OF_1_DAY);
             }
@@ -125,22 +125,22 @@ public class RequestInterceptor implements HandlerInterceptor {
         if (urmUser == null) {
             modelAndView.addObject("result", new ResultVo("10010", "login expired"));
         } else {
-            System.out.println("userName  is " + urmUser.getUserName());
+//            System.out.println("userName  is " + urmUser.getUserName());
             System.out.println("----------------------------------" + JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).toJSONString() + "-------------------");
             String gcmToken = JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).getString("gcmToken");
-            System.out.println("get gcmtoken ++++++++++++++++++++++++++++++++++++" + gcmToken + "++++++++++++++++++++++++++++++++");
-            System.out.println("gcmtoken from database :" + urmUser.getGcmToken() == null ? "is null .." : urmUser.getGcmToken());
+           /* System.out.println("get gcmtoken ++++++++++++++++++++++++++++++++++++" + gcmToken + "++++++++++++++++++++++++++++++++");
+            System.out.println("gcmtoken from database :" + urmUser.getGcmToken() == null ? "is null .." : urmUser.getGcmToken());*/
             //用户与gcmtoken绑定
             //1. 获取gcmtoken
             if (!StringUtils.isEmpty(gcmToken)) {
                 //3. 不为空,比对
                 if (urmUser.getGcmToken() == null) {
-                    System.out.println("user'Gcmtoken not exist before ");
+//                    System.out.println("user'Gcmtoken not exist before ");
                     //5. 更新
                     urmUser.setGcmToken(gcmToken);
                     appService.updateUserInfo(urmUser);
                 } else if (!urmUser.getGcmToken().equals(gcmToken)) {
-                    System.out.println("update , not equal ");
+//                    System.out.println("update , not equal ");
                     //5. 更新
                     urmUser.setGcmToken(gcmToken);
                     appService.updateUserInfo(urmUser);
