@@ -173,7 +173,7 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
 
                 List<PivotField> cate2List = nl.get(field);
                 for (PivotField pf : cate2List) {// string - object - long
-                    System.out.println(pf.getValue() + "\t" + pf.getCount());
+//                    System.out.println(pf.getValue() + "\t" + pf.getCount());
                     List<NameValue> nvs = pivotFieldVals.get(field);
                     if (nvs == null) {
                         nvs = new ArrayList<>();
