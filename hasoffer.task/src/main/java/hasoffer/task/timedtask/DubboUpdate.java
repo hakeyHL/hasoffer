@@ -91,7 +91,7 @@ public class DubboUpdate {
      * 缓存时间设置为30min
      * @return
      */
-    @Scheduled(cron = "00 55 11 * * ?")
+    @Scheduled(cron = "00 15 12 * * ?")
     public void priceOffNotieUpdatestart() {
 
         long startTime = TimeUtils.now();
