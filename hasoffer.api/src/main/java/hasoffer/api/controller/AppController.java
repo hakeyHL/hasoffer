@@ -201,6 +201,7 @@ public class AppController {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
+        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         switch (action) {
             case FLOWCTRLSUCCESS:
                 // 流量拦截成功
@@ -214,7 +215,6 @@ public class AppController {
                 break;
             case HOMEPAGE:
                 Map map = new HashMap();
-                DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
                 MarketChannel marketChannel = deviceInfoVo.getMarketChannel();
                 map.put("info", AffliIdHelper.getAffiIds(marketChannel));
                 modelAndView.addObject("data", map);
@@ -271,7 +271,13 @@ public class AppController {
                 break;
             case COMADD:
                 Map nMap = new HashMap();
-                nMap.put("op", false);
+                //如果版本是28就放开,否则关闭
+                String appVersion = deviceInfoVo.getAppVersion();
+                if (StringUtils.isNotBlank(appVersion) && Integer.valueOf(appVersion) == 28) {
+                    nMap.put("op", true);
+                } else {
+                    nMap.put("op", false);
+                }
                 modelAndView.addObject("data", nMap);
             default:
                 break;
