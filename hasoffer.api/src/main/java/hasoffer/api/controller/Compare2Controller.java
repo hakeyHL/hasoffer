@@ -7,7 +7,6 @@ import hasoffer.api.controller.vo.*;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.SearchHelper;
-import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.AppDisplayMode;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
@@ -82,10 +81,24 @@ public class Compare2Controller {
     private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
 
     public static void main(String[] args) {
-        for (int i = 0; i < 10; i++) {
+       /* for (int i = 0; i < 10; i++) {
             String dealUrlWithAff = WebsiteHelper.getDeeplinkWithAff(Website.SNAPDEAL, "https://www.snapdeal.com/product/jbl-sb350-soundbar-with-wirless/1602277955", new String[]{MarketChannel.SHANCHUAN.name(), "dfecc858243a616a"});
             System.out.println(dealUrlWithAff);
+        }*/
+    }
+
+    public static String getStringNum(String source) {
+        source = source.trim();
+        String str2 = "";
+        if (source != null && !"".equals(source)) {
+            for (int i = 0; i < source.length(); i++) {
+                if (source.charAt(i) >= 48 && source.charAt(i) <= 57) {
+                    str2 += source.charAt(i);
+                }
+            }
+
         }
+        return str2;
     }
 
     // @Cacheable(value = "compare", key = "'getcmpskus_'+#q+'_'+#site+'_'+#price+'_'+#page+'_'+#size")
@@ -157,6 +170,30 @@ public class Compare2Controller {
                           @RequestParam(defaultValue = "1") int page,
                           @RequestParam(defaultValue = "20") int pageSize,
                           HttpServletResponse response) {
+        /*1. 判断和处理客户端传送的价格,使其合法化
+        1.1 是否可以使用正则或者别的方法把除数字外的东西去掉.
+
+        2. 初始化匹配条件到sio对象中
+
+        3. 匹配sku
+        3.1 查看是否存在以deviceId和cliSite联合组成的key,此数据是在dot和流量拦截时存入的.(AppController)PtmCmpSkuIndex2
+        3.2 如果存在则返回null
+        3.3 不存在则以cliSite sourceId keyword 为及其他组成的key查询缓存中是否存在
+        3.4 存在则转为对象然后返回,流程结束
+        3.5 不存在则通过cliSite sourceId keyword 从数据库中查询,然后放入缓存,返回,流程结束
+
+        4. 匹配商品 getSioBySearch
+        4.1 获取查询Q , 根据q,cliSite使用HexDigestUtil.md5生成log的key.
+        4.2 从searchLog中获取此商品,如果有则set进sio中
+        4.3 如果无sio.setFirstSearch(true),然后再使用searchForResult方法获取该商品
+        4.4 具体为从solr中按照title搜索该商品,只有匹配度大于0.4的才会被认为是一个商品
+
+        5. 比价列表
+        5.1 库中是否有此商品
+        5.2 无则直接结束流程
+        5.3 有则查询和处理比价列表返回*/
+
+
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
@@ -168,44 +205,56 @@ public class Compare2Controller {
         PtmProduct ptmProduct = null;
         if (!StringUtils.isEmpty(price)) {
             //如果price不为空
-            if (price.contains(",")) {
-                System.out.println(price + "    contains , ");
-                price = price.replaceAll(",", " ");
-            }
-            if (price.contains("Rs.")) {
-                System.out.println(price + "    contains Rs. ");
-                price = price.replaceAll("Rs.", " ");
-            }
-            if (price.contains("₹")) {
-                System.out.println(price + "    contains ₹ ");
-                price = price.replaceAll("₹", " ");
-            }
-            price = price.replaceAll(" ", "");
-            System.out.println(" price is " + price);
+            price = getStringNum(price);
         }
-        SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, pageSize);
         try {
+            SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, pageSize);
             //匹配sku
             PtmCmpSkuIndex2 cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
             //根据title匹配到商品
             getSioBySearch(sio);
-            logger.info("get product from solr or searchLog ");
             if (sio.getHsProId() > 0) {
                 ptmProduct = productService.getProduct(sio.getHsProId());
                 //若此时匹配到的商品实际库中不存在则删除此匹配记录,下次重新匹配
                 if (ptmProduct == null) {
                     logger.info("product id" + sio.getHsProId() + " is not exist ");
                     productService.deleteProduct(sio.getHsProId());
-                    //未匹配,结束操作
+                    String currentDeeplink = "";
+                    if (cmpSkuIndex != null && cmpSkuIndex.getId() > 0) {
+                        if (cmpSkuIndex.getWebsite().equals(sio.getCliSite())) {
+                            currentDeeplink = WebsiteHelper.getDeeplinkWithAff(cmpSkuIndex.getWebsite(), cmpSkuIndex.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
+                        }
+                        cr = new CmpResult();
+                        cr.setProductVo(new ProductVo(sio.getHsProId(), sio.getCliQ(), productCacheManager.getProductMasterImageUrl(sio.getHsProId()), 0.0f, currentDeeplink));
+                        cr.setDisplayMode(AppDisplayMode.NONE);
+                        cr.setStd(true);
+                        cr.setPriceList(new ArrayList<CmpProductListVo>());
+                        jsonObject.put("data", JSONObject.toJSON(cr));
+                    }
+                    if (cr == null) {
+                        cr = new CmpResult();
+                        cr.setPriceList(new ArrayList<CmpProductListVo>());
+                    } else {
+                        if (cr.getPriceList() == null) {
+                            cr.setPriceList(new ArrayList<CmpProductListVo>());
+                        }
+                    }
+                    jsonObject.put("data", JSONObject.toJSON(cr));
+                    Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
+                    return null;
                 } else {
                     cr = getCmpProducts(cmpSkuIndex, sio);
                     if (cr != null && cr.getPriceList().size() > 0) {
                         cr.setPriceOff(cr.getPriceList().get(0).getSaved());
                     }
-//                    if (cr == null) {
-//                        cr = new CmpResult();
-//                        cr.setProductVo(new ProductVo(sio.getHsProId(), sio.getCliQ(), productCacheManager.getProductMasterImageUrl(ptmProduct.getId()), 0.0f, WebsiteHelper.getDeeplinkWithAff(Website.valueOf(ptmProduct.getSourceSite()), ptmProduct.getSourceUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()})));
-//                    }
+                    if (cr == null) {
+                        cr = new CmpResult();
+                        cr.setPriceList(new ArrayList<CmpProductListVo>());
+                    } else {
+                        if (cr.getPriceList() == null) {
+                            cr.setPriceList(new ArrayList<CmpProductListVo>());
+                        }
+                    }
                     cr.setProductId(sio.getHsProId());
                     //cr.setCopywriting(ptmProduct != null && ptmProduct.isStd() ? "Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you." : "Looked around Myntre,Jabong & 5 other apps,thought you might like these items as well..");
                     cr.setCopywriting("Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you.");
@@ -221,18 +270,32 @@ public class Compare2Controller {
             } else {
                 //小于等于0,直接返回
                 logger.info("productid is " + sio.getHsProId() + " ls than zero");
+                if (cr == null) {
+                    cr = new CmpResult();
+                    cr.setPriceList(new ArrayList<CmpProductListVo>());
+                } else {
+                    if (cr.getPriceList() == null) {
+                        cr.setPriceList(new ArrayList<CmpProductListVo>());
+                    }
+                }
                 jsonObject.put("data", JSONObject.toJSON(cr));
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
                 return null;
             }
         } catch (Exception e) {
             logger.error(String.format("sdk_cmp_  [NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", q, site, price, page, pageSize));
+            if (cr == null) {
+                cr = new CmpResult();
+                cr.setPriceList(new ArrayList<CmpProductListVo>());
+            } else {
+                if (cr.getPriceList() == null) {
+                    cr.setPriceList(new ArrayList<CmpProductListVo>());
+                }
+            }
             jsonObject.put("data", JSONObject.toJSON(cr));
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
             return null;
         }
-        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
-        return null;
     }
 
     @RequestMapping(value = "/cmpsku", method = RequestMethod.GET)
@@ -675,7 +738,6 @@ public class Compare2Controller {
     }
 
     private CmpResult getCmpProducts(PtmCmpSkuIndex2 ptmCmpSkuIndex2, SearchIO sio) {
-        System.out.println(" ptmCmpSkuIndex2  " + ptmCmpSkuIndex2);
         long cmpSkuId = 0L;
         //初始化一个空的用于存放比价商品列表的List
         List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
@@ -774,7 +836,7 @@ public class Compare2Controller {
             comparedSkuVos = null;
             comparedSkuVos = new ArrayList<>();
             //将新的加入的放入到列表中
-            System.out.println("tempCmpProductListVos" + tempCmpProductListVos.size());
+//            System.out.println("tempCmpProductListVos" + tempCmpProductListVos.size());
             comparedSkuVos.addAll(tempCmpProductListVos);
             long endTime = System.nanoTime(); //获取结束时间
             System.out.println("total time is " + (endTime - startTime) / 1000000 + "");
@@ -783,21 +845,21 @@ public class Compare2Controller {
         try {
             if (ptmCmpSkuIndex2 != null && ptmCmpSkuIndex2.getId() > 0) {
                 if (ptmCmpSkuIndex2.getWebsite().equals(sio.getCliSite())) {
-                    System.out.println(" enter ptmCmpSkuIndex2 get deepLink ");
+//                    System.out.println(" enter ptmCmpSkuIndex2 get deepLink ");
                     currentDeeplink = WebsiteHelper.getDeeplinkWithAff(ptmCmpSkuIndex2.getWebsite(), ptmCmpSkuIndex2.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
-                    System.out.println("currentDeeplink1  " + currentDeeplink);
+//                    System.out.println("currentDeeplink1  " + currentDeeplink);
                 }
             } else if (clientCmpSku != null) {
                 if (!cmpSkuCacheManager.isFlowControlled(sio.getDeviceId(), sio.getCliSite())) {
-                    System.out.println(" enter clientCmpSku get deepLink ");
-                    System.out.println(" sku id is " + clientCmpSku.getId());
-                    System.out.println("  clientCmpSku.getSkuTitle()  : " + clientCmpSku.getSkuTitle());
-                    System.out.println("   sio.getCliQ() : " + sio.getCliQ());
-                    System.out.println(" clientCmpSku.getPrice() :   " + clientCmpSku.getPrice());
-                    System.out.println("  cliPrice  " + cliPrice);
+//                    System.out.println(" enter clientCmpSku get deepLink ");
+//                    System.out.println(" sku id is " + clientCmpSku.getId());
+//                    System.out.println("  clientCmpSku.getSkuTitle()  : " + clientCmpSku.getSkuTitle());
+//                    System.out.println("   sio.getCliQ() : " + sio.getCliQ());
+//                    System.out.println(" clientCmpSku.getPrice() :   " + clientCmpSku.getPrice());
+//                    System.out.println("  cliPrice  " + cliPrice);
                     if (clientCmpSku.getSkuTitle().equalsIgnoreCase(sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
                         currentDeeplink = WebsiteHelper.getDeeplinkWithAff(clientCmpSku.getWebsite(), clientCmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
-                        System.out.println("currentDeeplink2  " + currentDeeplink);
+//                        System.out.println("currentDeeplink2  " + currentDeeplink);
                     }
                 }
             }

@@ -201,6 +201,7 @@ public class AppController {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
+        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         switch (action) {
             case FLOWCTRLSUCCESS:
                 // 流量拦截成功
@@ -214,7 +215,6 @@ public class AppController {
                 break;
             case HOMEPAGE:
                 Map map = new HashMap();
-                DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
                 MarketChannel marketChannel = deviceInfoVo.getMarketChannel();
                 map.put("info", AffliIdHelper.getAffiIds(marketChannel));
                 modelAndView.addObject("data", map);
@@ -266,12 +266,18 @@ public class AppController {
                 NINEAPP.put("NINEAPP", tempNINEAPP);
                 apps.add(NINEAPP);
                 apps.add(GOOGLEPLAY);
-                DownloadConfigVo downloadConfigVo = new DownloadConfigVo(false, Arrays.asList("com.snapdeal.main", "com.flipkart.android", "in.amazon.mShop.android.shopping", "net.one97.paytm", "com.ebay.mobile", "com.shopclues", "com.infibeam.infibeamapp", "com.myntra.android", "com.jabong.android", "com.alibaba.aliexpresshd"), "NINEAPP", apps, Arrays.asList("com.voonik.android", "cn.xender", "com.india.hasoffer", "com.lenovo.anyshare,gps", "com.mobile.indiapp", "com.leo.appmaster", "com.voodoo.android", "com.app.buyhatke", "com.makemytrip", "com.goibibo", "com.cleartrip.android", "com.yatra.base", "com.android.contacts"));
+                DownloadConfigVo downloadConfigVo = new DownloadConfigVo(true, Arrays.asList("com.snapdeal.main", "com.flipkart.android", "in.amazon.mShop.android.shopping", "net.one97.paytm", "com.ebay.mobile", "com.shopclues", "com.infibeam.infibeamapp", "com.myntra.android", "com.jabong.android", "com.alibaba.aliexpresshd"), "NINEAPP", apps, Arrays.asList("com.voonik.android", "cn.xender", "com.india.hasoffer", "com.lenovo.anyshare,gps", "com.mobile.indiapp", "com.leo.appmaster", "com.voodoo.android", "com.app.buyhatke", "com.makemytrip", "com.goibibo", "com.cleartrip.android", "com.yatra.base", "com.android.contacts"));
                 modelAndView.addObject("data", downloadConfigVo);
                 break;
             case COMADD:
                 Map nMap = new HashMap();
-                nMap.put("op", false);
+                //如果版本是28就放开,否则关闭
+                String appVersion = deviceInfoVo.getAppVersion();
+                if (StringUtils.isNotBlank(appVersion) && Integer.valueOf(appVersion) == 28) {
+                    nMap.put("op", true);
+                } else {
+                    nMap.put("op", false);
+                }
                 modelAndView.addObject("data", nMap);
             default:
                 break;
