@@ -77,13 +77,6 @@ public class AppAdController {
             System.out.println(e.getMessage());
         }
     }
-
-    /**
-     * 根据商品id获取category
-     * 根据category匹配广告
-     *
-     * @return
-     */
     @RequestMapping("product")
     public ModelAndView getAdsByProductId(@RequestParam(defaultValue = "0") Long productId) {
         ModelAndView modelAndView = new ModelAndView();
@@ -101,6 +94,7 @@ public class AppAdController {
                 Iterator<Adt> iterator = adt.iterator();
                 while (iterator.hasNext()) {
                     Adt ad = iterator.next();
+                    boolean result = judgeIfAffi(ad.getAderName());
                     if (appType != null && appType.name().equals("APP")) {
                         //如果是appType是APP判断当前是否为hasoffer自己
                         if (ad.getAderName().equals("HASOFFER")) {
@@ -109,36 +103,19 @@ public class AppAdController {
                             continue;
                         } else {
                             //否则处理返回
-                            if (!StringUtils.isEmpty(ad.getAderName())) {
-                                ad.setPackageName(packageMap.get(Website.valueOf(ad.getAderName())));
-                            }
                             if (!StringUtils.isEmpty(ad.getAdLink())) {
-                                ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(Website.valueOf(ad.getAderName()), ad.getAdLink(), marketChannel));
+                                ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(result==true?Website.valueOf(ad.getAderName()):null, ad.getAdLink(), marketChannel));
                             }
                         }
                     } else if (appType != null && !appType.name().equals("APP")) {
                         //如果不是APP，直接处理返回
-                        if (ad.getAderName().equals("HASOFFER")) {
-                            ad.setPackageName("com.india.hasoffer");
-                        } else {
-                            if (!StringUtils.isEmpty(ad.getAderName())) {
-                                ad.setPackageName(packageMap.get(Website.valueOf(ad.getAderName())));
-                            }
-                            if (!StringUtils.isEmpty(ad.getAdLink())) {
-                                ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(Website.valueOf(ad.getAderName()), ad.getAdLink(), marketChannel));
-                            }
+                        if (!StringUtils.isEmpty(ad.getAdLink())) {
+                            ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(result==true?Website.valueOf(ad.getAderName()):null, ad.getAdLink(), marketChannel));
                         }
                     } else {
                         //如果AppType为空，就不过滤hasoffer了
-                        if (ad.getAderName().equals("HASOFFER")) {
-                            ad.setPackageName("com.india.hasoffer");
-                        } else {
-                            if (!StringUtils.isEmpty(ad.getAderName())) {
-                                ad.setPackageName(packageMap.get(Website.valueOf(ad.getAderName())));
-                            }
-                            if (!StringUtils.isEmpty(ad.getAdLink())) {
-                                ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(Website.valueOf(ad.getAderName()), ad.getAdLink(), marketChannel));
-                            }
+                        if (!StringUtils.isEmpty(ad.getAdLink())) {
+                            ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(result==true?Website.valueOf(ad.getAderName()):null, ad.getAdLink(), marketChannel));
                         }
                     }
                 }
@@ -166,4 +143,33 @@ public class AppAdController {
         System.out.println(errorCodeName);
         return modelAndView;
     }
+
+    /**
+     * 判断给定字符串是否是联盟
+     *
+     * @param nameString
+     * @return
+     */
+    public boolean judgeIfAffi(String nameString) {
+        boolean flag = true;
+        //要根据包名判断是否属于联盟
+        if (StringUtils.isEmpty(nameString)) {
+            flag = false;
+            return flag;
+        } else {
+            List<String> sites = new ArrayList<>();
+
+            Website[] values = Website.values();
+            //将site放入list
+            for (int i = 0; i < values.length; i++) {
+                Website value = values[i];
+                sites.add(value.name());
+            }
+            if (!sites.contains(nameString.toUpperCase())) {
+                flag = false;
+            }
+        }
+        return flag;
+    }
+
 }
