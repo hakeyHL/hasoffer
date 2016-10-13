@@ -30,7 +30,7 @@ import java.util.*;
 @Controller
 @RequestMapping("ad")
 public class AppAdController {
-   /* static Map<Website, String> packageMap = new HashMap<Website, String>();
+    static Map<Website, String> packageMap = new HashMap<Website, String>();
 
     static {
         packageMap.put(Website.SNAPDEAL, "com.snapdeal.main");
@@ -43,7 +43,7 @@ public class AppAdController {
         packageMap.put(Website.MYNTRA, "com.myntra.android");
         packageMap.put(Website.JABONG, "com.jabong.android");
         packageMap.put(Website.VOONIK, "com.voonik.android");
-    }*/
+    }
 
     Logger logger = LoggerFactory.getLogger(AppAdController.class);
     @Resource
