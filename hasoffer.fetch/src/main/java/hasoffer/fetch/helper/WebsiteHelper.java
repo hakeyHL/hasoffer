@@ -407,6 +407,9 @@ public class WebsiteHelper {
     }
 
     public static String getAdtUrlByWebSite(Website website, String url, MarketChannel marketChannel) {
+        if (website == null) {
+            website = Website.UNKNOWN;
+        }
         switch (website) {
             case FLIPKART:
                 if (url.contains("?")) {
@@ -415,11 +418,8 @@ public class WebsiteHelper {
                     url += "?affid=" + AffliIdHelper.getAffiIdByWebsite(website, marketChannel);
                 }
                 return url;
-//            case SNAPDEAL:
-//                return AmazonHelper.getProductIdByUrl(url);
-//            case SHOPCLUES:
-//                return SnapdealHelper.getProductIdByUrl(url);
             default:
+                //默认直接返回url
                 return url;
         }
     }
