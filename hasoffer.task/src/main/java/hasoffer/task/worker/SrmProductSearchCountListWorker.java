@@ -62,8 +62,10 @@ public class SrmProductSearchCountListWorker implements Runnable {
 
         while (page <= totalPage) {
 
-            if (queue.size() > 50000) {
-                logger.info("queue size =" + queue.size());
+            int size = queue.size();
+
+            if (size > 50000) {
+                logger.info("queue size =" + size);
 
                 try {
                     TimeUnit.MINUTES.sleep(10);
