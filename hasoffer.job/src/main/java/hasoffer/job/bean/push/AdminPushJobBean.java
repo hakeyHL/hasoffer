@@ -120,6 +120,12 @@ public class AdminPushJobBean extends QuartzJobBean {
 
                 try {
 
+                    if (gcmTokenList != null && gcmTokenList.contains("diME4RkV_6A:APA91bGHSgs6e6RyDjnKH2DPq3Ca7Q_D4cSRRq_JySvRO8txSIJgDgHFi1JULM7uM-EXwxTkswtP1PoKJzZ0l0jUdaAf88-VfZcVkE8C5rPEO-neb3hOdZjT0mjGsa002vLwdYHgyU3S")) {
+                        System.out.println("push to ashit ");
+                        String push = pushService.push(("diME4RkV_6A:APA91bGHSgs6e6RyDjnKH2DPq3Ca7Q_D4cSRRq_JySvRO8txSIJgDgHFi1JULM7uM-EXwxTkswtP1PoKJzZ0l0jUdaAf88-VfZcVkE8C5rPEO-neb3hOdZjT0mjGsa002vLwdYHgyU3S"), pushBo);
+                        System.out.println("pushresult = " + push);
+                    }
+
                     MulticastResult multicastResult = pushService.GroupPush(gcmTokenList, pushBo);
 
                     System.out.println(multicastResult.toString());
