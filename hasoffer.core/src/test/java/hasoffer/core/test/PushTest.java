@@ -38,7 +38,7 @@ public class PushTest {
 //        String to3 = "d8jxhUTX_V8:APA91bERHojtZm7qCDNgdeUU3PXgHEkgDVXA8xbxdEZ-3MUb-HaisGuRL-IvfQ-lgoIx9vdZ38IJVHblHszk_OkOz5F548r80UUEqqDbY8XI6Jonv_LYYEQ6kuXgxOl6uNAIcwlhs2Ao";
 //        String to2 = "ewZ71EnFqlw:APA91bEna9Fvlkcp1qo2yNfSnDyKBOtUnnC-4GSfeEUPoCHZO6PG2EjL4oHO_XpDylqagW1NHCFwS2GZq7M6MuR5ZaphlFVyqJ7MOOS6YEvv9cCSwID1u5qRIg5srI8oU5qBzo8XCVCI";
 //        String to1 = "cTJQKR5lAX0:APA91bHKSxBXExt2Rj26HSL9NG4503f-z1dgmAX2rftijut6IPwg_6WDu4xUSv4nEzzBWaxd6vlqjNAWzB4UqCn7-NktO6MsQbCA0bnfBHhisqFtYasJLnf9RQJZ4iXH8l23-c1WiHYl";
-        String to2 = "c_uLObMKfv8:APA91bHjuOXadfafdafdTLb_0y7REPU-tL6cULNQ-TotqX7ALTDgZO3ONI6Lm_3DRv5EXhae47zlI1sIhbumLxrdXW_1WM3QSVj7vfRGIuWFR-8xfhUCSNNzYhhnInsnwpqwJzj67bPvnvRJXNe3Y";
+        String to2 = "eRs3M4KL4nc:APA91bFDKR0fb4qd0Hwioc2bZ9c-LoWddf6Z8WiqGRcFuYPjcdVI0dfocy7mYI1aFWYDC73q-XG-BoiB0mpRGig2OXpjeb8wpStjfy8mR0W4k9vbEXqOww2iKs1p3cL88LiYk7uE97k2";
 //        String to3 = "de1R9kclQ4g:APA91bEzvw6cS2i_iDa3Xd-b4x1rRcDhlIwB4yDQ1R52TZ20eJRCjCsQBtRmfCbck2n48-XHHXzM_ymdJpVXDEg8_YX2AzFEd6bu8ZG7I7Gz5oK09dl-bUgLhFMx4S-vtOYIFi-JvaaL";
 
 //        System.out.println(to2.equals(to3));
@@ -70,6 +70,24 @@ public class PushTest {
 //        pushService.push(to3, pushBo);
 
         System.out.println();
+    }
+
+    @Test
+    public void f2() {
+
+        AppPushMessage message = new AppPushMessage(
+                new AppMsgDisplay("demo+test", "demo", "test"),
+                new AppMsgClick(AppMsgClickType.DEAL, "123456", WebsiteHelper.getPackage(Website.FLIPKART))
+        );
+
+        AppPushBo pushBo = new AppPushBo("678678", "19:50", message);
+
+        PushServiceImpl p = new PushServiceImpl();
+
+        String to2 = "eRs3M4KL4nc:APA91bFDKR0fb4qd0Hwioc2bZ9c-LoWddf6Z8WiqGRcFuYPjcdVI0dfocy7mYI1aFWYDC73q-XG-BoiB0mpRGig2OXpjeb8wpStjfy8mR0W4k9vbEXqOww2iKs1p3cL88LiYk7uE97k2";
+
+        p.push(to2, pushBo);
+
     }
 
 }
