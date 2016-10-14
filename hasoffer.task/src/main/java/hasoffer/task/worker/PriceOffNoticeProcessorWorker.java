@@ -117,10 +117,8 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
         } else if (TaskStatus.NONE.equals(taskStatus)) {
             queue.add(skuid);
             if (Website.SNAPDEAL.equals(website) || Website.FLIPKART.equals(website) || Website.AMAZON.equals(website)) {
-                queue.add(skuid);
                 fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_2);
             } else {
-                queue.add(skuid);
                 fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_5);
             }
             logger.info("taskstatus NONE for [" + skuid + "] , resend success");
