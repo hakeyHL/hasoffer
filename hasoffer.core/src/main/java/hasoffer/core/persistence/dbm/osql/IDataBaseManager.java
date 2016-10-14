@@ -5,6 +5,7 @@ import org.apache.poi.ss.formula.functions.T;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by glx on 2015/5/20.
@@ -42,7 +43,17 @@ public interface IDataBaseManager {
 
     List queryByIds(String jpaSql, String[] ids);
 
+    List queryBySql(final String queryString, final Map<String, Object> paramsMap);
+
     void update(final List<T> array);
 
+    void update(Object t);
+
+    void saveOrUpdate(Object it);
+
     void deleteBySQL(final String sql);
+
+    void updateBySQL(final String sql);
+
+    void exeSQL(final String sql);
 }

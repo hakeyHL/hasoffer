@@ -13,6 +13,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
@@ -26,7 +27,7 @@ import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IFetchService;
 import hasoffer.core.product.IProductService;
-import hasoffer.core.product.solr.ProductIndexServiceImpl;
+import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
 import hasoffer.core.search.ISearchService;
 import hasoffer.fetch.core.IProductProcessor;
 import hasoffer.fetch.core.ISummaryProductProcessor;
@@ -64,8 +65,6 @@ public class SearchController {
     @Resource
     IProductService productService;
     @Resource
-    ProductIndexServiceImpl productIndexService;
-    @Resource
     ISearchService searchService;
     @Resource
     ICategoryService categoryService;
@@ -78,7 +77,39 @@ public class SearchController {
     @Resource
     SearchLogCacheManager logCacheManager;
     @Resource
+    ProductIndex2ServiceImpl productIndex2Service;
+    @Resource
     IMongoDbManager mdm;
+
+    @RequestMapping(value = "/spell", method = RequestMethod.GET)
+    public ModelAndView spell(HttpServletRequest request) {
+        ModelAndView mav = new ModelAndView("search/spell");
+        String text = request.getParameter("text");
+
+        if (StringUtils.isEmpty(text)) {
+            mav.addObject("text", "");
+            return mav;
+        }
+
+        mav.addObject("text", text);
+
+        try {
+
+//            List<String> sugs = Arrays.asList("1", "2", "3");
+            List<String> sugs = productService.spellcheck(text);
+
+            mav.addObject("sugs", sugs);
+
+            mav.addObject("result", "ok");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            mav.addObject("result", "error");
+        }
+
+        return mav;
+    }
 
     @RequestMapping(value = "/rematch/{logId}", method = RequestMethod.GET)
     public ModelAndView rematch(@PathVariable String logId) {
@@ -274,7 +305,13 @@ public class SearchController {
         if (StringUtils.isEmpty(title)) {
             title = srmSearchLog.getKeyword();
         }
-        pagedResults = productIndexService.searchPro(0, 0, 0, title, page, size);
+
+        SearchCriteria sc = new SearchCriteria();
+        sc.setKeyword(title);
+        sc.setPage(page);
+        sc.setPageSize(size);
+        pagedResults = productIndex2Service.searchProducts(sc);
+
         List<PtmProduct> indexProducts = productService.getProducts(pagedResults.getData());
         indexProducts.remove(firstProduct);
 

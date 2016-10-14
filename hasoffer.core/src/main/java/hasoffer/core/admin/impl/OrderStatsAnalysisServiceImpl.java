@@ -8,6 +8,9 @@ import hasoffer.core.admin.ISnapdealAffiliateService;
 import hasoffer.core.persistence.dbm.HibernateDao;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
+import hasoffer.core.persistence.po.admin.updater.OrderStatsAnalysisPOUpdater;
+import hasoffer.core.persistence.po.urm.PriceOffNotice;
+import hasoffer.core.persistence.po.urm.UrmUserOrderBak;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
@@ -15,10 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Transactional
@@ -106,5 +106,37 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
         String execSql = sql.append(Q_BASE).append(whereSql).append(groupSql).append(" ORDER BY orderTime desc ").toString();
         System.out.println(execSql + ":" + param.toArray());
         return hdao.findPageOfMapBySql(execSql, page, size, param.toArray());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void mergeOldUserOrderToNewUser(String oldUserId, String newUserId) {
+
+        UrmUserOrderBak urmUserOrderBak = new UrmUserOrderBak();
+
+        List<OrderStatsAnalysisPO> orderList = dbm.query("SELECT t FROM OrderStatsAnalysisPO t WHERE t.userId = ?0 ", Arrays.asList(oldUserId));
+
+        StringBuffer sb = new StringBuffer();
+
+        for (OrderStatsAnalysisPO order : orderList) {
+
+            OrderStatsAnalysisPOUpdater updater = new OrderStatsAnalysisPOUpdater(order.getId());
+
+            updater.getPo().setUserId(newUserId);
+
+            dbm.update(updater);
+
+            sb.append(order.getId());
+        }
+
+        urmUserOrderBak.setId(Long.parseLong(oldUserId));
+        urmUserOrderBak.setOrderIdStrig(sb.toString());
+
+        dbm.create(urmUserOrderBak);
+        //将老用户的降价提醒更新到新用户
+        List<PriceOffNotice> notices = dbm.query(" SELECT t FROM PriceOffNotice t WHERE t.userid = ?0 ", Arrays.asList(oldUserId));
+        for (PriceOffNotice notice : notices) {
+            dbm.updateBySQL("update PriceOffNotice t set t.userid=" + newUserId + " where t.userid=" + notice.getUserid());
+        }
     }
 }

@@ -4,8 +4,10 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.product.ProductBo;
+import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.cache.CategoryCacheManager;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
@@ -20,12 +22,18 @@ import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
-import hasoffer.core.product.solr.*;
+import hasoffer.core.product.solr.CmpSkuModel;
+import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
+import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
+import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.search.ISearchService;
+import hasoffer.core.task.ListProcessTask;
+import hasoffer.core.task.worker.ILister;
+import hasoffer.core.task.worker.IProcessor;
 import hasoffer.core.utils.ImageUtil;
-import hasoffer.data.solr.*;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.model.ListProduct;
+import hasoffer.nlp.core.google.GoogleSpellChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -40,11 +48,10 @@ import java.util.*;
 public class ProductServiceImpl implements IProductService {
     private static final String Q_PRODUCT =
             "SELECT t FROM PtmProduct t";
+
     private static final String Q_PRODUCT_BY_CATEGORY =
             "SELECT t FROM PtmProduct t WHERE t.categoryId = ?0";
-    private static final String Q_PRODUCT_BY_CMPID =
-            "SELECT t FROM PtmProduct t " +
-                    " WHERE t.id > ?0 ";
+
     private static final String Q_PRODUCT_BY_CREATETIME =
             "SELECT t FROM PtmProduct t " +
                     " WHERE t.createTime > ?0 " +
@@ -55,10 +62,6 @@ public class ProductServiceImpl implements IProductService {
             "SELECT t FROM PtmCmpSku t " +
                     " WHERE t.productId = ?0   " +
                     " ORDER BY t.price ASC ";
-
-//    private static final String Q_ONSALE_PTM_CMPSKU =
-//            "SELECT t FROM PtmCmpSku t " +
-//                    " WHERE t.productId = ?0  AND  t.price >?1  AND t.status <> 'OFFSALE'  ORDER BY t.price ASC  ";
 
     private static final String Q_ONSALE_PTM_CMPSKU =
             "SELECT  DISTINCT " +
@@ -82,18 +85,12 @@ public class ProductServiceImpl implements IProductService {
     private static final String Q_PTM_IMAGE =
             "SELECT t FROM PtmImage t " +
                     " WHERE t.productId = ?0  ";
-    private static final String Q_PTM_BASICATTRIBUTE =
-            "SELECT t FROM PtmBasicAttribute t " +
-                    " WHERE t.productId = ?0 ";
 
     private static final String Q_PTM_TOPSEELLING =
             "select t from PtmTopSelling t where   t.status='ONLINE'  order by t.lUpdateTime desc , t.count desc ";
 
     @Resource
     ISearchService searchService;
-
-    @Resource
-    ProductIndexServiceImpl productIndexService;
     @Resource
     ProductIndex2ServiceImpl productIndex2Service;
     @Resource
@@ -110,9 +107,80 @@ public class ProductServiceImpl implements IProductService {
     private ICmpSkuService cmpSkuService;
     @Resource
     private ProductCacheManager productCacheManager;
+
     private Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
-    public static void main(String[] args) {
+    @Override
+    public List<String> spellcheck(String text) {
+        boolean onlyByGoogle = true;
+
+        if (StringUtils.isEmpty(text)) {
+            return null;
+        }
+
+        text = text.trim().replaceAll("\\s+", " ");
+        System.out.println(text);
+
+        String[] ts = text.split("\\s");
+
+        List<String> sugs = null;
+        if (onlyByGoogle || ts.length > 1) {
+            System.out.println(String.format("spellcheck[%s] by google.", text));
+            sugs = GoogleSpellChecker.check(text);
+        } else {
+            System.out.println(String.format("spellcheck[%s] by solr.", text));
+            Map<String, List<String>> sugMap = productIndex2Service.spellCheck(text);
+            sugs = sugMap.get(text);
+        }
+
+        return sugs;
+    }
+
+    @Override
+    public void importProduct2SolrByCategory(final long cateId) {
+
+        final PtmCategory category = dbm.get(PtmCategory.class, cateId);
+        if (category == null) {
+            return;
+        }
+
+        ListProcessTask<ProductModel2> productListProcessTask = new ListProcessTask<>(
+                new ILister() {
+                    @Override
+                    public PageableResult<ProductModel2> getData(int page) {
+                        SearchCriteria sc = new SearchCriteria();
+                        sc.setPage(page);
+                        sc.setPageSize(200);
+                        sc.setCategoryId(String.valueOf(cateId));
+                        sc.setLevel(category.getLevel());
+                        return productIndex2Service.searchProducts(sc);
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcessor<ProductModel2>() {
+                    @Override
+                    public void process(ProductModel2 o) {
+                        importProduct2Solr2(o.getId());
+                    }
+                }
+        );
+
+        productListProcessTask.setQueueMaxSize(300);
+        productListProcessTask.setProcessorCount(2);
+
+        productListProcessTask.go();
+    }
+
+    /*public static void main(String[] args) {
         List<PtmCmpSku> tempSkuList = new ArrayList<>();
         PtmCmpSku ptm = new PtmCmpSku();
         ptm.setPrice(100f);
@@ -145,7 +213,7 @@ public class ProductServiceImpl implements IProductService {
         });
         System.out.println(min.getPrice());
         System.out.println(max.getPrice());
-    }
+    }*/
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -214,7 +282,7 @@ public class ProductServiceImpl implements IProductService {
             product.setPrice(price);
             System.out.println("minPrice =" + price);
 
-            importProduct2Solr(product);
+            importProduct2Solr2(product);
         }
 
     }
@@ -258,17 +326,6 @@ public class ProductServiceImpl implements IProductService {
         }
 
         dbm.batchSave(topSellings);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updatePtmProductCategoryId(long ptmProductId, long categoryId) {
-
-        PtmProductUpdater updater = new PtmProductUpdater(ptmProductId);
-
-        updater.getPo().setCategoryId(categoryId);
-
-        dbm.update(updater);
     }
 
     @Override
@@ -353,7 +410,7 @@ public class ProductServiceImpl implements IProductService {
         dbm.update(productUpdater);
 
         product.setCategoryId(targetCate);
-        importProduct2Solr(product);
+        importProduct2Solr2(product);
     }
 
     @Override
@@ -373,7 +430,7 @@ public class ProductServiceImpl implements IProductService {
         dbm.update(ptmProductUpdater);
 
         product.setTag(tag);
-        importProduct2Solr(product);
+        importProduct2Solr2(product);
 
         return true;
     }
@@ -526,7 +583,6 @@ public class ProductServiceImpl implements IProductService {
             dbm.delete(PtmProduct.class, ptmProductId);
         }
 
-        productIndexService.remove(String.valueOf(ptmProductId));
         productIndex2Service.remove(String.valueOf(ptmProductId));
 
         // 删除searchlog 以及 缓存
@@ -565,26 +621,9 @@ public class ProductServiceImpl implements IProductService {
 //        List skuList = new ArrayList();
 //        skuList.add(cmpSku);
 
-        importProduct2Solr(product);
+        importProduct2Solr2(product);
 
         return new ProductBo(product, new ArrayList<PtmCmpSku>(), ptmImage);
-    }
-
-    @Override
-    public void reimport2Solr(boolean removeFirst) {
-        updateProductIndex2Solr();
-//        if (removeFirst) {
-//            try {
-//                productIndexService.removeAll();
-//            } catch (SolrServerException e) {
-//                logger.error("{}", e);
-//            } catch (IOException e) {
-//                logger.error("{}", e);
-//            }
-//    }
-//
-//        addOrUpdateSolr(Q_PRODUCT, null);
-
     }
 
     @Override
@@ -608,6 +647,7 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    @Deprecated
     @Transactional
     public void updateProductBrandModel(long proId, String productBrand, String modelName) {
         PtmProductUpdater productUpdater = new PtmProductUpdater(proId);
@@ -619,19 +659,13 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public void reimport2Solr(long productId) {
-        PtmProduct ptmProduct = getProduct(productId);
-        if (ptmProduct != null) {
-            importProduct2Solr(ptmProduct);
-        }
-    }
+    @Transactional
+    public void updateProductBrand(long proId, String productBrand) {
+        PtmProductUpdater productUpdater = new PtmProductUpdater(proId);
+        productUpdater.getPo().setBrand(productBrand);
+        dbm.update(productUpdater);
 
-    @Override
-    public void import2Solr(ProductModel pm) {
-        if (pm == null) {
-            return;
-        }
-        productIndexService.createOrUpdate(pm);
+        importProduct2Solr2(proId);
     }
 
     @Override
@@ -646,85 +680,6 @@ public class ProductServiceImpl implements IProductService {
     public PageableResult<PtmCmpSku> listNotOffSaleCmpSkus(long proId, int page, int size) {
         PageableResult<PtmCmpSku> pagedResult = dbm.queryPage(Q_NOTOFFSALE_PTM_CMPSKU, page, size, Arrays.asList(proId));
         return pagedResult;
-    }
-
-    @Override
-    public ProductModel getProductModel(PtmProduct product) {
-        if (product == null) {
-            return null;
-        }
-
-        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(product.getId());
-        float minPrice = -1f, maxPrice = -1f;
-        for (PtmCmpSku cmpSku : cmpSkus) {
-            float skuPrice = cmpSku.getPrice();
-            if (skuPrice <= 0 || cmpSku.getStatus() == SkuStatus.OFFSALE) {
-                continue;
-            }
-
-            if (minPrice <= 0) {
-                minPrice = skuPrice;
-                maxPrice = minPrice;
-                continue;
-            }
-
-            if (minPrice > skuPrice) {
-                minPrice = skuPrice;
-            }
-            if (maxPrice < skuPrice) {
-                maxPrice = skuPrice;
-            }
-        }
-
-        if (minPrice < 0) {
-            productIndexService.remove(String.valueOf(product.getId()));
-            productIndex2Service.remove(String.valueOf(product.getId()));
-            return null;
-        }
-
-//        PtmCategory category = dbm.get(PtmCategory.class, product.getCategoryId());
-        List<PtmCategory> categories = categoryCacheManager.getRouterCategoryList(product.getCategoryId());
-
-        long cate1 = 0L, cate2 = 0L, cate3 = 0L;
-        String cate3name = "";
-
-        // 目前仅支持3级类目
-        if (ArrayUtils.hasObjs(categories)) {
-            cate1 = categories.get(0).getId();
-
-            int cateSize = categories.size();
-
-            if (cateSize > 1) {
-                cate2 = categories.get(1).getId();
-            }
-
-            if (cateSize > 2) {
-                cate3 = categories.get(2).getId();
-            }
-        }
-
-        long searchCount = 0;
-        SrmProductSearchCount productSearchCount = searchService.findSearchCountByProductId(product.getId());
-        if (productSearchCount != null) {
-            searchCount = productSearchCount.getCount();
-        }
-
-        ProductModel productModel = new ProductModel(product.getId(),
-                product.getTitle(),
-                product.getTag(),
-                cate3,
-                cate3name,
-                minPrice,
-                product.getDescription(),
-                product.getColor(),
-                product.getSize(),
-                product.getRating(),
-                cate1,
-                cate2,
-                cate3,
-                searchCount);
-
-        return productModel;
     }
 
     @Override
@@ -763,7 +718,7 @@ public class ProductServiceImpl implements IProductService {
                 cate3 = cate.getId();
                 cate3name = cate.getName();
             }
-            cateTag = categoryCacheManager.getCategoryTag(product.getCategoryId());
+            cateTag = cate.getKeyword();
         }
 
         List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(product.getId());
@@ -789,7 +744,7 @@ public class ProductServiceImpl implements IProductService {
         float minPrice = 0.0f, maxPrice = 0.0f;
 
         for (Map.Entry<Website, PtmCmpSku> kv : cmpSkuMap.entrySet()) {
-            Website website = kv.getKey();
+//            Website website = kv.getKey();
             PtmCmpSku cmpSku = kv.getValue();
 
             float price = cmpSku.getPrice();
@@ -839,23 +794,6 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public void importProduct2Solr(PtmProduct product) {
-        if (product == null) {
-            return;
-        }
-        // new import
-        importProduct2Solr2(product);
-
-//        ProductModel productModel = getProductModel(product);
-//
-//        if (productModel != null) {
-//            productIndexService.createOrUpdate(productModel);
-//        } else {
-//            productIndexService.remove(String.valueOf(product.getId()));
-//        }
-    }
-
-    @Override
     public void importProduct2Solr2(PtmProduct product) {
         if (product == null) {
             return;
@@ -895,62 +833,12 @@ public class ProductServiceImpl implements IProductService {
                 continue;
             } else {
                 for (PtmProduct product : products) {
-                    importProduct2Solr(product);
+                    importProduct2Solr2(product);
                 }
             }
 
             pageNum++;
         }
-    }
-
-    private void updateProductIndex2Solr() {
-        long id = 1L;
-
-        final String Q_MAX_PROID = "SELECT MAX(t.id) FROM PtmProduct t";
-        final long maxId = dbm.querySingle(Q_MAX_PROID);
-
-        while (id <= maxId) {
-            PtmProduct product = getProduct(id);
-
-            if (id++ % 500 == 0) {
-                System.out.println("addOrUpdateSolr2, id = " + id);
-            }
-
-            if (product == null || product.getPrice() <= 0) {
-                productIndexService.remove(String.valueOf(id));
-                continue;
-            }
-
-            List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(id);
-            int validCount = 0;
-            for (PtmCmpSku cmpSku : cmpSkus) {
-                if (cmpSku.getStatus() == SkuStatus.OFFSALE || cmpSku.getPrice() <= 0) {
-                    continue;
-                }
-                validCount++;
-            }
-
-            if (validCount <= 0) {
-                // remove from solr
-                productIndexService.remove(String.valueOf(id));
-            }
-
-        }
-    }
-
-    @Override
-    public void append2Solr() {
-        FilterQuery[] fqs = null;
-        Sort[] sorts = new Sort[]{
-                new Sort("id", Order.DESC)
-        };
-        PivotFacet[] pivotFacets = null;
-
-        SearchResult<Long> sr = productIndexService.search("*", fqs, sorts, pivotFacets, 1, 1);
-
-        long maxId = sr.getResult().get(0);
-
-        addOrUpdateSolr(Q_PRODUCT_BY_CMPID, Arrays.asList(maxId));
     }
 
     @Override

@@ -43,7 +43,7 @@ public class FixPtmProductCategoryUpdateWorker implements Runnable {
             dbm.update(updater);
 
             PtmProduct product = productService.getProduct(skuQ.getProductId());
-            productService.importProduct2Solr(product);
+            productService.importProduct2Solr2(product);
 
             System.out.println("update success for [" + skuQ.getProductId() + "] ,categoryid [" + skuQ.getCategoryId() + "]");
         }

@@ -24,8 +24,12 @@
         <module>hasoffer.job.worker</module>
         <module>hasoffer.fetch.api</module>
         <module>hasoffer.fetch.provider</module>
-        <module>hasoffer.fetch.consumer</module>
         <module>hasoffer.analysis.api</module>
+        <module>hasoffer.spider.provider</module>
+        <module>hasoffer.spider.task</module>
+        <module>hasoffer.spider.result</module>
+        <module>hasoffer.offlinejob</module>
+        <module>hasoffer.datafixes</module>
     </modules>
 
     <properties>
@@ -105,6 +109,12 @@
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>${logback.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
@@ -197,6 +207,17 @@
                 <version>0.1</version>
             </dependency>
 
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>15.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <dependencies>

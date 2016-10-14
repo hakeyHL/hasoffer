@@ -36,6 +36,20 @@
             </div>
 
             <div class="col-lg-2">
+                <select id="sort" name="sort" class="form-control">
+                    <option value="RELEVANCE"
+                            <c:if test="${page.pageParams.sort=='RELEVANCE'}">selected</c:if> >默认排序
+                    </option>
+                    <option value="PRICEL2H" <c:if test="${page.pageParams.sort=='PRICEL2H'}">selected</c:if>>价格从低到高
+                    </option>
+                    <option value="PRICEH2L" <c:if test="${page.pageParams.sort=='PRICEH2L'}">selected</c:if>>价格从高到低
+                    </option>
+                    <option value="POPULARITY" <c:if test="${page.pageParams.sort=='POPULARITY'}">selected</c:if>>热度
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-lg-2">
                 <button type="submit" class="btn btn-primary">查询</button>
             </div>
         </form>
@@ -48,13 +62,15 @@
                     <td>ID</td>
                     <td>图片</td>
                     <td>标题</td>
+                    <td>最低价</td>
+                    <td>品牌</td>
                     <td>Tag</td>
                     <%----%>
                     <%--<td>价格(Rs.)</td>--%>
                     <%--<td>评论数</td>--%>
 
                     <td>来源</td>
-                    <td>创建时间</td>
+                    <%--<td>创建时间</td>--%>
                     <%--<td>颜色</td>--%>
                     <%--<td>大小</td>--%>
                     <%--<td></td>--%>
@@ -77,14 +93,19 @@
                                 </c:forEach>
                             </p>
                         </td>
+                        <td>${thd.minPrice}</td>
+                        <td>${thd.brand}
+                            <a name="modifyBtn${thd.id}" href="javascript:void(0);" style="display: none"
+                               onclick="pCtrl.modifyBrand('${thd.id}', '${thd.brand}')">编辑</a>
+                        </td>
                         <td>${thd.tag}
-                            <a id="modifyBtn${thd.id}" href="javascript:void(0);" style="display: none"
+                            <a name="modifyBtn${thd.id}" href="javascript:void(0);" style="display: none"
                                onclick="pCtrl.modifyTag('${thd.id}', '${thd.tag}')">编辑</a>
                         </td>
                             <%--<td>${product.price}</td>
                             <td>${product.rating}</td>--%>
                         <td>${thd.sourceSite}</td>
-                        <td>${thd.createTime}</td>
+                            <%--<td>${thd.createTime}</td>--%>
                             <%--<td>${product.color}</td>
                             <td>${product.size}</td>
                             <td></td>--%>
@@ -115,10 +136,22 @@
             }
         },
         onPro: function (id) {
-            $("#modifyBtn" + id).css("display", "block");
+//            $("#modifyBtn" + id).css("display", "block");
+            $("a[name='modifyBtn" + id + "']").css("display", "block");
         },
         outPro: function (id) {
-            $("#modifyBtn" + id).css("display", "none");
+//            $("#modifyBtn" + id).css("display", "none");
+            $("a[name='modifyBtn" + id + "']").css("display", "none");
+        },
+        modifyBrand: function (id, brand) {
+            console.log(id + "\t" + brand);
+            var newBrand = prompt('编辑品牌', brand);
+            if (newBrand != null && newBrand != brand) {
+                // 更新tag
+                http.doPost('/p/updateBrand', {id: id, brand: newBrand}, function (data) {
+                    console.log(data);
+                });
+            }
         }
     };
 </script>

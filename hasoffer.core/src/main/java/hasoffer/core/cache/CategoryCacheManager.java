@@ -1,11 +1,9 @@
 package hasoffer.core.cache;
 
 import com.alibaba.fastjson.JSON;
-import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
-import hasoffer.core.persistence.po.ptm.PtmCateTag;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.redis.ICacheService;
@@ -76,31 +74,5 @@ public class CategoryCacheManager {
             System.out.println(e.getMessage());
         }
         return categories;
-    }
-
-    public String getCategoryTag(long categoryId) {
-        String key = CACHE_KEY_PRE + "Tag_Map";
-
-        String cateTag = "";
-
-        boolean exists = cacheService.exists(key);
-        if (exists) {
-            cateTag = cacheService.mapGet(key, String.valueOf(categoryId));
-            if (StringUtils.isEmpty(cateTag)) {
-                cateTag = "";
-            }
-        } else {
-            List<PtmCateTag> cateTags = categoryService.listAllCategoryTags();
-            if (ArrayUtils.hasObjs(cateTags)) {
-                for (PtmCateTag ct : cateTags) {
-                    cacheService.mapPut(key, ct.getId() + "", ct.getTag());
-                    if (categoryId == ct.getId()) {
-                        cateTag = ct.getTag();
-                    }
-                }
-            }
-        }
-
-        return cateTag;
     }
 }

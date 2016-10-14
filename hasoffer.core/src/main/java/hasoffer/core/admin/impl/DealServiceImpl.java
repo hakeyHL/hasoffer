@@ -8,6 +8,7 @@ import hasoffer.core.persistence.dbm.HibernateDao;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
+import hasoffer.core.persistence.po.app.updater.AppDealUpdater;
 import hasoffer.core.product.solr.DealIndexServiceImpl;
 import hasoffer.core.product.solr.DealModel;
 import hasoffer.core.task.ListProcessTask;
@@ -55,8 +56,20 @@ public class DealServiceImpl implements IDealService {
     }
 
     @Override
-    public PageableResult<AppDeal> findDealList(int page, int size) {
-        return dbm.queryPage("select t from AppDeal t order by t.id desc", page, size);
+    public PageableResult<AppDeal> findDealList(int page, int size, int type, String orderByField) {
+
+        String querySql = "select t from AppDeal t WHERE t.appdealSource = 'AppDealSourceType' order by t." + orderByField + " desc";
+
+        if (type == 1) {
+            querySql = querySql.replace("AppDealSourceType", "MANUAL_INPUT");
+            return dbm.queryPage(querySql, page, size);
+        } else if (type == 2) {
+            querySql = querySql.replace("AppDealSourceType", "PRICE_OFF");
+            return dbm.queryPage(querySql, page, size);
+        } else {
+            querySql = querySql.replace("WHERE t.appdealSource = 'AppDealSourceType'", "");
+            return dbm.queryPage(querySql, page, size);
+        }
     }
 
     @Override
@@ -200,6 +213,18 @@ public class DealServiceImpl implements IDealService {
     @Override
     public AppBanner getBannerByDealId(Long dealId) {
         return (AppBanner) dbm.querySingle("SELECT t FROM AppBanner t WHERE t.sourceId = ?0 ", Arrays.asList(dealId.toString()));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateDealExpire(Long id) {
+
+        AppDeal deal = dbm.get(AppDeal.class, id);
+
+        AppDealUpdater updater = new AppDealUpdater(id);
+        updater.getPo().setExpireTime(deal.getCreateTime());
+
+        dbm.update(updater);
     }
 
     @Override

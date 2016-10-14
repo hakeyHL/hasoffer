@@ -1,5 +1,6 @@
 package hasoffer.job.bean.deal;
 
+import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
@@ -9,10 +10,12 @@ import hasoffer.core.persistence.mongo.PriceNode;
 import hasoffer.core.persistence.mongo.PtmCmpSkuHistoryPrice;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.data.redis.IRedisListService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -65,7 +68,6 @@ public class CheckGetPriceOffDealWorker implements Runnable {
 
             try {
 
-
                 Object pop = redisListService.pop(PRICE_DROP_SKUID_QUEUE);
 
                 if (pop == null) {
@@ -79,9 +81,26 @@ public class CheckGetPriceOffDealWorker implements Runnable {
                 }
 
                 long skuid = Long.parseLong((String) pop);
+                System.out.println("CheckGetPriceOffDealJobBean pop get " + skuid);
 
                 PtmCmpSku sku = dbm.get(PtmCmpSku.class, skuid);
                 if (sku == null) {
+                    System.out.println("CheckGetPriceOffDealJobBean pop get " + skuid + " is null");
+                    continue;
+                }
+
+                //主商品被访问超过50次创建deal
+                long productId = sku.getProductId();
+
+                System.out.println("CheckGetPriceOffDealJobBean pop get product id is " + productId);
+                String yesterdayYmd = TimeUtils.parse(TimeUtils.addDay(TimeUtils.nowDate(), -1), "yyyyMMdd");
+                System.out.println("CheckGetPriceOffDealJobBean pop get yesterday is " + yesterdayYmd);
+
+                SrmProductSearchCount productSearchCount = dbm.querySingle("SELECT t FROM SrmProductSearchCount t WHERE t.productId = ?0 AND t.ymd = ?1", Arrays.asList(productId, yesterdayYmd));
+                System.out.println("CheckGetPriceOffDealJobBean pop get SrmProductSearchCount is " + productSearchCount.getId());
+                System.out.println("CheckGetPriceOffDealJobBean pop get SrmProductSearchCount count is " + productSearchCount.getCount());
+
+                if (productSearchCount.getCount() < 50) {
                     continue;
                 }
 
@@ -104,7 +123,10 @@ public class CheckGetPriceOffDealWorker implements Runnable {
                 PtmCmpSkuHistoryPrice historyPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, skuid);
 
                 float minPrice = getMinPrice(historyPrice);
-                if (newPrice < 1.1 * minPrice) {//符合条件，创建deal
+                System.out.println("minPrice " + minPrice);
+                System.out.println("newPrice " + newPrice);
+
+                if (newPrice < minPrice * 1.1) {//符合条件，创建deal
 
                     AppDeal appdeal = new AppDeal();
 
@@ -114,7 +136,7 @@ public class CheckGetPriceOffDealWorker implements Runnable {
                     appdeal.setWebsite(sku.getWebsite());
                     appdeal.setAppdealSource(AppdealSource.PRICE_OFF);
                     appdeal.setCreateTime(TimeUtils.nowDate());
-                    appdeal.setDisplay(false);
+                    appdeal.setDisplay(true);
                     //question 这种deal只有涨价才失效，加他个365天
                     appdeal.setExpireTime(TimeUtils.addDay(TimeUtils.nowDate(), 365));
                     appdeal.setLinkUrl(sku.getUrl());
@@ -137,12 +159,29 @@ public class CheckGetPriceOffDealWorker implements Runnable {
                     appdeal.setDescription(description);
                     appdeal.setPriceDescription("Rs." + (int) newPrice);
                     appdeal.setOriginPrice(oriPrice);
-                    appdeal.setDiscount((int) (1 - newPrice / oriPrice) * 100);
+                    appdeal.setDiscount((int) ((1 - newPrice / oriPrice) * 100));
 
-                    if (appdeal != null) {
-                        dealService.createAppDealByPriceOff(appdeal);
+                    //url重复不创建
+                    boolean flag = true;
+                    List<AppDeal> appdealList = dbm.query("SELECT t FROM AppDeal t WHERE t.linkUrl = ?0", Arrays.asList(sku.getUrl()));
+                    if (appdealList != null && appdealList.size() != 0) {
+                        System.out.println("query by url get " + appdealList.size() + " sku");
+                        flag = false;
                     }
 
+                    //当天title不能重名
+                    String title = sku.getTitle();
+                    Website website = sku.getWebsite();
+                    appdealList = dbm.query("SELECT t FROM AppDeal t WHERE t.title = ?0 AND t.website = ?1 ", Arrays.asList(title, website));
+                    if (appdealList != null && appdealList.size() != 0) {
+                        System.out.println("query by title website get " + appdealList.size() + " sku");
+                        flag = false;
+                    }
+
+                    System.out.println("flag " + flag);
+                    if (flag) {
+                        dealService.createAppDealByPriceOff(appdeal);
+                    }
                 }
 
             } catch (Exception e) {

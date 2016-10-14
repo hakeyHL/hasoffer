@@ -23,11 +23,10 @@ import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
+import hasoffer.core.persistence.po.sys.SysAdmin;
 import hasoffer.core.product.*;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
-import hasoffer.core.product.solr.ProductIndexServiceImpl;
-import hasoffer.core.product.solr.ProductModel;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.task.ListProcessTask;
@@ -40,6 +39,8 @@ import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import hasoffer.fetch.sites.paytm.PaytmHelper;
 import hasoffer.fetch.sites.shopclues.ShopcluesHelper;
+import hasoffer.webcommon.context.Context;
+import hasoffer.webcommon.context.StaticContext;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -48,6 +49,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -64,11 +66,7 @@ import java.util.concurrent.*;
 @RequestMapping(value = "/fixdata")
 public class FixController {
 
-    private static final String Q_SHOPCLUES_OFFSALE = "SELECT t FROM PtmCmpSku t WHERE t.website = 'SHOPCLUES' AND t.status = 'OFFSALE' ORDER BY t.id";
-    private static final String Q_SHOPCLUES_STOCKOUT = "SELECT t FROM PtmCmpSku t WHERE t.website = 'SHOPCLUES' AND t.status = 'OUTSTOCK' ORDER BY t.id";
-
-    private static final String Q_PTMCATEGORY_BYPARENTID = "SELECT t FROM PtmCategory t WHERE t.parentId = ?0 ";
-    private static final String Q_PTMCMPSKU_BYCATEGORYID = "SELECT t FROM PtmCmpSku t WHERE t.categoryId = ?0 ";
+    private static final String Q_SKU_PRODUCTID = "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ORDER BY t.id";
 
     private static final String Q_PTMCMPSKU = "SELECT t FROM PtmCmpSku t WHERE t.productId < 100000";
     private static final String Q_INDEX = "SELECT t FROM PtmCmpSkuIndex2 t ORDER BY t.id ASC";
@@ -97,8 +95,6 @@ public class FixController {
     CmpskuIndexServiceImpl cmpskuIndexService;
     @Resource
     ICategoryService categoryservice;
-    @Resource
-    ProductIndexServiceImpl productIndexServiceImpl;
     @Resource
     ICacheService cacheServiceImpl;
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
@@ -149,7 +145,7 @@ public class FixController {
         for (Long proId : proIdSet) {
             PtmProduct pro = dbm.get(PtmProduct.class, proId);
             if (pro != null) {
-                productService.importProduct2Solr(pro);
+                productService.importProduct2Solr2(pro);
             } else {
                 productService.deleteProduct(proId);
             }
@@ -363,13 +359,23 @@ public class FixController {
 
     //fixdata/deleteproductanyway/
     @RequestMapping(value = "/deleteproductanyway/{proId}", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String deleteproduct2(@PathVariable Long proId) {
+    public ModelAndView
+    deleteproduct2(@PathVariable Long proId) {
+        ModelAndView mav = new ModelAndView();
+
+        SysAdmin admin = (SysAdmin) Context.currentContext().get(StaticContext.USER);
+
+        if (admin == null || !admin.getUname().equals("chevy")) {
+            mav.addObject("result", "error!");
+            return mav;
+        }
+
         if (proId > 0) {
             productService.deleteProduct(proId);
         }
-        return "ok";
+
+        mav.addObject("result", "ok");
+        return mav;
     }
 
     @RequestMapping(value = "/cleansearchlogs", method = RequestMethod.GET)
@@ -431,7 +437,7 @@ public class FixController {
             PtmProduct product = productService.getProduct(id);
 
             if (product != null) {
-                productService.importProduct2Solr(product);
+                productService.importProduct2Solr2(product);
             }
         }
         return "ok";
@@ -527,7 +533,110 @@ public class FixController {
         for (int i = 1; i < size; i++) {
             searchService.mergeProducts(finalProduct, cmpSkuMap, products.get(i));
         }
+    }
 
+    //fixdata/fixProductSkusRepeatUrl
+    @RequestMapping(value = "/fixProductSkusRepeatUrl/{productId}", method = RequestMethod.GET)
+    @ResponseBody
+    public String fixProductSkusRepeatUrl(@PathVariable long productId) {
+
+        System.out.println("productid = " + productId);
+        cleanProductSkusByUrl(productId);
+
+        return "ok";
+    }
+
+    private void cleanProductSkusByUrl(long productId) {
+
+        Set<String> urlSet = new HashSet<>();
+
+        List<PtmCmpSku> skuList = dbm.query(Q_SKU_PRODUCTID, Arrays.asList(productId));
+        if (skuList == null) {
+            System.out.println("skuList is null");
+        } else {
+            System.out.println("get skuList size =  " + skuList.size());
+        }
+
+        boolean flag = false;
+
+        for (int i = 0; i < skuList.size(); i++) {
+
+            PtmCmpSku ptmCmpSku = skuList.get(i);
+
+            String url = ptmCmpSku.getUrl();
+            System.out.println("sku [" + i + "] url is " + url);
+            if (urlSet.contains(url)) {
+                System.out.println("sku [" + i + "] url is already saved remove");
+                cmpSkuService.deleteCmpSku(ptmCmpSku.getId());
+                System.out.println("remove succes");
+                flag = true;
+            } else {
+                urlSet.add(url);
+                System.out.println("sku [" + i + "] url not in set add success");
+            }
+        }
+
+        if (flag) {
+            System.out.println("reimport product " + productId + " to solr start");
+            productService.importProduct2Solr2(productId);
+            System.out.println("reimport product " + productId + " to solr end");
+        }
+
+    }
+
+    /**
+     * 修复sorceSite为空的商品的图片
+     *
+     * @return
+     */
+    //fixdata/fixSourceUrlNullProductImage
+    @RequestMapping(value = "/fixSourceUrlNullProductImage", method = RequestMethod.GET)
+    @ResponseBody
+    public String fixSourceUrlNullProductImage() {
+
+        List<PtmProduct> productList = dbm.query("SELECT t FROM PtmProduct t WHERE t.sourceSite = ''");
+
+        for (PtmProduct product : productList) {
+
+            System.out.println("fix product " + product.getId());
+
+            List<PtmImage> productImageList = dbm.query("SELECT t FROM PtmImage t WHERE t.productId = ?0 ", Arrays.asList(product.getId()));
+
+            if (productImageList != null && productImageList.size() != 0) {
+                System.out.println("product " + product.getId() + " already fix " + productImageList.size());
+                continue;
+            }
+
+            List<PtmCmpSku> skuList = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ORDER BY t.id", Arrays.asList(product.getId()));
+            if (skuList == null || skuList.size() == 0) {
+                System.out.println("reday to fix " + product.getId() + " has " + skuList.size() + " sku contiue");
+                continue;
+            }
+
+            System.out.println("reday to fix " + product.getId() + " has " + skuList.size() + " sku");
+            for (PtmCmpSku sku : skuList) {
+
+                Website website = sku.getWebsite();
+                String url = sku.getUrl();
+                System.out.println("website = " + website.name());
+                String imageUrl = "";
+                try {
+                    imageUrl = fetchService.fetchWebsiteImageUrl(website, url);
+
+                    if (StringUtils.isEmpty(imageUrl)) {
+                        continue;
+                    }
+
+                    productService.updateProductImage2(product.getId(), imageUrl);
+                    System.out.println("update success for " + product.getId());
+                    break;
+                } catch (Exception e) {
+                    System.out.println("update fail for " + product.getId() + " use " + sku.getId());
+                    continue;
+                }
+            }
+        }
+        return "ok";
     }
 
     @RequestMapping(value = "/fiximages/{site}", method = RequestMethod.GET)
@@ -967,46 +1076,6 @@ public class FixController {
         }
 
         return "ok";
-    }
-
-    //fixdata/testcategoryresult
-    @RequestMapping("/testcategoryresult")
-    @ResponseBody
-    public String testcategoryresult() {
-
-        List<PtmCategory> secondCategoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.level = 2 ");
-
-        for (PtmCategory category : secondCategoryList) {
-
-            List<Object> thirdCategoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.parentId = ?0 ", Arrays.asList(category.getId()));
-
-            if (thirdCategoryList == null || thirdCategoryList.size() == 0) {
-                PageableResult<ProductModel> pageableResult = productIndexServiceImpl.searchPro(category.getId(), 2, 1, 20);
-                if (pageableResult.getNumFund() != 0) {
-                    continue;
-                } else {
-                    System.out.println(category.getId());
-                }
-            } else {
-                continue;
-            }
-
-        }
-
-        List<PtmCategory> thirdCategoryList = dbm.query("SELECT t FROM PtmCategory t WHERE t.level = 3 ");
-
-        for (PtmCategory category : thirdCategoryList) {
-
-            PageableResult<ProductModel> pageableResult = productIndexServiceImpl.searchPro(category.getId(), 3, 1, 20);
-            if (pageableResult.getNumFund() != 0) {
-                continue;
-            } else {
-                System.out.println(category.getId());
-            }
-
-        }
-
-        return "";
     }
 
     //fixdata/fixproductprice

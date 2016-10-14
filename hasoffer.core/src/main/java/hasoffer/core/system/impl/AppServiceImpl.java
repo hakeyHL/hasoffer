@@ -8,28 +8,22 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
-import hasoffer.core.persistence.po.app.AppBanner;
-import hasoffer.core.persistence.po.app.AppDeal;
-import hasoffer.core.persistence.po.app.AppVersion;
-import hasoffer.core.persistence.po.app.AppWebsite;
+import hasoffer.core.persistence.po.app.*;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
-import hasoffer.core.persistence.po.urm.UrmUser;
-import hasoffer.core.persistence.po.urm.UrmUserDevice;
+import hasoffer.core.persistence.po.urm.*;
 import hasoffer.core.system.IAppService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created on 2015/12/30.
  */
 @Service
+@Transactional
 public class AppServiceImpl implements IAppService {
 
     private static final String Q_APP_VERSION =
@@ -65,6 +59,20 @@ public class AppServiceImpl implements IAppService {
             "SELECT t FROM UrmUser t " +
                     " where t.thirdId=?0";
 
+    private static final String Q_APP_GETUSER_BY_ID =
+            "SELECT t FROM UrmUser t " +
+                    " where t.id=?0";
+
+    private static final String Q_APP_USER_GET_BY_NAME =
+            "SELECT t FROM UrmUser t " +
+                    " where t.userName=?0";
+
+    private static final String Q_APP_URM_SIGNCOIN_BY_USERID =
+            "SELECT t FROM UrmSignCoin t where t.userId=?0 ";
+
+    private static final String Q_APP_URM_GET_SIGNCONFIG =
+            "SELECT t FROM UrmSignAwdCfg t order by t.count desc  ";
+
     private static final String Q_APP_URMDEVICE_GETIDSBYDEVICEID =
             "SELECT t.id FROM UrmDevice t " +
                     " where t.deviceId=?0";
@@ -99,8 +107,13 @@ public class AppServiceImpl implements IAppService {
 
     private static final String Q_APP_CATEGORY_BYID =
             "SELECT t FROM PtmCategory t where t.id=?0 ";
+
+    private static final String Q_APP_GIFT_LIST =
+            "SELECT t FROM HasofferCoinsExchangeGift t order by t.coinPrice asc ";
+
     @Resource
     IDataBaseManager dbm;
+
     private String Q_APP_GETPRODUCTS =
             "SELECT t FROM PtmProduct t " +
                     " where 1=1 and ";
@@ -150,6 +163,7 @@ public class AppServiceImpl implements IAppService {
     @Override
     public PageableResult getDeals(Long page, Long pageSize) {
         return dbm.queryPage(Q_APP_GETDEALS, page.intValue() <= 1 ? 1 : page.intValue(), pageSize.intValue(), Arrays.asList(TimeUtils.getDayStart()));
+//        return dbm.queryPage(Q_APP_GETDEALS, page.intValue() <= 1 ? 1 : page.intValue(), pageSize.intValue(), Arrays.asList(new Date()));
     }
 
     @Override
@@ -163,20 +177,32 @@ public class AppServiceImpl implements IAppService {
     }
 
     @Override
-    public AppDeal getDealDetail(String id) {
-        List li = new ArrayList();
-        li.add(Long.valueOf(id));
-        return dbm.querySingle(Q_APP_GEDEALDETAIL, li);
+    public AppDeal getDealDetail(long id) {
+        return dbm.querySingle(Q_APP_GEDEALDETAIL, Arrays.asList(id));
     }
 
     @Override
-    public UrmUser getUserById(String thirdId) {
+    public UrmUser getUserByThirdId(String thirdId) {
         List li = Arrays.asList(thirdId);
         List<UrmUser> urmUsers = dbm.query(Q_APP_GETUSERBYTHIRDID, li);
         if (urmUsers != null && urmUsers.size() > 0) {
             return urmUsers.get(0);
         }
         return null;
+    }
+
+    @Override
+    public UrmUser getUserById(Long id) {
+        List<UrmUser> urmUsers = dbm.query(Q_APP_GETUSER_BY_ID, Collections.singletonList(id));
+        if (urmUsers != null && urmUsers.size() > 0) {
+            return urmUsers.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public List<UrmUser> getIdDescUserListByThirdId(String thirdId) {
+        return dbm.query("SELECT t FROM UrmUser t WHERE t.thirdId = ?0 ORDER BY t.id DESC", Arrays.asList(thirdId));
     }
 
     @Override
@@ -212,7 +238,7 @@ public class AppServiceImpl implements IAppService {
 
     @Override
     public List<String> getUserDevicesByUserId(String userId) {
-        return dbm.query(Q_APP_URMUSERDEVICE_GETIDSBYUSERID, 1, 5, Arrays.asList(userId));
+        return dbm.query(Q_APP_URMUSERDEVICE_GETIDSBYUSERID, Arrays.asList(userId));
     }
 
     @Override
@@ -236,9 +262,10 @@ public class AppServiceImpl implements IAppService {
 
     @Override
     public void updateUserInfo(UrmUser uUser) {
-        List li = new ArrayList();
-        li.add(uUser);
-        dbm.update(li);
+        //List li = new ArrayList();
+        //li.add(uUser);
+        //dbm.update(li);
+        dbm.update(uUser);
     }
 
     @Override
@@ -271,11 +298,82 @@ public class AppServiceImpl implements IAppService {
         dbm.update(deals);
     }
 
+    @Override
+    public List<UrmUser> getUsersByUserName(String userName) {
+        return dbm.query(Q_APP_USER_GET_BY_NAME, Arrays.asList(userName));
+    }
+
+    @Override
+    public Map<Integer, Integer> getSignAwardNum() {
+        List<UrmSignAwdCfg> signAwardNum = dbm.query(Q_APP_URM_GET_SIGNCONFIG);
+        Map<Integer, Integer> afwCfgMap = new HashMap<>();
+        if (signAwardNum != null) {
+            for (UrmSignAwdCfg urmSignAwdCfg : signAwardNum) {
+                afwCfgMap.put(urmSignAwdCfg.getCount(), urmSignAwdCfg.getAwardCoin());
+            }
+        }
+
+        //for (int i = 1; i < 8; i++) {
+        //    if (afwCfgMap.get(i) == null) {
+        //        afwCfgMap.put(i, 5 + 5 * i);
+        //    }
+        //}
+        return afwCfgMap;
+    }
+
+    @Override
+    public List<HasofferCoinsExchangeGift> getGiftList() {
+        return dbm.query(Q_APP_GIFT_LIST);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void bakUserInfo(UrmUser urmUser) {
+
+        UrmUserBak userBak = new UrmUserBak();
+
+        userBak.setId(urmUser.getId());
+        userBak.setAvatarPath(urmUser.getAvatarPath());
+        //userBak.setConSignNum(urmUser.getConSignNum());
+        userBak.setCreateTime(urmUser.getCreateTime());
+        userBak.setGcmToken(urmUser.getGcmToken());
+        //userBak.setLastSignTime(urmUser.getLastSignTime());
+        //userBak.setMaxConSignNum(urmUser.getMaxConSignNum());
+        //userBak.setSignCoin(urmUser.getSignCoin());
+        userBak.setTelephone(urmUser.getTelephone());
+        userBak.setThirdId(urmUser.getThirdId());
+        userBak.setThirdPlatform(urmUser.getThirdPlatform());
+        userBak.setThirdToken(urmUser.getThirdToken());
+        userBak.setUserName(urmUser.getUserName());
+        userBak.setUserToken(urmUser.getUserToken());
+
+        dbm.create(userBak);
+        dbm.delete(UrmUser.class, urmUser.getId());
+    }
+
     public PtmCategory getCategoryInfo(Long cateId) {
         List<PtmCategory> query = dbm.query(Q_APP_CATEGORY_BYID, Arrays.asList(cateId));
         if (query != null && query.size() > 0) {
             return query.get(0);
         }
         return null;
+    }
+
+    @Override
+    public UrmSignCoin getSignCoinByUserId(Long id) {
+        List<UrmSignCoin> signCoins = dbm.query(Q_APP_URM_SIGNCOIN_BY_USERID, Collections.singletonList(id));
+        if (signCoins != null && signCoins.size() > 0) {
+            return signCoins.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public void updateUrmSignCoin(UrmSignCoin urmSignCoin) {
+        if (urmSignCoin.getLastSignTime() != null) {
+            urmSignCoin.setSignZhTime(new Date(urmSignCoin.getLastSignTime()));
+            urmSignCoin.setSignIndTime(new Date(urmSignCoin.getLastSignTime() - TimeUtils.MILLISECONDS_OF_1_MINUTE * 150));
+        }
+        dbm.saveOrUpdate(urmSignCoin);
     }
 }

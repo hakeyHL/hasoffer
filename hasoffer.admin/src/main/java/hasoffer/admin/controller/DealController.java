@@ -1,13 +1,17 @@
 package hasoffer.admin.controller;
 
+import hasoffer.admin.controller.vo.AppdealVo;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.IDUtil;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.admin.impl.DealServiceImpl;
+import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.enums.BannerFrom;
 import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
+import hasoffer.core.product.solr.DealModel;
 import hasoffer.core.utils.DateEditor;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.webcommon.helper.PageHelper;
@@ -24,9 +28,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by lihongde on 2016/6/21 12:47
@@ -40,6 +42,8 @@ public class DealController {
     IDealService dealService;
     @Resource
     DealServiceImpl dealServiceImple;
+    @Resource
+    IDataBaseManager dbm;
     private Logger logger = LoggerFactory.getLogger(DealController.class);
 
     @InitBinder
@@ -48,14 +52,37 @@ public class DealController {
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ModelAndView listDealData(HttpServletRequest request, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "50") int size) {
+    public ModelAndView listDealData(HttpServletRequest request, @RequestParam(defaultValue = "createTime") String orderByField, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "50") int size, @RequestParam(defaultValue = "0") int type) {
         ModelAndView mav = new ModelAndView("deal/list");
-        PageableResult<AppDeal> pageableResult = dealService.findDealList(page, size);
+        PageableResult<AppDeal> pageableResult = dealService.findDealList(page, size, type, orderByField);
+        List<AppdealVo> appdealVoList = new ArrayList<>();
         for (AppDeal appDeal : pageableResult.getData()) {
-            appDeal.setListPageImage(ImageUtil.getImageUrl(appDeal.getListPageImage()));
+            AppdealVo appdealVo = new AppdealVo();
+
+            appdealVo.setId(appDeal.getId());
+            appdealVo.setWebsite(appDeal.getWebsite());
+            appdealVo.setCreateTime(appDeal.getCreateTime());
+            appdealVo.setListPageImage(ImageUtil.getImageUrl(appDeal.getListPageImage()));
+            appdealVo.setPush(appDeal.isPush());
+            appdealVo.setDisplay(appDeal.isDisplay());
+            appdealVo.setTitle(appDeal.getTitle());
+            appdealVo.setPriceDescription(appDeal.getPriceDescription());
+            appdealVo.setExpireTime(appDeal.getExpireTime());
+            appdealVo.setDealClickCount(appDeal.getDealClickCount());
+            appdealVo.setLinkUrl(appDeal.getLinkUrl());
+            appdealVo.setDiscount(appDeal.getDiscount());
+            appdealVo.setAppdealSource(appDeal.getAppdealSource());
+            appdealVo.setOriginPrice(appDeal.getOriginPrice());
+            if (TimeUtils.nowDate().getTime() > appDeal.getExpireTime().getTime()) {
+                appdealVo.setExpireStatus(0);//已经失效
+            } else {
+                appdealVo.setExpireStatus(1);//有效
+            }
+            appdealVoList.add(appdealVo);
         }
         mav.addObject("page", PageHelper.getPageModel(request, pageableResult));
-        mav.addObject("datas", pageableResult.getData());
+        mav.addObject("datas", appdealVoList);
+        mav.addObject("type", type);
         return mav;
     }
 
@@ -106,6 +133,7 @@ public class DealController {
 
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
     public ModelAndView edit(AppDeal deal, MultipartFile dealFile, MultipartFile bannerFile, String bannerImageUrl) throws IOException {
+
         String dealPath = "";
         String dealSmallPath = "";
         String dealBigPath = "";
@@ -179,7 +207,9 @@ public class DealController {
             deal.setListPageImage(dealSmallPath);
         }
         dealService.updateDeal(deal);
-        dealServiceImple.reimportAllDeals2Solr();
+        DealModel dm = new DealModel(deal);
+        dealServiceImple.importDeal2Solr(dm);
+//        dealServiceImple.reimportAllDeals2Solr();
         return new ModelAndView("redirect:/deal/list");
     }
 

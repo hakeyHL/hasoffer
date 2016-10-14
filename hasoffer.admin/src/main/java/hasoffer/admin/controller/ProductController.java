@@ -4,6 +4,7 @@ import hasoffer.admin.common.chart.ChartHelper;
 import hasoffer.admin.controller.vo.CategoryVo;
 import hasoffer.admin.controller.vo.CmpSkuVo;
 import hasoffer.admin.controller.vo.ProductVo;
+import hasoffer.base.enums.SearchResultSort;
 import hasoffer.base.model.PageModel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
@@ -11,6 +12,7 @@ import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
@@ -22,7 +24,8 @@ import hasoffer.core.product.IFetchService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.exception.ProductNotFoundException;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
-import hasoffer.core.product.solr.ProductIndexServiceImpl;
+import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
+import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.search.ISearchService;
 import hasoffer.fetch.model.OriFetchedProduct;
@@ -54,7 +57,7 @@ public class ProductController {
     @Resource
     IProductService productService;
     @Resource
-    ProductIndexServiceImpl productIndexService;
+    ProductIndex2ServiceImpl productIndex2Service;
     @Resource
     CmpskuIndexServiceImpl cmpskuIndexService;
     @Resource
@@ -286,25 +289,72 @@ public class ProductController {
                                      @RequestParam(defaultValue = "0") int category1,
                                      @RequestParam(defaultValue = "0") int category2,
                                      @RequestParam(defaultValue = "0") int category3,
+                                     @RequestParam(defaultValue = "RELEVANCE") SearchResultSort sort,
                                      @RequestParam(defaultValue = "1") int page,
                                      @RequestParam(defaultValue = "20") int size) {
 
         ModelAndView mav = new ModelAndView("product/list");
 
-        PageableResult pagedResults = null;
+        PageableResult<ProductModel2> pagedResults = null;
         List<PtmProduct> products = null;
         PageModel pageModel = null;
 
-        pagedResults = productIndexService.searchPro(category1, category2, category3, title, page, size);
+        SearchCriteria sc = new SearchCriteria();
+        if (category3 > 0) {
+            sc.setCategoryId(String.valueOf(category3));
+            sc.setLevel(3);
+        } else if (category2 > 0) {
+            sc.setCategoryId(String.valueOf(category2));
+            sc.setLevel(2);
+        } else if (category1 > 0) {
+            sc.setCategoryId(String.valueOf(category1));
+            sc.setLevel(1);
+        }
+        sc.setKeyword(title);
+        sc.setPageSize(size);
+        sc.setPage(page);
+        sc.setSort(sort);
 
-        products = productService.getProducts(pagedResults.getData());
+        pagedResults = productIndex2Service.searchProducts(sc);
+
+//        products = productService.getProducts(pagedResults.getData());
 
         pageModel = PageHelper.getPageModel(request, pagedResults);
 
-        mav.addObject("products", getProductVos(products));
+        mav.addObject("products", getProductVos2(pagedResults.getData()));
         mav.addObject("page", pageModel);
 
         return mav;
+    }
+
+    private List<ProductVo> getProductVos2(List<ProductModel2> products) {
+        List<ProductVo> productVos = new ArrayList<ProductVo>();
+        if (ArrayUtils.isNullOrEmpty(products)) {
+            return productVos;
+        }
+
+        for (ProductModel2 product : products) {
+            productVos.add(getProductVo2(product));
+        }
+        return productVos;
+    }
+
+    private ProductVo getProductVo2(ProductModel2 p) {
+        ProductVo vo = new ProductVo();
+
+        vo.setId(p.getId());
+
+        vo.setTitle(p.getTitle());
+        vo.setTag(p.getTag());
+
+        vo.setPrice(p.getMinPrice());
+        vo.setMinPrice(p.getMinPrice());
+
+        vo.setBrand(p.getBrand());
+
+        vo.setMasterImageUrl(productService.getProductMasterImageUrl(p.getId()));
+
+        return vo;
     }
 
     @RequestMapping(value = "/updateTag", method = RequestMethod.POST)
@@ -315,6 +365,20 @@ public class ProductController {
         String tag = request.getParameter("tag");
 
         productService.updateProductTag(proId, tag);
+
+        mav.addObject("result", "ok");
+
+        return mav;
+    }
+
+    @RequestMapping(value = "/updateBrand", method = RequestMethod.POST)
+    public ModelAndView updateBrand(HttpServletRequest request) {
+        ModelAndView mav = new ModelAndView("product/list");
+
+        String proId = request.getParameter("id");
+        String brand = request.getParameter("brand");
+
+        productService.updateProductBrand(Long.valueOf(proId), brand);
 
         mav.addObject("result", "ok");
 

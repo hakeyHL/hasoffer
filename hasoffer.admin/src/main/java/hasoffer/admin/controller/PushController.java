@@ -3,20 +3,27 @@ package hasoffer.admin.controller;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.admin.controller.vo.PushVo;
 import hasoffer.base.enums.MarketChannel;
+import hasoffer.base.model.PageModel;
+import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.JSONUtil;
+import hasoffer.base.utils.StringUtils;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.push.*;
+import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.enums.PushSourceType;
+import hasoffer.core.persistence.po.app.AppDeal;
+import hasoffer.core.persistence.po.app.AppPush;
 import hasoffer.core.push.IPushService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import hasoffer.data.redis.IRedisListService;
+import hasoffer.webcommon.helper.PageHelper;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 /**
  * Created on 2016/6/21 12:47
@@ -25,6 +32,8 @@ import java.util.Map;
 @Controller
 @RequestMapping(value = "/push")
 public class PushController {
+
+    private static final String ADMIN_PUSH_QUEUE = "ADMIN_PUSH_QUEUE";
     static Map<Website, String> packageMap = new HashMap<Website, String>();
 
     static {
@@ -42,7 +51,129 @@ public class PushController {
 
     @Resource
     IPushService pushService;
-    private Logger logger = LoggerFactory.getLogger(PushController.class);
+    @Resource
+    IDataBaseManager dbm;
+    @Resource
+    IRedisListService redisListService;
+
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public ModelAndView list(HttpServletRequest request,
+                             @RequestParam(defaultValue = "") String startTime,
+                             @RequestParam(defaultValue = "") String endTime,
+                             @RequestParam(defaultValue = "DEAL") String pushSourceTypeString,
+                             @RequestParam(defaultValue = "1") int curPage,
+                             @RequestParam(defaultValue = "20") int pageSize) {
+
+        ModelAndView modelAndView = new ModelAndView("push/list");
+
+        final String YMD_WEB_PATTERN = "yyyy-MM-dd";
+
+        Date startDate = null;
+        Date endDate = null;
+        if (StringUtils.isEmpty(startTime)) {
+            startDate = new Date(TimeUtils.today());
+            endDate = new Date();
+            startTime = TimeUtils.parse(startDate, YMD_WEB_PATTERN);
+            endTime = startTime;
+        } else {
+            startDate = TimeUtils.stringToDate(startTime, YMD_WEB_PATTERN);
+            endDate = TimeUtils.addDay(TimeUtils.stringToDate(endTime, YMD_WEB_PATTERN), 1);
+        }
+
+        PushSourceType pushSourceType = PushSourceType.valueOf(pushSourceTypeString);
+
+        PageableResult pagedAppPush = pushService.getPagedAppPush(pushSourceType, startDate, endDate, curPage, pageSize);
+
+        List<AppPush> appPushList = pagedAppPush.getData();
+
+        PageModel pageModel = PageHelper.getPageModel(request, pagedAppPush);
+
+        modelAndView.addObject("appPushList", appPushList);
+        modelAndView.addObject("page", pageModel);
+        modelAndView.addObject("startTime", startTime);
+        modelAndView.addObject("endTime", endTime);
+
+        return modelAndView;
+    }
+
+    @RequestMapping(value = "/pushInit/{pushSourceTypeString}/{sourceId}", method = RequestMethod.GET)
+    public ModelAndView pushInit(@PathVariable String pushSourceTypeString, @PathVariable String sourceId) {
+        ModelAndView mav = new ModelAndView("push/pushInit");
+
+        if (StringUtils.isEmpty(pushSourceTypeString)) {
+            pushSourceTypeString = "DEAL";
+        }
+
+        PushSourceType pushSourceType = PushSourceType.valueOf(pushSourceTypeString.toUpperCase());
+//        crowd
+        String pushSourceId = sourceId;
+        String pushTitle = "";
+        String pushContent = "";
+
+        if (PushSourceType.DEAL.equals(pushSourceType)) {
+
+            AppDeal appDeal = dbm.get(AppDeal.class, Long.valueOf(sourceId));
+
+            pushTitle = appDeal.getTitle();
+            pushContent = appDeal.getPriceDescription();
+
+        }
+
+        AppPush appPush = new AppPush();
+        appPush.setTitle(pushTitle);
+        appPush.setContent(pushContent);
+        appPush.setCreateTime(TimeUtils.nowDate());
+        appPush.setPushSourceType(PushSourceType.DEAL);
+        appPush.setSourceId(sourceId);
+
+        mav.addObject("pushSourceType", pushSourceType);
+        mav.addObject("pushSourceId", pushSourceId);
+        mav.addObject("pushTitle", pushTitle);
+        mav.addObject("pushContent", pushContent);
+
+        return mav;
+    }
+
+    @RequestMapping(value = "/create/{pushSourceTypeString}/{sourceId}", method = RequestMethod.POST)
+    @ResponseBody
+    public String create(HttpServletRequest request, @PathVariable String pushSourceTypeString, @PathVariable String sourceId) {
+        String pushContent = request.getParameter("pushContent");
+        if (StringUtils.isEmpty(pushSourceTypeString)) {
+            pushSourceTypeString = "DEAL";
+        }
+
+        PushSourceType pushSourceType = PushSourceType.valueOf(pushSourceTypeString.toUpperCase());
+//        crowd
+        String pushTitle = "";
+        if (pushContent == null) {
+            pushContent = "";
+        }
+
+        if (PushSourceType.DEAL.equals(pushSourceType)) {
+
+            AppDeal appDeal = dbm.get(AppDeal.class, Long.valueOf(sourceId));
+
+            pushTitle = appDeal.getTitle();
+            if (StringUtils.isEmpty(pushContent)) {
+                pushContent = appDeal.getPriceDescription();
+            }
+
+        }
+
+        AppPush appPush = new AppPush();
+        appPush.setTitle(pushTitle);
+        appPush.setContent(pushContent);
+        appPush.setCreateTime(TimeUtils.nowDate());
+        appPush.setPushSourceType(PushSourceType.DEAL);
+        appPush.setSourceId(sourceId);
+
+        //创建apppush对象
+        pushService.createAppPush(appPush);
+        //加入队列,由别的线程来完成push操作
+        redisListService.push(ADMIN_PUSH_QUEUE, JSONUtil.toJSON(appPush));
+
+        return "ok";
+    }
 
     @RequestMapping(value = "/pushIndex")
     public ModelAndView PushIndex() {

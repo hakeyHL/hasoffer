@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public interface IDealService {
 
-    PageableResult<AppDeal> findDealList(int page, int size);
+    PageableResult<AppDeal> findDealList(int page, int size, int type, String orderByType);
 
     /**
      * admin后台手动导入deal
@@ -30,6 +30,14 @@ public interface IDealService {
     AppDeal getDealById(Long dealId);
 
     AppBanner getBannerByDealId(Long dealId);
+
+    /**
+     * 将deal设置为过期
+     * 过期时间为创建时间
+     *
+     * @param id
+     */
+    void updateDealExpire(Long id);
 
     void saveOrUpdateBanner(AppBanner banner);
 

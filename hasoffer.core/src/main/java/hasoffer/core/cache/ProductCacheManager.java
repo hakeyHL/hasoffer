@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -40,6 +41,14 @@ public class ProductCacheManager {
     @Resource
     ICmpSkuService cmpSkuService;
     Logger logger = LoggerFactory.getLogger(ProductCacheManager.class);
+
+    public static void main(String[] args) {
+        BigDecimal a = BigDecimal.valueOf(10);
+        String price = a + "";
+        System.out.println(price);
+        float floatAblePrice = Float.valueOf(price);
+        System.out.println(floatAblePrice);
+    }
 
     /**
      * 根据商品ID查询商品
@@ -92,12 +101,16 @@ public class ProductCacheManager {
      * @return
      */
     public PageableResult<PtmCmpSku> listPagedCmpSkus(long proId, int page, int size) {
+        System.out.println(" proId proId proId :" + proId);
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_" + String.valueOf(proId) + "_" + page + "_" + size;
         String cmpSkusJson = cacheService.get(key, 0);
+        //先不读缓存,也不存缓存
+//        String cmpSkusJson = null;
         PageableResult<PtmCmpSku> pagedCmpskus = null;
         try {
             if (StringUtils.isEmpty(cmpSkusJson)) {
                 pagedCmpskus = productService.listOnsaleCmpSkus(proId, page, size);
+                System.out.println("--------- pagedCmpskus  -----------" + pagedCmpskus.getData().size());
                 List<PtmCmpSku> data = pagedCmpskus.getData();
                 if (data != null && data.size() > 0) {
                     pagedCmpskus.setData(getOnsaleSkuList(data, proId));
@@ -147,15 +160,14 @@ public class ProductCacheManager {
                     cmpSku.setStatus(SkuStatus.valueOf((String) map.get("status")));
                     cmpSkus.add(cmpSku);
                 }
-                pagedCmpskus = new PageableResult<PtmCmpSku>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
+                pagedCmpskus = new PageableResult<>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
             }
         } catch (Exception e) {
-            logger.error(" deal skus from cache error " + e.getMessage());
+            logger.error("deal skus from cache error:{}", e.getMessage(), e);
             return null;
         }
         return pagedCmpskus;
     }
-
 
     public List<PtmProduct> getTopSellins(int page, int size) {
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_TopSelling" + "_" + page + "_" + size;
@@ -222,7 +234,7 @@ public class ProductCacheManager {
             } else {
                 PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
 
-                List<PtmCmpSku> cmpSkus = new ArrayList<PtmCmpSku>();
+                List<PtmCmpSku> cmpSkus = new ArrayList<>();
                 List<Map> data = datas.getData();
 
                 for (Map<String, Object> map : data) {
@@ -255,44 +267,46 @@ public class ProductCacheManager {
                     cmpSku.setStatus(SkuStatus.valueOf((String) map.get("status")));
                     cmpSkus.add(cmpSku);
                 }
-                pagedCmpskus = new PageableResult<PtmCmpSku>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
+                pagedCmpskus = new PageableResult<>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
             }
         } catch (Exception e) {
-            logger.error(" deal skus from cache error " + e.getMessage());
+            logger.error("deal skus from cache error {}", e.getMessage(), e);
             return null;
         }
         return pagedCmpskus;
     }
 
-    public List<PtmCmpSku> getOnsaleSkuList(List data, Long productId) {
+    public List<PtmCmpSku> getOnsaleSkuList(List data, long productId) {
+        System.out.println("get productId is : " + productId);
         List<PtmCmpSku> tempPtmCmpSkus = new ArrayList<>();
         int i = 0;
         for (Object object : data) {
             System.out.println(" get onsale ptmcmpsku : i " + i);
             JSONArray jsonArray = JSONArray.parseArray(JSONArray.toJSONString(object));
             String website = (String) jsonArray.get(0);
-            int price = (Integer) jsonArray.get(1);
+            String price = jsonArray.get(1) + "";
             //根据price和site定位需要的sku
-            List<PtmCmpSku> cmpSkus = skuCacheService.getCmpSkusBySiteAndPrice(Float.valueOf(price + ""), Website.valueOf(website), productId);
+            List<PtmCmpSku> cmpSkus = skuCacheService.getCmpSkusBySiteAndPrice(Float.valueOf(price), Website.valueOf(website), productId);
             if (cmpSkus != null) {
-                tempPtmCmpSkus.add(cmpSkus.get(0));
+                //TODO  优选选择onsale的sku,否则返回outstock的sku
+                PtmCmpSku onsaleSku = getOnsaleSku(cmpSkus, productId);
+                if (onsaleSku != null && onsaleSku.getProductId() == productId) {
+                    tempPtmCmpSkus.add(onsaleSku);
+                    System.out.println("title " + onsaleSku.getTitle() + " price " + onsaleSku.getPrice() + " productId  " + onsaleSku.getProductId());
+                }
+//                tempPtmCmpSkus.add(cmpSkus.get(0));
             }
-            //TODO  优选选择onsale的sku,否则返回outstock的sku
-//            PtmCmpSku onsaleSku = getOnsaleSku(cmpSkus);
-//            if (onsaleSku != null) {
-//                tempPtmCmpSkus.add(onsaleSku);
-//            }
             i++;
         }
         return tempPtmCmpSkus;
     }
 
-    public PtmCmpSku getOnsaleSku(List<PtmCmpSku> ptmCmpSkus) {
+    public PtmCmpSku getOnsaleSku(List<PtmCmpSku> ptmCmpSkus, long ProductId) {
 
         PtmCmpSku OnsalePtmCmpSku = null;
         PtmCmpSku OutStockPtmCmpSku = null;
         for (PtmCmpSku ptmCmpSku : ptmCmpSkus) {
-            if (ptmCmpSku.getStatus().name().equals("ONSALE")) {
+            if (ptmCmpSku.getStatus().name().equals("ONSALE") && ptmCmpSku.getProductId() == ProductId) {
                 OnsalePtmCmpSku = ptmCmpSku;
                 break;
             } else {

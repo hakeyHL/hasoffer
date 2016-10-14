@@ -208,6 +208,7 @@ public class SearchServiceImpl implements ISearchService {
      * @param asr
      */
     @Override
+    @Transactional
     public void analysisAndRelate(SrmAutoSearchResult asr) {
         ProductBo productBo = null;
 
@@ -281,7 +282,7 @@ public class SearchServiceImpl implements ISearchService {
 
         productService.deleteProduct(product.getId());
 
-        productService.importProduct2Solr(finalProduct);
+        productService.importProduct2Solr2(finalProduct);
     }
 
     @Override

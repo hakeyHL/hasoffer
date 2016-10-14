@@ -1,23 +1,18 @@
 package hasoffer.core.product.impl;
 
+import com.alibaba.fastjson.JSON;
 import hasoffer.base.exception.ImageDownloadOrUploadException;
 import hasoffer.base.model.ImagePath;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
-import hasoffer.base.utils.ArrayUtils;
-import hasoffer.base.utils.HexDigestUtil;
-import hasoffer.base.utils.StringUtils;
-import hasoffer.base.utils.TimeUtils;
+import hasoffer.base.utils.*;
 import hasoffer.core.bo.product.SkuPriceUpdateResultBo;
 import hasoffer.core.exception.CmpSkuUrlNotFoundException;
 import hasoffer.core.exception.MultiUrlException;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.*;
-import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.persistence.po.ptm.PtmCmpSku2;
-import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
-import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
+import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.persistence.po.stat.StatSkuPriceUpdateResult;
 import hasoffer.core.persistence.po.stat.updater.StatSkuPriceUpdateResultUpdater;
@@ -33,6 +28,8 @@ import hasoffer.fetch.model.ProductStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import hasoffer.fetch.sites.snapdeal.SnapdealHelper;
 import hasoffer.spider.model.FetchedProduct;
+import hasoffer.spider.model.FetchedProductReview;
+import org.apache.commons.collections.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -41,12 +38,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.*;
 
 /**
  * Created on 2016/1/4.
  */
 @Service
+@Transactional
 public class CmpSkuServiceImpl implements ICmpSkuService {
 
     private static final String Q_CMPSKU_BY_PRODUCTID =
@@ -59,7 +58,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 AND t.status = ?1 ";
 
     private final String Q_CMPSKU_INDEX_BY_TITLEINDEX = "select t from PtmCmpSkuIndex2 t where t.siteSkuTitleIndex = ?0 ";
-    private final String Q_CMPSKU_GET_BY_PRICEANDSITE = "select t from PtmCmpSku t where t.productId=?2 and t.website = ?1  and t.status <>'OFFSALE' and  t.price =?0  order by price asc  ";
+    private final String Q_CMPSKU_GET_BY_PRICEANDSITE = "select t from PtmCmpSku t where t.productId=?0 and t.website = ?1  and t.status <>'OFFSALE' and  t.price =?2  order by price asc  ";
 
     private final String Q_CMPSKU_INDEX_BY_SOURCESID = "select t from PtmCmpSkuIndex2 t where t.siteSourceSidIndex = ?0 ";
     private final String Q_CMPSKU_STORES_BY_PRODUCTID = "SELECT  DISTINCT t.website  from PtmCmpSku t where t.productId=?0 and t.status<>'OFFSALE'";
@@ -353,7 +352,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
     @Override
     public List<PtmCmpSku> getCmpSkusBySiteAndPrice(float price, Website website, Long productId) {
-        return dbm.query(Q_CMPSKU_GET_BY_PRICEANDSITE, Arrays.asList(price, website, productId));
+        return dbm.query(Q_CMPSKU_GET_BY_PRICEANDSITE, Arrays.asList(productId, website, price));
     }
 
     /**
@@ -418,12 +417,160 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         return ptmCmpSku;
     }
 
+//    @Override
+//    public void createDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct) {
+//
+//        String jsonParam = fetchedProduct.getJsonParam();
+//        String description = fetchedProduct.getDescription();
+//        String offers = fetchedProduct.getOffers();
+//        List<FetchedProductReview> fetchedProductReviewList = fetchedProduct.getFetchedProductReviewList();
+//
+//        if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description) && StringUtils.isEmpty(offers) && (fetchedProductReviewList == null || fetchedProductReviewList.size() == 0)) {
+//            return;
+//        }
+//
+//        //在fetch包暂时无法跟新升级的时候，先在这里回避掉这种错误
+//        if (StringUtils.isEqual("[]", description)) {
+//            description = "";
+//        }
+//
+//        //save ptmcmpskuDescription
+//        PtmCmpSkuDescription ptmCmpSkuDescription = mdm.queryOne(PtmCmpSkuDescription.class, ptmCmpSku.getId());
+//        if (ptmCmpSkuDescription == null) {//不存在该条记录
+//
+//            ptmCmpSkuDescription = new PtmCmpSkuDescription();
+//
+//            ptmCmpSkuDescription.setId(ptmCmpSku.getId());
+//            ptmCmpSkuDescription.setJsonParam(jsonParam);
+//            ptmCmpSkuDescription.setJsonDescription(description);
+//            ptmCmpSkuDescription.setOffers(offers);
+//            ptmCmpSkuDescription.setFetchedProductReviewList(fetchedProductReviewList);
+//
+//            mdm.save(ptmCmpSkuDescription);
+//        } else {//存在该条记录
+//
+//            boolean flagDescription = false;
+//            boolean flagJsonParam = false;
+//            boolean flagOffers = false;
+//            boolean flagReviewList = false;
+//
+//            String oldJsonDescription = ptmCmpSkuDescription.getJsonDescription();
+//            String oldJsonParam = ptmCmpSkuDescription.getJsonParam();
+//            String oldOffers = ptmCmpSkuDescription.getOffers();
+//            List<FetchedProductReview> oldFetchedProductReviewList = ptmCmpSkuDescription.getFetchedProductReviewList();
+//
+//            //新的参数不为空，且新的参数和原有的不相同，更新
+//            if (!StringUtils.isEmpty(jsonParam) && !StringUtils.isEqual(jsonParam, oldJsonParam)) {
+//                ptmCmpSkuDescription.setJsonParam(jsonParam);
+//                flagDescription = true;
+//            }
+//
+//            //新的描述不为空，且和旧的参数不相同
+//            if (!StringUtils.isEmpty(description) && !StringUtils.isEqual(description, oldJsonDescription)) {
+//                ptmCmpSkuDescription.setJsonDescription(description);
+//                flagJsonParam = true;
+//            }
+//
+//            //新的offers不为空，且和就得offers不相同
+//            //注意offer内容只要不相同就要更新，有的offer不在可用，需要更新成空
+//            if (!StringUtils.isEqual(offers, oldOffers)) {
+//                ptmCmpSkuDescription.setOffers(offers);
+//                flagOffers = true;
+//            }
+//
+//            //新的评论和旧的评论不一样就更新
+//            if (!ListUtils.isEqualList(oldFetchedProductReviewList, fetchedProductReviewList)) {
+//                ptmCmpSkuDescription.setFetchedProductReviewList(fetchedProductReviewList);
+//                flagReviewList = true;
+//            }
+//
+//            if (flagDescription || flagJsonParam || flagOffers || flagReviewList) {
+//                mdm.save(ptmCmpSkuDescription);
+//            }
+//        }
+//
+//        //save productDescription
+//        PtmProduct ptmProduct = dbm.get(PtmProduct.class, ptmCmpSku.getProductId());
+//        String productTitle = ptmProduct.getTitle();
+//        System.out.println(fetchedProduct.toString());
+//        System.out.println("createDescription:" + jsonParam);
+//        try {
+//            HashMap<String, String> hashMap = JSONUtil.toObject(jsonParam, HashMap.class);
+//
+//            String color = hashMap.get("Color");
+//            String memory = hashMap.get("Memory");
+//            String model = hashMap.get("Model");
+//
+//            if (!productTitle.contains(color)) {
+//                hashMap.remove("Color");
+//            }
+//            if (!productTitle.contains(memory)) {
+//                hashMap.remove("Memory");
+//            }
+//            if (!productTitle.contains(model)) {
+//                hashMap.remove("Model");
+//            }
+//
+//            jsonParam = JSON.toJSONString(hashMap);
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        PtmProductDescription ptmProductDescription = mdm.queryOne(PtmProductDescription.class, ptmCmpSku.getProductId());
+//
+//        if (ptmProductDescription == null) {//如果不存在该记录
+//
+//            ptmProductDescription = new PtmProductDescription();
+//
+//            ptmProductDescription.setId(ptmCmpSku.getProductId());
+//            //最开始需求没说明白描述和参数问题，字段写错了，修改通知前台
+//            ptmProductDescription.setJsonDescription(jsonParam);
+//            ptmProductDescription.setJsonParam(description);
+//
+//            if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
+//                return;
+//            }
+//
+//            mdm.save(ptmProductDescription);
+//        } else {//如果存在
+//
+//            boolean flagDescription = false;
+//            boolean flagJsonParam = false;
+//
+//            //最一开始设计的错误，修改需要通知api
+//            String oldJsonDescription = ptmProductDescription.getJsonParam();//product 描述
+//            String oldJsonParam = ptmCmpSkuDescription.getJsonDescription();//product 参数
+//
+//            //新的参数不为空，且新的参数和原有的不相同，更新
+//            if (!StringUtils.isEmpty(jsonParam) && !StringUtils.isEqual(jsonParam, oldJsonParam)) {
+//                ptmProductDescription.setJsonDescription(jsonParam);
+//                flagDescription = true;
+//            }
+//
+//            //新的描述不为空，且和旧的参数不相同
+//            if (!StringUtils.isEmpty(description) && StringUtils.isEqual(description, oldJsonDescription)) {
+//                ptmCmpSkuDescription.setJsonParam(description);
+//                flagJsonParam = true;
+//            }
+//
+//            if (flagDescription || flagJsonParam) {
+//                mdm.save(ptmProductDescription);
+//            }
+//        }
+//    }
+
     @Override
-    public void createDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct) {
+    public void createSkuDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct) {
 
         String jsonParam = fetchedProduct.getJsonParam();
         String description = fetchedProduct.getDescription();
         String offers = fetchedProduct.getOffers();
+        List<FetchedProductReview> fetchedProductReviewList = fetchedProduct.getFetchedProductReviewList();
+
+        if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description) && StringUtils.isEmpty(offers) && (fetchedProductReviewList == null || fetchedProductReviewList.size() == 0)) {
+            return;
+        }
 
         //在fetch包暂时无法跟新升级的时候，先在这里回避掉这种错误
         if (StringUtils.isEqual("[]", description)) {
@@ -440,20 +587,22 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             ptmCmpSkuDescription.setJsonParam(jsonParam);
             ptmCmpSkuDescription.setJsonDescription(description);
             ptmCmpSkuDescription.setOffers(offers);
-
-            if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description)) {
-                return;
+            if (fetchedProductReviewList != null) {
+                ptmCmpSkuDescription.setFetchedProductReviewList(fetchedProductReviewList);
             }
+
             mdm.save(ptmCmpSkuDescription);
         } else {//存在该条记录
 
             boolean flagDescription = false;
             boolean flagJsonParam = false;
             boolean flagOffers = false;
+            boolean flagReviewList = false;
 
             String oldJsonDescription = ptmCmpSkuDescription.getJsonDescription();
             String oldJsonParam = ptmCmpSkuDescription.getJsonParam();
             String oldOffers = ptmCmpSkuDescription.getOffers();
+            List<FetchedProductReview> oldFetchedProductReviewList = ptmCmpSkuDescription.getFetchedProductReviewList();
 
             //新的参数不为空，且新的参数和原有的不相同，更新
             if (!StringUtils.isEmpty(jsonParam) && !StringUtils.isEqual(jsonParam, oldJsonParam)) {
@@ -474,13 +623,63 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
                 flagOffers = true;
             }
 
+            //新的评论和旧的评论不一样就更新
+            if (!ListUtils.isEqualList(oldFetchedProductReviewList, fetchedProductReviewList)) {
+                ptmCmpSkuDescription.setFetchedProductReviewList(fetchedProductReviewList);
+                flagReviewList = true;
+            }
 
-            if (flagDescription || flagJsonParam || flagOffers) {
+            if (flagDescription || flagJsonParam || flagOffers || flagReviewList) {
                 mdm.save(ptmCmpSkuDescription);
             }
         }
+    }
+
+    @Override
+    public void createProductDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct) {
+
+        String jsonParam = fetchedProduct.getJsonParam();
+        String description = fetchedProduct.getDescription();
+        String offers = fetchedProduct.getOffers();
+        List<FetchedProductReview> fetchedProductReviewList = fetchedProduct.getFetchedProductReviewList();
+
+        if (StringUtils.isEmpty(jsonParam) && StringUtils.isEmpty(description) && StringUtils.isEmpty(offers) && (fetchedProductReviewList == null || fetchedProductReviewList.size() == 0)) {
+            return;
+        }
+
+        //在fetch包暂时无法跟新升级的时候，先在这里回避掉这种错误
+        if (StringUtils.isEqual("[]", description)) {
+            description = "";
+        }
 
         //save productDescription
+        PtmProduct ptmProduct = dbm.get(PtmProduct.class, ptmCmpSku.getProductId());
+        String productTitle = ptmProduct.getTitle();
+        System.out.println(fetchedProduct.toString());
+        System.out.println("createDescription:" + jsonParam);
+        try {
+            HashMap<String, String> hashMap = JSONUtil.toObject(jsonParam, HashMap.class);
+
+            String color = hashMap.get("Color");
+            String memory = hashMap.get("Memory");
+            String model = hashMap.get("Model");
+
+            if (!productTitle.contains(color)) {
+                hashMap.remove("Color");
+            }
+            if (!productTitle.contains(memory)) {
+                hashMap.remove("Memory");
+            }
+            if (!productTitle.contains(model)) {
+                hashMap.remove("Model");
+            }
+
+            jsonParam = JSON.toJSONString(hashMap);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         PtmProductDescription ptmProductDescription = mdm.queryOne(PtmProductDescription.class, ptmCmpSku.getProductId());
 
         if (ptmProductDescription == null) {//如果不存在该记录
@@ -504,7 +703,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
             //最一开始设计的错误，修改需要通知api
             String oldJsonDescription = ptmProductDescription.getJsonParam();//product 描述
-            String oldJsonParam = ptmCmpSkuDescription.getJsonDescription();//product 参数
+            String oldJsonParam = ptmProductDescription.getJsonDescription();//product 参数
 
             //新的参数不为空，且新的参数和原有的不相同，更新
             if (!StringUtils.isEmpty(jsonParam) && !StringUtils.isEqual(jsonParam, oldJsonParam)) {
@@ -514,7 +713,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
             //新的描述不为空，且和旧的参数不相同
             if (!StringUtils.isEmpty(description) && StringUtils.isEqual(description, oldJsonDescription)) {
-                ptmCmpSkuDescription.setJsonParam(description);
+                ptmProductDescription.setJsonParam(description);
                 flagJsonParam = true;
             }
 

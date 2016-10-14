@@ -5,10 +5,13 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.BeanUtil;
 import hasoffer.core.persistence.dbm.osql.exception.OSqlException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.poi.ss.formula.functions.T;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.orm.hibernate4.HibernateCallback;
@@ -320,6 +323,30 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
         });
     }
 
+    @Override
+    public List queryBySql(final String queryString, final Map<String, Object> paramsMap) {
+        logger.info("queryBySql sql == " + queryString);
+        logger.info("paramsMap = " + ReflectionToStringBuilder.toString(paramsMap, ToStringStyle.MULTI_LINE_STYLE));
+        return  (List) this.getHibernate4Template().execute(new HibernateCallback() {
+            public Object doInHibernate(final Session session) throws HibernateException {
+                Query query = session.createSQLQuery(queryString).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+                if (paramsMap != null) {
+                    for (String key : paramsMap.keySet()) {
+                        Object obj = paramsMap.get(key);
+                        if (obj instanceof Collection<?>) {
+                            query.setParameterList(key, (Collection<?>) obj);
+                        } else if (obj instanceof Object[]) {
+                            query.setParameterList(key, (Object[]) obj);
+                        } else {
+                            query.setParameter(key, obj);
+                        }
+                    }
+                }
+                return query.list();
+            }
+        });
+    }
+
     protected abstract HibernateTemplate getHibernate4Template();
 
     @Override
@@ -330,6 +357,7 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
                         session.update(array.get(0));
                         session.flush();
 //                        session.clear();
+                        // why close? zwd.
                         session.close();
                         return null;
                     }
@@ -337,7 +365,27 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
     }
 
     @Override
+    public void update(final Object t) {
+        getHibernate4Template().getSessionFactory().getCurrentSession().update(t);
+    }
+
+    @Override
+    public void saveOrUpdate(Object it) {
+        getHibernate4Template().getSessionFactory().getCurrentSession().saveOrUpdate(it);
+    }
+
+    @Override
     public void deleteBySQL(final String sql) {
+        exeSQL(sql);
+    }
+
+    @Override
+    public void updateBySQL(final String sql) {
+        exeSQL(sql);
+    }
+
+    @Override
+    public void exeSQL(final String sql) {
         getHibernate4Template().execute(new HibernateCallback<Object>() {
             @Override
             public Object doInHibernate(Session session) throws HibernateException {

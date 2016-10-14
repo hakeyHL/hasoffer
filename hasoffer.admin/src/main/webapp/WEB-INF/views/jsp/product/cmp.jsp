@@ -87,23 +87,19 @@
                                 <div class="col-lg-12">
                                     <button type="button" class="btn btn-primary"
                                             onclick="batchDelete('<%=contextPath%>/p/batchDelete')"
-                                            data-toggle="modal" data-target="#confirm-delete">批量删除
+                                            data-toggle="modal" data-target="#confirm-delete">批量删除SKU
                                     </button>
-                                </div>
-                                <div class="col-lg-12">
+                                    <%--</div>--%>
+                                    <%--<div class="col-lg-12">--%>
                                     <button type="button" class="btn btn-primary"
                                             onclick="removeCache(${pId})"
                                             data-toggle="modal" data-target="#confirm-delete">清除缓存
                                     </button>
-                                </div>
-                                <div class="col-lg-12">
-
-                                </div>
-                                <div class="col-lg-12">
-                                    <p>
-                                        <button id="changeStatus" class="btn btn-info" onclick="change(${pId})">切换状态
-                                        </button>
-                                    </p>
+                                    <button id="changeStatus" class="btn btn-info" onclick="change(${pId})">切换状态
+                                    </button>
+                                    <button id="delBtn" class="btn btn-danger" onclick="delProduct(${pId})">
+                                        删除商品
+                                    </button>
                                 </div>
 
                             </div>
@@ -140,8 +136,9 @@
                             </thead>
                             <tbody>
                             <c:forEach items="${cmpSkus}" var="cmpSku">
-                                <tr>
-                                    <td><input type="checkbox" name="subBox" value="${cmpSku.id}"/></td>
+                                <tr onclick="clickOnTr(${cmpSku.id})">
+                                    <td><input id="subBox${cmpSku.id}" type="checkbox" name="subBox"
+                                               value="${cmpSku.id}"/></td>
                                     <td>${cmpSku.id}</td>
                                     <td>${cmpSku.website}</td>
                                     <td>
@@ -339,6 +336,17 @@
         });
     }
 
+    function delProduct(pid) {
+
+        if (!confirm("您正在删除商品\n这是一个危险的操作\n删除商品会导致与商品关联的搜索日志会被置为初始状态\n请确认")) {
+            return;
+        }
+
+        http.doGet("/fixdata/deleteproductanyway/" + pid, function (data) {
+            alert(data.result);
+        })
+    }
+
     //状态切换
     function change(topSellingId) {
 
@@ -375,6 +383,11 @@
     $subBox.click(function () {
         $("#checkAll").prop("checked", $subBox.length == $("input[name='subBox']:checked").length ? true : false);
     });
+
+    function clickOnTr(skuId) {
+        var checked = $("#subBox" + skuId).prop("checked");
+        $("#subBox" + skuId).prop("checked", !checked);
+    }
 
     function batchUrlSubmit() {
         var url = $.trim($("#batchUrl").val());//获取会话中的隐藏属性URL

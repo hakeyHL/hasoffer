@@ -6,8 +6,8 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
-import hasoffer.spider.common.SpiderLogger;
 import hasoffer.spider.constants.RedisKeysUtils;
+import hasoffer.spider.logger.SpiderLogger;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchUrlResult;
 import hasoffer.spider.redis.service.IFetchCacheService;
@@ -99,7 +99,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     public TaskStatus getUrlTaskStatus(Website website, String url, long expireSeconds) {
         String cacheKey = FetchUrlResult.getCacheKey(website, url, expireSeconds);
         TaskStatus taskStatusByUrl = fetchCacheService.getTaskStatusByUrl(cacheKey);
-        SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.getUrlTaskStatus(website,url) -->website:{}, url:{}, taskState:{}", website, url, taskStatusByUrl);
+        //SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.getUrlTaskStatus(website,url,expireSeconds) -->website:{}, url:{}, taskState:{}, expireSeconds:{}", website, url, taskStatusByUrl, expireSeconds);
         return taskStatusByUrl;
     }
 

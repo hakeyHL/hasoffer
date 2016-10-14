@@ -9,6 +9,7 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.urm.PriceOffNotice;
 import hasoffer.core.persistence.po.urm.UrmDevice;
+import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.persistence.po.urm.updater.PriceOffNoticeUpdater;
 import hasoffer.core.push.IPushService;
@@ -108,6 +109,10 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
 
         PtmCmpSku ptmCmpSku = dbm.get(PtmCmpSku.class, skuid);
         System.out.println("get sku success for " + skuid);
+        if (ptmCmpSku == null) {
+            System.out.println("sku has bean removed " + skuid);
+            return;
+        }
 
         //检测价格是否需要发push
         int curpage = 1;
@@ -141,7 +146,7 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
                 }
 
                 System.out.println("skuprice < noticeprice push");
-                push(priceOffNotice, ptmCmpSku, true);
+                pushNew(priceOffNotice, ptmCmpSku, true);
             }
             curpage++;
         }
@@ -152,15 +157,124 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
 
         PriceOffNotice priceOffNotice = getPriceOffNotice(id);
 
+        if (priceOffNotice == null) {
+            System.out.println("priceOffNotice is null " + id);
+            return false;
+        }
+
         long skuid = priceOffNotice.getSkuid();
 
         PtmCmpSku ptmCmpSku = dbm.get(PtmCmpSku.class, skuid);
 
-        boolean pushStatus = push(priceOffNotice, ptmCmpSku, cacheFail);
+        boolean pushStatus = pushNew(priceOffNotice, ptmCmpSku, cacheFail);
 
         return pushStatus;
     }
 
+    /**
+     * 按照用户push的方法，
+     *
+     * @param priceOffNotice
+     * @param ptmCmpSku
+     * @param cacheFail      push失败是否缓存到失败队列重发
+     * @return
+     */
+    private boolean pushNew(PriceOffNotice priceOffNotice, PtmCmpSku ptmCmpSku, boolean cacheFail) {
+
+        Long id = priceOffNotice.getId();
+
+        String useridString = priceOffNotice.getUserid();
+        Long userid = Long.valueOf(useridString);
+
+        //获取用户信息
+        UrmUser urmUser = dbm.get(UrmUser.class, userid);
+
+        System.out.println("userid:skuid__" + useridString + ":" + ptmCmpSku.getId());
+        boolean pushStatus = false;
+
+        if (urmUser == null) {
+            System.out.println("urmuser is null");
+        } else {
+
+            String gcmToken = urmUser.getGcmToken();
+
+            System.out.println("gcmToken:" + gcmToken);
+            if (!StringUtils.isEmpty(gcmToken)) {
+
+                List<UrmUserDevice> userDeviceList = dbm.query("SELECT t FROM UrmUserDevice t WHERE t.userId = ?0", Arrays.asList(useridString));
+
+                if (userDeviceList == null) {
+                    System.out.println("userDeviceList is null");
+                } else {
+                    System.out.println("userDeviceList size " + userDeviceList.size());
+                }
+
+                if (userDeviceList != null && userDeviceList.size() != 0) {
+
+                    String deviceId = userDeviceList.get(0).getDeviceId();
+
+                    //deeplink
+                    String deepLinkUrl = WebsiteHelper.getDeeplinkWithAff(ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), new String[]{MarketChannel.GOOGLEPLAY.name(), deviceId, useridString});
+                    System.out.println("deepLinkUrl " + deepLinkUrl);
+
+                    String title = "PRICE DROP ALERT! " + ptmCmpSku.getTitle();
+                    String content = "Now available at Rs." + (int) ptmCmpSku.getPrice() + ". Check details now.";
+
+                    AppPushMessage message = new AppPushMessage(
+                            new AppMsgDisplay(title + content, title, content),
+                            new AppMsgClick(AppMsgClickType.DEEPLINK, deepLinkUrl, WebsiteHelper.getPackage(ptmCmpSku.getWebsite()))
+                    );
+
+
+                    AppPushBo appPushBo = new AppPushBo("5x1", "15:10", message);
+
+                    String response = pushService.push(gcmToken, appPushBo);
+
+                    System.out.println("response " + response);
+                    JSONObject jsonResponse = JSONObject.parseObject(response.trim());
+
+                    Integer success = jsonResponse.getInteger("success");
+                    Integer failure = jsonResponse.getInteger("failure");
+                    if (success == 1) {
+                        //推送成功
+                        pushStatus = true;
+                        System.out.println("push success for " + userid + " " + ptmCmpSku.getId());
+                    }
+
+                    if (failure == 1) {
+                        //推送失败
+                        System.out.println("push fail for " + userid + " " + ptmCmpSku.getId());
+                    }
+                }
+
+                if (pushStatus) {
+                    updatePriceOffNoticeStatus(id, true);
+                    System.out.println("update lastpushstatus push success for priceOffNoticeid" + id);
+                } else {
+                    updatePriceOffNoticeStatus(id, false);
+                    System.out.println("update lastpushstatus push fail for priceOffNoticeid" + id);
+                    //是否需要将失败写入缓存
+                    if (cacheFail) {
+                        redisListService.push(PUSH_FAIL_PRICEOFFNOTICE_ID, priceOffNotice.getId() + "");
+                        System.out.println("cache push fail success for " + priceOffNotice.getId());
+                    }
+                }
+
+            }
+
+        }
+
+        return pushStatus;
+    }
+
+    /**
+     * 按照用户找设备，然后按照设备推送的方法
+     *
+     * @param priceOffNotice
+     * @param ptmCmpSku
+     * @param cacheFail
+     * @return
+     */
     private boolean push(PriceOffNotice priceOffNotice, PtmCmpSku ptmCmpSku, boolean cacheFail) {
 
         Long id = priceOffNotice.getId();

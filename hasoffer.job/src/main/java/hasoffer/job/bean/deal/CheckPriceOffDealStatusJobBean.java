@@ -3,6 +3,7 @@ package hasoffer.job.bean.deal;
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.TimeUtils;
@@ -37,8 +38,12 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
      * Logger for this class
      */
     private static final Logger logger = LoggerFactory.getLogger(CheckPriceOffDealStatusJobBean.class);
-    private static final String Q_PRICEOFF_DEAL = "SELECT t From Appdeal t WHERE t.appdealSource = 'PRICE_OFF' AND t.expireTime > ?0 ORDER BY t.createTime DESC";
-    private static int PRICEOFF_DEAL_LIST_THREAD_NUM = 1;
+    private static final String Q_PRICEOFF_DEAL = "SELECT t From AppDeal t WHERE t.appdealSource = 'PRICE_OFF' AND t.expireTime > ?0 ORDER BY t.createTime DESC";
+    private static int PRICEOFF_DEAL_LIST_THREAD_NUM = 0;
+
+    static {
+        CheckPriceOffDealStatusJobBean.PRICEOFF_DEAL_LIST_THREAD_NUM++;
+    }
 
     @Resource
     IFetchDubboService fetchDubboService;
@@ -59,46 +64,57 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
             @Override
             public void run() {
 
-                int curPage = 1;
-                int pageSize = 1000;
+                try {
 
-                PageableResult<AppDeal> pageableResult = dbm.queryPage(Q_PRICEOFF_DEAL, curPage, pageSize, Arrays.asList(TimeUtils.nowDate()));
 
-                long totalPage = pageableResult.getTotalPage();
+                    int curPage = 1;
+                    int pageSize = 1000;
 
-                while (curPage <= totalPage) {
+                    PageableResult<AppDeal> pageableResult = dbm.queryPage(Q_PRICEOFF_DEAL, curPage, pageSize, Arrays.asList(TimeUtils.nowDate()));
 
-                    if (priceOffDealQueue.size() > 1000) {
-                        try {
-                            TimeUnit.SECONDS.sleep(5);
-                        } catch (InterruptedException e) {
+                    long totalPage = pageableResult.getTotalPage();
+                    System.out.println("price off deal status total page =" + totalPage);
 
+                    while (curPage <= totalPage) {
+
+                        System.out.println("price off deal status curpage =" + curPage);
+
+                        if (priceOffDealQueue.size() > 1000) {
+                            try {
+                                TimeUnit.SECONDS.sleep(5);
+                            } catch (InterruptedException e) {
+
+                            }
+                            continue;
                         }
-                        continue;
+
+                        if (curPage > 1) {
+                            pageableResult = dbm.queryPage(Q_PRICEOFF_DEAL, curPage, pageSize, Arrays.asList(TimeUtils.nowDate()));
+                        }
+
+                        List<AppDeal> dealList = pageableResult.getData();
+                        System.out.println("find appdeal size =" + dealList.size());
+
+                        for (AppDeal deal : dealList) {
+
+                            long ptmcmpskuid = deal.getPtmcmpskuid();
+                            PtmCmpSku ptmCmpSku = dbm.get(PtmCmpSku.class, ptmcmpskuid);
+                            Website website = ptmCmpSku.getWebsite();
+                            String url = ptmCmpSku.getUrl();
+                            fetchDubboService.sendUrlTask(website, url, TimeUtils.SECONDS_OF_1_MINUTE * 45, TaskLevel.LEVEL_2);
+
+                            priceOffDealQueue.add(deal);
+                            System.out.println("add price off deal to update queue success " + deal.getId());
+                        }
+
+                        curPage++;
                     }
 
-                    if (curPage > 1) {
-                        pageableResult = dbm.queryPage(Q_PRICEOFF_DEAL, curPage, pageSize, Arrays.asList(TimeUtils.nowDate()));
-                    }
-
-                    List<AppDeal> dealList = pageableResult.getData();
-
-                    for (AppDeal deal : dealList) {
-
-                        long ptmcmpskuid = deal.getPtmcmpskuid();
-                        PtmCmpSku ptmCmpSku = dbm.get(PtmCmpSku.class, ptmcmpskuid);
-                        Website website = ptmCmpSku.getWebsite();
-                        String url = ptmCmpSku.getUrl();
-                        fetchDubboService.sendUrlTask(website, url, TimeUtils.SECONDS_OF_1_MINUTE * 45, TaskLevel.LEVEL_2);
-
-                        priceOffDealQueue.add(deal);
-
-                    }
-
-                    curPage++;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    CheckPriceOffDealStatusJobBean.PRICEOFF_DEAL_LIST_THREAD_NUM--;
                 }
-
-                CheckPriceOffDealStatusJobBean.PRICEOFF_DEAL_LIST_THREAD_NUM--;
             }
         });
 
@@ -107,12 +123,29 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
             es.execute(new Runnable() {
                 @Override
                 public void run() {
+
+                    long startTime = TimeUtils.now();
+
                     while (true) {
+
+                        long now = TimeUtils.now();
+
+                        //如果当前时间和启动时间相差超过50分钟，就自杀了吧少年
+                        if (now - startTime > TimeUtils.MILLISECONDS_OF_1_MINUTE * 50) {
+                            break;
+                        }
 
                         AppDeal deal = priceOffDealQueue.poll();
 
                         if (deal == null) {
                             System.out.println("CheckPriceOffDealStatusJobBean poll get null sleep 5 seconds");
+
+                            System.out.println("thread size " + CheckPriceOffDealStatusJobBean.PRICEOFF_DEAL_LIST_THREAD_NUM);
+                            System.out.println("queue size " + priceOffDealQueue.size());
+                            if (CheckPriceOffDealStatusJobBean.PRICEOFF_DEAL_LIST_THREAD_NUM == 0 && priceOffDealQueue.size() == 0) {
+                                System.out.println("CheckPriceOffDealStatusJobBean list thread is die and queue size is 0 ,process thread go die");
+                                break;
+                            }
                             try {
                                 TimeUnit.SECONDS.sleep(5);
                             } catch (InterruptedException e) {
@@ -143,7 +176,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                         //如果返回结果状态为running，那么将sku返回队列
                         if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
                             priceOffDealQueue.add(deal);
-//            logger.info("taskstatus RUNNING for [" + skuid + "]");
+//                            logger.info("taskstatus RUNNING for [" + skuid + "]");
                         } else if (TaskStatus.STOPPED.equals(taskStatus)) {
                             logger.info("taskstatus STOPPED for [" + skuid + "]");
                         } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
@@ -168,25 +201,20 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
 
                             float newPrice = fetchedProduct.getPrice();
 
-                            if (newPrice > sku.getPrice()) {
-                                dealService.deleteDeal(deal.getId());
+                            //涨价了或者状态不是onsale失效
+                            if (newPrice > sku.getPrice() || !SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
+//                                dealService.deleteDeal(deal.getId());
+                                dealService.updateDealExpire(deal.getId());
                             }
                         }
-
-
-                        if (CheckPriceOffDealStatusJobBean.PRICEOFF_DEAL_LIST_THREAD_NUM == 0 && priceOffDealQueue.size() == 0) {
-                            break;
-                        }
                     }
-                    System.out.println("CheckPriceOffDealStatusJobBean list thread is die and queue size is 0 ,process thread go die");
                 }
             });
 
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("executeInternal(CheckPriceOffDealStatusJobBean context={}) - end", context);
-        }
+        logger.debug("executeInternal(CheckPriceOffDealStatusJobBean context={}) - end", context);
+
     }
 }
 

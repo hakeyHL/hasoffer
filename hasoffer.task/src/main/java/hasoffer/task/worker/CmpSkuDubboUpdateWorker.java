@@ -2,12 +2,15 @@ package hasoffer.task.worker;
 
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
+import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory3;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
@@ -29,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 public class CmpSkuDubboUpdateWorker implements Runnable {
 
     private static final String PRICE_DROP_SKUID_QUEUE = "PRICE_DROP_SKUID_QUEUE";
+    public static Integer CMPSKU_DUBBOUPDATE_WORKER_THREAD_NUMBER = 0;
     private static Logger logger = LoggerFactory.getLogger(CmpSkuDubboUpdateWorker.class);
     private IDataBaseManager dbm;
     private ConcurrentLinkedQueue<PtmCmpSku> queue;
@@ -42,14 +46,24 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         this.fetchDubboService = fetchDubboService;
         this.cmpSkuService = cmpSkuService;
         this.redisListService = redisListService;
+        CMPSKU_DUBBOUPDATE_WORKER_THREAD_NUMBER++;
     }
 
     @Override
     public void run() {
 
+        long startTime = TimeUtils.now();
+
         while (true) {
 
             try {
+
+                if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_1_HOUR * 20) {
+                    CMPSKU_DUBBOUPDATE_WORKER_THREAD_NUMBER--;
+                    System.out.println("cmpsku dubboupdate worker thread has live above 20 hours ,thread going to die ");
+                    System.out.println("alive thread number " + CMPSKU_DUBBOUPDATE_WORKER_THREAD_NUMBER);
+                    break;
+                }
 
                 PtmCmpSku sku = queue.poll();
 
@@ -74,6 +88,10 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 updatePtmCmpSku(sku);
 
             } catch (Exception e) {
+                if (e instanceof InterruptedException) {
+                    System.out.println("InterruptedException break");
+                    break;
+                }
                 System.out.println(TimeUtils.nowDate());
                 e.printStackTrace();
             }
@@ -123,12 +141,6 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             System.out.println(JSONUtil.toJSON(fetchedProduct).toString() + "id=" + skuid);
 
             try {
-                cmpSkuService.createDescription(sku, fetchedProduct);
-            } catch (Exception e) {
-                logger.info("createDescription fail " + skuid);
-            }
-
-            try {
                 cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
             } catch (Exception e) {
                 logger.info("updateCmpSkuBySpiderFetchedProduct fail " + skuid);
@@ -141,10 +153,35 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
                 logger.info("createPtmCmpSkuImage fail " + skuid);
             }
 
-//            如果降价，写入队列
-            if (price > fetchedProduct.getPrice()) {
+//            如果降价且CommentsNumber 大于40写入队列，并且状态必须是onsale
+            if (price > fetchedProduct.getPrice() && fetchedProduct.getCommentsNumber() > 40 && SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
                 redisListService.push(PRICE_DROP_SKUID_QUEUE, skuid + "");
                 System.out.println("price drop add to queue success " + skuid);
+            }
+
+            try {
+
+                PtmProduct ptmProduct = dbm.get(PtmProduct.class, sku.getProductId());
+
+                if (ptmProduct != null) {
+
+                    //保存sku的描述信息
+                    cmpSkuService.createSkuDescription(sku, fetchedProduct);
+
+                    String productTitle = ptmProduct.getTitle();
+
+                    if (StringUtils.isEqual(productTitle, sku.getTitle())) {
+                        //保存product的描述信息
+                        cmpSkuService.createProductDescription(sku, fetchedProduct);
+                        System.out.println("update product spec success for " + ptmProduct.getId());
+                    } else {
+                        System.out.println("product spec should remove " + ptmProduct.getId());
+                    }
+                } else {
+                    System.out.println(skuid + " product is null");
+                }
+            } catch (Exception e) {
+                logger.info("createDescription fail " + skuid);
             }
 
 //            对FLIPKART没有类目的数据进行更新,暂时注释掉

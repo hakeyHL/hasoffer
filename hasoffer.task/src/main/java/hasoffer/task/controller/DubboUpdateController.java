@@ -4,10 +4,12 @@ import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
@@ -78,7 +80,7 @@ public class DubboUpdateController {
 
         ExecutorService es = Executors.newCachedThreadPool();
 
-        ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
+        ConcurrentLinkedQueue<Long> queue = new ConcurrentLinkedQueue<>();
 
         es.execute(new PriceOffNoticeListWorker(dbm, queue, fetchDubboService));
 
@@ -90,7 +92,7 @@ public class DubboUpdateController {
         }
 
         for (int i = 0; i < 10; i++) {
-            es.execute(new PriceOffNoticeProcessorWorker(queue, fetchDubboService, redisListService, cmpSkuService));
+            es.execute(new PriceOffNoticeProcessorWorker(queue, fetchDubboService, redisListService, cmpSkuService, dbm));
         }
 
         taskRunning3.set(true);
@@ -101,6 +103,7 @@ public class DubboUpdateController {
 
     /**
      * sku的日常更新（目前策略热搜）
+     *
      * @return
      */
     //dubbofetchtask/updatestart
@@ -116,7 +119,7 @@ public class DubboUpdateController {
 
         ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
 
-        es.execute(new SrmProductSearchCountListWorker(dbm, queue, fetchDubboService));
+        es.execute(new SrmProductSearchCountListWorker(dbm, queue, fetchDubboService, redisListService));
 
         //保证list任务优先执行
         try {
@@ -195,11 +198,42 @@ public class DubboUpdateController {
 
         System.out.println(JSONUtil.toJSON(fetchedProduct).toString() + "id=" + skuid);
 
-        cmpSkuService.createDescription(ptmCmpSku, fetchedProduct);
+        try {
+            cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
+        try {
+            cmpSkuService.createPtmCmpSkuImage(skuid, fetchedProduct);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        cmpSkuService.createPtmCmpSkuImage(skuid, fetchedProduct);
+        try {
+
+            PtmProduct ptmProduct = dbm.get(PtmProduct.class, ptmCmpSku.getProductId());
+
+            if (ptmProduct != null) {
+
+                //保存sku的描述信息
+                cmpSkuService.createSkuDescription(ptmCmpSku, fetchedProduct);
+
+                String productTitle = ptmProduct.getTitle();
+
+                if (StringUtils.isEqual(productTitle, ptmCmpSku.getTitle())) {
+                    //保存product的描述信息
+                    cmpSkuService.createProductDescription(ptmCmpSku, fetchedProduct);
+                    System.out.println("update product spec success for " + ptmProduct.getId());
+                } else {
+                    System.out.println("product spec should remove " + ptmProduct.getId());
+                }
+            } else {
+                System.out.println(skuid + " product is null");
+            }
+        } catch (Exception e) {
+            System.out.println("createDescription fail " + skuid);
+        }
 
         return "ok";
     }

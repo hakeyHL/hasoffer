@@ -8,7 +8,6 @@ import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.persistence.po.ptm.updater.PtmProductUpdater;
-import hasoffer.core.product.solr.ProductModel;
 import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.fetch.model.ListProduct;
 
@@ -31,10 +30,6 @@ public interface IProductService {
 
     ProductBo createProductByListProducts(Map<Website, ListProduct> listProductMap);
 
-    void reimport2Solr(boolean removeFirst);
-
-    void append2Solr();
-
     PageableResult<PtmCmpSku> listPagedCmpSkus(long proId, int pageNum, int pageSize);
 
     List<PtmProduct> listProducts(long cateId, int page, int size);
@@ -51,25 +46,13 @@ public interface IProductService {
 
     List<String> getProductImageUrls(Long id);
 
-    void updateSku(long skuId, String url);
-
-    void importProduct2Solr(PtmProduct product);
-
-    void importProduct2Solr2(PtmProduct product);
-
     PtmProduct getProduct(long proId);
 
     boolean updateProductTag(String proId, String tag);
 
     void updateProductCategory(PtmProduct product, Long targetCate);
 
-    PtmCmpSku createCmpsku(long productId, float price, String url, String title, String imageUrl);
-
-    PtmCmpSku createCmpsku(long ptmProductId, float price, String url, String title, String imageUrl, String deeplink);
-
     void deleteProduct(long ptmProductId);
-
-    PageableResult<PtmCmpSku> listOnsaleCmpSkus(long proId, int page, int size);
 
     ProductBo getProductBo(long proId);
 
@@ -77,31 +60,41 @@ public interface IProductService {
 
     void expTopSellingsFromSearchCount(String ymd);
 
-    void updatePtmProductCategoryId(long ptmProductId, long categoryId);
-
     void updateProductImage2(Long id, String oriImageUrl);
 
     void updatePtmProductPrice(long id);
 
     void updatePtmProdcutWebsite(long id, Website website);
 
-    ProductModel getProductModel(PtmProduct product);
-
-    void import2Solr(ProductModel pm);
-
-    PageableResult<PtmCmpSku> listNotOffSaleCmpSkus(long proId, int page, int size);
-
-    ProductModel2 getProductModel2(PtmProduct product);
-
     void updateProductStd(Long proId, boolean std);
 
-    void reimport2Solr(long productId);
+    void updateProductBrand(long proId, String productBrand);
 
     void updateProductBrandModel(long proId, String productBrand, String modelName);
 
     void updateProduct(PtmProductUpdater ptmProductUpdater);
 
+    // sku todo 迁移到 ICmpSkuService
+    PageableResult<PtmCmpSku> listNotOffSaleCmpSkus(long proId, int page, int size);
+
+    PageableResult<PtmCmpSku> listOnsaleCmpSkus(long proId, int page, int size);
+
+    void updateSku(long skuId, String url);
+
+    PtmCmpSku createCmpsku(long productId, float price, String url, String title, String imageUrl);
+
+    PtmCmpSku createCmpsku(long ptmProductId, float price, String url, String title, String imageUrl, String deeplink);
+
+    // solr
+    ProductModel2 getProductModel2(PtmProduct product);
+
     void importProduct2Solr2(long proId);
 
     void importProduct2Solr2(PtmProduct o, List<PtmCmpSku> cmpSkus);
+
+    void importProduct2Solr2(PtmProduct product);
+
+    void importProduct2SolrByCategory(long cateId);
+
+    List<String> spellcheck(String text);
 }

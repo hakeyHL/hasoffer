@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd"
+       default-lazy-init="false">
+    <dubbo:application name="spider-spider"/>
+    <!-- 使用zookeeper注册中心暴露服务地址 -->
+    <dubbo:registry id="provider_reg" address="zookeeper://zookeeper_server:2181" check="false" subscribe="false"/>
+
+    <dubbo:registry id="consumer_reg" address="zookeeper://zookeeper_server:2181" check="false" register="false"/>
+
+    <dubbo:protocol name="dubbo" port="20881"/>
+
+    <!-- 要引用的服务接口 check表示启动是检查服务是否已经提供。 -->
+    <dubbo:reference id="skuResultDubboService" registry="consumer_reg" interface="hasoffer.dubbo.spider.result.api.ISkuResultDubboService"
+                     version="1.0" check="false" timeout="10000"/>
+
+    <dubbo:reference id="productResultDubboService" registry="consumer_reg" interface="hasoffer.dubbo.spider.result.api.IProductResultDubboService"
+                     version="1.0" check="false" timeout="10000"/>
+
+
+    <!-- 要暴露的服务接口 -->
+    <dubbo:service interface="hasoffer.dubbo.spider.task.api.ISkuTaskDubboService" registry="provider_reg" version="1.0"
+                   ref="skuTaskDubboService" timeout="10000"/>
+    <bean id="skuTaskDubboService" class="hasoffer.spider.service.dubbo.SkuTaskDubboServiceImpl"/>
+    <dubbo:service interface="hasoffer.dubbo.spider.task.api.IProductTaskDubboService" registry="provider_reg" version="1.0"
+                   ref="productTaskDubboService" timeout="10000"/>
+    <bean id="productTaskDubboService" class="hasoffer.spider.service.dubbo.ProductTaskDubboServiceImpl"/>
+</beans>

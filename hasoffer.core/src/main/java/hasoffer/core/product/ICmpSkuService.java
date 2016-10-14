@@ -26,7 +26,11 @@ public interface ICmpSkuService {
 
     void saveHistoryPrice(Long sid, List<PriceNode> priceNodes);
 
-    void createDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct);
+//    void createDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct);
+
+    void createSkuDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct);
+
+    void createProductDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct);
 
     void createPtmCmpSkuImage(long skuId, FetchedProduct fetchedProduct);
 
@@ -36,6 +40,11 @@ public interface ICmpSkuService {
 
     void updateCmpSkuByOriFetchedProduct(long skuId, OriFetchedProduct oriFetchedProduct);
 
+    /**
+     * SKU更新，通过spider 更新数据。
+     * @param skuId
+     * @param fetchedProduct
+     */
     void updateCmpSkuBySpiderFetchedProduct(long skuId, FetchedProduct fetchedProduct);
 
     void updateCmpSku(long id, String url, String color, String size, float price);

@@ -14,10 +14,10 @@
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/stdout.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/stdout.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+            <FileNamePattern>${log.base}/stdout.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <MaxHistory>10</MaxHistory>
+                <MaxHistory>3</MaxHistory>
                 <!-- or whenever the file size reaches 100MB -->
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -31,7 +31,7 @@
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/sql-access.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/sql-access.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+            <FileNamePattern>${log.base}/sql-access.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <MaxHistory>10</MaxHistory>
@@ -48,7 +48,7 @@
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/spring-exception.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/spring-exception.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+            <FileNamePattern>${log.base}/spring-exception.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <MaxHistory>10</MaxHistory>
@@ -70,7 +70,7 @@
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/error.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/error.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+            <FileNamePattern>${log.base}/error.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <MaxHistory>10</MaxHistory>
@@ -93,7 +93,7 @@
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/info.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/info.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+            <FileNamePattern>${log.base}/info.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <MaxHistory>10</MaxHistory>
@@ -117,10 +117,10 @@
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/mongodb.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/mongodb.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+            <FileNamePattern>${log.base}/mongodb.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <MaxHistory>10</MaxHistory>
+                <MaxHistory>5</MaxHistory>
                 <!-- or whenever the file size reaches 100MB -->
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -134,10 +134,27 @@
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/thirdPart.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/thirdPart.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+            <FileNamePattern>${log.base}/thirdPart.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <MaxHistory>10</MaxHistory>
+                <MaxHistory>5</MaxHistory>
+                <!-- or whenever the file size reaches 100MB -->
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%date [%thread][IP:%X{ip}|USER:%X{user}][%-8level%logger{80}] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="AppUserFileOut"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.base}/appUser.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${log.base}/appUser.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <MaxHistory>30</MaxHistory>
                 <!-- or whenever the file size reaches 100MB -->
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -151,6 +168,10 @@
     <logger name="hasoffer" level="INFO">
         <appender-ref ref="InfoLoggerFileOut"/>
         <appender-ref ref="ErrorLoggerFileOut"/>
+    </logger>
+
+    <logger name="hasoffer.api.controller.AppUserController" level="DEBUG">
+        <appender-ref ref="AppUserFileOut"/>
     </logger>
 
     <!-- Hibernate SQL -->
@@ -167,6 +188,9 @@
         <appender-ref ref="SqlLoggerFileOut"/>
     </logger>
     <logger name="org.hibernate.engine.query.HQLQueryPlan" level="ERROR">
+        <appender-ref ref="SqlLoggerFileOut"/>
+    </logger>
+    <logger name="org.hibernate.engine.transaction.spi.AbstractTransactionImpl" level="DEBUG">
         <appender-ref ref="SqlLoggerFileOut"/>
     </logger>
 

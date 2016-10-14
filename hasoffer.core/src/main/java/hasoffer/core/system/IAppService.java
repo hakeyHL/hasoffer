@@ -5,15 +5,15 @@ import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
-import hasoffer.core.persistence.po.app.AppBanner;
-import hasoffer.core.persistence.po.app.AppDeal;
-import hasoffer.core.persistence.po.app.AppVersion;
-import hasoffer.core.persistence.po.app.AppWebsite;
+import hasoffer.core.persistence.po.app.*;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
+import hasoffer.core.persistence.po.urm.UrmSignAwdCfg;
+import hasoffer.core.persistence.po.urm.UrmSignCoin;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created on 2015/12/30.
@@ -38,9 +38,13 @@ public interface IAppService {
 
     List<PtmCategory> getCategory();
 
-    AppDeal getDealDetail(String id);
+    AppDeal getDealDetail(long id);
 
-    UrmUser getUserById(String thirdId);
+    UrmUser getUserByThirdId(String thirdId);
+
+    UrmUser getUserById(Long Id);
+
+    List<UrmUser> getIdDescUserListByThirdId(String thirdId);
 
     List getProductByCriteria(SearchCriteria criteria);
 
@@ -61,4 +65,16 @@ public interface IAppService {
     int isHasChildNode(Long id);
 
     void countDealClickCount(AppDeal appDeal);
+
+    List<UrmUser> getUsersByUserName(String userName);
+
+    Map<Integer, Integer> getSignAwardNum();
+
+    List<HasofferCoinsExchangeGift> getGiftList();
+
+    void bakUserInfo(UrmUser urmUser);
+
+    UrmSignCoin getSignCoinByUserId(Long id);
+
+    void updateUrmSignCoin(UrmSignCoin urmSignCoin);
 }

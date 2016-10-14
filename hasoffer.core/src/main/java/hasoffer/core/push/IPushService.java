@@ -1,9 +1,14 @@
 package hasoffer.core.push;
 
+import com.google.android.gcm.server.MulticastResult;
 import hasoffer.base.enums.MarketChannel;
+import hasoffer.base.model.PageableResult;
 import hasoffer.core.bo.push.AppPushBo;
+import hasoffer.core.persistence.enums.PushSourceType;
+import hasoffer.core.persistence.po.app.AppPush;
 import hasoffer.core.persistence.po.urm.UrmDevice;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -21,4 +26,11 @@ public interface IPushService {
     List<MarketChannel> getAllMarketChannels();
 
     List<String> getAllAppVersions();
+
+    MulticastResult GroupPush(List<String> gcmTokens, AppPushBo pushBo) throws Exception;
+
+    AppPush createAppPush(AppPush appPush);
+
+    PageableResult getPagedAppPush(PushSourceType pushSourceType, Date startDate, Date endDate, int curPage, int pageSize);
+
 }

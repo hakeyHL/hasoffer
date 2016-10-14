@@ -4,15 +4,17 @@ import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchUrlResult;
 import hasoffer.spider.model.FetchedProduct;
-import hasoffer.task.controller.DubboUpdateController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,37 +28,51 @@ import java.util.concurrent.TimeUnit;
 public class PriceOffNoticeProcessorWorker implements Runnable {
 
     private static final String PRICEOFF_NOTICE_SKUID_QUEUE = "PRICEOFF_NOTICE_SKUID_QUEUE";
+    public static Integer PRICEOFFNOTICE_PRICESSOR_WORKER_THREADNUMBER = 0;
     private static Logger logger = LoggerFactory.getLogger(PriceOffNoticeProcessorWorker.class);
-    private ConcurrentLinkedQueue<PtmCmpSku> queue;
+    private ConcurrentLinkedQueue<Long> queue;
     private IFetchDubboService fetchDubboService;
     private IRedisListService redisListService;
     private ICmpSkuService cmpSkuService;
+    private IDataBaseManager dbm;
 
-    public PriceOffNoticeProcessorWorker(ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, IRedisListService redisListService, ICmpSkuService cmpSkuService) {
+    public PriceOffNoticeProcessorWorker(ConcurrentLinkedQueue<Long> queue, IFetchDubboService fetchDubboService, IRedisListService redisListService, ICmpSkuService cmpSkuService, IDataBaseManager dbm) {
         this.queue = queue;
         this.fetchDubboService = fetchDubboService;
         this.redisListService = redisListService;
         this.cmpSkuService = cmpSkuService;
+        this.dbm = dbm;
+        PRICEOFFNOTICE_PRICESSOR_WORKER_THREADNUMBER++;
     }
 
     @Override
     public void run() {
 
+        long startTime = TimeUtils.now();
+
         while (true) {
 
-            PtmCmpSku sku = queue.poll();
+            Long skuid = queue.poll();
 
             try {
 
-                if (sku == null) {
+                if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_1_HOUR * 1) {
+                    PRICEOFFNOTICE_PRICESSOR_WORKER_THREADNUMBER--;
+                    System.out.println("price off notice processor worker thread has live above 1 hours ,thread going to die ");
+                    System.out.println("alive thread number " + PRICEOFFNOTICE_PRICESSOR_WORKER_THREADNUMBER);
+                    break;
+                }
+
+                if (skuid == null) {
                     try {
                         TimeUnit.SECONDS.sleep(3);
                         logger.info("task update get null sleep 3 seconds");
                     } catch (InterruptedException e) {
                         return;
                     }
-                    continue;
                 }
+
+                PtmCmpSku sku = dbm.get(PtmCmpSku.class, skuid);
 
                 Date updateTime = sku.getUpdateTime();
                 if (updateTime != null) {
@@ -71,15 +87,9 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
                 System.out.println(TimeUtils.nowDate());
                 e.printStackTrace();
             }
-
-            System.out.println("Price_OFF_LIST_THREAD_NUM == " + DubboUpdateController.Price_OFF_LIST_THREAD_NUM);
-            System.out.println("queue size is " + queue.size());
-            System.out.println("sku ex: " + sku.getId());
-            if (DubboUpdateController.Price_OFF_LIST_THREAD_NUM == 0 && queue.size() == 0) {
-                System.out.println("price off process queue has no object ,thread going to die");
-                break;
-            }
         }
+
+        System.out.println("queue size is " + queue.size());
     }
 
     private void updatePtmCmpSku(PtmCmpSku sku) {
@@ -98,19 +108,19 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
 
         //如果返回结果状态为running，那么将sku返回队列
         if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
-            queue.add(sku);
+            queue.add(skuid);
 //            logger.info("taskstatus RUNNING for [" + skuid + "]");
         } else if (TaskStatus.STOPPED.equals(taskStatus)) {
             logger.info("taskstatus STOPPED for [" + skuid + "]");
         } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
             logger.info("taskstatus EXCEPTION for [" + skuid + "]");
         } else if (TaskStatus.NONE.equals(taskStatus)) {
-            queue.add(sku);
+            queue.add(skuid);
             if (Website.SNAPDEAL.equals(website) || Website.FLIPKART.equals(website) || Website.AMAZON.equals(website)) {
-                queue.add(sku);
+                queue.add(skuid);
                 fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_2);
             } else {
-                queue.add(sku);
+                queue.add(skuid);
                 fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_5);
             }
             logger.info("taskstatus NONE for [" + skuid + "] , resend success");
@@ -123,9 +133,28 @@ public class PriceOffNoticeProcessorWorker implements Runnable {
             System.out.println(JSONUtil.toJSON(fetchedProduct).toString() + "id=" + skuid);
 
             try {
-                cmpSkuService.createDescription(sku, fetchedProduct);
+
+                PtmProduct ptmProduct = dbm.get(PtmProduct.class, sku.getProductId());
+
+                if (ptmProduct != null) {
+
+                    //保存sku的描述信息
+                    cmpSkuService.createSkuDescription(sku, fetchedProduct);
+
+                    String productTitle = ptmProduct.getTitle();
+
+                    if (StringUtils.isEqual(productTitle, sku.getTitle())) {
+                        //保存product的描述信息
+                        cmpSkuService.createProductDescription(sku, fetchedProduct);
+                        System.out.println("update product spec success for " + ptmProduct.getId());
+                    } else {
+                        System.out.println("product spec should remove " + ptmProduct.getId());
+                    }
+                } else {
+                    System.out.println(skuid + " product is null");
+                }
             } catch (Exception e) {
-                logger.info("createDescription fail " + skuid);
+                System.out.println("createDescription fail " + skuid);
             }
 
             try {

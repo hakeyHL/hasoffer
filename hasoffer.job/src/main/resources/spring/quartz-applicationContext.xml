@@ -19,21 +19,12 @@
         <property name="applicationContextSchedulerContextKey" value="applicationContextKey"/>
         <property name="triggers">
             <list>
-                <ref bean="demoTrigger"/>
-                <ref bean="fetchTrigger"/>
-                <!--<ref bean="dealozTrigger"/>-->
-                <ref bean="orderSATrigger"/>
-                <ref bean="imageDownLoadTrigger"/>
-                <ref bean="imageDownLoadTrigger2"/>
-                <ref bean="skuImageDownLoadTrigger"/>
-                <ref bean="statHijackFetchTrigger"/>
                 <ref bean="statSearchLogTrigger"/>
-                <ref bean="skuImageListDownLoadTrigger"/>
                 <ref bean="priceOffNoticeTrigger"/>
                 <ref bean="pushFailRePushTrigger"/>
-                <!--<ref bean="fetchTestTrigger"/>-->
-                <!--<ref bean="topSellingTaskTrigger"/>-->
                 <ref bean="priceOffDealUpdateTrigger"/>
+                <ref bean="priceOffGetDealTrigger"/>
+                <ref bean="adminPushTrigger"/>
                 <!--<ref bean="statVisitSkuUpdateTrigger"/>-->
             </list>
         </property>
@@ -48,76 +39,6 @@
     <bean id="historyJobListener" class="hasoffer.job.quartz.HistoryJobListener"/>
 
     <!-- demo job -->
-    <bean name="demoJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="hasoffer.job.bean.DemoJobBean"/>
-    </bean>
-
-    <bean id="demoTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-        <property name="jobDetail" ref="demoJob"/>
-        <property name="cronExpression" value="0 0 0/1 * * ? "/>
-    </bean>
-
-    <!-- fetch job -->
-    <bean name="fetchJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="hasoffer.job.bean.fetch.FetchJobBean"/>
-        <!--<property name="beanName" value="fetchJobBean"/>-->
-    </bean>
-
-    <bean id="fetchTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-        <property name="jobDetail" ref="fetchJob"/>
-        <property name="cronExpression" value="0 0 1 1 1 ? 2066 "/>
-    </bean>
-
-
-    <!--<bean name="dealozJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
-    <!--<property name="jobClass" value="hasoffer.job.bean.fetch.DealozJobBean"/>-->
-    <!--</bean>-->
-    <!--<bean id="dealozTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
-    <!--<property name="jobDetail" ref="dealozJob"/>-->
-    <!--<property name="cronExpression" value="0 0 1 1 1 ? 2066 "/>-->
-    <!--</bean>-->
-
-    <bean name="orderSAJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="hasoffer.job.bean.order.OrderSAsisJobBean"/>
-    </bean>
-    <bean id="orderSATrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-        <property name="jobDetail" ref="orderSAJob"/>
-        <property name="cronExpression" value="0 0 0/1 * * ? "/>
-    </bean>
-
-    <!-- 图片抓取 -->
-    <bean name="imageDownLoadJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="hasoffer.job.bean.image.ImageDownloadJobBean"/>
-    </bean>
-    <bean id="imageDownLoadTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-        <property name="jobDetail" ref="imageDownLoadJob"/>
-        <property name="cronExpression" value="0 0/20 * * * ?"/>
-    </bean>
-
-    <bean name="imageDownLoadJob2" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="hasoffer.job.bean.image.Image2DownloadJobBean"/>
-    </bean>
-    <bean id="imageDownLoadTrigger2" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-        <property name="jobDetail" ref="imageDownLoadJob2"/>
-        <property name="cronExpression" value="0 0/20 * * * ?"/>
-    </bean>
-
-    <bean name="skuImageDownLoadJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="hasoffer.job.bean.image.SkuImageDownloadJobBean"/>
-    </bean>
-    <bean id="skuImageDownLoadTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-        <property name="jobDetail" ref="skuImageDownLoadJob"/>
-        <property name="cronExpression" value="0 0/10 * * * ?"/>
-    </bean>
-
-    <bean name="skuImageListDownLoadJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="hasoffer.job.bean.image.SkuImageListDownLoadJobBean"/>
-    </bean>
-    <bean id="skuImageListDownLoadTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-        <property name="jobDetail" ref="skuImageListDownLoadJob"/>
-        <property name="cronExpression" value="0 30 12 * * ?"/>
-    </bean>
-
     <bean name="priceOffNoticeJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="hasoffer.job.bean.push.PriceOffNoticeJobBean"/>
     </bean>
@@ -138,13 +59,6 @@
     </bean>
 
     <!-- 定时统计 -->
-    <bean name="statHijackFetchJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="hasoffer.job.bean.stat.StatHijackFetchJobBean"/>
-    </bean>
-    <bean id="statHijackFetchTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-        <property name="jobDetail" ref="statHijackFetchJob"/>
-        <property name="cronExpression" value="0 0 0/1 * * ?"/>
-    </bean>
 
     <bean name="statSearchLogJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="hasoffer.job.bean.stat.StatSearchLogJobBean"/>
@@ -154,31 +68,15 @@
         <property name="cronExpression" value="0 0 10 * * ?"/>
     </bean>
 
-    <!--<bean name="statVisitSkuUpdateJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
-    <!--<property name="jobClass" value="hasoffer.job.bean.stat.StatVisitSkuUpdateJobBean"/>-->
-    <!--</bean>-->
-    <!--<bean id="statVisitSkuUpdateTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
-    <!--<property name="jobDetail" ref="statVisitSkuUpdateJob"/>-->
-    <!--<property name="cronExpression" value="0 30 0/1 * * ?"/>-->
-    <!--</bean>-->
-    <!-- fetchTest job -->
-    <!--<bean name="fetchTestJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
-        <!--<property name="jobClass" value="hasoffer.job.bean.fetch.FetchTestJobBean"/>-->
-    <!--</bean>-->
+    <!--price off create deal -->
+    <bean name="priceOffGetDealJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.deal.CheckGetPriceOffDealJobBean"/>
+    </bean>
 
-    <!--<bean id="fetchTestTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
-        <!--<property name="jobDetail" ref="fetchTestJob"/>-->
-        <!--<property name="cronExpression" value="0 0 0/1 * * ?"/>-->
-    <!--</bean>-->
-
-    <!--<bean name="topSellingTaskJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
-        <!--<property name="jobClass" value="hasoffer.job.bean.fetch.TopSellingTaskJobBean"/>-->
-    <!--</bean>-->
-
-    <!--<bean id="topSellingTaskTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
-        <!--<property name="jobDetail" ref="topSellingTaskJob"/>-->
-        <!--<property name="cronExpression" value="0 0 0/1 * * ?"/>-->
-    <!--</bean>-->
+    <bean id="priceOffGetDealTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="priceOffGetDealJob"/>
+        <property name="cronExpression" value="0 0/10 * * * ?"/>
+    </bean>
 
     <!--price off deal update-->
     <bean name="priceOffDealUpdateJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
@@ -188,5 +86,15 @@
     <bean id="priceOffDealUpdateTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="priceOffDealUpdateJob"/>
         <property name="cronExpression" value="0 0 0/1 * * ?"/>
+    </bean>
+
+    <!--admin push -->
+    <bean name="adminPushJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.push.AdminPushJobBean"/>
+    </bean>
+
+    <bean id="adminPushTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="adminPushJob"/>
+        <property name="cronExpression" value="0 0 1 1 1 ? 2066 "/>
     </bean>
 </beans>

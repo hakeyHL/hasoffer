@@ -1,5 +1,6 @@
 package hasoffer.api.interceptor;
 
+import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import hasoffer.api.controller.vo.DeviceEventVo;
 import hasoffer.api.controller.vo.DeviceInfoVo;
@@ -90,14 +91,6 @@ public class RequestInterceptor implements HandlerInterceptor {
         return true;
     }
 
-//    private void addLogToDB(DeviceRequestBo requestVo) {
-//        ActorRef defaultActorRef = AkkaActorRef.getDefaultActorRef();
-//        AkkaJobConfigMessage message = new AkkaJobConfigMessage(DeviceLogActor.class, 1);
-//        defaultActorRef.tell(message, ActorRef.noSender());
-//        AkkaJobMessage akkaJobMessage = new AkkaJobMessage(DeviceLogActor.class, requestVo);
-//        defaultActorRef.tell(akkaJobMessage, ActorRef.noSender());
-//    }
-
     private void recordClientEvent(DeviceRequestVo requestVo, HttpServletRequest request) {
         if (requestVo.getRequestUri().equals("/app/log")) {
             String event = request.getParameter("event");
@@ -113,65 +106,94 @@ public class RequestInterceptor implements HandlerInterceptor {
         if (modelAndView != null && modelAndView.getModel().containsKey("searchCriteria")) {
             modelAndView.getModel().remove("searchCriteria");
         }
-        if (modelAndView != null) {
-            UrmUser urmUser = null;
-            String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
+        UrmUser urmUser = null;
+        String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
+        logger.info("userToken is : " + userToken);
+        if (StringUtils.isNotBlank(userToken)) {
             String key = "user_" + userToken;
             urmUser = userICacheService.get(UrmUser.class, key, 0);
-
             if (urmUser == null) {
+                System.out.println("user not exist in cache ,query it from database ");
                 urmUser = appService.getUserByUserToken(userToken);
                 userICacheService.add(key, urmUser, TimeUtils.SECONDS_OF_1_DAY);
             }
+        }
 
-            if (urmUser == null) {
-                modelAndView.addObject("result", new ResultVo("10010", "login expired"));
-            } else {
-//                List<String> ids = null;
-//                String deviceId = JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).getString("deviceId");
-//                String deviceKey = "urmDevice_ids_mapKey_" + deviceId;
-//                Map map = null;
-//                String deviceValue = urmDeviceService.get(deviceKey, 0);
-//
-//                if (!StringUtils.isEmpty(deviceValue)) {
-//                    ids = new ArrayList<>();
-//                    JSONObject jsonObject = JSONObject.parseObject(deviceValue);
-//                    JSONArray urmDevice_ids1 = jsonObject.getJSONArray("urmDevice_ids");
-//                    String[] strings = urmDevice_ids1.toArray(new String[]{});
-//                    for (String str : strings) {
-//                        ids.add(str);
-//                    }
-//                } else {
-//                    ids = appService.getUserDevices(deviceId);
-//                    map = new HashMap();
-//                    map.put("urmDevice_ids", ids);
-//                    urmDeviceService.add(deviceKey, JSONUtil.toJSON(map), TimeUtils.SECONDS_OF_1_DAY);
-//                }
-//                System.out.println("update user and device relationship ");
-//                List<String> deviceIds = appService.getUserDevicesByUserId(urmUser.getId() + "");
-//                System.out.println("get ids  by userId from urmUserDevice :" + deviceIds.size());
-//                List<UrmUserDevice> urmUserDevices = new ArrayList<>();
-//                for (String id : ids) {
-//                    boolean flag = false;
-//                    for (String dId : deviceIds) {
-//                        if (id.equals(dId)) {
-//                            flag = true;
-//                            System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);
-//                        }
-//                    }
-//                    if (!flag) {
-//                        System.out.println("id :" + id + " is not exist before ");
-//                        UrmUserDevice urmUserDevice = new UrmUserDevice();
-//                        urmUserDevice.setDeviceId(id);
-//                        urmUserDevice.setUserId(urmUser.getId() + "");
-//                        urmUserDevices.add(urmUserDevice);
-//                    }
-//                }
-//                //将关联关系插入到关联表中
-//                int count = appService.addUrmUserDevice(urmUserDevices);
-//                System.out.println(" batch save  result size : " + count);
-                modelAndView.addObject("result", new ResultVo("00000", "ok"));
+        if (modelAndView == null) {
+            modelAndView = new ModelAndView();
+        }
+        if (urmUser == null) {
+            modelAndView.addObject("result", new ResultVo("10010", "login expired"));
+        } else {
+            System.out.println("userName  is " + urmUser.getUserName());
+            System.out.println("----------------------------------" + JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).toJSONString() + "-------------------");
+            String gcmToken = JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).getString("gcmToken");
+            System.out.println("get gcmtoken ++++++++++++++++++++++++++++++++++++" + gcmToken + "++++++++++++++++++++++++++++++++");
+            System.out.println("gcmtoken from database :" + urmUser.getGcmToken() == null ? "is null .." : urmUser.getGcmToken());
+            //用户与gcmtoken绑定
+            //1. 获取gcmtoken
+            if (!StringUtils.isEmpty(gcmToken)) {
+                //3. 不为空,比对
+                if (urmUser.getGcmToken() == null) {
+                    System.out.println("user'Gcmtoken not exist before ");
+                    //5. 更新
+                    urmUser.setGcmToken(gcmToken);
+                    appService.updateUserInfo(urmUser);
+                } else if (!urmUser.getGcmToken().equals(gcmToken)) {
+                    System.out.println("update , not equal ");
+                    //5. 更新
+                    urmUser.setGcmToken(gcmToken);
+                    appService.updateUserInfo(urmUser);
+                }
+                //4. 相等,过
             }
+            //2. 为空,过
+            modelAndView.addObject("result", new ResultVo("00000", "ok"));
+                /*List<String> ids = null;
+                String deviceId = JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).getString("deviceId");
+                String deviceKey = "urmDevice_ids_mapKey_" + deviceId;
+                Map map = null;
+                String deviceValue = urmDeviceService.get(deviceKey, 0);
+
+                if (!StringUtils.isEmpty(deviceValue)) {
+                    ids = new ArrayList<>();
+                    JSONObject jsonObject = JSONObject.parseObject(deviceValue);
+                    JSONArray urmDevice_ids1 = jsonObject.getJSONArray("urmDevice_ids");
+                    String[] strings = urmDevice_ids1.toArray(new String[]{});
+                    for (String str : strings) {
+                        ids.add(str);
+                    }
+                } else {
+                    ids = appService.getUserDevices(deviceId);
+                    map = new HashMap();
+                    map.put("urmDevice_ids", ids);
+                    urmDeviceService.add(deviceKey, JSONUtil.toJSON(map), TimeUtils.SECONDS_OF_1_DAY);
+                }
+                System.out.println("update user and device relationship ");
+                List<String> deviceIds = appService.getUserDevicesByUserId(urmUser.getId() + "");
+                System.out.println("get ids  by userId from urmUserDevice :" + deviceIds.size());
+                List<UrmUserDevice> urmUserDevices = new ArrayList<>();
+                for (String id : ids) {
+                    System.out.println(" id id id :" + id);
+                    boolean flag = false;
+                    for (String dId : deviceIds) {
+                        System.out.println(" dId dId dId :" + dId);
+                        if (id.equals(dId)) {
+                            flag = true;
+                            System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);
+                        }
+                    }
+                    if (!flag) {
+                        System.out.println("id :" + id + " is not exist before ");
+                        UrmUserDevice urmUserDevice = new UrmUserDevice();
+                        urmUserDevice.setDeviceId(id);
+                        urmUserDevice.setUserId(urmUser.getId() + "");
+                        urmUserDevices.add(urmUserDevice);
+                    }
+                }
+                //将关联关系插入到关联表中
+                int count = appService.addUrmUserDevice(urmUserDevices);
+                System.out.println(" batch save  result size : " + count);*/
         }
     }
 
