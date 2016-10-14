@@ -10,10 +10,7 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.*;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
-import hasoffer.core.persistence.po.urm.UrmSignAwdCfg;
-import hasoffer.core.persistence.po.urm.UrmUser;
-import hasoffer.core.persistence.po.urm.UrmUserBak;
-import hasoffer.core.persistence.po.urm.UrmUserDevice;
+import hasoffer.core.persistence.po.urm.*;
 import hasoffer.core.system.IAppService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -69,6 +66,9 @@ public class AppServiceImpl implements IAppService {
     private static final String Q_APP_USER_GET_BY_NAME =
             "SELECT t FROM UrmUser t " +
                     " where t.userName=?0";
+
+    private static final String Q_APP_URM_SIGNCOIN_BY_USERID =
+            "SELECT t FROM UrmSignCoin t where t.userId=?0 ";
 
     private static final String Q_APP_URM_GET_SIGNCONFIG =
             "SELECT t FROM UrmSignAwdCfg t order by t.count desc  ";
@@ -304,8 +304,21 @@ public class AppServiceImpl implements IAppService {
     }
 
     @Override
-    public List<UrmSignAwdCfg> getSignAwardNum() {
-        return dbm.query(Q_APP_URM_GET_SIGNCONFIG);
+    public Map<Integer, Integer> getSignAwardNum() {
+        List<UrmSignAwdCfg> signAwardNum = dbm.query(Q_APP_URM_GET_SIGNCONFIG);
+        Map<Integer, Integer> afwCfgMap = new HashMap<>();
+        if (signAwardNum != null) {
+            for (UrmSignAwdCfg urmSignAwdCfg : signAwardNum) {
+                afwCfgMap.put(urmSignAwdCfg.getCount(), urmSignAwdCfg.getAwardCoin());
+            }
+        }
+
+        //for (int i = 1; i < 8; i++) {
+        //    if (afwCfgMap.get(i) == null) {
+        //        afwCfgMap.put(i, 5 + 5 * i);
+        //    }
+        //}
+        return afwCfgMap;
     }
 
     @Override
@@ -321,12 +334,12 @@ public class AppServiceImpl implements IAppService {
 
         userBak.setId(urmUser.getId());
         userBak.setAvatarPath(urmUser.getAvatarPath());
-        userBak.setConSignNum(urmUser.getConSignNum());
+        //userBak.setConSignNum(urmUser.getConSignNum());
         userBak.setCreateTime(urmUser.getCreateTime());
         userBak.setGcmToken(urmUser.getGcmToken());
-        userBak.setLastSignTime(urmUser.getLastSignTime());
-        userBak.setMaxConSignNum(urmUser.getMaxConSignNum());
-        userBak.setSignCoin(urmUser.getSignCoin());
+        //userBak.setLastSignTime(urmUser.getLastSignTime());
+        //userBak.setMaxConSignNum(urmUser.getMaxConSignNum());
+        //userBak.setSignCoin(urmUser.getSignCoin());
         userBak.setTelephone(urmUser.getTelephone());
         userBak.setThirdId(urmUser.getThirdId());
         userBak.setThirdPlatform(urmUser.getThirdPlatform());
@@ -344,5 +357,23 @@ public class AppServiceImpl implements IAppService {
             return query.get(0);
         }
         return null;
+    }
+
+    @Override
+    public UrmSignCoin getSignCoinByUserId(Long id) {
+        List<UrmSignCoin> signCoins = dbm.query(Q_APP_URM_SIGNCOIN_BY_USERID, Collections.singletonList(id));
+        if (signCoins != null && signCoins.size() > 0) {
+            return signCoins.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public void updateUrmSignCoin(UrmSignCoin urmSignCoin) {
+        if (urmSignCoin.getLastSignTime() != null) {
+            urmSignCoin.setSignZhTime(new Date(urmSignCoin.getLastSignTime()));
+            urmSignCoin.setSignIndTime(new Date(urmSignCoin.getLastSignTime() - TimeUtils.MILLISECONDS_OF_1_MINUTE * 150));
+        }
+        dbm.saveOrUpdate(urmSignCoin);
     }
 }

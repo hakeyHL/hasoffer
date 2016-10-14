@@ -8,10 +8,12 @@ import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.*;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.urm.UrmSignAwdCfg;
+import hasoffer.core.persistence.po.urm.UrmSignCoin;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created on 2015/12/30.
@@ -66,9 +68,13 @@ public interface IAppService {
 
     List<UrmUser> getUsersByUserName(String userName);
 
-    List<UrmSignAwdCfg> getSignAwardNum();
+    Map<Integer, Integer> getSignAwardNum();
 
     List<HasofferCoinsExchangeGift> getGiftList();
 
     void bakUserInfo(UrmUser urmUser);
+
+    UrmSignCoin getSignCoinByUserId(Long id);
+
+    void updateUrmSignCoin(UrmSignCoin urmSignCoin);
 }

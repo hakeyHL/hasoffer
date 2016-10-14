@@ -30,10 +30,7 @@ import hasoffer.core.persistence.po.app.*;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.urm.UrmDevice;
-import hasoffer.core.persistence.po.urm.UrmSignAwdCfg;
-import hasoffer.core.persistence.po.urm.UrmUser;
-import hasoffer.core.persistence.po.urm.UrmUserDevice;
+import hasoffer.core.persistence.po.urm.*;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
@@ -361,20 +358,22 @@ public class AppController {
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
         UrmUser user = appService.getUserByUserToken(userToken);
         if (user != null) {
+
+            // 获取基本配置
+            Map<Integer, Integer> afwCfgMap = appService.getSignAwardNum();
+
             calculateHasofferCoin(Collections.singletonList(user), data);
             //添加返回:
             //1. 从订单记录中查询直接乘以10
             data.setPendingCoins(data.getPendingCoins().multiply(BigDecimal.valueOf(10)));
             data.setVerifiedCoins(data.getVerifiedCoins().multiply(BigDecimal.valueOf(10)));
 
-            // 获取基本配置
-            Map<Integer, Integer> afwCfgMap = initDefaultValue();
+            UrmSignCoin urmSignCoin = appService.getSignCoinByUserId(user.getId());
 
             //2. 本次签到奖励
             Set<Integer> integers = afwCfgMap.keySet();
             Integer max = Collections.max(integers);
-            Long lastSignTime = user.getLastSignTime();
-            if (lastSignTime == null) {
+            if (urmSignCoin == null) {
                 //如果为空,代表还没有签到过
                 data.setThisTimeCoin(afwCfgMap.get(1));
                 data.setNextTimeCoin(afwCfgMap.get(2));
@@ -385,12 +384,12 @@ public class AppController {
                 //String currentDate = simpleDateFormat.format(new Date());
                 //String lastSignDate = simpleDateFormat.format(new Date(user.getLastSignTime()));
                 long current = new Date().getTime();
-                long days = TimeUtils.getIndiaTime(current) / TimeUtils.MILLISECONDS_OF_1_DAY - TimeUtils.getIndiaTime(lastSignTime) / TimeUtils.MILLISECONDS_OF_1_DAY;
+                long days = TimeUtils.getIndiaTime(current) / TimeUtils.MILLISECONDS_OF_1_DAY - TimeUtils.getIndiaTime(urmSignCoin.getLastSignTime()) / TimeUtils.MILLISECONDS_OF_1_DAY;
                 if (days == 0) {
                     //如果今天已经签到过,返回已签到标识
                     data.setHasSign(true);
                     //明天签到的奖励
-                    Integer conSignNum = user.getConSignNum();
+                    Integer conSignNum = urmSignCoin.getConSignNum();
                     //最大连续签到数会大于连续奖励数
                     //需要知道Map中的最大key值
                     if (conSignNum + 1 >= max) {
@@ -398,10 +397,10 @@ public class AppController {
                     } else {
                         data.setThisTimeCoin(afwCfgMap.get(conSignNum + 1));
                     }
-                    data.setMaxConSignNum(user.getConSignNum());
+                    data.setMaxConSignNum(urmSignCoin.getConSignNum());
                 } else if (days == 1) {// 如果是连续签单，则按照连续签到返回数据；
                     //返回已签到+1作为本次,已连续+2作为下次返回
-                    Integer conSignNum = user.getConSignNum();
+                    Integer conSignNum = urmSignCoin.getConSignNum();
                     //需要知道Map中的最大key值
                     if (conSignNum + 1 >= max) {
                         data.setThisTimeCoin(afwCfgMap.get(max));
@@ -413,7 +412,7 @@ public class AppController {
                     } else {
                         data.setNextTimeCoin(afwCfgMap.get(conSignNum + 2));
                     }
-                    data.setMaxConSignNum(user.getConSignNum());
+                    data.setMaxConSignNum(urmSignCoin.getConSignNum());
                 } else if (days > 1) {// 如果不是，则重新从0开始；
                     data.setThisTimeCoin(afwCfgMap.get(1));
                     data.setNextTimeCoin(afwCfgMap.get(2));
@@ -422,7 +421,7 @@ public class AppController {
                 }
             }
             //4. verified coin = approved*10+签到获得.
-            data.setVerifiedCoins(data.getVerifiedCoins().add(BigDecimal.valueOf(user.getSignCoin())));
+            data.setVerifiedCoins(data.getVerifiedCoins().add(BigDecimal.valueOf(urmSignCoin.getSignCoin())));
 
         }
         data.setAuxiliaryCheck(true);
@@ -430,23 +429,6 @@ public class AppController {
         return mv;
     }
 
-    private Map<Integer, Integer> initDefaultValue() {
-        List<UrmSignAwdCfg> signAwardNum = appService.getSignAwardNum();
-        Map<Integer, Integer> afwCfgMap = new HashMap<>();
-
-        if (signAwardNum != null) {
-            for (UrmSignAwdCfg urmSignAwdCfg : signAwardNum) {
-                afwCfgMap.put(urmSignAwdCfg.getCount(), urmSignAwdCfg.getAwardCoin());
-            }
-        }
-        for (int i = 1; i < 8; i++) {
-            if (afwCfgMap.get(i) == null) {
-                afwCfgMap.put(i, 5 + 5 * i);
-            }
-        }
-
-        return afwCfgMap;
-    }
 
     /**
      * banners列表

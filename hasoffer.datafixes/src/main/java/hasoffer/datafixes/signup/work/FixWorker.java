@@ -3,7 +3,7 @@ package hasoffer.datafixes.signup.work;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
 import hasoffer.core.persistence.mongo.UserSignLog;
-import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.persistence.po.urm.UrmSignCoin;
 import hasoffer.core.system.IAppService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,16 +58,15 @@ public class FixWorker {
             });
 
             // 计算签到用户的实际签到天数及连续性
-            UrmUser user = appService.getUserById(key);
-            if (user != null) {
-                calSignUpCoin(user, signList);
-                appService.updateUserInfo(user);
-            }
+            UrmSignCoin urmSignCoin = new UrmSignCoin();
+            urmSignCoin.setUserId(key);
+            calSignUpCoin(urmSignCoin, signList);
+            appService.updateUrmSignCoin(urmSignCoin);
         }
 
     }
 
-    private void calSignUpCoin(UrmUser user, List<Long> signTimes) {
+    private void calSignUpCoin(UrmSignCoin user, List<Long> signTimes) {
         //Long userId = user.getKey();
         //List<Long> signTimes = user.getValue();
         long signCoin = 0L;
@@ -88,7 +87,7 @@ public class FixWorker {
                 }
                 conSignNum = 1;
             }
-            logger.info("user:{}, Sign time:{}, conSignUp:{}, Day jet lag:{}", user.getId(), new Date(signTime), conSignNum, x);
+            logger.info("user:{}, Sign time:{}, conSignUp:{}, Day jet lag:{}", user.getUserId(), new Date(signTime), conSignNum, x);
             signCoin += getThisCoin(conSignNum);
 
         }
