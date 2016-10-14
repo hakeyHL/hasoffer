@@ -547,7 +547,7 @@ public class AppController {
                             StringBuilder sb = new StringBuilder();
                             String description = appDeal.getDescription();
                             sb.append(description == null ? "" : description);
-                            /*if (description.lastIndexOf("\n") > 0) {
+                            if (description.lastIndexOf("\n") > 0) {
                                 if (description.lastIndexOf("\n") == description.length() - 1) {
                                     //最后有换行,再加一个换行
                                     sb.append("\n");
@@ -561,7 +561,7 @@ public class AppController {
                                 sb.append("\n");
                                 sb.append("\n");
                             }
-                            sb.append("How to get the deal: \n");
+                           /* sb.append("How to get the deal: \n");
                             sb.append("1 Click \"Activate Deal\" button.\n");
                             sb.append("2 Add the product of your choice to cart.\n");
                             sb.append("3 And no coupon code required.\n\n");*/
@@ -716,10 +716,10 @@ public class AppController {
                                     sb.append("\n");
                                     sb.append("\n");
                                 }
-                                sb.append("How to get the deal: \n");
+                               /* sb.append("How to get the deal: \n");
                                 sb.append("1 Click \"Activate Deal\" button.\n");
                                 sb.append("2 Add the product of your choice to cart.\n");
-                                sb.append("3 And no coupon code required.\n\n");
+                                sb.append("3 And no coupon code required.\n\n");*/
                                 if (appDeal.getPtmcmpskuid() > 0) {
                                     PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
                                     if (ptmCmpSkuDescription != null) {
