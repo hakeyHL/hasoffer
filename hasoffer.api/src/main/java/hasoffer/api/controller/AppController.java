@@ -537,7 +537,7 @@ public class AppController {
                     Long dealId = Long.valueOf(id);
                     AppDeal appDeal = appService.getDealDetail(dealId);
                     if (appDeal != null) {
-                        if (vsion < 23) {
+                        if (vsion < 23 || appDeal.getAppdealSource().name().equals("MANUAL_INPUT")) {
                             System.out.println("has this deal ");
                             map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
                             map.put("title", appDeal.getTitle());
@@ -591,6 +591,11 @@ public class AppController {
                             }
                             map.put("description", sb.toString());
                         } else {
+                           /* //要判断deal的类型,手动导入和降价生成
+                            if (appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
+                                //降价生成
+
+                            }*/
                             map.put("discount", appDeal.getDiscount());
                             map.put("originPrice", appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
                             map.put("priceDescription", appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
