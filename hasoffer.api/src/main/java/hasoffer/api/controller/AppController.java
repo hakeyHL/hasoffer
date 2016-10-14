@@ -347,11 +347,9 @@ public class AppController {
         BackDetailVo data = new BackDetailVo();
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
         UrmUser user = appService.getUserByUserToken(userToken);
+        // 获取基本配置
+        Map<Integer, Integer> afwCfgMap = appService.getSignAwardNum();
         if (user != null) {
-
-            // 获取基本配置
-            Map<Integer, Integer> afwCfgMap = appService.getSignAwardNum();
-
             calculateHasofferCoin(Collections.singletonList(user), data);
             //添加返回:
             UrmSignCoin urmSignCoin = appService.getSignCoinByUserId(user.getId());
@@ -410,6 +408,8 @@ public class AppController {
                 data.setVerifiedCoins(data.getVerifiedCoins().add(BigDecimal.valueOf(urmSignCoin.getSignCoin())));
             }
 
+        } else {
+            data.setThisTimeCoin(afwCfgMap.get(1) == null ? 1 : afwCfgMap.get(1));
         }
         data.setAuxiliaryCheck(true);
         mv.addObject("data", data);
