@@ -105,11 +105,14 @@ public class AdminPushJobBean extends QuartzJobBean {
 
                 for (UrmDevice urmDevice : urmDeviceList) {
 
+                    String shopApp = urmDevice.getShopApp();
+
                     if (urmDevice.getId().equals("dd3af1280b74a528f073316c17425841")) {
                         System.out.println("found ashit");
+                        System.out.println("website " + website.name());
+                        System.out.println("shopApp = " + shopApp);
                     }
 
-                    String shopApp = urmDevice.getShopApp();
                     if (shopApp.contains(website.name())) {
                         //按照appVersion排除
                         //按照shopApp排除
