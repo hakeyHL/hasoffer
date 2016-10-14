@@ -30,7 +30,10 @@ import hasoffer.core.persistence.po.app.*;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.urm.*;
+import hasoffer.core.persistence.po.urm.UrmDevice;
+import hasoffer.core.persistence.po.urm.UrmSignCoin;
+import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
@@ -419,9 +422,9 @@ public class AppController {
                     // 当前最大连续签到次数
                     data.setMaxConSignNum(0);
                 }
+                //4. verified coin = approved*10+签到获得.
+                data.setVerifiedCoins(data.getVerifiedCoins().add(BigDecimal.valueOf(urmSignCoin.getSignCoin())));
             }
-            //4. verified coin = approved*10+签到获得.
-            data.setVerifiedCoins(data.getVerifiedCoins().add(BigDecimal.valueOf(urmSignCoin.getSignCoin())));
 
         }
         data.setAuxiliaryCheck(true);
