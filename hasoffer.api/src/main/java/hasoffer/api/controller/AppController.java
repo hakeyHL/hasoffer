@@ -344,6 +344,7 @@ public class AppController {
         ModelAndView mv = new ModelAndView();
         mv.addObject("errorCode", "00000");
         mv.addObject("errorCode", "msg");
+        //若用户未登录显示为已连续签到0
         BackDetailVo data = new BackDetailVo();
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
         UrmUser user = appService.getUserByUserToken(userToken);
@@ -409,9 +410,13 @@ public class AppController {
             }
 
         } else {
-            data.setThisTimeCoin(afwCfgMap.get(1) == null ? 1 : afwCfgMap.get(1));
+            data.setThisTimeCoin(afwCfgMap.get(1) == null ? 0 : afwCfgMap.get(1));
+            //未登录返回连续签到次数为0
+            data.setMaxConSignNum(0);
         }
         data.setAuxiliaryCheck(true);
+        //set sign in and rewards config map
+        data.setSinDaysRewardsCfg(afwCfgMap);
         mv.addObject("data", data);
         return mv;
     }
