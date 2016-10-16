@@ -1,7 +1,10 @@
 package hasoffer.api.listener;
 
 import hasoffer.api.worker.DeviceRequestSaveWorker;
+import hasoffer.api.worker.UrmSignAlertWorker;
 import hasoffer.base.utils.DaemonThreadFactory;
+import hasoffer.core.system.IAppService;
+import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IDeviceService;
 import hasoffer.core.user.impl.DeviceServiceImpl;
 import org.springframework.web.context.ContextLoaderListener;
@@ -11,6 +14,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import javax.servlet.ServletContextEvent;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class ApplicationListener extends ContextLoaderListener {
 
@@ -31,6 +36,13 @@ public class ApplicationListener extends ContextLoaderListener {
 //
         IDeviceService deviceService = springContext.getBean(DeviceServiceImpl.class);
         es.execute(DaemonThreadFactory.create(new DeviceRequestSaveWorker(deviceService)));
+
+        //check if user had signed yesterday by until today 22:00:00 hadn't sign.
+        //we will push message to alert them to sign in our app and get hasoffer coin.
+        IAppService appService = springContext.getBean(AppServiceImpl.class);
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        scheduledExecutorService.scheduleAtFixedRate(new UrmSignAlertWorker(appService), 0, 1, TimeUnit.MINUTES);
+
     }
 
     @Override

@@ -7,7 +7,6 @@ import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.*;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
-import hasoffer.core.persistence.po.urm.UrmSignAwdCfg;
 import hasoffer.core.persistence.po.urm.UrmSignCoin;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
@@ -77,4 +76,6 @@ public interface IAppService {
     UrmSignCoin getSignCoinByUserId(Long id);
 
     void updateUrmSignCoin(UrmSignCoin urmSignCoin);
+
+    void checkAndAlertUser2Sign();
 }
