@@ -376,4 +376,20 @@ public class AppServiceImpl implements IAppService {
         }
         dbm.saveOrUpdate(urmSignCoin);
     }
+
+    @Override
+    public void checkAndAlertUser2Sign() {
+        //record opreate history ,so that i could anwser xu's question .
+
+
+        //1. check who had't sign till today 22:00:00
+
+
+        //2. send push message to alert them to sign in .
+
+        //3. record this history into mongo or mysql .
+
+
+        //4. over .
+    }
 }
