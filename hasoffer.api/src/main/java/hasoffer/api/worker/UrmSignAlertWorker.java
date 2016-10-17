@@ -7,6 +7,9 @@ import java.util.Date;
 
 /**
  * Created by HL on 2016/10/17.
+ * designed for alert user sign in at 22:00:00
+ * but do not use in the end .
+ * ready use in the  future ...
  */
 public class UrmSignAlertWorker implements Runnable {
     private IAppService appService;
