@@ -371,9 +371,6 @@ public class AppController {
             } else {
                 data.setEverSign(false);
                 //判断今天是否已经签过
-                //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                //String currentDate = simpleDateFormat.format(new Date());
-                //String lastSignDate = simpleDateFormat.format(new Date(user.getLastSignTime()));
                 long current = new Date().getTime();
                 long days = TimeUtils.getIndiaTime(current) / TimeUtils.MILLISECONDS_OF_1_DAY - TimeUtils.getIndiaTime(urmSignCoin.getLastSignTime()) / TimeUtils.MILLISECONDS_OF_1_DAY;
                 if (days == 0) {
@@ -425,6 +422,10 @@ public class AppController {
         data.setSinDaysRewardsCfg(afwCfgMap);
         if (data.getSinDaysRewardsCfg() != null) {
             Map<Integer, Integer> sinDaysRewardsCfg = data.getSinDaysRewardsCfg();
+
+            data.setSignConfigKeys(sinDaysRewardsCfg.keySet().toArray(new Integer[]{}));
+            data.setSignConfigValus(sinDaysRewardsCfg.values().toArray(new Integer[]{}));
+
             if (sinDaysRewardsCfg.get(sinDaysRewardsCfg.size()) != null) {
                 data.setSignMoreCoin(sinDaysRewardsCfg.get(sinDaysRewardsCfg.size()));
             } else {

@@ -36,6 +36,9 @@ public class BackDetailVo {
     //是否从未签到过,默认是
     private boolean everSign = true;
 
+    private Integer[] signConfigKeys;
+    private Integer[] signConfigValus;
+
     //是否检测辅助功能开启
     private boolean auxiliaryCheck = false;
 
@@ -127,5 +130,21 @@ public class BackDetailVo {
 
     public void setSinDaysRewardsCfg(Map<Integer, Integer> sinDaysRewardsCfg) {
         this.sinDaysRewardsCfg = sinDaysRewardsCfg;
+    }
+
+    public Integer[] getSignConfigKeys() {
+        return signConfigKeys;
+    }
+
+    public void setSignConfigKeys(Integer[] signConfigKeys) {
+        this.signConfigKeys = signConfigKeys;
+    }
+
+    public Integer[] getSignConfigValus() {
+        return signConfigValus;
+    }
+
+    public void setSignConfigValus(Integer[] signConfigValus) {
+        this.signConfigValus = signConfigValus;
     }
 }
