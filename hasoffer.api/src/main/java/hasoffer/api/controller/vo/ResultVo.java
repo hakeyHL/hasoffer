@@ -15,6 +15,7 @@ public class ResultVo {
     private String msg = "ok";
 
     private List ataList = new ArrayList();
+    private List dataList = new ArrayList();
     private Map data = new HashMap();
 
     public ResultVo() {
@@ -55,5 +56,13 @@ public class ResultVo {
 
     public void setData(Map data) {
         this.data = data;
+    }
+
+    public List getDataList() {
+        return dataList;
+    }
+
+    public void setDataList(List dataList) {
+        this.dataList = dataList;
     }
 }
