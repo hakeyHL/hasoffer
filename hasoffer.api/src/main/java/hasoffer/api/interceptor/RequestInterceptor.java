@@ -71,6 +71,7 @@ public class RequestInterceptor implements HandlerInterceptor {
             String deviceId = DeviceUtils.getDeviceId(deviceInfoVo.getDeviceId(), deviceInfoVo.getImeiId(), deviceInfoVo.getSerial());
             Context.currentContext().set(StaticContext.DEVICE_ID, deviceId);
 
+			/**
             if (!StringUtils.isEmpty(userToken) && !"null".equalsIgnoreCase(userToken)) {
                 Context.currentContext().set(StaticContext.USER_TOKEN, userToken);
 
@@ -79,7 +80,7 @@ public class RequestInterceptor implements HandlerInterceptor {
                 if (user != null) {
                     Context.currentContext().set(StaticContext.USER_ID, user.getId());
                 }
-            }
+            }*/
 
         } catch (Exception e) {
             logger.error(String.format("RequestInterceptor Has Error: %s. request = [%s]. query = [%s] .device=[%s]",
