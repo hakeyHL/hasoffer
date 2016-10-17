@@ -45,7 +45,7 @@ public class RequestInterceptor implements HandlerInterceptor {
         Gson gson = new Gson();
 
         String deviceInfoStr = Context.currentContext().getHeader("deviceinfo");
-        String userToken = Context.currentContext().getHeader("usertoken");
+        String userToken = Context.currentContext().getHeader("usertoken", "");
         String requestUri = httpServletRequest.getRequestURI();
         String queryStr = httpServletRequest.getQueryString();
         try {
@@ -71,7 +71,7 @@ public class RequestInterceptor implements HandlerInterceptor {
             String deviceId = DeviceUtils.getDeviceId(deviceInfoVo.getDeviceId(), deviceInfoVo.getImeiId(), deviceInfoVo.getSerial());
             Context.currentContext().set(StaticContext.DEVICE_ID, deviceId);
 
-            if (!StringUtils.isEmpty(userToken)) {
+            if (!StringUtils.isEmpty(userToken) && !"null".equalsIgnoreCase(userToken)) {
                 Context.currentContext().set(StaticContext.USER_TOKEN, userToken);
 
                 //todo add cache
