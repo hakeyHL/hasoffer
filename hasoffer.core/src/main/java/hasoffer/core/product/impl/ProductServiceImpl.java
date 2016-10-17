@@ -722,6 +722,9 @@ public class ProductServiceImpl implements IProductService {
         }
 
         List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(product.getId());
+        if (cmpSkus == null || cmpSkus.size() < 1) {
+            return null;
+        }
         Map<Website, PtmCmpSku> cmpSkuMap = new HashMap<>();
         for (PtmCmpSku cmpSku : cmpSkus) {
             if (cmpSku.getStatus() == SkuStatus.OFFSALE || cmpSku.getPrice() <= 0) {
