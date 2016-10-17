@@ -30,7 +30,6 @@ public class Adt implements Identifiable<Long> {
     private String adBtnContent;
     private String aderSiteUrl;
     private boolean isShow = false;
-    @Transient
     private String packageName;
     private int adLocation;
     //为适配客户端显示的格式化的时间字符串--开始时间

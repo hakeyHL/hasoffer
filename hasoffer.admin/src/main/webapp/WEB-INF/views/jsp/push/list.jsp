@@ -71,7 +71,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <c:forEach items="${appPushLists}" var="appPush">
+                    <c:forEach items="${appPushList}" var="appPush">
                         <tr>
                             <td>${appPush.id}</td>
                             <td>${appPush.createTime}</td>

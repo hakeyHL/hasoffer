@@ -106,6 +106,13 @@ public class AdminPushJobBean extends QuartzJobBean {
                 for (UrmDevice urmDevice : urmDeviceList) {
 
                     String shopApp = urmDevice.getShopApp();
+
+                    if (urmDevice.getId().equals("dd3af1280b74a528f073316c17425841")) {
+                        System.out.println("found ashit");
+                        System.out.println("website " + website.name());
+                        System.out.println("shopApp = " + shopApp);
+                    }
+
                     if (shopApp.contains(website.name())) {
                         //按照appVersion排除
                         //按照shopApp排除
@@ -119,6 +126,12 @@ public class AdminPushJobBean extends QuartzJobBean {
                 }
 
                 try {
+
+                    if (gcmTokenList != null && gcmTokenList.contains("diME4RkV_6A:APA91bGHSgs6e6RyDjnKH2DPq3Ca7Q_D4cSRRq_JySvRO8txSIJgDgHFi1JULM7uM-EXwxTkswtP1PoKJzZ0l0jUdaAf88-VfZcVkE8C5rPEO-neb3hOdZjT0mjGsa002vLwdYHgyU3S")) {
+                        System.out.println("push to ashit ");
+                        String push = pushService.push(("diME4RkV_6A:APA91bGHSgs6e6RyDjnKH2DPq3Ca7Q_D4cSRRq_JySvRO8txSIJgDgHFi1JULM7uM-EXwxTkswtP1PoKJzZ0l0jUdaAf88-VfZcVkE8C5rPEO-neb3hOdZjT0mjGsa002vLwdYHgyU3S"), pushBo);
+                        System.out.println("push result = " + push);
+                    }
 
                     MulticastResult multicastResult = pushService.GroupPush(gcmTokenList, pushBo);
 

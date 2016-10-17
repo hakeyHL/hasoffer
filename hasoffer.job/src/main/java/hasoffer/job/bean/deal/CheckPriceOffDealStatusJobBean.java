@@ -99,6 +99,10 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
 
                             long ptmcmpskuid = deal.getPtmcmpskuid();
                             PtmCmpSku ptmCmpSku = dbm.get(PtmCmpSku.class, ptmcmpskuid);
+                            if (ptmCmpSku == null) {
+                                System.out.println("get null sku,id = ptmcmpskuid");
+                                continue;
+                            }
                             Website website = ptmCmpSku.getWebsite();
                             String url = ptmCmpSku.getUrl();
                             fetchDubboService.sendUrlTask(website, url, TimeUtils.SECONDS_OF_1_MINUTE * 45, TaskLevel.LEVEL_2);
