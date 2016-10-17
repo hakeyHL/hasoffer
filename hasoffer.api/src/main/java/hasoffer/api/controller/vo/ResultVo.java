@@ -1,18 +1,22 @@
 package hasoffer.api.controller.vo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by chevy on 2016/7/4.
  */
 public class ResultVo {
 
-    private String errorCode;
+    private String errorCode = "00000";
 
-    private String msg;
+    private String msg = "ok";
 
     private List ataList = new ArrayList();
+    private Map data = new HashMap();
+
     public ResultVo() {
     }
 
@@ -43,5 +47,13 @@ public class ResultVo {
 
     public void setAtaList(List ataList) {
         this.ataList = ataList;
+    }
+
+    public Map getData() {
+        return data;
+    }
+
+    public void setData(Map data) {
+        this.data = data;
     }
 }
