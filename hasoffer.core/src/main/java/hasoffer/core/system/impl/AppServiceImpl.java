@@ -306,7 +306,7 @@ public class AppServiceImpl implements IAppService {
     @Override
     public Map<Integer, Integer> getSignAwardNum() {
         List<UrmSignAwdCfg> signAwardNum = dbm.query(Q_APP_URM_GET_SIGNCONFIG);
-        Map<Integer, Integer> afwCfgMap = new HashMap<>();
+        Map<Integer, Integer> afwCfgMap = new LinkedHashMap<>();
         if (signAwardNum != null) {
             for (UrmSignAwdCfg urmSignAwdCfg : signAwardNum) {
                 afwCfgMap.put(urmSignAwdCfg.getCount(), urmSignAwdCfg.getAwardCoin());
