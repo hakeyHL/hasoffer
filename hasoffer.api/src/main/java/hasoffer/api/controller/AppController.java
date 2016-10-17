@@ -202,6 +202,7 @@ public class AppController {
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
         DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        MarketChannel marketChannel = null;
         switch (action) {
             case FLOWCTRLSUCCESS:
                 // 流量拦截成功
@@ -215,9 +216,14 @@ public class AppController {
                 break;
             case HOMEPAGE:
                 Map map = new HashMap();
-                MarketChannel marketChannel = deviceInfoVo.getMarketChannel();
+                marketChannel = deviceInfoVo.getMarketChannel();
                 map.put("info", AffliIdHelper.getAffiIds(marketChannel));
                 modelAndView.addObject("data", map);
+                break;
+            case INDEXPAGE:
+                marketChannel = deviceInfoVo.getMarketChannel();
+                List<Map<String, String>> list = AffliIdHelper.getAffIds(marketChannel);
+                modelAndView.addObject("data", list);
                 break;
             case CLICKDEAL:
                 String id = request.getParameter("value");
