@@ -423,6 +423,19 @@ public class AppController {
         data.setAuxiliaryCheck(true);
         //set sign in and rewards config map
         data.setSinDaysRewardsCfg(afwCfgMap);
+        if (data.getSinDaysRewardsCfg() != null) {
+            Map<Integer, Integer> sinDaysRewardsCfg = data.getSinDaysRewardsCfg();
+            if (sinDaysRewardsCfg.get(sinDaysRewardsCfg.size()) != null) {
+                data.setSignMoreCoin(sinDaysRewardsCfg.get(sinDaysRewardsCfg.size()));
+            } else {
+                Iterator<Integer> iterator = sinDaysRewardsCfg.keySet().iterator();
+                int lastDayReward = 1;
+                while (iterator.hasNext()) {
+                    lastDayReward = iterator.next();
+                }
+                data.setSignMoreCoin(sinDaysRewardsCfg.get(lastDayReward));
+            }
+        }
         mv.addObject("data", data);
         return mv;
     }

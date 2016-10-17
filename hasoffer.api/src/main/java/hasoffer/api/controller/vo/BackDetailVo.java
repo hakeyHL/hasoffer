@@ -29,11 +29,25 @@ public class BackDetailVo {
 
     //今日是否已经签到
     private boolean hasSign = false;
+
     //连续签到天数和奖励配置
     private Map<Integer, Integer> sinDaysRewardsCfg = new HashMap<>();
+
     //是否从未签到过,默认是
     private boolean everSign = true;
+
+    //是否检测辅助功能开启
     private boolean auxiliaryCheck = false;
+
+    private int signMoreCoin;
+
+    public int getSignMoreCoin() {
+        return signMoreCoin;
+    }
+
+    public void setSignMoreCoin(int signMoreCoin) {
+        this.signMoreCoin = signMoreCoin;
+    }
 
     public boolean isAuxiliaryCheck() {
         return auxiliaryCheck;
