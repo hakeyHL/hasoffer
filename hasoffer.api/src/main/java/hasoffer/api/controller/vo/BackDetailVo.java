@@ -2,7 +2,9 @@ package hasoffer.api.controller.vo;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hs on 2016/6/16.
@@ -10,9 +12,9 @@ import java.util.List;
  */
 public class BackDetailVo {
     //冻结coin
-    private BigDecimal PendingCoins;
+    private BigDecimal PendingCoins = BigDecimal.ZERO;
     //可使用coin
-    private BigDecimal verifiedCoins;
+    private BigDecimal verifiedCoins = BigDecimal.ZERO;
     //订单记录
     private List<OrderVo> transcations = new ArrayList<OrderVo>();
 
@@ -23,11 +25,12 @@ public class BackDetailVo {
     private Integer nextTimeCoin = 0;
 
     //当前最大连续签到数
-    private Integer maxConSignNum;
+    private Integer maxConSignNum = 0;
 
     //今日是否已经签到
     private boolean hasSign = false;
-
+    //连续签到天数和奖励配置
+    private Map<Integer, Integer> sinDaysRewardsCfg = new HashMap<>();
     //是否从未签到过,默认是
     private boolean everSign = true;
     private boolean auxiliaryCheck = false;
@@ -102,5 +105,13 @@ public class BackDetailVo {
 
     public void setMaxConSignNum(Integer maxConSignNum) {
         this.maxConSignNum = maxConSignNum;
+    }
+
+    public Map<Integer, Integer> getSinDaysRewardsCfg() {
+        return sinDaysRewardsCfg;
+    }
+
+    public void setSinDaysRewardsCfg(Map<Integer, Integer> sinDaysRewardsCfg) {
+        this.sinDaysRewardsCfg = sinDaysRewardsCfg;
     }
 }

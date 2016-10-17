@@ -31,6 +31,19 @@ public class ApplicationListener extends ContextLoaderListener {
 //
         IDeviceService deviceService = springContext.getBean(DeviceServiceImpl.class);
         es.execute(DaemonThreadFactory.create(new DeviceRequestSaveWorker(deviceService)));
+
+        //check if user had signed yesterday by until today 22:00:00 hadn't sign.
+        //we will push message to alert them to sign in our app and get hasoffer coin.
+//        Date currentDate = new Date();
+//        long indiaTime = TimeUtils.getIndiaTime(currentDate.getTime());
+//        long pushTime = TimeUtils.today(0, 30, 0);
+//        pushTime = TimeUtils.getIndiaTime(pushTime);
+
+//        IAppService appService = springContext.getBean(AppServiceImpl.class);
+//        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+//        scheduledExecutorService.scheduleAtFixedRate(new UrmSignAlertWorker(appService), pushTime - indiaTime, 1000 * 60 * 60 * 24, TimeUnit.SECONDS);
+//        scheduledExecutorService.scheduleAtFixedRate(new UrmSignAlertWorker(appService), 5, 2, TimeUnit.SECONDS);
+
     }
 
     @Override
