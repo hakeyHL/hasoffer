@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import hasoffer.api.controller.vo.ResultVo;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.core.app.AppClientCfgService;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +27,6 @@ public class AppCliCfgController {
     private AppClientCfgService appClientCfgService;
 
     public static void main(String[] args) {
-        if (StringUtils.isNotBlank("")) {
-            System.out.println("we");
-        }
     }
 
     @RequestMapping(value = "/app/homeCfg")
