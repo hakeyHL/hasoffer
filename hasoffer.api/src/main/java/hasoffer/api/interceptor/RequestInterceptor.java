@@ -45,7 +45,7 @@ public class RequestInterceptor implements HandlerInterceptor {
         Gson gson = new Gson();
 
         String deviceInfoStr = Context.currentContext().getHeader("deviceinfo");
-        String userToken = Context.currentContext().getHeader("usertoken");
+        String userToken = Context.currentContext().getHeader("usertoken", "");
         String requestUri = httpServletRequest.getRequestURI();
         String queryStr = httpServletRequest.getQueryString();
         try {
@@ -71,12 +71,17 @@ public class RequestInterceptor implements HandlerInterceptor {
             String deviceId = DeviceUtils.getDeviceId(deviceInfoVo.getDeviceId(), deviceInfoVo.getImeiId(), deviceInfoVo.getSerial());
             Context.currentContext().set(StaticContext.DEVICE_ID, deviceId);
 
-            if (!StringUtils.isEmpty(userToken)) {
+            if (!StringUtils.isEmpty(userToken) && !"null".equalsIgnoreCase(userToken)) {
                 Context.currentContext().set(StaticContext.USER_TOKEN, userToken);
-
-                //todo add cache
-                UrmUser user = appService.getUserByUserToken(userToken);
-                if (user != null) {
+                UrmUser user = null;
+                String key = "user_" + userToken;
+                user = userICacheService.get(UrmUser.class, key, 0);
+                if (user == null) {
+                    user = appService.getUserByUserToken(userToken);
+                    if (user != null) {
+                        userICacheService.add(key, user, TimeUtils.SECONDS_OF_1_DAY);
+                    }
+                } else {
                     Context.currentContext().set(StaticContext.USER_ID, user.getId());
                 }
             }
@@ -108,28 +113,25 @@ public class RequestInterceptor implements HandlerInterceptor {
         }
         UrmUser urmUser = null;
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
-//        logger.info("userToken is : " + userToken);
+        System.out.println("usertoken : " + userToken);
         if (StringUtils.isNotBlank(userToken)) {
             String key = "user_" + userToken;
             urmUser = userICacheService.get(UrmUser.class, key, 0);
             if (urmUser == null) {
-//                System.out.println("user not exist in cache ,query it from database ");
                 urmUser = appService.getUserByUserToken(userToken);
-                userICacheService.add(key, urmUser, TimeUtils.SECONDS_OF_1_DAY);
+                if (urmUser != null) {
+                    userICacheService.add(key, urmUser, TimeUtils.SECONDS_OF_1_DAY);
+                }
             }
         }
-
+        System.out.println("----------------------------------" + JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).toJSONString() + "-------------------");
         if (modelAndView == null) {
             modelAndView = new ModelAndView();
         }
         if (urmUser == null) {
             modelAndView.addObject("result", new ResultVo("10010", "login expired"));
         } else {
-//            System.out.println("userName  is " + urmUser.getUserName());
-            System.out.println("----------------------------------" + JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).toJSONString() + "-------------------");
             String gcmToken = JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).getString("gcmToken");
-           /* System.out.println("get gcmtoken ++++++++++++++++++++++++++++++++++++" + gcmToken + "++++++++++++++++++++++++++++++++");
-            System.out.println("gcmtoken from database :" + urmUser.getGcmToken() == null ? "is null .." : urmUser.getGcmToken());*/
             //用户与gcmtoken绑定
             //1. 获取gcmtoken
             if (!StringUtils.isEmpty(gcmToken)) {
@@ -154,7 +156,6 @@ public class RequestInterceptor implements HandlerInterceptor {
                 String deviceKey = "urmDevice_ids_mapKey_" + deviceId;
                 Map map = null;
                 String deviceValue = urmDeviceService.get(deviceKey, 0);
-
                 if (!StringUtils.isEmpty(deviceValue)) {
                     ids = new ArrayList<>();
                     JSONObject jsonObject = JSONObject.parseObject(deviceValue);
@@ -201,4 +202,5 @@ public class RequestInterceptor implements HandlerInterceptor {
             throws Exception {
 
     }
+
 }

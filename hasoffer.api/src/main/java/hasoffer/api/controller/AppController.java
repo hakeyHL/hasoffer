@@ -202,6 +202,7 @@ public class AppController {
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
         DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        MarketChannel marketChannel = null;
         switch (action) {
             case FLOWCTRLSUCCESS:
                 // 流量拦截成功
@@ -215,9 +216,14 @@ public class AppController {
                 break;
             case HOMEPAGE:
                 Map map = new HashMap();
-                MarketChannel marketChannel = deviceInfoVo.getMarketChannel();
+                marketChannel = deviceInfoVo.getMarketChannel();
                 map.put("info", AffliIdHelper.getAffiIds(marketChannel));
                 modelAndView.addObject("data", map);
+                break;
+            case INDEXPAGE:
+                marketChannel = deviceInfoVo.getMarketChannel();
+                List<Map<String, String>> list = AffliIdHelper.getAffIds(marketChannel);
+                modelAndView.addObject("data", list);
                 break;
             case CLICKDEAL:
                 String id = request.getParameter("value");
@@ -355,7 +361,6 @@ public class AppController {
             //添加返回:
             UrmSignCoin urmSignCoin = appService.getSignCoinByUserId(user.getId());
 
-            //2. 本次签到奖励
             Set<Integer> integers = afwCfgMap.keySet();
             Integer max = Collections.max(integers);
             if (urmSignCoin == null) {
@@ -365,9 +370,6 @@ public class AppController {
             } else {
                 data.setEverSign(false);
                 //判断今天是否已经签过
-                //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                //String currentDate = simpleDateFormat.format(new Date());
-                //String lastSignDate = simpleDateFormat.format(new Date(user.getLastSignTime()));
                 long current = new Date().getTime();
                 long days = TimeUtils.getIndiaTime(current) / TimeUtils.MILLISECONDS_OF_1_DAY - TimeUtils.getIndiaTime(urmSignCoin.getLastSignTime()) / TimeUtils.MILLISECONDS_OF_1_DAY;
                 if (days == 0) {
@@ -417,6 +419,23 @@ public class AppController {
         data.setAuxiliaryCheck(true);
         //set sign in and rewards config map
         data.setSinDaysRewardsCfg(afwCfgMap);
+        if (data.getSinDaysRewardsCfg() != null) {
+            Map<Integer, Integer> sinDaysRewardsCfg = data.getSinDaysRewardsCfg();
+
+            data.setSignConfigKeys(sinDaysRewardsCfg.keySet().toArray(new Integer[]{}));
+            data.setSignConfigValus(sinDaysRewardsCfg.values().toArray(new Integer[]{}));
+
+            if (sinDaysRewardsCfg.get(sinDaysRewardsCfg.size()) != null) {
+                data.setSignMoreCoin(sinDaysRewardsCfg.get(sinDaysRewardsCfg.size()));
+            } else {
+                Iterator<Integer> iterator = sinDaysRewardsCfg.keySet().iterator();
+                int lastDayReward = 1;
+                while (iterator.hasNext()) {
+                    lastDayReward = iterator.next();
+                }
+                data.setSignMoreCoin(sinDaysRewardsCfg.get(lastDayReward));
+            }
+        }
         mv.addObject("data", data);
         return mv;
     }
@@ -1331,7 +1350,7 @@ public class AppController {
                     BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.015)).min(orderStatsAnalysisPO.getTentativeAmount());
                     //乘以10再取整
                     tempPrice = tempPrice.multiply(BigDecimal.TEN);
-                    orderVo.setAccount(tempPrice.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+                    orderVo.setAccount(tempPrice.divide(BigDecimal.ONE, 1, BigDecimal.ROUND_HALF_UP));
                     orderVo.setChannel(orderStatsAnalysisPO.getChannel());
                     orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
                     orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
