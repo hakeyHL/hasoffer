@@ -110,7 +110,7 @@ public class RequestInterceptor implements HandlerInterceptor {
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
         System.out.println("usertoken : " + userToken);
 //        logger.info("userToken is : " + userToken);
-        if (StringUtils.isNotEmpty(userToken)) {
+        if (StringUtils.isNotBlank(userToken)) {
             System.out.println("usertoken is not  blank .");
             String key = "user_" + userToken;
             urmUser = userICacheService.get(UrmUser.class, key, 0);
