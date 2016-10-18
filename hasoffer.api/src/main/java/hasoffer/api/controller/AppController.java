@@ -1351,7 +1351,7 @@ public class AppController {
                     BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.015)).min(orderStatsAnalysisPO.getTentativeAmount());
                     //乘以10再取整
                     tempPrice = tempPrice.multiply(BigDecimal.TEN);
-                    orderVo.setAccount(tempPrice.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+                    orderVo.setAccount(tempPrice.divide(BigDecimal.ONE, 1, BigDecimal.ROUND_HALF_UP));
                     orderVo.setChannel(orderStatsAnalysisPO.getChannel());
                     orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
                     orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
