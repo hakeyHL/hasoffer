@@ -156,7 +156,6 @@ public class RequestInterceptor implements HandlerInterceptor {
                 String deviceKey = "urmDevice_ids_mapKey_" + deviceId;
                 Map map = null;
                 String deviceValue = urmDeviceService.get(deviceKey, 0);
-
                 if (!StringUtils.isEmpty(deviceValue)) {
                     ids = new ArrayList<>();
                     JSONObject jsonObject = JSONObject.parseObject(deviceValue);
