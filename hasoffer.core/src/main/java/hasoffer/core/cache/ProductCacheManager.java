@@ -114,8 +114,8 @@ public class ProductCacheManager {
                 List<PtmCmpSku> data = pagedCmpskus.getData();
                 if (data != null && data.size() > 0) {
                     pagedCmpskus.setData(getOnsaleSkuList(data, proId));
+                    cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
                 }
-                cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
             } else {
                 PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
 
@@ -294,7 +294,6 @@ public class ProductCacheManager {
                     tempPtmCmpSkus.add(onsaleSku);
                     System.out.println("title " + onsaleSku.getTitle() + " price " + onsaleSku.getPrice() + " productId  " + onsaleSku.getProductId());
                 }
-//                tempPtmCmpSkus.add(cmpSkus.get(0));
             }
             i++;
         }

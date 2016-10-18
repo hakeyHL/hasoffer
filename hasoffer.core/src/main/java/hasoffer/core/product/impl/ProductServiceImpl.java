@@ -72,7 +72,7 @@ public class ProductServiceImpl implements IProductService {
                     "WHERE " +
                     " t.productId = ?0 " +
                     "AND t.price > ?1 " +
-                    "AND t.status  <> 'OFFSALE' " +
+                    "AND t.status='ONSALE' " +
                     "ORDER BY " +
                     " t.price ASC";
 
