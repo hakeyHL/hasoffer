@@ -361,7 +361,6 @@ public class AppController {
             //添加返回:
             UrmSignCoin urmSignCoin = appService.getSignCoinByUserId(user.getId());
 
-            //2. 本次签到奖励
             Set<Integer> integers = afwCfgMap.keySet();
             Integer max = Collections.max(integers);
             if (urmSignCoin == null) {
