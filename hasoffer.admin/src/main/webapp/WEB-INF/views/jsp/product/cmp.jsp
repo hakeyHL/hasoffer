@@ -36,15 +36,23 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">×</span></button>
-                <h4 class="modal-title">提示信息</h4>
+                <h4 class="modal-title">提示信息/Friendly Reminder</h4>
             </div>
             <div class="modal-body">
-                <p>您确认要删除选中记录吗？</p>
+                <p>您确认要删除选中记录吗？</p><br/>
+
+                <p>Are you sure you want to delete the selected record</p>
             </div>
             <div class="modal-footer">
                 <input type="hidden" id="batchUrl"/>
-                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <a onclick="batchUrlSubmit()" class="btn btn-success" data-dismiss="modal">确定</a>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    <span>取消</span><br/>
+                    <span>Cancel</span>
+                </button>
+                <a onclick="batchUrlSubmit()" class="btn btn-success" data-dismiss="modal">
+                    <span>确定</span><br/>
+                    <span>Ok</span>
+                </a>
             </div>
         </div>
     </div>
@@ -52,7 +60,7 @@
 <div id="page-wrapper">
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">比价信息</h1>
+            <h1 class="page-header">比价信息/Product Info</h1>
         </div>
         <!-- /.col-lg-12 -->
     </div>
@@ -63,7 +71,7 @@
 
                 <div class="col-lg-12">
                     <div class="panel panel-default">
-                        <div class="panel-heading">基本信息（点击标题查看商品详情）</div>
+                        <div class="panel-heading">基本信息/Basic Info（点击标题查看商品详情）</div>
                         <div class="panel-body">
                             <p>
                                 标题(title) : <a href="/p/detail/${product.id}" target="_blank">${product.title}</a>
@@ -87,18 +95,21 @@
                                 <div class="col-lg-12">
                                     <button type="button" class="btn btn-primary"
                                             onclick="batchDelete('<%=contextPath%>/p/batchDelete')"
-                                            data-toggle="modal" data-target="#confirm-delete">批量删除SKU
+                                            data-toggle="modal" data-target="#confirm-delete">
+                                        <span>批量删除SKU</span><br/><span>Batch Delete Product's Skus</span>
                                     </button>
                                     <%--</div>--%>
                                     <%--<div class="col-lg-12">--%>
                                     <button type="button" class="btn btn-primary"
                                             onclick="removeCache(${pId})"
-                                            data-toggle="modal" data-target="#confirm-delete">清除缓存
+                                            data-toggle="modal" data-target="#confirm-delete">
+                                        <span>清除缓存</span><br/><span>Remove Product Cache</span>
                                     </button>
-                                    <button id="changeStatus" class="btn btn-info" onclick="change(${pId})">切换状态
+                                    <button id="changeStatus" class="btn btn-info" onclick="change(${pId})">
+                                        <span>切换状态</span><br/><span>Toggle Status</span>
                                     </button>
                                     <button id="delBtn" class="btn btn-danger" onclick="delProduct(${pId})">
-                                        删除商品
+                                        <span>删除商品</span><br/><span>Delete Product</span>
                                     </button>
                                 </div>
 
@@ -115,23 +126,24 @@
 
                     <div class="panel panel-default">
                         <!-- Default panel contents -->
-                        <div class="panel-heading">比价列表
-                            <button onclick="compareCtrl.preAdd()">新增</button>
+                        <div class="panel-heading">比价列表/Sku List
+                            <button onclick="compareCtrl.preAdd()">新增/Add Sku</button>
                         </div>
 
                         <!-- Table -->
                         <table class="table table-bordered table-hover table-condensed" style="font-size:12px;">
                             <thead>
                             <tr>
-                                <td><input type="checkbox" id="checkAll"/>全选</td>
-                                <td>序号</td>
-                                <td>网站</td>
-                                <td>图片</td>
-                                <td>SKU信息</td>
-                                <td>价格(Rs.)</td>
-                                <td>状态</td>
-                                <td>更新时间</td>
-                                <td>执行操作</td>
+                                <td><input type="checkbox" id="checkAll"/><span>全选</span><br/><span>Select All</span>
+                                </td>
+                                <td><span>序号</span><br/><span>SkuId</span></td>
+                                <td><span>网站</span><br/><span>Website</span></td>
+                                <td><span>图片</span><br/><span>image</span></td>
+                                <td><span>SKU信息</span><br/><span>Sku title</span></td>
+                                <td><span>价格(Rs.)</span><br/><span>Sku price</span></td>
+                                <td><span>状态</span><br/><span>Sku status</span></td>
+                                <td><span>更新时间</span><br/><span>Sku last updateTime</span></td>
+                                <td><span>执行操作</span><br/><span>Operation</span></td>
                             </tr>
                             </thead>
                             <tbody>
@@ -155,12 +167,17 @@
                                     <td>
                                         <a class="active" href="javascript:void(0);"
                                            onclick="compareCtrl.preModify(${cmpSku.id}, '${cmpSku.url}', ${cmpSku.price}, '${cmpSku.size}', '${cmpSku.color}')">
-                                            编辑</a>
+                                            <span>编辑</span><br/><span>Edit</span>
+                                        </a>
                                     </td>
                                     <td><a href="javascript:void(0);"
-                                           onclick="compareCtrl.delete(${cmpSku.id})">删除</a></td>
-                                    <td><a href="javascript:void(0)"
-                                           onclick="compareCtrl.update(${cmpSku.id})">更新</a></td>
+                                           onclick="compareCtrl.delete(${cmpSku.id})">
+                                        <span>删除</span><br/><span>Delete</span>
+                                    </a></td>
+                                        <%-- <td><a href="javascript:void(0)"
+                                                onclick="compareCtrl.update(${cmpSku.id})">
+                                             <span>更新</span><br/><span>Update</span>
+                                             </a></td>--%>
                                 </tr>
                             </c:forEach>
                             </tbody>
@@ -183,7 +200,7 @@
                                 <input type="hidden" name="productId" value="${product.id}">
 
                                 <div class="form-group">
-                                    <label class="col-sm-2 control-label">序号</label>
+                                    <label class="col-sm-2 control-label">序号/Id</label>
 
                                     <div class="col-sm-4">
                                         <label class="form-control" id="label_id">新建</label>
@@ -191,7 +208,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-2 control-label">链接</label>
+                                    <label class="col-sm-2 control-label">链接/Url</label>
 
                                     <div class="col-sm-10">
                                         <input type="text" class="form-control" name="url" id="url">
@@ -206,14 +223,14 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-2 control-label">颜色</label>
+                                    <label class="col-sm-2 control-label">颜色/Color</label>
 
                                     <div class="col-sm-4">
                                         <input type="text" class="form-control" name="color" id="color">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-2 control-label">大小</label>
+                                    <label class="col-sm-2 control-label">大小/Size</label>
 
                                     <div class="col-sm-4">
                                         <input type="text" class="form-control" name="size" id="size">
@@ -245,8 +262,8 @@
             $("#price").val(price);
             $("#size").val(size);
             $("#color").val(color);
-            $("#label_id").html("更新 - " + id);
-            $("#btn_submit").html("更新");
+            $("#label_id").html("更新/Update - " + id);
+            $("#btn_submit").html("更新/Update");
             document.body.scrollTop = 1000000;
         },
         preAdd: function () {
@@ -260,7 +277,9 @@
             document.body.scrollTop = 1000000;
         },
         delete: function (id) {
-            if (confirm("将会删除比价记录，继续？")) {
+            if (confirm("将会删除比价记录，继续？" +
+                            "selected product will be delete ,continue")) {
+
                 http.doGet("/p/cmp/del/" + id, function () {
                     window.location.reload()
                 });
@@ -270,10 +289,12 @@
             http.doPost("/p/cmp/update/" + id, null, function (data) {
                 var status = data.status;
                 if (status == 'success') {
-                    alert("更新成功");
+                    alert("更新成功" +
+                            "Update success");
                     window.location.reload()
                 } else {
-                    alert("更新失败");
+                    alert("更新失败" +
+                            "Update fail");
                 }
             });
         }
@@ -328,10 +349,10 @@
 
         http.doPost(url, {productId: productId}, function (data) {
             if (data.status == 'success') {
-                BootstrapDialog.alert("成功");
+                BootstrapDialog.alert("成功/Success");
             }
             if (data.status == 'fail') {
-                BootstrapDialog.warning("失败");
+                BootstrapDialog.warning("失败/Fail");
             }
         });
     }
