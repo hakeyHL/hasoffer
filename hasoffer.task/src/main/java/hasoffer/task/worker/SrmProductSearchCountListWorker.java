@@ -68,7 +68,7 @@ public class SrmProductSearchCountListWorker implements Runnable {
                 logger.info("queue size =" + size);
 
                 try {
-                    TimeUnit.MINUTES.sleep(10);
+                    TimeUnit.MINUTES.sleep(30);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
