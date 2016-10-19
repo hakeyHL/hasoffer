@@ -1,4 +1,4 @@
-package hasoffer.api.controller.vo;
+package hasoffer.core.app.vo;
 
 /**
  * Created by hs on 2016年09月01日.

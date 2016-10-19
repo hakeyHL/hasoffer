@@ -1,4 +1,4 @@
-package hasoffer.api.controller.vo;
+package hasoffer.core.app.vo;
 
 /**
  * 商品列表Vo

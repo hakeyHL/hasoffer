@@ -1,8 +1,8 @@
 package hasoffer.api.helper;
 
-import hasoffer.api.controller.vo.DeviceInfoVo;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.core.app.vo.DeviceInfoVo;
 
 import java.util.Arrays;
 import java.util.Map;

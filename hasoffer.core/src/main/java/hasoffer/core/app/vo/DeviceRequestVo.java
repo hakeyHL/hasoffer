@@ -1,4 +1,4 @@
-package hasoffer.api.controller.vo;
+package hasoffer.core.app.vo;
 
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.bo.user.DeviceEventBo;
