@@ -489,7 +489,7 @@ public class AppController {
                 dealVo.setExtra(0d);
                 dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
                 if (appDeal.getWebsite().name().equals("FLIPKART")) {
-                    dealVo.setExtra(1.5);
+                    dealVo.setExtra(7.5);
                 }
                 dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
                 dealVo.setExp(appDeal.getExpireTime());
@@ -507,7 +507,7 @@ public class AppController {
                 dealVo.setExtra(0d);
                 dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
                 if (appDeal.getWebsite().name().equals("FLIPKART")) {
-                    dealVo.setExtra(1.5);
+                    dealVo.setExtra(7.5);
                 }
                 dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
                 dealVo.setExp(appDeal.getExpireTime());
@@ -773,7 +773,7 @@ public class AppController {
                         }
                         map.put("extra", 0);
                         if (appDeal.getWebsite() == Website.FLIPKART) {
-                            map.put("extra", 1.5);
+                            map.put("extra", 7.5);
                             map.put("cashbackInfo", "1. Offer valid for a limited time only while stocks last\n" +
                                     "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +
                                     "3. Rewards may not paid on purchases made using store credits/gift vouchers\n" +
@@ -965,7 +965,7 @@ public class AppController {
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
                 String orderStatus = orderStatsAnalysisPO.getOrderStatus();
                 if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name()) && orderStatus != null && (orderStatus.equals("tentative") || orderStatus.equals("approved"))) {
-                    BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.015)).min(orderStatsAnalysisPO.getTentativeAmount());
+                    BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.075)).min(orderStatsAnalysisPO.getTentativeAmount());
                     coins = coins.add(tempPrice);
                 }
             }
@@ -1347,7 +1347,7 @@ public class AppController {
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
                 if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
                     OrderVo orderVo = new OrderVo();
-                    BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.015)).min(orderStatsAnalysisPO.getTentativeAmount());
+                    BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.075)).min(orderStatsAnalysisPO.getTentativeAmount());
                     //乘以10再取整
                     tempPrice = tempPrice.multiply(BigDecimal.TEN);
                     orderVo.setAccount(tempPrice.divide(BigDecimal.ONE, 1, BigDecimal.ROUND_HALF_UP));
