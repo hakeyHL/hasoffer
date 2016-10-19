@@ -234,9 +234,13 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updatePtmProductPrice(long id) {
+    public boolean updatePtmProductPrice(long id) {
 
         List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ", Arrays.asList(id));
+
+        PtmProduct ptmProduct = dbm.get(PtmProduct.class, id);
+
+        float oriPrice = ptmProduct.getPrice();
 
         float price = 0.0f;
         boolean flag = true;
@@ -265,7 +269,7 @@ public class ProductServiceImpl implements IProductService {
 
         }
 
-        if (price != 0) {
+        if (price != 0 && price != oriPrice) {
 
             PtmProductUpdater updater = new PtmProductUpdater(id);
 
@@ -276,13 +280,17 @@ public class ProductServiceImpl implements IProductService {
 
             PtmProduct product = getProduct(id);
             if (product == null) {
-                return;
+                return false;
             }
 
             product.setPrice(price);
             System.out.println("minPrice =" + price);
 
             importProduct2Solr2(product);
+
+            return true;
+        } else {
+            return false;
         }
 
     }
