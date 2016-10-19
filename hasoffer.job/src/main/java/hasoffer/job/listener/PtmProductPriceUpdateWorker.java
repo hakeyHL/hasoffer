@@ -51,9 +51,9 @@ public class PtmProductPriceUpdateWorker implements Runnable {
 //                    System.out.println("update Ptmproduct price success for " + productid);
                     try {
                         productService.importProduct2Solr2(productService.getProduct(productid));
-//                        System.out.println("update success then reimport product to solr success");
+                        System.out.println("update success then reimport product to solr success for " + productid);
                     } catch (Exception e) {
-//                        System.out.println("update success then reimport product to solr fail");
+                        System.out.println("update success then reimport product to solr fail for " + productid);
                     }
                 }
             }
