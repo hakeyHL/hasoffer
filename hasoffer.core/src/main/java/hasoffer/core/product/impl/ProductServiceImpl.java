@@ -64,15 +64,13 @@ public class ProductServiceImpl implements IProductService {
                     " ORDER BY t.price ASC ";
 
     private static final String Q_ONSALE_PTM_CMPSKU =
-            "SELECT  DISTINCT " +
-                    " website, " +
-                    " price " +
+            "SELECT  t " +
                     "FROM " +
                     " PtmCmpSku t " +
                     "WHERE " +
                     " t.productId = ?0 " +
                     "AND t.price > ?1 " +
-                    "AND t.status  <> 'OFFSALE' " +
+                    "AND t.status='ONSALE' " +
                     "ORDER BY " +
                     " t.price ASC";
 
@@ -234,9 +232,16 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updatePtmProductPrice(long id) {
+    public boolean updatePtmProductPrice(long id) {
 
         List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ", Arrays.asList(id));
+
+        PtmProduct ptmProduct = dbm.get(PtmProduct.class, id);
+        if (ptmProduct == null) {
+            return false;
+        }
+
+        float oriPrice = ptmProduct.getPrice();
 
         float price = 0.0f;
         boolean flag = true;
@@ -265,7 +270,7 @@ public class ProductServiceImpl implements IProductService {
 
         }
 
-        if (price != 0) {
+        if (price != 0 && price != oriPrice) {
 
             PtmProductUpdater updater = new PtmProductUpdater(id);
 
@@ -274,15 +279,14 @@ public class ProductServiceImpl implements IProductService {
 
             dbm.update(updater);
 
-            PtmProduct product = getProduct(id);
-            if (product == null) {
-                return;
-            }
-
-            product.setPrice(price);
+            ptmProduct.setPrice(price);
             System.out.println("minPrice =" + price);
 
-            importProduct2Solr2(product);
+            importProduct2Solr2(ptmProduct);
+
+            return true;
+        } else {
+            return false;
         }
 
     }

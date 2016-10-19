@@ -132,11 +132,10 @@ public class CmpSkuCacheManager {
     }
 
     public List<PtmCmpSku> getCmpSkusBySiteAndPrice(float price, Website website, Long productId) {
-        System.out.println(System.currentTimeMillis());
         List<PtmCmpSku> ptmCmpSkus = null;
         String key = CACHE_KEY_PRE + "getSkuByPriceAndSite" + price + "_" + website.name();
         String s = null;
-//        String s = skuCacheServiceMap.get(key, 0);
+        s = skuCacheServiceMap.get(key, 0);
 //        ptmCmpSkus = cmpSkuService.getCmpSkusBySiteAndPrice(Float.valueOf(price + ""), website, productId);
         if (StringUtils.isEmpty(s)) {
             System.out.println(" get productId porducdtId : " + productId);
@@ -144,8 +143,9 @@ public class CmpSkuCacheManager {
             System.out.println(" ptmCmpskus : prmcmpskus :" + ptmCmpSkus.size());
             Map<String, List> map = new HashMap();
             map.put(key, ptmCmpSkus);
-//            skuCacheServiceMap.add(key, JSONUtil.toJSON(map), TimeUtils.SECONDS_OF_1_HOUR * 4);
+            skuCacheServiceMap.add(key, JSONUtil.toJSON(map), TimeUtils.SECONDS_OF_1_HOUR * 4);
         } else {
+            System.out.println("getget");
             try {
                 Map map = JSONUtil.toObject(s, Map.class);
                 List<LinkedHashMap> li = (List) map.get(key);

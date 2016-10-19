@@ -4,7 +4,7 @@ import akka.actor.ActorRef;
 import hasoffer.akka.factory.AkkaActorRef;
 import hasoffer.akka.pojo.AkkaJobConfigMessage;
 import hasoffer.akka.pojo.AkkaJobMessage;
-import hasoffer.api.controller.vo.SearchIO;
+import hasoffer.core.app.vo.SearchIO;
 import hasoffer.core.bo.system.SearchLogBo;
 import hasoffer.webcommon.akka.SearchLogActor;
 

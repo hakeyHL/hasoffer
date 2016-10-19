@@ -62,7 +62,13 @@ public interface IProductService {
 
     void updateProductImage2(Long id, String oriImageUrl);
 
-    void updatePtmProductPrice(long id);
+    /**
+     * 该方法用来更新product的价格信息
+     *
+     * @param id
+     * @return 商品价格被更新了返回true，其他情况false
+     */
+    boolean updatePtmProductPrice(long id);
 
     void updatePtmProdcutWebsite(long id, Website website);
 

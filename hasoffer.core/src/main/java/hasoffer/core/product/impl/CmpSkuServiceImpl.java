@@ -58,10 +58,10 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
             "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 AND t.status = ?1 ";
 
     private final String Q_CMPSKU_INDEX_BY_TITLEINDEX = "select t from PtmCmpSkuIndex2 t where t.siteSkuTitleIndex = ?0 ";
-    private final String Q_CMPSKU_GET_BY_PRICEANDSITE = "select t from PtmCmpSku t where t.productId=?0 and t.website = ?1  and t.status <>'OFFSALE' and  t.price =?2  order by price asc  ";
+    private final String Q_CMPSKU_GET_BY_PRICEANDSITE = "select t from PtmCmpSku t where t.productId=?0 and t.website = ?1  and t.status='ONSALE' and  t.price =?2  order by price asc  ";
 
     private final String Q_CMPSKU_INDEX_BY_SOURCESID = "select t from PtmCmpSkuIndex2 t where t.siteSourceSidIndex = ?0 ";
-    private final String Q_CMPSKU_STORES_BY_PRODUCTID = "SELECT  DISTINCT t.website  from PtmCmpSku t where t.productId=?0 and t.status<>'OFFSALE'";
+    private final String Q_CMPSKU_STORES_BY_PRODUCTID = "SELECT  DISTINCT t.website  from PtmCmpSku t where t.productId=?0 and t.status='ONSALE'";
 
     @Resource
     IFetchService fetchService;

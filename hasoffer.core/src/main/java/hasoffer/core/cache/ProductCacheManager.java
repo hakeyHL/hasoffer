@@ -2,7 +2,6 @@ package hasoffer.core.cache;
 
 import com.alibaba.fastjson.JSONArray;
 import hasoffer.base.model.PageableResult;
-import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
@@ -13,6 +12,7 @@ import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.redis.ICacheService;
+import hasoffer.core.utils.JsonHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -113,53 +113,18 @@ public class ProductCacheManager {
                 System.out.println("--------- pagedCmpskus  -----------" + pagedCmpskus.getData().size());
                 List<PtmCmpSku> data = pagedCmpskus.getData();
                 if (data != null && data.size() > 0) {
-                    pagedCmpskus.setData(getOnsaleSkuList(data, proId));
+                    //now , only the sku status is 'ONSALE' will return to our client , this method is closed by temporarily.
+//                  pagedCmpskus.setData(getOnsaleSkuList(data, proId));
+                    cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
+                } else {
+                    //no data ,return empty list ;
+                    pagedCmpskus = new PageableResult<>();
+                    pagedCmpskus.setData(new ArrayList<PtmCmpSku>());
                 }
-                cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
             } else {
                 PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
-
                 List<PtmCmpSku> cmpSkus = new ArrayList<PtmCmpSku>();
-                List<Map> data = datas.getData();
-
-                for (Map<String, Object> map : data) {
-                    PtmCmpSku cmpSku = new PtmCmpSku();
-                    String website = (String) map.get("website");
-                    Double price = (Double) map.get("price");
-                    Double cashBack = (Double) map.get("cashBack");
-                    Double shipping = (Double) map.get("shipping");
-                    if (StringUtils.isEmpty(website) || price == null) {
-                        continue;
-                    }
-                    cmpSku.setId(Long.valueOf(map.get("id") + ""));
-                    cmpSku.setProductId(Long.valueOf(map.get("productId") + ""));
-                    cmpSku.setWebsite(Website.valueOf(website));
-                    cmpSku.setSeller((String) map.get("seller"));
-                    cmpSku.setSkuTitle((String) map.get("skuTitle"));
-                    cmpSku.setTitle((String) map.get("title"));
-                    cmpSku.setSupportPayMethod((String) map.get("supportPayMethod"));
-                    cmpSku.setPrice(price.floatValue());
-                    cmpSku.setCashBack(cashBack.floatValue());
-                    cmpSku.setShipping(shipping.floatValue());
-                    cmpSku.setRatings((Integer) map.get("ratings"));
-                    cmpSku.setReturnDays((Integer) map.get("returnDays"));
-                    cmpSku.setCommentsNumber(Long.valueOf(map.get("commentsNumber") + ""));
-                    cmpSku.setRating((String) map.get("rating"));
-                    cmpSku.setImagePath((String) map.get("imagePath"));
-                    cmpSku.setSmallImagePath((String) map.get("smallImagePath"));
-                    cmpSku.setOriImageUrl((String) map.get("oriImageUrl"));
-                    cmpSku.setDeeplink((String) map.get("deeplink"));
-                    cmpSku.setUrl((String) map.get("url"));
-                    cmpSku.setOriUrl((String) map.get("oriUrl"));
-                    cmpSku.setColor((String) map.get("color"));
-                    cmpSku.setSize((String) map.get("size"));
-                    cmpSku.setUpdateTime(new Date((Long) map.get("updateTime")));
-                    cmpSku.setChecked((Boolean) map.get("checked"));
-                    cmpSku.setSourcePid((String) map.get("sourcePid"));
-                    cmpSku.setSourceSid((String) map.get("sourceSid"));
-                    cmpSku.setStatus(SkuStatus.valueOf((String) map.get("status")));
-                    cmpSkus.add(cmpSku);
-                }
+                JsonHelper.transferJson2Object(datas.getData(), cmpSkus);
                 pagedCmpskus = new PageableResult<>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
             }
         } catch (Exception e) {
@@ -196,26 +161,7 @@ public class ProductCacheManager {
                     cacheService.add(key, JSONUtil.toJSON(products), TimeUtils.SECONDS_OF_1_HOUR * 8);
                 }
             } else {
-                List<Map> datas = JSONUtil.toObject(ptmProductJson, List.class);
-                for (Map map : datas) {
-                    PtmProduct ptmProduct = new PtmProduct();
-                    String website = (String) map.get("sourceSite");
-                    Double price = (Double) map.get("price");
-                    if (StringUtils.isEmpty(website) || price == null) {
-                        continue;
-                    }
-                    ptmProduct.setId(Long.valueOf(map.get("id") + ""));
-                    ptmProduct.setTitle((String) map.get("title"));
-                    ptmProduct.setPrice(price.floatValue());
-                    ptmProduct.setRating((Integer) map.get("rating"));
-                    ptmProduct.setColor((String) map.get("color"));
-                    ptmProduct.setSize((String) map.get("size"));
-                    ptmProduct.setSourceUrl((String) map.get("sourceUrl"));
-                    ptmProduct.setSourceSite((String) map.get("sourceSite"));
-                    ptmProduct.setCategoryId(((Integer) map.get("categoryId")).longValue());
-                    ptmProduct.setTag((String) map.get("tag"));
-                    products.add(ptmProduct);
-                }
+                JsonHelper.transferJson2Object(JSONUtil.toObject(ptmProductJson, List.class), products);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -233,40 +179,8 @@ public class ProductCacheManager {
                 cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
             } else {
                 PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
-
                 List<PtmCmpSku> cmpSkus = new ArrayList<>();
-                List<Map> data = datas.getData();
-
-                for (Map<String, Object> map : data) {
-                    PtmCmpSku cmpSku = new PtmCmpSku();
-                    String website = (String) map.get("website");
-                    Double price = (Double) map.get("price");
-                    if (StringUtils.isEmpty(website) || price == null) {
-                        continue;
-                    }
-                    cmpSku.setId(Long.valueOf(map.get("id") + ""));
-                    cmpSku.setProductId(Long.valueOf(map.get("productId") + ""));
-                    cmpSku.setWebsite(Website.valueOf(website));
-                    cmpSku.setSeller((String) map.get("seller"));
-                    cmpSku.setSkuTitle((String) map.get("skuTitle"));
-                    cmpSku.setTitle((String) map.get("title"));
-                    cmpSku.setPrice(price.floatValue());
-                    cmpSku.setRating((String) map.get("rating"));
-                    cmpSku.setImagePath((String) map.get("imagePath"));
-                    cmpSku.setOriImageUrl((String) map.get("oriImageUrl"));
-                    cmpSku.setDeeplink((String) map.get("deeplink"));
-                    cmpSku.setSmallImagePath((String) map.get("smallImagePath"));
-                    cmpSku.setUrl((String) map.get("url"));
-                    cmpSku.setOriUrl((String) map.get("oriUrl"));
-                    cmpSku.setColor((String) map.get("color"));
-                    cmpSku.setSize((String) map.get("size"));
-                    cmpSku.setUpdateTime(new Date((Long) map.get("updateTime")));
-                    cmpSku.setChecked((Boolean) map.get("checked"));
-                    cmpSku.setSourcePid((String) map.get("sourcePid"));
-                    cmpSku.setSourceSid((String) map.get("sourceSid"));
-                    cmpSku.setStatus(SkuStatus.valueOf((String) map.get("status")));
-                    cmpSkus.add(cmpSku);
-                }
+                JsonHelper.transferJson2Object(datas.getData(), cmpSkus);
                 pagedCmpskus = new PageableResult<>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
             }
         } catch (Exception e) {
@@ -276,6 +190,7 @@ public class ProductCacheManager {
         return pagedCmpskus;
     }
 
+    //现在前台不返回offsale的sku,此方法暂时停用,且此方法查询效率低
     public List<PtmCmpSku> getOnsaleSkuList(List data, long productId) {
         System.out.println("get productId is : " + productId);
         List<PtmCmpSku> tempPtmCmpSkus = new ArrayList<>();
@@ -294,7 +209,6 @@ public class ProductCacheManager {
                     tempPtmCmpSkus.add(onsaleSku);
                     System.out.println("title " + onsaleSku.getTitle() + " price " + onsaleSku.getPrice() + " productId  " + onsaleSku.getProductId());
                 }
-//                tempPtmCmpSkus.add(cmpSkus.get(0));
             }
             i++;
         }
@@ -302,7 +216,6 @@ public class ProductCacheManager {
     }
 
     public PtmCmpSku getOnsaleSku(List<PtmCmpSku> ptmCmpSkus, long ProductId) {
-
         PtmCmpSku OnsalePtmCmpSku = null;
         PtmCmpSku OutStockPtmCmpSku = null;
         for (PtmCmpSku ptmCmpSku : ptmCmpSkus) {
