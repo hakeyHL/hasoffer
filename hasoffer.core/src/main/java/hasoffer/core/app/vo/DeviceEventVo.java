@@ -1,4 +1,4 @@
-package hasoffer.api.controller.vo;
+package hasoffer.core.app.vo;
 
 /**
  * Date : 2016/2/23

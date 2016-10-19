@@ -2,12 +2,12 @@ package hasoffer.api.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import hasoffer.api.controller.vo.PriceCurveVo;
-import hasoffer.api.controller.vo.PriceCurveXYVo;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.JsonHelper;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.core.app.vo.PriceCurveVo;
+import hasoffer.core.app.vo.PriceCurveXYVo;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.mongo.PriceNode;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;

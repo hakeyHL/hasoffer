@@ -2,7 +2,6 @@ package hasoffer.api.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import hasoffer.api.controller.vo.*;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.JsonHelper;
@@ -16,6 +15,7 @@ import hasoffer.base.utils.AffliIdHelper;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IOrderStatsAnalysisService;
+import hasoffer.core.app.vo.*;
 import hasoffer.core.bo.product.Banners;
 import hasoffer.core.bo.product.CategoryVo;
 import hasoffer.core.bo.push.*;
@@ -40,7 +40,6 @@ import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.system.IAppService;
-import hasoffer.core.user.IDeviceService;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchedProductReview;
@@ -56,7 +55,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -77,13 +75,9 @@ public class AppController {
     @Resource
     private IAppService appService;
     @Resource
-    private IDeviceService deviceService;
-    @Resource
     private CmpSkuCacheManager cmpSkuCacheManager;
     @Resource
     private ProductCacheManager productCacheManager;
-    @Resource
-    private ContentNegotiatingViewResolver jsonViewResolver;
     @Resource
     private ProductIndex2ServiceImpl productIndex2Service;
     @Resource
@@ -198,99 +192,8 @@ public class AppController {
     @RequestMapping(value = "/callback", method = RequestMethod.GET)
     public ModelAndView callback(HttpServletRequest request,
                                  @RequestParam CallbackAction action) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("errorCode", "00000");
-        modelAndView.addObject("msg", "ok");
-        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-        MarketChannel marketChannel = null;
-        switch (action) {
-            case FLOWCTRLSUCCESS:
-                // 流量拦截成功
-                try {
-                    String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-                    DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-                    cmpSkuCacheManager.recordFlowControll(deviceId, deviceInfo.getCurShopApp());
-                } catch (Exception e) {
-                    logger.debug(e.getMessage());
-                }
-                break;
-            case HOMEPAGE:
-                Map map = new HashMap();
-                marketChannel = deviceInfoVo.getMarketChannel();
-                map.put("info", AffliIdHelper.getAffiIds(marketChannel));
-                modelAndView.addObject("data", map);
-                break;
-            case INDEXPAGE:
-                marketChannel = deviceInfoVo.getMarketChannel();
-                List<Map<String, String>> list = AffliIdHelper.getAffIds(marketChannel);
-                modelAndView.addObject("data", list);
-                break;
-            case CLICKDEAL:
-                String id = request.getParameter("value");
-                System.out.println(" id  id  deal  " + id);
-                AppDeal appDeal = appService.getDealDetail(Long.valueOf(id));
-                if (appDeal != null) {
-                    appService.countDealClickCount(appDeal);
-                }
-                break;
-            case DOWNLOADBOOTCONFIG:
-                //app下载引导
-                List<Map<String, List<ThirdAppVo>>> apps = new ArrayList<Map<String, List<ThirdAppVo>>>();
-                Map<String, List<ThirdAppVo>> NINEAPP = new HashMap<>();
-                Map<String, List<ThirdAppVo>> GOOGLEPLAY = new HashMap<>();
-
-                //添加GooglePlay渠道的app下载属性
-                List<ThirdAppVo> tempGOOGLEPLAY = new ArrayList<ThirdAppVo>();
-                ThirdAppVo googlePlayApps_Amazon = new ThirdAppVo(Website.AMAZON, AppAdController.packageMap.get(Website.AMAZON), "https://play.google.com/store/apps/details?id=com.amazon.mShop.android.shopping", WebsiteHelper.getLogoUrl(Website.AMAZON), "Browse,search & buy millions of products right from your Android device", 4.3f, "491,637", "50,000,000 - 100,000,000", "9.6MB");
-                ThirdAppVo googlePlayApps_Flipkart = new ThirdAppVo(Website.FLIPKART, AppAdController.packageMap.get(Website.FLIPKART), "https://play.google.com/store/apps/details?id=com.flipkart.android", WebsiteHelper.getLogoUrl(Website.FLIPKART), "Shop for electronics,apparels & more using our Flipart app Free shipping & COD", 4.2f, "2,044,978", "50,000,000 - 100,000,000", "10.0MB");
-                ThirdAppVo googlePlayApps_ShopClues = new ThirdAppVo(Website.SHOPCLUES, AppAdController.packageMap.get(Website.SHOPCLUES), "https://play.google.com/store/apps/details?id=com.shopclues", WebsiteHelper.getLogoUrl(Website.SHOPCLUES), "India's largest Online Marketplace is now in your Pocket - Install,Shop,Enjoy!", 3.9f, "235,468", "10,000,000 - 50,000,000", "7.1MB");
-                ThirdAppVo googlePlayApps_eBay = new ThirdAppVo(Website.EBAY, AppAdController.packageMap.get(Website.EBAY), "https://play.google.com/store/apps/details?id=com.ebay.mobile", WebsiteHelper.getLogoUrl(Website.EBAY), "Buy,bid & sell! Deals & Discounts to Save Money on Home,Collectables & Cars", 4.2f, "1,759,547", "100,000,000 - 500,000,000", "20.6MB");
-                ThirdAppVo googlePlayApps_Paytm = new ThirdAppVo(Website.PAYTM, AppAdController.packageMap.get(Website.PAYTM), "https://play.google.com/store/apps/details?id=net.one97.paytm", WebsiteHelper.getLogoUrl(Website.PAYTM), "Best Mobile Recharge and DTH Recharge, Bill Payment and Shipping Experience", 4.3f, "1,401,209", "10,000,000 - 50,000,000", "13.0MB");
-                ThirdAppVo googlePlayApps_Snapdeal = new ThirdAppVo(Website.SNAPDEAL, AppAdController.packageMap.get(Website.SNAPDEAL), "https://play.google.com/store/apps/details?id=com.snapdeal.main", WebsiteHelper.getLogoUrl(Website.SNAPDEAL), "Best deals on women & men's fashion,home essentials,electronics & gadgets!", 4.1f, "1,035,900", "10,000,000 - 50,000,000", "12.0MB");
-                ThirdAppVo googlePlayApps_Jabong = new ThirdAppVo(Website.JABONG, AppAdController.packageMap.get(Website.JABONG), "https://play.google.com/store/apps/details?id=com.jabong.android", WebsiteHelper.getLogoUrl(Website.JABONG), "India's Best Online Shopping App To Buy Latest Fashion for Men,Women,Kids", 3.9f, "171,487", "10,000,000 - 50,000,000", "6.1MB");
-                ThirdAppVo googlePlayApps_VOONIK = new ThirdAppVo(Website.VOONIK, AppAdController.packageMap.get(Website.VOONIK), "https://play.google.com/store/apps/details?id=com.voonik.android", WebsiteHelper.getLogoUrl(Website.VOONIK), "Online Shopping for women clothing,ethnic wear,sarees,kurtis,lingere in India", 4.2f, "129,079", "5,000,000 - 10,000,000", "5.8MB");
-                ThirdAppVo googlePlayApps_INFIBEAM = new ThirdAppVo(Website.INFIBEAM, AppAdController.packageMap.get(Website.INFIBEAM), "https://play.google.com/store/apps/details?id=com.infibeam.infibeamapp", WebsiteHelper.getLogoUrl(Website.INFIBEAM), "Infibeam.com-Buy Mobiles,Electronics,Books,Gifts,Clothes & more", 3.7f, "8,424", "1,000,000 - 5,000,000", "26.2MB");
-                ThirdAppVo googlePlayApps_Myntra = new ThirdAppVo(Website.MYNTRA, AppAdController.packageMap.get(Website.MYNTRA), "https://play.google.com/store/apps/details?id=com.myntra.android&hl=en", WebsiteHelper.getLogoUrl(Website.MYNTRA), "Online shopping for fashion clothes,footwear,accessories for Men,Women & Kids", 4.1f, "509,053", "10,000,000 - 50,000,000", "17.2MB");
-
-                tempGOOGLEPLAY.addAll(Arrays.asList(googlePlayApps_Amazon, googlePlayApps_Flipkart, googlePlayApps_ShopClues, googlePlayApps_eBay, googlePlayApps_Paytm, googlePlayApps_Snapdeal, googlePlayApps_Jabong, googlePlayApps_VOONIK, googlePlayApps_INFIBEAM, googlePlayApps_Myntra));
-                GOOGLEPLAY.put("GOOGLEPLAY", tempGOOGLEPLAY);
-
-                //添加9APP渠道的app下载属性
-                List<ThirdAppVo> tempNINEAPP = new ArrayList<ThirdAppVo>();
-                ThirdAppVo nineApp_Amazon = new ThirdAppVo(Website.AMAZON, AppAdController.packageMap.get(Website.AMAZON), "http://www.9apps.com/android-apps/Amazon-India-Shopping/", WebsiteHelper.getLogoUrl(Website.AMAZON), "Browse,search & buy millions of products right from your Android device", 4.3f, "491,637", "50,000,000 - 100,000,000", "9.6MB");
-                ThirdAppVo nineApp_Flipkart = new ThirdAppVo(Website.FLIPKART, AppAdController.packageMap.get(Website.FLIPKART), "http://www.9apps.com/android-apps/Flipkart-Amazing-Discounts-Everyday/", WebsiteHelper.getLogoUrl(Website.FLIPKART), "Shop for electronics,apparels & more using our Flipart app Free shipping & COD", 4.2f, "2,044,978", "50,000,000 - 100,000,000", "10.0MB");
-                ThirdAppVo nineApp_ShopClues = new ThirdAppVo(Website.SHOPCLUES, AppAdController.packageMap.get(Website.SHOPCLUES), "http://www.9apps.com/android-apps/ShopClues/", WebsiteHelper.getLogoUrl(Website.SHOPCLUES), "India's largest Online Marketplace is now in your Pocket - Install,Shop,Enjoy!", 3.9f, "235,468", "10,000,000 - 50,000,000", "7.1MB");
-                ThirdAppVo nineApp_eBay = new ThirdAppVo(Website.EBAY, AppAdController.packageMap.get(Website.EBAY), "http://www.9apps.com/android-apps/eBay/", WebsiteHelper.getLogoUrl(Website.EBAY), "Buy,bid & sell! Deals & Discounts to Save Money on Home,Collectables & Cars", 4.2f, "1,759,547", "100,000,000 - 500,000,000", "20.6MB");
-                ThirdAppVo nineApp_Paytm = new ThirdAppVo(Website.PAYTM, AppAdController.packageMap.get(Website.PAYTM), "http://www.9apps.com/android-apps/Recharge-Shop-and-Wallet-Paytm/", WebsiteHelper.getLogoUrl(Website.PAYTM), "Best Mobile Recharge and DTH Recharge, Bill Payment and Shipping Experience", 4.3f, "1,401,209", "10,000,000 - 50,000,000", "13.0MB");
-                ThirdAppVo nineApp_Snapdeal = new ThirdAppVo(Website.SNAPDEAL, AppAdController.packageMap.get(Website.SNAPDEAL), "http://www.9apps.com/android-apps/Snapdeal-Online-Shopping-India/", WebsiteHelper.getLogoUrl(Website.SNAPDEAL), "Best deals on women & men's fashion,home essentials,electronics & gadgets!", 4.1f, "1,035,900", "10,000,000 - 50,000,000", "12.0MB");
-                ThirdAppVo nineApp_Jabong = new ThirdAppVo(Website.JABONG, AppAdController.packageMap.get(Website.JABONG), "http://www.9apps.com/android-apps/Jabong-Online-Fashion-Shopping/", WebsiteHelper.getLogoUrl(Website.JABONG), "India's Best Online Shopping App To Buy Latest Fashion for Men,Women,Kids", 3.9f, "171,487", "10,000,000 - 50,000,000", "6.1MB");
-                ThirdAppVo nineApp_VOONIK = new ThirdAppVo(Website.VOONIK, AppAdController.packageMap.get(Website.VOONIK), "http://www.9apps.com/android-apps/Voonik-Shopping-App-For-Women/", WebsiteHelper.getLogoUrl(Website.VOONIK), "Online Shopping for women clothing,ethnic wear,sarees,kurtis,lingere in India", 4.2f, "129,079", "5,000,000 - 10,000,000", "5.8MB");
-                ThirdAppVo nineApp_INFIBEAM = new ThirdAppVo(Website.INFIBEAM, AppAdController.packageMap.get(Website.INFIBEAM), "http://www.9apps.com/android-apps/Infibeam-Online-Shopping-App/", WebsiteHelper.getLogoUrl(Website.INFIBEAM), "Infibeam.com-Buy Mobiles,Electronics,Books,Gifts,Clothes & more", 3.7f, "8,424", "1,000,000 - 5,000,000", "26.2MB");
-                ThirdAppVo nineApp_Myntra = new ThirdAppVo(Website.MYNTRA, AppAdController.packageMap.get(Website.MYNTRA), "http://www.9apps.com/android-apps/Myntra-Fashion-Shopping-App/", WebsiteHelper.getLogoUrl(Website.MYNTRA), "Online shopping for fashion clothes,footwear,accessories for Men,Women & Kids", 4.1f, "509,053", "10,000,000 - 50,000,000", "17.2MB");
-
-                tempNINEAPP.addAll(Arrays.asList(nineApp_Amazon, nineApp_Flipkart, nineApp_ShopClues, nineApp_eBay, nineApp_Paytm, nineApp_Snapdeal, nineApp_Jabong, nineApp_VOONIK, nineApp_INFIBEAM, nineApp_Myntra));
-                NINEAPP.put("NINEAPP", tempNINEAPP);
-                apps.add(NINEAPP);
-                apps.add(GOOGLEPLAY);
-                DownloadConfigVo downloadConfigVo = new DownloadConfigVo(true, Arrays.asList("com.snapdeal.main", "com.flipkart.android", "in.amazon.mShop.android.shopping", "net.one97.paytm", "com.ebay.mobile", "com.shopclues", "com.infibeam.infibeamapp", "com.myntra.android", "com.jabong.android", "com.alibaba.aliexpresshd"), "NINEAPP", apps, Arrays.asList("com.voonik.android", "cn.xender", "com.india.hasoffer", "com.lenovo.anyshare,gps", "com.mobile.indiapp", "com.leo.appmaster", "com.voodoo.android", "com.app.buyhatke", "com.makemytrip", "com.goibibo", "com.cleartrip.android", "com.yatra.base", "com.android.contacts"));
-                modelAndView.addObject("data", downloadConfigVo);
-                break;
-            case COMADD:
-                Map nMap = new HashMap();
-                //如果版本是28就放开,否则关闭
-                String appVersion = deviceInfoVo.getAppVersion();
-                if (StringUtils.isNotBlank(appVersion) && Integer.valueOf(appVersion) == 28) {
-                    nMap.put("op", true);
-                } else {
-                    nMap.put("op", false);
-                }
-                modelAndView.addObject("data", nMap);
-            default:
-                break;
-        }
-        return modelAndView;
+        return callBackMethod(request, action);
     }
-
     @RequestMapping(value = "/sites", method = RequestMethod.GET)
     public ModelAndView site() {
         List<AppWebsite> appWebsites = appService.getWebsites(true);
@@ -543,256 +446,7 @@ public class AppController {
         ModelAndView mv = new ModelAndView();
         mv.addObject("errorCode", "00000");
         mv.addObject("msg", "ok");
-        Map map = new HashMap();
-        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-        if (deviceInfoVo != null) {
-            String appVersion = deviceInfoVo.getAppVersion();
-            if (!StringUtils.isEmpty(appVersion)) {
-                //暂时只是去除空格,未来要加上正则匹配,希望根林不要坑我...
-                appVersion = appVersion.trim();
-                Integer vsion = Integer.valueOf(appVersion);
-                System.out.println("dealId is :" + id);
-                if (StringUtils.isEmpty(id)) {
-                    //空,完毕
-                    System.out.println("no deal id ");
-                    mv.addObject("data", null);
-                    return mv;
-                } else {
-                    Long dealId = Long.valueOf(id);
-                    AppDeal appDeal = appService.getDealDetail(dealId);
-                    if (appDeal != null) {
-                        if (vsion < 23) {
-                            System.out.println("has this deal ");
-                            map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
-                            map.put("title", appDeal.getTitle());
-                            map.put("website", appDeal.getWebsite());
-                            map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
-                            map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                            StringBuilder sb = new StringBuilder();
-                            String description = appDeal.getDescription();
-                            sb.append(description == null ? "" : description);
-                            if (description.lastIndexOf("\n") > 0) {
-                                if (description.lastIndexOf("\n") == description.length() - 1) {
-                                    //最后有换行,再加一个换行
-                                    sb.append("\n");
-                                } else {
-                                    //最后无换行,加两个
-                                    sb.append("\n");
-                                    sb.append("\n");
-                                }
-                            } else {
-                                //无换行
-                                sb.append("\n");
-                                sb.append("\n");
-                            }
-                           /* sb.append("How to get the deal: \n");
-                            sb.append("1 Click \"Activate Deal\" button.\n");
-                            sb.append("2 Add the product of your choice to cart.\n");
-                            sb.append("3 And no coupon code required.\n\n");*/
-                            if (appDeal.getPtmcmpskuid() > 0) {
-                                PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
-                                if (ptmCmpSkuDescription != null) {
-                                    String jsonParam = ptmCmpSkuDescription.getJsonParam();
-                                    if (StringUtils.isNotBlank(jsonParam)) {
-                                        Map jsonMap = JsonHelper.getJsonMap(jsonParam);
-                                        if (jsonMap != null) {
-                                            //遍历map
-                                            Set<Map.Entry> set = jsonMap.entrySet();
-                                            Iterator<Map.Entry> iterator = set.iterator();
-                                            if (iterator.hasNext()) {
-                                                sb.append("Key Features: \n");
-                                            }
-                                            while (iterator.hasNext()) {
-                                                Map.Entry next = iterator.next();
-                                                sb.append(next.getKey()).append(" : ");
-                                                sb.append(next.getValue()).append("\n");
-                                            }
-                                        }
-
-                                    }
-
-                                }
-                            }
-                            map.put("description", sb.toString());
-                        } else {
-                            map.put("discount", appDeal.getDiscount());
-                            map.put("originPrice", appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
-                            map.put("priceDescription", appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
-                            map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
-                            map.put("title", appDeal.getTitle());
-                            //返回deal的处境时间距离现在时间的时间,多少天,小时,分钟..
-                            map.put("createTime", getDifference2Date(new Date(), appDeal.getCreateTime()));
-                            map.put("website", appDeal.getWebsite());
-                            //降价生成deal无失效日期
-                            if (!appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
-                                map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
-                            } else {
-                                //是降价生成的deal，失效时间设置创建时间七天后
-                                Date createTime = appDeal.getCreateTime();
-                                createTime.setTime(createTime.getTime() + 1000 * 60 * 60 * 24 * 7);
-                                map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(createTime));
-                            }
-                            map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-
-                            //要判断deal的类型,手动导入和降价生成
-                            if (appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
-                                //降价生成
-                                StringBuilder sb = new StringBuilder();
-                                String description = appDeal.getDescription();
-                                //网站名 is offering 商品名 for Rs.现价.
-                                //当支持货到付款时展示 : Cash On Delivery is available
-                                sb.append(appDeal.getWebsite().name()).append(" is offering ").append(appDeal.getTitle()).append(" for ").append(appDeal.getPriceDescription()).append(".");
-                                //是否支持COD
-                                PtmCmpSku cmpSkuById = cmpSkuCacheManager.getCmpSkuById(appDeal.getPtmcmpskuid());
-                                if (cmpSkuById != null) {
-                                    //如果存在此sku
-                                    String supportPayMethod = cmpSkuById.getSupportPayMethod();
-                                    if (!StringUtils.isBlank(supportPayMethod) && supportPayMethod.contains("COD")) {
-                                        sb.append("Cash On Delivery is available.");
-                                    }
-                                }
-                                //描述拼接完成
-                                map.put("description", sb.toString());
-                                //拼接Price Research
-                                if (StringUtils.isNotBlank(description)) {
-                                    //如果描述不为空,拼接描述然后换行,空行
-                                    sb = new StringBuilder();
-                                    sb.append(description).append("\n\n");
-                                }
-                                if (appDeal.getPtmcmpskuid() > 0) {
-                                    //如果存在skuId,将skuId返回
-                                    map.put("skuId", appDeal.getPtmcmpskuid());
-                                    PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
-                                    if (ptmCmpSkuDescription != null) {
-                                        List<FetchedProductReview> fetchedProductReviewList = ptmCmpSkuDescription.getFetchedProductReviewList();
-                                        if (fetchedProductReviewList != null && fetchedProductReviewList.size() > 0) {
-                                            List<String> commentList = new ArrayList<>();
-                                            for (FetchedProductReview fec : fetchedProductReviewList) {
-                                                String reviewContent = fec.getReviewContent();
-                                                if (!StringUtils.isEmpty(reviewContent)) {
-                                                    reviewContent = ClientHelper.delHTMLTag(reviewContent);
-                                                    //处理下换行符号
-                                                    reviewContent.replaceAll("\n", "");
-                                                }
-                                                if (!StringUtils.isEmpty(reviewContent)) {
-                                                    if (commentList.size() < 4) {
-                                                        //拼接评论标题
-                                                        String reviewTitle = fec.getReviewTitle();
-                                                        if (!StringUtils.isEmpty(reviewTitle)) {
-                                                            reviewTitle = ClientHelper.delHTMLTag(reviewTitle);
-                                                            //处理下换行符号
-                                                            reviewTitle.replaceAll("\n", "");
-                                                            commentList.add(reviewTitle == null ? "" : reviewTitle + "." + reviewContent);
-                                                        } else {
-                                                            commentList.add(reviewContent);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            map.put("comments", commentList);
-                                        }
-                                        //查看是否存在offer,如果存在将offer拼接
-                                        //“网站名” also provides “SKU当前生效的offer数量“ extra offer（offer数量为1时 展示offer 大于1时 展示offers）: “按服务端排序展示offer列表 以分号间隔”
-                                        String offers = ptmCmpSkuDescription.getOffers();
-                                        if (!hasoffer.base.utils.StringUtils.isEmpty(offers)) {
-                                            String[] temps = offers.split(",");
-                                            if (temps.length >= 1) {
-                                                sb.append(appDeal.getWebsite().name()).append(" also provides ").append(temps.length).append(" extra offer :");
-                                            }
-                                            for (String str : temps) {
-                                                sb.append(str).append(";");
-                                            }
-                                            //拼完之后换行,空一行
-                                            sb.append("\n\n");
-                                            sb.append("Please note: offers and price may vary by location.");
-                                        }
-                                        //设置Key Features
-                                        String jsonParam = ptmCmpSkuDescription.getJsonParam();
-                                        if (StringUtils.isNotBlank(jsonParam)) {
-                                            Map jsonMap = JsonHelper.getJsonMap(jsonParam);
-                                            map.put("KeyFeatures", jsonMap);
-                                        }
-
-                                    }
-                                    map.put("priceResearch", sb.toString());
-                                    Map priceCurveDesc = new HashMap();
-                                    //配置点击弹出价格曲线的文字以及文字的颜色
-                                    priceCurveDesc.put("clickableContent", "Click here to check price history.");
-                                    priceCurveDesc.put("fontColor", "#108ee9");
-                                    map.put("clickConfig", priceCurveDesc);
-                                }
-                            } else {
-                                //手动导入,描述要用老的方式
-                                StringBuilder sb = new StringBuilder();
-                                String description = appDeal.getDescription();
-                                sb.append(description == null ? "" : description);
-                                if (description.lastIndexOf("\n") > 0) {
-                                    if (description.lastIndexOf("\n") == description.length() - 1) {
-                                        //最后有换行,再加一个换行
-                                        sb.append("\n");
-                                    } else {
-                                        //最后无换行,加两个
-                                        sb.append("\n");
-                                        sb.append("\n");
-                                    }
-                                } else {
-                                    //无换行
-                                    sb.append("\n");
-                                    sb.append("\n");
-                                }
-                               /* sb.append("How to get the deal: \n");
-                                sb.append("1 Click \"Activate Deal\" button.\n");
-                                sb.append("2 Add the product of your choice to cart.\n");
-                                sb.append("3 And no coupon code required.\n\n");*/
-                                if (appDeal.getPtmcmpskuid() > 0) {
-                                    PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
-                                    if (ptmCmpSkuDescription != null) {
-                                        String jsonParam = ptmCmpSkuDescription.getJsonParam();
-                                        if (StringUtils.isNotBlank(jsonParam)) {
-                                            Map jsonMap = JsonHelper.getJsonMap(jsonParam);
-                                            if (jsonMap != null) {
-                                                //遍历map
-                                                Set<Map.Entry> set = jsonMap.entrySet();
-                                                Iterator<Map.Entry> iterator = set.iterator();
-                                                if (iterator.hasNext()) {
-                                                    sb.append("Key Features: \n");
-                                                }
-                                                while (iterator.hasNext()) {
-                                                    Map.Entry next = iterator.next();
-                                                    sb.append(next.getKey()).append(" : ");
-                                                    sb.append(next.getValue()).append("\n");
-                                                }
-                                            }
-
-                                        }
-
-                                    }
-                                }
-                                map.put("description", sb.toString());
-                            }
-                        }
-                        map.put("extra", 0);
-                        if (appDeal.getWebsite() == Website.FLIPKART) {
-                            map.put("extra", 7.5);
-                            map.put("cashbackInfo", "1. Offer valid for a limited time only while stocks last\n" +
-                                    "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +
-                                    "3. Rewards may not paid on purchases made using store credits/gift vouchers\n" +
-                                    "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
-                                    "5  Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
-                        }
-                        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-                        DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-                        System.out.println("link url is  :" + appDeal.getLinkUrl());
-                        String s = appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId});
-                        logger.info(" dealInfo record deal deepLink :" + s);
-                        map.put("deeplink", s);
-                        mv.addObject("data", map);
-                        return mv;
-                    }
-                }
-            }
-        }
-        return mv;
+        return getDealInfoMethod(id, mv);
     }
 
     public String getDifference2Date(Date maxDate, Date comparedDate) {
@@ -1378,4 +1032,352 @@ public class AppController {
         data.setVerifiedCoins(verifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
     }
+
+    private ModelAndView callBackMethod(HttpServletRequest request, @RequestParam CallbackAction action) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("errorCode", "00000");
+        modelAndView.addObject("msg", "ok");
+        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        MarketChannel marketChannel = null;
+        switch (action) {
+            case FLOWCTRLSUCCESS:
+                // 流量拦截成功
+                try {
+                    String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+                    DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+                    cmpSkuCacheManager.recordFlowControll(deviceId, deviceInfo.getCurShopApp());
+                } catch (Exception e) {
+                    logger.debug(e.getMessage());
+                }
+                break;
+            case HOMEPAGE:
+                Map map = new HashMap();
+                marketChannel = deviceInfoVo.getMarketChannel();
+                map.put("info", AffliIdHelper.getAffiIds(marketChannel));
+                modelAndView.addObject("data", map);
+                break;
+            case INDEXPAGE:
+                marketChannel = deviceInfoVo.getMarketChannel();
+                List<Map<String, String>> list = AffliIdHelper.getAffIds(marketChannel);
+                modelAndView.addObject("data", list);
+                break;
+            case CLICKDEAL:
+                String id = request.getParameter("value");
+                System.out.println(" id  id  deal  " + id);
+                AppDeal appDeal = appService.getDealDetail(Long.valueOf(id));
+                if (appDeal != null) {
+                    appService.countDealClickCount(appDeal);
+                }
+                break;
+            case DOWNLOADBOOTCONFIG:
+                //app下载引导
+                List<Map<String, List<ThirdAppVo>>> apps = new ArrayList<Map<String, List<ThirdAppVo>>>();
+                Map<String, List<ThirdAppVo>> NINEAPP = new HashMap<>();
+                Map<String, List<ThirdAppVo>> GOOGLEPLAY = new HashMap<>();
+
+                //添加GooglePlay渠道的app下载属性
+                List<ThirdAppVo> tempGOOGLEPLAY = new ArrayList<ThirdAppVo>();
+                ThirdAppVo googlePlayApps_Amazon = new ThirdAppVo(Website.AMAZON, AppAdController.packageMap.get(Website.AMAZON), "https://play.google.com/store/apps/details?id=com.amazon.mShop.android.shopping", WebsiteHelper.getLogoUrl(Website.AMAZON), "Browse,search & buy millions of products right from your Android device", 4.3f, "491,637", "50,000,000 - 100,000,000", "9.6MB");
+                ThirdAppVo googlePlayApps_Flipkart = new ThirdAppVo(Website.FLIPKART, AppAdController.packageMap.get(Website.FLIPKART), "https://play.google.com/store/apps/details?id=com.flipkart.android", WebsiteHelper.getLogoUrl(Website.FLIPKART), "Shop for electronics,apparels & more using our Flipart app Free shipping & COD", 4.2f, "2,044,978", "50,000,000 - 100,000,000", "10.0MB");
+                ThirdAppVo googlePlayApps_ShopClues = new ThirdAppVo(Website.SHOPCLUES, AppAdController.packageMap.get(Website.SHOPCLUES), "https://play.google.com/store/apps/details?id=com.shopclues", WebsiteHelper.getLogoUrl(Website.SHOPCLUES), "India's largest Online Marketplace is now in your Pocket - Install,Shop,Enjoy!", 3.9f, "235,468", "10,000,000 - 50,000,000", "7.1MB");
+                ThirdAppVo googlePlayApps_eBay = new ThirdAppVo(Website.EBAY, AppAdController.packageMap.get(Website.EBAY), "https://play.google.com/store/apps/details?id=com.ebay.mobile", WebsiteHelper.getLogoUrl(Website.EBAY), "Buy,bid & sell! Deals & Discounts to Save Money on Home,Collectables & Cars", 4.2f, "1,759,547", "100,000,000 - 500,000,000", "20.6MB");
+                ThirdAppVo googlePlayApps_Paytm = new ThirdAppVo(Website.PAYTM, AppAdController.packageMap.get(Website.PAYTM), "https://play.google.com/store/apps/details?id=net.one97.paytm", WebsiteHelper.getLogoUrl(Website.PAYTM), "Best Mobile Recharge and DTH Recharge, Bill Payment and Shipping Experience", 4.3f, "1,401,209", "10,000,000 - 50,000,000", "13.0MB");
+                ThirdAppVo googlePlayApps_Snapdeal = new ThirdAppVo(Website.SNAPDEAL, AppAdController.packageMap.get(Website.SNAPDEAL), "https://play.google.com/store/apps/details?id=com.snapdeal.main", WebsiteHelper.getLogoUrl(Website.SNAPDEAL), "Best deals on women & men's fashion,home essentials,electronics & gadgets!", 4.1f, "1,035,900", "10,000,000 - 50,000,000", "12.0MB");
+                ThirdAppVo googlePlayApps_Jabong = new ThirdAppVo(Website.JABONG, AppAdController.packageMap.get(Website.JABONG), "https://play.google.com/store/apps/details?id=com.jabong.android", WebsiteHelper.getLogoUrl(Website.JABONG), "India's Best Online Shopping App To Buy Latest Fashion for Men,Women,Kids", 3.9f, "171,487", "10,000,000 - 50,000,000", "6.1MB");
+                ThirdAppVo googlePlayApps_VOONIK = new ThirdAppVo(Website.VOONIK, AppAdController.packageMap.get(Website.VOONIK), "https://play.google.com/store/apps/details?id=com.voonik.android", WebsiteHelper.getLogoUrl(Website.VOONIK), "Online Shopping for women clothing,ethnic wear,sarees,kurtis,lingere in India", 4.2f, "129,079", "5,000,000 - 10,000,000", "5.8MB");
+                ThirdAppVo googlePlayApps_INFIBEAM = new ThirdAppVo(Website.INFIBEAM, AppAdController.packageMap.get(Website.INFIBEAM), "https://play.google.com/store/apps/details?id=com.infibeam.infibeamapp", WebsiteHelper.getLogoUrl(Website.INFIBEAM), "Infibeam.com-Buy Mobiles,Electronics,Books,Gifts,Clothes & more", 3.7f, "8,424", "1,000,000 - 5,000,000", "26.2MB");
+                ThirdAppVo googlePlayApps_Myntra = new ThirdAppVo(Website.MYNTRA, AppAdController.packageMap.get(Website.MYNTRA), "https://play.google.com/store/apps/details?id=com.myntra.android&hl=en", WebsiteHelper.getLogoUrl(Website.MYNTRA), "Online shopping for fashion clothes,footwear,accessories for Men,Women & Kids", 4.1f, "509,053", "10,000,000 - 50,000,000", "17.2MB");
+
+                tempGOOGLEPLAY.addAll(Arrays.asList(googlePlayApps_Amazon, googlePlayApps_Flipkart, googlePlayApps_ShopClues, googlePlayApps_eBay, googlePlayApps_Paytm, googlePlayApps_Snapdeal, googlePlayApps_Jabong, googlePlayApps_VOONIK, googlePlayApps_INFIBEAM, googlePlayApps_Myntra));
+                GOOGLEPLAY.put("GOOGLEPLAY", tempGOOGLEPLAY);
+
+                //添加9APP渠道的app下载属性
+                List<ThirdAppVo> tempNINEAPP = new ArrayList<ThirdAppVo>();
+                ThirdAppVo nineApp_Amazon = new ThirdAppVo(Website.AMAZON, AppAdController.packageMap.get(Website.AMAZON), "http://www.9apps.com/android-apps/Amazon-India-Shopping/", WebsiteHelper.getLogoUrl(Website.AMAZON), "Browse,search & buy millions of products right from your Android device", 4.3f, "491,637", "50,000,000 - 100,000,000", "9.6MB");
+                ThirdAppVo nineApp_Flipkart = new ThirdAppVo(Website.FLIPKART, AppAdController.packageMap.get(Website.FLIPKART), "http://www.9apps.com/android-apps/Flipkart-Amazing-Discounts-Everyday/", WebsiteHelper.getLogoUrl(Website.FLIPKART), "Shop for electronics,apparels & more using our Flipart app Free shipping & COD", 4.2f, "2,044,978", "50,000,000 - 100,000,000", "10.0MB");
+                ThirdAppVo nineApp_ShopClues = new ThirdAppVo(Website.SHOPCLUES, AppAdController.packageMap.get(Website.SHOPCLUES), "http://www.9apps.com/android-apps/ShopClues/", WebsiteHelper.getLogoUrl(Website.SHOPCLUES), "India's largest Online Marketplace is now in your Pocket - Install,Shop,Enjoy!", 3.9f, "235,468", "10,000,000 - 50,000,000", "7.1MB");
+                ThirdAppVo nineApp_eBay = new ThirdAppVo(Website.EBAY, AppAdController.packageMap.get(Website.EBAY), "http://www.9apps.com/android-apps/eBay/", WebsiteHelper.getLogoUrl(Website.EBAY), "Buy,bid & sell! Deals & Discounts to Save Money on Home,Collectables & Cars", 4.2f, "1,759,547", "100,000,000 - 500,000,000", "20.6MB");
+                ThirdAppVo nineApp_Paytm = new ThirdAppVo(Website.PAYTM, AppAdController.packageMap.get(Website.PAYTM), "http://www.9apps.com/android-apps/Recharge-Shop-and-Wallet-Paytm/", WebsiteHelper.getLogoUrl(Website.PAYTM), "Best Mobile Recharge and DTH Recharge, Bill Payment and Shipping Experience", 4.3f, "1,401,209", "10,000,000 - 50,000,000", "13.0MB");
+                ThirdAppVo nineApp_Snapdeal = new ThirdAppVo(Website.SNAPDEAL, AppAdController.packageMap.get(Website.SNAPDEAL), "http://www.9apps.com/android-apps/Snapdeal-Online-Shopping-India/", WebsiteHelper.getLogoUrl(Website.SNAPDEAL), "Best deals on women & men's fashion,home essentials,electronics & gadgets!", 4.1f, "1,035,900", "10,000,000 - 50,000,000", "12.0MB");
+                ThirdAppVo nineApp_Jabong = new ThirdAppVo(Website.JABONG, AppAdController.packageMap.get(Website.JABONG), "http://www.9apps.com/android-apps/Jabong-Online-Fashion-Shopping/", WebsiteHelper.getLogoUrl(Website.JABONG), "India's Best Online Shopping App To Buy Latest Fashion for Men,Women,Kids", 3.9f, "171,487", "10,000,000 - 50,000,000", "6.1MB");
+                ThirdAppVo nineApp_VOONIK = new ThirdAppVo(Website.VOONIK, AppAdController.packageMap.get(Website.VOONIK), "http://www.9apps.com/android-apps/Voonik-Shopping-App-For-Women/", WebsiteHelper.getLogoUrl(Website.VOONIK), "Online Shopping for women clothing,ethnic wear,sarees,kurtis,lingere in India", 4.2f, "129,079", "5,000,000 - 10,000,000", "5.8MB");
+                ThirdAppVo nineApp_INFIBEAM = new ThirdAppVo(Website.INFIBEAM, AppAdController.packageMap.get(Website.INFIBEAM), "http://www.9apps.com/android-apps/Infibeam-Online-Shopping-App/", WebsiteHelper.getLogoUrl(Website.INFIBEAM), "Infibeam.com-Buy Mobiles,Electronics,Books,Gifts,Clothes & more", 3.7f, "8,424", "1,000,000 - 5,000,000", "26.2MB");
+                ThirdAppVo nineApp_Myntra = new ThirdAppVo(Website.MYNTRA, AppAdController.packageMap.get(Website.MYNTRA), "http://www.9apps.com/android-apps/Myntra-Fashion-Shopping-App/", WebsiteHelper.getLogoUrl(Website.MYNTRA), "Online shopping for fashion clothes,footwear,accessories for Men,Women & Kids", 4.1f, "509,053", "10,000,000 - 50,000,000", "17.2MB");
+
+                tempNINEAPP.addAll(Arrays.asList(nineApp_Amazon, nineApp_Flipkart, nineApp_ShopClues, nineApp_eBay, nineApp_Paytm, nineApp_Snapdeal, nineApp_Jabong, nineApp_VOONIK, nineApp_INFIBEAM, nineApp_Myntra));
+                NINEAPP.put("NINEAPP", tempNINEAPP);
+                apps.add(NINEAPP);
+                apps.add(GOOGLEPLAY);
+                DownloadConfigVo downloadConfigVo = new DownloadConfigVo(true, Arrays.asList("com.snapdeal.main", "com.flipkart.android", "in.amazon.mShop.android.shopping", "net.one97.paytm", "com.ebay.mobile", "com.shopclues", "com.infibeam.infibeamapp", "com.myntra.android", "com.jabong.android", "com.alibaba.aliexpresshd"), "NINEAPP", apps, Arrays.asList("com.voonik.android", "cn.xender", "com.india.hasoffer", "com.lenovo.anyshare,gps", "com.mobile.indiapp", "com.leo.appmaster", "com.voodoo.android", "com.app.buyhatke", "com.makemytrip", "com.goibibo", "com.cleartrip.android", "com.yatra.base", "com.android.contacts"));
+                modelAndView.addObject("data", downloadConfigVo);
+                break;
+            case COMADD:
+                Map nMap = new HashMap();
+                //如果版本是28就放开,否则关闭
+                String appVersion = deviceInfoVo.getAppVersion();
+                if (StringUtils.isNotBlank(appVersion) && Integer.valueOf(appVersion) == 28) {
+                    nMap.put("op", true);
+                } else {
+                    nMap.put("op", false);
+                }
+                modelAndView.addObject("data", nMap);
+            default:
+                break;
+        }
+        return modelAndView;
+    }
+
+    private ModelAndView getDealInfoMethod(@RequestParam String id, ModelAndView mv) {
+        Map map = new HashMap();
+        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        if (deviceInfoVo != null) {
+            String appVersion = deviceInfoVo.getAppVersion();
+            if (!StringUtils.isEmpty(appVersion)) {
+                //暂时只是去除空格,未来要加上正则匹配,希望根林不要坑我...
+                appVersion = appVersion.trim();
+                Integer vsion = Integer.valueOf(appVersion);
+                System.out.println("dealId is :" + id);
+                if (StringUtils.isEmpty(id)) {
+                    //空,完毕
+                    System.out.println("no deal id ");
+                    mv.addObject("data", null);
+                    return mv;
+                } else {
+                    Long dealId = Long.valueOf(id);
+                    AppDeal appDeal = appService.getDealDetail(dealId);
+                    if (appDeal != null) {
+                        if (vsion < 23) {
+                            System.out.println("has this deal ");
+                            map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
+                            map.put("title", appDeal.getTitle());
+                            map.put("website", appDeal.getWebsite());
+                            map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
+                            map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                            StringBuilder sb = new StringBuilder();
+                            String description = appDeal.getDescription();
+                            sb.append(description == null ? "" : description);
+                            if (description.lastIndexOf("\n") > 0) {
+                                if (description.lastIndexOf("\n") == description.length() - 1) {
+                                    //最后有换行,再加一个换行
+                                    sb.append("\n");
+                                } else {
+                                    //最后无换行,加两个
+                                    sb.append("\n");
+                                    sb.append("\n");
+                                }
+                            } else {
+                                //无换行
+                                sb.append("\n");
+                                sb.append("\n");
+                            }
+                           /* sb.append("How to get the deal: \n");
+                            sb.append("1 Click \"Activate Deal\" button.\n");
+                            sb.append("2 Add the product of your choice to cart.\n");
+                            sb.append("3 And no coupon code required.\n\n");*/
+                            if (appDeal.getPtmcmpskuid() > 0) {
+                                PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
+                                if (ptmCmpSkuDescription != null) {
+                                    String jsonParam = ptmCmpSkuDescription.getJsonParam();
+                                    if (StringUtils.isNotBlank(jsonParam)) {
+                                        Map jsonMap = JsonHelper.getJsonMap(jsonParam);
+                                        if (jsonMap != null) {
+                                            //遍历map
+                                            Set<Map.Entry> set = jsonMap.entrySet();
+                                            Iterator<Map.Entry> iterator = set.iterator();
+                                            if (iterator.hasNext()) {
+                                                sb.append("Key Features: \n");
+                                            }
+                                            while (iterator.hasNext()) {
+                                                Map.Entry next = iterator.next();
+                                                sb.append(next.getKey()).append(" : ");
+                                                sb.append(next.getValue()).append("\n");
+                                            }
+                                        }
+
+                                    }
+
+                                }
+                            }
+                            map.put("description", sb.toString());
+                        } else {
+                            map.put("discount", appDeal.getDiscount());
+                            map.put("originPrice", appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
+                            map.put("priceDescription", appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
+                            map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
+                            map.put("title", appDeal.getTitle());
+                            //返回deal的处境时间距离现在时间的时间,多少天,小时,分钟..
+                            map.put("createTime", getDifference2Date(new Date(), appDeal.getCreateTime()));
+                            map.put("website", appDeal.getWebsite());
+                            //降价生成deal无失效日期
+                            if (!appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
+                                map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
+                            } else {
+                                //是降价生成的deal，失效时间设置创建时间七天后
+                                Date createTime = appDeal.getCreateTime();
+                                createTime.setTime(createTime.getTime() + 1000 * 60 * 60 * 24 * 7);
+                                map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(createTime));
+                            }
+                            map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+
+                            //要判断deal的类型,手动导入和降价生成
+                            if (appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
+                                //降价生成
+                                StringBuilder sb = new StringBuilder();
+                                String description = appDeal.getDescription();
+                                //网站名 is offering 商品名 for Rs.现价.
+                                //当支持货到付款时展示 : Cash On Delivery is available
+                                sb.append(appDeal.getWebsite().name()).append(" is offering ").append(appDeal.getTitle()).append(" for ").append(appDeal.getPriceDescription()).append(".");
+                                //是否支持COD
+                                PtmCmpSku cmpSkuById = cmpSkuCacheManager.getCmpSkuById(appDeal.getPtmcmpskuid());
+                                if (cmpSkuById != null) {
+                                    //如果存在此sku
+                                    String supportPayMethod = cmpSkuById.getSupportPayMethod();
+                                    if (!StringUtils.isBlank(supportPayMethod) && supportPayMethod.contains("COD")) {
+                                        sb.append("Cash On Delivery is available.");
+                                    }
+                                }
+                                //描述拼接完成
+                                map.put("description", sb.toString());
+                                //拼接Price Research
+                                if (StringUtils.isNotBlank(description)) {
+                                    //如果描述不为空,拼接描述然后换行,空行
+                                    sb = new StringBuilder();
+                                    sb.append(description).append("\n\n");
+                                }
+                                if (appDeal.getPtmcmpskuid() > 0) {
+                                    //如果存在skuId,将skuId返回
+                                    map.put("skuId", appDeal.getPtmcmpskuid());
+                                    PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
+                                    if (ptmCmpSkuDescription != null) {
+                                        List<FetchedProductReview> fetchedProductReviewList = ptmCmpSkuDescription.getFetchedProductReviewList();
+                                        if (fetchedProductReviewList != null && fetchedProductReviewList.size() > 0) {
+                                            List<String> commentList = new ArrayList<>();
+                                            for (FetchedProductReview fec : fetchedProductReviewList) {
+                                                String reviewContent = fec.getReviewContent();
+                                                if (!StringUtils.isEmpty(reviewContent)) {
+                                                    reviewContent = ClientHelper.delHTMLTag(reviewContent);
+                                                    //处理下换行符号
+                                                    reviewContent.replaceAll("\n", "");
+                                                }
+                                                if (!StringUtils.isEmpty(reviewContent)) {
+                                                    if (commentList.size() < 4) {
+                                                        //拼接评论标题
+                                                        String reviewTitle = fec.getReviewTitle();
+                                                        if (!StringUtils.isEmpty(reviewTitle)) {
+                                                            reviewTitle = ClientHelper.delHTMLTag(reviewTitle);
+                                                            //处理下换行符号
+                                                            reviewTitle.replaceAll("\n", "");
+                                                            commentList.add(reviewTitle == null ? "" : reviewTitle + "." + reviewContent);
+                                                        } else {
+                                                            commentList.add(reviewContent);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            map.put("comments", commentList);
+                                        }
+                                        //查看是否存在offer,如果存在将offer拼接
+                                        //“网站名” also provides “SKU当前生效的offer数量“ extra offer（offer数量为1时 展示offer 大于1时 展示offers）: “按服务端排序展示offer列表 以分号间隔”
+                                        String offers = ptmCmpSkuDescription.getOffers();
+                                        if (!hasoffer.base.utils.StringUtils.isEmpty(offers)) {
+                                            String[] temps = offers.split(",");
+                                            if (temps.length >= 1) {
+                                                sb.append(appDeal.getWebsite().name()).append(" also provides ").append(temps.length).append(" extra offer :");
+                                            }
+                                            for (String str : temps) {
+                                                sb.append(str).append(";");
+                                            }
+                                            //拼完之后换行,空一行
+                                            sb.append("\n\n");
+                                            sb.append("Please note: offers and price may vary by location.");
+                                        }
+                                        //设置Key Features
+                                        String jsonParam = ptmCmpSkuDescription.getJsonParam();
+                                        if (StringUtils.isNotBlank(jsonParam)) {
+                                            Map jsonMap = JsonHelper.getJsonMap(jsonParam);
+                                            map.put("KeyFeatures", jsonMap);
+                                        }
+
+                                    }
+                                    map.put("priceResearch", sb.toString());
+                                    Map priceCurveDesc = new HashMap();
+                                    //配置点击弹出价格曲线的文字以及文字的颜色
+                                    priceCurveDesc.put("clickableContent", "Click here to check price history.");
+                                    priceCurveDesc.put("fontColor", "#108ee9");
+                                    map.put("clickConfig", priceCurveDesc);
+                                }
+                            } else {
+                                //手动导入,描述要用老的方式
+                                StringBuilder sb = new StringBuilder();
+                                String description = appDeal.getDescription();
+                                sb.append(description == null ? "" : description);
+                                if (description.lastIndexOf("\n") > 0) {
+                                    if (description.lastIndexOf("\n") == description.length() - 1) {
+                                        //最后有换行,再加一个换行
+                                        sb.append("\n");
+                                    } else {
+                                        //最后无换行,加两个
+                                        sb.append("\n");
+                                        sb.append("\n");
+                                    }
+                                } else {
+                                    //无换行
+                                    sb.append("\n");
+                                    sb.append("\n");
+                                }
+                               /* sb.append("How to get the deal: \n");
+                                sb.append("1 Click \"Activate Deal\" button.\n");
+                                sb.append("2 Add the product of your choice to cart.\n");
+                                sb.append("3 And no coupon code required.\n\n");*/
+                                if (appDeal.getPtmcmpskuid() > 0) {
+                                    PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
+                                    if (ptmCmpSkuDescription != null) {
+                                        String jsonParam = ptmCmpSkuDescription.getJsonParam();
+                                        if (StringUtils.isNotBlank(jsonParam)) {
+                                            Map jsonMap = JsonHelper.getJsonMap(jsonParam);
+                                            if (jsonMap != null) {
+                                                //遍历map
+                                                Set<Map.Entry> set = jsonMap.entrySet();
+                                                Iterator<Map.Entry> iterator = set.iterator();
+                                                if (iterator.hasNext()) {
+                                                    sb.append("Key Features: \n");
+                                                }
+                                                while (iterator.hasNext()) {
+                                                    Map.Entry next = iterator.next();
+                                                    sb.append(next.getKey()).append(" : ");
+                                                    sb.append(next.getValue()).append("\n");
+                                                }
+                                            }
+
+                                        }
+
+                                    }
+                                }
+                                map.put("description", sb.toString());
+                            }
+                        }
+                        map.put("extra", 0);
+                        if (appDeal.getWebsite() == Website.FLIPKART) {
+                            map.put("extra", 7.5);
+                            map.put("cashbackInfo", "1. Offer valid for a limited time only while stocks last\n" +
+                                    "2. To earn Rewards, remember to visit retailer through Hasoffer & then place your order\n" +
+                                    "3. Rewards may not paid on purchases made using store credits/gift vouchers\n" +
+                                    "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
+                                    "5  Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
+                        }
+                        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+                        DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+                        System.out.println("link url is  :" + appDeal.getLinkUrl());
+                        String s = appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId});
+                        logger.info(" dealInfo record deal deepLink :" + s);
+                        map.put("deeplink", s);
+                        mv.addObject("data", map);
+                        return mv;
+                    }
+                }
+            }
+        }
+        return mv;
+    }
+
 }
