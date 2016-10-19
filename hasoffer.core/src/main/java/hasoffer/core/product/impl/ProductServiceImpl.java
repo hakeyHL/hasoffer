@@ -239,6 +239,9 @@ public class ProductServiceImpl implements IProductService {
         List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ", Arrays.asList(id));
 
         PtmProduct ptmProduct = dbm.get(PtmProduct.class, id);
+        if (ptmProduct == null) {
+            return false;
+        }
 
         float oriPrice = ptmProduct.getPrice();
 
@@ -278,15 +281,10 @@ public class ProductServiceImpl implements IProductService {
 
             dbm.update(updater);
 
-            PtmProduct product = getProduct(id);
-            if (product == null) {
-                return false;
-            }
-
-            product.setPrice(price);
+            ptmProduct.setPrice(price);
             System.out.println("minPrice =" + price);
 
-            importProduct2Solr2(product);
+            importProduct2Solr2(ptmProduct);
 
             return true;
         } else {
