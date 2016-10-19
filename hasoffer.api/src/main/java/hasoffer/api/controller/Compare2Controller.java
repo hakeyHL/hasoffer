@@ -35,6 +35,7 @@ import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.exception.NonMatchedProductException;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
+import hasoffer.core.utils.ApiUtils;
 import hasoffer.core.utils.JsonHelper;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
@@ -80,7 +81,7 @@ public class Compare2Controller {
     IPriceOffNoticeService iPriceOffNoticeService;
     private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
        /* for (int i = 0; i < 10; i++) {
             String dealUrlWithAff = WebsiteHelper.getDeeplinkWithAff(Website.SNAPDEAL, "https://www.snapdeal.com/product/jbl-sb350-soundbar-with-wirless/1602277955", new String[]{MarketChannel.SHANCHUAN.name(), "dfecc858243a616a"});
             System.out.println(dealUrlWithAff);
@@ -311,7 +312,7 @@ public class Compare2Controller {
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
         PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"skuPrice", "deepLink", "saved", "priceOff", "productVo", "pagedComparedSkuVos", "copywriting", "displayMode", "std", "cashBack"});
-        CmpResult cr = null;
+        CmpResult cr = new CmpResult();
         PtmProduct product = productService.getProduct(Long.valueOf(id));
         String userToken = Context.currentContext().getHeader("usertoken");
         if (product != null) {
@@ -333,14 +334,17 @@ public class Compare2Controller {
             // 速度优化
             SearchHelper.addToLog(sio);
             logger.debug(sio.toString());
+            ApiUtils.resloveClass(cr);
             jsonObject.put("data", JSONObject.toJSON(cr));
             System.out.println("time " + (System.currentTimeMillis() - l) / 1000);
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
             return null;
         }
+        ApiUtils.resloveClass(cr);
         jsonObject.put("data", JSONObject.toJSON(cr));
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
         return null;
+
     }
 
     private CmpResult getDefaultCmpResult(SearchIO sio, PtmCmpSkuIndex2 cmpSkuIndex) {
@@ -614,7 +618,7 @@ public class Compare2Controller {
         List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
         CmpResult cmpResult = new CmpResult();
         //从ptmCmpSku表获取 productId为指定值、且状态为ONSALE 按照价格升序排列
-        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(product.getId(), sio.getPage(), 6);
+        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(product.getId(), sio.getPage(), sio.getSize());
         if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
             System.out.println("get skus size is " + pagedCmpskus.getData().size());
             List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();

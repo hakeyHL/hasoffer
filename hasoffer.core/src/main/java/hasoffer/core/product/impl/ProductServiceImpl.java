@@ -64,9 +64,7 @@ public class ProductServiceImpl implements IProductService {
                     " ORDER BY t.price ASC ";
 
     private static final String Q_ONSALE_PTM_CMPSKU =
-            "SELECT  DISTINCT " +
-                    " website, " +
-                    " price " +
+            "SELECT  t " +
                     "FROM " +
                     " PtmCmpSku t " +
                     "WHERE " +

@@ -113,8 +113,13 @@ public class ProductCacheManager {
                 System.out.println("--------- pagedCmpskus  -----------" + pagedCmpskus.getData().size());
                 List<PtmCmpSku> data = pagedCmpskus.getData();
                 if (data != null && data.size() > 0) {
-                    pagedCmpskus.setData(getOnsaleSkuList(data, proId));
+                    //now , only the sku status is 'ONSALE' will return to our client , this method is closed by temporarily.
+//                  pagedCmpskus.setData(getOnsaleSkuList(data, proId));
                     cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
+                } else {
+                    //no data ,return empty list ;
+                    pagedCmpskus = new PageableResult<>();
+                    pagedCmpskus.setData(new ArrayList<PtmCmpSku>());
                 }
             } else {
                 PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
@@ -276,6 +281,7 @@ public class ProductCacheManager {
         return pagedCmpskus;
     }
 
+    //现在前台不返回offsale的sku,此方法暂时停用,且此方法查询效率低
     public List<PtmCmpSku> getOnsaleSkuList(List data, long productId) {
         System.out.println("get productId is : " + productId);
         List<PtmCmpSku> tempPtmCmpSkus = new ArrayList<>();

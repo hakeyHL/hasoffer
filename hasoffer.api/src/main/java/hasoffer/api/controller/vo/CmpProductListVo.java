@@ -43,7 +43,7 @@ public class CmpProductListVo {
 
     public CmpProductListVo(PtmCmpSku cmpSku, String logoImage) {
         this.id = cmpSku.getId();
-        this.coins = cmpSku.getWebsite() == Website.FLIPKART ? Math.round(0.015 * cmpSku.getPrice()) : 0;
+        this.coins = cmpSku.getWebsite() == Website.FLIPKART ? Math.round(0.075 * cmpSku.getPrice()) : 0;
         this.ratingNum = cmpSku.getWebsite().equals(Website.EBAY) ? 0 : cmpSku.getRatings();
         this.imageUrl = cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath());
         this.totalRatingsNum = cmpSku.getWebsite().equals(Website.EBAY) ? 0 : cmpSku.getCommentsNumber();
@@ -77,7 +77,7 @@ public class CmpProductListVo {
 //            }
 //        }
         this.distributionTime = cmpSku.getDeliveryTime();
-        this.backRate = cmpSku.getWebsite() == Website.FLIPKART ? 1.5f : 0;
+        this.backRate = cmpSku.getWebsite() == Website.FLIPKART ? 7.5f : 0;
         this.returnGuarantee = cmpSku.getReturnDays();
         String payMethod = cmpSku.getSupportPayMethod();
         if (!StringUtils.isEmpty(payMethod)) {
