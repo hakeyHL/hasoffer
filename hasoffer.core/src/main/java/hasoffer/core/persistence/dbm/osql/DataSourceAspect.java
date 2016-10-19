@@ -1,0 +1,32 @@
+package hasoffer.core.persistence.dbm.osql;
+
+import org.springframework.aop.AfterReturningAdvice;
+import org.springframework.aop.MethodBeforeAdvice;
+
+import java.lang.reflect.Method;
+
+/**
+ * Created by chevy on 2016/10/19.
+ */
+
+public class DataSourceAspect implements MethodBeforeAdvice, AfterReturningAdvice {
+
+    @Override
+    public void afterReturning(Object returnValue, Method method,
+                               Object[] args, Object target) throws Throwable {
+        // TODO Auto-generated method stub
+        DataSourceContextHolder.clearDataSourceType();
+    }
+
+    @Override
+    public void before(Method method, Object[] args, Object target)
+            throws Throwable {
+        DataSource ds = method.getAnnotation(DataSource.class);
+        if (ds != null && ds.value() == DataSource.DataSourceType.Slave) {
+            DataSourceContextHolder.setDataSourceType("read");
+        } else {
+            DataSourceContextHolder.setDataSourceType("default");
+        }
+    }
+
+}

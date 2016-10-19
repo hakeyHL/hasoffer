@@ -89,6 +89,17 @@ public class ProductTest {
     private Pattern PATTERN_Brand = Pattern.compile("[\t*?]([a-zA-Z])[\t*?]");
 
     @Test
+    public void testDB() {
+        PtmProduct product = productService.getProduct(100L);
+        System.out.println(product.getTitle());
+
+        List<PriceNode> priceNodes = cmpSkuService.queryHistoryPrice(2988761);
+        for (PriceNode pn : priceNodes) {
+            System.out.println(pn.getYmd() + " = " + pn.getPrice());
+        }
+    }
+
+    @Test
     public void testSolr() {
         long proId = 6467L;
         productService.importProduct2Solr2(proId);

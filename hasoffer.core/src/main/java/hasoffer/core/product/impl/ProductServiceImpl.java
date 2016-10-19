@@ -436,7 +436,6 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-//    @Cacheable(value = CACHE_KEY, key = "#root.methodName + '_' + #root.args[0]")
     public PtmProduct getProduct(long proId) {
         return dbm.get(PtmProduct.class, proId);
     }
