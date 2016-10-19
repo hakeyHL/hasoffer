@@ -103,7 +103,7 @@
                                     <button type="button" class="btn btn-primary"
                                             onclick="removeCache(${pId})"
                                             data-toggle="modal" data-target="#confirm-delete">
-                                        <span>清除缓存</span><br/><span>Remove Product Cache</span>
+                                        <span>更新商品价格&清除缓存</span><br/><span>Update product price&Remove Product Cache</span>
                                     </button>
                                     <button id="changeStatus" class="btn btn-info" onclick="change(${pId})">
                                         <span>切换状态</span><br/><span>Toggle Status</span>
