@@ -47,13 +47,14 @@ public class PtmProductPriceUpdateWorker implements Runnable {
             List<Long> productIdList = dbm.query("SELECT distinct t.productId FROM PtmCmpSku t WHERE t.updateTime > ?0 and t.updateTime < ?1", Arrays.asList(t1, t2));
 
             for (long productid : productIdList) {
-                productService.updatePtmProductPrice(productid);
-//                System.out.println("update Ptmproduct price success for " + productid);
-                try {
-                    productService.importProduct2Solr2(productService.getProduct(productid));
-                    System.out.println("update success then reimport product to solr success");
-                } catch (Exception e) {
-                    System.out.println("update success then reimport product to solr fail");
+                if (productService.updatePtmProductPrice(productid)) {
+//                    System.out.println("update Ptmproduct price success for " + productid);
+                    try {
+                        productService.importProduct2Solr2(productService.getProduct(productid));
+                        System.out.println("update success then reimport product to solr success for " + productid);
+                    } catch (Exception e) {
+                        System.out.println("update success then reimport product to solr fail for " + productid);
+                    }
                 }
             }
 

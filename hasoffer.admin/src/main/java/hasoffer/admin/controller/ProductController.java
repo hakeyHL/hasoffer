@@ -518,6 +518,12 @@ public class ProductController {
 
         try {
 
+            //更新product价格
+            if (productService.updatePtmProductPrice(productId)) {
+                //重新导入prodcut
+                productService.importProduct2Solr2(productService.getProduct(productId));
+            }
+
             //清除商品缓存
             cacheServiceImpl.del("PRODUCT_" + productId);
             //清除sku缓存        PRODUCT__listPagedCmpSkus_3198_1_10
