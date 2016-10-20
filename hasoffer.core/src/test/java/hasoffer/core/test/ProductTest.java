@@ -91,7 +91,9 @@ public class ProductTest {
     @Test
     public void testDB() {
         PtmProduct product = productService.getProduct(100L);
-        System.out.println(product.getTitle());
+        for (int i = 0; i < 20; i++) {
+            System.out.println(product.getTitle());
+        }
 
         List<PriceNode> priceNodes = cmpSkuService.queryHistoryPrice(2988761);
         for (PriceNode pn : priceNodes) {

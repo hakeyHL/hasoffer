@@ -9,7 +9,8 @@
 
     <!-- mysql 配置 -->
     <!-- datasource 1 -->
-    <bean id="druidDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+    <bean id="masterDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init"
+          destroy-method="close">
         <!-- 基本属性 url、user、password -->
         <property name="url" value="${jdbc.url}"/>
         <property name="username" value="${jdbc.username}"/>
@@ -43,7 +44,7 @@
     </bean>
 
     <!-- datasource 2 -->
-    <bean id="readDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+    <bean id="slaveDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
         <!-- 基本属性 url、user、password -->
         <property name="url" value="${readDb.url}"/>
         <property name="username" value="${readDb.username}"/>
@@ -77,15 +78,15 @@
     </bean>
 
     <!-- 编写spring 配置文件的配置多数源映射关系 -->
-    <bean class="hasoffer.core.persistence.dbm.osql.DynamicDataSource" id="dataSource">
+    <bean class="hasoffer.core.persistence.dbm.osql.datasource.DynamicDataSource" id="dataSource">
         <property name="targetDataSources">
             <map key-type="java.lang.String">
-                <entry value-ref="druidDataSource" key="default"></entry>
-                <entry value-ref="readDataSource" key="read"></entry>
+                <entry value-ref="masterDataSource" key="master"></entry>
+                <entry value-ref="slaveDataSource" key="slave"></entry>
                 <!-- key -->
             </map>
         </property>
-        <property name="defaultTargetDataSource" ref="druidDataSource">
+        <property name="defaultTargetDataSource" ref="masterDataSource">
         </property>
     </bean>
 
@@ -120,7 +121,8 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
-    <bean id="dataSourceAspect" class="hasoffer.core.persistence.dbm.osql.DataSourceAspect"/>
+    <!-- 动态选择数据源 面向切面 -->
+    <bean id="dataSourceAspect" class="hasoffer.core.persistence.dbm.osql.datasource.DataSourceAspect"/>
 
     <aop:config>
         <aop:pointcut id="transactionPointCut" expression="execution(* hasoffer.core.*.*.*(..))"/>

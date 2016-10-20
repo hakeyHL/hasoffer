@@ -1,4 +1,4 @@
-package hasoffer.core.persistence.dbm.osql;
+package hasoffer.core.persistence.dbm.osql.datasource;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,10 +13,5 @@ import java.lang.annotation.Target;
 public @interface DataSource {
 
     DataSourceType value() default DataSourceType.Master;
-
-    public enum DataSourceType {
-        Master,
-        Slave
-    }
 
 }

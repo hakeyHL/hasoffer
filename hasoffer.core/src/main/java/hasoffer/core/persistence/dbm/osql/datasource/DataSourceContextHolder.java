@@ -1,4 +1,4 @@
-package hasoffer.core.persistence.dbm.osql;
+package hasoffer.core.persistence.dbm.osql.datasource;
 
 /**
  * Created by chevy on 2016/10/19.

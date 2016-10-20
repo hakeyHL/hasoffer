@@ -12,6 +12,8 @@ import hasoffer.core.cache.CategoryCacheManager;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.dbm.osql.datasource.DataSource;
+import hasoffer.core.persistence.dbm.osql.datasource.DataSourceType;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.persistence.po.ptm.updater.PtmImageUpdater;
@@ -440,6 +442,7 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    @DataSource(value = DataSourceType.Slave)
     public PtmProduct getProduct(long proId) {
         return dbm.get(PtmProduct.class, proId);
     }
