@@ -39,7 +39,7 @@ public class DealServiceImpl implements IDealService {
     private static final long EXPIRE_TIME_MS = 7 * 24 * 60 * 60 * 1000;
 
     //手动导入deal的sql
-    private static final String IMPORT_SQL = "insert into appdeal(website, title, linkUrl, expireTime, priceDescription ,description, createTime,  push ,display ,imageUrl,discount,dealCategoryId,dealClickCount,appdealSource,ptmcmpskuid) values(?,?, ?, ?, ?, ? ,?, ?, ?, ?,?,?,?,'MANUAL_INPUT',0)";
+//    private static final String IMPORT_SQL = "insert into appdeal(website, title, linkUrl, expireTime, priceDescription ,description, createTime,  push ,display ,imageUrl,discount,dealCategoryId,dealClickCount,appdealSource,ptmcmpskuid) values(?,?, ?, ?, ?, ? ,?, ?, ?, ?,?,?,?,'MANUAL_INPUT',0)";
 
     private static final String Q_DEALS = "SELECT t FROM AppDeal t";
 
@@ -90,7 +90,7 @@ public class DealServiceImpl implements IDealService {
         int repeatLinkNum = 0;
         List<String> linkList = new ArrayList<>();
         List<Map<String, String>> maps = ExcelUtils.readRows(1, tempFile);
-        for (int i = 0; i < maps.size() - 1; i++) {
+        for (int i = 0; i < maps.size(); i++) {
             Map<String, String> stringStringMap = maps.get(i);
             //set attribute to object
             AppDeal appDeal = new AppDeal();
@@ -101,11 +101,12 @@ public class DealServiceImpl implements IDealService {
                     appDeal.setWebsite(Website.valueOf(website.trim()));
                 } else {
                     emptyLinkNum++;
+                    failNum++;
                     continue;
                 }
             } catch (Exception e) {
                 failNum++;
-                importResult.put("errorMessage", "未识别的site / not recognized website type !");
+                importResult.put("errorMessage", "未识别的site / not recognized website type at row  " + (i + 1));
                 continue;
                 //not a website
             }
@@ -115,6 +116,7 @@ public class DealServiceImpl implements IDealService {
                 appDeal.setTitle(dealTitle);
             } else {
                 emptyLinkNum++;
+                failNum++;
                 continue;
             }
 
@@ -123,12 +125,15 @@ public class DealServiceImpl implements IDealService {
             if (!StringUtils.isEmpty(dealLink)) {
                 if (linkList.contains(dealLink)) {
                     repeatLinkNum++;
+                    failNum++;
+                    continue;
                 } else {
                     linkList.add(dealLink);
                     appDeal.setLinkUrl(dealLink.trim());
                 }
             } else {
                 emptyLinkNum++;
+                failNum++;
                 continue;
             }
 
@@ -167,19 +172,22 @@ public class DealServiceImpl implements IDealService {
             }
             try {
                 //TODO 插入时报无id
-                dbm.batchSave(Arrays.asList(appDeal));
+                appDeal.setCreateTime(new Date());
+                Long aLong = dbm.create(appDeal);
+                System.out.println(aLong);
             } catch (Exception e) {
                 failNum++;
-                importResult.put("errorMessage", "插入失败 / insert fail  : " + appDeal.getTitle() + "  msg : " + e.getMessage());
+                importResult.put("errorMessage", "插入失败 / insert fail  : row " + (i + 1) + "  , msg : " + e.getMessage());
                 continue;
             }
             System.out.println("over ");
         }
-        importResult.put("totalRows", maps.size() - 1);
-        importResult.put("successRows", maps.size() - 1 - failNum);
+        importResult.put("totalRows", maps.size());
+        importResult.put("successRows", maps.size() - failNum);
         importResult.put("failRows", failNum);
-        importResult.put("_nullRows", emptyLinkNum);
+        importResult.put("nullRows", emptyLinkNum);
         importResult.put("repeatRows", repeatLinkNum);
+        importResult.put("errorMessage", importResult.get("errorMessage") == null ? "无" : importResult.get("errorMessage"));
         return importResult;
     }
 
