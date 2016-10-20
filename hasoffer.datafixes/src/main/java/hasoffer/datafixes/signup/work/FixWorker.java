@@ -72,6 +72,7 @@ public class FixWorker {
         long signCoin = 0L;
         Long lastSignTime = 0L;
         int conSignNum = 0;
+        int sumSignNum = 0;
         user.setMaxConSignNum(1);
         for (Long signTime : signTimes) {
             long x = (signTime + TimeUtils.MILLISECONDS_OF_1_HOUR * 8) / TimeUtils.MILLISECONDS_OF_1_DAY - (lastSignTime + TimeUtils.MILLISECONDS_OF_1_HOUR * 8) / TimeUtils.MILLISECONDS_OF_1_DAY;
@@ -81,16 +82,19 @@ public class FixWorker {
                 continue;
             } else if (x == 1) {
                 conSignNum++;
+                sumSignNum++;
             } else if (x > 1) {
                 if (user.getMaxConSignNum() < conSignNum) {
                     user.setMaxConSignNum(conSignNum);
                 }
                 conSignNum = 1;
+                sumSignNum++;
             }
             logger.info("user:{}, Sign time:{}, conSignUp:{}, Day jet lag:{}", user.getUserId(), new Date(signTime), conSignNum, x);
             signCoin += getThisCoin(conSignNum);
 
         }
+        user.setSumSignNum(sumSignNum);
         user.setSignCoin(signCoin);
         user.setConSignNum(conSignNum);
     }

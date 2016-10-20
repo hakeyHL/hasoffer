@@ -21,6 +21,10 @@ public class UrmSignCoin {
     @Column(columnDefinition = "int default 0")
     private Integer conSignNum = 0;
 
+    //一共多少次
+    @Column(columnDefinition = "int default 0")
+    private Integer sumSignNum = 0;
+
     //最近签到时间
     private Long lastSignTime = 0L;
 
@@ -56,6 +60,17 @@ public class UrmSignCoin {
 
     public void setConSignNum(Integer conSignNum) {
         this.conSignNum = conSignNum;
+    }
+
+    public Integer getSumSignNum() {
+        if (sumSignNum == null) {
+            sumSignNum = 0;
+        }
+        return sumSignNum;
+    }
+
+    public void setSumSignNum(Integer sumSignNum) {
+        this.sumSignNum = sumSignNum;
     }
 
     public Long getLastSignTime() {
