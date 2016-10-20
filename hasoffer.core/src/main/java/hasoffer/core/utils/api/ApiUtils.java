@@ -1,4 +1,4 @@
-package hasoffer.api.utils;
+package hasoffer.core.utils.api;
 
 import com.alibaba.fastjson.JSON;
 import hasoffer.base.utils.JSONUtil;
@@ -10,6 +10,7 @@ import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Field;
@@ -21,11 +22,12 @@ import java.util.List;
  * Created by hs on 2016年10月19日.
  * Time 14:28
  */
+@Component
 public class ApiUtils {
     @Resource
-    static AppServiceImpl appService;
+    AppServiceImpl appService;
     @Resource
-    static IPriceOffNoticeService iPriceOffNoticeService;
+    IPriceOffNoticeService iPriceOffNoticeService;
     @Resource
     SearchLogCacheManager searchLogCacheManager;
     @Resource
@@ -38,7 +40,7 @@ public class ApiUtils {
      * @throws Exception
      */
 
-    public static void resloveClass(Object object) {
+    public void resloveClass(Object object) {
         //加载这个类的成员
         //如果它是list且为null就初始化一下
         //如果是基本类型就算了,它们有初始值
@@ -80,7 +82,7 @@ public class ApiUtils {
         System.out.println("over");
     }
 
-    public static void transferJson2Object(List<LinkedHashMap> dataList, List desList) throws Exception {
+    public void transferJson2Object(List<LinkedHashMap> dataList, List desList) throws Exception {
         for (LinkedHashMap linkedHashMap1 : dataList) {
             String string = JSON.toJSONString(linkedHashMap1);
             PtmCmpSku ptmCmpSku = JSONUtil.toObject(string, PtmCmpSku.class);
@@ -88,7 +90,7 @@ public class ApiUtils {
         }
     }
 
-    public static String getStringNum(String source) {
+    public String getStringNum(String source) {
         source = source.trim();
         String str2 = "";
         if (source != null && !"".equals(source)) {
@@ -102,7 +104,7 @@ public class ApiUtils {
         return str2;
     }
 
-    public static boolean isPriceOffAlert(String userToken, Long skuId) {
+    public boolean isPriceOffAlert(String userToken, Long skuId) {
         if (!StringUtils.isEmpty(userToken)) {
             System.out.println("userToken is :" + userToken);
             UrmUser urmUser = appService.getUserByUserToken(userToken);
