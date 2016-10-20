@@ -37,7 +37,7 @@ public class DataSourceAspect implements MethodBeforeAdvice, AfterReturningAdvic
             return;
         }
 
-        logger.debug(String.format("method : %s/%s, datasource : %s", method.getDeclaringClass().getName(), method.getName(), ds.value()));
+        System.out.println(String.format("method : %s/%s, datasource : %s", method.getDeclaringClass().getName(), method.getName(), ds.value()));
 
         if (ds.value() == DataSourceType.Slave) {
             DataSourceContextHolder.setDataSourceType("slave");
