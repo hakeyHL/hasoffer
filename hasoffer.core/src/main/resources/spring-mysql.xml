@@ -126,8 +126,11 @@
 
     <aop:config>
         <!--<aop:pointcut id="transactionPointCut" expression="execution(* hasoffer.core.*.*.*(..))"/>-->
-        <aop:pointcut id="transactionPointCut" expression="execution(* hasoffer.*.*.*.*(..))"/>
-        <aop:advisor pointcut-ref="transactionPointCut" advice-ref="dataSourceAspect" order="1"/>
+        <aop:pointcut id="transactionPointCut1" expression="execution(* hasoffer.admin.controller.*.*(..))"/>
+        <aop:pointcut id="transactionPointCut2" expression="execution(* hasoffer.api.controller.*.*(..))"/>
+
+        <aop:advisor pointcut-ref="transactionPointCut1" advice-ref="dataSourceAspect" order="1"/>
+        <aop:advisor pointcut-ref="transactionPointCut2" advice-ref="dataSourceAspect" order="2"/>
         <!--<aop:advisor pointcut-ref="transactionPointCut" advice-ref="dataSourceExchange" order="1"/>-->
     </aop:config>
 </beans>
