@@ -6,7 +6,6 @@ import com.alibaba.fastjson.serializer.PropertyFilter;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.SearchHelper;
-import hasoffer.api.utils.ApiUtils;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
@@ -36,6 +35,7 @@ import hasoffer.core.search.exception.NonMatchedProductException;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.core.utils.JsonHelper;
+import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
@@ -83,6 +83,8 @@ public class Compare2Controller {
     IPriceOffNoticeService iPriceOffNoticeService;
     @Resource
     AppCmpServiceImpl appCmpService;
+    @Resource
+    ApiUtils apiUtils;
     private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
 
     public static void main(String[] args) throws Exception {
@@ -196,7 +198,7 @@ public class Compare2Controller {
 
         if (!StringUtils.isEmpty(price)) {
             //如果price不为空
-            price = ApiUtils.getStringNum(price);
+            price = apiUtils.getStringNum(price);
         }
         SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, pageSize);
         getSioBySearch(sio);
@@ -233,18 +235,19 @@ public class Compare2Controller {
                 logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, pageSize));
                 //if exception occured ,get default cmpResult
                 jsonObject.put("data", JSONObject.toJSON(cr));
+                e.printStackTrace();
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
                 return null;
             }
             // 速度优化
             SearchHelper.addToLog(sio);
             logger.debug(sio.toString());
-            ApiUtils.resloveClass(cr);
+            apiUtils.resloveClass(cr);
             jsonObject.put("data", JSONObject.toJSON(cr));
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
             return null;
         }
-        ApiUtils.resloveClass(cr);
+        apiUtils.resloveClass(cr);
         jsonObject.put("data", JSONObject.toJSON(cr));
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
         return null;
@@ -452,8 +455,9 @@ public class Compare2Controller {
                     logger.info(" getCmpProducts record deepLinkUrl :" + cplv.getDeepLinkUrl());
                     cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()}));
                     logger.info(" getCmpProducts record deepLink :" + cplv.getDeepLinkUrl());
-
-                    cplv.setIsAlert(ApiUtils.isPriceOffAlert(userToken, cplv.getId()));
+                    if (!StringUtils.isEmpty(userToken)) {
+                        cplv.setIsAlert(apiUtils.isPriceOffAlert(userToken, cplv.getId()));
+                    }
                     comparedSkuVos.add(cplv);
                 }
                 if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {
