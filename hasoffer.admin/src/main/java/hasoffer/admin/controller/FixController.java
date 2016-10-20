@@ -7,6 +7,7 @@ import hasoffer.admin.controller.vo.TitleCountVo;
 import hasoffer.admin.worker.FixSkuErrorInPriceWorker;
 import hasoffer.admin.worker.FlipkartSkuCategory2GetListWorker;
 import hasoffer.admin.worker.FlipkartSkuCategory2GetSaveWorker;
+import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.exception.ImageDownloadOrUploadException;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.model.ImagePath;
@@ -43,6 +44,7 @@ import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.htmlcleaner.TagNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -1626,6 +1628,18 @@ public class FixController {
                 }
             }
         }
+        return null;
+    }
+
+    //fixdata/91mobile
+    @RequestMapping(value = "/91mobile", method = RequestMethod.GET)
+    public String nineOnemobileFetch() throws HttpFetchException {
+
+        String url = "http://www.91mobiles.com/template/category_finder/finder_ajax.php?ord=0.5544784158021026&requestType=2&listType=list&selMobSort=views&amount=1000%3B45000&sCatName=phone&price_range_apply=0&tr_fl%5B%5D=mob_market_status_filter.marketstatus_filter%3Aava_stores&search=&hidFrmSubFlag=1&page=2&category=mobile&unique_sort=&hdnCategory=mobile&user_search=&url_feat_rule=";
+
+        TagNode root = HtmlUtils.getUrlRootTagNode(url);
+
+
         return null;
     }
 }

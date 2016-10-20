@@ -3,19 +3,48 @@ package hasoffer.core.test.basetest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.HttpResponseModel;
+import hasoffer.base.utils.HtmlUtils;
 import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.core.utils.Httphelper;
+import org.htmlcleaner.HtmlCleaner;
+import org.htmlcleaner.TagNode;
+import org.htmlcleaner.XPatherException;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static hasoffer.base.utils.HtmlUtils.getSubNodesByXPath;
 
 /**
  * Date : 2016/5/31
  * Function :
  */
 public class HttpTest {
+
+    @Test
+    public void test91Mobile() throws HttpFetchException, XPatherException {
+
+        String url = "http://www.91mobiles.com/template/category_finder/finder_ajax.php?ord=0.5544784158021026&requestType=2&listType=list&selMobSort=views&amount=1000%3B45000&sCatName=phone&price_range_apply=0&tr_fl%5B%5D=mob_market_status_filter.marketstatus_filter%3Aava_stores&search=&hidFrmSubFlag=1&page=2&category=mobile&unique_sort=&hdnCategory=mobile&user_search=&url_feat_rule=";
+
+        TagNode root = HtmlUtils.getUrlRootTagNode(url);
+
+        String html = root.getText().toString();
+
+        JSONObject object = JSONObject.parseObject(html);
+
+        html = object.getString("response");
+
+        root = new HtmlCleaner().clean(html);
+
+        List<TagNode> productNodeList = getSubNodesByXPath(root, "//div[@class='filter filer_finder']");
+
+        System.out.println(html);
+    }
+
     @Test
     public void testHttp() throws Exception {
         String url = "https://www.flipkart.com/mobiles-accessories/pr?sid=tyy&q=JBL+headphone";
