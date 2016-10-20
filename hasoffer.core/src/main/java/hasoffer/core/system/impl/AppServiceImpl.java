@@ -3,6 +3,8 @@ package hasoffer.core.system.impl;
 import hasoffer.base.enums.AppType;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.Website;
+import hasoffer.base.utils.AffliIdHelper;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.system.SearchCriteria;
@@ -13,10 +15,13 @@ import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.urm.*;
 import hasoffer.core.system.IAppService;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.nio.charset.Charset;
 import java.util.*;
 
 /**
@@ -25,6 +30,8 @@ import java.util.*;
 @Service
 @Transactional
 public class AppServiceImpl implements IAppService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AppServiceImpl.class);
 
     private static final String Q_APP_VERSION =
             "SELECT t FROM AppVersion t " +
@@ -392,4 +399,97 @@ public class AppServiceImpl implements IAppService {
 
         //4. over .
     }
+
+    @Override
+    public List<Map<String, String>> getIndexPage(MarketChannel marketChannel, String deviceId) {
+        List<Map<String, String>> mapList = new ArrayList<>();
+
+        Map<String, String> flipkartMap = new HashMap<>();
+        //X: 网站编号；Y：联盟ID；Z：渠道编号
+        flipkartMap.put("X", getPackageName(Website.FLIPKART));
+        flipkartMap.put("Y", getIndexUrl(Website.FLIPKART, marketChannel, deviceId));
+        flipkartMap.put("Z", getLiveDemo(Website.FLIPKART, marketChannel, deviceId));
+        flipkartMap.put("I", getInstallUrl(Website.FLIPKART));
+        flipkartMap.put("J", Website.FLIPKART.toString());
+
+        mapList.add(flipkartMap);
+
+        Map<String, String> snapDealMap = new HashMap<>();
+        snapDealMap.put("X", getPackageName(Website.SNAPDEAL));
+        snapDealMap.put("Y", getIndexUrl(Website.SNAPDEAL, marketChannel, deviceId));
+        snapDealMap.put("Z", getLiveDemo(Website.SNAPDEAL, marketChannel, deviceId));
+        snapDealMap.put("I", getInstallUrl(Website.SNAPDEAL));
+        snapDealMap.put("J", Website.SNAPDEAL.toString());
+        mapList.add(snapDealMap);
+
+        Map<String, String> shopClueMap = new HashMap<>();
+        shopClueMap.put("X", getPackageName(Website.SHOPCLUES));
+        shopClueMap.put("Y", getIndexUrl(Website.SHOPCLUES, marketChannel, deviceId));
+        shopClueMap.put("Z", getLiveDemo(Website.SHOPCLUES, marketChannel, deviceId));
+        shopClueMap.put("I", getInstallUrl(Website.SHOPCLUES));
+        shopClueMap.put("J", Website.SHOPCLUES.toString());
+        mapList.add(shopClueMap);
+
+        return mapList;
+    }
+
+    private String getInstallUrl(Website website) {
+        String[] flipkart = new String[]{"zhangchen", "wangshuom"};
+        Random random = new Random();
+        Map<Website, String> packageMap = new HashMap<>();
+        packageMap.put(Website.FLIPKART, "http://dl.flipkart.com/dl/install-app?affid=" + flipkart[random.nextInt(flipkart.length)]);
+        packageMap.put(Website.SNAPDEAL, "");
+        packageMap.put(Website.SHOPCLUES, "");
+        //packageMap.put(Website.EBAY, "");
+        return packageMap.get(website);
+    }
+
+    private String getPackageName(Website website) {
+        Map<Website, String> packageMap = new HashMap<>();
+        packageMap.put(Website.FLIPKART, "com.flipkart.android");
+        packageMap.put(Website.SNAPDEAL, "com.snapdeal.main");
+        packageMap.put(Website.SHOPCLUES, "com.shopclues");
+        //packageMap.put(Website.EBAY, "com.ebay.mobile");
+        return packageMap.get(website);
+    }
+
+    private String getLiveDemo(Website website, MarketChannel marketChannel, String deviceId) {
+        Map<Website, String> liveDemoMap = new HashMap<>();
+        String extParam1 = AffliIdHelper.getMarketId(marketChannel);
+        liveDemoMap.put(Website.FLIPKART, "http://dl.flipkart.com/dl/apple-iphone-5s/p/itme8ra4f4twtsva?affid=affiliate357&affExtParam1=" + extParam1 + "&affExtParam2=" + extParam1 + "_" + deviceId + "_0");
+        liveDemoMap.put(Website.SNAPDEAL, "android-app://com.snapdeal.main/snapdeal/m.snapdeal.com/product/apple-iphone-5s-16-gb/1204769399?aff_id=82856&utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_sub=" + extParam1 + "&aff_sub2=" + extParam1 + "_" + deviceId + "_0");
+        liveDemoMap.put(Website.SHOPCLUES, "http://www.shopclues.com/apple-iphone-5s-16gb-44.html?ty=0&id=none&mcid=aff&utm_source=Hasoffer&OfferId=15");
+        //liveDemoMap.put(Website.EBAY, "http://genlin.ss");
+        return liveDemoMap.get(website);
+    }
+
+    private String getIndexUrl(Website website, MarketChannel marketChannel, String deviceId) {
+        String[] flipkart = new String[]{"raymondzh", "zhangchen", "wangshuom"};
+        Random random = new Random();
+        Map<Website, String> indexUrlMap = new HashMap<>();
+        String flipkartAffid = flipkart[random.nextInt(flipkart.length)];
+        String flipkartExtParam1 = AffliIdHelper.getMarketId(marketChannel);
+        if ("raymondzh".equals(flipkartAffid)) {
+            flipkartExtParam1 = "103662";
+        }
+        indexUrlMap.put(Website.FLIPKART, "http://dl.flipkart.com/dl/?affid=" + flipkartAffid + "&affExtParam1=" + flipkartExtParam1 + "&affExtParam2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0");
+
+        String[] snapDealAffids = new String[]{"112338"};
+        String snapDealAffid = flipkart[random.nextInt(snapDealAffids.length)];
+        String snapDealExtParam1 = AffliIdHelper.getMarketId(marketChannel);
+        if ("112338".equals(flipkartAffid)) {
+            snapDealExtParam1 = "103662";
+        }
+        indexUrlMap.put(Website.SNAPDEAL, "android-app://com.snapdeal.main/snapdeal/m.snapdeal.com?aff_id=" + snapDealAffid + "&utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_sub=" + snapDealExtParam1 + "&aff_sub2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0");
+        indexUrlMap.put(Website.SHOPCLUES, "http://www.shopclues.com/?ty=0&id=none&mcid=aff&utm_source=Hasoffer&OfferId=15");
+        //indexUrlMap.put(Website.EBAY, "http://genlin.ss/?ty=0&id=none&mcid=aff&utm_source=Hasoffer&OfferId=15");
+        String s = indexUrlMap.get(website);
+        logger.info("url:{}", s);
+        if (s == null) {
+            return "";
+        } else {
+            return new String(org.apache.commons.codec.binary.Base64.encodeBase64(s.getBytes(Charset.forName("UTF-8"))));
+        }
+    }
+
 }

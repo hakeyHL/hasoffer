@@ -19,11 +19,16 @@ public class DeviceInfoVo {
     private String mac; // mac地址
 
     private String deviceName;
+
     private String osVersion;
+
+    private Integer osVersionCode;
+
     private String appVersion;
     private String screen;
     private String screenSize;
     private String ramSize;
+
 
     private Website curShopApp;
     private String[] shopApp;
@@ -155,6 +160,14 @@ public class DeviceInfoVo {
 
     public void setOsVersion(String osVersion) {
         this.osVersion = osVersion;
+    }
+
+    public Integer getOsVersionCode() {
+        return osVersionCode;
+    }
+
+    public void setOsVersionCode(Integer osVersionCode) {
+        this.osVersionCode = osVersionCode;
     }
 
     public String getAppVersion() {
