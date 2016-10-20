@@ -161,7 +161,9 @@ public class ProductCacheManager {
                     cacheService.add(key, JSONUtil.toJSON(products), TimeUtils.SECONDS_OF_1_HOUR * 8);
                 }
             } else {
-                JsonHelper.transferJson2Object(JSONUtil.toObject(ptmProductJson, List.class), products);
+                List<LinkedHashMap> maps = JSONUtil.toObject(ptmProductJson, List.class);
+                JsonHelper.transferJson2ObjectPro(maps, products);
+                System.out.println("1");
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
