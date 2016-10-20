@@ -105,7 +105,7 @@ public class DealController {
         Map<String, Object> result = new HashMap<String, Object>();
         try {
             result = dealService.importExcelFile(multiFile);
-            dealServiceImple.reimportAllDeals2Solr();
+//            dealServiceImple.reimportAllDeals2Solr();
             result.put("success", true);
         } catch (Exception e) {
             logger.error("导入失败");

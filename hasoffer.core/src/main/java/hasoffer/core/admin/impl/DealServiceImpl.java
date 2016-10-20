@@ -174,6 +174,7 @@ public class DealServiceImpl implements IDealService {
                 //TODO 插入时报无id
                 appDeal.setCreateTime(new Date());
                 Long aLong = dbm.create(appDeal);
+                dealIndexService.createOrUpdate(new DealModel(appDeal));
                 System.out.println(aLong);
             } catch (Exception e) {
                 failNum++;
