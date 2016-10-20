@@ -165,9 +165,17 @@
         <%--<script>--%>
         <%--$("#expireTime").datetimepicker();--%>
         <%--</script>--%>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">原价：</label>
+
+            <div class="col-sm-6">
+                <input type="text" name="originPrice" id="originPrice" value="${deal.originPrice}"
+                       class="form-control">
+            </div>
+        </div>
 
         <div class="form-group">
-            <label class="col-sm-3 control-label">价格描述：</label>
+            <label class="col-sm-3 control-label">价格描述/现价：</label>
 
             <div class="col-sm-7">
                 <textarea class="form-control" id="priceDescription" name="priceDescription"

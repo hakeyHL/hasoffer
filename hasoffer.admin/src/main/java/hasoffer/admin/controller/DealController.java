@@ -133,7 +133,9 @@ public class DealController {
                 mav.addObject("bannerImageUrl", ImageUtil.getImageUrl(appBanner.getImageUrl()));
             }
         }
-
+        if (deal.getOriginPrice() == null) {
+            deal.setOriginPrice(0f);
+        }
         mav.addObject("deal", deal);
         return mav;
     }
