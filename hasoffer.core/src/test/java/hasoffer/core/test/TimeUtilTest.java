@@ -2,9 +2,13 @@ package hasoffer.core.test;
 
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.persistence.dbm.osql.datasource.DataSourceContextHolder;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created on 2016/4/14.
@@ -13,6 +17,56 @@ public class TimeUtilTest {
 
     private void print(String str) {
         System.out.println(str);
+    }
+
+    @Test
+    public void test4() {
+//        DataSourceContextHolder
+        ExecutorService es = Executors.newCachedThreadPool();
+        es.execute(new Runnable() {
+            @Override
+            public void run() {
+                DataSourceContextHolder.setDataSourceType("111");
+                while (true) {
+
+                    System.out.println("1111 - " + DataSourceContextHolder.getDataSourceType());
+
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(100);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                }
+            }
+        });
+
+        es.execute(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    DataSourceContextHolder.setDataSourceType("222");
+                    while (true) {
+
+                        System.out.println("222 - " + DataSourceContextHolder.getDataSourceType());
+
+                        try {
+                            TimeUnit.MILLISECONDS.sleep(100);
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+
+        while (true) {
+            try {
+                TimeUnit.SECONDS.sleep(5);
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
+
     }
 
     @Test
