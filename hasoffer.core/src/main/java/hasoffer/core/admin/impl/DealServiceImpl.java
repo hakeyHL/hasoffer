@@ -2,6 +2,7 @@ package hasoffer.core.admin.impl;
 
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.ExcelUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.dbm.HibernateDao;
@@ -15,15 +16,17 @@ import hasoffer.core.task.ListProcessTask;
 import hasoffer.core.task.worker.ILister;
 import hasoffer.core.task.worker.IProcessor;
 import hasoffer.core.utils.excel.ExcelImporter;
-import hasoffer.core.utils.excel.ImportCallBack;
-import hasoffer.core.utils.excel.ImportConfig;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.util.TempFile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -74,123 +77,109 @@ public class DealServiceImpl implements IDealService {
 
     @Override
     public Map<String, Object> importExcelFile(MultipartFile multipartFile) throws Exception {
-        Map<String, Object> importResult = importer.setImportConfig(new ImportConfig() {
-                                                                        @Override
-                                                                        public String validation(Workbook xwb) {
-                                                                            return null;
-                                                                        }
 
-                                                                        @Override
-                                                                        public String getImportSQL() {
-                                                                            return IMPORT_SQL;
-                                                                        }
+        Map<String, Object> importResult = new HashMap<>();
+        //import deal into database
+        String originalFilename = multipartFile.getOriginalFilename();
+        File tempFile = TempFile.createTempFile("/hasoffer/", originalFilename.substring(originalFilename.indexOf("."), originalFilename.length()));
+        InputStream inputStream = multipartFile.getInputStream();
+        FileUtils.copyInputStreamToFile(inputStream, tempFile);
+        inputStream.close();
+        int failNum = 0;
+        int emptyLinkNum = 0;
+        int repeatLinkNum = 0;
+        List<String> linkList = new ArrayList<>();
+        List<Map<String, String>> maps = ExcelUtils.readRows(1, tempFile);
+        for (int i = 0; i < maps.size() - 1; i++) {
+            Map<String, String> stringStringMap = maps.get(i);
+            //set attribute to object
+            AppDeal appDeal = new AppDeal();
+            //1. website
+            String website = stringStringMap.get("0");
+            try {
+                if (!StringUtils.isEmpty(website)) {
+                    appDeal.setWebsite(Website.valueOf(website.trim()));
+                } else {
+                    emptyLinkNum++;
+                    continue;
+                }
+            } catch (Exception e) {
+                failNum++;
+                importResult.put("errorMessage", "未识别的site / not recognized website type !");
+                continue;
+                //not a website
+            }
+            //2. deal title
+            String dealTitle = stringStringMap.get("1");
+            if (!StringUtils.isEmpty(dealTitle)) {
+                appDeal.setTitle(dealTitle);
+            } else {
+                emptyLinkNum++;
+                continue;
+            }
 
-                                                                        @Override
-                                                                        public List<Object[]> getImportData(HibernateDao dao, List<Object[]> data) {
+            //3. link
+            String dealLink = stringStringMap.get("2");
+            if (!StringUtils.isEmpty(dealLink)) {
+                if (linkList.contains(dealLink)) {
+                    repeatLinkNum++;
+                } else {
+                    linkList.add(dealLink);
+                    appDeal.setLinkUrl(dealLink.trim());
+                }
+            } else {
+                emptyLinkNum++;
+                continue;
+            }
 
-                                                                            return data;
-                                                                        }
+            //4. deal expireTime
 
-                                                                        @Override
-                                                                        public ImportCallBack getImportCallBack() {
-                                                                            return new ImportCallBack() {
-                                                                                @Override
-                                                                                public Map<String, Object> preOperation(HibernateDao dao, List<Object[]> data) {
-                                                                                    Website website = null;
-                                                                                    Map<String, Object> map = new HashMap<String, Object>();
-                                                                                    int _nullRows = 0;
-                                                                                    int repeatRows = 0;
-                                                                                    List<Object[]> dataQueue = new LinkedList<Object[]>();
-                                                                                    for (int i = 0; i < data.size(); i++) {
-                                                                                        Object[] tempData = new Object[13];
-                                                                                        for (int j = 0; j < tempData.length; j++) {
-                                                                                            //TODO  网站名/deal名称/deal跳转链接为空 记录日志
-                                                                                            if (StringUtils.isBlank(data.get(i)[0] + "") || StringUtils.isBlank(data.get(i)[1] + "") || StringUtils.isBlank(data.get(i)[2] + "")) {
-                                                                                                _nullRows++;
-                                                                                            } else {
-                                                                                                System.arraycopy(data.get(i), 0, tempData, 0, data.get(i).length);
-                                                                                            }
+            String dealExpTime = stringStringMap.get("3");
+            if (!StringUtils.isEmpty(dealExpTime)) {
+                appDeal.setExpireTime(new SimpleDateFormat("yyyy/MM/dd").parse(dealExpTime.trim()));
+            } else {
+                //is empty ,set after 7 days
+                appDeal.setExpireTime(TimeUtils.addDay(new Date(), 7));
+            }
 
-                                                                                            if (!StringUtils.isBlank(tempData[0] + "")) {
-                                                                                                tempData[0] = tempData[0].toString().toUpperCase();
-                                                                                                //检查字符串是否属于规范
-                                                                                                try {
-                                                                                                    website = Website.valueOf(tempData[0] + "");
-                                                                                                } catch (Exception e) {
-                                                                                                    System.out.printf(e.getMessage());
-                                                                                                    website = null;
-                                                                                                }
-                                                                                            }
+            //5. price description
+            String dealPriceDescription = stringStringMap.get("4");
+            if (!StringUtils.isEmpty(dealPriceDescription)) {
+                appDeal.setPriceDescription(dealPriceDescription);
+            }
 
-                                                                                            if (StringUtils.isBlank(tempData[3] + "")) {
-                                                                                                tempData[3] = TimeUtils.after(EXPIRE_TIME_MS);
-                                                                                            }
-                                                                                            if (tempData[5] == null || StringUtils.isBlank(tempData[5] + "")) {
-                                                                                                StringBuilder sb = new StringBuilder();
-                                                                                                sb.append(tempData[0]).append(" is offering ").append(tempData[1]).append(" .\n");
-                                                                                                sb.append("\n");
-                                                                                                sb.append("Steps to order the item at ").append(tempData[0]).append(" website: \n");
-                                                                                                sb.append("\n");
-                                                                                                sb.append("1. First, visit the offer page at ").append(tempData[0]).append(" .\n");
-                                                                                                sb.append("2. Select your product according to the item variety.\n");
-                                                                                                sb.append("3. Then click on Buy Now option. \n");
-                                                                                                sb.append("4. Sign in/ Sign up at ").append(tempData[0]).append(" and fill up your address. \n");
-                                                                                                sb.append("5. Choose your payment option and make payment your cart value.").append(" .\n");
-                                                                                                tempData[5] = sb.toString();
-                                                                                            }
-
-                                                                                            if (tempData[6] == null || StringUtils.isBlank(tempData[6] + "")) {
-                                                                                                tempData[6] = new Date(TimeUtils.now());
-                                                                                            }
-
-                                                                                            if (tempData[7] == null || StringUtils.isBlank(tempData[7] + "")) {
-                                                                                                tempData[7] = 0;
-                                                                                            }
-
-                                                                                            if (tempData[8] == null || StringUtils.isBlank(tempData[8] + "")) {
-                                                                                                tempData[8] = 0;
-                                                                                            }
-                                                                                            if (tempData[10] == null || StringUtils.isBlank(tempData[10] + "")) {
-                                                                                                tempData[10] = 50;
-                                                                                            }
-                                                                                            if (tempData[11] == null || StringUtils.isBlank(tempData[11] + "")) {
-                                                                                                tempData[11] = -1l;
-                                                                                            }
-                                                                                            if (tempData[12] == null || StringUtils.isBlank(tempData[12] + "")) {
-                                                                                                tempData[12] = 0l;
-                                                                                            }
-
-                                                                                            // TODO 重复元素记录日志
-                                                                                            for (int k = 0; k < dataQueue.size(); k++) {
-                                                                                                if (dataQueue.get(k)[2].equals(tempData[2])) {
-                                                                                                    repeatRows++;
-                                                                                                    dataQueue.remove(k);
-                                                                                                }
-                                                                                            }
-                                                                                        }
-                                                                                        if (website != null) {
-                                                                                            dataQueue.add(tempData);
-                                                                                        } else {
-                                                                                            continue;
-                                                                                        }
-                                                                                    }
-                                                                                    map.put("_nullRows", _nullRows);
-                                                                                    map.put("repeatRows", repeatRows);
-                                                                                    map.put("dataQueue", dataQueue);
-                                                                                    return map;
-                                                                                }
-
-                                                                                @Override
-                                                                                public void postOperation(HibernateDao dao, List<Object[]> data) {
-
-                                                                                }
-                                                                            };
-
-                                                                        }
-                                                                    }
-
-        ).importExcelFile(multipartFile);
-
+            //6. maybe have deal description
+            String dealDescription = stringStringMap.get("5");
+            if (!StringUtils.isEmpty(dealDescription)) {
+                appDeal.setDescription(dealDescription);
+            } else {
+                StringBuilder sb = new StringBuilder();
+                sb.append(website).append(" is offering ").append(dealTitle).append(" .\n");
+                sb.append("\n");
+                sb.append("Steps to order the item at ").append(website).append(" website: \n");
+                sb.append("\n");
+                sb.append("1. First, visit the offer page at ").append(website).append(" .\n");
+                sb.append("2. Select your product according to the item variety.\n");
+                sb.append("3. Then click on Buy Now option. \n");
+                sb.append("4. Sign in/ Sign up at ").append(website).append(" and fill up your address. \n");
+                sb.append("5. Choose your payment option and make payment your cart value.").append(" .\n");
+                appDeal.setDescription(sb.toString());
+            }
+            try {
+                //TODO 插入时报无id
+                dbm.batchSave(Arrays.asList(appDeal));
+            } catch (Exception e) {
+                failNum++;
+                importResult.put("errorMessage", "插入失败 / insert fail  : " + appDeal.getTitle() + "  msg : " + e.getMessage());
+                continue;
+            }
+            System.out.println("over ");
+        }
+        importResult.put("totalRows", maps.size() - 1);
+        importResult.put("successRows", maps.size() - 1 - failNum);
+        importResult.put("failRows", failNum);
+        importResult.put("_nullRows", emptyLinkNum);
+        importResult.put("repeatRows", repeatLinkNum);
         return importResult;
     }
 

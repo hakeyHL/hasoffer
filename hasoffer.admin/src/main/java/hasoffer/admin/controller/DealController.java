@@ -28,6 +28,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -45,6 +46,12 @@ public class DealController {
     @Resource
     IDataBaseManager dbm;
     private Logger logger = LoggerFactory.getLogger(DealController.class);
+
+    public static void main(String[] args) {
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-M月-yyyy");
+        System.out.println(simpleDateFormat.format(date));
+    }
 
     @InitBinder
     public void initBinder(WebDataBinder binder) throws Exception {
@@ -239,7 +246,6 @@ public class DealController {
             e.printStackTrace();
         }
     }
-
 
     /**
      * 提供文件下载

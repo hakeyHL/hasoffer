@@ -37,7 +37,7 @@
                         <li>创建失败数量<span id="failRows"></span></li>
                         <li>因网站名/deal名称/deal跳转链接为空失败<span id="nullRows"></span>条</li>
                         <li>因deal链接重复失败<span id="repeatRows"></span>条</li>
-                        <li>其他失败<span id="otherFailRows"></span>条</li>
+                        <li>其他失败<span id="errorMessage"></span></li>
                     </ul>
                 </div>
                 <div class="modal-footer">
@@ -251,7 +251,7 @@
                             $("#failRows").html(data.failRows);
                             $("#nullRows").html(data._nullRows);
                             $("#repeatRows").html(data.repeatRows);
-                            $("#otherFailRows").html(data.otherFailRows);
+                            $("#errorMessage").html(data.errorMessage);
                             $('#import_result').modal('show');
                             $("#confirm_button").click(function () {
                                 $('#import_result').modal('hide');
