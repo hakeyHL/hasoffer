@@ -485,6 +485,7 @@ public class ProductController {
 
     @RequestMapping(value = "/batchDelete", method = RequestMethod.GET)
     @ResponseBody
+//    @DataSource(value = DataSourceType.Slave)
     public boolean batchDelete(@RequestParam(value = "ids[]") Long[] ids) {
 //        cmpSkuService.batchDeleteCmpSku(ids);
 

@@ -125,7 +125,8 @@
     <bean id="dataSourceAspect" class="hasoffer.core.persistence.dbm.osql.datasource.DataSourceAspect"/>
 
     <aop:config>
-        <aop:pointcut id="transactionPointCut" expression="execution(* hasoffer.core.*.*.*(..))"/>
+        <!--<aop:pointcut id="transactionPointCut" expression="execution(* hasoffer.core.*.*.*(..))"/>-->
+        <aop:pointcut id="transactionPointCut" expression="execution(* hasoffer.*.*.*.*(..))"/>
         <aop:advisor pointcut-ref="transactionPointCut" advice-ref="dataSourceAspect" order="1"/>
         <!--<aop:advisor pointcut-ref="transactionPointCut" advice-ref="dataSourceExchange" order="1"/>-->
     </aop:config>
