@@ -18,6 +18,12 @@ public class DataSourceAspect implements MethodBeforeAdvice, AfterReturningAdvic
     @Override
     public void afterReturning(Object returnValue, Method method,
                                Object[] args, Object target) throws Throwable {
+        DataSource ds = method.getAnnotation(DataSource.class);
+
+        if (ds == null) {
+            return;
+        }
+
         DataSourceContextHolder.clearDataSourceType();
     }
 
