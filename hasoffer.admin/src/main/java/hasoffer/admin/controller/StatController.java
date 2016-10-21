@@ -5,10 +5,13 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
 import hasoffer.core.product.ICmpSkuService;
+import hasoffer.core.product.IProductService;
+import hasoffer.core.search.ISearchService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
@@ -27,6 +30,28 @@ public class StatController {
     ICmpSkuService cmpSkuService;
     @Resource
     IMongoDbManager mdm;
+    @Resource
+    ISearchService searchService;
+    @Resource
+    IProductService productService;
+
+
+    @RequestMapping(value = "/stat", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String statSearchCount(@RequestParam String ymd) {
+        if (StringUtils.isEmpty(ymd)) {
+            ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
+        }
+
+        searchService.saveSearchCount_old(ymd);
+
+        productService.expTopSellingsFromSearchCount(ymd);
+
+        searchService.statSearchCount_old(ymd);
+
+        return "ok";
+    }
 
     @RequestMapping(value = "/monitor", method = RequestMethod.GET)
     public ModelAndView skupriceupdateresult() {
