@@ -124,6 +124,7 @@ public class ProductCacheManager {
             } else {
                 PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
                 List<PtmCmpSku> cmpSkus = new ArrayList<PtmCmpSku>();
+                cmpSkus.add(new PtmCmpSku());
                 JsonHelper.transferJson2Object(datas.getData(), cmpSkus);
                 pagedCmpskus = new PageableResult<>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
             }
@@ -162,8 +163,8 @@ public class ProductCacheManager {
                 }
             } else {
                 List<LinkedHashMap> maps = JSONUtil.toObject(ptmProductJson, List.class);
-                JsonHelper.transferJson2ObjectPro(maps, products);
-                System.out.println("1");
+                products.add(new PtmProduct());
+                JsonHelper.transferJson2Object(maps, products);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -182,6 +183,7 @@ public class ProductCacheManager {
             } else {
                 PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
                 List<PtmCmpSku> cmpSkus = new ArrayList<>();
+                cmpSkus.add(new PtmCmpSku());
                 JsonHelper.transferJson2Object(datas.getData(), cmpSkus);
                 pagedCmpskus = new PageableResult<>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
             }

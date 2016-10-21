@@ -14,6 +14,7 @@ import hasoffer.spider.model.FetchedProduct;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created on 2016/1/4.
@@ -115,4 +116,6 @@ public interface ICmpSkuService {
     void updateFlipakrtSkuBrandAndModel(long skuid, String brand, String model);
 
     void updateCmpSkuBrandModel(Long id, String brand, String model);
+
+    void loadImageDownLoadTasks(LinkedBlockingQueue<PtmCmpSku> cmpSkusQueue);
 }

@@ -1,8 +1,5 @@
 package hasoffer.job.bean.image;
 
-import hasoffer.base.model.PageableResult;
-import hasoffer.base.utils.ArrayUtils;
-import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.dbm.osql.datasource.DataSource;
 import hasoffer.core.persistence.dbm.osql.datasource.DataSourceType;
@@ -13,15 +10,17 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Component
 public class SkuImageDownloadJobBean extends QuartzJobBean {
 
     /**
@@ -38,14 +37,18 @@ public class SkuImageDownloadJobBean extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+        f();
 
         final LinkedBlockingQueue<PtmCmpSku> cmpSkuQueue = new LinkedBlockingQueue<PtmCmpSku>();
+
+        final AtomicBoolean loadTaskFinished = new AtomicBoolean(false);
 
         ExecutorService es = Executors.newCachedThreadPool();
         es.execute(new Runnable() {
             @Override
             public void run() {
-                loadImageDownLoadTasks(cmpSkuQueue);
+                cmpSkuService.loadImageDownLoadTasks(cmpSkuQueue);
+                loadTaskFinished.set(true);
             }
         });
 
@@ -90,6 +93,10 @@ public class SkuImageDownloadJobBean extends QuartzJobBean {
                 continue;
             }
 
+            if (!loadTaskFinished.get()) {
+                continue;
+            }
+
             break;
         }
 
@@ -97,36 +104,8 @@ public class SkuImageDownloadJobBean extends QuartzJobBean {
     }
 
     @DataSource(value = DataSourceType.Slave)
-    private void loadImageDownLoadTasks(LinkedBlockingQueue<PtmCmpSku> cmpSkusQueue) {
-        final int PAGE_SIZE = 1000;
-
-        PageableResult<PtmCmpSku> pSkus = dbm.queryPage(Q_SKU_IMAGE, 1, PAGE_SIZE);
-
-        long totalPage = pSkus.getTotalPage();
-        long page = totalPage;
-
-        while (page >= 1) {
-            List<PtmCmpSku> skus = null;
-            if (page == 1) {
-                skus = pSkus.getData();
-            } else {
-                skus = dbm.query(Q_SKU_IMAGE, (int) page, PAGE_SIZE);
-            }
-
-            if (ArrayUtils.hasObjs(skus)) {
-                for (PtmCmpSku sku : skus) {
-                    if (StringUtils.isEmpty(sku.getOriImageUrl())) {
-                        continue;
-                    }
-                    if (sku.isFailLoadImage()) {
-                        continue;
-                    }
-
-                    cmpSkusQueue.add(sku);
-                }
-            }
-
-            page--;
-        }
+    public void f() {
+        System.out.println("111");
     }
+
 }

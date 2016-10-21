@@ -3,6 +3,7 @@ package hasoffer.core.product.impl;
 import com.alibaba.fastjson.JSON;
 import hasoffer.base.exception.ImageDownloadOrUploadException;
 import hasoffer.base.model.ImagePath;
+import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.*;
@@ -40,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created on 2016/1/4.
@@ -1149,5 +1151,42 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         }
 
         ptmCmpSkuImageService.createPtmCmpSkuImage(ptmCmpSkuImage);
+    }
+
+    //    @DataSource(value = DataSourceType.Slave)
+    public void loadImageDownLoadTasks(LinkedBlockingQueue<PtmCmpSku> cmpSkusQueue) {
+        final String Q_SKU_IMAGE =
+                "SELECT t FROM PtmCmpSku t WHERE t.imagePath IS NULL";
+
+        final int PAGE_SIZE = 1000;
+
+        PageableResult<PtmCmpSku> pSkus = dbm.queryPage(Q_SKU_IMAGE, 1, PAGE_SIZE);
+
+        long totalPage = pSkus.getTotalPage();
+        long page = totalPage;
+
+        while (page >= 1) {
+            List<PtmCmpSku> skus = null;
+            if (page == 1) {
+                skus = pSkus.getData();
+            } else {
+                skus = dbm.query(Q_SKU_IMAGE, (int) page, PAGE_SIZE);
+            }
+
+            if (ArrayUtils.hasObjs(skus)) {
+                for (PtmCmpSku sku : skus) {
+                    if (StringUtils.isEmpty(sku.getOriImageUrl())) {
+                        continue;
+                    }
+                    if (sku.isFailLoadImage()) {
+                        continue;
+                    }
+
+                    cmpSkusQueue.add(sku);
+                }
+            }
+
+            page--;
+        }
     }
 }
