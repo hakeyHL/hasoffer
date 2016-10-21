@@ -1115,7 +1115,7 @@ public class AppController {
                 Map nMap = new HashMap();
                 //如果版本是28就放开,否则关闭
                 String appVersion = deviceInfoVo.getAppVersion();
-                if (StringUtils.isNotBlank(appVersion) && Integer.valueOf(appVersion) == 28) {
+                if (StringUtils.isNotBlank(appVersion) && Integer.valueOf(appVersion) >= 28) {
                     nMap.put("op", true);
                 } else {
                     nMap.put("op", false);
