@@ -677,6 +677,7 @@ public class SearchServiceImpl implements ISearchService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void saveSrmProductSearchStat(SrmProductSearchStat ss) {
         SrmProductSearchStat productSearchStat = dbm.get(SrmProductSearchStat.class, ss.getId());
         if (productSearchStat != null) {
