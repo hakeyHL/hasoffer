@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +87,7 @@ public class ProductSearchManager {
 
 
     @DataSource(DataSourceType.Master)
+    @Transactional
     private void delSearchCount(String ymd) {
         String sql = "delete from SrmProductSearchCount t where t.ymd='" + ymd + "'";
         dbm.deleteBySQL(sql);
