@@ -98,7 +98,7 @@
     </bean>
     <bean id="skuImageDownLoadTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="skuImageDownLoadJob"/>
-        <property name="cronExpression" value="0 0/10 * * * ?"/>
+        <property name="cronExpression" value="0 0 0/2 * * ?"/>
     </bean>
 
     <bean name="skuImageListDownLoadJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
