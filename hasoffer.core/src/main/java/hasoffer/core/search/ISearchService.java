@@ -101,4 +101,8 @@ public interface ISearchService {
     List<SrmProductSearchStat> findSearchCountStats();
 
     SrmProductSearchCount findSearchCountByProductId(Long proId);
+
+    void saveSearchCount_old(String ymd);
+
+    void statSearchCount_old(String ymd);
 }

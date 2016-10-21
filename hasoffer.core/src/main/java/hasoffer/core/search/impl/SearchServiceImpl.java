@@ -1,6 +1,7 @@
 package hasoffer.core.search.impl;
 
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.HexDigestUtil;
@@ -85,6 +86,87 @@ public class SearchServiceImpl implements ISearchService {
     @Resource
     SearchLogCacheManager searchLogCacheManager;
     private Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
+
+    @Transactional
+    private void delSearchCount(String ymd) {
+        String sql = "delete from SrmProductSearchCount t where t.ymd='" + ymd + "'";
+        dbm.deleteBySQL(sql);
+    }
+
+    @Override
+    public void saveSearchCount_old(String ymd) {
+        logger.debug(String.format("save search count [%s]", ymd));
+
+        List<SrmProductSearchCount> spscs = new ArrayList<SrmProductSearchCount>();
+
+        Map<Long, Long> countMap = searchLogCacheManager.getProductCount(ymd);
+
+        if (countMap.size() > 0) {
+            delSearchCount(ymd);
+        }
+
+        int count = 0;
+        for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
+
+            long productId = countKv.getKey();
+            long searchCount = countKv.getValue();
+
+            List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId, SkuStatus.ONSALE);
+            int size = 0;
+            if (ArrayUtils.hasObjs(cmpSkus)) {
+                size = cmpSkus.size();
+            }
+
+            spscs.add(new SrmProductSearchCount(ymd, productId, searchCount, size));
+
+            if (count % 2000 == 0) {
+                saveLogCount(spscs);
+                count = 0;
+                spscs.clear();
+            }
+
+            productService.importProduct2Solr2(productId);
+        }
+
+        if (ArrayUtils.hasObjs(spscs)) {
+            saveLogCount(spscs);
+        }
+
+    }
+
+    @Override
+    @Transactional
+    public void statSearchCount_old(String ymd) {
+        long stime = TimeUtils.stringToDate(ymd, "yyyyMMdd").getTime();
+        long etime = stime + TimeUtils.MILLISECONDS_OF_1_DAY;
+
+        // 统计没有匹配到结果的数量
+        long count_no_matched = dbm.querySingle(STAT_SEARCH_COUNT3, Arrays.asList(stime, etime));
+        long count_matched = dbm.querySingle(STAT_SEARCH_COUNT4, Arrays.asList(stime, etime));
+
+        long count0 = dbm.querySingle(STAT_SEARCH_COUNT, Arrays.asList(ymd, 0));
+
+        long count1 = dbm.querySingle(STAT_SEARCH_COUNT, Arrays.asList(ymd, 1));
+
+        long count2 = dbm.querySingle(STAT_SEARCH_COUNT, Arrays.asList(ymd, 2));
+
+        long count3 = dbm.querySingle(STAT_SEARCH_COUNT, Arrays.asList(ymd, 3));
+
+        long count4 = dbm.querySingle(STAT_SEARCH_COUNT2, Arrays.asList(ymd, 4, 11));
+
+        long count5 = dbm.querySingle(STAT_SEARCH_COUNT2, Arrays.asList(ymd, 11, 51));
+
+        long count6 = dbm.querySingle(STAT_SEARCH_COUNT2, Arrays.asList(ymd, 51, 1000));
+
+        SrmProductSearchStat productSearchStat = dbm.get(SrmProductSearchStat.class, ymd);
+        if (productSearchStat != null) {
+            dbm.delete(SrmProductSearchStat.class, ymd);
+        }
+
+        productSearchStat = new SrmProductSearchStat(ymd, (int) count_no_matched, (int) count_matched,
+                (int) count0, (int) count1, (int) count2, (int) count3, (int) count4, (int) count5, (int) count6);
+        dbm.create(productSearchStat);
+    }
 
     @Override
     public SrmProductSearchCount findSearchCountByProductId(Long proId) {
