@@ -3,21 +3,27 @@ package hasoffer.core.test.basetest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.HttpResponseModel;
+import hasoffer.base.model.Website;
 import hasoffer.base.utils.HtmlUtils;
 import hasoffer.base.utils.http.HttpUtils;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.utils.Httphelper;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 import org.htmlcleaner.XPatherException;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static hasoffer.base.utils.HtmlUtils.getSubNodesByXPath;
+import static hasoffer.base.utils.http.XPathUtils.getSubNodeByXPath;
 
 /**
  * Date : 2016/5/31
@@ -25,25 +31,93 @@ import static hasoffer.base.utils.HtmlUtils.getSubNodesByXPath;
  */
 public class HttpTest {
 
+    public static final String WEBSITE_91MOBILE_URL_PREFIEX = "http://www.91mobiles.com";
+
     @Test
-    public void test91Mobile() throws HttpFetchException, XPatherException {
+    public void test91Mobile() throws HttpFetchException, XPatherException, ContentParseException {
 
         String url = "http://www.91mobiles.com/template/category_finder/finder_ajax.php?ord=0.5544784158021026&requestType=2&listType=list&selMobSort=views&amount=1000%3B45000&sCatName=phone&price_range_apply=0&tr_fl%5B%5D=mob_market_status_filter.marketstatus_filter%3Aava_stores&search=&hidFrmSubFlag=1&page=2&category=mobile&unique_sort=&hdnCategory=mobile&user_search=&url_feat_rule=";
 
-        TagNode root = HtmlUtils.getUrlRootTagNode(url);
-
-        String html = root.getText().toString();
+        String html = HtmlUtils.getUrlHtml(url);
 
         JSONObject object = JSONObject.parseObject(html);
 
         html = object.getString("response");
 
-        root = new HtmlCleaner().clean(html);
+        html = html.substring(html.indexOf('<'));
 
-        List<TagNode> productNodeList = getSubNodesByXPath(root, "//div[@class='filter filer_finder']");
+        TagNode root = new HtmlCleaner().clean(html);
 
-        System.out.println(html);
+        List<TagNode> productListNode = getSubNodesByXPath(root, "//div[@class='filter filer_finder']");
+
+        for (TagNode productNode : productListNode) {
+
+            TagNode productUrlNode = getSubNodeByXPath(productNode, "//a[@target='_blank']", null);
+
+            String productUrl = productUrlNode.getAttributeByName("href");
+
+            productUrl = WEBSITE_91MOBILE_URL_PREFIEX + productUrl;
+
+            TagNode sourceIdNode = getSubNodeByXPath(productNode, "//span[@title='Add to favourites']", null);
+            String sourceId = sourceIdNode.getAttributeByName("data-product-id");
+
+            System.out.println(productUrl + "___" + sourceId);
+
+            PtmProduct ptmProduct = new PtmProduct();
+
+            List<PtmCmpSku> ptmCmpSkuList = new ArrayList<>();
+
+            fetchProductAndSkuList(ptmProduct, ptmCmpSkuList, productUrl, sourceId);
+
+        }
+
+        System.out.println();
     }
+
+    private void fetchProductAndSkuList(PtmProduct ptmProduct, List<PtmCmpSku> ptmCmpSkuList, String productUrl, String sourceId) throws HttpFetchException, ContentParseException, XPatherException {
+
+        TagNode productPageRootTagNode = HtmlUtils.getUrlRootTagNode(productUrl);
+
+        //查询sourceId是否有重复，发现就continue
+
+        TagNode productTitleNode = getSubNodeByXPath(productPageRootTagNode, "//h1", null);
+
+        //主商品title
+        String productTitle = productTitleNode.getText().toString();
+
+        //主商品图片
+        TagNode productImageNode = getSubNodeByXPath(productPageRootTagNode, "//img[@id='mainImage']", null);
+
+        String imageUrl = productImageNode.getAttributeByName("data-zoom-image");
+
+        List<TagNode> skuNodeList = getSubNodesByXPath(productPageRootTagNode, "//ul[@id='found_store_list']/li[@data-stores='yes']");
+
+        for (TagNode skuNode : skuNodeList) {
+
+            String websiteString = skuNode.getAttributeByName("data-relevance");
+
+            String[] subStr = websiteString.split("\\.");
+
+            if (subStr != null && subStr.length == 2) {
+                websiteString = subStr[0].toUpperCase();
+            }
+
+            try {
+
+                Website website = Website.valueOf(websiteString);
+
+
+                PtmCmpSku ptmCmpSku = new PtmCmpSku();
+
+                ptmCmpSku.setWebsite(website);
+
+            } catch (Exception e) {
+                continue;
+            }
+
+        }
+    }
+
 
     @Test
     public void testHttp() throws Exception {
