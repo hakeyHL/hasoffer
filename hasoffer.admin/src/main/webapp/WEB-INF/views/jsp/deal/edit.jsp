@@ -134,7 +134,7 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="col-sm-3 control-label">折扣额度：</label>
+            <label class="col-sm-3 control-label">折扣额度(Number must)：</label>
 
             <div class="col-sm-6">
                 <input type="number" name="discount" id="discount" value="${deal.discount}"
@@ -166,7 +166,7 @@
         <%--$("#expireTime").datetimepicker();--%>
         <%--</script>--%>
         <div class="form-group">
-            <label class="col-sm-3 control-label">原价：</label>
+            <label class="col-sm-3 control-label">原价(Number must)：</label>
 
             <div class="col-sm-6">
                 <input type="number" name="originPrice" id="originPrice" value="${deal.originPrice}"
