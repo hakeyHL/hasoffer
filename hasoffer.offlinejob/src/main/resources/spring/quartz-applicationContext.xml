@@ -26,6 +26,7 @@
                 <ref bean="imageDownLoadTrigger2"/>
                 <ref bean="skuImageDownLoadTrigger"/>
                 <ref bean="skuImageListDownLoadTrigger"/>
+                <ref bean="statSearchLogJob"/>
             </list>
         </property>
 
