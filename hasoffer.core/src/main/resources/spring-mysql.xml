@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:tx="http://www.springframework.org/schema/tx"
-       xmlns:aop="http://www.springframework.org/schema/aop" xmlns="http://www.springframework.org/schema/beans"
+       xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
 	                           http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
 	                           http://www.springframework.org/schema/tx
-	                           http://www.springframework.org/schema/tx/spring-tx-4.0.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+	                           http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
 
     <!-- mysql 配置 -->
     <!-- datasource 1 -->
@@ -121,18 +121,4 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
-    <!-- 动态选择数据源 面向切面 -->
-    <bean id="dataSourceAspect" class="hasoffer.core.persistence.dbm.osql.datasource.DataSourceAspect"/>
-
-    <aop:config>
-        <!--<aop:pointcut id="transactionPointCut" expression="execution(* hasoffer.core.*.*.*(..))"/>-->
-        <aop:pointcut id="transactionPointCut1" expression="execution(* hasoffer.admin.controller.*.*(..))"/>
-        <aop:pointcut id="transactionPointCut2" expression="execution(* hasoffer.api.controller.*.*(..))"/>
-        <aop:pointcut id="transactionPointCut3" expression="execution(* hasoffer.core.test.*.*(..))"/>
-
-        <aop:advisor pointcut-ref="transactionPointCut1" advice-ref="dataSourceAspect" order="1"/>
-        <aop:advisor pointcut-ref="transactionPointCut2" advice-ref="dataSourceAspect" order="2"/>
-        <aop:advisor pointcut-ref="transactionPointCut3" advice-ref="dataSourceAspect" order="3"/>
-        <!--<aop:advisor pointcut-ref="transactionPointCut" advice-ref="dataSourceExchange" order="1"/>-->
-    </aop:config>
 </beans>
