@@ -1,7 +1,6 @@
 package hasoffer.core.search.impl;
 
 import hasoffer.base.model.PageableResult;
-import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.HexDigestUtil;
@@ -14,6 +13,8 @@ import hasoffer.core.bo.system.SearchLogBo;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.dbm.osql.datasource.DataSource;
+import hasoffer.core.persistence.dbm.osql.datasource.DataSourceType;
 import hasoffer.core.persistence.enums.SearchPrecise;
 import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
@@ -96,40 +97,6 @@ public class SearchServiceImpl implements ISearchService {
         return null;
     }
 
-    @Override
-    @Transactional
-    public void statSearchCount(String ymd) {
-        long stime = TimeUtils.stringToDate(ymd, "yyyyMMdd").getTime();
-        long etime = stime + TimeUtils.MILLISECONDS_OF_1_DAY;
-
-        // 统计没有匹配到结果的数量
-        long count_no_matched = dbm.querySingle(STAT_SEARCH_COUNT3, Arrays.asList(stime, etime));
-        long count_matched = dbm.querySingle(STAT_SEARCH_COUNT4, Arrays.asList(stime, etime));
-
-        long count0 = dbm.querySingle(STAT_SEARCH_COUNT, Arrays.asList(ymd, 0));
-
-        long count1 = dbm.querySingle(STAT_SEARCH_COUNT, Arrays.asList(ymd, 1));
-
-        long count2 = dbm.querySingle(STAT_SEARCH_COUNT, Arrays.asList(ymd, 2));
-
-        long count3 = dbm.querySingle(STAT_SEARCH_COUNT, Arrays.asList(ymd, 3));
-
-        long count4 = dbm.querySingle(STAT_SEARCH_COUNT2, Arrays.asList(ymd, 4, 11));
-
-        long count5 = dbm.querySingle(STAT_SEARCH_COUNT2, Arrays.asList(ymd, 11, 51));
-
-        long count6 = dbm.querySingle(STAT_SEARCH_COUNT2, Arrays.asList(ymd, 51, 1000));
-
-        SrmProductSearchStat productSearchStat = dbm.get(SrmProductSearchStat.class, ymd);
-        if (productSearchStat != null) {
-            dbm.delete(SrmProductSearchStat.class, ymd);
-        }
-
-        productSearchStat = new SrmProductSearchStat(ymd, (int) count_no_matched, (int) count_matched,
-                (int) count0, (int) count1, (int) count2, (int) count3, (int) count4, (int) count5, (int) count6);
-        dbm.create(productSearchStat);
-    }
-
 
     @Override
     public List<SrmProductSearchStat> findSearchCountStats() {
@@ -139,67 +106,6 @@ public class SearchServiceImpl implements ISearchService {
     @Override
     public PageableResult<SrmProductSearchCount> findSearchCountsByYmd(String ymd, int page, int size) {
         return dbm.queryPage(Q_SEARCH_COUNT, page, size, Arrays.asList(ymd));
-    }
-
-    @Override
-    public void saveSearchCount(String ymd) {
-        logger.debug(String.format("save search count [%s]", ymd));
-
-        List<SrmProductSearchCount> spscs = new ArrayList<SrmProductSearchCount>();
-
-        Map<Long, Long> countMap = searchLogCacheManager.getProductCount(ymd);
-
-        if (countMap.size() > 0) {
-            delSearchCount(ymd);
-        }
-
-        int count = 0;
-        for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
-
-            long productId = countKv.getKey();
-            long searchCount = countKv.getValue();
-            PtmProduct product = productService.getProduct(productId);
-
-            List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId, SkuStatus.ONSALE);
-            int size = 0;
-            if (ArrayUtils.hasObjs(cmpSkus)) {
-                size = cmpSkus.size();
-            }
-
-            spscs.add(new SrmProductSearchCount(ymd, productId, searchCount, size));
-
-            if (count % 2000 == 0) {
-                saveLogCount(spscs);
-                count = 0;
-                spscs.clear();
-            }
-
-            productService.importProduct2Solr2(productId);
-//            ProductModel pm = productService.getProductModel(product);
-//
-//            if (pm == null) {
-//                continue;
-//            }
-//
-//            pm.setSearchCount(searchCount);
-//            productService.import2Solr(pm);
-        }
-
-        if (ArrayUtils.hasObjs(spscs)) {
-            saveLogCount(spscs);
-        }
-
-        /*Collections.sort(spsc, new Comparator<SrmProductSearchCount>() {
-            @Override
-            public int compare(SrmProductSearchCount o1, SrmProductSearchCount o2) {
-                if (o1.getCount() > o2.getCount()) {
-                    return -1;
-                } else if (o1.getCount() < o2.getCount()) {
-                    return 1;
-                }
-                return 0;
-            }
-        });*/
     }
 
     /**
@@ -742,9 +648,41 @@ public class SearchServiceImpl implements ISearchService {
         dbm.batchSave(searchCounts);
     }
 
-    private void delSearchCount(String ymd) {
-        String sql = "delete from SrmProductSearchCount t where t.ymd='" + ymd + "'";
-        dbm.deleteBySQL(sql);
+    @Override
+    @DataSource(DataSourceType.Slave)
+    public SrmProductSearchStat statSearchCount(String ymd) {
+        long stime = TimeUtils.stringToDate(ymd, "yyyyMMdd").getTime();
+        long etime = stime + TimeUtils.MILLISECONDS_OF_1_DAY;
+
+        // 统计没有匹配到结果的数量
+        long count_no_matched = dbm.querySingle(STAT_SEARCH_COUNT3, Arrays.asList(stime, etime));
+        long count_matched = dbm.querySingle(STAT_SEARCH_COUNT4, Arrays.asList(stime, etime));
+
+        long count0 = dbm.querySingle(STAT_SEARCH_COUNT, Arrays.asList(ymd, 0));
+
+        long count1 = dbm.querySingle(STAT_SEARCH_COUNT, Arrays.asList(ymd, 1));
+
+        long count2 = dbm.querySingle(STAT_SEARCH_COUNT, Arrays.asList(ymd, 2));
+
+        long count3 = dbm.querySingle(STAT_SEARCH_COUNT, Arrays.asList(ymd, 3));
+
+        long count4 = dbm.querySingle(STAT_SEARCH_COUNT2, Arrays.asList(ymd, 4, 11));
+
+        long count5 = dbm.querySingle(STAT_SEARCH_COUNT2, Arrays.asList(ymd, 11, 51));
+
+        long count6 = dbm.querySingle(STAT_SEARCH_COUNT2, Arrays.asList(ymd, 51, 1000));
+
+        return new SrmProductSearchStat(ymd, (int) count_no_matched, (int) count_matched,
+                (int) count0, (int) count1, (int) count2, (int) count3, (int) count4, (int) count5, (int) count6);
+    }
+
+    @Override
+    public void saveSrmProductSearchStat(SrmProductSearchStat ss) {
+        SrmProductSearchStat productSearchStat = dbm.get(SrmProductSearchStat.class, ss.getId());
+        if (productSearchStat != null) {
+            dbm.delete(SrmProductSearchStat.class, ss.getId());
+        }
+        dbm.create(productSearchStat);
     }
 
     @Override

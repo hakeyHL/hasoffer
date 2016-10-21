@@ -23,9 +23,9 @@ import java.util.Map;
 
 public interface ISearchService {
 
-    void statSearchCount(String ymd);
+    void saveSrmProductSearchStat(SrmProductSearchStat ss);
 
-    void saveSearchCount(String ymd);
+    SrmProductSearchStat statSearchCount(String ymd);
 
     void mergeProducts(PtmProduct finalProduct, Map<String, PtmCmpSku> cmpSkuMap, PtmProduct product);
 

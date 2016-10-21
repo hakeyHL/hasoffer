@@ -58,16 +58,6 @@
         <property name="cronExpression" value="0 30 11,14,22 * * ?"/>
     </bean>
 
-    <!-- 定时统计 -->
-
-    <bean name="statSearchLogJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="hasoffer.job.bean.stat.StatSearchLogJobBean"/>
-    </bean>
-    <bean id="statSearchLogTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-        <property name="jobDetail" ref="statSearchLogJob"/>
-        <property name="cronExpression" value="0 0 10 * * ?"/>
-    </bean>
-
     <!--price off create deal -->
     <bean name="priceOffGetDealJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="hasoffer.job.bean.deal.CheckGetPriceOffDealJobBean"/>
