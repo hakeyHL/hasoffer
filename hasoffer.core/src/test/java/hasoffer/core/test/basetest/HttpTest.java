@@ -8,19 +8,18 @@ import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.HtmlUtils;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.utils.Httphelper;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 import org.htmlcleaner.XPatherException;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static hasoffer.base.utils.HtmlUtils.getSubNodesByXPath;
 import static hasoffer.base.utils.http.XPathUtils.getSubNodeByXPath;
@@ -83,7 +82,7 @@ public class HttpTest {
         TagNode productTitleNode = getSubNodeByXPath(productPageRootTagNode, "//h1", null);
 
         //主商品title
-        String productTitle = productTitleNode.getText().toString();
+        String productTitle = StringUtils.filterAndTrim(productTitleNode.getText().toString(), null);
 
         //主商品图片
         TagNode productImageNode = getSubNodeByXPath(productPageRootTagNode, "//img[@id='mainImage']", null);
@@ -91,6 +90,29 @@ public class HttpTest {
         String imageUrl = productImageNode.getAttributeByName("data-zoom-image");
 
         List<TagNode> skuNodeList = getSubNodesByXPath(productPageRootTagNode, "//ul[@id='found_store_list']/li[@data-stores='yes']");
+
+        Map<String, String> specMap = getSpecMap();
+
+        List<TagNode> specSectionNodeList = getSubNodesByXPath(productPageRootTagNode, "//div[@class='spec_box']");
+
+        for (TagNode specSctionNode : specSectionNodeList) {
+
+            List<TagNode> specInfoNode = getSubNodesByXPath(specSctionNode, "/tr");
+
+            for (TagNode specNode : specInfoNode) {
+
+                TagNode specKeyNode = getSubNodeByXPath(specNode, "//td[@class='spec_ttle']", null);
+                TagNode specValueNode = getSubNodeByXPath(specNode, "//td[@class='spec_des']", null);
+
+                String key = specKeyNode.getText().toString();
+                String value = StringUtils.filterAndTrim(specValueNode.getText().toString(), null);
+
+                if (specMap.containsKey(key)) {
+                    specMap.put(key, value);
+                }
+
+            }
+        }
 
         for (TagNode skuNode : skuNodeList) {
 
@@ -106,16 +128,103 @@ public class HttpTest {
 
                 Website website = Website.valueOf(websiteString);
 
+                TagNode skuTitleNode = getSubNodeByXPath(skuNode, "//p[@class='heading instock div_delivery']", null);
+                String skuTitle = skuTitleNode.getText().toString();
+                if (StringUtils.isEmpty(skuTitle)) {
+                    skuTitle = productTitle;
+                }
+
+                float price = 0.0f;
+                TagNode skuPriceNode = getSubNodeByXPath(skuNode, "//span[@class='price price_price_color']", null);
+                String priceString = StringUtils.filterAndTrim(skuPriceNode.getText().toString(), Arrays.asList("Rs.", ","));
+                if (NumberUtils.isNumber(priceString)) {
+                    price = Float.parseFloat(priceString);
+                }
+
+                int rating = 0;
+                TagNode skuStarNode = getSubNodeByXPath(skuNode, "//div[@class='rating prclst']", null);
+                String skuStarString = skuStarNode.getAttributeByName("style");
+                skuStarString = skuStarString.substring(skuStarString.indexOf(':') + 1, skuStarString.indexOf('%'));
+                if (NumberUtils.isNumber(skuStarString)) {
+                    rating = Integer.parseInt(skuStarString) / 20;
+                }
+
+                //
 
                 PtmCmpSku ptmCmpSku = new PtmCmpSku();
 
                 ptmCmpSku.setWebsite(website);
+                ptmCmpSku.setTitle(skuTitle);
+                ptmCmpSku.setPrice(price);
+                ptmCmpSku.setRatings(rating);
 
             } catch (Exception e) {
                 continue;
             }
 
         }
+    }
+
+
+    public Map<String, String> getSpecMap() {
+
+        Map<String, String> map = new HashMap<>();
+
+        map.put("Launch Date", "");
+        map.put("Brand", "");
+        map.put("Model", "");
+        map.put("Operating System", "");
+        map.put("Custom UI", "");
+        map.put("General SIM Slot(s)", "");
+        map.put("General SIM Size", "");
+        map.put("Network", "");
+        map.put("Fingerprint Sensor", "");
+        map.put("Quick Charging", "");
+        map.put("Dimensions", "");
+        map.put("Weight", "");
+        map.put("Build Material", "");
+        map.put("Screen Size", "");
+        map.put("Screen Resolution", "");
+        map.put("Pixel Density", "");
+        map.put("Chipset", "");
+        map.put("Processor", "");
+        map.put("Architecture", "");
+        map.put("Graphics", "");
+        map.put("RAM", "");
+        map.put("Internal Memory", "");
+        map.put("Expandable Memory", "");
+        map.put("USB OTG Support", "");
+        map.put("MAIN CAMERA Resolution", "");
+        map.put("MAIN CAMERA Sensor", "");
+        map.put("MAIN CAMERA Autofocus", "");
+        map.put("MAIN CAMERA Aperture", "");
+        map.put("MAIN CAMERA Optical Image Stabilisation", "");
+        map.put("MAIN CAMERA Flash", "");
+        map.put("MAIN CAMERA Image Resolution", "");
+        map.put("MAIN CAMERA Camera Features", "");
+        map.put("MAIN CAMERAVideo Recording", "");
+        map.put("FRONT CAMERA Resolution", "");
+        map.put("FRONT CAMERA Sensor", "");
+        map.put("FRONT CAMERA Autofocus", "");
+        map.put("Capacity", "");
+        map.put("Type", "");
+        map.put("User Replaceable", "");
+        map.put("SIM Size", "");
+        map.put("Network Support", "");
+        map.put("VoLTE", "");
+        map.put("SIM 1", "");
+        map.put("SIM 2", "");
+        map.put("Bluetooth", "");
+        map.put("GPS", "");
+        map.put("NFC", "");
+        map.put("USB Connectivity", "");
+        map.put("FM Radio", "");
+        map.put("Loudspeaker ", "");
+        map.put("Audio Jack", "");
+        map.put("Fingerprint Sensor Position ", "");
+        map.put("Other Sensors", "");
+
+        return map;
     }
 
 
