@@ -136,7 +136,7 @@ public class CmpSkuCacheManager {
         String key = CACHE_KEY_PRE + "getSkuByPriceAndSite" + price + "_" + website.name();
         String s = null;
         s = skuCacheServiceMap.get(key, 0);
-        ptmCmpSkus = cmpSkuService.getCmpSkusBySiteAndPrice(Float.valueOf(price + ""), website, productId);
+//        ptmCmpSkus = cmpSkuService.getCmpSkusBySiteAndPrice(Float.valueOf(price + ""), website, productId);
         if (StringUtils.isEmpty(s)) {
             System.out.println(" get productId porducdtId : " + productId);
             ptmCmpSkus = cmpSkuService.getCmpSkusBySiteAndPrice(Float.valueOf(price + ""), website, productId);

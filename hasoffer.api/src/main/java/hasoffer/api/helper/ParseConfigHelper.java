@@ -1,8 +1,8 @@
 package hasoffer.api.helper;
 
-import hasoffer.api.controller.vo.ParseConfigSetting;
-import hasoffer.api.controller.vo.ParseConfigVo;
 import hasoffer.base.model.Website;
+import hasoffer.core.app.vo.ParseConfigSetting;
+import hasoffer.core.app.vo.ParseConfigVo;
 import hasoffer.fetch.helper.WebsiteHelper;
 
 import java.util.ArrayList;

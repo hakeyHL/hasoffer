@@ -1,8 +1,14 @@
 package hasoffer.core.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.PropertyFilter;
+import hasoffer.base.utils.JSONUtil;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * Created by hs on 2016年07月29日.
@@ -32,4 +38,20 @@ public class JsonHelper<T> {
 //        }
 //        return new ArrayList<>();
 //    }
+
+    public static void transferJson2Object(List<LinkedHashMap> dataList, List desList) throws Exception {
+        for (LinkedHashMap linkedHashMap1 : dataList) {
+            String string = JSON.toJSONString(linkedHashMap1);
+            PtmCmpSku ptmCmpSku = JSONUtil.toObject(string, PtmCmpSku.class);
+            desList.add(ptmCmpSku);
+        }
+    }
+
+    public static void transferJson2ObjectPro(List<LinkedHashMap> dataList, List desList) throws Exception {
+        for (LinkedHashMap linkedHashMap1 : dataList) {
+            String string = JSON.toJSONString(linkedHashMap1);
+            PtmProduct product = JSONUtil.toObject(string, PtmProduct.class);
+            desList.add(product);
+        }
+    }
 }

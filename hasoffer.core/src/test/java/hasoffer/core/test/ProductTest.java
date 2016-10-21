@@ -10,6 +10,8 @@ import hasoffer.core.admin.IDealService;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.dbm.osql.datasource.DataSource;
+import hasoffer.core.persistence.dbm.osql.datasource.DataSourceType;
 import hasoffer.core.persistence.mongo.PriceNode;
 import hasoffer.core.persistence.mongo.PtmCmpSkuHistoryPrice;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
@@ -87,6 +89,20 @@ public class ProductTest {
     MongoDbFactory mongoDbFactory;
     private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
     private Pattern PATTERN_Brand = Pattern.compile("[\t*?]([a-zA-Z])[\t*?]");
+
+    @Test
+    @DataSource(value = DataSourceType.Slave)
+    public void testDB() {
+        PtmProduct product = productService.getProduct(100L);
+        for (int i = 0; i < 20; i++) {
+            System.out.println(product.getTitle());
+        }
+
+        List<PriceNode> priceNodes = cmpSkuService.queryHistoryPrice(2988761);
+        for (PriceNode pn : priceNodes) {
+            System.out.println(pn.getYmd() + " = " + pn.getPrice());
+        }
+    }
 
     @Test
     public void testSolr() {

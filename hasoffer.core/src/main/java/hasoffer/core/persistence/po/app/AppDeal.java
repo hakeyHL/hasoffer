@@ -45,7 +45,7 @@ public class AppDeal implements Identifiable<Long> {
     @Column(length = 1024)
     private String priceDescription;//deal价格描述
 
-    private boolean display;//是否显示
+    private boolean display = false;//是否显示
     @Column(columnDefinition = "text")
     private String listPageImage;//deal列表页图片
 

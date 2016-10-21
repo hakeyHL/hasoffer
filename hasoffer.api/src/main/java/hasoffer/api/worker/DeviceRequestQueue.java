@@ -1,6 +1,6 @@
 package hasoffer.api.worker;
 
-import hasoffer.api.controller.vo.DeviceRequestVo;
+import hasoffer.core.app.vo.DeviceRequestVo;
 
 import java.util.concurrent.LinkedBlockingQueue;
 

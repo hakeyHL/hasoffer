@@ -78,4 +78,6 @@ public interface IAppService {
     void updateUrmSignCoin(UrmSignCoin urmSignCoin);
 
     void checkAndAlertUser2Sign();
+
+    List<Map<String, String>> getIndexPage(MarketChannel marketChannel, String deviceId);
 }

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	                           http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+
+
+							   http://www.springframework.org/schema/data/mongo
+                               http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd">
+
+    <!-- mongo 配置 -->
+    <mongo:mongo id="mongo" host="${mongo.host}" port="${mongo.port}">
+        <mongo:options
+                connections-per-host="${mongo.connectionsPerHost}"
+                threads-allowed-to-block-for-connection-multiplier="${mongo.threadsAllowedToBlockForConnectionMultiplier}"
+                connect-timeout="${mongo.connectTimeout}"
+                max-wait-time="${mongo.maxWaitTime}"
+                auto-connect-retry="${mongo.autoConnectRetry}"
+                socket-keep-alive="${mongo.socketKeepAlive}"
+                socket-timeout="${mongo.socketTimeout}"
+                slave-ok="${mongo.slaveOk}"
+                write-number="${mongo.writeNum}"
+                write-timeout="${mongo.writeTimeout}"
+                write-fsync="${mongo.writeFsync}"/>
+    </mongo:mongo>
+    <mongo:db-factory dbname="${mongo.database}" mongo-ref="mongo" id="mongoDbFactory"/>
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
+    </bean>
+
+</beans>

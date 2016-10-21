@@ -28,6 +28,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -45,6 +46,12 @@ public class DealController {
     @Resource
     IDataBaseManager dbm;
     private Logger logger = LoggerFactory.getLogger(DealController.class);
+
+    public static void main(String[] args) {
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-M月-yyyy");
+        System.out.println(simpleDateFormat.format(date));
+    }
 
     @InitBinder
     public void initBinder(WebDataBinder binder) throws Exception {
@@ -98,7 +105,7 @@ public class DealController {
         Map<String, Object> result = new HashMap<String, Object>();
         try {
             result = dealService.importExcelFile(multiFile);
-            dealServiceImple.reimportAllDeals2Solr();
+//            dealServiceImple.reimportAllDeals2Solr();
             result.put("success", true);
         } catch (Exception e) {
             logger.error("导入失败");
@@ -126,7 +133,9 @@ public class DealController {
                 mav.addObject("bannerImageUrl", ImageUtil.getImageUrl(appBanner.getImageUrl()));
             }
         }
-
+        if (deal.getOriginPrice() == null) {
+            deal.setOriginPrice(0f);
+        }
         mav.addObject("deal", deal);
         return mav;
     }
@@ -239,7 +248,6 @@ public class DealController {
             e.printStackTrace();
         }
     }
-
 
     /**
      * 提供文件下载

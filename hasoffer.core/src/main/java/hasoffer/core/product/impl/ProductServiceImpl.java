@@ -64,9 +64,7 @@ public class ProductServiceImpl implements IProductService {
                     " ORDER BY t.price ASC ";
 
     private static final String Q_ONSALE_PTM_CMPSKU =
-            "SELECT  DISTINCT " +
-                    " website, " +
-                    " price " +
+            "SELECT  t " +
                     "FROM " +
                     " PtmCmpSku t " +
                     "WHERE " +
@@ -442,7 +440,6 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-//    @Cacheable(value = CACHE_KEY, key = "#root.methodName + '_' + #root.args[0]")
     public PtmProduct getProduct(long proId) {
         return dbm.get(PtmProduct.class, proId);
     }
