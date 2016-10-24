@@ -26,6 +26,7 @@
                 <ref bean="imageDownLoadTrigger2"/>
                 <ref bean="skuImageDownLoadTrigger"/>
                 <ref bean="skuImageListDownLoadTrigger"/>
+                <ref bean="statSearchLogTrigger"/>
             </list>
         </property>
 
@@ -98,7 +99,7 @@
     </bean>
     <bean id="skuImageDownLoadTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="skuImageDownLoadJob"/>
-        <property name="cronExpression" value="0 0/10 * * * ?"/>
+        <property name="cronExpression" value="0 0 0/2 * * ?"/>
     </bean>
 
     <bean name="skuImageListDownLoadJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
@@ -107,6 +108,15 @@
     <bean id="skuImageListDownLoadTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="skuImageListDownLoadJob"/>
         <property name="cronExpression" value="0 30 12 * * ?"/>
+    </bean>
+
+    <!-- 定时统计 -->
+    <bean name="statSearchLogJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.stat.StatSearchLogJobBean"/>
+    </bean>
+    <bean id="statSearchLogTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="statSearchLogJob"/>
+        <property name="cronExpression" value="0 0 10 * * ?"/>
     </bean>
 
     <!--<bean name="topSellingTaskJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->

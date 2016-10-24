@@ -115,4 +115,6 @@ public interface ICmpSkuService {
     void updateFlipakrtSkuBrandAndModel(long skuid, String brand, String model);
 
     void updateCmpSkuBrandModel(Long id, String brand, String model);
+
+//    void loadImageDownLoadTasks(LinkedBlockingQueue<PtmCmpSku> cmpSkusQueue);
 }

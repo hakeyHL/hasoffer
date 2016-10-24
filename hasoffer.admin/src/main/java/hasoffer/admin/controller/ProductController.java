@@ -13,6 +13,8 @@ import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.system.SearchCriteria;
+import hasoffer.core.persistence.dbm.osql.datasource.DataSource;
+import hasoffer.core.persistence.dbm.osql.datasource.DataSourceType;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
@@ -146,6 +148,7 @@ public class ProductController {
     }
 
     @RequestMapping(value = "/cmp/{id}", method = RequestMethod.GET)
+    @DataSource(value = DataSourceType.Slave)
     public ModelAndView listCompares(@PathVariable long id) throws ProductNotFoundException {
         ModelAndView mav = new ModelAndView("product/cmp");
         mav.addObject("pId", id);

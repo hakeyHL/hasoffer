@@ -144,10 +144,10 @@ public class FlipkartHelper {
                 //如果size 是2 是没有用户id
                 switch (affs.length) {
                     case 2:
-                        channel_deviceId_userid += AffliIdHelper.getAffAlia(affs[0]) + "_" + affs[1] + "_0";
+                        channel_deviceId_userid += AffliIdHelper.getMarketId(affs[0]) + "_" + affs[1] + "_0";
                         break;
                     case 3:
-                        channel_deviceId_userid += AffliIdHelper.getAffAlia(affs[0]) + "_" + affs[1] + "_" + affs[2];
+                        channel_deviceId_userid += AffliIdHelper.getMarketId(affs[0]) + "_" + affs[1] + "_" + affs[2];
                         break;
                     default:
                 }

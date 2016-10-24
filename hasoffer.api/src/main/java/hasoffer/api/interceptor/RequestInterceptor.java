@@ -2,14 +2,14 @@ package hasoffer.api.interceptor;
 
 import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
-import hasoffer.api.controller.vo.DeviceEventVo;
-import hasoffer.api.controller.vo.DeviceInfoVo;
-import hasoffer.api.controller.vo.DeviceRequestVo;
-import hasoffer.api.controller.vo.ResultVo;
 import hasoffer.api.worker.DeviceRequestQueue;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.utils.DeviceUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.app.vo.DeviceEventVo;
+import hasoffer.core.app.vo.DeviceInfoVo;
+import hasoffer.core.app.vo.DeviceRequestVo;
+import hasoffer.core.app.vo.ResultVo;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.IAppService;

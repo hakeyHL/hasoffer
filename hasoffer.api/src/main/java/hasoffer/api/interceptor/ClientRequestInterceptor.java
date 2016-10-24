@@ -1,9 +1,8 @@
 package hasoffer.api.interceptor;
-
-import hasoffer.api.controller.vo.DeviceInfoVo;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.UrlUtils;
+import hasoffer.core.app.vo.DeviceInfoVo;
 import hasoffer.core.user.IDeviceService;
 import hasoffer.webcommon.context.Context;
 import org.apache.commons.lang3.math.NumberUtils;

@@ -1,9 +1,9 @@
 package hasoffer.api.worker;
 
-import hasoffer.api.controller.vo.DeviceEventVo;
-import hasoffer.api.controller.vo.DeviceInfoVo;
-import hasoffer.api.controller.vo.DeviceRequestVo;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.core.app.vo.DeviceEventVo;
+import hasoffer.core.app.vo.DeviceInfoVo;
+import hasoffer.core.app.vo.DeviceRequestVo;
 import hasoffer.core.bo.user.DeviceEventBo;
 import hasoffer.core.bo.user.DeviceInfoBo;
 import hasoffer.core.bo.user.DeviceRequestBo;
