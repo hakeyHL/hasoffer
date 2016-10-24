@@ -157,36 +157,6 @@ public class SearchController {
         return mav;
     }
 
-    @RequestMapping(value = "/stat", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String statSearchCount(@RequestParam String ymd) {
-        if (StringUtils.isEmpty(ymd)) {
-            ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
-        }
-
-        searchService.saveSearchCount(ymd);
-
-        productService.expTopSellingsFromSearchCount(ymd);
-
-        searchService.statSearchCount(ymd);
-
-        return "ok";
-    }
-
-    @RequestMapping(value = "/stat2", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String statSearchCount2(@RequestParam String ymd) {
-        if (StringUtils.isEmpty(ymd)) {
-            ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
-        }
-
-        searchService.statSearchCount(ymd);
-
-        return "ok";
-    }
-
     @RequestMapping(value = "/result/ok", method = RequestMethod.POST)
     public ModelAndView resultOk(HttpServletRequest request) {
 

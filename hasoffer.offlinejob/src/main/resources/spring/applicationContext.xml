@@ -10,8 +10,8 @@
     <description>框架全局配置</description>
 
     <!-- 自动扫描包 -->
-    <context:component-scan base-package="hasoffer.job.service;hasoffer.job.quartz;hasoffer.job.bean"
-                            annotation-config="true"/>
+    <!--<context:component-scan base-package="hasoffer.job.service;hasoffer.job.quartz;hasoffer.job.bean" annotation-config="true"/>-->
+    <context:component-scan base-package="hasoffer.*" annotation-config="true"/>
 
     <!-- 动态选择数据源 面向切面 -->
     <bean id="dataSourceAspect" class="hasoffer.core.persistence.dbm.osql.datasource.DataSourceAspect"/>
