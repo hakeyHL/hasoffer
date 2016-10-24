@@ -6,10 +6,15 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.persistence.mongo.MobileCateDescription;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.junit.Test;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +22,102 @@ import java.util.regex.Pattern;
  * Created on 2016/5/16.
  */
 public class StringTest {
+
+    @Test
+    public void beanTest() throws InvocationTargetException, IllegalAccessException {
+
+        MobileCateDescription mobileCateDescription = new MobileCateDescription();
+
+        Map<String, String> specMap = new LinkedHashMap<>();
+        Map<String, String> newSpecMap = new LinkedHashMap<>();
+
+
+        //General
+        specMap.put("Launch Date", "1");
+        specMap.put("Brand", "2");
+        specMap.put("Model", "wdq");
+        specMap.put("Operating System", "asdasdw");
+        specMap.put("Custom UI", "189hd9");
+        specMap.put("SIM Slot(s)", "*(@HH&@!");
+
+        //Design
+        specMap.put("Dimensions", "shfwihfewf");
+        specMap.put("Weight", "!()@JF)!JF");
+        specMap.put("Build Material", "N!*(H(!BV(!");
+
+        //Display
+        specMap.put("Screen Size", "*(h91hd1ndiaw");
+        specMap.put("Screen Resolution", "N*(!H(*!V!#");
+        specMap.put("Pixel Density", "afn89023nf2");
+
+        //Performance
+        specMap.put("Chipset", "afn923hf29fn");
+        specMap.put("Processor", "123123");
+        specMap.put("Architecture", "(!GBV(!BV");
+        specMap.put("Graphics", "aohwf");
+        specMap.put("RAM", "121eh198h9");
+
+        //Storage
+        specMap.put("Internal Memory", "acm8932fn92");
+        specMap.put("Expandable Memory", ",.,lmoca");
+        specMap.put("USB OTG Support", ",.?");
+
+        //Camera
+        specMap.put("MAIN CAMERA Resolution", "1231");
+        specMap.put("MAIN CAMERA Sensor", "123123");
+        specMap.put("MAIN CAMERA Autofocus", "13123");
+        specMap.put("MAIN CAMERA Aperture", "sfsdf");
+        specMap.put("MAIN CAMERA Optical Image Stabilisation", "asfaf");
+        specMap.put("MAIN CAMERA Flash", "adfafd");
+        specMap.put("MAIN CAMERA Image Resolution", "adfadfa");
+        specMap.put("MAIN CAMERA Camera Features", "1231d1d1");
+        specMap.put("MAIN CAMERA Video Recording", "12d1d21d");
+        specMap.put("FRONT CAMERA Resolution", "1d12d1");
+        specMap.put("FRONT CAMERA Sensor", "1d1d1");
+        specMap.put("FRONT CAMERA Autofocus", "d12d12d1");
+
+        //Battery
+        specMap.put("Capacity", "1d21d1");
+        specMap.put("Type", "1d12d1");
+        specMap.put("User Replaceable", "1d1d21");
+        specMap.put("Quick Charging", "1d1d21");
+
+        //Network&Connectivity
+        specMap.put("SIM Size", "1d1d12d");
+        specMap.put("Network Support", "13c4f5f");
+        specMap.put("VoLTE", "2f2f424f");
+        specMap.put("SIM 1", "f3f2f4");
+        specMap.put("SIM 2", "f24f2f");
+        specMap.put("Bluetooth", "f2424");
+        specMap.put("GPS", "f2f423");
+        specMap.put("NFC", "f24f2");
+        specMap.put("USB Connectivity", "2f42f4");
+
+        //Multimedia
+        specMap.put("FM Radio", "f2f423");
+        specMap.put("Loudspeaker", "2f42f4");
+        specMap.put("Audio Jack", "2f42f2");
+
+        //Special Features
+        specMap.put("Fingerprint Sensor", "2f2f");
+        specMap.put("Fingerprint Sensor Position", "2f2342");
+        specMap.put("Other Sensors", "f2f423f3");
+
+        for (Map.Entry<String, String> entry : specMap.entrySet()) {
+
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            key = key.replaceAll(" ", "_").replace("(s)", "").toLowerCase();
+
+            newSpecMap.put(key, value);
+        }
+
+        BeanUtils.populate(mobileCateDescription, newSpecMap);
+
+        System.out.println(mobileCateDescription);
+
+    }
 
     @Test
     public void testDiscount() {
@@ -135,7 +236,7 @@ public class StringTest {
     @Test
     public void testStr1() {
 
-        String str = "/gp/slredirect/redirect.html/ref=pa_sp_atf_aps_sr_pg1_1?pl=FRWcQVS5IPm8DzL%2B9KtwLxWqh7%2BsPygdWxJ3D1q1FpSj0whtJhEJuCM%2FAsFeUYEtDq7RphcrklI%2F%0AoUZE2vGaHoXIJcoi90F30Vh6k6WUHxzxm5tYtQjb%2BbxV%2FeWTHlmIjKMc%2B%2FgIcGu31fcBXg3GDsOm%0AoCKuZL1jC1IAb2p76Jw5VzKu0L41%2FHn%2BPzcKSfD9nPq%2F6ezTAS6TkYTXOHKQL4CJ6buFWpa4bQsE%0ATtCEQYM2nZydqskrNCcUItUJcfm8EymXbVoIq68y0GfK25BJ8L475G1%2FMLUIRLnIlJm15rmg0VTA%0Ao4mPVlJ%2F1YoY0zn1stk6D88rMN4BA7fT3CwKKSVl2K2w5ioN0Vg%2BLrz9e9Dy3o456mY3P8Esrbpy%0A5Avo39ElSua9lQr%2B7mk0R8bPmKC8AesnUIpS74FD7IT9w6Dml89pJUgt2JXFPoNvKO0pxvZQzVMm%0A8%2FU%2BvOZiUHUECznSC3s6nt5Kqy83b8iP3UEamI%2B1oj9iQWT%2FTOTy0Fad3qR5%2BxsfthMMytwa4jj6%0AJ5wytoINDZBRotiHw4wCu2kYb%2BwPk8BfMOXBpiWXjUiP4KxuYU%2BxzyK8%2BkvU5hhkNtNRXQnEJ1Zy%0AJGwDc%2FZITkiD%2BnQnjAaRj8im0kfjcvXzAtG5Ea5A1x1Jy2SrrlXqX4sXWOV7P8z6JMTAPM7ofYKQ%0A8JxpFcoWhIQaue4opwt%2FOFo%2F4PQVy0Ba4fwBwYE%2FSupJV4%2BIuzIuS8Jb75V%2Bci5RmOOwuM2qdrFO%0AgHgBFTrUIDFIruYsm51ZJiR4uURfI4pCataw%2B1A1qvsu%2FrqIjJnRJSczyYH7qZdv%2BpqLU6m7zZkB%0A7vXNlDS9PnsYo0jk%2FSHzCZ41Mh89RmlpxPNwY4xis512Eanptw%2BNCXn9EIFPOHvZLYwbf6K5Fzw9%0AFhbMuwvS7F19GuWgt%2Fk54QTnF2tB%2BA3%2FWze4AX13cRw2fI7dQZIJvLzVDYjNaq7JE67XTNArGuTC%0Aj0EXtNhnLNpcvIyf49ag%2FpJWHFE0lfJLxDlPIor7%2FW6bChWCDjHLd631fpAncA32dCpQWE4Hq5W9%0Azt%2FGCI8nVyx8aWjzOTBPsRdYH1n9t4Q8zBkF1TOi%2BbS%2BF4b6k0yWiUw6YAQoRFfl%2FwJVqng3i1bA%0ABJI7jaSGKWF3Zrvv7tw1ODqdJUf5HilKFggp%2Bln9ET%2FQuHWW1NoSglYLauU2%2BprB6A%3D%3D&token=0EA3486BC3CE4C876BBBFCECAD1E15943940BE9F";
+        String str = "http%3A%2F%2Fwww.ebay.in%2Fitm%2FMOTO-E3-POWER-16GB-2GB-RAM-8MP-2MP-4G-LTE-3500-MAH-PHONE-BLACK-%2F252594992971%3Fhash=item3acfd5b74b%3Ag%3AQ4oAAOSwal5YCJBG%26aff_source=dgm";
 
         str = StringUtils.urlDecode(str);
 

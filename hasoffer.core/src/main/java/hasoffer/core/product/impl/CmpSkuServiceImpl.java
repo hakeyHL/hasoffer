@@ -565,6 +565,12 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     @Override
     public void createSkuDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct) {
 
+        //对于手机类目，sourceSite是91Mobile的不在更新
+        PtmProduct ptmProduct = dbm.get(PtmProduct.class, ptmCmpSku.getProductId());
+        if (StringUtils.isEqual(ptmProduct.getSourceSite(), Website.MOBILE91.name())) {
+            return;
+        }
+
         String jsonParam = fetchedProduct.getJsonParam();
         String description = fetchedProduct.getDescription();
         String offers = fetchedProduct.getOffers();
@@ -640,6 +646,12 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     @Override
     public void createProductDescription(PtmCmpSku ptmCmpSku, FetchedProduct fetchedProduct) {
 
+        //对于手机类目，sourceSite是91Mobile的不在更新
+        PtmProduct ptmProduct = dbm.get(PtmProduct.class, ptmCmpSku.getProductId());
+        if (StringUtils.isEqual(ptmProduct.getSourceSite(), Website.MOBILE91.name())) {
+            return;
+        }
+
         String jsonParam = fetchedProduct.getJsonParam();
         String description = fetchedProduct.getDescription();
         String offers = fetchedProduct.getOffers();
@@ -655,7 +667,6 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         }
 
         //save productDescription
-        PtmProduct ptmProduct = dbm.get(PtmProduct.class, ptmCmpSku.getProductId());
         String productTitle = ptmProduct.getTitle();
         System.out.println(fetchedProduct.toString());
         System.out.println("createDescription:" + jsonParam);
