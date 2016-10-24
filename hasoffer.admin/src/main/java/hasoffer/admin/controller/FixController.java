@@ -7,6 +7,8 @@ import hasoffer.admin.controller.vo.TitleCountVo;
 import hasoffer.admin.worker.FixSkuErrorInPriceWorker;
 import hasoffer.admin.worker.FlipkartSkuCategory2GetListWorker;
 import hasoffer.admin.worker.FlipkartSkuCategory2GetSaveWorker;
+import hasoffer.base.exception.ContentParseException;
+import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.exception.ImageDownloadOrUploadException;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.model.ImagePath;
@@ -43,6 +45,9 @@ import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.htmlcleaner.HtmlCleaner;
+import org.htmlcleaner.TagNode;
+import org.htmlcleaner.XPatherException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -55,8 +60,12 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.*;
 import java.util.concurrent.*;
+
+import static hasoffer.base.utils.HtmlUtils.getSubNodesByXPath;
+import static hasoffer.base.utils.http.XPathUtils.getSubNodeByXPath;
 
 /**
  * Date : 2016/3/25
@@ -66,8 +75,8 @@ import java.util.concurrent.*;
 @RequestMapping(value = "/fixdata")
 public class FixController {
 
+    public static final String WEBSITE_91MOBILE_URL_PREFIEX = "http://www.91mobiles.com";
     private static final String Q_SKU_PRODUCTID = "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ORDER BY t.id";
-
     private static final String Q_PTMCMPSKU = "SELECT t FROM PtmCmpSku t WHERE t.productId < 100000";
     private static final String Q_INDEX = "SELECT t FROM PtmCmpSkuIndex2 t ORDER BY t.id ASC";
 
@@ -119,6 +128,380 @@ public class FixController {
             Website.NAAPTOL,
             Website.ZOOMIN
     };
+
+    @RequestMapping(value = "/mobile91Fetch", method = RequestMethod.GET)
+    @ResponseBody
+    public String mobile91Fetch() throws Exception {
+
+        String prefix = "http://www.91mobiles.com/template/category_finder/finder_ajax.php?ord=0.5544784158021026&requestType=2&listType=list&selMobSort=views&amount=1000%3B45000&sCatName=phone&price_range_apply=0&tr_fl%5B%5D=mob_market_status_filter.marketstatus_filter%3Aava_stores&search=&hidFrmSubFlag=1&page=";
+        String suffix = "&category=mobile&unique_sort=&hdnCategory=mobile&user_search=&url_feat_rule=";
+        int num = 1;
+
+        for (int i = 0; i < 119; i++) {
+            String url = prefix + num + suffix;
+            System.out.println(url + " FETCH START");
+            mobile91Fetch(url);
+            System.out.println(url + " FETCH END");
+            num++;
+        }
+
+        return "ok";
+    }
+
+    private void mobile91Fetch(String url) throws Exception {
+        String html = HtmlUtils.getUrlHtml(url);
+
+        JSONObject object = JSONObject.parseObject(html);
+
+        html = object.getString("response");
+
+        html = html.substring(html.indexOf('<'));
+
+        TagNode root = new HtmlCleaner().clean(html);
+
+        List<TagNode> productListNode = getSubNodesByXPath(root, "//div[@class='filter filer_finder']");
+
+        for (TagNode productNode : productListNode) {
+
+            TagNode productUrlNode = getSubNodeByXPath(productNode, "//a[@target='_blank']", null);
+
+            String productUrl = productUrlNode.getAttributeByName("href");
+
+            productUrl = WEBSITE_91MOBILE_URL_PREFIEX + productUrl;
+
+            TagNode sourceIdNode = getSubNodeByXPath(productNode, "//span[@title='Add to favourites']", null);
+            String sourceId = sourceIdNode.getAttributeByName("data-product-id");
+
+            System.out.println(productUrl + "___" + sourceId);
+
+            PtmProduct ptmProduct = new PtmProduct();
+
+            List<PtmCmpSku> ptmCmpSkuList = new ArrayList<>();
+
+            fetchProductAndSkuList(ptmProduct, ptmCmpSkuList, productUrl, sourceId);
+
+            PtmProduct ptmproduct = productService.createPtmproduct(ptmProduct);
+            System.out.println("product create success " + ptmproduct.getId());
+            System.out.println(ptmproduct);
+
+
+            for (PtmCmpSku ptmCmpSku : ptmCmpSkuList) {
+                ptmCmpSku.setProductId(ptmproduct.getId());
+                PtmCmpSku ptmcmpsku = productService.createPtmcmpsku(ptmCmpSku);
+                System.out.println("sku create success " + ptmcmpsku.getId());
+                System.out.println(ptmcmpsku);
+            }
+
+            productService.importProduct2Solr2(ptmProduct);
+            System.out.println("product import success " + ptmproduct.getId());
+        }
+
+        System.out.println();
+    }
+
+    private void fetchProductAndSkuList(PtmProduct ptmProduct, List<PtmCmpSku> ptmCmpSkuList, String productUrl, String sourceId) throws HttpFetchException, ContentParseException, XPatherException {
+
+        TagNode productPageRootTagNode = HtmlUtils.getUrlRootTagNode(productUrl);
+
+        //查询sourceId是否有重复，发现就continue
+        PtmProduct product = dbm.querySingle("SELECT t FROM PtmProduct t WHERE t.sourceSite = 'MOBILE91' AND t.sourceId = ?0 ", Arrays.asList(sourceId));
+        if (product != null) {
+            System.out.println("ptmproduct has existed " + product.getId() + " sourceId");
+            System.out.println("new url " + productUrl);
+            return;
+        }
+
+        TagNode productTitleNode = getSubNodeByXPath(productPageRootTagNode, "//h1", null);
+
+        //主商品title
+        String productTitle = StringUtils.filterAndTrim(productTitleNode.getText().toString(), null);
+        //主商品图片
+        TagNode productImageNode = getSubNodeByXPath(productPageRootTagNode, "//img[@id='mainImage']", null);
+        String imageUrl = productImageNode.getAttributeByName("data-zoom-image");
+
+        List<TagNode> skuNodeList = getSubNodesByXPath(productPageRootTagNode, "//ul[@id='found_store_list']/li[@data-stores='yes']");
+
+        Map<String, String> specMap = getSpecMap();
+
+        List<TagNode> specSectionNodeList = getSubNodesByXPath(productPageRootTagNode, "//div[@class='specs_table_wrap']/div/table");
+
+        for (TagNode specSctionNode : specSectionNodeList) {
+
+            List<TagNode> specInfoNode = getSubNodesByXPath(specSctionNode, "/tbody/tr");
+
+            if (specInfoNode != null && getSubNodesByXPath(specInfoNode.get(0), "//table[@class='border specs_table_sub']").size() > 0) {//判断是否还有分块节点
+
+                for (TagNode subSpecNode : specInfoNode) {
+
+                    List<TagNode> subSpecInfoNodeList = getSubNodesByXPath(subSpecNode, "//table[@class='border specs_table_sub']/tbody/tr");
+
+                    for (TagNode subSpecInfoNode : subSpecInfoNodeList) {
+
+                        TagNode subTitleNode = getSubNodeByXPath(subSpecNode, "//div[@class='sub_head']/p/span", null);
+                        String subTitle = subTitleNode.getText().toString();
+
+                        fetchSpecInfo(subSpecInfoNode, specMap, subTitle.toUpperCase() + " ");//转换成大写
+                    }
+                }
+            } else {
+                for (TagNode specNode : specInfoNode) {
+                    fetchSpecInfo(specNode, specMap, "");
+                }
+            }
+        }
+
+
+        float minPrice = 0.0f;
+        for (TagNode skuNode : skuNodeList) {
+
+            String websiteString = skuNode.getAttributeByName("data-relevance");
+
+            String[] subStr = websiteString.split("\\.");
+
+            if (subStr != null && subStr.length == 2) {
+                websiteString = subStr[0].toUpperCase();
+            }
+
+            try {
+
+                //sku网站名称
+                Website website = Website.valueOf(websiteString);
+
+                //sku标题
+                TagNode skuTitleNode = getSubNodeByXPath(skuNode, "//p[@class='heading instock div_delivery']", null);
+                String skuTitle = skuTitleNode.getText().toString();
+                if (StringUtils.isEmpty(skuTitle)) {
+                    skuTitle = productTitle;
+                }
+
+                //sku价格
+                float price = 0.0f;
+                TagNode skuPriceNode = getSubNodeByXPath(skuNode, "//span[@class='price price_price_color']", null);
+                String priceString = StringUtils.filterAndTrim(skuPriceNode.getText().toString(), Arrays.asList("Rs.", ","));
+                if (NumberUtils.isNumber(priceString)) {
+                    price = Float.parseFloat(priceString);
+                }
+
+                //sku评分
+                int rating = 0;
+                TagNode skuStarNode = getSubNodeByXPath(skuNode, "//div[@class='rating prclst']", null);
+                String skuStarString = skuStarNode.getAttributeByName("style");
+                skuStarString = skuStarString.substring(skuStarString.indexOf(':') + 1, skuStarString.indexOf('%'));
+                if (NumberUtils.isNumber(skuStarString)) {
+                    rating = Integer.parseInt(skuStarString) / 20;
+                }
+
+                //获取sku详细的url
+                String oriUrl = "";
+                String url = "";
+                TagNode skuUrlNode = getSubNodeByXPath(skuNode, "/div[@class='merchant_list']/span", null);
+                String beforeRedirectUrl = skuUrlNode.getAttributeByName("data-href-url");
+                TagNode redirectRootNode = HtmlUtils.getUrlRootTagNode(beforeRedirectUrl);
+                skuUrlNode = getSubNodeByXPath(redirectRootNode, "//meta[@http-equiv='refresh']", null);
+                String urlInfo = skuUrlNode.getAttributeByName("content");
+
+                /*
+http://affiliateshopclues.com/?a=33&c=69&p=r&s1=&ckmrdr=http://www.shopclues.com/redmi-note-3-32gb-3gb-ram-2.html?utm_source=91mobiles&utm_medium=CPS&s2=||1477299181|27065|553|detail-vary2|
+http://www.amazon.in/Xiaomi-Redmi-Note-Gold-32GB/dp/B01C2T6IDY/?tag=exclusivemob-21&ascsubtag=||1477299234|27065|553|detail-vary2|
+https://www.snapdeal.com/product/redmi-note3-32gb/654134757432?utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_id=1306&aff_sub=!!1477299306!27065!553!detail-vary2!&affRedirect=true&viewinapp=true&msite-fallback=true
+http://www.infibeam.com/Mobiles/xiaomi-redmi-note-3/P-mobi-6249051535-cat-z.html?trackId=buy_street&subTrackId=detail-vary2#variantId=P-mobi-50513042892
+https://dl.flipkart.com/dl/moto-e3-power-black-16-gb/p/itmekgt2fbywqgcv?pid=MOBEKGT2HGDGADFW&affid=sales91mob&affExtParam1=DP&affExtParam2=!!1477299379!28983!553!detail!
+http://www.s2d6.com/x/?x=c&z=s&v=5953892&k=||1477299419|28983|553|detail|&t=http://rover.ebay.com/rover/1/4686-127726-2357-6/2?&site=Partnership_CONMT&mpre=http%3A%2F%2Fwww.ebay.in%2Fitm%2FMOTO-E3-POWER-16GB-2GB-RAM-8MP-2MP-4G-LTE-3500-MAH-PHONE-BLACK-%2F252594992971%3Fhash=item3acfd5b74b%3Ag%3AQ4oAAOSwal5YCJBG%26aff_source=dgm
+                 */
+                String[] subStr1 = urlInfo.split("URL=");
+                if (subStr1 != null && subStr1.length == 2) {
+                    oriUrl = subStr1[1];
+                    if (Website.SHOPCLUES.equals(website)) {
+                        String[] subStr3 = oriUrl.split("ckmrdr=");
+                        if (subStr3 != null && subStr3.length == 2) {
+                            url = subStr3[1];
+                            subStr3 = url.split("html\\?");
+                            if (subStr3 != null && subStr3.length == 2) {
+                                url = subStr3[0] + "html";
+                            }
+                        }
+                    } else if (Website.AMAZON.equals(website)) {
+                        String[] subStr3 = oriUrl.split("\\?");
+                        if (subStr3 != null && subStr3.length == 2) {
+                            url = subStr3[0];
+                        }
+                    } else if (Website.SNAPDEAL.equals(website) || Website.INFIBEAM.equals(website)) {
+                        String[] subStr3 = oriUrl.split("\\?");
+                        if (subStr3 != null && subStr3.length >= 2) {
+                            url = subStr3[0];
+                        }
+                    } else if (Website.FLIPKART.equals(website)) {
+                        String[] subStr3 = oriUrl.split("&affid");
+                        if (subStr3 != null && subStr3.length >= 2) {
+                            url = subStr3[0];
+                            url = url.replace("dl.flipkart.com/dl", "www.flipkart.com");
+                        }
+                    } else if (Website.EBAY.equals(website)) {
+                        String[] subStr3 = oriUrl.split("mpre=");
+                        if (subStr3 != null && subStr3.length >= 2) {
+                            url = subStr3[1];
+                            url = URLDecoder.decode(url);
+                        }
+                    }
+                }
+
+                //设置ptmcmpsku信息
+                PtmCmpSku ptmCmpSku = new PtmCmpSku();
+                if (StringUtils.isEmpty(url) || StringUtils.isEmpty(oriUrl)) {
+                    System.out.println("url or oriUrl is empty");
+                    continue;
+                }
+
+                ptmCmpSku.setWebsite(website);
+                ptmCmpSku.setTitle(skuTitle);
+                ptmCmpSku.setPrice(price);
+                if (minPrice == 0.0 || minPrice > price) {
+                    minPrice = price;
+                }
+                ptmCmpSku.setRatings(rating);
+                ptmCmpSku.setCategoryId(5L);
+                ptmCmpSku.setOriImageUrl(imageUrl);
+                ptmCmpSku.setCreateTime(TimeUtils.nowDate());
+                ptmCmpSku.setOriUrl(oriUrl);
+                ptmCmpSku.setUrl(url);
+
+                ptmCmpSkuList.add(ptmCmpSku);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                continue;
+            }
+
+        }
+
+        //设置主商品信息
+        ptmProduct.setTitle(productTitle);
+        ptmProduct.setSourceUrl(productUrl);
+        ptmProduct.setSourceSite(Website.MOBILE91.name());
+        ptmProduct.setSourceId(sourceId);
+        ptmProduct.setCategoryId(5);
+        ptmProduct.setPrice(minPrice);
+
+    }
+
+    //此处要求，不是区域内部继续分块，subTitle传空值
+    private void fetchSpecInfo(TagNode specNode, Map<String, String> specMap, String subTitle) throws ContentParseException {
+
+        TagNode specKeyNode = getSubNodeByXPath(specNode, "//th[@class='scnd']", null);
+        TagNode specValueNode = getSubNodeByXPath(specNode, "//td[@class='frth']", null);
+
+        String key = specKeyNode.getText().toString();
+        String value = StringUtils.filterAndTrim(specValueNode.getText().toString(), null);
+
+        //判断value的值有无对勾
+        TagNode specValueChildNode = getSubNodeByXPath(specValueNode, "/span", null);
+        if (specValueChildNode != null) {
+            String classString = specValueChildNode.getAttributeByName("class");
+            if (StringUtils.isEqual(classString, "Stylus_check")) {
+                if (StringUtils.isEmpty(value)) {
+                    value = "yes";
+                } else {
+                    value = "yes," + value;
+                }
+            }
+//            else if(StringUtils.isEqual(classString, "no")){//no还是注释掉，页面上一般no符号后面还是no
+//                value = "no,"+value;
+//            }
+        }
+
+//        List<TagNode> valueChildNode = specValueNode.getChildTagList();
+//        if (valueChildNode.size() > 0) {
+//            value = "";//暂时没有想到解决办法，所以先置为空串
+//        }
+
+        if (specMap.containsKey(subTitle + key)) {
+            if (StringUtils.isEmpty(subTitle)) {
+                specMap.put(key, value);
+            } else {
+                specMap.put(subTitle + key, value);
+            }
+        }
+    }
+
+
+    public Map<String, String> getSpecMap() {
+
+        Map<String, String> map = new LinkedHashMap<>();
+
+
+        //General
+        map.put("Launch Date", "");
+        map.put("Brand", "");
+        map.put("Model", "");
+        map.put("Operating System", "");
+        map.put("Custom UI", "");
+        map.put("SIM Slot(s)", "");
+
+        //Design
+        map.put("Dimensions", "");
+        map.put("Weight", "");
+        map.put("Build Material", "");
+
+        //Display
+        map.put("Screen Size", "");
+        map.put("Screen Resolution", "");
+        map.put("Pixel Density", "");
+
+        //Performance
+        map.put("Chipset", "");
+        map.put("Processor", "");
+        map.put("Architecture", "");
+        map.put("Graphics", "");
+        map.put("RAM", "");
+
+        //Storage
+        map.put("Internal Memory", "");
+        map.put("Expandable Memory", "");
+        map.put("USB OTG Support", "");
+
+        //Camera
+        map.put("MAIN CAMERA Resolution", "");
+        map.put("MAIN CAMERA Sensor", "");
+        map.put("MAIN CAMERA Autofocus", "");
+        map.put("MAIN CAMERA Aperture", "");
+        map.put("MAIN CAMERA Optical Image Stabilisation", "");
+        map.put("MAIN CAMERA Flash", "");
+        map.put("MAIN CAMERA Image Resolution", "");
+        map.put("MAIN CAMERA Camera Features", "");
+        map.put("MAIN CAMERA Video Recording", "");
+        map.put("FRONT CAMERA Resolution", "");
+        map.put("FRONT CAMERA Sensor", "");
+        map.put("FRONT CAMERA Autofocus", "");
+
+        //Battery
+        map.put("Capacity", "");
+        map.put("Type", "");
+        map.put("User Replaceable", "");
+        map.put("Quick Charging", "");
+
+        //Network&Connectivity
+        map.put("SIM Size", "");
+        map.put("Network Support", "");
+        map.put("VoLTE", "");
+        map.put("SIM 1", "");
+        map.put("SIM 2", "");
+        map.put("Bluetooth", "");
+        map.put("GPS", "");
+        map.put("NFC", "");
+        map.put("USB Connectivity", "");
+
+        //Multimedia
+        map.put("FM Radio", "");
+        map.put("Loudspeaker", "");
+        map.put("Audio Jack", "");
+
+        //Special Features
+        map.put("Fingerprint Sensor", "");
+        map.put("Fingerprint Sensor Position", "");
+        map.put("Other Sensors", "");
+
+        return map;
+    }
 
     @RequestMapping(value = "/deletesmallsitesku", method = RequestMethod.GET)
     @ResponseBody
@@ -1626,6 +2009,18 @@ public class FixController {
                 }
             }
         }
+        return null;
+    }
+
+    //fixdata/91mobile
+    @RequestMapping(value = "/91mobile", method = RequestMethod.GET)
+    public String nineOnemobileFetch() throws HttpFetchException {
+
+        String url = "http://www.91mobiles.com/template/category_finder/finder_ajax.php?ord=0.5544784158021026&requestType=2&listType=list&selMobSort=views&amount=1000%3B45000&sCatName=phone&price_range_apply=0&tr_fl%5B%5D=mob_market_status_filter.marketstatus_filter%3Aava_stores&search=&hidFrmSubFlag=1&page=2&category=mobile&unique_sort=&hdnCategory=mobile&user_search=&url_feat_rule=";
+
+        TagNode root = HtmlUtils.getUrlRootTagNode(url);
+
+
         return null;
     }
 }

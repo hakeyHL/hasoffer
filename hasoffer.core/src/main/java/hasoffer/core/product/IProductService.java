@@ -18,6 +18,11 @@ import java.util.Map;
 
 public interface IProductService {
 
+    //暂时使用，回头91mobile抓完删掉
+    PtmProduct createPtmproduct(PtmProduct ptmproduct);
+
+    PtmCmpSku createPtmcmpsku(PtmCmpSku ptmCmpsku);
+
     PageableResult<PtmProduct> listProductsByCreateTime(Date fromDate, int page, int size);
 
     @Deprecated

@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
 /**
  * Created on 2016/9/9.
  */
+@Deprecated
 public class CheckPriceOffGetDealListener extends ContextLoaderListener {
 
     //获取spring注入的bean对象
