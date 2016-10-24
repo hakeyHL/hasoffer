@@ -317,6 +317,23 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public PtmProduct createPtmproduct(PtmProduct ptmproduct) {
+
+        Long aLong = dbm.create(ptmproduct);
+        ptmproduct.setId(aLong);
+        return ptmproduct;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public PtmCmpSku createPtmcmpsku(PtmCmpSku ptmCmpsku) {
+        Long aLong = dbm.create(ptmCmpsku);
+        ptmCmpsku.setId(aLong);
+        return ptmCmpsku;
+    }
+
+    @Override
     public PageableResult<PtmProduct> listProductsByCreateTime(Date fromDate, int page, int size) {
         return dbm.queryPage(Q_PRODUCT_BY_CREATETIME, page, size, Arrays.asList(fromDate));
     }

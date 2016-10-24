@@ -152,11 +152,6 @@ public class FlipkartHelper {
                     default:
                 }
                 sb.append("&affExtParam2=").append(channel_deviceId_userid);
-            /*    for (String aff : affs) {
-                    channel_deviceId_userid += aff + "_";
-                }
-                channel_deviceId_userid = channel_deviceId_userid.substring(0, channel_deviceId_userid.lastIndexOf("_"));
-                sb.append("&affExtParam2=").append(channel_deviceId_userid);*/
             }
 
         } else {
@@ -166,21 +161,14 @@ public class FlipkartHelper {
                 sb.append("?affid=").append(affid);
             }
 
-            if (affs.length >= 1) {
-//            int i = 1;
-//            for (String aff : affs) {
-//                sb.append("&affExtParam").append(i++).append("=").append(aff);
-//            }
-                sb.append("&affExtParam1=").append(affs[0]);
-
-                if (affs.length >= 2) {
-                    String deviceUser = affs[1];
-                    if (affs.length == 3) {
-                        deviceUser += "_" + affs[2];
-                    }
-                    sb.append("&affExtParam2=").append(deviceUser);
-                }
+            if (affs.length == 1) {
+                sb.append("&affExtParam1=").append(affs[0]).append("&affExtParam2=").append(affs[0]).append("_").append("0").append("_").append("0");
+            } else if (affs.length == 2) {
+                sb.append("&affExtParam1=").append(affs[0]).append("&affExtParam2=").append(affs[0]).append("_").append(affs[1]).append("_").append("0");
+            } else if (affs.length == 3) {
+                sb.append("&affExtParam2=").append(affs[0]).append("&affExtParam2=").append(affs[0]).append("_").append(affs[1]).append("_").append(affs[2]);
             }
+
         }
         return sb.toString();
     }

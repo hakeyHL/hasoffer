@@ -2,11 +2,11 @@ package hasoffer.job.service.impl;
 
 import hasoffer.base.thread.HasofferThreadFactory;
 import hasoffer.base.utils.DaemonThreadFactory;
-import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.SearchProductService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
+import hasoffer.job.service.ISearchRecordListService;
 import hasoffer.job.service.IWebSiteFetchService;
 import hasoffer.job.worker.SearchRecordListWorker;
 import hasoffer.job.worker.SearchRecordProcessWorker;
@@ -25,8 +25,10 @@ public class WebSiteFetchServiceImpl implements IWebSiteFetchService {
 
     @Resource
     ISearchService searchService;
+
     @Resource
-    IDataBaseManager dbm;
+    ISearchRecordListService searchRecordListService;
+
     @Resource
     SearchProductService searchProductService;
     @Resource
@@ -39,7 +41,7 @@ public class WebSiteFetchServiceImpl implements IWebSiteFetchService {
 
         LinkedBlockingQueue<SrmAutoSearchResult> searchLogQueue = new LinkedBlockingQueue<SrmAutoSearchResult>();
 
-        es.execute(DaemonThreadFactory.create(new SearchRecordListWorker(searchProductService, dbm, searchLogQueue)));
+        es.execute(DaemonThreadFactory.create(new SearchRecordListWorker(searchProductService, searchRecordListService, searchLogQueue)));
 
         String threadName = "SearchRecordProcessWorker-Thread";
         HasofferThreadFactory factory = new HasofferThreadFactory(threadName);
