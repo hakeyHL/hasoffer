@@ -11,6 +11,7 @@ import java.util.Map;
  * Created by glx on 2015/5/20.
  */
 public interface IDataBaseManager {
+
     <ID extends Serializable, T extends Identifiable<ID>> T get(Class<T> tClass, ID id);
 
     <ID extends Serializable, T extends Identifiable<ID>> ID create(T t);

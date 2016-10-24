@@ -21,7 +21,6 @@
         <!--<module>hasoffer.nlp</module>-->
         <!--<module>hasoffer.akka</module>-->
         <module>hasoffer.job</module>
-        <module>hasoffer.job.worker</module>
         <module>hasoffer.fetch.api</module>
         <module>hasoffer.fetch.provider</module>
         <module>hasoffer.analysis.api</module>

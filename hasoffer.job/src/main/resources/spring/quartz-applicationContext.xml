@@ -19,7 +19,6 @@
         <property name="applicationContextSchedulerContextKey" value="applicationContextKey"/>
         <property name="triggers">
             <list>
-                <ref bean="statSearchLogTrigger"/>
                 <ref bean="priceOffNoticeTrigger"/>
                 <ref bean="pushFailRePushTrigger"/>
                 <ref bean="priceOffDealUpdateTrigger"/>
