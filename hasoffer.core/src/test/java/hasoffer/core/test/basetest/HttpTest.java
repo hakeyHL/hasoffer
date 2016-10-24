@@ -93,24 +93,31 @@ public class HttpTest {
 
         Map<String, String> specMap = getSpecMap();
 
-        List<TagNode> specSectionNodeList = getSubNodesByXPath(productPageRootTagNode, "//div[@class='spec_box']");
+        List<TagNode> specSectionNodeList = getSubNodesByXPath(productPageRootTagNode, "//div[@class='specs_table_wrap']/div/table");
 
         for (TagNode specSctionNode : specSectionNodeList) {
 
-            List<TagNode> specInfoNode = getSubNodesByXPath(specSctionNode, "/tr");
+            List<TagNode> specInfoNode = getSubNodesByXPath(specSctionNode, "/tbody/tr");
 
-            for (TagNode specNode : specInfoNode) {
+            if (specInfoNode != null && getSubNodesByXPath(specInfoNode.get(0), "//table[@class='border specs_table_sub']").size() > 0) {//判断是否还有分块节点
 
-                TagNode specKeyNode = getSubNodeByXPath(specNode, "//td[@class='spec_ttle']", null);
-                TagNode specValueNode = getSubNodeByXPath(specNode, "//td[@class='spec_des']", null);
+                for (TagNode subSpecNode : specInfoNode) {
 
-                String key = specKeyNode.getText().toString();
-                String value = StringUtils.filterAndTrim(specValueNode.getText().toString(), null);
+                    List<TagNode> subSpecInfoNodeList = getSubNodesByXPath(subSpecNode, "//table[@class='border specs_table_sub']/tbody/tr");
 
-                if (specMap.containsKey(key)) {
-                    specMap.put(key, value);
+                    for (TagNode subSpecInfoNode : subSpecInfoNodeList) {
+
+                        TagNode subTitleNode = getSubNodeByXPath(subSpecNode, "//div[@class='sub_head']/p/span", null);
+                        String subTitle = subTitleNode.getText().toString();
+
+                        fetchSpecInfo(subSpecInfoNode, specMap, subTitle.toUpperCase() + " ");//转换成大写
+                    }
+
                 }
-
+            } else {
+                for (TagNode specNode : specInfoNode) {
+                    fetchSpecInfo(specNode, specMap, "");
+                }
             }
         }
 
@@ -166,17 +173,55 @@ public class HttpTest {
     }
 
 
+    //此处要求，不是区域内部继续分块，subTitle传空值
+    private void fetchSpecInfo(TagNode specNode, Map<String, String> specMap, String subTitle) throws ContentParseException {
+
+
+        TagNode specKeyNode = getSubNodeByXPath(specNode, "//th[@class='scnd']", null);
+        TagNode specValueNode = getSubNodeByXPath(specNode, "//td[@class='frth']", null);
+
+        String key = specKeyNode.getText().toString();
+        String value = StringUtils.filterAndTrim(specValueNode.getText().toString(), null);
+
+        if (StringUtils.isEmpty(value)) {//如果后面信息为空，判断是否为对勾
+            TagNode specValueChildNode = getSubNodeByXPath(specValueNode, "/span", null);
+            if (specValueChildNode != null) {
+                String classString = specValueChildNode.getAttributeByName("class");
+                if (StringUtils.isEqual(classString, "Stylus_check")) {
+                    value = "yes";
+                }
+            }
+        }
+
+//        List<TagNode> valueChildNode = specValueNode.getChildTagList();
+//        if (valueChildNode.size() > 0) {
+//            value = "";//暂时没有想到解决办法，所以先置为空串
+//        }
+
+        if (specMap.containsKey(subTitle + key)) {
+            if (StringUtils.isEmpty(subTitle)) {
+                specMap.put(key, value);
+            } else {
+                specMap.put(subTitle + key, value);
+            }
+        }
+
+    }
+
+
     public Map<String, String> getSpecMap() {
 
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new LinkedHashMap<>();
 
         map.put("Launch Date", "");
         map.put("Brand", "");
         map.put("Model", "");
         map.put("Operating System", "");
         map.put("Custom UI", "");
-        map.put("General SIM Slot(s)", "");
-        map.put("General SIM Size", "");
+//        map.put("General SIM Slot(s)", "");
+        map.put("SIM Slot(s)", "");
+//        map.put("General SIM Size", "");
+        map.put("SIM Size", "");
         map.put("Network", "");
         map.put("Fingerprint Sensor", "");
         map.put("Quick Charging", "");

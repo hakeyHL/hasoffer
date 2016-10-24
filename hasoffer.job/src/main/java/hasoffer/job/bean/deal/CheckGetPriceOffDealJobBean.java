@@ -10,6 +10,7 @@ import hasoffer.core.persistence.mongo.PriceNode;
 import hasoffer.core.persistence.mongo.PtmCmpSkuHistoryPrice;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.utils.ImageUtil;
 import hasoffer.data.redis.IRedisListService;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -133,9 +135,28 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
 
                     AppDeal appdeal = new AppDeal();
 
-                    appdeal.setImageUrl(sku.getImagePath());
-                    appdeal.setInfoPageImage(sku.getImagePath());
-                    appdeal.setListPageImage(sku.getSmallImagePath());
+                    String imagePath = sku.getImagePath();
+                    imagePath = ImageUtil.getImageUrl(imagePath);
+
+                    String dealPath = "";
+                    String dealBigPath = "";
+                    String dealSmallPath = "";
+
+                    try {
+                        File imageFile = ImageUtil.downloadImage(imagePath);
+
+                        dealPath = ImageUtil.uploadImage(imageFile);
+                        dealBigPath = ImageUtil.uploadImage(imageFile, 316, 180);
+                        dealSmallPath = ImageUtil.uploadImage(imageFile, 180, 180);
+
+                    } catch (Exception e) {
+                        System.out.println("check get priceoff deal image download error");
+                        continue;
+                    }
+
+                    appdeal.setImageUrl(dealPath);
+                    appdeal.setInfoPageImage(dealBigPath);
+                    appdeal.setListPageImage(dealSmallPath);
                     appdeal.setWebsite(sku.getWebsite());
                     appdeal.setAppdealSource(AppdealSource.PRICE_OFF);
                     appdeal.setCreateTime(TimeUtils.nowDate());
