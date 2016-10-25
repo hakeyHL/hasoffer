@@ -124,6 +124,7 @@ public class AppServiceImpl implements IAppService {
     private String Q_APP_GETPRODUCTS =
             "SELECT t FROM PtmProduct t " +
                     " where 1=1 and ";
+    private List<UrmSignCoin> userSignRecord;
 
     @Override
     public AppVersion getLatestVersion(AppType appType) {
@@ -433,6 +434,7 @@ public class AppServiceImpl implements IAppService {
         return mapList;
     }
 
+
     private String getInstallUrl(Website website) {
         String[] flipkart = new String[]{"zhangchen", "wangshuom"};
         Random random = new Random();
@@ -490,6 +492,11 @@ public class AppServiceImpl implements IAppService {
         } else {
             return new String(org.apache.commons.codec.binary.Base64.encodeBase64(s.getBytes(Charset.forName("UTF-8"))));
         }
+    }
+
+    @Override
+    public List<UrmSignCoin> getUserSignRecord() {
+        return dbm.query("select t from UrmSignCoin t ");
     }
 
 }
