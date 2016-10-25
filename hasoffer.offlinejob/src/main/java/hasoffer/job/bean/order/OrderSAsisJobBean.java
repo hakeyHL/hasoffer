@@ -50,7 +50,7 @@ public class OrderSAsisJobBean extends QuartzJobBean {
             }
 
         } catch (Exception e) {
-            logger.error("reportOrderStatistic:任务失败,   DATE:" + new Date() + ":具体如下", e);
+            logger.error("reportOrderStatistic: update order fail.   DATE:" + new Date() + ": msg:", e);
         }
     }
 }
