@@ -75,7 +75,7 @@ public class AdminPushJobBean extends QuartzJobBean {
             }
 
             AppPushMessage message = new AppPushMessage(
-                    new AppMsgDisplay(appPush.getTitle() + appPush.getContent(), appPush.getTitle(), appPush.getContent()),
+                    new AppMsgDisplay(appPush.getTitle() + appPush.getContent(), appPush.getTitle(), appPush.getContent(), appPush.getPushImageUrl()),
                     new AppMsgClick(clickType, appPush.getSourceId(), WebsiteHelper.getPackage(website))
             );
 
