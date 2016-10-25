@@ -35,7 +35,7 @@ public class AppCliCfgController {
         switch (action) {
             case 1:
                 //get home page redeem tip
-                resultVo.getData().put("redeem", Arrays.asList("Earn Hasoffer Coin Everyday!", "Redeem Rs100-1000 Amazon Gift Card"));
+                resultVo.getData().put("redeem", Arrays.asList("Get Rs100-1000 Gift !", "on check-in everyday"));
                 break;
             default:
                 break;
