@@ -64,9 +64,9 @@ public class SearchRecordProcessWorker implements Runnable {
                     TimeUnit.SECONDS.sleep(5);
                     continue;
                 }
-                //if (logger.isDebugEnabled()) {
-                //    logger.debug("SearchRecordProcessWorker. search keyword {}. begin", autoSearchResult);
-                //}
+                if (logger.isDebugEnabled()) {
+                    logger.debug("SearchRecordProcessWorker. search keyword {}. begin", autoSearchResult);
+                }
 
                 // 获取mongo 中存储的数据并转换成java对象。
                 boolean isFetch = false;
