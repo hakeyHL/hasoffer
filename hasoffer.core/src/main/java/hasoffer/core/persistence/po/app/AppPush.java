@@ -26,6 +26,7 @@ public class AppPush implements Identifiable<Long> {
     private Long pushExpectDeviceNumber;//预计推送设备数
     private Long receiveSuccessNumber;//成功接收
     private Long clickNumber;//用户点击次数
+    private String pushImageUrl;//推送的图片地址
 
     @Override
     public Long getId() {
@@ -101,6 +102,14 @@ public class AppPush implements Identifiable<Long> {
         this.title = title;
     }
 
+    public String getPushImageUrl() {
+        return pushImageUrl;
+    }
+
+    public void setPushImageUrl(String pushImageUrl) {
+        this.pushImageUrl = pushImageUrl;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -118,7 +127,8 @@ public class AppPush implements Identifiable<Long> {
             return false;
         if (receiveSuccessNumber != null ? !receiveSuccessNumber.equals(appPush.receiveSuccessNumber) : appPush.receiveSuccessNumber != null)
             return false;
-        return !(clickNumber != null ? !clickNumber.equals(appPush.clickNumber) : appPush.clickNumber != null);
+        if (clickNumber != null ? !clickNumber.equals(appPush.clickNumber) : appPush.clickNumber != null) return false;
+        return !(pushImageUrl != null ? !pushImageUrl.equals(appPush.pushImageUrl) : appPush.pushImageUrl != null);
 
     }
 
@@ -133,6 +143,7 @@ public class AppPush implements Identifiable<Long> {
         result = 31 * result + (pushExpectDeviceNumber != null ? pushExpectDeviceNumber.hashCode() : 0);
         result = 31 * result + (receiveSuccessNumber != null ? receiveSuccessNumber.hashCode() : 0);
         result = 31 * result + (clickNumber != null ? clickNumber.hashCode() : 0);
+        result = 31 * result + (pushImageUrl != null ? pushImageUrl.hashCode() : 0);
         return result;
     }
 }

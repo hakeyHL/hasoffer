@@ -6,6 +6,7 @@ import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageModel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.IDUtil;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
@@ -15,14 +16,18 @@ import hasoffer.core.persistence.enums.PushSourceType;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppPush;
 import hasoffer.core.push.IPushService;
+import hasoffer.core.utils.ImageUtil;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.webcommon.helper.PageHelper;
+import jodd.io.FileUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.*;
 
 /**
@@ -105,18 +110,19 @@ public class PushController {
         }
 
         PushSourceType pushSourceType = PushSourceType.valueOf(pushSourceTypeString.toUpperCase());
-//        crowd
+        //        crowd
         String pushSourceId = sourceId;
         String pushTitle = "";
         String pushContent = "";
-
+        String imageUrl = "";
         if (PushSourceType.DEAL.equals(pushSourceType)) {
 
             AppDeal appDeal = dbm.get(AppDeal.class, Long.valueOf(sourceId));
 
             pushTitle = appDeal.getTitle();
             pushContent = appDeal.getPriceDescription();
-
+            imageUrl = ImageUtil.getImageUrl(appDeal.getImageUrl());
+            mav.addObject("hasoferOriImageUrl", appDeal.getImageUrl());
         }
 
         AppPush appPush = new AppPush();
@@ -125,7 +131,7 @@ public class PushController {
         appPush.setCreateTime(TimeUtils.nowDate());
         appPush.setPushSourceType(PushSourceType.DEAL);
         appPush.setSourceId(sourceId);
-
+        mav.addObject("imageUrl", imageUrl);
         mav.addObject("pushSourceType", pushSourceType);
         mav.addObject("pushSourceId", pushSourceId);
         mav.addObject("pushTitle", pushTitle);
@@ -136,14 +142,30 @@ public class PushController {
 
     @RequestMapping(value = "/create/{pushSourceTypeString}/{sourceId}", method = RequestMethod.POST)
     @ResponseBody
-    public String create(HttpServletRequest request, @PathVariable String pushSourceTypeString, @PathVariable String sourceId) {
+    public String create(HttpServletRequest request,
+                         @PathVariable String pushSourceTypeString,
+                         @PathVariable String sourceId,
+                         MultipartFile pushImageFile,
+                         String imageUrl) {
+        String pushImageUrl = "";
+        if (StringUtils.isEmpty(imageUrl)) {
+            if (pushImageFile != null) {
+                try {
+                    File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
+                    FileUtil.writeBytes(imageFile, pushImageFile.getBytes());
+                    pushImageUrl = ImageUtil.uploadImage(imageFile);
+                } catch (Exception e) {
+                    System.out.println("upload image failed .");
+                }
+            }
+        }
         String pushContent = request.getParameter("pushContent");
         if (StringUtils.isEmpty(pushSourceTypeString)) {
             pushSourceTypeString = "DEAL";
         }
 
         PushSourceType pushSourceType = PushSourceType.valueOf(pushSourceTypeString.toUpperCase());
-//        crowd
+        //        crowd
         String pushTitle = "";
         if (pushContent == null) {
             pushContent = "";
@@ -161,6 +183,9 @@ public class PushController {
         }
 
         AppPush appPush = new AppPush();
+        if (!StringUtils.isEmpty(pushImageUrl)) {
+            appPush.setPushImageUrl(ImageUtil.getImageUrl(pushImageUrl));
+        }
         appPush.setTitle(pushTitle);
         appPush.setContent(pushContent);
         appPush.setCreateTime(TimeUtils.nowDate());
@@ -207,17 +232,17 @@ public class PushController {
                 mv.addObject("pushCount", 1);
                 mv.addObject("pushType", "single");
                 AppPushBo pushBo = new AppPushBo("5x1", "15:10", message);
-//                //3.渠道
-//                for (String channel : pushVol.getChannel()) {
-//                    //4.版本列表
-//                    for (String version : pushVol.getVersion()) {
-//
-//                        for (String website : pushVol.getWebsite()) {
-//
-//                        }
-//                        //5.app列表
-//                    }
-//                }
+                //                //3.渠道
+                //                for (String channel : pushVol.getChannel()) {
+                //                    //4.版本列表
+                //                    for (String version : pushVol.getVersion()) {
+                //
+                //                        for (String website : pushVol.getWebsite()) {
+                //
+                //                        }
+                //                        //5.app列表
+                //                    }
+                //                }
                 String pushResult = pushService.push(pushVol.getGcmToken(), pushBo);
                 if (pushResult != null) {
                     JSONObject JsonObject = JSONObject.parseObject(pushResult);
@@ -227,9 +252,9 @@ public class PushController {
                         mv.addObject("successCount", 0);
                         mv.addObject("failedCount", 1);
                     }
-//                    JSONArray results = JsonObject.getJSONArray("results");
-//                    JSONObject jsonObject = results.getJSONObject(0);
-//                    String error = jsonObject.getString("error");
+                    //                    JSONArray results = JsonObject.getJSONArray("results");
+                    //                    JSONObject jsonObject = results.getJSONObject(0);
+                    //                    String error = jsonObject.getString("error");
                 } else {
                     mv.addObject("success", true);
                     mv.addObject("msg", "网络请求失败!");
