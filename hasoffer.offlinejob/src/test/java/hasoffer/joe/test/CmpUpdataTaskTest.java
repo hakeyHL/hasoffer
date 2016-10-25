@@ -5,7 +5,6 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
-import hasoffer.job.worker.CmpSkuUpdateWorker;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -87,7 +86,7 @@ public class CmpUpdataTaskTest {
         es.execute(listTask);
 
         for (int i = 0; i < 10; i++) {
-            es.execute(new CmpSkuUpdateWorker(skuQueue, cmpSkuService, flipkartFetchService));
+            //es.execute(new CmpSkuUpdateWorker(skuQueue, cmpSkuService, flipkartFetchService));
         }
 
         while (true) {
