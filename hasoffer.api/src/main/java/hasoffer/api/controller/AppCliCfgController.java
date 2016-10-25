@@ -81,7 +81,7 @@ public class AppCliCfgController {
                 //search
                 map.put("002", true);
 
-//                map.put("003", true);
+                map.put("003", true);
 
                 resultVo.setData(map);
                 break;
