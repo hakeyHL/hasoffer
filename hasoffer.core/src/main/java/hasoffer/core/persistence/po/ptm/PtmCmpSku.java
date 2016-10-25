@@ -526,4 +526,48 @@ public class PtmCmpSku implements Identifiable<Long> {
         result = 31 * result + (model != null ? model.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "PtmCmpSku{" +
+                "bigImagePath='" + bigImagePath + '\'' +
+                ", id=" + id +
+                ", productId=" + productId +
+                ", categoryId=" + categoryId +
+                ", categoryId2=" + categoryId2 +
+                ", website=" + website +
+                ", seller='" + seller + '\'' +
+                ", skuTitle='" + skuTitle + '\'' +
+                ", title='" + title + '\'' +
+                ", price=" + price +
+                ", oriPrice=" + oriPrice +
+                ", cashBack=" + cashBack +
+                ", rating='" + rating + '\'' +
+                ", imagePath='" + imagePath + '\'' +
+                ", smallImagePath='" + smallImagePath + '\'' +
+                ", oriImageUrl='" + oriImageUrl + '\'' +
+                ", deeplink='" + deeplink + '\'' +
+                ", url='" + url + '\'' +
+                ", oriUrl='" + oriUrl + '\'' +
+                ", color='" + color + '\'' +
+                ", size='" + size + '\'' +
+                ", updateTime=" + updateTime +
+                ", createTime=" + createTime +
+                ", titleUpdateTime=" + titleUpdateTime +
+                ", checked=" + checked +
+                ", failLoadImage=" + failLoadImage +
+                ", sourcePid='" + sourcePid + '\'' +
+                ", sourceSid='" + sourceSid + '\'' +
+                ", indexNeed=" + indexNeed +
+                ", status=" + status +
+                ", commentsNumber=" + commentsNumber +
+                ", ratings=" + ratings +
+                ", shipping=" + shipping +
+                ", supportPayMethod='" + supportPayMethod + '\'' +
+                ", deliveryTime='" + deliveryTime + '\'' +
+                ", returnDays=" + returnDays +
+                ", brand='" + brand + '\'' +
+                ", model='" + model + '\'' +
+                '}';
+    }
 }
