@@ -80,4 +80,6 @@ public interface IAppService {
     void checkAndAlertUser2Sign();
 
     List<Map<String, String>> getIndexPage(MarketChannel marketChannel, String deviceId);
+
+    List<UrmSignCoin> getUserSignRecord();
 }

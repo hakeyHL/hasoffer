@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by hs on 2016/7/8.
@@ -366,4 +367,30 @@ public class AppUserController {
         return null;
     }
 
+    @RequestMapping("user/signRecord")
+    public String getSignRecord(HttpServletResponse response) {
+        List<UrmSignCoin> signCoins = appService.getUserSignRecord();
+        Map<Integer, List<UrmSignCoin>> maps = new ConcurrentHashMap<>();
+        for (UrmSignCoin urmSignCoin : signCoins) {
+            if (maps.containsKey(urmSignCoin.getMaxConSignNum())) {
+                maps.get(urmSignCoin.getMaxConSignNum()).add(urmSignCoin);
+            } else {
+                List<UrmSignCoin> list = new ArrayList<>();
+                list.add(urmSignCoin);
+                maps.put(urmSignCoin.getMaxConSignNum(), list);
+            }
+        }
+        JSONObject jsonObject = new JSONObject();
+        Set<Map.Entry<Integer, List<UrmSignCoin>>> entries = maps.entrySet();
+        Iterator<Map.Entry<Integer, List<UrmSignCoin>>> iterator = entries.iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Integer, List<UrmSignCoin>> next = iterator.next();
+            Integer key = next.getKey();
+            int size = next.getValue().size();
+            jsonObject.put(key + "", size);
+        }
+        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        return null;
+
+    }
 }
