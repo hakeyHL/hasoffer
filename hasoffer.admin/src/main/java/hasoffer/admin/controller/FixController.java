@@ -19,6 +19,7 @@ import hasoffer.core.analysis.ProductAnalysisService;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.HijackLog;
+import hasoffer.core.persistence.mongo.MobileCateDescription;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
 import hasoffer.core.persistence.po.ptm.*;
@@ -43,11 +44,11 @@ import hasoffer.fetch.sites.paytm.PaytmHelper;
 import hasoffer.fetch.sites.shopclues.ShopcluesHelper;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
-import org.htmlcleaner.XPatherException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -129,13 +130,14 @@ public class FixController {
             Website.ZOOMIN
     };
 
+    //fixdata/mobile91Fetch
     @RequestMapping(value = "/mobile91Fetch", method = RequestMethod.GET)
     @ResponseBody
     public String mobile91Fetch() throws Exception {
 
         String prefix = "http://www.91mobiles.com/template/category_finder/finder_ajax.php?ord=0.5544784158021026&requestType=2&listType=list&selMobSort=views&amount=1000%3B45000&sCatName=phone&price_range_apply=0&tr_fl%5B%5D=mob_market_status_filter.marketstatus_filter%3Aava_stores&search=&hidFrmSubFlag=1&page=";
         String suffix = "&category=mobile&unique_sort=&hdnCategory=mobile&user_search=&url_feat_rule=";
-        int num = 1;
+        int num = 2;
 
         for (int i = 0; i < 119; i++) {
             String url = prefix + num + suffix;
@@ -178,7 +180,28 @@ public class FixController {
 
             List<PtmCmpSku> ptmCmpSkuList = new ArrayList<>();
 
-            fetchProductAndSkuList(ptmProduct, ptmCmpSkuList, productUrl, sourceId);
+            MobileCateDescription mobileCateDescription = new MobileCateDescription();
+
+            long t1 = System.currentTimeMillis();
+            System.out.println("start fetch process product " + System.currentTimeMillis());
+
+            try {
+                fetchProductAndSkuList(ptmProduct, ptmCmpSkuList, mobileCateDescription, productUrl, sourceId);
+            } catch (Exception e) {
+                long t2 = System.currentTimeMillis();
+                System.out.println("fetch product error cast" + (t2 - t1) / 1000);
+                continue;
+            }
+
+            long t3 = System.currentTimeMillis();
+            System.out.println("fetch product finish cast " + (t3 - t1) / 1000);
+
+            if (StringUtils.isEmpty(ptmProduct.getTitle())) {
+                continue;
+            }
+            if (ptmCmpSkuList.size() == 0) {
+                continue;
+            }
 
             PtmProduct ptmproduct = productService.createPtmproduct(ptmProduct);
             System.out.println("product create success " + ptmproduct.getId());
@@ -192,21 +215,24 @@ public class FixController {
                 System.out.println(ptmcmpsku);
             }
 
+            mobileCateDescription.setId(ptmProduct.getId());
+            mdm.save(mobileCateDescription);
+            System.out.println("prodcut description create success " + mobileCateDescription.getId());
+            System.out.println("prodcut description " + mobileCateDescription);
+
             productService.importProduct2Solr2(ptmProduct);
             System.out.println("product import success " + ptmproduct.getId());
         }
-
-        System.out.println();
     }
 
-    private void fetchProductAndSkuList(PtmProduct ptmProduct, List<PtmCmpSku> ptmCmpSkuList, String productUrl, String sourceId) throws HttpFetchException, ContentParseException, XPatherException {
+    private void fetchProductAndSkuList(PtmProduct ptmProduct, List<PtmCmpSku> ptmCmpSkuList, MobileCateDescription mobileCateDescription, String productUrl, String sourceId) throws Exception {
 
         TagNode productPageRootTagNode = HtmlUtils.getUrlRootTagNode(productUrl);
 
         //查询sourceId是否有重复，发现就continue
         PtmProduct product = dbm.querySingle("SELECT t FROM PtmProduct t WHERE t.sourceSite = 'MOBILE91' AND t.sourceId = ?0 ", Arrays.asList(sourceId));
         if (product != null) {
-            System.out.println("ptmproduct has existed " + product.getId() + " sourceId");
+            System.out.println("ptmproduct has existed " + product.getId() + " sourceId = " + sourceId);
             System.out.println("new url " + productUrl);
             return;
         }
@@ -217,13 +243,32 @@ public class FixController {
         String productTitle = StringUtils.filterAndTrim(productTitleNode.getText().toString(), null);
         //主商品图片
         TagNode productImageNode = getSubNodeByXPath(productPageRootTagNode, "//img[@id='mainImage']", null);
-        String imageUrl = productImageNode.getAttributeByName("data-zoom-image");
+
+        String imageUrl = "";
+        if (productImageNode != null) {
+            imageUrl = productImageNode.getAttributeByName("data-zoom-image");
+        } else {
+            productImageNode = getSubNodeByXPath(productPageRootTagNode, "//div[@class='zoomWindowContainer']/div", null);
+            if (productImageNode != null) {
+                imageUrl = productImageNode.getAttributeByName("style");
+                String[] subStr = imageUrl.split("background-image");
+                imageUrl = subStr[1].substring(subStr[1].indexOf('(', subStr[1].indexOf(')'))).replace("\"", "");
+            }
+        }
+
 
         List<TagNode> skuNodeList = getSubNodesByXPath(productPageRootTagNode, "//ul[@id='found_store_list']/li[@data-stores='yes']");
+        if (skuNodeList == null || skuNodeList.size() == 0) {
+            skuNodeList = getSubNodesByXPath(productPageRootTagNode, "//div[@id='onlineStoresListRowDivId']/div");
+        }
 
         Map<String, String> specMap = getSpecMap();
 
         List<TagNode> specSectionNodeList = getSubNodesByXPath(productPageRootTagNode, "//div[@class='specs_table_wrap']/div/table");
+
+        if (specSectionNodeList == null || specSectionNodeList.size() == 0) {
+            specSectionNodeList = getSubNodesByXPath(productPageRootTagNode, "//div[@class='spec_box']/table[@class='spec_table']");
+        }
 
         for (TagNode specSctionNode : specSectionNodeList) {
 
@@ -244,8 +289,13 @@ public class FixController {
                     }
                 }
             } else {
+                String subTitle = "";
                 for (TagNode specNode : specInfoNode) {
-                    fetchSpecInfo(specNode, specMap, "");
+                    TagNode subTitleNode = getSubNodeByXPath(specNode, "//span[@class='specs_head']", null);
+                    if (subTitleNode != null) {
+                        subTitle = subTitleNode.getText().toString();
+                    }
+                    fetchSpecInfo(specNode, specMap, subTitle);
                 }
             }
         }
@@ -255,6 +305,9 @@ public class FixController {
         for (TagNode skuNode : skuNodeList) {
 
             String websiteString = skuNode.getAttributeByName("data-relevance");
+            if (StringUtils.isEmpty(websiteString)) {
+                websiteString = skuNode.getAttributeByName("data-store");
+            }
 
             String[] subStr = websiteString.split("\\.");
 
@@ -269,6 +322,9 @@ public class FixController {
 
                 //sku标题
                 TagNode skuTitleNode = getSubNodeByXPath(skuNode, "//p[@class='heading instock div_delivery']", null);
+                if (skuTitleNode == null) {
+                    skuTitleNode = getSubNodeByXPath(skuNode, "//div[@class='prclst_strD']/span[@class='p_ttle']", null);
+                }
                 String skuTitle = skuTitleNode.getText().toString();
                 if (StringUtils.isEmpty(skuTitle)) {
                     skuTitle = productTitle;
@@ -276,8 +332,13 @@ public class FixController {
 
                 //sku价格
                 float price = 0.0f;
+                String priceString = "";
                 TagNode skuPriceNode = getSubNodeByXPath(skuNode, "//span[@class='price price_price_color']", null);
-                String priceString = StringUtils.filterAndTrim(skuPriceNode.getText().toString(), Arrays.asList("Rs.", ","));
+                if (skuPriceNode == null) {
+                    priceString = skuNode.getAttributeByName("data-price");
+                } else {
+                    priceString = StringUtils.filterAndTrim(skuPriceNode.getText().toString(), Arrays.asList("Rs.", ","));
+                }
                 if (NumberUtils.isNumber(priceString)) {
                     price = Float.parseFloat(priceString);
                 }
@@ -285,6 +346,9 @@ public class FixController {
                 //sku评分
                 int rating = 0;
                 TagNode skuStarNode = getSubNodeByXPath(skuNode, "//div[@class='rating prclst']", null);
+                if (skuStarNode == null) {
+                    skuStarNode = getSubNodeByXPath(skuNode, "/div[@class='prclst_strN']/div[@class='prclst-stars']/div", null);
+                }
                 String skuStarString = skuStarNode.getAttributeByName("style");
                 skuStarString = skuStarString.substring(skuStarString.indexOf(':') + 1, skuStarString.indexOf('%'));
                 if (NumberUtils.isNumber(skuStarString)) {
@@ -295,6 +359,9 @@ public class FixController {
                 String oriUrl = "";
                 String url = "";
                 TagNode skuUrlNode = getSubNodeByXPath(skuNode, "/div[@class='merchant_list']/span", null);
+                if (skuUrlNode == null) {
+                    skuUrlNode = getSubNodeByXPath(skuNode, "/div[@class='prslstStrgoto']/span", null);
+                }
                 String beforeRedirectUrl = skuUrlNode.getAttributeByName("data-href-url");
                 TagNode redirectRootNode = HtmlUtils.getUrlRootTagNode(beforeRedirectUrl);
                 skuUrlNode = getSubNodeByXPath(redirectRootNode, "//meta[@http-equiv='refresh']", null);
@@ -341,6 +408,7 @@ http://www.s2d6.com/x/?x=c&z=s&v=5953892&k=||1477299419|28983|553|detail|&t=http
                         if (subStr3 != null && subStr3.length >= 2) {
                             url = subStr3[1];
                             url = URLDecoder.decode(url);
+                            url = url.substring(0, url.indexOf('&'));
                         }
                     }
                 }
@@ -368,7 +436,11 @@ http://www.s2d6.com/x/?x=c&z=s&v=5953892&k=||1477299419|28983|553|detail|&t=http
                 ptmCmpSkuList.add(ptmCmpSku);
 
             } catch (Exception e) {
-                e.printStackTrace();
+
+                if (e instanceof IllegalArgumentException) {
+                } else {
+                    e.printStackTrace();
+                }
                 continue;
             }
 
@@ -382,13 +454,32 @@ http://www.s2d6.com/x/?x=c&z=s&v=5953892&k=||1477299419|28983|553|detail|&t=http
         ptmProduct.setCategoryId(5);
         ptmProduct.setPrice(minPrice);
 
+        //商品描述信息
+        Map<String, String> newSpecMap = new LinkedHashMap<>();
+        for (Map.Entry<String, String> entry : specMap.entrySet()) {
+
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            key = key.replaceAll(" ", "_").replace("(s)", "").toLowerCase();
+
+            newSpecMap.put(key, value);
+        }
+
+        BeanUtils.populate(mobileCateDescription, newSpecMap);
     }
 
     //此处要求，不是区域内部继续分块，subTitle传空值
     private void fetchSpecInfo(TagNode specNode, Map<String, String> specMap, String subTitle) throws ContentParseException {
 
         TagNode specKeyNode = getSubNodeByXPath(specNode, "//th[@class='scnd']", null);
+        if (specKeyNode == null) {
+            specKeyNode = getSubNodeByXPath(specNode, "//td[@class='spec_ttle']", null);
+        }
         TagNode specValueNode = getSubNodeByXPath(specNode, "//td[@class='frth']", null);
+        if (specKeyNode == null) {
+            specKeyNode = getSubNodeByXPath(specNode, "//td[@class='spec_des']", null);
+        }
 
         String key = specKeyNode.getText().toString();
         String value = StringUtils.filterAndTrim(specValueNode.getText().toString(), null);
