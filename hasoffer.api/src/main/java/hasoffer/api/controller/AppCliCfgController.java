@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hs on 2016年10月17日.
@@ -70,6 +72,18 @@ public class AppCliCfgController {
                         cacheService.add(HOME_REDEEM_TIP_COPY, JSON.toJSONString(redeemStrings), -1);
                     }
                 }
+                break;
+            case 3:
+                //get wishList config
+                Map<String, Boolean> map = new HashMap<>();
+                //wish
+                map.put("001", true);
+                //search
+                map.put("002", true);
+
+//                map.put("003", true);
+
+                resultVo.setData(map);
                 break;
             default:
                 break;
