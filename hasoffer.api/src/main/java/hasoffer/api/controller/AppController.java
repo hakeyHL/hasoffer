@@ -480,14 +480,14 @@ public class AppController {
         String userToken = UUID.randomUUID().toString();
         String deviceId = JSON.parseObject(request.getHeader("deviceinfo")).getString("deviceId");
         //String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-        System.out.println(" get deviceId is : " + deviceId);
+//        System.out.println(" get deviceId is : " + deviceId);
         //1. 根据deviceId获得device 的id列表
         List<String> ids = appService.getUserDevices(deviceId);
-        System.out.println(" get ids by deviceId :" + ids.size());
+//        System.out.println(" get ids by deviceId :" + ids.size());
 
         UrmUser uUser = appService.getUserByThirdId(StringUtils.isEmpty(userVO.getThirdId()) ? "-" : userVO.getThirdId());
         if (uUser == null) {
-            logger.debug("user is not exist before");
+//            logger.debug("user is not exist before");
             uUser = new UrmUser();
             uUser.setUserToken(userToken);
             uUser.setAvatarPath(userVO.getUserIcon());
@@ -498,10 +498,10 @@ public class AppController {
             uUser.setUserName(userVO.getUserName());
             uUser.setThirdId(userVO.getThirdId());
             int result = appService.addUser(uUser);
-            logger.debug("add user result is :" + result);
+//            logger.debug("add user result is :" + result);
 
         } else {
-            logger.debug("user exist ,update userInfo");
+//            logger.debug("user exist ,update userInfo");
             uUser.setUserName(userVO.getUserName());
             uUser.setThirdPlatform(userVO.getPlatform());
             uUser.setTelephone(uUser.getTelephone());
@@ -509,16 +509,16 @@ public class AppController {
             uUser.setThirdToken(uUser.getThirdToken());
             uUser.setUserToken(userToken);
             appService.updateUserInfo(uUser);
-            logger.debug("update userInfo over ");
+//            logger.debug("update userInfo over ");
             //把最新的usertoken放进去
             if (!StringUtils.isEmpty(lastTimeUserToken)) {
                 lastTimeUserToken = userToken;
             }
 
-            System.out.println("update user and device relationship ");
+//            System.out.println("update user and device relationship ");
 
             List<String> deviceIds = appService.getUserDevicesByUserId(uUser.getId() + "");
-            System.out.println("get ids  by userId from urmUserDevice :" + deviceIds.size());
+//            System.out.println("get ids  by userId from urmUserDevice :" + deviceIds.size());
             List<UrmUserDevice> urmUserDevices = new ArrayList<>();
             for (String id : ids) {
                 boolean flag = false;
@@ -527,11 +527,11 @@ public class AppController {
 //                    System.out.println(" dId_dId_dId " + dId);
                     if (id.equals(dId)) {
                         flag = true;
-                        System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);
+//                        System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);
                     }
                 }
                 if (!flag) {
-                    System.out.println("id :" + id + " is not exist before ");
+//                    System.out.println("id :" + id + " is not exist before ");
                     UrmUserDevice urmUserDevice = new UrmUserDevice();
                     urmUserDevice.setDeviceId(id);
                     urmUserDevice.setUserId(uUser.getId() + "");
@@ -540,7 +540,7 @@ public class AppController {
             }
             //将关联关系插入到关联表中
             int count = appService.addUrmUserDevice(urmUserDevices);
-            System.out.println(" batch save  result size : " + count);
+//            System.out.println(" batch save  result size : " + count);
         }
         map.put("userToken", userToken);
         jsonObject.put("data", map);
@@ -552,8 +552,8 @@ public class AppController {
         String thirdId = userVO.getThirdId();
 
         if (StringUtils.isEmpty(lastTimeUserToken) || StringUtils.isEmpty(thirdId)) {//如果userToken或者thirdId为空
-            System.out.println("lastTimeUserToken is :" + lastTimeUserToken);
-            System.out.println("current user thirdId is : " + thirdId);
+//            System.out.println("lastTimeUserToken is :" + lastTimeUserToken);
+//            System.out.println("current user thirdId is : " + thirdId);
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
@@ -562,7 +562,7 @@ public class AppController {
 
         if (userByLastUserToken != null) {
             //如果老token有对应用户,存起来,方便二次处理
-            logger.error("old userInfo and this thirdId is  : " + thirdId + " InfoInfo " + JSON.toJSONString(userByLastUserToken));
+//            logger.error("old userInfo and this thirdId is  : " + thirdId + " InfoInfo " + JSON.toJSONString(userByLastUserToken));
 
             String oldThirdId = userByLastUserToken.getThirdId();
 

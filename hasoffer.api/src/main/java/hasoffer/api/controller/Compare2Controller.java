@@ -447,9 +447,9 @@ public class Compare2Controller {
 //                        websiteSet.add(cmpSku.getWebsite());
 //                    }
                     // 忽略前台返回的价格
-                    System.out.println("sku smallImagePath is " + cmpSku.getSmallImagePath());
+//                    System.out.println("sku smallImagePath is " + cmpSku.getSmallImagePath());
                     CmpProductListVo cplv = new CmpProductListVo(cmpSku, WebsiteHelper.getLogoUrl(cmpSku.getWebsite()));
-                    System.out.println("after set , imageUrl is  " + cplv.getImageUrl());
+//                    System.out.println("after set , imageUrl is  " + cplv.getImageUrl());
                     cplv.setDeepLinkUrl(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()}));
 
                     logger.info(" getCmpProducts record deepLinkUrl :" + cplv.getDeepLinkUrl());
@@ -483,7 +483,7 @@ public class Compare2Controller {
             List<CmpProductListVo> tempCmpProductListVos = new ArrayList<CmpProductListVo>();
             //计算评论数*星级的总和
             int sum = 0;
-            System.out.println("iterator  comparedSkuVos , and  it is size is " + comparedSkuVos.size());
+//            System.out.println("iterator  comparedSkuVos , and  it is size is " + comparedSkuVos.size());
             for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
 //                if (websiteSet.size() <= 0) {
 //                    break;
@@ -492,19 +492,19 @@ public class Compare2Controller {
 //                    websiteSet.remove(cmpProductListVo.getWebsite());
                 //去除列表中除此之外的其他此site的数据
                 if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
-                    System.out.println("not ebay ");
+//                    System.out.println("not ebay ");
                     //评论数*星级 累加 除以评论数和
                     sum += cmpProductListVo.getTotalRatingsNum() * cmpProductListVo.getRatingNum();
                     tempTotalComments += cmpProductListVo.getTotalRatingsNum();
                 }
                 //获取offers
-                System.out.println(" get offers from mongoDb ");
-                System.out.println(" cmpProductListVo " + cmpProductListVo.getId() + "  : price : " + cmpProductListVo.getPrice());
+//                System.out.println(" get offers from mongoDb ");
+//                System.out.println(" cmpProductListVo " + cmpProductListVo.getId() + "  : price : " + cmpProductListVo.getPrice());
                 PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, cmpProductListVo.getId());
                 List<String> offer = new ArrayList<>();
                 if (ptmCmpSkuDescription != null) {
                     String offers = ptmCmpSkuDescription.getOffers();
-                    System.out.println(" got it ,and offers is " + offers);
+//                    System.out.println(" got it ,and offers is " + offers);
                     if (!StringUtils.isEmpty(offers)) {
                         String[] temps = offers.split(",");
                         for (String str : temps) {
@@ -562,25 +562,25 @@ public class Compare2Controller {
                 || srmSearchLog.getPrecise() == SearchPrecise.MANUALSET)) {
 
             if (srmSearchLog.getPtmProductId() <= 0) {
-                System.out.println("Found search log. but product id is 0 .");
+//                System.out.println("Found search log. but product id is 0 .");
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), "", 0);
             }
 
             sio.set(srmSearchLog.getCategory(), srmSearchLog.getPtmProductId(), srmSearchLog.getPtmCmpSkuId());
-            System.out.println("getHsProId  :" + sio.getHsProId());
+//            System.out.println("getHsProId  :" + sio.getHsProId());
         } else {
             if (srmSearchLog == null) {
-                System.out.println("srmSearchLog is null");
+//                System.out.println("srmSearchLog is null");
                 sio.setFirstSearch(true);
-                System.out.println("setFirstSearch is true");
+//                System.out.println("setFirstSearch is true");
             }
 
             try {
-                System.out.println("searchForResult  ");
+//                System.out.println("searchForResult  ");
                 searchForResult(sio);
                 System.out.println(" searchForResult result  " + sio.getHsProId());
             } catch (NonMatchedProductException e) {
-                System.out.println("searchForResult_old  ");
+//                System.out.println("searchForResult_old  ");
                 System.out.println(" searchForResult_old result  " + sio.getHsProId());
             }
         }
@@ -597,7 +597,7 @@ public class Compare2Controller {
         // 搜索SKU
         PageableResult<CmpSkuModel> pagedCmpskuModels = cmpskuIndexService.searchSku(_q, 1, 5);
         List<CmpSkuModel> skuModels = pagedCmpskuModels.getData();
-        System.out.println("skuModels   " + skuModels.size());
+//        System.out.println("skuModels   " + skuModels.size());
 
         if (ArrayUtils.isNullOrEmpty(skuModels)) {
             throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, "", 0);
@@ -626,7 +626,7 @@ public class Compare2Controller {
         }
 
         long cateId = 0L;
-        System.out.println("skuModel.getProductId()  " + skuModel.getProductId());
+//        System.out.println("skuModel.getProductId()  " + skuModel.getProductId());
         sio.set(cateId, skuModel.getProductId(), skuModel.getId());
     }
 }

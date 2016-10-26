@@ -63,7 +63,7 @@ public class AppDealController {
         PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"exp", "extra", "link", "priceDescription", "image"});
         //先展示与浏览商品同类的deal
         List<DealModel> dealModels = indexService.simpleSearch(title, page, pageSize);
-        System.out.println("search from solr dealModels  :" + dealModels.size());
+//        System.out.println("search from solr dealModels  :" + dealModels.size());
         if (dealModels != null && dealModels.size() > 0) {
             for (DealModel dealModel : dealModels) {
                 if (dealModel.getExpireTime().compareTo(new Date()) != 1 && dealModel.isDisplay()) {
@@ -77,13 +77,13 @@ public class AppDealController {
                     deals.add(dealVo);
                 }
             }
-            System.out.println("from solr get   :" + deals.size());
+//            System.out.println("from solr get   :" + deals.size());
         }
         //再展示手机类deal id或parentid 为 5 level小于等于3
         PageableResult pageableResult = appService.getDeals(page + 0l, pageSize + 0l);
         if (pageableResult != null && pageableResult.getData() != null && pageableResult.getData().size() > 0) {
             List<AppDeal> list = pageableResult.getData();
-            System.out.println("search from mysql get   :" + list.size());
+//            System.out.println("search from mysql get   :" + list.size());
             List<DealVo> mobileDeals = new ArrayList<DealVo>();
             Iterator<AppDeal> dealIterator = list.iterator();
             while (dealIterator.hasNext()) {
@@ -100,9 +100,9 @@ public class AppDealController {
                     dealIterator.remove();
                 }
             }
-            System.out.println("mobile  get   :" + mobileDeals.size());
+//            System.out.println("mobile  get   :" + mobileDeals.size());
             deals.addAll(mobileDeals);
-            System.out.println("current size   :" + deals.size());
+//            System.out.println("current size   :" + deals.size());
             //其他deal按照点击次数排序
             Collections.sort(list, new Comparator<AppDeal>() {
                 @Override
@@ -115,7 +115,7 @@ public class AppDealController {
                     return 0;
                 }
             });
-            System.out.println("last  list size   :" + list.size());
+//            System.out.println("last  list size   :" + list.size());
             for (AppDeal appDeal : list) {
                 DealVo dealVo = new DealVo();
                 dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getBiggerLogoUrl(appDeal.getWebsite()));
@@ -126,7 +126,7 @@ public class AppDealController {
                 dealVo.setDeepLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
                 deals.add(dealVo);
             }
-            System.out.println("current  deals size   :" + deals.size());
+//            System.out.println("current  deals size   :" + deals.size());
         }
         Map map = new HashMap();
         map.put("deals", deals);
@@ -144,7 +144,7 @@ public class AppDealController {
         jsonObject.put("msg", "ok");
         hashMap.put("provisions", "• Taxs are applicable.\n• This offer cannot be clubbed with any other ongoing offer.\n• Offer cannot be redeemed for cash.\n• No coupon code required.\n• Company has the right to end this offer without prior notice.\n");
         if (appDeal != null) {
-            logger.info("has this deal " + id);
+//            logger.info("has this deal " + id);
             hashMap.put("description", appDeal.getDescription());
         }
         jsonObject.put("data", hashMap);

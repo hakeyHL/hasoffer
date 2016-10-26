@@ -153,16 +153,16 @@ public class AppSkuController {
         jsonObject.put("msg", "ok");
         //1. 先拿到所有的价格数据
         List<PriceNode> priceNodes = cmpSkuService.queryHistoryPrice(id);
-        System.out.println(priceNodes != null ? "  priceNodes  :" + priceNodes.size() : "null a .....");
+//        System.out.println(priceNodes != null ? "  priceNodes  :" + priceNodes.size() : "null a .....");
 
 
         if (priceNodes == null) {
-            System.out.println(" no records in history ");
+//            System.out.println(" no records in history ");
             //如果不存在历史价格数据将当前sku价格作为历史数据返回
             priceNodes = new ArrayList<>();
             PtmCmpSku ptmCmpSku = cmpSkuService.getCmpSkuById(id);
             if (ptmCmpSku != null) {
-                System.out.println(" get ptmcmpsku by id " + id + " got  it ");
+//                System.out.println(" get ptmcmpsku by id " + id + " got  it ");
                 priceNodes.add(new PriceNode(ptmCmpSku.getUpdateTime(), ptmCmpSku.getPrice()));
             }
         }
@@ -177,7 +177,7 @@ public class AppSkuController {
                 if (referencePrice != priceNode.getPrice()) {
                     flag = true;
                 }
-                System.out.println("priceNodes  Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
+//                System.out.println("priceNodes  Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
             }
             Float maxPrice = Collections.max(priceNodes, new Comparator<PriceNode>() {
                 @Override
@@ -212,20 +212,20 @@ public class AppSkuController {
 
             if (flag) {
                 //有变化点
-                System.out.println("has more than one priceNode ");
+//                System.out.println("has more than one priceNode ");
                 PriceCurveVo priceCurveVo = getPriceCurveVo(priceNodes, false);
                 priceCurveVo.setDistanceX2X(20);
                 jsonObject.put("data", JSONObject.toJSON(priceCurveVo));
-                System.out.println("  JSON.toJSONString(jsonObject)  " + JSON.toJSONString(jsonObject));
+//                System.out.println("  JSON.toJSONString(jsonObject)  " + JSON.toJSONString(jsonObject));
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             } else {
-                System.out.println("has one or slightly different points ");
-                System.out.println(" priceNodes size is :" + priceNodes.size());
+//                System.out.println("has one or slightly different points ");
+//                System.out.println(" priceNodes size is :" + priceNodes.size());
                 PriceCurveVo priceCurveVo = getPriceCurveVo(priceNodes, true);
                 priceCurveVo.setDistanceX2X(20);
                 jsonObject.put("data", JSONObject.toJSON(priceCurveVo));
-                System.out.println("  JSON.toJSONString(jsonObject)  " + JSON.toJSONString(jsonObject));
+//                System.out.println("  JSON.toJSONString(jsonObject)  " + JSON.toJSONString(jsonObject));
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             }
@@ -260,7 +260,7 @@ public class AppSkuController {
         priceNodes = null;
         System.gc();
         priceNodes = priceListNodes;
-        System.out.println(" after distinct by price ,size is " + priceNodes.size());
+//        System.out.println(" after distinct by price ,size is " + priceNodes.size());
     }
 
     /**
@@ -270,9 +270,9 @@ public class AppSkuController {
      */
     public PriceCurveVo getPriceCurveVo(List<PriceNode> priceNodes, boolean isYSpecial) {
 
-        for (PriceNode priceNode : priceNodes) {
-            System.out.println(" TTT " + getDateMMdd(priceNode.getPriceTimeL()) + " PPP " + priceNode.getPrice());
-        }
+//        for (PriceNode priceNode : priceNodes) {
+//            System.out.println(" TTT " + getDateMMdd(priceNode.getPriceTimeL()) + " PPP " + priceNode.getPrice());
+//        }
 
 //        System.out.println(" distinct list by price ");
 //        distinctListByPrice(priceNodes);
@@ -308,7 +308,7 @@ public class AppSkuController {
         List<PriceNode> tempPriceNodes = new ArrayList<>();
         //2. 将当期日期作为最后一个元素加入到列表中
         if (!getDateMMdd(priceNodes.get(priceNodes.size() - 1).getPriceTimeL()).equals(getDateMMdd(new Date().getTime()))) {
-            System.out.println(" add current date ");
+//            System.out.println(" add current date ");
             priceNodes.add(new PriceNode(new Date(), priceNodes.get(priceNodes.size() - 1).getPrice()));
         }
 
@@ -316,7 +316,7 @@ public class AppSkuController {
 
         List<String> X = new ArrayList<>();
         Long priceTimeL = priceNodes.get(priceNodes.size() - 1).getPriceTimeL();
-        System.out.println(" priceTimeL" + getDateMMdd(priceTimeL));
+//        System.out.println(" priceTimeL" + getDateMMdd(priceTimeL));
 
         //遍历日期
         int i = 4;
@@ -333,24 +333,24 @@ public class AppSkuController {
         tempPriceNodes.add(new PriceNode(priceNodes.get(0).getPriceTime(), priceNodes.get(0).getPrice()));
         //2.2 获取其长度
         int priceNodesSize = priceNodes.size();
-        System.out.println(" priceNodesSize  " + priceNodesSize);
-        for (PriceNode priceNode : priceNodes) {
-            System.out.println(" TAAA  " + getDateMMdd(priceNode.getPriceTimeL()) + " PAAAA " + priceNode.getPrice());
-        }
+//        System.out.println(" priceNodesSize  " + priceNodesSize);
+//        for (PriceNode priceNode : priceNodes) {
+//            System.out.println(" TAAA  " + getDateMMdd(priceNode.getPriceTimeL()) + " PAAAA " + priceNode.getPrice());
+//        }
         //3.处理,添加辅助点
         for (int j = 1; j < priceNodesSize; j++) {
             PriceNode priceNo = priceNodes.get(j);
-            System.out.println("array " + j + "  is  " + getDateMMdd(priceNo.getPriceTimeL()) + "  and price is :" + priceNo.getPrice());
+//            System.out.println("array " + j + "  is  " + getDateMMdd(priceNo.getPriceTimeL()) + "  and price is :" + priceNo.getPrice());
             //除了第一个,如果当前的前一天与上一个值不相同则增加前一天这个点
             long priorDateLong = priceNo.getPriceTimeL() - 1000 * 60 * 60 * 24;
             String priorDate = getDateMMdd(priorDateLong);
-            System.out.println(" priorDate " + priorDate);
+//            System.out.println(" priorDate " + priorDate);
             if (!priorDate.equals(getDateMMdd(priceNodes.get(j - 1).getPriceTimeL()))) {
                 //3.1 如果如果当前元素的前一天日期与前一个元素的日期不相等,
-                System.out.println("not equal ");
+//                System.out.println("not equal ");
                 Date date = new Date();
                 date.setTime(priorDateLong);
-                System.out.println("add node :  " + priorDate + " price " + priceNodes.get(j - 1).getPrice());
+//                System.out.println("add node :  " + priorDate + " price " + priceNodes.get(j - 1).getPrice());
                 PriceNode insertPriceNode = new PriceNode(date, priceNodes.get(j - 1).getPrice());
                 //3.2 添加此辅助点,价格与前一个元素的价格相同
                 if (!ifExistTime(getDateMMdd(date.getTime()), tempPriceNodes)) {
@@ -373,7 +373,7 @@ public class AppSkuController {
         System.gc();
         priceNodes = new ArrayList<>();
         priceNodes.addAll(tempPriceNodes);
-        System.out.println(" priceNodes " + priceNodes.size());
+//        System.out.println(" priceNodes " + priceNodes.size());
         BigDecimal middlePrice = (maxPrice.add(minPrice)).divide(BigDecimal.valueOf(2), BigDecimal.ROUND_HALF_UP);
         if (isYSpecial) {
             BigDecimal minY = BigDecimal.ZERO;
@@ -412,7 +412,7 @@ public class AppSkuController {
         sortPriceNoedesDateASC(priceNodes);
         if (priceNodes != null && priceNodes.size() > 0) {
             for (PriceNode priceNode : priceNodes) {
-                System.out.println(" Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
+//                System.out.println(" Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
                 //查询到价格历史,开始分析priceTimeL
                 PriceCurveXYVo priceCurveXYVo = new PriceCurveXYVo(this.getDateMMdd(priceNode.getPriceTimeL()), BigDecimal.valueOf(priceNode.getPrice()).longValue(), getDistance2X(priceTimeL, priceNode.getPriceTimeL()));
                 priceXY.add(priceCurveXYVo);

@@ -80,7 +80,7 @@ public class AppAdController {
     @RequestMapping("product")
     public ModelAndView getAdsByProductId(@RequestParam(defaultValue = "0") Long productId) {
         ModelAndView modelAndView = new ModelAndView();
-        logger.info(" get advertisement ");
+//        logger.info(" get advertisement ");
         Map map = new HashMap<>();
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
