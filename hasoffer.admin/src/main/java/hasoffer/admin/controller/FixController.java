@@ -130,6 +130,16 @@ public class FixController {
             Website.ZOOMIN
     };
 
+    //fixdata/bonepriceMobileFetch
+    @RequestMapping(value = "/bonepriceMobileFetch", method = RequestMethod.GET)
+    @ResponseBody
+    public String bonepriceMobileFetch() {
+
+
+        return "ok";
+    }
+
+
     //fixdata/mobile91Fetch
     @RequestMapping(value = "/mobile91Fetch", method = RequestMethod.GET)
     @ResponseBody
