@@ -49,6 +49,8 @@ public interface IAppService {
 
     List<String> getUserDevicesByUserId(String userId);
 
+    List<String> getUserIdsByDeviceId(String urmDeviceId);
+
     int addUrmUserDevice(List<UrmUserDevice> urmUserDevices);
 
     int addUser(UrmUser urmUser);

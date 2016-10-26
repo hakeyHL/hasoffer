@@ -35,6 +35,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -392,5 +393,77 @@ public class AppUserController {
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
 
+    }
+
+    /**
+     * &
+     * 手机用户邮箱和手机号
+     *
+     * @param response
+     * @return
+     */
+    @RequestMapping("user/getEAndP")
+    public String getUserEmailAndPhone(HttpServletResponse response,
+                                       @RequestParam(defaultValue = "") String telephone,
+                                       @RequestParam(defaultValue = "") String email) {
+        long startTime = System.currentTimeMillis();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("errorCode", "00000");
+        jsonObject.put("msg", "ok");
+        if (StringUtils.isEmpty(telephone) && StringUtils.isEmpty(email)) {
+            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            return null;
+        } else {
+            //1.userToken 验证和用户查询
+            UrmUser urmUser = null;
+            String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
+            if (StringUtils.isEmpty(userToken)) {
+                //暂时不能读缓存,因为缓存中的记录不存在手机号和邮箱
+                //2.get用户
+                urmUser = appService.getUserByUserToken(userToken);
+                if (urmUser != null) {
+
+                    if (!StringUtils.isEmpty(telephone) && !telephone.equals(urmUser.getTelephone())) {
+                        //update
+                        urmUser.setTelephone(telephone);
+                    }
+                    if (!StringUtils.isEmpty(email) && !email.equals(urmUser.getEmail())) {
+                        urmUser.setEmail(email);
+                    }
+                    appService.updateUserInfo(urmUser);
+                }
+            } else {
+                //3.无,分析deviceId
+                DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+                if (deviceInfoVo != null && !StringUtils.isEmpty(deviceInfoVo.getDeviceId())) {
+                    //4.有,获取urmDevice记录
+                    List<String> deviceIds = appService.getUserDevices(deviceInfoVo.getDeviceId());
+                    for (String deviceId : deviceIds) {
+                        //5.获取用户设备关系
+                        List<String> userIds = appService.getUserIdsByDeviceId(deviceId);
+                        for (String userid : userIds) {
+                            UrmUser user = appService.getUserById(Long.valueOf(userid));
+                            if (user != null) {
+                                //6.用户是否已绑定邮箱和手机号
+                                //7.未绑定,直接绑定
+                                if (!StringUtils.isEmpty(telephone) && StringUtils.isEmpty(user.getTelephone())) {
+                                    //update
+                                    user.setTelephone(telephone);
+                                }
+                                if (!StringUtils.isEmpty(email) && StringUtils.isEmpty(user.getEmail())) {
+                                    user.setEmail(email);
+                                }
+                                //8.已绑定,放弃
+                                appService.updateUserInfo(user);
+                            }
+                        }
+                    }
+                }
+            }
+            //9.其他,放弃
+        }
+        System.out.println("totalTime : " + (BigDecimal.valueOf(System.currentTimeMillis()).subtract(BigDecimal.valueOf(startTime)).divide(BigDecimal.valueOf(1000), 1, BigDecimal.ROUND_HALF_UP)));
+        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        return null;
     }
 }

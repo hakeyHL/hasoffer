@@ -15,13 +15,11 @@ import hasoffer.base.model.ImagePath;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.*;
+import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.core.analysis.ProductAnalysisService;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.mongo.HijackLog;
-import hasoffer.core.persistence.mongo.MobileCateDescription;
-import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
-import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
+import hasoffer.core.persistence.mongo.*;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
@@ -77,6 +75,10 @@ import static hasoffer.base.utils.http.XPathUtils.getSubNodeByXPath;
 public class FixController {
 
     public static final String WEBSITE_91MOBILE_URL_PREFIEX = "http://www.91mobiles.com";
+    public static final String WEBSITE_BONEPRICE_URL_PREFIEX = "http://www.boneprice.com";
+    public static final String WEBSITE_BONEPRICE_REDIRECTURL_PREFIEX = "/go_product.html?item_id=";
+    public static final String WEBSITE_LAZADA_URL_PREFIEX = "http://www.lazada.co.id";
+
     private static final String Q_SKU_PRODUCTID = "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ORDER BY t.id";
     private static final String Q_PTMCMPSKU = "SELECT t FROM PtmCmpSku t WHERE t.productId < 100000";
     private static final String Q_INDEX = "SELECT t FROM PtmCmpSkuIndex2 t ORDER BY t.id ASC";
@@ -129,6 +131,222 @@ public class FixController {
             Website.NAAPTOL,
             Website.ZOOMIN
     };
+
+    //fixdata/bonepriceMobileFetch
+    @RequestMapping(value = "/bonepriceMobileFetch", method = RequestMethod.GET)
+    @ResponseBody
+    public String bonepriceMobileFetch() throws Exception {
+
+        String prefix = "http://www.boneprice.com/category.html?s=";
+        String suffix = "&cat=Mobile_Phone&vt=list";
+
+        for (int i = 0; i < 353; i++) {
+
+            int result = i * 20 + i;
+
+            String url = prefix + result + suffix;
+
+            System.out.println("listpage url = " + url);
+
+            String html = HtmlUtils.getUrlHtml(url);
+
+            TagNode listPageRoot = HtmlUtils.getUrlRootTagNode(url);
+
+            List<TagNode> productNodeList = getSubNodesByXPath(listPageRoot, "//ul[@class='category_plist']/li");
+
+            for (TagNode productNode : productNodeList) {
+
+                //判断是否为product节点
+                List<TagNode> divNodeList = getSubNodesByXPath(productNode, "/div");
+                if (divNodeList == null || divNodeList.size() == 0) {
+                    continue;
+                }
+
+                TagNode skuOrProductNode = getSubNodeByXPath(productNode, "/a", null);
+
+                String skuOrProductNodeHrefString = skuOrProductNode.getAttributeByName("href");
+
+                if (skuOrProductNodeHrefString.contains("/go_product.html?")) {//该字符串表示，该链接直接指向一个sku，跳过抓取
+                    continue;
+                }
+
+                String productUrl = skuOrProductNodeHrefString;
+
+                productUrl = WEBSITE_BONEPRICE_URL_PREFIEX + productUrl;
+
+                System.out.println("product url = " + productUrl);
+
+                PtmProduct ptmProduct = new PtmProduct();
+
+                List<PtmCmpSku> skuList = new ArrayList<>();
+
+                PtmProductDescription productDescription = new PtmProductDescription();
+
+                bonepriceMobileInfoFetch(ptmProduct, skuList, productDescription, productUrl);
+
+                //存数据的时候注意判断sourceId
+                System.out.println(ptmProduct);
+                System.out.println(skuList);
+                System.out.println(productDescription);
+
+            }
+        }
+
+        return "ok";
+    }
+
+    /**
+     * 该方法根据主商品的url，直接抓取ptmproduct和其对应的ptmcmpskuList，返回true时候，可以创建，返回false，建立跳过不创建
+     *
+     * @param ptmProduct
+     * @param skuList
+     * @param productDescription
+     * @param productUrl
+     * @return
+     * @throws Exception
+     */
+    private boolean bonepriceMobileInfoFetch(PtmProduct ptmProduct, List<PtmCmpSku> skuList, PtmProductDescription productDescription, String productUrl) throws Exception {
+
+        /*
+        skuList 设置标题、图片、价格、网站、oriUrl、url（lazada特殊处理）、站内评分
+         */
+
+        String html = HtmlUtils.getUrlHtml(productUrl);
+
+        TagNode productDetailPageRootNode = HtmlUtils.getUrlRootTagNode(productUrl);
+
+        List<TagNode> skuNodeList = getSubNodesByXPath(productDetailPageRootNode, "//ul[@class='p_list']/li");
+
+        //最低价格的标记
+        float minPrice = 0;
+
+        for (TagNode skuNode : skuNodeList) {
+            //网站
+            String websiteString = skuNode.getAttributeByName("data-src").toUpperCase();
+            Website website = null;
+            try {
+                website = Website.valueOf(websiteString);
+            } catch (Exception e) {
+                continue;
+            }
+
+            //title
+            TagNode skuTitleNode = getSubNodeByXPath(skuNode, "//div[@class='pl_title']/a", new ContentParseException("boneprice detail page titlenode not found"));
+            String title = skuTitleNode.getText().toString();
+
+            //价格
+            float price = 0.0f;
+            TagNode priceNode = getSubNodeByXPath(skuNode, "//div[@class='pl_price_m']", null);
+            if (priceNode == null) {
+                priceNode = getSubNodeByXPath(skuNode, "//div[@class='pl_price']", new ContentParseException("boneprice detail page price node not found"));
+            }
+            String priceString = StringUtils.filterAndTrim(priceNode.getText().toString().replaceAll("\\.", "").replaceAll("Rp", ""), null);
+            if (NumberUtils.isNumber(priceString)) {
+                price = Float.parseFloat(priceString);
+            }
+
+            //url
+            String url = "";
+            String dataId = skuNode.getAttributeByName("data-id");
+            //获取重定向的url
+            String href = WEBSITE_BONEPRICE_URL_PREFIEX + WEBSITE_BONEPRICE_REDIRECTURL_PREFIEX + dataId;
+            //从响应中确定实际url
+            String redirectHtml = HtmlUtils.getUrlHtml(href);
+            String[] substr = redirectHtml.split("document\\.location\\.replace");
+            String realUrl = substr[1].substring(substr[1].indexOf('(') + 2, substr[1].indexOf(')') - 1);//此处realurl带有联盟信息，以后截断
+            if (realUrl.startsWith("http://ho.lazada.co.id/SHDMi5")) {
+                realUrl = UrlUtils.getParam(realUrl, "url");
+                String[] subStr = realUrl.split("\\?");
+                realUrl = subStr[0];
+                //再次访问lazada获取正确的url
+                HttpResponseModel httpResponseModel = HttpUtils.get(realUrl, null);
+                realUrl = WEBSITE_LAZADA_URL_PREFIEX + httpResponseModel.getRedirect();
+            }
+
+            url = realUrl;
+
+            //站内评分 0 1 2 3 4 5
+            int star = 0;
+            TagNode skuStarNode = getSubNodeByXPath(skuNode, "//span[@class='s_ravg']", new ContentParseException("boneprice star node not found"));
+            String skuStarString = skuStarNode.getText().toString();
+            if (NumberUtils.isNumber(skuStarString)) {
+                star = Integer.parseInt(skuStarString);
+            }
+
+            if (price != 0.0) {
+
+                //与minprice比较
+                if (minPrice > price || minPrice == 0.0) {
+                    minPrice = price;
+                }
+
+                PtmCmpSku ptmCmpSku = new PtmCmpSku();
+
+                ptmCmpSku.setTitle(title);
+                ptmCmpSku.setPrice(price);
+                ptmCmpSku.setWebsite(website);
+                ptmCmpSku.setUrl(url);
+                ptmCmpSku.setRatings(star);
+
+                skuList.add(ptmCmpSku);
+            }
+        }
+
+        //如果最低价为0，认为抓取失败
+        if (minPrice == 0.0) {
+            return false;
+        }
+        //skuList的大小为0，认为抓取失败
+        if (skuList.size() == 0) {
+            return false;
+        }
+
+        /*
+            主商品，设置标题、价格（使用支持的skuList的最低价格）、主商品评分、主商品描述、sourceId（//input[@id='item_id']/@value）、sourceSite、sourceUrl
+         */
+
+        //商品图片
+        TagNode productImageNode = getSubNodeByXPath(productDetailPageRootNode, "//div[@class='product_detail']/div[@class='dthumb']/img", new ContentParseException("boneprice product image node not found"));
+        String productImage = productImageNode.getAttributeByName("src");
+
+        //productTilte
+        TagNode productTitleNode = getSubNodeByXPath(productDetailPageRootNode, "//h2[@class='d_title']", new ContentParseException("boneprice product title node not found"));
+        String productTitle = productTitleNode.getText().toString();
+
+        //主商品评分
+        List<TagNode> productStarNodeList = getSubNodesByXPath(productDetailPageRootNode, "//div[@id='main']/div[@class='product_detail']/div[@class='p_detail']/div[@class='d_rating']/div[@class='star']/div[@class='s_on']");
+        int star = productStarNodeList.size();
+
+        //主商品评分
+        TagNode productSpecNode = getSubNodeByXPath(productDetailPageRootNode, "//div[@class='speccontent']", new ContentParseException("boneprice product spec node not found"));
+        String productDesc = productSpecNode.getText().toString();
+
+        //主商品sourceId
+        String sourceId = "";
+        List<TagNode> sourceIdNodeList = getSubNodesByXPath(productDetailPageRootNode, "//input[@id='item_id']");
+        sourceId = sourceIdNodeList.get(0).getAttributeByName("value");
+
+        //主商品属性赋值
+        ptmProduct.setTitle(productTitle);
+        ptmProduct.setPrice(minPrice);
+        ptmProduct.setRating(star);
+        ptmProduct.setSourceId(sourceId);
+        ptmProduct.setSourceSite("BONEPRICE");
+        ptmProduct.setSourceUrl(productUrl);
+
+        //主商品描述赋值
+        productDescription.setJsonDescription(productDesc);
+
+        //统一设置
+        //图片
+        //oriUrl
+        for (PtmCmpSku ptmCmpSku : skuList) {
+            ptmCmpSku.setOriImageUrl(productImage);
+            ptmCmpSku.setOriUrl(productUrl);
+        }
+
+        return true;
+    }
 
     //fixdata/mobile91Fetch
     @RequestMapping(value = "/mobile91Fetch", method = RequestMethod.GET)

@@ -60,4 +60,13 @@ public class PtmProductDescription {
         result = 31 * result + (jsonDescription != null ? jsonDescription.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "PtmProductDescription{" +
+                "id=" + id +
+                ", jsonParam='" + jsonParam + '\'' +
+                ", jsonDescription='" + jsonDescription + '\'' +
+                '}';
+    }
 }

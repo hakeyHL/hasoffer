@@ -26,6 +26,7 @@ public class UrmUser implements Identifiable<Long> {
     private Date createTime;
     private String telephone;
     private String gcmToken;
+    private String email;
     ////用户的coin
     //@Column(columnDefinition = "bigint default 0")
     //private Long signCoin = 0L;
@@ -71,12 +72,13 @@ public class UrmUser implements Identifiable<Long> {
     //    this.lastSignTime = lastSignTime;
     //}
 
+
     public String getTelephone() {
         return telephone;
     }
 
     public void setTelephone(String telephone) {
-        telephone = telephone;
+        this.telephone = telephone;
     }
 
     public Long getId() {
@@ -151,6 +153,14 @@ public class UrmUser implements Identifiable<Long> {
         this.gcmToken = gcmToken;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -168,7 +178,8 @@ public class UrmUser implements Identifiable<Long> {
         if (avatarPath != null ? !avatarPath.equals(urmUser.avatarPath) : urmUser.avatarPath != null) return false;
         if (createTime != null ? !createTime.equals(urmUser.createTime) : urmUser.createTime != null) return false;
         if (telephone != null ? !telephone.equals(urmUser.telephone) : urmUser.telephone != null) return false;
-        return gcmToken != null ? gcmToken.equals(urmUser.gcmToken) : urmUser.gcmToken == null;
+        if (gcmToken != null ? !gcmToken.equals(urmUser.gcmToken) : urmUser.gcmToken != null) return false;
+        return !(email != null ? !email.equals(urmUser.email) : urmUser.email != null);
 
     }
 
@@ -184,6 +195,7 @@ public class UrmUser implements Identifiable<Long> {
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (telephone != null ? telephone.hashCode() : 0);
         result = 31 * result + (gcmToken != null ? gcmToken.hashCode() : 0);
+        result = 31 * result + (email != null ? email.hashCode() : 0);
         return result;
     }
 }
