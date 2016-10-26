@@ -32,7 +32,7 @@ public class ThirdPartyController {
     @RequestMapping(value = "/api/deals", method = RequestMethod.POST)
     public String config(HttpServletRequest request, HttpServletResponse response) {
         String acceptjson = Httphelper.getJsonFromRequest(request);
-        logger.info("accept content is " + acceptjson);
+//        logger.info("accept content is " + acceptjson);
         String result = thridPartyService.getDeals(acceptjson);
         Httphelper.sendJsonMessage(result, response);
         return null;

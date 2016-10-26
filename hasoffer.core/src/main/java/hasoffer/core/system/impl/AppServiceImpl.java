@@ -88,6 +88,9 @@ public class AppServiceImpl implements IAppService {
             "SELECT t.deviceId FROM UrmUserDevice t " +
                     " where t.userId=?0";
 
+    private static final String Q_APP_URMUSERDEVICE_GETIUSERIDSBYDEVICEID =
+            "SELECT t.userId FROM UrmUserDevice t " +
+                    " where t.deviceId=?0";
 
     private static final String Q_APP_GETDEALS =
             "SELECT t FROM AppDeal t where  t.display='1' and    t.expireTime >= ?0   and t.listPageImage is not null  order by id desc   ";
@@ -250,6 +253,11 @@ public class AppServiceImpl implements IAppService {
     }
 
     @Override
+    public List<String> getUserIdsByDeviceId(String urmDeviceId) {
+        return dbm.query(Q_APP_URMUSERDEVICE_GETIUSERIDSBYDEVICEID, Arrays.asList(urmDeviceId));
+    }
+
+    @Override
     @Transactional
     public int addUrmUserDevice(List<UrmUserDevice> urmUserDevices) {
         return dbm.batchSave(urmUserDevices);
@@ -265,7 +273,7 @@ public class AppServiceImpl implements IAppService {
     @Override
     public List<String> getUserDevices(String deviceId) {
         //有的用户绑定设备列表
-        return dbm.query(Q_APP_URMDEVICE_GETIDSBYDEVICEID, 1, 5, Arrays.asList(deviceId));
+        return dbm.query(Q_APP_URMDEVICE_GETIDSBYDEVICEID, 1, 10, Arrays.asList(deviceId));
     }
 
     @Override
