@@ -12,10 +12,20 @@ public class AppMsgDisplay {
 
     private String content;
 
+
+    private String showImageUrl;
+
     public AppMsgDisplay(String outTitle, String title, String content) {
         this.outTitle = outTitle;
         this.title = title;
         this.content = content;
+    }
+
+    public AppMsgDisplay(String outTitle, String title, String content, String showImageUrl) {
+        this.outTitle = outTitle;
+        this.title = title;
+        this.content = content;
+        this.showImageUrl = showImageUrl;
     }
 
     public String getOutTitle() {
@@ -40,5 +50,13 @@ public class AppMsgDisplay {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getShowImageUrl() {
+        return showImageUrl;
+    }
+
+    public void setShowImageUrl(String showImageUrl) {
+        this.showImageUrl = showImageUrl;
     }
 }

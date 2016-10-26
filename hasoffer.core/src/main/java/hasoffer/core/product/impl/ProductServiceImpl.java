@@ -77,7 +77,7 @@ public class ProductServiceImpl implements IProductService {
     private static final String Q_NOTOFFSALE_PTM_CMPSKU =
             "SELECT t FROM PtmCmpSku t " +
                     " WHERE t.productId = ?0 " +
-                    "   AND t.status != 'OFFSALE'  " +
+                    "   AND t.status= 'ONSALE'  " +
                     " ORDER BY t.price ASC ";
 
     private static final String Q_PTM_IMAGE =

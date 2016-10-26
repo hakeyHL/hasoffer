@@ -39,7 +39,8 @@ public class OrderSAsisJobBean extends QuartzJobBean {
             //orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day2AgoTime, day2AgoTime);
             //orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.toString(), day1AgoTime, day1AgoTime);
 
-            int[] days = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 10, 13, 15, 18, 20, 25, 30, 35, 40, 45, 50};
+            int[] days = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 10, 13, 15, 18, 20, 25, 30};
+            //int[] days = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 10, 13, 15, 18, 20, 25, 30, 35, 40, 45, 50};
 
             for (int i : days) {
                 Date day = TimeUtils.addDay(todayTime, -i);
@@ -49,7 +50,7 @@ public class OrderSAsisJobBean extends QuartzJobBean {
             }
 
         } catch (Exception e) {
-            logger.error("reportOrderStatistic:任务失败,   DATE:" + new Date() + ":具体如下", e);
+            logger.error("reportOrderStatistic: update order fail.   DATE:" + new Date() + ": msg:", e);
         }
     }
 }

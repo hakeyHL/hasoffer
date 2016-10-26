@@ -139,6 +139,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             System.out.println(JSONUtil.toJSON(fetchedProduct).toString() + "id=" + skuid);
 
             try {
+                //
                 cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
             } catch (Exception e) {
                 logger.info("updateCmpSkuBySpiderFetchedProduct fail " + skuid);
