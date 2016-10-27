@@ -445,7 +445,7 @@ public class AppServiceImpl implements IAppService {
         aliExpressMap.put("Z", "");
         aliExpressMap.put("I", "");
         aliExpressMap.put("J", Website.ALIEXPRESS.toString());
-        mapList.add(shopClueMap);
+        mapList.add(aliExpressMap);
 
         return mapList;
     }
