@@ -162,25 +162,25 @@ public class FlipkartHelper {
             }
 
             if (affs.length == 1) {
-                sb.append("&affExtParam1=").append(affs[0]).append("&affExtParam2=").append(affs[0]).append("_").append("0").append("_").append("0");
+                sb.append("&affExtParam1=").append(affs[0]).append("&affExtParam2=").append(AffliIdHelper.getMarketId(affs[0])).append("_").append("0").append("_").append("0");
             } else if (affs.length == 2) {
-                sb.append("&affExtParam1=").append(affs[0]).append("&affExtParam2=").append(affs[0]).append("_").append(affs[1]).append("_").append("0");
+                sb.append("&affExtParam1=").append(affs[0]).append("&affExtParam2=").append(AffliIdHelper.getMarketId(affs[0])).append("_").append(affs[1]).append("_").append("0");
             } else if (affs.length == 3) {
-                sb.append("&affExtParam2=").append(affs[0]).append("&affExtParam2=").append(affs[0]).append("_").append(affs[1]).append("_").append(affs[2]);
+                sb.append("&affExtParam1=").append(affs[0]).append("&affExtParam2=").append(AffliIdHelper.getMarketId(affs[0])).append("_").append(affs[1]).append("_").append(affs[2]);
             }
 
         }
         return sb.toString();
     }
 
-    public static void main(String[] args) {
-        //String url = "https://www.flipkart.com/philips-qt4000-15-pro-skin-advanced-trimmer-men/p/itmdpgxmahh9kujg?pid=SHVDPGXHU2XNTYHC&fm=merchandising&iid=M_85bae8f1-8b0c-4279-86d0-75a3423cef65.2644f0e4-5ed4-4f66-be7f-54cc5e3478fd&otracker=hp_omu_Flipkart+Assured_1_2644f0e4-5ed4-4f66-be7f-54cc5e3478fd_2644f0e4-5ed4-4f66-be7f-54cc5e3478fd_1";
-        //String[] ss = new String[]{"a", "b", "c"};
-        //String s = getUrlWithAff(url, ss);
-        //System.out.println(s);
-        for (int i = 0; i < 100; i++) {
-            System.out.println(new Random().nextInt(10));
-
-        }
-    }
+    //public static void main(String[] args) {
+    //    //String url = "https://www.flipkart.com/philips-qt4000-15-pro-skin-advanced-trimmer-men/p/itmdpgxmahh9kujg?pid=SHVDPGXHU2XNTYHC&fm=merchandising&iid=M_85bae8f1-8b0c-4279-86d0-75a3423cef65.2644f0e4-5ed4-4f66-be7f-54cc5e3478fd&otracker=hp_omu_Flipkart+Assured_1_2644f0e4-5ed4-4f66-be7f-54cc5e3478fd_2644f0e4-5ed4-4f66-be7f-54cc5e3478fd_1";
+    //    //String[] ss = new String[]{"a", "b", "c"};
+    //    //String s = getUrlWithAff(url, ss);
+    //    //System.out.println(s);
+    //    for (int i = 0; i < 100; i++) {
+    //        System.out.println(new Random().nextInt(10));
+    //
+    //    }
+    //}
 }
