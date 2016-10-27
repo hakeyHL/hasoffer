@@ -21,6 +21,10 @@ public class UserSignLog {
     private String signDateStr;
 
     private String signIndDateStr;
+/*
+    private String version;
+
+    private String deviceId;*/
 
     @PersistenceConstructor
     public UserSignLog() {
