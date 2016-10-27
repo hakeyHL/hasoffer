@@ -765,7 +765,7 @@ public class SearchServiceImpl implements ISearchService {
         if (productSearchStat != null) {
             dbm.delete(SrmProductSearchStat.class, ss.getId());
         }
-        dbm.create(productSearchStat);
+        dbm.create(ss);
     }
 
     @Override
