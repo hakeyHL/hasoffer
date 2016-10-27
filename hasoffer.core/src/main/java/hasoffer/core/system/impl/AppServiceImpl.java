@@ -474,19 +474,21 @@ public class AppServiceImpl implements IAppService {
     }
 
     private String getIndexUrl(Website website, MarketChannel marketChannel, String deviceId) {
-        String[] flipkart = new String[]{"raymondzh", "zhangchen", "wangshuom"};
+
         Random random = new Random();
         Map<Website, String> indexUrlMap = new HashMap<>();
-        String flipkartAffid = flipkart[random.nextInt(flipkart.length)];
+        String flipkartAffid = AffliIdHelper.FLIKART_YEAHMOBI_FLIDS[random.nextInt(AffliIdHelper.FLIKART_YEAHMOBI_FLIDS.length)];
         String flipkartExtParam1 = AffliIdHelper.getMarketId(marketChannel);
-        if ("raymondzh".equals(flipkartAffid)) {
-            flipkartExtParam1 = "103662";
+        if (Arrays.asList(AffliIdHelper.FLIKART_YEAHMOBI_FLIDS).contains(flipkartAffid)) {
+            String[] affExtParams = new String[]{"103662", "103650", "103647", "103643"};
+            flipkartExtParam1 = affExtParams[random.nextInt(affExtParams.length)];
         }
         indexUrlMap.put(Website.FLIPKART, "http://dl.flipkart.com/dl/?affid=" + flipkartAffid + "&affExtParam1=" + flipkartExtParam1 + "&affExtParam2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0");
 
         String[] snapDealAffids = new String[]{"112338"};
-        String snapDealAffid = flipkart[random.nextInt(snapDealAffids.length)];
+        String snapDealAffid = snapDealAffids[random.nextInt(snapDealAffids.length)];
         String snapDealExtParam1 = AffliIdHelper.getMarketId(marketChannel);
+        // 112338是yeahmobi申请的snapdeal帐号
         if ("112338".equals(flipkartAffid)) {
             snapDealExtParam1 = "103662";
         }
