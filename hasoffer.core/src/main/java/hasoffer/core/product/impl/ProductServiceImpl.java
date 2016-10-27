@@ -707,12 +707,26 @@ public class ProductServiceImpl implements IProductService {
         }
 
         List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(product.getId());
+        Map<Website, PtmCmpSku> cmpSkuMap = new HashMap<>();
+        //no skus ,skip .
         if (cmpSkus == null || cmpSkus.size() < 1) {
             return null;
+        } else {
+            //if has onsale sku
+            int onsaleSkuSize = 0;
+            for (PtmCmpSku cmpSku : cmpSkus) {
+                if (cmpSku.getStatus().name().equals("ONSALE")) {
+                    onsaleSkuSize++;
+                    break;
+                }
+            }
+            if (onsaleSkuSize == 0) {
+                return null;
+            }
         }
-        Map<Website, PtmCmpSku> cmpSkuMap = new HashMap<>();
+
         for (PtmCmpSku cmpSku : cmpSkus) {
-            if (cmpSku.getStatus() == SkuStatus.OFFSALE || cmpSku.getPrice() <= 0) {
+            if (cmpSku.getStatus() == SkuStatus.ONSALE || cmpSku.getPrice() <= 0) {
                 continue;
             }
 
