@@ -214,8 +214,15 @@ public class ProductServiceImpl implements IProductService {
         for (int i = 0; i < skus.size(); i++) {
 
             PtmCmpSku sku = skus.get(i);
+            /*
+            2016-10-27 10:26:00
+            修改价格更新策略，前台只返回onsale的数据
+             */
             //status
-            if (sku.getStatus() == SkuStatus.OFFSALE) {
+//            if (sku.getStatus() == SkuStatus.OFFSALE) {
+//                continue;
+//            }
+            if (sku.getStatus() != SkuStatus.ONSALE) {
                 continue;
             }
             //price
