@@ -514,13 +514,16 @@ public class AppServiceImpl implements IAppService {
     }
 
     private String getAliExpressIndexUrl(MarketChannel marketChannel, String deviceId) {
-        String url = "http://s.click.aliexpress.com/e/";
-        Random random = new Random();
-        if (random.nextInt(30) == 1) {
-            String[] aliExpresses = new String[]{"qbA6QFyv3", "dkAEi2de1"};
-            url = url + aliExpresses[random.nextInt(aliExpresses.length)];
-        }
-        return new String(org.apache.commons.codec.binary.Base64.encodeBase64(url.getBytes(Charset.forName("UTF-8"))));
+        return "";
+        //Random random = new Random();
+        //if (random.nextInt(30) == 1) {
+        //    String url = "http://s.click.aliexpress.com/e/";
+        //    String[] aliExpresses = new String[]{"qbA6QFyv3", "dkAEi2de1"};
+        //    url = url + aliExpresses[random.nextInt(aliExpresses.length)];
+        //    return new String(org.apache.commons.codec.binary.Base64.encodeBase64(url.getBytes(Charset.forName("UTF-8"))));
+        //}else {
+        //    return "";
+        //}
     }
 
     @Override
