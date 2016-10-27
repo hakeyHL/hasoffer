@@ -234,7 +234,7 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
 
 
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error("Get OrderTime error. Msg:{}", e);
         }
         Set<String> deviceSet = new HashSet<>();
         for (AffiliateOrder order : orderList) {
@@ -272,19 +272,19 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
             try {
                 po.setOrderTime(DateUtils.parseDate(order.getOrderDate(), "dd-MM-yyyy HH:mm:ss"));
             } catch (ParseException e) {
-                e.printStackTrace();
+                logger.error("Get OrderTime error. Msg:{}", e);
             }
             String extParam1 = order.getAffExtParam1();
-            String channel = extParam1 == null || "".equals(extParam1) ? "NONE" : extParam1;
+            String channel = extParam1 == null || "".equals(extParam1) ? MarketChannel.NONE.name() : extParam1;
             po.setChannel(channel);
             po.setChannelSrc(channel);
             try {
-                if (("NONE".equals(po.getChannel()) || "LeoMaster".equals(po.getChannel())) && po.getOrderTime().after(DateUtils.parseDate("2016-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"))) {
+                if ((MarketChannel.NONE.name().equals(po.getChannel()) || MarketChannel.LeoMaster.name().equals(po.getChannel())) && po.getOrderTime().after(DateUtils.parseDate("2016-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"))) {
                     MarketChannel channelByAffId = getChannelByAffId(po.getAffID());
-                    po.setChannel(channelByAffId.toString());
+                    po.setChannel(channelByAffId.name());
                 }
             } catch (ParseException e) {
-                e.printStackTrace();
+                logger.error("Get channel error. Msg:{}", e);
             }
             String deviceId_userId = order.getAffExtParam2();
             if (deviceId_userId != null && !"".equals(deviceId_userId)) {
