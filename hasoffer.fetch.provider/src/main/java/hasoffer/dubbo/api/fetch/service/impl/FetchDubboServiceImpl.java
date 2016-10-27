@@ -78,7 +78,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
         FetchUrlResult fetchUrlResult = new FetchUrlResult(website, url, seconds);
         fetchUrlResult.setTaskStatus(TaskStatus.START);
         fetchUrlResult.setDate(new Date());
-        String redisKey = RedisKeysUtils.getWaitUrlListKey(taskLevel);
+        String redisKey = RedisKeysUtils.getWaitUrlListKey(taskLevel, website);
         try {
             String key = FetchUrlResult.getCacheKey(fetchUrlResult);
             if (key == null) {

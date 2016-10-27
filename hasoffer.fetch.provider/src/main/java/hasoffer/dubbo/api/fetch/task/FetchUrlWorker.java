@@ -2,6 +2,7 @@ package hasoffer.dubbo.api.fetch.task;
 
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
+import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.spider.api.ISpiderService;
 import hasoffer.spider.api.impl.SpiderServiceImpl;
@@ -22,28 +23,31 @@ public class FetchUrlWorker implements Runnable {
 
     private IFetchCacheService fetchCacheService;
 
+    private Website website;
+
     private ISpiderService fetchService = new SpiderServiceImpl();
 
-    public FetchUrlWorker(WebApplicationContext springContext) {
-        fetchCacheService = (IFetchCacheService) springContext.getBean("fetchCacheService");
+    public FetchUrlWorker(WebApplicationContext springContext, Website website) {
+        this.website = website;
+        this.fetchCacheService = (IFetchCacheService) springContext.getBean("fetchCacheService");
     }
 
     @Override
     public void run() {
         while (true) {
             try {
-                Object pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_1));
+                Object pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_1, website));
                 if (pop == null) {
-                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_2));
+                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_2, website));
                 }
                 if (pop == null) {
-                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_3));
+                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_3, website));
                 }
                 if (pop == null) {
-                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_4));
+                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_4, website));
                 }
                 if (pop == null) {
-                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_5));
+                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_5, website));
                 }
                 if (pop == null) {
                     TimeUnit.MINUTES.sleep(1);

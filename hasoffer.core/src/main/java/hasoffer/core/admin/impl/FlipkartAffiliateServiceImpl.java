@@ -5,6 +5,7 @@ import hasoffer.affiliate.affs.flipkart.FlipkartAffiliateProductProcessor;
 import hasoffer.affiliate.model.AffiliateOrder;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.AffliIdHelper;
 import hasoffer.core.admin.IFlipkartAffiliateService;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.urm.UrmDevice;
@@ -35,26 +36,20 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
 
     private static MarketChannel getChannelByAffId(String affId) {
         if (affId == null) {
-            return MarketChannel.TEST;
+            return MarketChannel.NONE;
         }
-        String[] leomasterFields = new String[]{"hlhakeygm", "oliviersl", "wuningSFg"};
-        String[] nineAppsFields = new String[]{"Sunyukunj", "gczyfw201", "xyangryrg", "zhouxixi0", "harveyouo", "allenooou"};
-        String[] shanchuanFields = new String[]{"160082642", "286867656", "289063282", "514330076", "602074420", "943546560"};
-        String[] googleplayFields = new String[]{"115377600"};
-        //String[] otherFields = new String[]{"120527343"};
-        String[] zukFields = new String[]{"747306881"};
-        if (Arrays.asList(leomasterFields).contains(affId)) {
+        if (Arrays.asList(AffliIdHelper.FLIKART_SHANCHUAN_FLIDS).contains(affId)) {
             return MarketChannel.SHANCHUAN;
-        } else if (Arrays.asList(nineAppsFields).contains(affId)) {
+        } else if (Arrays.asList(AffliIdHelper.FLIKART_NINEAPPS_FLIDS).contains(affId)) {
             return MarketChannel.NINEAPPS;
-        } else if (Arrays.asList(shanchuanFields).contains(affId)) {
-            return MarketChannel.SHANCHUAN;
-        } else if (Arrays.asList(googleplayFields).contains(affId)) {
+        } else if (Arrays.asList(AffliIdHelper.FLIKART_LEO_FLIDS).contains(affId)) {
+            return MarketChannel.LEO;
+        } else if (Arrays.asList(AffliIdHelper.FLIKART_GOOGLEPLAY_FLIDS).contains(affId)) {
             return MarketChannel.GOOGLEPLAY;
-        } else if (Arrays.asList(zukFields).contains(affId)) {
+        } else if (Arrays.asList(AffliIdHelper.FLIKART_ZUK_FLIDS).contains(affId)) {
             return MarketChannel.ZUK;
         }
-        return MarketChannel.TEST;
+        return MarketChannel.NONE;
 
     }
 
@@ -231,10 +226,15 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
             TimeUnit.SECONDS.sleep(3);
             orderList.addAll(getOrderList("wangshuom", "fb22aa12b24249ab88a051070c314ab5", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
             logger.info("over wangshuom: order.size={}", orderList.size());
+            TimeUnit.SECONDS.sleep(3);
+            orderList.addAll(getOrderList("abbott1981", "5cf8f2cf2b3b4dc1a8af9ece67a57698", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
+            TimeUnit.SECONDS.sleep(3);
+            orderList.addAll(getOrderList("abbott1981", "5cf8f2cf2b3b4dc1a8af9ece67a57698", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
+            logger.info("over abbott1981: order.size={}", orderList.size());
 
 
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error("Get OrderTime error. Msg:{}", e);
         }
         Set<String> deviceSet = new HashSet<>();
         for (AffiliateOrder order : orderList) {
@@ -243,10 +243,15 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
                 continue;
             }
             String[] tempArray = affExtParam2.split("_");
-            if (tempArray.length == 2) {
+            // 只有一个值的时候，肯定是设备ID
+            // 有两个的时候，因为在后面加了一个用户
+            // 有三个的时候，因为在首页劫持加了网盟，第一个参数表示渠道，第二个表示设备，第三个表示用户，所以，将来统一改成三个。
+            if (tempArray.length == 1) {
                 deviceSet.add(tempArray[0]);
-            } else {
+            } else if (tempArray.length == 2) {
                 deviceSet.add(tempArray[0]);
+            } else if (tempArray.length == 3) {
+                deviceSet.add(tempArray[1]);
             }
         }
 
@@ -267,19 +272,19 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
             try {
                 po.setOrderTime(DateUtils.parseDate(order.getOrderDate(), "dd-MM-yyyy HH:mm:ss"));
             } catch (ParseException e) {
-                e.printStackTrace();
+                logger.error("Get OrderTime error. Msg:{}", e);
             }
             String extParam1 = order.getAffExtParam1();
-            String channel = extParam1 == null || "".equals(extParam1) ? "NONE" : extParam1;
+            String channel = extParam1 == null || "".equals(extParam1) ? MarketChannel.NONE.name() : extParam1;
             po.setChannel(channel);
             po.setChannelSrc(channel);
             try {
-                if (("NONE".equals(po.getChannel()) || "LeoMaster".equals(po.getChannel())) && po.getOrderTime().after(DateUtils.parseDate("2016-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"))) {
+                if ((MarketChannel.NONE.name().equals(po.getChannel()) || MarketChannel.LeoMaster.name().equals(po.getChannel())) && po.getOrderTime().after(DateUtils.parseDate("2016-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"))) {
                     MarketChannel channelByAffId = getChannelByAffId(po.getAffID());
-                    po.setChannel(channelByAffId.toString());
+                    po.setChannel(channelByAffId.name());
                 }
             } catch (ParseException e) {
-                e.printStackTrace();
+                logger.error("Get channel error. Msg:{}", e);
             }
             String deviceId_userId = order.getAffExtParam2();
             if (deviceId_userId != null && !"".equals(deviceId_userId)) {
@@ -287,8 +292,10 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
                 if (tempArray.length == 2) {
                     po.setDeviceId(tempArray[0]);
                     po.setUserId(tempArray[1]);
-                } else {
-                    po.setDeviceId(tempArray[0]);
+                } else if (tempArray.length == 3) {
+                    po.setChannel(AffliIdHelper.getMarketChannelById(tempArray[0]).name());
+                    po.setDeviceId(tempArray[1]);
+                    po.setDeviceId(tempArray[2]);
                 }
             }
             po.setOrderStatus(order.getStatus());
