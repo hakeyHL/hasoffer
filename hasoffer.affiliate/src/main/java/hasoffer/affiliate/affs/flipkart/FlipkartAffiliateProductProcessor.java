@@ -181,7 +181,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
             }
             return orderList;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Get Order List From Flipkart error. Msg:{}", e);
             return new ArrayList<>();
         }
 

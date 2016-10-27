@@ -1,5 +1,6 @@
 package hasoffer.dubbo.api.listener;
 
+import hasoffer.base.model.Website;
 import hasoffer.base.thread.HasofferThreadFactory;
 import hasoffer.dubbo.api.fetch.task.FetchKeywordWorker;
 import hasoffer.dubbo.api.fetch.task.FetchUrlWorker;
@@ -19,24 +20,57 @@ public class FetchListener extends ContextLoaderListener {
     @Override
     public void contextInitialized(ServletContextEvent event) {
         springContext = WebApplicationContextUtils.getWebApplicationContext(event.getServletContext());
-
-        initThread();
+        initUrlThread();
+        initKeyWordThread();
     }
 
-    private void initThread() {
+    private void initUrlThread() {
+        HasofferThreadFactory factory = new HasofferThreadFactory("FetchUrlWorker");
+        ExecutorService es = Executors.newCachedThreadPool(factory);
 
+        for (int i = 0; i < 1; i++) {
+            es.execute(new FetchUrlWorker(springContext, Website.AMAZON));
+        }
+
+        for (int i = 0; i < 15; i++) {
+            es.execute(new FetchUrlWorker(springContext, Website.FLIPKART));
+        }
+
+        for (int i = 0; i < 3; i++) {
+            es.execute(new FetchUrlWorker(springContext, Website.SNAPDEAL));
+        }
+
+        for (int i = 0; i < 3; i++) {
+            es.execute(new FetchUrlWorker(springContext, Website.EBAY));
+        }
+
+        for (int i = 0; i < 3; i++) {
+            es.execute(new FetchUrlWorker(springContext, Website.SHOPCLUES));
+        }
+
+        for (int i = 0; i < 1; i++) {
+            es.execute(new FetchUrlWorker(springContext, Website.PAYTM));
+        }
+
+        for (int i = 0; i < 1; i++) {
+            es.execute(new FetchUrlWorker(springContext, Website.MYNTRA));
+        }
+
+        for (int i = 0; i < 1; i++) {
+            es.execute(new FetchUrlWorker(springContext, Website.INFIBEAM));
+        }
+
+        for (int i = 0; i < 1; i++) {
+            es.execute(new FetchUrlWorker(springContext, Website.JABONG));
+        }
+    }
+
+    private void initKeyWordThread() {
         HasofferThreadFactory factory = new HasofferThreadFactory("FetchKeywordWorker");
         ExecutorService es = Executors.newCachedThreadPool(factory);
         for (int i = 0; i < 20; i++) {
             es.execute(new FetchKeywordWorker(springContext));
         }
-
-        factory = new HasofferThreadFactory("FetchUrlWorker");
-        es = Executors.newCachedThreadPool(factory);
-        for (int i = 0; i < 20; i++) {
-            es.execute(new FetchUrlWorker(springContext));
-        }
-
     }
 
     @Override
