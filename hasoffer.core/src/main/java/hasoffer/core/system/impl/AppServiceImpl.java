@@ -416,7 +416,7 @@ public class AppServiceImpl implements IAppService {
         Map<String, String> flipkartMap = new HashMap<>();
         //X: 网站编号；Y：联盟ID；Z：渠道编号
         flipkartMap.put("X", getPackageName(Website.FLIPKART));
-        flipkartMap.put("Y", getIndexUrl(Website.FLIPKART, marketChannel, deviceId));
+        flipkartMap.put("Y", getFlipkartIndexUrl(marketChannel, deviceId));
         flipkartMap.put("Z", getLiveDemo(Website.FLIPKART, marketChannel, deviceId));
         flipkartMap.put("I", getInstallUrl(Website.FLIPKART));
         flipkartMap.put("J", Website.FLIPKART.toString());
@@ -425,7 +425,7 @@ public class AppServiceImpl implements IAppService {
 
         Map<String, String> snapDealMap = new HashMap<>();
         snapDealMap.put("X", getPackageName(Website.SNAPDEAL));
-        snapDealMap.put("Y", getIndexUrl(Website.SNAPDEAL, marketChannel, deviceId));
+        snapDealMap.put("Y", getSnapDealIndexUrl(marketChannel, deviceId));
         snapDealMap.put("Z", getLiveDemo(Website.SNAPDEAL, marketChannel, deviceId));
         snapDealMap.put("I", getInstallUrl(Website.SNAPDEAL));
         snapDealMap.put("J", Website.SNAPDEAL.toString());
@@ -433,10 +433,18 @@ public class AppServiceImpl implements IAppService {
 
         Map<String, String> shopClueMap = new HashMap<>();
         shopClueMap.put("X", getPackageName(Website.SHOPCLUES));
-        shopClueMap.put("Y", getIndexUrl(Website.SHOPCLUES, marketChannel, deviceId));
+        shopClueMap.put("Y", getShopCluesIndexUrl());
         shopClueMap.put("Z", getLiveDemo(Website.SHOPCLUES, marketChannel, deviceId));
         shopClueMap.put("I", getInstallUrl(Website.SHOPCLUES));
         shopClueMap.put("J", Website.SHOPCLUES.toString());
+        mapList.add(shopClueMap);
+
+        Map<String, String> aliExpressMap = new HashMap<>();
+        aliExpressMap.put("X", getPackageName(Website.ALIEXPRESS));
+        aliExpressMap.put("Y", getAliExpressIndexUrl(marketChannel, deviceId));
+        aliExpressMap.put("Z", "");
+        aliExpressMap.put("I", "");
+        aliExpressMap.put("J", Website.ALIEXPRESS.toString());
         mapList.add(shopClueMap);
 
         return mapList;
@@ -459,6 +467,7 @@ public class AppServiceImpl implements IAppService {
         packageMap.put(Website.FLIPKART, "com.flipkart.android");
         packageMap.put(Website.SNAPDEAL, "com.snapdeal.main");
         packageMap.put(Website.SHOPCLUES, "com.shopclues");
+        packageMap.put(Website.ALIEXPRESS, "com.alibaba.aliexpresshd");
         //packageMap.put(Website.EBAY, "com.ebay.mobile");
         return packageMap.get(website);
     }
@@ -473,35 +482,45 @@ public class AppServiceImpl implements IAppService {
         return liveDemoMap.get(website);
     }
 
-    private String getIndexUrl(Website website, MarketChannel marketChannel, String deviceId) {
+    private String getFlipkartIndexUrl(MarketChannel marketChannel, String deviceId) {
 
         Random random = new Random();
-        Map<Website, String> indexUrlMap = new HashMap<>();
         String flipkartAffid = AffliIdHelper.FLIKART_YEAHMOBI_FLIDS[random.nextInt(AffliIdHelper.FLIKART_YEAHMOBI_FLIDS.length)];
         String flipkartExtParam1 = AffliIdHelper.getMarketId(marketChannel);
         if (Arrays.asList(AffliIdHelper.FLIKART_YEAHMOBI_FLIDS).contains(flipkartAffid)) {
             String[] affExtParams = new String[]{"103662", "103650", "103647", "103643"};
             flipkartExtParam1 = affExtParams[random.nextInt(affExtParams.length)];
         }
-        indexUrlMap.put(Website.FLIPKART, "http://dl.flipkart.com/dl/?affid=" + flipkartAffid + "&affExtParam1=" + flipkartExtParam1 + "&affExtParam2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0");
+        String url = "http://dl.flipkart.com/dl/?affid=" + flipkartAffid + "&affExtParam1=" + flipkartExtParam1 + "&affExtParam2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0";
+        return new String(org.apache.commons.codec.binary.Base64.encodeBase64(url.getBytes(Charset.forName("UTF-8"))));
+    }
 
+    private String getSnapDealIndexUrl(MarketChannel marketChannel, String deviceId) {
+        Random random = new Random();
         String[] snapDealAffids = new String[]{"112338"};
         String snapDealAffid = snapDealAffids[random.nextInt(snapDealAffids.length)];
         String snapDealExtParam1 = AffliIdHelper.getMarketId(marketChannel);
         // 112338是yeahmobi申请的snapdeal帐号
-        if ("112338".equals(flipkartAffid)) {
+        if ("112338".equals(snapDealAffid)) {
             snapDealExtParam1 = "103662";
         }
-        indexUrlMap.put(Website.SNAPDEAL, "android-app://com.snapdeal.main/snapdeal/m.snapdeal.com?aff_id=" + snapDealAffid + "&utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_sub=" + snapDealExtParam1 + "&aff_sub2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0");
-        indexUrlMap.put(Website.SHOPCLUES, "http://www.shopclues.com/?ty=0&id=none&mcid=aff&utm_source=Hasoffer&OfferId=15");
-        //indexUrlMap.put(Website.EBAY, "http://genlin.ss/?ty=0&id=none&mcid=aff&utm_source=Hasoffer&OfferId=15");
-        String s = indexUrlMap.get(website);
-        logger.info("url:{}", s);
-        if (s == null) {
-            return "";
-        } else {
-            return new String(org.apache.commons.codec.binary.Base64.encodeBase64(s.getBytes(Charset.forName("UTF-8"))));
+        String url = "android-app://com.snapdeal.main/snapdeal/m.snapdeal.com?aff_id=" + snapDealAffid + "&utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_sub=" + snapDealExtParam1 + "&aff_sub2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0";
+        return new String(org.apache.commons.codec.binary.Base64.encodeBase64(url.getBytes(Charset.forName("UTF-8"))));
+    }
+
+    private String getShopCluesIndexUrl() {
+        String url = "http://www.shopclues.com/?ty=0&id=none&mcid=aff&utm_source=Hasoffer&OfferId=15";
+        return new String(org.apache.commons.codec.binary.Base64.encodeBase64(url.getBytes(Charset.forName("UTF-8"))));
+    }
+
+    private String getAliExpressIndexUrl(MarketChannel marketChannel, String deviceId) {
+        String url = "http://s.click.aliexpress.com/e/";
+        Random random = new Random();
+        if (random.nextInt(30) == 1) {
+            String[] aliExpresses = new String[]{"qbA6QFyv3", "dkAEi2de1"};
+            url = url + aliExpresses[random.nextInt(aliExpresses.length)];
         }
+        return new String(org.apache.commons.codec.binary.Base64.encodeBase64(url.getBytes(Charset.forName("UTF-8"))));
     }
 
     @Override
