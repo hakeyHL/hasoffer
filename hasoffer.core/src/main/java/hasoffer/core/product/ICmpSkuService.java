@@ -20,6 +20,17 @@ import java.util.List;
  */
 public interface ICmpSkuService {
 
+    /**
+     * 该方法用来根据sourceSid和website在数据库中准确定位一个或者多个符合条件的sku信息
+     *
+     * @param sourceSid
+     * @param website
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    List<PtmCmpSku> getPtmCmpSkuListBySourceSidAndWebsite(String sourceSid, Website website, int page, int pageSize);
+
     List<PriceNode> queryHistoryPrice(long id);
 
     void saveHistoryPrice(long id, Date time, float price);
@@ -42,6 +53,7 @@ public interface ICmpSkuService {
 
     /**
      * SKU更新，通过spider 更新数据。
+     *
      * @param skuId
      * @param fetchedProduct
      */

@@ -1,6 +1,9 @@
 package hasoffer.core.test.m;
 
+import hasoffer.base.model.Website;
+import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.sites.snapdeal.SnapdealHelper;
+import org.junit.Test;
 
 /**
  * Date : 2016/4/13
@@ -55,6 +58,15 @@ public class SnapdealUrlTest {
         String u = "https://m.snapdeal.com/product/favourite-bikerz-oneside-black-leatherette/676589481376?aff_id=82856&utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_sub=174675";
 
         System.out.println(u.substring(0,100));
+    }
+
+    @Test
+    public void test2() {
+        String url = "https://m.snapdeal.com/product/diamond-interiors-premium-queen-size/630909501982";
+        Website webSite = WebsiteHelper.getWebSite(url);
+        String sourceSid = SnapdealHelper.getSkuIdByUrl(url);
+        System.out.println(sourceSid);
+        System.out.println(webSite);
     }
 
 }

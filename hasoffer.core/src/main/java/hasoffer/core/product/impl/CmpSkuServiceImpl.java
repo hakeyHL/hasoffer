@@ -62,6 +62,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
     private final String Q_CMPSKU_INDEX_BY_SOURCESID = "select t from PtmCmpSkuIndex2 t where t.siteSourceSidIndex = ?0 ";
     private final String Q_CMPSKU_STORES_BY_PRODUCTID = "SELECT  DISTINCT t.website  from PtmCmpSku t where t.productId=?0 and t.status='ONSALE'";
+    private final String Q_PTMCMPSKULIST_BY_SOURCESID_WEBSITE = "SELECT t FROM PtmCmpSku t WHERE t.website = ?0 AND t.sourceSid = ?1";
 
     @Resource
     IFetchService fetchService;
@@ -75,6 +76,11 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     IPtmCmpSkuImageService ptmCmpSkuImageService;
 
     private Logger logger = LoggerFactory.getLogger(CmpSkuServiceImpl.class);
+
+    @Override
+    public List<PtmCmpSku> getPtmCmpSkuListBySourceSidAndWebsite(String sourceSid, Website website, int page, int pageSize) {
+        return (List<PtmCmpSku>) dbm.queryPage(Q_PTMCMPSKULIST_BY_SOURCESID_WEBSITE, page, pageSize, Arrays.asList(website, sourceSid));
+    }
 
     @Override
     public List<PriceNode> queryHistoryPrice(long id) {
