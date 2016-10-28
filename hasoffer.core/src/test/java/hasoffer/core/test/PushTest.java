@@ -614,4 +614,30 @@ public class PushTest {
 
     }
 
+    @Test
+    public void test4() throws Exception {
+
+        List<String> tokenList = new ArrayList<>();
+
+
+//        tokenList.add("这里将urmdeice表里面，apptype='APP' appversion = 29 的用户的gcmtoken查出来")
+
+        AppPushMessage message = new AppPushMessage(
+//                new AppMsgDisplay("第一个参数=第二个参数+第三个参数","第二个参数，商品标题","第三个参数，加个描述"),//此处可以仿照下面搞一下
+                new AppMsgDisplay("Lenovo PHAB 16 GB 6.98 inch with Wi-Fi+4G  (Ebony) Now available at Rs.10,999, click to view details.  ", "Lenovo PHAB 16 GB 6.98 inch with Wi-Fi+4G  (Ebony) ", "Now available at Rs.10,999, click to view details. "),
+//                null,这个地方为null的话，客户端不会显示
+                new AppMsgClick(AppMsgClickType.DEAL, "99000264", "com.flipkart.android")
+        );
+
+        AppPushBo pushBo = new AppPushBo("678678", "19:50", message);//前俩个参数任意
+
+
+
+        MulticastResult multicastResult = new PushServiceImpl().GroupPush(tokenList, pushBo);
+
+        System.out.println(multicastResult);
+
+    }
+
+
 }
