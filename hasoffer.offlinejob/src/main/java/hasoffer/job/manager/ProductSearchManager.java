@@ -26,6 +26,9 @@ import java.util.Map;
  */
 @Component
 public class ProductSearchManager {
+
+    private final Logger searchLog = LoggerFactory.getLogger("StatSearchLogJobBean.log");
+
     @Resource
     IProductService productService;
     @Resource
@@ -40,7 +43,7 @@ public class ProductSearchManager {
 
     public void saveSearchCount(String ymd) {
         logger.debug(String.format("save search count [%s]", ymd));
-
+        searchLog.info("saveSearchCount(String ymd) start.");
         List<SrmProductSearchCount> spscs = new ArrayList<>();
 
         Map<Long, Long> countMap = searchLogCacheManager.getProductCount(ymd);
@@ -65,6 +68,7 @@ public class ProductSearchManager {
         if (ArrayUtils.hasObjs(spscs)) {
             saveLogCount(spscs);
         }
+        searchLog.info("saveSearchCount(String ymd) end.");
     }
 
     @DataSource(DataSourceType.Slave)

@@ -46,23 +46,20 @@ import java.util.*;
 
 @Service
 public class ProductServiceImpl implements IProductService {
+
     private static final String Q_PRODUCT =
             "SELECT t FROM PtmProduct t";
-
     private static final String Q_PRODUCT_BY_CATEGORY =
             "SELECT t FROM PtmProduct t WHERE t.categoryId = ?0";
-
     private static final String Q_PRODUCT_BY_CREATETIME =
             "SELECT t FROM PtmProduct t " +
                     " WHERE t.createTime > ?0 " +
                     "   AND t.sourceSite <> 'MYSMARTPRICE' " +
                     " ORDER BY t.createTime ASC ";
-
     private static final String Q_PTM_CMPSKU =
             "SELECT t FROM PtmCmpSku t " +
                     " WHERE t.productId = ?0   " +
                     " ORDER BY t.price ASC ";
-
     private static final String Q_ONSALE_PTM_CMPSKU =
             "SELECT  t " +
                     "FROM " +
@@ -73,20 +70,17 @@ public class ProductServiceImpl implements IProductService {
                     "AND t.status='ONSALE' " +
                     "ORDER BY " +
                     " t.price ASC";
-
     private static final String Q_NOTOFFSALE_PTM_CMPSKU =
             "SELECT t FROM PtmCmpSku t " +
                     " WHERE t.productId = ?0 " +
                     "   AND t.status= 'ONSALE'  " +
                     " ORDER BY t.price ASC ";
-
     private static final String Q_PTM_IMAGE =
             "SELECT t FROM PtmImage t " +
                     " WHERE t.productId = ?0  ";
-
     private static final String Q_PTM_TOPSEELLING =
             "select t from PtmTopSelling t where   t.status='ONLINE'  order by t.lUpdateTime desc , t.count desc ";
-
+    private final Logger searchLog = LoggerFactory.getLogger("StatSearchLogJobBean.log");
     @Resource
     ISearchService searchService;
     @Resource
@@ -276,6 +270,8 @@ public class ProductServiceImpl implements IProductService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void expTopSellingsFromSearchCount(String ymd) {
+        searchLog.info("expTopSellingsFromSearchCount(String ymd) {} :start.", ymd);
+
         // 查询
         int page = 1, size = 40;
         PageableResult<SrmProductSearchCount> pagedSearchCounts = searchService.findSearchCountsByYmd(ymd, page, size);
@@ -302,6 +298,7 @@ public class ProductServiceImpl implements IProductService {
         }
 
         dbm.batchSave(topSellings);
+        searchLog.info("expTopSellingsFromSearchCount(String ymd) {} :end.", ymd);
     }
 
     @Override

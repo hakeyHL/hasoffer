@@ -8,6 +8,8 @@ import hasoffer.core.search.ISearchService;
 import hasoffer.job.manager.ProductSearchManager;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import javax.annotation.Resource;
@@ -16,6 +18,8 @@ import javax.annotation.Resource;
  * Created on 2016/6/27.
  */
 public class StatSearchLogJobBean extends QuartzJobBean {
+
+    private final Logger logger = LoggerFactory.getLogger("StatSearchLogJobBean.log");
 
     @Resource
     SearchLogCacheManager logCacheManager;
@@ -28,23 +32,26 @@ public class StatSearchLogJobBean extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-//        String ymd = TimeUtils.parse(TimeUtils.today(), "yyyyMMdd");
         String ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
 
-        System.out.println("ymd = " + ymd);
-        System.out.println("saveSearchCount...");
+        //System.out.println("ymd = " + ymd);
+        logger.info("ymd = " + ymd);
+        //System.out.println("saveSearchCount...");
+        logger.info("saveSearchCount...");
         // 保存所有被搜索过的商品
         productSearchManager.saveSearchCount(ymd);
 
-        System.out.println("expTopSellingsFromSearchCount...");
+        logger.info("expTopSellingsFromSearchCount...");
+        //System.out.println("expTopSellingsFromSearchCount...");
         // top selling
         productService.expTopSellingsFromSearchCount(ymd);
 
-        System.out.println("statSearchCount...");
+        logger.info("statSearchCount...");
+        //System.out.println("statSearchCount...");
         // 统计比价质量
         SrmProductSearchStat ss = searchService.statSearchCount(ymd);
         searchService.saveSrmProductSearchStat(ss);
-
-        System.out.println("StatSearchLogJobBean finished.");
+        logger.info("StatSearchLogJobBean finished.");
+        //System.out.println("StatSearchLogJobBean finished.");
     }
 }
