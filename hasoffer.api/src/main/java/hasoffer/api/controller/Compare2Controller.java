@@ -11,6 +11,7 @@ import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.HexDigestUtil;
+import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.app.impl.AppCmpServiceImpl;
 import hasoffer.core.app.vo.*;
@@ -27,6 +28,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
@@ -46,6 +48,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
@@ -85,6 +88,9 @@ public class Compare2Controller {
     AppCmpServiceImpl appCmpService;
     @Resource
     ApiUtils apiUtils;
+    @Resource
+    ICmpSkuService cmpSkuService;
+
     private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
 
     public static void main(String[] args) throws Exception {
@@ -413,6 +419,100 @@ public class Compare2Controller {
         }
         return affs;
     }
+
+    /**
+     * 给vc开发用的
+     *
+     * @param url
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @RequestMapping(value = "/newnewconfig", method = RequestMethod.POST)
+    @ResponseBody
+    public String newnewconfig(@RequestParam String url,
+                               @RequestParam(defaultValue = "1") int page,
+                               @RequestParam(defaultValue = "20") int pageSize) {
+
+        String json = "";
+
+        //先手sourceSid匹配，如果沒有数据，再走原有的接口
+        //上传的url不为空
+        if (!org.apache.commons.lang3.StringUtils.isBlank(url)) {
+
+            Website website = WebsiteHelper.getWebSite(url);
+
+            String sourceSid = WebsiteHelper.getSkuIdFromUrl(website, url);
+
+            //todo 这个方法没有加缓存
+            json = getSkuListBySourceSidAndWebsite(website, sourceSid, page, pageSize);
+
+            //判断如果上面还是空的,走/cmp/sdk/cmpskus
+            if (StringUtils.isEmpty(json)) {
+
+//                SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, pageSize);
+                SearchIO sio = new SearchIO(sourceSid, "", "", website.name(), "0", null, "", page, pageSize);
+                getSioBySearch(sio);
+                json = appCmpService.sdkCmpSku(sio);
+
+            }
+        }
+
+        return json;
+    }
+
+    /**
+     * 这是根据sourceSid+website直接走数据库的匹配逻辑
+     *
+     * @param website
+     * @param sourceSid
+     * @return
+     */
+    private String getSkuListBySourceSidAndWebsite(Website website, String sourceSid, int page, int pageSize) {
+        //网站不为空
+        if (website != null) {
+
+            if (Website.SNAPDEAL.equals(website) || Website.FLIPKART.equals(website)) {
+
+                List<PtmCmpSku> skuList = cmpSkuService.getPtmCmpSkuListBySourceSidAndWebsite(sourceSid, Website.FLIPKART, page, pageSize);
+
+                //这里返回的是一个sourceSid与请求url相同且网站是FLIPKART的集合
+                //可能会根据某个条件筛选来进行优化，
+                //此处暂时有数据就返回的策略
+                if (skuList != null && skuList.size() != 0) {
+                    //外层循环用来控制遍历数据库返回的skuList
+                    for (int i = 0; i < skuList.size() - 1; i++) {
+
+                        PtmCmpSku ptmCmpSku = skuList.get(i);
+
+                        List<PtmCmpSku> resultSkuList = cmpSkuService.listCmpSkus(ptmCmpSku.getProductId());
+
+                        //内层循环用来控制遍历按照sku的productId返回的sku列表
+                        for (int j = resultSkuList.size() - 1; j >= 0; j--) {
+                            ptmCmpSku = resultSkuList.get(j);
+                            //价格为0过滤
+                            if (ptmCmpSku.getPrice() <= 0) {
+                                resultSkuList.remove(j);
+                                continue;
+                            }
+                            //状态不是onsale过滤
+                            if (ptmCmpSku.getStatus() != SkuStatus.ONSALE) {
+                                resultSkuList.remove(j);
+                                continue;
+                            }
+                        }
+
+                        //循环过滤完毕，判断时候有数据剩余
+                        if (skuList.size() != 0) {
+                            return JSONUtil.toJSON(resultSkuList);
+                        }
+                    }
+                }
+            }
+        }
+        return "";
+    }
+
 
     /**
      * get cmp product results

@@ -447,7 +447,23 @@ public class AppServiceImpl implements IAppService {
         aliExpressMap.put("J", Website.ALIEXPRESS.toString());
         mapList.add(aliExpressMap);
 
+        Map<String, String> amazonMap = new HashMap<>();
+        amazonMap.put("X", getPackageName(Website.AMAZON));
+        amazonMap.put("Y", getAmazonIndexUrl(marketChannel, deviceId));
+        amazonMap.put("Z", "");
+        amazonMap.put("I", "");
+        amazonMap.put("J", Website.AMAZON.toString());
+        mapList.add(amazonMap);
+
         return mapList;
+    }
+
+    private String getAmazonIndexUrl(MarketChannel marketChannel, String deviceId) {
+        Random random = new Random();
+        if (random.nextInt(50) == 1) {
+            return "intent://amazon.in/?tag=ahaso1-21&camp=3638&ref=as_li_tl#Intent;scheme=com.amazon.mobile.shopping;package=in.amazon.mShop.android.shopping;S.browser_fallback_url=https://play.google.com/store/apps/details?id=in.amazon.mShop.android.shopping;end";
+        }
+        return "";
     }
 
 
