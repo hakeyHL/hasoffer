@@ -463,7 +463,8 @@ public class AppServiceImpl implements IAppService {
 //        if (random.nextInt(50) == 1) {
 //            return "intent://amazon.in/?tag=ahaso1-21&camp=3638&ref=as_li_tl#Intent;scheme=com.amazon.mobile.shopping;package=in.amazon.mShop.android.shopping;S.browser_fallback_url=https://play.google.com/store/apps/details?id=in.amazon.mShop.android.shopping;end";
 //        }
-        return "intent://amazon.in/?tag=ahaso1-21&camp=3638&ref=as_li_tl#Intent;scheme=com.amazon.mobile.shopping;package=in.amazon.mShop.android.shopping;S.browser_fallback_url=https://play.google.com/store/apps/details?id=in.amazon.mShop.android.shopping;end";
+        String amazonUrl = "intent://amazon.in/?tag=ahaso1-21&camp=3638&ref=as_li_tl#Intent;scheme=com.amazon.mobile.shopping;package=in.amazon.mShop.android.shopping;S.browser_fallback_url=https://play.google.com/store/apps/details?id=in.amazon.mShop.android.shopping;end";
+        return new String(org.apache.commons.codec.binary.Base64.encodeBase64(amazonUrl.getBytes(Charset.forName("UTF-8"))));
 //        return "";
     }
 
