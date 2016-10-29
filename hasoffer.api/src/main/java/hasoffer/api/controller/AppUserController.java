@@ -415,9 +415,9 @@ public class AppUserController {
             return null;
         } else {
             //1.userToken 验证和用户查询
-            UrmUser urmUser = null;
+            UrmUser urmUser;
             String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
-            if (StringUtils.isEmpty(userToken)) {
+            if (!StringUtils.isEmpty(userToken)) {
                 //暂时不能读缓存,因为缓存中的记录不存在手机号和邮箱
                 //2.get用户
                 urmUser = appService.getUserByUserToken(userToken);
@@ -437,10 +437,38 @@ public class AppUserController {
                 DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
                 if (deviceInfoVo != null && !StringUtils.isEmpty(deviceInfoVo.getDeviceId())) {
                     //4.有,获取urmDevice记录
-                    List<String> deviceIds = appService.getUserDevices(deviceInfoVo.getDeviceId());
+                    List<String> deviceIds = null;
+                    String deviceIdsCacheKey = "DEVICEIDS_" + deviceInfoVo.getDeviceId().toUpperCase();
+                    String deviceIdsCacheValue = urmDeviceService.get(deviceIdsCacheKey, 0);
+                    if (!StringUtils.isEmpty(deviceIdsCacheValue)) {
+                        JSONArray deviceCacheArrays = JSONArray.parseArray(deviceIdsCacheValue);
+                        if (deviceCacheArrays != null) {
+                            deviceIds = new ArrayList<>();
+                            Collections.addAll(deviceIds, deviceCacheArrays.toArray(new String[]{}));
+                        }
+                    } else {
+                        deviceIds = appService.getUserDevices(deviceInfoVo.getDeviceId());
+                        if (deviceIds != null && deviceIds.size() > 0) {
+                            urmDeviceService.add(deviceIdsCacheKey, JSONArray.toJSONString(deviceIds), TimeUtils.SECONDS_OF_1_DAY);
+                        }
+                    }
                     for (String deviceId : deviceIds) {
                         //5.获取用户设备关系
-                        List<String> userIds = appService.getUserIdsByDeviceId(deviceId);
+                        List<String> userIds = null;
+                        String userIdsCacheKey = "DEVICEIDS_" + deviceId;
+                        String userIdsCacheValue = urmDeviceService.get(userIdsCacheKey, 0);
+                        if (!StringUtils.isEmpty(userIdsCacheValue)) {
+                            JSONArray userCacheArrays = JSONArray.parseArray(userIdsCacheValue);
+                            if (userCacheArrays != null) {
+                                userIds = new ArrayList<>();
+                                Collections.addAll(userIds, userCacheArrays.toArray(new String[]{}));
+                            }
+                        } else {
+                            userIds = appService.getUserIdsByDeviceId(deviceId);
+                            if (userIds != null && userIds.size() > 0) {
+                                urmDeviceService.add(userIdsCacheKey, JSONArray.toJSONString(userIds), TimeUtils.SECONDS_OF_1_DAY);
+                            }
+                        }
                         for (String userid : userIds) {
                             UrmUser user = appService.getUserById(Long.valueOf(userid));
                             if (user != null) {
