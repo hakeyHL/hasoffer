@@ -79,9 +79,9 @@ public class AppCliCfgController {
                 //wish
                 map.put("001", true);
                 //search
-                map.put("002", false);
+                map.put("002", true);
 
-                map.put("003", false);
+                map.put("003", true);
 
                 resultVo.setData(map);
                 break;
