@@ -484,6 +484,7 @@ public class AppServiceImpl implements IAppService {
         packageMap.put(Website.SNAPDEAL, "com.snapdeal.main");
         packageMap.put(Website.SHOPCLUES, "com.shopclues");
         packageMap.put(Website.ALIEXPRESS, "com.alibaba.aliexpresshd");
+        packageMap.put(Website.AMAZON, "in.amazon.mShop.android.shopping");
         //packageMap.put(Website.EBAY, "com.ebay.mobile");
         return packageMap.get(website);
     }
