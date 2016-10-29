@@ -460,10 +460,11 @@ public class AppServiceImpl implements IAppService {
 
     private String getAmazonIndexUrl(MarketChannel marketChannel, String deviceId) {
         Random random = new Random();
-        if (random.nextInt(50) == 1) {
-            return "intent://amazon.in/?tag=ahaso1-21&camp=3638&ref=as_li_tl#Intent;scheme=com.amazon.mobile.shopping;package=in.amazon.mShop.android.shopping;S.browser_fallback_url=https://play.google.com/store/apps/details?id=in.amazon.mShop.android.shopping;end";
-        }
-        return "";
+//        if (random.nextInt(50) == 1) {
+//            return "intent://amazon.in/?tag=ahaso1-21&camp=3638&ref=as_li_tl#Intent;scheme=com.amazon.mobile.shopping;package=in.amazon.mShop.android.shopping;S.browser_fallback_url=https://play.google.com/store/apps/details?id=in.amazon.mShop.android.shopping;end";
+//        }
+        return "intent://amazon.in/?tag=ahaso1-21&camp=3638&ref=as_li_tl#Intent;scheme=com.amazon.mobile.shopping;package=in.amazon.mShop.android.shopping;S.browser_fallback_url=https://play.google.com/store/apps/details?id=in.amazon.mShop.android.shopping;end";
+//        return "";
     }
 
 
