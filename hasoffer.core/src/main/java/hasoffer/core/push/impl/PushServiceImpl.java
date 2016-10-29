@@ -89,7 +89,8 @@ public class PushServiceImpl implements IPushService {
     @Override
     public MulticastResult GroupPush(List<String> gcmTokens, AppPushBo pushBo) throws Exception {
         Sender sender = new Sender("AIzaSyCZrHjOkZ57j3Dvq_TpvYW8Mt38Ej1dzQA");
-        String userMessage = JSONUtil.toJSON(pushBo);
+        String userMessage = JSONUtil.toJSON(pushBo.getMessage());
+        System.out.println(userMessage);
         Message message = new Message.Builder().timeToLive(30).delayWhileIdle(true).addData("message", userMessage).build();
         MulticastResult result = sender.send(message, gcmTokens, 1);
         return result;
