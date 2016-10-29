@@ -43,7 +43,7 @@ public class ProductSearchManager {
 
     public void saveSearchCount(String ymd) {
         logger.debug(String.format("save search count [%s]", ymd));
-        searchLog.info("saveSearchCount(String ymd) start.");
+        searchLog.info("saveSearchCount(String ymd) {}: start.", ymd);
         List<SrmProductSearchCount> spscs = new ArrayList<>();
 
         Map<Long, Long> countMap = searchLogCacheManager.getProductCount(ymd);
@@ -68,7 +68,7 @@ public class ProductSearchManager {
         if (ArrayUtils.hasObjs(spscs)) {
             saveLogCount(spscs);
         }
-        searchLog.info("saveSearchCount(String ymd) end.");
+        searchLog.info("saveSearchCount(String ymd) {}: end.", ymd);
     }
 
     @DataSource(DataSourceType.Slave)
