@@ -44,7 +44,6 @@ import java.util.*;
  */
 @Service
 public class SearchServiceImpl implements ISearchService {
-
     private static final String Q_NORESULT_SEARCH_LOG =
             " SELECT t FROM SrmSearchLog t " +
                     " WHERE t.ptmProductId = 0 " +
@@ -71,10 +70,9 @@ public class SearchServiceImpl implements ISearchService {
     private static final String STAT_SEARCH_COUNT2 = "SELECT COUNT(t.id) FROM SrmProductSearchCount t WHERE t.ymd=?0 AND t.skuCount>=?1 AND t.skuCount<?2 ";
     private static final String STAT_SEARCH_COUNT3 = "SELECT COUNT(t.id) FROM SrmSearchLog t WHERE t.lUpdateTime>?0 AND t.lUpdateTime<?1 AND t.ptmProductId=0 ";
     private static final String STAT_SEARCH_COUNT4 = "SELECT COUNT(t.id) FROM SrmSearchLog t WHERE t.lUpdateTime>?0 AND t.lUpdateTime<?1 AND t.ptmProductId>0 ";
-
     private static final String Q_SEARCH_COUNT_BY_PRODUCTID =
             "SELECT t FROM SrmProductSearchCount t WHERE t.productId = ?0 ORDER BY t.ymd DESC";
-
+    private final Logger searchLog = LoggerFactory.getLogger("StatSearchLogJobBean.log");
     @Resource
     IDataBaseManager dbm;
     @Resource
@@ -761,11 +759,16 @@ public class SearchServiceImpl implements ISearchService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveSrmProductSearchStat(SrmProductSearchStat ss) {
+
+        searchLog.info("saveSrmProductSearchStat(SrmProductSearchStat ss) start.");
+
         SrmProductSearchStat productSearchStat = dbm.get(SrmProductSearchStat.class, ss.getId());
         if (productSearchStat != null) {
             dbm.delete(SrmProductSearchStat.class, ss.getId());
         }
         dbm.create(ss);
+
+        searchLog.info("saveSrmProductSearchStat(SrmProductSearchStat ss) end.");
     }
 
     @Override

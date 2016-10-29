@@ -39,10 +39,10 @@
         </encoder>
     </appender>
 
-    <appender name="StatHijackFetchJobBeanLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.base}/StatHijackFetch.log</file>
+    <appender name="StatSearchLogJobBeanLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.base}/statSearchLog.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${log.base}/StatHijackFetch.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+            <FileNamePattern>${log.base}/statSearchLog.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <!-- or whenever the file size reaches 100MB -->
                 <maxFileSize>100MB</maxFileSize>
@@ -101,8 +101,8 @@
         <appender-ref ref="ErrorLoggerFileOut"/>
     </logger>
 
-    <logger name="hasoffer.job.bean.stat.StatHijackFetchJobBean" level="DEBUG">
-        <appender-ref ref="StatHijackFetchJobBeanLog"/>
+    <logger name="StatSearchLogJobBean.log" level="DEBUG">
+        <appender-ref ref="StatSearchLogJobBeanLog"/>
     </logger>
 
     <logger name="ch.qos.logback" level="INFO"/>
