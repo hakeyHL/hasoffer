@@ -300,7 +300,7 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
                 } else if (tempArray.length == 3) {
                     po.setChannel(AffliIdHelper.getMarketChannelById(tempArray[0]).name());
                     po.setDeviceId(tempArray[1]);
-                    po.setDeviceId(tempArray[2]);
+                    po.setUserId(tempArray[2]);
                 }
             }
             po.setOrderStatus(order.getStatus());
