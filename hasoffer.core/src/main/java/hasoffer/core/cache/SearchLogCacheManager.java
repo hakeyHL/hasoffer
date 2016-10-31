@@ -74,6 +74,7 @@ public class SearchLogCacheManager {
 
             if (addCount) {
                 countSearchedProduct(searchLog.getPtmProductId());
+                countSearchedProductByHour(searchLog.getPtmProductId());
             }
         }
 
@@ -96,6 +97,35 @@ public class SearchLogCacheManager {
         if (!exist) {
             cacheService.mapPut(logCountMap, key, "1");
             cacheService.expire(logCountMap, TimeUtils.SECONDS_OF_1_DAY * 2);
+            return;
+        }
+
+        String countStr = cacheService.mapGet(logCountMap, key);
+
+        if (StringUtils.isEmpty(countStr)) {
+            cacheService.mapPut(logCountMap, key, "1");
+        } else {
+            long count = Long.valueOf(countStr);
+            cacheService.mapPut(logCountMap, key, String.valueOf(count + 1));
+        }
+    }
+
+    public void countSearchedProductByHour(long proId) {
+        logger.debug("product id = " + proId);
+        if (proId <= 0) {
+            return;
+        }
+
+        Date date = TimeUtils.nowDate();
+
+        String logCountMap = "LOG_COUNT_" + TimeUtils.parse(date, "yyyyMMdd_HH");
+
+        String key = String.valueOf(proId);
+
+        boolean exist = cacheService.exists(logCountMap);
+        if (!exist) {
+            cacheService.mapPut(logCountMap, key, "1");
+            cacheService.expire(logCountMap, TimeUtils.SECONDS_OF_1_DAY * 1);
             return;
         }
 
