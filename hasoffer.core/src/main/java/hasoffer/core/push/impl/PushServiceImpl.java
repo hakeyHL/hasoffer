@@ -13,6 +13,8 @@ import hasoffer.core.persistence.po.app.AppPush;
 import hasoffer.core.persistence.po.urm.UrmDevice;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.utils.Httphelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,7 @@ public class PushServiceImpl implements IPushService {
             "SELECT  DISTINCT t.marketChannel from AppVersion  t";
     private static final String Q_APPVERSION_GET_ALLVERSIONS =
             "SELECT DISTINCT t.version  from AppVersion t where t.appType='APP'";
+    Logger logger = LoggerFactory.getLogger(PushServiceImpl.class);
     @Resource
     private IDataBaseManager dbm;
 
@@ -90,7 +93,7 @@ public class PushServiceImpl implements IPushService {
     public MulticastResult GroupPush(List<String> gcmTokens, AppPushBo pushBo) throws Exception {
         Sender sender = new Sender("AIzaSyCZrHjOkZ57j3Dvq_TpvYW8Mt38Ej1dzQA");
         String userMessage = JSONUtil.toJSON(pushBo.getMessage());
-        System.out.println(userMessage);
+        logger.info("DealPush userMessage" + userMessage);
         Message message = new Message.Builder().timeToLive(30).delayWhileIdle(true).addData("message", userMessage).build();
         MulticastResult result = sender.send(message, gcmTokens, 1);
         return result;
