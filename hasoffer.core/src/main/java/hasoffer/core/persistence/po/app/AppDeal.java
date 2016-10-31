@@ -17,6 +17,8 @@ public class AppDeal implements Identifiable<Long> {
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    //Deal的权重,初始均为0
+    private int weight = 0;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -216,14 +218,22 @@ public class AppDeal implements Identifiable<Long> {
         this.originPrice = originPrice;
     }
 
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
     @Override
     public boolean equals(Object o) {
-
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
         AppDeal appDeal = (AppDeal) o;
 
+        if (weight != appDeal.weight) return false;
         if (push != appDeal.push) return false;
         if (display != appDeal.display) return false;
         if (discount != appDeal.discount) return false;
@@ -247,14 +257,14 @@ public class AppDeal implements Identifiable<Long> {
             return false;
         if (dealCategoryId != null ? !dealCategoryId.equals(appDeal.dealCategoryId) : appDeal.dealCategoryId != null)
             return false;
-        if (originPrice != null ? !originPrice.equals(appDeal.originPrice) : appDeal.originPrice != null) return false;
+        return !(originPrice != null ? !originPrice.equals(appDeal.originPrice) : appDeal.originPrice != null);
 
-        return true;
     }
 
     @Override
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + weight;
         result = 31 * result + (website != null ? website.hashCode() : 0);
         result = 31 * result + (appdealSource != null ? appdealSource.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);

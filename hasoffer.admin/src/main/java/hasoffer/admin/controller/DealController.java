@@ -11,7 +11,6 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.enums.BannerFrom;
 import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
-import hasoffer.core.product.solr.DealModel;
 import hasoffer.core.utils.DateEditor;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.webcommon.helper.PageHelper;
@@ -77,6 +76,7 @@ public class DealController {
             appdealVo.setExpireTime(appDeal.getExpireTime());
             appdealVo.setDealClickCount(appDeal.getDealClickCount());
             appdealVo.setLinkUrl(appDeal.getLinkUrl());
+            appdealVo.setWeight(appDeal.getWeight());
             appdealVo.setDiscount(appDeal.getDiscount());
             appdealVo.setAppdealSource(appDeal.getAppdealSource());
             appdealVo.setOriginPrice(appDeal.getOriginPrice());
@@ -216,8 +216,8 @@ public class DealController {
             deal.setListPageImage(dealSmallPath);
         }
         dealService.updateDeal(deal);
-        DealModel dm = new DealModel(deal);
-        dealServiceImple.importDeal2Solr(dm);
+//        DealModel dm = new DealModel(deal);
+//        dealServiceImple.importDeal2Solr(dm);
 //        dealServiceImple.reimportAllDeals2Solr();
         return new ModelAndView("redirect:/deal/list");
     }

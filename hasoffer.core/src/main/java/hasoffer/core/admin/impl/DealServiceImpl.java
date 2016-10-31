@@ -61,7 +61,7 @@ public class DealServiceImpl implements IDealService {
     @Override
     public PageableResult<AppDeal> findDealList(int page, int size, int type, String orderByField) {
 
-        String querySql = "select t from AppDeal t WHERE t.appdealSource = 'AppDealSourceType' order by t." + orderByField + " desc";
+        String querySql = "select t from AppDeal t WHERE t.appdealSource = 'AppDealSourceType' order by t.weight desc, t." + orderByField + " desc";
 
         if (type == 1) {
             querySql = querySql.replace("AppDealSourceType", "MANUAL_INPUT");

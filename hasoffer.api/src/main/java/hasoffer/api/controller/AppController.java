@@ -392,6 +392,7 @@ public class AppController {
             if (dateCmpResult <= 0) {
                 DealVo dealVo = new DealVo();
                 dealVo.setId(appDeal.getId());
+                dealVo.setType(appDeal.getWeight() >= 1 ? 1 : 0);
                 dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
                 dealVo.setExtra(0d);
                 dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
@@ -410,6 +411,7 @@ public class AppController {
             } else {
                 DealVo dealVo = new DealVo();
                 dealVo.setId(appDeal.getId());
+                dealVo.setType(appDeal.getWeight() >= 1 ? 1 : 0);
                 dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
                 dealVo.setExtra(0d);
                 dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
