@@ -27,6 +27,10 @@ public class SystemController {
         System.out.println(dayStart4);
         long dayStart5 = TimeUtils.getDayStart("2016-10-26", "yyyy-MM-dd");
         System.out.println(dayStart5);
+        long dayStart6 = TimeUtils.getDayStart("2016-10-29", "yyyy-MM-dd");
+        System.out.println(dayStart6);
+        long dayStart7 = TimeUtils.time(2016, 10, 30, 22, 0, 0);
+        System.out.println(dayStart7);
     }
 
     @RequestMapping(value = "/error", method = RequestMethod.GET)
