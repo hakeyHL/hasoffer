@@ -120,7 +120,8 @@ public class PushTest {
     public void test4() throws Exception {
 
         List<String> tokenList = new ArrayList<>();
-        tokenList.add("fnYp6Xli_zw:APA91bElDjle2n7JoUUlMnpQ4p-cgv8y8PGlycWzC3g4E079tVxkt71O_l8ZinJdgcFAWV9KbBsAOzvCRnZiyi_HzOY8hd47uHIvmkcoPuuMGspCJWCwxdPipCfdPM8Vydc2eG_j-HIG");
+//        tokenList.add("fnYp6Xli_zw:APA91bElDjle2n7JoUUlMnpQ4p-cgv8y8PGlycWzC3g4E079tVxkt71O_l8ZinJdgcFAWV9KbBsAOzvCRnZiyi_HzOY8hd47uHIvmkcoPuuMGspCJWCwxdPipCfdPM8Vydc2eG_j-HIG");
+        tokenList.add("eJeMyvmar2k:APA91bE1SbCN5ESXEdaT9pvn0bFDxqChwAU_t9zwJXp60KWSKJk1sEbBtOQTEBfTXQPnZG1K-QIQQ6lzwz8tbxKlFh9jm6CzOJ9wQ7p7PaR-z4ICyPPPvqJk0Zi5FgodR-esA_-te6ct");
 
 //        tokenList.add("这里将urmdeice表里面，apptype='APP' appversion = 29 的用户的gcmtoken查出来")
 
