@@ -9,7 +9,6 @@ import hasoffer.base.utils.HtmlUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.UrlUtils;
 import hasoffer.base.utils.http.HttpUtils;
-import hasoffer.fetch.exception.ProductTitleNotFoundException;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.sites.mysmartprice.model.MySmartPriceCmpSku;
 import hasoffer.fetch.sites.mysmartprice.model.MySmartPricePriceTable;
@@ -33,7 +32,6 @@ public class NewMspSkuCompareProcessor {
     private static final Logger logger = LoggerFactory.getLogger(NewMspSkuCompareProcessor.class);
 
     private static final String XPATH_TITLE = "//h1[@class='prdct-dtl__ttl']";
-    private static final String XPATH_TITLE_2 = "//h1[@id='mspSingleTitle']";
     private static final String XPATH_RATE = "//span[@class='view_review_count']/span[@itemprop='reviewCount']";
     private static final String XPATH_PRICE = "//span[@class='prdct-dtl__slr-prc-rcmnd-val']";
     private static final String XPATH_PRICE1 = "//div[@class='smart_price']";
@@ -65,15 +63,6 @@ public class NewMspSkuCompareProcessor {
         TagNode root = HtmlUtils.getUrlRootTagNode(url);
 
         String title = getSubNodeStringByXPath(root, XPATH_TITLE, null);
-        if (StringUtils.isEmpty(title)) {
-            title = getSubNodeStringByXPath(root, XPATH_TITLE_2, new ProductTitleNotFoundException(url));
-        }
-
-        String ratingStr = getSubNodeStringByXPath(root, XPATH_RATE, null);
-        int rating = 0;
-        if (!StringUtils.isEmpty(ratingStr)) {
-            rating = Integer.parseInt(ratingStr);
-        }
 
         String priceStr = getSubNodeStringByXPath(root, XPATH_PRICE, null);
         if (StringUtils.isEmpty(priceStr)) {
@@ -122,6 +111,12 @@ public class NewMspSkuCompareProcessor {
         }
 
         List<String> sizes = getSubNodesStringsByXPath(root, XPATH_SIZES, null);
+
+        String ratingStr = getSubNodeStringByXPath(root, XPATH_RATE, null);
+        int rating = 0;
+        if (!StringUtils.isEmpty(ratingStr)) {
+            rating = Integer.parseInt(ratingStr);
+        }
 
         // features
         List<String> features_show = getSubNodesStringsByXPath(root, XPATH_FEATURES_SHOW, null);
