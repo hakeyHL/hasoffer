@@ -23,4 +23,6 @@ public class RedisTest {
         listService.push("PRICE_OFF_SKUID_QUEUE", "2");
         System.out.println(listService.size("PRICE_OFF_SKUID_QUEUE"));
     }
+
+
 }

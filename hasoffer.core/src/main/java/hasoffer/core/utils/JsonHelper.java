@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.PropertyFilter;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -57,5 +58,10 @@ public class JsonHelper {
                 }
             }
         }
+    }
+
+    public static <T> List<T> toList(String jsonString, Class<T> targetClass) {
+        String data = StringEscapeUtils.unescapeHtml(jsonString);
+        return JSON.parseArray(data, targetClass);
     }
 }

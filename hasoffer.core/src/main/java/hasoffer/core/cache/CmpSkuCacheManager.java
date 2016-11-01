@@ -1,7 +1,9 @@
 package hasoffer.core.cache;
 
 import com.alibaba.fastjson.JSON;
+import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
@@ -10,6 +12,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.redis.ICacheService;
+import hasoffer.core.utils.JsonHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -58,6 +61,33 @@ public class CmpSkuCacheManager {
         }
 
         return cmpSku;
+    }
+
+    public List<PtmCmpSku> listCmpSkus(long productId, SkuStatus skuStatus) {
+        String key = CACHE_KEY_PRE + "_listCmpSkus_" + String.valueOf(productId) + skuStatus.name();
+
+        String cmpSkusJson = cacheService.get(key, 0);
+
+        //先不读缓存,也不存缓存
+        List<PtmCmpSku> cmpSkus = new ArrayList<PtmCmpSku>();
+        try {
+            if (StringUtils.isEmpty(cmpSkusJson)) {
+                cmpSkus = cmpSkuService.listCmpSkus(productId, skuStatus);
+
+                System.out.println("--------- listCmpSkus  -----------" + cmpSkus.size());
+
+                if (ArrayUtils.hasObjs(cmpSkus)) {
+                    cacheService.add(key, JSONUtil.toJSON(cmpSkus), TimeUtils.SECONDS_OF_1_HOUR * 4);
+                }
+            } else {
+                cmpSkus = JsonHelper.toList(cmpSkusJson, PtmCmpSku.class);
+            }
+        } catch (Exception e) {
+            logger.error("deal skus from cache error:{}", e.getMessage(), e);
+            return null;
+        }
+
+        return cmpSkus;
     }
 
     /**
@@ -161,4 +191,5 @@ public class CmpSkuCacheManager {
         }
         return ptmCmpSkus;
     }
+
 }

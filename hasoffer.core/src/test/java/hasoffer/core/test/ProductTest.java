@@ -8,6 +8,7 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.bo.system.SearchCriteria;
+import hasoffer.core.cache.CmpSkuCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.dbm.osql.datasource.DataSource;
@@ -87,8 +88,18 @@ public class ProductTest {
     IMongoDbManager mdm;
     @Resource
     MongoDbFactory mongoDbFactory;
+    @Resource
+    CmpSkuCacheManager cmpSkuCacheManager;
     private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
     private Pattern PATTERN_Brand = Pattern.compile("[\t*?]([a-zA-Z])[\t*?]");
+
+    @Test
+    public void test2() {
+        List<PtmCmpSku> cmpSkus = cmpSkuCacheManager.listCmpSkus(100, SkuStatus.ONSALE);
+        for (PtmCmpSku cmpSku : cmpSkus) {
+            System.out.println(cmpSku.getTitle());
+        }
+    }
 
     @Test
     @DataSource(value = DataSourceType.Slave)
