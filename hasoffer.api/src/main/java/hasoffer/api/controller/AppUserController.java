@@ -394,13 +394,9 @@ public class AppUserController {
         }
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
-        Query query = new Query();
-        Criteria criteria = new Criteria();
-        criteria.and("signDate");
-        criteria.gte(startTime);
-        criteria.lt(endTime);
-        query.addCriteria(criteria);
-        List<UserSignLog> userSignLogs = mongoDbManager.query(UserSignLog.class, query);
+//        Query query = new Query();
+//        query.addCriteria(Criteria.where("signDate").gte(startTime).lt(endTime));
+        List<UserSignLog> userSignLogs = mongoDbManager.query(UserSignLog.class, new Query().addCriteria(Criteria.where("signDate").gte(startTime).lt(endTime)));
         Map<Long, Integer> map = new HashMap();
         if (userSignLogs != null && userSignLogs.size() > 0) {
             for (UserSignLog userSignLog : userSignLogs) {
