@@ -732,7 +732,7 @@ public class ProductServiceImpl implements IProductService {
         }
 
         for (PtmCmpSku cmpSku : cmpSkus) {
-            if (cmpSku.getStatus() == SkuStatus.ONSALE || cmpSku.getPrice() <= 0) {
+            if (!SkuStatus.ONSALE.equals(cmpSku.getStatus()) || cmpSku.getPrice() <= 0) {
                 continue;
             }
 
