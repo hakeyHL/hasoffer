@@ -51,7 +51,7 @@ public class StatController {
     @RequestMapping(value = "/statByHour", method = RequestMethod.GET)
     public
     @ResponseBody
-    String statSearchCountByHour(@RequestParam String ymd_hour) {
+    String statSearchCountByHour(@RequestParam(defaultValue = "") String ymd_hour) {
 
         if (StringUtils.isEmpty(ymd_hour)) {
             ymd_hour = TimeUtils.parse(TimeUtils.add(TimeUtils.nowDate(), TimeUtils.MILLISECONDS_OF_1_HOUR * -1), "yyyyMMdd_HH");
