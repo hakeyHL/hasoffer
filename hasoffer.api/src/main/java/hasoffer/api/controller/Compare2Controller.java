@@ -20,6 +20,8 @@ import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.exception.ERROR_CODE;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
+import hasoffer.core.persistence.dbm.osql.datasource.DataSource;
+import hasoffer.core.persistence.dbm.osql.datasource.DataSourceType;
 import hasoffer.core.persistence.enums.SearchPrecise;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.mongo.PtmProductDescription;
@@ -167,6 +169,7 @@ public class Compare2Controller {
      *
      * @return
      */
+    @DataSource(value = DataSourceType.Slave)
     @RequestMapping("sdk/cmpskus")
     public String cmpSkus(@RequestParam(defaultValue = "") final String q,
                           @RequestParam(defaultValue = "") final String brand,
@@ -213,6 +216,7 @@ public class Compare2Controller {
         return null;
     }
 
+    @DataSource(value = DataSourceType.Slave)
     @RequestMapping(value = "/cmpsku", method = RequestMethod.GET)
     public ModelAndView cmpsku(@RequestParam(defaultValue = "0") final String id,
                                @RequestParam(defaultValue = "1") int page,
@@ -428,6 +432,7 @@ public class Compare2Controller {
      * @param pageSize
      * @return
      */
+    @DataSource(value = DataSourceType.Slave)
     @RequestMapping(value = "/newnewconfig", method = RequestMethod.POST)
     @ResponseBody
     public String newnewconfig(@RequestParam String url,

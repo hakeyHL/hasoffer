@@ -10,13 +10,13 @@ public class Test {
         //for (int i = 1; ; i++) {
         //    System.out.println(i);
         //}
-        String timeStr = DateFormatUtils.format(new Date(), "HH");
+        String timeStr = DateFormatUtils.format(new Date(), "yyyyMMdd_HH");
         System.out.println(timeStr);
 
-        System.out.println("x" + System.getProperty("line.separator") + "Y");
-        String homeFolder = System.getProperty("user.home");
-        System.out.println(homeFolder);
-        System.out.println("12345678\tY");
-        System.out.println("1\tY");
+//        System.out.println("x" + System.getProperty("line.separator") + "Y");
+//        String homeFolder = System.getProperty("user.home");
+//        System.out.println(homeFolder);
+//        System.out.println("12345678\tY");
+//        System.out.println("1\tY");
     }
 }

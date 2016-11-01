@@ -33,13 +33,23 @@ public class StatSearchLogJobBean extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+        logger.info("StatSearchLogJobBean start");
+
         String ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
 
+        logger.info("saveSearchCount_old({}) start", ymd);
         searchService.saveSearchCount_old(ymd);
+        logger.info("saveSearchCount_old({}) end", ymd);
 
+        logger.info("expTopSellingsFromSearchCount({}) start", ymd);
         productService.expTopSellingsFromSearchCount(ymd);
+        logger.info("expTopSellingsFromSearchCount({}) end", ymd);
 
+        logger.info("statSearchCount_old({}) start", ymd);
         searchService.statSearchCount_old(ymd);
+        logger.info("statSearchCount_old({}) end", ymd);
+
+        logger.info("StatSearchLogJobBean end");
     }
 
     //    @Override

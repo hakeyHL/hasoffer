@@ -134,6 +134,14 @@
             </div>
         </div>
         <div class="form-group">
+            <label class="col-sm-3 control-label">权重(Weight)：</label>
+
+            <div class="col-sm-6">
+                <input type="number" name="weight" id="weight" value="${deal.weight}"
+                       class="form-control">
+            </div>
+        </div>
+        <div class="form-group">
             <label class="col-sm-3 control-label">折扣额度(Number must)：</label>
 
             <div class="col-sm-6">

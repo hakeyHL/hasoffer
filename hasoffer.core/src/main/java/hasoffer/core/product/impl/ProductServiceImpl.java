@@ -47,6 +47,8 @@ import java.util.*;
 @Service
 public class ProductServiceImpl implements IProductService {
 
+    private static final Logger searchLog = LoggerFactory.getLogger("StatSearchLogJobBean.log");
+
     private static final String Q_PRODUCT =
             "SELECT t FROM PtmProduct t";
     private static final String Q_PRODUCT_BY_CATEGORY =
@@ -80,7 +82,7 @@ public class ProductServiceImpl implements IProductService {
                     " WHERE t.productId = ?0  ";
     private static final String Q_PTM_TOPSEELLING =
             "select t from PtmTopSelling t where   t.status='ONLINE'  order by t.lUpdateTime desc , t.count desc ";
-    private final Logger searchLog = LoggerFactory.getLogger("StatSearchLogJobBean.log");
+
     @Resource
     ISearchService searchService;
     @Resource
@@ -720,7 +722,7 @@ public class ProductServiceImpl implements IProductService {
             int onsaleSkuSize = 0;
             for (PtmCmpSku cmpSku : cmpSkus) {
                 if (cmpSku.getStatus().name().equals("ONSALE")) {
-                    onsaleSkuSize++;
+                    ++onsaleSkuSize;
                     break;
                 }
             }

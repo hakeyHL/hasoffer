@@ -27,6 +27,8 @@ import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,9 +38,9 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by hs on 2016/7/8.
@@ -368,28 +370,46 @@ public class AppUserController {
         return null;
     }
 
-    @RequestMapping("user/signRecord")
-    public String getSignRecord(HttpServletResponse response) {
-        List<UrmSignCoin> signCoins = appService.getUserSignRecord();
-        Map<Integer, List<UrmSignCoin>> maps = new ConcurrentHashMap<>();
-        for (UrmSignCoin urmSignCoin : signCoins) {
-            if (maps.containsKey(urmSignCoin.getMaxConSignNum())) {
-                maps.get(urmSignCoin.getMaxConSignNum()).add(urmSignCoin);
-            } else {
-                List<UrmSignCoin> list = new ArrayList<>();
-                list.add(urmSignCoin);
-                maps.put(urmSignCoin.getMaxConSignNum(), list);
-            }
-        }
+    @RequestMapping("analysis/signRecord")
+    public String getSignRecord(String fromDate, String toDate, HttpServletResponse response) throws ParseException {
         JSONObject jsonObject = new JSONObject();
-        Set<Map.Entry<Integer, List<UrmSignCoin>>> entries = maps.entrySet();
-        Iterator<Map.Entry<Integer, List<UrmSignCoin>>> iterator = entries.iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<Integer, List<UrmSignCoin>> next = iterator.next();
-            Integer key = next.getKey();
-            int size = next.getValue().size();
-            jsonObject.put(key + "", size);
+        Long startTime;
+        Long endTime;
+        jsonObject.put("errorCode", "10000");
+        jsonObject.put("msg", "date error");
+        if (StringUtils.isEmpty(fromDate) && StringUtils.isEmpty(toDate)) {
+            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            return null;
         }
+        if (StringUtils.isEmpty(fromDate)) {
+            jsonObject.put("msg", "from date  not empty ");
+            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            return null;
+        }
+        startTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(fromDate).getTime();
+        if (StringUtils.isEmpty(toDate)) {
+            endTime = new Date().getTime();
+        } else {
+            endTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(toDate).getTime();
+        }
+        jsonObject.put("errorCode", "00000");
+        jsonObject.put("msg", "ok");
+//        Query query = new Query();
+//        query.addCriteria(Criteria.where("signDate").gte(startTime).lt(endTime));
+        List<UserSignLog> userSignLogs = mongoDbManager.query(UserSignLog.class, new Query().addCriteria(Criteria.where("signDate").gte(startTime).lt(endTime)));
+        Map<Long, Integer> map = new HashMap();
+        if (userSignLogs != null && userSignLogs.size() > 0) {
+            for (UserSignLog userSignLog : userSignLogs) {
+                if (map.containsKey(userSignLog.getUserId())) {
+                    map.put(userSignLog.getUserId(), map.get(userSignLog.getUserId()) + 1);
+                } else {
+                    map.put(userSignLog.getUserId(), 1);
+                }
+            }
+        } else {
+            jsonObject.put("msg", "no data ");
+        }
+        jsonObject.put("data", JSON.toJSONString(map));
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
 

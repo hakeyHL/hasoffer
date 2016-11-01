@@ -24,6 +24,8 @@ import hasoffer.core.cache.AppCacheManager;
 import hasoffer.core.cache.CmpSkuCacheManager;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
+import hasoffer.core.persistence.dbm.osql.datasource.DataSource;
+import hasoffer.core.persistence.dbm.osql.datasource.DataSourceType;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.*;
@@ -375,6 +377,7 @@ public class AppController {
      *
      * @return
      */
+    @DataSource(value = DataSourceType.Slave)
     @RequestMapping(value = "/deals", method = RequestMethod.GET)
     public ModelAndView deals(@RequestParam(defaultValue = "0") String page, @RequestParam(defaultValue = "20") String pageSize) {
         //1. 从数据库中查询到
@@ -389,6 +392,7 @@ public class AppController {
             if (dateCmpResult <= 0) {
                 DealVo dealVo = new DealVo();
                 dealVo.setId(appDeal.getId());
+                dealVo.setType(appDeal.getWeight() >= 1 ? 1 : 0);
                 dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
                 dealVo.setExtra(0d);
                 dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
@@ -407,6 +411,7 @@ public class AppController {
             } else {
                 DealVo dealVo = new DealVo();
                 dealVo.setId(appDeal.getId());
+                dealVo.setType(appDeal.getWeight() >= 1 ? 1 : 0);
                 dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
                 dealVo.setExtra(0d);
                 dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
@@ -441,6 +446,7 @@ public class AppController {
      * @param id
      * @return
      */
+    @DataSource(value = DataSourceType.Slave)
     @RequestMapping(value = "/dealInfo", method = RequestMethod.GET)
     public ModelAndView getdealInfo(@RequestParam String id) {
         //临时按照appVersion区分返回描述
@@ -605,6 +611,7 @@ public class AppController {
      *
      * @return
      */
+    @DataSource(value = DataSourceType.Slave)
     @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
     public ModelAndView userInfo() {
         ModelAndView mv = new ModelAndView();
@@ -659,6 +666,7 @@ public class AppController {
      *
      * @return
      */
+    @DataSource(value = DataSourceType.Slave)
     @RequestMapping(value = "/productsList")
     public ModelAndView productsList(SearchCriteria criteria, @RequestParam(defaultValue = "4") int type) {
         long l = System.currentTimeMillis();

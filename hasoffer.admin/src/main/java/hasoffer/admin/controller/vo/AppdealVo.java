@@ -16,7 +16,7 @@ public class AppdealVo {
 
     private String title;//deal标题
     private String linkUrl;//deal跳转地址
-
+    private int weight = 0;
     private String imageUrl;//本地图片服务器地址
     private Date createTime;//deal创建时间
     private Date expireTime;//deal失效时间
@@ -202,5 +202,13 @@ public class AppdealVo {
 
     public void setWebsite(Website website) {
         this.website = website;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
     }
 }

@@ -23,6 +23,8 @@ public class DealVo {
     private int discount;
     private boolean isExpired;
     private float originPrice;
+    //deal type ,0:general ;1:hot ;etc ,default is general
+    private int type = 0;
 
     public String getPriceDescription() {
         return priceDescription;
@@ -126,5 +128,13 @@ public class DealVo {
 
     public void setOriginPrice(float originPrice) {
         this.originPrice = originPrice;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 }

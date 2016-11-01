@@ -24,7 +24,7 @@ public class MySmartPriceProcessorTest {
 
     @Test
     public void f0() {
-        String url = "http://www.mysmartprice.com/mobile/apple-iphone-5s-msp3216";
+        String url = "http://www.mysmartprice.com/mobile/apple-iphone-6-msp4340";
         NewMspSkuCompareProcessor processor = new NewMspSkuCompareProcessor();
         try {
             MySmartPriceProduct p = processor.parse(url);

@@ -232,6 +232,11 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
             orderList.addAll(getOrderList("abbott1981", "5cf8f2cf2b3b4dc1a8af9ece67a57698", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
             logger.info("over abbott1981: order.size={}", orderList.size());
 
+            orderList.addAll(getOrderList("raymondzh", "850098b32c044bd2a519eb976064709b", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
+            TimeUnit.SECONDS.sleep(3);
+            orderList.addAll(getOrderList("raymondzh", "850098b32c044bd2a519eb976064709b", FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
+            logger.info("over raymondzh: order.size={}", orderList.size());
+
 
         } catch (InterruptedException e) {
             logger.error("Get OrderTime error. Msg:{}", e);
@@ -295,7 +300,7 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
                 } else if (tempArray.length == 3) {
                     po.setChannel(AffliIdHelper.getMarketChannelById(tempArray[0]).name());
                     po.setDeviceId(tempArray[1]);
-                    po.setDeviceId(tempArray[2]);
+                    po.setUserId(tempArray[2]);
                 }
             }
             po.setOrderStatus(order.getStatus());
