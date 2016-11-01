@@ -139,6 +139,30 @@ public class SearchLogCacheManager {
         }
     }
 
+    public Map<Long, Long> getProductCountByHour(String ymd_hour) {
+
+        Map<Long, Long> countMap = new HashMap<Long, Long>();
+
+        String logCountMap = "LOG_COUNT_" + ymd_hour;
+
+        boolean exist = cacheService.exists(logCountMap);
+        if (!exist) {
+            return countMap;
+        }
+
+        Map<String, String> countStrMap = cacheService.mapGetAll(logCountMap);
+
+        for (Map.Entry<String, String> kv : countStrMap.entrySet()) {
+            String proIdStr = kv.getKey();
+            String countStr = kv.getValue();
+            long proId = Long.valueOf(proIdStr);
+            long count = Long.valueOf(countStr);
+            countMap.put(proId, count);
+        }
+
+        return countMap;
+    }
+
     public Map<Long, Long> getProductCount(String ymd) {
 
         Map<Long, Long> countMap = new HashMap<Long, Long>();
