@@ -39,13 +39,15 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
     private IFetchDubboService fetchDubboService;
     private ICmpSkuService cmpSkuService;
     private IRedisListService redisListService;
+    private Long cacheSeconds;
 
-    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, ICmpSkuService cmpSkuService, IRedisListService redisListService) {
+    public CmpSkuDubboUpdateWorker(IDataBaseManager dbm, ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, ICmpSkuService cmpSkuService, IRedisListService redisListService, long cacheSeconds) {
         this.dbm = dbm;
         this.queue = queue;
         this.fetchDubboService = fetchDubboService;
         this.cmpSkuService = cmpSkuService;
         this.redisListService = redisListService;
+        this.cacheSeconds = cacheSeconds;
         CMPSKU_DUBBOUPDATE_WORKER_THREAD_NUMBER++;
     }
 
@@ -110,7 +112,7 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             return;
         }
 
-        TaskStatus taskStatus = fetchDubboService.getUrlTaskStatus(website, url, TimeUtils.SECONDS_OF_1_DAY);
+        TaskStatus taskStatus = fetchDubboService.getUrlTaskStatus(website, url, cacheSeconds);
 
         FetchUrlResult fetchUrlResult = null;
 
@@ -125,14 +127,14 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         } else if (TaskStatus.NONE.equals(taskStatus)) {
             queue.add(sku);
             if (Website.SNAPDEAL.equals(website) || Website.FLIPKART.equals(website) || Website.AMAZON.equals(website)) {
-                fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_2);
+                fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), cacheSeconds, TaskLevel.LEVEL_2);
             } else {
-                fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_5);
+                fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), cacheSeconds, TaskLevel.LEVEL_5);
             }
             logger.info("taskstatus NONE for [" + skuid + "] , resend success");
         } else {//(TaskStatus.FINISH.equals(taskStatus)))
             logger.info("taskstatus FINISH for [" + skuid + "]");
-            fetchUrlResult = fetchDubboService.getProductsByUrl(sku.getWebsite(), sku.getUrl(), TimeUtils.SECONDS_OF_1_DAY);
+            fetchUrlResult = fetchDubboService.getProductsByUrl(sku.getWebsite(), sku.getUrl(), cacheSeconds);
 
             FetchedProduct fetchedProduct = fetchUrlResult.getFetchProduct();
 

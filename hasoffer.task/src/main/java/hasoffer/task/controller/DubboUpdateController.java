@@ -42,10 +42,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RequestMapping(value = "/dubbofetchtask")
 public class DubboUpdateController {
 
-    public static int Price_OFF_LIST_THREAD_NUM = 1;
     private static AtomicBoolean taskRunning1 = new AtomicBoolean(false);
     private static AtomicBoolean taskRunning2 = new AtomicBoolean(false);
     private static AtomicBoolean taskRunning3 = new AtomicBoolean(false);
+    private static AtomicBoolean taskRunning4 = new AtomicBoolean(false);
+
+
     @Resource
     @Qualifier("fetchDubboService")
     IFetchDubboService fetchDubboService;
@@ -63,6 +65,34 @@ public class DubboUpdateController {
     IPriceOffNoticeService priceOffNoticeService;
     @Resource
     IRedisListService redisListService;
+
+
+    /**
+     * Date：2016-11-1 10:34更新改成一直在更新，从redis中读取数据
+     */
+    @RequestMapping(value = "/start", method = RequestMethod.GET)
+    @ResponseBody
+    public String start() {
+        if (taskRunning4.get()) {
+            return "task running.";
+        }
+
+        long cacheSeconds = TimeUtils.SECONDS_OF_1_HOUR * 2;
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
+
+        es.execute(new ListNeedUpdateFromRedisWorker(queue, fetchDubboService, redisListService, cmpSkuService, cacheSeconds));
+
+        for (int i = 0; i < 60; i++) {
+            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService, cacheSeconds));
+        }
+
+
+        taskRunning4.set(true);
+        return "ok";
+    }
 
     /**
      * 该任务用来更新用户订阅的sku，如果价格变化加入缓存队列，等待push
@@ -115,6 +145,8 @@ public class DubboUpdateController {
             return "task running.";
         }
 
+        long cacheSeconds = TimeUtils.SECONDS_OF_1_DAY;
+
         ExecutorService es = Executors.newCachedThreadPool();
 
         ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
@@ -129,7 +161,7 @@ public class DubboUpdateController {
         }
 
         for (int i = 0; i < 60; i++) {
-            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService));
+            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService, cacheSeconds));
         }
 
         taskRunning1.set(true);
@@ -137,29 +169,31 @@ public class DubboUpdateController {
         return "ok";
     }
 
-    //dubbofetchtask/updateTopSellingSpec
-    @RequestMapping(value = "/updateTopSellingSpec", method = RequestMethod.GET)
-    @ResponseBody
-    public String updateTopSellingSpec() {
-
-        if (taskRunning2.get()) {
-            return "task running.";
-        }
-
-        ExecutorService es = Executors.newCachedThreadPool();
-
-        ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
-
-        es.execute(new TopSellingListWorker(dbm, queue, fetchDubboService));
-
-        for (int i = 0; i < 30; i++) {
-            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService));
-        }
-
-        taskRunning2.set(true);
-
-        return "ok";
-    }
+//    //dubbofetchtask/updateTopSellingSpec
+//    @RequestMapping(value = "/updateTopSellingSpec", method = RequestMethod.GET)
+//    @ResponseBody
+//    public String updateTopSellingSpec() {
+//
+//        if (taskRunning2.get()) {
+//            return "task running.";
+//        }
+//
+//
+//
+//        ExecutorService es = Executors.newCachedThreadPool();
+//
+//        ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
+//
+//        es.execute(new TopSellingListWorker(dbm, queue, fetchDubboService));
+//
+//        for (int i = 0; i < 30; i++) {
+//            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService,cacheSeconds));
+//        }
+//
+//        taskRunning2.set(true);
+//
+//        return "ok";
+//    }
 
     //dubbofetchtask/testSingle
     @RequestMapping(value = "/testSingle/{skuid}", method = RequestMethod.GET)
