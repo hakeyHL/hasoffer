@@ -105,4 +105,8 @@ public interface ISearchService {
     void saveSearchCount_old(String ymd);
 
     void statSearchCount_old(String ymd);
+
+    void delSearchCountByHour(String ymd_hour);
+
+    void saveSearchCountByHour(String ymd_hour, long productId, long searchCount, int size);
 }

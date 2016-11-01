@@ -22,6 +22,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
+import hasoffer.core.persistence.po.search.SrmProductSearchCountByHour;
 import hasoffer.core.persistence.po.search.SrmProductSearchStat;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.search.updater.SrmSearchLogUpdater;
@@ -89,6 +90,19 @@ public class SearchServiceImpl implements ISearchService {
     private void delSearchCount(String ymd) {
         String sql = "delete from SrmProductSearchCount t where t.ymd='" + ymd + "'";
         dbm.deleteBySQL(sql);
+    }
+
+    @Transactional
+    public void delSearchCountByHour(String ymd_hour) {
+        String sql = "delete from SrmProductSearchCountByHour t where t.ymdHour='" + ymd_hour + "'";
+        dbm.deleteBySQL(sql);
+    }
+
+    @Override
+    @Transactional
+    public void saveSearchCountByHour(String ymd_hour, long productId, long searchCount, int size) {
+        SrmProductSearchCountByHour srmProductSearchCountByHour = new SrmProductSearchCountByHour(ymd_hour, productId, searchCount, size);
+        dbm.create(srmProductSearchCountByHour);
     }
 
     @Override
