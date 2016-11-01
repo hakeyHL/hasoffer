@@ -722,7 +722,7 @@ public class ProductServiceImpl implements IProductService {
             int onsaleSkuSize = 0;
             for (PtmCmpSku cmpSku : cmpSkus) {
                 if (cmpSku.getStatus().name().equals("ONSALE")) {
-                    onsaleSkuSize++;
+                    ++onsaleSkuSize;
                     break;
                 }
             }
