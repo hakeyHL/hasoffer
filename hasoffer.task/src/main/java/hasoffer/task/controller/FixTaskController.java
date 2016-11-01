@@ -342,6 +342,8 @@ public class FixTaskController {
 
         final String Q_MOBILE_SKU = "SELECT t FROM PtmCmpSku t WHERE t.categoryId = 5 ORDER BY t.id ";
 
+        final long cacheSeconds = TimeUtils.SECONDS_OF_1_DAY / 2;
+
         ExecutorService es = Executors.newCachedThreadPool();
 
         final ConcurrentLinkedQueue<PtmCmpSku> cmpSkuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
@@ -401,7 +403,7 @@ public class FixTaskController {
                         }
 
                         cmpSkuQueue.add(sku);
-                        fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskLevel.LEVEL_1);
+                        fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), cacheSeconds, TaskLevel.LEVEL_1);
 
                         logger.info("send url request succes for " + sku.getWebsite() + " sku id is [" + sku.getId() + "]");
                     }
@@ -410,7 +412,7 @@ public class FixTaskController {
         });
 
         for (int i = 0; i < 20; i++) {
-            es.execute(new CmpSkuDubboUpdateWorker(dbm, cmpSkuQueue, fetchDubboService, cmpSkuService, redisListService));
+            es.execute(new CmpSkuDubboUpdateWorker(dbm, cmpSkuQueue, fetchDubboService, cmpSkuService, redisListService, cacheSeconds));
         }
 
         return "ok";

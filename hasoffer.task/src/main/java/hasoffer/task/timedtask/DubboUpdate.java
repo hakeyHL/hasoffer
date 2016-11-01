@@ -47,6 +47,8 @@ public class DubboUpdate {
 
         long startTime = TimeUtils.now();
 
+        long cacheSeconds = TimeUtils.SECONDS_OF_1_DAY;
+
         ExecutorService es = Executors.newCachedThreadPool();
 
         ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
@@ -61,7 +63,7 @@ public class DubboUpdate {
         }
 
         for (int i = 0; i < 60; i++) {
-            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService));
+            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService, cacheSeconds));
         }
 
         while (true) {
