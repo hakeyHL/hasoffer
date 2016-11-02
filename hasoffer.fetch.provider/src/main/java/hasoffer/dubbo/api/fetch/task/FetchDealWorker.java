@@ -1,17 +1,18 @@
 package hasoffer.dubbo.api.fetch.task;
 
+import hasoffer.base.enums.TaskLevel;
+import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.spider.api.ISpiderService;
 import hasoffer.spider.api.impl.SpiderServiceImpl;
 import hasoffer.spider.constants.RedisKeysUtils;
+import hasoffer.spider.logger.SpiderLogger;
 import hasoffer.spider.model.FetchDealResult;
 import hasoffer.spider.redis.service.IFetchCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.io.IOException;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,6 +24,8 @@ public class FetchDealWorker implements Runnable {
 
     private IFetchCacheService fetchCacheService;
 
+    private Website website;
+
     private ISpiderService fetchService = new SpiderServiceImpl();
 
     public FetchDealWorker(WebApplicationContext springContext) {
@@ -32,25 +35,48 @@ public class FetchDealWorker implements Runnable {
     @Override
     public void run() {
         while (true) {
-            Object pop = fetchCacheService.popTaskList(RedisKeysUtils.WAIT_KEY_LIST);
-            if (pop == null) {
-                try {
+            try {
+                Object pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitDealList(TaskLevel.LEVEL_1, website));
+                if (pop == null) {
+                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitDealList(TaskLevel.LEVEL_2, website));
+                }
+                if (pop == null) {
+                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitDealList(TaskLevel.LEVEL_3, website));
+                }
+                if (pop == null) {
+                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitDealList(TaskLevel.LEVEL_4, website));
+                }
+                if (pop == null) {
+                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitDealList(TaskLevel.LEVEL_5, website));
+                }
+                if (pop == null) {
                     TimeUnit.MINUTES.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                } else {
+                    SpiderLogger.infoFetchFlow("start spider this url: {}", pop);
+                    FetchDealResult fetchDealResult = JSONUtil.toObject(pop.toString(), FetchDealResult.class);
+                    fetch(fetchDealResult);
+                    if (fetchDealResult.overFetch()) {
+                        logger.info("FetchDealWorker crawl finish: {} ", fetchDealResult);
+                    } else {
+                        logger.info("FetchDealWorker crawl running: {} ", fetchDealResult);
+                    }
+                    SpiderLogger.infoFetchFlow("Finish spider this url: {}", pop);
                 }
-            } else {
-                logger.info("FetchDealWorker at {} , pop word: {}", new Date(), pop);
-                FetchDealResult fetchDealResult = null;
-                try {
-                    fetchDealResult = JSONUtil.toObject(pop.toString(), FetchDealResult.class);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-//                fetch(fetchResult);
+            } catch (Exception e) {
+                logger.error("FetchDealWorker is error. Error Msg: Json to Object fail.", e);
             }
-
-
         }
+    }
+
+    public void fetch(FetchDealResult fetchDealResult) {
+//        try {
+//            fetchUrlResult = fetchService.(fetchUrlResult);
+//        } catch (UnSupportWebsiteException e) {
+//            fetchUrlResult.setTaskStatus(TaskStatus.STOPPED);
+//            fetchUrlResult.setErrMsg("un able support website.");
+//            String cacheKey = FetchUrlResult.getCacheKey(fetchUrlResult);
+//            fetchCacheService.cacheResult(cacheKey, fetchUrlResult, fetchUrlResult.getExpireSeconds());
+//            logger.error("FetchKeywordWorker is error. Error Msg: un able support website.", e);
+//        }
     }
 }

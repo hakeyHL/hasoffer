@@ -11,14 +11,12 @@ import hasoffer.spider.logger.SpiderLogger;
 import hasoffer.spider.model.FetchDealResult;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchUrlResult;
-import hasoffer.spider.model.FetchedDealInfo;
 import hasoffer.spider.redis.service.IFetchCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import java.util.Date;
-import java.util.List;
 
 public class FetchDubboServiceImpl implements IFetchDubboService {
 
@@ -30,18 +28,24 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     @Override
     public void sendDealTask(Website website, long cacheSeconds, TaskLevel taskLevel) {
 
-        String redisKey = RedisKeysUtils.getWaitUrlListKey(taskLevel, website);
+        //获取Deal等待队列的key名称
+        String redisKey = RedisKeysUtils.getWaitDealList(taskLevel, website);
 
+        //封装结果对象
         FetchDealResult fetchDealResult = new FetchDealResult();
         fetchDealResult.setWebsite(website);
         fetchDealResult.setTaskStatus(TaskStatus.START);
         fetchDealResult.setExpireSeconds(cacheSeconds);
 
         try {
+            //获取缓存数据信息的key名称，该名称为状态map中存放该任务状态的key
             String key = FetchDealResult.getCacheKey(fetchDealResult);
             if (key == null) {
                 return;
             }
+            //获取状态map中的该key的状态信息
+            //如果已经存在该数据，不执行任何操作
+            //如果没有该数据，那么将该数据加入wait队列，并且添加状态信息为start到map中
             TaskStatus dealTaskStatus = fetchCacheService.getDealTaskStatus(key);
             if (TaskStatus.NONE.equals(dealTaskStatus)) {
                 fetchCacheService.pushTaskList(redisKey, JSONUtil.toJSON(fetchDealResult));
@@ -54,15 +58,19 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     }
 
     @Override
-    public TaskStatus getDealTaskStatus(Website website, long expireSeconds) {
+    public TaskStatus getDealTaskStatus(Website website, long expireSeconds, TaskLevel taskLevel) {
+        //获取该任务的key，查看该任务的状态
         String cacheKey = FetchDealResult.getCacheKey(website, expireSeconds);
-        TaskStatus taskStatusByUrl = fetchCacheService.getTaskStatusByUrl(cacheKey);
+        TaskStatus taskStatusByUrl = fetchCacheService.getDealTaskStatus(cacheKey);
         return taskStatusByUrl;
     }
 
     @Override
-    public List<FetchedDealInfo> getDesidimeDealInfo() {
-        return null;
+    public FetchDealResult getDealInfo(Website website, long expireSeconds, TaskLevel taskLevel) {
+        String cacheKey = FetchDealResult.getCacheKey(website, expireSeconds);
+        //获取该任务的响应数据
+        FetchDealResult fetchDealResult = fetchCacheService.getDealInfo(cacheKey);
+        return fetchDealResult;
     }
 
     @Override

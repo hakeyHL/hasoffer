@@ -3,11 +3,9 @@ package hasoffer.dubbo.api.fetch.service;
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
+import hasoffer.spider.model.FetchDealResult;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchUrlResult;
-import hasoffer.spider.model.FetchedDealInfo;
-
-import java.util.List;
 
 public interface IFetchDubboService {
 
@@ -19,12 +17,12 @@ public interface IFetchDubboService {
     /**
      * 获取deal抓取的状态
      */
-    TaskStatus getDealTaskStatus(Website website, long expireSeconds);
+    TaskStatus getDealTaskStatus(Website website, long expireSeconds, TaskLevel taskLevel);
 
     /**
      * 获取抓取的deal信息
      */
-    List<FetchedDealInfo> getDesidimeDealInfo();
+    FetchDealResult getDealInfo(Website website, long expireSeconds, TaskLevel taskLevel);
 
     /**
      * 获取结果
