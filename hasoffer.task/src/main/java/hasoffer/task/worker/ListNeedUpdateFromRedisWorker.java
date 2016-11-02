@@ -71,7 +71,7 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
             }
 
             //根据商品id，发起更新任务
-            Long productId = (Long) pop;
+            Long productId = Long.valueOf((String) pop);
 
             List<PtmCmpSku> ptmCmpSkuList = cmpSkuService.listCmpSkus(productId);
 
