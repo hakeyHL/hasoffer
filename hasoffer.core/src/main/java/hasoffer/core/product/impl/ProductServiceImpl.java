@@ -197,6 +197,13 @@ public class ProductServiceImpl implements IProductService {
         }
     }
 
+    /**
+     * 该方法用来更新主商品的价格
+     * 该方法跟新商品价格后，会自动导入solr
+     *
+     * @param id
+     * @return
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updatePtmProductPrice(long id) {
