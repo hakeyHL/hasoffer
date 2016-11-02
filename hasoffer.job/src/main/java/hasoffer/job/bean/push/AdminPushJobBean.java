@@ -24,6 +24,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -108,7 +109,7 @@ public class AdminPushJobBean extends QuartzJobBean {
                     String shopApp = urmDevice.getShopApp();
 
                     if (urmDevice.getId().equals("dd3af1280b74a528f073316c17425841")) {
-                        System.out.println("found ashit");
+                        System.out.println("shitTime:" + new SimpleDateFormat("yyyyMMddHHmmss") + "found ashit");
                         System.out.println("website " + website.name());
                         System.out.println("shopApp = " + shopApp);
                     }
