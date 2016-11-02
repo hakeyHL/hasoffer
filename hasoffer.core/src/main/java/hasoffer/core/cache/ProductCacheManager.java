@@ -13,6 +13,7 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.utils.JsonHelper;
+import hasoffer.data.redis.IRedisListService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -40,6 +41,8 @@ public class ProductCacheManager {
     IProductService productService;
     @Resource
     ICmpSkuService cmpSkuService;
+    @Resource
+    IRedisListService redisListService;
     Logger logger = LoggerFactory.getLogger(ProductCacheManager.class);
 
     public static void main(String[] args) {
@@ -233,5 +236,14 @@ public class ProductCacheManager {
             }
         }
         return OnsalePtmCmpSku == null ? OutStockPtmCmpSku : OnsalePtmCmpSku;
+    }
+
+    public void put2UpdateQueue(long productId) {
+
+        String ymd = TimeUtils.parse(TimeUtils.today(), TimeUtils.PATTERN_YMD);
+
+        String key = CACHE_KEY_PRE + "WAIT_4_UPDATE_" + ymd;
+
+        redisListService.push(key, String.valueOf(productId));
     }
 }

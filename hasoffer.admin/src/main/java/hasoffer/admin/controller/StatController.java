@@ -4,6 +4,7 @@ import hasoffer.base.model.SkuStatus;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.cache.CmpSkuCacheManager;
+import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
@@ -46,6 +47,8 @@ public class StatController {
     SearchLogCacheManager searchLogCacheManager;
     @Resource
     CmpSkuCacheManager cmpSkuCacheManager;
+    @Resource
+    ProductCacheManager productCacheManager;
     private Logger logger = LoggerFactory.getLogger(StatController.class);
 
     @RequestMapping(value = "/statByHour", method = RequestMethod.GET)
@@ -78,6 +81,7 @@ public class StatController {
 
             searchService.saveSearchCountByHour(ymd_hour, productId, searchCount, size);
 
+            productCacheManager.put2UpdateQueue(productId);
 //            productService.importProduct2Solr2(productId);
         }
 

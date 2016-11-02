@@ -1,5 +1,6 @@
 package hasoffer.core.test.cache;
 
+import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.redis.ICacheService;
@@ -28,10 +29,14 @@ public class CacheTest {
     @Resource
     SearchLogCacheManager searchLogCacheManager;
 
+    @Resource
+    ProductCacheManager productCacheManager;
+
     @Test
     public void del() {
         //2a02a62ddd62eeae23e0984d031cb6c8
-        searchLogCacheManager.delCache("2a02a62ddd62eeae23e0984d031cb6c8");
+//        searchLogCacheManager.delCache("2a02a62ddd62eeae23e0984d031cb6c8");
+        productCacheManager.put2UpdateQueue(1000);
     }
 
     @Test
