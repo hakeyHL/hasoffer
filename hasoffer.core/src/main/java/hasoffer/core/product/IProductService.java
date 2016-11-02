@@ -3,10 +3,7 @@ package hasoffer.core.product;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.core.bo.product.ProductBo;
-import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.persistence.po.ptm.PtmImage;
-import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.ptm.PtmTopSelling;
+import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmProductUpdater;
 import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.fetch.model.ListProduct;
@@ -108,4 +105,6 @@ public interface IProductService {
     void importProduct2SolrByCategory(long cateId);
 
     List<String> spellcheck(String text);
+
+    void saveImage222(PtmImage2 image2);
 }

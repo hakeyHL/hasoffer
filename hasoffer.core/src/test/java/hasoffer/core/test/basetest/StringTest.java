@@ -24,6 +24,17 @@ import java.util.regex.Pattern;
 public class StringTest {
 
     @Test
+    public void testJson() {
+        String json = "{\"sImg\":\"//img.dxcdn.com/productimages/sku_344792_2_smal.jpg\", \"mImg\":\"//img.dxcdn.com/productimages/sku_344792_2.jpg\", \"bImg\":\"//img.dxcdn.com/productimages/sku_344792_2.jpg\"}";
+
+        JSONObject object = JSONObject.parseObject(json);
+
+        String sImg = (String) object.get("sImg");
+        String mImg = (String) object.get("mImg");
+        String bImg = (String) object.get("bImg");
+    }
+
+    @Test
     public void beanTest() throws InvocationTargetException, IllegalAccessException {
 
         MobileCateDescription mobileCateDescription = new MobileCateDescription();

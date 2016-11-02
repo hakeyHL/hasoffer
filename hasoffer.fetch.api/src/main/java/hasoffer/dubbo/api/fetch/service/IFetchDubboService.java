@@ -5,8 +5,26 @@ import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchUrlResult;
+import hasoffer.spider.model.FetchedDealInfo;
+
+import java.util.List;
 
 public interface IFetchDubboService {
+
+    /**
+     * 发送deal抓取请求
+     */
+    void sendDealTask(Website website, long cacheSeconds, TaskLevel taskLevel);
+
+    /**
+     * 获取deal抓取的状态
+     */
+    TaskStatus getDealTaskStatus(Website website, long expireSeconds);
+
+    /**
+     * 获取抓取的deal信息
+     */
+    List<FetchedDealInfo> getDesidimeDealInfo();
 
     /**
      * 获取结果
