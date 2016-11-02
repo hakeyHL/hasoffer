@@ -42,7 +42,7 @@ public class DubboUpdate {
      *
      * @return
      */
-    @Scheduled(cron = "00 30 14 * * ?")
+//    @Scheduled(cron = "00 30 14 * * ?")
     public void updatestart() {
 
         long startTime = TimeUtils.now();
@@ -93,7 +93,7 @@ public class DubboUpdate {
      * 缓存时间设置为30min
      * @return
      */
-    @Scheduled(cron = "00 10 12 * * ?")
+    @Scheduled(cron = "00 30 11 * * ?")
     public void priceOffNotieUpdatestart() {
 
         long startTime = TimeUtils.now();

@@ -4,6 +4,7 @@ import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.data.redis.IRedisListService;
@@ -21,8 +22,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class ListNeedUpdateFromRedisWorker implements Runnable {
 
+    private static final String UPDATE_WAIT_QUEUE = "PRODUCT_WAIT_4_UPDATE_";
     private static Logger logger = LoggerFactory.getLogger(ListNeedUpdateFromRedisWorker.class);
-
     private ConcurrentLinkedQueue<PtmCmpSku> queue;
     private IFetchDubboService fetchDubboService;
     private IRedisListService redisListService;
@@ -39,6 +40,9 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
 
     @Override
     public void run() {
+
+        String ymd = TimeUtils.parse(TimeUtils.today(), TimeUtils.PATTERN_YMD);
+
         while (true) {
 
             //判断队列大小
@@ -51,10 +55,12 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
 
                 }
                 continue;
+            } else if (size == 0) {
+                ymd = TimeUtils.parse(TimeUtils.today(), TimeUtils.PATTERN_YMD);
             }
 
             //队列取数
-            Object pop = redisListService.pop("UPDATE_NIMA_KEY");
+            Object pop = redisListService.pop(UPDATE_WAIT_QUEUE + ymd);
             if (pop == null) {//如果队列没有数据了，休息30分钟
                 try {
                     TimeUnit.MINUTES.sleep(30);
@@ -70,7 +76,6 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
             List<PtmCmpSku> ptmCmpSkuList = cmpSkuService.listCmpSkus(productId);
 
             //在加入队列的时候进行一些必要的判断
-
             if (ptmCmpSkuList != null && ptmCmpSkuList.size() > 0) {
 
                 for (PtmCmpSku sku : ptmCmpSkuList) {

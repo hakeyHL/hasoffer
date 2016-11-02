@@ -24,6 +24,7 @@
                 <ref bean="priceOffDealUpdateTrigger"/>
                 <ref bean="priceOffGetDealTrigger"/>
                 <ref bean="adminPushTrigger"/>
+                <ref bean="statLogCountBeanTrigger"/>
                 <!--<ref bean="statVisitSkuUpdateTrigger"/>-->
             </list>
         </property>
@@ -45,6 +46,16 @@
     <bean id="priceOffNoticeTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="priceOffNoticeJob"/>
         <property name="cronExpression" value="0 48 15 * * ?"/>
+    </bean>
+
+    <!-- 用户搜索一小时统计一次 -->
+    <bean name="statLogCount" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.stat.StatLogCountJobBean"/>
+    </bean>
+
+    <bean id="statLogCountBeanTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="statLogCount"/>
+        <property name="cronExpression" value="0 10 0/1 * * ?"/>
     </bean>
 
     <!--push重新发送的任务-->
