@@ -217,10 +217,10 @@ public class DealServiceImpl implements IDealService {
     @Transactional(rollbackFor = Exception.class)
     public void updateDealExpire(Long id) {
 
-        AppDeal deal = dbm.get(AppDeal.class, id);
-
         AppDealUpdater updater = new AppDealUpdater(id);
-        updater.getPo().setExpireTime(deal.getCreateTime());
+        //2016-11-2-15:09   过期时间改成当前时间
+//        updater.getPo().setExpireTime(deal.getCreateTime());
+        updater.getPo().setExpireTime(TimeUtils.nowDate());
 
         dbm.update(updater);
     }
