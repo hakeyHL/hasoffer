@@ -9,6 +9,7 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.cache.CmpSkuCacheManager;
+import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.dbm.osql.datasource.DataSource;
@@ -90,14 +91,36 @@ public class ProductTest {
     MongoDbFactory mongoDbFactory;
     @Resource
     CmpSkuCacheManager cmpSkuCacheManager;
+    @Resource
+    SearchLogCacheManager searchLogCacheManager;
     private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
     private Pattern PATTERN_Brand = Pattern.compile("[\t*?]([a-zA-Z])[\t*?]");
 
     @Test
     public void test2() {
-        List<PtmCmpSku> cmpSkus = cmpSkuCacheManager.listCmpSkus(100, SkuStatus.ONSALE);
-        for (PtmCmpSku cmpSku : cmpSkus) {
-            System.out.println(cmpSku.getTitle());
+        for (int i = 100000; i < 100100; i++) {
+            searchLogCacheManager.countSearchedProductByHour(i);
+        }
+
+        String ymd_hour = "20161101_14";
+
+        Map<Long, Long> countMap = searchLogCacheManager.getProductCount(ymd_hour);
+
+        if (countMap.size() > 0) {
+            searchService.delSearchCountByHour(ymd_hour);
+        }
+
+        for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
+
+            long productId = countKv.getKey();
+            long searchCount = countKv.getValue();
+
+            List<PtmCmpSku> cmpSkus = cmpSkuCacheManager.listCmpSkus(productId, SkuStatus.ONSALE);
+
+            int size = cmpSkus.size();
+
+            searchService.saveSearchCountByHour(ymd_hour, productId, searchCount, size);
+
         }
     }
 

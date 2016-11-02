@@ -83,11 +83,10 @@ public class CmpSkuCacheManager {
                 cmpSkus = JsonHelper.toList(cmpSkusJson, PtmCmpSku.class);
             }
         } catch (Exception e) {
-            logger.error("deal skus from cache error:{}", e.getMessage(), e);
-            return null;
+            logger.error(e.getMessage());
+        } finally {
+            return cmpSkus;
         }
-
-        return cmpSkus;
     }
 
     /**

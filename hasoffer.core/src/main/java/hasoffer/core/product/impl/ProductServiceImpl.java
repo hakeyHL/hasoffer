@@ -712,12 +712,13 @@ public class ProductServiceImpl implements IProductService {
             cateTag = cate.getKeyword();
         }
 
-        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(product.getId());
+//        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(product.getId());
+        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(product.getId(), SkuStatus.ONSALE);
         Map<Website, PtmCmpSku> cmpSkuMap = new HashMap<>();
         //no skus ,skip .
         if (cmpSkus == null || cmpSkus.size() < 1) {
             return null;
-        } else {
+        } /*else {
             //if has onsale sku
             int onsaleSkuSize = 0;
             for (PtmCmpSku cmpSku : cmpSkus) {
@@ -729,10 +730,10 @@ public class ProductServiceImpl implements IProductService {
             if (onsaleSkuSize == 0) {
                 return null;
             }
-        }
+        }*/
 
         for (PtmCmpSku cmpSku : cmpSkus) {
-            if (cmpSku.getStatus() == SkuStatus.ONSALE || cmpSku.getPrice() <= 0) {
+            if (!SkuStatus.ONSALE.equals(cmpSku.getStatus()) || cmpSku.getPrice() <= 0) {
                 continue;
             }
 
@@ -745,6 +746,10 @@ public class ProductServiceImpl implements IProductService {
             if (mSku == null || cmpSku.getPrice() < mSku.getPrice()) {
                 cmpSkuMap.put(website, cmpSku);
             }
+        }
+
+        if (cmpSkuMap.size() <= 0) {
+            return null;
         }
 
         int review = 0;

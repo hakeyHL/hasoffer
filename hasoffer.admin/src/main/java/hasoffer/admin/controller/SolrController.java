@@ -87,6 +87,7 @@ public class SolrController {
         System.out.println(products.size());
 
     }
+
     //1973863
     @RequestMapping(value = "/product/importbycategory3", method = RequestMethod.GET)
     public void importbycategory3(@RequestParam final long cate) {
@@ -152,6 +153,7 @@ public class SolrController {
                     @Override
                     public void process(PtmProduct o) {
                         try {
+                            System.out.println("execute product id : " + o.getId());
                             productService.importProduct2Solr2(o);
                         } catch (Exception e) {
                             System.out.println("ERROR " + o.getId() + "\t" + e.getMessage());
