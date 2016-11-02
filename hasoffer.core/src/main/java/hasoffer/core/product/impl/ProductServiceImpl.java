@@ -245,18 +245,22 @@ public class ProductServiceImpl implements IProductService {
 
         }
 
-        if (price != 0 && price != oriPrice) {
+        if (price != 0) {
 
-            PtmProductUpdater updater = new PtmProductUpdater(id);
+            //如果价格发生变化,更新数据库
+            if (price != oriPrice) {
+                PtmProductUpdater updater = new PtmProductUpdater(id);
 
-            updater.getPo().setPrice(price);
-            updater.getPo().setUpdateTime(TimeUtils.nowDate());
+                updater.getPo().setPrice(price);
+                updater.getPo().setUpdateTime(TimeUtils.nowDate());
 
-            dbm.update(updater);
+                dbm.update(updater);
+            }
 
             ptmProduct.setPrice(price);
             System.out.println("minPrice =" + price);
 
+            //不管任何情况，重新导入product
             importProduct2Solr2(ptmProduct);
 
             return true;
