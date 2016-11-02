@@ -8,14 +8,17 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.spider.constants.RedisKeysUtils;
 import hasoffer.spider.logger.SpiderLogger;
+import hasoffer.spider.model.FetchDealResult;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchUrlResult;
+import hasoffer.spider.model.FetchedDealInfo;
 import hasoffer.spider.redis.service.IFetchCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 
 public class FetchDubboServiceImpl implements IFetchDubboService {
 
@@ -23,6 +26,44 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
 
     @Resource
     private IFetchCacheService fetchCacheService;
+
+    @Override
+    public void sendDealTask(Website website, long cacheSeconds, TaskLevel taskLevel) {
+
+        String redisKey = RedisKeysUtils.getWaitUrlListKey(taskLevel, website);
+
+        FetchDealResult fetchDealResult = new FetchDealResult();
+        fetchDealResult.setWebsite(website);
+        fetchDealResult.setTaskStatus(TaskStatus.START);
+        fetchDealResult.setExpireSeconds(cacheSeconds);
+
+        try {
+            String key = FetchDealResult.getCacheKey(fetchDealResult);
+            if (key == null) {
+                return;
+            }
+            TaskStatus dealTaskStatus = fetchCacheService.getDealTaskStatus(key);
+            if (TaskStatus.NONE.equals(dealTaskStatus)) {
+                fetchCacheService.pushTaskList(redisKey, JSONUtil.toJSON(fetchDealResult));
+                SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendDealTask(fetchDealResult) save {} into Redis List {} success", fetchDealResult.getWebsite(), redisKey);
+                fetchCacheService.setTaskStatusByUrl(key, TaskStatus.START);
+            }
+        } catch (Exception e) {
+            SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendDealTask(fetchDealResult) save {} into Redis List {} fail", fetchDealResult.getWebsite(), redisKey, e);
+        }
+    }
+
+    @Override
+    public TaskStatus getDealTaskStatus(Website website, long expireSeconds) {
+        String cacheKey = FetchDealResult.getCacheKey(website, expireSeconds);
+        TaskStatus taskStatusByUrl = fetchCacheService.getTaskStatusByUrl(cacheKey);
+        return taskStatusByUrl;
+    }
+
+    @Override
+    public List<FetchedDealInfo> getDesidimeDealInfo() {
+        return null;
+    }
 
     @Override
     public FetchResult getProductsKeyWord(Website webSite, String keyword) {

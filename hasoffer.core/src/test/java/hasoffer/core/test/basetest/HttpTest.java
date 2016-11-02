@@ -7,6 +7,7 @@ import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.utils.HtmlUtils;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
@@ -16,10 +17,7 @@ import org.htmlcleaner.TagNode;
 import org.htmlcleaner.XPatherException;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static hasoffer.base.utils.HtmlUtils.getSubNodesByXPath;
 import static hasoffer.base.utils.http.XPathUtils.getSubNodeByXPath;
@@ -31,6 +29,67 @@ import static hasoffer.base.utils.http.XPathUtils.getSubNodeByXPath;
 public class HttpTest {
 
     public static final String WEBSITE_91MOBILE_URL_PREFIEX = "http://www.91mobiles.com";
+    public static final String WEBSITE_DX_URL_PREFIEX = "http://www.dx.com/";
+
+    @Test
+    public void fetchHuiji() throws Exception {
+
+        String[] urlArray = new String[]{
+                "http://www.dx.com/c/hobbies-toys-899/rc-airplanes-quadcopters-805?pageSize=200&page=1",
+                "http://www.dx.com/c/hobbies-toys-899/rc-airplanes-quadcopters-805?pageSize=200&page=2",
+                "http://www.dx.com/c/hobbies-toys-899/rc-airplanes-quadcopters-805?pageSize=200&page=3",
+        };
+
+        for (String url : urlArray) {
+
+            TagNode pageRoot = HtmlUtils.getUrlRootTagNode(url);
+
+            List<TagNode> productNodeList = getSubNodesByXPath(pageRoot, "//ul[@class='productList subList']/li");
+
+            for (TagNode productNode : productNodeList) {
+
+                TagNode urlNode = getSubNodeByXPath(productNode, "//div[@class='photo']/a", new ContentParseException("url node not found"));
+                String productUrl = WEBSITE_DX_URL_PREFIEX + urlNode.getAttributeByName("href");
+
+                TagNode productInfoPageRoot = HtmlUtils.getUrlRootTagNode(productUrl);
+                String urlHtml = HtmlUtils.getUrlHtml(productUrl);
+
+                Huiji huiji = new Huiji();
+                huiji.setUrl(productUrl);
+
+                TagNode imagebrotherNode = getSubNodeByXPath(productInfoPageRoot, "//div[@id='midPicBox']", new ContentParseException("image brother node not found"));
+
+                TagNode parentNode = imagebrotherNode.getParent();
+
+                List<TagNode> imageListNode = getSubNodesByXPath(parentNode, "//div[@class='small_photo']/div/ul");
+
+                imageListNode = getSubNodesByXPath(imageListNode.get(0), "/li");
+
+                for (TagNode imageNode : imageListNode) {
+
+                    imageNode = getSubNodeByXPath(imageNode, "/a", new ContentParseException("image node not found"));
+
+                    String imageUrlString = imageNode.getAttributeByName("rel");
+
+                    JSONObject json = JSONObject.parseObject(imageUrlString);
+
+                    String simageUrl = json.getString("sImg");
+                    String mimageUrl = StringUtils.filterAndTrim(simageUrl, Arrays.asList("_small"));
+
+                    Map<String, String> imageMap = new HashMap<>();
+
+                    imageMap.put("simg", "http:" + simageUrl);
+                    imageMap.put("mimg", "http:" + mimageUrl);
+                    imageMap.put("bimg", "http:" + mimageUrl);
+
+                    huiji.getImageList().add(imageMap);
+                }
+
+                System.out.println(huiji);//一个商品抓取完毕
+            }
+        }
+
+    }
 
     @Test
     public void test91Mobile() throws HttpFetchException, XPatherException, ContentParseException {
@@ -71,7 +130,6 @@ public class HttpTest {
 
         System.out.println();
     }
-
 
     @Test
     public void testHttp() throws Exception {
@@ -128,5 +186,44 @@ public class HttpTest {
         }
 
 
+    }
+
+    class Huiji {
+        private String id;
+        private String url;
+        private List<Object> imageList = new ArrayList<>();
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public List<Object> getImageList() {
+            return imageList;
+        }
+
+        public void setImageList(List<Object> imageList) {
+            this.imageList = imageList;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        @Override
+        public String toString() {
+            return "Huiji{" +
+                    "id='" + id + '\'' +
+                    ", url='" + url + '\'' +
+                    ", imageList=" + imageList +
+                    '}';
+        }
     }
 }
