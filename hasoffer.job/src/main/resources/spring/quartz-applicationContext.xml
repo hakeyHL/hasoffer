@@ -55,7 +55,7 @@
 
     <bean id="statLogCountBeanTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="statLogCount"/>
-        <property name="cronExpression" value="0 10 0/1 * * ?"/>
+        <property name="cronExpression" value="0 25 0/1 * * ?"/>
     </bean>
 
     <!--push重新发送的任务-->
