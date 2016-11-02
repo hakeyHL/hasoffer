@@ -105,6 +105,12 @@ public class ProductServiceImpl implements IProductService {
     private Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     @Override
+    @Transactional
+    public void saveImage222(PtmImage2 image2) {
+        dbm.create(image2);
+    }
+
+    @Override
     public List<String> spellcheck(String text) {
         boolean onlyByGoogle = true;
 
