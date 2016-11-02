@@ -1,5 +1,6 @@
 package hasoffer.job.bean.push;
 
+import com.alibaba.fastjson.JSON;
 import com.google.android.gcm.server.MulticastResult;
 import hasoffer.base.enums.AppType;
 import hasoffer.base.model.PageableResult;
@@ -24,6 +25,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -81,7 +83,8 @@ public class AdminPushJobBean extends QuartzJobBean {
 
             AppPushBo pushBo = new AppPushBo("678678", "19:50", message);
 
-
+            System.out.println("push currentTime is :" + new SimpleDateFormat("yyyyMMddHHmmss").
+                    format(new Date()) + " and content is : " + JSON.toJSONString(message));
             //暂定推送人群是所有app用户
             int curPage = 1;
             int pageSize = 1000;
@@ -108,7 +111,7 @@ public class AdminPushJobBean extends QuartzJobBean {
                     String shopApp = urmDevice.getShopApp();
 
                     if (urmDevice.getId().equals("dd3af1280b74a528f073316c17425841")) {
-                        System.out.println("found ashit");
+                        System.out.println("shitTime:" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "found ashit");
                         System.out.println("website " + website.name());
                         System.out.println("shopApp = " + shopApp);
                     }

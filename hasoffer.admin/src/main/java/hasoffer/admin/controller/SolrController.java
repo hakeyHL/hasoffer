@@ -153,7 +153,6 @@ public class SolrController {
                     @Override
                     public void process(PtmProduct o) {
                         try {
-                            System.out.println("execute product id : " + o.getId());
                             productService.importProduct2Solr2(o);
                         } catch (Exception e) {
                             System.out.println("ERROR " + o.getId() + "\t" + e.getMessage());
