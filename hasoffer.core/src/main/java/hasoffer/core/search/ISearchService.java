@@ -92,8 +92,6 @@ public interface ISearchService {
 
     void updateSrmSearchLogStatus(String id, long productId, SearchPrecise precise);
 
-    void saveLogCount(List<SrmProductSearchCount> searchCounts);
-
     void analysisAndRelate(SrmAutoSearchResult asr);
 
     PageableResult<SrmProductSearchCount> findSearchCountsByYmd(String ymd, int page, int size);

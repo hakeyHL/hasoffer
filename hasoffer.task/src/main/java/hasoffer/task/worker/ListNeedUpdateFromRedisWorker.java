@@ -55,9 +55,18 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
             if (size > 50000) {
                 logger.info("queue size " + size + " sleep 5 minutes");
                 try {
-                    TimeUnit.MINUTES.sleep(5);
+                    TimeUnit.MINUTES.sleep(20);
                 } catch (InterruptedException e) {
 
+                }
+
+                int newSize = queue.size();
+                if (size == newSize) {
+                    //临时解决锁死的办法，丢弃最前面的1w个数据
+                    for (int i = 0; i < 10000; i++) {
+                        queue.poll();
+                    }
+                    logger.info("drop 10000 ptmcmpsku");
                 }
                 continue;
             } else if (size == 0) {
@@ -66,7 +75,7 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
 
             //队列取数
             //num默认为更新线程数量
-            int num = 120;
+            int num = 1200;
             while (num > 0) {
                 num--;
 
@@ -130,7 +139,7 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                             fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), cacheSeconds, TaskLevel.LEVEL_5);
                         }
 
-                        logger.info("send url request succes for " + sku.getWebsite() + " sku id is [" + sku.getId() + "]");
+                        logger.info("send url request succes for " + sku.getWebsite() + " sku id is _" + sku.getId() + "_");
                     }
 
                     //now productid hava been sended ,add to processed set
