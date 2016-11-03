@@ -119,11 +119,11 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
         //如果返回结果状态为running，那么将sku返回队列
         if (TaskStatus.RUNNING.equals(taskStatus) || TaskStatus.START.equals(taskStatus)) {
             queue.add(sku);
-            logger.info("taskstatus RUNNING for [" + skuid + "]");
+            logger.info("taskstatus RUNNING for _" + skuid + "_");
         } else if (TaskStatus.STOPPED.equals(taskStatus)) {
-            logger.info("taskstatus STOPPED for [" + skuid + "]");
+            logger.info("taskstatus STOPPED for _" + skuid + "_");
         } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
-            logger.info("taskstatus EXCEPTION for [" + skuid + "]");
+            logger.info("taskstatus EXCEPTION for _" + skuid + "_");
         } else if (TaskStatus.NONE.equals(taskStatus)) {
             queue.add(sku);
             if (Website.SNAPDEAL.equals(website) || Website.FLIPKART.equals(website) || Website.AMAZON.equals(website)) {
@@ -131,9 +131,9 @@ public class CmpSkuDubboUpdateWorker implements Runnable {
             } else {
                 fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), cacheSeconds, TaskLevel.LEVEL_5);
             }
-            logger.info("taskstatus NONE for [" + skuid + "] , resend success");
+            logger.info("taskstatus NONE for _" + skuid + "_ , resend success");
         } else {//(TaskStatus.FINISH.equals(taskStatus)))
-            logger.info("taskstatus FINISH for [" + skuid + "]");
+            logger.info("taskstatus FINISH for _" + skuid + "_");
             fetchUrlResult = fetchDubboService.getProductsByUrl(sku.getWebsite(), sku.getUrl(), cacheSeconds);
 
             FetchedProduct fetchedProduct = fetchUrlResult.getFetchProduct();
