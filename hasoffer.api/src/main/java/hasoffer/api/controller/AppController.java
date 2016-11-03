@@ -911,7 +911,7 @@ public class AppController {
                 }
                 if (websiteSet.contains(ptmCmpSku2.getWebsite())) {
                     websiteSet.remove(ptmCmpSku2.getWebsite());
-                    System.out.println("count comment ans stats exclude  ebay ");
+//                    System.out.println("count comment ans stats exclude  ebay ");
                     if (!ptmCmpSku2.getWebsite().equals(Website.EBAY)) {
                         //评论数*星级 累加 除以评论数和
                         sum += ptmCmpSku2.getRatings() * ptmCmpSku2.getCommentsNumber();
@@ -920,7 +920,7 @@ public class AppController {
                     }
                 }
             }
-            System.out.println("totalCommentNum   " + totalCommentNum);
+//            System.out.println("totalCommentNum   " + totalCommentNum);
             productListVo.setCommentNum(totalCommentNum);
             int rating = ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(totalCommentNum == 0 ? 1 : totalCommentNum), 0, BigDecimal.ROUND_HALF_UP).longValue());
             productListVo.setRatingNum(rating <= 0 ? 90 : rating);

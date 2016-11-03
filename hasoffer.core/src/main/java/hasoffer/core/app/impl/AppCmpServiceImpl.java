@@ -237,7 +237,7 @@ public class AppCmpServiceImpl implements AppCmpService {
             sio.setHsSkuId(cmpSkuId);
             List<CmpProductListVo> tempCmpProductListVos = new ArrayList<CmpProductListVo>();
             //每个site只保留一个且为最低价
-            System.out.println("websiteSet :" + websiteSet.size());
+//            System.out.println("websiteSet :" + websiteSet.size());
             long startTime = System.nanoTime();   //获取开始时间
             for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
                 if (websiteSet.size() <= 0) {
@@ -278,7 +278,7 @@ public class AppCmpServiceImpl implements AppCmpService {
         }
         //取与客户端所传商品同一个site的sku作为sku匹配sku
         cmpResult.setProductVo(new ProductVo(sio.getHsProId(), sio.getCliQ(), productCacheManager.getProductMasterImageUrl(sio.getHsProId()), 0.0f, currentDeeplink));
-        System.out.println("comparedSkuVos" + comparedSkuVos.size());
+//        System.out.println("comparedSkuVos" + comparedSkuVos.size());
         cmpResult.setPriceList(comparedSkuVos);
         cmpResult.setCopywriting("Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you.");
         return cmpResult;
