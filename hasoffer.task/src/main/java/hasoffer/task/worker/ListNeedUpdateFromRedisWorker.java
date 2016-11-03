@@ -55,7 +55,7 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
             if (size > 50000) {
                 logger.info("queue size " + size + " sleep 5 minutes");
                 try {
-                    TimeUnit.MINUTES.sleep(30);
+                    TimeUnit.MINUTES.sleep(20);
                 } catch (InterruptedException e) {
 
                 }
