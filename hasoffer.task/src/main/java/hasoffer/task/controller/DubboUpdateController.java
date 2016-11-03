@@ -15,6 +15,7 @@ import hasoffer.core.product.IProductService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.data.redis.IRedisListService;
+import hasoffer.data.redis.IRedisSetService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchUrlResult;
@@ -65,6 +66,8 @@ public class DubboUpdateController {
     IPriceOffNoticeService priceOffNoticeService;
     @Resource
     IRedisListService redisListService;
+    @Resource
+    IRedisSetService redisSetService;
 
 
     /**
@@ -84,7 +87,7 @@ public class DubboUpdateController {
 
         ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
 
-        es.execute(new ListNeedUpdateFromRedisWorker(queue, fetchDubboService, redisListService, cmpSkuService, cacheSeconds));
+        es.execute(new ListNeedUpdateFromRedisWorker(queue, fetchDubboService, redisListService, redisSetService, cmpSkuService, cacheSeconds));
 
         for (int i = 0; i < 60; i++) {
             es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService, cacheSeconds));

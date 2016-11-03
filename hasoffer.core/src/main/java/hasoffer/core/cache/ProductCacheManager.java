@@ -14,6 +14,7 @@ import hasoffer.core.product.IProductService;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.utils.JsonHelper;
 import hasoffer.data.redis.IRedisListService;
+import hasoffer.data.redis.IRedisSetService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -43,6 +44,8 @@ public class ProductCacheManager {
     ICmpSkuService cmpSkuService;
     @Resource
     IRedisListService redisListService;
+    @Resource
+    IRedisSetService redisSetService;
     Logger logger = LoggerFactory.getLogger(ProductCacheManager.class);
 
     public static void main(String[] args) {
@@ -242,8 +245,28 @@ public class ProductCacheManager {
 
         String ymd = TimeUtils.parse(TimeUtils.today(), TimeUtils.PATTERN_YMD);
 
+        String key_updated = CACHE_KEY_PRE + "UPDATE_PROCESSED_" + ymd;
+        String key_added = CACHE_KEY_PRE + "ADDED_" + ymd;
         String key = CACHE_KEY_PRE + "WAIT_4_UPDATE_" + ymd;
 
-        redisListService.push(key, String.valueOf(productId));
+        // 如果处理过，那就不用加入到队列
+        if (redisSetService.contains(key_updated, String.valueOf(productId))) {
+            return;
+        }
+
+        // 如果没有添加过，就再次加入
+        if (!redisSetService.contains(key_added, String.valueOf(productId))) {
+            redisSetService.add(key_added, String.valueOf(productId));
+            redisListService.push(key, String.valueOf(productId));
+        }
     }
+
+    public void put2UpdateProcessedSet(long productId) {
+        String ymd = TimeUtils.parse(TimeUtils.today(), TimeUtils.PATTERN_YMD);
+
+        String key_updated = CACHE_KEY_PRE + "UPDATE_PROCESSED_" + ymd;
+
+        redisSetService.add(key_updated, String.valueOf(productId));
+    }
+
 }

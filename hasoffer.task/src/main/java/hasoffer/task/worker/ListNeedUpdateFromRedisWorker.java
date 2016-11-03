@@ -8,6 +8,7 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.data.redis.IRedisListService;
+import hasoffer.data.redis.IRedisSetService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,17 +24,21 @@ import java.util.concurrent.TimeUnit;
 public class ListNeedUpdateFromRedisWorker implements Runnable {
 
     private static final String UPDATE_WAIT_QUEUE = "PRODUCT_WAIT_4_UPDATE_";
+    private static final String KEY_PROCESSED_SET = "PRODUCT_UPDATE_PROCESSED_";
+
     private static Logger logger = LoggerFactory.getLogger(ListNeedUpdateFromRedisWorker.class);
     private ConcurrentLinkedQueue<PtmCmpSku> queue;
     private IFetchDubboService fetchDubboService;
     private IRedisListService redisListService;
+    private IRedisSetService redisSetService;
     private ICmpSkuService cmpSkuService;
     private long cacheSeconds;
 
-    public ListNeedUpdateFromRedisWorker(ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, IRedisListService redisListService, ICmpSkuService cmpSkuService, long cacheSeconds) {
+    public ListNeedUpdateFromRedisWorker(ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, IRedisListService redisListService, IRedisSetService redisSetService, ICmpSkuService cmpSkuService, long cacheSeconds) {
         this.queue = queue;
         this.fetchDubboService = fetchDubboService;
         this.redisListService = redisListService;
+        this.redisSetService = redisSetService;
         this.cmpSkuService = cmpSkuService;
         this.cacheSeconds = cacheSeconds;
     }
@@ -61,7 +66,7 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
 
             //队列取数
             //num默认为更新线程数量
-            int num = 60;
+            int num = 120;
             while (num > 0) {
                 num--;
 
@@ -72,6 +77,11 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                     } catch (InterruptedException e) {
 
                     }
+                    continue;
+                }
+
+                //if proceded set has this productId，continue next one
+                if (redisSetService.contains(KEY_PROCESSED_SET, (String) pop)) {
                     continue;
                 }
 
@@ -122,6 +132,9 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
 
                         logger.info("send url request succes for " + sku.getWebsite() + " sku id is [" + sku.getId() + "]");
                     }
+
+                    //now productid hava been sended ,add to processed set
+                    redisSetService.add(KEY_PROCESSED_SET, String.valueOf(productId));
                 }
             }
         }
