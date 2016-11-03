@@ -70,6 +70,7 @@ public class DubboUpdateController {
     /**
      * Date：2016-11-1 10:34更新改成一直在更新，从redis中读取数据
      */
+    //dubbofetchtask/start
     @RequestMapping(value = "/start", method = RequestMethod.GET)
     @ResponseBody
     public String start() {
