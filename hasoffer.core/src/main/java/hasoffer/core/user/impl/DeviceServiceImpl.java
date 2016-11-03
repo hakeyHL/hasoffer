@@ -51,6 +51,7 @@ import java.util.regex.Pattern;
 public class DeviceServiceImpl implements IDeviceService {
 
     private static final String Q_DEVICE = " SELECT t FROM UrmDevice t ORDER BY t.createTime DESC ";
+    private static final String Q_DEVICE_DEVICEID = " SELECT t FROM UrmDevice t where t.deviceId=?0 ";
     private static final String Q_DEVICE_ASC = " SELECT t FROM UrmDevice t ORDER BY t.createTime ASC ";
     private static final String Q_DEVICE_BY_TIME =
             " SELECT t FROM UrmDevice t " +
@@ -147,6 +148,16 @@ public class DeviceServiceImpl implements IDeviceService {
     @Override
     public PageableResult<UrmDevice> findPagedUrmDeviceByAppType(AppType appType, int curPage, int pageSize) {
         return dbm.queryPage("SELECT t FROM UrmDevice t WHERE t.appType = ?0 ORDER BY t.id", curPage, pageSize, Arrays.asList(appType));
+    }
+
+    @Override
+    public List<UrmDevice> getDevicesByDeviceId(String deviceId) {
+        return dbm.query(Q_DEVICE_DEVICEID, Arrays.asList(deviceId));
+    }
+
+    @Override
+    public PageableResult<UrmDevice> findPagedUrmdeviceByAPPTypeAndChannel(AppType appType, MarketChannel marketChannel, int curPage, int pageSize) {
+        return dbm.queryPage("SELECT t FROM UrmDevice t WHERE t.appType = ?0 and t.marketChannel=?1 ORDER BY t.id ", curPage, pageSize, Arrays.asList(appType, marketChannel));
     }
 
     @Override
@@ -469,6 +480,7 @@ public class DeviceServiceImpl implements IDeviceService {
     /**
      * 直接将requestlog中curApp拿出来存储进行转化
      * 该功能切换至分析日志
+     *
      * @param urmDeviceRequestLog
      */
 //    private void parseHijackLog(UrmDeviceRequestLog urmDeviceRequestLog) {
@@ -483,7 +495,6 @@ public class DeviceServiceImpl implements IDeviceService {
 //
 //        mdm.save(hijackLog);
 //    }
-
     private void parseBuyLog(List<String> websiteList, UrmDeviceRequestLog urmDeviceRequestLog, String query) {
         String[] params = query.split("&");
 

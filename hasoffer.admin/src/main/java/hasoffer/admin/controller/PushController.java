@@ -1,7 +1,10 @@
 package hasoffer.admin.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.android.gcm.server.MulticastResult;
 import hasoffer.admin.controller.vo.PushVo;
+import hasoffer.base.enums.AppType;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageModel;
 import hasoffer.base.model.PageableResult;
@@ -15,11 +18,15 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.enums.PushSourceType;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppPush;
+import hasoffer.core.persistence.po.urm.UrmDevice;
 import hasoffer.core.push.IPushService;
+import hasoffer.core.user.IDeviceService;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.webcommon.helper.PageHelper;
 import jodd.io.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +35,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -37,8 +45,8 @@ import java.util.*;
 @Controller
 @RequestMapping(value = "/push")
 public class PushController {
-
     private static final String ADMIN_PUSH_QUEUE = "ADMIN_PUSH_QUEUE";
+    private static final Logger logger = LoggerFactory.getLogger(PushController.class);
     static Map<Website, String> packageMap = new HashMap<Website, String>();
 
     static {
@@ -60,6 +68,8 @@ public class PushController {
     IDataBaseManager dbm;
     @Resource
     IRedisListService redisListService;
+    @Resource
+    IDeviceService deviceService;
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public ModelAndView list(HttpServletRequest request,
@@ -267,5 +277,188 @@ public class PushController {
                 break;
         }
         return mv;
+    }
+
+    /**
+     * @param appPush     封装对象
+     * @param type        点击类型,推送类型
+     * @param packageName 包名
+     * @param toType      0 默认所有设备,1特指哪一个,需要给出设备id
+     */
+    @RequestMapping("tempPushTask")
+    public void tempPushTask(AppPush appPush, AppMsgClickType type, @RequestParam String packageName,
+                             @RequestParam(defaultValue = "0") int toType,
+                             String deviceId,
+                             @RequestParam(defaultValue = "0") int version,
+                             @RequestParam(defaultValue = "none") String versionCompare) {
+        logger.info("api temp push interface   is run at {}", new Date());
+        //只推送渠道为googlePlay,版本小于等于27的设备
+        //type GOOGLEPLAY
+        //url 无
+        //包名com.india.hasoffer
+
+        //title为空也默认是版本推送
+        if (appPush == null || org.apache.commons.lang3.StringUtils.isEmpty(appPush.getTitle())) {
+            appPush = new AppPush();
+            appPush.setContent("Earn hasoffer coins to redeem the Rs.100 Amazon gift card！");
+            appPush.setCreateTime(new Date());
+            appPush.setTitle("Update the latest version.");
+            type = AppMsgClickType.GOOGLEPLAY;
+        }
+        switch (toType) {
+            case 0:
+                if (appPush != null) {
+                    AppMsgClick appMsgClick = new AppMsgClick(type, appPush.getSourceId() == null ? null : appPush.getSourceId(), packageName);
+                    if (packageName.equals("com.india.hasoffer")) {
+                        appMsgClick = new AppMsgClick(type, null, packageName);
+                    }
+                    AppPushMessage message = new AppPushMessage(
+                            new AppMsgDisplay(appPush.getTitle() + appPush.getContent(), appPush.getTitle(), appPush.getContent(), appPush.getPushImageUrl()),
+                            appMsgClick
+                    );
+
+                    AppPushBo pushBo = new AppPushBo("678678", "19:50", message);
+
+                    System.out.println("push currentTime is :" + new SimpleDateFormat("yyyyMMddHHmmss").
+                            format(new Date()) + " and content is : " + JSON.toJSONString(message));
+                    //暂定推送人群是所有app用户
+                    int curPage = 1;
+                    int pageSize = 1000;
+                    //只推送渠道为googlePlay,版本小于等于27的设备
+                    //type GOOGLEPLAY
+                    //appType 是app
+                    PageableResult<UrmDevice> pageableResult = deviceService.findPagedUrmdeviceByAPPTypeAndChannel(AppType.APP, MarketChannel.GOOGLEPLAY, curPage, pageSize);
+                    long totalPage = pageableResult.getTotalPage();
+                    System.out.println("totalpage = " + totalPage);
+
+                    while (curPage <= totalPage) {
+
+                        System.out.println("curPage = " + curPage);
+
+                        List<String> gcmTokenList = new ArrayList<>();
+
+                        if (curPage > 1) {
+                            pageableResult = deviceService.findPagedUrmdeviceByAPPTypeAndChannel(AppType.APP, MarketChannel.GOOGLEPLAY, curPage, pageSize);
+                        }
+
+                        List<UrmDevice> urmDeviceList = pageableResult.getData();
+
+                        for (UrmDevice urmDevice : urmDeviceList) {
+
+                            String shopApp = urmDevice.getShopApp();
+                            String gcmToken = urmDevice.getGcmToken();
+                            if (!hasoffer.base.utils.StringUtils.isEmpty(gcmToken)) {
+                                if (version > 0) {
+                                    //有版本要求
+                                    if (!StringUtils.isEmpty(urmDevice.getAppVersion())) {
+                                        if (!versionCompare.equals("none")) {
+                                            //
+                                            if (versionCompare.equals("le")) {
+                                                if (Integer.valueOf(urmDevice.getAppVersion()) <= version) {
+                                                    gcmTokenList.add(gcmToken);
+                                                }
+                                            } else {
+                                                //大于等于
+                                                if (Integer.valueOf(urmDevice.getAppVersion()) >= version) {
+                                                    gcmTokenList.add(gcmToken);
+                                                }
+                                            }
+                                        } else {
+                                            //无限制
+                                            gcmTokenList.add(gcmToken);
+                                        }
+                                    }
+                                    //else 不添加
+                                } else {
+                                    //直接加
+                                    gcmTokenList.add(gcmToken);
+                                }
+                            }
+                            if (urmDevice.getId().equals("dd3af1280b74a528f073316c17425841")) {
+                                System.out.println("shitTime:" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "found ashit");
+                                System.out.println("website " + packageName);
+                                System.out.println("shopApp = " + shopApp);
+                            }
+                        }
+                        try {
+
+                            if (gcmTokenList != null && gcmTokenList.contains("diME4RkV_6A:APA91bGHSgs6e6RyDjnKH2DPq3Ca7Q_D4cSRRq_JySvRO8txSIJgDgHFi1JULM7uM-EXwxTkswtP1PoKJzZ0l0jUdaAf88-VfZcVkE8C5rPEO-neb3hOdZjT0mjGsa002vLwdYHgyU3S")) {
+                                System.out.println("push to ashit ");
+                                String push = pushService.push(("diME4RkV_6A:APA91bGHSgs6e6RyDjnKH2DPq3Ca7Q_D4cSRRq_JySvRO8txSIJgDgHFi1JULM7uM-EXwxTkswtP1PoKJzZ0l0jUdaAf88-VfZcVkE8C5rPEO-neb3hOdZjT0mjGsa002vLwdYHgyU3S"), pushBo);
+                                System.out.println("push result = " + push);
+                            }
+
+                            MulticastResult multicastResult = pushService.GroupPush(gcmTokenList, pushBo);
+
+                            System.out.println(multicastResult.toString());
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        curPage++;
+                    }
+                }
+                break;
+            case 1:
+                if (org.apache.commons.lang3.StringUtils.isNotEmpty(deviceId)) {
+                    List<String> gcmTokenList = new ArrayList<>();
+                    AppMsgClick appMsgClick = new AppMsgClick(type, appPush.getSourceId() == null ? null : appPush.getSourceId(), packageName);
+                    if (packageName.equals("com.india.hasoffer")) {
+                        appMsgClick = new AppMsgClick(type, null, packageName);
+                    }
+
+                    AppPushMessage message = new AppPushMessage(
+                            new AppMsgDisplay(appPush.getTitle() + appPush.getContent(), appPush.getTitle(), appPush.getContent(), appPush.getPushImageUrl()),
+                            appMsgClick
+                    );
+                    AppPushBo pushBo = new AppPushBo("678678", "19:50", message);
+                    List<UrmDevice> devicesByDeviceId = deviceService.getDevicesByDeviceId(deviceId);
+                    for (UrmDevice urmDevice : devicesByDeviceId) {
+                        String gcmToken = urmDevice.getGcmToken();
+                        if (!hasoffer.base.utils.StringUtils.isEmpty(gcmToken)) {
+                            if (version > 0) {
+                                //有版本要求
+                                if (!StringUtils.isEmpty(urmDevice.getAppVersion())) {
+                                    if (!versionCompare.equals("none")) {
+                                        //
+                                        if (versionCompare.equals("le")) {
+                                            if (Integer.valueOf(urmDevice.getAppVersion()) <= version) {
+                                                gcmTokenList.add(gcmToken);
+                                            }
+                                        } else {
+                                            //大于等于
+                                            if (Integer.valueOf(urmDevice.getAppVersion()) >= version) {
+                                                gcmTokenList.add(gcmToken);
+                                            }
+                                        }
+                                    } else {
+                                        //无限制
+                                        gcmTokenList.add(gcmToken);
+                                    }
+                                }
+                                //else 不添加
+                            } else {
+                                //直接加
+                                gcmTokenList.add(gcmToken);
+                            }
+                        }
+                    }
+                    MulticastResult multicastResult = null;
+                    try {
+                        if (gcmTokenList != null && gcmTokenList.size() > 0) {
+                            multicastResult = pushService.GroupPush(gcmTokenList, pushBo);
+                        } else {
+                            return;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return;
+                    }
+                    System.out.println(multicastResult.toString());
+                }
+                break;
+            default:
+        }
+        logger.info("temp Push   stop at {}", new Date());
     }
 }

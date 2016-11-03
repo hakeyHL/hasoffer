@@ -246,6 +246,7 @@ public class ProductCacheManager {
         String ymd = TimeUtils.parse(TimeUtils.today(), TimeUtils.PATTERN_YMD);
 
         String key_updated = CACHE_KEY_PRE + "UPDATE_PROCESSED_" + ymd;
+        String key_added = CACHE_KEY_PRE + "ADDED_" + ymd;
         String key = CACHE_KEY_PRE + "WAIT_4_UPDATE_" + ymd;
 
         // 如果处理过，那就不用加入到队列
@@ -253,7 +254,11 @@ public class ProductCacheManager {
             return;
         }
 
-        redisListService.push(key, String.valueOf(productId));
+        // 如果没有添加过，就再次加入
+        if (!redisSetService.contains(key_added, String.valueOf(productId))) {
+            redisSetService.add(key_added, String.valueOf(productId));
+            redisListService.push(key, String.valueOf(productId));
+        }
     }
 
     public void put2UpdateProcessedSet(long productId) {
