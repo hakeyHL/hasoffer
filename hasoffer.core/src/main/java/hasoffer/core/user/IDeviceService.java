@@ -94,4 +94,8 @@ public interface IDeviceService {
     List<StatDevice> findCmpskuStat(String marketChannel, int days, String startYmd, String endYmd);
 
     PageableResult<UrmDevice> findPagedUrmDeviceByAppType(AppType appType, int curPage, int pageSize);
+
+    List<UrmDevice> getDevicesByDeviceId(String deviceId);
+
+    PageableResult<UrmDevice> findPagedUrmdeviceByAPPTypeAndChannel(AppType app, MarketChannel googleplay, int curPage, int pageSize);
 }
