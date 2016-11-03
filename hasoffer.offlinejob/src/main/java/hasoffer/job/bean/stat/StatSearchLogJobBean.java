@@ -2,7 +2,6 @@ package hasoffer.job.bean.stat;
 
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.cache.SearchLogCacheManager;
-import hasoffer.core.persistence.po.search.SrmProductSearchStat;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
 import hasoffer.job.manager.ProductSearchManager;
@@ -52,28 +51,28 @@ public class StatSearchLogJobBean extends QuartzJobBean {
         logger.info("StatSearchLogJobBean end");
     }
 
-    //    @Override
-    protected void executeInternal_old(JobExecutionContext context) throws JobExecutionException {
-        String ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
-
-        //System.out.println("ymd = " + ymd);
-        logger.info("ymd = " + ymd);
-        //System.out.println("saveSearchCount...");
-        logger.info("saveSearchCount...");
-        // 保存所有被搜索过的商品
-        productSearchManager.saveSearchCount(ymd);
-
-        logger.info("expTopSellingsFromSearchCount...");
-        //System.out.println("expTopSellingsFromSearchCount...");
-        // top selling
-        productService.expTopSellingsFromSearchCount(ymd);
-
-        logger.info("statSearchCount...");
-        //System.out.println("statSearchCount...");
-        // 统计比价质量
-        SrmProductSearchStat ss = searchService.statSearchCount(ymd);
-        searchService.saveSrmProductSearchStat(ss);
-        logger.info("StatSearchLogJobBean finished.");
-        //System.out.println("StatSearchLogJobBean finished.");
-    }
+//    //    @Override
+//    protected void executeInternal_old(JobExecutionContext context) throws JobExecutionException {
+//        String ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
+//
+//        //System.out.println("ymd = " + ymd);
+//        logger.info("ymd = " + ymd);
+//        //System.out.println("saveSearchCount...");
+//        logger.info("saveSearchCount...");
+//        // 保存所有被搜索过的商品
+//        productSearchManager.saveSearchCount(ymd);
+//
+//        logger.info("expTopSellingsFromSearchCount...");
+//        //System.out.println("expTopSellingsFromSearchCount...");
+//        // top selling
+//        productService.expTopSellingsFromSearchCount(ymd);
+//
+//        logger.info("statSearchCount...");
+//        //System.out.println("statSearchCount...");
+//        // 统计比价质量
+//        SrmProductSearchStat ss = searchService.statSearchCount(ymd);
+//        searchService.saveSrmProductSearchStat(ss);
+//        logger.info("StatSearchLogJobBean finished.");
+//        //System.out.println("StatSearchLogJobBean finished.");
+//    }
 }
