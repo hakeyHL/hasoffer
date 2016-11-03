@@ -525,6 +525,7 @@ public class ProductController {
             productService.updatePtmProductPrice(productId);
 
             //清除商品缓存
+
             cacheServiceImpl.del("PRODUCT_" + productId);
             //清除sku缓存        PRODUCT__listPagedCmpSkus_3198_1_10
             Set<String> keys = cacheServiceImpl.keys("PRODUCT__listPagedCmpSkus_" + productId + "_*");
@@ -532,6 +533,14 @@ public class ProductController {
             for (String key : keys) {
                 cacheServiceImpl.del(key);
             }
+
+            //清除topselling缓存        PRODUCT__listPagedCmpSkus_TopSelling_0_20
+            Set<String> topsellingCache = cacheServiceImpl.keys("PRODUCT__listPagedCmpSkus" + "_*");
+
+            for (String topCache : topsellingCache) {
+                cacheServiceImpl.del(topCache);
+            }
+
 
             statusMap.put("status", "success");
 

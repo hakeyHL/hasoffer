@@ -670,8 +670,7 @@ public class AppController {
     @RequestMapping(value = "/productsList")
     public ModelAndView productsList(SearchCriteria criteria, @RequestParam(defaultValue = "4") int type) {
         long l = System.currentTimeMillis();
-        System.out.println("enter ");
-        System.out.println(Thread.currentThread().getName() + " :  criteria : " + criteria.toString());
+//        System.out.println(Thread.currentThread().getName() + " :  criteria : " + criteria.toString());
         ModelAndView mv = new ModelAndView();
         List li = new ArrayList();
         Map map = new HashMap();
