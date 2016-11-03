@@ -9,6 +9,7 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.cache.CmpSkuCacheManager;
+import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
@@ -46,7 +47,6 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Pattern;
 
 /**
  * Created by chevy on 2015/12/16.
@@ -93,8 +93,20 @@ public class ProductTest {
     CmpSkuCacheManager cmpSkuCacheManager;
     @Resource
     SearchLogCacheManager searchLogCacheManager;
-    private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
-    private Pattern PATTERN_Brand = Pattern.compile("[\t*?]([a-zA-Z])[\t*?]");
+    @Resource
+    ProductCacheManager productCacheManager;
+
+
+//    private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
+//    private Pattern PATTERN_Brand = Pattern.compile("[\t*?]([a-zA-Z])[\t*?]");
+
+    @Test
+    public void testtest() {
+        productCacheManager.put2UpdateQueue(100L);
+
+        productCacheManager.put2UpdateProcessedSet(1000L);
+        productCacheManager.put2UpdateQueue(1000L);
+    }
 
     @Test
     public void test2() {
