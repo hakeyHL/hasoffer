@@ -86,8 +86,9 @@ public class SearchLogCacheManager {
         if (proId <= 0) {
             return;
         }
-        // 业务需求：当前时间减10小时
-        Date date = TimeUtils.add(TimeUtils.nowDate(), -1 * TimeUtils.MILLISECONDS_OF_1_HOUR * 10);
+        // 业务需求：当前时间减10小时 - out date
+//        Date date = TimeUtils.add(TimeUtils.nowDate(), -1 * TimeUtils.MILLISECONDS_OF_1_HOUR * 10);
+        Date date = TimeUtils.nowDate();
 
         String logCountMap = "LOG_COUNT_" + TimeUtils.parse(date, "yyyyMMdd");
 
