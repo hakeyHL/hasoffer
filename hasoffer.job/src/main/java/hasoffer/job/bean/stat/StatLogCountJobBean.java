@@ -1,12 +1,10 @@
 package hasoffer.job.bean.stat;
 
-import hasoffer.base.model.SkuStatus;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.cache.CmpSkuCacheManager;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
-import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
@@ -17,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -62,9 +59,10 @@ public class StatLogCountJobBean extends QuartzJobBean {
             long productId = countKv.getKey();
             long searchCount = countKv.getValue();
 
-            List<PtmCmpSku> cmpSkus = cmpSkuCacheManager.listCmpSkus(productId, SkuStatus.ONSALE);
+//            List<PtmCmpSku> cmpSkus = cmpSkuCacheManager.listCmpSkus(productId, SkuStatus.ONSALE);
 
-            int size = cmpSkus.size();
+//            int size = cmpSkus.size();
+            int size = 0;
 
             searchService.saveSearchCountByHour(ymd_hour, productId, searchCount, size);
 

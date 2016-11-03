@@ -109,6 +109,30 @@ public class SearchServiceImpl implements ISearchService {
     public void saveSearchCount_old(String ymd) {
         logger.debug(String.format("save search count [%s]", ymd));
 
+        Map<Long, Long> countMap = searchLogCacheManager.getProductCount(ymd);
+
+        if (countMap.size() > 0) {
+            delSearchCount(ymd);
+        }
+
+        for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
+
+            long productId = countKv.getKey();
+            long searchCount = countKv.getValue();
+
+            List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId, SkuStatus.ONSALE);
+            int size = 0;
+            if (ArrayUtils.hasObjs(cmpSkus)) {
+                size = cmpSkus.size();
+            }
+
+            saveLogCount(new SrmProductSearchCount(ymd, productId, searchCount, size));
+
+            productService.importProduct2Solr2(productId);
+        }
+
+       /* logger.debug(String.format("save search count [%s]", ymd));
+
         List<SrmProductSearchCount> spscs = new ArrayList<SrmProductSearchCount>();
 
         Map<Long, Long> countMap = searchLogCacheManager.getProductCount(ymd);
@@ -142,7 +166,7 @@ public class SearchServiceImpl implements ISearchService {
 
         if (ArrayUtils.hasObjs(spscs)) {
             saveLogCount(spscs);
-        }
+        }*/
 
     }
 
@@ -736,10 +760,10 @@ public class SearchServiceImpl implements ISearchService {
         dbm.update(srmSearchLogUpdater);
     }
 
-    @Override
+
     @Transactional(rollbackFor = Exception.class)
-    public void saveLogCount(List<SrmProductSearchCount> searchCounts) {
-        dbm.batchSave(searchCounts);
+    public void saveLogCount(SrmProductSearchCount searchCount) {
+        dbm.create(searchCount);
     }
 
     @Override
