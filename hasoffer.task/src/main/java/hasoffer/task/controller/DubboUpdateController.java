@@ -6,6 +6,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
@@ -68,7 +69,8 @@ public class DubboUpdateController {
     IRedisListService redisListService;
     @Resource
     IRedisSetService redisSetService;
-
+    @Resource
+    ProductCacheManager productCacheManager;
 
     /**
      * Date：2016-11-1 10:34更新改成一直在更新，从redis中读取数据
@@ -87,7 +89,7 @@ public class DubboUpdateController {
 
         ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
 
-        es.execute(new ListNeedUpdateFromRedisWorker(queue, fetchDubboService, redisListService, redisSetService, cmpSkuService, cacheSeconds));
+        es.execute(new ListNeedUpdateFromRedisWorker(queue, fetchDubboService, redisListService, redisSetService, cmpSkuService, cacheSeconds, productCacheManager));
 
 
         for (int i = 0; i < 60; i++) {

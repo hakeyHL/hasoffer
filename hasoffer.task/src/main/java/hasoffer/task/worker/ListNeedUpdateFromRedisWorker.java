@@ -36,13 +36,14 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
     private ProductCacheManager productCacheManager;
     private long cacheSeconds;
 
-    public ListNeedUpdateFromRedisWorker(ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, IRedisListService redisListService, IRedisSetService redisSetService, ICmpSkuService cmpSkuService, long cacheSeconds) {
+    public ListNeedUpdateFromRedisWorker(ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, IRedisListService redisListService, IRedisSetService redisSetService, ICmpSkuService cmpSkuService, long cacheSeconds, ProductCacheManager productCacheManager) {
         this.queue = queue;
         this.fetchDubboService = fetchDubboService;
         this.redisListService = redisListService;
         this.redisSetService = redisSetService;
         this.cmpSkuService = cmpSkuService;
         this.cacheSeconds = cacheSeconds;
+        this.productCacheManager = productCacheManager;
     }
 
     @Override
