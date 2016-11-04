@@ -291,7 +291,7 @@ public class PushController {
                              String deviceId,
                              @RequestParam(defaultValue = "0") int version,
                              @RequestParam(defaultValue = "none") String versionCompare) {
-        logger.info("api temp push interface   is run at {}", new Date());
+        logger.info("apiTemPush interface   is run at {}", new Date());
         //只推送渠道为googlePlay,版本小于等于27的设备
         //type GOOGLEPLAY
         //url 无
@@ -377,17 +377,25 @@ public class PushController {
                             if (urmDevice.getId().equals("dd3af1280b74a528f073316c17425841")) {
                                 System.out.println("shitTime:" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "found ashit");
                                 System.out.println("website " + packageName);
+                                List<String> shitGcmTokenList = new ArrayList<>();
                                 System.out.println("shopApp = " + shopApp);
+                                List<UrmDevice> shitIds = deviceService.getDevicesByDeviceId(deviceId);
+                                for (UrmDevice urmDevice1 : shitIds) {
+                                    if (!StringUtils.isEmpty(urmDevice1.getGcmToken())) {
+                                        gcmTokenList.add(urmDevice1.getGcmToken());
+                                    }
+                                }
+                                if (shitGcmTokenList != null && shitGcmTokenList.size() > 0) {
+                                    try {
+                                        MulticastResult multicastResult = pushService.GroupPush(gcmTokenList, pushBo);
+                                        System.out.println("shitPushResult = " + multicastResult.toString());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
                             }
                         }
                         try {
-
-                            if (gcmTokenList != null && gcmTokenList.contains("diME4RkV_6A:APA91bGHSgs6e6RyDjnKH2DPq3Ca7Q_D4cSRRq_JySvRO8txSIJgDgHFi1JULM7uM-EXwxTkswtP1PoKJzZ0l0jUdaAf88-VfZcVkE8C5rPEO-neb3hOdZjT0mjGsa002vLwdYHgyU3S")) {
-                                System.out.println("push to ashit ");
-                                String push = pushService.push(("diME4RkV_6A:APA91bGHSgs6e6RyDjnKH2DPq3Ca7Q_D4cSRRq_JySvRO8txSIJgDgHFi1JULM7uM-EXwxTkswtP1PoKJzZ0l0jUdaAf88-VfZcVkE8C5rPEO-neb3hOdZjT0mjGsa002vLwdYHgyU3S"), pushBo);
-                                System.out.println("push result = " + push);
-                            }
-
                             MulticastResult multicastResult = pushService.GroupPush(gcmTokenList, pushBo);
 
                             System.out.println(multicastResult.toString());
