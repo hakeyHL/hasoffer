@@ -96,7 +96,7 @@
     <!-- logger -->
 
     <!-- code info log -->
-    <logger name="hasoffer.job" level="INFO">
+    <logger name="hasoffer" level="INFO">
         <appender-ref ref="InfoLoggerFileOut"/>
         <appender-ref ref="ErrorLoggerFileOut"/>
     </logger>
