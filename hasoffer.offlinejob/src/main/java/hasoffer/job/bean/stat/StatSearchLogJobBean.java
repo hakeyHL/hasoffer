@@ -1,7 +1,12 @@
 package hasoffer.job.bean.stat;
 
+import hasoffer.base.model.SkuStatus;
+import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.cache.SearchLogCacheManager;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.search.SrmProductSearchCount;
+import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
 import hasoffer.job.manager.ProductSearchManager;
@@ -12,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created on 2016/6/27.
@@ -28,6 +35,10 @@ public class StatSearchLogJobBean extends QuartzJobBean {
     IProductService productService;
     @Resource
     ISearchService searchService;
+    @Resource
+    SearchLogCacheManager searchLogCacheManager;
+    @Resource
+    ICmpSkuService cmpSkuService;
 
 
     @Override
@@ -37,7 +48,7 @@ public class StatSearchLogJobBean extends QuartzJobBean {
         String ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
 
         logger.info("saveSearchCount_old({}) start", ymd);
-        searchService.saveSearchCount_old(ymd);
+        saveSearchCount(ymd);
         logger.info("saveSearchCount_old({}) end", ymd);
 
         logger.info("expTopSellingsFromSearchCount({}) start", ymd);
@@ -51,28 +62,67 @@ public class StatSearchLogJobBean extends QuartzJobBean {
         logger.info("StatSearchLogJobBean end");
     }
 
-//    //    @Override
-//    protected void executeInternal_old(JobExecutionContext context) throws JobExecutionException {
-//        String ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
-//
-//        //System.out.println("ymd = " + ymd);
-//        logger.info("ymd = " + ymd);
-//        //System.out.println("saveSearchCount...");
-//        logger.info("saveSearchCount...");
-//        // 保存所有被搜索过的商品
-//        productSearchManager.saveSearchCount(ymd);
-//
-//        logger.info("expTopSellingsFromSearchCount...");
-//        //System.out.println("expTopSellingsFromSearchCount...");
-//        // top selling
-//        productService.expTopSellingsFromSearchCount(ymd);
-//
-//        logger.info("statSearchCount...");
-//        //System.out.println("statSearchCount...");
-//        // 统计比价质量
-//        SrmProductSearchStat ss = searchService.statSearchCount(ymd);
-//        searchService.saveSrmProductSearchStat(ss);
-//        logger.info("StatSearchLogJobBean finished.");
-//        //System.out.println("StatSearchLogJobBean finished.");
-//    }
+    public void saveSearchCount(String ymd) {
+        logger.debug(String.format("save search count [%s]", ymd));
+
+        Map<Long, Long> countMap = searchLogCacheManager.getProductCount(ymd);
+
+        if (countMap.size() > 0) {
+            searchService.delSearchCount(ymd);
+        }
+
+        for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
+
+            long productId = countKv.getKey();
+            long searchCount = countKv.getValue();
+
+            List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId, SkuStatus.ONSALE);
+            int size = 0;
+            if (ArrayUtils.hasObjs(cmpSkus)) {
+                size = cmpSkus.size();
+            }
+
+            searchService.saveLogCount(new SrmProductSearchCount(ymd, productId, searchCount, size));
+
+            productService.importProduct2Solr2(productId);
+        }
+
+       /* logger.debug(String.format("save search count [%s]", ymd));
+
+        List<SrmProductSearchCount> spscs = new ArrayList<SrmProductSearchCount>();
+
+        Map<Long, Long> countMap = searchLogCacheManager.getProductCount(ymd);
+
+        if (countMap.size() > 0) {
+            delSearchCount(ymd);
+        }
+
+        int count = 0;
+        for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
+
+            long productId = countKv.getKey();
+            long searchCount = countKv.getValue();
+
+            List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId, SkuStatus.ONSALE);
+            int size = 0;
+            if (ArrayUtils.hasObjs(cmpSkus)) {
+                size = cmpSkus.size();
+            }
+
+            spscs.add(new SrmProductSearchCount(ymd, productId, searchCount, size));
+
+            if (count % 2000 == 0) {
+                saveLogCount(spscs);
+                count = 0;
+                spscs.clear();
+            }
+
+            productService.importProduct2Solr2(productId);
+        }
+
+        if (ArrayUtils.hasObjs(spscs)) {
+            saveLogCount(spscs);
+        }*/
+
+    }
 }

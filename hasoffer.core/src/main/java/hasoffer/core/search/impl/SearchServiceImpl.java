@@ -1,7 +1,6 @@
 package hasoffer.core.search.impl;
 
 import hasoffer.base.model.PageableResult;
-import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.HexDigestUtil;
@@ -87,7 +86,7 @@ public class SearchServiceImpl implements ISearchService {
     private Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
 
     @Transactional
-    private void delSearchCount(String ymd) {
+    public void delSearchCount(String ymd) {
         String sql = "delete from SrmProductSearchCount t where t.ymd='" + ymd + "'";
         dbm.deleteBySQL(sql);
     }
@@ -103,71 +102,6 @@ public class SearchServiceImpl implements ISearchService {
     public void saveSearchCountByHour(String ymd_hour, long productId, long searchCount, int size) {
         SrmProductSearchCountByHour srmProductSearchCountByHour = new SrmProductSearchCountByHour(ymd_hour, productId, searchCount, size);
         dbm.create(srmProductSearchCountByHour);
-    }
-
-    @Override
-    public void saveSearchCount_old(String ymd) {
-        logger.debug(String.format("save search count [%s]", ymd));
-
-        Map<Long, Long> countMap = searchLogCacheManager.getProductCount(ymd);
-
-        if (countMap.size() > 0) {
-            delSearchCount(ymd);
-        }
-
-        for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
-
-            long productId = countKv.getKey();
-            long searchCount = countKv.getValue();
-
-            List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId, SkuStatus.ONSALE);
-            int size = 0;
-            if (ArrayUtils.hasObjs(cmpSkus)) {
-                size = cmpSkus.size();
-            }
-
-            saveLogCount(new SrmProductSearchCount(ymd, productId, searchCount, size));
-
-            productService.importProduct2Solr2(productId);
-        }
-
-       /* logger.debug(String.format("save search count [%s]", ymd));
-
-        List<SrmProductSearchCount> spscs = new ArrayList<SrmProductSearchCount>();
-
-        Map<Long, Long> countMap = searchLogCacheManager.getProductCount(ymd);
-
-        if (countMap.size() > 0) {
-            delSearchCount(ymd);
-        }
-
-        int count = 0;
-        for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
-
-            long productId = countKv.getKey();
-            long searchCount = countKv.getValue();
-
-            List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId, SkuStatus.ONSALE);
-            int size = 0;
-            if (ArrayUtils.hasObjs(cmpSkus)) {
-                size = cmpSkus.size();
-            }
-
-            spscs.add(new SrmProductSearchCount(ymd, productId, searchCount, size));
-
-            if (count % 2000 == 0) {
-                saveLogCount(spscs);
-                count = 0;
-                spscs.clear();
-            }
-
-            productService.importProduct2Solr2(productId);
-        }
-
-        if (ArrayUtils.hasObjs(spscs)) {
-            saveLogCount(spscs);
-        }*/
-
     }
 
     @Override
