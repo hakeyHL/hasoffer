@@ -323,6 +323,7 @@ public class AppController {
             data.setMaxConSignNum(0);
         }
 //        data.setAuxiliaryCheck(true);
+        data.setAuxiliaryCheck(false);
         //set sign in and rewards config map
         data.setSinDaysRewardsCfg(afwCfgMap);
         if (data.getSinDaysRewardsCfg() != null) {
