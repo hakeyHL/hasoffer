@@ -1,6 +1,7 @@
 package hasoffer.joe.test;
 
 import hasoffer.data.redis.IRedisListService;
+import hasoffer.data.redis.IRedisSetService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -18,10 +19,13 @@ public class RedisTest {
     @Resource
     IRedisListService<String> listService;
 
+    @Resource
+    IRedisSetService redisSetService;
+
     @Test
     public void test() {
-        listService.push("PRICE_OFF_SKUID_QUEUE", "2");
-        System.out.println(listService.size("PRICE_OFF_SKUID_QUEUE"));
+//        listService.push("PRICE_OFF_SKUID_QUEUE", "2");
+        System.out.println(redisSetService.size("PRODUCT_UPDATE_PROCESSED_20161104"));
     }
 
 

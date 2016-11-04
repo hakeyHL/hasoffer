@@ -102,6 +102,10 @@ public class ProductTest {
 
     @Test
     public void testtest() {
+        for (int i = 89992; i < 92000; i++) {
+            searchLogCacheManager.countSearchedProduct(i);
+        }
+
         productCacheManager.put2UpdateQueue(100L);
 
         productCacheManager.put2UpdateProcessedSet(1000L);

@@ -100,11 +100,13 @@ public interface ISearchService {
 
     SrmProductSearchCount findSearchCountByProductId(Long proId);
 
-    void saveSearchCount_old(String ymd);
-
     void statSearchCount_old(String ymd);
 
     void delSearchCountByHour(String ymd_hour);
 
     void saveSearchCountByHour(String ymd_hour, long productId, long searchCount, int size);
+
+    void delSearchCount(String ymd);
+
+    void saveLogCount(SrmProductSearchCount srmProductSearchCount);
 }

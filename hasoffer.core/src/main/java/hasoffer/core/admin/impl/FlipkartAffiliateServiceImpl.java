@@ -294,7 +294,9 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
             String deviceId_userId = order.getAffExtParam2();
             if (deviceId_userId != null && !"".equals(deviceId_userId)) {
                 String[] tempArray = deviceId_userId.split("_");
-                if (tempArray.length == 2) {
+                if (tempArray.length == 1) {
+                    po.setDeviceId(tempArray[0]);
+                } else if (tempArray.length == 2) {
                     po.setDeviceId(tempArray[0]);
                     po.setUserId(tempArray[1]);
                 } else if (tempArray.length == 3) {

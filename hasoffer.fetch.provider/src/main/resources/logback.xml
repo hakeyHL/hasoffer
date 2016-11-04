@@ -44,6 +44,23 @@
         </encoder>
     </appender>
 
+    <appender name="ErrorPipelineLoggerFileOut"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.base}/error-pipe-result.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${log.base}/error-pipe-result.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <MaxHistory>10</MaxHistory>
+                <!-- or whenever the file size reaches 100MB -->
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%date [%thread][%-8level%logger{80}] %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <appender name="FetchUrlResultLoggerFileOut"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/fetch-url-result.log</file>
@@ -254,6 +271,10 @@
 
     <logger name="hasoffer.spider.detail.ppl.RedisPagePipeline" level="DEBUG">
         <appender-ref ref="FetchUrlResultLoggerFileOut"/>
+    </logger>
+
+    <logger name="hasoffer.spider.detail.ppl.ErrorRedisPagePipeline" level="DEBUG">
+        <appender-ref ref="ErrorPipelineLoggerFileOut"/>
     </logger>
 
     <logger name="hasoffer.fetch.keyword.success" level="DEBUG">

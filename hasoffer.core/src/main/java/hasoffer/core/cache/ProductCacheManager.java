@@ -269,4 +269,10 @@ public class ProductCacheManager {
         redisSetService.add(key_updated, String.valueOf(productId));
     }
 
+    public long getWait4UpdateProductCount(String ymd) {
+        String key_updated = CACHE_KEY_PRE + "UPDATE_PROCESSED_" + ymd;
+
+//        return redisSetService.size(key_updated);
+        return 0;
+    }
 }

@@ -51,6 +51,20 @@ public class StatController {
     ProductCacheManager productCacheManager;
     private Logger logger = LoggerFactory.getLogger(StatController.class);
 
+    @RequestMapping(value = "/show_update_status", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String showUpdateStatus(@RequestParam(defaultValue = "") String ymd) {
+        if (StringUtils.isEmpty(ymd)) {
+            ymd = TimeUtils.parse(TimeUtils.add(TimeUtils.nowDate(), TimeUtils.MILLISECONDS_OF_1_HOUR * -1), "yyyyMMdd_HH");
+        }
+
+        long wait4UpdateProduct = productCacheManager.getWait4UpdateProductCount(ymd);
+
+//        return new ModelAndView("");
+        return "ok";
+    }
+
     @RequestMapping(value = "/statByHour", method = RequestMethod.GET)
     public
     @ResponseBody
@@ -84,57 +98,6 @@ public class StatController {
             productCacheManager.put2UpdateQueue(productId);
 //            productService.importProduct2Solr2(productId);
         }
-
-        return "ok";
-    }
-
-    /*
-    logger.debug(String.format("save search count [%s]", ymd));
-
-    List<SrmProductSearchCount> spscs = new ArrayList<SrmProductSearchCount>();
-
-
-
-    int count = 0;
-    for (Map.Entry<Long, Long> countKv : countMap.entrySet()) {
-
-        long productId = countKv.getKey();
-        long searchCount = countKv.getValue();
-
-        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(productId, SkuStatus.ONSALE);
-        int size = 0;
-        if (ArrayUtils.hasObjs(cmpSkus)) {
-            size = cmpSkus.size();
-        }
-
-        spscs.add(new SrmProductSearchCount(ymd, productId, searchCount, size));
-
-        if (count % 2000 == 0) {
-            saveLogCount(spscs);
-            count = 0;
-            spscs.clear();
-        }
-
-        productService.importProduct2Solr2(productId);
-    }
-
-    if (ArrayUtils.hasObjs(spscs)) {
-        saveLogCount(spscs);
-    }*/
-
-    @RequestMapping(value = "/stat", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String statSearchCount(@RequestParam String ymd) {
-        if (StringUtils.isEmpty(ymd)) {
-            ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
-        }
-
-        searchService.saveSearchCount_old(ymd);
-
-        productService.expTopSellingsFromSearchCount(ymd);
-
-        searchService.statSearchCount_old(ymd);
 
         return "ok";
     }
