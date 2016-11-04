@@ -250,9 +250,9 @@ public class ProductCacheManager {
         String key = CACHE_KEY_PRE + "WAIT_4_UPDATE_" + ymd;
 
         // 如果处理过，那就不用加入到队列
-        if (redisSetService.contains(key_updated, String.valueOf(productId))) {
-            return;
-        }
+//        if (redisSetService.contains(key_updated, String.valueOf(productId))) {
+//            return;
+//        }
 
         // 如果没有添加过，就再次加入
         if (!redisSetService.contains(key_added, String.valueOf(productId))) {
@@ -270,9 +270,14 @@ public class ProductCacheManager {
     }
 
     public long getWait4UpdateProductCount(String ymd) {
-        String key_updated = CACHE_KEY_PRE + "UPDATE_PROCESSED_" + ymd;
-
-//        return redisSetService.size(key_updated);
-        return 0;
+        String key_updated = CACHE_KEY_PRE + "WAIT_4_UPDATE_" + ymd;
+        return redisListService.size(key_updated);
     }
+
+    public long getUpdateProcessdProductCount(String ymd) {
+        String key_updated = CACHE_KEY_PRE + "UPDATE_PROCESSED_" + ymd;
+        return redisSetService.size(key_updated);
+    }
+
+
 }
