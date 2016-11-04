@@ -42,19 +42,19 @@ public class FetchListener extends ContextLoaderListener {
             es.execute(new FetchUrlWorker(springContext, Website.AMAZON));
         }
 
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < 20; i++) {
             es.execute(new FetchUrlWorker(springContext, Website.FLIPKART));
         }
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 5; i++) {
             es.execute(new FetchUrlWorker(springContext, Website.SNAPDEAL));
         }
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             es.execute(new FetchUrlWorker(springContext, Website.EBAY));
         }
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             es.execute(new FetchUrlWorker(springContext, Website.SHOPCLUES));
         }
 

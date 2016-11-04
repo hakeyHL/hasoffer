@@ -322,7 +322,8 @@ public class AppController {
             //未登录返回连续签到次数为0
             data.setMaxConSignNum(0);
         }
-        data.setAuxiliaryCheck(true);
+//        data.setAuxiliaryCheck(true);
+        data.setAuxiliaryCheck(false);
         //set sign in and rewards config map
         data.setSinDaysRewardsCfg(afwCfgMap);
         if (data.getSinDaysRewardsCfg() != null) {

@@ -146,6 +146,13 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     }
 
     @Override
+    public FetchUrlResult popFetchUrlResult() {
+        FetchUrlResult fetchUrlResult = fetchCacheService.popFinishUrlList();
+        logger.info("popFetchUrlResult(), obj:{}", JSONUtil.toJSON(fetchUrlResult));
+        return fetchUrlResult;
+    }
+
+    @Override
     public TaskStatus getUrlTaskStatus(Website website, String url, long expireSeconds) {
         String cacheKey = FetchUrlResult.getCacheKey(website, url, expireSeconds);
         TaskStatus taskStatusByUrl = fetchCacheService.getTaskStatusByUrl(cacheKey);

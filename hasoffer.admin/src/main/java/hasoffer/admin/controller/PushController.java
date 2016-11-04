@@ -285,7 +285,7 @@ public class PushController {
      * @param packageName 包名
      * @param toType      0 默认所有设备,1特指哪一个,需要给出设备id
      */
-    @RequestMapping("tempPushTask")
+    @RequestMapping(value = "tempPushTask")
     public void tempPushTask(AppPush appPush, AppMsgClickType type, @RequestParam String packageName,
                              @RequestParam(defaultValue = "0") int toType,
                              String deviceId,

@@ -56,13 +56,15 @@ public class StatController {
     @ResponseBody
     String showUpdateStatus(@RequestParam(defaultValue = "") String ymd) {
         if (StringUtils.isEmpty(ymd)) {
-            ymd = TimeUtils.parse(TimeUtils.add(TimeUtils.nowDate(), TimeUtils.MILLISECONDS_OF_1_HOUR * -1), "yyyyMMdd_HH");
+            ymd = TimeUtils.parse(TimeUtils.nowDate(), "yyyyMMdd");
         }
 
         long wait4UpdateProduct = productCacheManager.getWait4UpdateProductCount(ymd);
 
-//        return new ModelAndView("");
-        return "ok";
+        long updateProcessd = productCacheManager.getUpdateProcessdProductCount(ymd);
+
+        return String.format("wait4UpdateProduct : %d | updateProcessd : %d", wait4UpdateProduct, updateProcessd);
+//        return "ok";
     }
 
     @RequestMapping(value = "/statByHour", method = RequestMethod.GET)
