@@ -7,5 +7,6 @@ package hasoffer.core.persistence.enums;
 public enum AppdealSource {
 
     PRICE_OFF,//降价产生deal
-    MANUAL_INPUT//人工后台录入deal
+    MANUAL_INPUT,//人工后台录入deal
+    DEAL_SITE//别的deal网站
 }

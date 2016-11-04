@@ -30,6 +30,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
 
         //获取Deal等待队列的key名称
         String redisKey = RedisKeysUtils.getWaitDealList(taskLevel, website);
+        System.out.println("wait deal redis key :" + redisKey);
 
         //封装结果对象
         FetchDealResult fetchDealResult = new FetchDealResult();
@@ -50,7 +51,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
             if (TaskStatus.NONE.equals(dealTaskStatus)) {
                 fetchCacheService.pushTaskList(redisKey, JSONUtil.toJSON(fetchDealResult));
                 SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendDealTask(fetchDealResult) save {} into Redis List {} success", fetchDealResult.getWebsite(), redisKey);
-                fetchCacheService.setTaskStatusByUrl(key, TaskStatus.START);
+                fetchCacheService.setDealTaskStatus(key, TaskStatus.START);
             }
         } catch (Exception e) {
             SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendDealTask(fetchDealResult) save {} into Redis List {} fail", fetchDealResult.getWebsite(), redisKey, e);

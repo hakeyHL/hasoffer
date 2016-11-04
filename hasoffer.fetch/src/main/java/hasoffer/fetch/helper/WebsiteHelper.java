@@ -72,6 +72,26 @@ public class WebsiteHelper {
         return null;
     }
 
+    public static String getAllWebSiteString(String url) {
+        try {
+            if (url.startsWith("http://") || url.startsWith("https://")) {
+                URL u = new URL(url);
+                String[] ss = u.getHost().split("\\.");
+
+                String websiteString = ss[ss.length - 2].toUpperCase();
+
+                if (StringUtils.isEmpty(websiteString)) {
+                    throw new RuntimeException();
+                }
+
+                return websiteString;
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        return null;
+    }
+
     public static String getPackage(Website website) {
         return packageMap.get(website);
     }
