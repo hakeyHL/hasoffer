@@ -5,6 +5,7 @@ import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.data.redis.IRedisListService;
@@ -32,6 +33,7 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
     private IRedisListService redisListService;
     private IRedisSetService redisSetService;
     private ICmpSkuService cmpSkuService;
+    private ProductCacheManager productCacheManager;
     private long cacheSeconds;
 
     public ListNeedUpdateFromRedisWorker(ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, IRedisListService redisListService, IRedisSetService redisSetService, ICmpSkuService cmpSkuService, long cacheSeconds) {
@@ -143,7 +145,8 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                     }
 
                     //now productid hava been sended ,add to processed set
-                    redisSetService.add(KEY_PROCESSED_SET, String.valueOf(productId));
+                    productCacheManager.put2UpdateProcessedSet(productId);
+//                    redisSetService.add(KEY_PROCESSED_SET, );
                 }
             }
         }

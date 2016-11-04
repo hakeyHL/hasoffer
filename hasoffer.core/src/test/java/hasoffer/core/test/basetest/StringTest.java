@@ -24,6 +24,16 @@ import java.util.regex.Pattern;
 public class StringTest {
 
     @Test
+    public void testMD5Url() {
+
+        String url = "http://www.flipkart.com/anna-andre-paris-set-3-nail-polishes-9-ml/p/itmdu4v5hjggbqrf?pid=NLPDU4V5YMRQXRPD";
+
+        String md5Url = HexDigestUtil.md5(url);
+
+        System.out.println(md5Url);
+    }
+
+    @Test
     public void testJson() {
         String json = "{\"sImg\":\"//img.dxcdn.com/productimages/sku_344792_2_smal.jpg\", \"mImg\":\"//img.dxcdn.com/productimages/sku_344792_2.jpg\", \"bImg\":\"//img.dxcdn.com/productimages/sku_344792_2.jpg\"}";
 
