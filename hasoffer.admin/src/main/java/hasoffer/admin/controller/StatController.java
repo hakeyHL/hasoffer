@@ -51,6 +51,20 @@ public class StatController {
     ProductCacheManager productCacheManager;
     private Logger logger = LoggerFactory.getLogger(StatController.class);
 
+    @RequestMapping(value = "/show_update_status", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String showUpdateStatus(@RequestParam(defaultValue = "") String ymd) {
+        if (StringUtils.isEmpty(ymd)) {
+            ymd = TimeUtils.parse(TimeUtils.add(TimeUtils.nowDate(), TimeUtils.MILLISECONDS_OF_1_HOUR * -1), "yyyyMMdd_HH");
+        }
+
+        long wait4UpdateProduct = productCacheManager.getWait4UpdateProductCount(ymd);
+
+//        return new ModelAndView("");
+        return "ok";
+    }
+
     @RequestMapping(value = "/statByHour", method = RequestMethod.GET)
     public
     @ResponseBody
