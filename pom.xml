@@ -29,6 +29,7 @@
         <module>hasoffer.spider.result</module>
         <module>hasoffer.offlinejob</module>
         <module>hasoffer.datafixes</module>
+        <module>hasoffer.third.proxyip</module>
     </modules>
 
     <properties>

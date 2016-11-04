@@ -3,7 +3,7 @@ package hasoffer.spider.worker;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.data.redis.impl.RedisListServiceImpl;
-import hasoffer.spider.constants.Constants;
+import hasoffer.spider.constants.SpiderConstants;
 import hasoffer.spider.context.SpiderConfigInitContext;
 import hasoffer.spider.enums.PageType;
 import hasoffer.spider.model.SpiderConfig;
@@ -74,9 +74,9 @@ public class SpiderProductWorker implements Runnable {
             }
 
             //为任务附加初始默认参数。
-            extraMap.put(Constants.SPIDER_EXTRA_PRO_ID, productId);
-            extraMap.put(Constants.SPIDER_EXTRA_WEB_SITE, spiderConfig.getWebsite());
-            extraMap.put(Constants.SPIDER_PARSE_TRY_TIMES, 0);
+            extraMap.put(SpiderConstants.SPIDER_EXTRA_PRO_ID, productId);
+            extraMap.put(SpiderConstants.SPIDER_EXTRA_WEB_SITE, spiderConfig.getWebsite());
+            extraMap.put(SpiderConstants.SPIDER_PARSE_TRY_TIMES, 0);
 
             spiderProductScheduler.pushRequest(productTask.getUrl(), extraMap);
 

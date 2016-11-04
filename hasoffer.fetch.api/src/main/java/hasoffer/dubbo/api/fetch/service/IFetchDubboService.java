@@ -78,6 +78,13 @@ public interface IFetchDubboService {
     void sendUrlTask(Website website, String url, long seconds, TaskLevel taskLevel);
 
     /**
+     * 获取URL更新的结果
+     *
+     * @return
+     */
+    FetchUrlResult popFetchUrlResult();
+
+    /**
      * 获取URL任务的状态。
      *
      * @param website
