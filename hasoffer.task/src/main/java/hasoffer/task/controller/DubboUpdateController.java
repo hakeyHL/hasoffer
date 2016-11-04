@@ -87,9 +87,7 @@ public class DubboUpdateController {
 
         ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
 
-        for (int i = 0; i < 5; i++) {
-            es.execute(new ListNeedUpdateFromRedisWorker(queue, fetchDubboService, redisListService, redisSetService, cmpSkuService, cacheSeconds));
-        }
+        es.execute(new ListNeedUpdateFromRedisWorker(queue, fetchDubboService, redisListService, redisSetService, cmpSkuService, cacheSeconds));
 
 
         for (int i = 0; i < 60; i++) {
