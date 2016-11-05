@@ -322,8 +322,21 @@ public class AppController {
             //未登录返回连续签到次数为0
             data.setMaxConSignNum(0);
         }
-//        data.setAuxiliaryCheck(true);
-        data.setAuxiliaryCheck(false);
+//        data.setAuxiliaryCheck(true)
+        //version 31 close
+        data.setAuxiliaryCheck(true);
+        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        if (deviceInfoVo != null && StringUtils.isNotEmpty(deviceInfoVo.getAppVersion())) {
+            String appVersion = deviceInfoVo.getAppVersion();
+            try {
+                int version = Integer.valueOf(appVersion);
+                if (version > 0 && version == 31) {
+                    data.setAuxiliaryCheck(false);
+                }
+            } catch (Exception e) {
+                logger.debug(Thread.currentThread().getId() + " time {} , transfer string number {} to number failed .", new Date(), appVersion);
+            }
+        }
         //set sign in and rewards config map
         data.setSinDaysRewardsCfg(afwCfgMap);
         if (data.getSinDaysRewardsCfg() != null) {
