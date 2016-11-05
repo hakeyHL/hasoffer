@@ -131,6 +131,31 @@ public class FixController {
             Website.ZOOMIN
     };
 
+    //fixdata/addUrlKeyForPtmCmpSku
+    @RequestMapping(value = "/addUrlKeyForPtmCmpSku/{ptmcmpskuId}", method = RequestMethod.GET)
+    @ResponseBody
+    public String addUrlKeyForPtmCmpSku(@PathVariable long ptmcmpskuId) throws Exception {
+
+        long startId = ptmcmpskuId;
+
+        for (long i = startId; i < 99961567; i++) {
+
+            PtmCmpSku ptmCmpSku = dbm.get(PtmCmpSku.class, i);
+
+            if (ptmCmpSku == null) {
+                continue;
+            } else {
+                cmpSkuService.setUrlKey(i, HexDigestUtil.md5(ptmCmpSku.getUrl()));
+                System.out.println("current ptmcmpsku id " + i);
+            }
+
+        }
+
+
+        return "ok";
+    }
+
+
     //fixdata/mobile91Fetch
     @RequestMapping(value = "/mobile91Fetch", method = RequestMethod.GET)
     @ResponseBody
