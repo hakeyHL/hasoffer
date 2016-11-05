@@ -31,6 +31,15 @@ public interface ICmpSkuService {
      */
     List<PtmCmpSku> getPtmCmpSkuListBySourceSidAndWebsite(String sourceSid, Website website, int page, int pageSize);
 
+    List<PtmCmpSku> getPtmCmpSkuListByUrlKey(String keyUrl);
+
+    /**
+     * 该方法用于修复sku表中urlKey，不建议在赋值时使用，赋值参见该类的setUrl()方法
+     * @param skuId
+     * @param urlKey
+     */
+    void setUrlKey(long skuId,String urlKey);
+
     List<PriceNode> queryHistoryPrice(long id);
 
     void saveHistoryPrice(long id, Date time, float price);

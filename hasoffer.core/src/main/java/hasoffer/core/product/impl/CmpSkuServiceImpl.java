@@ -63,6 +63,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     private final String Q_CMPSKU_INDEX_BY_SOURCESID = "select t from PtmCmpSkuIndex2 t where t.siteSourceSidIndex = ?0 ";
     private final String Q_CMPSKU_STORES_BY_PRODUCTID = "SELECT  DISTINCT t.website  from PtmCmpSku t where t.productId=?0 and t.status='ONSALE'";
     private final String Q_PTMCMPSKULIST_BY_SOURCESID_WEBSITE = "SELECT t FROM PtmCmpSku t WHERE t.website = ?0 AND t.sourceSid = ?1";
+    private final String Q_PTMCMPSKULIST_BY_URLKEY = "SELECT t FROM PtmCmpSku t WHERE t.urlKey = ?0";
 
     @Resource
     IFetchService fetchService;
@@ -80,6 +81,20 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     @Override
     public List<PtmCmpSku> getPtmCmpSkuListBySourceSidAndWebsite(String sourceSid, Website website, int page, int pageSize) {
         return (List<PtmCmpSku>) dbm.queryPage(Q_PTMCMPSKULIST_BY_SOURCESID_WEBSITE, page, pageSize, Arrays.asList(website, sourceSid));
+    }
+
+    @Override
+    public List<PtmCmpSku> getPtmCmpSkuListByUrlKey(String keyUrl) {
+        return dbm.query(Q_PTMCMPSKULIST_BY_URLKEY, Arrays.asList(keyUrl));
+    }
+
+    @Override
+    public void setUrlKey(long skuId, String urlKey) {
+        PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(skuId);
+
+        updater.getPo().setUrlKey(urlKey);
+
+        dbm.update(updater);
     }
 
     @Override
