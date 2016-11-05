@@ -3,6 +3,7 @@ package hasoffer.dubbo.api.fetch.service;
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
+import hasoffer.spider.enums.TaskTarget;
 import hasoffer.spider.model.FetchDealResult;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchUrlResult;
@@ -67,6 +68,17 @@ public interface IFetchDubboService {
      */
     void sendUrlTask(Website website, String url, TaskLevel taskLevel);
 
+
+    /**
+     *
+     * @param website
+     * @param url
+     * @param expireSeconds
+     * @param taskTarget 任务目标
+     * @param taskLevel 任务级别
+     */
+    void sendUrlTask(Website website, String url, Long expireSeconds, TaskTarget taskTarget, TaskLevel taskLevel);
+
     /**
      * 提交URL更新任务
      *
@@ -82,7 +94,7 @@ public interface IFetchDubboService {
      *
      * @return
      */
-    FetchUrlResult popFetchUrlResult();
+    FetchUrlResult popFetchUrlResult(TaskTarget taskTarget);
 
     /**
      * 获取URL任务的状态。

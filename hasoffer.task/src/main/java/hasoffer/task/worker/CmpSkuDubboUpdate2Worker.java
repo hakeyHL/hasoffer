@@ -14,6 +14,7 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
+import hasoffer.spider.enums.TaskTarget;
 import hasoffer.spider.model.FetchUrlResult;
 import hasoffer.spider.model.FetchedProduct;
 import org.slf4j.Logger;
@@ -57,7 +58,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
 
             try {
 
-                FetchUrlResult fetchUrlResult = fetchDubboService.popFetchUrlResult();
+                FetchUrlResult fetchUrlResult = fetchDubboService.popFetchUrlResult(TaskTarget.SKU_UPDATE);
 
                 if (fetchUrlResult == null) {
                     TimeUnit.MINUTES.sleep(3);
