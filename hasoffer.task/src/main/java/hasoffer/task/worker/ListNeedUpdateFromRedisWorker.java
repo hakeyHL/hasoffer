@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -28,7 +27,6 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
     private static final String KEY_PROCESSED_SET = "PRODUCT_UPDATE_PROCESSED_";
 
     private static Logger logger = LoggerFactory.getLogger(ListNeedUpdateFromRedisWorker.class);
-    private ConcurrentLinkedQueue<PtmCmpSku> queue;
     private IFetchDubboService fetchDubboService;
     private IRedisListService redisListService;
     private IRedisSetService redisSetService;
@@ -36,8 +34,7 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
     private ProductCacheManager productCacheManager;
     private long cacheSeconds;
 
-    public ListNeedUpdateFromRedisWorker(ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, IRedisListService redisListService, IRedisSetService redisSetService, ICmpSkuService cmpSkuService, long cacheSeconds, ProductCacheManager productCacheManager) {
-        this.queue = queue;
+    public ListNeedUpdateFromRedisWorker(IFetchDubboService fetchDubboService, IRedisListService redisListService, IRedisSetService redisSetService, ICmpSkuService cmpSkuService, long cacheSeconds, ProductCacheManager productCacheManager) {
         this.fetchDubboService = fetchDubboService;
         this.redisListService = redisListService;
         this.redisSetService = redisSetService;
@@ -50,34 +47,20 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
     public void run() {
 
         String ymd = TimeUtils.parse(TimeUtils.today(), TimeUtils.PATTERN_YMD);
+        long tomorrowDayStart = TimeUtils.getDayStart(TimeUtils.addDay(TimeUtils.nowDate(), 1).getTime());
 
         while (true) {
 
-            //判断队列大小
-            int size = queue.size();
-            if (size > 50000) {
-                logger.info("queue size " + size + " sleep 5 minutes");
-                try {
-                    TimeUnit.MINUTES.sleep(20);
-                } catch (InterruptedException e) {
-
-                }
-
-                int newSize = queue.size();
-                if (size == newSize) {
-                    //临时解决锁死的办法，丢弃最前面的1w个数据
-                    for (int i = 0; i < 10000; i++) {
-                        queue.poll();
-                    }
-                    logger.info("drop 10000 ptmcmpsku");
-                }
-                continue;
-            } else if (size == 0) {
+            //保证时间正常
+            if (tomorrowDayStart < TimeUtils.now()) {
                 ymd = TimeUtils.parse(TimeUtils.today(), TimeUtils.PATTERN_YMD);
+                tomorrowDayStart = TimeUtils.getDayStart(TimeUtils.addDay(TimeUtils.nowDate(), 1).getTime());
+                System.out.println("current ymd = " + ymd);
+                System.out.println("current daystart is " + tomorrowDayStart);
             }
 
+
             //队列取数
-            //num默认为更新线程数量
             int num = 1200;
             while (num > 0) {
                 num--;
@@ -135,10 +118,8 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                                 sku.setUrl(url);
                             }
 
-                            queue.add(sku);
                             fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), cacheSeconds, TaskLevel.LEVEL_3);
                         } else {
-                            queue.add(sku);
                             fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), cacheSeconds, TaskLevel.LEVEL_5);
                         }
 

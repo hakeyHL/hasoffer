@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -35,20 +34,15 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
     private static final String PRICE_DROP_SKUID_QUEUE = "PRICE_DROP_SKUID_QUEUE";
 
     private IDataBaseManager dbm;
-    private ConcurrentLinkedQueue<PtmCmpSku> queue;
     private IFetchDubboService fetchDubboService;
     private ICmpSkuService cmpSkuService;
     private IRedisListService redisListService;
-    private Long cacheSeconds;
 
-    public CmpSkuDubboUpdate2Worker(IDataBaseManager dbm, ConcurrentLinkedQueue<PtmCmpSku> queue, IFetchDubboService fetchDubboService, ICmpSkuService cmpSkuService, IRedisListService redisListService, long cacheSeconds) {
+    public CmpSkuDubboUpdate2Worker(IDataBaseManager dbm, IFetchDubboService fetchDubboService, ICmpSkuService cmpSkuService, IRedisListService redisListService) {
         this.dbm = dbm;
-        this.queue = queue;
         this.fetchDubboService = fetchDubboService;
         this.cmpSkuService = cmpSkuService;
         this.redisListService = redisListService;
-        this.cacheSeconds = cacheSeconds;
-//        CMPSKU_DUBBOUPDATE_WORKER_THREAD_NUMBER++;
     }
 
     @Override
