@@ -26,7 +26,7 @@ public class StringTest {
     @Test
     public void testMD5Url() {
 
-        String url = "http://www.flipkart.com/anna-andre-paris-set-3-nail-polishes-9-ml/p/itmdu4v5hjggbqrf?pid=NLPDU4V5YMRQXRPD";
+        String url = "http://www.amazon.in/gp/offer-listing/B013JPA6C4/";
 
         String md5Url = HexDigestUtil.md5(url);
 

@@ -11,6 +11,7 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.data.redis.IRedisSetService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
+import hasoffer.spider.enums.TaskTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,9 +119,9 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                                 sku.setUrl(url);
                             }
 
-                            fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), cacheSeconds, TaskLevel.LEVEL_3);
+                            fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), cacheSeconds, TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_3);
                         } else {
-                            fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), cacheSeconds, TaskLevel.LEVEL_5);
+                            fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), cacheSeconds, TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_5);
                         }
 
                         logger.info("send url request succes for " + sku.getWebsite() + " sku id is _" + sku.getId() + "_");
