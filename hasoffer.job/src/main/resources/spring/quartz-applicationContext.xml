@@ -25,7 +25,7 @@
                 <ref bean="priceOffGetDealTrigger"/>
                 <ref bean="adminPushTrigger"/>
                 <ref bean="statLogCountBeanTrigger"/>
-                <!--<ref bean="statVisitSkuUpdateTrigger"/>-->
+                <ref bean="dealSiteFetchTrigger"/>
             </list>
         </property>
 
@@ -55,7 +55,7 @@
 
     <bean id="statLogCountBeanTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="statLogCount"/>
-        <property name="cronExpression" value="0 25 0/1 * * ?"/>
+        <property name="cronExpression" value="0 10 0/1 * * ?"/>
     </bean>
 
     <!--push重新发送的任务-->
@@ -97,4 +97,15 @@
         <property name="jobDetail" ref="adminPushJob"/>
         <property name="cronExpression" value="0 0 1 1 1 ? 2066 "/>
     </bean>
+
+    <!-- 从deal站抓取deal -->
+    <bean name="dealSiteFetch" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.deal.DealSiteFetchDealJobBean"/>
+    </bean>
+
+    <bean id="dealSiteFetchTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="dealSiteFetch"/>
+        <property name="cronExpression" value="0 33 0/1 * * ?"/>
+    </bean>
+
 </beans>
