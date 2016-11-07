@@ -208,12 +208,15 @@
                                data-toggle="modal" data-target="#confirm-delete">删除</a></td>
                         <td><a href="/push/pushInit/DEAL/${data.id}">推送</a></td>
                         <td>
-                            <c:if test="${data.expireStatus==1}">
-                                有效
-                            </c:if>
-                            <c:if test="${data.expireStatus==0}">
-                                已经失效
-                            </c:if>
+                            <button id="dealStatuId${data.id}" onclick="swapStatus(${data.expireStatus},${data.id})"
+                                    <c:if test="${data.expireStatus==0}">disabled</c:if>>
+                                <c:if test="${data.expireStatus==1}">
+                                    有效
+                                </c:if>
+                                <c:if test="${data.expireStatus==0}">
+                                    已经失效
+                                </c:if>
+                            </button>
                         </td>
                     </tr>
                 </c:forEach>
@@ -270,7 +273,6 @@
                     }
                 });
             });
-
 
             //全选/全不选
             $("#checkAll").click(function () {
@@ -351,6 +353,19 @@
             });
         }
 
-
+        function swapStatus(dealStatus, dealId) {
+            if (dealStatus == 1) {
+                $.getJSON("${pageContext.request.contextPath }/deal/disableDeal/" + dealId, function (data) {
+                    dealDocId = "dealStatuId" + dealId;
+                    if (data.code == "00000") {
+                        $("#" + dealDocId).html("已经失效");
+//                        $("#" + dealDocId).attr("style", "opacity: 0.2");
+                        $("#" + dealDocId).attr("disabled", "disabled");
+                    }
+                });
+            } else {
+                alert("已失效,此处不可修改");
+            }
+        }
     </script>
     <jsp:include page="../include/footer.jsp"/>

@@ -287,4 +287,23 @@ public class DealController {
             }
         }
     }
+
+    @RequestMapping(value = "disableDeal/{id}", method = RequestMethod.GET)
+    public ModelAndView setDealDisable(@PathVariable long id) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("code", "00000");
+        modelAndView.addObject("msg", "ok");
+        if (id > 0) {
+            AppDeal appDeal = dealService.getDealById(id);
+            if (appDeal != null) {
+                appDeal.setExpireTime(new Date());
+                try {
+                    dealService.updateDeal(appDeal);
+                } catch (Exception e) {
+                    modelAndView.addObject("code", "10000");
+                }
+            }
+        }
+        return modelAndView;
+    }
 }
