@@ -166,7 +166,7 @@
                                     <td>${cmpSku.updateTime}</td>
                                     <td>
                                         <a class="active" href="javascript:void(0);"
-                                           onclick="compareCtrl.preModify(${cmpSku.id}, '${cmpSku.url}', ${cmpSku.price}, '${cmpSku.size}', '${cmpSku.color}')">
+                                           onclick="compareCtrl.preModify(${cmpSku.id}, '${cmpSku.url}', ${cmpSku.price}, '${cmpSku.size}', '${cmpSku.color}', '${cmpSku.status}')">
                                             <span>编辑</span><br/><span>Edit</span>
                                         </a>
                                     </td>
@@ -223,6 +223,17 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
+                                    <label class="col-sm-2 control-label">状态（status）</label>
+                                    <!-- Single button -->
+                                    <div class="col-sm-4">
+                                        <select id="statusSelect" name="skuStatus">
+                                            <c:forEach items="${skuStatus}" var="skuStatus">
+                                                <option value="${skuStatus}">${skuStatus}</option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
                                     <label class="col-sm-2 control-label">颜色/Color</label>
 
                                     <div class="col-sm-4">
@@ -256,12 +267,13 @@
 
 <script>
     var compareCtrl = {
-        preModify: function (id, url, price, size, color) {
+        preModify: function (id, url, price, size, color, status) {
             $("#id").val(id);
             $("#url").val(url);
             $("#price").val(price);
             $("#size").val(size);
             $("#color").val(color);
+            $("#statusSelect").val(status);
             $("#label_id").html("更新/Update - " + id);
             $("#btn_submit").html("更新/Update");
             document.body.scrollTop = 1000000;

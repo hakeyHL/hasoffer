@@ -20,6 +20,10 @@ public class PtmStdSku implements Identifiable<Long> {
 
     private float refPrice; // 参考价格
 
+    private String color; // 颜色
+
+    private String size; // 大小
+
     private Date createTime;//该条sku记录的创建时间
 
     private PtmStdSku() {

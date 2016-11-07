@@ -388,6 +388,39 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public PtmCmpSku createCmpSku(long productId, String url, String color, String size, float price, String skuStatus) {
+
+        PtmCmpSku ptmCmpSku = new PtmCmpSku();
+
+        ptmCmpSku.setUrl(url);
+        ptmCmpSku.setProductId(productId);
+        ptmCmpSku.setColor(color);
+        ptmCmpSku.setSize(size);
+        ptmCmpSku.setPrice(price);
+        ptmCmpSku.setStatus(SkuStatus.valueOf(skuStatus));
+
+        Website website = WebsiteHelper.getWebSite(url);
+        if (website != null) {
+            ptmCmpSku.setWebsite(website);
+        }
+
+        createCmpSku(ptmCmpSku);
+
+        return ptmCmpSku;
+    }
+
+    /**
+     * 新增一条cmpSku记录
+     *
+     * @param productId
+     * @param url
+     * @param color
+     * @param size
+     * @param price
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public PtmCmpSku createCmpSku(long productId, String url, String color, String size, float price) {
 
         PtmCmpSku ptmCmpSku = new PtmCmpSku();
@@ -867,6 +900,26 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     public void importCmpSku2solr(PtmCmpSku ptmCmpSku) {
         logger.debug(String.format("import or update to solr-sku {%d}", ptmCmpSku.getId()));
         cmpskuIndexService.createOrUpdate(new CmpSkuModel(ptmCmpSku));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateCmpSku(long id, String url, String color, String size, float price, String skuStatus) {
+        PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(id);
+
+        ptmCmpSkuUpdater.getPo().setUpdateTime(TimeUtils.nowDate());
+        ptmCmpSkuUpdater.getPo().setUrl(url);
+        ptmCmpSkuUpdater.getPo().setPrice(price);
+        ptmCmpSkuUpdater.getPo().setColor(color);
+        ptmCmpSkuUpdater.getPo().setSize(size);
+        ptmCmpSkuUpdater.getPo().setStatus(SkuStatus.valueOf(skuStatus));
+
+        Website website = WebsiteHelper.getWebSite(url);
+        if (website != null) {
+            ptmCmpSkuUpdater.getPo().setWebsite(website);
+        }
+
+        dbm.update(ptmCmpSkuUpdater);
     }
 
     @Override

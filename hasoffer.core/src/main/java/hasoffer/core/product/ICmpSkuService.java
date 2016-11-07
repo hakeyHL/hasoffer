@@ -69,6 +69,7 @@ public interface ICmpSkuService {
      */
     void updateCmpSkuBySpiderFetchedProduct(long skuId, FetchedProduct fetchedProduct);
 
+    void updateCmpSku(long id, String url, String color, String size, float price, String skuStatus);
     void updateCmpSku(long id, String url, String color, String size, float price);
 
     SkuPriceUpdateResultBo countUpdate(String ymd);
@@ -77,6 +78,7 @@ public interface ICmpSkuService {
 
     List<StatSkuPriceUpdateResult> listUpdateResults();
 
+    PtmCmpSku createCmpSku(long productId, String url, String color, String size, float price, String skuStatus);
     PtmCmpSku createCmpSku(long productId, String url, String color, String size, float price);
 
     PtmCmpSku createCmpSku(PtmCmpSku ptmCmpSku);
