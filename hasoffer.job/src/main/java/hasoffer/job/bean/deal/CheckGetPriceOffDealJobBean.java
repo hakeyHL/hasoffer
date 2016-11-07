@@ -166,7 +166,7 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
                     List<AppDeal> appdealList = dbm.query("SELECT t FROM AppDeal t WHERE t.linkUrl = ?0", Arrays.asList(sku.getUrl()));
                     if (appdealList != null && appdealList.size() != 0) {
                         System.out.println("query by url get " + appdealList.size() + " sku");
-                        flag = false;
+                        continue;
                     }
 
                     //当天title不能重名
@@ -175,7 +175,7 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
                     appdealList = dbm.query("SELECT t FROM AppDeal t WHERE t.title = ?0 AND t.website = ?1 ", Arrays.asList(title, website));
                     if (appdealList != null && appdealList.size() != 0) {
                         System.out.println("query by title website get " + appdealList.size() + " sku");
-                        flag = false;
+                        continue;
                     }
 
                     System.out.println("flag " + flag + " then convert image");
@@ -199,12 +199,15 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
                         continue;
                     }
 
+                    System.out.println("flag " + flag + " convert image success");
+
                     appdeal.setImageUrl(dealPath);
                     appdeal.setInfoPageImage(dealBigPath);
                     appdeal.setListPageImage(dealSmallPath);
 
                     if (flag) {
                         dealService.createAppDealByPriceOff(appdeal);
+                        System.out.println("create priceoff deal success");
                         //创建成功一个就跳出
                         break;
                     }
@@ -214,6 +217,8 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
                 e.printStackTrace();
             }
         }
+
+        logger.info("CheckGetPriceOffDealWorker will stop at {}", new Date());
 
     }
 }
