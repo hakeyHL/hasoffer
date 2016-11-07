@@ -29,6 +29,8 @@ public interface IDealService {
 
     AppDeal getDealById(Long dealId);
 
+    AppDeal getDealBySourceId(Long skuId);
+
     AppBanner getBannerByDealId(Long dealId);
 
     /**
