@@ -174,7 +174,7 @@ public class StdProductServiceImpl implements IStdProductService {
             return null;
         }
 
-        PtmStdProduct stdProduct = new PtmStdProduct(productName, brandName, modelName, desc);
+        PtmStdProduct stdProduct = new PtmStdProduct(productName, brandName, modelName);
 
         // create product
         dbm.create(stdProduct);
