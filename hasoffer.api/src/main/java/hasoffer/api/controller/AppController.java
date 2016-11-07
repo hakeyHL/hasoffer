@@ -1195,52 +1195,7 @@ public class AppController {
                             map.put("website", appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
                             map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
                             map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                            StringBuilder sb = new StringBuilder();
-                            String description = appDeal.getDescription();
-                            sb.append(description == null ? "" : description);
-                            if (description.lastIndexOf("\n") > 0) {
-                                if (description.lastIndexOf("\n") == description.length() - 1) {
-                                    //最后有换行,再加一个换行
-                                    sb.append("\n");
-                                } else {
-                                    //最后无换行,加两个
-                                    sb.append("\n");
-                                    sb.append("\n");
-                                }
-                            } else {
-                                //无换行
-                                sb.append("\n");
-                                sb.append("\n");
-                            }
-                           /* sb.append("How to get the deal: \n");
-                            sb.append("1 Click \"Activate Deal\" button.\n");
-                            sb.append("2 Add the product of your choice to cart.\n");
-                            sb.append("3 And no coupon code required.\n\n");*/
-                            if (appDeal.getPtmcmpskuid() > 0) {
-                                PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
-                                if (ptmCmpSkuDescription != null) {
-                                    String jsonParam = ptmCmpSkuDescription.getJsonParam();
-                                    if (StringUtils.isNotBlank(jsonParam)) {
-                                        Map jsonMap = JsonHelper.getJsonMap(jsonParam);
-                                        if (jsonMap != null) {
-                                            //遍历map
-                                            Set<Map.Entry> set = jsonMap.entrySet();
-                                            Iterator<Map.Entry> iterator = set.iterator();
-                                            if (iterator.hasNext()) {
-                                                sb.append("Key Features: \n");
-                                            }
-                                            while (iterator.hasNext()) {
-                                                Map.Entry next = iterator.next();
-                                                sb.append(next.getKey()).append(" : ");
-                                                sb.append(next.getValue()).append("\n");
-                                            }
-                                        }
-
-                                    }
-
-                                }
-                            }
-                            map.put("description", sb.toString());
+                            getModel1Deal(map, appDeal);
                         } else {
                             map.put("discount", appDeal.getDiscount());
                             map.put("originPrice", appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
@@ -1349,100 +1304,10 @@ public class AppController {
                                     map.put("clickConfig", priceCurveDesc);
                                 }
                             } else if (AppdealSource.DEAL_SITE.equals(appDeal.getAppdealSource())) {
-                                StringBuilder sb = new StringBuilder();
-                                String description = appDeal.getDescription();
-                                sb.append(description == null ? "" : description);
-                                if (description.lastIndexOf("\n") > 0) {
-                                    if (description.lastIndexOf("\n") == description.length() - 1) {
-                                        //最后有换行,再加一个换行
-                                        sb.append("\n");
-                                    } else {
-                                        //最后无换行,加两个
-                                        sb.append("\n");
-                                        sb.append("\n");
-                                    }
-                                } else {
-                                    //无换行
-                                    sb.append("\n");
-                                    sb.append("\n");
-                                }
-                               /* sb.append("How to get the deal: \n");
-                                sb.append("1 Click \"Activate Deal\" button.\n");
-                                sb.append("2 Add the product of your choice to cart.\n");
-                                sb.append("3 And no coupon code required.\n\n");*/
-                                if (appDeal.getPtmcmpskuid() > 0) {
-                                    PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
-                                    if (ptmCmpSkuDescription != null) {
-                                        String jsonParam = ptmCmpSkuDescription.getJsonParam();
-                                        if (StringUtils.isNotBlank(jsonParam)) {
-                                            Map jsonMap = JsonHelper.getJsonMap(jsonParam);
-                                            if (jsonMap != null) {
-                                                //遍历map
-                                                Set<Map.Entry> set = jsonMap.entrySet();
-                                                Iterator<Map.Entry> iterator = set.iterator();
-                                                if (iterator.hasNext()) {
-                                                    sb.append("Key Features: \n");
-                                                }
-                                                while (iterator.hasNext()) {
-                                                    Map.Entry next = iterator.next();
-                                                    sb.append(next.getKey()).append(" : ");
-                                                    sb.append(next.getValue()).append("\n");
-                                                }
-                                            }
-
-                                        }
-
-                                    }
-                                }
-                                map.put("description", sb.toString());
+                                getModel1Deal(map, appDeal);
                             } else {
                                 //手动导入,描述要用老的方式
-                                StringBuilder sb = new StringBuilder();
-                                String description = appDeal.getDescription();
-                                sb.append(description == null ? "" : description);
-                                if (description.lastIndexOf("\n") > 0) {
-                                    if (description.lastIndexOf("\n") == description.length() - 1) {
-                                        //最后有换行,再加一个换行
-                                        sb.append("\n");
-                                    } else {
-                                        //最后无换行,加两个
-                                        sb.append("\n");
-                                        sb.append("\n");
-                                    }
-                                } else {
-                                    //无换行
-                                    sb.append("\n");
-                                    sb.append("\n");
-                                }
-                               /* sb.append("How to get the deal: \n");
-                                sb.append("1 Click \"Activate Deal\" button.\n");
-                                sb.append("2 Add the product of your choice to cart.\n");
-                                sb.append("3 And no coupon code required.\n\n");*/
-                                if (appDeal.getPtmcmpskuid() > 0) {
-                                    PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
-                                    if (ptmCmpSkuDescription != null) {
-                                        String jsonParam = ptmCmpSkuDescription.getJsonParam();
-                                        if (StringUtils.isNotBlank(jsonParam)) {
-                                            Map jsonMap = JsonHelper.getJsonMap(jsonParam);
-                                            if (jsonMap != null) {
-                                                //遍历map
-                                                Set<Map.Entry> set = jsonMap.entrySet();
-                                                Iterator<Map.Entry> iterator = set.iterator();
-                                                if (iterator.hasNext()) {
-                                                    sb.append("Key Features: \n");
-                                                }
-                                                while (iterator.hasNext()) {
-                                                    Map.Entry next = iterator.next();
-                                                    sb.append(next.getKey()).append(" : ");
-                                                    sb.append(next.getValue()).append("\n");
-                                                }
-                                            }
-
-                                        }
-
-                                    }
-                                }
-                                map.put("description", sb.toString());
+                                getModel1Deal(map, appDeal);
                             }
                         }
                         map.put("extra", 0);
@@ -1467,6 +1332,55 @@ public class AppController {
             }
         }
         return mv;
+    }
+
+    private void getModel1Deal(Map map, AppDeal appDeal) {
+        StringBuilder sb = new StringBuilder();
+        String description = appDeal.getDescription();
+        sb.append(description == null ? "" : description);
+        if (description.lastIndexOf("\n") > 0) {
+            if (description.lastIndexOf("\n") == description.length() - 1) {
+                //最后有换行,再加一个换行
+                sb.append("\n");
+            } else {
+                //最后无换行,加两个
+                sb.append("\n");
+                sb.append("\n");
+            }
+        } else {
+            //无换行
+            sb.append("\n");
+            sb.append("\n");
+        }
+                               /* sb.append("How to get the deal: \n");
+                                sb.append("1 Click \"Activate Deal\" button.\n");
+                                sb.append("2 Add the product of your choice to cart.\n");
+                                sb.append("3 And no coupon code required.\n\n");*/
+        if (appDeal.getPtmcmpskuid() > 0) {
+            PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
+            if (ptmCmpSkuDescription != null) {
+                String jsonParam = ptmCmpSkuDescription.getJsonParam();
+                if (StringUtils.isNotBlank(jsonParam)) {
+                    Map jsonMap = JsonHelper.getJsonMap(jsonParam);
+                    if (jsonMap != null) {
+                        //遍历map
+                        Set<Map.Entry> set = jsonMap.entrySet();
+                        Iterator<Map.Entry> iterator = set.iterator();
+                        if (iterator.hasNext()) {
+                            sb.append("Key Features: \n");
+                        }
+                        while (iterator.hasNext()) {
+                            Map.Entry next = iterator.next();
+                            sb.append(next.getKey()).append(" : ");
+                            sb.append(next.getValue()).append("\n");
+                        }
+                    }
+
+                }
+
+            }
+        }
+        map.put("description", sb.toString());
     }
 
 }

@@ -24,6 +24,12 @@ import java.util.regex.Pattern;
 public class StringTest {
 
     @Test
+    public void testYmd() {
+        String ymd = TimeUtils.parse(TimeUtils.today(), TimeUtils.PATTERN_YMD);
+        System.out.println(ymd);
+    }
+
+    @Test
     public void testMD5Url() {
 
         String url = "http://www.amazon.in/gp/offer-listing/B013JPA6C4/";

@@ -94,7 +94,7 @@ public interface IFetchDubboService {
      *
      * @return
      */
-    FetchUrlResult popFetchUrlResult(TaskTarget taskTarget);
+    String popFetchUrlResult(TaskTarget taskTarget);
 
     /**
      * 获取URL任务的状态。

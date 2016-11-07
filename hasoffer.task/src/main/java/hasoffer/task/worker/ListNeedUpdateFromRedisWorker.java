@@ -56,9 +56,10 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
             if (tomorrowDayStart < TimeUtils.now()) {
                 ymd = TimeUtils.parse(TimeUtils.today(), TimeUtils.PATTERN_YMD);
                 tomorrowDayStart = TimeUtils.getDayStart(TimeUtils.addDay(TimeUtils.nowDate(), 1).getTime());
-                System.out.println("current ymd = " + ymd);
-                System.out.println("current daystart is " + tomorrowDayStart);
             }
+
+            System.out.println("current ymd = " + ymd);
+            System.out.println("current daystart is " + tomorrowDayStart);
 
 
             //队列取数
@@ -69,6 +70,7 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                 Object pop = redisListService.pop(UPDATE_WAIT_QUEUE + ymd);
                 if (pop == null) {//如果队列没有数据了，休息30分钟
                     try {
+                        System.out.println("sku update pop get null sleep 30 min " + tomorrowDayStart);
                         TimeUnit.MINUTES.sleep(30);
                     } catch (InterruptedException e) {
 
