@@ -75,7 +75,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
 
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.info("CmpSkuDubboUpdate2Worker.run() exception.", e);
             }
         }
     }
