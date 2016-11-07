@@ -1,7 +1,5 @@
 package hasoffer.core.app.vo;
 
-import hasoffer.base.model.Website;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -17,7 +15,7 @@ public class DealVo {
     private Double extra;
     private String link;
     private String logoUrl;
-    private Website website;
+    private String website;
     private String priceDescription;
     private String deepLink;
     private int discount;
@@ -34,11 +32,11 @@ public class DealVo {
         this.priceDescription = priceDescription;
     }
 
-    public Website getWebsite() {
+    public String getWebsite() {
         return website;
     }
 
-    public void setWebsite(Website website) {
+    public void setWebsite(String website) {
         this.website = website;
     }
 

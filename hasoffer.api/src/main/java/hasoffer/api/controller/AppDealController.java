@@ -70,7 +70,7 @@ public class AppDealController {
                     DealVo dealVo = new DealVo();
                     dealVo.setLogoUrl(dealModel.getWebsite() == null ? "" : WebsiteHelper.getBiggerLogoUrl(Website.valueOf(dealModel.getWebsite())));
                     dealVo.setTitle(dealModel.getTitle());
-                    dealVo.setWebsite(Website.valueOf(dealModel.getWebsite()));
+                    dealVo.setWebsite(Website.valueOf(dealModel.getWebsite()).name());
                     dealVo.setId(dealModel.getId());
                     dealVo.setDiscount(dealModel.getDiscount());
                     dealVo.setDeepLink(dealModel.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(Website.valueOf(dealModel.getWebsite()), dealModel.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
@@ -92,7 +92,7 @@ public class AppDealController {
                     DealVo dealVo = new DealVo();
                     dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getBiggerLogoUrl(appDeal.getWebsite()));
                     dealVo.setTitle(appDeal.getTitle());
-                    dealVo.setWebsite(appDeal.getWebsite());
+                    dealVo.setWebsite(appDeal.getWebsite().name());
                     dealVo.setId(appDeal.getId());
                     dealVo.setDiscount(appDeal.getDiscount());
                     dealVo.setDeepLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
@@ -120,7 +120,7 @@ public class AppDealController {
                 DealVo dealVo = new DealVo();
                 dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getBiggerLogoUrl(appDeal.getWebsite()));
                 dealVo.setTitle(appDeal.getTitle());
-                dealVo.setWebsite(appDeal.getWebsite());
+                dealVo.setWebsite(appDeal.getWebsite().name());
                 dealVo.setId(appDeal.getId());
                 dealVo.setDiscount(appDeal.getDiscount());
                 dealVo.setDeepLink(appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));

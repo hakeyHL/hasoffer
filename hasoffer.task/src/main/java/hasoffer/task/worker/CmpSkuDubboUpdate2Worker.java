@@ -29,10 +29,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class CmpSkuDubboUpdate2Worker implements Runnable {
 
-    private static Logger logger = LoggerFactory.getLogger(CmpSkuDubboUpdate2Worker.class);
-
     private static final String PRICE_DROP_SKUID_QUEUE = "PRICE_DROP_SKUID_QUEUE";
-
+    private static Logger logger = LoggerFactory.getLogger(CmpSkuDubboUpdate2Worker.class);
     private IDataBaseManager dbm;
     private IFetchDubboService fetchDubboService;
     private ICmpSkuService cmpSkuService;

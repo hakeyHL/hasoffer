@@ -26,6 +26,7 @@ import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
 import hasoffer.core.persistence.dbm.osql.datasource.DataSource;
 import hasoffer.core.persistence.dbm.osql.datasource.DataSourceType;
+import hasoffer.core.persistence.enums.AppdealSource;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.*;
@@ -322,10 +323,9 @@ public class AppController {
             //未登录返回连续签到次数为0
             data.setMaxConSignNum(0);
         }
-//        data.setAuxiliaryCheck(true)
-        //version 31 close
+//        data.setAuxiliaryCheck(true);
         data.setAuxiliaryCheck(true);
-        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+       /* DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         if (deviceInfoVo != null && StringUtils.isNotEmpty(deviceInfoVo.getAppVersion())) {
             String appVersion = deviceInfoVo.getAppVersion();
             try {
@@ -336,7 +336,7 @@ public class AppController {
             } catch (Exception e) {
                 logger.debug(Thread.currentThread().getId() + " time {} , transfer string number {} to number failed .", new Date(), appVersion);
             }
-        }
+        }*/
         //set sign in and rewards config map
         data.setSinDaysRewardsCfg(afwCfgMap);
         if (data.getSinDaysRewardsCfg() != null) {
@@ -420,7 +420,7 @@ public class AppController {
                 dealVo.setDiscount(appDeal.getDiscount());
                 dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
                 dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
-                dealVo.setWebsite(appDeal.getWebsite());
+                dealVo.setWebsite(appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
                 li.add(dealVo);
             } else {
                 DealVo dealVo = new DealVo();
@@ -439,7 +439,8 @@ public class AppController {
                 dealVo.setDiscount(appDeal.getDiscount());
                 dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
                 dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
-                dealVo.setWebsite(appDeal.getWebsite());
+                //TODO  site不支持时取字符
+                dealVo.setWebsite(appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
                 li.add(dealVo);
             }
         }
@@ -1191,7 +1192,7 @@ public class AppController {
                             System.out.println("has this deal ");
                             map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
                             map.put("title", appDeal.getTitle());
-                            map.put("website", appDeal.getWebsite());
+                            map.put("website", appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
                             map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
                             map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
                             StringBuilder sb = new StringBuilder();
@@ -1248,7 +1249,7 @@ public class AppController {
                             map.put("title", appDeal.getTitle());
                             //返回deal的处境时间距离现在时间的时间,多少天,小时,分钟..
                             map.put("createTime", getDifference2Date(new Date(), appDeal.getCreateTime()));
-                            map.put("website", appDeal.getWebsite());
+                            map.put("website", appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
                             //降价生成deal无失效日期
                             if (!appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
                                 map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
@@ -1347,6 +1348,53 @@ public class AppController {
                                     priceCurveDesc.put("fontColor", "#108ee9");
                                     map.put("clickConfig", priceCurveDesc);
                                 }
+                            } else if (AppdealSource.DEAL_SITE.equals(appDeal.getAppdealSource())) {
+                                StringBuilder sb = new StringBuilder();
+                                String description = appDeal.getDescription();
+                                sb.append(description == null ? "" : description);
+                                if (description.lastIndexOf("\n") > 0) {
+                                    if (description.lastIndexOf("\n") == description.length() - 1) {
+                                        //最后有换行,再加一个换行
+                                        sb.append("\n");
+                                    } else {
+                                        //最后无换行,加两个
+                                        sb.append("\n");
+                                        sb.append("\n");
+                                    }
+                                } else {
+                                    //无换行
+                                    sb.append("\n");
+                                    sb.append("\n");
+                                }
+                               /* sb.append("How to get the deal: \n");
+                                sb.append("1 Click \"Activate Deal\" button.\n");
+                                sb.append("2 Add the product of your choice to cart.\n");
+                                sb.append("3 And no coupon code required.\n\n");*/
+                                if (appDeal.getPtmcmpskuid() > 0) {
+                                    PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
+                                    if (ptmCmpSkuDescription != null) {
+                                        String jsonParam = ptmCmpSkuDescription.getJsonParam();
+                                        if (StringUtils.isNotBlank(jsonParam)) {
+                                            Map jsonMap = JsonHelper.getJsonMap(jsonParam);
+                                            if (jsonMap != null) {
+                                                //遍历map
+                                                Set<Map.Entry> set = jsonMap.entrySet();
+                                                Iterator<Map.Entry> iterator = set.iterator();
+                                                if (iterator.hasNext()) {
+                                                    sb.append("Key Features: \n");
+                                                }
+                                                while (iterator.hasNext()) {
+                                                    Map.Entry next = iterator.next();
+                                                    sb.append(next.getKey()).append(" : ");
+                                                    sb.append(next.getValue()).append("\n");
+                                                }
+                                            }
+
+                                        }
+
+                                    }
+                                }
+                                map.put("description", sb.toString());
                             } else {
                                 //手动导入,描述要用老的方式
                                 StringBuilder sb = new StringBuilder();
