@@ -3,6 +3,7 @@ package hasoffer.core.persistence.po.ptm;
 import hasoffer.base.enums.IndexNeed;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 import hasoffer.fetch.helper.WebsiteHelper;
@@ -49,6 +50,8 @@ public class PtmCmpSku implements Identifiable<Long> {
     private String deeplink;
     @Column(columnDefinition = "text")
     private String url;
+    private String urlKey;
+
     @Column(columnDefinition = "text")
     private String oriUrl; //原始URL 可能带有其他网站的联盟信息
 
@@ -179,6 +182,21 @@ public class PtmCmpSku implements Identifiable<Long> {
 
     public void setUrl(String url) {
         this.url = url;
+        this.urlKey = HexDigestUtil.md5(url);
+    }
+
+    public String getUrlKey() {
+        return urlKey;
+    }
+
+    /**
+     * 该方法只是第一次修复使用的，修复后不建议使用
+     * 设置urlKey的方法参见setUrl()方法
+     * @param urlKey
+     */
+    @Deprecated
+    public void setUrlKey(String urlKey) {
+        this.urlKey = urlKey;
     }
 
     public String getSeller() {
@@ -464,6 +482,7 @@ public class PtmCmpSku implements Identifiable<Long> {
             return false;
         if (deeplink != null ? !deeplink.equals(ptmCmpSku.deeplink) : ptmCmpSku.deeplink != null) return false;
         if (url != null ? !url.equals(ptmCmpSku.url) : ptmCmpSku.url != null) return false;
+        if (urlKey != null ? !urlKey.equals(ptmCmpSku.urlKey) : ptmCmpSku.urlKey != null) return false;
         if (oriUrl != null ? !oriUrl.equals(ptmCmpSku.oriUrl) : ptmCmpSku.oriUrl != null) return false;
         if (color != null ? !color.equals(ptmCmpSku.color) : ptmCmpSku.color != null) return false;
         if (size != null ? !size.equals(ptmCmpSku.size) : ptmCmpSku.size != null) return false;
@@ -504,6 +523,7 @@ public class PtmCmpSku implements Identifiable<Long> {
         result = 31 * result + (oriImageUrl != null ? oriImageUrl.hashCode() : 0);
         result = 31 * result + (deeplink != null ? deeplink.hashCode() : 0);
         result = 31 * result + (url != null ? url.hashCode() : 0);
+        result = 31 * result + (urlKey != null ? urlKey.hashCode() : 0);
         result = 31 * result + (oriUrl != null ? oriUrl.hashCode() : 0);
         result = 31 * result + (color != null ? color.hashCode() : 0);
         result = 31 * result + (size != null ? size.hashCode() : 0);
@@ -530,8 +550,7 @@ public class PtmCmpSku implements Identifiable<Long> {
     @Override
     public String toString() {
         return "PtmCmpSku{" +
-                "bigImagePath='" + bigImagePath + '\'' +
-                ", id=" + id +
+                "id=" + id +
                 ", productId=" + productId +
                 ", categoryId=" + categoryId +
                 ", categoryId2=" + categoryId2 +
@@ -545,9 +564,11 @@ public class PtmCmpSku implements Identifiable<Long> {
                 ", rating='" + rating + '\'' +
                 ", imagePath='" + imagePath + '\'' +
                 ", smallImagePath='" + smallImagePath + '\'' +
+                ", bigImagePath='" + bigImagePath + '\'' +
                 ", oriImageUrl='" + oriImageUrl + '\'' +
                 ", deeplink='" + deeplink + '\'' +
                 ", url='" + url + '\'' +
+                ", urlKey='" + urlKey + '\'' +
                 ", oriUrl='" + oriUrl + '\'' +
                 ", color='" + color + '\'' +
                 ", size='" + size + '\'' +

@@ -87,13 +87,12 @@ public class DubboUpdateController {
 
         ExecutorService es = Executors.newCachedThreadPool();
 
-        ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
-
-        es.execute(new ListNeedUpdateFromRedisWorker(queue, fetchDubboService, redisListService, redisSetService, cmpSkuService, cacheSeconds, productCacheManager));
+        es.execute(new ListNeedUpdateFromRedisWorker(fetchDubboService, redisListService, redisSetService, cmpSkuService, cacheSeconds, productCacheManager));
 
 
         for (int i = 0; i < 60; i++) {
-            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService, cacheSeconds));
+//            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService, cacheSeconds));
+            es.execute(new CmpSkuDubboUpdate2Worker(dbm, fetchDubboService, cmpSkuService, redisListService));
         }
 
 

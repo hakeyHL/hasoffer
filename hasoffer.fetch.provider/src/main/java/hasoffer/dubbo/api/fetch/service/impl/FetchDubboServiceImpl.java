@@ -7,6 +7,7 @@ import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.spider.constants.RedisKeysUtils;
+import hasoffer.spider.enums.TaskTarget;
 import hasoffer.spider.logger.SpiderLogger;
 import hasoffer.spider.model.FetchDealResult;
 import hasoffer.spider.model.FetchResult;
@@ -124,6 +125,30 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     }
 
     @Override
+    public void sendUrlTask(Website website, String url, Long expireSeconds, TaskTarget taskTarget, TaskLevel taskLevel) {
+        if (expireSeconds == null) {
+            expireSeconds = TimeUtils.SECONDS_OF_1_DAY;
+        }
+        FetchUrlResult fetchUrlResult = new FetchUrlResult(website, url, expireSeconds, TaskStatus.START, new Date(), taskTarget);
+        String redisKey = RedisKeysUtils.getWaitUrlListKey(taskLevel, website);
+        try {
+            String key = FetchUrlResult.getCacheKey(fetchUrlResult);
+            if (key == null) {
+                logger.info("key is null.website:{}, url:{}", website, url);
+                return;
+            }
+            TaskStatus taskStatusByUrl = fetchCacheService.getTaskStatusByUrl(key);
+            if (TaskStatus.NONE.equals(taskStatusByUrl)) {
+                fetchCacheService.pushTaskList(redisKey, JSONUtil.toJSON(fetchUrlResult));
+                SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} success", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), redisKey);
+                fetchCacheService.setTaskStatusByUrl(key, TaskStatus.START);
+            }
+        } catch (Exception e) {
+            SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} fail", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), redisKey, e);
+        }
+    }
+
+    @Override
     public void sendUrlTask(Website website, String url, long seconds, TaskLevel taskLevel) {
         FetchUrlResult fetchUrlResult = new FetchUrlResult(website, url, seconds);
         fetchUrlResult.setTaskStatus(TaskStatus.START);
@@ -146,8 +171,8 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     }
 
     @Override
-    public FetchUrlResult popFetchUrlResult() {
-        FetchUrlResult fetchUrlResult = fetchCacheService.popFinishUrlList();
+    public FetchUrlResult popFetchUrlResult(TaskTarget taskTarget) {
+        FetchUrlResult fetchUrlResult = fetchCacheService.popFinishUrlList(taskTarget);
         logger.info("popFetchUrlResult(), obj:{}", JSONUtil.toJSON(fetchUrlResult));
         return fetchUrlResult;
     }

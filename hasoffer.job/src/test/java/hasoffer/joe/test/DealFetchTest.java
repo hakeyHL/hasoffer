@@ -8,7 +8,6 @@ import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.enums.AppdealSource;
 import hasoffer.core.persistence.po.app.AppDeal;
-import hasoffer.core.utils.ImageUtil;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
@@ -21,7 +20,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -140,26 +138,26 @@ public class DealFetchTest {
         System.out.println("flag " + flag + " then convert image");
 
         //todo s3可能又内网的访问方式，不收费
-        String imagePath = fetchedDealInfo.getImageUrl();
-        imagePath = ImageUtil.getImageUrl(imagePath);
-        String dealPath = "";
-        String dealBigPath = "";
-        String dealSmallPath = "";
-
-        try {
-            File imageFile = ImageUtil.downloadImage(imagePath);
-
-            dealPath = ImageUtil.uploadImage(imageFile);
-            dealBigPath = ImageUtil.uploadImage(imageFile, 316, 180);
-            dealSmallPath = ImageUtil.uploadImage(imageFile, 180, 180);
-
-        } catch (Exception e) {
-            System.out.println("check get priceoff deal image download error");
-        }
-
-        appdeal.setImageUrl(dealPath);
-        appdeal.setInfoPageImage(dealBigPath);
-        appdeal.setListPageImage(dealSmallPath);
+////        String imagePath = fetchedDealInfo.getImageUrl();
+////        imagePath = ImageUtil.getImageUrl(imagePath);
+////        String dealPath = "";
+////        String dealBigPath = "";
+////        String dealSmallPath = "";
+////
+////        try {
+////            File imageFile = ImageUtil.downloadImage(imagePath);
+////
+////            dealPath = ImageUtil.uploadImage(imageFile);
+////            dealBigPath = ImageUtil.uploadImage(imageFile, 316, 180);
+////            dealSmallPath = ImageUtil.uploadImage(imageFile, 180, 180);
+////
+////        } catch (Exception e) {
+////            System.out.println("check get priceoff deal image download error");
+////        }
+//
+//        appdeal.setImageUrl(dealPath);
+//        appdeal.setInfoPageImage(dealBigPath);
+//        appdeal.setListPageImage(dealSmallPath);
 
         return appdeal;
 
