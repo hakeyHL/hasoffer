@@ -7,6 +7,7 @@ import hasoffer.admin.controller.vo.ProductVo;
 import hasoffer.base.enums.SearchResultSort;
 import hasoffer.base.model.PageModel;
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.JSONUtil;
@@ -126,7 +127,7 @@ public class ProductController {
         String id = request.getParameter("id");
         String productId = request.getParameter("productId");
         String url = request.getParameter("url");
-
+        String skuStatus = request.getParameter("skuStatus");
         float price = 0.0f;
         String priceStr = request.getParameter("price");
         if (NumberUtils.isNumber(priceStr)) {
@@ -138,10 +139,10 @@ public class ProductController {
 
         if (!StringUtils.isEmpty(id)) {
             // 更新
-            cmpSkuService.updateCmpSku(Long.valueOf(id), url, color, size, price);
+            cmpSkuService.updateCmpSku(Long.valueOf(id), url, color, size, price, skuStatus);
         } else {
             // 创建
-            cmpSkuService.createCmpSku(Long.valueOf(productId), url, color, size, price);
+            cmpSkuService.createCmpSku(Long.valueOf(productId), url, color, size, price, skuStatus);
         }
         ModelAndView mav = new ModelAndView("redirect:/p/cmp/" + productId);
         return mav;
@@ -188,7 +189,8 @@ public class ProductController {
 
         mav.addObject("skuColors", JSONUtil.toJSON(colors));
         mav.addObject("skuSizes", JSONUtil.toJSON(sizes));
-
+        //获取sku状态列表
+        mav.addObject("skuStatus", SkuStatus.values());
         List<String> days = new ArrayList<String>();
         Map<Website, List<Float>> priceMap = new HashMap<Website, List<Float>>();
         getPriceLogs(priceLogMap, days, priceMap);
