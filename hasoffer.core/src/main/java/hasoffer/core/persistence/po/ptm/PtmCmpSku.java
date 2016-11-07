@@ -192,6 +192,7 @@ public class PtmCmpSku implements Identifiable<Long> {
     /**
      * 该方法只是第一次修复使用的，修复后不建议使用
      * 设置urlKey的方法参见setUrl()方法
+     *
      * @param urlKey
      */
     @Deprecated

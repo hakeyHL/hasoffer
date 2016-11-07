@@ -325,7 +325,7 @@ public class AppController {
         }
 //        data.setAuxiliaryCheck(true);
         data.setAuxiliaryCheck(true);
-        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+       /* DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         if (deviceInfoVo != null && StringUtils.isNotEmpty(deviceInfoVo.getAppVersion())) {
             String appVersion = deviceInfoVo.getAppVersion();
             try {
@@ -336,7 +336,7 @@ public class AppController {
             } catch (Exception e) {
                 logger.debug(Thread.currentThread().getId() + " time {} , transfer string number {} to number failed .", new Date(), appVersion);
             }
-        }
+        }*/
         //set sign in and rewards config map
         data.setSinDaysRewardsCfg(afwCfgMap);
         if (data.getSinDaysRewardsCfg() != null) {
