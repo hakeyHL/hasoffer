@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+@Deprecated
 public class CheckGetPriceOffDealWorker implements Runnable {
     /**
      * Logger for this class
