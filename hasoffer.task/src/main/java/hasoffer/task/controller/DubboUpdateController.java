@@ -76,9 +76,9 @@ public class DubboUpdateController {
      * Date：2016-11-1 10:34更新改成一直在更新，从redis中读取数据
      */
     //dubbofetchtask/start
-    @RequestMapping(value = "/start", method = RequestMethod.GET)
+    @RequestMapping(value = "/start/{dataString}", method = RequestMethod.GET)
     @ResponseBody
-    public String start() {
+    public String start(@PathVariable String dataString) {
         if (taskRunning4.get()) {
             return "task running.";
         }
@@ -88,7 +88,6 @@ public class DubboUpdateController {
         ExecutorService es = Executors.newCachedThreadPool();
 
         es.execute(new ListNeedUpdateFromRedisWorker(fetchDubboService, redisListService, redisSetService, cmpSkuService, cacheSeconds, productCacheManager));
-
 
         for (int i = 0; i < 60; i++) {
 //            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService, cacheSeconds));

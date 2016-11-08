@@ -30,11 +30,17 @@ import java.util.concurrent.TimeUnit;
 public class CmpSkuDubboUpdate2Worker implements Runnable {
 
     private static final String PRICE_DROP_SKUID_QUEUE = "PRICE_DROP_SKUID_QUEUE";
+    private static long popNumber = 0;
     private static Logger logger = LoggerFactory.getLogger(CmpSkuDubboUpdate2Worker.class);
     private IDataBaseManager dbm;
     private IFetchDubboService fetchDubboService;
     private ICmpSkuService cmpSkuService;
     private IRedisListService redisListService;
+
+    private long popFinishNumber = 0;
+    private long popExceptionNumber = 0;
+    private long urlKeyFoundNumber = 0;
+    private long urlKeyNotFoundNumber = 0;
 
     public CmpSkuDubboUpdate2Worker(IDataBaseManager dbm, IFetchDubboService fetchDubboService, ICmpSkuService cmpSkuService, IRedisListService redisListService) {
         this.dbm = dbm;
@@ -49,6 +55,15 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
         while (true) {
 
             try {
+                if (CmpSkuDubboUpdate2Worker.popNumber >= 2000) {
+                    System.out.println("popNumber " + popNumber);
+                    System.out.println("popFinishNumber " + popFinishNumber);
+                    System.out.println("popExceptionNumber " + popExceptionNumber);
+                    System.out.println("urlKeyFoundNumber " + urlKeyFoundNumber);
+                    System.out.println("urlKeyNotFoundNumber " + urlKeyNotFoundNumber);
+                    break;
+                }
+
                 logger.info("fetchDubboService.popFetchUrlResult(TaskTarget.SKU_UPDATE) start");
                 String fetchUrlResultStr = fetchDubboService.popFetchUrlResult(TaskTarget.SKU_UPDATE);
                 logger.info("fetchUrlResult JSON: {}", fetchUrlResultStr);
@@ -58,6 +73,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                     continue;
                 }
                 FetchUrlResult fetchUrlResult = JSONUtil.toObject(fetchUrlResultStr, FetchUrlResult.class);
+                popNumber++;
                 logger.info("fetchDubboService.popFetchUrlResult(TaskTarget.SKU_UPDATE) end");
                 if (fetchUrlResult.getUrl() == null) {
                     logger.info("fetchUrlResult.getUrl() null");
@@ -69,16 +85,21 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                 TaskStatus taskStatus = fetchUrlResult.getTaskStatus();
 
                 if (TaskStatus.FINISH.equals(taskStatus)) {
-
+                    popFinishNumber++;
                     String urlKey = HexDigestUtil.md5(url);
                     List<PtmCmpSku> skuList = cmpSkuService.getPtmCmpSkuListByUrlKey(urlKey);
 
-                    for (PtmCmpSku ptmCmpSku : skuList) {
-
-                        //更新商品的信息，写入多图数据，写入描述/参数
-                        updatePtmCmpSku(ptmCmpSku, fetchUrlResult);
+                    if (skuList == null || skuList.size() == 0) {
+                        urlKeyNotFoundNumber++;
+                    } else {
+                        urlKeyFoundNumber++;
+                        for (PtmCmpSku ptmCmpSku : skuList) {
+                            //更新商品的信息，写入多图数据，写入描述/参数
+                            updatePtmCmpSku(ptmCmpSku, fetchUrlResult);
+                        }
                     }
-
+                } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
+                    popExceptionNumber++;
                 }
             } catch (Exception e) {
                 logger.info("CmpSkuDubboUpdate2Worker.run() exception.", e);
