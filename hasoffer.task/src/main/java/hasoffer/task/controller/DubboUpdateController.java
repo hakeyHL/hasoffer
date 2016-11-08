@@ -93,7 +93,7 @@ public class DubboUpdateController {
         CmpSkuDubboUpdate2Worker.popNumber = number;
 //        for (int i = 0; i < 60; i++) {
 //            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService, cacheSeconds));
-            es.execute(new CmpSkuDubboUpdate2Worker(dbm, fetchDubboService, cmpSkuService, redisListService));
+        es.execute(new CmpSkuDubboUpdate2Worker(fetchDubboService, cmpSkuService, redisListService));
 //        }
 
 
