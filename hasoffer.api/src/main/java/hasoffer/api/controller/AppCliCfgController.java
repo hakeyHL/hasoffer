@@ -59,6 +59,7 @@ public class AppCliCfgController {
                 break;
             case 2:
                 //change home page redeem tip
+                logger.info("enter home copy swap ");
                 if (StringUtils.isNotEmpty(stringFirst) && StringUtils.isNotEmpty(stringSecond)) {
                     List<String> redeemStrings = Arrays.asList(stringFirst, stringSecond);
                     //get home page redeem tip
@@ -74,14 +75,20 @@ public class AppCliCfgController {
                 }
                 break;
             case 3:
-                //get wishList config
+                logger.info("client scan config ");
+                // config
                 Map<String, Boolean> map = new HashMap<>();
-                //wish
-                map.put("001", true);
                 //search
+                map.put("001", true);
+
+                //wishlist
                 map.put("002", true);
 
+                //购物车
                 map.put("003", true);
+
+                //email and phone get
+                map.put("004", true);
 
                 resultVo.setData(map);
                 break;
