@@ -138,8 +138,6 @@ public class Compare2Controller {
                 PtmProduct ptmProduct = productService.getProduct(sio.getHsProId());
                 if (ptmProduct == null) {
                     productService.deleteProduct(sio.getHsProId());
-                } else {
-                    //logger.info(ptmProduct.toString());
                 }
 
             }

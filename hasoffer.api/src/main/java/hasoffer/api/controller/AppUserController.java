@@ -48,11 +48,7 @@ import java.util.*;
 @Controller
 @RequestMapping("/app")
 public class AppUserController {
-
     private final Logger logger = LoggerFactory.getLogger(AppUserController.class);
-
-    private final Long jotLag = TimeUtils.MILLISECONDS_OF_1_MINUTE * 150;
-
     @Resource
     AppServiceImpl appService;
     @Resource

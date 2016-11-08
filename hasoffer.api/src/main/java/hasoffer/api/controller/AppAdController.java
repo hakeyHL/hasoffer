@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -67,16 +68,17 @@ public class AppAdController {
             Message message = new Message.Builder().timeToLive(30).delayWhileIdle(true).addData("message", userMessage).build();
 //            Result result = sender.send(message, "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd", 2);
             MulticastResult result = sender.send(message, Arrays.asList("cWkpvtsRBd4:APA91bFxIK8S3M_ZRzkEBrm6fx2aSk183GdG4nF5U9CkuBpxp4mlyoKYISI1uqbs-H8r-_oHiLdrrnYVgcviUf4T-J9G4HxtLnWbD2whRAaqBoos-I8jp48Ye6z0cJ0rXk6MAARZMVaH", "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd"), 1);
-            System.out.println("123");
+            System.out.println(result.toString());
 //            Result result = sender.sendNoRetry(message, "cWkpvtsRBd4:APA91bFxIK8S3M_ZRzkEBrm6fx2aSk183GdG4nF5U9CkuBpxp4mlyoKYISI1uqbs-H8r-_oHiLdrrnYVgcviUf4T-J9G4HxtLnWbD2whRAaqBoos-I8jp48Ye6z0cJ0rXk6MAARZMVaH");
 //            String errorCodeName = result.getErrorCodeName();
 //            System.out.println(errorCodeName);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             System.out.println(" get exception ");
             System.out.println(e.getMessage());
         }
     }
+
     @RequestMapping("product")
     public ModelAndView getAdsByProductId(@RequestParam(defaultValue = "0") Long productId) {
         ModelAndView modelAndView = new ModelAndView();
@@ -104,18 +106,18 @@ public class AppAdController {
                         } else {
                             //否则处理返回
                             if (!StringUtils.isEmpty(ad.getAdLink())) {
-                                ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(result==true?Website.valueOf(ad.getAderName()):null, ad.getAdLink(), marketChannel));
+                                ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(result == true ? Website.valueOf(ad.getAderName()) : null, ad.getAdLink(), marketChannel));
                             }
                         }
                     } else if (appType != null && !appType.name().equals("APP")) {
                         //如果不是APP，直接处理返回
                         if (!StringUtils.isEmpty(ad.getAdLink())) {
-                            ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(result==true?Website.valueOf(ad.getAderName()):null, ad.getAdLink(), marketChannel));
+                            ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(result == true ? Website.valueOf(ad.getAderName()) : null, ad.getAdLink(), marketChannel));
                         }
                     } else {
                         //如果AppType为空，就不过滤hasoffer了
                         if (!StringUtils.isEmpty(ad.getAdLink())) {
-                            ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(result==true?Website.valueOf(ad.getAderName()):null, ad.getAdLink(), marketChannel));
+                            ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(result == true ? Website.valueOf(ad.getAderName()) : null, ad.getAdLink(), marketChannel));
                         }
                     }
                 }
@@ -131,14 +133,19 @@ public class AppAdController {
     }
 
     @RequestMapping("tPush")
-    public ModelAndView tt() throws Exception {
+    public ModelAndView tt() {
         ModelAndView modelAndView = new ModelAndView();
         Sender sender = new Sender("key=AIzaSyCZrHjOkZ57j3Dvq_TpvYW8Mt38Ej1dzQA");
         String userMessage = "{\"errorCode\":\"00000\"}";
         Message message = new Message.Builder().timeToLive(30).delayWhileIdle(true).addData("m", userMessage).build();
 //        String regId="e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd";
 //        Result result  = sender.send(message, regId, 1);
-        Result result = sender.send(message, "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd", 2);
+        Result result = null;
+        try {
+            result = sender.send(message, "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd", 2);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
         String errorCodeName = result.getErrorCodeName();
         System.out.println(errorCodeName);
         return modelAndView;

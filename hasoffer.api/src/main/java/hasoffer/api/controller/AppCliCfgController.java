@@ -28,7 +28,7 @@ import java.util.Map;
 @Controller
 @RequestMapping(value = "/cfg")
 public class AppCliCfgController {
-    final String HOME_REDEEM_TIP_COPY = "app_home_copy";
+    static final String HOME_REDEEM_TIP_COPY = "app_home_copy";
     @Autowired
     private CacheServiceImpl cacheService;
     private Logger logger = LoggerFactory.getLogger(AppCliCfgController.class);
