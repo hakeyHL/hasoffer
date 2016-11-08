@@ -120,6 +120,9 @@
                     <option
                             <c:if test="${type==2}">selected</c:if> value="2">降价生成
                     </option>
+                    <option
+                            <c:if test="${type==3}">selected</c:if> value="2">DEAL网站
+                    </option>
                 </select>
             </form>
         </div>
