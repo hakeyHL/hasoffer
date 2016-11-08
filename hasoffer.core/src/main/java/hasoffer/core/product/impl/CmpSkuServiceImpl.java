@@ -927,7 +927,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
                 new ILister() {
                     @Override
                     public PageableResult getData(int page) {
-                        System.out.println(skuUpdateResult.toString());
+                        System.out.println(page + " : " + skuUpdateResult.toString());
                         return dbm.queryPage(SQL_FIND_BY_YMD, page, 2000);
                     }
 
