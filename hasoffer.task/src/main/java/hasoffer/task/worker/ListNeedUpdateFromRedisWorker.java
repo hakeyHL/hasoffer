@@ -78,7 +78,7 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
             System.out.println("current ymd = " + ymd);
             System.out.println("current daystart is " + tomorrowDayStart);
 
-            if (testSendPtmCmpSkuNumber > number) {
+            if (testSendFlipkartNumber > number) {
                 System.out.println("testPopProductNumber " + testPopProductNumber);
                 System.out.println("testProcedProductNumber " + testProcedProductNumber);
                 System.out.println("testTotalPtmCmpSkuNumber " + testTotalPtmCmpSkuNumber);

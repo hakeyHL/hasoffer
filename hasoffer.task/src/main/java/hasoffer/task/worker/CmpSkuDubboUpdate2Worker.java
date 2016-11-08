@@ -62,11 +62,18 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                     System.out.println("urlKeyFoundNumber " + urlKeyFoundNumber);
                     System.out.println("urlKeyNotFoundNumber " + urlKeyNotFoundNumber);
                     break;
+                } else {
+                    System.out.println("popNumber " + popNumber);
+                    System.out.println("popFinishNumber " + popFinishNumber);
+                    System.out.println("popExceptionNumber " + popExceptionNumber);
+                    System.out.println("urlKeyFoundNumber " + urlKeyFoundNumber);
+                    System.out.println("urlKeyNotFoundNumber " + urlKeyNotFoundNumber);
                 }
 
                 String fetchUrlResultStr = fetchDubboService.popFetchUrlResult(TaskTarget.SKU_UPDATE);
                 if (fetchUrlResultStr == null) {
-                    TimeUnit.MINUTES.sleep(3);
+//                    TimeUnit.MINUTES.sleep(3);
+                    TimeUnit.SECONDS.sleep(10);
                     logger.info("fetchUrlResult get null sleep 3 MINUTES");
                     continue;
                 }
@@ -152,9 +159,9 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                 if (StringUtils.isEqual(productTitle, sku.getTitle())) {
                     //保存product的描述信息
                     cmpSkuService.createProductDescription(sku, fetchedProduct);
-                    System.out.println("update product spec success for " + ptmProduct.getId());
+//                    System.out.println("update product spec success for " + ptmProduct.getId());
                 } else {
-                    System.out.println("product spec should remove " + ptmProduct.getId());
+//                    System.out.println("product spec should remove " + ptmProduct.getId());
                 }
             } else {
                 System.out.println(skuid + " product is null");
