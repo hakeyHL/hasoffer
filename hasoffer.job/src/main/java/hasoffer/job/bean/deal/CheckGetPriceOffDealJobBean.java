@@ -166,6 +166,7 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
                     List<AppDeal> appdealList = dbm.query("SELECT t FROM AppDeal t WHERE t.linkUrl = ?0", Arrays.asList(sku.getUrl()));
                     if (appdealList != null && appdealList.size() != 0) {
                         System.out.println("query by url get " + appdealList.size() + " sku");
+                        flag = false;
                         continue;
                     }
 
@@ -175,6 +176,7 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
                     appdealList = dbm.query("SELECT t FROM AppDeal t WHERE t.title = ?0 AND t.website = ?1 ", Arrays.asList(title, website));
                     if (appdealList != null && appdealList.size() != 0) {
                         System.out.println("query by title website get " + appdealList.size() + " sku");
+                        flag = false;
                         continue;
                     }
 

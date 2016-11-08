@@ -3,6 +3,7 @@ package hasoffer.job.bean.deal;
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
@@ -61,7 +62,9 @@ public class DealSiteFetchDealJobBean extends QuartzJobBean {
 
                     AppDeal deal = getDeal(fetchedDealInfo, dbm);
 
-                    dealService.createAppDealByPriceOff(deal);
+                    if (deal != null) {
+                        dealService.createAppDealByPriceOff(deal);
+                    }
                 }
 
                 break;
@@ -84,6 +87,10 @@ public class DealSiteFetchDealJobBean extends QuartzJobBean {
         Website webSite = WebsiteHelper.getWebSite(fetchedDealInfo.getLink());
 
         String webSiteString = WebsiteHelper.getAllWebSiteString(fetchedDealInfo.getLink());
+
+        if (StringUtils.isEmpty(webSiteString)) {
+            return null;
+        }
 
         if (webSite == null) {
             webSite = Website.UNKNOWN;
@@ -132,19 +139,21 @@ public class DealSiteFetchDealJobBean extends QuartzJobBean {
         if (appdealList != null && appdealList.size() != 0) {
             System.out.println("query by url get " + appdealList.size() + " sku");
             flag = false;
+            System.out.println("flag " + flag + " then convert image");
+            return null;
         }
 
         System.out.println("flag " + flag + " then convert image");
 
         //todo s3可能又内网的访问方式，不收费
-        String imagePath = fetchedDealInfo.getImageUrl();
-        imagePath = ImageUtil.getImageUrl(imagePath);
+        String imageUrl = fetchedDealInfo.getImageUrl();
+
         String dealPath = "";
         String dealBigPath = "";
         String dealSmallPath = "";
 
         try {
-            File imageFile = ImageUtil.downloadImage(imagePath);
+            File imageFile = ImageUtil.downloadImage(imageUrl);
 
             dealPath = ImageUtil.uploadImage(imageFile);
             dealBigPath = ImageUtil.uploadImage(imageFile, 316, 180);

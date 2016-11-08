@@ -8,7 +8,6 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import hasoffer.task.worker.MongoListStatHijackFetchWorker;
-import hasoffer.task.worker.MysqlListWorker2;
 import hasoffer.task.worker.SaveOrUpdateIndexWorker;
 import hasoffer.task.worker.UpdateFkSdIndexWorker;
 import org.springframework.stereotype.Controller;
@@ -79,7 +78,8 @@ public class FixIndexController {
 
         ListProcessWorkerStatus<PtmCmpSku> ws = new ListProcessWorkerStatus<PtmCmpSku>();
 
-        es.execute(new MysqlListWorker2<PtmCmpSku>(Q_SKU_INDEX_UPDATE, ws, dbm));
+//        该worker挪到admin项目里面了
+//        es.execute(new MysqlListWorker2<PtmCmpSku>(Q_SKU_INDEX_UPDATE, ws, dbm));
 
         for (int i = 0; i < 5; i++) {
             es.execute(new UpdateFkSdIndexWorker(ws, dbm, cmpSkuService));

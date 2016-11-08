@@ -3,6 +3,7 @@ package hasoffer.core.product;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.core.bo.product.SkuPriceUpdateResultBo;
+import hasoffer.core.bo.product.SkuUpdateResult;
 import hasoffer.core.persistence.mongo.PriceNode;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku2;
@@ -139,6 +140,11 @@ public interface ICmpSkuService {
     void updateFlipakrtSkuBrandAndModel(long skuid, String brand, String model);
 
     void updateCmpSkuBrandModel(Long id, String brand, String model);
+
+    SkuUpdateResult statUpdateResult(String ymd);
+
+    void saveSkuUpdateResult(SkuUpdateResult skuUpdateResult);
+
 
 //    void loadImageDownLoadTasks(LinkedBlockingQueue<PtmCmpSku> cmpSkusQueue);
 }

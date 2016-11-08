@@ -3,6 +3,7 @@ package hasoffer.admin.controller;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.bo.product.SkuUpdateResult;
 import hasoffer.core.cache.CmpSkuCacheManager;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
@@ -50,6 +51,21 @@ public class StatController {
     @Resource
     ProductCacheManager productCacheManager;
     private Logger logger = LoggerFactory.getLogger(StatController.class);
+
+    @RequestMapping(value = "/sku_update_result", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String sku_update_result(@RequestParam(defaultValue = "") String ymd) {
+        if (StringUtils.isEmpty(ymd)) {
+            ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
+        }
+
+        SkuUpdateResult skuUpdateResult = cmpSkuService.statUpdateResult(ymd);
+
+        cmpSkuService.saveSkuUpdateResult(skuUpdateResult);
+
+        return "ok";
+    }
 
     @RequestMapping(value = "/show_update_status", method = RequestMethod.GET)
     public
