@@ -78,7 +78,7 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
             System.out.println("current ymd = " + ymd);
             System.out.println("current daystart is " + tomorrowDayStart);
 
-            if (testSendFlipkartNumber > number) {
+            if (testSendPtmCmpSkuNumber > number) {
                 System.out.println("testPopProductNumber " + testPopProductNumber);
                 System.out.println("testProcedProductNumber " + testProcedProductNumber);
                 System.out.println("testTotalPtmCmpSkuNumber " + testTotalPtmCmpSkuNumber);
@@ -86,12 +86,6 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                 System.out.println("testSendFlipkartNumber " + testSendFlipkartNumber);
                 break;
             }
-
-
-            //队列取数
-//            int num = 1200;
-//            while (num > 0) {
-//                num--;
 
             Object pop = redisListService.pop(UPDATE_WAIT_QUEUE + ymd);
             if (pop == null) {//如果队列没有数据了，休息30分钟
@@ -172,5 +166,4 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
             }
         }
     }
-//    }
 }
