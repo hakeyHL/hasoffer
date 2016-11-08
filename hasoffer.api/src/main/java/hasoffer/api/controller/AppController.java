@@ -63,6 +63,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -96,12 +97,18 @@ public class AppController {
     @Resource
     private IOrderStatsAnalysisService orderService;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
-        Date date1 = DateUtils.parseDate("2016-10-05 19:11:00", "yyyy-MM-dd HH:mm:ss");
-        Date date2 = DateUtils.parseDate("2016-10-02 21:11:00", "yyyy-MM-dd HH:mm:ss");
-        long days = date1.getTime() / TimeUtils.MILLISECONDS_OF_1_DAY - date2.getTime() / TimeUtils.MILLISECONDS_OF_1_DAY;
-        System.out.println(days);
+        Date date1 = null;
+        try {
+            date1 = DateUtils.parseDate("2016-10-05 19:11:00", "yyyy-MM-dd HH:mm:ss");
+            Date date2 = DateUtils.parseDate("2016-10-02 21:11:00", "yyyy-MM-dd HH:mm:ss");
+            long days = date1.getTime() / TimeUtils.MILLISECONDS_OF_1_DAY - date2.getTime() / TimeUtils.MILLISECONDS_OF_1_DAY;
+            System.out.println(days);
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getLocalizedMessage());
+        }
 
     }
 
@@ -518,8 +525,7 @@ public class AppController {
             uUser.setThirdToken(userVO.getToken());
             uUser.setUserName(userVO.getUserName());
             uUser.setThirdId(userVO.getThirdId());
-            int result = appService.addUser(uUser);
-//            logger.debug("add user result is :" + result);
+            appService.addUser(uUser);
 
         } else {
 //            logger.debug("user exist ,update userInfo");
@@ -560,8 +566,7 @@ public class AppController {
                 }
             }
             //将关联关系插入到关联表中
-            int count = appService.addUrmUserDevice(urmUserDevices);
-//            System.out.println(" batch save  result size : " + count);
+            appService.addUrmUserDevice(urmUserDevices);
         }
         map.put("userToken", userToken);
         jsonObject.put("data", map);
@@ -690,7 +695,6 @@ public class AppController {
         List li = new ArrayList();
         Map map = new HashMap();
         PageableResult<ProductModel2> products;
-        String data = "";
         //查询热卖商品
         switch (type) {
             case 0:
@@ -725,7 +729,6 @@ public class AppController {
                             Map.Entry next = iterator.next();
                             List<NameValue> nameValues = (List<NameValue>) next.getValue();
                             System.out.println("cate " + next.getKey() + " ::: nameValues  :" + nameValues.size());
-                            int i = 0;
                             for (NameValue nameValue : nameValues) {
                                 Long cateId = Long.valueOf(nameValue.getName() + "");
                                 //可能是二级也可能是三级 ,二级的放一块,三级的放一块
@@ -755,7 +758,6 @@ public class AppController {
                                         categoryVo3.setHasChildren(0);
                                         thirdCategoryList.add(categoryVo3);
                                     }
-                                    i++;
                                 }
                             }
                         }
@@ -1254,7 +1256,8 @@ public class AppController {
                                                 if (!StringUtils.isEmpty(reviewContent)) {
                                                     reviewContent = ClientHelper.delHTMLTag(reviewContent);
                                                     //处理下换行符号
-                                                    reviewContent.replaceAll("\n", "");
+                                                    String replaceResult = reviewContent.replaceAll("\n", "");
+                                                    reviewContent = replaceResult;
                                                 }
                                                 if (!StringUtils.isEmpty(reviewContent)) {
                                                     if (commentList.size() < 4) {
@@ -1263,7 +1266,8 @@ public class AppController {
                                                         if (!StringUtils.isEmpty(reviewTitle)) {
                                                             reviewTitle = ClientHelper.delHTMLTag(reviewTitle);
                                                             //处理下换行符号
-                                                            reviewTitle.replaceAll("\n", "");
+                                                            String replaceResult = reviewTitle.replaceAll("\n", "");
+                                                            reviewTitle = replaceResult;
                                                             commentList.add(reviewTitle == null ? "" : reviewTitle + "." + reviewContent);
                                                         } else {
                                                             commentList.add(reviewContent);
@@ -1338,8 +1342,8 @@ public class AppController {
         StringBuilder sb = new StringBuilder();
         String description = appDeal.getDescription();
         sb.append(description == null ? "" : description);
-        if (description.lastIndexOf("\n") > 0) {
-            if (description.lastIndexOf("\n") == description.length() - 1) {
+        if (description.lastIndexOf('\n') > 0) {
+            if (description.lastIndexOf('\n') == description.length() - 1) {
                 //最后有换行,再加一个换行
                 sb.append("\n");
             } else {

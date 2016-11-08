@@ -71,8 +71,8 @@ public class AppSkuController {
     }
 
     public static void main(String[] args) {
-//        Long tempDateL = 1472608486682l - 1472452044987l;
-//        System.out.println(BigDecimal.valueOf(tempDateL).divide(BigDecimal.valueOf(60 * 60 * 1000 * 24), BigDecimal.ROUND_HALF_UP).longValue());
+        Long tempDateL = 1472608486682l - 1472452044987l;
+        System.out.println(BigDecimal.valueOf(tempDateL).divide(BigDecimal.valueOf(60 * 60 * 1000 * 24), BigDecimal.ROUND_HALF_UP).longValue());
 //        Date date1 = new Date();
 //        date1.setTime(1472452044987l);
 //        Date date2 = new Date();
@@ -114,7 +114,7 @@ public class AppSkuController {
         if (ptmCmpSku != null) {
             logger.info(" has this sku " + id);
             PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, ptmCmpSku.getId());
-            logger.info("get sku totalWeigth from  mongo " + ptmCmpSkuDescription == null ? " not null" : " is null");
+            logger.info("get sku totalWeigth from  mongo " + ptmCmpSkuDescription);
             Map map = new HashMap<>();
             if (ptmCmpSkuDescription != null) {
                 map.put("description", ptmCmpSkuDescription.getJsonDescription() == null ? "" : ClientHelper.delHTMLTag(ptmCmpSkuDescription.getJsonDescription()));//描述
@@ -169,9 +169,9 @@ public class AppSkuController {
 
         boolean flag = false;
         if (priceNodes != null && priceNodes.size() != 0) {
-            for (PriceNode priceNode : priceNodes) {
+           /* for (PriceNode priceNode : priceNodes) {
                 System.out.println(" T" + getDateMMdd(priceNode.getPriceTimeL()) + " P " + priceNode.getPrice());
-            }
+            }*/
             float referencePrice = priceNodes.get(0).getPrice();
             for (PriceNode priceNode : priceNodes) {
                 if (referencePrice != priceNode.getPrice()) {
@@ -236,34 +236,6 @@ public class AppSkuController {
     }
 
     /**
-     * 按照是价格去重
-     *
-     * @return
-     */
-    public void distinctListByPrice(List<PriceNode> priceNodes) {
-        //去重
-        Set<Float> priceSet = new HashSet<>();
-        for (PriceNode priceNode : priceNodes) {
-            priceSet.add(priceNode.getPrice());
-        }
-
-        List<PriceNode> priceListNodes = new ArrayList<>();
-        for (PriceNode priceNode : priceNodes) {
-            if (priceSet.size() < 1) {
-                break;
-            }
-            if (priceSet.contains(priceNode.getPrice())) {
-                priceListNodes.add(priceNode);
-                priceSet.remove(priceNode.getPrice());
-            }
-        }
-        priceNodes = null;
-        System.gc();
-        priceNodes = priceListNodes;
-//        System.out.println(" after distinct by price ,size is " + priceNodes.size());
-    }
-
-    /**
      * 将给定集合整理出Y轴和坐标数据
      *
      * @return
@@ -275,7 +247,6 @@ public class AppSkuController {
 //        }
 
 //        System.out.println(" distinct list by price ");
-//        distinctListByPrice(priceNodes);
         List<Long> Y = new ArrayList<>();
         BigDecimal maxPrice = BigDecimal.valueOf(Collections.max(priceNodes, new Comparator<PriceNode>() {
             @Override
@@ -370,7 +341,6 @@ public class AppSkuController {
             }
         }
         priceNodes = null;
-        System.gc();
         priceNodes = new ArrayList<>();
         priceNodes.addAll(tempPriceNodes);
 //        System.out.println(" priceNodes " + priceNodes.size());

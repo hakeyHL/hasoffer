@@ -2,8 +2,6 @@ package hasoffer.api.controller;
 
 import hasoffer.api.helper.Httphelper;
 import hasoffer.core.third.impl.ThirdServiceImple;
-import org.hibernate.annotations.common.util.impl.LoggerFactory;
-import org.jboss.logging.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,8 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 public class ThirdPartyController {
     @Resource
     ThirdServiceImple thridPartyService;
-    private Logger logger = LoggerFactory.logger(ThirdPartyController.class);
-
     /**
      * provide API to get deals for Gmobi
      *
