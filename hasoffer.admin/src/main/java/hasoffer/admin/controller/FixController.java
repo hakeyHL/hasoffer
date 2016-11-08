@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.admin.controller.vo.TitleCountVo;
-import hasoffer.admin.worker.FixSkuErrorInPriceWorker;
-import hasoffer.admin.worker.FlipkartSkuCategory2GetListWorker;
-import hasoffer.admin.worker.FlipkartSkuCategory2GetSaveWorker;
-import hasoffer.admin.worker.MysqlListWorker2;
+import hasoffer.admin.worker.*;
 import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.exception.ImageDownloadOrUploadException;
@@ -146,24 +143,8 @@ public class FixController {
         executorService.execute(new MysqlListWorker2(queryString, ws, dbm));
 
         for (int i = 0; i < 50; i++) {
-//            executorService.execute(new UrlKeyFixWorker());
+            executorService.execute(new UrlKeyFixWorker(ws, cmpSkuService));
         }
-
-        long startId = ptmcmpskuId;
-
-        for (long i = startId; i < 99961567; i++) {
-
-            PtmCmpSku ptmCmpSku = dbm.get(PtmCmpSku.class, i);
-
-            if (ptmCmpSku == null) {
-                continue;
-            } else {
-                cmpSkuService.setUrlKey(i, HexDigestUtil.md5(ptmCmpSku.getUrl()));
-                System.out.println("current ptmcmpsku id " + i);
-            }
-
-        }
-
 
         return "ok";
     }

@@ -69,6 +69,9 @@ public class DealServiceImpl implements IDealService {
         } else if (type == 2) {
             querySql = querySql.replace("AppDealSourceType", "PRICE_OFF");
             return dbm.queryPage(querySql, page, size);
+        } else if (type == 3) {
+            querySql = querySql.replace("AppDealSourceType", "DEAL_SITE");
+            return dbm.queryPage(querySql, page, size);
         } else {
             querySql = querySql.replace("WHERE t.appdealSource = 'AppDealSourceType'", "");
             return dbm.queryPage(querySql, page, size);

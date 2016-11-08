@@ -99,10 +99,16 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     }
 
     @Override
-    public void setUrlKey(long skuId, String urlKey) {
+    public void setUrlKey(long skuId, String newUrl, String urlKey) {
         PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(skuId);
 
-        updater.getPo().setUrlKey(urlKey);
+        if (!StringUtils.isEmpty(newUrl)) {
+            updater.getPo().setUrl(newUrl);
+        }
+
+        if (!StringUtils.isEmpty(urlKey)) {
+            updater.getPo().setUrlKey(urlKey);
+        }
 
         dbm.update(updater);
     }

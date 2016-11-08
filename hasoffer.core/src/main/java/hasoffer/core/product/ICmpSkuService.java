@@ -36,11 +36,11 @@ public interface ICmpSkuService {
 
     /**
      * 该方法用于修复sku表中urlKey，不建议在赋值时使用，赋值参见该类的setUrl()方法
-     *
      * @param skuId
+     * @param newUrl
      * @param urlKey
      */
-    void setUrlKey(long skuId, String urlKey);
+    void setUrlKey(long skuId, String newUrl, String urlKey);
 
     List<PriceNode> queryHistoryPrice(long id);
 
