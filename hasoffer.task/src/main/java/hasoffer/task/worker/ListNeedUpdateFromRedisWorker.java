@@ -34,6 +34,7 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
     private ICmpSkuService cmpSkuService;
     private ProductCacheManager productCacheManager;
     private long cacheSeconds;
+    private long number;
 
     private long testPopProductNumber = 0;
     private long testProcedProductNumber = 0;
@@ -48,6 +49,16 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
         this.cmpSkuService = cmpSkuService;
         this.cacheSeconds = cacheSeconds;
         this.productCacheManager = productCacheManager;
+    }
+
+    public ListNeedUpdateFromRedisWorker(IFetchDubboService fetchDubboService, IRedisListService redisListService, IRedisSetService redisSetService, ICmpSkuService cmpSkuService, long cacheSeconds, ProductCacheManager productCacheManager, long number) {
+        this.fetchDubboService = fetchDubboService;
+        this.redisListService = redisListService;
+        this.redisSetService = redisSetService;
+        this.cmpSkuService = cmpSkuService;
+        this.cacheSeconds = cacheSeconds;
+        this.productCacheManager = productCacheManager;
+        this.number = number;
     }
 
     @Override
@@ -67,7 +78,7 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
             System.out.println("current ymd = " + ymd);
             System.out.println("current daystart is " + tomorrowDayStart);
 
-            if (testSendFlipkartNumber > 2000) {
+            if (testSendFlipkartNumber > number) {
                 System.out.println("testPopProductNumber " + testPopProductNumber);
                 System.out.println("testProcedProductNumber " + testProcedProductNumber);
                 System.out.println("testTotalPtmCmpSkuNumber " + testTotalPtmCmpSkuNumber);

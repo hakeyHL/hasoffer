@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 public class CmpSkuDubboUpdate2Worker implements Runnable {
 
     private static final String PRICE_DROP_SKUID_QUEUE = "PRICE_DROP_SKUID_QUEUE";
-    private static long popNumber = 0;
+    public static long popNumber = 0;
     private static Logger logger = LoggerFactory.getLogger(CmpSkuDubboUpdate2Worker.class);
     private IDataBaseManager dbm;
     private IFetchDubboService fetchDubboService;
@@ -55,7 +55,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
         while (true) {
 
             try {
-                if (CmpSkuDubboUpdate2Worker.popNumber >= 2000) {
+                if (CmpSkuDubboUpdate2Worker.popNumber < 0) {
                     System.out.println("popNumber " + popNumber);
                     System.out.println("popFinishNumber " + popFinishNumber);
                     System.out.println("popExceptionNumber " + popExceptionNumber);
@@ -73,7 +73,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                     continue;
                 }
                 FetchUrlResult fetchUrlResult = JSONUtil.toObject(fetchUrlResultStr, FetchUrlResult.class);
-                popNumber++;
+                popNumber--;
                 logger.info("fetchDubboService.popFetchUrlResult(TaskTarget.SKU_UPDATE) end");
                 if (fetchUrlResult.getUrl() == null) {
                     logger.info("fetchUrlResult.getUrl() null");
