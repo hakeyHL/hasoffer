@@ -44,6 +44,9 @@ public class StatSkuUpdateResult implements Identifiable<String> {
     private long allTotal = 0;
     private long allSuccess = 0;
 
+    public StatSkuUpdateResult() {
+    }
+
     public StatSkuUpdateResult(String ymd) {
         this.id = ymd;
     }
