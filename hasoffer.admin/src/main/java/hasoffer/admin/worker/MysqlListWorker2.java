@@ -28,12 +28,20 @@ public class MysqlListWorker2 implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
 
-            int page = 1;
-            int pageSize = 1000;
+        int page = 1;
+        int pageSize = 1000;
 
-            PageableResult pagedResults = dbm.queryPage(queryString, page, pageSize);
+        PageableResult pagedResults = dbm.queryPage(queryString, page, pageSize);
+
+        long totalPage = pagedResults.getTotalPage();
+
+        while (page <= totalPage) {
+
+            if (page > 1) {
+                pagedResults = dbm.queryPage(queryString, page, pageSize);
+            }
+
             List cmpSkus = pagedResults.getData();
 
             if (ws.getSdQueue().size() > 2000) {
