@@ -5,7 +5,6 @@ import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.JSONUtil;
-import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.data.redis.IRedisListService;
@@ -28,7 +27,6 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
     private static final String PRICE_DROP_SKUID_QUEUE = "PRICE_DROP_SKUID_QUEUE";
     public static long popNumber = 0;
     private static Logger logger = LoggerFactory.getLogger(CmpSkuDubboUpdate2Worker.class);
-    private IDataBaseManager dbm;
     private IFetchDubboService fetchDubboService;
     private ICmpSkuService cmpSkuService;
     private IRedisListService redisListService;
@@ -38,9 +36,9 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
     private long urlKeyFoundNumber = 0;
     private long urlKeyNotFoundNumber = 0;
     private long testFlipkartNumber = 0;
+    private long testSnapdealNumber = 0;
 
-    public CmpSkuDubboUpdate2Worker(IDataBaseManager dbm, IFetchDubboService fetchDubboService, ICmpSkuService cmpSkuService, IRedisListService redisListService) {
-        this.dbm = dbm;
+    public CmpSkuDubboUpdate2Worker(IFetchDubboService fetchDubboService, ICmpSkuService cmpSkuService, IRedisListService redisListService) {
         this.fetchDubboService = fetchDubboService;
         this.cmpSkuService = cmpSkuService;
         this.redisListService = redisListService;
@@ -59,6 +57,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                     System.out.println("urlKeyFoundNumber " + urlKeyFoundNumber);
                     System.out.println("urlKeyNotFoundNumber " + urlKeyNotFoundNumber);
                     System.out.println("testFlipkartNumber " + testFlipkartNumber);
+                    System.out.println("testSnapdealNumber " + testSnapdealNumber);
                     break;
                 } else {
                     System.out.println("popNumber " + popNumber);
@@ -67,6 +66,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                     System.out.println("urlKeyFoundNumber " + urlKeyFoundNumber);
                     System.out.println("urlKeyNotFoundNumber " + urlKeyNotFoundNumber);
                     System.out.println("testFlipkartNumber " + testFlipkartNumber);
+                    System.out.println("testSnapdealNumber " + testSnapdealNumber);
                 }
 
                 String fetchUrlResultStr = fetchDubboService.popFetchUrlResult(TaskTarget.SKU_UPDATE);
@@ -91,6 +91,13 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                     popFinishNumber++;
                     String urlKey = HexDigestUtil.md5(url);
                     List<PtmCmpSku> skuList = cmpSkuService.getPtmCmpSkuListByUrlKey(urlKey);
+
+                    if (Website.FLIPKART.equals(fetchUrlResult.getWebsite())) {
+                        testFlipkartNumber++;
+                    }
+                    if (Website.SNAPDEAL.equals(fetchUrlResult.getWebsite())) {
+                        testSnapdealNumber++;
+                    }
 
                     if (skuList == null || skuList.size() == 0) {
                         urlKeyNotFoundNumber++;
@@ -120,10 +127,6 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
 
         if (website == null) {
             return;
-        }
-
-        if (Website.FLIPKART.equals(website)) {
-            testFlipkartNumber++;
         }
 
         FetchedProduct fetchedProduct = fetchUrlResult.getFetchProduct();

@@ -41,6 +41,8 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
     private long testTotalPtmCmpSkuNumber = 0;
     private long testSendPtmCmpSkuNumber = 0;
     private long testSendFlipkartNumber = 0;
+    private long testSendSnapdealNumber = 0;
+
 
     public ListNeedUpdateFromRedisWorker(IFetchDubboService fetchDubboService, IRedisListService redisListService, IRedisSetService redisSetService, ICmpSkuService cmpSkuService, long cacheSeconds, ProductCacheManager productCacheManager) {
         this.fetchDubboService = fetchDubboService;
@@ -84,6 +86,7 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                 System.out.println("testTotalPtmCmpSkuNumber " + testTotalPtmCmpSkuNumber);
                 System.out.println("testSendPtmCmpSkuNumber " + testSendPtmCmpSkuNumber);
                 System.out.println("testSendFlipkartNumber " + testSendFlipkartNumber);
+                System.out.println("testSendSnapdealNumber " + testSendSnapdealNumber);
                 break;
             }
 
@@ -148,6 +151,9 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
 
                         if (Website.FLIPKART.equals(website)) {
                             testSendFlipkartNumber++;
+                        }
+                        if (Website.SNAPDEAL.equals(website)) {
+                            testSendSnapdealNumber++;
                         }
 
                         fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), cacheSeconds, TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_3);
