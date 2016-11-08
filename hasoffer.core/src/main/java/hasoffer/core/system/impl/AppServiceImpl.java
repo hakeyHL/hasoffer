@@ -536,7 +536,7 @@ public class AppServiceImpl implements IAppService {
     private String getAliExpressIndexUrl(MarketChannel marketChannel, String deviceId) {
         Random random = new Random();
         String url = "";
-        if (random.nextInt(50) == 1) {
+        if (random.nextInt(5) != 1) {
             url = "http://s.click.aliexpress.com/e/qbA6QFyv3";
         }
         return new String(org.apache.commons.codec.binary.Base64.encodeBase64(url.getBytes(Charset.forName("UTF-8"))));

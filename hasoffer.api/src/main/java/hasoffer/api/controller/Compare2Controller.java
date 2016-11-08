@@ -243,7 +243,7 @@ public class Compare2Controller {
                 logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, pageSize));
                 //if exception occured ,get default cmpResult
                 jsonObject.put("data", JSONObject.toJSON(cr));
-                e.printStackTrace();
+                System.out.println(e.getMessage());
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
                 return null;
             }
