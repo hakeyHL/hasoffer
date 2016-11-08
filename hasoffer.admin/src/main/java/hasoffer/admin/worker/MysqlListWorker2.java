@@ -46,6 +46,7 @@ public class MysqlListWorker2 implements Runnable {
             }
 
             ws.getSdQueue().addAll(cmpSkus);
+            page++;
         }
 
     }
