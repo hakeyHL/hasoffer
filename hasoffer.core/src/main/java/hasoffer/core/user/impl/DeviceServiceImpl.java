@@ -76,6 +76,8 @@ public class DeviceServiceImpl implements IDeviceService {
             "SELECT t FROM UrmDayVisit t ORDER BY t.id DESC";
     private static final String D_DEVICE_LOG = "delete FROM UrmDevice t where t.id in (:ids) ";
     private static final String Q_DEVICE_BY_IDS = "SELECT t FROM UrmDevice t where t.id in (:ids)";
+
+    private final String dataFormatStringYMD = "yyyyMMdd";
     @Resource
     IDataBaseManager dbm;
     @Resource
@@ -116,14 +118,14 @@ public class DeviceServiceImpl implements IDeviceService {
         //        {"marketChannel":"SHANCHUAN", "deviceYmd":{"$lt":"20160513"}, "cmpPrice":{"$gt":0},"ymd":{"$gt":"20160501"},"ymd":{"$lt":"20160510"}}
         Calendar cal = Calendar.getInstance();//使用默认时区和语言环境获得一个日历。
         try {
-            Date date = DateUtils.parseDate(startYmd, "yyyyMMdd");
+            Date date = DateUtils.parseDate(startYmd, dataFormatStringYMD);
             cal.setTime(date);
             cal.add(Calendar.DAY_OF_MONTH, -days);//取当前日期的前一天.
         } catch (ParseException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
 
-        String beginYmd = DateFormatUtils.format(cal, "yyyyMMdd");
+        String beginYmd = DateFormatUtils.format(cal, dataFormatStringYMD);
         Query query;
         if (marketChannel == null || "ALL".equals(marketChannel) || "".equals(marketChannel)) {
             query = Query.query(
@@ -255,7 +257,7 @@ public class DeviceServiceImpl implements IDeviceService {
 
         Map<MarketChannel, StatDevice> mcDMap = new HashMap<MarketChannel, StatDevice>();
 
-        Date sDate = TimeUtils.stringToDate(ymd, "yyyyMMdd");
+        Date sDate = TimeUtils.stringToDate(ymd, dataFormatStringYMD);
         Date eDate = TimeUtils.addDay(sDate, 1);
 
         int page = 1;
@@ -517,7 +519,7 @@ public class DeviceServiceImpl implements IDeviceService {
         long proId = 0L;
         Website website = null;
 
-        int _index = value.indexOf("_");
+        int _index = value.indexOf('_');
         if (_index > 0) {
             String proIdStr = value.substring(0, _index);
             if (NumberUtils.isDigits(proIdStr)) {
@@ -605,7 +607,7 @@ public class DeviceServiceImpl implements IDeviceService {
 
     @Override
     public boolean restatIfInHour() {
-        String ymd = TimeUtils.parse(TimeUtils.today(), "yyyyMMdd");
+        String ymd = TimeUtils.parse(TimeUtils.today(), dataFormatStringYMD);
 
         UrmDayVisit dayVisit = dbm.get(UrmDayVisit.class, ymd);
 
@@ -654,8 +656,8 @@ public class DeviceServiceImpl implements IDeviceService {
     @Override
     public DayVisitBo statDayVisit(String ymd) {
         DayVisitBo dvb = new DayVisitBo(ymd);
-        Date startDate = TimeUtils.toDate(TimeUtils.getDayStart(ymd, "yyyyMMdd"));
-        Date endDate = TimeUtils.toDate(TimeUtils.getDayStart(ymd, "yyyyMMdd") + TimeUtils.MILLISECONDS_OF_1_DAY);
+        Date startDate = TimeUtils.toDate(TimeUtils.getDayStart(ymd, dataFormatStringYMD));
+        Date endDate = TimeUtils.toDate(TimeUtils.getDayStart(ymd, dataFormatStringYMD) + TimeUtils.MILLISECONDS_OF_1_DAY);
 
         logger.debug(String.format("stat day visit .day[%s]", ymd));
 
@@ -699,7 +701,7 @@ public class DeviceServiceImpl implements IDeviceService {
 
                     if ("/cmp/getcmpskus".equals(log.getRequestUri())) {
                         compareDeviceIdSet.add(deviceId);
-                        if (TimeUtils.parse(device.getCreateTime(), "yyyyMMdd").equals(ymd)) {
+                        if (TimeUtils.parse(device.getCreateTime(), dataFormatStringYMD).equals(ymd)) {
                             // 是当天的新设备
                             visitNew++;
                         }
