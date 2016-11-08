@@ -64,9 +64,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                     break;
                 }
 
-                logger.info("fetchDubboService.popFetchUrlResult(TaskTarget.SKU_UPDATE) start");
                 String fetchUrlResultStr = fetchDubboService.popFetchUrlResult(TaskTarget.SKU_UPDATE);
-                logger.info("fetchUrlResult JSON: {}", fetchUrlResultStr);
                 if (fetchUrlResultStr == null) {
                     TimeUnit.MINUTES.sleep(3);
                     logger.info("fetchUrlResult get null sleep 3 MINUTES");
@@ -74,7 +72,6 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                 }
                 FetchUrlResult fetchUrlResult = JSONUtil.toObject(fetchUrlResultStr, FetchUrlResult.class);
                 popNumber--;
-                logger.info("fetchDubboService.popFetchUrlResult(TaskTarget.SKU_UPDATE) end");
                 if (fetchUrlResult.getUrl() == null) {
                     logger.info("fetchUrlResult.getUrl() null");
                     continue;
@@ -120,9 +117,6 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
         }
 
         FetchedProduct fetchedProduct = fetchUrlResult.getFetchProduct();
-
-        System.out.println(JSONUtil.toJSON(fetchedProduct).toString() + "id=" + skuid);
-
 
         try {
             //
