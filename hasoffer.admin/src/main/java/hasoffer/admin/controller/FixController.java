@@ -7,6 +7,7 @@ import hasoffer.admin.controller.vo.TitleCountVo;
 import hasoffer.admin.worker.FixSkuErrorInPriceWorker;
 import hasoffer.admin.worker.FlipkartSkuCategory2GetListWorker;
 import hasoffer.admin.worker.FlipkartSkuCategory2GetSaveWorker;
+import hasoffer.admin.worker.MysqlListWorker2;
 import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.exception.ImageDownloadOrUploadException;
@@ -135,6 +136,18 @@ public class FixController {
     @RequestMapping(value = "/addUrlKeyForPtmCmpSku/{ptmcmpskuId}", method = RequestMethod.GET)
     @ResponseBody
     public String addUrlKeyForPtmCmpSku(@PathVariable long ptmcmpskuId) throws Exception {
+
+        String queryString = "SELECT t FROM PtmCmpSku t ORDER BY t.id";
+
+        ExecutorService executorService = Executors.newCachedThreadPool();
+
+        ListProcessWorkerStatus<PtmCmpSku> ws = new ListProcessWorkerStatus<>();
+
+        executorService.execute(new MysqlListWorker2(queryString, ws, dbm));
+
+        for (int i = 0; i < 50; i++) {
+//            executorService.execute(new UrlKeyFixWorker());
+        }
 
         long startId = ptmcmpskuId;
 
