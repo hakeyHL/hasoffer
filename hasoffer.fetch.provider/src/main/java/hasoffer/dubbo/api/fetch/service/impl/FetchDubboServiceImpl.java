@@ -176,11 +176,14 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     @Override
     public String popFetchUrlResult(TaskTarget taskTarget) {
         String fetchUrlResult = fetchCacheService.popFinishUrlList(taskTarget);
-        try {
-            FetchUrlResult result = JSONUtil.toObject(fetchUrlResult, FetchUrlResult.class);
-            fetchCacheService.popNum(result.getWebsite());
-        } catch (IOException e) {
-            logger.error("Json:{}", fetchUrlResult, e);
+        if (fetchUrlResult != null) {
+
+            try {
+                FetchUrlResult result = JSONUtil.toObject(fetchUrlResult, FetchUrlResult.class);
+                fetchCacheService.popNum(result.getWebsite());
+            } catch (IOException e) {
+                logger.error("Json:{}", fetchUrlResult, e);
+            }
         }
         logger.info("popFetchUrlResult(), obj:{}", fetchUrlResult);
         return fetchUrlResult;
