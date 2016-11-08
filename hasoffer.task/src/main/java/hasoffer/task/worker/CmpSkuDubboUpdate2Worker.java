@@ -101,6 +101,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
 
                     if (skuList == null || skuList.size() == 0) {
                         urlKeyNotFoundNumber++;
+                        logger.info("url = " + url);
                     } else {
                         urlKeyFoundNumber++;
                         for (PtmCmpSku ptmCmpSku : skuList) {
