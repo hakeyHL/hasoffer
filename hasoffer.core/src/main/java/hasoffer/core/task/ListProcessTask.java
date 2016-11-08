@@ -22,6 +22,9 @@ public class ListProcessTask<T> {
     IProcessor processor;
     int processorCount = 20;
     long queueMaxSize = 3000;
+
+    ListProcessWorkerStatus<T> ws = new ListProcessWorkerStatus<T>();
+
     private Logger logger = LoggerFactory.getLogger(ListProcessTask.class);
 
     public ListProcessTask(ILister list,
@@ -31,7 +34,6 @@ public class ListProcessTask<T> {
     }
 
     public void go() {
-        ListProcessWorkerStatus<T> ws = new ListProcessWorkerStatus<T>();
 
         ExecutorService es = Executors.newCachedThreadPool();
         es.execute(new ListWorker<T>(ws, list, queueMaxSize));
@@ -61,5 +63,21 @@ public class ListProcessTask<T> {
 
     public void setQueueMaxSize(long queueMaxSize) {
         this.queueMaxSize = queueMaxSize;
+    }
+
+    public boolean isAllFinished() {
+        if (list.isRunForever()) {
+            return false;
+        }
+
+        if (!ws.isListWorkFinished()) {
+            return false;
+        }
+
+        if (ws.getSdQueue().size() > 0) {
+            return false;
+        }
+
+        return true;
     }
 }

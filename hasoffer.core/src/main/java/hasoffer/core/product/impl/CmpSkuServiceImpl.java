@@ -49,6 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created on 2016/1/4.
@@ -918,12 +919,13 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     @Override
     @DataSource(value = DataSourceType.Slave)
     public SkuUpdateResult statUpdateResult(String ymd) {
-        final long deadLineDate = TimeUtils.yesterday();
+        final long deadLineDate = TimeUtils.stringToDate(ymd, "yyyyMMdd").getTime() - TimeUtils.MILLISECONDS_OF_1_DAY;
+
         final String SQL_FIND_BY_YMD = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd = '" + ymd + "'";
 
         final SkuUpdateResult skuUpdateResult = new SkuUpdateResult(ymd);
 
-        ListProcessTask<SrmProductSearchCount> srmProductSearchCountListProcessTask = new ListProcessTask<>(
+        ListProcessTask<SrmProductSearchCount> listProcessTask = new ListProcessTask<>(
                 new ILister() {
                     @Override
                     public PageableResult getData(int page) {
@@ -1015,6 +1017,22 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
                     }
                 }
         );
+
+        listProcessTask.go();
+
+        boolean next = true;
+
+        while (next) {
+            if (listProcessTask.isAllFinished()) {
+                next = false;
+            }
+
+            try {
+                TimeUnit.SECONDS.sleep(10);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         return skuUpdateResult;
     }
