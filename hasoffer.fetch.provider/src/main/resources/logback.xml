@@ -219,7 +219,27 @@
         </encoder>
     </appender>
 
-
+    <appender name="webmagicErrorFileOut"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.base}/webmagic-error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${log.base}/webmagic-error.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <MaxHistory>10</MaxHistory>
+                <!-- or whenever the file size reaches 100MB -->
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%date [%thread][%-8level%logger{80}] %msg%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
     <!-- logger -->
 
     <!-- code info log -->
@@ -228,6 +248,10 @@
         <appender-ref ref="ErrorLoggerFileOut"/>
     </logger>
 
+    <!-- webmagic part log -->
+    <logger name="us.codecraft.webmagic" level="INFO">
+        <appender-ref ref="webmagicErrorFileOut"/>
+    </logger>
     <!-- third part log -->
     <logger name="org" level="INFO">
         <appender-ref ref="ThirdPartLoggerFileOut"/>
