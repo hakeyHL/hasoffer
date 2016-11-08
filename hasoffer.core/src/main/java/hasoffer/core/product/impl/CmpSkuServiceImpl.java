@@ -890,7 +890,14 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveSkuUpdateResult(SkuUpdateResult skuUpdateResult) {
-        StatSkuUpdateResult statSkuUpdateResult = new StatSkuUpdateResult(skuUpdateResult.getYmd());
+        String ymd = skuUpdateResult.getYmd();
+
+        StatSkuUpdateResult statSkuUpdateResult = dbm.get(StatSkuUpdateResult.class, ymd);
+        if (statSkuUpdateResult != null) {
+            dbm.delete(StatSkuUpdateResult.class, ymd);
+        }
+
+        statSkuUpdateResult = new StatSkuUpdateResult(skuUpdateResult.getYmd());
 
         statSkuUpdateResult.setAllTotal(skuUpdateResult.getAllTotal());
         statSkuUpdateResult.setAllSuccess(skuUpdateResult.getAllSuccess());
