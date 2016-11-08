@@ -63,7 +63,7 @@ public class FetchUrlWorker implements Runnable {
                     SpiderLogger.infoFetchFlow("Finish spider this url: {}", pop);
                 }
             } catch (Exception e) {
-                logger.error("FetchKeywordWorker is error. Error Msg: Json to Object fail.", e);
+                logger.error("FetchUrlWorker is error. Error Msg: Json to Object fail.", e);
             }
         }
     }

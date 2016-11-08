@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.Date;
 
 public class FetchDubboServiceImpl implements IFetchDubboService {
@@ -129,6 +130,8 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
         if (expireSeconds == null) {
             expireSeconds = TimeUtils.SECONDS_OF_1_DAY;
         }
+
+        fetchCacheService.pushNum(website);
         FetchUrlResult fetchUrlResult = new FetchUrlResult(website, url, expireSeconds, TaskStatus.START, new Date(), taskTarget);
         String redisKey = RedisKeysUtils.getWaitUrlListKey(taskLevel, website);
         try {
@@ -173,7 +176,13 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     @Override
     public String popFetchUrlResult(TaskTarget taskTarget) {
         String fetchUrlResult = fetchCacheService.popFinishUrlList(taskTarget);
-        logger.info("popFetchUrlResult(), obj:{}", JSONUtil.toJSON(fetchUrlResult));
+        try {
+            FetchUrlResult result = JSONUtil.toObject(fetchUrlResult, FetchUrlResult.class);
+            fetchCacheService.popNum(result.getWebsite());
+        } catch (IOException e) {
+            logger.error("Json:{}", fetchUrlResult, e);
+        }
+        logger.info("popFetchUrlResult(), obj:{}", fetchUrlResult);
         return fetchUrlResult;
     }
 
