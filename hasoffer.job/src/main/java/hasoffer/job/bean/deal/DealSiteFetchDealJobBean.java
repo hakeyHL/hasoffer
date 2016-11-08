@@ -146,14 +146,14 @@ public class DealSiteFetchDealJobBean extends QuartzJobBean {
         System.out.println("flag " + flag + " then convert image");
 
         //todo s3可能又内网的访问方式，不收费
-        String imagePath = fetchedDealInfo.getImageUrl();
-        imagePath = ImageUtil.getImageUrl(imagePath);
+        String imageUrl = fetchedDealInfo.getImageUrl();
+
         String dealPath = "";
         String dealBigPath = "";
         String dealSmallPath = "";
 
         try {
-            File imageFile = ImageUtil.downloadImage(imagePath);
+            File imageFile = ImageUtil.downloadImage(imageUrl);
 
             dealPath = ImageUtil.uploadImage(imageFile);
             dealBigPath = ImageUtil.uploadImage(imageFile, 316, 180);
