@@ -35,6 +35,12 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
     private ProductCacheManager productCacheManager;
     private long cacheSeconds;
 
+    private long testPopProductNumber = 0;
+    private long testProcedProductNumber = 0;
+    private long testTotalPtmCmpSkuNumber = 0;
+    private long testSendPtmCmpSkuNumber = 0;
+    private long testSendFlipkartNumber = 0;
+
     public ListNeedUpdateFromRedisWorker(IFetchDubboService fetchDubboService, IRedisListService redisListService, IRedisSetService redisSetService, ICmpSkuService cmpSkuService, long cacheSeconds, ProductCacheManager productCacheManager) {
         this.fetchDubboService = fetchDubboService;
         this.redisListService = redisListService;
@@ -61,6 +67,15 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
             System.out.println("current ymd = " + ymd);
             System.out.println("current daystart is " + tomorrowDayStart);
 
+            if (testSendFlipkartNumber > 2000) {
+                System.out.println("testPopProductNumber " + testPopProductNumber);
+                System.out.println("testProcedProductNumber " + testProcedProductNumber);
+                System.out.println("testTotalPtmCmpSkuNumber " + testTotalPtmCmpSkuNumber);
+                System.out.println("testSendPtmCmpSkuNumber " + testSendPtmCmpSkuNumber);
+                System.out.println("testSendFlipkartNumber " + testSendFlipkartNumber);
+                break;
+            }
+
 
             //队列取数
             int num = 1200;
@@ -78,6 +93,8 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                     continue;
                 }
 
+                testPopProductNumber++;
+
                 //if proceded set has this productId，continue next one
                 if (redisSetService.contains(KEY_PROCESSED_SET, (String) pop)) {
                     continue;
@@ -87,11 +104,14 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                 Long productId = Long.valueOf((String) pop);
 
                 List<PtmCmpSku> ptmCmpSkuList = cmpSkuService.listCmpSkus(productId);
+                testProcedProductNumber++;
 
                 //在加入队列的时候进行一些必要的判断
                 if (ptmCmpSkuList != null && ptmCmpSkuList.size() > 0) {
 
                     for (PtmCmpSku sku : ptmCmpSkuList) {
+
+                        testTotalPtmCmpSkuNumber++;
 
                         //offsale的不再更新
                         if (SkuStatus.OFFSALE.equals(sku.getStatus())) {
@@ -121,9 +141,15 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                                 sku.setUrl(url);
                             }
 
+                            if (Website.FLIPKART.equals(website)) {
+                                testSendFlipkartNumber++;
+                            }
+
                             fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), cacheSeconds, TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_3);
+                            testSendPtmCmpSkuNumber++;
                         } else {
                             fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), cacheSeconds, TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_5);
+                            testSendPtmCmpSkuNumber++;
                         }
 
                         logger.info("send url request succes for " + sku.getWebsite() + " sku id is _" + sku.getId() + "_");
