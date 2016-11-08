@@ -1,7 +1,6 @@
 package hasoffer.api.controller;
 
 import com.google.android.gcm.server.Message;
-import com.google.android.gcm.server.MulticastResult;
 import com.google.android.gcm.server.Result;
 import com.google.android.gcm.server.Sender;
 import hasoffer.base.enums.AppType;
@@ -51,7 +50,8 @@ public class AppAdController {
     AdvertiseService advertiseService;
 
     public static void main(String[] args) {
-        try {
+        System.out.println("1");
+       /* try {
             Sender sender = new Sender("AIzaSyCZrHjOkZ57j3Dvq_TpvYW8Mt38Ej1dzQA");
             String userMessage = "{\n" +
                     "    \"display\": {\n" +
@@ -66,7 +66,6 @@ public class AppAdController {
                     "    }\n" +
                     "}";
             Message message = new Message.Builder().timeToLive(30).delayWhileIdle(true).addData("message", userMessage).build();
-//            Result result = sender.send(message, "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd", 2);
             MulticastResult result = sender.send(message, Arrays.asList("cWkpvtsRBd4:APA91bFxIK8S3M_ZRzkEBrm6fx2aSk183GdG4nF5U9CkuBpxp4mlyoKYISI1uqbs-H8r-_oHiLdrrnYVgcviUf4T-J9G4HxtLnWbD2whRAaqBoos-I8jp48Ye6z0cJ0rXk6MAARZMVaH", "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd"), 1);
             System.out.println(result.toString());
 //            Result result = sender.sendNoRetry(message, "cWkpvtsRBd4:APA91bFxIK8S3M_ZRzkEBrm6fx2aSk183GdG4nF5U9CkuBpxp4mlyoKYISI1uqbs-H8r-_oHiLdrrnYVgcviUf4T-J9G4HxtLnWbD2whRAaqBoos-I8jp48Ye6z0cJ0rXk6MAARZMVaH");
@@ -76,7 +75,7 @@ public class AppAdController {
             System.out.println(e.getMessage());
             System.out.println(" get exception ");
             System.out.println(e.getMessage());
-        }
+        }*/
     }
 
     @RequestMapping("product")
@@ -103,22 +102,10 @@ public class AppAdController {
                             //如果是自己，跳过
                             iterator.remove();
                             continue;
-                        } else {
-                            //否则处理返回
-                            if (!StringUtils.isEmpty(ad.getAdLink())) {
-                                ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(result == true ? Website.valueOf(ad.getAderName()) : null, ad.getAdLink(), marketChannel));
-                            }
                         }
-                    } else if (appType != null && !appType.name().equals("APP")) {
-                        //如果不是APP，直接处理返回
-                        if (!StringUtils.isEmpty(ad.getAdLink())) {
-                            ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(result == true ? Website.valueOf(ad.getAderName()) : null, ad.getAdLink(), marketChannel));
-                        }
-                    } else {
-                        //如果AppType为空，就不过滤hasoffer了
-                        if (!StringUtils.isEmpty(ad.getAdLink())) {
-                            ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(result == true ? Website.valueOf(ad.getAderName()) : null, ad.getAdLink(), marketChannel));
-                        }
+                    }
+                    if (!StringUtils.isEmpty(ad.getAdLink())) {
+                        ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(result == true ? Website.valueOf(ad.getAderName()) : null, ad.getAdLink(), marketChannel));
                     }
                 }
                 map.put("ads", adt);
@@ -143,11 +130,11 @@ public class AppAdController {
         Result result = null;
         try {
             result = sender.send(message, "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd", 2);
+            String errorCodeName = result.getErrorCodeName();
+            System.out.println(errorCodeName);
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-        String errorCodeName = result.getErrorCodeName();
-        System.out.println(errorCodeName);
         return modelAndView;
     }
 
