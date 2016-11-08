@@ -91,10 +91,10 @@ public class DubboUpdateController {
         es.execute(new ListNeedUpdateFromRedisWorker(fetchDubboService, redisListService, redisSetService, cmpSkuService, cacheSeconds, productCacheManager, number));//for test
 
         CmpSkuDubboUpdate2Worker.popNumber = number;
-        for (int i = 0; i < 60; i++) {
+//        for (int i = 0; i < 60; i++) {
 //            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService, cacheSeconds));
             es.execute(new CmpSkuDubboUpdate2Worker(dbm, fetchDubboService, cmpSkuService, redisListService));
-        }
+//        }
 
 
         taskRunning4.set(true);
