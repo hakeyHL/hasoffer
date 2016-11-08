@@ -31,12 +31,12 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
     private ICmpSkuService cmpSkuService;
     private IRedisListService redisListService;
 
-    private long popFinishNumber = 0;
-    private long popExceptionNumber = 0;
-    private long urlKeyFoundNumber = 0;
-    private long urlKeyNotFoundNumber = 0;
-    private long testFlipkartNumber = 0;
-    private long testSnapdealNumber = 0;
+//    private long popFinishNumber = 0;
+//    private long popExceptionNumber = 0;
+//    private long urlKeyFoundNumber = 0;
+//    private long urlKeyNotFoundNumber = 0;
+//    private long testFlipkartNumber = 0;
+//    private long testSnapdealNumber = 0;
 
     public CmpSkuDubboUpdate2Worker(IFetchDubboService fetchDubboService, ICmpSkuService cmpSkuService, IRedisListService redisListService) {
         this.fetchDubboService = fetchDubboService;
@@ -50,24 +50,24 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
         while (true) {
 
             try {
-                if (CmpSkuDubboUpdate2Worker.popNumber < 0) {
-                    System.out.println("popNumber " + popNumber);
-                    System.out.println("popFinishNumber " + popFinishNumber);
-                    System.out.println("popExceptionNumber " + popExceptionNumber);
-                    System.out.println("urlKeyFoundNumber " + urlKeyFoundNumber);
-                    System.out.println("urlKeyNotFoundNumber " + urlKeyNotFoundNumber);
-                    System.out.println("testFlipkartNumber " + testFlipkartNumber);
-                    System.out.println("testSnapdealNumber " + testSnapdealNumber);
-                    break;
-                } else {
-                    System.out.println("popNumber " + popNumber);
-                    System.out.println("popFinishNumber " + popFinishNumber);
-                    System.out.println("popExceptionNumber " + popExceptionNumber);
-                    System.out.println("urlKeyFoundNumber " + urlKeyFoundNumber);
-                    System.out.println("urlKeyNotFoundNumber " + urlKeyNotFoundNumber);
-                    System.out.println("testFlipkartNumber " + testFlipkartNumber);
-                    System.out.println("testSnapdealNumber " + testSnapdealNumber);
-                }
+//                if (CmpSkuDubboUpdate2Worker.popNumber < 0) {
+//                    System.out.println("popNumber " + popNumber);
+//                    System.out.println("popFinishNumber " + popFinishNumber);
+//                    System.out.println("popExceptionNumber " + popExceptionNumber);
+//                    System.out.println("urlKeyFoundNumber " + urlKeyFoundNumber);
+//                    System.out.println("urlKeyNotFoundNumber " + urlKeyNotFoundNumber);
+//                    System.out.println("testFlipkartNumber " + testFlipkartNumber);
+//                    System.out.println("testSnapdealNumber " + testSnapdealNumber);
+//                    break;
+//                } else {
+//                    System.out.println("popNumber " + popNumber);
+//                    System.out.println("popFinishNumber " + popFinishNumber);
+//                    System.out.println("popExceptionNumber " + popExceptionNumber);
+//                    System.out.println("urlKeyFoundNumber " + urlKeyFoundNumber);
+//                    System.out.println("urlKeyNotFoundNumber " + urlKeyNotFoundNumber);
+//                    System.out.println("testFlipkartNumber " + testFlipkartNumber);
+//                    System.out.println("testSnapdealNumber " + testSnapdealNumber);
+//                }
 
                 String fetchUrlResultStr = fetchDubboService.popFetchUrlResult(TaskTarget.SKU_UPDATE);
                 if (fetchUrlResultStr == null) {
@@ -88,29 +88,29 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                 TaskStatus taskStatus = fetchUrlResult.getTaskStatus();
 
                 if (TaskStatus.FINISH.equals(taskStatus)) {
-                    popFinishNumber++;
+//                    popFinishNumber++;
                     String urlKey = HexDigestUtil.md5(url);
                     List<PtmCmpSku> skuList = cmpSkuService.getPtmCmpSkuListByUrlKey(urlKey);
 
-                    if (Website.FLIPKART.equals(fetchUrlResult.getWebsite())) {
-                        testFlipkartNumber++;
-                    }
-                    if (Website.SNAPDEAL.equals(fetchUrlResult.getWebsite())) {
-                        testSnapdealNumber++;
-                    }
+//                    if (Website.FLIPKART.equals(fetchUrlResult.getWebsite())) {
+//                        testFlipkartNumber++;
+//                    }
+//                    if (Website.SNAPDEAL.equals(fetchUrlResult.getWebsite())) {
+//                        testSnapdealNumber++;
+//                    }
 
                     if (skuList == null || skuList.size() == 0) {
-                        urlKeyNotFoundNumber++;
-                        logger.info("url = " + url);
+//                        urlKeyNotFoundNumber++;
+                        logger.info("urkKey not found url = " + url);
                     } else {
-                        urlKeyFoundNumber++;
+//                        urlKeyFoundNumber++;
                         for (PtmCmpSku ptmCmpSku : skuList) {
                             //更新商品的信息，写入多图数据，写入描述/参数
                             updatePtmCmpSku(ptmCmpSku, fetchUrlResult);
                         }
                     }
                 } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
-                    popExceptionNumber++;
+//                    popExceptionNumber++;
                 }
             } catch (Exception e) {
                 logger.info("CmpSkuDubboUpdate2Worker.run() exception.", e);

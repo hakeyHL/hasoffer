@@ -36,12 +36,12 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
     private long cacheSeconds;
     private long number;
 
-    private long testPopProductNumber = 0;
-    private long testProcedProductNumber = 0;
-    private long testTotalPtmCmpSkuNumber = 0;
-    private long testSendPtmCmpSkuNumber = 0;
-    private long testSendFlipkartNumber = 0;
-    private long testSendSnapdealNumber = 0;
+//    private long testPopProductNumber = 0;
+//    private long testProcedProductNumber = 0;
+//    private long testTotalPtmCmpSkuNumber = 0;
+//    private long testSendPtmCmpSkuNumber = 0;
+//    private long testSendFlipkartNumber = 0;
+//    private long testSendSnapdealNumber = 0;
 
 
     public ListNeedUpdateFromRedisWorker(IFetchDubboService fetchDubboService, IRedisListService redisListService, IRedisSetService redisSetService, ICmpSkuService cmpSkuService, long cacheSeconds, ProductCacheManager productCacheManager) {
@@ -53,15 +53,15 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
         this.productCacheManager = productCacheManager;
     }
 
-    public ListNeedUpdateFromRedisWorker(IFetchDubboService fetchDubboService, IRedisListService redisListService, IRedisSetService redisSetService, ICmpSkuService cmpSkuService, long cacheSeconds, ProductCacheManager productCacheManager, long number) {
-        this.fetchDubboService = fetchDubboService;
-        this.redisListService = redisListService;
-        this.redisSetService = redisSetService;
-        this.cmpSkuService = cmpSkuService;
-        this.cacheSeconds = cacheSeconds;
-        this.productCacheManager = productCacheManager;
-        this.number = number;
-    }
+//    public ListNeedUpdateFromRedisWorker(IFetchDubboService fetchDubboService, IRedisListService redisListService, IRedisSetService redisSetService, ICmpSkuService cmpSkuService, long cacheSeconds, ProductCacheManager productCacheManager, long number) {
+//        this.fetchDubboService = fetchDubboService;
+//        this.redisListService = redisListService;
+//        this.redisSetService = redisSetService;
+//        this.cmpSkuService = cmpSkuService;
+//        this.cacheSeconds = cacheSeconds;
+//        this.productCacheManager = productCacheManager;
+//        this.number = number;
+//    }
 
     @Override
     public void run() {
@@ -80,15 +80,15 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
             System.out.println("current ymd = " + ymd);
             System.out.println("current daystart is " + tomorrowDayStart);
 
-            if (testSendFlipkartNumber > number) {
-                System.out.println("testPopProductNumber " + testPopProductNumber);
-                System.out.println("testProcedProductNumber " + testProcedProductNumber);
-                System.out.println("testTotalPtmCmpSkuNumber " + testTotalPtmCmpSkuNumber);
-                System.out.println("testSendPtmCmpSkuNumber " + testSendPtmCmpSkuNumber);
-                System.out.println("testSendFlipkartNumber " + testSendFlipkartNumber);
-                System.out.println("testSendSnapdealNumber " + testSendSnapdealNumber);
-                break;
-            }
+//            if (testSendFlipkartNumber > number) {
+//                System.out.println("testPopProductNumber " + testPopProductNumber);
+//                System.out.println("testProcedProductNumber " + testProcedProductNumber);
+//                System.out.println("testTotalPtmCmpSkuNumber " + testTotalPtmCmpSkuNumber);
+//                System.out.println("testSendPtmCmpSkuNumber " + testSendPtmCmpSkuNumber);
+//                System.out.println("testSendFlipkartNumber " + testSendFlipkartNumber);
+//                System.out.println("testSendSnapdealNumber " + testSendSnapdealNumber);
+//                break;
+//            }
 
             Object pop = redisListService.pop(UPDATE_WAIT_QUEUE + ymd);
             if (pop == null) {//如果队列没有数据了，休息30分钟
@@ -101,7 +101,7 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                 continue;
             }
 
-            testPopProductNumber++;
+//            testPopProductNumber++;
 
             //if proceded set has this productId，continue next one
             if (redisSetService.contains(KEY_PROCESSED_SET, (String) pop)) {
@@ -112,14 +112,14 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
             Long productId = Long.valueOf((String) pop);
 
             List<PtmCmpSku> ptmCmpSkuList = cmpSkuService.listCmpSkus(productId);
-            testProcedProductNumber++;
+//            testProcedProductNumber++;
 
             //在加入队列的时候进行一些必要的判断
             if (ptmCmpSkuList != null && ptmCmpSkuList.size() > 0) {
 
                 for (PtmCmpSku sku : ptmCmpSkuList) {
 
-                    testTotalPtmCmpSkuNumber++;
+//                    testTotalPtmCmpSkuNumber++;
 
                     //offsale的不再更新
                     if (SkuStatus.OFFSALE.equals(sku.getStatus())) {
@@ -149,18 +149,18 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                             sku.setUrl(url);
                         }
 
-                        if (Website.FLIPKART.equals(website)) {
-                            testSendFlipkartNumber++;
-                        }
-                        if (Website.SNAPDEAL.equals(website)) {
-                            testSendSnapdealNumber++;
-                        }
+//                        if (Website.FLIPKART.equals(website)) {
+//                            testSendFlipkartNumber++;
+//                        }
+//                        if (Website.SNAPDEAL.equals(website)) {
+//                            testSendSnapdealNumber++;
+//                        }
 
                         fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), cacheSeconds, TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_3);
-                        testSendPtmCmpSkuNumber++;
+//                        testSendPtmCmpSkuNumber++;
                     } else {
                         fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), cacheSeconds, TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_5);
-                        testSendPtmCmpSkuNumber++;
+//                        testSendPtmCmpSkuNumber++;
                     }
 
                     logger.info("send url request succes for " + sku.getWebsite() + " sku id is _" + sku.getId() + "_");
