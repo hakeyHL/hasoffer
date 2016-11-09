@@ -9,6 +9,7 @@ import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.spider.constants.RedisKeysUtils;
 import hasoffer.spider.enums.TaskTarget;
 import hasoffer.spider.logger.SpiderLogger;
+import hasoffer.spider.model.FetchCompareWebsiteResult;
 import hasoffer.spider.model.FetchDealResult;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchUrlResult;
@@ -89,6 +90,34 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
         FetchUrlResult fetchUrlResult = getFetchUrlResult(webSite, url, expireSeconds);
         logger.info("FetchDubboServiceImpl.getProductsByUrl(webSite,url):{}, {} . Now is {} ", webSite, url, fetchUrlResult);
         return fetchUrlResult;
+    }
+
+    @Override
+    public void sendCompareWebsiteFetchTask(Website website, String url, TaskLevel taskLevel, long cacheSeconds) {
+
+        //先检查解析过的set中是否含有该url，如果有跳过，如果没有新增
+        boolean flag = fetchCacheService.checkCompareWebsiteFetch(RedisKeysUtils.PARSED_COMPAREWEBSITE_FETCH_URL, url, cacheSeconds);
+
+        if (!flag) {
+            return;
+        }
+
+        //获取等待队列的名称
+        String redisKey = RedisKeysUtils.getWaitCompareWebsiteFetchList(taskLevel, website);
+        System.out.println("wait compare website task redis key :" + redisKey);
+
+        //封装结果对象
+        FetchCompareWebsiteResult fetchCompareWebsiteResult = new FetchCompareWebsiteResult();
+        fetchCompareWebsiteResult.setOriWebsite(website);
+        fetchCompareWebsiteResult.setCacheSeconds(cacheSeconds);
+        fetchCompareWebsiteResult.setUrl(url);
+
+        fetchCacheService.pushTaskList(redisKey, JSONUtil.toJSON(fetchCompareWebsiteResult));
+    }
+
+    @Override
+    public FetchCompareWebsiteResult getCompareWebsiteFetchResult(Website webSite, String url, long expireSeconds) {
+        return null;
     }
 
     @Override
