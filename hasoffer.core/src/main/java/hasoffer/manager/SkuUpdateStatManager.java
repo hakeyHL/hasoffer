@@ -93,12 +93,14 @@ public class SkuUpdateStatManager {
     }
 
 
-    public SkuUpdateResult statUpdateResultByHour(String ymd_hh) {
-        final long deadLineDate = TimeUtils.stringToDate(ymd_hh, "yyyyMMdd_HH").getTime() - TimeUtils.MILLISECONDS_OF_1_DAY;
+    public SkuUpdateResult statUpdateResultToday() {
+        final long deadLineDate = TimeUtils.yesterday();
 
-        Map<Long, Long> proMap = searchLogCacheManager.getProductCountByHour(ymd_hh);
+        String ymd = TimeUtils.parse(TimeUtils.today(), TimeUtils.PATTERN_YMD);
 
-        final SkuUpdateResult skuUpdateResult = new SkuUpdateResult(ymd_hh);
+        Map<Long, Long> proMap = searchLogCacheManager.getProductCount(ymd);
+
+        final SkuUpdateResult skuUpdateResult = new SkuUpdateResult(ymd);
 
         if (proMap != null) {
             for (Map.Entry<Long, Long> kv : proMap.entrySet()) {

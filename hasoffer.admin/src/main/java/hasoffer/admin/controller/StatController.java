@@ -62,20 +62,23 @@ public class StatController {
             ymd = TimeUtils.parse(TimeUtils.today(), "yyyyMMdd");
         }
 
-        List<SkuUpdateResult2> updateResults = searchLogCacheManager.getStatResults(ymd);
+        SkuUpdateResult2 skuUpdateResult2 = searchLogCacheManager.getStatResult(ymd);
 
         ModelAndView mav = new ModelAndView("showstat/sku_update_status");
-        mav.addObject("datas", updateResults);
+        mav.addObject("updateRst", skuUpdateResult2);
+
+        long wait4UpdateProduct = productCacheManager.getWait4UpdateProductCount(ymd);
+        long updateProcessd = productCacheManager.getUpdateProcessdProductCount(ymd);
+
+        mav.addObject("wait4Update", wait4UpdateProduct);
+        mav.addObject("updateProcessd", updateProcessd);
+
         return mav;
     }
 
-    @RequestMapping(value = "/sku_update_result_hour", method = RequestMethod.GET)
-    public ModelAndView sku_update_result_hour(@RequestParam(defaultValue = "") String ymd_hh) {
-        if (StringUtils.isEmpty(ymd_hh)) {
-            ymd_hh = TimeUtils.parse(TimeUtils.add(TimeUtils.nowDate(), TimeUtils.MILLISECONDS_OF_1_HOUR * -1), "yyyyMMdd_HH");
-        }
-
-        SkuUpdateResult skuUpdateResult = skuUpdateStatManager.statUpdateResultByHour(ymd_hh);
+    @RequestMapping(value = "/sku_update_status_today", method = RequestMethod.GET)
+    public ModelAndView sku_update_status_today() {
+        skuUpdateStatManager.statUpdateResultToday();
 
         ModelAndView mav = new ModelAndView("redirect:/stat/show_updates");
         return mav;
@@ -94,22 +97,6 @@ public class StatController {
         cmpSkuService.saveSkuUpdateResult(skuUpdateResult);
 
         return "ok";
-    }
-
-    @RequestMapping(value = "/show_update_status", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String showUpdateStatus(@RequestParam(defaultValue = "") String ymd) {
-        if (StringUtils.isEmpty(ymd)) {
-            ymd = TimeUtils.parse(TimeUtils.nowDate(), "yyyyMMdd");
-        }
-
-        long wait4UpdateProduct = productCacheManager.getWait4UpdateProductCount(ymd);
-
-        long updateProcessd = productCacheManager.getUpdateProcessdProductCount(ymd);
-
-        return String.format("wait4UpdateProduct : %d | updateProcessd : %d", wait4UpdateProduct, updateProcessd);
-//        return "ok";
     }
 
     @RequestMapping(value = "/statByHour", method = RequestMethod.GET)

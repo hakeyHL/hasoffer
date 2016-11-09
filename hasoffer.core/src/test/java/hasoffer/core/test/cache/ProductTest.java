@@ -10,7 +10,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * Created by chevy on 2015/12/16.
@@ -38,16 +37,14 @@ public class ProductTest {
         productCacheManager.put2UpdateProcessedSet(1000L);
         productCacheManager.put2UpdateQueue(1000L);
 
-        skuUpdateStatManager.statUpdateResultByHour("20161109_11");
+        skuUpdateStatManager.statUpdateResultToday();
     }
 
     @Test
     public void test1() {
-        List<SkuUpdateResult2> datas = searchLogCacheManager.getStatResults("20161109");
+        SkuUpdateResult2 dat = searchLogCacheManager.getStatResult("20161109");
 
-        for (SkuUpdateResult2 dat : datas) {
-            System.out.println(dat.getAllTotal());
-        }
+        System.out.println(dat.getAllTotal());
     }
 
 }
