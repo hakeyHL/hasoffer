@@ -1,3 +1,5 @@
+package hasoffer.admin.test;
+
 import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.utils.HtmlUtils;

@@ -4,6 +4,7 @@ import hasoffer.base.model.SkuStatus;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.product.SkuUpdateResult;
+import hasoffer.core.bo.product.SkuUpdateResult2;
 import hasoffer.core.cache.CmpSkuCacheManager;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
@@ -13,6 +14,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
+import hasoffer.manager.SkuUpdateStatManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -50,7 +52,34 @@ public class StatController {
     CmpSkuCacheManager cmpSkuCacheManager;
     @Resource
     ProductCacheManager productCacheManager;
+    @Resource
+    SkuUpdateStatManager skuUpdateStatManager;
     private Logger logger = LoggerFactory.getLogger(StatController.class);
+
+    @RequestMapping(value = "/show_updates", method = RequestMethod.GET)
+    public ModelAndView show_updates(@RequestParam(defaultValue = "") String ymd) {
+        if (StringUtils.isEmpty(ymd)) {
+            ymd = TimeUtils.parse(TimeUtils.today(), "yyyyMMdd");
+        }
+
+        List<SkuUpdateResult2> updateResults = searchLogCacheManager.getStatResults(ymd);
+
+        ModelAndView mav = new ModelAndView("showstat/sku_update_status");
+        mav.addObject("datas", updateResults);
+        return mav;
+    }
+
+    @RequestMapping(value = "/sku_update_result_hour", method = RequestMethod.GET)
+    public ModelAndView sku_update_result_hour(@RequestParam(defaultValue = "") String ymd_hh) {
+        if (StringUtils.isEmpty(ymd_hh)) {
+            ymd_hh = TimeUtils.parse(TimeUtils.add(TimeUtils.nowDate(), TimeUtils.MILLISECONDS_OF_1_HOUR * -1), "yyyyMMdd_HH");
+        }
+
+        SkuUpdateResult skuUpdateResult = skuUpdateStatManager.statUpdateResultByHour(ymd_hh);
+
+        ModelAndView mav = new ModelAndView("redirect:/stat/show_updates");
+        return mav;
+    }
 
     @RequestMapping(value = "/sku_update_result", method = RequestMethod.GET)
     public
@@ -60,7 +89,7 @@ public class StatController {
             ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
         }
 
-        SkuUpdateResult skuUpdateResult = cmpSkuService.statUpdateResult(ymd);
+        SkuUpdateResult skuUpdateResult = skuUpdateStatManager.statUpdateResult(ymd);
 
         cmpSkuService.saveSkuUpdateResult(skuUpdateResult);
 

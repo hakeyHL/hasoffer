@@ -29,4 +29,5 @@
     <import resource="spring-cache.xml"/>
 
     <context:component-scan base-package="hasoffer.core"/>
+    <context:component-scan base-package="hasoffer.manager"/>
 </beans>

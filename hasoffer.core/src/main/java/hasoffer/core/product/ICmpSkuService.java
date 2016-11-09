@@ -141,10 +141,5 @@ public interface ICmpSkuService {
 
     void updateCmpSkuBrandModel(Long id, String brand, String model);
 
-    SkuUpdateResult statUpdateResult(String ymd);
-
     void saveSkuUpdateResult(SkuUpdateResult skuUpdateResult);
-
-
-//    void loadImageDownLoadTasks(LinkedBlockingQueue<PtmCmpSku> cmpSkusQueue);
 }

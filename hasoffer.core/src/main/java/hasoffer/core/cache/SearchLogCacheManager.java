@@ -1,7 +1,10 @@
 package hasoffer.core.cache;
 
+import com.alibaba.fastjson.JSON;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.bo.product.SkuUpdateResult;
+import hasoffer.core.bo.product.SkuUpdateResult2;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.search.ISearchService;
@@ -10,9 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Date : 2016/5/7
@@ -193,5 +194,39 @@ public class SearchLogCacheManager {
         String key = CACHE_KEY_PRE + searchLogId;
 
         cacheService.del(key);
+    }
+
+    public void cacheStatResult(SkuUpdateResult skuUpdateResult) {
+        String ymd = skuUpdateResult.getYmd();
+
+        if (ymd.indexOf("_") > 0) {
+            ymd = ymd.substring(0, ymd.indexOf("_"));
+        }
+
+        String key = CACHE_KEY_PRE + "cacheStatResult_" + ymd;
+
+        cacheService.mapPut(key, skuUpdateResult.getYmd(), JSON.toJSONString(skuUpdateResult));
+    }
+
+    public List<SkuUpdateResult2> getStatResults(String ymd) {
+        String key = CACHE_KEY_PRE + "cacheStatResult_" + ymd;
+
+        Map<String, String> datas = cacheService.mapGetAll(key);
+
+        List<SkuUpdateResult2> skuUpdateResults = new ArrayList<>();
+
+        for (Map.Entry<String, String> data : datas.entrySet()) {
+            SkuUpdateResult2 skuUpdateResult = JSON.parseObject(data.getValue(), SkuUpdateResult2.class);
+            skuUpdateResults.add(skuUpdateResult);
+        }
+
+        Collections.sort(skuUpdateResults, new Comparator<SkuUpdateResult2>() {
+            @Override
+            public int compare(SkuUpdateResult2 o1, SkuUpdateResult2 o2) {
+                return o1.getYmd().compareTo(o2.getYmd());
+            }
+        });
+
+        return skuUpdateResults;
     }
 }
