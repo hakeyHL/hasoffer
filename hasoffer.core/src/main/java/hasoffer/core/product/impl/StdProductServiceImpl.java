@@ -9,10 +9,10 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.core.analysis.ProductAnalysisService;
 import hasoffer.core.analysis.model.FlipkartSearchedSkuAnalysisResult;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.po.ptm.PtmStdDef;
+import hasoffer.core.persistence.po.ptm.PtmStdAttrDef;
 import hasoffer.core.persistence.po.ptm.PtmStdProduct;
 import hasoffer.core.persistence.po.ptm.PtmStdSku;
-import hasoffer.core.persistence.po.ptm.PtmStdSkuValue;
+import hasoffer.core.persistence.po.ptm.PtmStdSkuAttr;
 import hasoffer.core.product.IStdProductService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -222,10 +222,10 @@ public class StdProductServiceImpl implements IStdProductService {
             return;
         }
 
-        PtmStdDef ptmStdDef = new PtmStdDef(stdName);
-        dbm.createIfNoExist(ptmStdDef);
+        PtmStdAttrDef ptmStdAttrDef = new PtmStdAttrDef(stdName);
+        dbm.createIfNoExist(ptmStdAttrDef);
 
-        PtmStdSkuValue stdSkuValue = new PtmStdSkuValue(stdSkuId, ptmStdDef.getId(), ptmStdDef.getStdName(), value);
+        PtmStdSkuAttr stdSkuValue = new PtmStdSkuAttr(stdSkuId, ptmStdAttrDef.getId(), ptmStdAttrDef.getStdDefName(), value);
         dbm.create(stdSkuValue);
     }
 }

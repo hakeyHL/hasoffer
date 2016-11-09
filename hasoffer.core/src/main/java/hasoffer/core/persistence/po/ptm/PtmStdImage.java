@@ -8,24 +8,25 @@ import javax.persistence.*;
  * Created on 2015/12/7.
  */
 @Entity
-public class PtmStdSkuImage implements Identifiable<Long> {
+public class PtmStdImage implements Identifiable<Long> {
 
     @Id
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private long stdProId; // ptm_std_product
-    private long stdSkuId; // ptm_std_sku
+    private long stdProId; // ptm_std_product # 一定不为 0
+    private long stdSkuId; // ptm_std_sku # 如果不能判定是哪个sku的，则为0
+
+    private String oriImageUrl;// 原图片url
 
     private String oriImagePath; // 下载后的图片路径
     private String smallImagePath;
     private String bigImagePath;
-    private String oriImageUrl;// 原图片url
 
     private int errTimes = 0;
 
-    public PtmStdSkuImage() {
+    public PtmStdImage() {
     }
 
     @Override
@@ -99,7 +100,7 @@ public class PtmStdSkuImage implements Identifiable<Long> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        PtmStdSkuImage that = (PtmStdSkuImage) o;
+        PtmStdImage that = (PtmStdImage) o;
 
         if (stdProId != that.stdProId) return false;
         if (stdSkuId != that.stdSkuId) return false;

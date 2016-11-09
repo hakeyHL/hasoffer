@@ -5,7 +5,7 @@ import hasoffer.core.persistence.dbm.osql.Identifiable;
 import javax.persistence.*;
 
 @Entity
-public class PtmStdSkuValue implements Identifiable<Long> {
+public class PtmStdSkuAttr implements Identifiable<Long> {
 
     @Id
     @Column(unique = true, nullable = false)
@@ -20,10 +20,10 @@ public class PtmStdSkuValue implements Identifiable<Long> {
 
     private String stdValue;
 
-    private PtmStdSkuValue() {
+    private PtmStdSkuAttr() {
     }
 
-    public PtmStdSkuValue(long stdSkuId, String stdDefId, String stdName, String stdValue) {
+    public PtmStdSkuAttr(long stdSkuId, String stdDefId, String stdName, String stdValue) {
         this();
         this.stdSkuId = stdSkuId;
         this.stdDefId = stdDefId;
@@ -78,7 +78,7 @@ public class PtmStdSkuValue implements Identifiable<Long> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        PtmStdSkuValue that = (PtmStdSkuValue) o;
+        PtmStdSkuAttr that = (PtmStdSkuAttr) o;
 
         if (stdSkuId != that.stdSkuId) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
