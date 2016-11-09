@@ -209,7 +209,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
 
             try {
                 FetchUrlResult result = JSONUtil.toObject(fetchUrlResult, FetchUrlResult.class);
-                fetchCacheService.popNum(result.getWebsite());
+                fetchCacheService.popNum(result.getWebsite(), result.getTaskStatus());
             } catch (IOException e) {
                 logger.error("Json:{}", fetchUrlResult, e);
             }
