@@ -1,9 +1,11 @@
 package hasoffer.fetch.sites.snapdeal;
 
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.AffliIdHelper;
 import hasoffer.base.utils.StringUtils;
 
+import java.util.Arrays;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,26 +59,24 @@ public class SnapdealHelper {
 
     public static String appendAff(String url, String[] affs) {
         //随机,1/10
-        String aff_query = "";
-        int randomInt = new Random().nextInt(10);
-        if (randomInt == 5) {
-            aff_query = "?aff_id=112338" + "&utm_source=aff_prog&utm_campaign=afts&offer_id=17";
-        } else {
-            aff_query = "?aff_id=" + AffliIdHelper.getAffiIdByWebsite(Website.SNAPDEAL, null) + "&utm_source=aff_prog&utm_campaign=afts&offer_id=17";
-        }
+        //int rand omInt = new Random().nextInt(10);
+
+        String affiIdByWebsite = AffliIdHelper.getAffiIdByWebsite(Website.SNAPDEAL, null);
+        String aff_query = "?aff_id=" + affiIdByWebsite + "&utm_source=aff_prog&utm_campaign=afts&offer_id=17";
         StringBuffer sb = new StringBuffer(url);
         sb.append(aff_query);
 
-        if (affs != null && affs.length > 0) {
-            if (affs != null && affs.length >= 1) {
-                sb.append("&aff_sub=").append(affs[0]);
-                if (affs.length >= 2) {
-                    String deviceUser = affs[1];
-                    if (affs.length == 3) {
-                        deviceUser += "_" + affs[2];
-                    }
-                    sb.append("&aff_sub2=").append(deviceUser);
-                }
+        if (affs != null) {
+            String marketChannel = AffliIdHelper.getMarketId(MarketChannel.valueOfString(affs[0]));
+            if (Arrays.asList(AffliIdHelper.SNAPDEAL_YEAHMOBI_FLIDS).contains(affiIdByWebsite)) {
+                marketChannel = AffliIdHelper.MARKET_CHANNEL_YEAHMOBI[new Random().nextInt(AffliIdHelper.MARKET_CHANNEL_YEAHMOBI.length)];
+            }
+            if (affs.length == 1) {
+                sb.append("&aff_sub=").append(marketChannel).append("&aff_sub2=").append(marketChannel).append("_").append("0").append("_").append("0");
+            } else if (affs.length == 2) {
+                sb.append("&aff_sub=").append(marketChannel).append("&aff_sub2=").append(marketChannel).append("_").append(affs[1]).append("_").append("0");
+            } else if (affs.length == 3) {
+                sb.append("&aff_sub=").append(marketChannel).append("&aff_sub2=").append(marketChannel).append("_").append(affs[1]).append("_").append(affs[2]);
             }
         }
 

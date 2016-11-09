@@ -5,6 +5,7 @@ import java.util.Date;
 
 public class SnapDealAffiliateOrder {
 
+    private String affId;
     private String product;
     private String category;
     private String orderCode;
@@ -14,31 +15,32 @@ public class SnapDealAffiliateOrder {
     private BigDecimal commissionRate;
     private BigDecimal commissionEarned;
     private Date dateTime;
-
     /**
      * 渠道
      */
     private String affiliateSubId1;
-
     /**
      * 设备ID
      */
     private String affiliateSubId2;
-
     /**
      *  暂定用户ID
      */
     private String affiliateSubId3;
-
     /**
      * 订单状态
      */
     private String status;
-
     private String userType;
     private String deviceType;
 
+    public String getAffId() {
+        return affId;
+    }
 
+    public void setAffId(String affId) {
+        this.affId = affId;
+    }
 
     public String getProduct() {
         return product;

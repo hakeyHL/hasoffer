@@ -3,7 +3,9 @@ package hasoffer.core.admin.impl;
 import hasoffer.affiliate.affs.IAffiliateProcessor;
 import hasoffer.affiliate.affs.snapdeal.SnapdealProductProcessor;
 import hasoffer.affiliate.affs.snapdeal.model.SnapDealAffiliateOrder;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.AffliIdHelper;
 import hasoffer.core.admin.ISnapdealAffiliateService;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.urm.UrmDevice;
@@ -31,11 +33,7 @@ public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
         orderList.addAll(getOrderList("82856", "09bf4a55fafe2ccc3c077e2ea48642", SnapdealProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
         orderList.addAll(getOrderList("89037", "c1050bf0b2c9b2f64c9c1e950ff53c", SnapdealProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
         orderList.addAll(getOrderList("104658", "2e89ca44b33433e2dfc953713ac472", SnapdealProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
-        //orderList.addAll(getOrderList("82856", "09bf4a55fafe2ccc3c077e2ea48642", SnapdealProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
-        //orderList.addAll(getOrderList("82856", "09bf4a55fafe2ccc3c077e2ea48642", SnapdealProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
-        //orderList.addAll(getOrderList("82856", "09bf4a55fafe2ccc3c077e2ea48642", SnapdealProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
-        //orderList.addAll(getOrderList("82856", "09bf4a55fafe2ccc3c077e2ea48642", SnapdealProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
-        //orderList.addAll(getOrderList("82856", "09bf4a55fafe2ccc3c077e2ea48642", SnapdealProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
+        orderList.addAll(getOrderList("112338", "afb1c380c01ba806dc5c14e8c1d018", SnapdealProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
         Set<String> deviceSet = new HashSet<String>();
         for (SnapDealAffiliateOrder order : orderList) {
             String affExtParam2 = order.getAffiliateSubId2();
@@ -43,10 +41,12 @@ public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
                 continue;
             }
             String[] tempArray = affExtParam2.split("_");
-            if (tempArray.length == 2) {
-                deviceSet.add(tempArray[0]);
-            } else {
-                deviceSet.add(tempArray[0]);
+            if (deviceSet != null) {
+                if (tempArray.length == 3) {
+                    deviceSet.add(tempArray[1]);
+                } else {
+                    deviceSet.add(tempArray[0]);
+                }
             }
         }
         Map<String, UrmDevice> deviceRegTime = getDeviceRegTime(deviceSet);
@@ -60,19 +60,32 @@ public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
 
         for (SnapDealAffiliateOrder order : orderList) {
             OrderStatsAnalysisPO po = new OrderStatsAnalysisPO();
+            po.setAffID(order.getAffId());
             po.setWebSite(Website.SNAPDEAL.toString());
             po.setOrderId(order.getOrderCode());
             String channel = order.getAffiliateSubId1();
-            po.setChannel(channel == null || "".equals(channel) ? "NONE" : channel);
+            po.setChannelSrc(channel);
+            if (channel == null || "".equals(channel)) {
+                po.setChannel(MarketChannel.NONE.name());
+            } else {
+                po.setChannel(MarketChannel.valueOfString(channel).name());
+            }
+            if (MarketChannel.NONE.name().equals(po.getChannel())) {
+                po.setChannel(AffliIdHelper.getMarketChannelById(channel).name());
+            }
             po.setOrderTime(order.getDateTime());
             String deviceId_userId = order.getAffiliateSubId2();
             if (deviceId_userId != null) {
                 String[] tempArray = deviceId_userId.split("_");
-                if (tempArray.length == 2) {
+                if (tempArray.length == 1) {
+                    po.setDeviceId(tempArray[0]);
+                } else if (tempArray.length == 2) {
                     po.setDeviceId(tempArray[0]);
                     po.setUserId(tempArray[1]);
-                } else {
-                    po.setDeviceId(tempArray[0]);
+                } else if (tempArray.length == 3) {
+                    po.setChannel(AffliIdHelper.getMarketChannelById(tempArray[0]).name());
+                    po.setDeviceId(tempArray[1]);
+                    po.setUserId(tempArray[2]);
                 }
             }
             // OLD?NEW
