@@ -23,20 +23,16 @@ import java.util.*;
  */
 public class SnapdealProductProcessor implements IAffiliateProcessor<SnapDealAffiliateOrder> {
 
+    public static final String R_START_DATE = "startDate";
+    public static final String R_END_DATE = "endDate";
+    public static final String R_ORDER_STATUS = "status";
+    public static final String R_ORDER_STATUS_APPROVED = "approved";
+    public static final String R_ORDER_STATUS_CANCELLED = "cancelled";
     private static final String TRACKINGID = "82856";
     private static final String TOEKN = "09bf4a55fafe2ccc3c077e2ea48642";
     private static final String AFFILIATE_BASE_URL = "http://affiliate-feeds.snapdeal.com/feed/" + TRACKINGID + ".json";
     private static final String AFFILIATE_PRODUCTDETAIL_URL = "http://affiliate-feeds.snapdeal.com/feed/product?id=";
-
-    public static final String R_START_DATE = "startDate";
-    public static final String R_END_DATE = "endDate";
-    public static final String R_ORDER_STATUS = "status";
-
-    public static final String R_ORDER_STATUS_APPROVED = "approved";
-    public static final String R_ORDER_STATUS_CANCELLED = "cancelled";
     //public static final String R_ORDER_STATUS_TENTATIVE = "approved";
-
-
 
     @Override
     public String getAffiliateToken() {
@@ -165,25 +161,26 @@ public class SnapdealProductProcessor implements IAffiliateProcessor<SnapDealAff
     }
 
     @Override
-    public List<SnapDealAffiliateOrder> getAffiliateOrderList(Map<String, String> headerMap,Map<String, String> parameterMap) {
+    public List<SnapDealAffiliateOrder> getAffiliateOrderList(Map<String, String> headerMap, Map<String, String> parameterMap) {
+        String affId = headerMap.get("Snapdeal-Affiliate-Id");
         String url = "affiliate-feeds.snapdeal.com/feed/api/order";
         try {
             String respJson = sendRequest(url, headerMap, parameterMap);
             Gson gson = new GsonBuilder().setDateFormat("MM/dd/yyyy HH:mm:ss").create();
             SnapdealOrderReport report = gson.fromJson(respJson, SnapdealOrderReport.class);
-
             List<SnapDealAffiliateOrder> productDetails = report.getProductDetails();
-            if(productDetails!=null) {
+            if (productDetails != null) {
                 for (SnapDealAffiliateOrder order : productDetails) {
                     if (order.getStatus() == null) {
                         order.setStatus(parameterMap.get(R_ORDER_STATUS));
                     }
+                    order.setAffId(affId);
                     //long x= TimeUtils.MILLISECONDS_OF_1_DAY*30;
                     //if (R_ORDER_STATUS_APPROVED.equals(order.getStatus()) && new Date().getTime() - order.getDateTime().getTime() < x) {
                     //    order.setStatus(R_ORDER_STATUS_APPROVED);
                     //}
                 }
-            }else{
+            } else {
                 productDetails = new ArrayList<>();
             }
             return productDetails;
