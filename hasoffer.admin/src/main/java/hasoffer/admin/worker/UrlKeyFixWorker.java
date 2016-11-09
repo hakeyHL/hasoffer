@@ -75,10 +75,10 @@ public class UrlKeyFixWorker implements Runnable {
             }
 
             if (flag) {
-                cmpSkuService.setUrlKey(id, newUrl, urlKey);
+                cmpSkuService.setUrlKey(id, newUrl, newUrlKey);
                 System.out.println("update success for " + id);
                 System.out.println("newUrl " + newUrl);
-                System.out.println("urlKey " + urlKey);
+                System.out.println("urlKey " + newUrlKey);
             }
 
         }

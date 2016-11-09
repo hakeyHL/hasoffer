@@ -130,17 +130,26 @@ public class FixController {
     };
 
     //fixdata/addUrlKeyForPtmCmpSku
-    @RequestMapping(value = "/addUrlKeyForPtmCmpSku/{ptmcmpskuId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/addUrlKeyForPtmCmpSku/{type}/{ptmcmpskuId}", method = RequestMethod.GET)
     @ResponseBody
-    public String addUrlKeyForPtmCmpSku(@PathVariable long ptmcmpskuId) throws Exception {
+    public String addUrlKeyForPtmCmpSku(@PathVariable long ptmcmpskuId, @PathVariable int type) throws Exception {
 
-        String queryString = "SELECT t FROM PtmCmpSku t ORDER BY t.id";
+        String queryString = "";
 
         ExecutorService executorService = Executors.newCachedThreadPool();
 
+
         ListProcessWorkerStatus<PtmCmpSku> ws = new ListProcessWorkerStatus<>();
 
-        executorService.execute(new MysqlListWorker2(queryString, ws, dbm));
+        if (type == 0) {//更新urlKey为null的
+            queryString = "SELECT t FROM PtmCmpSku t WHERE t.urlKey is null ORDER BY t.id";
+            executorService.execute(new MysqlListWorker2(queryString, ws, dbm));
+        } else if (type == 1) {//从指定的最小id开始更新
+            queryString = "SELECT t FROM PtmCmpSku t WHERE t.id > ?0 ORDER BY t.id";
+            executorService.execute(new MysqlListWorker2(queryString, ws, dbm, ptmcmpskuId));
+        } else {
+            return "error";
+        }
 
         for (int i = 0; i < 50; i++) {
             executorService.execute(new UrlKeyFixWorker(ws, cmpSkuService));

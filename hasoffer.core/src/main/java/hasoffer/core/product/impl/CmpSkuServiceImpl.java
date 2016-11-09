@@ -91,6 +91,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void setUrlKey(long skuId, String newUrl, String urlKey) {
         PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(skuId);
 
