@@ -3,7 +3,6 @@ package hasoffer.core.product.impl;
 import com.alibaba.fastjson.JSON;
 import hasoffer.base.exception.ImageDownloadOrUploadException;
 import hasoffer.base.model.ImagePath;
-import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.*;
@@ -13,12 +12,9 @@ import hasoffer.core.exception.CmpSkuUrlNotFoundException;
 import hasoffer.core.exception.MultiUrlException;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.dbm.osql.datasource.DataSource;
-import hasoffer.core.persistence.dbm.osql.datasource.DataSourceType;
 import hasoffer.core.persistence.mongo.*;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
-import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.persistence.po.stat.StatSkuPriceUpdateResult;
 import hasoffer.core.persistence.po.stat.StatSkuUpdateResult;
 import hasoffer.core.persistence.po.stat.updater.StatSkuPriceUpdateResultUpdater;
@@ -27,9 +23,6 @@ import hasoffer.core.product.IFetchService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
-import hasoffer.core.task.ListProcessTask;
-import hasoffer.core.task.worker.ILister;
-import hasoffer.core.task.worker.IProcessor;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.model.OriFetchedProduct;
@@ -49,7 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created on 2016/1/4.
@@ -928,127 +920,6 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         statSkuUpdateResult.setMyntraSuccess(skuUpdateResult.getMyntraSuccess());
 
         dbm.create(statSkuUpdateResult);
-    }
-
-    @Override
-    @DataSource(value = DataSourceType.Slave)
-    public SkuUpdateResult statUpdateResult(String ymd) {
-        final long deadLineDate = TimeUtils.stringToDate(ymd, "yyyyMMdd").getTime() - TimeUtils.MILLISECONDS_OF_1_DAY;
-
-        final String SQL_FIND_BY_YMD = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd = '" + ymd + "'";
-
-        final SkuUpdateResult skuUpdateResult = new SkuUpdateResult(ymd);
-
-        ListProcessTask<SrmProductSearchCount> listProcessTask = new ListProcessTask<>(
-                new ILister() {
-                    @Override
-                    public PageableResult getData(int page) {
-                        System.out.println(page + " : " + skuUpdateResult.toString());
-                        return dbm.queryPage(SQL_FIND_BY_YMD, page, 2000);
-                    }
-
-                    @Override
-                    public boolean isRunForever() {
-                        return false;
-                    }
-
-                    @Override
-                    public void setRunForever(boolean runForever) {
-
-                    }
-                },
-                new IProcessor<SrmProductSearchCount>() {
-                    @Override
-                    public void process(SrmProductSearchCount o) {
-                        long proId = o.getProductId();
-                        List<PtmCmpSku> cmpSkus = listCmpSkus(proId);
-                        for (PtmCmpSku cmpSku : cmpSkus) {
-                            countSkuUpdate(skuUpdateResult, cmpSku);
-                        }
-                    }
-
-                    private void countSkuUpdate(SkuUpdateResult skuUpdateResult, PtmCmpSku cmpSku) {
-                        if (cmpSku.getStatus() == SkuStatus.ONSALE && cmpSku.getWebsite() != null) {
-
-                            boolean success = cmpSku.getUpdateTime().getTime() > deadLineDate;
-
-                            skuUpdateResult.addAllTotal();
-                            if (success) {
-                                skuUpdateResult.addAllSuccess();
-                            }
-
-                            switch (cmpSku.getWebsite()) {
-                                case FLIPKART:
-                                    skuUpdateResult.addFlipkartTotal();
-                                    if (success) {
-                                        skuUpdateResult.addFlipkartSuccess();
-                                    }
-                                    break;
-                                case AMAZON:
-                                    skuUpdateResult.addAmazonTotal();
-                                    if (success) {
-                                        skuUpdateResult.addAmazonSuccess();
-                                    }
-                                    break;
-                                case EBAY:
-                                    skuUpdateResult.addEbayotal();
-                                    if (success) {
-                                        skuUpdateResult.addEbaySuccess();
-                                    }
-                                    break;
-                                case SHOPCLUES:
-                                    skuUpdateResult.addShopcluesTotal();
-                                    if (success) {
-                                        skuUpdateResult.addShopcluesSuccess();
-                                    }
-                                    break;
-                                case SNAPDEAL:
-                                    skuUpdateResult.addSnapdealTotal();
-                                    if (success) {
-                                        skuUpdateResult.addSnapdealSuccess();
-                                    }
-                                    break;
-                                case INFIBEAM:
-                                    skuUpdateResult.addInfibeamTotal();
-                                    if (success) {
-                                        skuUpdateResult.addInfibeamSuccess();
-                                    }
-                                    break;
-                                case PAYTM:
-                                    skuUpdateResult.addPaytmTotal();
-                                    if (success) {
-                                        skuUpdateResult.addPaytmSuccess();
-                                    }
-                                    break;
-                                case MYNTRA:
-                                    skuUpdateResult.addMyntraTotal();
-                                    if (success) {
-                                        skuUpdateResult.addMyntraSuccess();
-                                    }
-                                    break;
-                            }
-                        }
-                    }
-                }
-        );
-
-        listProcessTask.go();
-
-        boolean next = true;
-
-        while (next) {
-            if (listProcessTask.isAllFinished()) {
-                next = false;
-            }
-
-            try {
-                TimeUnit.SECONDS.sleep(10);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        return skuUpdateResult;
     }
 
     @Override

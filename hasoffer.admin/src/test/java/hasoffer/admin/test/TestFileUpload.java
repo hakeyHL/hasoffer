@@ -1,3 +1,5 @@
+package hasoffer.admin.test;
+
 import hasoffer.base.utils.IDUtil;
 import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.utils.ImageUtil;

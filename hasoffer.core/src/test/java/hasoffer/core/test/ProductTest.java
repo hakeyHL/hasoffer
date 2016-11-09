@@ -110,6 +110,8 @@ public class ProductTest {
 
         productCacheManager.put2UpdateProcessedSet(1000L);
         productCacheManager.put2UpdateQueue(1000L);
+
+
     }
 
     @Test

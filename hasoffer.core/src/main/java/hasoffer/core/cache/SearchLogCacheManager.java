@@ -1,7 +1,10 @@
 package hasoffer.core.cache;
 
+import com.alibaba.fastjson.JSON;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.bo.product.SkuUpdateResult;
+import hasoffer.core.bo.product.SkuUpdateResult2;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.search.ISearchService;
@@ -193,5 +196,19 @@ public class SearchLogCacheManager {
         String key = CACHE_KEY_PRE + searchLogId;
 
         cacheService.del(key);
+    }
+
+    public void cacheStatResult(SkuUpdateResult skuUpdateResult) {
+        String key = CACHE_KEY_PRE + "cacheStatResult";
+
+        cacheService.mapPut(key, skuUpdateResult.getYmd(), JSON.toJSONString(skuUpdateResult));
+    }
+
+    public SkuUpdateResult2 getStatResult(String ymd) {
+        String key = CACHE_KEY_PRE + "cacheStatResult";
+
+        String jsonData = cacheService.mapGet(key, ymd);
+
+        return JSON.parseObject(jsonData, SkuUpdateResult2.class);
     }
 }

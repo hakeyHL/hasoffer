@@ -33,6 +33,9 @@ public class SkuUpdateResult {
     private AtomicInteger allTotal = new AtomicInteger(0);
     private AtomicInteger allSuccess = new AtomicInteger(0);
 
+    public SkuUpdateResult() {
+    }
+
     public SkuUpdateResult(String ymd) {
         this.ymd = ymd;
     }

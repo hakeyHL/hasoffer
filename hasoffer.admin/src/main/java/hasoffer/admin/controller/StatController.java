@@ -4,6 +4,7 @@ import hasoffer.base.model.SkuStatus;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.product.SkuUpdateResult;
+import hasoffer.core.bo.product.SkuUpdateResult2;
 import hasoffer.core.cache.CmpSkuCacheManager;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
@@ -13,6 +14,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
+import hasoffer.manager.SkuUpdateStatManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -50,7 +52,37 @@ public class StatController {
     CmpSkuCacheManager cmpSkuCacheManager;
     @Resource
     ProductCacheManager productCacheManager;
+    @Resource
+    SkuUpdateStatManager skuUpdateStatManager;
     private Logger logger = LoggerFactory.getLogger(StatController.class);
+
+    @RequestMapping(value = "/show_updates", method = RequestMethod.GET)
+    public ModelAndView show_updates(@RequestParam(defaultValue = "") String ymd) {
+        if (StringUtils.isEmpty(ymd)) {
+            ymd = TimeUtils.parse(TimeUtils.today(), "yyyyMMdd");
+        }
+
+        SkuUpdateResult2 skuUpdateResult2 = searchLogCacheManager.getStatResult(ymd);
+
+        ModelAndView mav = new ModelAndView("showstat/sku_update_status");
+        mav.addObject("updateRst", skuUpdateResult2);
+
+        long wait4UpdateProduct = productCacheManager.getWait4UpdateProductCount(ymd);
+        long updateProcessd = productCacheManager.getUpdateProcessdProductCount(ymd);
+
+        mav.addObject("wait4Update", wait4UpdateProduct);
+        mav.addObject("updateProcessd", updateProcessd);
+
+        return mav;
+    }
+
+    @RequestMapping(value = "/sku_update_status_today", method = RequestMethod.GET)
+    public ModelAndView sku_update_status_today() {
+        skuUpdateStatManager.statUpdateResultToday();
+
+        ModelAndView mav = new ModelAndView("redirect:/stat/show_updates");
+        return mav;
+    }
 
     @RequestMapping(value = "/sku_update_result", method = RequestMethod.GET)
     public
@@ -60,27 +92,11 @@ public class StatController {
             ymd = TimeUtils.parse(TimeUtils.yesterday(), "yyyyMMdd");
         }
 
-        SkuUpdateResult skuUpdateResult = cmpSkuService.statUpdateResult(ymd);
+        SkuUpdateResult skuUpdateResult = skuUpdateStatManager.statUpdateResult(ymd);
 
         cmpSkuService.saveSkuUpdateResult(skuUpdateResult);
 
         return "ok";
-    }
-
-    @RequestMapping(value = "/show_update_status", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String showUpdateStatus(@RequestParam(defaultValue = "") String ymd) {
-        if (StringUtils.isEmpty(ymd)) {
-            ymd = TimeUtils.parse(TimeUtils.nowDate(), "yyyyMMdd");
-        }
-
-        long wait4UpdateProduct = productCacheManager.getWait4UpdateProductCount(ymd);
-
-        long updateProcessd = productCacheManager.getUpdateProcessdProductCount(ymd);
-
-        return String.format("wait4UpdateProduct : %d | updateProcessd : %d", wait4UpdateProduct, updateProcessd);
-//        return "ok";
     }
 
     @RequestMapping(value = "/statByHour", method = RequestMethod.GET)

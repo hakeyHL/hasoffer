@@ -141,6 +141,9 @@
                                 <li class="active">
                                     <a href="/s/showstat"> 比价质量统计</a>
                                 </li>
+                                <li class="active">
+                                    <a href="/stat/show_updates"> 价格更新状态</a>
+                                </li>
                             </ul>
                         </li>
                     </c:if>
