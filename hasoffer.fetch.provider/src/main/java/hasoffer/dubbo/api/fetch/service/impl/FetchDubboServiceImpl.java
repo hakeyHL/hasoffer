@@ -160,8 +160,8 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
             expireSeconds = TimeUtils.SECONDS_OF_1_DAY;
         }
 
-        fetchCacheService.pushNum(website.name());
-        fetchCacheService.countPushUrl(website.name(), url);
+        fetchCacheService.pushNum(website.name() + "_" + taskTarget.name());
+        fetchCacheService.countPushUrl(website.name() + "_" + taskTarget.name(), url);
         FetchUrlResult fetchUrlResult = new FetchUrlResult(website, url, expireSeconds, TaskStatus.START, new Date(), taskTarget);
         String redisKey = RedisKeysUtils.getWaitUrlListKey(taskLevel, website);
         try {
