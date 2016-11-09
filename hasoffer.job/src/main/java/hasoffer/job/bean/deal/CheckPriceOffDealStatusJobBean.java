@@ -41,12 +41,9 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
      * Logger for this class
      */
     private static final Logger logger = LoggerFactory.getLogger(CheckPriceOffDealStatusJobBean.class);
-    private static final String Q_PRICEOFF_DEAL = "SELECT t From AppDeal t WHERE t.appdealSource = 'PRICE_OFF' AND t.expireTime > ?0 ORDER BY t.createTime DESC";
-    private static int PRICEOFF_DEAL_LIST_THREAD_NUM = 0;
-
-    static {
-        CheckPriceOffDealStatusJobBean.PRICEOFF_DEAL_LIST_THREAD_NUM++;
-    }
+    //updateTime :2016-11-09 10:27
+//    private static final String Q_PRICEOFF_DEAL = "SELECT t From AppDeal t WHERE t.appdealSource = 'PRICE_OFF' AND t.expireTime > ?0 ORDER BY t.createTime DESC";
+    private static final String Q_PRICEOFF_DEAL = "SELECT t From AppDeal t WHERE t.appdealSource <> 'MANUAL_INPUT' AND t.expireTime > ?0 ORDER BY t.createTime DESC";
 
     @Resource
     IFetchDubboService fetchDubboService;
@@ -66,42 +63,39 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
         es.execute(new Runnable() {
             @Override
             public void run() {
-
                 try {
-
-
                     int curPage = 1;
                     int pageSize = 1000;
 
                     PageableResult<AppDeal> pageableResult = dbm.queryPage(Q_PRICEOFF_DEAL, curPage, pageSize, Arrays.asList(TimeUtils.nowDate()));
 
                     long totalPage = pageableResult.getTotalPage();
-                    System.out.println("price off deal status total page =" + totalPage);
+                    logger.info("price off deal status total page =" + totalPage);
 
                     while (curPage <= totalPage) {
 
-                        System.out.println("price off deal status curpage =" + curPage);
+                        logger.info("price off deal status curpage =" + curPage);
 
                         if (curPage > 1) {
                             pageableResult = dbm.queryPage(Q_PRICEOFF_DEAL, curPage, pageSize, Arrays.asList(TimeUtils.nowDate()));
                         }
 
                         List<AppDeal> dealList = pageableResult.getData();
-                        System.out.println("find appdeal size =" + dealList.size());
+                        logger.info("find appdeal size =" + dealList.size());
 
                         for (AppDeal deal : dealList) {
 
                             long ptmcmpskuid = deal.getPtmcmpskuid();
                             PtmCmpSku ptmCmpSku = dbm.get(PtmCmpSku.class, ptmcmpskuid);
                             if (ptmCmpSku == null) {
-                                System.out.println("get null sku,id = ptmcmpskuid");
+                                logger.info("get null sku,id = ptmcmpskuid");
                                 continue;
                             }
                             Website website = ptmCmpSku.getWebsite();
                             String url = ptmCmpSku.getUrl();
                             fetchDubboService.sendUrlTask(website, url, TimeUtils.SECONDS_OF_1_MINUTE * 45, TaskTarget.DEAL_UPDATE, TaskLevel.LEVEL_2);
 
-                            System.out.println("add price off deal to update queue success " + deal.getId());
+                            logger.info("add price off deal to update queue success " + deal.getId());
                         }
 
                         curPage++;
@@ -109,8 +103,6 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                } finally {
-                    CheckPriceOffDealStatusJobBean.PRICEOFF_DEAL_LIST_THREAD_NUM--;
                 }
             }
         });
@@ -136,7 +128,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
 
                         if (StringUtils.isEmpty(pop)) {
                             try {
-                                System.out.println("pop deal update list get null sleep 5 seconds");
+                                logger.info("pop deal update list get null sleep 5 seconds");
                                 TimeUnit.SECONDS.sleep(5);
                             } catch (InterruptedException e) {
 
@@ -148,7 +140,11 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
 
                             FetchUrlResult fetchUrlResult1 = JSONUtil.toObject(pop, FetchUrlResult.class);
                             FetchedProduct fetchedProduct = fetchUrlResult1.getFetchProduct();
-                            System.out.println(JSONUtil.toJSON(fetchedProduct).toString());
+                            if (fetchedProduct == null) {
+                                logger.info("deal update fetchedProduct is null");
+                            } else {
+                                logger.info("deal update fetchedProduct : " + (fetchedProduct).toString());
+                            }
 
                             String url = fetchUrlResult1.getUrl();
                             String urlKey = HexDigestUtil.md5(url);
@@ -158,7 +154,6 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                             for (PtmCmpSku sku : skuList) {
 
                                 // try update sku
-                                Long skuid = sku.getId();
                                 Website website = WebsiteHelper.getWebSite(url);
 
                                 if (website == null) {
@@ -177,11 +172,13 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                                 }
                             }
                         } catch (IOException e) {
-                            System.out.println("deal update pop string parse error");
+                            logger.info("deal update pop string parse error");
                         }
                     }
                 }
             });
         }
+
+        logger.info("CheckPriceOffDealStatusJobBean will stop at {}", new Date());
     }
 }

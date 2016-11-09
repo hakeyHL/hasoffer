@@ -48,7 +48,14 @@ public class DealSiteFetchDealJobBean extends QuartzJobBean {
 
         fetchDubboService.sendDealTask(Website.DESIDIME, TimeUtils.SECONDS_OF_1_HOUR, TaskLevel.LEVEL_2);
 
+        long waitStartTime = TimeUtils.now();
+
         while (true) {
+
+            if (TimeUtils.now() - waitStartTime > TimeUtils.SECONDS_OF_1_MINUTE * 15) {
+                System.out.println("deal website fetch wait above 10 min go to die");
+                break;
+            }
 
             TaskStatus taskStatus = fetchDubboService.getDealTaskStatus(Website.DESIDIME, TimeUtils.SECONDS_OF_1_HOUR, TaskLevel.LEVEL_2);
 

@@ -88,6 +88,17 @@ public class MysqlTest {
     private ConcurrentLinkedQueue<PtmCmpSku> skuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
 
     @Test
+    public void testPageQuery() {
+
+        String queryString = "SELECT t FROM PtmCmpSku t WHERE t.urlKey is null ORDER BY t.id";
+
+        PageableResult<Object> pageableResult = dbm.queryPage(queryString, 1, 1000);
+
+        List<Object> data = pageableResult.getData();
+
+    }
+
+    @Test
     public void testQueryUrmDevice() {
 
         PageableResult<UrmDevice> pagedUrmDeviceByAppType = deviceService.findPagedUrmDeviceByAppType(AppType.APP, 1, 1000);
