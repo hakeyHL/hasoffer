@@ -64,6 +64,7 @@ public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
             po.setWebSite(Website.SNAPDEAL.toString());
             po.setOrderId(order.getOrderCode());
             String channel = order.getAffiliateSubId1();
+            po.setChannelSrc(channel);
             if (channel == null || "".equals(channel)) {
                 po.setChannel(MarketChannel.NONE.name());
             } else {
