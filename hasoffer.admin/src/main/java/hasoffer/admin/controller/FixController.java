@@ -185,58 +185,65 @@ public class FixController {
                                   @RequestParam(defaultValue = "0") int totalPageSize,
                                   @RequestParam(defaultValue = "0") int limitSize,
                                   @RequestParam(defaultValue = "json") String responseType,
-                                  String getHtmlUrl
+                                  @RequestParam(defaultValue = "") String fetchUrl
     ) throws Exception {
-        String fetchUrl;
-        if (responseType.equals("json")) {
-            fetchUrl = "http://www.91mobiles.com/mobile-memory-card-finder.php";
-        } else {
-            fetchUrl = "http://api.91mobiles.com:8080/nm-community/api/searchPage/web";
+        if (fetchUrl.equals("")) {
+            return null;
         }
         int num = 0;
-        JSONObject jsonObject = new JSONObject();
-        //t 当前时间戳
-        jsonObject.put("t", new Date().getTime());
-        //q:搜索关键字
-        jsonObject.put("q", cateName);
-        //srtBy:score
-        jsonObject.put("srtBy", "score");
-        //srtType:desc
-        jsonObject.put("srtType", "desc");
-        //limit 20
-        if (limitSize < 1) {
-            limitSize = 20;
-        }
-        jsonObject.put("limit", limitSize);
-        //startRow 0
+        if (responseType.equals("json")) {
+            JSONObject jsonObject = new JSONObject();
+            //t 当前时间戳
+            jsonObject.put("t", new Date().getTime());
+            //q:搜索关键字
+            jsonObject.put("q", cateName);
+            //srtBy:score
+            jsonObject.put("srtBy", "score");
+            //srtType:desc
+            jsonObject.put("srtType", "desc");
+            //limit 20
+            if (limitSize < 1) {
+                limitSize = 20;
+            }
+            jsonObject.put("limit", limitSize);
+            //startRow 0
 
-        //get total page
-        try {
-            jsonObject.put("startRow", 0);
-            String postResultString = Httphelper.doPost(fetchUrl, jsonObject.toJSONString());
-            if (!StringUtils.isEmpty(postResultString)) {
-                JSONObject jsonResult = JSONObject.parseObject(postResultString);
-                Integer productCount = jsonResult.getInteger("productCount");
-                if (productCount > 0) {
-                    if (productCount % limitSize != 0) {
-                        //+1
-                        totalPageSize = (productCount / limitSize) + 1;
-                    } else {
-                        totalPageSize = productCount / limitSize;
+            //get total page
+            try {
+                jsonObject.put("startRow", 0);
+                String postResultString = Httphelper.doPost(fetchUrl, jsonObject.toJSONString());
+                if (!StringUtils.isEmpty(postResultString)) {
+                    JSONObject jsonResult = JSONObject.parseObject(postResultString);
+                    Integer productCount = jsonResult.getInteger("productCount");
+                    if (productCount > 0) {
+                        if (productCount % limitSize != 0) {
+                            //+1
+                            totalPageSize = (productCount / limitSize) + 1;
+                        } else {
+                            totalPageSize = productCount / limitSize;
+                        }
                     }
                 }
+            } catch (Exception e) {
+                logger.info(" calculate totalPage exception {}", e.getMessage());
             }
-        } catch (Exception e) {
-            logger.info(" calculate totalPage exception {}", e.getMessage());
+            for (int i = 0; i < totalPageSize; i++) {
+                jsonObject.put("startRow", i * jsonObject.getInteger("limit"));
+                System.out.println(fetchUrl + " _ " + cateName + "  FETCH START");
+                Cate91Fetch(fetchUrl, jsonObject);
+                System.out.println(fetchUrl + " _ " + cateName + " FETCH END");
+                num++;
+            }
+            System.out.println("total num " + num);
+        } else {
+            for (int i = 1; i < totalPageSize + 1; i++) {
+                String url = fetchUrl + "?page=" + i;
+                System.out.println(url + " html  FETCH START");
+                Cate91FetchHtml(url);
+                System.out.println(url + " html  FETCH END");
+                num++;
+            }
         }
-        for (int i = 0; i < totalPageSize; i++) {
-            jsonObject.put("startRow", i * jsonObject.getInteger("limit"));
-            System.out.println(fetchUrl + " _ " + cateName + "  FETCH START");
-            Cate91Fetch(fetchUrl, jsonObject);
-            System.out.println(fetchUrl + " _ " + cateName + " FETCH END");
-            num++;
-        }
-        System.out.println("total num " + num);
         return "ok";
     }
 
@@ -348,7 +355,10 @@ public class FixController {
 
             TagNode productUrlNode = getSubNodeByXPath(productNode, "//a[@target='_blank']", null);
 
-            String productUrl = productUrlNode.getAttributeByName("data-href-url");
+            String productUrl = productUrlNode.getAttributeByName("href");
+            if (productUrl != null) {
+                productUrl = WEBSITE_91MOBILE_URL_PREFIEX + productUrl;
+            }
             System.out.println(productUrl);
         }
     }
