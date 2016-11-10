@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 public class CmpSkuDubboUpdate2Worker implements Runnable {
 
     private static final String PRICE_DROP_SKUID_QUEUE = "PRICE_DROP_SKUID_QUEUE";
-    public static long popNumber = 0;
+    //    public static long popNumber = 0;
     private static Logger logger = LoggerFactory.getLogger(CmpSkuDubboUpdate2Worker.class);
     private IFetchDubboService fetchDubboService;
     private ICmpSkuService cmpSkuService;
@@ -73,11 +73,11 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                 if (fetchUrlResultStr == null) {
 //                    TimeUnit.MINUTES.sleep(3);
                     TimeUnit.SECONDS.sleep(10);
-                    logger.info("fetchUrlResult get null sleep 3 MINUTES");
+                    logger.info("fetchUrlResult get null sleep 10 MINUTES");
                     continue;
                 }
                 FetchUrlResult fetchUrlResult = JSONUtil.toObject(fetchUrlResultStr, FetchUrlResult.class);
-                popNumber--;
+//                popNumber--;
                 if (fetchUrlResult.getUrl() == null) {
                     logger.info("fetchUrlResult.getUrl() null");
                     continue;
@@ -89,6 +89,11 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
 
                 if (TaskStatus.FINISH.equals(taskStatus)) {
 //                    popFinishNumber++;
+
+                    if (Website.FLIPKART.equals(fetchUrlResult.getWebsite())) {
+                        logger.info("pop get flipkart finish result");
+                    }
+
                     String urlKey = HexDigestUtil.md5(url);
                     List<PtmCmpSku> skuList = cmpSkuService.getPtmCmpSkuListByUrlKey(urlKey);
 
@@ -107,10 +112,13 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                         for (PtmCmpSku ptmCmpSku : skuList) {
                             //更新商品的信息，写入多图数据，写入描述/参数
                             updatePtmCmpSku(ptmCmpSku, fetchUrlResult);
+                            logger.info("update success for " + ptmCmpSku.getWebsite());
                         }
                     }
                 } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
-//                    popExceptionNumber++;
+                    if (Website.FLIPKART.equals(fetchUrlResult.getWebsite())) {
+                        logger.info("pop get flipkart exception result");
+                    }
                 }
             } catch (Exception e) {
                 logger.info("CmpSkuDubboUpdate2Worker.run() exception.", e);
@@ -127,6 +135,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
         Website website = WebsiteHelper.getWebSite(url);
 
         if (website == null) {
+            logger.info("website is null for _" + skuid + "_");
             return;
         }
 

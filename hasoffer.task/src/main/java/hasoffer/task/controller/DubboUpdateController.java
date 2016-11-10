@@ -83,14 +83,14 @@ public class DubboUpdateController {
             return "task running.";
         }
 
-        long cacheSeconds = TimeUtils.SECONDS_OF_1_HOUR * 2;
+        long cacheSeconds = TimeUtils.MILLISECONDS_OF_1_HOUR * 2;
 
         ExecutorService es = Executors.newCachedThreadPool();
 
         es.execute(new ListNeedUpdateFromRedisWorker(fetchDubboService, redisListService, redisSetService, cmpSkuService, cacheSeconds, productCacheManager));
 //        es.execute(new ListNeedUpdateFromRedisWorker(fetchDubboService, redisListService, redisSetService, cmpSkuService, cacheSeconds, productCacheManager, number));//for test
 
-        CmpSkuDubboUpdate2Worker.popNumber = number;
+//        CmpSkuDubboUpdate2Worker.popNumber = number;
         for (int i = 0; i < 10; i++) {
 //            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService, cacheSeconds));
             es.execute(new CmpSkuDubboUpdate2Worker(fetchDubboService, cmpSkuService, redisListService));
