@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <configuration>
-    <substitutionProperty name="log.base" value="${user.home}/logs/job-logs"/>
+    <substitutionProperty name="log.base" value="${user.home}/logs/offlinejob-logs"/>
     <!--<substitutionProperty name="log.base" value="${catalina.base}/logs/job-logs"/>-->
 
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
@@ -99,6 +99,10 @@
     <logger name="hasoffer" level="INFO">
         <appender-ref ref="InfoLoggerFileOut"/>
         <appender-ref ref="ErrorLoggerFileOut"/>
+    </logger>
+
+    <logger name="hasoffer.base" level="INFO">
+        <appender-ref ref="InfoLoggerFileOut"/>
     </logger>
 
     <logger name="StatSearchLogJobBean.log" level="DEBUG">
