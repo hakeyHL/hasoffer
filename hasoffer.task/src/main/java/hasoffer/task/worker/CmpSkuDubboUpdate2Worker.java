@@ -73,7 +73,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                 if (fetchUrlResultStr == null) {
 //                    TimeUnit.MINUTES.sleep(3);
                     TimeUnit.SECONDS.sleep(10);
-                    logger.info("fetchUrlResult get null sleep 3 MINUTES");
+                    logger.info("fetchUrlResult get null sleep 10 MINUTES");
                     continue;
                 }
                 FetchUrlResult fetchUrlResult = JSONUtil.toObject(fetchUrlResultStr, FetchUrlResult.class);
@@ -89,6 +89,11 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
 
                 if (TaskStatus.FINISH.equals(taskStatus)) {
 //                    popFinishNumber++;
+
+                    if (Website.FLIPKART.equals(fetchUrlResult.getWebsite())) {
+                        logger.info("pop get flipkart finish result");
+                    }
+
                     String urlKey = HexDigestUtil.md5(url);
                     List<PtmCmpSku> skuList = cmpSkuService.getPtmCmpSkuListByUrlKey(urlKey);
 
@@ -111,7 +116,9 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                         }
                     }
                 } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
-                    logger.info("fetch get exception status");
+                    if (Website.FLIPKART.equals(fetchUrlResult.getWebsite())) {
+                        logger.info("pop get flipkart exception result");
+                    }
                 }
             } catch (Exception e) {
                 logger.info("CmpSkuDubboUpdate2Worker.run() exception.", e);
