@@ -160,7 +160,8 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
             expireSeconds = TimeUtils.SECONDS_OF_1_DAY;
         }
 
-        fetchCacheService.pushNum(website);
+        fetchCacheService.pushNum(website.name() + "_" + taskTarget.name());
+        fetchCacheService.countPushUrl(website.name() + "_" + taskTarget.name(), url);
         FetchUrlResult fetchUrlResult = new FetchUrlResult(website, url, expireSeconds, TaskStatus.START, new Date(), taskTarget);
         String redisKey = RedisKeysUtils.getWaitUrlListKey(taskLevel, website);
         try {
@@ -209,7 +210,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
 
             try {
                 FetchUrlResult result = JSONUtil.toObject(fetchUrlResult, FetchUrlResult.class);
-                fetchCacheService.popNum(result.getWebsite());
+                fetchCacheService.popNum(result.getWebsite() + "_" + taskTarget + "_" + result.getTaskStatus());
             } catch (IOException e) {
                 logger.error("Json:{}", fetchUrlResult, e);
             }
