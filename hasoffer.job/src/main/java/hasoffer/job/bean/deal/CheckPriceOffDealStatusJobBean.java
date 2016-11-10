@@ -96,6 +96,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                             fetchDubboService.sendUrlTask(website, url, TimeUtils.SECONDS_OF_1_MINUTE * 45, TaskTarget.DEAL_UPDATE, TaskLevel.LEVEL_2);
 
                             logger.info("add price off deal to update queue success " + deal.getId());
+                            logger.info("add price off deal to update queue success type is " + deal.getAppdealSource());
                         }
 
                         curPage++;
