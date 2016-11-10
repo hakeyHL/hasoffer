@@ -10,6 +10,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku2;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.persistence.po.stat.StatSkuPriceUpdateResult;
+import hasoffer.core.persistence.po.stat.StatSkuUpdateResult;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.spider.model.FetchedProduct;
 
@@ -142,4 +143,6 @@ public interface ICmpSkuService {
     void updateCmpSkuBrandModel(Long id, String brand, String model);
 
     void saveSkuUpdateResult(SkuUpdateResult skuUpdateResult);
+
+    List<StatSkuUpdateResult> getSkuUpdateResults();
 }

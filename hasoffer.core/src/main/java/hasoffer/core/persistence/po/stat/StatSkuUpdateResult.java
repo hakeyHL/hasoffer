@@ -26,7 +26,7 @@ public class StatSkuUpdateResult implements Identifiable<String> {
     private long snapdealTotal = 0;
     private long snapdealSuccess = 0;
 
-    private long ebayotal = 0;
+    private long ebayTotal = 0;
     private long ebaySuccess = 0;
 
     private long shopcluesTotal = 0;
@@ -109,12 +109,12 @@ public class StatSkuUpdateResult implements Identifiable<String> {
         this.snapdealSuccess = snapdealSuccess;
     }
 
-    public long getEbayotal() {
-        return ebayotal;
+    public long getEbayTotal() {
+        return ebayTotal;
     }
 
     public void setEbayTotal(long ebayotal) {
-        this.ebayotal = ebayotal;
+        this.ebayTotal = ebayotal;
     }
 
     public long getEbaySuccess() {

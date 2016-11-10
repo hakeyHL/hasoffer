@@ -11,6 +11,7 @@ import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.stat.StatSkuUpdateResult;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
@@ -72,6 +73,9 @@ public class StatController {
 
         mav.addObject("wait4Update", wait4UpdateProduct);
         mav.addObject("updateProcessd", updateProcessd);
+
+        List<StatSkuUpdateResult> skuUpdateResults = cmpSkuService.getSkuUpdateResults();
+        mav.addObject("updateRst2", skuUpdateResults);
 
         return mav;
     }
