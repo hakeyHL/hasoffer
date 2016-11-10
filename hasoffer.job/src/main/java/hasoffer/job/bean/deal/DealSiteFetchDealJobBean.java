@@ -52,8 +52,8 @@ public class DealSiteFetchDealJobBean extends QuartzJobBean {
 
         while (true) {
 
-            if (TimeUtils.now() - waitStartTime > TimeUtils.SECONDS_OF_1_MINUTE * 15) {
-                System.out.println("deal website fetch wait above 10 min go to die");
+            if (TimeUtils.now() - waitStartTime > TimeUtils.MILLISECONDS_OF_1_MINUTE * 15) {
+                System.out.println("deal website fetch wait above 15 min go to die");
                 break;
             }
 
