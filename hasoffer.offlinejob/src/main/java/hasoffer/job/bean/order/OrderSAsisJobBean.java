@@ -46,11 +46,10 @@ public class OrderSAsisJobBean extends QuartzJobBean {
                 Date day = TimeUtils.addDay(todayTime, -i);
                 orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.name(), day, day);
                 orderStatsAnalysisService.updateOrder(Website.FLIPKART.name(), day, day);
-
             }
 
         } catch (Exception e) {
-            logger.error("reportOrderStatistic: update order fail.   DATE:" + new Date() + ": msg:", e);
+            logger.error("reportOrderStatistic: update order fail. DATE:" + new Date() + ": msg:", e);
         }
     }
 }
