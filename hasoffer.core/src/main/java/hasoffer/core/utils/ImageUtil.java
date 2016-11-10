@@ -74,7 +74,7 @@ public class ImageUtil {
             return convertAndUploadImage(file);
 
         } catch (Exception e) {
-            logger.error(e.getMessage() + "[" + imageUrl + "]");
+            logger.info("[" + imageUrl + "]", e);
             throw new ImageDownloadOrUploadException("下载或上传图片时出错");
         } finally {
             // 删除图片
@@ -99,7 +99,7 @@ public class ImageUtil {
             // 上传图片
             return uploadImage(file);
         } catch (Exception e) {
-            logger.error(e.getMessage() + "[" + imageUrl + "]");
+            logger.info("[" + imageUrl + "]", e);
             throw new ImageDownloadOrUploadException("下载或上传图片时出错");
         } finally {
             // 删除图片
