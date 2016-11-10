@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 public class CmpSkuDubboUpdate2Worker implements Runnable {
 
     private static final String PRICE_DROP_SKUID_QUEUE = "PRICE_DROP_SKUID_QUEUE";
-    public static long popNumber = 0;
+    //    public static long popNumber = 0;
     private static Logger logger = LoggerFactory.getLogger(CmpSkuDubboUpdate2Worker.class);
     private IFetchDubboService fetchDubboService;
     private ICmpSkuService cmpSkuService;
@@ -77,7 +77,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                     continue;
                 }
                 FetchUrlResult fetchUrlResult = JSONUtil.toObject(fetchUrlResultStr, FetchUrlResult.class);
-                popNumber--;
+//                popNumber--;
                 if (fetchUrlResult.getUrl() == null) {
                     logger.info("fetchUrlResult.getUrl() null");
                     continue;
@@ -107,10 +107,11 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                         for (PtmCmpSku ptmCmpSku : skuList) {
                             //更新商品的信息，写入多图数据，写入描述/参数
                             updatePtmCmpSku(ptmCmpSku, fetchUrlResult);
+                            logger.info("update success for " + ptmCmpSku.getWebsite());
                         }
                     }
                 } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
-//                    popExceptionNumber++;
+                    logger.info("fetch get exception status");
                 }
             } catch (Exception e) {
                 logger.info("CmpSkuDubboUpdate2Worker.run() exception.", e);
@@ -127,6 +128,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
         Website website = WebsiteHelper.getWebSite(url);
 
         if (website == null) {
+            logger.info("website is null for _" + skuid + "_");
             return;
         }
 
