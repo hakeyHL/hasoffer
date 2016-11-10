@@ -3,6 +3,7 @@ package hasoffer.job.bean.stat;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.bo.product.SkuUpdateResult;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
@@ -10,6 +11,7 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
 import hasoffer.job.manager.ProductSearchManager;
+import hasoffer.manager.SkuUpdateStatManager;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
@@ -39,6 +41,8 @@ public class StatSearchLogJobBean extends QuartzJobBean {
     SearchLogCacheManager searchLogCacheManager;
     @Resource
     ICmpSkuService cmpSkuService;
+    @Resource
+    SkuUpdateStatManager skuUpdateStatManager;
 
 
     @Override
@@ -63,6 +67,9 @@ public class StatSearchLogJobBean extends QuartzJobBean {
     }
 
     public void saveSearchCount(String ymd) {
+        final long deadLineDate = TimeUtils.yesterday();
+        SkuUpdateResult skuUpdateResult = new SkuUpdateResult(ymd);
+
         logger.debug(String.format("save search count [%s]", ymd));
 
         Map<Long, Long> countMap = searchLogCacheManager.getProductCount(ymd);
@@ -80,9 +87,14 @@ public class StatSearchLogJobBean extends QuartzJobBean {
             int size = 0;
             if (ArrayUtils.hasObjs(cmpSkus)) {
                 size = cmpSkus.size();
+                for (PtmCmpSku cmpSku : cmpSkus) {
+                    skuUpdateStatManager.countSkuUpdate(skuUpdateResult, cmpSku, deadLineDate);
+                }
             }
 
             searchService.saveLogCount(new SrmProductSearchCount(ymd, productId, searchCount, size));
+
+            cmpSkuService.saveSkuUpdateResult(skuUpdateResult);
 
             productService.importProduct2Solr2(productId);
         }

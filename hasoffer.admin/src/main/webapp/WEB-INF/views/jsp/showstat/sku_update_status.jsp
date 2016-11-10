@@ -31,7 +31,8 @@
                     </thead>
                     <tbody>
                     <tr>
-                        <td>${updateRst.ymd}
+                        <td>${updateRst.ymd}</td>
+                        <td>${updateRst.allTotal} | ${updateRst.allSuccess}
                             (<fmt:formatNumber pattern="##.##"
                                                value="${100 * updateRst.allSuccess/updateRst.allTotal}"></fmt:formatNumber>
                             %)

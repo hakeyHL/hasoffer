@@ -117,7 +117,7 @@ public class SkuUpdateStatManager {
         return skuUpdateResult;
     }
 
-    private void countSkuUpdate(SkuUpdateResult skuUpdateResult, PtmCmpSku cmpSku, long deadLineDate) {
+    public void countSkuUpdate(SkuUpdateResult skuUpdateResult, PtmCmpSku cmpSku, long deadLineDate) {
         if (cmpSku.getStatus() == SkuStatus.ONSALE && cmpSku.getWebsite() != null) {
 
             boolean success = cmpSku.getUpdateTime().getTime() > deadLineDate;
