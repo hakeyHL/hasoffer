@@ -1286,4 +1286,11 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         ptmCmpSkuImageService.createPtmCmpSkuImage(ptmCmpSkuImage);
     }
+
+    @Override
+    public List<StatSkuUpdateResult> getSkuUpdateResults() {
+        final String Q_RST = "SELECT t FROM StatSkuUpdateResult t order by id desc";
+
+        return dbm.query(Q_RST, 1, 5);
+    }
 }
