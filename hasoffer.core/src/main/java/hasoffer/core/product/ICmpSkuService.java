@@ -1,5 +1,6 @@
 package hasoffer.core.product;
 
+import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.core.bo.product.SkuPriceUpdateResultBo;
@@ -145,4 +146,8 @@ public interface ICmpSkuService {
     void saveSkuUpdateResult(SkuUpdateResult skuUpdateResult);
 
     List<StatSkuUpdateResult> getSkuUpdateResults();
+
+    PageableResult<PtmCmpSku> listCmpSkus(int page, int size);
+
+
 }

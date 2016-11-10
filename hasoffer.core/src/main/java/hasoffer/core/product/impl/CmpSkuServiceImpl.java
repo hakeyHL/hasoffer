@@ -3,6 +3,7 @@ package hasoffer.core.product.impl;
 import com.alibaba.fastjson.JSON;
 import hasoffer.base.exception.ImageDownloadOrUploadException;
 import hasoffer.base.model.ImagePath;
+import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.*;
@@ -79,6 +80,12 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     IPtmCmpSkuImageService ptmCmpSkuImageService;
 
     private Logger logger = LoggerFactory.getLogger(CmpSkuServiceImpl.class);
+
+    @Override
+    public PageableResult<PtmCmpSku> listCmpSkus(int page, int size) {
+        String q_sku = "select t from PtmCmpSku t where t.status = ?0";
+        return dbm.queryPage(q_sku, page, size, Arrays.asList(SkuStatus.ONSALE));
+    }
 
     @Override
     public List<PtmCmpSku> getPtmCmpSkuListBySourceSidAndWebsite(String sourceSid, Website website, int page, int pageSize) {
