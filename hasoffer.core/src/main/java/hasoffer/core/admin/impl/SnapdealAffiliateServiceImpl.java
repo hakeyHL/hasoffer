@@ -74,7 +74,7 @@ public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
             if (MarketChannel.NONE.name().equals(po.getChannel())) {
                 po.setChannel(AffliIdHelper.getMarketChannelById(channel).name());
             }
-            po.setOrderTime(order.getDateTime());
+            po.setOrderInTime(order.getDateTime());
             po.setOrderTime(new Date(po.getOrderInTime().getTime() + TimeUtils.MILLISECONDS_OF_1_MINUTE * 150));
             String deviceId_userId = order.getAffiliateSubId2();
             if (deviceId_userId != null) {

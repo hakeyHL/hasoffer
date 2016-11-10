@@ -5,7 +5,6 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IOrderStatsAnalysisService;
 import hasoffer.core.admin.ISnapdealAffiliateService;
-import hasoffer.core.persistence.dbm.HibernateDao;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.admin.updater.OrderStatsAnalysisPOUpdater;
@@ -13,6 +12,8 @@ import hasoffer.core.persistence.po.urm.PriceOffNotice;
 import hasoffer.core.persistence.po.urm.UrmUserOrderBak;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,15 +24,12 @@ import java.util.*;
 @Service
 @Transactional
 public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService {
-
     //private static final String Q_BASE = "sum(1) as sumCount, SUM(IF(userType='OLD',1,0)) as oldUserCount,SUM(IF(userType='NEW',1,0)) as newUserCount,SUM(IF(userType='NONE',1,0)) as noneUserCount,sum(if(channel='GOOGLEPLAY',1,0)) as googleChannel,sum(if(channel='SHANCHUAN' or channel='LeoMaster' ,1,0)) as shanchuanChannel,sum(if(channel='NINEAPPS',1,0)) as nineAppChannel,sum(if(channel='NONE',1,0)) as noneChannel from report_ordersatas";
     private static final String Q_BASE = "sum(1) AS sumCount, SUM(IF(userType = 'OLD', 1, 0)) AS oldUserCount, SUM(IF(userType = 'NEW', 1, 0)) AS newUserCount, SUM(IF(userType = 'NONE', 1, 0)) AS noneUserCount, sum( IF (channel = 'GOOGLEPLAY', 1, 0)) AS googleChannel, sum( IF ( channel = 'GOOGLEPLAY' AND userType = 'OLD', 1, 0 )) AS googleOldChannel, sum( IF ( channel = 'GOOGLEPLAY' AND userType = 'NEW', 1, 0 )) AS googleNewChannel, sum( IF ( channel = 'GOOGLEPLAY' AND userType = 'NONE', 1, 0 )) AS googleNoneChannel, sum( IF ( channel = 'SHANCHUAN' OR channel = 'LeoMaster', 1, 0 )) AS shanchuanChannel, sum( IF (( channel = 'SHANCHUAN' OR channel = 'LeoMaster' ) AND userType = 'OLD', 1, 0 )) AS shanchuanOldChannel, sum( IF (( channel = 'SHANCHUAN' OR channel = 'LeoMaster' ) AND userType = 'NEW', 1, 0 )) AS shanchuanNewChannel, sum( IF (( channel = 'SHANCHUAN' OR channel = 'LeoMaster' ) AND userType = 'NONE', 1, 0 )) AS shanchuanNoneChannel, sum(IF(channel = 'NINEAPPS', 1, 0)) AS nineAppChannel, sum( IF ( channel = 'NINEAPPS' AND userType = 'OLD', 1, 0 )) AS nineAppOldChannel, sum( IF ( channel = 'NINEAPPS' AND userType = 'NEW', 1, 0 )) AS nineAppNewChannel, sum( IF ( channel = 'NINEAPPS' AND userType = 'NONE', 1, 0 )) AS nineAppNoneChannel, sum(IF(channel = 'NONE' OR channel = 'TEST' , 1, 0)) AS noneChannel from report_ordersatas";
-
     private static final String D_BASE = "delete from report_ordersatas where webSite=? and orderTime>=DATE_FORMAT(?,'%Y-%m-%d %H:%i:%S') and orderTime<DATE_FORMAT(?,'%Y-%m-%d %H:%i:%S')";
     @Resource
     IDataBaseManager dbm;
-    @Resource
-    HibernateDao hdao;
+    private Logger logger = LoggerFactory.getLogger(OrderStatsAnalysisServiceImpl.class);
     @Resource
     private FlipkartAffiliateServiceImpl flipkartAffiliateService;
     @Resource
@@ -39,12 +37,13 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
 
     @Override
     public int insert(OrderStatsAnalysisPO po) {
+        logger.info("insert order: {}", po.toString());
         return dbm.create(po);
     }
 
     @Override
     public int delete(String webSite, Date startTime, Date endTime) {
-        return hdao.deleteBySql(D_BASE, webSite, startTime, endTime);
+        return dbm.deleteBySql(D_BASE, webSite, startTime, endTime);
     }
 
     @Override
@@ -105,7 +104,7 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
         }
         String execSql = sql.append(Q_BASE).append(whereSql).append(groupSql).append(" ORDER BY orderTime desc ").toString();
         System.out.println(execSql + ":" + param.toArray());
-        return hdao.findPageOfMapBySql(execSql, page, size, param.toArray());
+        return dbm.findPageOfMapBySql(execSql, page, size, param.toArray());
     }
 
     @Override
