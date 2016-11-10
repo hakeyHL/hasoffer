@@ -4,12 +4,18 @@ import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.spider.enums.TaskTarget;
+import hasoffer.spider.model.FetchCompareWebsiteResult;
 import hasoffer.spider.model.FetchDealResult;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchUrlResult;
 
 public interface IFetchDubboService {
 
+/***********************************deal 抓取相关*************************************************/
+/*
+    用途：用deal网站爬取一些deal数据
+    要点：一般从某一个固定页面，返回一组可以封装为appdeal的数据
+ */
     /**
      * 发送deal抓取请求
      */
@@ -25,6 +31,14 @@ public interface IFetchDubboService {
      */
     FetchDealResult getDealInfo(Website website, long expireSeconds, TaskLevel taskLevel);
 
+/*************************************************************************************************/
+
+
+/***********************************关键字抓取相关************************************************/
+/*
+    用途：根据某个关键字，从各个网站搜索得到结果
+    要点：解析搜索结果页面，得到一个List<PtmCmpSku>的数据，其中包含各个网站的数据
+ */
     /**
      * 获取结果
      *
@@ -51,6 +65,13 @@ public interface IFetchDubboService {
      */
     TaskStatus getKeyWordTaskStatus(Website webSite, String keyword);
 
+/*************************************************************************************************/
+
+/***********************************url更新相关***************************************************/
+/*
+    用途：根据某个url，从响应的页面得到单个sku的信息
+    要点：一个url只会对应一个ptmcmpsku,更新数据的时候按照url的md5值去更新
+ */
     /**
      * 提交URL更新任务，该任务级别默认为TaskLevel.LEVEL_5(最低)。
      *
@@ -115,5 +136,20 @@ public interface IFetchDubboService {
      */
     FetchUrlResult getProductsByUrl(Website webSite, String url, long expireSeconds);
 
+/*************************************************************************************************/
 
+    /***********************************
+     * 比价网站的数据抓取
+     ********************************************/
+/*
+    用途：根据比价网站的一个product url，得到一个product和一个List<PtmCmpSku>的数据
+    要点：url来源一般是一个比价网站，每一个productUrl都能获得一个ptmproduct和一组ptmcmpsku
+ */
+
+    void sendCompareWebsiteFetchTask(Website website, String url, TaskLevel taskLevel, long expireSeconds);
+
+
+    FetchCompareWebsiteResult getCompareWebsiteFetchResult(Website webSite, String url, long expireSeconds);
+
+/*************************************************************************************************/
 }

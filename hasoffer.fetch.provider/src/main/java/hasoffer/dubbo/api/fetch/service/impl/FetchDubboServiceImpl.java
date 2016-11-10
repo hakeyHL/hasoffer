@@ -9,6 +9,7 @@ import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.spider.constants.RedisKeysUtils;
 import hasoffer.spider.enums.TaskTarget;
 import hasoffer.spider.logger.SpiderLogger;
+import hasoffer.spider.model.FetchCompareWebsiteResult;
 import hasoffer.spider.model.FetchDealResult;
 import hasoffer.spider.model.FetchResult;
 import hasoffer.spider.model.FetchUrlResult;
@@ -92,6 +93,34 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     }
 
     @Override
+    public void sendCompareWebsiteFetchTask(Website website, String url, TaskLevel taskLevel, long cacheSeconds) {
+
+        //先检查解析过的set中是否含有该url，如果有跳过，如果没有新增
+        boolean flag = fetchCacheService.checkCompareWebsiteFetch(RedisKeysUtils.PARSED_COMPAREWEBSITE_FETCH_URL, url, cacheSeconds);
+
+        if (!flag) {
+            return;
+        }
+
+        //获取等待队列的名称
+        String redisKey = RedisKeysUtils.getWaitCompareWebsiteFetchList(taskLevel, website);
+        System.out.println("wait compare website task redis key :" + redisKey);
+
+        //封装结果对象
+        FetchCompareWebsiteResult fetchCompareWebsiteResult = new FetchCompareWebsiteResult();
+        fetchCompareWebsiteResult.setOriWebsite(website);
+        fetchCompareWebsiteResult.setCacheSeconds(cacheSeconds);
+        fetchCompareWebsiteResult.setUrl(url);
+
+        fetchCacheService.pushTaskList(redisKey, JSONUtil.toJSON(fetchCompareWebsiteResult));
+    }
+
+    @Override
+    public FetchCompareWebsiteResult getCompareWebsiteFetchResult(Website webSite, String url, long expireSeconds) {
+        return null;
+    }
+
+    @Override
     public void sendKeyWordTask(Website website, String keyword) {
         FetchResult fetchResult = new FetchResult(website, keyword);
         fetchResult.setTaskStatus(TaskStatus.START);
@@ -131,7 +160,8 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
             expireSeconds = TimeUtils.SECONDS_OF_1_DAY;
         }
 
-        fetchCacheService.pushNum(website);
+        fetchCacheService.pushNum(website.name() + "_" + taskTarget.name());
+        fetchCacheService.countPushUrl(website.name() + "_" + taskTarget.name(), url);
         FetchUrlResult fetchUrlResult = new FetchUrlResult(website, url, expireSeconds, TaskStatus.START, new Date(), taskTarget);
         String redisKey = RedisKeysUtils.getWaitUrlListKey(taskLevel, website);
         try {
@@ -180,7 +210,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
 
             try {
                 FetchUrlResult result = JSONUtil.toObject(fetchUrlResult, FetchUrlResult.class);
-                fetchCacheService.popNum(result.getWebsite());
+                fetchCacheService.popNum(result.getWebsite() + "_" + taskTarget + "_" + result.getTaskStatus());
             } catch (IOException e) {
                 logger.error("Json:{}", fetchUrlResult, e);
             }

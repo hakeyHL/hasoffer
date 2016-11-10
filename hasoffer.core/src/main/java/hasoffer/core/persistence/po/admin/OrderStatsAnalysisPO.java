@@ -237,4 +237,31 @@ public class OrderStatsAnalysisPO implements Identifiable<Integer> {
     public void setVersion(String version) {
         this.version = version;
     }
+
+    @Override
+    public String toString() {
+        return "OrderStatsAnalysisPO{" +
+                "id=" + id +
+                ", affID='" + affID + '\'' +
+                ", webSite='" + webSite + '\'' +
+                ", channel='" + channel + '\'' +
+                ", channelSrc='" + channelSrc + '\'' +
+                ", userId='" + userId + '\'' +
+                ", userType='" + userType + '\'' +
+                ", orderId='" + orderId + '\'' +
+                ", orderTime=" + orderTime +
+                ", orderType='" + orderType + '\'' +
+                ", orderStatus='" + orderStatus + '\'' +
+                ", title='" + title + '\'' +
+                ", productId='" + productId + '\'' +
+                ", category='" + category + '\'' +
+                ", saleAmount=" + saleAmount +
+                ", commissionRate=" + commissionRate +
+                ", tentativeAmount=" + tentativeAmount +
+                ", logTime=" + logTime +
+                ", deviceId='" + deviceId + '\'' +
+                ", deviceRegTime=" + deviceRegTime +
+                ", version='" + version + '\'' +
+                '}';
+    }
 }

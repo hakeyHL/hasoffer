@@ -179,6 +179,74 @@ public class FixController {
         return "ok";
     }
 
+    @RequestMapping(value = "/cate91Fetch", method = RequestMethod.GET)
+    @ResponseBody
+    public String category91Fetch(String cateName,
+                                  @RequestParam(defaultValue = "0") int totalPageSize,
+                                  @RequestParam(defaultValue = "0") int limitSize,
+                                  @RequestParam(defaultValue = "json") String responseType,
+                                  @RequestParam(defaultValue = "") String fetchUrl
+    ) throws Exception {
+        if (fetchUrl.equals("")) {
+            return null;
+        }
+        int num = 0;
+        if (responseType.equals("json")) {
+            JSONObject jsonObject = new JSONObject();
+            //t 当前时间戳
+            jsonObject.put("t", new Date().getTime());
+            //q:搜索关键字
+            jsonObject.put("q", cateName);
+            //srtBy:score
+            jsonObject.put("srtBy", "score");
+            //srtType:desc
+            jsonObject.put("srtType", "desc");
+            //limit 20
+            if (limitSize < 1) {
+                limitSize = 20;
+            }
+            jsonObject.put("limit", limitSize);
+            //startRow 0
+
+            //get total page
+            try {
+                jsonObject.put("startRow", 0);
+                String postResultString = Httphelper.doPost(fetchUrl, jsonObject.toJSONString());
+                if (!StringUtils.isEmpty(postResultString)) {
+                    JSONObject jsonResult = JSONObject.parseObject(postResultString);
+                    Integer productCount = jsonResult.getInteger("productCount");
+                    if (productCount > 0) {
+                        if (productCount % limitSize != 0) {
+                            //+1
+                            totalPageSize = (productCount / limitSize) + 1;
+                        } else {
+                            totalPageSize = productCount / limitSize;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                logger.info(" calculate totalPage exception {}", e.getMessage());
+            }
+            for (int i = 0; i < totalPageSize; i++) {
+                jsonObject.put("startRow", i * jsonObject.getInteger("limit"));
+                System.out.println(fetchUrl + " _ " + cateName + "  FETCH START");
+                Cate91Fetch(fetchUrl, jsonObject);
+                System.out.println(fetchUrl + " _ " + cateName + " FETCH END");
+                num++;
+            }
+            System.out.println("total num " + num);
+        } else {
+            for (int i = 1; i < totalPageSize + 1; i++) {
+                String url = fetchUrl + "?page=" + i;
+                System.out.println(url + " html  FETCH START");
+                Cate91FetchHtml(url);
+                System.out.println(url + " html  FETCH END");
+                num++;
+            }
+        }
+        return "ok";
+    }
+
     private void mobile91Fetch(String url) throws Exception {
         String html = HtmlUtils.getUrlHtml(url);
 
@@ -251,6 +319,47 @@ public class FixController {
 
             productService.importProduct2Solr2(ptmProduct);
             System.out.println("product import success " + ptmproduct.getId());
+        }
+    }
+
+    private void Cate91Fetch(String url, JSONObject jsonObject) throws Exception {
+        String jsonString = Httphelper.doPost(url, jsonObject.toJSONString());
+        //get Products
+        if (!StringUtils.isEmpty(jsonString)) {
+            JSONObject object = JSONObject.parseObject(jsonString);
+            if (object != null) {
+                JSONArray products = object.getJSONArray("products");
+                Iterator<Object> iterator = products.iterator();
+                while (iterator.hasNext()) {
+                    JSONObject product = (JSONObject) iterator.next();
+                    String productUrl = product.getString("productUrl");
+                    if (!StringUtils.isEmpty(productUrl)) {
+                        productUrl = "http://www.91mobiles.com/" + productUrl;
+                        System.out.println(productUrl);
+                    }
+                }
+            }
+        } else {
+            return;
+        }
+
+    }
+
+    private void Cate91FetchHtml(String url) throws Exception {
+        String html = HtmlUtils.getUrlHtml(url);
+        TagNode root = new HtmlCleaner().clean(html);
+
+        List<TagNode> productListNode = getSubNodesByXPath(root, "//div[@class='filter filer_finder']");
+
+        for (TagNode productNode : productListNode) {
+
+            TagNode productUrlNode = getSubNodeByXPath(productNode, "//a[@target='_blank']", null);
+
+            String productUrl = productUrlNode.getAttributeByName("href");
+            if (productUrl != null) {
+                productUrl = WEBSITE_91MOBILE_URL_PREFIEX + productUrl;
+            }
+            System.out.println(productUrl);
         }
     }
 

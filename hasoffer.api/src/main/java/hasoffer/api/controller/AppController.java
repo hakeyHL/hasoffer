@@ -50,7 +50,6 @@ import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import jodd.util.NameValue;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -63,7 +62,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -99,16 +97,16 @@ public class AppController {
 
     public static void main(String[] args) {
 
-        Date date1 = null;
-        try {
-            date1 = DateUtils.parseDate("2016-10-05 19:11:00", "yyyy-MM-dd HH:mm:ss");
-            Date date2 = DateUtils.parseDate("2016-10-02 21:11:00", "yyyy-MM-dd HH:mm:ss");
-            long days = date1.getTime() / TimeUtils.MILLISECONDS_OF_1_DAY - date2.getTime() / TimeUtils.MILLISECONDS_OF_1_DAY;
-            System.out.println(days);
-        } catch (ParseException e) {
-            System.out.println(e.getMessage());
-            System.out.println(e.getLocalizedMessage());
-        }
+        //Date date1 = null;
+        //try {
+        //    date1 = DateUtils.parseDate("2016-10-05 19:11:00", "yyyy-MM-dd HH:mm:ss");
+        //    Date date2 = DateUtils.parseDate("2016-10-02 21:11:00", "yyyy-MM-dd HH:mm:ss");
+        //    long days = date1.getTime() / TimeUtils.MILLISECONDS_OF_1_DAY - date2.getTime() / TimeUtils.MILLISECONDS_OF_1_DAY;
+        //    System.out.println(days);
+        //} catch (ParseException e) {
+        //    System.out.println(e.getMessage());
+        //    System.out.println(e.getLocalizedMessage());
+        //}
 
     }
 
