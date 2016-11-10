@@ -6,6 +6,7 @@ import hasoffer.affiliate.model.AffiliateOrder;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.AffliIdHelper;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IFlipkartAffiliateService;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.urm.UrmDevice;
@@ -275,7 +276,8 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
             po.setOrderId(order.getAffiliateOrderItemId());
             po.setAffID(order.getAffID());
             try {
-                po.setOrderTime(DateUtils.parseDate(order.getOrderDate(), "dd-MM-yyyy HH:mm:ss"));
+                po.setOrderInTime(DateUtils.parseDate(order.getOrderDate(), "dd-MM-yyyy HH:mm:ss"));
+                po.setOrderTime(new Date(po.getOrderInTime().getTime() + TimeUtils.MILLISECONDS_OF_1_MINUTE * 150));
             } catch (ParseException e) {
                 logger.error("Get OrderTime error. Msg:{}", e);
             }

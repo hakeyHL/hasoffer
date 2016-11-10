@@ -82,78 +82,75 @@
                 </table>
             </div>
 
-
-            <div class="row">
-                <div class="col-lg-12">
-                    <table class="table table-bordered table-hover table-condensed" style="font-size:12px;">
-                        <thead>
+            <div class="col-lg-12">
+                <table class="table table-bordered table-hover table-condensed" style="font-size:12px;">
+                    <thead>
+                    <tr>
+                        <td>日期</td>
+                        <td>总计 | 已更新</td>
+                        <td>Flipkart</td>
+                        <td>Amazon</td>
+                        <td>Snapdeal</td>
+                        <td>Ebay</td>
+                        <td>shopclues</td>
+                        <td>paytm</td>
+                        <td>myntra</td>
+                        <td>infibeam</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <c:forEach items="${updateRst2}" var="rst">
                         <tr>
-                            <td>日期</td>
-                            <td>总计 | 已更新</td>
-                            <td>Flipkart</td>
-                            <td>Amazon</td>
-                            <td>Snapdeal</td>
-                            <td>Ebay</td>
-                            <td>shopclues</td>
-                            <td>paytm</td>
-                            <td>myntra</td>
-                            <td>infibeam</td>
+                            <td>${rst.id}</td>
+                            <td>${rst.allTotal} | ${rst.allSuccess}
+                                (<fmt:formatNumber pattern="##.##"
+                                                   value="${100 * rst.allSuccess/rst.allTotal}"></fmt:formatNumber>
+                                %)
+                            </td>
+                            <td>${rst.flipkartTotal} | ${rst.flipkartSuccess}
+                                (<fmt:formatNumber pattern="##.##"
+                                                   value="${100 * rst.flipkartSuccess/rst.flipkartTotal}"></fmt:formatNumber>
+                                %)
+                            </td>
+                            <td>${rst.amazonTotal} | ${rst.amazonSuccess}
+                                (<fmt:formatNumber pattern="##.##"
+                                                   value="${100 * rst.amazonSuccess/rst.amazonTotal}"></fmt:formatNumber>
+                                %)
+                            </td>
+                            <td>${rst.snapdealTotal} | ${rst.snapdealSuccess}
+                                (<fmt:formatNumber pattern="##.##"
+                                                   value="${100 * rst.snapdealSuccess/rst.snapdealTotal}"></fmt:formatNumber>
+                                %)
+                            </td>
+                            <td>${rst.ebayTotal} | ${rst.ebaySuccess}
+                                (<fmt:formatNumber pattern="##.##"
+                                                   value="${100 * rst.ebaySuccess/rst.ebayTotal}"></fmt:formatNumber>
+                                %)
+                            </td>
+                            <td>${rst.shopcluesTotal} | ${rst.shopcluesSuccess}
+                                (<fmt:formatNumber pattern="##.##"
+                                                   value="${100 * rst.shopcluesSuccess/rst.shopcluesTotal}"></fmt:formatNumber>
+                                %)
+                            </td>
+                            <td>${rst.paytmTotal} | ${rst.paytmSuccess}
+                                (<fmt:formatNumber pattern="##.##"
+                                                   value="${100 * rst.paytmSuccess/rst.paytmTotal}"></fmt:formatNumber>
+                                %)
+                            </td>
+                            <td>${rst.myntraTotal} | ${rst.myntraSuccess}
+                                (<fmt:formatNumber pattern="##.##"
+                                                   value="${100 * rst.myntraSuccess/rst.myntraTotal}"></fmt:formatNumber>
+                                %)
+                            </td>
+                            <td>${rst.infibeamTotal} | ${rst.infibeamSuccess}
+                                (<fmt:formatNumber pattern="##.##"
+                                                   value="${100 * rst.infibeamSuccess/rst.infibeamTotal}"></fmt:formatNumber>
+                                %)
+                            </td>
                         </tr>
-                        </thead>
-                        <tbody>
-                        <c:forEach items="${updateRst2}" var="rst">
-                            <tr>
-                                <td>${rst.id}</td>
-                                <td>${rst.allTotal} | ${rst.allSuccess}
-                                    (<fmt:formatNumber pattern="##.##"
-                                                       value="${100 * rst.allSuccess/rst.allTotal}"></fmt:formatNumber>
-                                    %)
-                                </td>
-                                <td>${rst.flipkartTotal} | ${rst.flipkartSuccess}
-                                    (<fmt:formatNumber pattern="##.##"
-                                                       value="${100 * rst.flipkartSuccess/rst.flipkartTotal}"></fmt:formatNumber>
-                                    %)
-                                </td>
-                                <td>${rst.amazonTotal} | ${rst.amazonSuccess}
-                                    (<fmt:formatNumber pattern="##.##"
-                                                       value="${100 * rst.amazonSuccess/rst.amazonTotal}"></fmt:formatNumber>
-                                    %)
-                                </td>
-                                <td>${rst.snapdealTotal} | ${rst.snapdealSuccess}
-                                    (<fmt:formatNumber pattern="##.##"
-                                                       value="${100 * rst.snapdealSuccess/rst.snapdealTotal}"></fmt:formatNumber>
-                                    %)
-                                </td>
-                                <td>${rst.ebayTotal} | ${rst.ebaySuccess}
-                                    (<fmt:formatNumber pattern="##.##"
-                                                       value="${100 * rst.ebaySuccess/rst.ebayTotal}"></fmt:formatNumber>
-                                    %)
-                                </td>
-                                <td>${rst.shopcluesTotal} | ${rst.shopcluesSuccess}
-                                    (<fmt:formatNumber pattern="##.##"
-                                                       value="${100 * rst.shopcluesSuccess/rst.shopcluesTotal}"></fmt:formatNumber>
-                                    %)
-                                </td>
-                                <td>${rst.paytmTotal} | ${rst.paytmSuccess}
-                                    (<fmt:formatNumber pattern="##.##"
-                                                       value="${100 * rst.paytmSuccess/rst.paytmTotal}"></fmt:formatNumber>
-                                    %)
-                                </td>
-                                <td>${rst.myntraTotal} | ${rst.myntraSuccess}
-                                    (<fmt:formatNumber pattern="##.##"
-                                                       value="${100 * rst.myntraSuccess/rst.myntraTotal}"></fmt:formatNumber>
-                                    %)
-                                </td>
-                                <td>${rst.infibeamTotal} | ${rst.infibeamSuccess}
-                                    (<fmt:formatNumber pattern="##.##"
-                                                       value="${100 * rst.infibeamSuccess/rst.infibeamTotal}"></fmt:formatNumber>
-                                    %)
-                                </td>
-                            </tr>
-                        </c:forEach>
-                        </tbody>
-                    </table>
-                </div>
+                    </c:forEach>
+                    </tbody>
+                </table>
             </div>
 
             <%--<jsp:include page="../include/page.jsp"/>--%>

@@ -118,61 +118,68 @@ public class SkuUpdateStatManager {
     }
 
     public void countSkuUpdate(SkuUpdateResult skuUpdateResult, PtmCmpSku cmpSku, long deadLineDate) {
-        if (cmpSku.getStatus() == SkuStatus.ONSALE && cmpSku.getWebsite() != null) {
+        if (cmpSku.getWebsite() != null) {
 
-            boolean success = cmpSku.getUpdateTime().getTime() > deadLineDate;
+            boolean successUpdate = cmpSku.getUpdateTime().getTime() > deadLineDate;
+
+            // 如果sku状态被更新成下架offsale,则需要判断更新时间才能决定是否更新成功
+            if (cmpSku.getStatus() == SkuStatus.OFFSALE) {
+                if (!successUpdate) {
+                    return;
+                }
+            }
 
             skuUpdateResult.addAllTotal();
-            if (success) {
+            if (successUpdate) {
                 skuUpdateResult.addAllSuccess();
             }
 
             switch (cmpSku.getWebsite()) {
                 case FLIPKART:
                     skuUpdateResult.addFlipkartTotal();
-                    if (success) {
+                    if (successUpdate) {
                         skuUpdateResult.addFlipkartSuccess();
                     }
                     break;
                 case AMAZON:
                     skuUpdateResult.addAmazonTotal();
-                    if (success) {
+                    if (successUpdate) {
                         skuUpdateResult.addAmazonSuccess();
                     }
                     break;
                 case EBAY:
                     skuUpdateResult.addEbayotal();
-                    if (success) {
+                    if (successUpdate) {
                         skuUpdateResult.addEbaySuccess();
                     }
                     break;
                 case SHOPCLUES:
                     skuUpdateResult.addShopcluesTotal();
-                    if (success) {
+                    if (successUpdate) {
                         skuUpdateResult.addShopcluesSuccess();
                     }
                     break;
                 case SNAPDEAL:
                     skuUpdateResult.addSnapdealTotal();
-                    if (success) {
+                    if (successUpdate) {
                         skuUpdateResult.addSnapdealSuccess();
                     }
                     break;
                 case INFIBEAM:
                     skuUpdateResult.addInfibeamTotal();
-                    if (success) {
+                    if (successUpdate) {
                         skuUpdateResult.addInfibeamSuccess();
                     }
                     break;
                 case PAYTM:
                     skuUpdateResult.addPaytmTotal();
-                    if (success) {
+                    if (successUpdate) {
                         skuUpdateResult.addPaytmSuccess();
                     }
                     break;
                 case MYNTRA:
                     skuUpdateResult.addMyntraTotal();
-                    if (success) {
+                    if (successUpdate) {
                         skuUpdateResult.addMyntraSuccess();
                     }
                     break;

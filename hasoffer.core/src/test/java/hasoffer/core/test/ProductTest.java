@@ -4,6 +4,7 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
+import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
@@ -46,6 +47,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.annotation.Resource;
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -99,6 +101,52 @@ public class ProductTest {
 
 //    private Pattern PATTERN_IN_WORD = Pattern.compile("[^0-9a-zA-Z\\-]");
 //    private Pattern PATTERN_Brand = Pattern.compile("[\t*?]([a-zA-Z])[\t*?]");
+
+    @Test
+    public void testskuurl() {
+        ListProcessTask<PtmCmpSku> listProcessTask = new ListProcessTask<>(
+                new ILister() {
+                    @Override
+                    public PageableResult getData(int page) {
+                        return cmpSkuService.listCmpSkus(page, 100);
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcessor<PtmCmpSku>() {
+                    @Override
+                    public void process(PtmCmpSku o) {
+                        String url = o.getUrl();
+                        String urlkey = o.getUrlKey();
+                        String _urlkey = HexDigestUtil.md5(url);
+
+                        if (!urlkey.equals(_urlkey)) {
+                            System.out.println(String.format("%d - %s - %s", o.getId(), o.getWebsite().name(), o.getUrlKey()));
+                        }
+                    }
+                }
+        );
+
+        listProcessTask.setProcessorCount(1);
+
+        listProcessTask.go();
+
+        while (!listProcessTask.isAllFinished()) {
+            try {
+                TimeUnit.SECONDS.sleep(5);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     @Test
     public void testtest() {
