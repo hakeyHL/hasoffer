@@ -12,17 +12,15 @@ import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmImage2;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.product.IProductService;
 import hasoffer.core.utils.Httphelper;
+import org.apache.commons.io.FileUtils;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 import org.htmlcleaner.XPatherException;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.annotation.Resource;
+import java.io.File;
+import java.io.FileReader;
 import java.util.*;
 
 import static hasoffer.base.utils.HtmlUtils.getSubNodesByXPath;
@@ -32,15 +30,40 @@ import static hasoffer.base.utils.http.XPathUtils.getSubNodeByXPath;
  * Date : 2016/5/31
  * Function :
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:spring-beans.xml")
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration(locations = "classpath:spring-beans.xml")
 public class HttpTest {
 
     public static final String WEBSITE_91MOBILE_URL_PREFIEX = "http://www.91mobiles.com";
     public static final String WEBSITE_DX_URL_PREFIEX = "http://www.dx.com/";
 
-    @Resource
-    IProductService productService;
+//    @Resource
+//    IProductService productService;
+
+    @Test
+    public void test_desc() throws Exception {
+        File file = new File("e:/test_desc.html");
+        FileReader fr = new FileReader(file);
+
+        TagNode tagNode = HtmlUtils.getTagNode(fr);
+        List<TagNode> tagNodes = getSubNodesByXPath(tagNode, "//div[@class='postblock']//p");
+
+        for (TagNode tn : tagNodes) {
+            System.out.println(tn.getText());
+        }
+    }
+
+    @Test
+    public void test_desc_() throws Exception {
+        String url = "http://www.desidime.com/forums/hot-deals-online/topics/get-up-to-600-cashback-has-giftcard-amazon-pantry";
+        HttpResponseModel responseModel = HttpUtils.get(url, null);
+
+        File file = new File("e:/test_desc.html");
+
+        file.createNewFile();
+
+        FileUtils.write(file, responseModel.getBodyString());
+    }
 
     @Test
     public void fetchHuiji() throws Exception {
@@ -117,11 +140,10 @@ public class HttpTest {
             Map<String, String> image = (Map<String, String>) obj;
 
             PtmImage2 image2 = new PtmImage2(huiji.getUrl(), image.get("bimg"), image.get("mimg"), image.get("simg"));
-            productService.saveImage222(image2);
+//            productService.saveImage222(image2);
         }
 
     }
-
 
 
     @Test
