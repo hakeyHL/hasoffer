@@ -1,11 +1,13 @@
 package hasoffer.dubbo.api.fetch.task;
 
 import hasoffer.base.enums.TaskLevel;
+import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.spider.api.ISpiderService;
 import hasoffer.spider.api.impl.SpiderServiceImpl;
 import hasoffer.spider.constants.RedisKeysUtils;
+import hasoffer.spider.exception.UnSupportWebsiteException;
 import hasoffer.spider.logger.SpiderLogger;
 import hasoffer.spider.model.FetchCompareWebsiteResult;
 import hasoffer.spider.redis.service.IFetchCacheService;
@@ -55,8 +57,7 @@ public class FetchCompareWebsiteTaskWorker implements Runnable {
                     SpiderLogger.infoFetchFlow("start spider this url: {}", pop);
                     FetchCompareWebsiteResult fetchCompareWebsiteResult = JSONUtil.toObject(pop.toString(), FetchCompareWebsiteResult.class);
 
-//                    todo 完成fetch方法
-//                    fetch(fetchCompareWebsiteResult);
+                    fetch(fetchCompareWebsiteResult);
                     SpiderLogger.infoFetchFlow("Finish spider this url: {}", pop);
                 }
             } catch (Exception e) {
@@ -65,15 +66,12 @@ public class FetchCompareWebsiteTaskWorker implements Runnable {
         }
     }
 
-//    public void fetch(FetchCompareWebsiteResult fetchCompareWebsiteResult) {
-//        try {
-//            fetchDealResult = fetchService.spiderDealInfo(fetchDealResult);
-//        } catch (UnSupportWebsiteException e) {
-//            fetchDealResult.setTaskStatus(TaskStatus.STOPPED);
-//            fetchDealResult.setErrMsg("un able support website.");
-//            String cacheKey = FetchDealResult.getCacheKey(fetchDealResult);
-//            fetchCacheService.cacheResult(cacheKey, fetchDealResult, fetchDealResult.getExpireSeconds());
-//            logger.error("FetchKeywordWorker is error. Error Msg: un able support website.", e);
-//        }
-//    }
+    public void fetch(FetchCompareWebsiteResult fetchCompareWebsiteResult) {
+        try {
+            fetchService.spiderCompareWebsite(fetchCompareWebsiteResult);
+        } catch (UnSupportWebsiteException e) {
+            fetchCompareWebsiteResult.setTaskStatus(TaskStatus.STOPPED);
+            fetchCacheService.pushCompareWebsiteFetchResultToFinishList(RedisKeysUtils.getComparewebsiteFetchResultKey(fetchCompareWebsiteResult.getOriWebsite()), JSONUtil.toJSON(fetchCompareWebsiteResult));
+        }
+    }
 }
