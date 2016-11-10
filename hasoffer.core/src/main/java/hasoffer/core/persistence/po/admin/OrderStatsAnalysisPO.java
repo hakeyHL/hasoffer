@@ -39,7 +39,15 @@ public class OrderStatsAnalysisPO implements Identifiable<Integer> {
     @Column(length = 20, nullable = false)
     private String orderId;
 
+    /**
+     * 北京时间
+     */
     private Date orderTime;
+
+    /**
+     * 印度时间
+     */
+    private Date orderInTime;
 
     /**
      * 比价订单或者流量劫持订单（SHOP/REDI）
@@ -140,6 +148,14 @@ public class OrderStatsAnalysisPO implements Identifiable<Integer> {
 
     public void setOrderTime(Date orderTime) {
         this.orderTime = orderTime;
+    }
+
+    public Date getOrderInTime() {
+        return orderInTime;
+    }
+
+    public void setOrderInTime(Date orderInTime) {
+        this.orderInTime = orderInTime;
     }
 
     public String getOrderType() {
@@ -250,6 +266,7 @@ public class OrderStatsAnalysisPO implements Identifiable<Integer> {
                 ", userType='" + userType + '\'' +
                 ", orderId='" + orderId + '\'' +
                 ", orderTime=" + orderTime +
+                ", orderInTime=" + orderInTime +
                 ", orderType='" + orderType + '\'' +
                 ", orderStatus='" + orderStatus + '\'' +
                 ", title='" + title + '\'' +

@@ -6,6 +6,7 @@ import hasoffer.affiliate.affs.snapdeal.model.SnapDealAffiliateOrder;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.AffliIdHelper;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.ISnapdealAffiliateService;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.urm.UrmDevice;
@@ -74,6 +75,7 @@ public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
                 po.setChannel(AffliIdHelper.getMarketChannelById(channel).name());
             }
             po.setOrderTime(order.getDateTime());
+            po.setOrderTime(new Date(po.getOrderInTime().getTime() + TimeUtils.MILLISECONDS_OF_1_MINUTE * 150));
             String deviceId_userId = order.getAffiliateSubId2();
             if (deviceId_userId != null) {
                 String[] tempArray = deviceId_userId.split("_");
