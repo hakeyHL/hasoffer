@@ -10,6 +10,7 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.enums.AppdealSource;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
@@ -18,6 +19,7 @@ import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.enums.TaskTarget;
 import hasoffer.spider.model.FetchUrlResult;
 import hasoffer.spider.model.FetchedProduct;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
@@ -85,15 +87,27 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
 
                         for (AppDeal deal : dealList) {
 
-                            long ptmcmpskuid = deal.getPtmcmpskuid();
-                            PtmCmpSku ptmCmpSku = dbm.get(PtmCmpSku.class, ptmcmpskuid);
-                            if (ptmCmpSku == null) {
-                                logger.info("get null sku,id = ptmcmpskuid");
-                                continue;
+                            //如果是price_off的判断sku的存在
+                            if (AppdealSource.PRICE_OFF.equals(deal.getAppdealSource())) {
+                                long ptmcmpskuid = deal.getPtmcmpskuid();
+                                PtmCmpSku ptmCmpSku = dbm.get(PtmCmpSku.class, ptmcmpskuid);
+                                if (ptmCmpSku == null) {
+                                    logger.info("get null sku,id = ptmcmpskuid");
+                                    continue;
+                                }
+                                Website website = ptmCmpSku.getWebsite();
+                                String url = ptmCmpSku.getUrl();
+                                fetchDubboService.sendUrlTask(website, url, TimeUtils.SECONDS_OF_1_MINUTE * 45, TaskTarget.DEAL_UPDATE, TaskLevel.LEVEL_2);
                             }
-                            Website website = ptmCmpSku.getWebsite();
-                            String url = ptmCmpSku.getUrl();
-                            fetchDubboService.sendUrlTask(website, url, TimeUtils.SECONDS_OF_1_MINUTE * 45, TaskTarget.DEAL_UPDATE, TaskLevel.LEVEL_2);
+
+                            //如果是Deal_site，判断website
+                            if (AppdealSource.DEAL_SITE.equals(deal.getAppdealSource())) {
+                                if (Website.UNKNOWN.equals(deal.getWebsite())) {
+                                    continue;
+                                }
+                                fetchDubboService.sendUrlTask(deal.getWebsite(), deal.getLinkUrl(), TimeUtils.SECONDS_OF_1_MINUTE * 45, TaskTarget.DEAL_UPDATE, TaskLevel.LEVEL_2);
+                            }
+
 
                             logger.info("add price off deal to update queue success " + deal.getId());
                             logger.info("add price off deal to update queue success type is " + deal.getAppdealSource());
@@ -148,6 +162,27 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                             }
 
                             String url = fetchUrlResult1.getUrl();
+
+                            //data 2016-11-10 10:50
+                            //暂时修改更新逻辑，适配deal网站抓取的deal更新
+                            PageableResult<AppDeal> pageableResult = dealService.findDealList(1, Integer.MAX_VALUE, 3, "id");
+                            List<AppDeal> dealList = pageableResult.getData();
+                            for (AppDeal appdeal : dealList) {
+                                String linkUrl = appdeal.getLinkUrl();
+                                if (StringUtils.isEqual(linkUrl, url)) {
+                                    if (appdeal.getPriceDescription() != null) {
+                                        String oriPriceString = StringUtils.filterAndTrim(appdeal.getPriceDescription(), Arrays.asList("Rs."));//deal之前的价格
+                                        if (NumberUtils.isNumber(oriPriceString)) {
+                                            float oriPrice = Float.parseFloat(oriPriceString);//deal之前的价格
+                                            float nowPrice = fetchedProduct.getPrice();
+                                            if (nowPrice > oriPrice) {
+                                                dealService.updateDealExpire(appdeal.getId());
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
                             String urlKey = HexDigestUtil.md5(url);
 
                             List<PtmCmpSku> skuList = cmpSkuService.getPtmCmpSkuListByUrlKey(urlKey);

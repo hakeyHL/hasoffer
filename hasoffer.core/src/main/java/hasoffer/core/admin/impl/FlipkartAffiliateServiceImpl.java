@@ -305,7 +305,7 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
                     po.setUserId(tempArray[2]);
                 }
             }
-            po.setOrderStatus(order.getStatus());
+            po.setOrderStatus("processed".equals(order.getStatus()) ? "approved" : order.getStatus());
             po.setCategory(order.getCategory());
             po.setTitle(order.getTitle());
             po.setProductId(order.getProductId());
