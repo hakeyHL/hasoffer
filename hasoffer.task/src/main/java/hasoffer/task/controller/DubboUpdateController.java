@@ -83,7 +83,7 @@ public class DubboUpdateController {
             return "task running.";
         }
 
-        long cacheSeconds = TimeUtils.SECONDS_OF_1_HOUR * 2;
+        long cacheSeconds = TimeUtils.MILLISECONDS_OF_1_HOUR * 2;
 
         ExecutorService es = Executors.newCachedThreadPool();
 
