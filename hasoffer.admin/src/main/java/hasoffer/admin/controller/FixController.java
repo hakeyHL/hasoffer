@@ -179,11 +179,20 @@ public class FixController {
         return "ok";
     }
 
-    @RequestMapping(value = "/tablet91Fetch", method = RequestMethod.GET)
+    @RequestMapping(value = "/cate91Fetch", method = RequestMethod.GET)
     @ResponseBody
-    public String category91Fetch(String cateName, @RequestParam(defaultValue = "0") int totalPageSize, @RequestParam(defaultValue = "0") int limitSize) throws Exception {
-
-        String fetchUrl = "http://api.91mobiles.com:8080/nm-community/api/searchPage/web";
+    public String category91Fetch(String cateName,
+                                  @RequestParam(defaultValue = "0") int totalPageSize,
+                                  @RequestParam(defaultValue = "0") int limitSize,
+                                  @RequestParam(defaultValue = "json") String responseType,
+                                  String getHtmlUrl
+    ) throws Exception {
+        String fetchUrl;
+        if (responseType.equals("json")) {
+            fetchUrl = "http://www.91mobiles.com/mobile-memory-card-finder.php";
+        } else {
+            fetchUrl = "http://api.91mobiles.com:8080/nm-community/api/searchPage/web";
+        }
         int num = 0;
         JSONObject jsonObject = new JSONObject();
         //t 当前时间戳
@@ -307,7 +316,6 @@ public class FixController {
     }
 
     private void Cate91Fetch(String url, JSONObject jsonObject) throws Exception {
-
         String jsonString = Httphelper.doPost(url, jsonObject.toJSONString());
         //get Products
         if (!StringUtils.isEmpty(jsonString)) {
@@ -324,8 +332,25 @@ public class FixController {
                     }
                 }
             }
+        } else {
+            return;
         }
 
+    }
+
+    private void Cate91FetchHtml(String url) throws Exception {
+        String html = HtmlUtils.getUrlHtml(url);
+        TagNode root = new HtmlCleaner().clean(html);
+
+        List<TagNode> productListNode = getSubNodesByXPath(root, "//div[@class='filter filer_finder']");
+
+        for (TagNode productNode : productListNode) {
+
+            TagNode productUrlNode = getSubNodeByXPath(productNode, "//a[@target='_blank']", null);
+
+            String productUrl = productUrlNode.getAttributeByName("data-href-url");
+            System.out.println(productUrl);
+        }
     }
 
     private void fetchProductAndSkuList(PtmProduct ptmProduct, List<PtmCmpSku> ptmCmpSkuList, MobileCateDescription mobileCateDescription, String productUrl, String sourceId) throws Exception {
