@@ -264,7 +264,7 @@ public class ProductServiceImpl implements IProductService {
             }
 
             ptmProduct.setPrice(price);
-            System.out.println("minPrice =" + price);
+//            System.out.println("minPrice =" + price);
 
             //不管任何情况，重新导入product
             importProduct2Solr2(ptmProduct);
@@ -831,9 +831,9 @@ public class ProductServiceImpl implements IProductService {
         ProductModel2 productModel2 = getProductModel2(product);
         if (productModel2 != null) {
             productIndex2Service.createOrUpdate(productModel2);
-            System.out.println("import product id : " + product.getId() == null ? null : product.getId()+" to solr is ok . ");
+//            System.out.println("import product id : " + product.getId() == null ? null : product.getId()+" to solr is ok . ");
         } else {
-            System.out.println("delete product id : " + product.getId() == null ? null : product.getId()+" from solr is ok . ");
+//            System.out.println("delete product id : " + product.getId() == null ? null : product.getId()+" from solr is ok . ");
             productIndex2Service.remove(String.valueOf(product.getId()));
         }
     }
