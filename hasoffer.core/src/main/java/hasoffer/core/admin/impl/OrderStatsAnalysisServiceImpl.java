@@ -26,12 +26,13 @@ import java.util.*;
 public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService {
     //private static final String Q_BASE = "sum(1) as sumCount, SUM(IF(userType='OLD',1,0)) as oldUserCount,SUM(IF(userType='NEW',1,0)) as newUserCount,SUM(IF(userType='NONE',1,0)) as noneUserCount,sum(if(channel='GOOGLEPLAY',1,0)) as googleChannel,sum(if(channel='SHANCHUAN' or channel='LeoMaster' ,1,0)) as shanchuanChannel,sum(if(channel='NINEAPPS',1,0)) as nineAppChannel,sum(if(channel='NONE',1,0)) as noneChannel from report_ordersatas";
     private static final String Q_BASE = "sum(1) AS sumCount, SUM(IF(userType = 'OLD', 1, 0)) AS oldUserCount, SUM(IF(userType = 'NEW', 1, 0)) AS newUserCount, SUM(IF(userType = 'NONE', 1, 0)) AS noneUserCount, sum( IF (channel = 'GOOGLEPLAY', 1, 0)) AS googleChannel, sum( IF ( channel = 'GOOGLEPLAY' AND userType = 'OLD', 1, 0 )) AS googleOldChannel, sum( IF ( channel = 'GOOGLEPLAY' AND userType = 'NEW', 1, 0 )) AS googleNewChannel, sum( IF ( channel = 'GOOGLEPLAY' AND userType = 'NONE', 1, 0 )) AS googleNoneChannel, sum( IF ( channel = 'SHANCHUAN' OR channel = 'LeoMaster', 1, 0 )) AS shanchuanChannel, sum( IF (( channel = 'SHANCHUAN' OR channel = 'LeoMaster' ) AND userType = 'OLD', 1, 0 )) AS shanchuanOldChannel, sum( IF (( channel = 'SHANCHUAN' OR channel = 'LeoMaster' ) AND userType = 'NEW', 1, 0 )) AS shanchuanNewChannel, sum( IF (( channel = 'SHANCHUAN' OR channel = 'LeoMaster' ) AND userType = 'NONE', 1, 0 )) AS shanchuanNoneChannel, sum(IF(channel = 'NINEAPPS', 1, 0)) AS nineAppChannel, sum( IF ( channel = 'NINEAPPS' AND userType = 'OLD', 1, 0 )) AS nineAppOldChannel, sum( IF ( channel = 'NINEAPPS' AND userType = 'NEW', 1, 0 )) AS nineAppNewChannel, sum( IF ( channel = 'NINEAPPS' AND userType = 'NONE', 1, 0 )) AS nineAppNoneChannel, sum(IF(channel = 'NONE' OR channel = 'TEST' , 1, 0)) AS noneChannel from report_ordersatas";
-    private static final String D_BASE = "delete from report_ordersatas where webSite=? and orderTime>=DATE_FORMAT(?,'%Y-%m-%d %H:%i:%S') and orderTime<DATE_FORMAT(?,'%Y-%m-%d %H:%i:%S')";
+    private static final String D_BASE = "delete from report_ordersatas where webSite=? and orderInTime>=DATE_FORMAT(?,'%Y-%m-%d %H:%i:%S') and orderInTime<DATE_FORMAT(?,'%Y-%m-%d %H:%i:%S')";
     @Resource
     IDataBaseManager dbm;
     private Logger logger = LoggerFactory.getLogger(OrderStatsAnalysisServiceImpl.class);
     @Resource
     private FlipkartAffiliateServiceImpl flipkartAffiliateService;
+
     @Resource
     private ISnapdealAffiliateService snapdealAffiliateService;
 
@@ -63,6 +64,7 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
         if (Website.FLIPKART.name().equals(webSite)) {
             List<OrderStatsAnalysisPO> flipkartPOList = flipkartAffiliateService.countOrderList(startTime, endTime);
             if (flipkartPOList != null && flipkartPOList.size() > 0) {
+                //先获取订单，然后再删除以前的订单，防止没有获取而直接删除造成订单错误。
                 delete(Website.FLIPKART.name(), startTime, delEndTime);
                 for (OrderStatsAnalysisPO po : flipkartPOList) {
                     insert(po);
