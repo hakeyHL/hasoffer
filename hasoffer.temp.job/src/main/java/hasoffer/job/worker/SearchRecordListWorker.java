@@ -49,7 +49,7 @@ public class SearchRecordListWorker implements Runnable {
                 PageableResult<SrmSearchLog> pagedSearchLog = searchRecordListService.getLastNoProductLog();
 
                 List<SrmSearchLog> searchLogs = pagedSearchLog.getData();
-
+                logger.debug("searchLogs.size: {}", searchLogs.size());
                 if (ArrayUtils.hasObjs(searchLogs)) {
                     for (SrmSearchLog searchLog : searchLogs) {
                         if (searchLog.getPrecise() == SearchPrecise.MANUALSET) {
