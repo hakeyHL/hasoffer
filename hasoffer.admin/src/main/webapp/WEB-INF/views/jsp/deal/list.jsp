@@ -152,6 +152,7 @@
                     <td>折扣</td>
                     <td>价格描述</td>
                     <td>原价</td>
+                    <td>现价</td>
                     <td>权重</td>
                     <td>生效时间</td>
                     <td>失效时间</td>
@@ -199,6 +200,7 @@
                         <td>${data.discount}</td>
                         <td>${data.priceDescription}</td>
                         <td>${data.originPrice}</td>
+                        <td>${data.presentPrice}</td>
                         <td>${data.weight}</td>
                         <td>${data.createTime}</td>
                         <td>${data.expireTime}</td>

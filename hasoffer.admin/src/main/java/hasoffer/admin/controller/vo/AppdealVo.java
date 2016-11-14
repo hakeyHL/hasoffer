@@ -44,6 +44,8 @@ public class AppdealVo {
 
     private int expireStatus;//是否有效的状态为
 
+    private Float presentPrice;
+
     public AppdealSource getAppdealSource() {
         return appdealSource;
     }
@@ -210,5 +212,13 @@ public class AppdealVo {
 
     public void setWeight(int weight) {
         this.weight = weight;
+    }
+
+    public Float getPresentPrice() {
+        return presentPrice;
+    }
+
+    public void setPresentPrice(Float presentPrice) {
+        this.presentPrice = presentPrice;
     }
 }

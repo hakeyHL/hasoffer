@@ -3,6 +3,8 @@ package hasoffer.core.admin;
 import hasoffer.base.model.PageableResult;
 import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
+import hasoffer.core.persistence.po.app.AppDealComment;
+import hasoffer.core.persistence.po.app.AppDealThumb;
 import hasoffer.core.product.solr.DealModel;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -54,4 +56,16 @@ public interface IDealService {
     void importDeal2Solr(DealModel dm);
 
     void reimportAllDeals2Solr();
+
+    AppDealThumb getDealThumbByUidDid(Long id, Long dealId);
+
+    void updateDealThumb(AppDealThumb appDealThumb);
+
+    void createThumb(AppDealThumb appDealThumb);
+
+    void createAppComment(AppDealComment appDealComment);
+
+    Long getTotalDealThumb();
+
+    PageableResult<AppDealComment> getPageAbleDealComment(Long dealId, int page, int pageSize);
 }
