@@ -71,7 +71,7 @@ public class FetchCompareWebsiteTaskWorker implements Runnable {
             fetchService.spiderCompareWebsite(fetchCompareWebsiteResult);
         } catch (UnSupportWebsiteException e) {
             fetchCompareWebsiteResult.setTaskStatus(TaskStatus.STOPPED);
-            fetchCacheService.pushCompareWebsiteFetchResultToFinishList(RedisKeysUtils.getComparewebsiteFetchResultKey(fetchCompareWebsiteResult.getOriWebsite()), JSONUtil.toJSON(fetchCompareWebsiteResult));
+            fetchCacheService.pushCompareWebsiteFetchResultToFinishList(RedisKeysUtils.getComparewebsiteFetchResultKey(fetchCompareWebsiteResult.getWebsite()), JSONUtil.toJSON(fetchCompareWebsiteResult));
         }
     }
 }

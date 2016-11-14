@@ -60,6 +60,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
         }
     }
 
+
     @Override
     public FetchResult getProductsKeyWord(Website webSite, String keyword) {
         FetchResult fetchResult = getFetchResultList(webSite, keyword);
@@ -91,9 +92,9 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
 
         //封装结果对象
         FetchCompareWebsiteResult fetchCompareWebsiteResult = new FetchCompareWebsiteResult();
-        fetchCompareWebsiteResult.setOriWebsite(website);
-        fetchCompareWebsiteResult.setCacheSeconds(cacheSeconds);
+        fetchCompareWebsiteResult.setWebsite(website);
         fetchCompareWebsiteResult.setUrl(url);
+        fetchCompareWebsiteResult.setTaskStatus(TaskStatus.START);
 
         fetchCacheService.pushTaskList(redisKey, JSONUtil.toJSON(fetchCompareWebsiteResult));
     }
