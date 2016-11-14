@@ -398,7 +398,7 @@ public class AppController {
      */
     @DataSource(value = DataSourceType.Slave)
     @RequestMapping(value = "/deals", method = RequestMethod.GET)
-    public ModelAndView deals(@RequestParam(defaultValue = "0") String page, @RequestParam(defaultValue = "20") String pageSize) {
+    public ModelAndView deals(@RequestParam(defaultValue = "0") String page, @RequestParam(defaultValue = "8") String pageSize) {
         //1. 从数据库中查询到
         ModelAndView mv = new ModelAndView();
         PageableResult Result = appService.getDeals(Long.valueOf(page), Long.valueOf(pageSize));

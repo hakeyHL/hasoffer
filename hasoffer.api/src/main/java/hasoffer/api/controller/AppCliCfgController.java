@@ -15,10 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hs on 2016年10月17日.
@@ -45,6 +42,7 @@ public class AppCliCfgController {
                                         String stringFirst,
                                         String stringSecond) {
         ResultVo resultVo = new ResultVo();
+        Map<String, Boolean> map = new HashMap<>();
         switch (action) {
             case 1:
                 //get home page redeem tip
@@ -78,7 +76,6 @@ public class AppCliCfgController {
             case 3:
                 logger.info("client scan config ");
                 // config
-                Map<String, Boolean> map = new HashMap<>();
                 //search
                 map.put("001", true);
 
@@ -91,6 +88,16 @@ public class AppCliCfgController {
                 //email and phone get
                 map.put("004", true);
 
+                resultVo.setData(map);
+
+                break;
+            case 4:
+                int flag = new Random().nextInt(100);
+                if (flag < 5) {
+                    map.put("isBoot", false);
+                } else {
+                    map.put("isBoot", true);
+                }
                 resultVo.setData(map);
                 break;
             default:
