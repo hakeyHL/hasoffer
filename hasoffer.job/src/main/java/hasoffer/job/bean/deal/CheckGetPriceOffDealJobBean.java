@@ -158,6 +158,7 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
                     }
 
                     appdeal.setDescription(sb.toString());
+                    appdeal.setPresentPrice(newPrice);
                     appdeal.setPriceDescription("Rs." + (int) newPrice);
                     appdeal.setOriginPrice(oriPrice);
                     appdeal.setDiscount((int) ((1 - newPrice / oriPrice) * 100));

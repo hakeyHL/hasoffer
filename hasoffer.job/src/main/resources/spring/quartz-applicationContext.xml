@@ -100,7 +100,7 @@
 
     <!-- 从deal站抓取deal -->
     <bean name="dealSiteFetch" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="hasoffer.job.bean.deal.DealSiteFetchDealJobBean"/>
+        <property name="jobClass" value="hasoffer.job.bean.deal.DealSiteSendRquestJobBean"/>
     </bean>
 
     <bean id="dealSiteFetchTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
