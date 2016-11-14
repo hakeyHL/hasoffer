@@ -16,15 +16,12 @@ public interface IFetchDubboService {
     用途：用deal网站爬取一些deal数据
     要点：一般从某一个固定页面，返回一组可以封装为appdeal的数据
  */
-    /**
-     * 发送deal抓取请求
-     */
-    void sendDealTask(Website website, long cacheSeconds, TaskLevel taskLevel);
 
     /**
-     * 获取deal抓取的状态
+     * 发送deal抓取请求
+     * 此处不设置缓存时间
      */
-    TaskStatus getDealTaskStatus(Website website, long expireSeconds, TaskLevel taskLevel);
+    void sendDealTask(Website website, TaskLevel taskLevel);
 
     /**
      * 获取抓取的deal信息
@@ -39,6 +36,7 @@ public interface IFetchDubboService {
     用途：根据某个关键字，从各个网站搜索得到结果
     要点：解析搜索结果页面，得到一个List<PtmCmpSku>的数据，其中包含各个网站的数据
  */
+
     /**
      * 获取结果
      *
@@ -72,6 +70,7 @@ public interface IFetchDubboService {
     用途：根据某个url，从响应的页面得到单个sku的信息
     要点：一个url只会对应一个ptmcmpsku,更新数据的时候按照url的md5值去更新
  */
+
     /**
      * 提交URL更新任务，该任务级别默认为TaskLevel.LEVEL_5(最低)。
      *
@@ -91,12 +90,11 @@ public interface IFetchDubboService {
 
 
     /**
-     *
      * @param website
      * @param url
      * @param expireSeconds
-     * @param taskTarget 任务目标
-     * @param taskLevel 任务级别
+     * @param taskTarget    任务目标
+     * @param taskLevel     任务级别
      */
     void sendUrlTask(Website website, String url, Long expireSeconds, TaskTarget taskTarget, TaskLevel taskLevel);
 

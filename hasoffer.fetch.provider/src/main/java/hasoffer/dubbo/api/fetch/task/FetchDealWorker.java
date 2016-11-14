@@ -73,12 +73,12 @@ public class FetchDealWorker implements Runnable {
 
     public void fetch(FetchDealResult fetchDealResult) {
         try {
-            fetchDealResult = fetchService.spiderDealInfo(fetchDealResult);
+            fetchService.spiderDealInfo(fetchDealResult);
         } catch (UnSupportWebsiteException e) {
             fetchDealResult.setTaskStatus(TaskStatus.STOPPED);
             fetchDealResult.setErrMsg("un able support website.");
-            String cacheKey = FetchDealResult.getCacheKey(fetchDealResult);
-            fetchCacheService.cacheResult(cacheKey, fetchDealResult, fetchDealResult.getExpireSeconds());
+            String resultKey = RedisKeysUtils.getDealwebsiteFetchResultKey(fetchDealResult.getWebsite());
+            fetchCacheService.pushDealWebsiteFetchResultToFinishList(resultKey, JSONUtil.toJSON(fetchDealResult));
             logger.error("FetchKeywordWorker is error. Error Msg: un able support website.", e);
         }
     }
