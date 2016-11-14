@@ -243,8 +243,8 @@ public class FixController {
             System.out.println("total num " + num);
         }
         totalPageSize = 14;
-        int num = 0;
         for (String htmlUrl : htmlReqUrlList) {
+            int num = 0;
             for (int i = 1; i < totalPageSize + 1; i++) {
                 htmlUrl = htmlUrl + "?page=" + i;
                 System.out.println(htmlUrl + " html  FETCH START");
