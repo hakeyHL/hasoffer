@@ -64,6 +64,9 @@ public class AppDeal implements Identifiable<Long> {
 
     private Float originPrice;//deal的原价
 
+    private Float presentPrice;//现价
+
+
     @Override
     public Long getId() {
         return id;
@@ -226,6 +229,14 @@ public class AppDeal implements Identifiable<Long> {
         this.weight = weight;
     }
 
+    public Float getPresentPrice() {
+        return presentPrice;
+    }
+
+    public void setPresentPrice(Float presentPrice) {
+        this.presentPrice = presentPrice;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -257,7 +268,8 @@ public class AppDeal implements Identifiable<Long> {
             return false;
         if (dealCategoryId != null ? !dealCategoryId.equals(appDeal.dealCategoryId) : appDeal.dealCategoryId != null)
             return false;
-        return !(originPrice != null ? !originPrice.equals(appDeal.originPrice) : appDeal.originPrice != null);
+        if (originPrice != null ? !originPrice.equals(appDeal.originPrice) : appDeal.originPrice != null) return false;
+        return !(presentPrice != null ? !presentPrice.equals(appDeal.presentPrice) : appDeal.presentPrice != null);
 
     }
 
@@ -283,6 +295,7 @@ public class AppDeal implements Identifiable<Long> {
         result = 31 * result + discount;
         result = 31 * result + (int) (ptmcmpskuid ^ (ptmcmpskuid >>> 32));
         result = 31 * result + (originPrice != null ? originPrice.hashCode() : 0);
+        result = 31 * result + (presentPrice != null ? presentPrice.hashCode() : 0);
         return result;
     }
 }
