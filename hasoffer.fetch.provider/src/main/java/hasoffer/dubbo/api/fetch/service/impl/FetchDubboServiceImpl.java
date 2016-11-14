@@ -4,6 +4,7 @@ import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.spider.constants.RedisKeysUtils;
@@ -29,7 +30,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     private IFetchCacheService fetchCacheService;
 
     @Override
-    public void sendDealTask(Website website, long cacheSeconds, TaskLevel taskLevel) {
+    public void sendDealTask(Website website, TaskLevel taskLevel) {
 
         //获取Deal等待队列的key名称
         String redisKey = RedisKeysUtils.getWaitDealList(taskLevel, website);
@@ -39,42 +40,24 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
         FetchDealResult fetchDealResult = new FetchDealResult();
         fetchDealResult.setWebsite(website);
         fetchDealResult.setTaskStatus(TaskStatus.START);
-        fetchDealResult.setExpireSeconds(cacheSeconds);
 
-        try {
-            //获取缓存数据信息的key名称，该名称为状态map中存放该任务状态的key
-            String key = FetchDealResult.getCacheKey(fetchDealResult);
-            if (key == null) {
-                return;
-            }
-            //获取状态map中的该key的状态信息
-            //如果已经存在该数据，不执行任何操作
-            //如果没有该数据，那么将该数据加入wait队列，并且添加状态信息为start到map中
-            TaskStatus dealTaskStatus = fetchCacheService.getDealTaskStatus(key);
-            if (TaskStatus.NONE.equals(dealTaskStatus)) {
-                fetchCacheService.pushTaskList(redisKey, JSONUtil.toJSON(fetchDealResult));
-                SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendDealTask(fetchDealResult) save {} into Redis List {} success", fetchDealResult.getWebsite(), redisKey);
-                fetchCacheService.setDealTaskStatus(key, TaskStatus.START);
-            }
-        } catch (Exception e) {
-            SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendDealTask(fetchDealResult) save {} into Redis List {} fail", fetchDealResult.getWebsite(), redisKey, e);
-        }
-    }
-
-    @Override
-    public TaskStatus getDealTaskStatus(Website website, long expireSeconds, TaskLevel taskLevel) {
-        //获取该任务的key，查看该任务的状态
-        String cacheKey = FetchDealResult.getCacheKey(website, expireSeconds);
-        TaskStatus taskStatusByUrl = fetchCacheService.getDealTaskStatus(cacheKey);
-        return taskStatusByUrl;
+        fetchCacheService.pushTaskList(redisKey, JSONUtil.toJSON(fetchDealResult));
     }
 
     @Override
     public FetchDealResult getDealInfo(Website website, long expireSeconds, TaskLevel taskLevel) {
-        String cacheKey = FetchDealResult.getCacheKey(website, expireSeconds);
-        //获取该任务的响应数据
-        FetchDealResult fetchDealResult = fetchCacheService.getDealInfo(cacheKey);
-        return fetchDealResult;
+        String result = fetchCacheService.popTaskList(RedisKeysUtils.getDealwebsiteFetchResultKey(website));
+
+        if (StringUtils.isEmpty(result)) {
+            return null;
+        } else {
+            try {
+                return JSONUtil.toObject(result, FetchDealResult.class);
+            } catch (IOException e) {
+                logger.debug("dealresult string to json error");
+                return null;
+            }
+        }
     }
 
     @Override
