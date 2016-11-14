@@ -60,6 +60,11 @@
         <listener-class>hasoffer.job.listener.PtmProductPriceUpdateListener</listener-class>
     </listener>
 
+    <listener>
+        <display-name>dealSiteFetchGetDeal_listener</display-name>
+        <listener-class>hasoffer.job.listener.DealSiteGetDealListener</listener-class>
+    </listener>
+
     <!--  <listener>
           <display-name>priceOffGetDeal_listener</display-name>
           <listener-class>hasoffer.job.listener.CheckPriceOffGetDealListener</listener-class>

@@ -26,7 +26,7 @@ public interface IFetchDubboService {
     /**
      * 获取抓取的deal信息
      */
-    FetchDealResult getDealInfo(Website website, long expireSeconds, TaskLevel taskLevel);
+    FetchDealResult getDealInfo(Website website);
 
 /*************************************************************************************************/
 

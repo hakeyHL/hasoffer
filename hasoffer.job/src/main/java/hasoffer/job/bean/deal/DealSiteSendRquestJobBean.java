@@ -39,10 +39,6 @@ public class DealSiteSendRquestJobBean extends QuartzJobBean {
         fetchDubboService.sendDealTask(Website.DESIDIME, TaskLevel.LEVEL_2);
 
         logger.info("DealSiteFetchDealJobBean send request success will stop at {}", new Date());
-//
-
 
     }
-
-//
 }
