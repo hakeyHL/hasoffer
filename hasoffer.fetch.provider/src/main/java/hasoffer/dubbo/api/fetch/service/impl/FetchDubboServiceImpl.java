@@ -45,7 +45,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     }
 
     @Override
-    public FetchDealResult getDealInfo(Website website, long expireSeconds, TaskLevel taskLevel) {
+    public FetchDealResult getDealInfo(Website website) {
         String result = fetchCacheService.popTaskList(RedisKeysUtils.getDealwebsiteFetchResultKey(website));
 
         if (StringUtils.isEmpty(result)) {

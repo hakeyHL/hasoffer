@@ -1,6 +1,5 @@
 package hasoffer.job.bean.deal;
 
-import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
@@ -14,78 +13,83 @@ import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchDealResult;
 import hasoffer.spider.model.FetchedDealInfo;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import javax.annotation.Resource;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created on 2016/11/7.
+ * Created on 2016/11/14.
+ * 该worker用来将抓取返回的数据，封装成appdeal对象
  */
-public class DealSiteFetchDealJobBean extends QuartzJobBean {
+public class DealSiteGetDealWoker implements Runnable {
 
     /**
      * Logger for this class
      */
-    private static final Logger logger = LoggerFactory.getLogger(DealSiteFetchDealJobBean.class);
+    private static final Logger logger = LoggerFactory.getLogger(DealSiteGetDealWoker.class);
+    private static final List<Website> dealSiteList = new ArrayList<>();
 
-    @Resource
-    IFetchDubboService fetchDubboService;
-    @Resource
-    IDataBaseManager dbm;
-    @Resource
-    IDealService dealService;
+    //初始化deal抓取的网站
+    static {
+        dealSiteList.add(Website.DESIDIME);
+    }
+
+    private IFetchDubboService fetchDubboService;
+    private IDataBaseManager dbm;
+    private IDealService dealService;
+
+    public DealSiteGetDealWoker(IDataBaseManager dbm, IFetchDubboService fetchDubboService, IDealService dealService) {
+        this.dbm = dbm;
+        this.fetchDubboService = fetchDubboService;
+        this.dealService = dealService;
+    }
+
 
     @Override
-    protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-
-        fetchDubboService.sendDealTask(Website.DESIDIME, TimeUtils.SECONDS_OF_1_HOUR, TaskLevel.LEVEL_2);
-
-        long waitStartTime = TimeUtils.now();
-
+    public void run() {
         while (true) {
 
-            if (TimeUtils.now() - waitStartTime > TimeUtils.MILLISECONDS_OF_1_MINUTE * 15) {
-                System.out.println("deal website fetch wait above 15 min go to die");
-                break;
-            }
+            for (Website website : dealSiteList) {
 
-            TaskStatus taskStatus = fetchDubboService.getDealTaskStatus(Website.DESIDIME, TimeUtils.SECONDS_OF_1_HOUR, TaskLevel.LEVEL_2);
+                FetchDealResult fetchDealResult = fetchDubboService.getDealInfo(website);
 
-            if (TaskStatus.FINISH.equals(taskStatus)) {
-
-                FetchDealResult fetchDealResult = fetchDubboService.getDealInfo(Website.DESIDIME, TimeUtils.SECONDS_OF_1_HOUR, TaskLevel.LEVEL_2);
-
-                List<FetchedDealInfo> dealInfoList = fetchDealResult.getDealInfoList();
-
-                for (FetchedDealInfo fetchedDealInfo : dealInfoList) {
-
-                    AppDeal deal = getDeal(fetchedDealInfo, dbm);
-
-                    if (deal != null) {
-                        dealService.createAppDealByPriceOff(deal);
-                    }
+                if (fetchDealResult == null) {
+                    continue;
                 }
 
-                break;
+                TaskStatus taskStatus = fetchDealResult.getTaskStatus();
+
+                if (TaskStatus.FINISH.equals(taskStatus)) {
+
+                    List<FetchedDealInfo> dealInfoList = fetchDealResult.getDealInfoList();
+
+                    for (FetchedDealInfo fetchedDealInfo : dealInfoList) {
+
+                        AppDeal deal = getDeal(fetchedDealInfo, dbm);
+
+                        if (deal != null) {
+                            dealService.createAppDealByPriceOff(deal);
+                        }
+                    }
+
+                    break;
+                }
+
             }
 
-            System.out.println(taskStatus);
             try {
-                TimeUnit.MINUTES.sleep(1);
+                TimeUnit.MINUTES.sleep(20);
             } catch (InterruptedException e) {
 
             }
         }
-
     }
+
 
     public AppDeal getDeal(FetchedDealInfo fetchedDealInfo, IDataBaseManager dbm) {
 
@@ -138,6 +142,7 @@ public class DealSiteFetchDealJobBean extends QuartzJobBean {
         }
 
         appdeal.setDescription(sb.toString());
+        appdeal.setPresentPrice(fetchedDealInfo.getPrice());
         appdeal.setPriceDescription("Rs." + fetchedDealInfo.getPrice());
         appdeal.setOriginPrice(fetchedDealInfo.getOriPrice());
         appdeal.setDiscount((int) ((1 - fetchedDealInfo.getPrice() / fetchedDealInfo.getOriPrice()) * 100));
