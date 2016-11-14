@@ -21,8 +21,11 @@ public class DealVo {
     private int discount;
     private boolean isExpired;
     private float originPrice;
+    private float presentPrice;
     //deal type ,0:general ;1:hot ;etc ,default is general
     private int type = 0;
+    private Long thumbNumber; //点赞数
+    private Long commentNumber;//评论数
 
     public String getPriceDescription() {
         return priceDescription;
@@ -134,5 +137,29 @@ public class DealVo {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public float getPresentPrice() {
+        return presentPrice;
+    }
+
+    public void setPresentPrice(float presentPrice) {
+        this.presentPrice = presentPrice;
+    }
+
+    public Long getCommentNumber() {
+        return commentNumber;
+    }
+
+    public void setCommentNumber(Long commentNumber) {
+        this.commentNumber = commentNumber;
+    }
+
+    public Long getThumbNumber() {
+        return thumbNumber;
+    }
+
+    public void setThumbNumber(Long thumbNumber) {
+        this.thumbNumber = thumbNumber;
     }
 }

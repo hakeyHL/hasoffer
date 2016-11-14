@@ -15,6 +15,7 @@ import hasoffer.base.utils.AffliIdHelper;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IOrderStatsAnalysisService;
+import hasoffer.core.admin.impl.DealServiceImpl;
 import hasoffer.core.app.vo.*;
 import hasoffer.core.bo.product.Banners;
 import hasoffer.core.bo.product.CategoryVo;
@@ -94,6 +95,8 @@ public class AppController {
     private MongoDbManager mongoDbManager;
     @Resource
     private IOrderStatsAnalysisService orderService;
+    @Resource
+    private DealServiceImpl dealService;
 
     public static void main(String[] args) {
 
@@ -408,44 +411,13 @@ public class AppController {
         Date currentDate = new Date();
         for (AppDeal appDeal : deals) {
             int dateCmpResult = currentDate.compareTo(appDeal.getExpireTime());
+            DealVo dealVo = new DealVo();
+            setDeal(appDeal, dealVo);
             if (dateCmpResult <= 0) {
-                DealVo dealVo = new DealVo();
-                dealVo.setId(appDeal.getId());
-                dealVo.setType(appDeal.getWeight() >= 1 ? 1 : 0);
-                dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
-                dealVo.setExtra(0d);
-                dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                if (appDeal.getWebsite().name().equals("FLIPKART")) {
-                    dealVo.setExtra(7.5);
-                }
-                dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                dealVo.setExp(appDeal.getExpireTime());
-                dealVo.setTitle(appDeal.getTitle());
                 dealVo.setIsExpired(false);
-                dealVo.setDiscount(appDeal.getDiscount());
-                dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
-                dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
-                dealVo.setWebsite(appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
                 li.add(dealVo);
             } else {
-                DealVo dealVo = new DealVo();
-                dealVo.setId(appDeal.getId());
-                dealVo.setType(appDeal.getWeight() >= 1 ? 1 : 0);
-                dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
-                dealVo.setExtra(0d);
-                dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                if (appDeal.getWebsite().name().equals("FLIPKART")) {
-                    dealVo.setExtra(7.5);
-                }
-                dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                dealVo.setExp(appDeal.getExpireTime());
-                dealVo.setTitle(appDeal.getTitle());
                 dealVo.setIsExpired(true);
-                dealVo.setDiscount(appDeal.getDiscount());
-                dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
-                dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
-                //TODO  site不支持时取字符
-                dealVo.setWebsite(appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
                 li.add(dealVo);
             }
         }
@@ -458,7 +430,6 @@ public class AppController {
         mv.addObject("data", map);
         return mv;
     }
-
 
     /**
      * deal详情
@@ -1385,4 +1356,29 @@ public class AppController {
         map.put("description", sb.toString());
     }
 
+    private void setDeal(AppDeal appDeal, DealVo dealVo) {
+        dealVo.setId(appDeal.getId());
+        dealVo.setType(appDeal.getWeight() >= 1 ? 1 : 0);
+        dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
+        dealVo.setExtra(0d);
+        dealVo.setLogoUrl(appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+        if (appDeal.getWebsite() != null && appDeal.getWebsite().name().equals("FLIPKART")) {
+            dealVo.setExtra(7.5);
+        }
+        dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+        dealVo.setExp(appDeal.getExpireTime());
+        dealVo.setTitle(appDeal.getTitle());
+        dealVo.setPresentPrice(appDeal.getPresentPrice() == null ? 0 : appDeal.getPresentPrice());
+        dealVo.setDiscount(appDeal.getDiscount());
+        dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
+        dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
+        dealVo.setWebsite(appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
+        //计算总评论数
+        //计算总点赞数
+        dealVo.setThumbNumber(dealService.getTotalDealThumb());
+        PageableResult<AppDealComment> dealComments = dealService.getPageAbleDealComment(appDeal.getId(), 1, 5);
+        if (dealComments != null) {
+            dealVo.setCommentNumber(dealComments.getNumFund());
+        }
+    }
 }

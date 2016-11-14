@@ -183,11 +183,19 @@
         </div>
 
         <div class="form-group">
-            <label class="col-sm-3 control-label">价格描述/现价：</label>
+            <label class="col-sm-3 control-label">价格描述：</label>
 
             <div class="col-sm-7">
                 <textarea class="form-control" id="priceDescription" name="priceDescription"
                           rows="5">${deal.priceDescription}</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">现价：</label>
+
+            <div class="col-sm-7">
+                <input type="number" name="presentPrice" id="presentPrice" value="${deal.presentPrice}"
+                       class="form-control">
             </div>
         </div>
 

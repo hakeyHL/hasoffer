@@ -9,6 +9,8 @@ import hasoffer.core.persistence.dbm.HibernateDao;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
+import hasoffer.core.persistence.po.app.AppDealComment;
+import hasoffer.core.persistence.po.app.AppDealThumb;
 import hasoffer.core.persistence.po.app.updater.AppDealUpdater;
 import hasoffer.core.product.solr.DealIndexServiceImpl;
 import hasoffer.core.product.solr.DealModel;
@@ -42,6 +44,9 @@ public class DealServiceImpl implements IDealService {
 //    private static final String IMPORT_SQL = "insert into appdeal(website, title, linkUrl, expireTime, priceDescription ,description, createTime,  push ,display ,imageUrl,discount,dealCategoryId,dealClickCount,appdealSource,ptmcmpskuid) values(?,?, ?, ?, ?, ? ,?, ?, ?, ?,?,?,?,'MANUAL_INPUT',0)";
 
     private static final String Q_DEALS = "SELECT t FROM AppDeal t";
+    private static final String Q_THUMB_UIDDID = "SELECT t FROM AppDealThumb t where t.userId=?0 and t.dealId=?1";
+    private static final String Q_THUMB_TOTAL = "SELECT sum(t.action) FROM AppDealThumb t";
+    private static final String Q_COMMENTS_DEALID = "SELECT t FROM AppDealComment t where t.dealId=?0 order by t.createTime desc ";
 
     @Resource
     IDataBaseManager dbm;
@@ -304,4 +309,40 @@ public class DealServiceImpl implements IDealService {
 
         listAndProcessTask2.go();
     }
+
+    @Override
+    public AppDealThumb getDealThumbByUidDid(Long userId, Long dealId) {
+        List<AppDealThumb> appDealThumbs = dbm.query(Q_THUMB_UIDDID, Arrays.asList(userId, dealId));
+        if (appDealThumbs != null && appDealThumbs.size() > 0) {
+            return appDealThumbs.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public void updateDealThumb(AppDealThumb appDealThumb) {
+        dbm.update(appDealThumb);
+    }
+
+    @Override
+    public void createThumb(AppDealThumb appDealThumb) {
+        dbm.create(appDealThumb);
+    }
+
+    @Override
+    public void createAppComment(AppDealComment appDealComment) {
+        dbm.create(appDealComment);
+    }
+
+    @Override
+    public Long getTotalDealThumb() {
+        return dbm.querySingle(Q_THUMB_TOTAL);
+    }
+
+    @Override
+    public PageableResult<AppDealComment> getPageAbleDealComment(Long dealId, int page, int pageSize) {
+        return dbm.queryPage(Q_COMMENTS_DEALID, page, pageSize, Arrays.asList(dealId));
+    }
+
 }

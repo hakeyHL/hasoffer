@@ -6,17 +6,24 @@ import com.alibaba.fastjson.serializer.PropertyFilter;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
+import hasoffer.core.app.vo.DealCommentVo;
 import hasoffer.core.app.vo.DealVo;
 import hasoffer.core.app.vo.DeviceInfoVo;
 import hasoffer.core.persistence.po.app.AppDeal;
+import hasoffer.core.persistence.po.app.AppDealComment;
+import hasoffer.core.persistence.po.app.AppDealThumb;
+import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.product.solr.DealIndexServiceImpl;
 import hasoffer.core.product.solr.DealModel;
+import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.utils.JsonHelper;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -26,6 +33,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -42,6 +50,8 @@ public class AppDealController {
     IAppService appService;
     @Resource
     DealIndexServiceImpl indexService;
+    @Resource
+    ICacheService<UrmUser> userICacheService;
 
     /**
      * 获取商品相关deal列表
@@ -150,5 +160,206 @@ public class AppDealController {
         jsonObject.put("data", hashMap);
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
+    }
+
+    @RequestMapping("thumb")
+    public String thumbDeal(@RequestParam(defaultValue = "0") String action,
+                            @RequestParam(defaultValue = "0") Long dealId,
+                            HttpServletResponse response) {
+        JSONObject jsonObject = new JSONObject();
+        Map hashMap = new HashMap<>();
+        int intAction = Integer.parseInt(action);
+        jsonObject.put("errorCode", "00000");
+        jsonObject.put("msg", "ok");
+        UrmUser urmUser;
+        Date currentDate = new Date();
+        if (dealId != 0) {
+            AppDeal dealDetail = appService.getDealDetail(dealId);
+            if (dealDetail != null) {
+                String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
+                if (StringUtils.isNotBlank(userToken)) {
+                    String key = "user_" + userToken;
+                    urmUser = userICacheService.get(UrmUser.class, key, 0);
+                    if (urmUser == null) {
+                        urmUser = appService.getUserByUserToken(userToken);
+                        if (urmUser != null) {
+                            userICacheService.add(key, urmUser, TimeUtils.SECONDS_OF_1_DAY);
+                        }
+                    }
+                    if (urmUser != null) {
+                        //查出之前记录
+                        AppDealThumb appDealThumb = dealService.getDealThumbByUidDid(urmUser.getId(), dealId);
+                        if (appDealThumb != null) {
+                            appDealThumb.setUpdateTime(currentDate.getTime());
+                            switch (intAction) {
+                                case 1:
+                                    //点赞
+                                    //之前有,判断之前的状态从而进行相应的操作
+                                    if (appDealThumb.getAction() == 1) {
+                                        appDealThumb.setAction(0);
+                                    } else {
+                                        appDealThumb.setAction(1);
+                                    }
+                                    break;
+                                case 2:
+                                    //点踩
+                                    if (appDealThumb.getAction() == -1) {
+                                        appDealThumb.setAction(0);
+                                    } else {
+                                        appDealThumb.setAction(-1);
+                                    }
+                                    break;
+                                default:
+                            }
+                            //update
+                            dealService.updateDealThumb(appDealThumb);
+                        } else {
+                            //之前没有,直接置状态
+                            if (intAction != 0) {
+                                appDealThumb = new AppDealThumb(urmUser.getId(), intAction, currentDate.getTime(), currentDate.getTime(), dealId);
+                                //创建
+                                dealService.createThumb(appDealThumb);
+                            }
+                        }
+                    } else {
+                        jsonObject.put("errorCode", "10000");
+                        jsonObject.put("msg", "user record is not exist --" + userToken);
+                    }
+                }
+            } else {
+                jsonObject.put("errorCode", "10000");
+                jsonObject.put("msg", "deal record is not exist --" + dealId);
+            }
+        } else {
+            jsonObject.put("errorCode", "10000");
+            jsonObject.put("msg", "dealId is not exist .");
+        }
+        jsonObject.put("data", hashMap);
+        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        return null;
+    }
+
+    @RequestMapping("comment")
+    public String commentDeal(@RequestParam(defaultValue = "0") Long dealId,
+                              @RequestParam(defaultValue = "0") String anonymous,
+                              @RequestParam(value = "") String content,
+                              HttpServletResponse response) {
+        //默认不匿名
+        JSONObject jsonObject = new JSONObject();
+        Map hashMap = new HashMap<>();
+        jsonObject.put("errorCode", "00000");
+        jsonObject.put("msg", "ok");
+        Date currentDate = new Date();
+        UrmUser urmUser;
+        if (StringUtils.isNotEmpty(content)) {
+            if (dealId != 0) {
+                AppDeal appDeal = dealService.getDealById(dealId);
+                if (appDeal != null) {
+                    String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
+                    if (StringUtils.isNotBlank(userToken)) {
+                        String key = "user_" + userToken;
+                        urmUser = userICacheService.get(UrmUser.class, key, 0);
+                        if (urmUser == null) {
+                            urmUser = appService.getUserByUserToken(userToken);
+                            if (urmUser != null) {
+                                userICacheService.add(key, urmUser, TimeUtils.SECONDS_OF_1_DAY);
+                            }
+                        }
+                        if (urmUser != null) {
+                            dealService.createAppComment(new AppDealComment(currentDate.getTime(),
+                                    urmUser.getId(),
+                                    content,
+                                    Integer.parseInt(anonymous),
+                                    dealId));
+                        } else {
+                            jsonObject.put("errorCode", "10000");
+                            jsonObject.put("msg", "no record  for this userToken  : " + userToken);
+                        }
+                    } else {
+                        jsonObject.put("errorCode", "10000");
+                        jsonObject.put("msg", "userToken is required ");
+                    }
+                } else {
+                    jsonObject.put("errorCode", "10000");
+                    jsonObject.put("msg", "no record for this id : " + dealId);
+                }
+            } else {
+                jsonObject.put("errorCode", "10000");
+                jsonObject.put("msg", "dealId is required.");
+            }
+        } else {
+            jsonObject.put("errorCode", "10000");
+            jsonObject.put("msg", "comment content is required .");
+        }
+        jsonObject.put("data", hashMap);
+        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        return null;
+    }
+
+    @RequestMapping("comments")
+    public String getDealComments(@RequestParam(defaultValue = "0") Long dealId,
+                                  @RequestParam(defaultValue = "1") int page,
+                                  @RequestParam(defaultValue = "5") int pageSize,
+                                  HttpServletResponse response) {
+        //默认不匿名
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("errorCode", "00000");
+        jsonObject.put("msg", "ok");
+        List<DealCommentVo> dealCommentVos = new ArrayList<>();
+        if (dealId == 0) {
+            jsonObject.put("errorCode", "10000");
+            jsonObject.put("msg", "dealId is required .");
+            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            return null;
+        }
+        AppDeal appDeal = dealService.getDealById(dealId);
+        if (appDeal == null) {
+            jsonObject.put("errorCode", "10000");
+            jsonObject.put("msg", "deal record is not exist for dealId : " + dealId);
+            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            return null;
+        }
+
+        PageableResult<AppDealComment> pageAbleDealComment = dealService.getPageAbleDealComment(dealId, page, pageSize);
+        if (pageAbleDealComment != null) {
+            List<AppDealComment> comments = pageAbleDealComment.getData();
+            for (AppDealComment appDealComment : comments) {
+                Long userId = appDealComment.getUserId();
+                if (userId > 0) {
+                    UrmUser urmUser = appService.getUserById(userId);
+                    if (urmUser != null) {
+                        String userName = urmUser.getUserName();
+                        if (appDealComment.getIsAnonymous() == 1 && StringUtils.isNotEmpty(userName)) {
+                            userName = userName.charAt(0) + "**" + userName.charAt(userName.length() - 1);
+                        }
+                        dealCommentVos.add(new DealCommentVo(getDifference2Date(new Date(),
+                                new Date(appDealComment.getCreateTime())),
+                                StringUtils.isEmpty(userName) ? "" : userName,
+                                urmUser.getAvatarPath() == null ? "" : urmUser.getAvatarPath(),
+                                appDealComment.getContent() == null ? "" : appDealComment.getContent()));
+                    }
+
+                }
+            }
+            jsonObject.put("data", dealCommentVos);
+        } else {
+            jsonObject.put("errorCode", "10000");
+            jsonObject.put("msg", "no data in database.");
+            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            return null;
+        }
+        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        return null;
+    }
+
+    public String getDifference2Date(Date maxDate, Date comparedDate) {
+        Long tempResult = maxDate.getTime() - comparedDate.getTime();
+        long nd = 1000 * 24 * 60 * 60;//一天的毫秒数
+        long nh = 1000 * 60 * 60;//一小时的毫秒数
+        long nm = 1000 * 60;//一分钟的毫秒数
+        int day = BigDecimal.valueOf(tempResult).divide(BigDecimal.valueOf(nd), BigDecimal.ROUND_HALF_UP).intValue();//计算差多少天
+        int hour = BigDecimal.valueOf(tempResult).divide(BigDecimal.valueOf(nh), BigDecimal.ROUND_HALF_UP).intValue();//计算差多少天
+        int min = BigDecimal.valueOf(tempResult).divide(BigDecimal.valueOf(nm), BigDecimal.ROUND_HALF_UP).intValue();//计算差多少天
+        return day <= 0 ? hour <= 0 ? min + " mins ago " : hour + " hours ago " : day + " days ago ";
     }
 }
