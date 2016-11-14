@@ -182,6 +182,8 @@ public class FixController {
     @RequestMapping(value = "/cate91Fetch", method = RequestMethod.GET)
     @ResponseBody
     public String category91Fetch() throws Exception {
+        int num = 0;
+
         int totalPageSize = 0;
         int limitSize = 0;
         String jsonReqUrlList = "http://api.91mobiles.com:8080/nm-community/api/searchPage/web";
@@ -232,7 +234,6 @@ public class FixController {
             } catch (Exception e) {
                 logger.info(" calculate totalPage exception {}", e.getMessage());
             }
-            int num = 0;
             for (int i = 0; i < totalPageSize; i++) {
                 jsonObject.put("startRow", i * jsonObject.getInteger("limit"));
                 System.out.println(jsonReqUrlList + " _ " + cate + "  FETCH START");
@@ -244,7 +245,7 @@ public class FixController {
         }
         totalPageSize = 14;
         for (String htmlUrl : htmlReqUrlList) {
-            int num = 0;
+            num = 0;
             for (int i = 1; i < totalPageSize + 1; i++) {
                 htmlUrl = htmlUrl + "?page=" + i;
                 System.out.println(htmlUrl + " html  FETCH START");
