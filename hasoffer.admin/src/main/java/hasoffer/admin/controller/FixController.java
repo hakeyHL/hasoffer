@@ -244,12 +244,12 @@ public class FixController {
         }
         totalPageSize = 14;
         int num = 0;
-        for (String url : htmlReqUrlList) {
+        for (String htmlUrl : htmlReqUrlList) {
             for (int i = 1; i < totalPageSize + 1; i++) {
-                url = url + "?page=" + i;
-                System.out.println(url + " html  FETCH START");
-                Cate91FetchHtml(url);
-                System.out.println(url + " html  FETCH END");
+                htmlUrl = htmlUrl + "?page=" + i;
+                System.out.println(htmlUrl + " html  FETCH START");
+                Cate91FetchHtml(htmlUrl);
+                System.out.println(htmlUrl + " html  FETCH END");
                 num++;
             }
         }
