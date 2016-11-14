@@ -190,13 +190,13 @@ public class FixController {
 
         List<String> apiJsonCates = new ArrayList<>();
         apiJsonCates.add("camera");
-        apiJsonCates.add("tablet");
-        apiJsonCates.add("tv");
+//        apiJsonCates.add("tablet");
+//        apiJsonCates.add("tv");
 
 
         List<String> htmlReqUrlList = new ArrayList<>();
-        htmlReqUrlList.add("http://www.91mobiles.com/mobile-memory-card-finder.php");
-        htmlReqUrlList.add("http://www.91mobiles.com/mobile-power-bank-finder.php");
+//        htmlReqUrlList.add("http://www.91mobiles.com/mobile-memory-card-finder.php");
+//        htmlReqUrlList.add("http://www.91mobiles.com/mobile-power-bank-finder.php");
         htmlReqUrlList.add("http://www.91mobiles.com/smartwatchfinder.php");
 
         for (String cate : apiJsonCates) {
@@ -246,11 +246,13 @@ public class FixController {
         totalPageSize = 14;
         for (String htmlUrl : htmlReqUrlList) {
             num = 0;
+            htmlUrl = htmlUrl + "?page=";
             for (int i = 1; i < totalPageSize + 1; i++) {
-                htmlUrl = htmlUrl + "?page=" + i;
-                System.out.println(htmlUrl + " html  FETCH START");
-                Cate91FetchHtml(htmlUrl);
-                System.out.println(htmlUrl + " html  FETCH END");
+                String tempUrl = "";
+                tempUrl = htmlUrl + i;
+                System.out.println(tempUrl + " html  FETCH START");
+                Cate91FetchHtml(tempUrl);
+                System.out.println(tempUrl + " html  FETCH END");
                 num++;
             }
         }
