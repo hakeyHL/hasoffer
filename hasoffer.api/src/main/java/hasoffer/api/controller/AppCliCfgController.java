@@ -29,6 +29,7 @@ import java.util.Map;
 @RequestMapping(value = "/cfg")
 public class AppCliCfgController {
     static final String HOME_REDEEM_TIP_COPY = "app_home_copy";
+    static final String HOME_INDEX_COPY = "app_home_index_copy";
     @Autowired
     private CacheServiceImpl cacheService;
     private Logger logger = LoggerFactory.getLogger(AppCliCfgController.class);
@@ -99,4 +100,42 @@ public class AppCliCfgController {
         return null;
     }
 
+    @RequestMapping(value = "/app/homeIndex")
+    public String homeIndexConfig(HttpServletResponse response,
+                                  String stringFirst,
+                                  String stringSecond,
+                                  String stringThird) {
+        ResultVo resultVo = new ResultVo();
+        //change home page redeem tip
+        logger.info("enter home copy swap ");
+        if (StringUtils.isNotEmpty(stringFirst) && StringUtils.isNotEmpty(stringSecond) && StringUtils.isNotEmpty(stringThird)) {
+            //set
+            List<String> redeemStrings = Arrays.asList(stringFirst, stringSecond, stringThird);
+            //get home page redeem tip
+            String homeRedeemTip2 = cacheService.get(HOME_INDEX_COPY, 0);
+            if (!StringUtils.isEmpty(homeRedeemTip2)) {
+                //delete
+                cacheService.del(HOME_INDEX_COPY);
+                cacheService.add(HOME_INDEX_COPY, JSON.toJSONString(redeemStrings), -1);
+            } else {
+                //add
+                cacheService.add(HOME_INDEX_COPY, JSON.toJSONString(redeemStrings), -1);
+            }
+        } else {
+            //get
+            String bootIndex = cacheService.get(HOME_INDEX_COPY, 0);
+            if (!StringUtils.isEmpty(bootIndex)) {
+                List<String> strings = JSONArray.parseArray(bootIndex, String.class);
+                resultVo.getData().put("bootIndex", strings);
+            } else {
+                resultVo.getData().put("bootIndex", Arrays.asList("GET YOUR DAILY COINS!",
+                        "50 Coins=1 Rupee!The more often you check in,the more you will earn",
+                        "REEDEM COINS FOR SUPER GIFT!"));
+                //add to cache
+                cacheService.add(HOME_INDEX_COPY, JSON.toJSONString(resultVo.getData()), -1);
+            }
+        }
+        Httphelper.sendJsonMessage(JSON.toJSONString(resultVo), response);
+        return null;
+    }
 }

@@ -30,6 +30,8 @@ import java.util.regex.Pattern;
  */
 
 public abstract class AbstractHibernate4DataBaseManager implements IDataBaseManager {
+    private static final Pattern PLACE_HOLDER = Pattern.compile("\\?");
+    private static final Pattern ORDER = Pattern.compile(" order +by +.*$", Pattern.CASE_INSENSITIVE);
     private static Logger logger = LoggerFactory.getLogger(AbstractHibernate4DataBaseManager.class);
     private static Pattern ORDER_BY = Pattern.compile("\\s+order\\s+by\\s+");
 
@@ -327,7 +329,7 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
     public List queryBySql(final String queryString, final Map<String, Object> paramsMap) {
         logger.info("queryBySql sql == " + queryString);
         logger.info("paramsMap = " + ReflectionToStringBuilder.toString(paramsMap, ToStringStyle.MULTI_LINE_STYLE));
-        return  (List) this.getHibernate4Template().execute(new HibernateCallback() {
+        return (List) this.getHibernate4Template().execute(new HibernateCallback() {
             public Object doInHibernate(final Session session) throws HibernateException {
                 Query query = session.createSQLQuery(queryString).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
                 if (paramsMap != null) {
@@ -380,6 +382,21 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
     }
 
     @Override
+    public Integer deleteBySql(final String sql, final Object... values) {
+
+        return getHibernate4Template().execute(new HibernateCallback<Integer>() {
+            @Override
+            public Integer doInHibernate(Session session) throws HibernateException {
+                Query q = buildQuery(session, true, sql, values);
+                int result = q.executeUpdate();
+                session.flush(); //清理缓存，执行批量插入
+                session.clear();//清空缓存中的 对象
+                return result;
+            }
+        });
+    }
+
+    @Override
     public void updateBySQL(final String sql) {
         exeSQL(sql);
     }
@@ -396,5 +413,96 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
                 return null;
             }
         });
+    }
+
+    @Override
+    public PageableResult<Map<String, Object>> findPageOfMapBySql(final String sql, final int page, final int pageSize, final Object... params) {
+        int totalCount = countBySql(sql, params);
+        List<Map<String, Object>> items = findListOfMapBySql(sql, page, pageSize, params);
+        return new PageableResult<>(items, totalCount, page, pageSize);
+    }
+
+    @Override
+    public List<Map<String, Object>> findListOfMapBySql(final String sql, final int page, final int pageSize, final Object... params) {
+        return getHibernate4Template().execute(new HibernateCallback<List<Map<String, Object>>>() {
+            @Override
+            public List<Map<String, Object>> doInHibernate(Session session) throws HibernateException {
+                Query query = buildQuery(session, true, sql, params).setFirstResult((page - 1) * pageSize).setMaxResults(pageSize);
+                List<Map<String, Object>> items = query.list();
+                session.flush();
+                session.close();
+                return items;
+            }
+        });
+    }
+
+    @Override
+    public int countBySql(String sql, Object... params) {
+        sql = ORDER.matcher(sql).replaceFirst("");
+        sql = "Select Count(*) From (" + sql + ") t";
+        Number nmb = this.findUniqueBySql(sql, params);
+        return nmb.intValue();
+    }
+
+    @Override
+    public <T> T findUniqueBySql(final String sql, final Object... parmas) {
+
+        return getHibernate4Template().execute(new HibernateCallback<T>() {
+            @Override
+            public T doInHibernate(Session session) throws HibernateException {
+                Query query = buildQuery(session, true, sql, parmas);
+                T ret = (T) query.uniqueResult();
+                session.flush();
+                session.close();
+                return ret;
+            }
+        });
+    }
+
+    private Query buildQuery(Session session, boolean nativeSql, String ql, Map<String, Object> values) {
+        Query query = null;
+        if (nativeSql) {
+            query = session.createSQLQuery(ql);
+        } else {
+            query = session.createQuery(ql);
+        }
+
+        for (String name : values.keySet()) {
+            setParameter(query, name, values.get(name));
+        }
+        return query;
+    }
+
+    private Query buildQuery(Session session, boolean isSql, String ql, Object[] values) {
+        int paramCnt = 0;
+        if (values.length > 0) {// replace ? to :param{i}
+            Matcher m = PLACE_HOLDER.matcher(ql);
+            StringBuffer sb = new StringBuffer();
+            while (m.find()) {
+                m.appendReplacement(sb, ":param" + paramCnt);
+                paramCnt++;
+            }
+            m.appendTail(sb);
+            if (paramCnt != values.length) {
+                throw new HibernateException("Params' count is: " + paramCnt + " but expected to be: " + values.length);
+            }
+            ql = sb.toString();
+        }
+
+        Query query = isSql ? session.createSQLQuery(ql) : session.createQuery(ql);
+        for (int i = 0; i < values.length; i++) {
+            setParameter(query, "param" + i, values[i]);
+        }
+        return query;
+    }
+
+    private void setParameter(Query query, String name, Object value) {
+        if (value instanceof Collection) {
+            query.setParameterList(name, (Collection<?>) value);
+        } else if (value instanceof Object[]) {
+            query.setParameterList(name, (Object[]) value);
+        } else {
+            query.setParameter(name, value);
+        }
     }
 }

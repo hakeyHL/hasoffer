@@ -30,6 +30,7 @@
         <module>hasoffer.offlinejob</module>
         <module>hasoffer.datafixes</module>
         <module>hasoffer.third.proxyip</module>
+        <module>hasoffer.temp.job</module>
     </modules>
 
     <properties>

@@ -54,7 +54,17 @@ public interface IDataBaseManager {
 
     void deleteBySQL(final String sql);
 
+    Integer deleteBySql(final String sql, final Object... values);
+
     void updateBySQL(final String sql);
 
     void exeSQL(final String sql);
+
+    PageableResult<Map<String, Object>> findPageOfMapBySql(String sql, int page, int pageSize, Object... values);
+
+    List<Map<String, Object>> findListOfMapBySql(String sql, int page, int pageSize, Object... params);
+
+    int countBySql(String sql, Object... params);
+
+    <T> T findUniqueBySql(String sql, Object... params);
 }

@@ -11,13 +11,11 @@ import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmImage;
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
 public class ImageUtil {
-    private static Logger logger = LoggerFactory.getLogger(ImageUtil.class);
+    //private static Logger logger = LoggerFactory.getLogger(ImageUtil.class);
 
     private static S3Storage s3Storage = new S3Storage();
 
@@ -74,7 +72,7 @@ public class ImageUtil {
             return convertAndUploadImage(file);
 
         } catch (Exception e) {
-            logger.error(e.getMessage() + "[" + imageUrl + "]");
+            //logger.info("[" + imageUrl + "]", e);
             throw new ImageDownloadOrUploadException("下载或上传图片时出错");
         } finally {
             // 删除图片
@@ -99,7 +97,7 @@ public class ImageUtil {
             // 上传图片
             return uploadImage(file);
         } catch (Exception e) {
-            logger.error(e.getMessage() + "[" + imageUrl + "]");
+            //logger.info("[" + imageUrl + "]", e);
             throw new ImageDownloadOrUploadException("下载或上传图片时出错");
         } finally {
             // 删除图片
