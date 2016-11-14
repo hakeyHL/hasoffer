@@ -181,22 +181,28 @@ public class FixController {
 
     @RequestMapping(value = "/cate91Fetch", method = RequestMethod.GET)
     @ResponseBody
-    public String category91Fetch(String cateName,
-                                  @RequestParam(defaultValue = "0") int totalPageSize,
-                                  @RequestParam(defaultValue = "0") int limitSize,
-                                  @RequestParam(defaultValue = "json") String responseType,
-                                  @RequestParam(defaultValue = "") String fetchUrl
-    ) throws Exception {
-        if (fetchUrl.equals("")) {
-            return null;
-        }
-        int num = 0;
-        if (responseType.equals("json")) {
+    public String category91Fetch() throws Exception {
+        int totalPageSize = 0;
+        int limitSize = 0;
+        String jsonReqUrlList = "http://api.91mobiles.com:8080/nm-community/api/searchPage/web";
+
+        List<String> apiJsonCates = new ArrayList<>();
+        apiJsonCates.add("camera");
+        apiJsonCates.add("tablet");
+        apiJsonCates.add("tv");
+
+
+        List<String> htmlReqUrlList = new ArrayList<>();
+        htmlReqUrlList.add("http://www.91mobiles.com/mobile-memory-card-finder.php");
+        htmlReqUrlList.add("http://www.91mobiles.com/mobile-power-bank-finder.php");
+        htmlReqUrlList.add("http://www.91mobiles.com/smartwatchfinder.php");
+
+        for (String cate : apiJsonCates) {
             JSONObject jsonObject = new JSONObject();
             //t 当前时间戳
             jsonObject.put("t", new Date().getTime());
             //q:搜索关键字
-            jsonObject.put("q", cateName);
+            jsonObject.put("q", cate);
             //srtBy:score
             jsonObject.put("srtBy", "score");
             //srtType:desc
@@ -207,11 +213,10 @@ public class FixController {
             }
             jsonObject.put("limit", limitSize);
             //startRow 0
-
             //get total page
             try {
                 jsonObject.put("startRow", 0);
-                String postResultString = Httphelper.doPost(fetchUrl, jsonObject.toJSONString());
+                String postResultString = Httphelper.doPost(jsonReqUrlList, jsonObject.toJSONString());
                 if (!StringUtils.isEmpty(postResultString)) {
                     JSONObject jsonResult = JSONObject.parseObject(postResultString);
                     Integer productCount = jsonResult.getInteger("productCount");
@@ -227,17 +232,21 @@ public class FixController {
             } catch (Exception e) {
                 logger.info(" calculate totalPage exception {}", e.getMessage());
             }
+            int num = 0;
             for (int i = 0; i < totalPageSize; i++) {
                 jsonObject.put("startRow", i * jsonObject.getInteger("limit"));
-                System.out.println(fetchUrl + " _ " + cateName + "  FETCH START");
-                Cate91Fetch(fetchUrl, jsonObject);
-                System.out.println(fetchUrl + " _ " + cateName + " FETCH END");
+                System.out.println(jsonReqUrlList + " _ " + cate + "  FETCH START");
+                Cate91Fetch(jsonReqUrlList, jsonObject);
+                System.out.println(jsonReqUrlList + " _ " + cate + " FETCH END");
                 num++;
             }
             System.out.println("total num " + num);
-        } else {
+        }
+        totalPageSize = 14;
+        int num = 0;
+        for (String url : htmlReqUrlList) {
             for (int i = 1; i < totalPageSize + 1; i++) {
-                String url = fetchUrl + "?page=" + i;
+                url = url + "?page=" + i;
                 System.out.println(url + " html  FETCH START");
                 Cate91FetchHtml(url);
                 System.out.println(url + " html  FETCH END");
