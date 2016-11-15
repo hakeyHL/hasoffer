@@ -17,6 +17,7 @@ public class Main {
                 "classpath:/spring-beans.xml",
                 "classpath:/spring/spring-init.xml");
         context.start();
+        logger.info("args:{}", args);
         if (args.length != 2) {
             logger.error("Args is error. please input start time and end time, 'yyyy-mm-dd'");
             return;
@@ -37,8 +38,8 @@ public class Main {
             logger.error("Parse date is error. the endDate:{}", arg1, e);
             return;
         }
-        OrderFixWorker bean = context.getBean(OrderFixWorker.class);
         logger.info("Job start.");
+        OrderFixWorker bean = context.getBean(OrderFixWorker.class);
         bean.runTask(startDate, endDate);
         logger.info("Job finish.");
     }
