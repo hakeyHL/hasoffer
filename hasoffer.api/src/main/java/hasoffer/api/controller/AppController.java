@@ -404,6 +404,7 @@ public class AppController {
     public ModelAndView deals(@RequestParam(defaultValue = "0") String page, @RequestParam(defaultValue = "8") String pageSize) {
         //1. 从数据库中查询到
         ModelAndView mv = new ModelAndView();
+        //忽略前端传页面大小
         PageableResult Result = appService.getDeals(Long.valueOf(page), Long.valueOf(8));
         Map map = new HashMap();
         List li = new ArrayList();
