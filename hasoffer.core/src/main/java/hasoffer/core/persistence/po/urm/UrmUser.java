@@ -28,6 +28,7 @@ public class UrmUser implements Identifiable<Long> {
     private String gcmToken;
     private String email;
     ////用户的coin
+
     //@Column(columnDefinition = "bigint default 0")
     //private Long signCoin = 0L;
     ////当前最大连续签到次数

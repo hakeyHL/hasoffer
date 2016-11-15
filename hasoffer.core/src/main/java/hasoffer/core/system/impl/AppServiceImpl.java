@@ -97,6 +97,7 @@ public class AppServiceImpl implements IAppService {
                     "t.expireTime >= ?0   and t.listPageImage is not null " +
                     " order by t.weight desc,t.id desc  ";
 
+    private static final String Q_APP_GETUSERS = "SELECT t FROM  UrmSignCoin t where t.conSignNum>1 or t.maxConSignNum > 1 ";
 
     private static final String Q_APP_GETDEALS_TEMP =
             "SELECT t FROM AppDeal t where  t.appdealSource='PRICE_OFF' and  t.display='0' and    t.expireTime >= ?0   and t.listPageImage is not null  order by id desc   ";
@@ -546,5 +547,23 @@ public class AppServiceImpl implements IAppService {
     public List<UrmSignCoin> getUserSignRecord() {
         return dbm.query("select t from UrmSignCoin t ");
     }
+
+    @Override
+    public PageableResult<UrmSignCoin> getUserList(int page, int pageSize) {
+
+        return dbm.queryPage(Q_APP_GETUSERS, page, pageSize);
+    }
+
+    @Override
+    @Transactional
+    public int addUserRedeemGroup(List<UrmUserRedeemGroup> groupList) {
+        return dbm.batchSave(groupList);
+    }
+
+    @Override
+    public UrmUserRedeemGroup getUrmRedeemGroupById(Long id) {
+        return dbm.get(UrmUserRedeemGroup.class, id);
+    }
+
 
 }

@@ -26,6 +26,7 @@ public class DealVo {
     private int type = 0;
     private Long thumbNumber; //点赞数
     private Long commentNumber;//评论数
+    private String createTime;
 
     public String getPriceDescription() {
         return priceDescription;
@@ -161,5 +162,13 @@ public class DealVo {
 
     public void setThumbNumber(Long thumbNumber) {
         this.thumbNumber = thumbNumber;
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 }
