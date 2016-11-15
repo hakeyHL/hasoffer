@@ -190,14 +190,14 @@ public class FixController {
 
         List<String> apiJsonCates = new ArrayList<>();
         apiJsonCates.add("camera");
-        apiJsonCates.add("tablet");
-        apiJsonCates.add("tv");
+//        apiJsonCates.add("tablet");
+//        apiJsonCates.add("tv");
 
 
         List<String> htmlReqUrlList = new ArrayList<>();
-        htmlReqUrlList.add("http://www.91mobiles.com/mobile-memory-card-finder.php");
-        htmlReqUrlList.add("http://www.91mobiles.com/mobile-power-bank-finder.php");
-        htmlReqUrlList.add("http://www.91mobiles.com/smartwatchfinder.php");
+//        htmlReqUrlList.add("http://www.91mobiles.com/mobile-memory-card-finder.php");
+//        htmlReqUrlList.add("http://www.91mobiles.com/mobile-power-bank-finder.php");
+//        htmlReqUrlList.add("http://www.91mobiles.com/smartwatchfinder.php");
 
         for (String cate : apiJsonCates) {
             JSONObject jsonObject = new JSONObject();
