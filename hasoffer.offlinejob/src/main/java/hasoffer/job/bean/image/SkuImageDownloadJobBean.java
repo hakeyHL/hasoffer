@@ -1,5 +1,6 @@
 package hasoffer.job.bean.image;
 
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
@@ -60,7 +61,16 @@ public class SkuImageDownloadJobBean extends QuartzJobBean {
                 public void run() {
                     processorCount.addAndGet(1);
 
+                    //标记线程的起始时间
+                    long startTime = TimeUtils.now();
+
                     while (true) {
+
+                        //该任务每隔俩个小时启动一次，设置100分钟线程自动结束
+                        if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_5_MINUTE * 100) {
+                            break;
+                        }
+
                         PtmCmpSku t = cmpSkuQueue.poll();
 
                         if (t == null) {
