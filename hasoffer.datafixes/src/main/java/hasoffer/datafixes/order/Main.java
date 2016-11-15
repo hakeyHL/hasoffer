@@ -22,8 +22,9 @@ public class Main {
             logger.error("Args is error. please input start time and end time, 'yyyy-mm-dd'");
             return;
         }
-        String arg0 = args[0];
-        String arg1 = args[1];
+        String arg0 = "2016-08-01";
+        String arg1 = "2016-09-30";
+
         Date startDate;
         Date endDate;
         try {
