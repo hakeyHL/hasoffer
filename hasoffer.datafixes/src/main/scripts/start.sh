@@ -1,8 +1,8 @@
 #!/bin/bash
-BIN_DIR=`hasoffer.datafixes.signup`
+BIN_DIR=`pwd`
 echo "BIN_DIR: $BIN_DIR"
 cd ..
-DEPLOY_DIR=`hasoffer.datafixes.signup`
+DEPLOY_DIR=`pwd`
 USER=hasoffer
 GROUP=hasoffer
 SERVER_NAME=""
