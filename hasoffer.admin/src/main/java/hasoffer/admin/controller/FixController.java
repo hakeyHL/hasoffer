@@ -2282,7 +2282,7 @@ http://www.s2d6.com/x/?x=c&z=s&v=5953892&k=||1477299419|28983|553|detail|&t=http
         }
         List<UrmUserRedeemGroup> groupList;
         PageableResult<UrmSignCoin> pageUrmUserList;
-        for (int i = 0; i < pageSize; i++) {
+        for (int i = 1; i < pageSize + 1; i++) {
             pageUrmUserList = appService.getUserList(i, 500);
             if (pageUrmUserList != null && pageUrmUserList.getData() != null) {
                 groupList = new ArrayList<>();
