@@ -1396,7 +1396,13 @@ public class AppController {
     }
 
     public void getDealThuAndComNums(Long dealId, Map map) {
-        map.put("thumbNumber", dealService.getTotalDealThumb());
+        map.put("action", 0);
+        map.put("commentNumber", 0);
+        map.put("thumbNumber", 0);
+        Long totalDealThumb = dealService.getTotalDealThumb();
+        if (totalDealThumb != null) {
+            map.put("thumbNumber", totalDealThumb);
+        }
         PageableResult<AppDealComment> dealComments = dealService.getPageAbleDealComment(dealId, 1, 5);
         if (dealComments != null) {
             map.put("commentNumber", dealComments.getNumFund());
@@ -1423,11 +1429,7 @@ public class AppController {
                     } else if (action == 1) {
                         //赞
                         map.put("action", 1);
-                    } else {
-                        map.put("action", 0);
                     }
-                } else {
-                    map.put("action", 0);
                 }
             }
         }
