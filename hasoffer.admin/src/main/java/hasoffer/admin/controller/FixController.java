@@ -2280,10 +2280,12 @@ http://www.s2d6.com/x/?x=c&z=s&v=5953892&k=||1477299419|28983|553|detail|&t=http
         if (tempPageUrmUserList != null) {
             pageSize = tempPageUrmUserList.getTotalPage();
         }
+        List<UrmUserRedeemGroup> groupList;
+        PageableResult<UrmSignCoin> pageUrmUserList;
         for (int i = 0; i < pageSize; i++) {
-            PageableResult<UrmSignCoin> pageUrmUserList = appService.getUserList(i, 500);
+            pageUrmUserList = appService.getUserList(i, 500);
             if (pageUrmUserList != null && pageUrmUserList.getData() != null) {
-                List<UrmUserRedeemGroup> groupList = new ArrayList<>();
+                groupList = new ArrayList<>();
                 for (UrmSignCoin urmSignCoin : pageUrmUserList.getData()) {
                     groupList.add(new UrmUserRedeemGroup(urmSignCoin.getUserId(), UrmUserGroup.U001));
                 }
