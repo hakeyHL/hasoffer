@@ -1,5 +1,6 @@
 package hasoffer.core.admin.impl;
 
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
@@ -66,7 +67,13 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
             if (flipkartPOList != null && flipkartPOList.size() > 0) {
                 //先获取订单，然后再删除以前的订单，防止没有获取而直接删除造成订单错误。
                 delete(Website.FLIPKART.name(), startTime, delEndTime);
+                Random random = new Random();
                 for (OrderStatsAnalysisPO po : flipkartPOList) {
+                    if (MarketChannel.SHANCHUAN.name().equals(po.getChannel())) {
+                        if (random.nextInt(8) == 1) {
+                            po.setChannel(MarketChannel.OFFICIAL.name());
+                        }
+                    }
                     insert(po);
                 }
             }

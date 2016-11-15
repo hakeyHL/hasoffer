@@ -73,7 +73,7 @@
         <appender-ref ref="ErrorLoggerFileOut"/>
     </logger>
 
-    <logger name="hasoffer.datafixes.signup.work.FixWorker" level="DEBUG">
+    <logger name="hasoffer.datafixes.signup.work.SignupFixWorker" level="DEBUG">
         <appender-ref ref="FixLoggerFileOut"/>
     </logger>
 

@@ -1,6 +1,6 @@
 package hasoffer.datafixes.signup;
 
-import hasoffer.datafixes.signup.work.FixWorker;
+import hasoffer.datafixes.signup.work.SignupFixWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -16,7 +16,7 @@ public class Main {
                 "classpath:/spring-beans.xml",
                 "classpath:/spring/spring-init.xml");
         context.start();
-        context.getBean(FixWorker.class);
+        context.getBean(SignupFixWorker.class);
         logger.info("start finish.");
         //while (true) {
         //    Thread.sleep(60000);

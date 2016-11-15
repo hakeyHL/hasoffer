@@ -27,6 +27,12 @@ public class OrderStatsAnalysisPO implements Identifiable<Integer> {
     @Column(length = 30)
     private String channelSrc;
 
+    @Column(length = 200)
+    private String affExtParam1;
+
+    @Column(length = 200)
+    private String affExtParam2;
+
     @Column(length = 100)
     private String userId;
 
@@ -254,6 +260,22 @@ public class OrderStatsAnalysisPO implements Identifiable<Integer> {
         this.version = version;
     }
 
+    public String getAffExtParam2() {
+        return affExtParam2;
+    }
+
+    public void setAffExtParam2(String affExtParam2) {
+        this.affExtParam2 = affExtParam2;
+    }
+
+    public String getAffExtParam1() {
+        return affExtParam1;
+    }
+
+    public void setAffExtParam1(String affExtParam1) {
+        this.affExtParam1 = affExtParam1;
+    }
+
     @Override
     public String toString() {
         return "OrderStatsAnalysisPO{" +
@@ -262,6 +284,8 @@ public class OrderStatsAnalysisPO implements Identifiable<Integer> {
                 ", webSite='" + webSite + '\'' +
                 ", channel='" + channel + '\'' +
                 ", channelSrc='" + channelSrc + '\'' +
+                ", affExtParam1='" + affExtParam1 + '\'' +
+                ", affExtParam2='" + affExtParam2 + '\'' +
                 ", userId='" + userId + '\'' +
                 ", userType='" + userType + '\'' +
                 ", orderId='" + orderId + '\'' +

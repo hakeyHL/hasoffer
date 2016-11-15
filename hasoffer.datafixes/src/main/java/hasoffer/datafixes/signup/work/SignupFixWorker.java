@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Resource;
 import java.util.*;
 
-public class FixWorker {
-    private static final Logger logger = LoggerFactory.getLogger(FixWorker.class);
+public class SignupFixWorker {
+    private static final Logger logger = LoggerFactory.getLogger(SignupFixWorker.class);
 
     @Resource
     private MongoDbManager mongoDbManager;
