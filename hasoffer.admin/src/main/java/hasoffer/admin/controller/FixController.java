@@ -8,10 +8,7 @@ import hasoffer.admin.worker.*;
 import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.exception.ImageDownloadOrUploadException;
-import hasoffer.base.model.HttpResponseModel;
-import hasoffer.base.model.ImagePath;
-import hasoffer.base.model.PageableResult;
-import hasoffer.base.model.Website;
+import hasoffer.base.model.*;
 import hasoffer.base.utils.*;
 import hasoffer.core.analysis.ProductAnalysisService;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
@@ -25,11 +22,14 @@ import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.sys.SysAdmin;
+import hasoffer.core.persistence.po.urm.UrmSignCoin;
+import hasoffer.core.persistence.po.urm.UrmUserRedeemGroup;
 import hasoffer.core.product.*;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.search.ISearchService;
+import hasoffer.core.system.IAppService;
 import hasoffer.core.task.ListProcessTask;
 import hasoffer.core.task.worker.ILister;
 import hasoffer.core.task.worker.IProcessor;
@@ -92,6 +92,8 @@ public class FixController {
     ICmpSkuService cmpSkuService;
     @Resource
     IFetchService fetchService;
+    @Resource
+    IAppService appService;
     @Resource
     IDeviceService deviceService;
     @Resource
@@ -2263,5 +2265,32 @@ http://www.s2d6.com/x/?x=c&z=s&v=5953892&k=||1477299419|28983|553|detail|&t=http
 
 
         return null;
+    }
+
+    /* 要把今天,包括今天连续签到大于1天的用户的礼品卡兑换比例保持原比例面额*50,
+   之后的用户都是面额*100*/
+    @RequestMapping("fixSignedUserInfo")
+    @ResponseBody
+    public String filterUserSignlg1unitlToday() {
+        //分页查询所有签到记录3659
+        //每页500    7+1  --159
+        //要记下现在的coin以便兑换时参考
+        PageableResult<UrmSignCoin> tempPageUrmUserList = appService.getUserList(0, 500);
+        long pageSize = 8;
+        if (tempPageUrmUserList != null) {
+            pageSize = tempPageUrmUserList.getTotalPage();
+        }
+        for (int i = 0; i < pageSize; i++) {
+            PageableResult<UrmSignCoin> pageUrmUserList = appService.getUserList(i, 500);
+            if (pageUrmUserList != null && pageUrmUserList.getData() != null) {
+                List<UrmUserRedeemGroup> groupList = new ArrayList<>();
+                for (UrmSignCoin urmSignCoin : pageUrmUserList.getData()) {
+                    groupList.add(new UrmUserRedeemGroup(urmSignCoin.getUserId(), UrmUserGroup.U001));
+                }
+                int resultCount = appService.addUserRedeemGroup(groupList);
+                logger.info("list size : {} and batchSaveSize is : {}  ", groupList.size(), resultCount);
+            }
+        }
+        return "ok";
     }
 }

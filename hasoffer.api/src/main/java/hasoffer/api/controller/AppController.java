@@ -10,6 +10,7 @@ import hasoffer.api.worker.SearchLogQueue;
 import hasoffer.base.enums.AppType;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.UrmUserGroup;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.AffliIdHelper;
 import hasoffer.base.utils.ArrayUtils;
@@ -34,15 +35,13 @@ import hasoffer.core.persistence.po.app.*;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.urm.UrmDevice;
-import hasoffer.core.persistence.po.urm.UrmSignCoin;
-import hasoffer.core.persistence.po.urm.UrmUser;
-import hasoffer.core.persistence.po.urm.UrmUserDevice;
+import hasoffer.core.persistence.po.urm.*;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.push.IPushService;
+import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
@@ -73,8 +72,9 @@ import java.util.*;
 @RequestMapping(value = "/app")
 public class AppController {
 
+    @Resource
+    ICacheService<UrmUser> userICacheService;
     private Logger logger = LoggerFactory.getLogger(AppController.class);
-
     @Resource
     private IAppService appService;
     @Resource
@@ -185,6 +185,15 @@ public class AppController {
         UrmUser user = appService.getUserByUserToken(userToken);
         if (user != null) {
             modelAndView.addObject("id", user.getId());
+            //判断用户属于哪个组
+            UrmUserRedeemGroup urmUserRedeemGroup = appService.getUrmRedeemGroupById(user.getId());
+            if (urmUserRedeemGroup != null && UrmUserGroup.U001.equals(urmUserRedeemGroup.getGroupName())) {
+                //需要修改兑换值100*100=10000 --> 100*50=5000
+                //即/2
+                for (HasofferCoinsExchangeGift exchangeGift : gifts) {
+                    exchangeGift.setCoinPrice(exchangeGift.getCoinPrice() / 2);
+                }
+            }
         }
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
@@ -1160,6 +1169,8 @@ public class AppController {
                     Long dealId = Long.valueOf(id);
                     AppDeal appDeal = appService.getDealDetail(dealId);
                     if (appDeal != null) {
+                        //获取点赞数和评论数以及该用户的点赞和点踩状态
+                        getDealThuAndComNums(appDeal.getId(), map);
                         if (vsion < 23) {
                             System.out.println("has this deal ");
                             map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
@@ -1369,6 +1380,7 @@ public class AppController {
         dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
         dealVo.setExp(appDeal.getExpireTime());
         dealVo.setTitle(appDeal.getTitle());
+        dealVo.setCreateTime(getDifference2Date(new Date(), appDeal.getCreateTime()));
         dealVo.setPresentPrice(appDeal.getPresentPrice() == null ? 0 : appDeal.getPresentPrice());
         dealVo.setDiscount(appDeal.getDiscount());
         dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
@@ -1380,6 +1392,44 @@ public class AppController {
         PageableResult<AppDealComment> dealComments = dealService.getPageAbleDealComment(appDeal.getId(), 1, 5);
         if (dealComments != null) {
             dealVo.setCommentNumber(dealComments.getNumFund());
+        }
+    }
+
+    public void getDealThuAndComNums(Long dealId, Map map) {
+        map.put("thumbNumber", dealService.getTotalDealThumb());
+        PageableResult<AppDealComment> dealComments = dealService.getPageAbleDealComment(dealId, 1, 5);
+        if (dealComments != null) {
+            map.put("commentNumber", dealComments.getNumFund());
+        }
+        //是否已点赞是否已点踩
+        UrmUser urmUser;
+        String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
+        if (StringUtils.isNotBlank(userToken)) {
+            String key = "user_" + userToken;
+            urmUser = userICacheService.get(UrmUser.class, key, 0);
+            if (urmUser == null) {
+                urmUser = appService.getUserByUserToken(userToken);
+                if (urmUser != null) {
+                    userICacheService.add(key, urmUser, TimeUtils.SECONDS_OF_1_DAY);
+                }
+            }
+            if (urmUser != null) {
+                AppDealThumb appDealThumb = dealService.getDealThumbByUidDid(urmUser.getId(), dealId);
+                if (appDealThumb != null) {
+                    int action = appDealThumb.getAction();
+                    if (action == -1) {
+                        //踩
+                        map.put("action", 2);
+                    } else if (action == 1) {
+                        //赞
+                        map.put("action", 1);
+                    } else {
+                        map.put("action", 0);
+                    }
+                } else {
+                    map.put("action", 0);
+                }
+            }
         }
     }
 }

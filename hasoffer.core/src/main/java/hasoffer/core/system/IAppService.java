@@ -10,6 +10,7 @@ import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.urm.UrmSignCoin;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
+import hasoffer.core.persistence.po.urm.UrmUserRedeemGroup;
 
 import java.util.List;
 import java.util.Map;
@@ -84,4 +85,10 @@ public interface IAppService {
     List<Map<String, String>> getIndexPage(MarketChannel marketChannel, String deviceId);
 
     List<UrmSignCoin> getUserSignRecord();
+
+    PageableResult<UrmSignCoin> getUserList(int page, int pageSize);
+
+    int addUserRedeemGroup(List<UrmUserRedeemGroup> groupList);
+
+    UrmUserRedeemGroup getUrmRedeemGroupById(Long id);
 }
