@@ -38,7 +38,8 @@ public class Main {
             return;
         }
         OrderFixWorker bean = context.getBean(OrderFixWorker.class);
+        logger.info("Job start.");
         bean.runTask(startDate, endDate);
-        logger.info("start finish.");
+        logger.info("Job finish.");
     }
 }

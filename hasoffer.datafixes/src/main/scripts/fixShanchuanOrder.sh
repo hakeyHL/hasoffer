@@ -2,20 +2,20 @@
 
 orderStartDate=$1
 endEndDate=$2
-if [ -n "$orderStartDate" ]; then
+if [ -z "$orderStartDate" ]; then
     echo "INFO: Please input the start time. format is YYYY-MM-dd."
     exit 1
 fi
 
-if [ -n "$endEndDate" ]; then
+if [ -z "$endEndDate" ]; then
     echo "INFO: Please input the end time. format is YYYY-MM-dd."
     exit 1
 fi
 
-BIN_DIR=`hasoffer.datafixes.order`
+BIN_DIR=`pwd`
 echo "BIN_DIR: $BIN_DIR"
 cd ..
-DEPLOY_DIR=`hasoffer.datafixes.order`
+DEPLOY_DIR=`pwd`
 USER=hasoffer
 GROUP=hasoffer
 SERVER_NAME=""
