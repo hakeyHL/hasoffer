@@ -5,6 +5,7 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.datasource.DataSourceContextHolder;
 import org.junit.Test;
 
+import java.awt.*;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,6 +18,15 @@ public class TimeUtilTest {
 
     private void print(String str) {
         System.out.println(str);
+    }
+
+    @Test
+    public void test5(){
+
+        long time = 1478793600885l;
+
+        System.out.println(TimeUtils.toDate(time));
+
     }
 
     @Test
