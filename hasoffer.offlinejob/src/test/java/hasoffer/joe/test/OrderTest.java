@@ -81,10 +81,13 @@ public class OrderTest {
     @org.junit.Test
     public void testOrderStats() {
         try {
-            Date start9mTime = DateUtils.parseDate("2016-08-01", "yyyy-MM-dd");
-            Date end9mTime = DateUtils.parseDate("2016-08-31", "yyyy-MM-dd");
-            BigDecimal bigDecimal = orderStatsAnalysisService.querySumOrderAmount(start9mTime, end9mTime);
-            System.out.println(bigDecimal.doubleValue());
+            Date date = new Date();
+            Date targetDate = DateUtils.parseDate("2016-11-21", "yyyy-MM-dd");
+            Long x = (targetDate.getTime() - date.getTime()) / (1000 * 60 * 60);
+
+            Date start8mTime = DateUtils.parseDate("2016-08-01", "yyyy-MM-dd");
+            Date end8mTime = DateUtils.parseDate("2016-08-31", "yyyy-MM-dd");
+            orderStatsAnalysisService.updateOrderToLow(start8mTime, end8mTime, 592120, x);
         } catch (ParseException e) {
             e.printStackTrace();
         }

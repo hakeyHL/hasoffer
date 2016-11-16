@@ -175,16 +175,16 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
         if (bigDecimal != null) {
             currentAmount = bigDecimal.doubleValue();
         }
-        double lowAmount = (targetAmount - currentAmount) / hour;
+        double lowAmount = (currentAmount - targetAmount) / hour;
         Random random = new Random();
         double tempAmount = 0;
         List<OrderStatsAnalysisPO> poList = new ArrayList<>();
         while (true) {
             boolean b = false;
             for (OrderStatsAnalysisPO po : orderList) {
-                int x = random.nextInt(50);
+                int x = random.nextInt(200);
                 if (MarketChannel.SHANCHUAN.name().equals(po.getChannel()) && x == 1) {
-                    tempAmount += tempAmount;
+                    tempAmount += (po.getTentativeAmount() == null ? 0 : po.getTentativeAmount().doubleValue());
                     poList.add(po);
                 }
                 if (tempAmount >= lowAmount) {
