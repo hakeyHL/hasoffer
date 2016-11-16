@@ -57,6 +57,22 @@ public class StatController {
     SkuUpdateStatManager skuUpdateStatManager;
     private Logger logger = LoggerFactory.getLogger(StatController.class);
 
+    @RequestMapping(value = "/exp_filpkart_update_failed_skus", method = RequestMethod.GET)
+    @ResponseBody
+    public String exp_filpkart_update_failed_skus(@RequestParam(defaultValue = "") String ymd) {
+        if (StringUtils.isEmpty(ymd)) {
+            ymd = TimeUtils.parse(TimeUtils.today(), "yyyyMMdd");
+        }
+
+        try {
+            skuUpdateStatManager.exp_failed_skus(ymd);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "ok";
+    }
+
     @RequestMapping(value = "/show_updates", method = RequestMethod.GET)
     public ModelAndView show_updates(@RequestParam(defaultValue = "") String ymd) {
         if (StringUtils.isEmpty(ymd)) {
