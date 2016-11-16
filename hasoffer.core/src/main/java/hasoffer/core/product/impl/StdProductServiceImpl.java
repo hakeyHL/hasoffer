@@ -14,9 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by chevy on 2016/8/12.
@@ -25,6 +23,13 @@ import java.util.Map;
 public class StdProductServiceImpl implements IStdProductService {
 
     private static final String Q_ATTR_BY_NAME = "SELECT t from PtmStdAttrDef t where t.stdDefName = ?0";
+
+    private static final String Q_SKU_PRICE = "select t from PtmStdPrice t where t.stdSkuId=?0 ";
+
+    private static final String Q_SKU_ATTR = "select t from PtmStdSkuAttr t where t.stdSkuId=?0 ";
+
+    private static final String Q_SKU_IMAGE = "select t from PtmStdImage t where t.stdSkuId=?0 ";
+
     @Resource
     IDataBaseManager dbm;
     @Resource
@@ -43,12 +48,47 @@ public class StdProductServiceImpl implements IStdProductService {
             return null;
         }
 
-        List<StdSkuPrice> skuPrices;
-        Map<String, StdSkuAttr> attrs;
-        List<StdSkuImage> stdImages;
+        List<StdSkuPrice> skuPrices = findSkuPriceInfo(skuId);
+        Map<String, StdSkuAttr> attrs = findStdSkuAttr(skuId);
+        List<StdSkuImage> stdImages = findImages(skuId);
+
         PtmStdSkuDetail stdSkuDetail = mdm.queryOne(PtmStdSkuDetail.class, skuId);
 
-        return null;
+        return new StdSkuBo(stdSku, attrs, skuPrices, stdImages, stdSkuDetail);
+    }
+
+    private List<StdSkuImage> findImages(long skuId) {
+        List<StdSkuImage> stdSkuImages = new ArrayList<>();
+
+        List<PtmStdImage> stdImages = dbm.query(Q_SKU_IMAGE, Arrays.asList(skuId));
+
+        for (PtmStdImage stdImage : stdImages) {
+            stdSkuImages.add(new StdSkuImage(stdImage));
+        }
+
+        return stdSkuImages;
+    }
+
+    private List<StdSkuPrice> findSkuPriceInfo(long skuId) {
+        List<PtmStdPrice> skuPrices = dbm.query(Q_SKU_PRICE, Arrays.asList(skuId));
+
+        List<StdSkuPrice> stdSkuPrices = new ArrayList<>();
+        for (PtmStdPrice stdPrice : skuPrices) {
+            stdSkuPrices.add(new StdSkuPrice(stdPrice));
+        }
+
+        return stdSkuPrices;
+    }
+
+    private Map<String, StdSkuAttr> findStdSkuAttr(long skuId) {
+        Map<String, StdSkuAttr> datamap = new HashMap<>();
+
+        List<PtmStdSkuAttr> stdSkuAttrs = dbm.query(Q_SKU_ATTR, Arrays.asList(skuId));
+        for (PtmStdSkuAttr stdSkuAttr : stdSkuAttrs) {
+            datamap.put(stdSkuAttr.getStdName(), new StdSkuAttr(stdSkuAttr));
+        }
+
+        return datamap;
     }
 
     @Override

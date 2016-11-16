@@ -1,5 +1,7 @@
 package hasoffer.core.bo.stdsku;
 
+import hasoffer.core.persistence.po.ptm.PtmStdSku;
+import hasoffer.core.persistence.po.ptm.PtmStdSkuDetail;
 import hasoffer.core.persistence.po.ptm.PtmStdSkuParamGroup;
 
 import java.util.Date;
@@ -36,6 +38,26 @@ public class StdSkuBo {
     private List<PtmStdSkuParamGroup> paramGroups;
 
     private String desc;
+
+    public StdSkuBo(PtmStdSku stdSku, Map<String, StdSkuAttr> skuAttrs, List<StdSkuPrice> skuPrices, List<StdSkuImage> skuImages, PtmStdSkuDetail skuDetail) {
+        this.id = stdSku.getId();
+        this.stdProId = stdSku.getStdProId();
+        this.title = stdSku.getTitle();
+        this.brand = stdSku.getBrand();
+        this.model = stdSku.getModel();
+        this.categoryId = stdSku.getCategoryId();
+        this.refPrice = stdSku.getRefPrice();
+        this.createTime = stdSku.getCreateTime();
+        this.sourceId = stdSku.getSourceId();
+        this.sourceUrl = stdSku.getSourceUrl();
+
+        this.skuAttrs = skuAttrs;
+        this.skuPrices = skuPrices;
+        this.skuImages = skuImages;
+
+        this.paramGroups = skuDetail.getParamGroups();
+        this.desc = skuDetail.getDesc();
+    }
 
     public long getId() {
         return id;
