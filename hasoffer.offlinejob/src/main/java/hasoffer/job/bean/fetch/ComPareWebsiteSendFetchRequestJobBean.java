@@ -31,12 +31,12 @@ import static hasoffer.base.utils.http.XPathUtils.getSubNodeByXPath;
 /**
  * Created on 2016/11/15.
  */
-public class ComPareWebsiteFetchJobBean extends QuartzJobBean {
+public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
     public static final String WEBSITE_91MOBILE_URL_PREFIEX = "http://www.91mobiles.com";
     /**
      * Logger for this class
      */
-    private static final Logger logger = LoggerFactory.getLogger(ComPareWebsiteFetchJobBean.class);
+    private static final Logger logger = LoggerFactory.getLogger(ComPareWebsiteSendFetchRequestJobBean.class);
     @Resource
     IFetchDubboService fetchDubboService;
 
