@@ -26,7 +26,7 @@ public class PtmStdSku implements Identifiable<Long> {
     private Date createTime;//该条sku记录的创建时间
 
     @Column(unique = true, nullable = false)
-    private long sourceId; // sourceId
+    private String sourceId; // sourceId
     private String sourceUrl; // source url
 
     private PtmStdSku() {
@@ -36,7 +36,7 @@ public class PtmStdSku implements Identifiable<Long> {
 
     public PtmStdSku(String title, String brand, String model,
                      long categoryId, float refPrice,
-                     long sourceId, String sourceUrl) {
+                     String sourceId, String sourceUrl) {
         this();
         this.title = title;
         this.brand = brand;
@@ -91,11 +91,11 @@ public class PtmStdSku implements Identifiable<Long> {
         this.createTime = createTime;
     }
 
-    public long getSourceId() {
+    public String getSourceId() {
         return sourceId;
     }
 
-    public void setSourceId(long sourceId) {
+    public void setSourceId(String sourceId) {
         this.sourceId = sourceId;
     }
 
