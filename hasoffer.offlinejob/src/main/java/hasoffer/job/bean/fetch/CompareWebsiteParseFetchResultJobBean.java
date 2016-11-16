@@ -46,6 +46,7 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
 
         //product基本信息相关
         FetchedProduct ptmproduct = compareWebsiteFetchResult.getPtmproduct();
+        System.out.println("product _" + ptmproduct);
 
         //sku列表信息相关
         float minPrice = 0.0f;
@@ -54,7 +55,7 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
         List<FetchedProduct> ptmcmpskuList = compareWebsiteFetchResult.getPtmcmpskuList();
 
         for (FetchedProduct ptmcmpsku : ptmcmpskuList) {
-
+            System.out.println("sku _" + ptmcmpsku);
             if (ptmcmpsku.getPrice() != 0) {
                 if (flag) {
                     minPrice = ptmcmpsku.getPrice();
@@ -70,7 +71,7 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
         }
 
         long categoryId = compareWebsiteFetchResult.getCategoryId();
-
+        System.out.println("categoryid _" + categoryId);
         PtmStdSku stdSku = new PtmStdSku(ptmproduct.getTitle(), ptmproduct.getBrand(), ptmproduct.getModel(), categoryId, minPrice, ptmproduct.getSourceId(), ptmproduct.getUrl());
 
 
@@ -78,6 +79,7 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
         List<String> imageUrlList = ptmproduct.getImageUrlList();
         List<StdSkuImage> stdImages = new ArrayList<>();
         for (String imageUrl : imageUrlList) {
+            System.out.println("imageUrl _" + imageUrl);
             StdSkuImage stdImage = new StdSkuImage(0L, 0L, 0L, imageUrl, "", "", "");
             stdImages.add(stdImage);
         }
@@ -87,6 +89,7 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
         List<FetchedParamGroup> fetchedParamGroupList = compareWebsiteFetchResult.getFetchedParamGroupList();
         for (FetchedParamGroup fetchedParamGroup : fetchedParamGroupList) {
             String fetchedJson = JSONUtil.toJSON(fetchedParamGroup);
+            System.out.print("param _" + fetchedJson);
             paramGroups.add(JSONUtil.toObject(fetchedJson, PtmStdSkuParamGroup.class));
         }
         PtmStdSkuDetail stdSkuDetail = new PtmStdSkuDetail(0, paramGroups, "");
