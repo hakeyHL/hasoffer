@@ -27,7 +27,7 @@
                 <ref bean="skuImageDownLoadTrigger"/>
                 <ref bean="skuImageListDownLoadTrigger"/>
                 <ref bean="statSearchLogTrigger"/>
-                <ref bean="compareWebsiteFetchTrigger"/>
+                <!--<ref bean="compareWebsiteFetchTrigger"/>-->
             </list>
         </property>
 
