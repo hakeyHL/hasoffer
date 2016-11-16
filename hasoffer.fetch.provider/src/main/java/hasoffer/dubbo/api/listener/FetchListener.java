@@ -2,6 +2,7 @@ package hasoffer.dubbo.api.listener;
 
 import hasoffer.base.model.Website;
 import hasoffer.base.thread.HasofferThreadFactory;
+import hasoffer.dubbo.api.fetch.task.FetchCompareWebsiteTaskWorker;
 import hasoffer.dubbo.api.fetch.task.FetchDealWorker;
 import hasoffer.dubbo.api.fetch.task.FetchKeywordWorker;
 import hasoffer.dubbo.api.fetch.task.FetchUrlWorker;
@@ -24,6 +25,15 @@ public class FetchListener extends ContextLoaderListener {
         initUrlThread();
         initKeyWordThread();
         initDealFetchThread();
+        initCompareWebsiteFetchThread();
+    }
+
+    private void initCompareWebsiteFetchThread() {
+        HasofferThreadFactory factory = new HasofferThreadFactory("FetchCompareWebsiteWorker");
+        ExecutorService es = Executors.newCachedThreadPool(factory);
+        for (int i = 0; i < 1; i++) {
+            es.execute(new FetchCompareWebsiteTaskWorker(springContext, Website.MOBILE91));
+        }
     }
 
     private void initDealFetchThread() {
