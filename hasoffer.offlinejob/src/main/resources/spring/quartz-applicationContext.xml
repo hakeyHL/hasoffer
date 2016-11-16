@@ -27,6 +27,7 @@
                 <ref bean="skuImageDownLoadTrigger"/>
                 <ref bean="skuImageListDownLoadTrigger"/>
                 <ref bean="statSearchLogTrigger"/>
+                <ref bean="compareWebsiteFetchTrigger"/>
             </list>
         </property>
 
@@ -119,6 +120,14 @@
         <property name="cronExpression" value="0 0 4 * * ?"/>
     </bean>
 
+    <!-- 比较网站数据抓取 -->
+    <bean name="compareWebsiteFetchJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.fetch.ComPareWebsiteFetchJobBean"/>
+    </bean>
+    <bean id="compareWebsiteFetchTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="compareWebsiteFetchJob"/>
+        <property name="cronExpression" value="0 0 1 1 1 ? 2066"/>
+    </bean>
     <!--<bean name="topSellingTaskJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
     <!--<property name="jobClass" value="hasoffer.job.bean.fetch.TopSellingTaskJobBean"/>-->
     <!--</bean>-->
