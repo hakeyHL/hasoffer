@@ -61,7 +61,8 @@ public class CompareWebsiteFetchResultWorker implements Runnable {
                     continue;
                 }
 
-                stdProductService.createStdSku(stdSkuBo);
+                boolean stdSku = stdProductService.createStdSku(stdSkuBo);
+                System.out.print("create " + stdSku);
 
             } else {
                 System.out.println("pop get " + taskStatus + "continue");
@@ -99,7 +100,6 @@ public class CompareWebsiteFetchResultWorker implements Runnable {
         long categoryId = compareWebsiteFetchResult.getCategoryId();
 
         PtmStdSku stdSku = new PtmStdSku(ptmproduct.getTitle(), ptmproduct.getBrand(), ptmproduct.getModel(), categoryId, minPrice, ptmproduct.getSourceId(), ptmproduct.getUrl());
-
 
 
         //product图片列表相关
