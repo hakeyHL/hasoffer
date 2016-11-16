@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static hasoffer.base.utils.HtmlUtils.getSubNodesByXPath;
 import static hasoffer.base.utils.http.XPathUtils.getSubNodeByXPath;
@@ -31,12 +32,11 @@ import static hasoffer.base.utils.http.XPathUtils.getSubNodeByXPath;
  * Created on 2016/11/15.
  */
 public class ComPareWebsiteFetchJobBean extends QuartzJobBean {
+    public static final String WEBSITE_91MOBILE_URL_PREFIEX = "http://www.91mobiles.com";
     /**
      * Logger for this class
      */
     private static final Logger logger = LoggerFactory.getLogger(ComPareWebsiteFetchJobBean.class);
-    public static final String WEBSITE_91MOBILE_URL_PREFIEX = "http://www.91mobiles.com";
-
     @Resource
     IFetchDubboService fetchDubboService;
 
@@ -53,14 +53,27 @@ public class ComPareWebsiteFetchJobBean extends QuartzJobBean {
         apiJsonCates.add("camera");
         apiJsonCates.add("tablet");
         apiJsonCates.add("tv");
+        List<Integer> apiJsonCateCategorys = new ArrayList<>();
+        apiJsonCateCategorys.add(3182);
+        apiJsonCateCategorys.add(57);
+        apiJsonCateCategorys.add(3100);
 
 
         List<String> htmlReqUrlList = new ArrayList<>();
         htmlReqUrlList.add("http://www.91mobiles.com/mobile-memory-card-finder.php");
         htmlReqUrlList.add("http://www.91mobiles.com/mobile-power-bank-finder.php");
         htmlReqUrlList.add("http://www.91mobiles.com/smartwatchfinder.php");
+        List<Integer> htmlReqUrlCategoryList = new ArrayList<>();
+        htmlReqUrlCategoryList.add(205);
+        htmlReqUrlCategoryList.add(270);
+        htmlReqUrlCategoryList.add(102909);
 
-        for (String cate : apiJsonCates) {
+        for (int i = 0; i < apiJsonCates.size(); i++) {
+
+            String cate = apiJsonCates.get(i);
+            Integer categoryId = apiJsonCateCategorys.get(i);
+//        }
+//        for (String cate : apiJsonCates) {
             JSONObject jsonObject = new JSONObject();
             //t 当前时间戳
             jsonObject.put("t", new Date().getTime());
@@ -94,25 +107,31 @@ public class ComPareWebsiteFetchJobBean extends QuartzJobBean {
                 }
             } catch (Exception e) {
                 logger.info(" calculate totalPage exception {}", e.getMessage());
+                e.printStackTrace();
             }
-            for (int i = 0; i < totalPageSize; i++) {
-                jsonObject.put("startRow", i * jsonObject.getInteger("limit"));
+            for (int j = 0; j < totalPageSize; j++) {
+                jsonObject.put("startRow", j * jsonObject.getInteger("limit"));
                 System.out.println(jsonReqUrlList + " _ " + cate + "  FETCH START");
-                cate91Fetch(jsonReqUrlList, jsonObject);
+                cate91Fetch(jsonReqUrlList, jsonObject, categoryId);
                 System.out.println(jsonReqUrlList + " _ " + cate + " FETCH END");
                 num++;
             }
             System.out.println("total num " + num);
         }
+
         totalPageSize = 14;
-        for (String htmlUrl : htmlReqUrlList) {
+        for (int i = 0; i < htmlReqUrlList.size(); i++) {
+
+            String htmlUrl = htmlReqUrlList.get(i);
+            Integer categoryId = htmlReqUrlCategoryList.get(i);
+
             num = 0;
             htmlUrl = htmlUrl + "?page=";
-            for (int i = 1; i < totalPageSize + 1; i++) {
+            for (int j = 1; j < totalPageSize + 1; j++) {
                 String tempUrl = "";
-                tempUrl = htmlUrl + i;
+                tempUrl = htmlUrl + j;
                 System.out.println(tempUrl + " html  FETCH START");
-                cate91FetchHtml(tempUrl);
+                cate91FetchHtml(tempUrl, categoryId);
                 System.out.println(tempUrl + " html  FETCH END");
                 num++;
             }
@@ -120,7 +139,7 @@ public class ComPareWebsiteFetchJobBean extends QuartzJobBean {
 
     }
 
-    private void cate91Fetch(String url, JSONObject jsonObject) {
+    private void cate91Fetch(String url, JSONObject jsonObject, long categoryId) {
         String jsonString = null;
         try {
             jsonString = Httphelper.doPost(url, jsonObject.toJSONString());
@@ -140,7 +159,12 @@ public class ComPareWebsiteFetchJobBean extends QuartzJobBean {
                         productUrl = "http://www.91mobiles.com/" + productUrl;
                         System.out.println(productUrl);
 
-                        fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_2, TimeUtils.MILLISECONDS_OF_1_HOUR * 10);
+                        fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_2, TimeUtils.MILLISECONDS_OF_1_HOUR * 10, categoryId);
+                        try {
+                            TimeUnit.SECONDS.sleep(3);
+                        } catch (InterruptedException e) {
+
+                        }
                     }
                 }
             }
@@ -150,7 +174,7 @@ public class ComPareWebsiteFetchJobBean extends QuartzJobBean {
 
     }
 
-    private void cate91FetchHtml(String url) {
+    private void cate91FetchHtml(String url, long categoryId) {
         String html = null;
         List<TagNode> productListNode = null;
         try {
@@ -180,8 +204,12 @@ public class ComPareWebsiteFetchJobBean extends QuartzJobBean {
             }
 
             System.out.println(productUrl);
-            fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_2, TimeUtils.MILLISECONDS_OF_1_HOUR * 10);
+            fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_2, TimeUtils.MILLISECONDS_OF_1_HOUR * 10, categoryId);
+            try {
+                TimeUnit.SECONDS.sleep(3);
+            } catch (InterruptedException e) {
 
+            }
         }
     }
 }

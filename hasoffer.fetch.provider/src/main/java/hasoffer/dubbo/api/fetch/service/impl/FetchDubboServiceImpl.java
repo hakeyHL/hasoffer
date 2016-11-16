@@ -77,7 +77,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     }
 
     @Override
-    public void sendCompareWebsiteFetchTask(Website website, String url, TaskLevel taskLevel, long cacheSeconds) {
+    public void sendCompareWebsiteFetchTask(Website website, String url, TaskLevel taskLevel, long cacheSeconds,long categoryId) {
 
         //先检查解析过的set中是否含有该url，如果有跳过，如果没有新增
         boolean flag = fetchCacheService.checkCompareWebsiteFetch(RedisKeysUtils.PARSED_COMPAREWEBSITE_FETCH_URL, url, cacheSeconds);
@@ -95,13 +95,14 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
         fetchCompareWebsiteResult.setWebsite(website);
         fetchCompareWebsiteResult.setUrl(url);
         fetchCompareWebsiteResult.setTaskStatus(TaskStatus.START);
+        fetchCompareWebsiteResult.setCategoryId(categoryId);
 
         fetchCacheService.pushTaskList(redisKey, JSONUtil.toJSON(fetchCompareWebsiteResult));
     }
 
     @Override
-    public FetchCompareWebsiteResult getCompareWebsiteFetchResult(Website webSite, String url, long expireSeconds) {
-        return null;
+    public FetchCompareWebsiteResult getCompareWebsiteFetchResult(Website webSite) {
+        return fetchCacheService.popFetchCompareWebsite(RedisKeysUtils.getComparewebsiteFetchResultKey(webSite));
     }
 
     @Override
