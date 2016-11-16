@@ -1,6 +1,7 @@
 package hasoffer.job.listener;
 
 import hasoffer.base.utils.DaemonThreadFactory;
+import hasoffer.core.product.impl.StdProductServiceImpl;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
@@ -27,10 +28,11 @@ public class CompareWebsiteFetchResultListener extends ContextLoaderListener {
     private void serverInitialized() {
 
         IFetchDubboService fetchDubboService = springContext.getBean(IFetchDubboService.class);
+        StdProductServiceImpl stdProductService = springContext.getBean(StdProductServiceImpl.class);
 
         ExecutorService es = Executors.newCachedThreadPool();
 
-        es.execute(DaemonThreadFactory.create(new CompareWebsiteFetchResultWorker(fetchDubboService)));
+        es.execute(DaemonThreadFactory.create(new CompareWebsiteFetchResultWorker(fetchDubboService, stdProductService)));
     }
 
     @Override

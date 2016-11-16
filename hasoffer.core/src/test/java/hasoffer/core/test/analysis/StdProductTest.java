@@ -1,10 +1,8 @@
 package hasoffer.core.test.analysis;
 
-import hasoffer.affiliate.model.FlipkartSkuInfo;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.ptm.PtmStdProduct;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.product.IStdProductService;
 import org.apache.commons.io.FileUtils;
@@ -17,7 +15,6 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by chevy on 2016/8/10.
@@ -92,7 +89,7 @@ public class StdProductTest {
             int tryTimes = 1;
             while (tryTimes++ <= 3) {
                 try {
-                    if (tryTimes > 2) {
+                    /*if (tryTimes > 2) {
                         System.out.print("retry - ");
                     }
                     System.out.println("search - " + keyword);
@@ -113,7 +110,7 @@ public class StdProductTest {
                                 .append("NULL").append("\n");
                     }
 
-                    break;
+                    break;*/
                 } catch (Exception e) {
                     if (tryTimes > 3) {
                         sb_err.append(keyword).append("\t")
@@ -160,7 +157,7 @@ public class StdProductTest {
             int tryTimes = 1;
             while (tryTimes++ <= 3) {
                 try {
-                    Map<String, FlipkartSkuInfo> skuInfoMap = stdProductService.searchSku(keyword_2);
+                   /* Map<String, FlipkartSkuInfo> skuInfoMap = stdProductService.searchSku(keyword_2);
 
                     if (tryTimes > 2) {
                         System.out.print("retry - ");
@@ -178,7 +175,7 @@ public class StdProductTest {
                         sb.append(keyword_2).append("\t").append("NULL");
                     }
                     sb.append("\n");
-                    break;
+                    break;*/
                 } catch (Exception e) {
                     if (tryTimes > 3) {
                         sb.append(keyword_2).append("\t").append("ERROR").append("\n");
@@ -201,9 +198,9 @@ public class StdProductTest {
     public void getFlipkartProduct() throws Exception {
         String keyword = "Chilli B03";
 
-        Map<String, FlipkartSkuInfo> skuInfoMap = stdProductService.searchSku(keyword);
+      /*  Map<String, FlipkartSkuInfo> skuInfoMap = stdProductService.searchSku(keyword);
 
-        stdProductService.createStd(skuInfoMap);
+        stdProductService.createStd(skuInfoMap);*/
     }
 
 }

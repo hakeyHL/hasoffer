@@ -1388,7 +1388,7 @@ public class AppController {
         dealVo.setWebsite(appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
         //计算总评论数
         //计算总点赞数
-        dealVo.setThumbNumber(dealService.getTotalDealThumb());
+        dealVo.setThumbNumber(dealService.getTotalDealThumb(appDeal.getId()));
         PageableResult<AppDealComment> dealComments = dealService.getPageAbleDealComment(appDeal.getId(), 1, 5);
         if (dealComments != null) {
             dealVo.setCommentNumber(dealComments.getNumFund());
@@ -1399,7 +1399,7 @@ public class AppController {
         map.put("action", 0);
         map.put("commentNumber", 0);
         map.put("thumbNumber", 0);
-        Long totalDealThumb = dealService.getTotalDealThumb();
+        Long totalDealThumb = dealService.getTotalDealThumb(dealId);
         if (totalDealThumb != null) {
             map.put("thumbNumber", totalDealThumb);
         }
