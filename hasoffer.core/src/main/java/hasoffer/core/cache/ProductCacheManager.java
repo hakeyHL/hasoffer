@@ -204,11 +204,11 @@ public class ProductCacheManager {
 
     //现在前台不返回offsale的sku,此方法暂时停用,且此方法查询效率低
     public List<PtmCmpSku> getOnsaleSkuList(List data, long productId) {
-        System.out.println("get productId is : " + productId);
+//        System.out.println("get productId is : " + productId);
         List<PtmCmpSku> tempPtmCmpSkus = new ArrayList<>();
         int i = 0;
         for (Object object : data) {
-            System.out.println(" get onsale ptmcmpsku : i " + i);
+//            System.out.println(" get onsale ptmcmpsku : i " + i);
             JSONArray jsonArray = JSONArray.parseArray(JSONArray.toJSONString(object));
             String website = (String) jsonArray.get(0);
             String price = jsonArray.get(1) + "";
