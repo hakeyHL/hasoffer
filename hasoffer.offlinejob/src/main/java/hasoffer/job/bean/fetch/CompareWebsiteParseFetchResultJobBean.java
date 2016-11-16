@@ -72,6 +72,7 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
 
         long categoryId = compareWebsiteFetchResult.getCategoryId();
         System.out.println("categoryid _" + categoryId);
+
         PtmStdSku stdSku = new PtmStdSku(ptmproduct.getTitle(), ptmproduct.getBrand(), ptmproduct.getModel(), categoryId, minPrice, ptmproduct.getSourceId(), ptmproduct.getUrl());
 
 
@@ -96,9 +97,9 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
         }
         PtmStdSkuDetail stdSkuDetail = new PtmStdSkuDetail(0, paramGroups, "");
 
-
+        System.out.println("stdSku = " + stdSku);
+        System.out.print("flag null = " + stdSku == null);
         StdSkuBo stdSkuBo = new StdSkuBo(stdSku, null, skuPrices, stdImages, stdSkuDetail);
-
 
         return stdSkuBo;
     }
