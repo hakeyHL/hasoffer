@@ -107,7 +107,7 @@ public class ProductCacheManager {
      * @return
      */
     public PageableResult<PtmCmpSku> listPagedCmpSkus(long proId, int page, int size) {
-        System.out.println(" proId proId proId :" + proId);
+//        System.out.println(" proId proId proId :" + proId);
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_" + String.valueOf(proId) + "_" + page + "_" + size;
         String cmpSkusJson = cacheService.get(key, 0);
         //先不读缓存,也不存缓存
@@ -116,7 +116,7 @@ public class ProductCacheManager {
         try {
             if (StringUtils.isEmpty(cmpSkusJson)) {
                 pagedCmpskus = productService.listOnsaleCmpSkus(proId, page, size);
-                System.out.println("--------- pagedCmpskus  -----------" + pagedCmpskus.getData().size());
+//                System.out.println("--------- pagedCmpskus  -----------" + pagedCmpskus.getData().size());
                 List<PtmCmpSku> data = pagedCmpskus.getData();
                 if (data != null && data.size() > 0) {
                     //now , only the sku status is 'ONSALE' will return to our client , this method is closed by temporarily.
