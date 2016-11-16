@@ -42,7 +42,10 @@ public class SkuUpdateStatManager {
 
         Map<Long, Long> proMap = searchLogCacheManager.getProductCount(ymd);
 
-        StringBuilder sb = new StringBuilder(String.format("%s update day(%s). \n", ymd, TimeUtils.parse(deadLineDate, TimeUtils.PATTERN_YMD)));
+        String header = String.format("%s update day(%s), product count %d. \n", ymd, TimeUtils.parse(deadLineDate, TimeUtils.PATTERN_YMD), proMap.size());
+        System.out.println(header);
+
+        StringBuilder sb = new StringBuilder(header);
 
         File file = new File("/home/hasoffer/exp_faild_sku.dat");
         if (file.exists()) {
