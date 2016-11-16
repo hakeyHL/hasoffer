@@ -7,6 +7,8 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.stdsku.StdSkuBo;
 import hasoffer.core.bo.stdsku.StdSkuImage;
 import hasoffer.core.bo.stdsku.StdSkuPrice;
+import hasoffer.core.persistence.po.ptm.PtmStdSku;
+import hasoffer.core.persistence.po.ptm.PtmStdSkuDetail;
 import hasoffer.core.persistence.po.ptm.PtmStdSkuParamGroup;
 import hasoffer.core.product.IStdProductService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
@@ -69,18 +71,8 @@ public class CompareWebsiteFetchResultWorker implements Runnable {
 
     private StdSkuBo convertResultToStdSkuBo(FetchCompareWebsiteResult compareWebsiteFetchResult) throws IOException {
 
-        StdSkuBo stdSkuBo = new StdSkuBo();
-
         //product基本信息相关
         FetchedProduct ptmproduct = compareWebsiteFetchResult.getPtmproduct();
-        long categoryId = compareWebsiteFetchResult.getCategoryId();
-
-        stdSkuBo.setTitle(ptmproduct.getTitle());
-        stdSkuBo.setBrand(ptmproduct.getBrand());
-        stdSkuBo.setModel(ptmproduct.getModel());
-        stdSkuBo.setCategoryId(categoryId);
-        stdSkuBo.setSourceId(ptmproduct.getSourceId());
-        stdSkuBo.setSourceUrl(ptmproduct.getUrl());
 
         //sku列表信息相关
         float minPrice = 0.0f;
@@ -103,7 +95,12 @@ public class CompareWebsiteFetchResultWorker implements Runnable {
             StdSkuPrice stdPrice = new StdSkuPrice(0L, 0, ptmcmpsku.getTitle(), ptmcmpsku.getPrice(), 0, ptmcmpsku.getShipping(), ptmcmpsku.getSkuStatus(), ptmcmpsku.getWebsite(), ptmcmpsku.getUrl(), TimeUtils.nowDate(), TimeUtils.nowDate());
             skuPrices.add(stdPrice);
         }
-        stdSkuBo.setRefPrice(minPrice);
+
+        long categoryId = compareWebsiteFetchResult.getCategoryId();
+
+        PtmStdSku stdSku = new PtmStdSku(ptmproduct.getTitle(), ptmproduct.getBrand(), ptmproduct.getModel(), categoryId, minPrice, ptmproduct.getSourceId(), ptmproduct.getUrl());
+
+
 
         //product图片列表相关
         List<String> imageUrlList = ptmproduct.getImageUrlList();
@@ -113,13 +110,17 @@ public class CompareWebsiteFetchResultWorker implements Runnable {
             stdImages.add(stdImage);
         }
 
+        //描述部分
         List<PtmStdSkuParamGroup> paramGroups = new ArrayList<>();
         List<FetchedParamGroup> fetchedParamGroupList = compareWebsiteFetchResult.getFetchedParamGroupList();
         for (FetchedParamGroup fetchedParamGroup : fetchedParamGroupList) {
             String fetchedJson = JSONUtil.toJSON(fetchedParamGroup);
             paramGroups.add(JSONUtil.toObject(fetchedJson, PtmStdSkuParamGroup.class));
         }
-        stdSkuBo.setParamGroups(paramGroups);
+        PtmStdSkuDetail stdSkuDetail = new PtmStdSkuDetail(0, paramGroups, "");
+
+
+        StdSkuBo stdSkuBo = new StdSkuBo(stdSku, null, skuPrices, stdImages, stdSkuDetail);
 
 
         return stdSkuBo;
