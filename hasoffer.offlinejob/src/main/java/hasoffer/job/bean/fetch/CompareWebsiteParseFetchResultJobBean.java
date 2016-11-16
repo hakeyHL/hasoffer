@@ -1,8 +1,8 @@
 package hasoffer.job.bean.fetch;
 
+import com.alibaba.fastjson.JSON;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
-import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.stdsku.StdSkuBo;
 import hasoffer.core.bo.stdsku.StdSkuImage;
@@ -90,9 +90,9 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
         List<PtmStdSkuParamGroup> paramGroups = new ArrayList<>();
         List<FetchedParamGroup> fetchedParamGroupList = compareWebsiteFetchResult.getFetchedParamGroupList();
         for (FetchedParamGroup fetchedParamGroup : fetchedParamGroupList) {
-            String fetchedJson = JSONUtil.toJSON(fetchedParamGroup);
+            String fetchedJson = JSON.toJSONString(fetchedParamGroup);
             System.out.print("param _" + fetchedJson);
-            paramGroups.add(JSONUtil.toObject(fetchedJson, PtmStdSkuParamGroup.class));
+            paramGroups.add(JSON.parseObject(fetchedJson, PtmStdSkuParamGroup.class));
         }
         PtmStdSkuDetail stdSkuDetail = new PtmStdSkuDetail(0, paramGroups, "");
 
