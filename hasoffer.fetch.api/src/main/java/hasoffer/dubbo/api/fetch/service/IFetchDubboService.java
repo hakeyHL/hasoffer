@@ -158,10 +158,10 @@ public interface IFetchDubboService {
      * @param taskLevel     任务优先级
      * @param expireSeconds 在指定时常内，对于客户端发送的抓取请求，进行url去重
      */
-    void sendCompareWebsiteFetchTask(Website website, String url, TaskLevel taskLevel, long expireSeconds);
+    void sendCompareWebsiteFetchTask(Website website, String url, TaskLevel taskLevel, long expireSeconds, long categoryId);
 
 
-    FetchCompareWebsiteResult getCompareWebsiteFetchResult(Website webSite, String url, long expireSeconds);
+    FetchCompareWebsiteResult getCompareWebsiteFetchResult(Website webSite);
 
 /*************************************************************************************************/
 }
