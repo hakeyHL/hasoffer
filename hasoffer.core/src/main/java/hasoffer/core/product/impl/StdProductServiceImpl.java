@@ -45,7 +45,7 @@ public class StdProductServiceImpl implements IStdProductService {
         // 各网站价格
         List<StdSkuPrice> skuPrices = skuBo.getSkuPrices();
         for (StdSkuPrice skuPrice : skuPrices) {
-            PtmStdPrice stdPrice = new PtmStdPrice(skuPrice.getStdSkuId(), skuPrice.getTitle(), skuPrice.getPrice(), skuPrice.getStockCount(),
+            PtmStdPrice stdPrice = new PtmStdPrice(stdSku.getId(), skuPrice.getTitle(), skuPrice.getPrice(), skuPrice.getStockCount(),
                     skuPrice.getShippingFee(), skuPrice.getSkuStatus(), skuPrice.getWebsite(), skuPrice.getUrl());
             dbm.create(stdPrice);
         }
