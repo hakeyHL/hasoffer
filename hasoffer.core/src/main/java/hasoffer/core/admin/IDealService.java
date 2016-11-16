@@ -65,7 +65,7 @@ public interface IDealService {
 
     void createAppComment(AppDealComment appDealComment);
 
-    Long getTotalDealThumb();
+    Long getTotalDealThumb(long dealId);
 
     PageableResult<AppDealComment> getPageAbleDealComment(Long dealId, int page, int pageSize);
 }
