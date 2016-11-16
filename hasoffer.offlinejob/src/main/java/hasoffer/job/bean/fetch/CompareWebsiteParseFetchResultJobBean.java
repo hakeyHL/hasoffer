@@ -78,10 +78,12 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
         //product图片列表相关
         List<String> imageUrlList = ptmproduct.getImageUrlList();
         List<StdSkuImage> stdImages = new ArrayList<>();
-        for (String imageUrl : imageUrlList) {
-            System.out.println("imageUrl _" + imageUrl);
-            StdSkuImage stdImage = new StdSkuImage(0L, 0L, 0L, imageUrl, "", "", "");
-            stdImages.add(stdImage);
+        if (stdImages != null && stdImages.size() != 0) {
+            for (String imageUrl : imageUrlList) {
+                System.out.println("imageUrl _" + imageUrl);
+                StdSkuImage stdImage = new StdSkuImage(0L, 0L, 0L, imageUrl, "", "", "");
+                stdImages.add(stdImage);
+            }
         }
 
         //描述部分
