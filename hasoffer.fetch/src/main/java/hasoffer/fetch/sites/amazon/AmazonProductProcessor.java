@@ -11,6 +11,7 @@ import hasoffer.fetch.exception.ImagesNotFoundException;
 import hasoffer.fetch.model.Product;
 import hasoffer.fetch.model.ProductImage;
 import hasoffer.fetch.model.Sku;
+import hasoffer.site.in.amazon.AmazonHelper;
 import org.htmlcleaner.TagNode;
 import org.htmlcleaner.XPatherException;
 import org.slf4j.Logger;

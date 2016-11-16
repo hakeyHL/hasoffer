@@ -11,6 +11,7 @@ import org.apache.poi.ss.formula.functions.T;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -428,6 +429,7 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
             @Override
             public List<Map<String, Object>> doInHibernate(Session session) throws HibernateException {
                 Query query = buildQuery(session, true, sql, params).setFirstResult((page - 1) * pageSize).setMaxResults(pageSize);
+                query.setResultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP);
                 List<Map<String, Object>> items = query.list();
                 session.flush();
                 session.close();
@@ -488,8 +490,13 @@ public abstract class AbstractHibernate4DataBaseManager implements IDataBaseMana
             }
             ql = sb.toString();
         }
+        Query query;
+        if (isSql) {
+            query = session.createSQLQuery(ql);
+        } else {
+            query = session.createQuery(ql);
+        }
 
-        Query query = isSql ? session.createSQLQuery(ql) : session.createQuery(ql);
         for (int i = 0; i < values.length; i++) {
             setParameter(query, "param" + i, values[i]);
         }

@@ -59,7 +59,7 @@
                             $("#endTime").datepicker({dateFormat: 'yy-mm-dd'});
                         </script>
                     </div>
-                    <div class="col-lg-2">
+                    <div class="col-sm-1">
                         <button type="submit" class="btn btn-primary">查询</button>
                     </div>
                 </form>
@@ -68,6 +68,17 @@
                 <form action="/orderStats/updateOrderReport" method="get">
                     <div class="col-lg-2">
                         <button type="submit" class="btn btn-primary">手动更新</button>
+                    </div>
+                </form>
+            </div>
+            <div style="float: left">
+                <form action="/orderStats/importAmazonOrderList" enctype="multipart/form-data" method="post"
+                      id="importForm">
+                    <div class="col-lg-12">
+                        <span class="modal-title">导入亚马逊订单:</span>
+                        <input type="file" name="multiFile" id="multiFile" class="file-loading"
+                               style="display: inline;"/>
+                        <button type="submit">提交</button>
                     </div>
                 </form>
             </div>

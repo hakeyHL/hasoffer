@@ -59,7 +59,7 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
             String formatEndTime = DateFormatUtils.format(startTime, "yyyy-MM-dd 00:00:00.000");
             endTime = DateUtils.parseDate(formatEndTime, "yyyy-MM-dd HH:mm:ss.SSS");
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error("Parse date is error.", e);
         }
         Date delEndTime = TimeUtils.addDay(endTime, 1);
         if (Website.FLIPKART.name().equals(webSite)) {
@@ -87,6 +87,23 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
                     insert(po);
                 }
             }
+        }
+    }
+
+    @Override
+    public void importAmazonOrder(Date startTime, Date endTime, List<OrderStatsAnalysisPO> orderModelList) {
+        try {
+            String formatStartTime = DateFormatUtils.format(startTime, "yyyy-MM-dd 00:00:00.000");
+            startTime = DateUtils.parseDate(formatStartTime, "yyyy-MM-dd HH:mm:ss.SSS");
+            String formatEndTime = DateFormatUtils.format(endTime, "yyyy-MM-dd 00:00:00.000");
+            endTime = DateUtils.parseDate(formatEndTime, "yyyy-MM-dd HH:mm:ss.SSS");
+        } catch (ParseException e) {
+            logger.error("Parse date is error.", e);
+        }
+        Date delEndTime = TimeUtils.addDay(endTime, 1);
+        delete(Website.AMAZON.name(), startTime, delEndTime);
+        for (OrderStatsAnalysisPO po : orderModelList) {
+            insert(po);
         }
     }
 

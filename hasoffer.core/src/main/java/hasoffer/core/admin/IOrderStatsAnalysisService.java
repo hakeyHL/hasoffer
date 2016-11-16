@@ -4,6 +4,7 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 public interface IOrderStatsAnalysisService {
@@ -13,6 +14,8 @@ public interface IOrderStatsAnalysisService {
     int delete(String webSite, Date startTime, Date endTime);
 
     void updateOrder(String webSite, Date startTime, Date endTime);
+
+    void importAmazonOrder(Date startTime, Date endTime, List<OrderStatsAnalysisPO> orderModelList);
 
     PageableResult<Map<String, Object>> selectPageableResult(String webSite, String channel, String orderStatus, Date startYmd, Date endYmd, int page, int size);
 
