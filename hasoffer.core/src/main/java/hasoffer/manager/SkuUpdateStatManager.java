@@ -14,9 +14,11 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.task.ListProcessTask;
 import hasoffer.core.task.worker.ILister;
 import hasoffer.core.task.worker.IProcessor;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +36,54 @@ public class SkuUpdateStatManager {
     @Resource
     SearchLogCacheManager searchLogCacheManager;
 
+    public void exp_failed_skus(String ymd) throws Exception {
+
+        long deadLineDate = TimeUtils.stringToDate(ymd, TimeUtils.PATTERN_YMD).getTime() - TimeUtils.MILLISECONDS_OF_1_DAY;
+
+        Map<Long, Long> proMap = searchLogCacheManager.getProductCount(ymd);
+
+        StringBuilder sb = new StringBuilder(String.format("%s update day(%s). \n", ymd, TimeUtils.parse(deadLineDate, TimeUtils.PATTERN_YMD)));
+
+        File file = new File("/home/hasoffer/exp_faild_sku.dat");
+        if (file.exists()) {
+            file.delete();
+        }
+        file.createNewFile();
+
+        int count = 1;
+        for (Map.Entry<Long, Long> kv : proMap.entrySet()) {
+            List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(kv.getKey());
+
+            for (PtmCmpSku cmpSku : cmpSkus) {
+                if (cmpSku.getWebsite() != null) {
+
+                    boolean successUpdate = cmpSku.getUpdateTime().getTime() > deadLineDate;
+
+                    // 如果sku状态被更新成下架offsale,则需要判断更新时间才能决定是否更新成功
+                    if (cmpSku.getStatus() == SkuStatus.OFFSALE) {
+                        if (!successUpdate) {
+                            return;
+                        }
+                    }
+
+                    if (!successUpdate) {
+                        sb.append(String.format("%d\t%s\n", cmpSku.getId(), cmpSku.getUrl()));
+                        count++;
+                    }
+                }
+            }
+
+            if (count > 2000) {
+                FileUtils.write(file, sb, true);
+                sb = new StringBuilder();
+            }
+        }
+
+        if (sb.length() > 0) {
+            FileUtils.write(file, sb, true);
+        }
+
+    }
 
     @DataSource(value = DataSourceType.Slave)
     public SkuUpdateResult statUpdateResult(String ymd) {
@@ -186,5 +236,4 @@ public class SkuUpdateStatManager {
             }
         }
     }
-
 }
