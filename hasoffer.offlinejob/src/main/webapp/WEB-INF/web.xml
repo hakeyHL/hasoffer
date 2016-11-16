@@ -55,11 +55,6 @@
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
 
-    <!--比价网站抓取结果处理守护进程的启动监听器-->
-    <!--<listener>-->
-    <!--<listener-class>hasoffer.job.listener.CompareWebsiteFetchResultListener</listener-class>-->
-    <!--</listener>-->
-
     <!-- -->
     <!--<listener>-->
     <!--<listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>-->

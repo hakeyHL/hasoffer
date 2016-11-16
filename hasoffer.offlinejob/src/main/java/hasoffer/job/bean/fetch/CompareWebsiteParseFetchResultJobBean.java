@@ -1,4 +1,4 @@
-package hasoffer.job.listener;
+package hasoffer.job.bean.fetch;
 
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
@@ -15,7 +15,13 @@ import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.spider.model.FetchCompareWebsiteResult;
 import hasoffer.spider.model.FetchedProduct;
 import hasoffer.spider.model.param.FetchedParamGroup;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.quartz.QuartzJobBean;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,51 +30,17 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created on 2016/8/16.
  */
-public class CompareWebsiteFetchResultWorker implements Runnable {
+public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
 
-    private IFetchDubboService fetchDubboService;
-    private IStdProductService stdProductService;
+    /**
+     * Logger for this class
+     */
+    private static final Logger logger = LoggerFactory.getLogger(ComPareWebsiteSendFetchRequestJobBean.class);
 
-    public CompareWebsiteFetchResultWorker(IFetchDubboService fetchDubboService, IStdProductService stdProductService) {
-        this.fetchDubboService = fetchDubboService;
-        this.stdProductService = stdProductService;
-    }
-
-    @Override
-    public void run() {
-        while (true) {
-
-            FetchCompareWebsiteResult compareWebsiteFetchResult = fetchDubboService.getCompareWebsiteFetchResult(Website.MOBILE91);
-
-            if (compareWebsiteFetchResult == null) {
-                try {
-                    TimeUnit.SECONDS.sleep(10);
-                } catch (InterruptedException e) {
-
-                }
-                System.out.println("pop get null wait 10 seconds");
-            }
-
-            TaskStatus taskStatus = compareWebsiteFetchResult.getTaskStatus();
-
-            if (TaskStatus.FINISH.equals(taskStatus)) {
-
-                StdSkuBo stdSkuBo = null;
-                try {
-                    stdSkuBo = convertResultToStdSkuBo(compareWebsiteFetchResult);
-                } catch (IOException e) {
-                    System.out.println("spec convert error");
-                    continue;
-                }
-
-                boolean stdSku = stdProductService.createStdSku(stdSkuBo);
-                System.out.print("create " + stdSku);
-
-            } else {
-                System.out.println("pop get " + taskStatus + "continue");
-            }
-        }
-    }
+    @Resource
+    IFetchDubboService fetchDubboService;
+    @Resource
+    IStdProductService stdProductService;
 
     private StdSkuBo convertResultToStdSkuBo(FetchCompareWebsiteResult compareWebsiteFetchResult) throws IOException {
 
@@ -124,5 +96,41 @@ public class CompareWebsiteFetchResultWorker implements Runnable {
 
 
         return stdSkuBo;
+    }
+
+    @Override
+    protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        while (true) {
+
+            FetchCompareWebsiteResult compareWebsiteFetchResult = fetchDubboService.getCompareWebsiteFetchResult(Website.MOBILE91);
+
+            if (compareWebsiteFetchResult == null) {
+                try {
+                    TimeUnit.SECONDS.sleep(10);
+                } catch (InterruptedException e) {
+
+                }
+                System.out.println("pop get null wait 10 seconds");
+            }
+
+            TaskStatus taskStatus = compareWebsiteFetchResult.getTaskStatus();
+
+            if (TaskStatus.FINISH.equals(taskStatus)) {
+
+                StdSkuBo stdSkuBo = null;
+                try {
+                    stdSkuBo = convertResultToStdSkuBo(compareWebsiteFetchResult);
+                } catch (IOException e) {
+                    System.out.println("spec convert error");
+                    continue;
+                }
+
+                boolean stdSku = stdProductService.createStdSku(stdSkuBo);
+                System.out.print("create " + stdSku);
+
+            } else {
+                System.out.println("pop get " + taskStatus + "continue");
+            }
+        }
     }
 }
