@@ -12,15 +12,15 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import javax.annotation.Resource;
 import java.util.Date;
 
-public class OrderSasisJobBean extends QuartzJobBean {
-    private static Logger logger = LoggerFactory.getLogger(OrderSasisJobBean.class);
+public class OrderSAsisJobBean extends QuartzJobBean {
+    private static Logger logger = LoggerFactory.getLogger(OrderSAsisJobBean.class);
 
     @Resource
     IOrderStatsAnalysisService orderStatsAnalysisService;
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        logger.info("OrderSasisJobBean job start.");
+        logger.info("OrderSAsisJobBean job start.");
         Date todayTime = new Date();
 
         int[] days = new int[]{0, 1, 2, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 24, 25, 26, 29, 30, 31, 25, 50, 60};
@@ -32,7 +32,7 @@ public class OrderSasisJobBean extends QuartzJobBean {
             orderStatsAnalysisService.updateOrder(Website.SNAPDEAL.name(), day, day);
             orderStatsAnalysisService.updateOrder(Website.FLIPKART.name(), day, day);
         }
-        logger.info("OrderSasisJobBean job end.");
+        logger.info("OrderSAsisJobBean job end.");
 
     }
 }

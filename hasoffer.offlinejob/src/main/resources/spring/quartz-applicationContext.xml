@@ -73,7 +73,7 @@
     <!--</bean>-->
 
     <bean name="orderSAJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="hasoffer.job.bean.order.OrderSasisJobBean"/>
+        <property name="jobClass" value="hasoffer.job.bean.order.OrderSAsisJobBean"/>
     </bean>
     <bean id="orderSATrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="orderSAJob"/>
