@@ -43,6 +43,11 @@
             <artifactId>hasoffer.data.solr</artifactId>
             <version>${hasoffer.version}</version>
         </dependency>
+        <dependency>
+            <groupId>hasoffer</groupId>
+            <artifactId>hasoffer.site.helper</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
 
         <!-- <dependency>
 			 <groupId>com.wcohen</groupId>

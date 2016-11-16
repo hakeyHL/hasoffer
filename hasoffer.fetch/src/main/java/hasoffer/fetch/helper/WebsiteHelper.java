@@ -6,7 +6,6 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.AffliIdHelper;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.UrlUtils;
-import hasoffer.fetch.sites.amazon.AmazonHelper;
 import hasoffer.fetch.sites.ebay.EbayHelper;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import hasoffer.fetch.sites.indiatimes.IndiatimesHelper;
@@ -15,6 +14,7 @@ import hasoffer.fetch.sites.paytm.PaytmHelper;
 import hasoffer.fetch.sites.shopclues.ShopcluesHelper;
 import hasoffer.fetch.sites.snapdeal.SnapdealHelper;
 import hasoffer.fetch.sites.theitdepot.TheitdepotHelper;
+import hasoffer.site.in.amazon.AmazonHelper;
 
 import java.net.URL;
 import java.net.URLDecoder;

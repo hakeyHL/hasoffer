@@ -9,6 +9,7 @@ import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.exception.amazon.AmazonRobotCheckException;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.fetch.model.ProductStatus;
+import hasoffer.site.in.amazon.AmazonHelper;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.htmlcleaner.TagNode;
 import org.slf4j.Logger;

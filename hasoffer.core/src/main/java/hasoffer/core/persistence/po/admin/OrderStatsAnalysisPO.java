@@ -42,7 +42,7 @@ public class OrderStatsAnalysisPO implements Identifiable<Integer> {
     @Column(length = 10, nullable = false)
     private String userType;
 
-    @Column(length = 20, nullable = false)
+    @Column(length = 20)
     private String orderId;
 
     /**

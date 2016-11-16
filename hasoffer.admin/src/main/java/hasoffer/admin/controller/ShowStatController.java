@@ -232,9 +232,9 @@ public class ShowStatController {
         String YMD_WEB_PATTERN = "yyyy-MM-dd";
         Date startYmd = TimeUtils.stringToDate(startTime, YMD_WEB_PATTERN);
         Date endYmd = TimeUtils.stringToDate(endTime, YMD_WEB_PATTERN);
-        PageableResult<Map<String, Object>> pagedHiJackList = orderStatsAnalysisService.selectPageableResult(webSite, channel, orderStatus, startYmd, endYmd, page, size);
+        PageableResult<Map<String, Object>> pagedOrderList = orderStatsAnalysisService.selectPageableResult(webSite, channel, orderStatus, startYmd, endYmd, page, size);
         List<OrderStatsAnalysisVO> reportList = new ArrayList<OrderStatsAnalysisVO>();
-        for (Map<String, Object> po : pagedHiJackList.getData()) {
+        for (Map<String, Object> po : pagedOrderList.getData()) {
             try {
                 OrderStatsAnalysisVO vo = new OrderStatsAnalysisVO();
 //                BeanUtils.copyProperties(vo, po);
@@ -256,7 +256,7 @@ public class ShowStatController {
                 e.printStackTrace();
             }
         }
-        PageableResult<OrderStatsAnalysisVO> pageableResult = new PageableResult<OrderStatsAnalysisVO>(reportList, pagedHiJackList.getNumFund(), pagedHiJackList.getCurrentPage(), pagedHiJackList.getPageSize());
+        PageableResult<OrderStatsAnalysisVO> pageableResult = new PageableResult<OrderStatsAnalysisVO>(reportList, pagedOrderList.getNumFund(), pagedOrderList.getCurrentPage(), pagedOrderList.getPageSize());
         ModelAndView mav = new ModelAndView("showstat/listOrderReport");
         mav.addObject("startTime", startTime);
         mav.addObject("endTime", endTime);
