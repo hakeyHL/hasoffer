@@ -35,6 +35,23 @@ public class StdProductServiceImpl implements IStdProductService {
     }
 
     @Override
+    public StdSkuBo findStdSku(long skuId) {
+
+        PtmStdSku stdSku = dbm.get(PtmStdSku.class, skuId);
+
+        if (stdSku == null) {
+            return null;
+        }
+
+        List<StdSkuPrice> skuPrices;
+        Map<String, StdSkuAttr> attrs;
+        List<StdSkuImage> stdImages;
+        PtmStdSkuDetail stdSkuDetail = mdm.queryOne(PtmStdSkuDetail.class, skuId);
+
+        return null;
+    }
+
+    @Override
     @Transactional
     public boolean createStdSku(StdSkuBo skuBo) {
 
