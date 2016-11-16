@@ -43,6 +43,7 @@ public class SkuUpdateStatManager {
         Map<Long, Long> proMap = searchLogCacheManager.getProductCount(ymd);
 
         String header = String.format("%s update day(%s), product count %d. \n", ymd, TimeUtils.parse(deadLineDate, TimeUtils.PATTERN_YMD), proMap.size());
+        System.out.println(header);
 
         StringBuilder sb = new StringBuilder(header);
 
