@@ -1399,7 +1399,7 @@ public class AppController {
         map.put("action", 0);
         map.put("commentNumber", 0);
         map.put("thumbNumber", 0);
-        Long totalDealThumb = dealService.getTotalDealThumb();
+        Long totalDealThumb = dealService.getTotalDealThumb(dealId);
         if (totalDealThumb != null) {
             map.put("thumbNumber", totalDealThumb);
         }
