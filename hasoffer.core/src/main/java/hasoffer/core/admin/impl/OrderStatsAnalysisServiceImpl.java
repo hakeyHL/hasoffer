@@ -170,7 +170,11 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
     @Transactional(rollbackFor = Exception.class)
     public void updateOrderToLow(Date startTime, Date endTime, double targetAmount, double hour) {
         List<OrderStatsAnalysisPO> orderList = dbm.query("SELECT t FROM OrderStatsAnalysisPO t WHERE t.channel='SHANCHUAN' and t.channelSrc='SHANCHUAN' and t.orderInTime>?0 and t.orderInTime<?1", Arrays.asList(startTime, endTime));
-        double currentAmount = querySumOrderAmount(startTime, endTime).doubleValue();
+        BigDecimal bigDecimal = querySumOrderAmount(startTime, endTime);
+        double currentAmount = 0;
+        if (bigDecimal != null) {
+            currentAmount = bigDecimal.doubleValue();
+        }
         double lowAmount = (targetAmount - currentAmount) / hour;
         Random random = new Random();
         double tempAmount = 0;
@@ -203,6 +207,6 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
     @Override
     @Transactional(rollbackFor = Exception.class)
     public BigDecimal querySumOrderAmount(Date startTime, Date endTime) {
-        return dbm.findUniqueBySql("select sum(tentativeAmount) from report_ordersatas where channel='SHANCHUAN' and channelSrc='SHANCHUAN' and orderInTime>? and orderInTime<?", Arrays.asList(startTime, endTime));
+        return dbm.findUniqueBySql("select sum(tentativeAmount) from report_ordersatas where channel='SHANCHUAN' and channelSrc='SHANCHUAN' and orderInTime>? and orderInTime<?", startTime, endTime);
     }
 }

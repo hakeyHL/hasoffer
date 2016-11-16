@@ -4,6 +4,7 @@ import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IFlipkartAffiliateService;
+import hasoffer.core.admin.IOrderStatsAnalysisService;
 import hasoffer.core.admin.ISnapdealAffiliateService;
 import hasoffer.core.admin.IUrmAffAccountService;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
@@ -14,6 +15,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -31,6 +33,9 @@ public class OrderTest {
 
     @Resource
     private IUrmAffAccountService urmAffAccountService;
+
+    @Resource
+    private IOrderStatsAnalysisService orderStatsAnalysisService;
 
     @org.junit.Test
     public void testOrderSnapDeal() {
@@ -72,5 +77,18 @@ public class OrderTest {
         affAccountList = urmAffAccountService.findAffAccountList(Website.SNAPDEAL);
         System.out.println(affAccountList.size());
     }
+
+    @org.junit.Test
+    public void testOrderStats() {
+        try {
+            Date start9mTime = DateUtils.parseDate("2016-08-01", "yyyy-MM-dd");
+            Date end9mTime = DateUtils.parseDate("2016-08-31", "yyyy-MM-dd");
+            BigDecimal bigDecimal = orderStatsAnalysisService.querySumOrderAmount(start9mTime, end9mTime);
+            System.out.println(bigDecimal.doubleValue());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }
