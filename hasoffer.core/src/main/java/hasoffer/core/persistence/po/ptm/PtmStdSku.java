@@ -17,23 +17,36 @@ public class PtmStdSku implements Identifiable<Long> {
     private long stdProId; // PtmStdProduct # id
 
     private String title;// (可能)带商品的color，size属性的
+    private String brand; // 品牌
+    private String model; // 型号 (品牌+型号不允许有重复)
 
+    private long categoryId;
     private float refPrice; // 参考价格
 
     private Date createTime;//该条sku记录的创建时间
 
+    @Column(unique = true, nullable = false)
     private long sourceId; // sourceId
     private String sourceUrl; // source url
 
     private PtmStdSku() {
         this.createTime = TimeUtils.nowDate();
+        this.stdProId = 0;
     }
 
-    public PtmStdSku(long stdProId, String title, float refPrice) {
+    public PtmStdSku(String title, String brand, String model,
+                     long categoryId, float refPrice,
+                     long sourceId, String sourceUrl) {
         this();
-        this.stdProId = stdProId;
         this.title = title;
+        this.brand = brand;
+        this.model = model;
+
+        this.categoryId = categoryId;
         this.refPrice = refPrice;
+
+        this.sourceId = sourceId;
+        this.sourceUrl = sourceUrl;
     }
 
     @Override
@@ -94,32 +107,27 @@ public class PtmStdSku implements Identifiable<Long> {
         this.sourceUrl = sourceUrl;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        PtmStdSku ptmStdSku = (PtmStdSku) o;
-
-        if (stdProId != ptmStdSku.stdProId) return false;
-        if (Float.compare(ptmStdSku.refPrice, refPrice) != 0) return false;
-        if (sourceId != ptmStdSku.sourceId) return false;
-        if (id != null ? !id.equals(ptmStdSku.id) : ptmStdSku.id != null) return false;
-        if (title != null ? !title.equals(ptmStdSku.title) : ptmStdSku.title != null) return false;
-        if (createTime != null ? !createTime.equals(ptmStdSku.createTime) : ptmStdSku.createTime != null) return false;
-        return !(sourceUrl != null ? !sourceUrl.equals(ptmStdSku.sourceUrl) : ptmStdSku.sourceUrl != null);
-
+    public String getBrand() {
+        return brand;
     }
 
-    @Override
-    public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (int) (stdProId ^ (stdProId >>> 32));
-        result = 31 * result + (title != null ? title.hashCode() : 0);
-        result = 31 * result + (refPrice != +0.0f ? Float.floatToIntBits(refPrice) : 0);
-        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
-        result = 31 * result + (int) (sourceId ^ (sourceId >>> 32));
-        result = 31 * result + (sourceUrl != null ? sourceUrl.hashCode() : 0);
-        return result;
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(long categoryId) {
+        this.categoryId = categoryId;
     }
 }

@@ -27,6 +27,23 @@ public class PtmStdImage implements Identifiable<Long> {
     private int errTimes = 0;
 
     public PtmStdImage() {
+        stdProId = 0;
+    }
+
+    public PtmStdImage(long stdSkuId, String oriImageUrl) {
+        this();
+        this.stdSkuId = stdSkuId;
+        this.oriImageUrl = oriImageUrl;
+    }
+
+    public PtmStdImage(long stdSkuId, String oriImageUrl, String oriImagePath, String smallImagePath, String bigImagePath, int errTimes) {
+        this();
+        this.stdSkuId = stdSkuId;
+        this.oriImageUrl = oriImageUrl;
+        this.oriImagePath = oriImagePath;
+        this.smallImagePath = smallImagePath;
+        this.bigImagePath = bigImagePath;
+        this.errTimes = errTimes;
     }
 
     @Override
