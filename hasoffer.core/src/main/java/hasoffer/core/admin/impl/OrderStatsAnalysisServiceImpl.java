@@ -169,7 +169,7 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateOrderToLow(Date startTime, Date endTime, double targetAmount, double hour) {
-        List<OrderStatsAnalysisPO> orderList = dbm.query("SELECT t FROM OrderStatsAnalysisPO t WHERE t.channel='SHANCHUAN' and t.channelSrc='SHANCHUAN' and t.orderInTime>? and t.orderInTime<?", Arrays.asList(startTime, endTime));
+        List<OrderStatsAnalysisPO> orderList = dbm.query("SELECT t FROM OrderStatsAnalysisPO t WHERE t.channel='SHANCHUAN' and t.channelSrc='SHANCHUAN' and t.orderInTime>?0 and t.orderInTime<?1", Arrays.asList(startTime, endTime));
         double currentAmount = querySumOrderAmount(startTime, endTime).doubleValue();
         double lowAmount = (targetAmount - currentAmount) / hour;
         Random random = new Random();
