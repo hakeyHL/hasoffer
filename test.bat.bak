@@ -1,0 +1,5 @@
+git pull origin dev
+git commit -a 
+git push origin dev 
+cd C:\Program Files (x86)\Git\hulitest4\india\hasoffer-servers-mater
+push.sh
