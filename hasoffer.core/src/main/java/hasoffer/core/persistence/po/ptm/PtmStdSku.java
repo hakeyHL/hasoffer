@@ -130,4 +130,20 @@ public class PtmStdSku implements Identifiable<Long> {
     public void setCategoryId(long categoryId) {
         this.categoryId = categoryId;
     }
+
+    @Override
+    public String toString() {
+        return "PtmStdSku{" +
+                "brand='" + brand + '\'' +
+                ", id=" + id +
+                ", stdProId=" + stdProId +
+                ", title='" + title + '\'' +
+                ", model='" + model + '\'' +
+                ", categoryId=" + categoryId +
+                ", refPrice=" + refPrice +
+                ", createTime=" + createTime +
+                ", sourceId='" + sourceId + '\'' +
+                ", sourceUrl='" + sourceUrl + '\'' +
+                '}';
+    }
 }
