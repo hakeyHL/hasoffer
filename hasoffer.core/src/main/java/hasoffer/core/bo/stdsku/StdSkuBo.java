@@ -24,7 +24,7 @@ public class StdSkuBo {
 
     private Date createTime;//该条sku记录的创建时间
 
-    private long sourceId; // sourceId
+    private String sourceId; // sourceId
     private String sourceUrl; // source url
 
     private Map<String, StdSkuAttr> skuAttrs;
@@ -101,11 +101,11 @@ public class StdSkuBo {
         this.createTime = createTime;
     }
 
-    public long getSourceId() {
+    public String getSourceId() {
         return sourceId;
     }
 
-    public void setSourceId(long sourceId) {
+    public void setSourceId(String sourceId) {
         this.sourceId = sourceId;
     }
 
