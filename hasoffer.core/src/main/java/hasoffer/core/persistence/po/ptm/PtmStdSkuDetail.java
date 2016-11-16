@@ -18,6 +18,9 @@ public class PtmStdSkuDetail {
 
     private String desc; // description
 
+    public PtmStdSkuDetail() {
+    }
+
     public PtmStdSkuDetail(long stdSkuId, List<PtmStdSkuParamGroup> paramGroups, String desc) {
         this.id = stdSkuId;
         this.paramGroups = paramGroups;

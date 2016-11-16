@@ -9,6 +9,10 @@ public class PtmStdSkuParamNode {
 
     private String value;
 
+    //为了转json
+    public PtmStdSkuParamNode() {
+    }
+
     public PtmStdSkuParamNode(String name, String value) {
         this.name = name;
         this.value = value;
