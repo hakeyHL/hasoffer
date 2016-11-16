@@ -35,6 +35,23 @@ public class StdProductServiceImpl implements IStdProductService {
     }
 
     @Override
+    public StdSkuBo findStdSku(long skuId) {
+
+        PtmStdSku stdSku = dbm.get(PtmStdSku.class, skuId);
+
+        if (stdSku == null) {
+            return null;
+        }
+
+        List<StdSkuPrice> skuPrices;
+        Map<String, StdSkuAttr> attrs;
+        List<StdSkuImage> stdImages;
+        PtmStdSkuDetail stdSkuDetail = mdm.queryOne(PtmStdSkuDetail.class, skuId);
+
+        return null;
+    }
+
+    @Override
     @Transactional
     public boolean createStdSku(StdSkuBo skuBo) {
 
@@ -45,7 +62,7 @@ public class StdProductServiceImpl implements IStdProductService {
         // 各网站价格
         List<StdSkuPrice> skuPrices = skuBo.getSkuPrices();
         for (StdSkuPrice skuPrice : skuPrices) {
-            PtmStdPrice stdPrice = new PtmStdPrice(skuPrice.getStdSkuId(), skuPrice.getTitle(), skuPrice.getPrice(), skuPrice.getStockCount(),
+            PtmStdPrice stdPrice = new PtmStdPrice(stdSku.getId(), skuPrice.getTitle(), skuPrice.getPrice(), skuPrice.getStockCount(),
                     skuPrice.getShippingFee(), skuPrice.getSkuStatus(), skuPrice.getWebsite(), skuPrice.getUrl());
             dbm.create(stdPrice);
         }

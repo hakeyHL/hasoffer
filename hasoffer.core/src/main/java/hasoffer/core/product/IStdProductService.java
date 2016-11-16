@@ -9,6 +9,8 @@ public interface IStdProductService {
 
     boolean createStdSku(StdSkuBo skuBo);
 
+    StdSkuBo findStdSku(long skuId);
+
 //    PtmStdProduct createStd(Map<String, FlipkartSkuInfo> skuInfoMap);
 //
 //    Map<String, FlipkartSkuInfo> searchSku(String keyword) throws Exception;

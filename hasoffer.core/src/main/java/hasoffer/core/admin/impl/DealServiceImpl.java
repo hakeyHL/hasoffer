@@ -45,7 +45,7 @@ public class DealServiceImpl implements IDealService {
 
     private static final String Q_DEALS = "SELECT t FROM AppDeal t";
     private static final String Q_THUMB_UIDDID = "SELECT t FROM AppDealThumb t where t.userId=?0 and t.dealId=?1";
-    private static final String Q_THUMB_TOTAL = "SELECT sum(t.action) FROM AppDealThumb t";
+    private static final String Q_THUMB_TOTAL = "SELECT sum(t.action) FROM AppDealThumb t where t.dealId=?0";
     private static final String Q_COMMENTS_DEALID = "SELECT t FROM AppDealComment t where t.dealId=?0 order by t.createTime desc ";
 
     @Resource
@@ -336,8 +336,8 @@ public class DealServiceImpl implements IDealService {
     }
 
     @Override
-    public Long getTotalDealThumb() {
-        return dbm.querySingle(Q_THUMB_TOTAL);
+    public Long getTotalDealThumb(long dealId) {
+        return dbm.querySingle(Q_THUMB_TOTAL, Arrays.asList(dealId));
     }
 
     @Override
