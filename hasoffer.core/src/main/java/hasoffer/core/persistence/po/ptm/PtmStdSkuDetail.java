@@ -1,5 +1,6 @@
 package hasoffer.core.persistence.po.ptm;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -10,24 +11,25 @@ import java.util.List;
 @Document(collection = "PtmStdSkuDetail")
 public class PtmStdSkuDetail {
 
-    private long stdSkuId; // @PtmStdSku.id
+    @Id
+    private long id;
 
     private List<PtmStdSkuParamGroup> paramGroups; // parameters
 
     private String desc; // description
 
     public PtmStdSkuDetail(long stdSkuId, List<PtmStdSkuParamGroup> paramGroups, String desc) {
-        this.stdSkuId = stdSkuId;
+        this.id = stdSkuId;
         this.paramGroups = paramGroups;
         this.desc = desc;
     }
 
-    public long getStdSkuId() {
-        return stdSkuId;
+    public long getId() {
+        return id;
     }
 
-    public void setStdSkuId(long stdSkuId) {
-        this.stdSkuId = stdSkuId;
+    public void setId(long id) {
+        this.id = id;
     }
 
     public List<PtmStdSkuParamGroup> getParamGroups() {

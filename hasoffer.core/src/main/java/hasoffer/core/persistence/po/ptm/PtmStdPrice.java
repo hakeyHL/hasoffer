@@ -19,7 +19,10 @@ public class PtmStdPrice implements Identifiable<Long> {
     private long stdSkuId; // ptm_std_sku # id
 
     private String title;// 带商品的color，size属性的
-    private float price;
+
+    private float price; // 价格
+    private long stockCount; // 库存
+    private float shippingFee; //运费
 
     private SkuStatus skuStatus;
 
@@ -30,6 +33,19 @@ public class PtmStdPrice implements Identifiable<Long> {
     private Date createTime = TimeUtils.nowDate();//该条sku记录的创建时间
 
     public PtmStdPrice() {
+
+    }
+
+    public PtmStdPrice(long stdSkuId, String title, float price, long stockCount,
+                       float shippingFee, SkuStatus skuStatus, Website website, String url) {
+        this.stdSkuId = stdSkuId;
+        this.title = title;
+        this.price = price;
+        this.stockCount = stockCount;
+        this.shippingFee = shippingFee;
+        this.skuStatus = skuStatus;
+        this.website = website;
+        this.url = url;
     }
 
     @Override
@@ -106,6 +122,22 @@ public class PtmStdPrice implements Identifiable<Long> {
         this.skuStatus = skuStatus;
     }
 
+    public long getStockCount() {
+        return stockCount;
+    }
+
+    public void setStockCount(long stockCount) {
+        this.stockCount = stockCount;
+    }
+
+    public float getShippingFee() {
+        return shippingFee;
+    }
+
+    public void setShippingFee(float shippingFee) {
+        this.shippingFee = shippingFee;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -115,6 +147,8 @@ public class PtmStdPrice implements Identifiable<Long> {
 
         if (stdSkuId != that.stdSkuId) return false;
         if (Float.compare(that.price, price) != 0) return false;
+        if (stockCount != that.stockCount) return false;
+        if (Float.compare(that.shippingFee, shippingFee) != 0) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (title != null ? !title.equals(that.title) : that.title != null) return false;
         if (skuStatus != that.skuStatus) return false;
@@ -131,6 +165,8 @@ public class PtmStdPrice implements Identifiable<Long> {
         result = 31 * result + (int) (stdSkuId ^ (stdSkuId >>> 32));
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (price != +0.0f ? Float.floatToIntBits(price) : 0);
+        result = 31 * result + (int) (stockCount ^ (stockCount >>> 32));
+        result = 31 * result + (shippingFee != +0.0f ? Float.floatToIntBits(shippingFee) : 0);
         result = 31 * result + (skuStatus != null ? skuStatus.hashCode() : 0);
         result = 31 * result + (website != null ? website.hashCode() : 0);
         result = 31 * result + (url != null ? url.hashCode() : 0);

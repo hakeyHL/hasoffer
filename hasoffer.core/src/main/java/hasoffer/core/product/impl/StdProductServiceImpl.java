@@ -1,24 +1,22 @@
 package hasoffer.core.product.impl;
 
-import hasoffer.affiliate.affs.flipkart.FlipkartAffiliateProductProcessor;
-import hasoffer.affiliate.model.AffiliateProduct;
 import hasoffer.affiliate.model.FlipkartAttribute;
-import hasoffer.affiliate.model.FlipkartSkuInfo;
-import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
-import hasoffer.core.analysis.ProductAnalysisService;
-import hasoffer.core.analysis.model.FlipkartSearchedSkuAnalysisResult;
+import hasoffer.core.bo.stdsku.StdSkuAttr;
+import hasoffer.core.bo.stdsku.StdSkuBo;
+import hasoffer.core.bo.stdsku.StdSkuImage;
+import hasoffer.core.bo.stdsku.StdSkuPrice;
+import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.po.ptm.PtmStdAttrDef;
-import hasoffer.core.persistence.po.ptm.PtmStdProduct;
-import hasoffer.core.persistence.po.ptm.PtmStdSku;
-import hasoffer.core.persistence.po.ptm.PtmStdSkuAttr;
+import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.product.IStdProductService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by chevy on 2016/8/12.
@@ -26,10 +24,113 @@ import java.util.*;
 @Service
 public class StdProductServiceImpl implements IStdProductService {
 
+    private static final String Q_ATTR_BY_NAME = "SELECT t from PtmStdAttrDef t where t.stdDefName = ?0";
     @Resource
     IDataBaseManager dbm;
+    @Resource
+    IMongoDbManager mdm;
+
+    private PtmStdAttrDef findAttrDefByName(String name) {
+        return dbm.querySingle(Q_ATTR_BY_NAME, Arrays.asList(name));
+    }
 
     @Override
+    public StdSkuBo findStdSku(long skuId) {
+
+        PtmStdSku stdSku = dbm.get(PtmStdSku.class, skuId);
+
+        if (stdSku == null) {
+            return null;
+        }
+
+        List<StdSkuPrice> skuPrices;
+        Map<String, StdSkuAttr> attrs;
+        List<StdSkuImage> stdImages;
+        PtmStdSkuDetail stdSkuDetail = mdm.queryOne(PtmStdSkuDetail.class, skuId);
+
+        return null;
+    }
+
+    @Override
+    @Transactional
+    public boolean createStdSku(StdSkuBo skuBo) {
+
+        PtmStdSku stdSku = new PtmStdSku(skuBo.getTitle(), skuBo.getBrand(), skuBo.getModel(),
+                skuBo.getCategoryId(), skuBo.getRefPrice(), skuBo.getSourceId(), skuBo.getSourceUrl());
+        dbm.create(stdSku);
+
+        // 各网站价格
+        List<StdSkuPrice> skuPrices = skuBo.getSkuPrices();
+        for (StdSkuPrice skuPrice : skuPrices) {
+            PtmStdPrice stdPrice = new PtmStdPrice(stdSku.getId(), skuPrice.getTitle(), skuPrice.getPrice(), skuPrice.getStockCount(),
+                    skuPrice.getShippingFee(), skuPrice.getSkuStatus(), skuPrice.getWebsite(), skuPrice.getUrl());
+            dbm.create(stdPrice);
+        }
+
+        // sku属性
+        Map<String, StdSkuAttr> attrs = skuBo.getSkuAttrs();
+        for (Map.Entry<String, StdSkuAttr> attr : attrs.entrySet()) {
+            PtmStdAttrDef attrDef = getAttrByName(attr.getKey());
+
+            StdSkuAttr skuAttr = attr.getValue();
+
+            PtmStdSkuAttr ptmStdSkuAttr = new PtmStdSkuAttr(stdSku.getId(), attrDef.getId(), attrDef.getStdDefName(), skuAttr.getStdValue());
+            dbm.create(ptmStdSkuAttr);
+        }
+
+        // 图片
+        List<StdSkuImage> stdImages = skuBo.getSkuImages();
+        for (StdSkuImage skuImage : stdImages) {
+            PtmStdImage stdImage = new PtmStdImage(stdSku.getId(), skuImage.getOriImageUrl());
+            dbm.create(stdImage);
+        }
+
+        // detail-info
+        PtmStdSkuDetail stdSkuDetail = new PtmStdSkuDetail(stdSku.getId(), skuBo.getParamGroups(), skuBo.getDesc());
+        mdm.save(stdSkuDetail);
+
+        return true;
+    }
+
+    private PtmStdAttrDef getAttrByName(String key) {
+        PtmStdAttrDef attrDef = findAttrDefByName(key);
+
+        if (attrDef == null) {
+            attrDef = new PtmStdAttrDef(key);
+            dbm.create(attrDef);
+        }
+
+        return attrDef;
+    }
+
+    private void createStdSkuValues(long stdSkuId, FlipkartAttribute fa) {
+
+        String color = fa.getColor();
+        String displaySize = fa.getDisplaySize();
+        String size = fa.getSize();
+        String sizeUnit = fa.getSizeUnit();
+        String storage = fa.getStorage();
+
+        setStdSkuValue(stdSkuId, "color", color);
+        setStdSkuValue(stdSkuId, "displaySize", displaySize);
+        setStdSkuValue(stdSkuId, "size", size);
+        setStdSkuValue(stdSkuId, "sizeUnit", sizeUnit);
+        setStdSkuValue(stdSkuId, "storage", storage);
+    }
+
+    private void setStdSkuValue(long stdSkuId, String stdName, String value) {
+        if (StringUtils.isEmpty(value) || StringUtils.isEmpty(value.trim())) {
+            return;
+        }
+
+        PtmStdAttrDef ptmStdAttrDef = new PtmStdAttrDef(stdName);
+        dbm.createIfNoExist(ptmStdAttrDef);
+
+        PtmStdSkuAttr stdSkuValue = new PtmStdSkuAttr(stdSkuId, ptmStdAttrDef.getId(), ptmStdAttrDef.getStdDefName(), value);
+        dbm.create(stdSkuValue);
+    }
+
+   /* @Override
     public Map<String, FlipkartSkuInfo> searchSku(String keyword) throws Exception {
         FlipkartAffiliateProductProcessor fapp = new FlipkartAffiliateProductProcessor();
         List<AffiliateProduct> searchedPros = fapp.getAffiliateProductByKeyword(keyword, 10);
@@ -133,9 +234,9 @@ public class StdProductServiceImpl implements IStdProductService {
         }
 
         return skuInfoMap;
-    }
+    }*/
 
-    @Override
+    /*@Override
     @Transactional
     public PtmStdProduct createStd(Map<String, FlipkartSkuInfo> skuInfoMap) {
         if (skuInfoMap == null) {
@@ -192,40 +293,7 @@ public class StdProductServiceImpl implements IStdProductService {
 
         System.out.println(skuInfoMap.size());
         return stdProduct;
-    }
+    }*/
 
-    private void createStdSku(long stdProductId, FlipkartSkuInfo fsi) {
-        PtmStdSku stdSku = new PtmStdSku(stdProductId, fsi.getTitle(), fsi.getFlipkartSellingPrice().getAmount());
-        // create sku
-        dbm.create(stdSku);
 
-        createStdSkuValues(stdSku.getId(), fsi.getAttributes());
-    }
-
-    private void createStdSkuValues(long stdSkuId, FlipkartAttribute fa) {
-
-        String color = fa.getColor();
-        String displaySize = fa.getDisplaySize();
-        String size = fa.getSize();
-        String sizeUnit = fa.getSizeUnit();
-        String storage = fa.getStorage();
-
-        setStdSkuValue(stdSkuId, "color", color);
-        setStdSkuValue(stdSkuId, "displaySize", displaySize);
-        setStdSkuValue(stdSkuId, "size", size);
-        setStdSkuValue(stdSkuId, "sizeUnit", sizeUnit);
-        setStdSkuValue(stdSkuId, "storage", storage);
-    }
-
-    private void setStdSkuValue(long stdSkuId, String stdName, String value) {
-        if (StringUtils.isEmpty(value) || StringUtils.isEmpty(value.trim())) {
-            return;
-        }
-
-        PtmStdAttrDef ptmStdAttrDef = new PtmStdAttrDef(stdName);
-        dbm.createIfNoExist(ptmStdAttrDef);
-
-        PtmStdSkuAttr stdSkuValue = new PtmStdSkuAttr(stdSkuId, ptmStdAttrDef.getId(), ptmStdAttrDef.getStdDefName(), value);
-        dbm.create(stdSkuValue);
-    }
 }

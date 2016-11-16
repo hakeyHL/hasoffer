@@ -1,17 +1,18 @@
 package hasoffer.core.product;
 
-import hasoffer.affiliate.model.FlipkartSkuInfo;
-import hasoffer.core.persistence.po.ptm.PtmStdProduct;
-
-import java.util.Map;
+import hasoffer.core.bo.stdsku.StdSkuBo;
 
 /**
  * Created by chevy on 2016/8/12.
  */
 public interface IStdProductService {
 
-    PtmStdProduct createStd(Map<String, FlipkartSkuInfo> skuInfoMap);
+    boolean createStdSku(StdSkuBo skuBo);
 
-    Map<String, FlipkartSkuInfo> searchSku(String keyword) throws Exception;
+    StdSkuBo findStdSku(long skuId);
+
+//    PtmStdProduct createStd(Map<String, FlipkartSkuInfo> skuInfoMap);
+//
+//    Map<String, FlipkartSkuInfo> searchSku(String keyword) throws Exception;
 
 }
