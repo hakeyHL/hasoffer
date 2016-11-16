@@ -111,6 +111,7 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
 
                 }
                 System.out.println("pop get null wait 10 seconds");
+                continue;
             }
 
             TaskStatus taskStatus = compareWebsiteFetchResult.getTaskStatus();
