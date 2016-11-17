@@ -22,6 +22,7 @@
                 <ref bean="demoTrigger"/>
                 <ref bean="fetchTrigger"/>
                 <ref bean="orderSATrigger"/>
+                <ref bean="orderSCTrigger"/>
                 <ref bean="imageDownLoadTrigger"/>
                 <ref bean="imageDownLoadTrigger2"/>
                 <ref bean="skuImageDownLoadTrigger"/>
@@ -77,6 +78,14 @@
     <bean id="orderSATrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="orderSAJob"/>
         <property name="cronExpression" value="0 5 0/1 * * ? "/>
+    </bean>
+
+    <bean name="orderSCJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.order.OrderSCJobBean"/>
+    </bean>
+    <bean id="orderSCTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="orderSCJob"/>
+        <property name="cronExpression" value="0 50 0/1 * * ? "/>
     </bean>
 
     <!-- 图片抓取 -->

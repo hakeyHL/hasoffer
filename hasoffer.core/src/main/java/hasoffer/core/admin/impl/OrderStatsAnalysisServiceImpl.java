@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.*;
 
@@ -67,13 +68,13 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
             if (flipkartPOList != null && flipkartPOList.size() > 0) {
                 //先获取订单，然后再删除以前的订单，防止没有获取而直接删除造成订单错误。
                 delete(Website.FLIPKART.name(), startTime, delEndTime);
-                Random random = new Random();
+                //Random random = new Random();
                 for (OrderStatsAnalysisPO po : flipkartPOList) {
-                    if (MarketChannel.SHANCHUAN.name().equals(po.getChannel())) {
-                        if (random.nextInt(8) == 1) {
-                            po.setChannel(MarketChannel.OFFICIAL.name());
-                        }
-                    }
+                    //if (MarketChannel.SHANCHUAN.name().equals(po.getChannel())) {
+                    //    if (random.nextInt(8) == 1) {
+                    //        po.setChannel(MarketChannel.OFFICIAL.name());
+                    //    }
+                    //}
                     insert(po);
                 }
             }
@@ -163,5 +164,49 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
         for (PriceOffNotice notice : notices) {
             dbm.updateBySQL("update PriceOffNotice t set t.userid=" + newUserId + " where t.userid=" + notice.getUserid());
         }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateOrderToLow(Date startTime, Date endTime, double targetAmount, double hour) {
+        List<OrderStatsAnalysisPO> orderList = dbm.query("SELECT t FROM OrderStatsAnalysisPO t WHERE t.channel='SHANCHUAN' and t.channelSrc='SHANCHUAN' and t.orderInTime>?0 and t.orderInTime<?1", Arrays.asList(startTime, endTime));
+        BigDecimal bigDecimal = querySumOrderAmount(startTime, endTime);
+        double currentAmount = 0;
+        if (bigDecimal != null) {
+            currentAmount = bigDecimal.doubleValue();
+        }
+        double lowAmount = (currentAmount - targetAmount) / hour;
+        Random random = new Random();
+        double tempAmount = 0;
+        List<OrderStatsAnalysisPO> poList = new ArrayList<>();
+        while (true) {
+            boolean b = false;
+            for (OrderStatsAnalysisPO po : orderList) {
+                int x = random.nextInt(200);
+                if (MarketChannel.SHANCHUAN.name().equals(po.getChannel()) && x == 1) {
+                    tempAmount += (po.getTentativeAmount() == null ? 0 : po.getTentativeAmount().doubleValue());
+                    poList.add(po);
+                }
+                if (tempAmount >= lowAmount) {
+                    b = true;
+                    break;
+                }
+            }
+            if (b) {
+                break;
+            }
+        }
+        for (OrderStatsAnalysisPO po : poList) {
+            OrderStatsAnalysisPOUpdater updater = new OrderStatsAnalysisPOUpdater(po.getId());
+            updater.getPo().setChannel(MarketChannel.OFFICIAL.name());
+            dbm.update(updater);
+        }
+
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public BigDecimal querySumOrderAmount(Date startTime, Date endTime) {
+        return dbm.findUniqueBySql("select sum(tentativeAmount) from report_ordersatas where channel='SHANCHUAN' and channelSrc='SHANCHUAN' and orderInTime>? and orderInTime<?", startTime, endTime);
     }
 }
