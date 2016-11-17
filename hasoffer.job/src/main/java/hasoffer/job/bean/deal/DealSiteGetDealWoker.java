@@ -33,10 +33,21 @@ public class DealSiteGetDealWoker implements Runnable {
      */
     private static final Logger logger = LoggerFactory.getLogger(DealSiteGetDealWoker.class);
     private static final List<Website> dealSiteList = new ArrayList<>();
+    private static final List<Website> updateDealSiteList = new ArrayList<>();
 
     //初始化deal抓取的网站
     static {
         dealSiteList.add(Website.DESIDIME);
+    }
+
+    //deal更新的网站
+    static {
+        updateDealSiteList.add(Website.FLIPKART);
+        updateDealSiteList.add(Website.SNAPDEAL);
+        updateDealSiteList.add(Website.PAYTM);
+        updateDealSiteList.add(Website.AMAZON);
+        updateDealSiteList.add(Website.SHOPCLUES);
+        updateDealSiteList.add(Website.EBAY);
     }
 
     private IFetchDubboService fetchDubboService;
@@ -105,9 +116,12 @@ public class DealSiteGetDealWoker implements Runnable {
 
         if (webSite == null) {
             webSite = Website.UNKNOWN;
-            appdeal.setExpireTime(TimeUtils.add(TimeUtils.nowDate(), TimeUtils.MILLISECONDS_OF_1_HOUR));
-        } else {
+        }
+
+        if (updateDealSiteList.contains(webSite)) {
             appdeal.setExpireTime(TimeUtils.addDay(TimeUtils.nowDate(), 365));
+        } else {
+            appdeal.setExpireTime(TimeUtils.add(TimeUtils.nowDate(), TimeUtils.MILLISECONDS_OF_1_HOUR * 4));
         }
 
 
