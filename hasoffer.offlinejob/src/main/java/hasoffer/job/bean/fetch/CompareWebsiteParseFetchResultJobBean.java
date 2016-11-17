@@ -41,6 +41,60 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
     IFetchDubboService fetchDubboService;
     @Resource
     IStdProductService stdProductService;
+    int getResultNum = 0;//用来标记获取的结果个数
+    int resultFinishNum = 0;//正常结果
+    int resultExceptionNum = 0;//异常结果
+
+    @Override
+    protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        while (true) {
+
+            FetchCompareWebsiteResult compareWebsiteFetchResult = fetchDubboService.getCompareWebsiteFetchResult(Website.MOBILE91);
+
+            if (compareWebsiteFetchResult == null) {
+                try {
+                    TimeUnit.SECONDS.sleep(10);
+                } catch (InterruptedException e) {
+
+                }
+                System.out.println("pop get null wait 10 seconds");
+                continue;
+            }
+
+            TaskStatus taskStatus = compareWebsiteFetchResult.getTaskStatus();
+            getResultNum++;
+            if (getResultNum % 20 == 0) {
+                logger.info("hava revice " + getResultNum + " response");
+            }
+
+            if (TaskStatus.FINISH.equals(taskStatus)) {
+
+                resultFinishNum++;
+                if (resultFinishNum % 20 == 0) {
+                    logger.info("hava revice finish" + resultFinishNum + " response");
+                }
+
+                StdSkuBo stdSkuBo = null;
+                try {
+                    stdSkuBo = convertResultToStdSkuBo(compareWebsiteFetchResult);
+                } catch (IOException e) {
+                    System.out.println("spec convert error");
+                    continue;
+                }
+
+                boolean stdSku = stdProductService.createStdSku(stdSkuBo);
+                System.out.print("create " + stdSku);
+
+            } else {
+                System.out.println("pop get " + taskStatus + "continue");
+                System.out.println(taskStatus + " url " + compareWebsiteFetchResult.getUrl());
+                resultExceptionNum++;
+                if (resultExceptionNum % 20 == 0) {
+                    logger.info("hava revice finish" + resultExceptionNum + " response");
+                }
+            }
+        }
+    }
 
     private StdSkuBo convertResultToStdSkuBo(FetchCompareWebsiteResult compareWebsiteFetchResult) throws IOException {
 
@@ -102,43 +156,5 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
         StdSkuBo stdSkuBo = new StdSkuBo(stdSku, null, skuPrices, stdImages, stdSkuDetail);
 
         return stdSkuBo;
-    }
-
-    @Override
-    protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        while (true) {
-
-            FetchCompareWebsiteResult compareWebsiteFetchResult = fetchDubboService.getCompareWebsiteFetchResult(Website.MOBILE91);
-
-            if (compareWebsiteFetchResult == null) {
-                try {
-                    TimeUnit.SECONDS.sleep(10);
-                } catch (InterruptedException e) {
-
-                }
-                System.out.println("pop get null wait 10 seconds");
-                continue;
-            }
-
-            TaskStatus taskStatus = compareWebsiteFetchResult.getTaskStatus();
-
-            if (TaskStatus.FINISH.equals(taskStatus)) {
-
-                StdSkuBo stdSkuBo = null;
-                try {
-                    stdSkuBo = convertResultToStdSkuBo(compareWebsiteFetchResult);
-                } catch (IOException e) {
-                    System.out.println("spec convert error");
-                    continue;
-                }
-
-                boolean stdSku = stdProductService.createStdSku(stdSkuBo);
-                System.out.print("create " + stdSku);
-
-            } else {
-                System.out.println("pop get " + taskStatus + "continue");
-                System.out.println(taskStatus + " url " + compareWebsiteFetchResult.getUrl());
-            }
-        }
     }
 }
