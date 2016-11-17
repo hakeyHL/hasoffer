@@ -176,6 +176,9 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
             currentAmount = bigDecimal.doubleValue();
         }
         double lowAmount = (currentAmount - targetAmount) / hour;
+        if (lowAmount < 0) {
+            return;
+        }
         Random random = new Random();
         double tempAmount = 0;
         List<OrderStatsAnalysisPO> poList = new ArrayList<>();
