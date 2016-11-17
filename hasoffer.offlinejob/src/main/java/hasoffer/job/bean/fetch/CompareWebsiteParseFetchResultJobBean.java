@@ -137,6 +137,7 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
 
             } else {
                 System.out.println("pop get " + taskStatus + "continue");
+                System.out.println(taskStatus + " url " + compareWebsiteFetchResult.getUrl());
             }
         }
     }
