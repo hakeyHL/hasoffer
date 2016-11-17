@@ -4,6 +4,7 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.product.SkuUpdateResult;
+import hasoffer.core.cache.CmpSkuCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.dbm.osql.datasource.DataSource;
@@ -14,11 +15,9 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.task.ListProcessTask;
 import hasoffer.core.task.worker.ILister;
 import hasoffer.core.task.worker.IProcessor;
-import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -35,58 +34,8 @@ public class SkuUpdateStatManager {
     ICmpSkuService cmpSkuService;
     @Resource
     SearchLogCacheManager searchLogCacheManager;
-
-    public void exp_failed_skus(String ymd) throws Exception {
-
-        long deadLineDate = TimeUtils.stringToDate(ymd, TimeUtils.PATTERN_YMD).getTime() - TimeUtils.MILLISECONDS_OF_1_DAY;
-
-        Map<Long, Long> proMap = searchLogCacheManager.getProductCount(ymd);
-
-        String header = String.format("%s update day(%s), product count %d. \n", ymd, TimeUtils.parse(deadLineDate, TimeUtils.PATTERN_YMD), proMap.size());
-        System.out.println(header);
-
-        StringBuilder sb = new StringBuilder(header);
-
-        File file = new File("/home/hasoffer/exp_faild_sku.dat");
-        if (file.exists()) {
-            file.delete();
-        }
-        file.createNewFile();
-
-        int count = 1;
-        for (Map.Entry<Long, Long> kv : proMap.entrySet()) {
-            List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(kv.getKey());
-
-            for (PtmCmpSku cmpSku : cmpSkus) {
-                if (cmpSku.getWebsite() != null) {
-
-                    boolean successUpdate = cmpSku.getUpdateTime().getTime() > deadLineDate;
-
-                    // 如果sku状态被更新成下架offsale,则需要判断更新时间才能决定是否更新成功
-                    if (cmpSku.getStatus() == SkuStatus.OFFSALE) {
-                        if (!successUpdate) {
-                            return;
-                        }
-                    }
-
-                    if (!successUpdate) {
-                        sb.append(String.format("%d\t%s\n", cmpSku.getId(), cmpSku.getUrl()));
-                        count++;
-                    }
-                }
-            }
-
-            if (count > 2000) {
-                FileUtils.write(file, sb, true);
-                sb = new StringBuilder();
-            }
-        }
-
-        if (sb.length() > 0) {
-            FileUtils.write(file, sb, true);
-        }
-
-    }
+    @Resource
+    CmpSkuCacheManager cmpSkuCacheManager;
 
     @DataSource(value = DataSourceType.Slave)
     public SkuUpdateResult statUpdateResult(String ymd) {
@@ -145,7 +94,6 @@ public class SkuUpdateStatManager {
         return skuUpdateResult;
     }
 
-
     public SkuUpdateResult statUpdateResultToday() {
         final long deadLineDate = TimeUtils.yesterday();
 
@@ -160,7 +108,10 @@ public class SkuUpdateStatManager {
                 long proId = kv.getKey();
                 List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(proId);
                 for (PtmCmpSku cmpSku : cmpSkus) {
-                    countSkuUpdate(skuUpdateResult, cmpSku, deadLineDate);
+                    boolean successUpdate = countSkuUpdate(skuUpdateResult, cmpSku, deadLineDate);
+                    if (!successUpdate) {
+                        cmpSkuCacheManager.push2failedUpdate(cmpSku);
+                    }
                 }
             }
 
@@ -170,7 +121,7 @@ public class SkuUpdateStatManager {
         return skuUpdateResult;
     }
 
-    public void countSkuUpdate(SkuUpdateResult skuUpdateResult, PtmCmpSku cmpSku, long deadLineDate) {
+    public boolean countSkuUpdate(SkuUpdateResult skuUpdateResult, PtmCmpSku cmpSku, long deadLineDate) {
         if (cmpSku.getWebsite() != null) {
 
             boolean successUpdate = cmpSku.getUpdateTime().getTime() > deadLineDate;
@@ -178,7 +129,7 @@ public class SkuUpdateStatManager {
             // 如果sku状态被更新成下架offsale,则需要判断更新时间才能决定是否更新成功
             if (cmpSku.getStatus() == SkuStatus.OFFSALE) {
                 if (!successUpdate) {
-                    return;
+                    return false;
                 }
             }
 
@@ -237,6 +188,10 @@ public class SkuUpdateStatManager {
                     }
                     break;
             }
+
+            return successUpdate;
         }
+
+        return false;
     }
 }

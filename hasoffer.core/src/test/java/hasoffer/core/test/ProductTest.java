@@ -151,15 +151,14 @@ public class ProductTest {
     @Test
     public void testtest() {
         for (int i = 89992; i < 92000; i++) {
-            searchLogCacheManager.countSearchedProduct(i);
+            PtmCmpSku cmpSku = cmpSkuService.getCmpSkuById(i);
+
+            if (cmpSku == null) {
+                continue;
+            }
+
+            cmpSkuCacheManager.push2failedUpdate(cmpSku);
         }
-
-        productCacheManager.put2UpdateQueue(100L);
-
-        productCacheManager.put2UpdateProcessedSet(1000L);
-        productCacheManager.put2UpdateQueue(1000L);
-
-
     }
 
     @Test
