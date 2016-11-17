@@ -39,9 +39,11 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
     private static final Logger logger = LoggerFactory.getLogger(ComPareWebsiteSendFetchRequestJobBean.class);
     @Resource
     IFetchDubboService fetchDubboService;
+    int requestSendNumber = 0;//用来记录请求发送的个数
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+
 
         int num = 0;
 
@@ -99,7 +101,7 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
                 if (!StringUtils.isEmpty(postResultString)) {
                     JSONObject jsonResult = JSONObject.parseObject(postResultString);
                     Integer productCount = jsonResult.getInteger("productCount");
-                    
+
                     JSONArray categoryArray = jsonObject.getJSONArray("categoryFilter");
                     for (int k = 0; k < categoryArray.size(); k++) {
 
@@ -193,6 +195,12 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
                         System.out.println(productUrl);
 
                         fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_2, TimeUtils.MILLISECONDS_OF_1_HOUR * 10, categoryId);
+
+                        requestSendNumber++;
+                        if (requestSendNumber % 20 == 0) {
+                            logger.info("hava send " + requestSendNumber + " request");
+                        }
+
                         try {
                             TimeUnit.SECONDS.sleep(3);
                         } catch (InterruptedException e) {
@@ -238,6 +246,12 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
 
             System.out.println(productUrl);
             fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_2, TimeUtils.MILLISECONDS_OF_1_HOUR * 10, categoryId);
+
+            requestSendNumber++;
+            if (requestSendNumber % 20 == 0) {
+                logger.info("hava send " + requestSendNumber + " request");
+            }
+
             try {
                 TimeUnit.SECONDS.sleep(3);
             } catch (InterruptedException e) {
