@@ -117,7 +117,6 @@ public class OrderController {
                 orderModel.setTitle(mapinfo.get("1"));
                 orderModel.setProductId(mapinfo.get("2"));
                 //orderModel.setSeller(mapinfo.get("seller"));
-                //TODO add the market channel.
                 String affID = mapinfo.get("4");
                 orderModel.setAffID(affID);
                 MarketChannel channel = AffliIdHelper.getChannelByAffIdForAmazon(affID);
