@@ -19,14 +19,14 @@ public class DemoJobBean extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        logger.info("DemoJobBean is run at {}", new Date());
+        logger.info("DemoJobBean is run, start at {}", new Date());
 
         try {
             TimeUnit.SECONDS.sleep(30);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        logger.info("DemoJobBean is run at {}", new Date());
+        logger.info("DemoJobBean is run, end at {}", new Date());
     }
 
 }

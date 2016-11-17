@@ -38,6 +38,7 @@
 
     <bean id="demoTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="demoJob"/>
+        <property name="startDelay" value="1000"/>
         <property name="cronExpression" value="0 0 0/1 * * ? "/>
     </bean>
 
@@ -47,9 +48,11 @@
         <!--<property name="beanName" value="fetchJobBean"/>-->
     </bean>
 
-    <bean id="fetchTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+    <bean id="fetchTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
         <property name="jobDetail" ref="fetchJob"/>
-        <property name="cronExpression" value="0 0 1 1 1 ? 2066 "/>
+        <property name="startDelay" value="1000"/>
+        <property name="repeatInterval" value="2000"/>
+        <property name="repeatCount" value="0"/>
     </bean>
 
 

@@ -109,7 +109,7 @@ public class SkuUpdateStatManager {
                 List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(proId);
                 for (PtmCmpSku cmpSku : cmpSkus) {
                     boolean successUpdate = countSkuUpdate(skuUpdateResult, cmpSku, deadLineDate);
-                    if (!successUpdate) {
+                    if (!successUpdate && cmpSku.getStatus() == SkuStatus.ONSALE) {
                         cmpSkuCacheManager.push2failedUpdate(cmpSku);
                     }
                 }
