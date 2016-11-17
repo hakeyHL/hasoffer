@@ -124,7 +124,6 @@ public class DealSiteGetDealWoker implements Runnable {
             appdeal.setExpireTime(TimeUtils.add(TimeUtils.nowDate(), TimeUtils.MILLISECONDS_OF_1_HOUR * 4));
         }
 
-
         appdeal.setWebsite(webSite);
         appdeal.setAppdealSource(AppdealSource.DEAL_SITE);
         appdeal.setCreateTime(TimeUtils.nowDate());
