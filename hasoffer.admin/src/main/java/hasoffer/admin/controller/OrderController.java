@@ -116,6 +116,8 @@ public class OrderController {
                 orderModel.setTitle(mapinfo.get("1"));
                 orderModel.setProductId(mapinfo.get("2"));
                 //orderModel.setSeller(mapinfo.get("seller"));
+                //TODO add the market channel.
+//                orderModel.setAffID();
                 orderModel.setChannel(MarketChannel.GOOGLEPLAY.name());
                 orderModel.setOrderInTime(date);
                 orderModel.setOrderTime(new Date(date.getTime() + TimeUtils.MILLISECONDS_OF_1_MINUTE * 150));
