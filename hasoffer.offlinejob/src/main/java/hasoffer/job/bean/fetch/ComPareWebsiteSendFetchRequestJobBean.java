@@ -90,12 +90,38 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
             jsonObject.put("limit", limitSize);
             //startRow 0
             //get total page
+            int filterCategoryId = 0;//表示类目id
+            int filterCategoryCount = 0;//表示对应类目下商品商品数量
+
             try {
                 jsonObject.put("startRow", 0);
                 String postResultString = Httphelper.doPost(jsonReqUrlList, jsonObject.toJSONString());
                 if (!StringUtils.isEmpty(postResultString)) {
                     JSONObject jsonResult = JSONObject.parseObject(postResultString);
                     Integer productCount = jsonResult.getInteger("productCount");
+                    
+                    JSONArray categoryArray = jsonObject.getJSONArray("categoryFilter");
+                    for (int k = 0; k < categoryArray.size(); k++) {
+
+                        JSONObject jsonCategoryInfo = categoryArray.getJSONObject(k);
+
+                        if (k == 0) {
+                            Integer count = jsonCategoryInfo.getInteger("count");
+                            Integer countCategoryId = jsonCategoryInfo.getInteger("categoryId");
+                            filterCategoryCount = count;
+                            filterCategoryId = countCategoryId;
+                        }
+
+                        if (k > 0) {
+                            Integer count = jsonCategoryInfo.getInteger("count");
+                            Integer countCategoryId = jsonCategoryInfo.getInteger("categoryId");
+                            if (count > filterCategoryCount) {
+                                filterCategoryId = countCategoryId;
+                                filterCategoryCount = count;
+                            }
+                        }
+                    }
+
                     if (productCount > 0) {
                         if (productCount % limitSize != 0) {
                             //+1
@@ -112,7 +138,7 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
             for (int j = 0; j < totalPageSize; j++) {
                 jsonObject.put("startRow", j * jsonObject.getInteger("limit"));
                 System.out.println(jsonReqUrlList + " _ " + cate + "  FETCH START");
-                cate91Fetch(jsonReqUrlList, jsonObject, categoryId);
+                cate91Fetch(jsonReqUrlList, jsonObject, categoryId, filterCategoryId);
                 System.out.println(jsonReqUrlList + " _ " + cate + " FETCH END");
                 num++;
             }
@@ -139,7 +165,7 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
 
     }
 
-    private void cate91Fetch(String url, JSONObject jsonObject, long categoryId) {
+    private void cate91Fetch(String url, JSONObject jsonObject, long categoryId, long filterCategoryId) {
         String jsonString = null;
         try {
             jsonString = Httphelper.doPost(url, jsonObject.toJSONString());
@@ -154,6 +180,13 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
                 Iterator<Object> iterator = products.iterator();
                 while (iterator.hasNext()) {
                     JSONObject product = (JSONObject) iterator.next();
+
+                    int groupCategoryId = jsonObject.getIntValue("productGroupCategoryId");
+
+                    if (groupCategoryId != filterCategoryId) {
+                        continue;
+                    }
+
                     String productUrl = product.getString("productUrl");
                     if (!StringUtils.isEmpty(productUrl)) {
                         productUrl = "http://www.91mobiles.com/" + productUrl;
