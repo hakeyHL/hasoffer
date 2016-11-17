@@ -102,7 +102,7 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
                     JSONObject jsonResult = JSONObject.parseObject(postResultString);
                     Integer productCount = jsonResult.getInteger("productCount");
 
-                    JSONArray categoryArray = jsonObject.getJSONArray("categoryFilter");
+                    JSONArray categoryArray = jsonResult.getJSONArray("categoryFilter");
                     for (int k = 0; k < categoryArray.size(); k++) {
 
                         JSONObject jsonCategoryInfo = categoryArray.getJSONObject(k);
@@ -183,7 +183,7 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
                 while (iterator.hasNext()) {
                     JSONObject product = (JSONObject) iterator.next();
 
-                    int groupCategoryId = jsonObject.getIntValue("productGroupCategoryId");
+                    int groupCategoryId = product.getIntValue("productGroupCategoryId");
 
                     if (groupCategoryId != filterCategoryId) {
                         continue;
