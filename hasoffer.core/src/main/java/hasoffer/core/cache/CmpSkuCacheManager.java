@@ -13,6 +13,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.utils.JsonHelper;
+import hasoffer.data.redis.IRedisListService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,9 @@ public class CmpSkuCacheManager {
 
     @Resource
     ICacheService<Map> skuCacheServiceMap;
+
+    @Resource
+    IRedisListService redisListService;
 
     @Resource
     ICmpSkuService cmpSkuService;
@@ -191,4 +195,18 @@ public class CmpSkuCacheManager {
         return ptmCmpSkus;
     }
 
+    public void push2failedUpdate(PtmCmpSku cmpSku) {
+        String key = CACHE_KEY_PRE + "FailedUpdate";
+
+        if (cacheService.exists(key)) {
+            cacheService.expire(key, TimeUtils.SECONDS_OF_1_HOUR * 2);
+        }
+
+        redisListService.push(key, String.valueOf(cmpSku.getId()));
+    }
+
+    public List getFailedUpdate(int start, int count) {
+        String key = CACHE_KEY_PRE + "FailedUpdate";
+        return redisListService.range(key, start, start + count);
+    }
 }

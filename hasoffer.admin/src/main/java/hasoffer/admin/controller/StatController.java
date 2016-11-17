@@ -27,6 +27,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -57,22 +58,6 @@ public class StatController {
     SkuUpdateStatManager skuUpdateStatManager;
     private Logger logger = LoggerFactory.getLogger(StatController.class);
 
-    @RequestMapping(value = "/exp_filpkart_update_failed_skus", method = RequestMethod.GET)
-    @ResponseBody
-    public String exp_filpkart_update_failed_skus(@RequestParam(defaultValue = "") String ymd) {
-        if (StringUtils.isEmpty(ymd)) {
-            ymd = TimeUtils.parse(TimeUtils.today(), "yyyyMMdd");
-        }
-
-        try {
-            skuUpdateStatManager.exp_failed_skus(ymd);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return "ok";
-    }
-
     @RequestMapping(value = "/show_updates", method = RequestMethod.GET)
     public ModelAndView show_updates(@RequestParam(defaultValue = "") String ymd) {
         if (StringUtils.isEmpty(ymd)) {
@@ -101,6 +86,23 @@ public class StatController {
         skuUpdateStatManager.statUpdateResultToday();
 
         ModelAndView mav = new ModelAndView("redirect:/stat/show_updates");
+        return mav;
+    }
+
+    @RequestMapping(value = "/show_failed_update_skus", method = RequestMethod.GET)
+    public ModelAndView show_failed_update_skus(@RequestParam(defaultValue = "1") int start,
+                                                @RequestParam(defaultValue = "100") int count) {
+        List<String> ids = cmpSkuCacheManager.getFailedUpdate(start, count);
+
+        List<PtmCmpSku> cmpSkus = new ArrayList<>();
+
+        for (String id : ids) {
+            PtmCmpSku cmpSku = cmpSkuService.getCmpSkuById(Long.valueOf(id));
+            cmpSkus.add(cmpSku);
+        }
+
+        ModelAndView mav = new ModelAndView("showstat/show_fail");
+        mav.addObject("skus", cmpSkus);
         return mav;
     }
 
