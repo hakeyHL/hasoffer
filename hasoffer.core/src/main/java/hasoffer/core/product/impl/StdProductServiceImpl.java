@@ -109,20 +109,24 @@ public class StdProductServiceImpl implements IStdProductService {
 
         // sku属性
         Map<String, StdSkuAttr> attrs = skuBo.getSkuAttrs();
-        for (Map.Entry<String, StdSkuAttr> attr : attrs.entrySet()) {
-            PtmStdAttrDef attrDef = getAttrByName(attr.getKey());
+        if (attrs != null) {
+            for (Map.Entry<String, StdSkuAttr> attr : attrs.entrySet()) {
+                PtmStdAttrDef attrDef = getAttrByName(attr.getKey());
 
-            StdSkuAttr skuAttr = attr.getValue();
+                StdSkuAttr skuAttr = attr.getValue();
 
-            PtmStdSkuAttr ptmStdSkuAttr = new PtmStdSkuAttr(stdSku.getId(), attrDef.getId(), attrDef.getStdDefName(), skuAttr.getStdValue());
-            dbm.create(ptmStdSkuAttr);
+                PtmStdSkuAttr ptmStdSkuAttr = new PtmStdSkuAttr(stdSku.getId(), attrDef.getId(), attrDef.getStdDefName(), skuAttr.getStdValue());
+                dbm.create(ptmStdSkuAttr);
+            }
         }
 
         // 图片
         List<StdSkuImage> stdImages = skuBo.getSkuImages();
-        for (StdSkuImage skuImage : stdImages) {
-            PtmStdImage stdImage = new PtmStdImage(stdSku.getId(), skuImage.getOriImageUrl());
-            dbm.create(stdImage);
+        if (stdImages != null) {
+            for (StdSkuImage skuImage : stdImages) {
+                PtmStdImage stdImage = new PtmStdImage(stdSku.getId(), skuImage.getOriImageUrl());
+                dbm.create(stdImage);
+            }
         }
 
         // detail-info
