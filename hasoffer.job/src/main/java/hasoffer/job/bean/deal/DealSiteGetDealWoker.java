@@ -127,9 +127,8 @@ public class DealSiteGetDealWoker implements Runnable {
         appdeal.setWebsite(webSite);
         appdeal.setAppdealSource(AppdealSource.DEAL_SITE);
         appdeal.setCreateTime(TimeUtils.nowDate());
-        //这里暂时设置抓回来的设置成false
-//        appdeal.setDisplay(true);
-        appdeal.setDisplay(false);
+        appdeal.setDisplay(true);
+//        appdeal.setDisplay(false);
         //question 这种deal只有涨价才失效，加他个365天
         appdeal.setLinkUrl(fetchedDealInfo.getLink());
         appdeal.setPush(false);
