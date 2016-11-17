@@ -2,6 +2,7 @@ package hasoffer.admin.controller;
 
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.AffliIdHelper;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.ExcelUtils;
 import hasoffer.base.utils.TimeUtils;
@@ -117,8 +118,10 @@ public class OrderController {
                 orderModel.setProductId(mapinfo.get("2"));
                 //orderModel.setSeller(mapinfo.get("seller"));
                 //TODO add the market channel.
-//                orderModel.setAffID();
-                orderModel.setChannel(MarketChannel.GOOGLEPLAY.name());
+                String affID = mapinfo.get("4");
+                orderModel.setAffID(affID);
+                MarketChannel channel = AffliIdHelper.getChannelByAffIdForAmazon(affID);
+                orderModel.setChannel(channel.name());
                 orderModel.setOrderInTime(date);
                 orderModel.setOrderTime(new Date(date.getTime() + TimeUtils.MILLISECONDS_OF_1_MINUTE * 150));
                 orderModel.setWebSite(Website.AMAZON.name());
