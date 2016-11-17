@@ -189,6 +189,7 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
                 if ((MarketChannel.NONE.name().equals(po.getChannel()) || MarketChannel.LeoMaster.name().equals(po.getChannel())) && po.getOrderTime().after(DateUtils.parseDate("2016-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"))) {
                     MarketChannel channelByAffId = getChannelByAffId(po.getAffID());
                     po.setChannel(channelByAffId.name());
+                    po.setChannelSrc(channelByAffId.name());
                 }
             } catch (ParseException e) {
                 logger.error("Get channel error. Msg:{}", e);
