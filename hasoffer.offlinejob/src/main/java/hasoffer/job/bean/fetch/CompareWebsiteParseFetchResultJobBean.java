@@ -92,13 +92,13 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
         List<FetchedParamGroup> fetchedParamGroupList = compareWebsiteFetchResult.getFetchedParamGroupList();
         for (FetchedParamGroup fetchedParamGroup : fetchedParamGroupList) {
             String fetchedJson = JSON.toJSONString(fetchedParamGroup);
-            System.out.print("param _" + fetchedJson);
+            System.out.println("param _" + fetchedJson);
             paramGroups.add(JSON.parseObject(fetchedJson, PtmStdSkuParamGroup.class));
         }
         PtmStdSkuDetail stdSkuDetail = new PtmStdSkuDetail(0, paramGroups, "");
 
         System.out.println("stdSku = " + stdSku);
-        System.out.print("flag null = " + stdSku == null);
+        System.out.println("flag null = " + stdSku == null);
         StdSkuBo stdSkuBo = new StdSkuBo(stdSku, null, skuPrices, stdImages, stdSkuDetail);
 
         return stdSkuBo;

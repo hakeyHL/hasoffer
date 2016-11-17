@@ -40,8 +40,6 @@ public class StdSkuBo {
     private String desc;
 
     public StdSkuBo(PtmStdSku stdSku, Map<String, StdSkuAttr> skuAttrs, List<StdSkuPrice> skuPrices, List<StdSkuImage> skuImages, PtmStdSkuDetail skuDetail) {
-        this.id = stdSku.getId();
-        this.stdProId = stdSku.getStdProId();
         this.title = stdSku.getTitle();
         this.brand = stdSku.getBrand();
         this.model = stdSku.getModel();
