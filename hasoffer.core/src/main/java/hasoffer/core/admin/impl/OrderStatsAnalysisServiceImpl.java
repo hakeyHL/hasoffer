@@ -68,13 +68,13 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
             if (flipkartPOList != null && flipkartPOList.size() > 0) {
                 //先获取订单，然后再删除以前的订单，防止没有获取而直接删除造成订单错误。
                 delete(Website.FLIPKART.name(), startTime, delEndTime);
-                //Random random = new Random();
+                Random random = new Random();
                 for (OrderStatsAnalysisPO po : flipkartPOList) {
-                    //if (MarketChannel.SHANCHUAN.name().equals(po.getChannel())) {
-                    //    if (random.nextInt(8) == 1) {
-                    //        po.setChannel(MarketChannel.OFFICIAL.name());
-                    //    }
-                    //}
+                    if (MarketChannel.SHANCHUAN.name().equals(po.getChannel())) {
+                        if (random.nextInt(5) == 1) {
+                            po.setChannel(MarketChannel.OFFICIAL.name());
+                        }
+                    }
                     insert(po);
                 }
             }
@@ -169,7 +169,7 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateOrderToLow(Date startTime, Date endTime, double targetAmount, double hour) {
-        List<OrderStatsAnalysisPO> orderList = dbm.query("SELECT t FROM OrderStatsAnalysisPO t WHERE t.channel='SHANCHUAN' and t.channelSrc='SHANCHUAN' and t.orderInTime>?0 and t.orderInTime<?1", Arrays.asList(startTime, endTime));
+        List<OrderStatsAnalysisPO> orderList = dbm.query("SELECT t FROM OrderStatsAnalysisPO t WHERE t.channel='SHANCHUAN' and t.orderInTime>?0 and t.orderInTime<?1", Arrays.asList(startTime, endTime));
         BigDecimal bigDecimal = querySumOrderAmount(startTime, endTime);
         double currentAmount = 0;
         if (bigDecimal != null) {

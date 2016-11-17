@@ -31,9 +31,13 @@ public class OrderSCJobBean extends QuartzJobBean {
             Date end8mTime = DateUtils.parseDate("2016-08-31", "yyyy-MM-dd");
             orderStatsAnalysisService.updateOrderToLow(start8mTime, end8mTime, 592120, x);
 
-            Date start9mTime = DateUtils.parseDate("2016-08-01", "yyyy-MM-dd");
-            Date end9mTime = DateUtils.parseDate("2016-08-31", "yyyy-MM-dd");
+            Date start9mTime = DateUtils.parseDate("2016-09-01", "yyyy-MM-dd");
+            Date end9mTime = DateUtils.parseDate("2016-09-30", "yyyy-MM-dd");
             orderStatsAnalysisService.updateOrderToLow(start9mTime, end9mTime, 692120, x);
+
+            Date start10mTime = DateUtils.parseDate("2016-10-01", "yyyy-MM-dd");
+            Date end10mTime = DateUtils.parseDate("2016-10-31", "yyyy-MM-dd");
+            orderStatsAnalysisService.updateOrderToLow(start10mTime, end10mTime, 52120, x);
 
         } catch (Exception e) {
             logger.error("reportOrderStatistic: update order fail. DATE:" + new Date() + ": msg:", e);
