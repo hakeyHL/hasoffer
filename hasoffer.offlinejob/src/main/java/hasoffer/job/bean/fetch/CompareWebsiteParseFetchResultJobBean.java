@@ -71,7 +71,7 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
 
                 resultFinishNum++;
                 if (resultFinishNum % 20 == 0) {
-                    logger.info("hava revice finish" + resultFinishNum + " response");
+                    logger.info("hava revice finish " + resultFinishNum + " response");
                 }
 
                 StdSkuBo stdSkuBo = null;
