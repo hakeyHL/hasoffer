@@ -160,7 +160,7 @@
         <%--<script>--%>
         <%--$("#createTime").datetimepicker();--%>
         <%--</script>--%>
-
+        <input type="hidden" name="ptmcmpskuid" value="${deal.ptmcmpskuid}">
         <div class="form-group">
             <label class="col-sm-3 control-label">失效时间：</label>
 
