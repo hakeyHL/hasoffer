@@ -7,6 +7,7 @@ import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.redis.impl.CacheServiceImpl;
 import hasoffer.core.search.ISearchService;
+import hasoffer.data.redis.IRedisSetService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.dao.DataAccessException;
@@ -41,6 +42,17 @@ public class RedisTest {
     ISearchService searchService;
     @Resource
     private RedisTemplate<Serializable, Serializable> redisTemplate;
+    @Resource
+    private IRedisSetService redisSetService;
+
+    @Test
+    public void testRedisSet() {
+
+        boolean contains = redisSetService.contains("wiuhweaifiwhfeaw", "123");
+
+        System.out.println(contains);
+
+    }
 
     @Test
     public void stat() {

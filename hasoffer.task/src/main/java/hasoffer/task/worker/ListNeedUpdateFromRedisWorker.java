@@ -104,7 +104,7 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
 //            testPopProductNumber++;
 
             //if proceded set has this productId，continue next one
-            if (redisSetService.contains(KEY_PROCESSED_SET, (String) pop)) {
+            if (redisSetService.contains(KEY_PROCESSED_SET + ymd, (String) pop)) {
                 continue;
             }
 
