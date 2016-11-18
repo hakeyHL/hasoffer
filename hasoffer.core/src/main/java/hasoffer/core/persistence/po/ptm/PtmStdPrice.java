@@ -24,8 +24,10 @@ public class PtmStdPrice implements Identifiable<Long> {
     private long stockCount; // 库存
     private float shippingFee; //运费
 
+    @Enumerated(EnumType.STRING)
     private SkuStatus skuStatus;
 
+    @Enumerated(EnumType.STRING)
     private Website website;
     private String url;
 
