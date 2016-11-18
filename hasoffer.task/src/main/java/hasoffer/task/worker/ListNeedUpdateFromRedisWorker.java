@@ -75,10 +75,10 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
             if (tomorrowDayStart < TimeUtils.now()) {
                 ymd = TimeUtils.parse(TimeUtils.today(), TimeUtils.PATTERN_YMD);
                 tomorrowDayStart = TimeUtils.getDayStart(TimeUtils.addDay(TimeUtils.nowDate(), 1).getTime());
+                logger.info("current ymd = " + ymd);
+                logger.info("current daystart is " + tomorrowDayStart);
             }
 
-            System.out.println("current ymd = " + ymd);
-            System.out.println("current daystart is " + tomorrowDayStart);
 
 //            if (testSendFlipkartNumber > number) {
 //                System.out.println("testPopProductNumber " + testPopProductNumber);
@@ -104,11 +104,14 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
 //            testPopProductNumber++;
 
             //if proceded set has this productId，continue next one
+            logger.info("pop from wait update queue");
             if (redisSetService.contains(KEY_PROCESSED_SET + ymd, (String) pop)) {
+                logger.info("proceded set has this productId，continue next one");
                 continue;
             }
 
             //根据商品id，发起更新任务
+            logger.info("proceded set do not hava this productid get skuList");
             Long productId = Long.valueOf((String) pop);
 
             List<PtmCmpSku> ptmCmpSkuList = cmpSkuService.listCmpSkus(productId);

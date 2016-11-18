@@ -68,11 +68,14 @@ public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
             po.setChannelSrc(channel);
             if (channel == null || "".equals(channel)) {
                 po.setChannel(MarketChannel.NONE.name());
+                po.setChannelSrc(MarketChannel.NONE.name());
             } else {
                 po.setChannel(MarketChannel.valueOfString(channel).name());
+                po.setChannelSrc(MarketChannel.valueOfString(channel).name());
             }
             if (MarketChannel.NONE.name().equals(po.getChannel())) {
                 po.setChannel(AffliIdHelper.getMarketChannelById(channel).name());
+                po.setChannelSrc(AffliIdHelper.getMarketChannelById(channel).name());
             }
             po.setOrderInTime(order.getDateTime());
             po.setOrderTime(new Date(po.getOrderInTime().getTime() + TimeUtils.MILLISECONDS_OF_1_MINUTE * 150));
@@ -86,6 +89,7 @@ public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
                     po.setUserId(tempArray[1]);
                 } else if (tempArray.length == 3) {
                     po.setChannel(AffliIdHelper.getMarketChannelById(tempArray[0]).name());
+                    po.setChannelSrc(AffliIdHelper.getMarketChannelById(tempArray[0]).name());
                     po.setDeviceId(tempArray[1]);
                     po.setUserId(tempArray[2]);
                 }

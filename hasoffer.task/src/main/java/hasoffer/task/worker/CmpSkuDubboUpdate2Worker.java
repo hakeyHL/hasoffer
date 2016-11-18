@@ -83,13 +83,14 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                     continue;
                 }
 
+                logger.info("pop get response success " + fetchUrlResult.getWebsite());
                 String url = fetchUrlResult.getUrl();
 
                 TaskStatus taskStatus = fetchUrlResult.getTaskStatus();
 
                 if (TaskStatus.FINISH.equals(taskStatus)) {
 //                    popFinishNumber++;
-
+                    logger.info("taskStatus is finish" + fetchUrlResult.getWebsite());
                     if (Website.FLIPKART.equals(fetchUrlResult.getWebsite())) {
                         logger.info("pop get flipkart finish result");
                     }
@@ -109,6 +110,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                         logger.info("urkKey not found url = " + url);
                     } else {
 //                        urlKeyFoundNumber++;
+                        logger.info("urkKey found skulist begin to update " + skuList.size());
                         for (PtmCmpSku ptmCmpSku : skuList) {
                             //更新商品的信息，写入多图数据，写入描述/参数
                             updatePtmCmpSku(ptmCmpSku, fetchUrlResult);
@@ -116,9 +118,9 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                         }
                     }
                 } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
-                    if (Website.FLIPKART.equals(fetchUrlResult.getWebsite())) {
-                        logger.info("pop get flipkart exception result");
-                    }
+                    logger.info("taskStatus is exception" + fetchUrlResult.getWebsite());
+                } else {
+                    logger.info("taskStatus is " + taskStatus + "_" + fetchUrlResult.getWebsite());
                 }
             } catch (Exception e) {
                 logger.info("CmpSkuDubboUpdate2Worker.run() exception.", e);
@@ -149,6 +151,8 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
             e.printStackTrace();
         }
 
+        logger.info("updateCmpSkuBySpiderFetchedProduct success " + fetchedProduct.getWebsite() + "_" + fetchedProduct.getSkuStatus() + "_" + skuid);
+
 //        try {
 //            cmpSkuService.createPtmCmpSkuImage(skuid, fetchedProduct);
 //        } catch (Exception e) {
@@ -158,7 +162,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
 //            如果降价且CommentsNumber 大于40写入队列，并且状态必须是onsale
         if (price > fetchedProduct.getPrice() && fetchedProduct.getCommentsNumber() > 40 && SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
             redisListService.push(PRICE_DROP_SKUID_QUEUE, skuid + "");
-            System.out.println("price drop add to queue success " + skuid);
+            logger.info("price drop add to queue success " + skuid);
         }
 
 //        try {
