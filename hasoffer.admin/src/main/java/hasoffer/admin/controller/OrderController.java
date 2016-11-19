@@ -94,7 +94,8 @@ public class OrderController {
                     try {
                         date = DateUtils.parseDate(dateStr, "yyyy-MM-dd HH:mm:ss");
                     } catch (ParseException e) {
-                        logger.error("Parse Date:{} is error.", dateStr, e);
+                        logger.error("Parse Date:{}  to 'yyyy-MM-dd HH:mm:ss' is error.", dateStr, e);
+                        return modelAndView;
                     }
                 }
                 if (startDate == null && date != null) {
