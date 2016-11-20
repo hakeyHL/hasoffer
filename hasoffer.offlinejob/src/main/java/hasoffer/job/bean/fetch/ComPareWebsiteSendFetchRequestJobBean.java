@@ -56,9 +56,9 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
         apiJsonCates.add("tablet");
         apiJsonCates.add("tv");
         List<Integer> apiJsonCateCategorys = new ArrayList<>();
-        apiJsonCateCategorys.add(3182);
-        apiJsonCateCategorys.add(57);
-        apiJsonCateCategorys.add(3100);
+        apiJsonCateCategorys.add(3182);//1658       308
+        apiJsonCateCategorys.add(57);//2700         57
+        apiJsonCateCategorys.add(3100);//
 
 
         List<String> htmlReqUrlList = new ArrayList<>();
@@ -66,9 +66,9 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
         htmlReqUrlList.add("http://www.91mobiles.com/mobile-power-bank-finder.php");
         htmlReqUrlList.add("http://www.91mobiles.com/smartwatchfinder.php");
         List<Integer> htmlReqUrlCategoryList = new ArrayList<>();
-        htmlReqUrlCategoryList.add(205);
-        htmlReqUrlCategoryList.add(270);
-        htmlReqUrlCategoryList.add(102909);
+        htmlReqUrlCategoryList.add(205);//61        56
+        htmlReqUrlCategoryList.add(270);//271       261
+        htmlReqUrlCategoryList.add(102909);//204    75
 
         for (int i = 0; i < apiJsonCates.size(); i++) {
 
