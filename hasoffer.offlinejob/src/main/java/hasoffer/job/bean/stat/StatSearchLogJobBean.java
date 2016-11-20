@@ -67,7 +67,7 @@ public class StatSearchLogJobBean extends QuartzJobBean {
     }
 
     public void saveSearchCount(String ymd) {
-        final long deadLineDate = TimeUtils.yesterday();
+        final long deadLineDate = TimeUtils.yesterday() - TimeUtils.MILLISECONDS_OF_1_DAY;
         SkuUpdateResult skuUpdateResult = new SkuUpdateResult(ymd);
 
         logger.debug(String.format("save search count [%s]", ymd));
