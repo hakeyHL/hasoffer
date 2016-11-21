@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -207,7 +206,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                                     }
                                 }
                             }
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             logger.info("deal update pop string parse error");
                         }
                     }
