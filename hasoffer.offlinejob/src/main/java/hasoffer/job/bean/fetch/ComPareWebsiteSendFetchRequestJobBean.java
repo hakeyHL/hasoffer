@@ -8,6 +8,7 @@ import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.HtmlUtils;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.utils.Httphelper;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import org.htmlcleaner.HtmlCleaner;
@@ -44,99 +45,53 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 
 //        method1();//抓取91mobile数据camera，tablet，tv，smart-watch，memory-card,power-bak
-        method2();//抓取91mobile数据mobile
+        try {
+            method2();//抓取91mobile数据mobile
+        } catch (HttpFetchException e) {
+            logger.info("fetch mobile category for 91mobile fail");
+        }
 
     }
 
-    private void method2() {
+    private void method2() throws HttpFetchException {
 
-        String[] queryArray = {
-                "samsung",
-                "nokia",
-                "sony",
-                "htc",
-                "micromax",
-                "karbonn",
-                "lg",
-                "blackberry",
-                "apple",
-                "lava",
-                "gionee",
-                "motorola",
-                "spice",
-                "lenovo",
-                "iball",
-                "celkon",
-                "panasonic",
-                "intex",
-                "huawei",
-                "maxx",
-                "xiaomi",
-                "oppo",
-                "vivo",
-                "asus",
-                "leeco",
-                "moto",
-                "lyf",
-                "coolpad",
-                "yu",
-                "oneplus",
-                "honor",
-                "xolo",
-                "infocus",
-                "swipe",
-                "microsoft",
-                "google",
-                "zte",
-                "meizu",
-                "reach",
-                "videocon",
-        };
+        String productListUrlPrefix = "http://www.91mobiles.com/template/category_finder/finder_ajax.php?show_next=1&ord=0.2768255707779246&requestType=2&listType=list&listType_v1=list&selMobSort=relevance&amount=1000%3B45000&sCatName=phone&price_range_apply=0&search=mobiles&hidFrmSubFlag=1&page=";
+        String productListUrlSuffix = "&category=mobile&unique_sort=&hdnCategory=mobile&user_search=mobiles&url_feat_rule=&hdndprice=10001-15000%2C15001-20000&hdndprice1=5001-15000";
+
+        String html = HtmlUtils.getUrlHtml(productListUrlPrefix + 1 + productListUrlSuffix);
+
+        JSONObject rootJsonObject = JSONObject.parseObject(html);
+        String response = rootJsonObject.getString("response");
+        int totalPages = rootJsonObject.getIntValue("totalPages");
 
 
-        String productListUrlFirst = "http://www.91mobiles.com/template/category_finder/finder_ajax.php?ord=0.06976051293193453&requestType=2&listType=list&listType_v1=list&selMobSort=relevance&amount=1000%3B45000&sCatName=phone&price_range_apply=0&search=";
-        String productListUrlSecond = "&hidFrmSubFlag=1&page=";
-        String productListUrlThird = "&category=mobile&hdnCategory=mobile&user_search=";
-
-        for (String query : queryArray) {
-
-            String productListUrl = productListUrlFirst + query + productListUrlSecond + 1 + productListUrlThird + query;
+        for (int i = 1; i <= totalPages; i++) {
 
             try {
 
-                String html = HtmlUtils.getUrlHtml(productListUrl);
-
-                JSONObject rootJsonObject = JSONObject.parseObject(html);
-
-                String response = rootJsonObject.getString("response");
-                int totalPages = rootJsonObject.getIntValue("totalPages");
-
-                for (int i = 0; i <= totalPages; i++) {
-
-                    if (i == 0) {
-                        html = HtmlUtils.getUrlHtml(productListUrl);
-                        rootJsonObject = JSONObject.parseObject(html);
-                        response = rootJsonObject.getString("response");
-                    }
-
-                    String[] subStr = response.split("hover_blue_link name gaclick\\\" data-type='name' href=\\\"");
-                    List<String> productUrlList = new ArrayList<>();
-
-                    for (int j = 1; j < subStr.length; j++) {
-                        String productUrlSuffix = subStr[j].substring(0, subStr[j].indexOf('\"'));
-                        productUrlList.add(WEBSITE_91MOBILE_URL_PREFIEX + productUrlSuffix);
-                    }
-
-                    logger.info("query page " + i + " " + query + " get " + productUrlList.size() + " productUrl");
-                    for (String productUrl : productUrlList) {
-//                        fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_1, TimeUtils.SECONDS_OF_1_DAY, 5);
-                    }
-
-                    System.out.println();
+                if (i > 1) {
+                    html = HtmlUtils.getUrlHtml(productListUrlPrefix + i + productListUrlSuffix);
+                    rootJsonObject = JSONObject.parseObject(html);
+                    response = rootJsonObject.getString("response");
                 }
 
+
+                String[] subStr = response.split("hover_blue_link name gaclick\\\" data-type='name' href=\\\"");
+                List<String> productUrlList = new ArrayList<>();
+
+                for (int j = 1; j < subStr.length; j++) {
+                    String productUrlSuffix = subStr[j].substring(0, subStr[j].indexOf('\"'));
+                    productUrlList.add(WEBSITE_91MOBILE_URL_PREFIEX + productUrlSuffix);
+                }
+
+                logger.info("query page " + i + " get " + productUrlList.size() + " productUrl");
+                for (String productUrl : productUrlList) {
+                    fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_1, TimeUtils.SECONDS_OF_1_DAY);
+                }
+
+
             } catch (HttpFetchException e) {
-                logger.info("HttpFetchException for query " + query);
+                logger.info("HttpFetchException for page " + i);
             }
         }
 
