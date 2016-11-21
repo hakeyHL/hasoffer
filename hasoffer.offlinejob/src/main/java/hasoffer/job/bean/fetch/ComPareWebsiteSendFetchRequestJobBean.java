@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -36,7 +37,7 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
      * Logger for this class
      */
     private static final Logger logger = LoggerFactory.getLogger(ComPareWebsiteSendFetchRequestJobBean.class);
-    //    @Resource
+    @Resource
     IFetchDubboService fetchDubboService;
     int requestSendNumber = 0;//用来记录请求发送的个数
 
