@@ -7,7 +7,6 @@ import hasoffer.spider.enums.TaskTarget;
 import hasoffer.spider.model.FetchCompareWebsiteResult;
 import hasoffer.spider.model.FetchDealResult;
 import hasoffer.spider.model.FetchResult;
-import hasoffer.spider.model.FetchUrlResult;
 
 public interface IFetchDubboService {
 
@@ -74,42 +73,14 @@ public interface IFetchDubboService {
     要点：一个url只会对应一个ptmcmpsku,更新数据的时候按照url的md5值去更新
  */
 
-    /**
-     * 提交URL更新任务，该任务级别默认为TaskLevel.LEVEL_5(最低)。
-     *
-     * @param website
-     * @param url
-     */
-    void sendUrlTask(Website website, String url);
-
-    /**
-     * 提交URL更新任务
-     *
-     * @param website
-     * @param url
-     * @param taskLevel 任务优先度，分为5级，TaskLevel.LEVEL_1(最高)，TaskLevel.LEVEL_5(最低)。
-     */
-    void sendUrlTask(Website website, String url, TaskLevel taskLevel);
-
 
     /**
      * @param website
      * @param url
-     * @param expireSeconds
      * @param taskTarget    任务目标
      * @param taskLevel     任务级别
      */
-    void sendUrlTask(Website website, String url, Long expireSeconds, TaskTarget taskTarget, TaskLevel taskLevel);
-
-    /**
-     * 提交URL更新任务
-     *
-     * @param website
-     * @param url
-     * @param seconds   缓存时间是多少
-     * @param taskLevel 任务优先度，分为5级，TaskLevel.LEVEL_1(最高)，TaskLevel.LEVEL_5(最低)。
-     */
-    void sendUrlTask(Website website, String url, long seconds, TaskLevel taskLevel);
+    void sendUrlTask(Website website, String url, TaskTarget taskTarget, TaskLevel taskLevel);
 
     /**
      * 获取URL更新的结果
@@ -117,25 +88,6 @@ public interface IFetchDubboService {
      * @return
      */
     String popFetchUrlResult(TaskTarget taskTarget);
-
-    /**
-     * 获取URL任务的状态。
-     *
-     * @param website
-     * @param url
-     * @return
-     */
-    TaskStatus getUrlTaskStatus(Website website, String url, long expireSeconds);
-
-    /**
-     * 获取URL任务的结果
-     *
-     * @param webSite
-     * @param url
-     * @param expireSeconds 过期时间
-     * @return
-     */
-    FetchUrlResult getProductsByUrl(Website webSite, String url, long expireSeconds);
 
 /*************************************************************************************************/
 
@@ -156,9 +108,8 @@ public interface IFetchDubboService {
      * @param website       比价网站的名称
      * @param url           比价网站的某个商品的详情页
      * @param taskLevel     任务优先级
-     * @param expireSeconds 在指定时常内，对于客户端发送的抓取请求，进行url去重
      */
-    void sendCompareWebsiteFetchTask(Website website, String url, TaskLevel taskLevel, long expireSeconds, long categoryId);
+    void sendCompareWebsiteFetchTask(Website website, String url, TaskLevel taskLevel, long categoryId);
 
 
     FetchCompareWebsiteResult getCompareWebsiteFetchResult(Website webSite);

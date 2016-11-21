@@ -8,6 +8,7 @@ import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.job.dto.TopSellingTaskDTO;
 import hasoffer.job.service.ITopSellingTaskService;
+import hasoffer.spider.enums.TaskTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,7 @@ public class TopSellingTaskServiceImpl implements ITopSellingTaskService {
                 break;
             }
             for (TopSellingTaskDTO ptmCmpSku : page) {
-                fetchDubboService.sendUrlTask(ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), 20 * 60, TaskLevel.LEVEL_3);
+                fetchDubboService.sendUrlTask(ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), TaskTarget.TOP_SELLING_UPDATE, TaskLevel.LEVEL_3);
                 logger.debug("commit topSelling task:" + ptmCmpSku.toString());
             }
             // 获取结果

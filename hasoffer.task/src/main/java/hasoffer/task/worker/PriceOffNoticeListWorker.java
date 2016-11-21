@@ -22,9 +22,11 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Created on 2016/5/13.
+ *
  */
+@Deprecated
 public class PriceOffNoticeListWorker implements Runnable {
-
+    //TODO wing
     private static final String Q_PRICEOFFNOTICE = "SELECT distinct t.skuid FROM PriceOffNotice t ORDER BY t.skuid ASC";
     private static Logger logger = LoggerFactory.getLogger(PriceOffNoticeListWorker.class);
 
@@ -124,7 +126,7 @@ public class PriceOffNoticeListWorker implements Runnable {
                     }
 
                     queue.add(skuid);
-                    fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TimeUtils.SECONDS_OF_1_MINUTE * 35, TaskTarget.DEAL_UPDATE, TaskLevel.LEVEL_2);
+                    fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskTarget.DEAL_UPDATE, TaskLevel.LEVEL_2);
 
 
                     logger.info("send url request succes for " + sku.getWebsite() + " sku id is [" + sku.getId() + "]");

@@ -7,7 +7,6 @@ import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.HtmlUtils;
 import hasoffer.base.utils.StringUtils;
-import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.utils.Httphelper;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import org.htmlcleaner.HtmlCleaner;
@@ -194,7 +193,7 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
                         productUrl = "http://www.91mobiles.com/" + productUrl;
                         System.out.println(productUrl);
 
-                        fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_2, TimeUtils.MILLISECONDS_OF_1_HOUR * 10, categoryId);
+                        fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_2, categoryId);
 
                         requestSendNumber++;
                         if (requestSendNumber % 20 == 0) {
@@ -245,7 +244,7 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
             }
 
             System.out.println(productUrl);
-            fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_2, TimeUtils.MILLISECONDS_OF_1_HOUR * 10, categoryId);
+            fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_2, categoryId);
 
             requestSendNumber++;
             if (requestSendNumber % 20 == 0) {
