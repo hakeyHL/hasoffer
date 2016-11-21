@@ -124,10 +124,9 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     @Override
     public void sendUrlTask(Website website, String url, TaskTarget taskTarget, TaskLevel taskLevel) {
 
-        fetchCacheService.pushNum(website.name() + "_" + taskTarget.name());
         fetchCacheService.countPushUrl(website.name() + "_" + taskTarget.name(), url);
         FetchUrlResult fetchUrlResult = new FetchUrlResult(website, url, TaskStatus.START, new Date(), taskTarget);
-        String redisKey = RedisKeysUtils.getWaitUrlListKey(taskLevel, website);
+        String redisKey = RedisKeysUtils.getWaitUrlListKey(taskLevel, taskTarget, website);
         try {
             String key = FetchUrlResult.getCacheKey(fetchUrlResult);
             if (key == null) {
@@ -148,15 +147,6 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     @Override
     public String popFetchUrlResult(TaskTarget taskTarget) {
         String fetchUrlResult = fetchCacheService.popFinishUrlList(taskTarget);
-        if (fetchUrlResult != null) {
-
-            try {
-                FetchUrlResult result = JSONUtil.toObject(fetchUrlResult, FetchUrlResult.class);
-                fetchCacheService.popNum(result.getWebsite() + "_" + taskTarget + "_" + result.getTaskStatus());
-            } catch (IOException e) {
-                logger.error("Json:{}", fetchUrlResult, e);
-            }
-        }
         logger.info("popFetchUrlResult(), obj:{}", fetchUrlResult);
         return fetchUrlResult;
     }
