@@ -7,6 +7,7 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.job.service.IFetchTestService;
+import hasoffer.spider.enums.TaskTarget;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,7 @@ public class FetchTestServiceImpl implements IFetchTestService {
             List<PtmCmpSku> list = page.getData();
             File file = new File(baseOutFolder + "/" + website.toString() + "_task.txt");
             for (PtmCmpSku ptmCmpSku : list) {
-                fetchDubboService.sendUrlTask(ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), TaskLevel.LEVEL_3);
+                fetchDubboService.sendUrlTask(ptmCmpSku.getWebsite(), ptmCmpSku.getUrl(), TaskTarget.PRICE_CHANGES, TaskLevel.LEVEL_3);
                 try {
                     FileUtils.write(file, ptmCmpSku.toString() + "\r\n", "utf-8", true);
                 } catch (IOException e) {

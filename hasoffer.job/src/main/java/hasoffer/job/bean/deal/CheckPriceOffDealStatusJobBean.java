@@ -97,7 +97,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                                 }
                                 Website website = ptmCmpSku.getWebsite();
                                 String url = ptmCmpSku.getUrl();
-                                fetchDubboService.sendUrlTask(website, url, TimeUtils.SECONDS_OF_1_MINUTE * 45, TaskTarget.DEAL_UPDATE, TaskLevel.LEVEL_2);
+                                fetchDubboService.sendUrlTask(website, url, TaskTarget.DEAL_UPDATE, TaskLevel.LEVEL_2);
                             }
 
                             //如果是Deal_site，判断website
@@ -105,7 +105,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                                 if (Website.UNKNOWN.equals(deal.getWebsite())) {
                                     continue;
                                 }
-                                fetchDubboService.sendUrlTask(deal.getWebsite(), deal.getLinkUrl(), TimeUtils.SECONDS_OF_1_MINUTE * 45, TaskTarget.DEAL_UPDATE, TaskLevel.LEVEL_2);
+                                fetchDubboService.sendUrlTask(deal.getWebsite(), deal.getLinkUrl(), TaskTarget.DEAL_UPDATE, TaskLevel.LEVEL_2);
                             }
 
 
