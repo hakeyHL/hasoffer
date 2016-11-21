@@ -120,6 +120,11 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                     }
                 } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
                     logger.info("taskStatus is exception " + website);
+//                    if (Website.AMAZON.equals(website)) {
+//                        String amazonUrl = fetchUrlResult.getUrl();
+//                        amazonUrl = amazonUrl.replace("gp/offer-listing", "dp");
+//                        fetchDubboService.sendUrlTask(Website.AMAZON, amazonUrl, TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_3);
+//                    }
                 } else {
                     logger.info("taskStatus is " + taskStatus + "_" + website);
                 }
