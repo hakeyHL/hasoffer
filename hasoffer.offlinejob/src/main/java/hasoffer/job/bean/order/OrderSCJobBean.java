@@ -24,16 +24,16 @@ public class OrderSCJobBean extends QuartzJobBean {
         try {
 
             Date date = new Date();
-            Date targetDate = DateUtils.parseDate("2016-11-21", "yyyy-MM-dd");
+            Date targetDate = DateUtils.parseDate("2016-11-22", "yyyy-MM-dd");
             Long x = (targetDate.getTime() - date.getTime()) / (1000 * 60 * 60);
 
             Date start8mTime = DateUtils.parseDate("2016-08-01", "yyyy-MM-dd");
             Date end8mTime = DateUtils.parseDate("2016-08-31", "yyyy-MM-dd");
-            orderStatsAnalysisService.updateOrderToLow(start8mTime, end8mTime, 592120, x);
+            orderStatsAnalysisService.updateOrderToLow(start8mTime, end8mTime, 552120, x);
 
             Date start9mTime = DateUtils.parseDate("2016-09-01", "yyyy-MM-dd");
             Date end9mTime = DateUtils.parseDate("2016-09-30", "yyyy-MM-dd");
-            orderStatsAnalysisService.updateOrderToLow(start9mTime, end9mTime, 692120, x);
+            orderStatsAnalysisService.updateOrderToLow(start9mTime, end9mTime, 622120, x);
 
             Date start10mTime = DateUtils.parseDate("2016-10-01", "yyyy-MM-dd");
             Date end10mTime = DateUtils.parseDate("2016-10-31", "yyyy-MM-dd");

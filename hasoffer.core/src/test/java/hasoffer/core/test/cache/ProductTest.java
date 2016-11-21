@@ -1,5 +1,6 @@
 package hasoffer.core.test.cache;
 
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.product.SkuUpdateResult2;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
@@ -33,8 +34,9 @@ public class ProductTest {
         }
 
         productCacheManager.put2UpdateQueue(100L);
+        String ymd = TimeUtils.parse(TimeUtils.today(), TimeUtils.PATTERN_YMD);
 
-        productCacheManager.put2UpdateProcessedSet(1000L);
+        productCacheManager.put2UpdateProcessedSet(1000L, ymd);
         productCacheManager.put2UpdateQueue(1000L);
 
         skuUpdateStatManager.statUpdateResultToday();
