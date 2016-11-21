@@ -37,18 +37,17 @@ public class FetchUrlWorker implements Runnable {
     public void run() {
         while (true) {
             try {
-                Object pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_1, TaskTarget.SKU_UPDATE, website));
-                if (pop == null) {
-                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_2, TaskTarget.SKU_UPDATE, website));
-                }
-                if (pop == null) {
-                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_3, TaskTarget.SKU_UPDATE, website));
-                }
-                if (pop == null) {
-                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_4, TaskTarget.SKU_UPDATE, website));
-                }
-                if (pop == null) {
-                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_5, TaskTarget.SKU_UPDATE, website));
+                Object pop = null;
+                for (TaskLevel taskLevel : TaskLevel.values()) {
+                    if (pop == null) {
+                        pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.DEAL_UPDATE, website));
+                    }
+                    if (pop == null) {
+                        pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.SKU_UPDATE, website));
+                    }
+                    if (pop == null) {
+                        pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.PRICE_CHANGES, website));
+                    }
                 }
                 if (pop == null) {
                     TimeUnit.MINUTES.sleep(1);
