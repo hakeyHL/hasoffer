@@ -172,7 +172,7 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                 }
 
                 //now productid hava been sended ,add to processed set
-                productCacheManager.put2UpdateProcessedSet(productId);
+                productCacheManager.put2UpdateProcessedSet(productId, ymd);
 //                    redisSetService.add(KEY_PROCESSED_SET, );
             }
         }

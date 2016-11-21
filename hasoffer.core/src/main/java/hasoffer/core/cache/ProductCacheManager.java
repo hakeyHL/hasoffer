@@ -261,8 +261,8 @@ public class ProductCacheManager {
         }
     }
 
-    public void put2UpdateProcessedSet(long productId) {
-        String ymd = TimeUtils.parse(TimeUtils.today(), TimeUtils.PATTERN_YMD);
+    public void put2UpdateProcessedSet(long productId, String ymd) {
+        //String ymd = TimeUtils.parse(TimeUtils.today(), TimeUtils.PATTERN_YMD);
 
         String key_updated = CACHE_KEY_PRE + "UPDATE_PROCESSED_" + ymd;
 
