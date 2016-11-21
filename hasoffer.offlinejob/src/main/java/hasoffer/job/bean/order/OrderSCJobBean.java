@@ -24,7 +24,7 @@ public class OrderSCJobBean extends QuartzJobBean {
         try {
 
             Date date = new Date();
-            Date targetDate = DateUtils.parseDate("2016-11-22 12:00:00", "yyyy-MM-dd HH:mm:ss");
+            Date targetDate = DateUtils.parseDate("2016-11-21 12:00:00", "yyyy-MM-dd HH:mm:ss");
             Long x = (targetDate.getTime() - date.getTime()) / (1000 * 60 * 60);
             logger.info("OrderSCJobBean x={}", x);
             Date start8mTime = DateUtils.parseDate("2016-08-01", "yyyy-MM-dd");
