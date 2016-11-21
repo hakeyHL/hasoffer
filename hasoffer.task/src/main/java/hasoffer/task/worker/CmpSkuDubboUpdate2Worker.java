@@ -85,13 +85,14 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
 
                 logger.info("pop get response success " + fetchUrlResult.getWebsite());
                 String url = fetchUrlResult.getUrl();
+                Website website = fetchUrlResult.getWebsite();
 
                 TaskStatus taskStatus = fetchUrlResult.getTaskStatus();
 
                 if (TaskStatus.FINISH.equals(taskStatus)) {
 //                    popFinishNumber++;
-                    logger.info("taskStatus is finish" + fetchUrlResult.getWebsite());
-                    if (Website.FLIPKART.equals(fetchUrlResult.getWebsite())) {
+                    logger.info("taskStatus is finish " + website);
+                    if (Website.FLIPKART.equals(website)) {
                         logger.info("pop get flipkart finish result");
                     }
 
@@ -107,10 +108,10 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
 
                     if (skuList == null || skuList.size() == 0) {
 //                        urlKeyNotFoundNumber++;
-                        logger.info("urkKey not found url = " + url);
+                        logger.info("urkKey not found " + website + "url = " + url);
                     } else {
 //                        urlKeyFoundNumber++;
-                        logger.info("urkKey found skulist begin to update " + skuList.size());
+                        logger.info("urkKey found " + website + " skulist begin to update " + skuList.size());
                         for (PtmCmpSku ptmCmpSku : skuList) {
                             //更新商品的信息，写入多图数据，写入描述/参数
                             updatePtmCmpSku(ptmCmpSku, fetchUrlResult);
@@ -118,9 +119,9 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                         }
                     }
                 } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
-                    logger.info("taskStatus is exception" + fetchUrlResult.getWebsite());
+                    logger.info("taskStatus is exception " + website);
                 } else {
-                    logger.info("taskStatus is " + taskStatus + "_" + fetchUrlResult.getWebsite());
+                    logger.info("taskStatus is " + taskStatus + "_" + website);
                 }
             } catch (Exception e) {
                 logger.info("CmpSkuDubboUpdate2Worker.run() exception.", e);
