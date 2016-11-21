@@ -57,41 +57,36 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
                 } catch (InterruptedException e) {
 
                 }
-                System.out.println("pop get null wait 10 seconds");
+                logger.info("pop get null wait 10 seconds");
                 continue;
             }
 
             TaskStatus taskStatus = compareWebsiteFetchResult.getTaskStatus();
             getResultNum++;
-            if (getResultNum % 20 == 0) {
-                logger.info("hava revice " + getResultNum + " response");
-            }
+            logger.info("hava revice " + getResultNum + " response");
 
             if (TaskStatus.FINISH.equals(taskStatus)) {
 
                 resultFinishNum++;
-                if (resultFinishNum % 20 == 0) {
-                    logger.info("hava revice finish " + resultFinishNum + " response");
-                }
+                logger.info("hava revice finish " + resultFinishNum + " response");
 
                 StdSkuBo stdSkuBo = null;
                 try {
                     stdSkuBo = convertResultToStdSkuBo(compareWebsiteFetchResult);
                 } catch (IOException e) {
-                    System.out.println("spec convert error");
+                    logger.info("spec convert error");
                     continue;
                 }
 
                 boolean stdSku = stdProductService.createStdSku(stdSkuBo);
-                System.out.print("create " + stdSku);
+                logger.info("create " + stdSku);
 
             } else {
-                System.out.println("pop get " + taskStatus + "continue");
-                System.out.println(taskStatus + " url " + compareWebsiteFetchResult.getUrl());
+                logger.info("pop get " + taskStatus + "continue");
+                logger.info(taskStatus + " url " + compareWebsiteFetchResult.getUrl());
                 resultExceptionNum++;
-                if (resultExceptionNum % 20 == 0) {
-                    logger.info("hava revice finish" + resultExceptionNum + " response");
-                }
+                logger.info("hava revice finish" + resultExceptionNum + " response");
+
             }
         }
     }
@@ -100,7 +95,7 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
 
         //product基本信息相关
         FetchedProduct ptmproduct = compareWebsiteFetchResult.getPtmproduct();
-        System.out.println("product _" + ptmproduct);
+        logger.info("product _" + ptmproduct);
 
         //sku列表信息相关
         float minPrice = 0.0f;
@@ -109,7 +104,7 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
         List<FetchedProduct> ptmcmpskuList = compareWebsiteFetchResult.getPtmcmpskuList();
 
         for (FetchedProduct ptmcmpsku : ptmcmpskuList) {
-            System.out.println("sku _" + ptmcmpsku);
+            logger.info("sku _" + ptmcmpsku);
             if (ptmcmpsku.getPrice() != 0) {
                 if (flag) {
                     minPrice = ptmcmpsku.getPrice();
@@ -125,7 +120,7 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
         }
 
         long categoryId = compareWebsiteFetchResult.getCategoryId();
-        System.out.println("categoryid _" + categoryId);
+        logger.info("categoryid _" + categoryId);
 
         PtmStdSku stdSku = new PtmStdSku(ptmproduct.getTitle(), ptmproduct.getBrand(), ptmproduct.getModel(), categoryId, minPrice, ptmproduct.getSourceId(), ptmproduct.getUrl());
 

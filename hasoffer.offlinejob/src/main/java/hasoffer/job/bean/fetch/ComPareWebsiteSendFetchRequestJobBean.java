@@ -8,7 +8,6 @@ import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.HtmlUtils;
 import hasoffer.base.utils.StringUtils;
-import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.utils.Httphelper;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import org.htmlcleaner.HtmlCleaner;
@@ -64,6 +63,7 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
         String response = rootJsonObject.getString("response");
         int totalPages = rootJsonObject.getIntValue("totalPages");
 
+        logger.info("91mobile mobile category fetch totalPage is " + totalPages);
 
         for (int i = 1; i <= totalPages; i++) {
 
@@ -75,7 +75,6 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
                     response = rootJsonObject.getString("response");
                 }
 
-
                 String[] subStr = response.split("hover_blue_link name gaclick\\\" data-type='name' href=\\\"");
                 List<String> productUrlList = new ArrayList<>();
 
@@ -86,15 +85,13 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
 
                 logger.info("query page " + i + " get " + productUrlList.size() + " productUrl");
                 for (String productUrl : productUrlList) {
-                    fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_1, TimeUtils.SECONDS_OF_1_DAY);
+                    fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_1, 5);
                 }
-
 
             } catch (HttpFetchException e) {
                 logger.info("HttpFetchException for page " + i);
             }
         }
-
 
     }
 
@@ -114,7 +111,6 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
         apiJsonCateCategorys.add(3182);//1658       308
         apiJsonCateCategorys.add(57);//2700         57
         apiJsonCateCategorys.add(3100);//
-
 
         List<String> htmlReqUrlList = new ArrayList<>();
         htmlReqUrlList.add("http://www.91mobiles.com/mobile-memory-card-finder.php");
@@ -219,7 +215,6 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
                 num++;
             }
         }
-
 
     }
 
