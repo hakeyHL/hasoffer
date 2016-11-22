@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.bo.stdsku.StdSkuAttr;
 import hasoffer.core.bo.stdsku.StdSkuBo;
 import hasoffer.core.bo.stdsku.StdSkuImage;
 import hasoffer.core.bo.stdsku.StdSkuPrice;
@@ -23,7 +24,9 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -78,8 +81,12 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
                     continue;
                 }
 
-                boolean stdSku = stdProductService.createStdSku(stdSkuBo);
-                logger.info("create " + stdSku);
+                try {
+                    boolean stdSku = stdProductService.createStdSku(stdSkuBo);
+                    logger.info("create " + stdSku);
+                } catch (Exception e) {
+                    logger.info("create fail");
+                }
 
             } else {
                 logger.info("pop get " + taskStatus + "continue");
@@ -128,7 +135,6 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
 
         PtmStdSku stdSku = new PtmStdSku(ptmproduct.getTitle(), ptmproduct.getBrand(), ptmproduct.getModel(), categoryId, minPrice, ptmproduct.getSourceId(), ptmproduct.getUrl());
 
-
         //product图片列表相关
         List<String> imageUrlList = ptmproduct.getImageUrlList();
         List<StdSkuImage> stdImages = new ArrayList<>();
@@ -151,7 +157,21 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
         PtmStdSkuDetail stdSkuDetail = new PtmStdSkuDetail(0, paramGroups, "");
 
         logger.info("stdSku = " + stdSku);
-        StdSkuBo stdSkuBo = new StdSkuBo(stdSku, null, skuPrices, stdImages, stdSkuDetail);
+
+        //商品规格
+        Map<String, String> attrMap = ptmproduct.getAttrMap();
+        Map<String, StdSkuAttr> skuAttrs = null;
+        if (attrMap != null && attrMap.size() > 0) {
+            skuAttrs = new HashMap<>();
+            for (Map.Entry<String, String> attrMapEntry : attrMap.entrySet()) {
+                String key = attrMapEntry.getKey();
+                String value = attrMapEntry.getValue();
+                StdSkuAttr stdSkuAttr = new StdSkuAttr(key, value);
+                skuAttrs.put(key, stdSkuAttr);
+            }
+        }
+
+        StdSkuBo stdSkuBo = new StdSkuBo(stdSku, skuAttrs, skuPrices, stdImages, stdSkuDetail);
 
         return stdSkuBo;
     }
