@@ -24,20 +24,23 @@ public class OrderSCJobBean extends QuartzJobBean {
         try {
 
             Date date = new Date();
-            Date targetDate = DateUtils.parseDate("2016-11-21 12:00:00", "yyyy-MM-dd HH:mm:ss");
-            Long x = (targetDate.getTime() - date.getTime()) / (1000 * 60 * 60);
-            logger.info("OrderSCJobBean x={}", x);
-            Date start8mTime = DateUtils.parseDate("2016-08-01", "yyyy-MM-dd");
+            Date targetDate08 = DateUtils.parseDate("2016-11-22 23:00:00", "yyyy-MM-dd HH:mm:ss");
+            Long x08 = (targetDate08.getTime() - date.getTime()) / (1000 * 60 * 60);
+            logger.info("OrderSCJobBean x08={}", x08);
+            Date start8mTime = DateUtils.parseDate("2016-08-31", "yyyy-MM-dd");
             Date end8mTime = DateUtils.parseDate("2016-09-01", "yyyy-MM-dd");
-            orderStatsAnalysisService.updateOrderToLow(start8mTime, end8mTime, 552120, x);
+            orderStatsAnalysisService.updateOrderToLow(start8mTime, end8mTime, 32120, x08);
 
-            Date start9mTime = DateUtils.parseDate("2016-09-01", "yyyy-MM-dd");
-            Date end9mTime = DateUtils.parseDate("2016-10-01", "yyyy-MM-dd");
-            orderStatsAnalysisService.updateOrderToLow(start9mTime, end9mTime, 622120, x);
+            //Date start9mTime = DateUtils.parseDate("2016-09-01", "yyyy-MM-dd");
+            //Date end9mTime = DateUtils.parseDate("2016-10-01", "yyyy-MM-dd");
+            //orderStatsAnalysisService.updateOrderToLow(start9mTime, end9mTime, 622120, x);
 
+            Date targetDate10 = DateUtils.parseDate("2016-11-30 23:00:00", "yyyy-MM-dd HH:mm:ss");
+            Long x10 = (targetDate10.getTime() - date.getTime()) / (1000 * 60 * 60);
+            logger.info("OrderSCJobBean x10={}", x10);
             Date start10mTime = DateUtils.parseDate("2016-10-01", "yyyy-MM-dd");
             Date end10mTime = DateUtils.parseDate("2016-11-01", "yyyy-MM-dd");
-            orderStatsAnalysisService.updateOrderToLow(start10mTime, end10mTime, 521200, x);
+            orderStatsAnalysisService.updateOrderToLow(start10mTime, end10mTime, 521200, x10);
 
         } catch (Exception e) {
             logger.error("reportOrderStatistic: update order fail. DATE:" + new Date() + ": msg:", e);
