@@ -33,7 +33,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -332,7 +331,7 @@ public class AppDealController {
                         if (appDealComment.getIsAnonymous() == 1 && StringUtils.isNotEmpty(userName)) {
                             userName = userName.charAt(0) + "**" + userName.charAt(userName.length() - 1);
                         }
-                        dealCommentVos.add(new DealCommentVo(getDifference2Date(new Date(),
+                        dealCommentVos.add(new DealCommentVo(TimeUtils.getDifference2Date(new Date(),
                                 new Date(appDealComment.getCreateTime())),
                                 StringUtils.isEmpty(userName) ? "" : userName,
                                 urmUser.getAvatarPath() == null ? "" : urmUser.getAvatarPath(),
@@ -350,16 +349,5 @@ public class AppDealController {
         }
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
-    }
-
-    public String getDifference2Date(Date maxDate, Date comparedDate) {
-        Long tempResult = maxDate.getTime() - comparedDate.getTime();
-        long nd = 1000 * 24 * 60 * 60;//一天的毫秒数
-        long nh = 1000 * 60 * 60;//一小时的毫秒数
-        long nm = 1000 * 60;//一分钟的毫秒数
-        int day = BigDecimal.valueOf(tempResult).divide(BigDecimal.valueOf(nd), BigDecimal.ROUND_HALF_UP).intValue();//计算差多少天
-        int hour = BigDecimal.valueOf(tempResult).divide(BigDecimal.valueOf(nh), BigDecimal.ROUND_HALF_UP).intValue();//计算差多少天
-        int min = BigDecimal.valueOf(tempResult).divide(BigDecimal.valueOf(nm), BigDecimal.ROUND_HALF_UP).intValue();//计算差多少天
-        return day <= 0 ? hour <= 0 ? min + " mins ago " : hour + " hours ago " : day + " days ago ";
     }
 }

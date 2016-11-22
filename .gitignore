@@ -9,4 +9,5 @@
 /.idea/
 *.pyc
 */*.pyc
-
+*.bat
+*.sh

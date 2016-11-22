@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -418,6 +419,7 @@ public class AppUserController {
      * @param response
      * @return
      */
+    @ExceptionHandler(value = RuntimeException.class)
     @RequestMapping("user/getEAndP")
     public String getUserEmailAndPhone(HttpServletResponse response,
                                        @RequestParam(defaultValue = "") String telephone,
