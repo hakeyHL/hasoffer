@@ -159,11 +159,11 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
 //                            testSendSnapdealNumber++;
 //                        }
 
-                        fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), cacheSeconds, TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_3);
+                        fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_3);
                         logger.info("send url request succes for " + sku.getWebsite() + " sku id is _" + sku.getId() + "_");
 //                        testSendPtmCmpSkuNumber++;
                     } else {
-                        fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), cacheSeconds, TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_5);
+                        fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_5);
                         logger.info("send url request succes for " + sku.getWebsite() + " sku id is _" + sku.getId() + "_");
 //                        testSendPtmCmpSkuNumber++;
                     }

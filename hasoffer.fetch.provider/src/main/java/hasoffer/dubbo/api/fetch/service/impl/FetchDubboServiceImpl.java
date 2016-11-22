@@ -5,7 +5,6 @@ import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
-import hasoffer.base.utils.TimeUtils;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.spider.constants.RedisKeysUtils;
 import hasoffer.spider.enums.TaskTarget;
@@ -68,19 +67,11 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
         return fetchResult;
     }
 
-
     @Override
-    public FetchUrlResult getProductsByUrl(Website webSite, String url, long expireSeconds) {
-        FetchUrlResult fetchUrlResult = getFetchUrlResult(webSite, url, expireSeconds);
-        logger.info("FetchDubboServiceImpl.getProductsByUrl(webSite,url):{}, {} . Now is {} ", webSite, url, fetchUrlResult);
-        return fetchUrlResult;
-    }
-
-    @Override
-    public void sendCompareWebsiteFetchTask(Website website, String url, TaskLevel taskLevel, long cacheSeconds,long categoryId) {
+    public void sendCompareWebsiteFetchTask(Website website, String url, TaskLevel taskLevel, long categoryId) {
 
         //先检查解析过的set中是否含有该url，如果有跳过，如果没有新增
-        boolean flag = fetchCacheService.checkCompareWebsiteFetch(RedisKeysUtils.PARSED_COMPAREWEBSITE_FETCH_URL, url, cacheSeconds);
+        boolean flag = fetchCacheService.checkCompareWebsiteFetch(RedisKeysUtils.PARSED_COMPAREWEBSITE_FETCH_URL, url);
 
         if (!flag) {
             return;
@@ -129,60 +120,25 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
         return fetchCacheService.getTaskStatusByKeyword(cacheKey);
     }
 
-    @Override
-    public void sendUrlTask(Website website, String url) {
-        sendUrlTask(website, url, TaskLevel.LEVEL_5);
-    }
 
     @Override
-    public void sendUrlTask(Website website, String url, TaskLevel taskLevel) {
-        sendUrlTask(website, url, TimeUtils.SECONDS_OF_1_DAY, taskLevel);
-    }
+    public void sendUrlTask(Website website, String url, TaskTarget taskTarget, TaskLevel taskLevel) {
 
-    @Override
-    public void sendUrlTask(Website website, String url, Long expireSeconds, TaskTarget taskTarget, TaskLevel taskLevel) {
-        if (expireSeconds == null) {
-            expireSeconds = TimeUtils.SECONDS_OF_1_DAY;
-        }
-
-        fetchCacheService.pushNum(website.name() + "_" + taskTarget.name());
         fetchCacheService.countPushUrl(website.name() + "_" + taskTarget.name(), url);
-        FetchUrlResult fetchUrlResult = new FetchUrlResult(website, url, expireSeconds, TaskStatus.START, new Date(), taskTarget);
-        String redisKey = RedisKeysUtils.getWaitUrlListKey(taskLevel, website);
+        FetchUrlResult fetchUrlResult = new FetchUrlResult(website, url, TaskStatus.START, new Date(), taskTarget);
+        String redisKey = RedisKeysUtils.getWaitUrlListKey(taskLevel, taskTarget, website);
         try {
             String key = FetchUrlResult.getCacheKey(fetchUrlResult);
             if (key == null) {
                 logger.info("key is null.website:{}, url:{}", website, url);
                 return;
             }
-            TaskStatus taskStatusByUrl = fetchCacheService.getTaskStatusByUrl(key);
-            if (TaskStatus.NONE.equals(taskStatusByUrl)) {
-                fetchCacheService.pushTaskList(redisKey, JSONUtil.toJSON(fetchUrlResult));
-                SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} success", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), redisKey);
-                fetchCacheService.setTaskStatusByUrl(key, TaskStatus.START);
-            }
-        } catch (Exception e) {
-            SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} fail", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), redisKey, e);
-        }
-    }
-
-    @Override
-    public void sendUrlTask(Website website, String url, long seconds, TaskLevel taskLevel) {
-        FetchUrlResult fetchUrlResult = new FetchUrlResult(website, url, seconds);
-        fetchUrlResult.setTaskStatus(TaskStatus.START);
-        fetchUrlResult.setDate(new Date());
-        String redisKey = RedisKeysUtils.getWaitUrlListKey(taskLevel, website);
-        try {
-            String key = FetchUrlResult.getCacheKey(fetchUrlResult);
-            if (key == null) {
-                return;
-            }
-            TaskStatus taskStatusByUrl = fetchCacheService.getTaskStatusByUrl(key);
-            if (TaskStatus.NONE.equals(taskStatusByUrl)) {
-                fetchCacheService.pushTaskList(redisKey, JSONUtil.toJSON(fetchUrlResult));
-                SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} success", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), redisKey);
-                fetchCacheService.setTaskStatusByUrl(key, TaskStatus.START);
-            }
+            //TaskStatus taskStatusByUrl = fetchCacheService.getTaskStatusByUrl(key);
+            fetchCacheService.pushTaskList(redisKey, JSONUtil.toJSON(fetchUrlResult));
+            //if (TaskStatus.NONE.equals(taskStatusByUrl)) {
+            //    SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} success", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), redisKey);
+            //    fetchCacheService.setTaskStatusByUrl(key, TaskStatus.START);
+            //}
         } catch (Exception e) {
             SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} fail", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), redisKey, e);
         }
@@ -191,25 +147,8 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     @Override
     public String popFetchUrlResult(TaskTarget taskTarget) {
         String fetchUrlResult = fetchCacheService.popFinishUrlList(taskTarget);
-        if (fetchUrlResult != null) {
-
-            try {
-                FetchUrlResult result = JSONUtil.toObject(fetchUrlResult, FetchUrlResult.class);
-                fetchCacheService.popNum(result.getWebsite() + "_" + taskTarget + "_" + result.getTaskStatus());
-            } catch (IOException e) {
-                logger.error("Json:{}", fetchUrlResult, e);
-            }
-        }
         logger.info("popFetchUrlResult(), obj:{}", fetchUrlResult);
         return fetchUrlResult;
-    }
-
-    @Override
-    public TaskStatus getUrlTaskStatus(Website website, String url, long expireSeconds) {
-        String cacheKey = FetchUrlResult.getCacheKey(website, url, expireSeconds);
-        TaskStatus taskStatusByUrl = fetchCacheService.getTaskStatusByUrl(cacheKey);
-        //SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.getUrlTaskStatus(website,url,expireSeconds) -->website:{}, url:{}, taskState:{}, expireSeconds:{}", website, url, taskStatusByUrl, expireSeconds);
-        return taskStatusByUrl;
     }
 
     private FetchResult getFetchResultList(Website webSite, String keyWord) {
@@ -218,10 +157,5 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
 
     }
 
-
-    private FetchUrlResult getFetchUrlResult(Website webSite, String url, long expireSeconds) {
-        String fetchResultKey = FetchUrlResult.getCacheKey(webSite, url, expireSeconds);
-        return fetchCacheService.getProductByUrl(fetchResultKey);
-    }
 
 }

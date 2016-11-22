@@ -22,6 +22,11 @@ public class StdSkuAttr {
         this.stdValue = stdSkuAttr.getStdValue();
     }
 
+    public StdSkuAttr(String stdName, String stdValue) {
+        this.stdName = stdName;
+        this.stdValue = stdValue;
+    }
+
     public Long getId() {
         return id;
     }

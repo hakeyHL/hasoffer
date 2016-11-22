@@ -4,10 +4,10 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.exception.ContentParseException;
+import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.HtmlUtils;
 import hasoffer.base.utils.StringUtils;
-import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.utils.Httphelper;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import org.htmlcleaner.HtmlCleaner;
@@ -25,8 +25,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static hasoffer.base.utils.HtmlUtils.getSubNodesByXPath;
 import static hasoffer.base.utils.http.XPathUtils.getSubNodeByXPath;
+import static hasoffer.base.utils.http.XPathUtils.getSubNodesByXPath;
 
 /**
  * Created on 2016/11/15.
@@ -44,6 +44,59 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 
+//        method1();//抓取91mobile数据camera，tablet，tv，smart-watch，memory-card,power-bak
+        try {
+            method2();//抓取91mobile数据mobile
+        } catch (HttpFetchException e) {
+            logger.info("fetch mobile category for 91mobile fail");
+        }
+
+    }
+
+    private void method2() throws HttpFetchException {
+
+        String productListUrlPrefix = "http://www.91mobiles.com/template/category_finder/finder_ajax.php?show_next=1&ord=0.2768255707779246&requestType=2&listType=list&listType_v1=list&selMobSort=relevance&amount=1000%3B45000&sCatName=phone&price_range_apply=0&search=mobiles&hidFrmSubFlag=1&page=";
+        String productListUrlSuffix = "&category=mobile&unique_sort=&hdnCategory=mobile&user_search=mobiles&url_feat_rule=&hdndprice=10001-15000%2C15001-20000&hdndprice1=5001-15000";
+
+        String html = HtmlUtils.getUrlHtml(productListUrlPrefix + 1 + productListUrlSuffix);
+
+        JSONObject rootJsonObject = JSONObject.parseObject(html);
+        String response = rootJsonObject.getString("response");
+        int totalPages = rootJsonObject.getIntValue("totalPages");
+
+        logger.info("91mobile mobile category fetch totalPage is " + totalPages);
+
+        for (int i = 1; i <= totalPages; i++) {
+
+            try {
+
+                if (i > 1) {
+                    html = HtmlUtils.getUrlHtml(productListUrlPrefix + i + productListUrlSuffix);
+                    rootJsonObject = JSONObject.parseObject(html);
+                    response = rootJsonObject.getString("response");
+                }
+
+                String[] subStr = response.split("hover_blue_link name gaclick\\\" data-type='name' href=\\\"");
+                List<String> productUrlList = new ArrayList<>();
+
+                for (int j = 1; j < subStr.length; j++) {
+                    String productUrlSuffix = subStr[j].substring(0, subStr[j].indexOf('\"'));
+                    productUrlList.add(WEBSITE_91MOBILE_URL_PREFIEX + productUrlSuffix);
+                }
+
+                logger.info("query page " + i + " get " + productUrlList.size() + " productUrl");
+                for (String productUrl : productUrlList) {
+                    fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_1, 5);
+                }
+
+            } catch (HttpFetchException e) {
+                logger.info("HttpFetchException for page " + i);
+            }
+        }
+
+    }
+
+    private void method1() {
 
         int num = 0;
 
@@ -59,7 +112,6 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
         apiJsonCateCategorys.add(3182);//1658       308
         apiJsonCateCategorys.add(57);//2700         57
         apiJsonCateCategorys.add(3100);//
-
 
         List<String> htmlReqUrlList = new ArrayList<>();
         htmlReqUrlList.add("http://www.91mobiles.com/mobile-memory-card-finder.php");
@@ -194,7 +246,7 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
                         productUrl = "http://www.91mobiles.com/" + productUrl;
                         System.out.println(productUrl);
 
-                        fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_2, TimeUtils.MILLISECONDS_OF_1_HOUR * 10, categoryId);
+                        fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_2, categoryId);
 
                         requestSendNumber++;
                         if (requestSendNumber % 20 == 0) {
@@ -223,7 +275,7 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
 
             TagNode root = new HtmlCleaner().clean(html);
 
-            productListNode = getSubNodesByXPath(root, "//div[@class='filter filer_finder']");
+            productListNode = getSubNodesByXPath(root, "//div[@class='filter filer_finder']", null);
 
         } catch (Exception e) {
             System.out.println("parse exception for " + url);
@@ -245,7 +297,7 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
             }
 
             System.out.println(productUrl);
-            fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_2, TimeUtils.MILLISECONDS_OF_1_HOUR * 10, categoryId);
+            fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_2, categoryId);
 
             requestSendNumber++;
             if (requestSendNumber % 20 == 0) {

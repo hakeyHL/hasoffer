@@ -67,7 +67,9 @@ public class SkuImageDownloadJobBean extends QuartzJobBean {
                     while (true) {
 
                         //该任务每隔俩个小时启动一次，设置100分钟线程自动结束
-                        if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_5_MINUTE * 100) {
+                        if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_1_MINUTE * 100) {
+                            logger.info("sku image download job bean live above 100 minutes");
+                            System.out.println("sku image download job bean live above 100 minutes");
                             break;
                         }
 
@@ -92,10 +94,11 @@ public class SkuImageDownloadJobBean extends QuartzJobBean {
                 break;
             }
 
-            if (cmpSkuQueue.size() > 0) {
-                logger.info("queue size = " + cmpSkuQueue.size());
-                continue;
-            }
+//            为了保证线程正常结束，注册掉该部分
+//            if (cmpSkuQueue.size() > 0) {
+//                logger.info("queue size = " + cmpSkuQueue.size());
+//                continue;
+//            }
 
             if (processorCount.get() > 0) {
                 logger.info("processorCount = " + processorCount.get());
@@ -109,7 +112,7 @@ public class SkuImageDownloadJobBean extends QuartzJobBean {
             break;
         }
 
-        logger.info("All jobs finished.");
+        logger.info("sku image download job bean all jobs finished.");
     }
 
 }

@@ -7,6 +7,7 @@ import hasoffer.base.utils.JSONUtil;
 import hasoffer.spider.api.ISpiderService;
 import hasoffer.spider.api.impl.SpiderServiceImpl;
 import hasoffer.spider.constants.RedisKeysUtils;
+import hasoffer.spider.enums.TaskTarget;
 import hasoffer.spider.exception.UnSupportWebsiteException;
 import hasoffer.spider.logger.SpiderLogger;
 import hasoffer.spider.model.FetchUrlResult;
@@ -36,18 +37,17 @@ public class FetchUrlWorker implements Runnable {
     public void run() {
         while (true) {
             try {
-                Object pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_1, website));
-                if (pop == null) {
-                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_2, website));
-                }
-                if (pop == null) {
-                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_3, website));
-                }
-                if (pop == null) {
-                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_4, website));
-                }
-                if (pop == null) {
-                    pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_5, website));
+                Object pop = null;
+                for (TaskLevel taskLevel : TaskLevel.values()) {
+                    if (pop == null) {
+                        pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.DEAL_UPDATE, website));
+                    }
+                    if (pop == null) {
+                        pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.SKU_UPDATE, website));
+                    }
+                    if (pop == null) {
+                        pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.PRICE_CHANGES, website));
+                    }
                 }
                 if (pop == null) {
                     TimeUnit.MINUTES.sleep(1);

@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -97,7 +96,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                                 }
                                 Website website = ptmCmpSku.getWebsite();
                                 String url = ptmCmpSku.getUrl();
-                                fetchDubboService.sendUrlTask(website, url, TimeUtils.SECONDS_OF_1_MINUTE * 45, TaskTarget.DEAL_UPDATE, TaskLevel.LEVEL_2);
+                                fetchDubboService.sendUrlTask(website, url, TaskTarget.DEAL_UPDATE, TaskLevel.LEVEL_2);
                             }
 
                             //如果是Deal_site，判断website
@@ -105,7 +104,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                                 if (Website.UNKNOWN.equals(deal.getWebsite())) {
                                     continue;
                                 }
-                                fetchDubboService.sendUrlTask(deal.getWebsite(), deal.getLinkUrl(), TimeUtils.SECONDS_OF_1_MINUTE * 45, TaskTarget.DEAL_UPDATE, TaskLevel.LEVEL_2);
+                                fetchDubboService.sendUrlTask(deal.getWebsite(), deal.getLinkUrl(), TaskTarget.DEAL_UPDATE, TaskLevel.LEVEL_2);
                             }
 
 
@@ -207,7 +206,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                                     }
                                 }
                             }
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             logger.info("deal update pop string parse error");
                         }
                     }
