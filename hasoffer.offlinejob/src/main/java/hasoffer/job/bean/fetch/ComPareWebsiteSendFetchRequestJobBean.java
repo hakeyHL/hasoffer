@@ -121,7 +121,8 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
                 String productUrl = WEBSITE_91MOBILE_URL_PREFIEX + subStr2[i].substring(0, subStr2[i].indexOf('"'));
                 fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_1, categoryId);
                 requestSendNumber++;
-                logger.info("hava send " + requestSendNumber + " request");
+                logger.info("hava send " + requestSendNumber + " request ");
+                logger.info("current url _" + productUrl);
             }
         }
     }
@@ -159,6 +160,7 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
                     fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_1, cateogyid);
                     requestSendNumber++;
                     logger.info("hava send " + requestSendNumber + " request");
+                    logger.info("current url _" + productUrl);
                 }
 
             } catch (HttpFetchException e) {
@@ -203,6 +205,7 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
                     fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, productUrl, TaskLevel.LEVEL_1, 5);
                     requestSendNumber++;
                     logger.info("hava send " + requestSendNumber + " request");
+                    logger.info("current url _" + productUrl);
                 }
 
             } catch (HttpFetchException e) {
