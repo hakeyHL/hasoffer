@@ -81,8 +81,12 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
                     continue;
                 }
 
-                boolean stdSku = stdProductService.createStdSku(stdSkuBo);
-                logger.info("create " + stdSku);
+                try {
+                    boolean stdSku = stdProductService.createStdSku(stdSkuBo);
+                    logger.info("create " + stdSku);
+                } catch (Exception e) {
+                    logger.info("create fail");
+                }
 
             } else {
                 logger.info("pop get " + taskStatus + "continue");
