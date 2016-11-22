@@ -66,8 +66,8 @@ public class SkuImageDownloadJobBean extends QuartzJobBean {
                     while (true) {
 
                         //该任务每隔俩个小时启动一次，设置100分钟线程自动结束
-                        if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_1_MINUTE * 5) {
-                            logger.info("sku image download job bean live above 100 minutes");
+                        if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_1_MINUTE * 110) {
+                            logger.info("sku image download job bean live above 110 minutes， Then will stop it.");
                             break;
                         }
 
@@ -110,7 +110,7 @@ public class SkuImageDownloadJobBean extends QuartzJobBean {
             break;
         }
 
-        logger.info("sku image download job bean all jobs finished.");
+        logger.info("sku image download job bean all jobs finished. And stop it.");
     }
 
 }
