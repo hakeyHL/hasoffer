@@ -10,7 +10,6 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.concurrent.ExecutorService;
@@ -20,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@Component
 public class SkuImageDownloadJobBean extends QuartzJobBean {
 
     /**
@@ -29,6 +27,7 @@ public class SkuImageDownloadJobBean extends QuartzJobBean {
     //private static final String Q_SKU_IMAGE =
     //        "SELECT t FROM PtmCmpSku t WHERE t.imagePath IS NULL";
     //            "SELECT t FROM PtmCmpSku t WHERE t.imagePath IS NULL AND t.oriImageUrl IS NOT NULL AND t.failLoadImage = 0";
+
     @Resource
     ICmpSkuService cmpSkuService;
     @Resource
