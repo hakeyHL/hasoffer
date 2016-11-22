@@ -26,8 +26,8 @@ public class SkuImageDownloadJobBean extends QuartzJobBean {
     /**
      * 取ptmimage 逻辑：未下载下来的图片，按照失败次数从小到大排
      */
-    private static final String Q_SKU_IMAGE =
-            "SELECT t FROM PtmCmpSku t WHERE t.imagePath IS NULL";
+    //private static final String Q_SKU_IMAGE =
+    //        "SELECT t FROM PtmCmpSku t WHERE t.imagePath IS NULL";
     //            "SELECT t FROM PtmCmpSku t WHERE t.imagePath IS NULL AND t.oriImageUrl IS NOT NULL AND t.failLoadImage = 0";
     @Resource
     ICmpSkuService cmpSkuService;
@@ -69,7 +69,6 @@ public class SkuImageDownloadJobBean extends QuartzJobBean {
                         //该任务每隔俩个小时启动一次，设置100分钟线程自动结束
                         if (TimeUtils.now() - startTime > TimeUtils.MILLISECONDS_OF_1_MINUTE * 100) {
                             logger.info("sku image download job bean live above 100 minutes");
-                            System.out.println("sku image download job bean live above 100 minutes");
                             break;
                         }
 
