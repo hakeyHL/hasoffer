@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -73,8 +72,9 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
                 StdSkuBo stdSkuBo = null;
                 try {
                     stdSkuBo = convertResultToStdSkuBo(compareWebsiteFetchResult);
-                } catch (IOException e) {
-                    logger.info("spec convert error");
+                } catch (Exception e) {
+                    logger.info("convert fetch result to stdSkubo exception");
+                    e.printStackTrace();
                     continue;
                 }
 
@@ -91,32 +91,36 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
         }
     }
 
-    private StdSkuBo convertResultToStdSkuBo(FetchCompareWebsiteResult compareWebsiteFetchResult) throws IOException {
+    private StdSkuBo convertResultToStdSkuBo(FetchCompareWebsiteResult compareWebsiteFetchResult) throws Exception {
 
         //product基本信息相关
         FetchedProduct ptmproduct = compareWebsiteFetchResult.getPtmproduct();
         logger.info("product _" + ptmproduct);
+        if (ptmproduct == null) {
+            throw new RuntimeException();
+        }
 
         //sku列表信息相关
         float minPrice = 0.0f;
         boolean flag = true;
         List<StdSkuPrice> skuPrices = new ArrayList<>();
         List<FetchedProduct> ptmcmpskuList = compareWebsiteFetchResult.getPtmcmpskuList();
-
-        for (FetchedProduct ptmcmpsku : ptmcmpskuList) {
-            logger.info("sku _" + ptmcmpsku);
-            if (ptmcmpsku.getPrice() != 0) {
-                if (flag) {
-                    minPrice = ptmcmpsku.getPrice();
-                } else {
-                    if (minPrice > ptmcmpsku.getPrice()) {
+        if (ptmcmpskuList != null) {
+            for (FetchedProduct ptmcmpsku : ptmcmpskuList) {
+                logger.info("sku _" + ptmcmpsku);
+                if (ptmcmpsku.getPrice() != 0) {
+                    if (flag) {
                         minPrice = ptmcmpsku.getPrice();
+                    } else {
+                        if (minPrice > ptmcmpsku.getPrice()) {
+                            minPrice = ptmcmpsku.getPrice();
+                        }
                     }
                 }
-            }
 
-            StdSkuPrice stdPrice = new StdSkuPrice(0L, 0, ptmcmpsku.getTitle(), ptmcmpsku.getPrice(), 0, ptmcmpsku.getShipping(), ptmcmpsku.getSkuStatus(), ptmcmpsku.getWebsite(), ptmcmpsku.getUrl(), TimeUtils.nowDate(), TimeUtils.nowDate());
-            skuPrices.add(stdPrice);
+                StdSkuPrice stdPrice = new StdSkuPrice(0L, 0, ptmcmpsku.getTitle(), ptmcmpsku.getPrice(), 0, ptmcmpsku.getShipping(), ptmcmpsku.getSkuStatus(), ptmcmpsku.getWebsite(), ptmcmpsku.getUrl(), TimeUtils.nowDate(), TimeUtils.nowDate());
+                skuPrices.add(stdPrice);
+            }
         }
 
         long categoryId = compareWebsiteFetchResult.getCategoryId();
@@ -130,7 +134,7 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
         List<StdSkuImage> stdImages = new ArrayList<>();
         if (imageUrlList != null && imageUrlList.size() != 0) {
             for (String imageUrl : imageUrlList) {
-                System.out.println("imageUrl _" + imageUrl);
+                logger.info("imageUrl _" + imageUrl);
                 StdSkuImage stdImage = new StdSkuImage(0L, 0L, 0L, imageUrl, "", "", "");
                 stdImages.add(stdImage);
             }
@@ -141,13 +145,12 @@ public class CompareWebsiteParseFetchResultJobBean extends QuartzJobBean {
         List<FetchedParamGroup> fetchedParamGroupList = compareWebsiteFetchResult.getFetchedParamGroupList();
         for (FetchedParamGroup fetchedParamGroup : fetchedParamGroupList) {
             String fetchedJson = JSON.toJSONString(fetchedParamGroup);
-            System.out.println("param _" + fetchedJson);
+            logger.info("param _" + fetchedJson);
             paramGroups.add(JSON.parseObject(fetchedJson, PtmStdSkuParamGroup.class));
         }
         PtmStdSkuDetail stdSkuDetail = new PtmStdSkuDetail(0, paramGroups, "");
 
-        System.out.println("stdSku = " + stdSku);
-        System.out.println("flag null = " + stdSku == null);
+        logger.info("stdSku = " + stdSku);
         StdSkuBo stdSkuBo = new StdSkuBo(stdSku, null, skuPrices, stdImages, stdSkuDetail);
 
         return stdSkuBo;
