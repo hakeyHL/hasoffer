@@ -457,17 +457,6 @@ public class AppController {
         return getDealInfoMethod(id, mv);
     }
 
-    public String getDifference2Date(Date maxDate, Date comparedDate) {
-        Long tempResult = maxDate.getTime() - comparedDate.getTime();
-        long nd = 1000 * 24 * 60 * 60;//一天的毫秒数
-        long nh = 1000 * 60 * 60;//一小时的毫秒数
-        long nm = 1000 * 60;//一分钟的毫秒数
-        int day = BigDecimal.valueOf(tempResult).divide(BigDecimal.valueOf(nd), BigDecimal.ROUND_HALF_UP).intValue();//计算差多少天
-        int hour = BigDecimal.valueOf(tempResult).divide(BigDecimal.valueOf(nh), BigDecimal.ROUND_HALF_UP).intValue();//计算差多少天
-        int min = BigDecimal.valueOf(tempResult).divide(BigDecimal.valueOf(nm), BigDecimal.ROUND_HALF_UP).intValue();//计算差多少天
-        return day <= 0 ? hour <= 0 ? min + " mins ago " : hour + " hours ago " : day + " days ago ";
-    }
-
     /**
      * 用户信息绑定
      *
@@ -1186,7 +1175,7 @@ public class AppController {
                             map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
                             map.put("title", appDeal.getTitle());
                             //返回deal的处境时间距离现在时间的时间,多少天,小时,分钟..
-                            map.put("createTime", getDifference2Date(new Date(), appDeal.getCreateTime()));
+                            map.put("createTime", TimeUtils.getDifference2Date(new Date(), appDeal.getCreateTime()));
                             map.put("website", appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
                             //降价生成deal无失效日期
                             if (!appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
@@ -1380,7 +1369,7 @@ public class AppController {
         dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
         dealVo.setExp(appDeal.getExpireTime());
         dealVo.setTitle(appDeal.getTitle());
-        dealVo.setCreateTime(getDifference2Date(new Date(), appDeal.getCreateTime()));
+        dealVo.setCreateTime(TimeUtils.getDifference2Date(new Date(), appDeal.getCreateTime()));
         dealVo.setPresentPrice(appDeal.getPresentPrice() == null ? 0 : appDeal.getPresentPrice());
         dealVo.setDiscount(appDeal.getDiscount());
         dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());

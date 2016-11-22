@@ -143,7 +143,10 @@ public class DealController {
 
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
     public ModelAndView edit(AppDeal deal, MultipartFile dealFile, MultipartFile bannerFile, String bannerImageUrl) throws IOException {
-
+        /**
+         * 无关属性: 不需要展示,不需要修改的属性,
+         * 不要忘记放入jsp文件中,否则信息丢失
+         */
         String dealPath = "";
         String dealSmallPath = "";
         String dealBigPath = "";
