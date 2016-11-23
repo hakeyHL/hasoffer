@@ -69,13 +69,20 @@ public class FetchUrlWorker implements Runnable {
     }
 
     public void fetch(FetchUrlResult fetchUrlResult) {
+        if (Website.AMAZON.equals(fetchUrlResult.getWebsite())) {
+            try {
+                TimeUnit.SECONDS.sleep(10);
+            } catch (InterruptedException e) {
+                logger.error("Time sleep error.", e);
+            }
+        }
         try {
             fetchUrlResult = fetchService.spiderProductByUrl(fetchUrlResult);
         } catch (UnSupportWebsiteException e) {
             fetchUrlResult.setTaskStatus(TaskStatus.STOPPED);
             fetchUrlResult.setErrMsg("un able support website.");
             String cacheKey = FetchUrlResult.getCacheKey(fetchUrlResult);
-            fetchCacheService.cacheResult(cacheKey, fetchUrlResult, fetchUrlResult.getExpireSeconds());
+            fetchCacheService.pushFinishUrlList(fetchUrlResult);
             logger.error("FetchKeywordWorker is error. Error Msg: un able support website.", e);
         }
     }
