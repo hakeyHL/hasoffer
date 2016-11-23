@@ -146,12 +146,12 @@ public class FixController {
         long totalPage = pageableResult.getTotalPage();
         System.out.println("totalpage " + totalPage);
 
-        for (int i = 1; i <= totalPage; i++) {
-            if (i > 1) {
+        for (; curPage <= totalPage; curPage++) {
+            if (curPage > 1) {
                 pageableResult = dbm.queryPage("SELECT t FROM PtmStdImage t ORDER BY t.id", curPage, pageSize);
             }
 
-            System.out.println("curPage " + i);
+            System.out.println("curPage " + curPage);
             List<PtmStdImage> imageList = pageableResult.getData();
 
             for (PtmStdImage image : imageList) {
