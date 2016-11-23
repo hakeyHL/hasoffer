@@ -124,23 +124,16 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     @Override
     public void sendUrlTask(Website website, String url, TaskTarget taskTarget, TaskLevel taskLevel) {
 
-        fetchCacheService.countPushUrl(website.name() + "_" + taskTarget.name(), url);
-        FetchUrlResult fetchUrlResult = new FetchUrlResult(website, url, TaskStatus.START, new Date(), taskTarget);
-        String redisKey = RedisKeysUtils.getWaitUrlListKey(taskLevel, taskTarget, website);
         try {
-            String key = FetchUrlResult.getCacheKey(fetchUrlResult);
+            String key = FetchUrlResult.getCacheKey(website, url);
             if (key == null) {
-                logger.info("key is null.website:{}, url:{}", website, url);
+                logger.info("sendUrlTask(): key is null.website:{}, url:{}", website, url);
                 return;
             }
-            //TaskStatus taskStatusByUrl = fetchCacheService.getTaskStatusByUrl(key);
-            fetchCacheService.pushTaskList(redisKey, JSONUtil.toJSON(fetchUrlResult));
-            //if (TaskStatus.NONE.equals(taskStatusByUrl)) {
-            //    SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} success", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), redisKey);
-            //    fetchCacheService.setTaskStatusByUrl(key, TaskStatus.START);
-            //}
+            FetchUrlResult fetchUrlResult = new FetchUrlResult(website, url, TaskStatus.START, new Date(), taskTarget);
+            fetchCacheService.pushTaskList(taskLevel, fetchUrlResult);
         } catch (Exception e) {
-            SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} fail", fetchUrlResult.getWebsite() + "_" + fetchUrlResult.getUrl(), redisKey, e);
+            SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} fail", website + "_" + url, e);
         }
     }
 
