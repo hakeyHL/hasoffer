@@ -38,10 +38,20 @@ public interface IDealService {
     /**
      * 将deal设置为过期
      * 过期时间为创建时间
-     *
+     * 该失效用于状态发生变化的失效
      * @param id
      */
     void updateDealExpire(Long id);
+
+    /**
+     * 将deal设置为过期
+     * 并且生成一个新deal
+     * 该失效用于价格降低的失效
+     *
+     * @param id
+     * @param newPrice
+     */
+    void updateDealExpire(Long id, float newPrice);
 
     void saveOrUpdateBanner(AppBanner banner);
 
