@@ -185,15 +185,15 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
             String channel = extParam1 == null || "".equals(extParam1) ? MarketChannel.NONE.name() : extParam1;
             po.setChannel(channel);
             po.setChannelSrc(channel);
-            try {
-                if ((MarketChannel.NONE.name().equals(po.getChannel()) || MarketChannel.LeoMaster.name().equals(po.getChannel())) && po.getOrderTime().after(DateUtils.parseDate("2016-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"))) {
-                    MarketChannel channelByAffId = getChannelByAffId(po.getAffID());
-                    po.setChannel(channelByAffId.name());
-                    po.setChannelSrc(channelByAffId.name());
-                }
-            } catch (ParseException e) {
-                logger.error("Get channel error. Msg:{}", e);
-            }
+//            try {
+//                if ((MarketChannel.NONE.name().equals(po.getChannel()) || MarketChannel.LeoMaster.name().equals(po.getChannel())) && po.getOrderTime().after(DateUtils.parseDate("2016-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"))) {
+//                    MarketChannel channelByAffId = getChannelByAffId(po.getAffID());
+//                    po.setChannel(channelByAffId.name());
+//                    po.setChannelSrc(channelByAffId.name());
+//                }
+//            } catch (ParseException e) {
+//                logger.error("Get channel error. Msg:{}", e);
+//            }
             String deviceId_userId = order.getAffExtParam2();
             if (deviceId_userId != null && !"".equals(deviceId_userId)) {
                 String[] tempArray = deviceId_userId.split("_");
