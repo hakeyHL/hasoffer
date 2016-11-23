@@ -15,4 +15,10 @@ public interface IStdProductService {
 //
 //    Map<String, FlipkartSkuInfo> searchSku(String keyword) throws Exception;
 
+    /*
+    该方法用来修复PtmStdImage的图片url
+    将thumb转乘成large
+     */
+    void fixImage(long imageId);
+
 }

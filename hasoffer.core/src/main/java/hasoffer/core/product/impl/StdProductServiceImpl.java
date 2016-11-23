@@ -9,6 +9,7 @@ import hasoffer.core.bo.stdsku.StdSkuPrice;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.*;
+import hasoffer.core.persistence.po.ptm.updater.PtmStdImageUpdater;
 import hasoffer.core.product.IStdProductService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +56,27 @@ public class StdProductServiceImpl implements IStdProductService {
         PtmStdSkuDetail stdSkuDetail = mdm.queryOne(PtmStdSkuDetail.class, skuId);
 
         return new StdSkuBo(stdSku, attrs, skuPrices, stdImages, stdSkuDetail);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void fixImage(long imageId) {
+
+        PtmStdImageUpdater updater = new PtmStdImageUpdater(imageId);
+
+        PtmStdImage ptmStdImage = dbm.get(PtmStdImage.class, imageId);
+
+        String oriImageUrl = ptmStdImage.getOriImageUrl();
+
+        String newImageUrl = oriImageUrl.replace("-thumb-", "-large-");
+
+        System.out.println("oriUrl " + oriImageUrl);
+        System.out.println("newUrl " + newImageUrl);
+
+        updater.getPo().setOriImageUrl(newImageUrl);
+
+        dbm.update(updater);
+
     }
 
     private List<StdSkuImage> findImages(long skuId) {
