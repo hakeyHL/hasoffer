@@ -218,6 +218,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                             }
                         } catch (Exception e) {
                             logger.info("deal update pop string parse error");
+                            e.printStackTrace();
                         }
                     }
                 }
