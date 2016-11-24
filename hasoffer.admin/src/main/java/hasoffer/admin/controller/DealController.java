@@ -204,10 +204,11 @@ public class DealController {
             banner.setRank(0);
 
             dealService.saveOrUpdateBanner(banner);
-        } else {//检查是否由该deal生成的banner，并且删除
+        } else {//检查是否由该deal生成的banner，该选项是不展示，不需要删除，修改状态即可
             AppBanner appBanner = dealService.getBannerByDealId(deal.getId());
             if (appBanner != null) {
-                dealService.deleteBanner(appBanner.getId());
+//                dealService.deleteBanner(appBanner.getId());
+                dealService.logicalDeleteBanner(appBanner.getId());
             }
         }
         if (!StringUtils.isEmpty(dealPath)) {

@@ -11,6 +11,7 @@ import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppDealComment;
 import hasoffer.core.persistence.po.app.AppDealThumb;
+import hasoffer.core.persistence.po.app.updater.AppBannerUpdater;
 import hasoffer.core.persistence.po.app.updater.AppDealUpdater;
 import hasoffer.core.product.solr.DealIndexServiceImpl;
 import hasoffer.core.product.solr.DealModel;
@@ -274,6 +275,18 @@ public class DealServiceImpl implements IDealService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteDeal(Long dealId) {
         dbm.delete(AppDeal.class, dealId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void logicalDeleteBanner(Long bannerId) {
+
+        AppBannerUpdater appBannerUpdater = new AppBannerUpdater(bannerId);
+
+        appBannerUpdater.getPo().setDeadline(TimeUtils.nowDate());
+
+        dbm.update(appBannerUpdater);
+
     }
 
     @Override

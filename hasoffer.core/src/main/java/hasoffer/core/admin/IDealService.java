@@ -59,6 +59,8 @@ public interface IDealService {
 
     void deleteDeal(Long dealId);
 
+    void logicalDeleteBanner(Long bannerId);
+
     void deleteBanner(Long bannerId);
 
     void batchDelete(Long[] ids);
