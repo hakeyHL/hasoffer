@@ -206,13 +206,13 @@ public class ProductServiceImpl implements IProductService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean updatePtmProductPrice(long id) {
+    public void updatePtmProductPrice(long id) {
 
         List<PtmCmpSku> skus = dbm.query("SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ", Arrays.asList(id));
 
         PtmProduct ptmProduct = dbm.get(PtmProduct.class, id);
         if (ptmProduct == null) {
-            return false;
+            return;
         }
 
         float oriPrice = ptmProduct.getPrice();
@@ -252,7 +252,6 @@ public class ProductServiceImpl implements IProductService {
         }
 
         if (price != 0) {
-
             //如果价格发生变化,更新数据库
             if (price != oriPrice) {
                 PtmProductUpdater updater = new PtmProductUpdater(id);
@@ -262,18 +261,10 @@ public class ProductServiceImpl implements IProductService {
 
                 dbm.update(updater);
             }
-
-            ptmProduct.setPrice(price);
-//            System.out.println("minPrice =" + price);
-
-            //不管任何情况，重新导入product
-            importProduct2Solr2(ptmProduct);
-
-            return true;
-        } else {
-            return false;
         }
 
+        //不管任何情况，重新导入product
+        importProduct2Solr2(ptmProduct);
     }
 
     @Override

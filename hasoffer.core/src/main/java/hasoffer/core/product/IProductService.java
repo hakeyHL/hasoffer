@@ -70,7 +70,7 @@ public interface IProductService {
      * @param id
      * @return 商品价格被更新了返回true，其他情况false
      */
-    boolean updatePtmProductPrice(long id);
+    void updatePtmProductPrice(long id);
 
     void updatePtmProdcutWebsite(long id, Website website);
 

@@ -128,12 +128,14 @@ public class DealController {
             deal.setImageUrl(ImageUtil.getImageUrl(deal.getImageUrl()));
         }
 
-        if (deal.isPush() == true) {
-            AppBanner appBanner = dealService.getBannerByDealId(dealId);
-            if (!StringUtils.isEmpty(appBanner.getImageUrl())) {
-                mav.addObject("bannerImageUrl", ImageUtil.getImageUrl(appBanner.getImageUrl()));
-            }
+        //不管该deal是不是被push到banner位置，都检查他的图片路径是否存在
+//        if (deal.isPush() == true) {
+        AppBanner appBanner = dealService.getBannerByDealId(dealId);
+        if (!StringUtils.isEmpty(appBanner.getImageUrl())) {
+            mav.addObject("bannerImageUrl", ImageUtil.getImageUrl(appBanner.getImageUrl()));
         }
+//        }
+
         if (deal.getOriginPrice() == null) {
             deal.setOriginPrice(0f);
         }
