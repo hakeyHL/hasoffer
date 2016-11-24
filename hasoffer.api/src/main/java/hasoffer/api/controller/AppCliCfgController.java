@@ -2,6 +2,7 @@ package hasoffer.api.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.core.app.AppClientCfgService;
 import hasoffer.core.app.vo.ResultVo;
@@ -120,23 +121,32 @@ public class AppCliCfgController {
             List<String> redeemStrings = Arrays.asList(stringFirst, stringSecond, stringThird);
             //get home page redeem tip
             String homeRedeemTip2 = cacheService.get(HOME_INDEX_COPY, 0);
+            resultVo.getData().put("bootIndex", redeemStrings);
             if (!StringUtils.isEmpty(homeRedeemTip2)) {
                 //delete
                 cacheService.del(HOME_INDEX_COPY);
-                cacheService.add(HOME_INDEX_COPY, JSON.toJSONString(redeemStrings), -1);
+                cacheService.add(HOME_INDEX_COPY, JSON.toJSONString(resultVo.getData()), -1);
             } else {
                 //add
-                cacheService.add(HOME_INDEX_COPY, JSON.toJSONString(redeemStrings), -1);
+                cacheService.add(HOME_INDEX_COPY, JSON.toJSONString(resultVo.getData()), -1);
             }
         } else {
             //get
             String bootIndex = cacheService.get(HOME_INDEX_COPY, 0);
             if (!StringUtils.isEmpty(bootIndex)) {
-                List<String> strings = JSONArray.parseArray(bootIndex, String.class);
-                resultVo.getData().put("bootIndex", strings);
+                try {
+                    JSONObject jsonObject = JSON.parseObject(bootIndex);
+                    List<String> bootIndex1 = JSONArray.parseArray(jsonObject.getString("bootIndex"), String.class);
+                    resultVo.getData().put("bootIndex", bootIndex1);
+                } catch (Exception e) {
+                    //出现异常时返回默认
+                    resultVo.getData().put("bootIndex", Arrays.asList("GET YOUR DAILY COINS!",
+                            "100 Coins=1 Rupee!The more often you check in,the more you will earn",
+                            "REEDEM COINS FOR SUPER GIFT!"));
+                }
             } else {
                 resultVo.getData().put("bootIndex", Arrays.asList("GET YOUR DAILY COINS!",
-                        "50 Coins=1 Rupee!The more often you check in,the more you will earn",
+                        "100 Coins=1 Rupee!The more often you check in,the more you will earn",
                         "REEDEM COINS FOR SUPER GIFT!"));
                 //add to cache
                 cacheService.add(HOME_INDEX_COPY, JSON.toJSONString(resultVo.getData()), -1);
