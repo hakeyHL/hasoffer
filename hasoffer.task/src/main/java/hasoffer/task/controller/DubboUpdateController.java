@@ -1,9 +1,13 @@
 package hasoffer.task.controller;
 
+import hasoffer.base.enums.TaskLevel;
+import hasoffer.base.model.Website;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
@@ -11,8 +15,11 @@ import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.data.redis.IRedisSetService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
+import hasoffer.spider.enums.TaskTarget;
 import hasoffer.task.worker.CmpSkuDubboUpdate2Worker;
 import hasoffer.task.worker.ListNeedUpdateFromRedisWorker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -32,9 +40,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RequestMapping(value = "/dubbofetchtask")
 public class DubboUpdateController {
 
-    private static AtomicBoolean taskRunning1 = new AtomicBoolean(false);
-    private static AtomicBoolean taskRunning2 = new AtomicBoolean(false);
-    private static AtomicBoolean taskRunning3 = new AtomicBoolean(false);
+    private static Logger logger = LoggerFactory.getLogger(DubboUpdateController.class);
     private static AtomicBoolean taskRunning4 = new AtomicBoolean(false);
 
 
@@ -89,30 +95,41 @@ public class DubboUpdateController {
         return "ok";
     }
 
-//    //dubbofetchtask/updateTopSellingSpec
-//    @RequestMapping(value = "/updateTopSellingSpec", method = RequestMethod.GET)
-//    @ResponseBody
-//    public String updateTopSellingSpec() {
-//
-//        if (taskRunning2.get()) {
-//            return "task running.";
-//        }
-//
-//
-//
-//        ExecutorService es = Executors.newCachedThreadPool();
-//
-//        ConcurrentLinkedQueue<PtmCmpSku> queue = new ConcurrentLinkedQueue<>();
-//
-//        es.execute(new TopSellingListWorker(dbm, queue, fetchDubboService));
-//
-//        for (int i = 0; i < 30; i++) {
-//            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService,cacheSeconds));
-//        }
-//
-//        taskRunning2.set(true);
-//
-//        return "ok";
-//    }
+    //dubbofetchtask/updateSingleSkuById
+    @RequestMapping(value = "/updateSingleSkuById/{skuid}", method = RequestMethod.GET)
+    @ResponseBody
+    public String updateSingleSkuById(@PathVariable long skuid) {
+
+        PtmCmpSku sku = dbm.get(PtmCmpSku.class, skuid);
+        if (sku == null) {
+            logger.info("sku is null id = " + skuid);
+        }
+
+        Website website = sku.getWebsite();
+        if (website == null) {
+            logger.info("sku website is null id = " + skuid);
+        }
+
+        if (StringUtils.isEmpty(sku.getUrl())) {
+            logger.info("sku website is null id = " + skuid);
+        }
+
+        if (Website.SNAPDEAL.equals(website)) {
+            String url = sku.getUrl();
+            url = StringUtils.filterAndTrim(url, Arrays.asList("/viewAllSellers"));
+            sku.setUrl(url);
+        }
+        //过滤掉amazon中gp/offer-listing的url,该url没有描述等信息
+        if (Website.AMAZON.equals(website)) {
+            String url = sku.getUrl();
+            url = url.replace("gp/offer-listing", "dp");
+            sku.setUrl(url);
+        }
+
+        fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_2);
+        logger.info("updateSingleSkuById send url request succes for " + sku.getWebsite() + " sku id is _" + sku.getId() + "_");
+
+        return "ok";
+    }
 
 }
