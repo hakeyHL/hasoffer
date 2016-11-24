@@ -48,7 +48,7 @@ public class FetchListener extends ContextLoaderListener {
         HasofferThreadFactory factory = new HasofferThreadFactory("FetchUrlWorker");
         ExecutorService es = Executors.newCachedThreadPool(factory);
 
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 3; i++) {
             es.execute(new FetchUrlWorker(springContext, Website.AMAZON));
         }
 

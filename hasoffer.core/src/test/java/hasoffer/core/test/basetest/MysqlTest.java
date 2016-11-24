@@ -10,6 +10,7 @@ import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmImage;
@@ -25,6 +26,7 @@ import hasoffer.fetch.model.ProductStatus;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import hasoffer.spider.model.FetchedProduct;
 import jodd.io.FileUtil;
+import org.apache.commons.beanutils.BeanUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -88,13 +90,16 @@ public class MysqlTest {
     private ConcurrentLinkedQueue<PtmCmpSku> skuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
 
     @Test
-    public void testPageQuery() {
+    public void testClone() throws Exception {
 
-        String queryString = "SELECT t FROM PtmCmpSku t WHERE t.urlKey is null ORDER BY t.id";
+        AppDeal deal = dbm.get(AppDeal.class, 1L);
 
-        PageableResult<Object> pageableResult = dbm.queryPage(queryString, 1, 1000);
+//        AppDeal newDeal1 = deal.clone();
 
-        List<Object> data = pageableResult.getData();
+        AppDeal newDeal2 = (AppDeal) BeanUtils.cloneBean(deal);
+
+//        System.out.print(newDeal1);
+        System.out.print(newDeal2);
 
     }
 

@@ -66,6 +66,9 @@ public class AppDeal implements Identifiable<Long> {
 
     private Float presentPrice;//现价
 
+    //保留空参构造
+    public AppDeal() {
+    }
 
     @Override
     public Long getId() {

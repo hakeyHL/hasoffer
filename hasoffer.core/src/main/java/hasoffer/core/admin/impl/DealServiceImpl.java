@@ -18,6 +18,7 @@ import hasoffer.core.task.ListProcessTask;
 import hasoffer.core.task.worker.ILister;
 import hasoffer.core.task.worker.IProcessor;
 import hasoffer.core.utils.excel.ExcelImporter;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.util.TempFile;
@@ -231,10 +232,42 @@ public class DealServiceImpl implements IDealService {
 
         AppDealUpdater updater = new AppDealUpdater(id);
         //2016-11-2-15:09   过期时间改成当前时间
-//        updater.getPo().setExpireTime(deal.getCreateTime());
         updater.getPo().setExpireTime(TimeUtils.nowDate());
-
         dbm.update(updater);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateDealExpire(Long id, float newPrice) {
+
+        AppDealUpdater updater = new AppDealUpdater(id);
+        //2016-11-2-15:09   过期时间改成当前时间
+//        updater.getPo().setExpireTime(deal.getCreateTime());
+
+
+//        2015-11-23-16:16  过期机制修改
+//        原始deal过期失效，且不展示
+        updater.getPo().setExpireTime(TimeUtils.nowDate());
+        updater.getPo().setDisplay(false);
+        dbm.update(updater);
+
+//      新生成关于新价格的deal；配置规则与原来相同
+        AppDeal deal = dbm.get(AppDeal.class, id);
+
+        try {
+            AppDeal newDeal = (AppDeal) BeanUtils.cloneBean(deal);
+
+            newDeal.setId(null);
+            newDeal.setCreateTime(TimeUtils.nowDate());
+            newDeal.setPriceDescription("Rs." + newPrice);
+            newDeal.setDealClickCount(0L);
+            newDeal.setPresentPrice(newPrice);
+
+            createAppDealByPriceOff(newDeal);
+        } catch (Exception e) {
+            System.out.println("updateDealExpire clone bean fail");
+        }
+
     }
 
     @Override
