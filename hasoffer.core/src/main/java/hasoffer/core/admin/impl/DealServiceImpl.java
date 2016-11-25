@@ -241,20 +241,10 @@ public class DealServiceImpl implements IDealService {
     @Transactional(rollbackFor = Exception.class)
     public void updateDealExpire(Long id, float newPrice) {
 
-        AppDealUpdater updater = new AppDealUpdater(id);
-        //2016-11-2-15:09   过期时间改成当前时间
-//        updater.getPo().setExpireTime(deal.getCreateTime());
+//        注意此处，先clone生成一份新的deal，然后再对旧的deal数据进行操作
 
-
-//        2015-11-23-16:16  过期机制修改
-//        原始deal过期失效，且不展示
-        updater.getPo().setExpireTime(TimeUtils.nowDate());
-        updater.getPo().setDisplay(false);
-        dbm.update(updater);
-
-//      新生成关于新价格的deal；配置规则与原来相同
         AppDeal deal = dbm.get(AppDeal.class, id);
-
+//      新生成关于新价格的deal；配置规则与原来相同
         try {
             AppDeal newDeal = (AppDeal) BeanUtils.cloneBean(deal);
 
@@ -269,6 +259,14 @@ public class DealServiceImpl implements IDealService {
             System.out.println("updateDealExpire clone bean fail");
         }
 
+        AppDealUpdater updater = new AppDealUpdater(id);
+        //2016-11-2-15:09   过期时间改成当前时间
+//        updater.getPo().setExpireTime(deal.getCreateTime());
+//        2015-11-23-16:16  过期机制修改
+//        原始deal过期失效，且不展示
+        updater.getPo().setExpireTime(TimeUtils.nowDate());
+        updater.getPo().setDisplay(false);
+        dbm.update(updater);
     }
 
     @Override
