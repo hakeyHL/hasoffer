@@ -4,6 +4,8 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmStdSku;
 import hasoffer.core.product.IPtmStdSkuService;
+import hasoffer.core.product.solr.PtmStdSkuIndexServiceImpl;
+import hasoffer.core.product.solr.PtmStdSkuModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
     Logger logger = LoggerFactory.getLogger(PtmStdSKuServiceImpl.class);
     @Resource
     private IDataBaseManager dbm;
+    @Resource
+    private PtmStdSkuIndexServiceImpl ptmStdSkuIndexServicel;
 
     @Override
     public PtmStdSku getStdSkuById(Long id) {
@@ -34,8 +38,27 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
 
     @Override
     public void importPtmStdSku2Solr(PtmStdSku ptmStdSku) {
-
+        //导入sku(product)到solr
+        if (ptmStdSku == null) {
+            return;
+        }
+        PtmStdSku ptmStdSku1 = dbm.get(PtmStdSku.class, ptmStdSku.getId());
+        if (ptmStdSku1 == null) {
+            //delete it from solr ,if it exist .
+            ptmStdSkuIndexServicel.remove(ptmStdSku.getId() + "");
+            return;
+        }
+        PtmStdSkuModel ptmStdSKuModel = getPtmStdSKuModel(ptmStdSku1);
+        if (ptmStdSKuModel == null) {
+            ptmStdSkuIndexServicel.remove(ptmStdSku.getId() + "");
+            return;
+        } else {
+            ptmStdSkuIndexServicel.createOrUpdate(ptmStdSKuModel);
+        }
     }
 
+    public PtmStdSkuModel getPtmStdSKuModel(PtmStdSku ptmStdSku1) {
+        return null;
+    }
 
 }
