@@ -242,21 +242,25 @@ public class DealServiceImpl implements IDealService {
     public void updateDealExpire(Long id, float newPrice) {
 
 //        注意此处，先clone生成一份新的deal，然后再对旧的deal数据进行操作
-
         AppDeal deal = dbm.get(AppDeal.class, id);
+        Float originPrice = deal.getOriginPrice();
+
+        if (newPrice < originPrice) {
 //      新生成关于新价格的deal；配置规则与原来相同
-        try {
-            AppDeal newDeal = (AppDeal) BeanUtils.cloneBean(deal);
+            try {
+                AppDeal newDeal = (AppDeal) BeanUtils.cloneBean(deal);
 
-            newDeal.setId(null);
-            newDeal.setCreateTime(TimeUtils.nowDate());
-            newDeal.setPriceDescription("Rs." + newPrice);
-            newDeal.setDealClickCount(0L);
-            newDeal.setPresentPrice(newPrice);
+                newDeal.setId(null);
+                newDeal.setCreateTime(TimeUtils.nowDate());
+                newDeal.setPriceDescription("Rs." + newPrice);
+                newDeal.setDealClickCount(0L);
+                newDeal.setPresentPrice(newPrice);
+                newDeal.setDiscount((int) ((1 - newPrice / originPrice) * 100));
 
-            createAppDealByPriceOff(newDeal);
-        } catch (Exception e) {
-            System.out.println("updateDealExpire clone bean fail");
+                createAppDealByPriceOff(newDeal);
+            } catch (Exception e) {
+                System.out.println("updateDealExpire clone bean fail");
+            }
         }
 
         AppDealUpdater updater = new AppDealUpdater(id);
