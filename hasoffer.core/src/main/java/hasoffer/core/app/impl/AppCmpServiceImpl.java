@@ -156,6 +156,8 @@ public class AppCmpServiceImpl implements AppCmpService {
 
     private CmpResult getCmpProducts(PtmCmpSkuIndex2 ptmCmpSkuIndex2, SearchIO sio) {
         long cmpSkuId = 0L;
+        float cmpedPrice = 0f;
+        cmpedPrice = sio.getCliPrice();
         //初始化一个空的用于存放比价商品列表的List
         List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
         CmpResult cmpResult = new CmpResult();
@@ -168,6 +170,22 @@ public class AppCmpServiceImpl implements AppCmpService {
             //统计site
             Set<Website> websiteSet = new HashSet<Website>();
             if (ArrayUtils.hasObjs(cmpSkus)) {
+                if (sio.getCliPrice() <= 0) {
+                    //未获取到价格,用最高价格作为客户端传来的商品价格
+                    cmpedPrice = Collections.max(cmpSkus, new Comparator<PtmCmpSku>() {
+                        @Override
+                        public int compare(PtmCmpSku o1, PtmCmpSku o2) {
+                            if (o1.getPrice() < o2.getPrice()) {
+                                return -1;
+                            }
+                            if (o1.getPrice() > o2.getPrice()) {
+                                return 1;
+                            }
+                            return 0;
+                        }
+                    }).getPrice();
+                }
+
                 for (PtmCmpSku cmpSku : cmpSkus) {
                     if (sio.getCliSite().equals(cmpSku.getWebsite())) {
                         clientCmpSku = cmpSku;
@@ -200,7 +218,7 @@ public class AppCmpServiceImpl implements AppCmpService {
                         websiteSet.add(cmpSku.getWebsite());
                     }
                     System.out.println("id :  " + cmpSku.getId() + " imagePath " + cmpSku.getSmallImagePath());
-                    CmpProductListVo cplv = new CmpProductListVo(cmpSku, sio.getCliPrice());
+                    CmpProductListVo cplv = new CmpProductListVo(cmpSku, cmpedPrice);
                     cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()}));
                     logger.info(" getCmpProducts(ptmCmpSkuIndex2, sio) record deepLink :" + cplv.getDeepLink());
                     comparedSkuVos.add(cplv);
