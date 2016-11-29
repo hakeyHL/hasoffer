@@ -8,6 +8,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.urm.PriceOffNotice;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
+import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -32,6 +34,64 @@ public class ApiUtils {
     SearchLogCacheManager searchLogCacheManager;
     @Resource
     CmpskuIndexServiceImpl cmpskuIndexService;
+
+    public static void filterProducts(List productList, String keyword) {
+        if (productList != null && productList.size() > 0) {
+            if (ProductModel2.class.isInstance(productList.get(0))) {
+                Iterator<ProductModel2> ptmList = productList.iterator();
+                while (ptmList.hasNext()) {
+                    //筛选title
+                    ProductModel2 next = ptmList.next();
+                    boolean b = FilterProducts(next.getTitle(), keyword);
+                    if (!b) {
+                        //false移除
+                        ptmList.remove();
+                    }
+                }
+            } else if (PtmCmpSku.class.isInstance(productList.get(0))) {
+                Iterator<PtmCmpSku> ptmList = productList.iterator();
+                while (ptmList.hasNext()) {
+                    //筛选title
+                    PtmCmpSku next = ptmList.next();
+                    boolean b = FilterProducts(next.getTitle(), keyword);
+                    if (!b) {
+                        //false移除
+                        ptmList.remove();
+                    }
+                }
+            }
+        }
+    }
+
+    private static boolean FilterProducts(String title, String keyword) {
+        String[] filterWords = new String[]{"case", "cover", "glass", "battery", "for", "back", "guard", "cable"};
+        boolean flag = true;
+        if (!StringUtils.isEmpty(title) && !StringUtils.isEmpty(keyword)) {
+            for (String str : filterWords) {
+                if (title.trim().toLowerCase().contains(str)) {
+                    //如果搜索结果中包含配件名称,看关键词中有没有
+                    if (keyword.trim().contains(str)) {
+                        //如果关键词中也有,ok
+                        return true;
+                    } else {
+                        //关键词中没有,filter
+                        return false;
+                    }
+                } else {
+                    //如果搜索结果中不包含配件名称,看关键词中有没有
+                    if (keyword.trim().toLowerCase().contains(str)) {
+                        //如果关键词中有,filter
+                        return false;
+                    } else {
+                        //关键词中没有,ok
+                        continue;
+                    }
+                }
+            }
+        }
+        //默认放行
+        return flag;
+    }
 
     /**
      * 在数据对象返回客户端之前检测其域是否都有值,除对象成员外都赋初始值

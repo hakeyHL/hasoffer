@@ -27,6 +27,7 @@ import hasoffer.core.search.exception.NonMatchedProductException;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.core.utils.JsonHelper;
+import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.helper.WebsiteHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,6 +170,7 @@ public class AppCmpServiceImpl implements AppCmpService {
             List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
             //统计site
             Set<Website> websiteSet = new HashSet<Website>();
+            ApiUtils.filterProducts(cmpSkus, sio.getCliQ());
             if (ArrayUtils.hasObjs(cmpSkus)) {
                 if (sio.getCliPrice() <= 0) {
                     //未获取到价格,用最高价格作为客户端传来的商品价格
