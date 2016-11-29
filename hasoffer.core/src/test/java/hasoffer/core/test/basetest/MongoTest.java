@@ -9,6 +9,7 @@ import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.enums.IndexStat;
 import hasoffer.core.persistence.mongo.*;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmStdSkuDetail;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.user.IDeviceService;
@@ -41,6 +42,24 @@ public class MongoTest {
     IDeviceService deviceService;
     @Resource
     ICmpSkuService cmpSkuService;
+
+    @Test
+    public void queryOne() {
+
+        PtmStdSkuDetail ptmStdSkuDetail = new PtmStdSkuDetail();
+
+        ptmStdSkuDetail.setId(123321);
+
+        mdm.save(ptmStdSkuDetail);
+
+        Query query = new Query();
+
+        PageableResult<PtmStdSkuDetail> pageableResult = mdm.queryPage(PtmStdSkuDetail.class, query, 1, 10);
+        System.out.println(pageableResult);
+
+        PtmCmpSkuHistoryPrice price = mdm.queryOne(PtmCmpSkuHistoryPrice.class, 31);
+        System.out.println(price);
+    }
 
     @Test
     public void test() {
@@ -290,15 +309,6 @@ public class MongoTest {
         statHijackFetch = new StatHijackFetch(id, website, sourceId, cliQ, createTime, lCreateTime, status, null);
 
         mdm.save(statHijackFetch);
-
-    }
-
-    @Test
-    public void testQuery() {
-
-        PtmCmpSkuDescription ptmCmpSkuDescription = mdm.queryOne(PtmCmpSkuDescription.class, 5555L);
-
-        System.out.println();
 
     }
 }
