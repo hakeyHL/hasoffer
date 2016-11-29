@@ -1,5 +1,6 @@
 package hasoffer.core.product;
 
+import hasoffer.base.exception.ImageDownloadOrUploadException;
 import hasoffer.core.bo.stdsku.StdSkuBo;
 
 /**
@@ -20,5 +21,7 @@ public interface IStdProductService {
     将thumb转乘成large
      */
     void fixImage(long imageId);
+
+    void downLoadImage(long imageId) throws ImageDownloadOrUploadException;
 
 }

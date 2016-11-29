@@ -1,6 +1,8 @@
 package hasoffer.core.product.impl;
 
 import hasoffer.affiliate.model.FlipkartAttribute;
+import hasoffer.base.exception.ImageDownloadOrUploadException;
+import hasoffer.base.model.ImagePath;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.bo.stdsku.StdSkuAttr;
 import hasoffer.core.bo.stdsku.StdSkuBo;
@@ -11,6 +13,7 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmStdImageUpdater;
 import hasoffer.core.product.IStdProductService;
+import hasoffer.core.utils.ImageUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,6 +77,24 @@ public class StdProductServiceImpl implements IStdProductService {
         System.out.println("newUrl " + newImageUrl);
 
         updater.getPo().setOriImageUrl(newImageUrl);
+
+        dbm.update(updater);
+
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void downLoadImage(long imageId) throws ImageDownloadOrUploadException {
+
+        PtmStdImage ptmStdImage = dbm.get(PtmStdImage.class, imageId);
+
+        PtmStdImageUpdater updater = new PtmStdImageUpdater(imageId);
+
+        ImagePath imagePath = ImageUtil.downloadAndUpload2(ptmStdImage.getOriImageUrl());
+
+        updater.getPo().setOriImagePath(imagePath.getOriginalPath());
+        updater.getPo().setSmallImagePath(imagePath.getSmallPath());
+        updater.getPo().setBigImagePath(imagePath.getBigPath());
 
         dbm.update(updater);
 

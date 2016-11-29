@@ -133,6 +133,39 @@ public class FixController {
             Website.ZOOMIN
     };
 
+    //fixdata/fetchPtmStdSkuImage
+    @RequestMapping(value = "/fetchPtmStdSkuImage", method = RequestMethod.GET)
+    @ResponseBody
+    public String fetchPtmStdSkuImage() throws Exception {
+
+        int curPage = 1;
+        int pageSize = 1000;
+
+        PageableResult<PtmStdImage> pageableResult = dbm.queryPage("SELECT t FROM PtmStdImage t ORDER BY t.id", curPage, pageSize);
+
+        long totalPage = pageableResult.getTotalPage();
+        System.out.println("totalpage " + totalPage);
+
+        for (; curPage <= totalPage; curPage++) {
+            if (curPage > 1) {
+                pageableResult = dbm.queryPage("SELECT t FROM PtmStdImage t ORDER BY t.id", curPage, pageSize);
+            }
+
+            System.out.println("curPage " + curPage);
+            List<PtmStdImage> imageList = pageableResult.getData();
+
+            for (PtmStdImage image : imageList) {
+                try {
+                    stdProductService.downLoadImage(image.getId());
+                    logger.info("download image success for " + image.getId());
+                } catch (Exception e) {
+                    logger.info("download image fail for " + image.getId());
+                }
+            }
+        }
+        return "ok";
+    }
+
     //fixdata/stdImageOriImageUrl
     @RequestMapping(value = "/stdImageOriImageUrl", method = RequestMethod.GET)
     @ResponseBody
