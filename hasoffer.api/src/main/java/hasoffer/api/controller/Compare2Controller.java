@@ -25,13 +25,13 @@ import hasoffer.core.persistence.dbm.osql.datasource.DataSourceType;
 import hasoffer.core.persistence.enums.SearchPrecise;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.mongo.PtmProductDescription;
-import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
-import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.product.ICmpSkuService;
+import hasoffer.core.product.IPtmStdPriceService;
 import hasoffer.core.product.impl.ProductServiceImpl;
+import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
@@ -57,10 +57,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created on 2015/12/21.
@@ -92,7 +89,12 @@ public class Compare2Controller {
     ApiUtils apiUtils;
     @Resource
     ICmpSkuService cmpSkuService;
-
+    @Resource
+    IPtmStdPriceService iPtmStdPriceService;
+    @Resource
+    PtmStdSKuServiceImpl ptmStdSKuService;
+    @Resource
+    IPtmStdPriceService ptmStdPriceService;
     private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
 
     public static void main(String[] args) throws Exception {
@@ -222,26 +224,27 @@ public class Compare2Controller {
                                HttpServletResponse response,
                                HttpServletRequest request
     ) {
-        System.out.println("enter ");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
         PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"skuPrice", "deepLink", "saved", "priceOff", "productVo", "pagedComparedSkuVos", "copywriting", "displayMode", "std", "cashBack"});
         CmpResult cr = new CmpResult();
+//        PtmStdSku ptmStdSku = ptmStdSKuService.getStdSkuById(Long.valueOf(id));
         PtmProduct product = productService.getProduct(Long.valueOf(id));
         String userToken = Context.currentContext().getHeader("usertoken");
         if (product != null) {
             System.out.println("product is exist in our system " + product.getId());
             String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
             DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+//            SearchIO sio = new SearchIO(ptmStdSku.getSourceId(), ptmStdSku.getTitle(), "", "", ptmStdSku.getRefPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, pageSize);
             SearchIO sio = new SearchIO(product.getSourceId(), product.getTitle(), "", StringUtils.isEmpty(product.getSourceSite()) == true ? null : product.getSourceSite(), product.getPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, pageSize);
             try {
-//                cr = getCmpProducts(sio, product);
                 cr = getCmpProducts(sio, product, userToken);
+//                cr = getCmpPrices(sio, ptmStdSku, userToken);
                 jsonObject.put("page", JSONObject.toJSON(PageHelper.getPageModel(request, cr.getPagedComparedSkuVos())));
             } catch (Exception e) {
+//                logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", ptmStdSku.getTitle(), "", ptmStdSku.getRefPrice(), page, pageSize));
                 logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, pageSize));
-                //if exception occured ,get default cmpResult
                 jsonObject.put("data", JSONObject.toJSON(cr));
                 System.out.println(e.getMessage());
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
@@ -729,7 +732,108 @@ public class Compare2Controller {
         }
 
         long cateId = 0L;
-//        System.out.println("skuModel.getProductId()  " + skuModel.getProductId());
         sio.set(cateId, skuModel.getProductId(), skuModel.getId());
     }
+
+    private CmpResult getCmpPrices(SearchIO sio, PtmStdSku ptmStdSku, String userToken) {
+        //初始化一个空的用于存放比价商品列表的List
+        List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
+        CmpResult cmpResult = new CmpResult();
+        PageableResult<PtmStdPrice> pagedCmpskus = ptmStdPriceService.getPagedPtmStdPriceList(ptmStdSku.getId(), SkuStatus.ONSALE, sio.getPage(), sio.getSize());
+        if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
+            List<PtmStdPrice> cmpPriceList = pagedCmpskus.getData();
+            //评论数按照加权平均值展示
+            Long tempTotalComments = Long.valueOf(0);
+            if (ArrayUtils.hasObjs(cmpPriceList)) {
+                // 获取vo list
+                for (PtmStdPrice ptmStdPrice : cmpPriceList) {
+                    CmpProductListVo cplv = new CmpProductListVo(ptmStdPrice, productCacheManager.getPtmStdSkuImageUrl(ptmStdSku.getId()), WebsiteHelper.getLogoUrl(ptmStdPrice.getWebsite()));
+                    cplv.setDeepLinkUrl(WebsiteHelper.getDeeplinkWithAff(ptmStdPrice.getWebsite(), ptmStdPrice.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()}));
+                    cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(ptmStdPrice.getWebsite(), ptmStdPrice.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()}));
+                    if (!StringUtils.isEmpty(userToken)) {
+                        cplv.setIsAlert(apiUtils.isPriceOffAlert(userToken, cplv.getId()));
+                    }
+                    comparedSkuVos.add(cplv);
+                }
+                if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {
+                    throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", ptmStdSku.getTitle(), ptmStdSku.getRefPrice());
+                }
+                //根据价格排序
+                Collections.sort(comparedSkuVos, new Comparator<CmpProductListVo>() {
+                    @Override
+                    public int compare(CmpProductListVo o1, CmpProductListVo o2) {
+                        if (o1.getPrice() > o2.getPrice()) {
+                            return 1;
+                        } else if (o1.getPrice() < o2.getPrice()) {
+                            return -1;
+                        }
+                        return 0;
+                    }
+                });
+
+            } else {
+                logger.debug("Found skus size is 0 .");
+                throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
+            }
+            List<CmpProductListVo> tempCmpProductListVos = new ArrayList<CmpProductListVo>();
+            int sum = 0;
+            for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
+                if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
+                    sum += cmpProductListVo.getTotalRatingsNum() * cmpProductListVo.getRatingNum();
+                    tempTotalComments += cmpProductListVo.getTotalRatingsNum();
+                }
+                PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, cmpProductListVo.getId());
+                List<String> offer = new ArrayList<>();
+                if (ptmCmpSkuDescription != null) {
+                    String offers = ptmCmpSkuDescription.getOffers();
+                    if (!StringUtils.isEmpty(offers)) {
+                        String[] temps = offers.split(",");
+                        for (String str : temps) {
+                            offer.add(str);
+                        }
+                        cmpProductListVo.setOffers(offer);
+                    }
+                }
+                if (cmpProductListVo.getWebsite().name().equals("FLIPKART")) {
+                    offer.add("Extra " + cmpProductListVo.getCoins() + " Hasoffer Coins");
+
+                }
+                tempCmpProductListVos.add(cmpProductListVo);
+//                }
+            }
+            //移除之前加进列表的所有的sku列表
+            comparedSkuVos = null;
+            comparedSkuVos = new ArrayList<>();
+            //将新的加入的放入到列表中
+            comparedSkuVos.addAll(tempCmpProductListVos);
+            String imageUrl = productCacheManager.getPtmStdSkuImageUrl(ptmStdSku.getId());
+            cmpResult.setImage(imageUrl);
+            cmpResult.setName(ptmStdSku.getTitle());
+            PageableResult<CmpProductListVo> priceList = new PageableResult<CmpProductListVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize());
+            cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
+            cmpResult.setPriceList(priceList.getData());
+            int rating = ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(tempTotalComments == 0 ? 1 : tempTotalComments), 0, BigDecimal.ROUND_HALF_UP).longValue());
+            cmpResult.setRatingNum(rating <= 0 ? 90 : rating);
+            cmpResult.setPagedComparedSkuVos(priceList);
+            cmpResult.setTotalRatingsNum(tempTotalComments);
+            PtmStdSkuDetail ptmStdSkuDetail = mongoDbManager.queryOne(PtmStdSkuDetail.class, ptmStdSku.getId());
+            String specs = "";
+            Map<String, String> specsMap = new HashMap();
+            if (ptmStdSkuDetail != null) {
+                List<PtmStdSkuParamGroup> paramGroups = ptmStdSkuDetail.getParamGroups();
+                for (PtmStdSkuParamGroup ptmStdSkuParamGroup : paramGroups) {
+                    List<PtmStdSkuParamNode> params = ptmStdSkuParamGroup.getParams();
+                    for (PtmStdSkuParamNode ptmStdSkuParamNode : params) {
+                        if (org.apache.commons.lang3.StringUtils.isNotEmpty(ptmStdSkuParamNode.getName()) && org.apache.commons.lang3.StringUtils.isNotEmpty(ptmStdSkuParamNode.getValue())) {
+                            specsMap.put(ptmStdSkuParamNode.getName(), ptmStdSkuParamNode.getValue());
+                        }
+                    }
+                }
+            }
+            cmpResult.setSpecs(JSON.toJSONString(specsMap));
+            return cmpResult;
+        }
+        return cmpResult;
+    }
+
 }

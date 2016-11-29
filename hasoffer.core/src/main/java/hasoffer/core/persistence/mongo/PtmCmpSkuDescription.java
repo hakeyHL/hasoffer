@@ -2,6 +2,7 @@ package hasoffer.core.persistence.mongo;
 
 import hasoffer.spider.model.FetchedProductReview;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -26,6 +27,10 @@ public class PtmCmpSkuDescription {
     private String offers;
 
     private List<FetchedProductReview> fetchedProductReviewList;
+
+    @PersistenceConstructor
+    public PtmCmpSkuDescription() {
+    }
 
     public long getId() {
         return id;

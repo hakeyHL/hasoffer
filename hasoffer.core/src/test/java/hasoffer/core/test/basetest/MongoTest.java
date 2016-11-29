@@ -48,7 +48,7 @@ public class MongoTest {
 
         PtmStdSkuDetail ptmStdSkuDetail = new PtmStdSkuDetail();
 
-        ptmStdSkuDetail.setId(123321);
+        ptmStdSkuDetail.setId(1233241);
 
         mdm.save(ptmStdSkuDetail);
 
@@ -57,7 +57,7 @@ public class MongoTest {
         PageableResult<PtmStdSkuDetail> pageableResult = mdm.queryPage(PtmStdSkuDetail.class, query, 1, 10);
         System.out.println(pageableResult);
 
-        PtmCmpSkuHistoryPrice price = mdm.queryOne(PtmCmpSkuHistoryPrice.class, 31);
+        PtmStdSkuDetail price = mdm.queryOne(PtmStdSkuDetail.class, 4);
         System.out.println(price);
     }
 

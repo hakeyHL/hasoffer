@@ -8,9 +8,11 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.ptm.PtmStdImage;
 import hasoffer.core.persistence.po.ptm.PtmTopSelling;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
+import hasoffer.core.product.IPtmStdImageService;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.utils.JsonHelper;
 import hasoffer.data.redis.IRedisListService;
@@ -47,6 +49,8 @@ public class ProductCacheManager {
     @Resource
     IRedisSetService redisSetService;
     Logger logger = LoggerFactory.getLogger(ProductCacheManager.class);
+    @Resource
+    private IPtmStdImageService stdImageService;
 
     public static void main(String[] args) {
         BigDecimal a = BigDecimal.valueOf(10);
@@ -89,6 +93,23 @@ public class ProductCacheManager {
         String imageUrl = cacheService.get(key, 0);
         if (imageUrl == null) {
             imageUrl = productService.getProductMasterImageUrl(id);
+            if (imageUrl != null) {
+                cacheService.add(key, imageUrl, CACHE_EXPIRE_TIME);
+            }
+        }
+
+        return imageUrl;
+    }
+
+    public String getPtmStdSkuImageUrl(long id) {
+        String key = CACHE_KEY_PRE + "_getPtmStdSkuImageUrl_" + id;
+        String imageUrl = cacheService.get(key, 0);
+        if (imageUrl == null) {
+            List<PtmStdImage> imageList = stdImageService.getStdSkuImageBySkuId(id);
+            if (imageList != null && imageList.size() > 0) {
+//                imageUrl = ImageUtil.getImageUrl(imageList.get(0).getBigImagePath());
+                imageUrl = imageList.get(0).getOriImageUrl();
+            }
             if (imageUrl != null) {
                 cacheService.add(key, imageUrl, CACHE_EXPIRE_TIME);
             }
