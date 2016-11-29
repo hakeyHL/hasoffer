@@ -4,6 +4,7 @@ import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmStdPrice;
 import hasoffer.core.utils.ImageUtil;
 
 import java.util.ArrayList;
@@ -106,6 +107,23 @@ public class CmpProductListVo {
         this.id = cmpSku.getId();
         this.skuPrice = sb.reverse().toString();
         this.website = cmpSku.getWebsite();
+    }
+
+    public CmpProductListVo(PtmStdPrice stdPrice, String ptmStdSkuImage, String logoImage) {
+        this.id = stdPrice.getId();
+        this.coins = stdPrice.getWebsite() == Website.FLIPKART ? Math.round(0.075 * stdPrice.getPrice()) : 0;
+        this.ratingNum = 0;
+        this.imageUrl = ptmStdSkuImage;
+        this.totalRatingsNum = 0l;
+        this.image = logoImage;
+        this.title = stdPrice.getTitle() == null ? "" : stdPrice.getTitle();
+        this.status = stdPrice.getSkuStatus();
+        this.price = Math.round(stdPrice.getPrice());
+        this.website = stdPrice.getWebsite();
+        this.freight = stdPrice.getShippingFee();
+        this.distributionTime = null;
+        this.backRate = stdPrice.getWebsite() == Website.FLIPKART ? 7.5f : 0;
+        this.returnGuarantee = 0;
     }
 
     public CmpProductListVo(String image, int ratingNum, Long totalRatingsNum, int price, int freight, String distributionTime, Long coins, float backRate, int returnGuarantee, List<String> support) {

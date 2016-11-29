@@ -40,6 +40,8 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
+import hasoffer.core.product.solr.PtmStdSkuIndexServiceImpl;
+import hasoffer.core.product.solr.PtmStdSkuModel;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.IAppService;
@@ -97,6 +99,8 @@ public class AppController {
     private IOrderStatsAnalysisService orderService;
     @Resource
     private DealServiceImpl dealService;
+    @Resource
+    private PtmStdSkuIndexServiceImpl ptmStdSkuIndexService;
 
     public static void main(String[] args) {
 
@@ -683,6 +687,7 @@ public class AppController {
                 System.out.println("  sort " + criteria.getSort().name());
                 criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
                 PageableResult p = productIndex2Service.searchProducts(criteria);
+//                PageableResult p = ptmStdSkuIndexService.searchProducts(criteria);
                 if (p != null && p.getData().size() > 0) {
                     System.out.println("getPivotFieldVals  " + p.getPivotFieldVals().size());
                     if (p.getPivotFieldVals() != null && p.getPivotFieldVals().size() > 0) {
@@ -871,6 +876,21 @@ public class AppController {
                     productListVo.setRatingNum(ptmProduct.getRating());
                     productListVo.setCommentNum(Long.valueOf(ptmProduct.getReview()));
                     productListVo.setStoresNum(ptmProduct.getStoreCount());
+                    desList.
+                            add(productListVo);
+                }
+            } else if (PtmStdSkuModel.class.isInstance(sourceList.get(0))) {
+                Iterator<PtmStdSkuModel> ptmList = sourceList.iterator();
+                while (ptmList.hasNext()) {
+                    PtmStdSkuModel ptmStdSkuModel = ptmList.next();
+                    ProductListVo productListVo = new ProductListVo();
+                    productListVo.setId(ptmStdSkuModel.getId());
+                    productListVo.setImageUrl(productCacheManager.getPtmStdSkuImageUrl(ptmStdSkuModel.getId()));
+                    productListVo.setName(ptmStdSkuModel.getTitle());
+                    productListVo.setPrice(Math.round(ptmStdSkuModel.getMinPrice()));
+                    productListVo.setRatingNum(ptmStdSkuModel.getRating());
+                    productListVo.setCommentNum(Long.valueOf(ptmStdSkuModel.getReview()));
+                    productListVo.setStoresNum(ptmStdSkuModel.getStoreCount());
                     desList.add(productListVo);
                 }
             }
