@@ -78,13 +78,13 @@ public class AppCliCfgController {
                 logger.info("client scan config ");
                 // config
                 //search
-                map.put("001", true);
+                map.put("001", false);
 
                 //wishlist
-                map.put("002", true);
+                map.put("002", false);
 
                 //购物车
-                map.put("003", true);
+                map.put("003", false);
 
                 //email and phone get
                 map.put("004", false);

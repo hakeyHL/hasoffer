@@ -84,6 +84,12 @@ public class OrderStatsAnalysisPO implements Identifiable<Integer> {
 
     private String version;
 
+
+    /**
+     * 0:网站，1：手动
+     */
+    private int dataSource;
+
     public Integer getId() {
         return id;
     }
@@ -274,6 +280,14 @@ public class OrderStatsAnalysisPO implements Identifiable<Integer> {
 
     public void setAffExtParam1(String affExtParam1) {
         this.affExtParam1 = affExtParam1;
+    }
+
+    public int getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(int dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override
