@@ -36,38 +36,38 @@ public class ComPareWebsiteSendFetchRequestJobBean extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 //          mobile
-//        try {
-//            method2();//抓取91mobile数据mobile
-//        } catch (HttpFetchException e) {
-//            logger.info("fetch mobile category for 91mobile fail");
-//        }
+        try {
+            method2();//抓取91mobile数据mobile
+        } catch (HttpFetchException e) {
+            logger.info("fetch mobile category for 91mobile fail");
+        }
 
 //          camera
-//        try {
-//            String tabletProductListUrlPrefix = "http://www.91mobiles.com/template/category_finder/finder_ajax.php?ord=0.8606721456464186&requestType=2&listType=list&listType_v1=&selMobSort=relevance&amount=1000%3B70000&sCatName=phone&price_range_apply=0&search=camera&hidFrmSubFlag=1&page=";
-//            String tabletProductListUrlSuffix = "&category=camera&unique_sort=&hdnCategory=camera&user_search=camera";
-//            method2(tabletProductListUrlPrefix, tabletProductListUrlSuffix, 3182);
-//        } catch (HttpFetchException e) {
-//            logger.info("fetch tablet category for 91mobile fail");
-//        }
+        try {
+            String tabletProductListUrlPrefix = "http://www.91mobiles.com/template/category_finder/finder_ajax.php?ord=0.8606721456464186&requestType=2&listType=list&listType_v1=&selMobSort=relevance&amount=1000%3B70000&sCatName=phone&price_range_apply=0&search=camera&hidFrmSubFlag=1&page=";
+            String tabletProductListUrlSuffix = "&category=camera&unique_sort=&hdnCategory=camera&user_search=camera";
+            method2(tabletProductListUrlPrefix, tabletProductListUrlSuffix, 3182);
+        } catch (HttpFetchException e) {
+            logger.info("fetch tablet category for 91mobile fail");
+        }
 
 //          tablet
-//        try {
-//            String tabletProductListUrlPrefix = "http://www.91mobiles.com/template/category_finder/finder_ajax.php?ord=0.5817923555480047&requestType=1&listType=list&listType_v1=&selMobSort=relevance&amount=1000%3B45000&sCatName=phone&price_range_apply=0&search=tablet&hidFrmSubFlag=1&page=";
-//            String tabletProductListUrlSuffix = "&category=tablet&unique_sort=&hdnCategory=tablet&user_search=tablet";
-//            method2(tabletProductListUrlPrefix, tabletProductListUrlSuffix, 57);
-//        } catch (HttpFetchException e) {
-//            logger.info("fetch tablet category for 91mobile fail");
-//        }
+        try {
+            String tabletProductListUrlPrefix = "http://www.91mobiles.com/template/category_finder/finder_ajax.php?ord=0.5817923555480047&requestType=1&listType=list&listType_v1=&selMobSort=relevance&amount=1000%3B45000&sCatName=phone&price_range_apply=0&search=tablet&hidFrmSubFlag=1&page=";
+            String tabletProductListUrlSuffix = "&category=tablet&unique_sort=&hdnCategory=tablet&user_search=tablet";
+            method2(tabletProductListUrlPrefix, tabletProductListUrlSuffix, 57);
+        } catch (HttpFetchException e) {
+            logger.info("fetch tablet category for 91mobile fail");
+        }
 
 //          tv
-//        try {
-//            String tabletProductListUrlPrefix = "http://www.91mobiles.com/template/category_finder/finder_ajax.php?ord=0.31939880350088856&requestType=2&listType=list&listType_v1=&selMobSort=relevance&amount=1000%3B70000&sCatName=phone&price_range_apply=0&search=television&hidFrmSubFlag=1&page=";
-//            String tabletProductListUrlSuffix = "&category=television&unique_sort=&hdnCategory=television&user_search=television";
-//            method2(tabletProductListUrlPrefix, tabletProductListUrlSuffix, 3100);
-//        } catch (HttpFetchException e) {
-//            logger.info("fetch tablet category for 91mobile fail");
-//        }
+        try {
+            String tabletProductListUrlPrefix = "http://www.91mobiles.com/template/category_finder/finder_ajax.php?ord=0.31939880350088856&requestType=2&listType=list&listType_v1=&selMobSort=relevance&amount=1000%3B70000&sCatName=phone&price_range_apply=0&search=television&hidFrmSubFlag=1&page=";
+            String tabletProductListUrlSuffix = "&category=television&unique_sort=&hdnCategory=television&user_search=television";
+            method2(tabletProductListUrlPrefix, tabletProductListUrlSuffix, 3100);
+        } catch (HttpFetchException e) {
+            logger.info("fetch tablet category for 91mobile fail");
+        }
 
 //          memory card
         try {
