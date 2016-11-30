@@ -153,10 +153,11 @@ public class AppUserController {
                 //将关联关系插入到关联表中
                 appService.addUrmUserDevice(urmUserDevices);
                 //insert record into priceOffAlert
-                long priceOffSkuId = 0;
-                float priceOffSkuPrice = 0;
+                long priceOffSkuId;
+                float priceOffSkuPrice;
                 if (skuId != 0) {
                     if ((skuId + "").length() >= 9) {
+                        System.out.println("billion ");
                         PtmStdPrice ptmStdPrice = ptmStdPriceService.getPtmStdPriceById(ApiUtils.rmoveBillion(skuId));
                         if (ptmStdPrice != null) {
                             priceOffSkuId = ApiUtils.addBillion(ptmStdPrice.getId());
@@ -167,6 +168,7 @@ public class AppUserController {
                             priceOffSkuPrice = cmpSku.getPrice();
                         }
                     } else {
+                        System.out.println("not billion ");
                         PtmCmpSku cmpSku = cmpSkuService.getCmpSkuById(skuId);
                         priceOffSkuId = cmpSku.getId();
                         priceOffSkuPrice = cmpSku.getPrice();
@@ -193,9 +195,12 @@ public class AppUserController {
                                 if (truelySkuPrice <= 0) {
                                     //not exist before
                                     boolean notice = iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", priceOffSkuId, priceOffSkuPrice, priceOffSkuPrice);
+                                    System.out.println("insert ");
+
                                 } else {
                                     //not exist before
                                     boolean notice = iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", priceOffSkuId, truelySkuPrice, truelySkuPrice);
+                                    System.out.println("insert 2");
                                 }
                                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                                 return null;
