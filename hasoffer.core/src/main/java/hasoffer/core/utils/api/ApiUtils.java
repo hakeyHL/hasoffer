@@ -7,10 +7,12 @@ import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.urm.PriceOffNotice;
 import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
+import hasoffer.core.utils.ConstantUtil;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -91,6 +93,37 @@ public class ApiUtils {
         }
         //默认放行
         return flag;
+    }
+
+    //去十亿
+    public static long rmoveBillion(long operatoredNumber) {
+        long tempNumber = operatoredNumber;
+        tempNumber = tempNumber - ConstantUtil.API_ONE_BILLION_NUMBER;
+        return tempNumber;
+    }
+
+    //加十亿
+    public static long addBillion(long operatoredNumber) {
+        long tempNumber = operatoredNumber;
+        tempNumber = tempNumber + ConstantUtil.API_ONE_BILLION_NUMBER;
+        return tempNumber;
+    }
+
+    public static void bindUserAndDevices(UrmUser urmUser, List<String> ids, List<String> deviceIds, List<UrmUserDevice> urmUserDevices) {
+        for (String id : ids) {
+            boolean flag = false;
+            for (String dId : deviceIds) {
+                if (id.equals(dId)) {
+                    flag = true;
+                }
+            }
+            if (!flag) {
+                UrmUserDevice urmUserDevice = new UrmUserDevice();
+                urmUserDevice.setDeviceId(id);
+                urmUserDevice.setUserId(urmUser.getId() + "");
+                urmUserDevices.add(urmUserDevice);
+            }
+        }
     }
 
     /**

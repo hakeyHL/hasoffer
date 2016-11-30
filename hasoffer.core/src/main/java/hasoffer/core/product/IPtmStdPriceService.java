@@ -13,5 +13,7 @@ import java.util.List;
 public interface IPtmStdPriceService {
     List<PtmStdPrice> getPtmStdPriceList(Long id, SkuStatus skuStatus);
 
+    PtmStdPrice getPtmStdPriceById(long id);
+
     PageableResult<PtmStdPrice> getPagedPtmStdPriceList(Long id, SkuStatus skuStatus, int page, int pageSize);
 }

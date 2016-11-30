@@ -46,6 +46,7 @@ import hasoffer.core.push.IPushService;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.utils.ImageUtil;
+import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchedProductReview;
 import hasoffer.webcommon.context.Context;
@@ -508,50 +509,20 @@ public class AppController {
             uUser.setThirdToken(uUser.getThirdToken());
             uUser.setUserToken(userToken);
             appService.updateUserInfo(uUser);
-//            logger.debug("update userInfo over ");
             //把最新的usertoken放进去
             if (!StringUtils.isEmpty(lastTimeUserToken)) {
                 lastTimeUserToken = userToken;
             }
-
-//            System.out.println("update user and device relationship ");
-
             List<String> deviceIds = appService.getUserDevicesByUserId(uUser.getId() + "");
-//            System.out.println("get ids  by userId from urmUserDevice :" + deviceIds.size());
             List<UrmUserDevice> urmUserDevices = new ArrayList<>();
-            for (String id : ids) {
-                boolean flag = false;
-//                System.out.println(" id_id_id " + id);
-                for (String dId : deviceIds) {
-//                    System.out.println(" dId_dId_dId " + dId);
-                    if (id.equals(dId)) {
-                        flag = true;
-//                        System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);
-                    }
-                }
-                if (!flag) {
-//                    System.out.println("id :" + id + " is not exist before ");
-                    UrmUserDevice urmUserDevice = new UrmUserDevice();
-                    urmUserDevice.setDeviceId(id);
-                    urmUserDevice.setUserId(uUser.getId() + "");
-                    urmUserDevices.add(urmUserDevice);
-                }
-            }
+            ApiUtils.bindUserAndDevices(uUser, ids, deviceIds, urmUserDevices);
             //将关联关系插入到关联表中
             appService.addUrmUserDevice(urmUserDevices);
         }
         map.put("userToken", userToken);
         jsonObject.put("data", map);
-//        return null;
-
-        //在此处合并同一用户的数据
-//        String lastTimeUserToken = request.getHeader("oldUserToken");
-//        String lastTimeUserToken = Context.currentContext().getHeader("oldUserToken");//上一次的userToken
         String thirdId = userVO.getThirdId();
-
         if (StringUtils.isEmpty(lastTimeUserToken) || StringUtils.isEmpty(thirdId)) {//如果userToken或者thirdId为空
-//            System.out.println("lastTimeUserToken is :" + lastTimeUserToken);
-//            System.out.println("current user thirdId is : " + thirdId);
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
@@ -560,17 +531,12 @@ public class AppController {
 
         if (userByLastUserToken != null) {
             //如果老token有对应用户,存起来,方便二次处理
-//            logger.error("old userInfo and this thirdId is  : " + thirdId + " InfoInfo " + JSON.toJSONString(userByLastUserToken));
-
             String oldThirdId = userByLastUserToken.getThirdId();
-
             List<UrmUser> oldUserList = appService.getIdDescUserListByThirdId(oldThirdId);
-
             if (oldUserList == null || oldUserList.size() == 0) {
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             }
-
             if (StringUtils.equals(thirdId, oldThirdId)) {//如果同样的userToken对应的记录只有一条并且thirdId一致，认为是正确的用户信息
                 //如果老的thirdId和新的thirdId一样的话要清除此third下的多个记录的问题
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
@@ -589,9 +555,7 @@ public class AppController {
                     orderService.mergeOldUserOrderToNewUser(oldUserList.get(i).getId() + "", oldUserList.get(0).getId() + "");//转移订单
                     appService.bakUserInfo(oldUserList.get(i));//备份用户数据
                 }
-
             }
-
         }
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
@@ -662,11 +626,11 @@ public class AppController {
     @RequestMapping(value = "/productsList")
     public ModelAndView productsList(SearchCriteria criteria, @RequestParam(defaultValue = "4") int type) {
         long l = System.currentTimeMillis();
-//        System.out.println(Thread.currentThread().getName() + " :  criteria : " + criteria.toString());
+        System.out.println(Thread.currentThread().getName() + " :  criteria : " + criteria.toString());
         ModelAndView mv = new ModelAndView();
         List li = new ArrayList();
         Map map = new HashMap();
-        PageableResult<ProductModel2> products;
+        PageableResult products;
         //查询热卖商品
         switch (type) {
             case 0:
@@ -686,8 +650,11 @@ public class AppController {
                 //search by title
                 System.out.println("  sort " + criteria.getSort().name());
                 criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
-                PageableResult p = productIndex2Service.searchProducts(criteria);
-//                PageableResult p = ptmStdSkuIndexService.searchProducts(criteria);
+                PageableResult p;
+                p = ptmStdSkuIndexService.searchProducts(criteria);
+                if (p == null || p.getData() == null || p.getData().size() < 1) {
+                    p = productIndex2Service.searchProducts(criteria);
+                }
                 if (p != null && p.getData().size() > 0) {
                     System.out.println("getPivotFieldVals  " + p.getPivotFieldVals().size());
                     getSkuListByKeyword(map, p);
@@ -712,7 +679,10 @@ public class AppController {
                 //category level page size
                 if (StringUtils.isNotBlank(criteria.getCategoryId())) {
                     //search by category
-                    products = productIndex2Service.searchPro(criteria);
+                    products = ptmStdSkuIndexService.searchStdPricesByCategory(criteria);
+                    if (products == null || products.getData() == null || products.getData().size() < 1) {
+                        products = productIndex2Service.searchPro(criteria);
+                    }
                     if (products != null && products.getData().size() > 0) {
                         addProductVo2List(li, products.getData());
                     }

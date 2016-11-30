@@ -71,7 +71,7 @@ public class AppCmpServiceImpl implements AppCmpService {
         PtmCmpSkuIndex2 cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
         //根据title匹配到商品
         CmpResult cr = null;
-        PtmProduct ptmProduct = null;
+        PtmProduct ptmProduct;
         try {
             if (sio.getHsProId() > 0) {
                 ptmProduct = productService.getProduct(sio.getHsProId());

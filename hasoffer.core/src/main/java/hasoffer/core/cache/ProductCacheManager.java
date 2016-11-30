@@ -108,7 +108,7 @@ public class ProductCacheManager {
         if (imageUrl == null) {
             List<PtmStdImage> imageList = stdImageService.getStdSkuImageBySkuId(id);
             if (imageList != null && imageList.size() > 0) {
-                imageUrl = ImageUtil.getImageUrl(imageList.get(0).getBigImagePath());
+                imageUrl = ImageUtil.getImageUrl(imageList.get(0).getSmallImagePath());
 //                imageUrl = imageList.get(0).getOriImageUrl();
             }
             if (imageUrl != null) {

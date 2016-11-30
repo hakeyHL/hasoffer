@@ -14,11 +14,13 @@ import hasoffer.core.app.vo.SearchIO;
 import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
 import hasoffer.core.persistence.mongo.UserSignLog;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmStdPrice;
 import hasoffer.core.persistence.po.urm.PriceOffNotice;
 import hasoffer.core.persistence.po.urm.UrmSignCoin;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.ICmpSkuService;
+import hasoffer.core.product.IPtmStdPriceService;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
@@ -63,6 +65,9 @@ public class AppUserController {
     MongoDbManager mongoDbManager;
     @Resource
     ApiUtils apiUtils;
+
+    @Resource
+    IPtmStdPriceService ptmStdPriceService;
 
     public static void main(String[] args) {
         //String affs[] = null;
@@ -109,7 +114,12 @@ public class AppUserController {
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
         //绑定用户设备关系
-        System.out.println("get info : type " + type + " skuId :" + skuId + " skuPrice " + skuPrice);
+        if (skuId <= 0) {
+            jsonObject.put("errorCode", "10000");
+            jsonObject.put("msg", "id le than zero ");
+            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            return null;
+        }
         skuPrice = apiUtils.getStringNum(skuPrice);
         float truelySkuPrice = Float.valueOf(skuPrice);
         //get user by userToken
@@ -118,10 +128,10 @@ public class AppUserController {
             System.out.println(" has userToken :" + userToken);
             UrmUser urmUser = appService.getUserByUserToken(userToken);
             if (urmUser != null) {
-                List<String> ids = null;
+                List<String> ids;
                 String deviceId = JSON.parseObject(request.getHeader("deviceinfo")).getString("deviceId");
                 String deviceKey = "urmDevice_ids_mapKey_" + deviceId;
-                Map map = null;
+                Map map;
                 String deviceValue = urmDeviceService.get(deviceKey, 0);
 
                 if (!StringUtils.isEmpty(deviceValue)) {
@@ -138,48 +148,37 @@ public class AppUserController {
                     map.put("urmDevice_ids", ids);
                     urmDeviceService.add(deviceKey, JSONUtil.toJSON(map), TimeUtils.SECONDS_OF_1_DAY);
                 }
-                System.out.println("update user and device relationship ");
                 List<String> deviceIds = appService.getUserDevicesByUserId(urmUser.getId() + "");
-                System.out.println("get ids  by userId from urmUserDevice :" + deviceIds.size());
                 List<UrmUserDevice> urmUserDevices = new ArrayList<>();
-                for (String id : ids) {
-                    boolean flag = false;
-                    for (String dId : deviceIds) {
-                        if (id.equals(dId)) {
-                            flag = true;
-                            System.out.println("dId by UserId :" + dId + " is  equal to id from deviceId :" + id);
-                        }
-                    }
-                    if (!flag) {
-                        System.out.println("id :" + id + " is not exist before ");
-                        UrmUserDevice urmUserDevice = new UrmUserDevice();
-                        urmUserDevice.setDeviceId(id);
-                        urmUserDevice.setUserId(urmUser.getId() + "");
-                        urmUserDevices.add(urmUserDevice);
-                    }
-                }
+                ApiUtils.bindUserAndDevices(urmUser, ids, deviceIds, urmUserDevices);
                 //将关联关系插入到关联表中
-                int count = appService.addUrmUserDevice(urmUserDevices);
-                System.out.println(" batch save  result size : " + count);
-
-
-                System.out.println("get this user " + urmUser.getUserName() + " and id is :" + urmUser.getId());
+                appService.addUrmUserDevice(urmUserDevices);
                 //insert record into priceOffAlert
+                long priceOffSkuId = 0;
+                float priceOffSkuPrice = 0;
                 if (skuId != 0) {
-                    PtmCmpSku cmpSku = cmpSkuService.getCmpSkuById(skuId);
-                    if (cmpSku != null) {
-                        PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + "", cmpSku.getId());
-                        if (priceOffNotice != null) {
-                            System.out.println("delete record :" + priceOffNotice.toString());
-                            iPriceOffNoticeService.deletePriceOffNotice(urmUser.getId() + "", cmpSku.getId());
+                    if ((skuId + "").length() >= 9) {
+                        PtmStdPrice ptmStdPrice = ptmStdPriceService.getPtmStdPriceById(ApiUtils.rmoveBillion(skuId));
+                        if (ptmStdPrice != null) {
+                            priceOffSkuId = ApiUtils.addBillion(ptmStdPrice.getId());
+                            priceOffSkuPrice = ptmStdPrice.getPrice();
+                        } else {
+                            PtmCmpSku cmpSku = cmpSkuService.getCmpSkuById(skuId);
+                            priceOffSkuId = cmpSku.getId();
+                            priceOffSkuPrice = cmpSku.getPrice();
                         }
-                        System.out.println("has this sku ,id is " + skuId + " and it's price in database is :" + cmpSku.getPrice());
+                    }
+                    if (priceOffSkuId != 0) {
+                        PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + "", priceOffSkuId);
+                        if (priceOffNotice != null) {
+                            iPriceOffNoticeService.deletePriceOffNotice(urmUser.getId() + "", priceOffSkuId);
+                        }
                         switch (type) {
                             case 0:
                                 //cancel
                                 System.out.println("cancel ");
                                 if (priceOffNotice != null) {
-                                    iPriceOffNoticeService.deletePriceOffNotice(urmUser.getId() + "", cmpSku.getId());
+                                    iPriceOffNoticeService.deletePriceOffNotice(urmUser.getId() + "", priceOffSkuId);
                                     Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                                     return null;
                                 } else {
@@ -189,17 +188,11 @@ public class AppUserController {
                             case 1:
                                 //set
                                 if (truelySkuPrice <= 0) {
-                                    System.out.println("not permit set this price :" + skuPrice);
-                                    System.out.println("use sku currentPrice " + cmpSku.getPrice());
                                     //not exist before
-                                    System.out.println("add record ");
-                                    boolean notice = iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", cmpSku.getId(), cmpSku.getPrice(), cmpSku.getPrice());
-                                    System.out.println(" result is :" + notice);
+                                    boolean notice = iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", priceOffSkuId, priceOffSkuPrice, priceOffSkuPrice);
                                 } else {
-                                    System.out.println("price is lg than zero ");
                                     //not exist before
-                                    boolean notice = iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", cmpSku.getId(), truelySkuPrice, truelySkuPrice);
-                                    System.out.println("   is :" + notice);
+                                    boolean notice = iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", priceOffSkuId, truelySkuPrice, truelySkuPrice);
                                 }
                                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                                 return null;
@@ -223,13 +216,17 @@ public class AppUserController {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "10001");
         jsonObject.put("msg", "no");
-        String userToken = Context.currentContext().getHeader("usertoken");
+        if (skuId <= 0) {
+            jsonObject.put("errorCode", "10001");
+            jsonObject.put("msg", "id le zero ");
+            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            return null;
+        }
+        String userToken = Context.currentContext().getHeader("userToken");
         if (!StringUtils.isEmpty(userToken)) {
             System.out.println("userToken is :" + userToken);
             UrmUser urmUser = appService.getUserByUserToken(userToken);
             if (urmUser != null) {
-                System.out.println("this userToken has user ");
-                System.out.println("check :  " + urmUser.getId() + "  skuId: " + skuId);
                 PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + "", skuId);
                 if (priceOffNotice != null) {
                     System.out.println("user has concerned this sku :" + skuId);
@@ -238,7 +235,6 @@ public class AppUserController {
                 }
             }
         }
-        System.out.println(" response result is : " + JSON.toJSONString(jsonObject));
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }

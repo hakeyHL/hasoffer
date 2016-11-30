@@ -6,6 +6,7 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmStdPrice;
 import hasoffer.core.utils.ImageUtil;
+import hasoffer.core.utils.api.ApiUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,7 +111,7 @@ public class CmpProductListVo {
     }
 
     public CmpProductListVo(PtmStdPrice stdPrice, String ptmStdSkuImage, String logoImage) {
-        this.id = stdPrice.getId();
+        this.id = ApiUtils.addBillion(stdPrice.getId());
         this.coins = stdPrice.getWebsite() == Website.FLIPKART ? Math.round(0.075 * stdPrice.getPrice()) : 0;
         this.ratingNum = 0;
         this.imageUrl = ptmStdSkuImage;
