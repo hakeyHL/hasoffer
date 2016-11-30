@@ -228,7 +228,7 @@ public class AppUserController {
         }
         String userToken = Context.currentContext().getHeader("userToken");
         if (!StringUtils.isEmpty(userToken)) {
-            System.out.println("userToken is :" + userToken);
+            System.out.println("usertoken is :" + userToken);
             UrmUser urmUser = appService.getUserByUserToken(userToken);
             if (urmUser != null) {
                 PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + "", skuId);
