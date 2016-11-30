@@ -174,9 +174,16 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                                         if (NumberUtils.isNumber(oriPriceString)) {
                                             float oriPrice = Float.parseFloat(oriPriceString);//deal之前的价格
                                             float nowPrice = fetchedProduct.getPrice();
-                                            if (nowPrice > oriPrice) {
+
+                                            //data 2016-11-30 11:30
+                                            //降价，生成新deal；涨价，失效不显示
+                                            if (nowPrice < oriPrice && SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
                                                 dealService.updateDealExpire(appdeal.getId(), nowPrice);
-                                                logger.info("desite deal update delete old and create a new deal success");
+                                                logger.info("deal site deal update delete old and create a new deal success");
+                                            }
+                                            if (nowPrice > oriPrice || !SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
+                                                dealService.updateDealExpire(appdeal.getId());
+                                                logger.info("deal site deal update orideal expire");
                                             }
                                         }
                                     }
@@ -203,14 +210,14 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                                     //用来标记是否更新过，true表示未被更新
                                     boolean flag = true;
 
-                                    //涨价了或者状态不是onsale失效，分为俩种失效机制
-                                    if (newPrice > sku.getPrice()) {
+                                    //data 2016-11-30 11:30
+                                    //降价，生成新deal；涨价，失效不显示
+                                    if (newPrice < sku.getPrice() && SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
                                         dealService.updateDealExpire(appdeal.getId(), newPrice);
                                         logger.info("price off deal update delete old and create a new deal success");
-                                        flag = false;
                                     }
 
-                                    if (flag && !SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
+                                    if (newPrice > sku.getPrice() || !SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
                                         dealService.updateDealExpire(appdeal.getId());
                                         logger.info("price off deal update orideal expire");
                                     }
