@@ -5,6 +5,7 @@ import hasoffer.base.enums.SearchResultSort;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.bo.system.SearchCriteria;
+import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.data.solr.*;
 import jodd.util.NameValue;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -12,10 +13,7 @@ import org.apache.solr.client.solrj.response.PivotField;
 import org.apache.solr.common.util.NamedList;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hs on 2016年11月28日.
@@ -36,19 +34,7 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
 
         // sort by
         SearchResultSort resultSort = sc.getSort();
-        if (resultSort != null) {
-            if (resultSort == SearchResultSort.POPULARITY) {
-                sorts = new Sort[2];
-                sorts[0] = new Sort(ProductModel2SortField.F_POPULARITY.getFieldName(), Order.DESC);
-                sorts[1] = new Sort("review", Order.DESC);
-            } else if (resultSort == SearchResultSort.PRICEL2H) {
-                sorts = new Sort[1];
-                sorts[0] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.ASC);
-            } else if (resultSort == SearchResultSort.PRICEH2L) {
-                sorts = new Sort[1];
-                sorts[0] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.DESC);
-            }
-        }
+        sorts = getSorts(sorts, resultSort);
 
         // pivot fields
         PivotFacet[] pivotFacets = new PivotFacet[pivotFieldSize];
@@ -109,7 +95,77 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
             }
         }
         PageableResult<PtmStdSkuModel> pagedPms = new PageableResult<PtmStdSkuModel>(sr.getResult(), sr.getTotalCount(), sc.getPage(), sc.getPageSize(), pivotFieldVals);
+        //遍历列表修改id
+        if (pagedPms != null && pagedPms.getData() != null && pagedPms.getData().size() > 0) {
+            Iterator<PtmStdSkuModel> iterator = pagedPms.getData().iterator();
+            while (iterator.hasNext()) {
+                PtmStdSkuModel ptmStdSkuModel = iterator.next();
+                ptmStdSkuModel.setId(ApiUtils.addBillion(ptmStdSkuModel.getId()));
+            }
+        }
         return pagedPms;
     }
 
+    private Sort[] getSorts(Sort[] sorts, SearchResultSort resultSort) {
+        if (resultSort != null) {
+            if (resultSort == SearchResultSort.POPULARITY) {
+                sorts = new Sort[2];
+                sorts[0] = new Sort(ProductModel2SortField.F_POPULARITY.getFieldName(), Order.DESC);
+                sorts[1] = new Sort("review", Order.DESC);
+            } else if (resultSort == SearchResultSort.PRICEL2H) {
+                sorts = new Sort[1];
+                sorts[0] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.ASC);
+            } else if (resultSort == SearchResultSort.PRICEH2L) {
+                sorts = new Sort[1];
+                sorts[0] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.DESC);
+            }
+        }
+        return sorts;
+    }
+
+    public PageableResult<PtmStdSkuModel> searchStdPricesByCategory(SearchCriteria criteria) {
+        int level = criteria.getLevel();
+        String cateId = criteria.getCategoryId();
+        int page = criteria.getPage();
+        int size = criteria.getPageSize();
+        if (level < 1 || level > 3) {
+            return null;
+        }
+        List<FilterQuery> fqList = new ArrayList<FilterQuery>();
+        int priceFrom = criteria.getPriceFrom(), priceTo = criteria.getPriceTo();
+        String priceFromStr = "*", priceToStr = "*";
+        if (priceFrom < priceTo && priceFrom >= 0) {
+            if (priceFrom <= 0) {
+                priceFrom = 1;
+            }
+            priceFromStr = String.valueOf(priceFrom);
+            if (priceTo > 0) {
+                priceToStr = String.valueOf(priceTo);
+            }
+            fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", priceFromStr, priceToStr)));
+        } else {
+            fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", "1", "*")));
+        }
+        Sort[] sorts = new Sort[1];
+        SearchResultSort resultSort = criteria.getSort();
+        sorts = getSorts(sorts, resultSort);
+        String q = "*:*";
+        PivotFacet[] pivotFacets = null;
+        fqList.add(new FilterQuery("cate" + level, String.valueOf(cateId)));
+        FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
+        SearchResult<PtmStdSkuModel> sr = searchObjs(q, fqs, sorts, pivotFacets, page <= 1 ? 1 : page, size, true);
+        PageableResult<PtmStdSkuModel> ptmStdSkuModelPageableResult = new PageableResult<>(sr.getResult(), sr.getTotalCount(), page, size);
+        addBillion2ListEle(ptmStdSkuModelPageableResult);
+        return ptmStdSkuModelPageableResult;
+    }
+
+    private void addBillion2ListEle(PageableResult<PtmStdSkuModel> ptmStdSkuModelPageableResult) {
+        if (ptmStdSkuModelPageableResult != null && ptmStdSkuModelPageableResult.getData() != null && ptmStdSkuModelPageableResult.getData().size() > 0) {
+            Iterator<PtmStdSkuModel> iterator = ptmStdSkuModelPageableResult.getData().iterator();
+            while (iterator.hasNext()) {
+                PtmStdSkuModel ptmStdSkuModel = iterator.next();
+                ptmStdSkuModel.setId(ApiUtils.addBillion(ptmStdSkuModel.getId()));
+            }
+        }
+    }
 }

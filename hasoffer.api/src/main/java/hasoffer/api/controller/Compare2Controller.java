@@ -218,7 +218,7 @@ public class Compare2Controller {
 
     @DataSource(value = DataSourceType.Slave)
     @RequestMapping(value = "/cmpsku", method = RequestMethod.GET)
-    public ModelAndView cmpsku(@RequestParam(defaultValue = "0") final String id,
+    public ModelAndView cmpsku(@RequestParam(defaultValue = "0") String id,
                                @RequestParam(defaultValue = "1") int page,
                                @RequestParam(defaultValue = "10") int pageSize,
                                HttpServletResponse response,
@@ -227,37 +227,45 @@ public class Compare2Controller {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
+        if (org.apache.commons.lang3.StringUtils.isEmpty(id)) {
+            jsonObject.put("msg", "id required .");
+            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        }
+        String userToken = Context.currentContext().getHeader("usertoken");
         PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"skuPrice", "deepLink", "saved", "priceOff", "productVo", "pagedComparedSkuVos", "copywriting", "displayMode", "std", "cashBack"});
         CmpResult cr = new CmpResult();
-//        PtmStdSku ptmStdSku = ptmStdSKuService.getStdSkuById(Long.valueOf(id));
-        PtmProduct product = productService.getProduct(Long.valueOf(id));
-        String userToken = Context.currentContext().getHeader("usertoken");
-        if (product != null) {
-            System.out.println("product is exist in our system " + product.getId());
-            String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-            DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-//            SearchIO sio = new SearchIO(ptmStdSku.getSourceId(), ptmStdSku.getTitle(), "", "", ptmStdSku.getRefPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, pageSize);
-            SearchIO sio = new SearchIO(product.getSourceId(), product.getTitle(), "", StringUtils.isEmpty(product.getSourceSite()) == true ? null : product.getSourceSite(), product.getPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, pageSize);
-            try {
+        SearchIO sio = null;
+        PtmProduct product = null;
+        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+        DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        PtmStdSku ptmStdSku = null;
+        if ((id).length() >= 9) {
+            id = ApiUtils.rmoveBillion(Long.valueOf(id)) + "";
+            ptmStdSku = ptmStdSKuService.getStdSkuById(Long.valueOf(id));
+        }
+        if (ptmStdSku != null) {
+            sio = new SearchIO(ptmStdSku.getSourceId(), ptmStdSku.getTitle(), "", "", ptmStdSku.getRefPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, pageSize);
+            cr = getCmpPrices(sio, ptmStdSku, userToken);
+        } else {
+            product = productService.getProduct(Long.valueOf(id));
+            if (product != null) {
+                sio = new SearchIO(product.getSourceId(), product.getTitle(), "", StringUtils.isEmpty(product.getSourceSite()) == true ? null : product.getSourceSite(), product.getPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, pageSize);
                 cr = getCmpProducts(sio, product, userToken);
-//                cr = getCmpPrices(sio, ptmStdSku, userToken);
-                jsonObject.put("page", JSONObject.toJSON(PageHelper.getPageModel(request, cr.getPagedComparedSkuVos())));
-            } catch (Exception e) {
-//                logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", ptmStdSku.getTitle(), "", ptmStdSku.getRefPrice(), page, pageSize));
-                logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, pageSize));
-                jsonObject.put("data", JSONObject.toJSON(cr));
-                System.out.println(e.getMessage());
-                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
-                return null;
             }
-            // 速度优化
-            SearchHelper.addToLog(sio);
-            logger.debug(sio.toString());
-            apiUtils.resloveClass(cr);
+        }
+        try {
+            jsonObject.put("page", JSONObject.toJSON(PageHelper.getPageModel(request, cr.getPagedComparedSkuVos())));
+        } catch (Exception e) {
+            logger.error("exception occur while get cmpSkuList on interface cmpsku , id is : {} and ptmStdSku ,PtmProduct ", ptmStdSku == null ? product.getId() : ptmStdSku.getId(), ptmStdSku, product);
+//            logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, pageSize));
             jsonObject.put("data", JSONObject.toJSON(cr));
+            System.out.println(e.getMessage());
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
             return null;
         }
+        // 速度优化
+        SearchHelper.addToLog(sio);
+        logger.debug(sio.toString());
         apiUtils.resloveClass(cr);
         jsonObject.put("data", JSONObject.toJSON(cr));
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
@@ -636,7 +644,7 @@ public class Compare2Controller {
             String imageUrl = productCacheManager.getProductMasterImageUrl(product.getId());
             cmpResult.setImage(imageUrl);
             cmpResult.setName(product.getTitle());
-            PageableResult<CmpProductListVo> priceList = new PageableResult<CmpProductListVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize());
+            PageableResult<CmpProductListVo> priceList = new PageableResult<>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize());
             cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
             cmpResult.setPriceList(priceList.getData());
             int rating = ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(tempTotalComments == 0 ? 1 : tempTotalComments), 0, BigDecimal.ROUND_HALF_UP).longValue());
@@ -737,7 +745,7 @@ public class Compare2Controller {
 
     private CmpResult getCmpPrices(SearchIO sio, PtmStdSku ptmStdSku, String userToken) {
         //初始化一个空的用于存放比价商品列表的List
-        List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
+        List<CmpProductListVo> comparedSkuVos = new ArrayList<>();
         CmpResult cmpResult = new CmpResult();
         PageableResult<PtmStdPrice> pagedCmpskus = ptmStdPriceService.getPagedPtmStdPriceList(ptmStdSku.getId(), SkuStatus.ONSALE, sio.getPage(), sio.getSize());
         if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
@@ -775,7 +783,7 @@ public class Compare2Controller {
                 logger.debug("Found skus size is 0 .");
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), sio.getKeyword(), 0.0f);
             }
-            List<CmpProductListVo> tempCmpProductListVos = new ArrayList<CmpProductListVo>();
+            List<CmpProductListVo> tempCmpProductListVos = new ArrayList<>();
             int sum = 0;
             for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
                 if (!cmpProductListVo.getWebsite().equals(Website.EBAY)) {
@@ -799,7 +807,6 @@ public class Compare2Controller {
 
                 }
                 tempCmpProductListVos.add(cmpProductListVo);
-//                }
             }
             //移除之前加进列表的所有的sku列表
             comparedSkuVos = null;
@@ -809,7 +816,7 @@ public class Compare2Controller {
             String imageUrl = productCacheManager.getPtmStdSkuImageUrl(ptmStdSku.getId());
             cmpResult.setImage(imageUrl);
             cmpResult.setName(ptmStdSku.getTitle());
-            PageableResult<CmpProductListVo> priceList = new PageableResult<CmpProductListVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize());
+            PageableResult<CmpProductListVo> priceList = new PageableResult<>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize());
             cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
             cmpResult.setPriceList(priceList.getData());
             int rating = ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(tempTotalComments == 0 ? 1 : tempTotalComments), 0, BigDecimal.ROUND_HALF_UP).longValue());

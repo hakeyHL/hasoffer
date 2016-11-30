@@ -15,10 +15,6 @@ import hasoffer.webcommon.akka.SearchLogActor;
 public class SearchHelper {
 
     public static void addToLog(SearchIO sio) {
-//        if (sio.getCliSite() != null) {
-//            SearchLogQueue.addLog(new SearchLogBo(sio.getCliSourceId(), sio.getCliQ(), sio.getCliQBrand(), sio.getCliSite().name(), sio.getHsCateId(), sio.getHsProId(), sio.getHsSkuId(), sio.getCliPrice()));
-//        }
-
         if (sio.getCliSite() != null) {
             SearchLogBo searchLogBo = new SearchLogBo(sio.getCliSourceId(), sio.getCliQ(), sio.getCliQBrand(), sio.getCliSite().name(), sio.getHsCateId(), sio.getHsProId(), sio.getHsSkuId(), sio.getCliPrice());
             ActorRef defaultActorRef = AkkaActorRef.getDefaultActorRef();

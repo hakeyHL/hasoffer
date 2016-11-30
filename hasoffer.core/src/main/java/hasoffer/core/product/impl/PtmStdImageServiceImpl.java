@@ -15,7 +15,7 @@ import java.util.List;
  */
 @Service
 public class PtmStdImageServiceImpl implements IPtmStdImageService {
-    private static final String PTMSTDIMAGE_GET_IMAGEURL_BY_SKUID = "select t from PtmStdImage t where t.stdSkuId=?0";
+    private static final String PTMSTDIMAGE_GET_IMAGEURL_BY_SKUID = "select t from PtmStdImage t where t.stdSkuId=?0 order by id asc ";
     @Resource
     IDataBaseManager dbm;
 

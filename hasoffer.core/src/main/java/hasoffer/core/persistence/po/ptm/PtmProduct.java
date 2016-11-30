@@ -265,20 +265,14 @@ public class PtmProduct implements Identifiable<Long> {
         return "PtmProduct{" +
                 "brand='" + brand + '\'' +
                 ", id=" + id +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
                 ", categoryId=" + categoryId +
                 ", title='" + title + '\'' +
-                ", tag='" + tag + '\'' +
                 ", model='" + model + '\'' +
                 ", price=" + price +
-                ", color='" + color + '\'' +
-                ", size='" + size + '\'' +
                 ", description='" + description + '\'' +
                 ", rating=" + rating +
                 ", sourceSite='" + sourceSite + '\'' +
                 ", sourceUrl='" + sourceUrl + '\'' +
-                ", sourceId='" + sourceId + '\'' +
                 ", std=" + std +
                 '}';
     }

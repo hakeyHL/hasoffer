@@ -43,6 +43,11 @@ public class PtmStdPriceServiceImpl implements IPtmStdPriceService {
     }
 
     @Override
+    public PtmStdPrice getPtmStdPriceById(long id) {
+        return dbm.get(PtmStdPrice.class, id);
+    }
+
+    @Override
     public PageableResult<PtmStdPrice> getPagedPtmStdPriceList(Long id, SkuStatus skuStatus, int page, int pageSize) {
         return dbm.queryPage(API_PTMSTDPRICE_GET_PRICELIST_BY_SKUID, page, pageSize, Arrays.asList(id, skuStatus));
     }

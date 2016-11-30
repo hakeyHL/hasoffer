@@ -114,7 +114,7 @@ public class AppSkuController {
         if (ptmCmpSku != null) {
             logger.info(" has this sku " + id);
             PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, ptmCmpSku.getId());
-            logger.info("get sku totalWeigth from  mongo " + ptmCmpSkuDescription);
+            logger.info("get sku totalWeight from  mongo " + ptmCmpSkuDescription);
             Map map = new HashMap<>();
             if (ptmCmpSkuDescription != null) {
                 map.put("description", ptmCmpSkuDescription.getJsonDescription() == null ? "" : ClientHelper.delHTMLTag(ptmCmpSkuDescription.getJsonDescription()));//描述
@@ -153,31 +153,23 @@ public class AppSkuController {
         jsonObject.put("msg", "ok");
         //1. 先拿到所有的价格数据
         List<PriceNode> priceNodes = cmpSkuService.queryHistoryPrice(id);
-//        System.out.println(priceNodes != null ? "  priceNodes  :" + priceNodes.size() : "null a .....");
-
-
         if (priceNodes == null) {
 //            System.out.println(" no records in history ");
             //如果不存在历史价格数据将当前sku价格作为历史数据返回
             priceNodes = new ArrayList<>();
             PtmCmpSku ptmCmpSku = cmpSkuService.getCmpSkuById(id);
             if (ptmCmpSku != null) {
-//                System.out.println(" get ptmcmpsku by id " + id + " got  it ");
                 priceNodes.add(new PriceNode(ptmCmpSku.getUpdateTime(), ptmCmpSku.getPrice()));
             }
         }
 
         boolean flag = false;
         if (priceNodes != null && priceNodes.size() != 0) {
-           /* for (PriceNode priceNode : priceNodes) {
-                System.out.println(" T" + getDateMMdd(priceNode.getPriceTimeL()) + " P " + priceNode.getPrice());
-            }*/
             float referencePrice = priceNodes.get(0).getPrice();
             for (PriceNode priceNode : priceNodes) {
                 if (referencePrice != priceNode.getPrice()) {
                     flag = true;
                 }
-//                System.out.println("priceNodes  Time :" + getDateMMdd(priceNode.getPriceTimeL()) + " price :" + priceNode.getPrice());
             }
             Float maxPrice = Collections.max(priceNodes, new Comparator<PriceNode>() {
                 @Override
@@ -216,16 +208,12 @@ public class AppSkuController {
                 PriceCurveVo priceCurveVo = getPriceCurveVo(priceNodes, false);
                 priceCurveVo.setDistanceX2X(20);
                 jsonObject.put("data", JSONObject.toJSON(priceCurveVo));
-//                System.out.println("  JSON.toJSONString(jsonObject)  " + JSON.toJSONString(jsonObject));
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             } else {
-//                System.out.println("has one or slightly different points ");
-//                System.out.println(" priceNodes size is :" + priceNodes.size());
                 PriceCurveVo priceCurveVo = getPriceCurveVo(priceNodes, true);
                 priceCurveVo.setDistanceX2X(20);
                 jsonObject.put("data", JSONObject.toJSON(priceCurveVo));
-//                System.out.println("  JSON.toJSONString(jsonObject)  " + JSON.toJSONString(jsonObject));
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             }
