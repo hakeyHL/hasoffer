@@ -22,6 +22,7 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
+import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
@@ -60,6 +61,8 @@ public class AppUserController {
     ICacheService<Map> urmDeviceService;
     @Resource
     MongoDbManager mongoDbManager;
+    @Resource
+    ApiUtils apiUtils;
 
     public static void main(String[] args) {
         //String affs[] = null;
@@ -99,7 +102,7 @@ public class AppUserController {
     @RequestMapping("user/priceAlert")
     public String setPriceAlert(@RequestParam(defaultValue = "100") int type,
                                 @RequestParam(defaultValue = "0") long skuId,
-                                @RequestParam(defaultValue = "0") float skuPrice,
+                                @RequestParam(defaultValue = "0") String skuPrice,
                                 HttpServletResponse response,
                                 HttpServletRequest request) {
         JSONObject jsonObject = new JSONObject();
@@ -107,6 +110,8 @@ public class AppUserController {
         jsonObject.put("msg", "ok");
         //绑定用户设备关系
         System.out.println("get info : type " + type + " skuId :" + skuId + " skuPrice " + skuPrice);
+        skuPrice = apiUtils.getStringNum(skuPrice);
+        float truelySkuPrice = Float.valueOf(skuPrice);
         //get user by userToken
         String userToken = Context.currentContext().getHeader("usertoken");
         if (!StringUtils.isEmpty(userToken)) {
@@ -183,7 +188,7 @@ public class AppUserController {
                                 }
                             case 1:
                                 //set
-                                if (skuPrice <= 0) {
+                                if (truelySkuPrice <= 0) {
                                     System.out.println("not permit set this price :" + skuPrice);
                                     System.out.println("use sku currentPrice " + cmpSku.getPrice());
                                     //not exist before
@@ -193,7 +198,7 @@ public class AppUserController {
                                 } else {
                                     System.out.println("price is lg than zero ");
                                     //not exist before
-                                    boolean notice = iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", cmpSku.getId(), skuPrice, skuPrice);
+                                    boolean notice = iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", cmpSku.getId(), truelySkuPrice, truelySkuPrice);
                                     System.out.println("   is :" + notice);
                                 }
                                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
