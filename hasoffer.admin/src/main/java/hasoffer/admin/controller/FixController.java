@@ -110,6 +110,8 @@ public class FixController {
     ICategoryService categoryservice;
     @Resource
     ICacheService cacheServiceImpl;
+    @Resource
+    IPtmStdPriceService ptmStdPriceService;
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
 
     private Website[] websites = {
@@ -132,6 +134,34 @@ public class FixController {
             Website.NAAPTOL,
             Website.ZOOMIN
     };
+
+    //fixdata/addUrlKeyForStdPrice
+    @RequestMapping(value = "/addUrlKeyForStdPrice", method = RequestMethod.GET)
+    @ResponseBody
+    public String addUrlKeyForStdPrice() throws Exception {
+
+        int curPage = 1;
+        int pageSize = 1000;
+
+        PageableResult<PtmStdPrice> pageableResult = dbm.queryPage("SELECT t FROM PtmStdPrice t ORDER BY t.id", curPage, pageSize);
+
+        long totalPage = pageableResult.getTotalPage();
+        System.out.println("totalpage " + totalPage);
+
+        for (; curPage <= totalPage; curPage++) {
+            if (curPage > 1) {
+                pageableResult = dbm.queryPage("SELECT t FROM PtmStdPrice t ORDER BY t.id", curPage, pageSize);
+            }
+
+            System.out.println("curPage " + curPage);
+            List<PtmStdPrice> stdPriceList = pageableResult.getData();
+
+            for (PtmStdPrice ptmstdPrice : stdPriceList) {
+                ptmStdPriceService.initUrlKey(ptmstdPrice.getId());
+            }
+        }
+        return "ok";
+    }
 
     //fixdata/fetchPtmStdSkuImage
     @RequestMapping(value = "/fetchPtmStdSkuImage", method = RequestMethod.GET)

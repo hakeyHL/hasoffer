@@ -2,6 +2,7 @@ package hasoffer.core.persistence.po.ptm;
 
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 
@@ -30,6 +31,7 @@ public class PtmStdPrice implements Identifiable<Long> {
     @Enumerated(EnumType.STRING)
     private Website website;
     private String url;
+    private String urlKey;
 
     private Date updateTime = TimeUtils.nowDate();
     private Date createTime = TimeUtils.nowDate();//该条sku记录的创建时间
@@ -48,6 +50,7 @@ public class PtmStdPrice implements Identifiable<Long> {
         this.skuStatus = skuStatus;
         this.website = website;
         this.url = url;
+        this.urlKey = HexDigestUtil.md5(url);
     }
 
     @Override
@@ -140,6 +143,21 @@ public class PtmStdPrice implements Identifiable<Long> {
         this.shippingFee = shippingFee;
     }
 
+    public String getUrlKey() {
+        return urlKey;
+    }
+
+    /**
+     * 该方法只是第一次修复使用的，修复后不建议使用
+     * 设置urlKey的方法参见setUrl()方法
+     *
+     * @param urlKey
+     */
+    @Deprecated
+    public void setUrlKey(String urlKey) {
+        this.urlKey = urlKey;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -156,6 +174,7 @@ public class PtmStdPrice implements Identifiable<Long> {
         if (skuStatus != that.skuStatus) return false;
         if (website != that.website) return false;
         if (url != null ? !url.equals(that.url) : that.url != null) return false;
+        if (urlKey != null ? !urlKey.equals(that.urlKey) : that.urlKey != null) return false;
         if (updateTime != null ? !updateTime.equals(that.updateTime) : that.updateTime != null) return false;
         return !(createTime != null ? !createTime.equals(that.createTime) : that.createTime != null);
 
@@ -172,6 +191,7 @@ public class PtmStdPrice implements Identifiable<Long> {
         result = 31 * result + (skuStatus != null ? skuStatus.hashCode() : 0);
         result = 31 * result + (website != null ? website.hashCode() : 0);
         result = 31 * result + (url != null ? url.hashCode() : 0);
+        result = 31 * result + (urlKey != null ? urlKey.hashCode() : 0);
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         return result;

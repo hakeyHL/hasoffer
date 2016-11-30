@@ -18,6 +18,8 @@ public class PtmStdImage implements Identifiable<Long> {
     private long stdProId; // ptm_std_product # 一定不为 0
     private long stdSkuId; // ptm_std_sku # 如果不能判定是哪个sku的，则为0
 
+    private long stdPriceId;//ptm_std_price
+
     private String oriImageUrl;// 原图片url
 
     private String oriImagePath; // 下载后的图片路径
@@ -112,6 +114,14 @@ public class PtmStdImage implements Identifiable<Long> {
         this.errTimes = errTimes;
     }
 
+    public long getStdPriceId() {
+        return stdPriceId;
+    }
+
+    public void setStdPriceId(long stdPriceId) {
+        this.stdPriceId = stdPriceId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -121,13 +131,14 @@ public class PtmStdImage implements Identifiable<Long> {
 
         if (stdProId != that.stdProId) return false;
         if (stdSkuId != that.stdSkuId) return false;
+        if (stdPriceId != that.stdPriceId) return false;
         if (errTimes != that.errTimes) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (oriImageUrl != null ? !oriImageUrl.equals(that.oriImageUrl) : that.oriImageUrl != null) return false;
         if (oriImagePath != null ? !oriImagePath.equals(that.oriImagePath) : that.oriImagePath != null) return false;
         if (smallImagePath != null ? !smallImagePath.equals(that.smallImagePath) : that.smallImagePath != null)
             return false;
-        if (bigImagePath != null ? !bigImagePath.equals(that.bigImagePath) : that.bigImagePath != null) return false;
-        return !(oriImageUrl != null ? !oriImageUrl.equals(that.oriImageUrl) : that.oriImageUrl != null);
+        return !(bigImagePath != null ? !bigImagePath.equals(that.bigImagePath) : that.bigImagePath != null);
 
     }
 
@@ -136,10 +147,11 @@ public class PtmStdImage implements Identifiable<Long> {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (int) (stdProId ^ (stdProId >>> 32));
         result = 31 * result + (int) (stdSkuId ^ (stdSkuId >>> 32));
+        result = 31 * result + (int) (stdPriceId ^ (stdPriceId >>> 32));
+        result = 31 * result + (oriImageUrl != null ? oriImageUrl.hashCode() : 0);
         result = 31 * result + (oriImagePath != null ? oriImagePath.hashCode() : 0);
         result = 31 * result + (smallImagePath != null ? smallImagePath.hashCode() : 0);
         result = 31 * result + (bigImagePath != null ? bigImagePath.hashCode() : 0);
-        result = 31 * result + (oriImageUrl != null ? oriImageUrl.hashCode() : 0);
         result = 31 * result + errTimes;
         return result;
     }

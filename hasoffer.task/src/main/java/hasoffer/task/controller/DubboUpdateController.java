@@ -11,6 +11,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
+import hasoffer.core.product.IPtmStdPriceService;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.data.redis.IRedisSetService;
@@ -18,6 +19,7 @@ import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.spider.enums.TaskTarget;
 import hasoffer.task.worker.CmpSkuDubboUpdate2Worker;
 import hasoffer.task.worker.ListNeedUpdateFromRedisWorker;
+import hasoffer.task.worker.StdPriceDubboUpdateWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -41,6 +43,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class DubboUpdateController {
 
     private static Logger logger = LoggerFactory.getLogger(DubboUpdateController.class);
+    private static AtomicBoolean taskRunning1 = new AtomicBoolean(false);
     private static AtomicBoolean taskRunning4 = new AtomicBoolean(false);
 
 
@@ -65,6 +68,8 @@ public class DubboUpdateController {
     IRedisSetService redisSetService;
     @Resource
     ProductCacheManager productCacheManager;
+    @Resource
+    IPtmStdPriceService ptmStdPriceService;
 
     /**
      * Date：2016-11-1 10:34更新改成一直在更新，从redis中读取数据
@@ -92,6 +97,26 @@ public class DubboUpdateController {
 
 
         taskRunning4.set(true);
+        return "ok";
+    }
+
+    //dubbofetchtask/stdPriceStart
+    @RequestMapping(value = "/stdPriceStart", method = RequestMethod.GET)
+    @ResponseBody
+    public String stdPriceStart() {
+        if (taskRunning1.get()) {
+            return "task running.";
+        }
+
+        ExecutorService es = Executors.newCachedThreadPool();
+
+        for (int i = 0; i < 10; i++) {
+//            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService, cacheSeconds));
+            es.execute(new StdPriceDubboUpdateWorker(fetchDubboService, redisListService, ptmStdPriceService));
+        }
+
+
+        taskRunning1.set(true);
         return "ok";
     }
 
