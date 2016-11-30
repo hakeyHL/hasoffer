@@ -141,7 +141,7 @@ public class FixController {
         int curPage = 1;
         int pageSize = 1000;
 
-        PageableResult<PtmStdImage> pageableResult = dbm.queryPage("SELECT t FROM PtmStdImage t ORDER BY t.id", curPage, pageSize);
+        PageableResult<PtmStdImage> pageableResult = dbm.queryPage("SELECT t FROM PtmStdImage t WHERE t.smallImagePath is NULL ORDER BY t.id", curPage, pageSize);
 
         long totalPage = pageableResult.getTotalPage();
         System.out.println("totalpage " + totalPage);

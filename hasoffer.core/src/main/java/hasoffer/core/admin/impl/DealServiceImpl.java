@@ -234,6 +234,7 @@ public class DealServiceImpl implements IDealService {
         AppDealUpdater updater = new AppDealUpdater(id);
         //2016-11-2-15:09   过期时间改成当前时间
         updater.getPo().setExpireTime(TimeUtils.nowDate());
+        updater.getPo().setDisplay(false);
         dbm.update(updater);
     }
 
