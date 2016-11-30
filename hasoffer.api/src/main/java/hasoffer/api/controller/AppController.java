@@ -686,8 +686,8 @@ public class AppController {
                 //search by title
                 System.out.println("  sort " + criteria.getSort().name());
                 criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
-//                PageableResult p = productIndex2Service.searchProducts(criteria);
-                PageableResult p = ptmStdSkuIndexService.searchProducts(criteria);
+                PageableResult p = productIndex2Service.searchProducts(criteria);
+//                PageableResult p = ptmStdSkuIndexService.searchProducts(criteria);
                 if (p != null && p.getData().size() > 0) {
                     System.out.println("getPivotFieldVals  " + p.getPivotFieldVals().size());
                     getSkuListByKeyword(map, p);
