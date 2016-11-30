@@ -858,7 +858,7 @@ public class AppController {
                     PtmStdSkuModel ptmStdSkuModel = ptmList.next();
                     ProductListVo productListVo = new ProductListVo();
                     productListVo.setId(ptmStdSkuModel.getId());
-                    productListVo.setImageUrl(productCacheManager.getPtmStdSkuImageUrl(ptmStdSkuModel.getId()));
+                    productListVo.setImageUrl(productCacheManager.getPtmStdSkuImageUrl(ApiUtils.rmoveBillion(ptmStdSkuModel.getId())));
                     productListVo.setName(ptmStdSkuModel.getTitle());
                     productListVo.setPrice(Math.round(ptmStdSkuModel.getMinPrice()));
                     productListVo.setRatingNum(ptmStdSkuModel.getRating());
