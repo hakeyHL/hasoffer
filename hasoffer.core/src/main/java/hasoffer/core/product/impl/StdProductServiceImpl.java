@@ -138,43 +138,62 @@ public class StdProductServiceImpl implements IStdProductService {
     @Transactional
     public boolean createStdSku(StdSkuBo skuBo) {
 
-        PtmStdSku stdSku = new PtmStdSku(skuBo.getTitle(), skuBo.getBrand(), skuBo.getModel(),
-                skuBo.getCategoryId(), skuBo.getRefPrice(), skuBo.getSourceId(), skuBo.getSourceUrl());
-        dbm.create(stdSku);
+        //查找或者创建一个PtmStdSku
+        boolean flag = false;//用来标记PtmStdSku是否是新创建的
+        PtmStdSku stdSku = dbm.querySingle("SELECT t FROM PtmStdSku t WHERE t.sourceId = ?0", Arrays.asList(skuBo.getSourceId()));
+        if (stdSku == null) {
+            stdSku = new PtmStdSku(skuBo.getTitle(), skuBo.getBrand(), skuBo.getModel(),
+                    skuBo.getCategoryId(), skuBo.getRefPrice(), skuBo.getSourceId(), skuBo.getSourceUrl());
+            dbm.create(stdSku);
+            flag = true;
+        }
 
+        //补全PtmStdPrice列表
+        List<PtmStdPrice> skuPriceList = dbm.query("SELECT t FROM PtmStdPrice t WHERE t.stdSkuId = ?0 ", Arrays.asList(stdSku.getId()));
+        List<String> existsUrl = new ArrayList<>();
+        if (skuPriceList != null && skuPriceList.size() != 0) {
+            for (PtmStdPrice stdPrice : skuPriceList) {
+                existsUrl.add(stdPrice.getUrl());
+            }
+        }
         // 各网站价格
         List<StdSkuPrice> skuPrices = skuBo.getSkuPrices();
         for (StdSkuPrice skuPrice : skuPrices) {
+            if (existsUrl.contains(skuPrice.getUrl())) {
+                continue;
+            }
             PtmStdPrice stdPrice = new PtmStdPrice(stdSku.getId(), skuPrice.getTitle(), skuPrice.getPrice(), skuPrice.getStockCount(),
                     skuPrice.getShippingFee(), skuPrice.getSkuStatus(), skuPrice.getWebsite(), skuPrice.getUrl());
             dbm.create(stdPrice);
         }
 
-        // sku属性
-        Map<String, StdSkuAttr> attrs = skuBo.getSkuAttrs();
-        if (attrs != null) {
-            for (Map.Entry<String, StdSkuAttr> attr : attrs.entrySet()) {
-                PtmStdAttrDef attrDef = getAttrByName(attr.getKey());
+        if (flag) {
+            // sku属性
+            Map<String, StdSkuAttr> attrs = skuBo.getSkuAttrs();
+            if (attrs != null) {
+                for (Map.Entry<String, StdSkuAttr> attr : attrs.entrySet()) {
+                    PtmStdAttrDef attrDef = getAttrByName(attr.getKey());
 
-                StdSkuAttr skuAttr = attr.getValue();
+                    StdSkuAttr skuAttr = attr.getValue();
 
-                PtmStdSkuAttr ptmStdSkuAttr = new PtmStdSkuAttr(stdSku.getId(), attrDef.getId(), attrDef.getStdDefName(), skuAttr.getStdValue());
-                dbm.create(ptmStdSkuAttr);
+                    PtmStdSkuAttr ptmStdSkuAttr = new PtmStdSkuAttr(stdSku.getId(), attrDef.getId(), attrDef.getStdDefName(), skuAttr.getStdValue());
+                    dbm.create(ptmStdSkuAttr);
+                }
             }
-        }
 
-        // 图片
-        List<StdSkuImage> stdImages = skuBo.getSkuImages();
-        if (stdImages != null) {
-            for (StdSkuImage skuImage : stdImages) {
-                PtmStdImage stdImage = new PtmStdImage(stdSku.getId(), skuImage.getOriImageUrl());
-                dbm.create(stdImage);
+            // 图片
+            List<StdSkuImage> stdImages = skuBo.getSkuImages();
+            if (stdImages != null) {
+                for (StdSkuImage skuImage : stdImages) {
+                    PtmStdImage stdImage = new PtmStdImage(stdSku.getId(), skuImage.getOriImageUrl());
+                    dbm.create(stdImage);
+                }
             }
-        }
 
-        // detail-info
-        PtmStdSkuDetail stdSkuDetail = new PtmStdSkuDetail(stdSku.getId(), skuBo.getParamGroups(), skuBo.getDesc());
-        mdm.save(stdSkuDetail);
+            // detail-info
+            PtmStdSkuDetail stdSkuDetail = new PtmStdSkuDetail(stdSku.getId(), skuBo.getParamGroups(), skuBo.getDesc());
+            mdm.save(stdSkuDetail);
+        }
 
         return true;
     }
