@@ -156,7 +156,7 @@ public class AppUserController {
                 long priceOffSkuId;
                 float priceOffSkuPrice;
                 if (skuId != 0) {
-                    if ((skuId + "").length() >= 9) {
+                    if ((skuId + "").length() >= 10) {
                         System.out.println("billion ");
                         PtmStdPrice ptmStdPrice = ptmStdPriceService.getPtmStdPriceById(ApiUtils.rmoveBillion(skuId));
                         if (ptmStdPrice != null) {

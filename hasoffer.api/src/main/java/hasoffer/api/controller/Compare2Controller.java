@@ -239,7 +239,7 @@ public class Compare2Controller {
         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         PtmStdSku ptmStdSku = null;
-        if ((id).length() >= 9) {
+        if ((id).length() >= 10) {
             id = ApiUtils.rmoveBillion(Long.valueOf(id)) + "";
             ptmStdSku = ptmStdSKuService.getStdSkuById(Long.valueOf(id));
         }
