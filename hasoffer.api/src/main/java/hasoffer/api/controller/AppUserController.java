@@ -123,7 +123,7 @@ public class AppUserController {
         skuPrice = apiUtils.getStringNum(skuPrice);
         float truelySkuPrice = Float.valueOf(skuPrice);
         //get user by userToken
-        String userToken = Context.currentContext().getHeader("userToken");
+        String userToken = Context.currentContext().getHeader("usertoken");
         if (!StringUtils.isEmpty(userToken)) {
             System.out.println(" has userToken :" + userToken);
             UrmUser urmUser = appService.getUserByUserToken(userToken);
@@ -157,7 +157,6 @@ public class AppUserController {
                 float priceOffSkuPrice;
                 if (skuId != 0) {
                     if ((skuId + "").length() >= 10) {
-                        System.out.println("billion ");
                         PtmStdPrice ptmStdPrice = ptmStdPriceService.getPtmStdPriceById(ApiUtils.rmoveBillion(skuId));
                         if (ptmStdPrice != null) {
                             priceOffSkuId = ApiUtils.addBillion(ptmStdPrice.getId());
@@ -168,7 +167,6 @@ public class AppUserController {
                             priceOffSkuPrice = cmpSku.getPrice();
                         }
                     } else {
-                        System.out.println("not billion ");
                         PtmCmpSku cmpSku = cmpSkuService.getCmpSkuById(skuId);
                         priceOffSkuId = cmpSku.getId();
                         priceOffSkuPrice = cmpSku.getPrice();
@@ -195,12 +193,10 @@ public class AppUserController {
                                 if (truelySkuPrice <= 0) {
                                     //not exist before
                                     boolean notice = iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", priceOffSkuId, priceOffSkuPrice, priceOffSkuPrice);
-                                    System.out.println("insert ");
 
                                 } else {
                                     //not exist before
                                     boolean notice = iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", priceOffSkuId, truelySkuPrice, truelySkuPrice);
-                                    System.out.println("insert 2");
                                 }
                                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                                 return null;
