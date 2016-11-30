@@ -123,7 +123,7 @@ public class AppUserController {
         skuPrice = apiUtils.getStringNum(skuPrice);
         float truelySkuPrice = Float.valueOf(skuPrice);
         //get user by userToken
-        String userToken = Context.currentContext().getHeader("usertoken");
+        String userToken = Context.currentContext().getHeader("userToken");
         if (!StringUtils.isEmpty(userToken)) {
             System.out.println(" has userToken :" + userToken);
             UrmUser urmUser = appService.getUserByUserToken(userToken);
@@ -133,7 +133,6 @@ public class AppUserController {
                 String deviceKey = "urmDevice_ids_mapKey_" + deviceId;
                 Map map;
                 String deviceValue = urmDeviceService.get(deviceKey, 0);
-
                 if (!StringUtils.isEmpty(deviceValue)) {
                     ids = new ArrayList<>();
                     JSONObject jsonObjects = JSONObject.parseObject(deviceValue);
@@ -167,6 +166,10 @@ public class AppUserController {
                             priceOffSkuId = cmpSku.getId();
                             priceOffSkuPrice = cmpSku.getPrice();
                         }
+                    } else {
+                        PtmCmpSku cmpSku = cmpSkuService.getCmpSkuById(skuId);
+                        priceOffSkuId = cmpSku.getId();
+                        priceOffSkuPrice = cmpSku.getPrice();
                     }
                     if (priceOffSkuId != 0) {
                         PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + "", priceOffSkuId);
