@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+">
+
+    <!-- 声明工厂 -->
+    <bean id="qrtz_scheduler" autowire="no" lazy-init="false"
+          class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="jobFactory">
+            <bean class="hasoffer.spring.quartz.factory.SpringBeanJobFactory"/>
+        </property>
+        <property name="schedulerName" value="qrtz_scheduler"/>
+        <!-- 发现添加dataSource之后无法正常执行调度任务，原因不知道。 -->
+        <!--applicationContextSchedulerContextKey： 是org.springframework.scheduling.quartz.SchedulerFactoryBean这个类中
+            把spring上下 文以key/value的方式存放在了quartz的上下文中了， 可以用applicationContextSchedulerContextKey所定义的key得到对应的spring上下文 -->
+        <property name="applicationContextSchedulerContextKey" value="applicationContextKey"/>
+        <property name="triggers">
+            <list>
+                <ref bean="associateEipJobTrigger"/>
+                <ref bean="releaseIPJobTrigger"/>
+            </list>
+        </property>
+
+        <property name="globalJobListeners">
+            <list>
+                <ref bean="historyJobListener"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="historyJobListener" class="hasoffer.spring.quartz.listener.HistoryJobListener"/>
+
+
+    <bean name="associateEipJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.AssociateEipJobBean"/>
+    </bean>
+
+    <bean id="associateEipJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="associateEipJob"/>
+        <property name="cronExpression" value="0 1 1/2 * * ?"/>
+    </bean>
+
+
+    <bean name="releaseIPJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.ReleaseIPJobBean"/>
+    </bean>
+
+    <bean id="releaseIPJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="releaseIPJob"/>
+        <property name="cronExpression" value="0 58 0/2 * * ?"/>
+    </bean>
+</beans>
