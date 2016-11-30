@@ -226,7 +226,7 @@ public class AppUserController {
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
-        String userToken = Context.currentContext().getHeader("userToken");
+        String userToken = Context.currentContext().getHeader("usertoken");
         if (!StringUtils.isEmpty(userToken)) {
             System.out.println("usertoken is :" + userToken);
             UrmUser urmUser = appService.getUserByUserToken(userToken);
