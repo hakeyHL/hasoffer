@@ -54,6 +54,19 @@ public class HttpTest {
     }
 
     @Test
+    public void test() throws HttpFetchException, ContentParseException {
+        String url = "http://www.t-cat.com.tw/Inquire/Trace.aspx?no=6391439590";
+
+        TagNode root = HtmlUtils.getUrlRootTagNode(url);
+
+        TagNode statusNode = getSubNodeByXPath(root, "//div[@id='ctl00_ContentPlaceHolder1_tblResult']/table[1]/tbody/tr[2]/td[2]", null);
+
+        String statusString = statusNode.getText().toString();
+
+        System.out.println(statusString);
+    }
+
+    @Test
     public void test_desc_() throws Exception {
         String url = "http://www.desidime.com/forums/hot-deals-online/topics/get-up-to-600-cashback-has-giftcard-amazon-pantry";
         HttpResponseModel responseModel = HttpUtils.get(url, null);

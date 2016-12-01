@@ -1,9 +1,9 @@
 package hasoffer.dubbo.api.fetch.task;
 
+import com.alibaba.fastjson.JSON;
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
-import hasoffer.base.utils.JSONUtil;
 import hasoffer.spider.api.ISpiderService;
 import hasoffer.spider.api.impl.SpiderServiceImpl;
 import hasoffer.spider.constants.RedisKeysUtils;
@@ -56,7 +56,7 @@ public class FetchUrlWorker implements Runnable {
                     TimeUnit.MINUTES.sleep(1);
                 } else {
                     SpiderLogger.infoFetchFlow("start spider this url: {}", pop);
-                    FetchUrlResult fetchUrlResult = JSONUtil.toObject(pop.toString(), FetchUrlResult.class);
+                    FetchUrlResult fetchUrlResult = JSON.parseObject(pop.toString(), FetchUrlResult.class);
                     fetch(fetchUrlResult);
                     if (fetchUrlResult.overFetch()) {
                         logger.info("FetchUrlWorker crawl finish: {} ", fetchUrlResult);
