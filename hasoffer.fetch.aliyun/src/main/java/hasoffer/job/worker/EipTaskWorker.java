@@ -14,9 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-public class EipTaskWorker implements Runnable {
+public class EipTaskWorker implements Callable<Boolean> {
 
     private final AliVPC vpc;
     private final AliVPCService aliVPCService;
@@ -32,8 +33,9 @@ public class EipTaskWorker implements Runnable {
     }
 
     @Override
-    public void run() {
+    public Boolean call() throws Exception {
         updateAliServerIp();
+        return true;
     }
 
     private void updateAliServerIp() {
@@ -125,4 +127,6 @@ public class EipTaskWorker implements Runnable {
         mapService.putMap("ALI-VPC-STATUS", vpc.getPrivateIpAddress(), "Y");
         logger.info("Update IP Finish. VPC {}, Local IP:{}, New Public IP:{}.", vpc.getEcsInstance(), vpc.getPrivateIpAddress(), vpc.getEipIpAddress());
     }
+
+
 }
