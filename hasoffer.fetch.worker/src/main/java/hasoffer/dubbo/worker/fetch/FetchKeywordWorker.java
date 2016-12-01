@@ -44,35 +44,34 @@ public class FetchKeywordWorker implements Runnable {
     @Override
     public void run() {
         while (true) {
-            String isWait = mapService.getValue("ALI-VPC-STATUS", localIp);
-            logger.info("Local IP:{}, ALI-VPC-STATUS: {}. Thread will sleep 1 min.", localIp, isWait);
-            if (isWait != null && "N".equals(isWait)) {
-                try {
+            try {
+                String waitStr = mapService.getValue("ALI-VPC-STATUS", localIp);
+                boolean isWait = waitStr != null && "N".equals(waitStr);
+                logger.info("Local IP:{}, isWait(ALI-VPC-STATUS): {} ", localIp, isWait);
+                if (isWait) {
                     TimeUnit.MINUTES.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    continue;
                 }
-                continue;
+                Object pop = fetchCacheService.popTaskList(RedisKeysUtils.WAIT_KEY_LIST);
+                if (pop == null) {
+                    try {
+                        TimeUnit.MINUTES.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    logger.info("FetchKeywordWorker at {} , pop word: {}", new Date(), pop);
+                    FetchResult fetchResult = null;
+                    try {
+                        fetchResult = JSONUtil.toObject(pop.toString(), FetchResult.class);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    fetch(fetchResult);
+                }
+            } catch (Exception e) {
+                logger.error("error:{}", e);
             }
-            Object pop = fetchCacheService.popTaskList(RedisKeysUtils.WAIT_KEY_LIST);
-            if (pop == null) {
-                try {
-                    TimeUnit.MINUTES.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                logger.info("FetchKeywordWorker at {} , pop word: {}", new Date(), pop);
-                FetchResult fetchResult = null;
-                try {
-                    fetchResult = JSONUtil.toObject(pop.toString(), FetchResult.class);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                fetch(fetchResult);
-            }
-
-
         }
     }
 
@@ -89,7 +88,7 @@ public class FetchKeywordWorker implements Runnable {
         logger.info("Fetch Success:website:{}, Key :{}, success:{}", fetchResult.getWebsite(), fetchResult.getKeyword(), fetchResult.getFetchProducts().size());
         String cacheKey = FetchResult.getCacheKey(fetchResult);
         fetchCacheService.setTaskStatusByKeyword(cacheKey, fetchResult.getTaskStatus());
-        fetchCacheService.cacheResult(cacheKey, fetchResult,FetchResult.expirySeconds(cacheKey));
+        fetchCacheService.cacheResult(cacheKey, fetchResult, FetchResult.expirySeconds(cacheKey));
     }
 
 }

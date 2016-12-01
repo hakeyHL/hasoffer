@@ -90,10 +90,11 @@ public class CmpProductListVo {
         }
     }
 
-    public CmpProductListVo(String logoImage, String smallImageUrl, PtmStdPrice ptmStdPrice) {
+    public CmpProductListVo(String logoImage, String smallImageUrl, PtmStdPrice ptmStdPrice, float cliPrice) {
         this.id = ptmStdPrice.getId();
         this.coins = ptmStdPrice.getWebsite() == Website.FLIPKART ? Math.round(0.075 * ptmStdPrice.getPrice()) : 0;
         this.ratingNum = 0;
+        this.saved = cliPrice == 0 ? 0 : Math.round(cliPrice - ptmStdPrice.getPrice());
         this.imageUrl = smallImageUrl;
         this.totalRatingsNum = 0l;
         this.image = logoImage;
@@ -103,7 +104,6 @@ public class CmpProductListVo {
         this.website = ptmStdPrice.getWebsite();
         this.freight = -1;
         this.distributionTime = "";
-        this.backRate = ptmStdPrice.getWebsite() == Website.FLIPKART ? 7.5f : 0;
         this.returnGuarantee = 0;
     }
 

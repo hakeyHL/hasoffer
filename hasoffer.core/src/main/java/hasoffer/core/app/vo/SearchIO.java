@@ -15,8 +15,8 @@ public class SearchIO {
     final String cliQ;//客户端传上来的字符串
     final Website cliSite;
     final String cliQBrand;
-    final float cliPrice;
     final String cliSourceId;
+    float cliPrice;
     // hs 开头的都是搜到的结果 hs - hasoffer
     long hsCateId;
     long hsProId;
@@ -133,6 +133,10 @@ public class SearchIO {
 
     public float getCliPrice() {
         return cliPrice;
+    }
+
+    public void setCliPrice(float cliPrice) {
+        this.cliPrice = cliPrice;
     }
 
     public int getPage() {
