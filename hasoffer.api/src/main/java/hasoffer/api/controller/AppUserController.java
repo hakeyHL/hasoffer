@@ -133,7 +133,6 @@ public class AppUserController {
                 String deviceKey = "urmDevice_ids_mapKey_" + deviceId;
                 Map map;
                 String deviceValue = urmDeviceService.get(deviceKey, 0);
-
                 if (!StringUtils.isEmpty(deviceValue)) {
                     ids = new ArrayList<>();
                     JSONObject jsonObjects = JSONObject.parseObject(deviceValue);
@@ -154,10 +153,10 @@ public class AppUserController {
                 //将关联关系插入到关联表中
                 appService.addUrmUserDevice(urmUserDevices);
                 //insert record into priceOffAlert
-                long priceOffSkuId = 0;
-                float priceOffSkuPrice = 0;
+                long priceOffSkuId;
+                float priceOffSkuPrice;
                 if (skuId != 0) {
-                    if ((skuId + "").length() >= 9) {
+                    if ((skuId + "").length() >= 10) {
                         PtmStdPrice ptmStdPrice = ptmStdPriceService.getPtmStdPriceById(ApiUtils.rmoveBillion(skuId));
                         if (ptmStdPrice != null) {
                             priceOffSkuId = ApiUtils.addBillion(ptmStdPrice.getId());
@@ -167,6 +166,10 @@ public class AppUserController {
                             priceOffSkuId = cmpSku.getId();
                             priceOffSkuPrice = cmpSku.getPrice();
                         }
+                    } else {
+                        PtmCmpSku cmpSku = cmpSkuService.getCmpSkuById(skuId);
+                        priceOffSkuId = cmpSku.getId();
+                        priceOffSkuPrice = cmpSku.getPrice();
                     }
                     if (priceOffSkuId != 0) {
                         PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + "", priceOffSkuId);
@@ -190,6 +193,7 @@ public class AppUserController {
                                 if (truelySkuPrice <= 0) {
                                     //not exist before
                                     boolean notice = iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", priceOffSkuId, priceOffSkuPrice, priceOffSkuPrice);
+
                                 } else {
                                     //not exist before
                                     boolean notice = iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", priceOffSkuId, truelySkuPrice, truelySkuPrice);
@@ -222,9 +226,9 @@ public class AppUserController {
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
-        String userToken = Context.currentContext().getHeader("userToken");
+        String userToken = Context.currentContext().getHeader("usertoken");
         if (!StringUtils.isEmpty(userToken)) {
-            System.out.println("userToken is :" + userToken);
+            System.out.println("usertoken is :" + userToken);
             UrmUser urmUser = appService.getUserByUserToken(userToken);
             if (urmUser != null) {
                 PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + "", skuId);

@@ -5,5 +5,5 @@ package hasoffer.core.utils;
  * Time 17:18
  */
 public class ConstantUtil {
-    public static final long API_ONE_BILLION_NUMBER = 100000000;
+    public static final long API_ONE_BILLION_NUMBER = 1000000000;
 }

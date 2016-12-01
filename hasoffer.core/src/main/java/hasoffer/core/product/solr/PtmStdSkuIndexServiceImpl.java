@@ -95,14 +95,15 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
             }
         }
         PageableResult<PtmStdSkuModel> pagedPms = new PageableResult<PtmStdSkuModel>(sr.getResult(), sr.getTotalCount(), sc.getPage(), sc.getPageSize(), pivotFieldVals);
+        addBillion2ListEle(pagedPms);
         //遍历列表修改id
-        if (pagedPms != null && pagedPms.getData() != null && pagedPms.getData().size() > 0) {
+       /* if (pagedPms != null && pagedPms.getData() != null && pagedPms.getData().size() > 0) {
             Iterator<PtmStdSkuModel> iterator = pagedPms.getData().iterator();
             while (iterator.hasNext()) {
                 PtmStdSkuModel ptmStdSkuModel = iterator.next();
                 ptmStdSkuModel.setId(ApiUtils.addBillion(ptmStdSkuModel.getId()));
             }
-        }
+        }*/
         return pagedPms;
     }
 

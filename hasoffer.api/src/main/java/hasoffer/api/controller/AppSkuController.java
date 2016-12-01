@@ -13,10 +13,13 @@ import hasoffer.core.persistence.mongo.PriceNode;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
+import hasoffer.core.persistence.po.ptm.PtmStdPrice;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
+import hasoffer.core.product.IPtmStdPriceService;
 import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.utils.ImageUtil;
+import hasoffer.core.utils.api.ApiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -44,6 +47,8 @@ public class AppSkuController {
     IPtmCmpSkuImageService ptmCmpSkuImageService;
     @Resource
     ProductServiceImpl productService;
+    @Resource
+    IPtmStdPriceService ptmStdPriceService;
     Logger logger = LoggerFactory.getLogger(AppSkuController.class);
 
     public static List getImageArray(List<PtmCmpSkuImage> list) {
@@ -152,15 +157,31 @@ public class AppSkuController {
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
         //1. 先拿到所有的价格数据
+        if (id <= 0) {
+            jsonObject.put("errorCode", "10000");
+            jsonObject.put("msg", "id ls zero ");
+            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            return null;
+        }
+        PtmStdPrice ptmStdPrice = null;
         List<PriceNode> priceNodes = cmpSkuService.queryHistoryPrice(id);
         if (priceNodes == null) {
-//            System.out.println(" no records in history ");
-            //如果不存在历史价格数据将当前sku价格作为历史数据返回
-            priceNodes = new ArrayList<>();
-            PtmCmpSku ptmCmpSku = cmpSkuService.getCmpSkuById(id);
-            if (ptmCmpSku != null) {
-                priceNodes.add(new PriceNode(ptmCmpSku.getUpdateTime(), ptmCmpSku.getPrice()));
+            if ((id + "").length() >= 10) {
+                ptmStdPrice = ptmStdPriceService.getPtmStdPriceById(ApiUtils.rmoveBillion(id));
             }
+            if (ptmStdPrice != null) {
+                //如果不存在历史价格数据将当前sku价格作为历史数据返回
+                priceNodes = new ArrayList<>();
+                priceNodes.add(new PriceNode(ptmStdPrice.getUpdateTime(), ptmStdPrice.getPrice()));
+            } else {
+                //如果不存在历史价格数据将当前sku价格作为历史数据返回
+                priceNodes = new ArrayList<>();
+                PtmCmpSku ptmCmpSku = cmpSkuService.getCmpSkuById(id);
+                if (ptmCmpSku != null) {
+                    priceNodes.add(new PriceNode(ptmCmpSku.getUpdateTime(), ptmCmpSku.getPrice()));
+                }
+            }
+
         }
 
         boolean flag = false;
