@@ -13,7 +13,7 @@
     <bean name="dataSource_crm" class="com.alibaba.druid.pool.DruidDataSource"
           init-method="init" destroy-method="close">
         <property name="url"
-                  value="jdbc:mysql://60.205.57.57:3306/hasoffer?allowMultiQueries=true&amp;zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=UTF-8"/>
+                  value="jdbc:mysql://mysql-server:3306/hasoffer?allowMultiQueries=true&amp;zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=UTF-8"/>
         <property name="username" value="hasoffer"/>
         <property name="password" value="123456"/>
 
