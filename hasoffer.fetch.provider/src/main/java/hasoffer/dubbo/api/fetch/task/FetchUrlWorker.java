@@ -48,6 +48,9 @@ public class FetchUrlWorker implements Runnable {
                     if (pop == null) {
                         pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.PRICE_CHANGES, website));
                     }
+                    if (pop == null) {
+                        pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.STDPRICE_UPDATE, website));
+                    }
                 }
                 if (pop == null) {
                     TimeUnit.MINUTES.sleep(1);
