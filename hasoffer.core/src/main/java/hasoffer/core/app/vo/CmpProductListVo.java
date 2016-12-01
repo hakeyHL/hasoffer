@@ -103,7 +103,7 @@ public class CmpProductListVo {
         this.website = ptmStdPrice.getWebsite();
         this.freight = -1;
         this.distributionTime = "";
-        this.backRate = ptmStdPrice.getWebsite() == Website.FLIPKART ? 7.5f : 0;
+//        this.backRate = ptmStdPrice.getWebsite() == Website.FLIPKART ? 7f : 0;
         this.returnGuarantee = 0;
     }
 
