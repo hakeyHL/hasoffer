@@ -17,8 +17,7 @@
         <property name="applicationContextSchedulerContextKey" value="applicationContextKey"/>
         <property name="triggers">
             <list>
-                <ref bean="associateEipJobTrigger"/>
-                <ref bean="releaseIPJobTrigger"/>
+                <ref bean="EipJobTrigger"/>
             </list>
         </property>
 
@@ -32,22 +31,12 @@
     <bean id="historyJobListener" class="hasoffer.spring.quartz.listener.HistoryJobListener"/>
 
 
-    <bean name="associateEipJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="hasoffer.job.bean.AssociateEipJobBean"/>
+    <bean name="EipJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.EipJobBean"/>
     </bean>
 
-    <bean id="associateEipJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-        <property name="jobDetail" ref="associateEipJob"/>
-        <property name="cronExpression" value="0 1 1/2 * * ?"/>
-    </bean>
-
-
-    <bean name="releaseIPJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="hasoffer.job.bean.ReleaseIPJobBean"/>
-    </bean>
-
-    <bean id="releaseIPJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-        <property name="jobDetail" ref="releaseIPJob"/>
-        <property name="cronExpression" value="0 58 0/2 * * ?"/>
+    <bean id="EipJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="EipJob"/>
+        <property name="cronExpression" value="0 58 0/1 * * ?"/>
     </bean>
 </beans>
