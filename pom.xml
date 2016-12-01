@@ -32,6 +32,7 @@
         <module>hasoffer.third.proxyip</module>
         <module>hasoffer.temp.job</module>
         <module>hasoffer.fetch.aliyun</module>
+        <module>hasoffer.fetch.worker</module>
     </modules>
 
     <properties>

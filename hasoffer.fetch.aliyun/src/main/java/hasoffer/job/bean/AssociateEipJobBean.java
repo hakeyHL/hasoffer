@@ -35,8 +35,9 @@ public class AssociateEipJobBean extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 
         List<AliVPC> aliVPCList = aliVPCService.queryAllVPCList();
-
+        // 申请公网IP
         for (AliVPC vpc : aliVPCList) {
+            //公网IP默认20M，费用默认按流量计费
             EipAddressModel eipAddressModel = AllocateEipAddressAction.allocateEipAddressAction("20", ActionConstant.RequestInternetChargeType.PayByTraffic);
             vpc.setEipId(eipAddressModel.getAllocationId());
             vpc.setEipIpAddress(eipAddressModel.getEipAddress());
@@ -45,17 +46,18 @@ public class AssociateEipJobBean extends QuartzJobBean {
             aliVPCLogService.insertLog(new Date(), vpc.getEipId(), vpc.getEipIpAddress(), eipAddressModel.getRequestId());
         }
 
+        // 休息5S，防止频繁请求，API无法处理
         try {
-            TimeUnit.SECONDS.sleep(2);
+            TimeUnit.SECONDS.sleep(5);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
+        //绑定公网IP
         for (AliVPC vpc : aliVPCList) {
-            mapService.putMap("alivpc-status", vpc.getPrivateIpAddress(), "Y");
-            //AllocateEipAddressAction.associateEipAddressAction(vpc.getEcsInstance(), vpc.getEipId());
+            mapService.putMap("ALI-VPC-STATUS", vpc.getPrivateIpAddress(), "Y");
+            AllocateEipAddressAction.associateEipAddressAction(vpc.getEcsInstance(), vpc.getEipId());
             logger.info("associateEipAddressAction(EcsInstance:{},EipId)", vpc.getEcsInstance(), vpc.getEipId());
-
         }
 
     }

@@ -34,6 +34,8 @@ import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
+import hasoffer.core.product.solr.PtmStdPriceIndexServiceImpl;
+import hasoffer.core.product.solr.PtmStdPriceModel;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.exception.NonMatchedProductException;
 import hasoffer.core.system.impl.AppServiceImpl;
@@ -95,6 +97,8 @@ public class Compare2Controller {
     PtmStdSKuServiceImpl ptmStdSKuService;
     @Resource
     IPtmStdPriceService ptmStdPriceService;
+    @Resource
+    PtmStdPriceIndexServiceImpl ptmStdPriceIndexService;
     private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
 
     public static void main(String[] args) throws Exception {
@@ -210,7 +214,10 @@ public class Compare2Controller {
             price = apiUtils.getStringNum(price);
         }
         SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, pageSize);
-        getSioBySearch(sio);
+        getPtmStdPriceBySioFromSolr(sio);
+        if (sio.getStdSkuId() <= 0) {
+            getSioBySearch(sio);
+        }
         String jsonResult = appCmpService.sdkCmpSku(sio);
         Httphelper.sendJsonMessage(jsonResult, response);
         return null;
@@ -697,6 +704,13 @@ public class Compare2Controller {
 //                System.out.println("searchForResult_old  ");
                 System.out.println(" searchForResult_old result  " + sio.getHsProId());
             }
+        }
+    }
+
+    public void getPtmStdPriceBySioFromSolr(SearchIO sio) {
+        PageableResult<PtmStdPriceModel> pricesList = ptmStdPriceIndexService.searchPrices(sio, 1, 5);
+        if (pricesList != null && pricesList.getData() != null && pricesList.getData().size() > 0) {
+            sio.set(pricesList.getData().get(0));
         }
     }
 
