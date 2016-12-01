@@ -55,12 +55,10 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
     public void importPtmStdSku2Solr(PtmStdSku ptmStdSku) {
         //导入sku(product)到solr
         if (ptmStdSku == null) {
-            System.out.println("a huli ");
             return;
         }
         PtmStdSku ptmStdSku1 = dbm.get(PtmStdSku.class, ptmStdSku.getId());
         if (ptmStdSku1 == null) {
-            System.out.println("huli");
             //delete it from solr ,if it exist .
             ptmStdSkuIndexServicel.remove(ptmStdSku.getId() + "");
             return;

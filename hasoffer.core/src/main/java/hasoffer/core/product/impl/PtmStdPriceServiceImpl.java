@@ -15,6 +15,8 @@ import hasoffer.core.persistence.po.ptm.PtmStdImage;
 import hasoffer.core.persistence.po.ptm.PtmStdPrice;
 import hasoffer.core.persistence.po.ptm.updater.PtmStdPriceUpdater;
 import hasoffer.core.product.IPtmStdPriceService;
+import hasoffer.core.product.solr.PtmStdPriceIndexServiceImpl;
+import hasoffer.core.product.solr.PtmStdPriceModel;
 import hasoffer.spider.model.FetchedProduct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +33,13 @@ import java.util.*;
 @Service
 public class PtmStdPriceServiceImpl implements IPtmStdPriceService {
     private static final String API_PTMSTDPRICE_GET_PRICELIST_BY_SKUID = "SELECT t  from PtmStdPrice t where t.stdSkuId=?0 and t.skuStatus=?1";
+    private static final String API_PTMSTDPRICE_GET_PRICELIST_BY_MINID = "SELECT t  from PtmStdPrice t where t.id >=?0 ";
     @Resource
     IDataBaseManager dbm;
     @Resource
     IMongoDbManager mdm;
+    @Resource
+    PtmStdPriceIndexServiceImpl ptmStdPriceIndexService;
     private Logger logger = LoggerFactory.getLogger(PtmStdPriceServiceImpl.class);
 
     @Override
@@ -50,6 +55,11 @@ public class PtmStdPriceServiceImpl implements IPtmStdPriceService {
     @Override
     public PageableResult<PtmStdPrice> getPagedPtmStdPriceList(Long id, SkuStatus skuStatus, int page, int pageSize) {
         return dbm.queryPage(API_PTMSTDPRICE_GET_PRICELIST_BY_SKUID, page, pageSize, Arrays.asList(id, skuStatus));
+    }
+
+    @Override
+    public PageableResult<PtmStdPrice> getPagedPtmStdPriceByMinId(Long minId, int page, int pageSize) {
+        return dbm.queryPage(API_PTMSTDPRICE_GET_PRICELIST_BY_MINID, page, pageSize, Arrays.asList(minId));
     }
 
     @Override
@@ -234,6 +244,26 @@ public class PtmStdPriceServiceImpl implements IPtmStdPriceService {
 
     }
 
+    @Override
+    public void importPtmStdPrice2Solr(PtmStdPrice ptmStdPrice) {
+        //导入sku(product)到solr
+        if (ptmStdPrice == null) {
+            return;
+        }
+        PtmStdPrice ptmStdPrice1 = dbm.get(PtmStdPrice.class, ptmStdPrice.getId());
+        if (ptmStdPrice1 == null) {
+            //delete it from solr ,if it exist .
+            ptmStdPriceIndexService.remove(ptmStdPrice.getId() + "");
+            return;
+        }
+        PtmStdPriceModel ptmStdPriceModel = getPtmStdPriceModel(ptmStdPrice1);
+        if (ptmStdPriceModel == null) {
+            ptmStdPriceIndexService.remove(ptmStdPrice.getId() + "");
+        } else {
+            ptmStdPriceIndexService.createOrUpdate(ptmStdPriceModel);
+        }
+    }
+
     public void saveHistoryPrice(long id, Date time, float price) {
         saveHistoryPrice(id, Arrays.asList(new PriceNode(time, price)));
     }
@@ -278,5 +308,13 @@ public class PtmStdPriceServiceImpl implements IPtmStdPriceService {
         }
 
         mdm.save(historyPrice);
+    }
+
+    protected PtmStdPriceModel getPtmStdPriceModel(PtmStdPrice ptmStdPrice) {
+        //获取sku列表然后转成model
+        if (SkuStatus.ONSALE.equals(ptmStdPrice.getSkuStatus())) {
+            return new PtmStdPriceModel(ptmStdPrice);
+        }
+        return null;
     }
 }
