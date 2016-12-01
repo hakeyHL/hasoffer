@@ -25,6 +25,7 @@ import hasoffer.core.persistence.po.search.SrmProductSearchCountByHour;
 import hasoffer.core.persistence.po.search.SrmProductSearchStat;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.persistence.po.search.updater.SrmSearchLogUpdater;
+import hasoffer.core.persistence.po.stat.StatCmpCategory;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
@@ -84,6 +85,12 @@ public class SearchServiceImpl implements ISearchService {
     @Resource
     SearchLogCacheManager searchLogCacheManager;
     private Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
+
+    @Override
+    @Transactional
+    public void saveStatCmpCategory(StatCmpCategory scc) {
+        dbm.create(scc);
+    }
 
     @Transactional
     public void delSearchCount(String ymd) {
