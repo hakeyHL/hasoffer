@@ -1,11 +1,11 @@
-package hasoffer.dubbo.api.listener;
+package hasoffer.dubbo.worker.listener;
 
 import hasoffer.base.model.Website;
 import hasoffer.base.thread.HasofferThreadFactory;
-import hasoffer.dubbo.api.fetch.task.FetchCompareWebsiteTaskWorker;
-import hasoffer.dubbo.api.fetch.task.FetchDealWorker;
-import hasoffer.dubbo.api.fetch.task.FetchKeywordWorker;
-import hasoffer.dubbo.api.fetch.task.FetchUrlWorker;
+import hasoffer.dubbo.worker.fetch.FetchCompareWebsiteTaskWorker;
+import hasoffer.dubbo.worker.fetch.FetchDealWorker;
+import hasoffer.dubbo.worker.fetch.FetchKeywordWorker;
+import hasoffer.dubbo.worker.fetch.FetchUrlWorker;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;

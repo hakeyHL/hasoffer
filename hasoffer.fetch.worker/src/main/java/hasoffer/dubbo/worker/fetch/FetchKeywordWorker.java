@@ -1,4 +1,4 @@
-package hasoffer.dubbo.api.fetch.task;
+package hasoffer.dubbo.worker.fetch;
 
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.spider.api.ISpiderService;

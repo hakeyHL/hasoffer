@@ -1,4 +1,4 @@
-package hasoffer.dubbo.api.fetch.task;
+package hasoffer.dubbo.worker.fetch;
 
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
@@ -53,6 +53,7 @@ public class FetchUrlWorker implements Runnable {
                     }
                 }
                 if (pop == null) {
+                    logger.info("task list is null. thread will sleep 1 min.");
                     TimeUnit.MINUTES.sleep(1);
                 } else {
                     SpiderLogger.infoFetchFlow("start spider this url: {}", pop);

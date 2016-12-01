@@ -1,4 +1,4 @@
-package hasoffer.dubbo.api.fetch.task;
+package hasoffer.dubbo.worker.fetch;
 
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
