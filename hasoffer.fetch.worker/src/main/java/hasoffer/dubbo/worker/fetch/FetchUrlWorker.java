@@ -81,6 +81,7 @@ public class FetchUrlWorker implements Runnable {
                 } else {
                     SpiderLogger.infoFetchFlow("start spider this url: {}", pop);
                     FetchUrlResult fetchUrlResult = JSONUtil.toObject(pop.toString(), FetchUrlResult.class);
+                    fetchCacheService.execNum(fetchUrlResult.getWebsite().name());
                     fetch(fetchUrlResult);
                     if (fetchUrlResult.overFetch()) {
                         logger.info("FetchUrlWorker crawl finish: {} ", fetchUrlResult);
