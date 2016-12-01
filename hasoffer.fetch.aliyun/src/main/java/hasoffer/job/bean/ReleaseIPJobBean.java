@@ -41,7 +41,7 @@ public class ReleaseIPJobBean extends QuartzJobBean {
 
         // 休息20S，防止频繁请求，API无法处理
         try {
-            TimeUnit.SECONDS.sleep(60);
+            TimeUnit.SECONDS.sleep(2);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

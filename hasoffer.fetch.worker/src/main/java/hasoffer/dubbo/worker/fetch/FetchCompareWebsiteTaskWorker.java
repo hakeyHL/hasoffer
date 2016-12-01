@@ -52,9 +52,10 @@ public class FetchCompareWebsiteTaskWorker implements Runnable {
     public void run() {
         while (true) {
             try {
-                String isWait = mapService.getValue("ALI-VPC-STATUS", localIp);
-                logger.info("Local IP:{}, ALI-VPC-STATUS: {}. Thread will sleep 1 min.", localIp, isWait);
-                if (isWait != null && "N".equals(isWait)) {
+                String waitStr = mapService.getValue("ALI-VPC-STATUS", localIp);
+                boolean isWait = waitStr != null && "N".equals(waitStr);
+                logger.info("Local IP:{}, isWait(ALI-VPC-STATUS): {} ", localIp, isWait);
+                if (isWait) {
                     TimeUnit.MINUTES.sleep(1);
                     continue;
                 }
