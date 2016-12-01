@@ -10,6 +10,7 @@ import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.persistence.po.search.SrmProductSearchStat;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
+import hasoffer.core.persistence.po.stat.StatCmpCategory;
 import hasoffer.fetch.model.ListProduct;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -105,6 +106,8 @@ public interface ISearchService {
     void delSearchCountByHour(String ymd_hour);
 
     void saveSearchCountByHour(String ymd_hour, long productId, long searchCount, int size);
+
+    void saveStatCmpCategory(StatCmpCategory scc);
 
     void delSearchCount(String ymd);
 
