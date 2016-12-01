@@ -35,10 +35,19 @@ public class ReleaseIPJobBean extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         //1. 向所有的服务器发送IP失效,暂停抓取服务；
         List<AliVPC> aliVPCList = aliVPCService.queryAllVPCList();
+        for (AliVPC vpc : aliVPCList) {
+            mapService.putMap("ALI-VPC-STATUS", vpc.getPrivateIpAddress(), "N");
+        }
+
+        // 休息20S，防止频繁请求，API无法处理
+        try {
+            TimeUnit.SECONDS.sleep(60);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         //2. 解绑IP
         for (AliVPC vpc : aliVPCList) {
-            mapService.putMap("ALI-VPC-STATUS", vpc.getPrivateIpAddress(), "N");
             UnassociateEipAddressResponse acsResponse = AllocateEipAddressAction.unAssociateEipAddressAction(vpc.getEcsInstance(), vpc.getEipId());
             logger.info("unAssociateEipAddressAction(EcsID:{}, EipID:{}, reqId:{})", vpc.getEcsInstance(), vpc.getEipId(), acsResponse.getRequestId());
         }
