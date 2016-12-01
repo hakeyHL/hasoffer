@@ -1,5 +1,7 @@
 package hasoffer.job.bean;
 
+import com.aliyuncs.ecs.model.v20140526.ReleaseEipAddressResponse;
+import com.aliyuncs.ecs.model.v20140526.UnassociateEipAddressResponse;
 import hasoffer.aliyun.api.action.AllocateEipAddressAction;
 import hasoffer.data.redis.IRedisMapService;
 import hasoffer.job.dmo.AliVPC;
@@ -34,23 +36,25 @@ public class ReleaseIPJobBean extends QuartzJobBean {
         //1. 向所有的服务器发送IP失效,暂停抓取服务；
         List<AliVPC> aliVPCList = aliVPCService.queryAllVPCList();
 
-        //2. 解绑IP，释放IP
+        //2. 解绑IP
         for (AliVPC vpc : aliVPCList) {
-            mapService.putMap("alivpc-status", vpc.getPrivateIpAddress(), "N");
-            //AllocateEipAddressAction.unAssociateEipAddressAction(vpc.getEcsInstance(), vpc.getEipId());
-            logger.info("unAssociateEipAddressAction(EcsID:{}, EipID:{})", vpc.getEcsInstance(), vpc.getEipId());
+            mapService.putMap("ALI-VPC-STATUS", vpc.getPrivateIpAddress(), "N");
+            UnassociateEipAddressResponse acsResponse = AllocateEipAddressAction.unAssociateEipAddressAction(vpc.getEcsInstance(), vpc.getEipId());
+            logger.info("unAssociateEipAddressAction(EcsID:{}, EipID:{}, reqId:{})", vpc.getEcsInstance(), vpc.getEipId(), acsResponse.getRequestId());
         }
 
+        // 休息5S，防止频繁请求，API无法处理
         try {
-            TimeUnit.SECONDS.sleep(2);
+            TimeUnit.SECONDS.sleep(5);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
+        //3. 释放IP
         for (AliVPC vpc : aliVPCList) {
-            String reqId = AllocateEipAddressAction.releaseEipAddressAction(vpc.getEipId());
-            logger.info("releaseEipAddressAction({})", vpc.getEipId());
-            aliVPCLogService.updateEndTimeLog(new Date(), vpc.getEipId(), reqId);
+            ReleaseEipAddressResponse response = AllocateEipAddressAction.releaseEipAddressAction(vpc.getEipId());
+            logger.info("releaseEipAddressAction(eipId:{}, reqId:{})", vpc.getEipId(), response.getRequestId());
+            aliVPCLogService.updateEndTimeLog(new Date(), vpc.getEipId(), response.getRequestId());
         }
 
     }
