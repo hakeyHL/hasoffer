@@ -168,32 +168,36 @@ public class FixController {
     @ResponseBody
     public String fetchPtmStdSkuImage() throws Exception {
 
+        int flagCount = 0;
+
         int curPage = 1;
         int pageSize = 1000;
 
-        PageableResult<PtmStdImage> pageableResult = dbm.queryPage("SELECT t FROM PtmStdImage t WHERE t.smallImagePath is NULL ORDER BY t.id", curPage, pageSize);
+        while (true) {
 
-        long totalPage = pageableResult.getTotalPage();
-        System.out.println("totalpage " + totalPage);
+            PageableResult<PtmStdImage> pageableResult = dbm.queryPage("SELECT t FROM PtmStdImage t WHERE t.smallImagePath is NULL ORDER BY t.id DESC", curPage, pageSize);
 
-        for (; curPage <= totalPage; curPage++) {
-            if (curPage > 1) {
-                pageableResult = dbm.queryPage("SELECT t FROM PtmStdImage t ORDER BY t.id", curPage, pageSize);
-            }
-
-            System.out.println("curPage " + curPage);
             List<PtmStdImage> imageList = pageableResult.getData();
+
+            if (imageList == null || imageList.size() == 0) {
+                TimeUnit.HOURS.sleep(3);
+                continue;
+            }
 
             for (PtmStdImage image : imageList) {
                 try {
                     stdProductService.downLoadImage(image.getId());
-                    logger.info("download image success for " + image.getId());
+                    flagCount++;
+
+                    if (flagCount % 100 == 0) {
+                        System.out.println("fix " + flagCount + " ptmstdimage");
+                    }
+                    System.out.println("download image success for " + image.getId());
                 } catch (Exception e) {
-                    logger.info("download image fail for " + image.getId());
+                    System.out.println("download image fail for " + image.getId());
                 }
             }
         }
-        return "ok";
     }
 
     //fixdata/stdImageOriImageUrl

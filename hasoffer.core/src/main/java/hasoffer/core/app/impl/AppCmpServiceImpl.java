@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.PropertyFilter;
 import hasoffer.base.model.AppDisplayMode;
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.core.app.AppCmpService;
@@ -17,11 +18,12 @@ import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.exception.ERROR_CODE;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
-import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
-import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.ptm.*;
+import hasoffer.core.product.IPtmStdPriceService;
+import hasoffer.core.product.IPtmStdSkuService;
 import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
+import hasoffer.core.product.solr.PtmStdSkuIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.exception.NonMatchedProductException;
 import hasoffer.core.system.impl.AppServiceImpl;
@@ -45,8 +47,6 @@ public class AppCmpServiceImpl implements AppCmpService {
     @Resource
     CmpskuIndexServiceImpl cmpskuIndexService;
     @Resource
-    ProductCacheManager productCacheManager;
-    @Resource
     CmpSkuCacheManager cmpSkuCacheManager;
     @Resource
     SearchLogCacheManager searchLogCacheManager;
@@ -60,6 +60,14 @@ public class AppCmpServiceImpl implements AppCmpService {
     AppServiceImpl appService;
     @Resource
     IPriceOffNoticeService iPriceOffNoticeService;
+    @Resource
+    PtmStdSkuIndexServiceImpl ptmStdSkuIndexService;
+    @Resource
+    IPtmStdSkuService skuService;
+    @Resource
+    IPtmStdPriceService stdPriceService;
+    @Resource
+    ProductCacheManager productCacheManager;
     private Logger logger = LoggerFactory.getLogger(AppCmpServiceImpl.class);
 
     @Override
@@ -68,91 +76,105 @@ public class AppCmpServiceImpl implements AppCmpService {
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
         PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"ratingNum", "bestPrice", "backRate", "support", "price", "returnGuarantee", "freight"});
-        PtmCmpSkuIndex2 cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
-        //根据title匹配到商品
         CmpResult cr = null;
-        PtmProduct ptmProduct;
-        try {
-            if (sio.getHsProId() > 0) {
-                ptmProduct = productService.getProduct(sio.getHsProId());
-                //若此时匹配到的商品实际库中不存在则删除此匹配记录,下次重新匹配
-                if (ptmProduct == null) {
-                    logger.info("product id" + sio.getHsProId() + " is not exist ");
-                    productService.deleteProduct(sio.getHsProId());
-                    String currentDeeplink = "";
-                    if (cmpSkuIndex != null && cmpSkuIndex.getId() > 0) {
-                        if (cmpSkuIndex.getWebsite().equals(sio.getCliSite())) {
-                            currentDeeplink = WebsiteHelper.getDeeplinkWithAff(cmpSkuIndex.getWebsite(), cmpSkuIndex.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
+        String currentDeeplink = "";
+        //优先从91mobile solr中搜索匹配
+        //deal还要走原来的推荐
+        if (sio.getStdSkuId() > 0) {
+            //如果有,则返回price列表
+            PtmStdSku stdSku = skuService.getStdSkuById(sio.getStdSkuId());
+            if (stdSku != null) {
+                cr = new CmpResult();
+                currentDeeplink = WebsiteHelper.getDeeplinkWithAff(Website.valueOf(sio.getStdPriceWebSite()), sio.getStdPriceUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
+                cr.setProductVo(new ProductVo(sio.getHsProId(), sio.getCliQ(), productCacheManager.getProductMasterImageUrl(sio.getHsProId()), 0.0f, currentDeeplink));
+                cr.setDisplayMode(AppDisplayMode.NONE);
+                cr.setStd(true);
+                cr.setProductId(ApiUtils.addBillion(stdSku.getId()));
+                cr.setCopywriting("Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you.");
+                PageableResult<PtmStdPrice> pagedPtmStdPriceList = stdPriceService.getPagedPtmStdPriceList(stdSku.getId(), SkuStatus.ONSALE, sio.getPage(), sio.getSize());
+                if (pagedPtmStdPriceList != null && pagedPtmStdPriceList.getData() != null && pagedPtmStdPriceList.getData().size() > 0) {
+                    List<CmpProductListVo> cmpProductListVoList = new ArrayList<>();
+                    for (PtmStdPrice ptmStdPrice : pagedPtmStdPriceList.getData()) {
+                        CmpProductListVo productListVo = new CmpProductListVo(WebsiteHelper.getLogoUrl(Website.valueOf(sio.getStdPriceWebSite())), productCacheManager.getProductMasterImageUrl(sio.getHsProId()), ptmStdPrice);
+                        cmpProductListVoList.add(productListVo);
+                    }
+                    cr.setPriceList(cmpProductListVoList);
+                } else {
+                    cr.setPriceList(new ArrayList<CmpProductListVo>());
+                }
+                jsonObject.put("data", JSONObject.toJSON(cr));
+                return jsonObject.toJSONString();
+            }
+        } else {
+            PtmCmpSkuIndex2 cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
+            //根据title匹配到商品
+            PtmProduct ptmProduct;
+            try {
+                if (sio.getHsProId() > 0) {
+                    ptmProduct = productService.getProduct(sio.getHsProId());
+                    //若此时匹配到的商品实际库中不存在则删除此匹配记录,下次重新匹配
+                    if (ptmProduct == null) {
+                        logger.info("product id" + sio.getHsProId() + " is not exist ");
+                        productService.deleteProduct(sio.getHsProId());
+                        if (cmpSkuIndex != null && cmpSkuIndex.getId() > 0) {
+                            if (cmpSkuIndex.getWebsite().equals(sio.getCliSite())) {
+                                currentDeeplink = WebsiteHelper.getDeeplinkWithAff(cmpSkuIndex.getWebsite(), cmpSkuIndex.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
+                            }
+                            cr = new CmpResult();
+                            cr.setProductVo(new ProductVo(sio.getHsProId(), sio.getCliQ(), productCacheManager.getProductMasterImageUrl(sio.getHsProId()), 0.0f, currentDeeplink));
+                            cr.setDisplayMode(AppDisplayMode.NONE);
+                            cr.setStd(true);
+                            cr.setPriceList(new ArrayList<CmpProductListVo>());
+                            jsonObject.put("data", JSONObject.toJSON(cr));
                         }
-                        cr = new CmpResult();
-                        cr.setProductVo(new ProductVo(sio.getHsProId(), sio.getCliQ(), productCacheManager.getProductMasterImageUrl(sio.getHsProId()), 0.0f, currentDeeplink));
+                        cr = fillCmpResult(cr);
+                        jsonObject.put("data", JSONObject.toJSON(cr));
+                        return jsonObject.toJSONString();
+                    } else {
+                        cr = getCmpProducts(cmpSkuIndex, sio);
+                        if (cr != null && cr.getPriceList().size() > 0) {
+                            cr.setPriceOff(cr.getPriceList().get(0).getSaved());
+                        }
+                        cr = fillCmpResult(cr);
+                        cr.setProductId(sio.getHsProId());
+                        //cr.setCopywriting(ptmProduct != null && ptmProduct.isStd() ? "Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you." : "Looked around Myntre,Jabong & 5 other apps,thought you might like these items as well..");
+                        cr.setCopywriting("Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you.");
+                        //暂时屏蔽标品非标品
+                        // cr.setDisplayMode(ptmProduct != null && ptmProduct.isStd() ? AppDisplayMode.NONE : AppDisplayMode.WATERFALL);
+                        // cr.setStd(ptmProduct.isStd());
                         cr.setDisplayMode(AppDisplayMode.NONE);
                         cr.setStd(true);
-                        cr.setPriceList(new ArrayList<CmpProductListVo>());
                         jsonObject.put("data", JSONObject.toJSON(cr));
+                        return JSON.toJSONString(jsonObject, propertyFilter);
                     }
-                    if (cr == null) {
-                        cr = new CmpResult();
-                        cr.setPriceList(new ArrayList<CmpProductListVo>());
-                    } else {
-                        if (cr.getPriceList() == null) {
-                            cr.setPriceList(new ArrayList<CmpProductListVo>());
-                        }
-                    }
-                    jsonObject.put("data", JSONObject.toJSON(cr));
-                    return jsonObject.toJSONString();
                 } else {
-                    cr = getCmpProducts(cmpSkuIndex, sio);
-                    if (cr != null && cr.getPriceList().size() > 0) {
-                        cr.setPriceOff(cr.getPriceList().get(0).getSaved());
-                    }
-                    if (cr == null) {
-                        cr = new CmpResult();
-                        cr.setPriceList(new ArrayList<CmpProductListVo>());
-                    } else {
-                        if (cr.getPriceList() == null) {
-                            cr.setPriceList(new ArrayList<CmpProductListVo>());
-                        }
-                    }
-                    cr.setProductId(sio.getHsProId());
-                    //cr.setCopywriting(ptmProduct != null && ptmProduct.isStd() ? "Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you." : "Looked around Myntre,Jabong & 5 other apps,thought you might like these items as well..");
-                    cr.setCopywriting("Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you.");
-                    //暂时屏蔽标品非标品
-                    // cr.setDisplayMode(ptmProduct != null && ptmProduct.isStd() ? AppDisplayMode.NONE : AppDisplayMode.WATERFALL);
-                    // cr.setStd(ptmProduct.isStd());
-                    cr.setDisplayMode(AppDisplayMode.NONE);
-                    cr.setStd(true);
+                    //小于等于0,直接返回
+                    logger.info("productid is " + sio.getHsProId() + " ls than zero");
+                    cr = fillCmpResult(cr);
                     jsonObject.put("data", JSONObject.toJSON(cr));
                     return JSON.toJSONString(jsonObject, propertyFilter);
                 }
-            } else {
-                //小于等于0,直接返回
-                logger.info("productid is " + sio.getHsProId() + " ls than zero");
-                if (cr == null) {
-                    cr = new CmpResult();
-                    cr.setPriceList(new ArrayList<CmpProductListVo>());
-                } else {
-                    if (cr.getPriceList() == null) {
-                        cr.setPriceList(new ArrayList<CmpProductListVo>());
-                    }
-                }
+            } catch (Exception e) {
+                logger.error(String.format("sdk_cmp_  [NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", sio.getCliQ(), sio.getCliSite(), sio.getCliPrice(), sio.getPage(), sio.getSize()));
+                cr = fillCmpResult(cr);
                 jsonObject.put("data", JSONObject.toJSON(cr));
                 return JSON.toJSONString(jsonObject, propertyFilter);
             }
-        } catch (Exception e) {
-            logger.error(String.format("sdk_cmp_  [NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", sio.getCliQ(), sio.getCliSite(), sio.getCliPrice(), sio.getPage(), sio.getSize()));
-            if (cr == null) {
-                cr = new CmpResult();
-                cr.setPriceList(new ArrayList<CmpProductListVo>());
-            } else {
-                if (cr.getPriceList() == null) {
-                    cr.setPriceList(new ArrayList<CmpProductListVo>());
-                }
-            }
-            jsonObject.put("data", JSONObject.toJSON(cr));
-            return JSON.toJSONString(jsonObject, propertyFilter);
         }
+        jsonObject.put("data", JSONObject.toJSON(cr));
+        return JSON.toJSONString(jsonObject, propertyFilter);
+    }
 
+    private CmpResult fillCmpResult(CmpResult cr) {
+        if (cr == null) {
+            cr = new CmpResult();
+            cr.setPriceList(new ArrayList<CmpProductListVo>());
+        } else {
+            if (cr.getPriceList() == null) {
+                cr.setPriceList(new ArrayList<CmpProductListVo>());
+            }
+        }
+        return cr;
     }
 
     private CmpResult getCmpProducts(PtmCmpSkuIndex2 ptmCmpSkuIndex2, SearchIO sio) {
@@ -219,7 +241,6 @@ public class AppCmpServiceImpl implements AppCmpService {
                     if (cmpSku.getWebsite() != null) {
                         websiteSet.add(cmpSku.getWebsite());
                     }
-                    System.out.println("id :  " + cmpSku.getId() + " imagePath " + cmpSku.getSmallImagePath());
                     CmpProductListVo cplv = new CmpProductListVo(cmpSku, cmpedPrice);
                     cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()}));
                     logger.info(" getCmpProducts(ptmCmpSkuIndex2, sio) record deepLink :" + cplv.getDeepLink());
@@ -302,5 +323,9 @@ public class AppCmpServiceImpl implements AppCmpService {
         cmpResult.setPriceList(comparedSkuVos);
         cmpResult.setCopywriting("Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you.");
         return cmpResult;
+    }
+
+    PtmStdSku searchStdPriceFromSolr(SearchIO searchIO) {
+        return null;
     }
 }

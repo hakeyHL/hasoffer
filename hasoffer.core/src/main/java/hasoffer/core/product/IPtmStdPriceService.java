@@ -19,6 +19,8 @@ public interface IPtmStdPriceService {
 
     PageableResult<PtmStdPrice> getPagedPtmStdPriceList(Long id, SkuStatus skuStatus, int page, int pageSize);
 
+    PageableResult<PtmStdPrice> getPagedPtmStdPriceByMinId(Long minId, int page, int pageSize);
+
     List<PtmStdPrice> getPtmstdPriceListByUrlKey(String urlKey);
 
     void updatePtmStdPriceBySpiderFetchedProduct(long stdPriceId, FetchedProduct fetchedProduct);
@@ -27,4 +29,6 @@ public interface IPtmStdPriceService {
 
     //初始化urlKey for ptmstdprice
     void initUrlKey(long stdPriceId);
+
+    void importPtmStdPrice2Solr(PtmStdPrice ptmStdPrice);
 }

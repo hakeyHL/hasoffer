@@ -4,6 +4,7 @@ import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.PriceUtil;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.core.product.solr.PtmStdPriceModel;
 
 /**
  * Date : 2016/5/27
@@ -21,14 +22,14 @@ public class SearchIO {
     long hsProId;
     long hsSkuId;
     boolean firstSearch;
-
+    String stdPriceUrl;
+    String stdPriceWebSite;
     String keyword; // 服务器用于匹配的字符串， 由处理q得来
-
     MarketChannel marketChannel;
     String deviceId;
-
     int page;
     int size;
+    private long stdSkuId;
 
     public SearchIO(String sourceId, String q, String brand, String site, String price,
                     MarketChannel marketChannel, String deviceId,
@@ -164,7 +165,37 @@ public class SearchIO {
         this.hsSkuId = skuId;
     }
 
+    public void set(PtmStdPriceModel ptmStdPriceModel) {
+        this.stdSkuId = ptmStdPriceModel.getStdSkuId();
+        this.stdPriceWebSite = ptmStdPriceModel.getSite();
+        this.stdPriceUrl = ptmStdPriceModel.getSkuUrl();
+    }
+
+    public String getStdPriceUrl() {
+        return stdPriceUrl;
+    }
+
+    public void setStdPriceUrl(String stdPriceUrl) {
+        this.stdPriceUrl = stdPriceUrl;
+    }
+
+    public String getStdPriceWebSite() {
+        return stdPriceWebSite;
+    }
+
+    public void setStdPriceWebSite(String stdPriceWebSite) {
+        this.stdPriceWebSite = stdPriceWebSite;
+    }
+
     public String getCliQBrand() {
         return cliQBrand;
+    }
+
+    public long getStdSkuId() {
+        return stdSkuId;
+    }
+
+    public void setStdSkuId(long stdSkuId) {
+        this.stdSkuId = stdSkuId;
     }
 }
