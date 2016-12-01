@@ -86,7 +86,7 @@ public class AppCmpServiceImpl implements AppCmpService {
             if (stdSku != null) {
                 cr = new CmpResult();
                 currentDeeplink = WebsiteHelper.getDeeplinkWithAff(Website.valueOf(sio.getStdPriceWebSite()), sio.getStdPriceUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
-                cr.setProductVo(new ProductVo(sio.getHsProId(), sio.getCliQ(), productCacheManager.getProductMasterImageUrl(sio.getHsProId()), 0.0f, currentDeeplink));
+                cr.setProductVo(new ProductVo(sio.getHsProId(), sio.getCliQ(), productCacheManager.getPtmStdSkuImageUrl(sio.getStdSkuId()), 0.0f, currentDeeplink));
                 cr.setDisplayMode(AppDisplayMode.NONE);
                 cr.setStd(true);
                 cr.setProductId(ApiUtils.addBillion(stdSku.getId()));
@@ -94,8 +94,27 @@ public class AppCmpServiceImpl implements AppCmpService {
                 PageableResult<PtmStdPrice> pagedPtmStdPriceList = stdPriceService.getPagedPtmStdPriceList(stdSku.getId(), SkuStatus.ONSALE, sio.getPage(), sio.getSize());
                 if (pagedPtmStdPriceList != null && pagedPtmStdPriceList.getData() != null && pagedPtmStdPriceList.getData().size() > 0) {
                     List<CmpProductListVo> cmpProductListVoList = new ArrayList<>();
+                    if (sio.getCliPrice() <= 0) {
+                        List<PtmStdPrice> data = pagedPtmStdPriceList.getData();
+                        float maxPrice = Collections.max(data, new Comparator<PtmStdPrice>() {
+                            @Override
+                            public int compare(PtmStdPrice o1, PtmStdPrice o2) {
+                                if (o1.getPrice() < o2.getPrice()) {
+                                    return -1;
+                                }
+                                if (o1.getPrice() > o2.getPrice()) {
+                                    return 1;
+                                }
+                                return 0;
+                            }
+                        }).getPrice();
+                        sio.setCliPrice(maxPrice);
+                    }
+                    //计算列表中最大价格
                     for (PtmStdPrice ptmStdPrice : pagedPtmStdPriceList.getData()) {
-                        CmpProductListVo productListVo = new CmpProductListVo(WebsiteHelper.getLogoUrl(Website.valueOf(sio.getStdPriceWebSite())), productCacheManager.getProductMasterImageUrl(sio.getHsProId()), ptmStdPrice);
+                        CmpProductListVo productListVo = new CmpProductListVo(WebsiteHelper.getLogoUrl(Website.valueOf(sio.getStdPriceWebSite())),
+                                productCacheManager.getPtmStdSkuImageUrl(ptmStdPrice.getStdSkuId()),
+                                ptmStdPrice, sio.getCliPrice());
                         cmpProductListVoList.add(productListVo);
                     }
                     cr.setPriceList(cmpProductListVoList);
