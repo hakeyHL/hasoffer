@@ -1,9 +1,11 @@
-package hasoffer.dubbo.api.fetch.task;
+package hasoffer.dubbo.worker.fetch;
 
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.IPUtils;
 import hasoffer.base.utils.JSONUtil;
+import hasoffer.data.redis.IRedisMapService;
 import hasoffer.spider.api.ISpiderService;
 import hasoffer.spider.api.impl.SpiderServiceImpl;
 import hasoffer.spider.constants.RedisKeysUtils;
@@ -16,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.net.SocketException;
 import java.util.concurrent.TimeUnit;
 
 public class FetchUrlWorker implements Runnable {
@@ -28,15 +31,31 @@ public class FetchUrlWorker implements Runnable {
 
     private ISpiderService fetchService = new SpiderServiceImpl();
 
+    private IRedisMapService<String, String> mapService;
+
+    private String localIp;
+
     public FetchUrlWorker(WebApplicationContext springContext, Website website) {
         this.website = website;
         this.fetchCacheService = (IFetchCacheService) springContext.getBean("fetchCacheService");
+        this.mapService = springContext.getBean(IRedisMapService.class);
+        try {
+            this.localIp = IPUtils.getFirstNoLoopbackIPAddresses();
+        } catch (SocketException e) {
+            logger.error("Get local IP error.", e);
+        }
     }
 
     @Override
     public void run() {
         while (true) {
             try {
+                String isWait = mapService.getValue("ALI-VPC-STATUS", localIp);
+                logger.info("Local IP:{}, ALI-VPC-STATUS: {}. Thread will sleep 1 min.", localIp, isWait);
+                if (isWait != null && "N".equals(isWait)) {
+                    TimeUnit.MINUTES.sleep(1);
+                    continue;
+                }
                 Object pop = null;
                 for (TaskLevel taskLevel : TaskLevel.values()) {
                     if (pop == null) {
@@ -48,8 +67,12 @@ public class FetchUrlWorker implements Runnable {
                     if (pop == null) {
                         pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.PRICE_CHANGES, website));
                     }
+                    if (pop == null) {
+                        pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.STDPRICE_UPDATE, website));
+                    }
                 }
                 if (pop == null) {
+                    logger.info("task list is null. thread will sleep 1 min.");
                     TimeUnit.MINUTES.sleep(1);
                 } else {
                     SpiderLogger.infoFetchFlow("start spider this url: {}", pop);
@@ -69,13 +92,13 @@ public class FetchUrlWorker implements Runnable {
     }
 
     public void fetch(FetchUrlResult fetchUrlResult) {
-        if (Website.AMAZON.equals(fetchUrlResult.getWebsite())) {
-            try {
-                TimeUnit.SECONDS.sleep(10);
-            } catch (InterruptedException e) {
-                logger.error("Time sleep error.", e);
-            }
-        }
+        //if (Website.AMAZON.equals(fetchUrlResult.getWebsite())) {
+        //    try {
+        //        TimeUnit.SECONDS.sleep(10);
+        //    } catch (InterruptedException e) {
+        //        logger.error("Time sleep error.", e);
+        //    }
+        //}
         try {
             fetchUrlResult = fetchService.spiderProductByUrl(fetchUrlResult);
         } catch (UnSupportWebsiteException e) {

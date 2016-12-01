@@ -32,11 +32,13 @@ public class StringTest {
     @Test
     public void testMD5Url() {
 
-        String url = "http://www.amazon.in/gp/offer-listing/B013JPA6C4/";
+        String url = "https://www.flipkart.com/honor-7-fantasy-silver-16-gb/p/itmebagjdxughuzh?pid=MOBEBAGJF5XGY4Y9";
 
         String md5Url = HexDigestUtil.md5(url);
 
         System.out.println(md5Url);
+//        bd0a428c5ba4057f67a9fe6d88c7caff
+//        bd0a428c5ba4057f67a9fe6d88c7caff
     }
 
     @Test

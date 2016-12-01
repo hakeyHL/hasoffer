@@ -46,16 +46,10 @@
         </listener-class>
     </listener>
 
-    <!--dubbo 服务根路径-->
-    <!--<servlet>-->
-    <!--<servlet-name>dubbo</servlet-name>-->
-    <!--<servlet-class>com.alibaba.dubbo.remoting.http.servlet.DispatcherServlet</servlet-class>-->
-    <!--<load-on-startup>1</load-on-startup>-->
-    <!--</servlet>-->
-    <!--<servlet-mapping>-->
-    <!--<servlet-name>dubbo</servlet-name>-->
-    <!--<url-pattern>/services/*</url-pattern>-->
-    <!--</servlet-mapping>-->
+    <listener>
+        <display-name>web_listener</display-name>
+        <listener-class>hasoffer.dubbo.worker.listener.FetchListener</listener-class>
+    </listener>
 
     <!-- session超时定义,单位为分钟 -->
     <session-config>
