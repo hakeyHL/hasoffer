@@ -3,6 +3,7 @@ package hasoffer.core.user.impl;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.bo.push.*;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
@@ -366,6 +367,89 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
             }
         }
 
+        return pushStatus;
+    }
+
+    @Override
+    public boolean priceOffNoticeSinglePush(float nowPrice, Website website, String url, String fetchedTitle, long priceOffNoticeId) {
+
+        PriceOffNotice priceOffNotice = dbm.get(PriceOffNotice.class, priceOffNoticeId);
+
+        //用来表示某个降价提醒推送管是否发送成功
+        boolean pushStatus = false;
+
+        //如果当前价格低于提醒价格
+        if (nowPrice < priceOffNotice.getNoticePrice()) {
+
+            //拿到用户id
+            String useridString = priceOffNotice.getUserid();
+            Long userid = Long.valueOf(useridString);
+
+            //获取用户信息
+            UrmUser urmUser = dbm.get(UrmUser.class, userid);
+            if (urmUser == null) {
+                System.out.println("urmuser is null");
+            } else {
+
+                //获取用户gcmtoken
+                String gcmToken = urmUser.getGcmToken();
+                System.out.println("gcmToken:" + gcmToken);
+
+                if (!StringUtils.isEmpty(gcmToken)) {
+
+                    //拿到用户的设备表
+                    List<UrmUserDevice> userDeviceList = dbm.query("SELECT t FROM UrmUserDevice t WHERE t.userId = ?0", Arrays.asList(useridString));
+                    if (userDeviceList == null) {
+                        System.out.println("userDeviceList is null");
+                    } else {
+                        System.out.println("userDeviceList size " + userDeviceList.size());
+                    }
+
+                    if (userDeviceList != null && userDeviceList.size() != 0) {
+
+                        String deviceId = userDeviceList.get(0).getDeviceId();
+
+                        //deeplink
+                        String deepLinkUrl = WebsiteHelper.getDeeplinkWithAff(website, url, new String[]{MarketChannel.GOOGLEPLAY.name(), deviceId, useridString});
+                        System.out.println("deepLinkUrl " + deepLinkUrl);
+
+                        String title = "PRICE DROP ALERT! " + fetchedTitle;
+                        String content = "Now available at Rs." + (int) nowPrice + ". Check details now.";
+
+                        AppPushMessage message = new AppPushMessage(
+                                new AppMsgDisplay(title + content, title, content),
+                                new AppMsgClick(AppMsgClickType.DEEPLINK, deepLinkUrl, WebsiteHelper.getPackage(website))
+                        );
+
+                        AppPushBo appPushBo = new AppPushBo("5x1", "15:10", message);
+
+                        String response = pushService.push(gcmToken, appPushBo);
+
+                        System.out.println("response " + response);
+                        JSONObject jsonResponse = JSONObject.parseObject(response.trim());
+
+                        Integer success = jsonResponse.getInteger("success");
+                        Integer failure = jsonResponse.getInteger("failure");
+                        if (success == 1) {
+                            //推送成功
+                            pushStatus = true;
+                        }
+
+                        if (failure == 1) {
+                            //推送失败
+                        }
+                    }
+
+                    if (pushStatus) {
+                        updatePriceOffNoticeStatus(priceOffNotice.getId(), true);
+                        System.out.println("update lastpushstatus push success for priceOffNoticeid" + priceOffNotice.getId());
+                    } else {
+                        updatePriceOffNoticeStatus(priceOffNotice.getId(), false);
+                        System.out.println("update lastpushstatus push fail for priceOffNoticeid" + priceOffNotice.getId());
+                    }
+                }
+            }
+        }
         return pushStatus;
     }
 }

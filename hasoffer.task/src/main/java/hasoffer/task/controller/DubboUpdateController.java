@@ -75,9 +75,9 @@ public class DubboUpdateController {
      * Date：2016-11-1 10:34更新改成一直在更新，从redis中读取数据
      */
     //dubbofetchtask/start
-    @RequestMapping(value = "/start/{number}", method = RequestMethod.GET)
+    @RequestMapping(value = "/start", method = RequestMethod.GET)
     @ResponseBody
-    public String start(@PathVariable long number) {
+    public String start() {
         if (taskRunning4.get()) {
             return "task running.";
         }
@@ -87,14 +87,10 @@ public class DubboUpdateController {
         ExecutorService es = Executors.newCachedThreadPool();
 
         es.execute(new ListNeedUpdateFromRedisWorker(fetchDubboService, redisListService, redisSetService, cmpSkuService, cacheSeconds, productCacheManager));
-//        es.execute(new ListNeedUpdateFromRedisWorker(fetchDubboService, redisListService, redisSetService, cmpSkuService, cacheSeconds, productCacheManager, number));//for test
 
-//        CmpSkuDubboUpdate2Worker.popNumber = number;
         for (int i = 0; i < 10; i++) {
-//            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService, cacheSeconds));
             es.execute(new CmpSkuDubboUpdate2Worker(fetchDubboService, cmpSkuService, redisListService));
         }
-
 
         taskRunning4.set(true);
         return "ok";
@@ -111,7 +107,6 @@ public class DubboUpdateController {
         ExecutorService es = Executors.newCachedThreadPool();
 
         for (int i = 0; i < 10; i++) {
-//            es.execute(new CmpSkuDubboUpdateWorker(dbm, queue, fetchDubboService, cmpSkuService, redisListService, cacheSeconds));
             es.execute(new StdPriceDubboUpdateWorker(fetchDubboService, redisListService, ptmStdPriceService));
         }
 
