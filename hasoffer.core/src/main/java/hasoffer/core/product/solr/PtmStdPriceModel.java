@@ -60,19 +60,19 @@ public class PtmStdPriceModel implements IIdentifiable<Long> {
         this.site = site;
     }
 
-    public String getUrl() {
+    public String getSkuUrl() {
         return skuUrl;
     }
 
-    public void setUrl(String skuUrl) {
+    public void setSkuUrl(String skuUrl) {
         this.skuUrl = skuUrl;
     }
 
-    public String getStatus() {
+    public String getSkuStatus() {
         return skuStatus;
     }
 
-    public void setStatus(String skuStatus) {
+    public void setSkuStatus(String skuStatus) {
         this.skuStatus = skuStatus;
     }
 }

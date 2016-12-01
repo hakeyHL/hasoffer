@@ -168,7 +168,7 @@ public class SearchIO {
     public void set(PtmStdPriceModel ptmStdPriceModel) {
         this.stdSkuId = ptmStdPriceModel.getStdSkuId();
         this.stdPriceWebSite = ptmStdPriceModel.getSite();
-        this.stdPriceUrl = ptmStdPriceModel.getUrl();
+        this.stdPriceUrl = ptmStdPriceModel.getSkuUrl();
     }
 
     public String getStdPriceUrl() {
