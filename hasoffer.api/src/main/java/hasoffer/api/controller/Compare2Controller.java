@@ -106,6 +106,8 @@ public class Compare2Controller {
             String dealUrlWithAff = WebsiteHelper.getDeeplinkWithAff(Website.SNAPDEAL, "https://www.snapdeal.com/product/jbl-sb350-soundbar-with-wirless/1602277955", new String[]{MarketChannel.SHANCHUAN.name(), "dfecc858243a616a"});
             System.out.println(dealUrlWithAff);
         }*/
+        float v = StringUtils.wordMatchD(StringUtils.toLowerCase("Professional Kingston MicroSDHC 32GB (32 Gigabyte) Card for Samsung Galaxy S4 Smartphone with custom"), "SAMSUNG GALAXY On7 (Black, 8 GB)");
+        System.out.println(v);
     }
 
     private static void addVo(List<ComparedSkuVo> comparedSkuVos, ComparedSkuVo comparedSkuVo) {
@@ -710,7 +712,10 @@ public class Compare2Controller {
     public void getPtmStdPriceBySioFromSolr(SearchIO sio) {
         PageableResult<PtmStdPriceModel> pricesList = ptmStdPriceIndexService.searchPrices(sio, 1, 5);
         if (pricesList != null && pricesList.getData() != null && pricesList.getData().size() > 0) {
-            sio.set(pricesList.getData().get(0));
+            float mc = StringUtils.wordMatchD(StringUtils.toLowerCase(pricesList.getData().get(0).getTitle()), sio.getCliQ());
+            if (mc >= 0.5) {
+                sio.set(pricesList.getData().get(0));
+            }
         }
     }
 
