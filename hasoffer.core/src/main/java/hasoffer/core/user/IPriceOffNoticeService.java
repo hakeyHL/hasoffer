@@ -1,5 +1,6 @@
 package hasoffer.core.user;
 
+import hasoffer.base.model.Website;
 import hasoffer.core.persistence.po.urm.PriceOffNotice;
 
 /**
@@ -46,4 +47,6 @@ public interface IPriceOffNoticeService {
 
     //针对push失败的用户重新发送
     boolean pushFailRePush(long id, boolean cacheFail);
+
+    boolean priceOffNoticeSinglePush(float nowPrice, Website website, String url, String fetchedTitle, long priceOffNoticeId);
 }

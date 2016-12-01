@@ -77,10 +77,20 @@ public interface IFetchDubboService {
     /**
      * @param website
      * @param url
-     * @param taskTarget    任务目标
-     * @param taskLevel     任务级别
+     * @param taskTarget 任务目标
+     * @param taskLevel  任务级别
      */
     void sendUrlTask(Website website, String url, TaskTarget taskTarget, TaskLevel taskLevel);
+
+    /**
+     *
+     * @param website
+     * @param url
+     * @param taskTarget
+     * @param taskLevel
+     * @param id      该参数用来记录一些客户端用来区分结果的id信息
+     */
+    void sendUrlTask(Website website, String url, TaskTarget taskTarget, TaskLevel taskLevel, long id);
 
     /**
      * 获取URL更新的结果
@@ -105,9 +115,9 @@ public interface IFetchDubboService {
     /**
      * 发送一个比较网站的详情页的url抓取请求
      *
-     * @param website       比价网站的名称
-     * @param url           比价网站的某个商品的详情页
-     * @param taskLevel     任务优先级
+     * @param website   比价网站的名称
+     * @param url       比价网站的某个商品的详情页
+     * @param taskLevel 任务优先级
      */
     void sendCompareWebsiteFetchTask(Website website, String url, TaskLevel taskLevel, long categoryId);
 

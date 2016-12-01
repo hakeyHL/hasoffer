@@ -138,6 +138,22 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     }
 
     @Override
+    public void sendUrlTask(Website website, String url, TaskTarget taskTarget, TaskLevel taskLevel, long id) {
+        try {
+            String key = FetchUrlResult.getCacheKey(website, url);
+            if (key == null) {
+                logger.info("sendUrlTask(): key is null.website:{}, url:{}", website, url);
+                return;
+            }
+            FetchUrlResult fetchUrlResult = new FetchUrlResult(website, url, TaskStatus.START, new Date(), taskTarget);
+            fetchUrlResult.setSkuId(id);
+            fetchCacheService.pushTaskList(taskLevel, fetchUrlResult);
+        } catch (Exception e) {
+            SpiderLogger.debugSpiderUrl("FetchDubboServiceImpl.sendUrlTask(fetchUrlResult) save {} into Redis List {} fail", website + "_" + url, e);
+        }
+    }
+
+    @Override
     public String popFetchUrlResult(TaskTarget taskTarget) {
         String fetchUrlResult = fetchCacheService.popFinishUrlList(taskTarget);
         logger.info("popFetchUrlResult(), obj:{}", fetchUrlResult);
