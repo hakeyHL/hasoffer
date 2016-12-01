@@ -48,7 +48,7 @@ public class FetchListener extends ContextLoaderListener {
         HasofferThreadFactory factory = new HasofferThreadFactory("FetchUrlWorker");
         ExecutorService es = Executors.newCachedThreadPool(factory);
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 5; i++) {
             es.execute(new FetchUrlWorker(springContext, Website.AMAZON));
         }
 
@@ -56,7 +56,7 @@ public class FetchListener extends ContextLoaderListener {
             es.execute(new FetchUrlWorker(springContext, Website.FLIPKART));
         }
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 6; i++) {
             es.execute(new FetchUrlWorker(springContext, Website.SNAPDEAL));
         }
 
@@ -64,7 +64,7 @@ public class FetchListener extends ContextLoaderListener {
             es.execute(new FetchUrlWorker(springContext, Website.EBAY));
         }
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 5; i++) {
             es.execute(new FetchUrlWorker(springContext, Website.SHOPCLUES));
         }
 
