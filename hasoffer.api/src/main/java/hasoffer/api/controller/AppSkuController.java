@@ -2,20 +2,16 @@ package hasoffer.api.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
-import hasoffer.api.helper.JsonHelper;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.app.vo.PriceCurveVo;
 import hasoffer.core.app.vo.PriceCurveXYVo;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.mongo.PriceNode;
-import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
-import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.persistence.po.ptm.PtmCmpSkuImage;
-import hasoffer.core.persistence.po.ptm.PtmStdPrice;
+import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
+import hasoffer.core.product.IPtmStdImageService;
 import hasoffer.core.product.IPtmStdPriceService;
 import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.utils.ImageUtil;
@@ -49,6 +45,8 @@ public class AppSkuController {
     ProductServiceImpl productService;
     @Resource
     IPtmStdPriceService ptmStdPriceService;
+    @Resource
+    IPtmStdImageService ptmStdImageService;
     Logger logger = LoggerFactory.getLogger(AppSkuController.class);
 
     public static List getImageArray(List<PtmCmpSkuImage> list) {
@@ -114,28 +112,37 @@ public class AppSkuController {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
-        //PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"ratingNum", "bestPrice", "priceOff", "backRate", "support", "price", "returnGuarantee", "freight"});
-        PtmCmpSku ptmCmpSku = cmpSkuService.getCmpSkuById(id);
-        if (ptmCmpSku != null) {
-            logger.info(" has this sku " + id);
-            PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, ptmCmpSku.getId());
-            logger.info("get sku totalWeight from  mongo " + ptmCmpSkuDescription);
-            Map map = new HashMap<>();
-            if (ptmCmpSkuDescription != null) {
-                map.put("description", ptmCmpSkuDescription.getJsonDescription() == null ? "" : ClientHelper.delHTMLTag(ptmCmpSkuDescription.getJsonDescription()));//描述
-                String tempJsonParam = ptmCmpSkuDescription.getJsonParam();
-                //去除html标签
-                if (!StringUtils.isEmpty(tempJsonParam)) {
-                    tempJsonParam = ClientHelper.delHTMLTag(tempJsonParam);
-                    //TODO error parse true
-                    map.put("specs", JsonHelper.getJsonMap(tempJsonParam));//参数
-                }
+        if (id <= 0) {
+            jsonObject.put("errorCode", "10000");
+            jsonObject.put("msg", "id le zero ");
+            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            return null;
+        }
+        Map map = new HashMap<>();
+        if (ApiUtils.rmoveBillion(id) > 0) {
+            PtmStdPrice ptmStdPriceById = ptmStdPriceService.getPtmStdPriceById(ApiUtils.rmoveBillion(id));
+            if (ptmStdPriceById != null) {
+                PtmStdSkuDetail ptmCmpSkuDescription = mongoDbManager.queryOne(PtmStdSkuDetail.class, ptmStdPriceById.getStdSkuId());
+                Map<String, String> specsMap = new HashMap();
+                List<PtmStdSkuParamGroup> paramGroups = ptmCmpSkuDescription.getParamGroups();
+                ApiUtils.setParameters(specsMap, paramGroups);
+                map.put("specs", JSON.toJSONString(specsMap));//参数
             }
-            List<PtmCmpSkuImage> ptmCmpSkuImages = ptmCmpSkuImageService.findPtmCmpSkuImages(ptmCmpSku.getId());
-            if (ptmCmpSkuImages != null && ptmCmpSkuImages.size() > 0) {
-                map.put("images", getImageArray(ptmCmpSkuImages));
+            List<PtmStdImage> skuImages = ptmStdImageService.getStdSkuImageBySkuId(ptmStdPriceById.getStdSkuId());
+            List<String> iamgeStringList = new ArrayList<>();
+            for (PtmStdImage ptmStdImage : skuImages) {
+                iamgeStringList.add(ImageUtil.getImageUrl(ptmStdImage.getSmallImagePath()));
+            }
+            if (skuImages != null && skuImages.size() > 0) {
+                map.put("images", iamgeStringList);
             } else {
-                map.put("images", Arrays.asList(ptmCmpSku.getBigImagePath() == null ? "" : ImageUtil.getImageUrl(ptmCmpSku.getBigImagePath())));
+                List<PtmStdImage> stdPriceImageByPriceId = ptmStdImageService.getStdPriceImageByPriceId(ptmStdPriceById.getId());
+                if (stdPriceImageByPriceId != null) {
+                    String imageUrl = ImageUtil.getImageUrl(stdPriceImageByPriceId.get(0).getSmallImagePath());
+                    if (org.apache.commons.lang3.StringUtils.isNotEmpty(imageUrl)) {
+                        map.put("images", Arrays.asList(imageUrl));
+                    }
+                }
             }
             map.put("distribution", 5);
             jsonObject.put("data", JSONObject.toJSON(map));
