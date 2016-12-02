@@ -1,6 +1,8 @@
 package hasoffer.api.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import hasoffer.api.helper.Httphelper;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.app.vo.ResultVo;
 import hasoffer.core.bo.push.AppMsgClick;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,16 +44,18 @@ public class SystemController {
     }
 
     @RequestMapping(value = "app/push/check", method = RequestMethod.GET)
-    public ResultVo checkGetPushMsg(@RequestParam(defaultValue = "100") int type) {
+    public ResultVo checkGetPushMsg(@RequestParam(defaultValue = "100") int type, HttpServletResponse response) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("errorCode", "00000");
+        jsonObject.put("msg", "ok");
         ResultVo resultVo = new ResultVo();
-        resultVo.getData().put("have", true);
+        resultVo.getData().put("have", false);
         List<String> msgList = new ArrayList<>();
+        //如果查询到才设置有
         AppPushMessage message = new AppPushMessage(
                 new AppMsgDisplay("Lenovo PHAB 16 GB 6.98 inch with Wi-Fi+4G  (Ebony) Now available at Rs.10,999, click to view details.  ", "Lenovo PHAB 16 GB 6.98 inch with Wi-Fi+4G  (Ebony) ", "Now available at Rs.10,999, click to view details. ", "https://www.baidu.com/img/bd_logo1.png"),
                 new AppMsgClick(AppMsgClickType.DEAL, "99000264", "com.flipkart.android")
         );
-
-
         AppPushMessage message2 = new AppPushMessage(
                 new AppMsgDisplay("price off alert ", "alert you ", "let us alert "),
                 new AppMsgClick(AppMsgClickType.DEEPLINK, "http://affiliateshopclues.com/?a=2892&c=69&p=r&s1=&ckmrdr=http://www.shopclues.com/apple-iphone-6s-16gb-26.html", "com.flipkart.android")
@@ -59,6 +64,8 @@ public class SystemController {
         msgList.add(JSON.toJSONString(message));
         msgList.add(JSON.toJSONString(message2));
         resultVo.getData().put("pushList", msgList);
-        return resultVo;
+        jsonObject.put("data", resultVo.getData());
+        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        return null;
     }
 }
