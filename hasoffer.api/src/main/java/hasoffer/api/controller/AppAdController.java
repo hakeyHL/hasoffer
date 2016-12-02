@@ -86,6 +86,7 @@ public class AppAdController {
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
         List<Adt> adt = advertiseService.getAdByCategory();
+        //如果当前展示广告app设备已安装则过滤
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         if (deviceInfo != null) {
             //判断一下如果appType是APP的不展示

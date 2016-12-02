@@ -16,7 +16,7 @@ public interface AliVPCLogDAO {
 
     @Update({
             "<script>",
-            "update t_ali_vpc_log set endTime=#{endTime, jdbcType=TIMESTAMP}, endReqId=#{reqId,jdbcType=VARCHAR},status='N' where eipId=#{eipId,jdbcType=VARCHAR}",
+            "update t_ali_vpc_log set endTime=#{endTime, jdbcType=TIMESTAMP}, endReqId=#{reqId,jdbcType=VARCHAR}, status='N' where eipId = #{eipId,jdbcType=VARCHAR}",
             "</script>"
     })
     void updateEndTimeLog(@Param("endTime") Date endTime, @Param("eipId") String eipId, @Param("reqId") String reqId);
