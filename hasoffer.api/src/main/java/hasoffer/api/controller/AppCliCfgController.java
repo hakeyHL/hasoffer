@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -157,11 +158,15 @@ public class AppCliCfgController {
     }
 
     @RequestMapping(value = "/app/pushCfg")
-    public ResultVo appPushConfig() {
+    public ModelAndView appPushConfig() {
+        ModelAndView modelAndView = new ModelAndView();
         ResultVo resultVo = new ResultVo();
+        modelAndView.addObject("errorCode", "00000");
+        modelAndView.addObject("msg", "ok");
         resultVo.getData().put("open", true);
         resultVo.getData().put("unit", "m");//d 天 h 小时 m 分钟
         resultVo.getData().put("scanInterval", 10);
-        return resultVo;
+        modelAndView.addObject("data", resultVo.getData());
+        return modelAndView;
     }
 }
