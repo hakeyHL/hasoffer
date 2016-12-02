@@ -106,6 +106,7 @@ public class AppCmpServiceImpl implements AppCmpService {
                         CmpProductListVo productListVo = new CmpProductListVo(WebsiteHelper.getLogoUrl(Website.valueOf(sio.getStdPriceWebSite())),
                                 productCacheManager.getPtmStdSkuImageUrl(ptmStdPrice.getStdSkuId()),
                                 ptmStdPrice, sio.getCliPrice());
+                        productListVo.setDeepLink(WebsiteHelper.getDeeplinkWithAff(ptmStdPrice.getWebsite(), ptmStdPrice.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()}));
                         cmpProductListVoList.add(productListVo);
                     }
                     cr.setPriceList(cmpProductListVoList);

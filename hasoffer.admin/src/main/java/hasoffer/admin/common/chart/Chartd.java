@@ -10,6 +10,9 @@ class Chartd {
 	String name;
 	List<Float> data;
 
+	public Chartd() {
+	}
+
 	public Chartd(String name, List<Float> data) {
 		this.name = name;
 		this.data = data;

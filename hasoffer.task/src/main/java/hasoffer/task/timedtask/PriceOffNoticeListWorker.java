@@ -33,7 +33,7 @@ public class PriceOffNoticeListWorker {
     @Resource
     IFetchDubboService fetchDubboService;
 
-    @Scheduled(cron = "0 0 12 * * ?")
+    @Scheduled(cron = "0 0 20 * * ?")
     public void sendPriceOffNoticeRequest() {
 
         int page = 1;
@@ -92,7 +92,7 @@ public class PriceOffNoticeListWorker {
                         url = url.replace("gp/offer-listing", "dp");
                     }
 
-                    fetchDubboService.sendUrlTask(website, url, TaskTarget.PRICEOFF_NOTICE, TaskLevel.LEVEL_2);
+                    fetchDubboService.sendUrlTask(website, url, TaskTarget.PRICEOFF_NOTICE, TaskLevel.LEVEL_2, skuid);
 
                     logger.info("send url request succes for " + website + " sku id is [" + skuid + "]");
                 }

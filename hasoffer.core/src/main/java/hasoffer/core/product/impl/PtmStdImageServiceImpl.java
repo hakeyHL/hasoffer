@@ -16,11 +16,17 @@ import java.util.List;
 @Service
 public class PtmStdImageServiceImpl implements IPtmStdImageService {
     private static final String PTMSTDIMAGE_GET_IMAGEURL_BY_SKUID = "select t from PtmStdImage t where t.stdSkuId=?0 order by id asc ";
+    private static final String PTMSTDIMAGE_GET_IMAGEURL_BY_PRICEID = "select t from PtmStdImage t where t.stdPriceId=?0 order by id asc ";
     @Resource
     IDataBaseManager dbm;
 
     @Override
     public List<PtmStdImage> getStdSkuImageBySkuId(Long stdSkuId) {
         return dbm.query(PTMSTDIMAGE_GET_IMAGEURL_BY_SKUID, Arrays.asList(stdSkuId));
+    }
+
+    @Override
+    public List<PtmStdImage> getStdPriceImageByPriceId(Long priceId) {
+        return dbm.query(PTMSTDIMAGE_GET_IMAGEURL_BY_SKUID, Arrays.asList(priceId));
     }
 }

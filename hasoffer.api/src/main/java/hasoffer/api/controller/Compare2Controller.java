@@ -843,19 +843,8 @@ public class Compare2Controller {
             cmpResult.setPagedComparedSkuVos(priceList);
             cmpResult.setTotalRatingsNum(tempTotalComments);
             PtmStdSkuDetail ptmStdSkuDetail = mongoDbManager.queryOne(PtmStdSkuDetail.class, ptmStdSku.getId());
-            String specs = "";
             Map<String, String> specsMap = new HashMap();
-            if (ptmStdSkuDetail != null) {
-                List<PtmStdSkuParamGroup> paramGroups = ptmStdSkuDetail.getParamGroups();
-                for (PtmStdSkuParamGroup ptmStdSkuParamGroup : paramGroups) {
-                    List<PtmStdSkuParamNode> params = ptmStdSkuParamGroup.getParams();
-                    for (PtmStdSkuParamNode ptmStdSkuParamNode : params) {
-                        if (org.apache.commons.lang3.StringUtils.isNotEmpty(ptmStdSkuParamNode.getName()) && org.apache.commons.lang3.StringUtils.isNotEmpty(ptmStdSkuParamNode.getValue())) {
-                            specsMap.put(ptmStdSkuParamNode.getName(), ptmStdSkuParamNode.getValue());
-                        }
-                    }
-                }
-            }
+            ApiUtils.setParameters(specsMap, ptmStdSkuDetail.getParamGroups());
             cmpResult.setSpecs(JSON.toJSONString(specsMap));
             return cmpResult;
         }

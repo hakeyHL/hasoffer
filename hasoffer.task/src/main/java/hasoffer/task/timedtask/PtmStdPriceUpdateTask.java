@@ -31,7 +31,7 @@ public class PtmStdPriceUpdateTask {
     @Resource
     IFetchDubboService fetchDubboService;
 
-    @Scheduled(cron = "0 0 10,15 * * ?")
+    @Scheduled(cron = "0 40 0/2 * * ?")
     public void updatePtmStdPrice() {
 
         int curPage = 1;
@@ -82,10 +82,12 @@ public class PtmStdPriceUpdateTask {
                         }
 
                         fetchDubboService.sendUrlTask(ptmStdPrice.getWebsite(), ptmStdPrice.getUrl(), TaskTarget.STDPRICE_UPDATE, TaskLevel.LEVEL_3);
-                        logger.info("send stdprice request succes for " + ptmStdPrice.getWebsite() + " sku id is _" + ptmStdPrice.getId() + "_");
-                    } else {
+                        System.out.println("send stdprice request succes for " + ptmStdPrice.getWebsite() + " sku id is _" + ptmStdPrice.getId() + "_");
+                    } else if (Website.EBAY.equals(website) || Website.PAYTM.equals(website) || Website.SHOPCLUES.equals(website) || Website.INFIBEAM.equals(website)) {
                         fetchDubboService.sendUrlTask(ptmStdPrice.getWebsite(), ptmStdPrice.getUrl(), TaskTarget.STDPRICE_UPDATE, TaskLevel.LEVEL_5);
-                        logger.info("send stdprice request succes for " + ptmStdPrice.getWebsite() + " sku id is _" + ptmStdPrice.getId() + "_");
+                        System.out.println("send stdprice request succes for " + ptmStdPrice.getWebsite() + " sku id is _" + ptmStdPrice.getId() + "_");
+                    } else {
+                        continue;
                     }
 
                 }

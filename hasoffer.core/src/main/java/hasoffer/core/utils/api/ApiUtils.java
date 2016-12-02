@@ -5,6 +5,8 @@ import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmStdSkuParamGroup;
+import hasoffer.core.persistence.po.ptm.PtmStdSkuParamNode;
 import hasoffer.core.persistence.po.urm.PriceOffNotice;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
@@ -17,10 +19,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by hs on 2016年10月19日.
@@ -122,6 +121,17 @@ public class ApiUtils {
                 urmUserDevice.setDeviceId(id);
                 urmUserDevice.setUserId(urmUser.getId() + "");
                 urmUserDevices.add(urmUserDevice);
+            }
+        }
+    }
+
+    public static void setParameters(Map<String, String> specsMap, List<PtmStdSkuParamGroup> paramGroups) {
+        for (PtmStdSkuParamGroup ptmStdSkuParamGroup : paramGroups) {
+            List<PtmStdSkuParamNode> params = ptmStdSkuParamGroup.getParams();
+            for (PtmStdSkuParamNode ptmStdSkuParamNode : params) {
+                if (org.apache.commons.lang3.StringUtils.isNotEmpty(ptmStdSkuParamNode.getName()) && org.apache.commons.lang3.StringUtils.isNotEmpty(ptmStdSkuParamNode.getValue())) {
+                    specsMap.put(ptmStdSkuParamNode.getName(), ptmStdSkuParamNode.getValue());
+                }
             }
         }
     }

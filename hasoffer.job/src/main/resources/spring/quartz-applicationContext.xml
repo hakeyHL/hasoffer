@@ -43,9 +43,11 @@
         <property name="jobClass" value="hasoffer.job.bean.push.PriceOffNoticeJobBean"/>
     </bean>
 
-    <bean id="priceOffNoticeTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+    <bean id="priceOffNoticeTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="startDelay" value="1000"/>
+        <property name="repeatCount" value="0"/>
+        <property name="repeatInterval" value="10000"/>
         <property name="jobDetail" ref="priceOffNoticeJob"/>
-        <property name="cronExpression" value="0 48 15 * * ?"/>
     </bean>
 
     <!-- 用户搜索一小时统计一次 -->

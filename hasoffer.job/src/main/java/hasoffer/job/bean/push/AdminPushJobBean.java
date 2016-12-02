@@ -7,6 +7,7 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.push.*;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.enums.PushSourceType;
@@ -40,6 +41,7 @@ public class AdminPushJobBean extends QuartzJobBean {
      */
     private static final Logger logger = LoggerFactory.getLogger(AdminPushJobBean.class);
     private static final String ADMIN_PUSH_QUEUE = "ADMIN_PUSH_QUEUE";
+    private static final String DEAL_PUSH_PREFIX = "DEAL_PUSH_";
 
     @Resource
     IRedisListService redisListService;
@@ -80,6 +82,13 @@ public class AdminPushJobBean extends QuartzJobBean {
                     new AppMsgDisplay(appPush.getTitle() + appPush.getContent(), appPush.getTitle(), appPush.getContent(), appPush.getPushImageUrl()),
                     new AppMsgClick(clickType, appPush.getSourceId(), WebsiteHelper.getPackage(website))
             );
+
+//-------------------------------------将push的内容写到redis新的push的key中-----------------------------------------//
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+            String YMD = simpleDateFormat.format(TimeUtils.nowDate());
+            String DEAL_PUSH_YMD_APPDEALID = DEAL_PUSH_PREFIX + YMD + "_" + appPush.getId();
+            redisListService.push(DEAL_PUSH_YMD_APPDEALID, JSONUtil.toJSON(message));
+//------------------------------------------------------------------------------------------------------------------//
 
             AppPushBo pushBo = new AppPushBo("678678", "19:50", message);
 
