@@ -29,7 +29,6 @@ import java.util.Map;
  * Function :
  */
 public class WebsiteHelper {
-
     private static final String MGSVC_KEY = "6f4922f45568161a8cdf4ad2299f6d23";
     private static final String MGSVC_URL_TEMP = "http://r.brandreward.com/?key=6f4922f45568161a8cdf4ad2299f6d23&id=%s&url=%s";
 
@@ -263,10 +262,10 @@ public class WebsiteHelper {
             case THEITDEPOT:
                 return url;
             default:
-                break;
+                return url;
         }
         // 这里返回空，即如果没有deeplink，返回空字符串
-        return StringUtils.EMPTY_STRING;
+//        return StringUtils.EMPTY_STRING;
     }
 
     public static String getLogoUrl(Website website) {
