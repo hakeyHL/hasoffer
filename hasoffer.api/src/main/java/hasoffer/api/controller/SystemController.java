@@ -49,7 +49,7 @@ public class SystemController {
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
         ResultVo resultVo = new ResultVo();
-        resultVo.getData().put("have", false);
+        resultVo.getData().put("have", true);
         List<String> msgList = new ArrayList<>();
         //如果查询到才设置有
         AppPushMessage message = new AppPushMessage(
