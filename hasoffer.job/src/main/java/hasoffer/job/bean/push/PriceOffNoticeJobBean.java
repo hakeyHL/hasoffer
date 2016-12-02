@@ -10,6 +10,7 @@ import hasoffer.data.redis.IRedisListService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.spider.enums.TaskTarget;
 import hasoffer.spider.model.FetchUrlResult;
+import hasoffer.spider.model.FetchedProduct;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
@@ -61,8 +62,18 @@ public class PriceOffNoticeJobBean extends QuartzJobBean {
             //获得结果对象
             FetchUrlResult fetchUrlResult = JSON.parseObject(priceOffNoticeResult, FetchUrlResult.class);
 
+            if (fetchUrlResult == null) {
+                continue;
+            }
+
             Long skuId = fetchUrlResult.getSkuId();
-            float nowPrice = fetchUrlResult.getFetchProduct().getPrice();
+
+            FetchedProduct fetchProduct = fetchUrlResult.getFetchProduct();
+            if (fetchProduct == null) {
+                continue;
+            }
+
+            float nowPrice = fetchProduct.getPrice();
             Website website = fetchUrlResult.getFetchProduct().getWebsite();
             String url = fetchUrlResult.getFetchProduct().getUrl();
             String fetchedTitle = fetchUrlResult.getFetchProduct().getTitle();

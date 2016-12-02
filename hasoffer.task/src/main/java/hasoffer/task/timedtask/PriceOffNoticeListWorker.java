@@ -33,7 +33,7 @@ public class PriceOffNoticeListWorker {
     @Resource
     IFetchDubboService fetchDubboService;
 
-    @Scheduled(cron = "0 0 12 * * ?")
+    @Scheduled(cron = "0 0 20 * * ?")
     public void sendPriceOffNoticeRequest() {
 
         int page = 1;
