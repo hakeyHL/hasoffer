@@ -40,7 +40,7 @@ public class SystemController {
         return mav;
     }
 
-    @RequestMapping(value = "app/push/checkgetpmsg", method = RequestMethod.GET)
+    @RequestMapping(value = "app/push/check", method = RequestMethod.GET)
     public ResultVo checkGetPushMsg(@RequestParam(defaultValue = "100") int type) {
         ResultVo resultVo = new ResultVo();
         resultVo.getData().put("have", true);
