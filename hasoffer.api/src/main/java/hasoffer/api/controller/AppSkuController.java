@@ -2,12 +2,15 @@ package hasoffer.api.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
+import hasoffer.api.helper.JsonHelper;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.app.vo.PriceCurveVo;
 import hasoffer.core.app.vo.PriceCurveXYVo;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.mongo.PriceNode;
+import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
@@ -144,9 +147,31 @@ public class AppSkuController {
                     }
                 }
             }
-            map.put("distribution", 5);
-            jsonObject.put("data", JSONObject.toJSON(map));
+        } else {
+            PtmCmpSku ptmCmpSku = cmpSkuService.getCmpSkuById(id);
+            if (ptmCmpSku != null) {
+                logger.info(" has this sku " + id);
+                PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, ptmCmpSku.getId());
+                logger.info("get sku totalWeight from  mongo " + ptmCmpSkuDescription);
+                if (ptmCmpSkuDescription != null) {
+                    map.put("description", ptmCmpSkuDescription.getJsonDescription() == null ? "" : ClientHelper.delHTMLTag(ptmCmpSkuDescription.getJsonDescription()));//描述
+                    String tempJsonParam = ptmCmpSkuDescription.getJsonParam();
+                    //去除html标签
+                    if (!StringUtils.isEmpty(tempJsonParam)) {
+                        tempJsonParam = ClientHelper.delHTMLTag(tempJsonParam);
+                        map.put("specs", JsonHelper.getJsonMap(tempJsonParam));//参数
+                    }
+                }
+                List<PtmCmpSkuImage> ptmCmpSkuImages = ptmCmpSkuImageService.findPtmCmpSkuImages(ptmCmpSku.getId());
+                if (ptmCmpSkuImages != null && ptmCmpSkuImages.size() > 0) {
+                    map.put("images", getImageArray(ptmCmpSkuImages));
+                } else {
+                    map.put("images", Arrays.asList(ptmCmpSku.getBigImagePath() == null ? "" : ImageUtil.getImageUrl(ptmCmpSku.getBigImagePath())));
+                }
+            }
         }
+        map.put("distribution", 5);
+        jsonObject.put("data", JSONObject.toJSON(map));
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
