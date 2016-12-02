@@ -10,6 +10,9 @@ public class AppPushMessage {
 
     private AppMsgClick click;
 
+    public AppPushMessage() {
+    }
+
     public AppPushMessage(AppMsgDisplay display, AppMsgClick click) {
         this.display = display;
         this.click = click;

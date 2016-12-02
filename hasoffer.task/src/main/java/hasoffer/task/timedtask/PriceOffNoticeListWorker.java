@@ -92,7 +92,7 @@ public class PriceOffNoticeListWorker {
                         url = url.replace("gp/offer-listing", "dp");
                     }
 
-                    fetchDubboService.sendUrlTask(website, url, TaskTarget.PRICEOFF_NOTICE, TaskLevel.LEVEL_2);
+                    fetchDubboService.sendUrlTask(website, url, TaskTarget.PRICEOFF_NOTICE, TaskLevel.LEVEL_2, skuid);
 
                     logger.info("send url request succes for " + website + " sku id is [" + skuid + "]");
                 }

@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.push.*;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,6 +37,7 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
     private static final String QUERY_PRICEOFF_BY_SKUID = "SELECT t FROM PriceOffNotice t WHERE t.skuid = ?0 ";
     private static final String QUERY_DEVICE_BY_USERID = "SELECT t FROM UrmUserDevice t WHERE t.userId = ?0 ";
     private static final String PUSH_FAIL_PRICEOFFNOTICE_ID = "PUSH_FAIL_PRICEOFFNOTICE_ID";
+    private static final String PRICEOFFNOTICE_PUSH_PREFIX = "PRICEOFFNOTICE_PUSH_";
 
     @Resource
     IDataBaseManager dbm;
@@ -420,6 +424,14 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
                                 new AppMsgDisplay(title + content, title, content),
                                 new AppMsgClick(AppMsgClickType.DEEPLINK, deepLinkUrl, WebsiteHelper.getPackage(website))
                         );
+
+//-------------------------------------将push的内容写到redis新的push的key中-----------------------------------------//
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+                        String YMD = simpleDateFormat.format(TimeUtils.nowDate());
+                        String PRICEOFFNOTICE_PUSH_YMD_USERID = PRICEOFFNOTICE_PUSH_PREFIX + YMD + "_" + userid;
+                        redisListService.push(PRICEOFFNOTICE_PUSH_YMD_USERID, JSONUtil.toJSON(message));
+//------------------------------------------------------------------------------------------------------------------//                        
+                        
 
                         AppPushBo appPushBo = new AppPushBo("5x1", "15:10", message);
 
