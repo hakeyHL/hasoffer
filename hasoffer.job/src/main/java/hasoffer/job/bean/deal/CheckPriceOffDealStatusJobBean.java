@@ -143,7 +143,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                         if (StringUtils.isEmpty(pop)) {
                             try {
                                 logger.info("pop deal update list get null sleep 5 seconds");
-                                TimeUnit.SECONDS.sleep(5);
+                                TimeUnit.MINUTES.sleep(5);
                             } catch (InterruptedException e) {
 
                             }
