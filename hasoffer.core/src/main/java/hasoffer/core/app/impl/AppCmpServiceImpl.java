@@ -96,19 +96,10 @@ public class AppCmpServiceImpl implements AppCmpService {
                     List<CmpProductListVo> cmpProductListVoList = new ArrayList<>();
                     if (sio.getCliPrice() <= 0) {
                         List<PtmStdPrice> data = pagedPtmStdPriceList.getData();
-                        float maxPrice = Collections.max(data, new Comparator<PtmStdPrice>() {
-                            @Override
-                            public int compare(PtmStdPrice o1, PtmStdPrice o2) {
-                                if (o1.getPrice() < o2.getPrice()) {
-                                    return -1;
-                                }
-                                if (o1.getPrice() > o2.getPrice()) {
-                                    return 1;
-                                }
-                                return 0;
-                            }
-                        }).getPrice();
-                        sio.setCliPrice(maxPrice);
+                        sortByPriceAsc(data);
+                        cr.setBestPrice(data.get(0).getPrice());
+                        cr.getProductVo().setCurrentLowestPrice(cr.getBestPrice());
+                        sio.setCliPrice(data.get(data.size() - 1).getPrice());
                     }
                     //计算列表中最大价格
                     for (PtmStdPrice ptmStdPrice : pagedPtmStdPriceList.getData()) {
@@ -182,6 +173,21 @@ public class AppCmpServiceImpl implements AppCmpService {
         }
         jsonObject.put("data", JSONObject.toJSON(cr));
         return JSON.toJSONString(jsonObject, propertyFilter);
+    }
+
+    private void sortByPriceAsc(List<PtmStdPrice> data) {
+        Collections.sort(data, new Comparator<PtmStdPrice>() {
+            @Override
+            public int compare(PtmStdPrice o1, PtmStdPrice o2) {
+                if (o1.getPrice() < o2.getPrice()) {
+                    return -1;
+                }
+                if (o1.getPrice() > o2.getPrice()) {
+                    return 1;
+                }
+                return 0;
+            }
+        });
     }
 
     private CmpResult fillCmpResult(CmpResult cr) {
