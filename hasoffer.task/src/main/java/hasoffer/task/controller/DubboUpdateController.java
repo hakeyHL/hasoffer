@@ -8,6 +8,7 @@ import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmStdSku;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
@@ -148,6 +149,21 @@ public class DubboUpdateController {
 
         fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_2);
         logger.info("updateSingleSkuById send url request succes for " + sku.getWebsite() + " sku id is _" + sku.getId() + "_");
+
+        return "ok";
+    }
+
+    //dubbofetchtask/mobile91SingleUrlReFetch
+    @RequestMapping(value = "/mobile91SingleUrlReFetch/{ptmStdSkuId}", method = RequestMethod.GET)
+    @ResponseBody
+    public String mobile91SingleUrlReFetch(@PathVariable long ptmStdSkuId) {
+
+        PtmStdSku ptmStdSku = dbm.get(PtmStdSku.class, ptmStdSkuId);
+
+        String sourceUrl = ptmStdSku.getSourceUrl();
+        long categoryId = ptmStdSku.getCategoryId();
+
+        fetchDubboService.sendCompareWebsiteFetchTask(Website.MOBILE91, sourceUrl, TaskLevel.LEVEL_1, categoryId);
 
         return "ok";
     }
