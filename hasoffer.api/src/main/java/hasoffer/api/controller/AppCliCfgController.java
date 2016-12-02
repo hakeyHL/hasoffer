@@ -155,4 +155,13 @@ public class AppCliCfgController {
         Httphelper.sendJsonMessage(JSON.toJSONString(resultVo), response);
         return null;
     }
+
+    @RequestMapping(value = "/app/pushCfg")
+    public ResultVo appPushConfig() {
+        ResultVo resultVo = new ResultVo();
+        resultVo.getData().put("open", true);
+        resultVo.getData().put("unit", "m");//d 天 h 小时 m 分钟
+        resultVo.getData().put("scanInterval", 10);
+        return resultVo;
+    }
 }
