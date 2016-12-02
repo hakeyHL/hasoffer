@@ -91,7 +91,7 @@ public class CmpProductListVo {
     }
 
     public CmpProductListVo(String logoImage, String smallImageUrl, PtmStdPrice ptmStdPrice, float cliPrice) {
-        this.id = ptmStdPrice.getId();
+        this.id = ApiUtils.addBillion(ptmStdPrice.getId());
         this.coins = ptmStdPrice.getWebsite() == Website.FLIPKART ? Math.round(0.075 * ptmStdPrice.getPrice()) : 0;
         this.ratingNum = 0;
         this.saved = cliPrice == 0 ? 0 : Math.round(cliPrice - ptmStdPrice.getPrice());
