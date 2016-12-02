@@ -293,11 +293,11 @@
         <appender-ref ref="FetchRequestLoggerFileOut"/>
     </logger>
 
-    <logger name="hasoffer.spider.detail.ppl.RedisPagePipeline" level="DEBUG">
+    <logger name="hasoffer.spider.detail.ppl.SpiderSuccessAction" level="DEBUG">
         <appender-ref ref="FetchUrlResultLoggerFileOut"/>
     </logger>
 
-    <logger name="hasoffer.spider.detail.ppl.ErrorRedisPagePipeline" level="DEBUG">
+    <logger name="hasoffer.spider.detail.ppl.SpiderErrorAction" level="DEBUG">
         <appender-ref ref="ErrorPipelineLoggerFileOut"/>
     </logger>
 
