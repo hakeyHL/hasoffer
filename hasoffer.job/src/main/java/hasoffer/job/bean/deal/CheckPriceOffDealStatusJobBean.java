@@ -143,7 +143,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                         if (StringUtils.isEmpty(pop)) {
                             try {
                                 logger.info("pop deal update list get null sleep 5 seconds");
-                                TimeUnit.SECONDS.sleep(5);
+                                TimeUnit.MINUTES.sleep(5);
                             } catch (InterruptedException e) {
 
                             }
@@ -159,6 +159,12 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                             } else {
                                 logger.info("deal update fetchedProduct : " + (fetchedProduct).toString());
                             }
+                            float nowPrice = fetchedProduct.getPrice();
+
+                            //抓取结果价格为0，过滤下一次
+                            if (nowPrice <= 0) {
+                                continue;
+                            }
 
                             String url = fetchUrlResult1.getUrl();
 
@@ -173,7 +179,6 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                                         String oriPriceString = StringUtils.filterAndTrim(appdeal.getPriceDescription(), Arrays.asList("Rs."));//deal之前的价格
                                         if (NumberUtils.isNumber(oriPriceString)) {
                                             float oriPrice = Float.parseFloat(oriPriceString);//deal之前的价格
-                                            float nowPrice = fetchedProduct.getPrice();
 
                                             //data 2016-11-30 11:30
                                             //降价，生成新deal；涨价，失效不显示
@@ -203,21 +208,17 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                                     continue;
                                 }
 
-                                float newPrice = fetchedProduct.getPrice();
                                 AppDeal appdeal = dealService.getDealBySourceId(sku.getId());
 
                                 if (appdeal != null) {
-                                    //用来标记是否更新过，true表示未被更新
-                                    boolean flag = true;
-
                                     //data 2016-11-30 11:30
                                     //降价，生成新deal；涨价，失效不显示
-                                    if (newPrice < sku.getPrice() && SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
-                                        dealService.updateDealExpire(appdeal.getId(), newPrice);
+                                    if (nowPrice < sku.getPrice() && SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
+                                        dealService.updateDealExpire(appdeal.getId(), nowPrice);
                                         logger.info("price off deal update delete old and create a new deal success");
                                     }
 
-                                    if (newPrice > sku.getPrice() || !SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
+                                    if (nowPrice > sku.getPrice() || !SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
                                         dealService.updateDealExpire(appdeal.getId());
                                         logger.info("price off deal update orideal expire");
                                     }
