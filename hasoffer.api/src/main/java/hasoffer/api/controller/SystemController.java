@@ -10,6 +10,7 @@ import hasoffer.core.bo.push.AppPushMessage;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,8 +40,8 @@ public class SystemController {
         return mav;
     }
 
-    @RequestMapping(value = "/checkgetpmsg", method = RequestMethod.GET)
-    public ResultVo checkGetPushMsg(int type) {
+    @RequestMapping(value = "app/push/checkgetpmsg", method = RequestMethod.GET)
+    public ResultVo checkGetPushMsg(@RequestParam(defaultValue = "100") int type) {
         ResultVo resultVo = new ResultVo();
         resultVo.getData().put("have", true);
         List<String> msgList = new ArrayList<>();
@@ -57,6 +58,7 @@ public class SystemController {
 
         msgList.add(JSON.toJSONString(message));
         msgList.add(JSON.toJSONString(message2));
+        resultVo.getData().put("pushList", msgList);
         return resultVo;
     }
 }
