@@ -1,8 +1,6 @@
 package hasoffer.core.app.vo;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,9 +11,6 @@ public class ResultVo {
     private String errorCode = "00000";
 
     private String msg = "ok";
-
-    private List ataList = new ArrayList();
-    private List dataList = new ArrayList();
     private Map data = new HashMap();
 
     public ResultVo() {
@@ -42,14 +37,6 @@ public class ResultVo {
         this.msg = msg;
     }
 
-    public List getAtaList() {
-        return ataList;
-    }
-
-    public void setAtaList(List ataList) {
-        this.ataList = ataList;
-    }
-
     public Map getData() {
         return data;
     }
@@ -58,11 +45,4 @@ public class ResultVo {
         this.data = data;
     }
 
-    public List getDataList() {
-        return dataList;
-    }
-
-    public void setDataList(List dataList) {
-        this.dataList = dataList;
-    }
 }
