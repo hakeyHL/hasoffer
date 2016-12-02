@@ -249,7 +249,7 @@
     </logger>
 
     <!-- webmagic part log -->
-    <logger name="us.codecraft.webmagic" level="INFO">
+    <logger name="us.codecraft" level="INFO">
         <appender-ref ref="webmagicErrorFileOut"/>
     </logger>
     <!-- third part log -->
@@ -273,9 +273,6 @@
         <appender-ref ref="fetchLoggerFileOut"/>
     </logger>
 
-    <logger name="us.codecraft" level="DEBUG">
-        <appender-ref ref="fetchLoggerFileOut"/>
-    </logger>
 
     <logger name="fetchFlowLogger" level="DEBUG">
         <appender-ref ref="FetchFlowLoggerFileOut"/>
