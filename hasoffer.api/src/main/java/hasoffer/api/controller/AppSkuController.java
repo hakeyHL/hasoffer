@@ -129,7 +129,7 @@ public class AppSkuController {
                 Map<String, String> specsMap = new HashMap();
                 List<PtmStdSkuParamGroup> paramGroups = ptmCmpSkuDescription.getParamGroups();
                 ApiUtils.setParameters(specsMap, paramGroups);
-                map.put("specs", JSON.toJSONString(specsMap));//参数
+                map.put("specs", specsMap);//参数
             }
             List<PtmStdImage> skuImages = ptmStdImageService.getStdSkuImageBySkuId(ptmStdPriceById.getStdSkuId());
             List<String> iamgeStringList = new ArrayList<>();
