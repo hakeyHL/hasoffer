@@ -1,6 +1,7 @@
 package hasoffer.core.utils.api;
 
 import com.alibaba.fastjson.JSON;
+import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.cache.SearchLogCacheManager;
@@ -15,6 +16,7 @@ import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.core.utils.ConstantUtil;
+import hasoffer.core.utils.JsonHelper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -134,6 +136,16 @@ public class ApiUtils {
                 }
             }
         }
+    }
+
+    public static PageableResult<PtmCmpSku> setPtmCmpSkuPageableResult(String cmpSkusJson) throws java.io.IOException {
+        PageableResult<PtmCmpSku> pagedCmpskus;
+        PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
+        List<PtmCmpSku> cmpSkus = new ArrayList<>();
+        cmpSkus.add(new PtmCmpSku());
+        JsonHelper.transferJson2Object(datas.getData(), cmpSkus);
+        pagedCmpskus = new PageableResult<>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
+        return pagedCmpskus;
     }
 
     /**
