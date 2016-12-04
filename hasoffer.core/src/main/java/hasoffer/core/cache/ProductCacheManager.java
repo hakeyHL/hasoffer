@@ -16,6 +16,7 @@ import hasoffer.core.product.IPtmStdImageService;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.core.utils.JsonHelper;
+import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.data.redis.IRedisSetService;
 import org.slf4j.Logger;
@@ -129,32 +130,22 @@ public class ProductCacheManager {
      * @return
      */
     public PageableResult<PtmCmpSku> listPagedCmpSkus(long proId, int page, int size) {
-//        System.out.println(" proId proId proId :" + proId);
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_" + String.valueOf(proId) + "_" + page + "_" + size;
         String cmpSkusJson = cacheService.get(key, 0);
         //先不读缓存,也不存缓存
-//        String cmpSkusJson = null;
-        PageableResult<PtmCmpSku> pagedCmpskus = null;
+        PageableResult<PtmCmpSku> pagedCmpskus;
         try {
             if (StringUtils.isEmpty(cmpSkusJson)) {
                 pagedCmpskus = productService.listOnsaleCmpSkus(proId, page, size);
-//                System.out.println("--------- pagedCmpskus  -----------" + pagedCmpskus.getData().size());
                 List<PtmCmpSku> data = pagedCmpskus.getData();
                 if (data != null && data.size() > 0) {
-                    //now , only the sku status is 'ONSALE' will return to our client , this method is closed by temporarily.
-//                  pagedCmpskus.setData(getOnsaleSkuList(data, proId));
                     cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
                 } else {
-                    //no data ,return empty list ;
                     pagedCmpskus = new PageableResult<>();
                     pagedCmpskus.setData(new ArrayList<PtmCmpSku>());
                 }
             } else {
-                PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
-                List<PtmCmpSku> cmpSkus = new ArrayList<PtmCmpSku>();
-                cmpSkus.add(new PtmCmpSku());
-                JsonHelper.transferJson2Object(datas.getData(), cmpSkus);
-                pagedCmpskus = new PageableResult<>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
+                pagedCmpskus = ApiUtils.setPtmCmpSkuPageableResult(cmpSkusJson);
             }
         } catch (Exception e) {
             logger.error("deal skus from cache error:{}", e.getMessage(), e);
@@ -162,7 +153,6 @@ public class ProductCacheManager {
         }
         return pagedCmpskus;
     }
-
     public List<PtmProduct> getTopSellins(int page, int size) {
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_TopSelling" + "_" + page + "_" + size;
         String ptmProductJson = cacheService.get(key, 0);
@@ -211,11 +201,7 @@ public class ProductCacheManager {
                     cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
                 }
             } else {
-                PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
-                List<PtmCmpSku> cmpSkus = new ArrayList<>();
-                cmpSkus.add(new PtmCmpSku());
-                JsonHelper.transferJson2Object(datas.getData(), cmpSkus);
-                pagedCmpskus = new PageableResult<>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
+                pagedCmpskus = ApiUtils.setPtmCmpSkuPageableResult(cmpSkusJson);
             }
         } catch (Exception e) {
             logger.error("deal skus from cache error {}", e.getMessage(), e);

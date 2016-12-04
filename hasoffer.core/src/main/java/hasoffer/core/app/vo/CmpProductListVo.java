@@ -104,7 +104,8 @@ public class CmpProductListVo {
         this.website = ptmStdPrice.getWebsite();
         this.freight = -1;
         this.distributionTime = "";
-        this.returnGuarantee = 0;
+        this.returnGuarantee = -1;
+        this.cashBack = 0;
         String tempPrice = Math.round(ptmStdPrice.getPrice()) + "";
         StringBuffer sb = new StringBuffer();
         for (int i = tempPrice.length() - 1; i >= 0; i--) {
