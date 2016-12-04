@@ -657,7 +657,7 @@ public class Compare2Controller {
             cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
             cmpResult.setPriceList(priceList.getData());
             int rating = ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(tempTotalComments == 0 ? 1 : tempTotalComments), 0, BigDecimal.ROUND_HALF_UP).longValue());
-            cmpResult.setRatingNum(rating <= 0 ? 90 : rating);
+            cmpResult.setRatingNum(rating);
             PtmProductDescription ptmProductDescription = mongoDbManager.queryOne(PtmProductDescription.class, product.getId());
             String specs = "";
             if (ptmProductDescription != null) {
@@ -839,7 +839,7 @@ public class Compare2Controller {
             cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
             cmpResult.setPriceList(priceList.getData());
             int rating = ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(tempTotalComments == 0 ? 1 : tempTotalComments), 0, BigDecimal.ROUND_HALF_UP).longValue());
-            cmpResult.setRatingNum(rating <= 0 ? 90 : rating);
+            cmpResult.setRatingNum(rating);
             cmpResult.setPagedComparedSkuVos(priceList);
             cmpResult.setTotalRatingsNum(tempTotalComments);
             PtmStdSkuDetail ptmStdSkuDetail = mongoDbManager.queryOne(PtmStdSkuDetail.class, ptmStdSku.getId());
