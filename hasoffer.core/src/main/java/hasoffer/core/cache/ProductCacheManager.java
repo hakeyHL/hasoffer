@@ -7,10 +7,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
-import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.ptm.PtmStdImage;
-import hasoffer.core.persistence.po.ptm.PtmTopSelling;
+import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.IPtmStdImageService;
@@ -113,13 +110,41 @@ public class ProductCacheManager {
             List<PtmStdImage> imageList = stdImageService.getStdSkuImageBySkuId(id);
             if (imageList != null && imageList.size() > 0) {
                 imageUrl = ImageUtil.getImageUrl(imageList.get(0).getSmallImagePath());
-//                imageUrl = imageList.get(0).getOriImageUrl();
             }
             if (imageUrl != null) {
                 cacheService.add(key, imageUrl, CACHE_EXPIRE_TIME);
             }
         }
 
+        return imageUrl;
+    }
+
+    public String getPtmStdPriceImageUrl(PtmStdPrice ptmStdPrice) {
+        String key = CACHE_KEY_PRE + "_getPtmStdPriceImageUrl_" + ptmStdPrice.getId();
+        String imageUrl = cacheService.get(key, 0);
+        List<PtmStdImage> imageList;
+        if (org.apache.commons.lang3.StringUtils.isEmpty(imageUrl)) {
+            imageList = stdImageService.getStdPriceImageByPriceId(ptmStdPrice.getId());
+            if (imageList != null && imageList.size() > 0) {
+                imageUrl = ImageUtil.getImageUrl(imageList.get(0).getSmallImagePath());
+            }
+            if (imageUrl != null) {
+                cacheService.add(key, imageUrl, CACHE_EXPIRE_TIME);
+            }
+        }
+        if (org.apache.commons.lang3.StringUtils.isEmpty(imageUrl)) {
+            key = CACHE_KEY_PRE + "_getPtmStdPriceImageUrl_SKUID" + ptmStdPrice.getStdSkuId();
+            imageUrl = cacheService.get(key, 0);
+            if (org.apache.commons.lang3.StringUtils.isEmpty(imageUrl)) {
+                imageList = stdImageService.getStdSkuImageBySkuId(ptmStdPrice.getStdSkuId());
+                if (imageList != null && imageList.size() > 0) {
+                    imageUrl = ImageUtil.getImageUrl(imageList.get(0).getSmallImagePath());
+                }
+                if (imageUrl != null) {
+                    cacheService.add(key, imageUrl, CACHE_EXPIRE_TIME);
+                }
+            }
+        }
         return imageUrl;
     }
 

@@ -132,7 +132,7 @@ public class AppSkuController {
                 ApiUtils.setParameters(specsMap, paramGroups);
                 map.put("specs", specsMap);//参数
             }
-            List<PtmStdImage> skuImages = ptmStdImageService.getStdSkuImageBySkuId(ptmStdPriceById.getStdSkuId());
+            List<PtmStdImage> skuImages = ptmStdImageService.getStdPriceImageByPriceId(ptmStdPriceById.getId());
             List<String> iamgeStringList = new ArrayList<>();
             for (PtmStdImage ptmStdImage : skuImages) {
                 iamgeStringList.add(ImageUtil.getImageUrl(ptmStdImage.getSmallImagePath()));
@@ -140,7 +140,7 @@ public class AppSkuController {
             if (skuImages != null && skuImages.size() > 0) {
                 map.put("images", iamgeStringList);
             } else {
-                List<PtmStdImage> stdPriceImageByPriceId = ptmStdImageService.getStdPriceImageByPriceId(ptmStdPriceById.getId());
+                List<PtmStdImage> stdPriceImageByPriceId = ptmStdImageService.getStdSkuImageBySkuId(ptmStdPriceById.getStdSkuId());
                 if (stdPriceImageByPriceId != null) {
                     String imageUrl = ImageUtil.getImageUrl(stdPriceImageByPriceId.get(0).getSmallImagePath());
                     if (org.apache.commons.lang3.StringUtils.isNotEmpty(imageUrl)) {
