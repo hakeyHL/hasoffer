@@ -9,6 +9,7 @@ import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.utils.HtmlUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.http.HttpUtils;
+import hasoffer.base.utils.http.XPathUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmImage2;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
@@ -55,15 +56,39 @@ public class HttpTest {
 
     @Test
     public void test() throws HttpFetchException, ContentParseException {
-        String url = "http://www.t-cat.com.tw/Inquire/Trace.aspx?no=6391439590";
+        String url = "http://www.t-cat.com.tw/Inquire/Trace.aspx?no=620020081615";
 
         TagNode root = HtmlUtils.getUrlRootTagNode(url);
 
-        TagNode statusNode = getSubNodeByXPath(root, "//div[@id='ctl00_ContentPlaceHolder1_tblResult']/table[1]/tbody/tr[2]/td[2]", null);
+        boolean contains = root.getText().toString().contains("非有效單號");
+        String statusString = "";
+        int shipStatus = 0;
 
-        String statusString = statusNode.getText().toString();
+        if (contains) {
+            shipStatus = 3;
+            statusString = "无效运单号";
+        } else {
+            TagNode shippingNode = XPathUtils.getSubNodeByXPath(root, "//span[@id='ctl00_ContentPlaceHolder1_lblTNs']", null);
 
+            if (shippingNode != null) {
+                shipStatus = 0;
+                statusString = "配送 中";
+            } else {
+                TagNode statusNode = XPathUtils.getSubNodeByXPath(root, "//div[@id='ctl00_ContentPlaceHolder1_tblResult']/table[1]/tbody/tr[2]/td[2]", null);
+                statusString = statusNode.getText().toString().trim();
+                if ("順利送達".equals(statusString)) {
+                    shipStatus = 1;
+                } else if ("拒收(調查處理中)".equals(statusString)) {
+                    shipStatus = 2;
+                } else {
+                    shipStatus = 0;
+                }
+            }
+        }
+
+        System.out.println(shipStatus);
         System.out.println(statusString);
+
     }
 
     @Test
