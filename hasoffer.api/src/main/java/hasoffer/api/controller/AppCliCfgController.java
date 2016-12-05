@@ -88,7 +88,7 @@ public class AppCliCfgController {
                 map.put("003", false);
 
                 //email and phone get
-                map.put("004", false);
+                map.put("004", true);
 
                 resultVo.setData(map);
 

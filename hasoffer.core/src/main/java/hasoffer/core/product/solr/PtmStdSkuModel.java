@@ -29,7 +29,6 @@ public class PtmStdSkuModel implements IIdentifiable<Long> {
     private int storeCount = 0;// site 数量
 
     private long searchCount = 0; // 搜索次数，表示商品热度
-
     public PtmStdSkuModel() {
     }
 

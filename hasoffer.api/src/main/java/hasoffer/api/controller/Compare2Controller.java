@@ -106,7 +106,8 @@ public class Compare2Controller {
             String dealUrlWithAff = WebsiteHelper.getDeeplinkWithAff(Website.SNAPDEAL, "https://www.snapdeal.com/product/jbl-sb350-soundbar-with-wirless/1602277955", new String[]{MarketChannel.SHANCHUAN.name(), "dfecc858243a616a"});
             System.out.println(dealUrlWithAff);
         }*/
-        float v = StringUtils.wordMatchD(StringUtils.toLowerCase("Professional Kingston MicroSDHC 32GB (32 Gigabyte) Card for Samsung Galaxy S4 Smartphone with custom"), "SAMSUNG GALAXY On7 (Black, 8 GB)");
+        float v = StringUtils.wordMatchD(StringUtils.toLowerCase("SAMSUNG Galaxy On Nxt (Black, 32 GB)"),
+                "Samsung Galaxy On Nxt");
         System.out.println(v);
     }
 
@@ -711,15 +712,21 @@ public class Compare2Controller {
 
     public void getPtmStdPriceBySioFromSolr(SearchIO sio) {
         PageableResult<PtmStdPriceModel> pricesList = ptmStdPriceIndexService.searchPrices(sio, 1, 5);
+        //选最大的
+        float maxMc = 0;
+        Map<Float, PtmStdPriceModel> comparedPricemnMap = new HashMap<>();
         if (pricesList != null && pricesList.getData() != null && pricesList.getData().size() > 0) {
             for (PtmStdPriceModel ptmStdPriceModel : pricesList.getData()) {
                 float mc = StringUtils.wordMatchD(StringUtils.toLowerCase(ptmStdPriceModel.getTitle()), sio.getCliQ());
                 if (mc >= 0.5) {
-                    sio.set(ptmStdPriceModel);
-                    break;
+                    if (mc > maxMc) {
+                        maxMc = mc;
+                    }
+                    comparedPricemnMap.put(mc, ptmStdPriceModel);
                 }
             }
         }
+        sio.set(comparedPricemnMap.get(maxMc));
     }
 
     /**

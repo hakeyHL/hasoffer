@@ -8,9 +8,10 @@ import hasoffer.api.helper.JsonHelper;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.app.vo.PriceCurveVo;
 import hasoffer.core.app.vo.PriceCurveXYVo;
-import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
+import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
 import hasoffer.core.persistence.mongo.PriceNode;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
+import hasoffer.core.persistence.mongo.PtmStdPriceHistoryPrice;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
@@ -41,8 +42,6 @@ public class AppSkuController {
     @Resource
     ICmpSkuService cmpSkuService;
     @Resource
-    IMongoDbManager mongoDbManager;
-    @Resource
     IPtmCmpSkuImageService ptmCmpSkuImageService;
     @Resource
     ProductServiceImpl productService;
@@ -50,6 +49,8 @@ public class AppSkuController {
     IPtmStdPriceService ptmStdPriceService;
     @Resource
     IPtmStdImageService ptmStdImageService;
+    @Resource
+    MongoDbManager mongoDbManager;
     Logger logger = LoggerFactory.getLogger(AppSkuController.class);
 
     public static List getImageArray(List<PtmCmpSkuImage> list) {
@@ -188,6 +189,7 @@ public class AppSkuController {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
+        List<PriceNode> priceNodes = null;
         //1. 先拿到所有的价格数据
         if (id <= 0) {
             jsonObject.put("errorCode", "10000");
@@ -195,8 +197,16 @@ public class AppSkuController {
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
+        if (ApiUtils.rmoveBillion(id) > 0) {
+            //从新的搜索
+            PtmStdPriceHistoryPrice ptmStdPriceHistoryPrice = mongoDbManager.queryOne(PtmStdPriceHistoryPrice.class, ApiUtils.rmoveBillion(id));
+            if (ptmStdPriceHistoryPrice != null) {
+                priceNodes = ptmStdPriceHistoryPrice.getPriceNodes();
+            }
+        } else {
+            priceNodes = cmpSkuService.queryHistoryPrice(id);
+        }
         PtmStdPrice ptmStdPrice = null;
-        List<PriceNode> priceNodes = cmpSkuService.queryHistoryPrice(id);
         if (priceNodes == null) {
             if ((id + "").length() >= 10) {
                 ptmStdPrice = ptmStdPriceService.getPtmStdPriceById(ApiUtils.rmoveBillion(id));
@@ -215,7 +225,6 @@ public class AppSkuController {
             }
 
         }
-
         boolean flag = false;
         if (priceNodes != null && priceNodes.size() != 0) {
             float referencePrice = priceNodes.get(0).getPrice();
@@ -256,8 +265,6 @@ public class AppSkuController {
             }
 
             if (flag) {
-                //有变化点
-//                System.out.println("has more than one priceNode ");
                 PriceCurveVo priceCurveVo = getPriceCurveVo(priceNodes, false);
                 priceCurveVo.setDistanceX2X(20);
                 jsonObject.put("data", JSONObject.toJSON(priceCurveVo));
