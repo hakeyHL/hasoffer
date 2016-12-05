@@ -1371,7 +1371,7 @@ public class AppController {
         if (appDeal.getDealThumbNumber() != null) {
             randomDealThumb = appDeal.getDealThumbNumber();
         }
-        dealVo.setThumbNumber(totalDealThumb == null ? 0 : totalDealThumb + randomDealThumb);
+        dealVo.setThumbNumber(totalDealThumb == null ? randomDealThumb : totalDealThumb + randomDealThumb);
         PageableResult<AppDealComment> dealComments = dealService.getPageAbleDealComment(appDeal.getId(), 1, 5);
         if (dealComments != null) {
             dealVo.setCommentNumber(dealComments.getNumFund());
