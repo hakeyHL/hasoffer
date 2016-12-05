@@ -5,6 +5,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -32,6 +33,11 @@ public class PtmStdPrice implements Identifiable<Long> {
     private Website website;
     private String url;
     private String urlKey;
+
+    @ColumnDefault(value = "0")
+    private long commentsNumber = 0;//评论数
+    @ColumnDefault(value = "0")
+    private int ratings = 0;//星级，存放百分比的整数位如 88即表示88%
 
     private Date updateTime = TimeUtils.nowDate();
     private Date createTime = TimeUtils.nowDate();//该条sku记录的创建时间
@@ -158,6 +164,22 @@ public class PtmStdPrice implements Identifiable<Long> {
         this.urlKey = urlKey;
     }
 
+    public long getCommentsNumber() {
+        return commentsNumber;
+    }
+
+    public void setCommentsNumber(long commentsNumber) {
+        this.commentsNumber = commentsNumber;
+    }
+
+    public int getRatings() {
+        return ratings;
+    }
+
+    public void setRatings(int ratings) {
+        this.ratings = ratings;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -169,6 +191,8 @@ public class PtmStdPrice implements Identifiable<Long> {
         if (Float.compare(that.price, price) != 0) return false;
         if (stockCount != that.stockCount) return false;
         if (Float.compare(that.shippingFee, shippingFee) != 0) return false;
+        if (commentsNumber != that.commentsNumber) return false;
+        if (ratings != that.ratings) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (title != null ? !title.equals(that.title) : that.title != null) return false;
         if (skuStatus != that.skuStatus) return false;
@@ -192,6 +216,8 @@ public class PtmStdPrice implements Identifiable<Long> {
         result = 31 * result + (website != null ? website.hashCode() : 0);
         result = 31 * result + (url != null ? url.hashCode() : 0);
         result = 31 * result + (urlKey != null ? urlKey.hashCode() : 0);
+        result = 31 * result + (int) (commentsNumber ^ (commentsNumber >>> 32));
+        result = 31 * result + ratings;
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         return result;
