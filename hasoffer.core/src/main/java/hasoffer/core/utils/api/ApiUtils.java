@@ -1,12 +1,12 @@
 package hasoffer.core.utils.api;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.persistence.po.ptm.PtmStdPrice;
 import hasoffer.core.persistence.po.ptm.PtmStdSkuParamGroup;
 import hasoffer.core.persistence.po.ptm.PtmStdSkuParamNode;
 import hasoffer.core.persistence.po.urm.PriceOffNotice;
@@ -14,11 +14,9 @@ import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
-import hasoffer.core.product.solr.PtmStdSkuModel;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.core.utils.ConstantUtil;
-import hasoffer.core.utils.JsonHelper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -142,18 +140,16 @@ public class ApiUtils {
 
     public static PageableResult<PtmCmpSku> setPtmCmpSkuPageableResult(String cmpSkusJson) throws java.io.IOException {
         PageableResult<PtmCmpSku> pagedCmpskus;
-        PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
+        PageableResult datas = JSON.parseObject(cmpSkusJson, PageableResult.class);
+        List<JSONObject> data = datas.getData();
         List<PtmCmpSku> cmpSkus = new ArrayList<>();
-        cmpSkus.add(new PtmCmpSku());
-        JsonHelper.transferJson2Object(datas.getData(), cmpSkus);
+        for (JSONObject jsonObject : data) {
+            String s = jsonObject.toJSONString();
+            PtmCmpSku ptmCmpSku = JSON.parseObject(s, PtmCmpSku.class);
+            cmpSkus.add(ptmCmpSku);
+        }
         pagedCmpskus = new PageableResult<>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
         return pagedCmpskus;
-    }
-
-    public static void setPriceTotalRatingNum(PtmStdSkuModel ptmStdSkuModel, List<PtmStdPrice> prices) {
-        for (PtmStdPrice ptmStdPrice : prices) {
-
-        }
     }
 
     public static int returnNumberBetween0And5(Long number) {
@@ -166,7 +162,6 @@ public class ApiUtils {
         }
         return number.intValue();
     }
-
     /**
      * 在数据对象返回客户端之前检测其域是否都有值,除对象成员外都赋初始值
      *
@@ -185,26 +180,22 @@ public class ApiUtils {
             declaredField.setAccessible(true);
             try {
                 if (declaredField.getType().equals(List.class)) {
-                    System.out.println("list");
                     if (declaredField.get(object) == null) {
                         declaredField.set(object, new ArrayList<>());
                     }
                 }
                 if (declaredField.getType().equals(Long.class)) {
-                    System.out.println("Long ");
                     //if null ,set
                     if (declaredField.get(object) == null) {
                         declaredField.set(object, 0l);
                     }
                 }
                 if (declaredField.getType().equals(Integer.class)) {
-                    System.out.println("Integer ");
                     if (declaredField.get(object) == null) {
                         declaredField.set(object, 0);
                     }
                 }
                 if (declaredField.getType().equals(Float.class)) {
-                    System.out.println("Float ");
                     if (declaredField.get(object) == null) {
                         declaredField.set(object, 0f);
                     }
@@ -213,7 +204,6 @@ public class ApiUtils {
                 System.out.println("set field exception : " + e.getMessage());
             }
         }
-        System.out.println("over");
     }
 
     public void transferJson2Object(List<LinkedHashMap> dataList, List desList) throws Exception {
@@ -240,10 +230,8 @@ public class ApiUtils {
 
     public boolean isPriceOffAlert(String userToken, Long skuId) {
         if (!StringUtils.isEmpty(userToken)) {
-            System.out.println("userToken is :" + userToken);
             UrmUser urmUser = appService.getUserByUserToken(userToken);
             if (urmUser != null) {
-                System.out.println("this userToken has user ");
                 PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + "", skuId);
                 if (priceOffNotice != null) {
                     return true;

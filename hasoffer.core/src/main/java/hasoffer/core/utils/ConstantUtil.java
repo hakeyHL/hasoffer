@@ -6,4 +6,5 @@ package hasoffer.core.utils;
  */
 public class ConstantUtil {
     public static final long API_ONE_BILLION_NUMBER = 1000000000;
+    public static final String API_DEALS_ = "API_DEALS_";
 }

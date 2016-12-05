@@ -1,21 +1,18 @@
 package hasoffer.core.cache;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
-import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.persistence.po.ptm.PtmProduct;
-import hasoffer.core.persistence.po.ptm.PtmStdImage;
-import hasoffer.core.persistence.po.ptm.PtmTopSelling;
+import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.IPtmStdImageService;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.utils.ImageUtil;
-import hasoffer.core.utils.JsonHelper;
 import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.data.redis.IRedisSetService;
@@ -25,7 +22,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Date : 2016/5/7
@@ -110,13 +110,41 @@ public class ProductCacheManager {
             List<PtmStdImage> imageList = stdImageService.getStdSkuImageBySkuId(id);
             if (imageList != null && imageList.size() > 0) {
                 imageUrl = ImageUtil.getImageUrl(imageList.get(0).getSmallImagePath());
-//                imageUrl = imageList.get(0).getOriImageUrl();
             }
             if (imageUrl != null) {
                 cacheService.add(key, imageUrl, CACHE_EXPIRE_TIME);
             }
         }
 
+        return imageUrl;
+    }
+
+    public String getPtmStdPriceImageUrl(PtmStdPrice ptmStdPrice) {
+        String key = CACHE_KEY_PRE + "_getPtmStdPriceImageUrl_" + ptmStdPrice.getId();
+        String imageUrl = cacheService.get(key, 0);
+        List<PtmStdImage> imageList;
+        if (org.apache.commons.lang3.StringUtils.isEmpty(imageUrl)) {
+            imageList = stdImageService.getStdPriceImageByPriceId(ptmStdPrice.getId());
+            if (imageList != null && imageList.size() > 0) {
+                imageUrl = ImageUtil.getImageUrl(imageList.get(0).getSmallImagePath());
+            }
+            if (imageUrl != null) {
+                cacheService.add(key, imageUrl, CACHE_EXPIRE_TIME);
+            }
+        }
+        if (org.apache.commons.lang3.StringUtils.isEmpty(imageUrl)) {
+            key = CACHE_KEY_PRE + "_getPtmStdPriceImageUrl_SKUID" + ptmStdPrice.getStdSkuId();
+            imageUrl = cacheService.get(key, 0);
+            if (org.apache.commons.lang3.StringUtils.isEmpty(imageUrl)) {
+                imageList = stdImageService.getStdSkuImageBySkuId(ptmStdPrice.getStdSkuId());
+                if (imageList != null && imageList.size() > 0) {
+                    imageUrl = ImageUtil.getImageUrl(imageList.get(0).getSmallImagePath());
+                }
+                if (imageUrl != null) {
+                    cacheService.add(key, imageUrl, CACHE_EXPIRE_TIME);
+                }
+            }
+        }
         return imageUrl;
     }
 
@@ -139,7 +167,7 @@ public class ProductCacheManager {
                 pagedCmpskus = productService.listOnsaleCmpSkus(proId, page, size);
                 List<PtmCmpSku> data = pagedCmpskus.getData();
                 if (data != null && data.size() > 0) {
-                    cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
+                    cacheService.add(key, JSON.toJSONString(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
                 } else {
                     pagedCmpskus = new PageableResult<>();
                     pagedCmpskus.setData(new ArrayList<PtmCmpSku>());
@@ -153,6 +181,7 @@ public class ProductCacheManager {
         }
         return pagedCmpskus;
     }
+
     public List<PtmProduct> getTopSellins(int page, int size) {
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_TopSelling" + "_" + page + "_" + size;
         String ptmProductJson = cacheService.get(key, 0);
@@ -177,15 +206,18 @@ public class ProductCacheManager {
                     }
                 }
                 if (products != null && products.size() > 0) {
-                    cacheService.add(key, JSONUtil.toJSON(products), TimeUtils.SECONDS_OF_1_HOUR * 8);
+                    cacheService.add(key, JSONArray.toJSONString(products), TimeUtils.SECONDS_OF_1_HOUR * 8);
                 }
             } else {
-                List<LinkedHashMap> maps = JSONUtil.toObject(ptmProductJson, List.class);
-                products.add(new PtmProduct());
-                JsonHelper.transferJson2Object(maps, products);
+//                List<PtmCmpSku> ptmCmpSkus = JSONArray.parseArray(ptmProductJson, PtmCmpSku.class);
+//                System.out.println("size is : "+ptmCmpSkus.size());
+//                List<LinkedHashMap> maps = JSONUtil.toObject(ptmProductJson, List.class);
+//                products.add(new PtmProduct());
+                products = JSONArray.parseArray(ptmProductJson, PtmProduct.class);
+//                JsonHelper.transferJson2Object(maps, products);
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
         return products;
     }
