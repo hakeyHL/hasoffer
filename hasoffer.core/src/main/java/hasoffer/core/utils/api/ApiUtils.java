@@ -1,10 +1,13 @@
 package hasoffer.core.utils.api;
 
 import com.alibaba.fastjson.JSON;
+import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmStdSkuParamGroup;
+import hasoffer.core.persistence.po.ptm.PtmStdSkuParamNode;
 import hasoffer.core.persistence.po.urm.PriceOffNotice;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
@@ -13,14 +16,12 @@ import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.core.utils.ConstantUtil;
+import hasoffer.core.utils.JsonHelper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by hs on 2016年10月19日.
@@ -124,6 +125,27 @@ public class ApiUtils {
                 urmUserDevices.add(urmUserDevice);
             }
         }
+    }
+
+    public static void setParameters(Map<String, String> specsMap, List<PtmStdSkuParamGroup> paramGroups) {
+        for (PtmStdSkuParamGroup ptmStdSkuParamGroup : paramGroups) {
+            List<PtmStdSkuParamNode> params = ptmStdSkuParamGroup.getParams();
+            for (PtmStdSkuParamNode ptmStdSkuParamNode : params) {
+                if (org.apache.commons.lang3.StringUtils.isNotEmpty(ptmStdSkuParamNode.getName()) && org.apache.commons.lang3.StringUtils.isNotEmpty(ptmStdSkuParamNode.getValue())) {
+                    specsMap.put(ptmStdSkuParamNode.getName(), ptmStdSkuParamNode.getValue());
+                }
+            }
+        }
+    }
+
+    public static PageableResult<PtmCmpSku> setPtmCmpSkuPageableResult(String cmpSkusJson) throws java.io.IOException {
+        PageableResult<PtmCmpSku> pagedCmpskus;
+        PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
+        List<PtmCmpSku> cmpSkus = new ArrayList<>();
+        cmpSkus.add(new PtmCmpSku());
+        JsonHelper.transferJson2Object(datas.getData(), cmpSkus);
+        pagedCmpskus = new PageableResult<>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
+        return pagedCmpskus;
     }
 
     /**

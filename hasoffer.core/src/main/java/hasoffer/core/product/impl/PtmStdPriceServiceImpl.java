@@ -122,17 +122,17 @@ public class PtmStdPriceServiceImpl implements IPtmStdPriceService {
 
                 ptmStdPriceUpdater.getPo().setSkuStatus(SkuStatus.ONSALE);
 
-//                //更新 commentsNumber
-//                long commentsNumber = fetchedProduct.getCommentsNumber();
-//                if (commentsNumber > 0) {
-//                    ptmCmpSkuUpdater.getPo().setCommentsNumber(commentsNumber);
-//                }
+                //更新 commentsNumber
+                long commentsNumber = fetchedProduct.getCommentsNumber();
+                if (commentsNumber > 0) {
+                    ptmStdPriceUpdater.getPo().setCommentsNumber(commentsNumber);
+                }
 
-//                //更新ratings
-//                int ratings = fetchedProduct.getRatings();
-//                if (ratings > 0) {
-//                    ptmCmpSkuUpdater.getPo().setRatings(ratings);
-//                }
+                //更新ratings
+                int ratings = fetchedProduct.getRatings();
+                if (ratings > 0) {
+                    ptmStdPriceUpdater.getPo().setRatings(ratings);
+                }
 
                 //更新 shipping
                 float shipping = fetchedProduct.getShipping();
