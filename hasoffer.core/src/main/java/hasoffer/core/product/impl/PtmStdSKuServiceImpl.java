@@ -14,11 +14,13 @@ import hasoffer.core.product.IPtmStdSkuService;
 import hasoffer.core.product.solr.PtmStdSkuIndexServiceImpl;
 import hasoffer.core.product.solr.PtmStdSkuModel;
 import hasoffer.core.search.ISearchService;
+import hasoffer.core.utils.api.ApiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -82,6 +84,8 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         //符合条件的sku筛选
         Set<Website> websiteSet = new HashSet<>();
         //最低价,高价
+        int totalCommentNumber = 0;
+        int tempRatingNumber = 0;
         if (priceList != null && priceList.size() > 0) {
             Iterator<PtmStdPrice> iterator = priceList.iterator();
             while (iterator.hasNext()) {
@@ -92,6 +96,8 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
                 if (next.getWebsite() != null) {
                     websiteSet.add(next.getWebsite());
                 }
+                totalCommentNumber += next.getCommentsNumber();
+                tempRatingNumber += next.getRatings() * next.getCommentsNumber();
             }
         } else {
             return null;
@@ -115,6 +121,9 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         });
         float minPrice = priceList.get(0).getPrice();
         float maxPrice = priceList.get(priceList.size() - 1).getPrice();
+        int ratingNumber = ApiUtils.returnNumberBetween0And5(BigDecimal.valueOf(tempRatingNumber).divide(BigDecimal.valueOf(totalCommentNumber == 0 ? 1 : totalCommentNumber), 0, BigDecimal.ROUND_HALF_UP).longValue());
+        ptmStdSkuModel.setRating(ratingNumber);
+        ptmStdSkuModel.setReview(totalCommentNumber);
         SrmProductSearchCount searchCount = searchService.findSearchCountByProductId(ptmStdSku1.getId());
         ptmStdSkuModel.setMinPrice(minPrice);
         ptmStdSkuModel.setMaxPrice(maxPrice);
