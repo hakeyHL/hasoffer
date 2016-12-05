@@ -712,9 +712,12 @@ public class Compare2Controller {
     public void getPtmStdPriceBySioFromSolr(SearchIO sio) {
         PageableResult<PtmStdPriceModel> pricesList = ptmStdPriceIndexService.searchPrices(sio, 1, 5);
         if (pricesList != null && pricesList.getData() != null && pricesList.getData().size() > 0) {
-            float mc = StringUtils.wordMatchD(StringUtils.toLowerCase(pricesList.getData().get(0).getTitle()), sio.getCliQ());
-            if (mc >= 0.5) {
-                sio.set(pricesList.getData().get(0));
+            for (PtmStdPriceModel ptmStdPriceModel : pricesList.getData()) {
+                float mc = StringUtils.wordMatchD(StringUtils.toLowerCase(ptmStdPriceModel.getTitle()), sio.getCliQ());
+                if (mc >= 0.5) {
+                    sio.set(ptmStdPriceModel);
+                    break;
+                }
             }
         }
     }
