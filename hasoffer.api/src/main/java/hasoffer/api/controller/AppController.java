@@ -1370,7 +1370,8 @@ public class AppController {
         dealVo.setWebsite(appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
         //计算总评论数
         //计算总点赞数
-        dealVo.setThumbNumber(dealService.getTotalDealThumb(appDeal.getId()) + appDeal.getDealThumbNumber() <= 0 ? appDeal.getDealThumbNumber() + 5l : appDeal.getDealThumbNumber());
+//        dealVo.setThumbNumber(dealService.getTotalDealThumb(appDeal.getId()) + appDeal.getDealThumbNumber() <= 0 ? appDeal.getDealThumbNumber() + 5l : appDeal.getDealThumbNumber());
+        dealVo.setThumbNumber(dealService.getTotalDealThumb(appDeal.getId()));
         PageableResult<AppDealComment> dealComments = dealService.getPageAbleDealComment(appDeal.getId(), 1, 5);
         if (dealComments != null) {
             dealVo.setCommentNumber(dealComments.getNumFund());
