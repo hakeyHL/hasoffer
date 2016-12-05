@@ -181,26 +181,22 @@ public class ApiUtils {
             declaredField.setAccessible(true);
             try {
                 if (declaredField.getType().equals(List.class)) {
-                    System.out.println("list");
                     if (declaredField.get(object) == null) {
                         declaredField.set(object, new ArrayList<>());
                     }
                 }
                 if (declaredField.getType().equals(Long.class)) {
-                    System.out.println("Long ");
                     //if null ,set
                     if (declaredField.get(object) == null) {
                         declaredField.set(object, 0l);
                     }
                 }
                 if (declaredField.getType().equals(Integer.class)) {
-                    System.out.println("Integer ");
                     if (declaredField.get(object) == null) {
                         declaredField.set(object, 0);
                     }
                 }
                 if (declaredField.getType().equals(Float.class)) {
-                    System.out.println("Float ");
                     if (declaredField.get(object) == null) {
                         declaredField.set(object, 0f);
                     }
@@ -209,7 +205,6 @@ public class ApiUtils {
                 System.out.println("set field exception : " + e.getMessage());
             }
         }
-        System.out.println("over");
     }
 
     public void transferJson2Object(List<LinkedHashMap> dataList, List desList) throws Exception {
@@ -236,10 +231,8 @@ public class ApiUtils {
 
     public boolean isPriceOffAlert(String userToken, Long skuId) {
         if (!StringUtils.isEmpty(userToken)) {
-            System.out.println("userToken is :" + userToken);
             UrmUser urmUser = appService.getUserByUserToken(userToken);
             if (urmUser != null) {
-                System.out.println("this userToken has user ");
                 PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + "", skuId);
                 if (priceOffNotice != null) {
                     return true;

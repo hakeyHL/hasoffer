@@ -1319,10 +1319,6 @@ public class AppController {
             sb.append("\n");
             sb.append("\n");
         }
-                               /* sb.append("How to get the deal: \n");
-                                sb.append("1 Click \"Activate Deal\" button.\n");
-                                sb.append("2 Add the product of your choice to cart.\n");
-                                sb.append("3 And no coupon code required.\n\n");*/
         if (appDeal.getPtmcmpskuid() > 0) {
             PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
             if (ptmCmpSkuDescription != null) {
