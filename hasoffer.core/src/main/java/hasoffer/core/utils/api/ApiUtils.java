@@ -6,7 +6,6 @@ import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.persistence.po.ptm.PtmStdPrice;
 import hasoffer.core.persistence.po.ptm.PtmStdSkuParamGroup;
 import hasoffer.core.persistence.po.ptm.PtmStdSkuParamNode;
 import hasoffer.core.persistence.po.urm.PriceOffNotice;
@@ -14,7 +13,6 @@ import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
-import hasoffer.core.product.solr.PtmStdSkuModel;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.core.utils.ConstantUtil;
@@ -142,20 +140,13 @@ public class ApiUtils {
 
     public static PageableResult<PtmCmpSku> setPtmCmpSkuPageableResult(String cmpSkusJson) throws java.io.IOException {
         PageableResult<PtmCmpSku> pagedCmpskus;
-        PageableResult datas = (PageableResult<Map>) JSONUtil.toObject(cmpSkusJson, PageableResult.class);
+        PageableResult datas = (PageableResult<Map>) JSON.parseObject(cmpSkusJson, PageableResult.class);
         List<PtmCmpSku> cmpSkus = new ArrayList<>();
         cmpSkus.add(new PtmCmpSku());
         JsonHelper.transferJson2Object(datas.getData(), cmpSkus);
         pagedCmpskus = new PageableResult<>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
         return pagedCmpskus;
     }
-
-    public static void setPriceTotalRatingNum(PtmStdSkuModel ptmStdSkuModel, List<PtmStdPrice> prices) {
-        for (PtmStdPrice ptmStdPrice : prices) {
-
-        }
-    }
-
     public static int returnNumberBetween0And5(Long number) {
         //取得其余数
         Long tempNumber = number % 10;

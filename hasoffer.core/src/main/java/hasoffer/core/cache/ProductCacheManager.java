@@ -1,5 +1,6 @@
 package hasoffer.core.cache;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
@@ -139,7 +140,7 @@ public class ProductCacheManager {
                 pagedCmpskus = productService.listOnsaleCmpSkus(proId, page, size);
                 List<PtmCmpSku> data = pagedCmpskus.getData();
                 if (data != null && data.size() > 0) {
-                    cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
+                    cacheService.add(key, JSON.toJSONString(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
                 } else {
                     pagedCmpskus = new PageableResult<>();
                     pagedCmpskus.setData(new ArrayList<PtmCmpSku>());
@@ -153,6 +154,7 @@ public class ProductCacheManager {
         }
         return pagedCmpskus;
     }
+
     public List<PtmProduct> getTopSellins(int page, int size) {
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_TopSelling" + "_" + page + "_" + size;
         String ptmProductJson = cacheService.get(key, 0);
@@ -177,9 +179,11 @@ public class ProductCacheManager {
                     }
                 }
                 if (products != null && products.size() > 0) {
-                    cacheService.add(key, JSONUtil.toJSON(products), TimeUtils.SECONDS_OF_1_HOUR * 8);
+                    cacheService.add(key, JSONArray.toJSONString(products), TimeUtils.SECONDS_OF_1_HOUR * 8);
                 }
             } else {
+//                List<PtmCmpSku> ptmCmpSkus = JSONArray.parseArray(ptmProductJson, PtmCmpSku.class);
+//                System.out.println("size is : "+ptmCmpSkus.size());
                 List<LinkedHashMap> maps = JSONUtil.toObject(ptmProductJson, List.class);
                 products.add(new PtmProduct());
                 JsonHelper.transferJson2Object(maps, products);
