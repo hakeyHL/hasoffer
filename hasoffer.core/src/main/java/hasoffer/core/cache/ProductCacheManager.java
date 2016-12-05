@@ -16,7 +16,6 @@ import hasoffer.core.product.IProductService;
 import hasoffer.core.product.IPtmStdImageService;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.utils.ImageUtil;
-import hasoffer.core.utils.JsonHelper;
 import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.data.redis.IRedisSetService;
@@ -26,7 +25,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Date : 2016/5/7
@@ -184,12 +186,13 @@ public class ProductCacheManager {
             } else {
 //                List<PtmCmpSku> ptmCmpSkus = JSONArray.parseArray(ptmProductJson, PtmCmpSku.class);
 //                System.out.println("size is : "+ptmCmpSkus.size());
-                List<LinkedHashMap> maps = JSONUtil.toObject(ptmProductJson, List.class);
-                products.add(new PtmProduct());
-                JsonHelper.transferJson2Object(maps, products);
+//                List<LinkedHashMap> maps = JSONUtil.toObject(ptmProductJson, List.class);
+//                products.add(new PtmProduct());
+                products = JSONArray.parseArray(ptmProductJson, PtmProduct.class);
+//                JsonHelper.transferJson2Object(maps, products);
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
         return products;
     }
