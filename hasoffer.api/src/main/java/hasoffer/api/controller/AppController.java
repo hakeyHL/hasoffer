@@ -1439,7 +1439,7 @@ public class AppController {
     }
 
     public void getDealsFromCache(List list, int page, int size) {
-        String key = ConstantUtil.API_DEALS_ + page + size;
+        String key = ConstantUtil.API_DEALS_ + page + "_" + +size;
         String dealsString = iCacheService.get(key, 0);
         if (org.apache.commons.lang3.StringUtils.isNotEmpty(dealsString)) {
             List<DealVo> dealVos = JSONArray.parseArray(dealsString, DealVo.class);
@@ -1450,7 +1450,7 @@ public class AppController {
     }
 
     public void setDeals2Cache(List list, int page, int size) {
-        String key = ConstantUtil.API_DEALS_ + page + size;
+        String key = ConstantUtil.API_DEALS_ + page + "_" + size;
         iCacheService.add(key, JSONArray.toJSONString(list), TimeUtils.SECONDS_OF_1_MINUTE * 5);
     }
 }

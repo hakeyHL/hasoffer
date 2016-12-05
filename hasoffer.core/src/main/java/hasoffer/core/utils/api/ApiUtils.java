@@ -14,7 +14,6 @@ import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
-import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.core.utils.ConstantUtil;
@@ -30,8 +29,6 @@ import java.util.*;
  */
 @Component
 public class ApiUtils {
-    @Resource
-    static ICacheService iCacheService;
     @Resource
     AppServiceImpl appService;
     @Resource
