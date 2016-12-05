@@ -165,9 +165,6 @@ public class Compare2Controller {
         mav.addObject("skus", cr.getPagedComparedSkuVos().getData());
         mav.addObject("page", PageHelper.getPageModel(request, cr.getPagedComparedSkuVos()));
         mav.addObject("newLayout", false);
-
-//        logger.info(sio.toString());
-
         return mav;
     }
 
@@ -551,9 +548,7 @@ public class Compare2Controller {
         //从ptmCmpSku表获取 productId为指定值、且状态为ONSALE 按照价格升序排列
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(product.getId(), sio.getPage(), sio.getSize());
         if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
-            System.out.println("get skus size is " + pagedCmpskus.getData().size());
             List<PtmCmpSku> cmpSkus = pagedCmpskus.getData();
-            System.out.println(" cmpskus size is " + cmpSkus.size());
             //评论数按照加权平均值展示
             Long tempTotalComments = Long.valueOf(0);
             //统计site
