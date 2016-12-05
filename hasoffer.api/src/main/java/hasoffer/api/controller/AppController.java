@@ -1141,10 +1141,8 @@ public class AppController {
                 //暂时只是去除空格,未来要加上正则匹配,希望根林不要坑我...
                 appVersion = appVersion.trim();
                 Integer vsion = Integer.valueOf(appVersion);
-                System.out.println("dealId is :" + id);
                 if (StringUtils.isEmpty(id)) {
                     //空,完毕
-                    System.out.println("no deal id ");
                     mv.addObject("data", null);
                     return mv;
                 } else {
@@ -1154,7 +1152,6 @@ public class AppController {
                         //获取点赞数和评论数以及该用户的点赞和点踩状态
                         getDealThuAndComNums(appDeal.getId(), map);
                         if (vsion < 23) {
-                            System.out.println("has this deal ");
                             map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
                             map.put("title", appDeal.getTitle());
                             map.put("website", appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
@@ -1370,7 +1367,11 @@ public class AppController {
         //计算总评论数
         //计算总点赞数
         Long totalDealThumb = dealService.getTotalDealThumb(appDeal.getId());
-        dealVo.setThumbNumber(totalDealThumb == null ? 0 : totalDealThumb + appDeal.getDealThumbNumber() <= 0 ? appDeal.getDealThumbNumber() + 5l : appDeal.getDealThumbNumber());
+        int randomDealThumb = 0;
+        if (appDeal.getDealThumbNumber() != null) {
+            randomDealThumb = appDeal.getDealThumbNumber();
+        }
+        dealVo.setThumbNumber(totalDealThumb == null ? 0 : totalDealThumb + randomDealThumb);
         PageableResult<AppDealComment> dealComments = dealService.getPageAbleDealComment(appDeal.getId(), 1, 5);
         if (dealComments != null) {
             dealVo.setCommentNumber(dealComments.getNumFund());
@@ -1382,8 +1383,18 @@ public class AppController {
         map.put("commentNumber", 0);
         map.put("thumbNumber", 0);
         Long totalDealThumb = dealService.getTotalDealThumb(dealId);
+        AppDeal dealDetail = appService.getDealDetail(dealId);
+        int randomThumbNumber = 0;
+        if (dealDetail != null) {
+            Integer dealThumbNumber = dealDetail.getDealThumbNumber();
+            if (dealThumbNumber != null) {
+                randomThumbNumber = dealThumbNumber;
+            }
+        }
         if (totalDealThumb != null) {
-            map.put("thumbNumber", totalDealThumb);
+            map.put("thumbNumber", totalDealThumb + randomThumbNumber);
+        } else {
+            map.put("thumbNumber", randomThumbNumber);
         }
         PageableResult<AppDealComment> dealComments = dealService.getPageAbleDealComment(dealId, 1, 5);
         if (dealComments != null) {
