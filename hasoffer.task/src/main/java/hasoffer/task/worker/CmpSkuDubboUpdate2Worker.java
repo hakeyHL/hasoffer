@@ -165,9 +165,12 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
 //            logger.info("createPtmCmpSkuImage fail " + skuid);
 //        }
 
-//            如果降价且CommentsNumber 大于40写入队列，并且状态必须是onsale
+//          如果降价且CommentsNumber 大于40写入队列，并且状态必须是onsale
+//          新加逻辑push逻辑使用true---rightPush
+//          新加逻辑pop辑使用true---rightPop
+//          Date：2016-12-05 12:41
         if (price > fetchedProduct.getPrice() && fetchedProduct.getCommentsNumber() > 40 && SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
-            redisListService.push(PRICE_DROP_SKUID_QUEUE, skuid + "");
+            redisListService.push(PRICE_DROP_SKUID_QUEUE, skuid + "", true);
             logger.info("price drop add to queue success " + skuid);
         }
 

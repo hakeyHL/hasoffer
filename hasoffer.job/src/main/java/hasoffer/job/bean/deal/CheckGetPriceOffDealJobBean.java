@@ -75,7 +75,10 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
 
             try {
 
-                Object pop = redisListService.pop(PRICE_DROP_SKUID_QUEUE);
+//          新加逻辑push逻辑使用true---rightPush
+//          新加逻辑pop辑使用true---rightPop
+//          Date：2016-12-05 12:41
+                Object pop = redisListService.pop(PRICE_DROP_SKUID_QUEUE, true);
 
                 if (pop == null) {
                     System.out.println("queue size =" + redisListService.size(PRICE_DROP_SKUID_QUEUE));
