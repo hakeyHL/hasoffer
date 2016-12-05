@@ -1,6 +1,7 @@
 package hasoffer.api.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
@@ -45,6 +46,7 @@ import hasoffer.core.product.solr.PtmStdSkuModel;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.IAppService;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.helper.WebsiteHelper;
@@ -424,7 +426,7 @@ public class AppController {
         PageableResult Result = appService.getDeals(Long.valueOf(page), Long.valueOf(8));
         Map map = new HashMap();
         List li = new ArrayList();
-        ApiUtils.getDealsFromCache(li, Integer.parseInt(page), 8);
+        getDealsFromCache(li, Integer.parseInt(page), 8);
         if (li.size() < 1) {
             List<AppDeal> deals = Result.getData();
             Date currentDate = new Date();
@@ -442,7 +444,7 @@ public class AppController {
             }
         }
         if (li.size() > 0) {
-            ApiUtils.setDeals2Cache(li, Integer.parseInt(page), 8);
+            setDeals2Cache(li, Integer.parseInt(page), 8);
         }
         map.put("deals", li);
         map.put("currentPage", Result.getCurrentPage());
@@ -1434,5 +1436,21 @@ public class AppController {
                 }
             }
         }
+    }
+
+    public void getDealsFromCache(List list, int page, int size) {
+        String key = ConstantUtil.API_DEALS_ + page + size;
+        String dealsString = iCacheService.get(key, 0);
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(dealsString)) {
+            List<DealVo> dealVos = JSONArray.parseArray(dealsString, DealVo.class);
+            if (dealVos != null && dealVos.size() > 0) {
+                list.addAll(dealVos);
+            }
+        }
+    }
+
+    public void setDeals2Cache(List list, int page, int size) {
+        String key = ConstantUtil.API_DEALS_ + page + size;
+        iCacheService.add(key, JSONArray.toJSONString(list), TimeUtils.SECONDS_OF_1_MINUTE * 5);
     }
 }

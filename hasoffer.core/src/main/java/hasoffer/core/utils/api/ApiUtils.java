@@ -1,13 +1,10 @@
 package hasoffer.core.utils.api;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
-import hasoffer.base.utils.TimeUtils;
-import hasoffer.core.app.vo.DealVo;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmStdSkuParamGroup;
@@ -168,23 +165,6 @@ public class ApiUtils {
         }
         return number.intValue();
     }
-
-    public static void getDealsFromCache(List list, int page, int size) {
-        String key = ConstantUtil.API_DEALS_ + page + size;
-        String dealsString = iCacheService.get(key, 0);
-        if (org.apache.commons.lang3.StringUtils.isNotEmpty(dealsString)) {
-            List<DealVo> dealVos = JSONArray.parseArray(dealsString, DealVo.class);
-            if (dealVos != null && dealVos.size() > 0) {
-                list.addAll(dealVos);
-            }
-        }
-    }
-
-    public static void setDeals2Cache(List list, int page, int size) {
-        String key = ConstantUtil.API_DEALS_ + page + size;
-        iCacheService.add(key, JSONArray.toJSONString(list), TimeUtils.SECONDS_OF_1_MINUTE * 5);
-    }
-
     /**
      * 在数据对象返回客户端之前检测其域是否都有值,除对象成员外都赋初始值
      *
