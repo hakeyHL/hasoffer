@@ -31,6 +31,7 @@ import hasoffer.core.task.ListProcessTask;
 import hasoffer.core.task.worker.ILister;
 import hasoffer.core.task.worker.IProcessor;
 import hasoffer.core.utils.ImageUtil;
+import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.model.ListProduct;
 import hasoffer.nlp.core.google.GoogleSpellChecker;
@@ -782,7 +783,7 @@ public class ProductServiceImpl implements IProductService {
             rating += cmpSku.getRatings() * cmpSku.getCommentsNumber();
         }
 
-        int rating2 = returnNumberBetween0And5(BigDecimal.valueOf(rating).divide(BigDecimal.valueOf(review == 0 ? 1 : review), 0, BigDecimal.ROUND_HALF_UP).longValue());
+        int rating2 = ApiUtils.returnNumberBetween0And5(BigDecimal.valueOf(rating).divide(BigDecimal.valueOf(review == 0 ? 1 : review), 0, BigDecimal.ROUND_HALF_UP).longValue());
         rating2 = rating2 <= 0 ? 90 : rating2;
 
         long searchCount = 0;
@@ -922,22 +923,11 @@ public class ProductServiceImpl implements IProductService {
             }
             System.out.println("totalCommentNum  " + totalCommentNum);
             productModel2.setReview(totalCommentNum.intValue());
-            int rating = returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(totalCommentNum == 0 ? 1 : totalCommentNum), 0, BigDecimal.ROUND_HALF_UP).longValue());
+            int rating = ApiUtils.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(totalCommentNum == 0 ? 1 : totalCommentNum), 0, BigDecimal.ROUND_HALF_UP).longValue());
             productModel2.setRating(rating <= 0 ? 90 : rating);
             productModel2.setStoreCount(count);
             productModel2.setMaxPrice(maxPrice);
             productModel2.setMinPrice(minPrice);
         }
-    }
-
-    public int returnNumberBetween0And5(Long number) {
-        //取得其余数
-        Long tempNumber = number % 10;
-        if (tempNumber > 0 && tempNumber <= 5) {
-            number = (number / 10) * 10 + 5;
-        } else if (tempNumber > 5) {
-            number = (number / 10) * 10 + 10;
-        }
-        return number.intValue();
     }
 }
