@@ -1,10 +1,13 @@
 package hasoffer.core.utils.api;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.app.vo.DealVo;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmStdSkuParamGroup;
@@ -14,6 +17,7 @@ import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
+import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.core.utils.ConstantUtil;
@@ -29,6 +33,8 @@ import java.util.*;
  */
 @Component
 public class ApiUtils {
+    @Resource
+    static ICacheService iCacheService;
     @Resource
     AppServiceImpl appService;
     @Resource
@@ -161,6 +167,22 @@ public class ApiUtils {
             number = (number / 10) * 10 + 10;
         }
         return number.intValue();
+    }
+
+    public static void getDealsFromCache(List list, int page, int size) {
+        String key = ConstantUtil.API_DEALS_ + page + size;
+        String dealsString = iCacheService.get(key, 0);
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(dealsString)) {
+            List<DealVo> dealVos = JSONArray.parseArray(dealsString, DealVo.class);
+            if (dealVos != null && dealVos.size() > 0) {
+                list.addAll(dealVos);
+            }
+        }
+    }
+
+    public static void setDeals2Cache(List list, int page, int size) {
+        String key = ConstantUtil.API_DEALS_ + page + size;
+        iCacheService.add(key, JSONArray.toJSONString(list), TimeUtils.SECONDS_OF_1_MINUTE * 5);
     }
 
     /**

@@ -77,6 +77,8 @@ public class AppController {
 
     @Resource
     ICacheService<UrmUser> userICacheService;
+    @Resource
+    ICacheService iCacheService;
     private Logger logger = LoggerFactory.getLogger(AppController.class);
     @Resource
     private IAppService appService;
@@ -422,19 +424,25 @@ public class AppController {
         PageableResult Result = appService.getDeals(Long.valueOf(page), Long.valueOf(8));
         Map map = new HashMap();
         List li = new ArrayList();
-        List<AppDeal> deals = Result.getData();
-        Date currentDate = new Date();
-        for (AppDeal appDeal : deals) {
-            int dateCmpResult = currentDate.compareTo(appDeal.getExpireTime());
-            DealVo dealVo = new DealVo();
-            setDeal(appDeal, dealVo);
-            if (dateCmpResult <= 0) {
-                dealVo.setIsExpired(false);
-                li.add(dealVo);
-            } else {
-                dealVo.setIsExpired(true);
-                li.add(dealVo);
+        ApiUtils.getDealsFromCache(li, Integer.parseInt(page), 8);
+        if (li.size() < 1) {
+            List<AppDeal> deals = Result.getData();
+            Date currentDate = new Date();
+            for (AppDeal appDeal : deals) {
+                int dateCmpResult = currentDate.compareTo(appDeal.getExpireTime());
+                DealVo dealVo = new DealVo();
+                setDeal(appDeal, dealVo);
+                if (dateCmpResult <= 0) {
+                    dealVo.setIsExpired(false);
+                    li.add(dealVo);
+                } else {
+                    dealVo.setIsExpired(true);
+                    li.add(dealVo);
+                }
             }
+        }
+        if (li.size() > 0) {
+            ApiUtils.setDeals2Cache(li, Integer.parseInt(page), 8);
         }
         map.put("deals", li);
         map.put("currentPage", Result.getCurrentPage());
