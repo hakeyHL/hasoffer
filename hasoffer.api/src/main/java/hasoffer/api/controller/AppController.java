@@ -1347,6 +1347,9 @@ public class AppController {
     }
 
     private void setDeal(AppDeal appDeal, DealVo dealVo) {
+        if (appDeal.getDealThumbNumber() == null) {
+            appDeal.setDealThumbNumber(0);
+        }
         dealVo.setId(appDeal.getId());
         dealVo.setType(appDeal.getWeight() >= 1 ? 1 : 0);
         dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
