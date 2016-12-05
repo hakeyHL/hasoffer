@@ -10,4 +10,7 @@ import java.util.List;
  */
 public interface IPtmStdImageService {
     List<PtmStdImage> getStdSkuImageBySkuId(Long stdSkuId);
+
+    List<PtmStdImage> getStdPriceImageByPriceId(Long priceId);
+
 }

@@ -657,7 +657,7 @@ public class Compare2Controller {
             cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
             cmpResult.setPriceList(priceList.getData());
             int rating = ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(tempTotalComments == 0 ? 1 : tempTotalComments), 0, BigDecimal.ROUND_HALF_UP).longValue());
-            cmpResult.setRatingNum(rating <= 0 ? 90 : rating);
+            cmpResult.setRatingNum(rating);
             PtmProductDescription ptmProductDescription = mongoDbManager.queryOne(PtmProductDescription.class, product.getId());
             String specs = "";
             if (ptmProductDescription != null) {
@@ -712,9 +712,12 @@ public class Compare2Controller {
     public void getPtmStdPriceBySioFromSolr(SearchIO sio) {
         PageableResult<PtmStdPriceModel> pricesList = ptmStdPriceIndexService.searchPrices(sio, 1, 5);
         if (pricesList != null && pricesList.getData() != null && pricesList.getData().size() > 0) {
-            float mc = StringUtils.wordMatchD(StringUtils.toLowerCase(pricesList.getData().get(0).getTitle()), sio.getCliQ());
-            if (mc >= 0.5) {
-                sio.set(pricesList.getData().get(0));
+            for (PtmStdPriceModel ptmStdPriceModel : pricesList.getData()) {
+                float mc = StringUtils.wordMatchD(StringUtils.toLowerCase(ptmStdPriceModel.getTitle()), sio.getCliQ());
+                if (mc >= 0.5) {
+                    sio.set(ptmStdPriceModel);
+                    break;
+                }
             }
         }
     }
@@ -839,23 +842,12 @@ public class Compare2Controller {
             cmpResult.setBestPrice(priceList.getData().get(0).getPrice());
             cmpResult.setPriceList(priceList.getData());
             int rating = ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(tempTotalComments == 0 ? 1 : tempTotalComments), 0, BigDecimal.ROUND_HALF_UP).longValue());
-            cmpResult.setRatingNum(rating <= 0 ? 90 : rating);
+            cmpResult.setRatingNum(rating);
             cmpResult.setPagedComparedSkuVos(priceList);
             cmpResult.setTotalRatingsNum(tempTotalComments);
             PtmStdSkuDetail ptmStdSkuDetail = mongoDbManager.queryOne(PtmStdSkuDetail.class, ptmStdSku.getId());
-            String specs = "";
             Map<String, String> specsMap = new HashMap();
-            if (ptmStdSkuDetail != null) {
-                List<PtmStdSkuParamGroup> paramGroups = ptmStdSkuDetail.getParamGroups();
-                for (PtmStdSkuParamGroup ptmStdSkuParamGroup : paramGroups) {
-                    List<PtmStdSkuParamNode> params = ptmStdSkuParamGroup.getParams();
-                    for (PtmStdSkuParamNode ptmStdSkuParamNode : params) {
-                        if (org.apache.commons.lang3.StringUtils.isNotEmpty(ptmStdSkuParamNode.getName()) && org.apache.commons.lang3.StringUtils.isNotEmpty(ptmStdSkuParamNode.getValue())) {
-                            specsMap.put(ptmStdSkuParamNode.getName(), ptmStdSkuParamNode.getValue());
-                        }
-                    }
-                }
-            }
+            ApiUtils.setParameters(specsMap, ptmStdSkuDetail.getParamGroups());
             cmpResult.setSpecs(JSON.toJSONString(specsMap));
             return cmpResult;
         }

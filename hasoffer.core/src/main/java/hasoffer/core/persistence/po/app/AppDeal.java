@@ -6,6 +6,7 @@ import hasoffer.core.persistence.enums.AppdealSource;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Random;
 
 /**
  * Created on 2016/6/17.
@@ -65,6 +66,7 @@ public class AppDeal implements Identifiable<Long> {
     private Float originPrice;//deal的原价
 
     private Float presentPrice;//现价
+    private Integer dealThumbNumber = new Random().nextInt(10); //deal 点赞数
 
     //保留空参构造
     public AppDeal() {
@@ -240,6 +242,14 @@ public class AppDeal implements Identifiable<Long> {
         this.presentPrice = presentPrice;
     }
 
+    public Integer getDealThumbNumber() {
+        return dealThumbNumber;
+    }
+
+    public void setDealThumbNumber(Integer dealThumbNumber) {
+        this.dealThumbNumber = dealThumbNumber;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -272,7 +282,9 @@ public class AppDeal implements Identifiable<Long> {
         if (dealCategoryId != null ? !dealCategoryId.equals(appDeal.dealCategoryId) : appDeal.dealCategoryId != null)
             return false;
         if (originPrice != null ? !originPrice.equals(appDeal.originPrice) : appDeal.originPrice != null) return false;
-        return !(presentPrice != null ? !presentPrice.equals(appDeal.presentPrice) : appDeal.presentPrice != null);
+        if (presentPrice != null ? !presentPrice.equals(appDeal.presentPrice) : appDeal.presentPrice != null)
+            return false;
+        return dealThumbNumber != null ? dealThumbNumber.equals(appDeal.dealThumbNumber) : appDeal.dealThumbNumber == null;
 
     }
 
@@ -299,6 +311,7 @@ public class AppDeal implements Identifiable<Long> {
         result = 31 * result + (int) (ptmcmpskuid ^ (ptmcmpskuid >>> 32));
         result = 31 * result + (originPrice != null ? originPrice.hashCode() : 0);
         result = 31 * result + (presentPrice != null ? presentPrice.hashCode() : 0);
+        result = 31 * result + (dealThumbNumber != null ? dealThumbNumber.hashCode() : 0);
         return result;
     }
 }
