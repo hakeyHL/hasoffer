@@ -1,6 +1,7 @@
 package hasoffer.api.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
@@ -45,6 +46,7 @@ import hasoffer.core.product.solr.PtmStdSkuModel;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.IAppService;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.helper.WebsiteHelper;
@@ -77,6 +79,8 @@ public class AppController {
 
     @Resource
     ICacheService<UrmUser> userICacheService;
+    @Resource
+    ICacheService iCacheService;
     private Logger logger = LoggerFactory.getLogger(AppController.class);
     @Resource
     private IAppService appService;
@@ -422,19 +426,25 @@ public class AppController {
         PageableResult Result = appService.getDeals(Long.valueOf(page), Long.valueOf(8));
         Map map = new HashMap();
         List li = new ArrayList();
-        List<AppDeal> deals = Result.getData();
-        Date currentDate = new Date();
-        for (AppDeal appDeal : deals) {
-            int dateCmpResult = currentDate.compareTo(appDeal.getExpireTime());
-            DealVo dealVo = new DealVo();
-            setDeal(appDeal, dealVo);
-            if (dateCmpResult <= 0) {
-                dealVo.setIsExpired(false);
-                li.add(dealVo);
-            } else {
-                dealVo.setIsExpired(true);
-                li.add(dealVo);
+        getDealsFromCache(li, Integer.parseInt(page), 8);
+        if (li.size() < 1) {
+            List<AppDeal> deals = Result.getData();
+            Date currentDate = new Date();
+            for (AppDeal appDeal : deals) {
+                int dateCmpResult = currentDate.compareTo(appDeal.getExpireTime());
+                DealVo dealVo = new DealVo();
+                setDeal(appDeal, dealVo);
+                if (dateCmpResult <= 0) {
+                    dealVo.setIsExpired(false);
+                    li.add(dealVo);
+                } else {
+                    dealVo.setIsExpired(true);
+                    li.add(dealVo);
+                }
             }
+        }
+        if (li.size() > 0) {
+            setDeals2Cache(li, Integer.parseInt(page), 8);
         }
         map.put("deals", li);
         map.put("currentPage", Result.getCurrentPage());
@@ -1141,10 +1151,8 @@ public class AppController {
                 //暂时只是去除空格,未来要加上正则匹配,希望根林不要坑我...
                 appVersion = appVersion.trim();
                 Integer vsion = Integer.valueOf(appVersion);
-                System.out.println("dealId is :" + id);
                 if (StringUtils.isEmpty(id)) {
                     //空,完毕
-                    System.out.println("no deal id ");
                     mv.addObject("data", null);
                     return mv;
                 } else {
@@ -1154,7 +1162,6 @@ public class AppController {
                         //获取点赞数和评论数以及该用户的点赞和点踩状态
                         getDealThuAndComNums(appDeal.getId(), map);
                         if (vsion < 23) {
-                            System.out.println("has this deal ");
                             map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
                             map.put("title", appDeal.getTitle());
                             map.put("website", appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
@@ -1319,10 +1326,6 @@ public class AppController {
             sb.append("\n");
             sb.append("\n");
         }
-                               /* sb.append("How to get the deal: \n");
-                                sb.append("1 Click \"Activate Deal\" button.\n");
-                                sb.append("2 Add the product of your choice to cart.\n");
-                                sb.append("3 And no coupon code required.\n\n");*/
         if (appDeal.getPtmcmpskuid() > 0) {
             PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, appDeal.getPtmcmpskuid());
             if (ptmCmpSkuDescription != null) {
@@ -1351,6 +1354,9 @@ public class AppController {
     }
 
     private void setDeal(AppDeal appDeal, DealVo dealVo) {
+        if (appDeal.getDealThumbNumber() == null) {
+            appDeal.setDealThumbNumber(0);
+        }
         dealVo.setId(appDeal.getId());
         dealVo.setType(appDeal.getWeight() >= 1 ? 1 : 0);
         dealVo.setImage(appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
@@ -1370,8 +1376,12 @@ public class AppController {
         dealVo.setWebsite(appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
         //计算总评论数
         //计算总点赞数
-//        dealVo.setThumbNumber(dealService.getTotalDealThumb(appDeal.getId()) + appDeal.getDealThumbNumber() <= 0 ? appDeal.getDealThumbNumber() + 5l : appDeal.getDealThumbNumber());
-        dealVo.setThumbNumber(dealService.getTotalDealThumb(appDeal.getId()));
+        Long totalDealThumb = dealService.getTotalDealThumb(appDeal.getId());
+        int randomDealThumb = 0;
+        if (appDeal.getDealThumbNumber() != null) {
+            randomDealThumb = appDeal.getDealThumbNumber();
+        }
+        dealVo.setThumbNumber(totalDealThumb == null ? randomDealThumb : totalDealThumb + randomDealThumb);
         PageableResult<AppDealComment> dealComments = dealService.getPageAbleDealComment(appDeal.getId(), 1, 5);
         if (dealComments != null) {
             dealVo.setCommentNumber(dealComments.getNumFund());
@@ -1383,8 +1393,18 @@ public class AppController {
         map.put("commentNumber", 0);
         map.put("thumbNumber", 0);
         Long totalDealThumb = dealService.getTotalDealThumb(dealId);
+        AppDeal dealDetail = appService.getDealDetail(dealId);
+        int randomThumbNumber = 0;
+        if (dealDetail != null) {
+            Integer dealThumbNumber = dealDetail.getDealThumbNumber();
+            if (dealThumbNumber != null) {
+                randomThumbNumber = dealThumbNumber;
+            }
+        }
         if (totalDealThumb != null) {
-            map.put("thumbNumber", totalDealThumb);
+            map.put("thumbNumber", totalDealThumb + randomThumbNumber);
+        } else {
+            map.put("thumbNumber", randomThumbNumber);
         }
         PageableResult<AppDealComment> dealComments = dealService.getPageAbleDealComment(dealId, 1, 5);
         if (dealComments != null) {
@@ -1416,5 +1436,21 @@ public class AppController {
                 }
             }
         }
+    }
+
+    public void getDealsFromCache(List list, int page, int size) {
+        String key = ConstantUtil.API_DEALS_ + page + "_" + +size;
+        String dealsString = iCacheService.get(key, 0);
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(dealsString)) {
+            List<DealVo> dealVos = JSONArray.parseArray(dealsString, DealVo.class);
+            if (dealVos != null && dealVos.size() > 0) {
+                list.addAll(dealVos);
+            }
+        }
+    }
+
+    public void setDeals2Cache(List list, int page, int size) {
+        String key = ConstantUtil.API_DEALS_ + page + "_" + size;
+        iCacheService.add(key, JSONArray.toJSONString(list), TimeUtils.SECONDS_OF_1_MINUTE * 5);
     }
 }

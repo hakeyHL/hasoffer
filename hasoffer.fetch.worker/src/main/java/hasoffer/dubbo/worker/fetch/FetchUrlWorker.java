@@ -66,13 +66,13 @@ public class FetchUrlWorker implements Runnable {
                         pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.DEAL_UPDATE, website));
                     }
                     if (pop == null) {
+                        pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.STDPRICE_UPDATE, website));
+                    }
+                    if (pop == null) {
                         pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.SKU_UPDATE, website));
                     }
                     if (pop == null) {
                         pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.PRICE_CHANGES, website));
-                    }
-                    if (pop == null) {
-                        pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.STDPRICE_UPDATE, website));
                     }
                 }
                 if (pop == null) {
