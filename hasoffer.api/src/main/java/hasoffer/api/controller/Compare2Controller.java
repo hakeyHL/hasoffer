@@ -217,7 +217,7 @@ public class Compare2Controller {
             price = apiUtils.getStringNum(price);
         }
         SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, pageSize);
-//        getPtmStdPriceBySioFromSolr(sio);
+        getPtmStdPriceBySioFromSolr(sio);
         if (sio.getStdSkuId() <= 0) {
             getSioBySearch(sio);
         }
