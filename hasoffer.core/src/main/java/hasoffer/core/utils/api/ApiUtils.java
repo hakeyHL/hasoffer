@@ -1,6 +1,7 @@
 package hasoffer.core.utils.api;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
@@ -16,7 +17,6 @@ import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.core.utils.ConstantUtil;
-import hasoffer.core.utils.JsonHelper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -140,13 +140,18 @@ public class ApiUtils {
 
     public static PageableResult<PtmCmpSku> setPtmCmpSkuPageableResult(String cmpSkusJson) throws java.io.IOException {
         PageableResult<PtmCmpSku> pagedCmpskus;
-        PageableResult datas = (PageableResult<Map>) JSON.parseObject(cmpSkusJson, PageableResult.class);
+        PageableResult datas = JSON.parseObject(cmpSkusJson, PageableResult.class);
+        List<JSONObject> data = datas.getData();
         List<PtmCmpSku> cmpSkus = new ArrayList<>();
-        cmpSkus.add(new PtmCmpSku());
-        JsonHelper.transferJson2Object(datas.getData(), cmpSkus);
+        for (JSONObject jsonObject : data) {
+            String s = jsonObject.toJSONString();
+            PtmCmpSku ptmCmpSku = JSON.parseObject(s, PtmCmpSku.class);
+            cmpSkus.add(ptmCmpSku);
+        }
         pagedCmpskus = new PageableResult<>(cmpSkus, datas.getNumFund(), datas.getCurrentPage(), datas.getPageSize());
         return pagedCmpskus;
     }
+
     public static int returnNumberBetween0And5(Long number) {
         //取得其余数
         Long tempNumber = number % 10;
