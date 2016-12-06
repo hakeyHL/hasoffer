@@ -214,7 +214,7 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
 
                     if (flag) {
                         dealService.createAppDealByPriceOff(appdeal);
-                        System.out.println("create priceoff deal success");
+                        System.out.println("create deal info id " + appdeal.getId() + "_now parice " + appdeal.getPresentPrice());
                         //创建成功一个就跳出
                         break;
                     }
