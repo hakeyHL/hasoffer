@@ -108,6 +108,8 @@ public class StdPriceDubboUpdateWorker implements Runnable {
 
         FetchedProduct fetchedProduct = fetchUrlResult.getFetchProduct();
 
+        System.out.println("fetch result is :" + fetchedProduct);
+
         try {
             //
             ptmStdPriceService.updatePtmStdPriceBySpiderFetchedProduct(stdPriceId, fetchedProduct);
