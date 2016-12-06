@@ -27,6 +27,6 @@ public class PtmStdImageServiceImpl implements IPtmStdImageService {
 
     @Override
     public List<PtmStdImage> getStdPriceImageByPriceId(Long priceId) {
-        return dbm.query(PTMSTDIMAGE_GET_IMAGEURL_BY_SKUID, Arrays.asList(priceId));
+        return dbm.query(PTMSTDIMAGE_GET_IMAGEURL_BY_PRICEID, Arrays.asList(priceId));
     }
 }

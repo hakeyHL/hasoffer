@@ -120,18 +120,7 @@ public class ProductCacheManager {
     }
 
     public String getPtmStdPriceImageUrl(PtmStdPrice ptmStdPrice) {
-        String key = CACHE_KEY_PRE + "_getPtmStdSkuImageUrl_" + ptmStdPrice.getStdSkuId();
-        String imageUrl = cacheService.get(key, 0);
-        if (imageUrl == null) {
-            List<PtmStdImage> imageList = stdImageService.getStdSkuImageBySkuId(ptmStdPrice.getStdSkuId());
-            if (imageList != null && imageList.size() > 0) {
-                imageUrl = ImageUtil.getImageUrl(imageList.get(0).getSmallImagePath());
-            }
-            if (imageUrl != null) {
-                cacheService.add(key, imageUrl, CACHE_EXPIRE_TIME);
-            }
-        }
-       /* String key = CACHE_KEY_PRE + "_getPtmStdPriceImageUrl_" + ptmStdPrice.getId();
+        String key = CACHE_KEY_PRE + "_getPtmStdPriceImageUrl_" + ptmStdPrice.getId();
         String imageUrl = cacheService.get(key, 0);
         List<PtmStdImage> imageList;
         if (org.apache.commons.lang3.StringUtils.isEmpty(imageUrl)) {
@@ -155,7 +144,7 @@ public class ProductCacheManager {
                     cacheService.add(key, imageUrl, CACHE_EXPIRE_TIME);
                 }
             }
-        }*/
+        }
         return imageUrl;
     }
 
