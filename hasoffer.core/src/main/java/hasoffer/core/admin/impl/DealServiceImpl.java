@@ -7,12 +7,14 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.dbm.HibernateDao;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.enums.AppdealSource;
 import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppDealComment;
 import hasoffer.core.persistence.po.app.AppDealThumb;
 import hasoffer.core.persistence.po.app.updater.AppBannerUpdater;
 import hasoffer.core.persistence.po.app.updater.AppDealUpdater;
+import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.solr.DealIndexServiceImpl;
 import hasoffer.core.product.solr.DealModel;
 import hasoffer.core.task.ListProcessTask;
@@ -57,7 +59,9 @@ public class DealServiceImpl implements IDealService {
     @Resource
     ExcelImporter importer;
     @Resource
-    private HibernateDao dao;
+    HibernateDao dao;
+    @Resource
+    ICmpSkuService cmpSkuService;
 
     public static void main(String[] args) {
         if (!(Website.valueOf("SHOP") instanceof Website)) {
@@ -258,7 +262,17 @@ public class DealServiceImpl implements IDealService {
                 newDeal.setPresentPrice(newPrice);
                 newDeal.setDiscount((int) ((1 - newPrice / originPrice) * 100));
 
+                if (AppdealSource.PRICE_OFF.equals(newDeal.getAppdealSource())) {
+
+                    long ptmcmpskuid = newDeal.getPtmcmpskuid();
+                    Float presentPrice = newDeal.getPresentPrice();
+
+                    if (ptmcmpskuid != 0) {
+                        cmpSkuService.saveHistoryPrice(ptmcmpskuid, TimeUtils.nowDate(), presentPrice);
+                    }
+                }
                 createAppDealByPriceOff(newDeal);
+                System.out.println("clone deal info id " + newDeal.getId() + "_now parice " + newDeal.getPresentPrice() + "_oriPrice " + originPrice);
             } catch (Exception e) {
                 System.out.println("updateDealExpire clone bean fail");
             }
