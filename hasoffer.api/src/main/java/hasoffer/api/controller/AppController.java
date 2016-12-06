@@ -658,7 +658,6 @@ public class AppController {
                 break;
             case 2:
                 //search by title
-                System.out.println("  sort " + criteria.getSort().name());
                 criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
                 PageableResult p;
                 p = ptmStdSkuIndexService.searchProducts(criteria);
