@@ -3,6 +3,7 @@ package hasoffer.api.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.amazonaws.util.Md5Utils;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.base.model.Website;
 import hasoffer.base.redis.RedisKey;
@@ -22,6 +23,7 @@ import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IPtmStdPriceService;
 import hasoffer.core.redis.ICacheService;
+import hasoffer.core.system.AppUserService;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.core.utils.api.ApiUtils;
@@ -65,9 +67,10 @@ public class AppUserController {
     MongoDbManager mongoDbManager;
     @Resource
     ApiUtils apiUtils;
-
     @Resource
     IPtmStdPriceService ptmStdPriceService;
+    @Resource
+    AppUserService appUserService;
 
     public static void main(String[] args) {
         //String affs[] = null;
@@ -516,5 +519,69 @@ public class AppUserController {
         System.out.println("totalTime : " + (BigDecimal.valueOf(System.currentTimeMillis()).subtract(BigDecimal.valueOf(startTime)).divide(BigDecimal.valueOf(1000), 1, BigDecimal.ROUND_HALF_UP)));
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
+    }
+
+    @RequestMapping(value = "user/login")
+    public ModelAndView regOrLogin(int type, String email, String passwd, String userName) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("errorCode", "00000");
+        modelAndView.addObject("msg", "success");
+        //用户名为邮箱
+        if (StringUtils.isEmpty(passwd)) {
+            //拒绝
+            modelAndView.addObject("errorCode", "10000");
+            modelAndView.addObject("msg", "passwd can not be empty .");
+        }
+        Map resultMap = new HashMap();
+        //头像为默认头像,客户端默认,server不管
+        switch (type) {
+            case 0:
+                //注册
+                if (StringUtils.isEmpty(email)) {
+                    //拒绝
+                    modelAndView.addObject("errorCode", "10000");
+                    modelAndView.addObject("msg", "email can not be empty .");
+                }
+                UrmUser urmUser = appUserService.getUrmUserByEmail(email);
+                if (urmUser != null) {
+                    //已存在,拒绝
+                    modelAndView.addObject("errorCode", "10000");
+                    modelAndView.addObject("msg", "email had registered.");
+                }
+                //添加
+                UrmUser newUrmUser = new UrmUser();
+                newUrmUser.setType(1);
+                newUrmUser.setEmail(email);
+                newUrmUser.setUserName(email);
+                newUrmUser.setPasswd(Md5Utils.md5AsBase64(passwd.getBytes()));
+                try {
+                    appUserService.insertUser(newUrmUser);
+                } catch (Exception e) {
+                    System.out.println("add user failed ." + e.getMessage());
+                    modelAndView.addObject("errorCode", "10000");
+                    modelAndView.addObject("msg", "add user failed ,please try again later .");
+                }
+                break;
+            case 1:
+                //登录
+                if (StringUtils.isEmpty(userName)) {
+                    //拒绝
+                    modelAndView.addObject("errorCode", "10000");
+                    modelAndView.addObject("msg", "userName can not be empty .");
+                }
+                //按照用户名和密码与去搜索
+                UrmUser authedUrmUser = appUserService.getUrmUserByUserNameAndPwd(userName, Md5Utils.md5AsBase64(passwd.getBytes()));
+                if (authedUrmUser == null) {
+                    modelAndView.addObject("errorCode", "10000");
+                    modelAndView.addObject("msg", "userName or password  are not corrected.");
+                } else {
+                    authedUrmUser.setUserToken(UUID.randomUUID().toString());
+                    appUserService.updateUrmUser(authedUrmUser);
+                    resultMap.put("userToken", authedUrmUser.getUserToken());
+                }
+                break;
+            default:
+        }
+        return modelAndView;
     }
 }

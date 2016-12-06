@@ -272,6 +272,7 @@ public class DealServiceImpl implements IDealService {
                     }
                 }
                 createAppDealByPriceOff(newDeal);
+                System.out.println("clone deal info id " + newDeal.getId() + "_now parice " + newDeal.getPresentPrice() + "_oriPrice " + originPrice);
             } catch (Exception e) {
                 System.out.println("updateDealExpire clone bean fail");
             }
