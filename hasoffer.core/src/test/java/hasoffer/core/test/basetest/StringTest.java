@@ -2,6 +2,7 @@ package hasoffer.core.test.basetest;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.StringUtils;
@@ -25,8 +26,9 @@ public class StringTest {
 
     @Test
     public void testYmd() {
-        String ymd = TimeUtils.parse(TimeUtils.today(), TimeUtils.PATTERN_YMD);
-        System.out.println(ymd);
+        for (TaskLevel taskLevel : TaskLevel.values()) {
+            System.out.println(taskLevel);
+        }
     }
 
     @Test
