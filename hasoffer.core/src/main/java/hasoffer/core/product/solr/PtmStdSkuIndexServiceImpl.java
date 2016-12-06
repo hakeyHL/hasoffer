@@ -120,6 +120,8 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
                 sorts = new Sort[1];
                 sorts[0] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.DESC);
             }
+        } else {
+            sorts[0] = new Sort("review", Order.DESC);
         }
         return sorts;
     }
