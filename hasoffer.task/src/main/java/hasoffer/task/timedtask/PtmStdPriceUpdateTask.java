@@ -81,10 +81,11 @@ public class PtmStdPriceUpdateTask {
                             ptmStdPrice.setUrl(url);
                         }
 
-                        fetchDubboService.sendUrlTask(ptmStdPrice.getWebsite(), ptmStdPrice.getUrl(), TaskTarget.STDPRICE_UPDATE, TaskLevel.LEVEL_3);
+                        fetchDubboService.sendUrlTask(ptmStdPrice.getWebsite(), ptmStdPrice.getUrl(), TaskTarget.STDPRICE_UPDATE, TaskLevel.LEVEL_2);
                         System.out.println("send stdprice request succes for " + ptmStdPrice.getWebsite() + " sku id is _" + ptmStdPrice.getId() + "_");
                     } else if (Website.EBAY.equals(website) || Website.PAYTM.equals(website) || Website.SHOPCLUES.equals(website) || Website.INFIBEAM.equals(website)) {
-                        fetchDubboService.sendUrlTask(ptmStdPrice.getWebsite(), ptmStdPrice.getUrl(), TaskTarget.STDPRICE_UPDATE, TaskLevel.LEVEL_5);
+                        //未保证更新，暂时level改成2
+                        fetchDubboService.sendUrlTask(ptmStdPrice.getWebsite(), ptmStdPrice.getUrl(), TaskTarget.STDPRICE_UPDATE, TaskLevel.LEVEL_2);
                         System.out.println("send stdprice request succes for " + ptmStdPrice.getWebsite() + " sku id is _" + ptmStdPrice.getId() + "_");
                     } else {
                         continue;
