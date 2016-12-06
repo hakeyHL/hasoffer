@@ -31,7 +31,7 @@ public class PtmStdPriceUpdateTask {
     @Resource
     IFetchDubboService fetchDubboService;
 
-    @Scheduled(cron = "0 45 0/2 * * ?")
+    @Scheduled(cron = "0 0/1 * * * ?")
     public void updatePtmStdPrice() {
 
         int curPage = 1;
