@@ -80,6 +80,10 @@ public class DealVo {
         return exp;
     }
 
+    public void setExp(String exp) {
+        this.exp = exp;
+    }
+
     public void setExp(Date time) {
         this.exp = new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(time);
     }
