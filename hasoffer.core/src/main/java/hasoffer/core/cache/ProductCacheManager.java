@@ -144,7 +144,7 @@ public class ProductCacheManager {
             }
         }
         if (org.apache.commons.lang3.StringUtils.isEmpty(imageUrl)) {
-            key = CACHE_KEY_PRE + "_getPtmStdPriceImageUrl_SKUID" + ptmStdPrice.getStdSkuId();
+            key = CACHE_KEY_PRE + "_getPtmStdPriceImageUrl_SKUID_" + ptmStdPrice.getStdSkuId();
             imageUrl = cacheService.get(key, 0);
             if (org.apache.commons.lang3.StringUtils.isEmpty(imageUrl)) {
                 imageList = stdImageService.getStdSkuImageBySkuId(ptmStdPrice.getStdSkuId());
