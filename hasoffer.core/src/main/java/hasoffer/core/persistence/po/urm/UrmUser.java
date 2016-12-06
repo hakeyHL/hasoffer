@@ -27,53 +27,9 @@ public class UrmUser implements Identifiable<Long> {
     private String telephone;
     private String gcmToken;
     private String email;
-    ////用户的coin
-
-    //@Column(columnDefinition = "bigint default 0")
-    //private Long signCoin = 0L;
-    ////当前最大连续签到次数
-    //@Column(columnDefinition = "int default 0")
-    //private Integer conSignNum = 0;
-    ////上次签到时间
-    //private Long lastSignTime;
-    ////最高连续签到记录
-    //@Column(columnDefinition = "int default 0")
-    //private Integer maxConSignNum;
-
-    //@Column(columnDefinition = "int default 0")
-    //public Integer getMaxConSignNum() {
-    //    return maxConSignNum;
-    //}
-    //
-    //public void setMaxConSignNum(Integer maxConSignNum) {
-    //    this.maxConSignNum = maxConSignNum;
-    //}
-    //
-    //public Long getSignCoin() {
-    //    return signCoin;
-    //}
-    //
-    //public void setSignCoin(Long signCoin) {
-    //    this.signCoin = signCoin;
-    //}
-    //
-    //public Integer getConSignNum() {
-    //    return conSignNum;
-    //}
-    //
-    //public void setConSignNum(Integer conSignNum) {
-    //    this.conSignNum = conSignNum;
-    //}
-    //
-    //public Long getLastSignTime() {
-    //    return lastSignTime;
-    //}
-    //
-    //public void setLastSignTime(Long lastSignTime) {
-    //    this.lastSignTime = lastSignTime;
-    //}
-
-
+    private String passwd;
+    @Column(columnDefinition = "int default 0")
+    private Integer type = 0;
     public String getTelephone() {
         return telephone;
     }
@@ -162,6 +118,22 @@ public class UrmUser implements Identifiable<Long> {
         this.email = email;
     }
 
+    public String getPasswd() {
+        return passwd;
+    }
+
+    public void setPasswd(String passwd) {
+        this.passwd = passwd;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -180,7 +152,9 @@ public class UrmUser implements Identifiable<Long> {
         if (createTime != null ? !createTime.equals(urmUser.createTime) : urmUser.createTime != null) return false;
         if (telephone != null ? !telephone.equals(urmUser.telephone) : urmUser.telephone != null) return false;
         if (gcmToken != null ? !gcmToken.equals(urmUser.gcmToken) : urmUser.gcmToken != null) return false;
-        return !(email != null ? !email.equals(urmUser.email) : urmUser.email != null);
+        if (email != null ? !email.equals(urmUser.email) : urmUser.email != null) return false;
+        if (passwd != null ? !passwd.equals(urmUser.passwd) : urmUser.passwd != null) return false;
+        return type != null ? type.equals(urmUser.type) : urmUser.type == null;
 
     }
 
@@ -197,6 +171,8 @@ public class UrmUser implements Identifiable<Long> {
         result = 31 * result + (telephone != null ? telephone.hashCode() : 0);
         result = 31 * result + (gcmToken != null ? gcmToken.hashCode() : 0);
         result = 31 * result + (email != null ? email.hashCode() : 0);
+        result = 31 * result + (passwd != null ? passwd.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
         return result;
     }
 }

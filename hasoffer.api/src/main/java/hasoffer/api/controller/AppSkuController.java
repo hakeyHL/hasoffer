@@ -6,25 +6,31 @@ import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.JsonHelper;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.app.vo.DeviceInfoVo;
 import hasoffer.core.app.vo.PriceCurveVo;
 import hasoffer.core.app.vo.PriceCurveXYVo;
 import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
-import hasoffer.core.persistence.mongo.PriceNode;
-import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
-import hasoffer.core.persistence.mongo.PtmStdPriceHistoryPrice;
+import hasoffer.core.persistence.mongo.*;
 import hasoffer.core.persistence.po.ptm.*;
+import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
 import hasoffer.core.product.IPtmStdImageService;
 import hasoffer.core.product.IPtmStdPriceService;
 import hasoffer.core.product.impl.ProductServiceImpl;
+import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.core.utils.api.ApiUtils;
+import hasoffer.webcommon.context.Context;
+import hasoffer.webcommon.context.StaticContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -51,6 +57,8 @@ public class AppSkuController {
     IPtmStdImageService ptmStdImageService;
     @Resource
     MongoDbManager mongoDbManager;
+    @Resource
+    AppServiceImpl appService;
     Logger logger = LoggerFactory.getLogger(AppSkuController.class);
 
     public static List getImageArray(List<PtmCmpSkuImage> list) {
@@ -281,6 +289,122 @@ public class AppSkuController {
         }
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
+    }
+
+    @RequestMapping("priceReport")
+    public ModelAndView priceReport(@RequestParam(defaultValue = "0") long skuId) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("errorCode", "00000");
+        modelAndView.addObject("msg", "success");
+        Date currentDate = new Date();
+        //要skuId
+        if (skuId <= 0) {
+            modelAndView.addObject("errorCode", "10000");
+            modelAndView.addObject("msg", "is ls zero .");
+        }
+
+
+        PriceReportLog priceReportLog = new PriceReportLog();
+        PriceReportStatistics priceReportStatistics;
+        boolean flag = true;
+        PriceReportStatistics statisticsReport = mongoDbManager.queryOne(PriceReportStatistics.class, skuId);
+        if (statisticsReport != null) {
+            priceReportStatistics = statisticsReport;
+            Update update = new Update();
+            update.set("updateTime", currentDate);
+            update.set("updateStamp", currentDate.getTime());
+            update.set("count", priceReportStatistics.getCount() + 1);
+            mongoDbManager.update(PriceReportStatistics.class, priceReportStatistics.getId(), update);
+            flag = false;
+        } else {
+            priceReportStatistics = new PriceReportStatistics();
+        }
+        //deviceId
+        DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        if (deviceInfo != null) {
+            String deviceId = deviceInfo.getDeviceId();
+            if (org.apache.commons.lang3.StringUtils.isNotEmpty(deviceId)) {
+                priceReportLog.setDeviceId(deviceId);
+            }
+        }
+        //userId
+        String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
+        UrmUser user = appService.getUserByUserToken(userToken);
+        if (user != null) {
+            priceReportLog.setUserId(user.getId());
+        }
+
+        priceReportLog.setSaveResult("success");
+        priceReportLog.setErrorMsg("no");
+        priceReportLog.setId(skuId);
+        priceReportLog.setTime(TimeUtils.parse(currentDate, "yyyyMMdd"));
+        priceReportLog.setStamp(currentDate.getTime());
+
+        if (flag) {
+            priceReportStatistics.setId(skuId);
+            priceReportStatistics.setTime(TimeUtils.parse(currentDate, "yyyyMMdd"));
+            priceReportStatistics.setStamp(currentDate.getTime());
+            priceReportStatistics.setSaveResult("success");
+            priceReportStatistics.setErrorMsg("no");
+            priceReportStatistics.setCount(priceReportStatistics.getCount() + 1);
+        }
+
+        PtmStdPrice ptmStdPrice;
+        PtmCmpSku ptmCmpSku;
+
+        //校验skuId
+        //根据skuId获取其商品Id
+        if (ApiUtils.rmoveBillion(skuId) > 0) {
+            ptmStdPrice = ptmStdPriceService.getPtmStdPriceById(ApiUtils.rmoveBillion(skuId));
+            priceReportLog.setpId(ptmStdPrice.getStdSkuId());
+            priceReportLog.setTitle(ptmStdPrice.getTitle());
+            priceReportLog.setPrice(ptmStdPrice.getPrice());
+            if (flag) {
+                priceReportStatistics.setpId(ptmStdPrice.getStdSkuId());
+                priceReportStatistics.setTitle(ptmStdPrice.getTitle());
+                priceReportStatistics.setPrice(ptmStdPrice.getPrice());
+            }
+        } else {
+            ptmCmpSku = cmpSkuService.getCmpSkuById(skuId);
+            priceReportLog.setpId(ptmCmpSku.getProductId());
+            priceReportLog.setTitle(ptmCmpSku.getTitle());
+            priceReportLog.setPrice(ptmCmpSku.getPrice());
+
+            if (flag) {
+                priceReportStatistics.setpId(ptmCmpSku.getProductId());
+                priceReportStatistics.setTitle(ptmCmpSku.getTitle());
+                priceReportStatistics.setPrice(ptmCmpSku.getPrice());
+            }
+        }
+        try {
+            mongoDbManager.save(priceReportLog);
+        } catch (Exception e) {
+            modelAndView.addObject("errorCode", "10000");
+            modelAndView.addObject("msg", "failed");
+            Update update = new Update();
+            update.set("saveResult", "failed");
+            update.set("errorMsg", e.getMessage());
+            mongoDbManager.update(PriceReportLog.class, priceReportLog.getId(), update);
+        }
+        if (flag) {
+            try {
+                priceReportStatistics.setUpdateTime(currentDate);
+                priceReportStatistics.setCount(1);
+                priceReportStatistics.setUpdateStamp(currentDate.getTime());
+                mongoDbManager.save(priceReportStatistics);
+            } catch (Exception e) {
+                modelAndView.addObject("errorCode", "10000");
+                modelAndView.addObject("msg", "failed");
+                Update update = new Update();
+                Date failDate = new Date();
+                update.set("saveResult", "failed");
+                update.set("errorMsg", e.getMessage());
+                update.set("updateTime", failDate);
+                update.set("updateStamp", failDate.getTime());
+                mongoDbManager.update(PriceReportStatistics.class, priceReportStatistics.getId(), update);
+            }
+        }
+        return modelAndView;
     }
 
     /**
