@@ -17,9 +17,13 @@ import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.core.utils.ConstantUtil;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -162,6 +166,7 @@ public class ApiUtils {
         }
         return number.intValue();
     }
+
     /**
      * 在数据对象返回客户端之前检测其域是否都有值,除对象成员外都赋初始值
      *
@@ -239,5 +244,26 @@ public class ApiUtils {
             }
         }
         return false;
+    }
+
+    public void sendEmail(String to) throws MessagingException {
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        Properties prop = new Properties();
+        prop.put("mail.smtp.auth", "true"); // 将这个参数设为true，让服务器进行认证,认证用户名和密码是否正确
+        prop.put("mail.smtp.timeout", "25000");
+        mailSender.setJavaMailProperties(prop);
+        mailSender.setUsername("zhouwendong@hasoffer.com"); // 根据自己的情况,设置username
+        mailSender.setPassword("Zhou1008");
+        mailSender.setHost("smtp.exmail.qq.com");
+        // 构建简单邮件对象，见名知意
+        MimeMessage mailMessage = mailSender.createMimeMessage();
+        MimeMessageHelper messageHelper = new MimeMessageHelper(mailMessage, true, "utf-8");
+        // 设定邮件参数
+        messageHelper.setFrom("zhouwendong@hasoffer.com");
+        messageHelper.setTo(to);
+        messageHelper.setSubject("欢迎使用");
+//        messageHelper.setText("Click ‘完成验证’ to finish auth:<a href=\"http://localhost:8080/u/ev/" + userId + "/" + activeCode + "\">验证</a>", true);
+        // 发送邮件
+        mailSender.send(mailMessage);
     }
 }
