@@ -31,16 +31,26 @@ public class OrderSCJobBean extends QuartzJobBean {
             Date end8mTime = DateUtils.parseDate("2016-09-01", "yyyy-MM-dd");
             orderStatsAnalysisService.updateOrderToLow(start8mTime, end8mTime, 32120, x08);
 
-            //Date start9mTime = DateUtils.parseDate("2016-09-01", "yyyy-MM-dd");
-            //Date end9mTime = DateUtils.parseDate("2016-10-01", "yyyy-MM-dd");
-            //orderStatsAnalysisService.updateOrderToLow(start9mTime, end9mTime, 622120, x);
+            Date targetDate09 = DateUtils.parseDate("2016-12-15 23:00:00", "yyyy-MM-dd HH:mm:ss");
+            Long x09 = (targetDate09.getTime() - date.getTime()) / (1000 * 60 * 60);
+            logger.info("OrderSCJobBean x09={}", x09);
+            Date start9mTime = DateUtils.parseDate("2016-09-01", "yyyy-MM-dd");
+            Date end9mTime = DateUtils.parseDate("2016-10-01", "yyyy-MM-dd");
+            orderStatsAnalysisService.updateOrderToLow(start9mTime, end9mTime, 642120, x09);
 
-            Date targetDate10 = DateUtils.parseDate("2016-11-30 23:00:00", "yyyy-MM-dd HH:mm:ss");
+            Date targetDate10 = DateUtils.parseDate("2016-12-15 23:00:00", "yyyy-MM-dd HH:mm:ss");
             Long x10 = (targetDate10.getTime() - date.getTime()) / (1000 * 60 * 60);
             logger.info("OrderSCJobBean x10={}", x10);
             Date start10mTime = DateUtils.parseDate("2016-10-01", "yyyy-MM-dd");
             Date end10mTime = DateUtils.parseDate("2016-11-01", "yyyy-MM-dd");
-            orderStatsAnalysisService.updateOrderToLow(start10mTime, end10mTime, 521200, x10);
+            orderStatsAnalysisService.updateOrderToLow(start10mTime, end10mTime, 721200, x10);
+
+            Date targetDate11 = DateUtils.parseDate("2016-12-15 23:00:00", "yyyy-MM-dd HH:mm:ss");
+            Long x11 = (targetDate11.getTime() - date.getTime()) / (1000 * 60 * 60);
+            logger.info("OrderSCJobBean x11={}", x11);
+            Date start11mTime = DateUtils.parseDate("2016-11-01", "yyyy-MM-dd");
+            Date end11mTime = DateUtils.parseDate("2016-12-01", "yyyy-MM-dd");
+            orderStatsAnalysisService.updateOrderToLow(start11mTime, end11mTime, 121200, x11);
 
         } catch (Exception e) {
             logger.error("reportOrderStatistic: update order fail. DATE:" + new Date() + ": msg:", e);
