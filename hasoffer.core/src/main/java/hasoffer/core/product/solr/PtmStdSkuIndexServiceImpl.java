@@ -111,8 +111,8 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
         if (resultSort != null) {
             if (resultSort == SearchResultSort.POPULARITY) {
                 sorts = new Sort[2];
-                sorts[0] = new Sort(ProductModel2SortField.F_POPULARITY.getFieldName(), Order.DESC);
-                sorts[1] = new Sort("review", Order.DESC);
+                sorts[0] = new Sort("review", Order.DESC);
+                sorts[1] = new Sort(ProductModel2SortField.F_POPULARITY.getFieldName(), Order.DESC);
             } else if (resultSort == SearchResultSort.PRICEL2H) {
                 sorts = new Sort[1];
                 sorts[0] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.ASC);
