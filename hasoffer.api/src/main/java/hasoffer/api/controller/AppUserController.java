@@ -531,6 +531,7 @@ public class AppUserController {
             //拒绝
             modelAndView.addObject("errorCode", "10000");
             modelAndView.addObject("msg", "passwd can not be empty .");
+            return modelAndView;
         }
         Map resultMap = new HashMap();
         //头像为默认头像,客户端默认,server不管
@@ -541,27 +542,35 @@ public class AppUserController {
                     //拒绝
                     modelAndView.addObject("errorCode", "10000");
                     modelAndView.addObject("msg", "email can not be empty .");
+                    modelAndView.addObject("data", resultMap);
+                    return modelAndView;
                 }
                 UrmUser urmUser = appUserService.getUrmUserByEmail(email);
                 if (urmUser != null) {
                     //已存在,拒绝
                     modelAndView.addObject("errorCode", "10000");
                     modelAndView.addObject("msg", "email had registered.");
+                    modelAndView.addObject("data", resultMap);
+                    return modelAndView;
                 }
                 //添加
                 UrmUser newUrmUser = new UrmUser();
                 newUrmUser.setType(1);
                 newUrmUser.setEmail(email);
+                newUrmUser.setCreateTime(new Date());
                 newUrmUser.setUserName(email);
+                newUrmUser.setUserToken(UUID.randomUUID().toString());
                 newUrmUser.setPasswd(Md5Utils.md5AsBase64(passwd.getBytes()));
                 try {
                     appUserService.insertUser(newUrmUser);
+                    resultMap.put("userToken", newUrmUser.getUserToken());
                 } catch (Exception e) {
                     System.out.println("add user failed ." + e.getMessage());
                     modelAndView.addObject("errorCode", "10000");
                     modelAndView.addObject("msg", "add user failed ,please try again later .");
                 }
-                break;
+                modelAndView.addObject("data", resultMap);
+                return modelAndView;
             case 1:
                 //登录
                 if (StringUtils.isEmpty(userName)) {
@@ -579,9 +588,11 @@ public class AppUserController {
                     appUserService.updateUrmUser(authedUrmUser);
                     resultMap.put("userToken", authedUrmUser.getUserToken());
                 }
-                break;
+                modelAndView.addObject("data", resultMap);
+                return modelAndView;
             default:
         }
+        modelAndView.addObject("data", resultMap);
         return modelAndView;
     }
 }

@@ -14,6 +14,7 @@ import hasoffer.core.persistence.po.app.AppDealComment;
 import hasoffer.core.persistence.po.app.AppDealThumb;
 import hasoffer.core.persistence.po.app.updater.AppBannerUpdater;
 import hasoffer.core.persistence.po.app.updater.AppDealUpdater;
+import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.solr.DealIndexServiceImpl;
 import hasoffer.core.product.solr.DealModel;
@@ -268,9 +269,17 @@ public class DealServiceImpl implements IDealService {
                     Float presentPrice = newDeal.getPresentPrice();
 
                     if (ptmcmpskuid != 0) {
+                        //记录历史价格
                         cmpSkuService.saveHistoryPrice(ptmcmpskuid, TimeUtils.nowDate(), presentPrice);
+                        System.out.println("update clone deal save history price for " + ptmcmpskuid);
+                        //更新sku价格
+                        PtmCmpSkuUpdater updater = new PtmCmpSkuUpdater(newDeal.getPtmcmpskuid());
+                        updater.getPo().setPrice(newPrice);
+                        dbm.update(updater);
+                        System.out.println("update clone deal update ptmcmpsku price for " + ptmcmpskuid);
                     }
                 }
+                //创建新克隆的appdeal
                 createAppDealByPriceOff(newDeal);
                 System.out.println("clone deal info id " + newDeal.getId() + "_now parice " + newDeal.getPresentPrice() + "_oriPrice " + originPrice);
             } catch (Exception e) {
