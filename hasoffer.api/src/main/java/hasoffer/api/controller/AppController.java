@@ -426,28 +426,28 @@ public class AppController {
         PageableResult Result = appService.getDeals(Long.valueOf(page), Long.valueOf(8));
         Map map = new HashMap();
         List li = new ArrayList();
-        getDealsFromCache(li, Integer.parseInt(page), 8);
-        boolean flag = true;
-        if (li.size() < 1) {
-            List<AppDeal> deals = Result.getData();
-            Date currentDate = new Date();
-            for (AppDeal appDeal : deals) {
-                int dateCmpResult = currentDate.compareTo(appDeal.getExpireTime());
-                DealVo dealVo = new DealVo();
-                setDeal(appDeal, dealVo);
-                if (dateCmpResult <= 0) {
-                    dealVo.setIsExpired(false);
-                    li.add(dealVo);
-                } else {
-                    dealVo.setIsExpired(true);
-                    li.add(dealVo);
-                }
+//        getDealsFromCache(li, Integer.parseInt(page), 8);
+//        boolean flag = true;
+//        if (li.size() < 1) {
+        List<AppDeal> deals = Result.getData();
+        Date currentDate = new Date();
+        for (AppDeal appDeal : deals) {
+            int dateCmpResult = currentDate.compareTo(appDeal.getExpireTime());
+            DealVo dealVo = new DealVo();
+            setDeal(appDeal, dealVo);
+            if (dateCmpResult <= 0) {
+                dealVo.setIsExpired(false);
+                li.add(dealVo);
+            } else {
+                dealVo.setIsExpired(true);
+                li.add(dealVo);
             }
-            flag = false;
         }
-        if (li.size() > 0 && flag) {
+//            flag = false;
+//        }
+     /*   if (li.size() > 0 && flag) {
             setDeals2Cache(li, Integer.parseInt(page), 8);
-        }
+        }*/
         map.put("deals", li);
         map.put("currentPage", Result.getCurrentPage());
         map.put("NumFund", Result.getNumFund());
