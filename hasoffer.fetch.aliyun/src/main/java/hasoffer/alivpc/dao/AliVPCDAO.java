@@ -1,7 +1,7 @@
-package hasoffer.job.dao;
+package hasoffer.alivpc.dao;
 
+import hasoffer.alivpc.dmo.AliVPCDMO;
 import hasoffer.aliyun.api.model.EipAddressModel;
-import hasoffer.job.dmo.AliVPC;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -15,7 +15,7 @@ public interface AliVPCDAO {
             "select `id`, `ecsInstance`, `privateIpAddress`, `eipId`, `eipIpAddress` from t_ali_vpc",
             "</script>"
     })
-    List<AliVPC> queryAllVPCList();
+    List<AliVPCDMO> queryAllVPCList();
 
     @Update({
             "<script>",

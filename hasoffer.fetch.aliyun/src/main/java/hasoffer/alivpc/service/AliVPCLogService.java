@@ -1,6 +1,6 @@
-package hasoffer.job.service;
+package hasoffer.alivpc.service;
 
-import hasoffer.job.dao.AliVPCLogDAO;
+import hasoffer.alivpc.dao.AliVPCLogDAO;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

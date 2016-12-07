@@ -6,19 +6,10 @@
                     class="collapse-sign"><em class="fa fa-expand-o"></em></b></a>
             <ul>
                 <li>
-                    <a href="${ctx}/lesson-data/initUpload?menuType=tchUnit" target="main-frame">面授预排课表上传</a>
+                    <a href="${ctx}/layout/showHome" target="main-frame">IP调度</a>
                 </li>
                 <li>
-                    <a href="${ctx}/lesson-data/initUpload?menuType=tchw" target="main-frame">面授周课表上传</a>
-                </li>
-                <li>
-                    <a href="${ctx}/lesson-data/initUpload?menuType=leaveCourse" target="main-frame">直播预排课表上传</a>
-                </li>
-                <li>
-                    <a href="${ctx}/lesson-data/initUpload?menuType=leaveWeekCourse" target="main-frame">直播周课表上传</a>
-                </li>
-                <li>
-                    <a href="${ctx}/lesson-data/showLessonHome" target="main-frame">课表编辑</a>
+                    <a href="${ctx}/layout/showUpdateStats" target="main-frame">更新统计</a>
                 </li>
             </ul>
         </li>

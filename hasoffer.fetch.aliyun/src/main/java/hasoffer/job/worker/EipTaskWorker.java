@@ -3,13 +3,13 @@ package hasoffer.job.worker;
 import com.aliyuncs.ecs.model.v20140526.ReleaseEipAddressResponse;
 import com.aliyuncs.ecs.model.v20140526.UnassociateEipAddressResponse;
 import com.aliyuncs.exceptions.ClientException;
+import hasoffer.alivpc.dmo.AliVPCDMO;
+import hasoffer.alivpc.service.AliVPCLogService;
+import hasoffer.alivpc.service.AliVPCService;
 import hasoffer.aliyun.api.action.AllocateEipAddressAction;
 import hasoffer.aliyun.api.model.EipAddressModel;
 import hasoffer.aliyun.api.util.ActionConstant;
 import hasoffer.data.redis.IRedisMapService;
-import hasoffer.job.dmo.AliVPC;
-import hasoffer.job.service.AliVPCLogService;
-import hasoffer.job.service.AliVPCService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,13 +19,13 @@ import java.util.concurrent.TimeUnit;
 
 public class EipTaskWorker implements Callable<Boolean> {
 
-    private final AliVPC vpc;
+    private final AliVPCDMO vpc;
     private final AliVPCService aliVPCService;
     private final AliVPCLogService aliVPCLogService;
     private final IRedisMapService<String, String> mapService;
     private Logger logger = LoggerFactory.getLogger(EipTaskWorker.class);
 
-    public EipTaskWorker(AliVPC vpc, AliVPCService aliVPCService, AliVPCLogService aliVPCLogService, IRedisMapService<String, String> mapService) {
+    public EipTaskWorker(AliVPCDMO vpc, AliVPCService aliVPCService, AliVPCLogService aliVPCLogService, IRedisMapService<String, String> mapService) {
         this.vpc = vpc;
         this.aliVPCService = aliVPCService;
         this.aliVPCLogService = aliVPCLogService;
