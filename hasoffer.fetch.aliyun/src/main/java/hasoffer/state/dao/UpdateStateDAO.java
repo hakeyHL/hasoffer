@@ -14,7 +14,7 @@ public interface UpdateStateDAO {
 
     @Insert({
             " INSERT INTO t_update_url_stats (taskTarget, updateDate, webSite, pushNum, finishNum, exceptionNum, stopNum, logTime) ",
-            " VALUES (#{dmo.taskTarget,jdbcType=VARCHAR}, #{dmo.updateDate,jdbcType=CHAR},  #{dmo.pushNum,jdbcType=INTEGER},  #{dmo.finishNum,jdbcType=INTEGER},  #{dmo.exceptionNum,jdbcType=INTEGER},  #{dmo.stopNum,jdbcType=INTEGER}, #{dmo.logTime,jdbcType=TIMESTAMP} )"
+            " VALUES (#{dmo.taskTarget,jdbcType=VARCHAR}, #{dmo.updateDate,jdbcType=CHAR}, #{dmo.webSite,jdbcType=VARCHAR},  #{dmo.pushNum,jdbcType=INTEGER},  #{dmo.finishNum,jdbcType=INTEGER},  #{dmo.exceptionNum,jdbcType=INTEGER},  #{dmo.stopNum,jdbcType=INTEGER}, #{dmo.logTime,jdbcType=TIMESTAMP} )"
     })
     void insert(@Param("dmo") UpdateStateDMO dmo);
 
@@ -28,7 +28,7 @@ public interface UpdateStateDAO {
     @Update({
             "<script>",
             " UPDATE t_update_url_stats SET pushNum=#{dmo.pushNum,jdbcType=INTEGER}, finishNum=#{dmo.finishNum,jdbcType=INTEGER}, exceptionNum=#{dmo.exceptionNum,jdbcType=INTEGER}, stopNum= #{dmo.stopNum,jdbcType=INTEGER}, logTime=#{dmo.logTime,jdbcType=TIMESTAMP} ",
-            " WHERE taskTarget=#{dmo.taskTarget,jdbcType=VARCHAR} and updateDate=#{dmo.updateDate,jdbcType=CHAR} ",
+            " WHERE taskTarget=#{dmo.taskTarget,jdbcType=VARCHAR} and webSite=#{dmo.webSite,jdbcType=VARCHAR} and updateDate=#{dmo.updateDate,jdbcType=CHAR} ",
             "</script>"
     })
     void update(@Param("dmo") UpdateStateDMO dmo);
