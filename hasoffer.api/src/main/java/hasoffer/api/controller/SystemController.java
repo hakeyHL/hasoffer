@@ -63,8 +63,6 @@ public class SystemController {
         jsonObject.put("msg", "ok");
         ResultVo resultVo = new ResultVo();
         resultVo.getData().put("have", false);
-        List<String> msgList = new ArrayList<>();
-
         String currentDate = TimeUtils.parse(new Date(), "yyyyMMdd");
         List<String> pushList = new ArrayList<>();
         //检查是否有deal推送
@@ -100,11 +98,11 @@ public class SystemController {
             case 0:
                 if (pushList.size() > 0) {
                     //没有,结束
-                    resultVo.getData().put("have", false);
-                    jsonObject.put("data", resultVo.getData());
-                    Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
-                    return null;
+                    resultVo.getData().put("have", true);
                 }
+                jsonObject.put("data", resultVo.getData());
+                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                return null;
             case 1:
                 jsonObject.put("data", resultVo.getData());
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
