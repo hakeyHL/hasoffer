@@ -4,6 +4,7 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.system.AppUserService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -15,14 +16,15 @@ import java.util.List;
  */
 @Service
 public class AppUserServiceImpl implements AppUserService {
-    private final String API_URMUSER_GET_BY_EMAIL = "";
-    private final String API_URMUSER_GET_BY_EMAIL_USERNAME = "";
+    private final String API_URMUSER_GET_BY_EMAIL = "select t from UrmUser t where t.email=?0 and type=1 ";
+    private final String API_URMUSER_GET_BY_USERNAME_PASSWD = "select t from UrmUser t where t.userName=?0 and t.passwd=?1 and type=1";
     @Resource
     IDataBaseManager dbm;
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void insertUser(UrmUser urmUser) {
-        dbm.createIfNoExist(urmUser);
+        dbm.create(urmUser);
     }
 
     @Override
@@ -42,9 +44,10 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public UrmUser getUrmUserByUserNameAndPwd(String userName, String passwd) {
-        return dbm.querySingle(API_URMUSER_GET_BY_EMAIL_USERNAME, Arrays.asList(passwd));
+        return dbm.querySingle(API_URMUSER_GET_BY_USERNAME_PASSWD, Arrays.asList(userName, passwd));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateUrmUser(UrmUser urmUser) {
         dbm.update(urmUser);
