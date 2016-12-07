@@ -4,6 +4,7 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.core.cache.CategoryCacheManager;
+import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmStdPrice;
@@ -38,6 +39,8 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
     IPtmStdPriceService iPtmStdPriceService;
     @Resource
     ISearchService searchService;
+    @Resource
+    MongoDbManager mongoDbManager;
     @Resource
     private IDataBaseManager dbm;
     @Resource
@@ -119,6 +122,17 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
                 return 0;
             }
         });
+        /*PtmStdSkuDetail ptmStdSkuDetail = mongoDbManager.queryOne(PtmStdSkuDetail.class, ptmStdSku1.getId());
+        List<PtmStdSkuParamGroup> paramGroups = ptmStdSkuDetail.getParamGroups();
+        for (PtmStdSkuParamGroup ptmStdSkuParamGroup : paramGroups) {
+            List<PtmStdSkuParamNode> params = ptmStdSkuParamGroup.getParams();
+            for (PtmStdSkuParamNode ptmStdSkuParamNode : params) {
+                String name = ptmStdSkuParamNode.getName();
+                System.out.println(name);
+                String value = ptmStdSkuParamNode.getValue();
+                System.out.println(value);
+            }
+        }*/
         float minPrice = priceList.get(0).getPrice();
         float maxPrice = priceList.get(priceList.size() - 1).getPrice();
         int ratingNumber = ApiUtils.returnNumberBetween0And5(BigDecimal.valueOf(tempRatingNumber).divide(BigDecimal.valueOf(totalCommentNumber == 0 ? 1 : totalCommentNumber), 0, BigDecimal.ROUND_HALF_UP).longValue());

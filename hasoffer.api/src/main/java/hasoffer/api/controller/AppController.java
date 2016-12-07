@@ -427,6 +427,7 @@ public class AppController {
         Map map = new HashMap();
         List li = new ArrayList();
         getDealsFromCache(li, Integer.parseInt(page), 8);
+        boolean flag = true;
         if (li.size() < 1) {
             List<AppDeal> deals = Result.getData();
             Date currentDate = new Date();
@@ -442,8 +443,9 @@ public class AppController {
                     li.add(dealVo);
                 }
             }
+            flag = false;
         }
-        if (li.size() > 0) {
+        if (li.size() > 0 && flag) {
             setDeals2Cache(li, Integer.parseInt(page), 8);
         }
         map.put("deals", li);
@@ -1450,6 +1452,6 @@ public class AppController {
 
     public void setDeals2Cache(List list, int page, int size) {
         String key = ConstantUtil.API_DEALS_ + page + "_" + size;
-        iCacheService.add(key, JSONArray.toJSONString(list), TimeUtils.SECONDS_OF_1_MINUTE * 5);
+        iCacheService.add(key, JSONArray.toJSONString(list), TimeUtils.MILLISECONDS_OF_1_MINUTE * 5);
     }
 }
