@@ -17,7 +17,7 @@
         <property name="applicationContextSchedulerContextKey" value="applicationContextKey"/>
         <property name="triggers">
             <list>
-                <!--<ref bean="EipJobTrigger"/>-->
+                <ref bean="EipJobTrigger"/>
                 <ref bean="UpdateStateJobTrigger"/>
             </list>
         </property>
