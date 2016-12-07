@@ -71,8 +71,8 @@ public class SystemController {
             //有deal推送
             Iterator iterator = dealPushSet.iterator();
             while (iterator.hasNext()) {
-                String dealPushJson = (String) iterator.next();
-                pushList.add(dealPushJson);
+                String dealKey = (String) iterator.next();
+                pushList.add(redisStringService.get(dealKey, 0));
             }
         }
         //检查是否有属于该用户的降价提醒
