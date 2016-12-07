@@ -17,7 +17,8 @@
         <property name="applicationContextSchedulerContextKey" value="applicationContextKey"/>
         <property name="triggers">
             <list>
-                <ref bean="EipJobTrigger"/>
+                <!--<ref bean="EipJobTrigger"/>-->
+                <ref bean="UpdateStateJobTrigger"/>
             </list>
         </property>
 
@@ -38,5 +39,14 @@
     <bean id="EipJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="EipJob"/>
         <property name="cronExpression" value="0 58 0/1 * * ?"/>
+    </bean>
+
+    <bean name="UpdateStateJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.UpdateStateJobBean"/>
+    </bean>
+
+    <bean id="UpdateStateJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="UpdateStateJob"/>
+        <property name="cronExpression" value="0 0/30 * * * ?"/>
     </bean>
 </beans>

@@ -13,17 +13,17 @@ import java.util.Map;
 public interface UpdateStateDAO {
 
     @Insert({
-            " INSERT INTO t_update_url_stats (taskTarget, updateDate, pushNum, finishNum, exceptionNum, stopNum, logTime) ",
+            " INSERT INTO t_update_url_stats (taskTarget, updateDate, webSite, pushNum, finishNum, exceptionNum, stopNum, logTime) ",
             " VALUES (#{dmo.taskTarget,jdbcType=VARCHAR}, #{dmo.updateDate,jdbcType=CHAR},  #{dmo.pushNum,jdbcType=INTEGER},  #{dmo.finishNum,jdbcType=INTEGER},  #{dmo.exceptionNum,jdbcType=INTEGER},  #{dmo.stopNum,jdbcType=INTEGER}, #{dmo.logTime,jdbcType=TIMESTAMP} )"
     })
     void insert(@Param("dmo") UpdateStateDMO dmo);
 
     @Select({
             "<script>",
-            "select taskTarget, updateDate, pushNum, finishNum, exceptionNum, stopNum from t_update_url_stats where updateDate=#{queryDate,jdbcType=CHAR} and taskTarget=#{taskTarget,jdbcType=VARCHAR}",
+            "select taskTarget, updateDate, webSite,pushNum, finishNum, exceptionNum, stopNum from t_update_url_stats where updateDate=#{queryDate,jdbcType=CHAR} and taskTarget=#{taskTarget,jdbcType=VARCHAR} and webSite= #{webSite,jdbcType=VARCHAR}",
             "</script>"
     })
-    List<UpdateStateDMO> selectByTaskTargetDate(@Param("taskTarget") String taskTarget, @Param("queryDate") String date);
+    List<UpdateStateDMO> selectByTaskTargetDate(@Param("queryDate") String updateStr, @Param("taskTarget") String taskTarget, @Param("webSite") String webSite);
 
     @Update({
             "<script>",
@@ -35,7 +35,7 @@ public interface UpdateStateDAO {
 
     @Select({
             "<script>",
-            "select taskTarget, updateDate, pushNum, finishNum, exceptionNum, stopNum from t_update_url_stats  where updateDate=#{queryDate,jdbcType=CHAR}",
+            "select taskTarget, updateDate, sum(pushNum) as pushNum, sum(finishNum) as finishNum, sum(exceptionNum) as exceptionNum, sum(stopNum) stopNum from t_update_url_stats  where updateDate=#{queryDate,jdbcType=CHAR} GROUP BY taskTarget,updateDate",
             "</script>"
     })
     List<UpdateStateDMO> selectByDate(@Param("queryDate") String date);
