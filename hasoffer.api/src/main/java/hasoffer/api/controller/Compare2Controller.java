@@ -658,25 +658,18 @@ public class Compare2Controller {
                 || srmSearchLog.getPrecise() == SearchPrecise.MANUALSET)) {
 
             if (srmSearchLog.getPtmProductId() <= 0) {
-//                System.out.println("Found search log. but product id is 0 .");
                 throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), "", 0);
             }
 
             sio.set(srmSearchLog.getCategory(), srmSearchLog.getPtmProductId(), srmSearchLog.getPtmCmpSkuId());
-//            System.out.println("getHsProId  :" + sio.getHsProId());
         } else {
             if (srmSearchLog == null) {
-//                System.out.println("srmSearchLog is null");
                 sio.setFirstSearch(true);
-//                System.out.println("setFirstSearch is true");
             }
 
             try {
-//                System.out.println("searchForResult  ");
                 searchForResult(sio);
-                System.out.println(" searchForResult result  " + sio.getHsProId());
             } catch (NonMatchedProductException e) {
-//                System.out.println("searchForResult_old  ");
                 System.out.println(" searchForResult_old result  " + sio.getHsProId());
             }
         }
@@ -712,12 +705,9 @@ public class Compare2Controller {
         // 搜索SKU
         PageableResult<CmpSkuModel> pagedCmpskuModels = cmpskuIndexService.searchSku(_q, 1, 5);
         List<CmpSkuModel> skuModels = pagedCmpskuModels.getData();
-//        System.out.println("skuModels   " + skuModels.size());
-
         if (ArrayUtils.isNullOrEmpty(skuModels)) {
             throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, "", 0);
         }
-
         CmpSkuModel skuModel = null;
         Map<Float, CmpSkuModel> comparedSkuMap = new HashMap<>();
         float maxMc = 0;
