@@ -64,11 +64,11 @@ public class FetchUrlWorker implements Runnable {
                 Object pop = null;
                 for (TaskLevel taskLevel : TaskLevel.values()) {
 
-                    logger.info("pop wait task list size = " + redisListService.size(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.PRICEOFF_NOTICE, website)));
-                    logger.info("pop wait task list size = " + redisListService.size(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.DEAL_UPDATE, website)));
-                    logger.info("pop wait task list size = " + redisListService.size(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.STDPRICE_UPDATE, website)));
-                    logger.info("pop wait task list size = " + redisListService.size(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.SKU_UPDATE, website)));
-                    logger.info("pop wait task list size = " + redisListService.size(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.PRICE_CHANGES, website)));
+                    logger.info("pop wait taskLevel:{}, taskTarget:{}, size:{} ", taskLevel, TaskTarget.PRICEOFF_NOTICE, redisListService.size(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.PRICEOFF_NOTICE, website)));
+                    logger.info("pop wait taskLevel:{}, taskTarget:{}, size:{} ", taskLevel, TaskTarget.DEAL_UPDATE, redisListService.size(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.DEAL_UPDATE, website)));
+                    logger.info("pop wait taskLevel:{}, taskTarget:{}, size:{} ", taskLevel, TaskTarget.STDPRICE_UPDATE, redisListService.size(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.STDPRICE_UPDATE, website)));
+                    logger.info("pop wait taskLevel:{}, taskTarget:{}, size:{} ", taskLevel, TaskTarget.SKU_UPDATE, redisListService.size(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.SKU_UPDATE, website)));
+                    logger.info("pop wait taskLevel:{}, taskTarget:{}, size:{} ", taskLevel, TaskTarget.PRICE_CHANGES, redisListService.size(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.PRICE_CHANGES, website)));
 
                     if (pop == null) {
                         pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.PRICEOFF_NOTICE, website));
