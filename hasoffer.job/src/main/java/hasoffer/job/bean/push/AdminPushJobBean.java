@@ -17,6 +17,7 @@ import hasoffer.core.persistence.po.urm.UrmDevice;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.user.IDeviceService;
 import hasoffer.data.redis.IRedisListService;
+import hasoffer.data.redis.IRedisService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -45,6 +46,8 @@ public class AdminPushJobBean extends QuartzJobBean {
 
     @Resource
     IRedisListService redisListService;
+    @Resource
+    IRedisService redisService;
     @Resource
     IDataBaseManager dbm;
     @Resource
@@ -87,7 +90,7 @@ public class AdminPushJobBean extends QuartzJobBean {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
             String YMD = simpleDateFormat.format(TimeUtils.nowDate());
             String DEAL_PUSH_YMD_APPDEALID = DEAL_PUSH_PREFIX + YMD + "_" + appPush.getId();
-            redisListService.push(DEAL_PUSH_YMD_APPDEALID, JSONUtil.toJSON(message));
+            redisService.add(DEAL_PUSH_YMD_APPDEALID, JSONUtil.toJSON(message), TimeUtils.MILLISECONDS_OF_1_DAY * 8);
 //------------------------------------------------------------------------------------------------------------------//
 
             AppPushBo pushBo = new AppPushBo("678678", "19:50", message);

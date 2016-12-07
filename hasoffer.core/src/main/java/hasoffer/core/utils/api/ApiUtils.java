@@ -26,6 +26,8 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by hs on 2016年10月19日.
@@ -167,6 +169,14 @@ public class ApiUtils {
         return number.intValue();
     }
 
+    public static boolean emailCheck(String email) {
+        boolean matched;
+        Pattern pattern = Pattern.compile("^([a-zA-Z0-9_\\-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)$");
+        Matcher matcher = pattern.matcher(email);
+        matched = matcher.matches();
+        return matched;
+    }
+
     /**
      * 在数据对象返回客户端之前检测其域是否都有值,除对象成员外都赋初始值
      *
@@ -246,7 +256,7 @@ public class ApiUtils {
         return false;
     }
 
-    public void sendEmail(String to) throws MessagingException {
+    public void sendEmail(String to, String content, boolean isHtml) throws MessagingException {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         Properties prop = new Properties();
         prop.put("mail.smtp.auth", "true"); // 将这个参数设为true，让服务器进行认证,认证用户名和密码是否正确
