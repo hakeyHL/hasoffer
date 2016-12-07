@@ -214,7 +214,7 @@ public class Compare2Controller {
             price = apiUtils.getStringNum(price);
         }
         SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, pageSize);
-//        getPtmStdPriceBySioFromSolr(sio);
+        getPtmStdPriceBySioFromSolr(sio);
         if (sio.getStdSkuId() <= 0) {
             getSioBySearch(sio);
         }
@@ -719,25 +719,23 @@ public class Compare2Controller {
         }
 
         CmpSkuModel skuModel = null;
+        Map<Float, CmpSkuModel> comparedSkuMap = new HashMap<>();
+        float maxMc = 0;
         for (CmpSkuModel cmpSkuModel : skuModels) {
-            if (cmpSkuModel.getProductId() == 0) {
-                continue;
+            float mc = StringUtils.wordMatchD(StringUtils.toLowerCase(cmpSkuModel.getTitle()), _q);
+            if (mc >= 0.5) {
+                if (mc > maxMc) {
+                    maxMc = mc;
+                }
+                comparedSkuMap.put(mc, cmpSkuModel);
             }
-            skuModel = cmpSkuModel;
-            break;
         }
 
-        if (skuModel == null) {
-            throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, "", 0);
-        }
-
-        String title = skuModel.getTitle();
-
-        float mc = StringUtils.wordMatchD(StringUtils.toLowerCase(title), _q);
-        System.out.println(" mc " + mc);
         // 匹配度如果小于40%, 则认为不匹配
-        if (mc <= 0.4) {
-            throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, title, mc);
+        if (comparedSkuMap.size() < 1) {
+            throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, "", maxMc);
+        } else {
+            skuModel = comparedSkuMap.get(maxMc);
         }
 
         long cateId = 0L;
