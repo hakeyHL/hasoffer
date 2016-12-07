@@ -522,7 +522,8 @@ public class AppUserController {
     }
 
     @RequestMapping(value = "user/login")
-    public ModelAndView regOrLogin(int type, String email, String passwd, String userName) {
+    public ModelAndView regOrLogin(@RequestParam(defaultValue = "4") int type, String email, String passwd, String userName) {
+        //邮箱校验
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "success");
@@ -542,6 +543,12 @@ public class AppUserController {
                     //拒绝
                     modelAndView.addObject("errorCode", "10000");
                     modelAndView.addObject("msg", "email can not be empty .");
+                    modelAndView.addObject("data", resultMap);
+                    return modelAndView;
+                }
+                if (!ApiUtils.emailCheck(email)) {
+                    modelAndView.addObject("errorCode", "10000");
+                    modelAndView.addObject("msg", "email illegal.");
                     modelAndView.addObject("data", resultMap);
                     return modelAndView;
                 }
