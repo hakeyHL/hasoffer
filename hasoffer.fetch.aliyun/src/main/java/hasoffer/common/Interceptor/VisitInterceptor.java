@@ -1,4 +1,4 @@
-package hasoffer.common.Interceptor;
+package hasoffer.common.interceptor;
 
 import hasoffer.admin.po.SysAdmin;
 import hasoffer.admin.service.IAdminService;

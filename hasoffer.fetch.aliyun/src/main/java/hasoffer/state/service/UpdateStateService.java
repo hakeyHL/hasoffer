@@ -21,13 +21,13 @@ public class UpdateStateService {
 
     public void stateTask() {
         for (TaskTarget taskTarget : TaskTarget.values()) {
-            UpdateStateDMO updateStateDMO = new UpdateStateDMO();
-            int pushNum = 0;
-            int finishNum = 0;
-            int exceptionNum = 0;
-            int stopNum = 0;
-            String ymd = DateFormatUtils.format(new Date(), "yyyyMMdd");
             for (WebSite website : WebSite.values()) {
+                UpdateStateDMO updateStateDMO = new UpdateStateDMO();
+                int pushNum = 0;
+                int finishNum = 0;
+                int exceptionNum = 0;
+                int stopNum = 0;
+                String ymd = DateFormatUtils.format(new Date(), "yyyyMMdd");
                 for (TaskLevel taskLevel : TaskLevel.values()) {
                     String key = "SPIDER_PUSH_NUM_" + taskTarget.name() + "_" + website.name() + "_" + taskLevel.name() + "_" + ymd;
                     pushNum = Integer.valueOf(redisService.get(key, 1000)) + pushNum;
@@ -40,19 +40,19 @@ public class UpdateStateService {
 
                 String stopKey = "SPIDER_POP_NUM_" + taskTarget.name() + "_" + website.name() + "_" + TaskStatus.STOP + "_" + ymd;
                 stopNum = Integer.valueOf(redisService.get(stopKey, 1000)) + stopNum;
-            }
-            String updateStr = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-            updateStateDMO.setTaskTarget(taskTarget.name());
-            updateStateDMO.setExceptionNum(exceptionNum);
-            updateStateDMO.setFinishNum(finishNum);
-            updateStateDMO.setStopNum(stopNum);
-            updateStateDMO.setUpdateDate(updateStr);
-            updateStateDMO.setLogTime(new Date());
-            List<UpdateStateDMO> updateStateDMOs = updateStateDao.selectByTaskTargetDate(taskTarget.name(), updateStr);
-            if (updateStateDMOs.size() == 0) {
-                updateStateDao.insert(updateStateDMO);
-            } else {
-                updateStateDao.update(updateStateDMO);
+                String updateStr = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+                updateStateDMO.setTaskTarget(taskTarget.name());
+                updateStateDMO.setExceptionNum(exceptionNum);
+                updateStateDMO.setFinishNum(finishNum);
+                updateStateDMO.setStopNum(stopNum);
+                updateStateDMO.setUpdateDate(updateStr);
+                updateStateDMO.setLogTime(new Date());
+                List<UpdateStateDMO> updateStateDMOs = updateStateDao.selectByTaskTargetDate(updateStr, taskTarget.name(), website.name());
+                if (updateStateDMOs.size() == 0) {
+                    updateStateDao.insert(updateStateDMO);
+                } else {
+                    updateStateDao.update(updateStateDMO);
+                }
             }
 
         }

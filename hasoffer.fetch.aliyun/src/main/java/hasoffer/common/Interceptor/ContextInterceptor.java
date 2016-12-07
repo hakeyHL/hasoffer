@@ -1,4 +1,4 @@
-package hasoffer.common.Interceptor;
+package hasoffer.common.interceptor;
 
 import hasoffer.common.context.Context;
 import hasoffer.common.context.ICookieListener;
