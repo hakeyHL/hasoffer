@@ -37,6 +37,11 @@ public class ShowHomeController {
         return new ModelAndView("layout/index");
     }
 
+    @RequestMapping("/showUpdateStats")
+    public ModelAndView showUpdateStats() {
+        return new ModelAndView("layout/updateStats");
+    }
+
 
     @RequestMapping("/pause")
     public String pauseTrigger(@RequestParam(defaultValue = "") String triggerName) {

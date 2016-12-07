@@ -30,8 +30,8 @@
 <%@ include file="./header.jsp" %>
 
 <aside id="left">
-
-    <%@ include file="./menu.jsp" %>
+    <%--<%@ include file="./menu.jsp" %>--%>
+    <%@ include file="./leftSideBar.jsp" %>
 </aside>
 
 <section id="content">

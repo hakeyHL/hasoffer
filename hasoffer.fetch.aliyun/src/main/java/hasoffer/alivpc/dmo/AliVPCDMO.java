@@ -1,6 +1,6 @@
-package hasoffer.job.dmo;
+package hasoffer.alivpc.dmo;
 
-public class AliVPC {
+public class AliVPCDMO {
 
     private Integer id;
     private String ecsInstance;
