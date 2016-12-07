@@ -1,5 +1,6 @@
 package hasoffer.core.product.impl;
 
+import hasoffer.base.enums.CategoryFilterParams;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
@@ -122,15 +123,50 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
                 return 0;
             }
         });
-        /*PtmStdSkuDetail ptmStdSkuDetail = mongoDbManager.queryOne(PtmStdSkuDetail.class, ptmStdSku1.getId());
+      /*  PtmStdSkuDetail ptmStdSkuDetail = mongoDbManager.queryOne(PtmStdSkuDetail.class, ptmStdSku1.getId());
         List<PtmStdSkuParamGroup> paramGroups = ptmStdSkuDetail.getParamGroups();
         for (PtmStdSkuParamGroup ptmStdSkuParamGroup : paramGroups) {
             List<PtmStdSkuParamNode> params = ptmStdSkuParamGroup.getParams();
             for (PtmStdSkuParamNode ptmStdSkuParamNode : params) {
                 String name = ptmStdSkuParamNode.getName();
-                System.out.println(name);
-                String value = ptmStdSkuParamNode.getValue();
-                System.out.println(value);
+                if (compareIgnoreCase(name, CategoryFilterParams.BRAND)) {
+                    ptmStdSkuModel.setBrand(ptmStdSkuParamNode.getValue());
+                }
+                if (compareIgnoreCase(name, CategoryFilterParams.RAM)) {
+                    ptmStdSkuModel.setRam(ApiUtils.getNumberFromString(ptmStdSkuParamNode.getValue()));
+                }
+                if (compareIgnoreCase(name, CategoryFilterParams.NETWORK)) {
+                    ptmStdSkuModel.setNetwork(ptmStdSkuParamNode.getValue());
+                }
+                if (compareIgnoreCase(name, CategoryFilterParams.SCREEN_SIZE)) {
+                    ptmStdSkuModel.setNetwork(ptmStdSkuParamNode.getValue());
+                }
+
+                if (compareIgnoreCase(name, CategoryFilterParams.SCREEN_RESOLUTION)) {
+                    ptmStdSkuModel.setNetwork(ptmStdSkuParamNode.getValue());
+                }
+                if (compareIgnoreCase(name, CategoryFilterParams.SECONDARY_CAMERA)) {
+                    ptmStdSkuModel.setNetwork(ptmStdSkuParamNode.getValue());
+                }
+
+                if (compareIgnoreCase(name, CategoryFilterParams.BATTERY_CAPACITY)) {
+                    ptmStdSkuModel.setNetwork(ptmStdSkuParamNode.getValue());
+                }
+
+                if (compareIgnoreCase(name, CategoryFilterParams.OPERATING_SYSTEM)) {
+                    ptmStdSkuModel.setNetwork(ptmStdSkuParamNode.getValue());
+                }
+                if (compareIgnoreCase(name, CategoryFilterParams.PRIMARY_CAMERA)) {
+                    ptmStdSkuModel.setNetwork(ptmStdSkuParamNode.getValue());
+                }
+
+                if (compareIgnoreCase(name, CategoryFilterParams.INTERNAL_MEMORY)) {
+                    ptmStdSkuModel.setNetwork(ptmStdSkuParamNode.getValue());
+                }
+
+                if (compareIgnoreCase(name, CategoryFilterParams.EXPANDABLE_MEMORY)) {
+                    ptmStdSkuModel.setNetwork(ptmStdSkuParamNode.getValue());
+                }
             }
         }*/
         float minPrice = priceList.get(0).getPrice();
@@ -162,4 +198,12 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
     }
 
+    private boolean compareIgnoreCase(String name, CategoryFilterParams params) {
+        name = name.toLowerCase().trim();
+        String paramString = params.name().toLowerCase();
+        if (paramString.contains("_")) {
+            paramString = paramString.replaceAll("_", "");
+        }
+        return name.equals(paramString);
+    }
 }

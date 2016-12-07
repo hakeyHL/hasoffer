@@ -426,9 +426,9 @@ public class AppController {
         PageableResult Result = appService.getDeals(Long.valueOf(page), Long.valueOf(8));
         Map map = new HashMap();
         List li = new ArrayList();
-//        getDealsFromCache(li, Integer.parseInt(page), 8);
-//        boolean flag = true;
-//        if (li.size() < 1) {
+       /* getDealsFromCache(li, Integer.parseInt(page), 8);
+        boolean flag = true;
+        if (li.size() < 1) {*/
         List<AppDeal> deals = Result.getData();
         Date currentDate = new Date();
         for (AppDeal appDeal : deals) {
@@ -442,9 +442,9 @@ public class AppController {
                 dealVo.setIsExpired(true);
                 li.add(dealVo);
             }
-        }
+//            }
 //            flag = false;
-//        }
+        }
      /*   if (li.size() > 0 && flag) {
             setDeals2Cache(li, Integer.parseInt(page), 8);
         }*/
@@ -743,10 +743,8 @@ public class AppController {
                     Long cateId = Long.valueOf(nameValue.getName() + "");
                     //可能是二级也可能是三级 ,二级的放一块,三级的放一块
                     if (cateId > 0) {
-//                                    System.out.println("  cate id " + cateId + " check  ");
                         PtmCategory ptmCategory = appCacheManager.getCategoryById(cateId);
                         if (ptmCategory != null && ptmCategory.getLevel() == 2) {
-//                                        System.out.println(i + " cate2  cate id " + cateId + " have ");
                             //处理二级类目
                             CategoryVo categoryVo = new CategoryVo();
                             categoryVo.setId(ptmCategory.getId());
@@ -758,7 +756,6 @@ public class AppController {
                             secondCategoryList.add(categoryVo);
                         } else if (ptmCategory != null && ptmCategory.getLevel() == 3) {
                             //处理三级类目
-//                                        System.out.println(i + " cate3  cate id " + cateId + " have ");
                             CategoryVo categoryVo3 = new CategoryVo();
                             categoryVo3.setId(ptmCategory.getId());
                             categoryVo3.setLevel(ptmCategory.getLevel());
