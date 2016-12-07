@@ -6,7 +6,6 @@
 %>
 <html>
 <head>
-    <title>Order Status</title>
     <link rel="stylesheet" href="<%=contextPath%>/extensions/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="<%=contextPath%>/extensions/bootstrap-table/bootstrap-table.css">
     <link rel="stylesheet" href="<%=contextPath%>/extensions/bootstrap-table/extensions/edittable/css/edittable.css">
@@ -23,10 +22,10 @@
     <script src="<%=contextPath%>/extensions/bootstrap-table/extensions/exporttable/js/exporttable.js"></script>
 </head>
 <body class="scrollY frameContent" style="OVERFLOW-X: scroll">
-<div class="col-infos">
+<div class="col-infos" id="info-div">
     <h2 style="display: inline;"><i class="fa fa-bar-chart-o"></i>更新统计</h2>
 </div>
-<div class="table-responsive">
+<div class="table-responsive" id="toolbar-table">
     <div>
 
         <!-- 在此填写窗口内容，自定义HTML -->
@@ -59,7 +58,6 @@
     var $dateStr = $('#queryDate').val();
     function initTable() {
         $table.bootstrapTable({
-            url: "${ctx}/updateState/selectUpdateByDay/" + $dateStr,
             height: getHeight(),
             columns: [
                 [{
@@ -92,11 +90,6 @@
                     title: '停止',
                     align: 'right',
                     halign: 'center'
-                }, {
-                    field: 'logTime',
-                    title: '已签收',
-                    align: 'right',
-                    halign: 'center'
                 }
                 ]
             ]
@@ -109,7 +102,24 @@
     }
 
     function getHeight() {
-        return $(window).height() - $('h4').outerHeight(true);
+        return $(window).height() - $('#info-div').outerHeight(true) - $('#toolbar-table').outerHeight(true);
+    }
+
+    function queryUpdateState() {
+        var url = "${ctx}/updateState/selectUpdateByDay/" + $dateStr;
+
+        $.ajax({
+            cache: true,
+            type: 'POST',
+            url: url,
+            contentType: 'application/json',
+            dataType: 'json',
+            async: false,
+            success: function (data) {
+                console.info(data);
+                $table.bootstrapTable('load', data);
+            }
+        });
     }
 
     $(function () {

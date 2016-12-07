@@ -55,6 +55,7 @@ public class UpdateStateService {
                 String updateStr = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
                 updateStateDMO.setTaskTarget(taskTarget.name());
                 updateStateDMO.setWebSite(website.name());
+                updateStateDMO.setPushNum(pushNum);
                 updateStateDMO.setExceptionNum(exceptionNum);
                 updateStateDMO.setFinishNum(finishNum);
                 updateStateDMO.setStopNum(stopNum);
