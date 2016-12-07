@@ -690,7 +690,9 @@ public class Compare2Controller {
                     comparedPricemnMap.put(mc, ptmStdPriceModel);
                 }
             }
-            sio.set(comparedPricemnMap.get(maxMc));
+            if (maxMc > 0) {
+                sio.set(comparedPricemnMap.get(maxMc));
+            }
         }
     }
 
