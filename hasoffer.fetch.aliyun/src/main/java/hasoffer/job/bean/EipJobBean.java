@@ -1,10 +1,10 @@
 package hasoffer.job.bean;
 
+import hasoffer.alivpc.dmo.AliVPCDMO;
+import hasoffer.alivpc.service.AliVPCLogService;
+import hasoffer.alivpc.service.AliVPCService;
 import hasoffer.base.thread.HasofferThreadFactory;
 import hasoffer.data.redis.IRedisMapService;
-import hasoffer.job.dmo.AliVPC;
-import hasoffer.job.service.AliVPCLogService;
-import hasoffer.job.service.AliVPCService;
 import hasoffer.job.worker.EipTaskWorker;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -34,10 +34,10 @@ public class EipJobBean extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         HasofferThreadFactory factory = new HasofferThreadFactory("FetchCompareWebsiteWorker");
-        List<AliVPC> aliVPCList = aliVPCService.queryAllVPCList();
+        List<AliVPCDMO> aliVPCDMOList = aliVPCService.queryAllVPCList();
         List<Future<Boolean>> resultList = new ArrayList<>();
         ExecutorService es = Executors.newCachedThreadPool(factory);
-        for (AliVPC vpc : aliVPCList) {
+        for (AliVPCDMO vpc : aliVPCDMOList) {
             try {
                 TimeUnit.SECONDS.sleep(new Random().nextInt(5));
             } catch (Exception e) {

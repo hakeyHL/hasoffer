@@ -64,12 +64,6 @@ public class FetchUrlWorker implements Runnable {
                 Object pop = null;
                 for (TaskLevel taskLevel : TaskLevel.values()) {
 
-                    logger.info("pop wait taskLevel:{}, taskTarget:{}, size:{} ", taskLevel, TaskTarget.PRICEOFF_NOTICE, redisListService.size(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.PRICEOFF_NOTICE, website)));
-                    logger.info("pop wait taskLevel:{}, taskTarget:{}, size:{} ", taskLevel, TaskTarget.DEAL_UPDATE, redisListService.size(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.DEAL_UPDATE, website)));
-                    logger.info("pop wait taskLevel:{}, taskTarget:{}, size:{} ", taskLevel, TaskTarget.STDPRICE_UPDATE, redisListService.size(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.STDPRICE_UPDATE, website)));
-                    logger.info("pop wait taskLevel:{}, taskTarget:{}, size:{} ", taskLevel, TaskTarget.SKU_UPDATE, redisListService.size(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.SKU_UPDATE, website)));
-                    logger.info("pop wait taskLevel:{}, taskTarget:{}, size:{} ", taskLevel, TaskTarget.PRICE_CHANGES, redisListService.size(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.PRICE_CHANGES, website)));
-
                     if (pop == null) {
                         pop = fetchCacheService.popTaskList(RedisKeysUtils.getWaitUrlListKey(taskLevel, TaskTarget.PRICEOFF_NOTICE, website));
                     }
@@ -90,16 +84,15 @@ public class FetchUrlWorker implements Runnable {
                     logger.info("task list is null. thread will sleep 1 min.");
                     TimeUnit.MINUTES.sleep(1);
                 } else {
-                    SpiderLogger.infoFetchFlow("start spider this url: {}", pop);
+                    logger.info("pop wait taskLevel:{}, taskTarget:{}, size:{} ", TaskLevel.LEVEL_1, TaskTarget.PRICEOFF_NOTICE, redisListService.size(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_1, TaskTarget.PRICEOFF_NOTICE, website)));
+                    logger.info("pop wait taskLevel:{}, taskTarget:{}, size:{} ", TaskLevel.LEVEL_2, TaskTarget.DEAL_UPDATE, redisListService.size(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_2, TaskTarget.DEAL_UPDATE, website)));
+                    logger.info("pop wait taskLevel:{}, taskTarget:{}, size:{} ", TaskLevel.LEVEL_3, TaskTarget.STDPRICE_UPDATE, redisListService.size(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_3, TaskTarget.STDPRICE_UPDATE, website)));
+                    logger.info("pop wait taskLevel:{}, taskTarget:{}, size:{} ", TaskLevel.LEVEL_4, TaskTarget.SKU_UPDATE, redisListService.size(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_4, TaskTarget.SKU_UPDATE, website)));
+                    logger.info("pop wait taskLevel:{}, taskTarget:{}, size:{} ", TaskLevel.LEVEL_5, TaskTarget.PRICE_CHANGES, redisListService.size(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_5, TaskTarget.PRICE_CHANGES, website)));
+                    SpiderLogger.infoFetchFlow("Spider this url: {}", pop);
                     FetchUrlResult fetchUrlResult = JSONUtil.toObject(pop.toString(), FetchUrlResult.class);
                     fetchCacheService.execNum(fetchUrlResult.getWebsite().name());
                     fetch(fetchUrlResult);
-                    if (fetchUrlResult.overFetch()) {
-                        logger.info("FetchUrlWorker crawl finish: {} ", fetchUrlResult);
-                    } else {
-                        logger.info("FetchUrlWorker crawl running: {} ", fetchUrlResult);
-                    }
-                    SpiderLogger.infoFetchFlow("Finish spider this url: {}", pop);
                 }
             } catch (Exception e) {
                 logger.error("FetchUrlWorker is error. Error Msg: Json to Object fail.", e);

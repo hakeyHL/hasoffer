@@ -29,17 +29,16 @@
 <body class="mainbg">
 <%@ include file="./header.jsp" %>
 
-<aside id="left">
-
-    <%@ include file="./menu.jsp" %>
-</aside>
 
 <section id="content">
-    <div id="right" class="main">
+    <section id="left">
+        <%@ include file="./leftSideBar.jsp" %>
+    </section>
+    <section id="right" class="main">
         <div id="mainFrame" class="mainFrame">
-            <iframe id="frameContent" src="${ctx}/layout/showHome" frameborder="0"></iframe>
+            <iframe id="frameContent" src="${ctx}/layout/showUpdateStats" frameborder="0"></iframe>
         </div>
-    </div>
+    </section>
 </section>
 </body>
 </html>
