@@ -154,6 +154,16 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
     }
 
     public PageableResult<PtmStdSkuModel> searchStdPricesByCategory(SearchCriteria criteria) {
+        List<String> pivotFields = criteria.getPivotFields();
+        int pivotFieldSize = pivotFields == null ? 0 : pivotFields.size();
+        PivotFacet[] pivotFacets = new PivotFacet[pivotFieldSize];
+        if (pivotFieldSize > 0) {
+            for (int i = 0; i < pivotFieldSize; i++) {
+                // cate2 distinct 提取出来所有值
+                pivotFacets[i] = new PivotFacet(pivotFields.get(i));
+            }
+        }
+
         int level = criteria.getLevel();
         String cateId = criteria.getCategoryId();
         int page = criteria.getPage();
@@ -180,11 +190,26 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
         SearchResultSort resultSort = criteria.getSort();
         sorts = getSorts(sorts, resultSort);
         String q = "*:*";
-        PivotFacet[] pivotFacets = null;
         fqList.add(new FilterQuery("cate" + level, String.valueOf(cateId)));
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
         SearchResult<PtmStdSkuModel> sr = searchObjs(q, fqs, sorts, pivotFacets, page <= 1 ? 1 : page, size, true);
-        PageableResult<PtmStdSkuModel> ptmStdSkuModelPageableResult = new PageableResult<>(sr.getResult(), sr.getTotalCount(), page, size);
+        Map<String, List<NameValue>> pivotFieldVals = new HashMap<>();
+        if (pivotFieldSize > 0) {
+            NamedList<List<PivotField>> facetPivot = sr.getFacetPivot();
+            for (int i = 0; i < pivotFieldSize; i++) {
+                String field = pivotFields.get(i);
+                List<PivotField> cate2List = facetPivot.get(field);
+                for (PivotField pf : cate2List) {
+                    List<NameValue> nvs = pivotFieldVals.get(field);
+                    if (nvs == null) {
+                        nvs = new ArrayList<>();
+                        pivotFieldVals.put(field, nvs);
+                    }
+                    nvs.add(new NameValue<>(pf.getValue(), Long.valueOf(pf.getCount())));
+                }
+            }
+        }
+        PageableResult<PtmStdSkuModel> ptmStdSkuModelPageableResult = new PageableResult<>(sr.getResult(), sr.getTotalCount(), page, size, pivotFieldVals);
         addBillion2ListEle(ptmStdSkuModelPageableResult);
         return ptmStdSkuModelPageableResult;
     }
