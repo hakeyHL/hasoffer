@@ -65,38 +65,40 @@ public class DealSiteGetDealWoker implements Runnable {
     public void run() {
         while (true) {
 
-            for (Website website : dealSiteList) {
+            try {
 
-                FetchDealResult fetchDealResult = fetchDubboService.getDealInfo(website);
+                for (Website website : dealSiteList) {
 
-                if (fetchDealResult == null) {
-                    continue;
-                }
+                    FetchDealResult fetchDealResult = fetchDubboService.getDealInfo(website);
 
-                TaskStatus taskStatus = fetchDealResult.getTaskStatus();
-
-                if (TaskStatus.FINISH.equals(taskStatus)) {
-
-                    List<FetchedDealInfo> dealInfoList = fetchDealResult.getDealInfoList();
-
-                    for (FetchedDealInfo fetchedDealInfo : dealInfoList) {
-
-                        AppDeal deal = getDeal(fetchedDealInfo, dbm);
-
-                        if (deal != null) {
-                            dealService.createAppDealByPriceOff(deal);
-                        }
+                    if (fetchDealResult == null) {
+                        continue;
                     }
 
-                    break;
+                    TaskStatus taskStatus = fetchDealResult.getTaskStatus();
+
+                    if (TaskStatus.FINISH.equals(taskStatus)) {
+
+                        List<FetchedDealInfo> dealInfoList = fetchDealResult.getDealInfoList();
+
+                        for (FetchedDealInfo fetchedDealInfo : dealInfoList) {
+
+                            AppDeal deal = getDeal(fetchedDealInfo, dbm);
+
+                            if (deal != null) {
+                                dealService.createAppDealByPriceOff(deal);
+                            }
+                        }
+
+                        break;
+                    }
+
                 }
 
-            }
-
-            try {
                 TimeUnit.MINUTES.sleep(20);
-            } catch (InterruptedException e) {
-
+            } catch (Exception e) {
+                System.out.println("deal site fetch exception");
+                e.printStackTrace();
             }
         }
     }
