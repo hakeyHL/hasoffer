@@ -224,7 +224,7 @@ public class DealServiceImpl implements IDealService {
 
     @Override
     public AppDeal getDealBySourceId(Long skuId) {
-        return dbm.querySingle("SELECT t FROM AppDeal t WHERE t.appdealSource = 'PRICE_OFF' AND t.ptmcmpskuid = ?0 ", Arrays.asList(skuId));
+        return dbm.querySingle("SELECT t FROM AppDeal t WHERE t.appdealSource = 'PRICE_OFF' AND t.ptmcmpskuid = ?0 ORDER BY t.expireTime DESC limit 1", Arrays.asList(skuId));
     }
 
     @Override

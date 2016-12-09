@@ -5,8 +5,9 @@ import java.util.Date;
 public class UpdateStateDMO {
 
     private int id;
-    private String taskTarget;
     private String updateDate;
+    private String taskTarget;
+    private String webSite;
     private int pushNum;
     private int finishNum;
     private int exceptionNum;
@@ -27,6 +28,14 @@ public class UpdateStateDMO {
 
     public void setTaskTarget(String taskTarget) {
         this.taskTarget = taskTarget;
+    }
+
+    public String getWebSite() {
+        return webSite;
+    }
+
+    public void setWebSite(String webSite) {
+        this.webSite = webSite;
     }
 
     public String getUpdateDate() {

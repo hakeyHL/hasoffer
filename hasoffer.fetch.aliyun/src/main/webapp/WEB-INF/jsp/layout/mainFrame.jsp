@@ -10,8 +10,7 @@
     <title>JOB列表查询</title>
     <%@ include file="/common/commonCss.jsp" %>
     <link rel="stylesheet" href="<%=contextPath1%>/css/page.css">
-    <link rel="stylesheet" href="<%=contextPath1%>/css/icomoon.min.css"
-          rel="stylesheet">
+    <link rel="stylesheet" href="<%=contextPath1%>/css/icomoon.min.css">
     <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
 
     <script src="${ctx}/js/WdatePicker.js"></script>

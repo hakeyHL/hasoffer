@@ -48,15 +48,15 @@ public class FetchListener extends ContextLoaderListener {
         HasofferThreadFactory factory = new HasofferThreadFactory("FetchUrlWorker");
         ExecutorService es = Executors.newCachedThreadPool(factory);
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 10; i++) {
             es.execute(new FetchUrlWorker(springContext, Website.AMAZON));
         }
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 25; i++) {
             es.execute(new FetchUrlWorker(springContext, Website.FLIPKART));
         }
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 10; i++) {
             es.execute(new FetchUrlWorker(springContext, Website.SNAPDEAL));
         }
 
@@ -64,7 +64,7 @@ public class FetchListener extends ContextLoaderListener {
             es.execute(new FetchUrlWorker(springContext, Website.EBAY));
         }
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 10; i++) {
             es.execute(new FetchUrlWorker(springContext, Website.SHOPCLUES));
         }
 
@@ -88,7 +88,7 @@ public class FetchListener extends ContextLoaderListener {
     private void initKeyWordThread() {
         HasofferThreadFactory factory = new HasofferThreadFactory("FetchKeywordWorker");
         ExecutorService es = Executors.newCachedThreadPool(factory);
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 10; i++) {
             es.execute(new FetchKeywordWorker(springContext));
         }
     }
