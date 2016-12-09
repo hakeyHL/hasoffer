@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
@@ -123,5 +124,12 @@ public class SystemController {
                 return null;
         }
 
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "app/testArray", method = RequestMethod.GET)
+    public String checkGetPushMsg(String[] a) {
+        System.out.println("1");
+        return "ok";
     }
 }
