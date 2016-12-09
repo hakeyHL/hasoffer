@@ -660,12 +660,6 @@ public class AppController {
                 break;
             case 2:
                 //search by title
-          /*      criteria.setPivotFields(Arrays.asList("cate2", "cate3", "Network",
-                        "Network3G", "Network4G",
-                        "Screen_Resolution", "Operating_System", "queryRam",
-                        "queryScreenSize", "querySecondaryCamera",
-                        "queryBatteryCapacity", "queryPrimaryCamera",
-                        "queryInternalMemory,brand"));*/
                 criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
                 PageableResult p;
                 p = ptmStdSkuIndexService.searchProducts(criteria);
@@ -721,12 +715,47 @@ public class AppController {
                 break;
             case 3:
                 //类目搜索
+                criteria.setPivotFields(Arrays.asList("Network",
+                        "Network3G", "Network4G",
+                        "Screen_Resolution", "Operating_System", "queryRam",
+                        "queryScreenSize", "querySecondaryCamera",
+                        "queryBatteryCapacity", "queryPrimaryCamera",
+                        "queryInternalMemory", "brand"));
                 //category level page size
                 if (StringUtils.isNotBlank(criteria.getCategoryId())) {
                     //search by category
                     products = ptmStdSkuIndexService.searchStdPricesByCategory(criteria);
                     if (products == null || products.getData() == null || products.getData().size() < 1) {
                         products = productIndex2Service.searchPro(criteria);
+                    } else {
+                        //处理下返回结果
+                        //1. 换名字
+                        //2. 合并NetWork
+                        //3. 指定的排序
+                        Map<String, List<NameValue<String, Long>>> pivotFieldValMap = new HashMap<>();
+                        Map<String, List<NameValue<String, Long>>> pivotFieldVals = products.getPivotFieldVals();
+
+                        List<NameValue<String, Long>> netWorkNVList = new ArrayList<>();
+
+                        Set<Map.Entry<String, List<NameValue<String, Long>>>> entries = pivotFieldVals.entrySet();
+                        Iterator<Map.Entry<String, List<NameValue<String, Long>>>> iterator = entries.iterator();
+                        while (iterator.hasNext()) {
+                            Map.Entry<String, List<NameValue<String, Long>>> next = iterator.next();
+                            String key = next.getKey();
+                            List<NameValue<String, Long>> value = next.getValue();
+                            if (key.equals("Network3G") || key.equals("Network4G") || key.equals("Network")) {
+                                netWorkNVList.addAll(value);
+                            }
+                            String cateFilterValue = ConstantUtil.API_CATEGORY_FILTER_PARAMS_MAP.get(key);
+                            if (cateFilterValue != null) {
+                                pivotFieldValMap.put(cateFilterValue, value);
+                            }
+                        }
+                        if (netWorkNVList.size() > 0) {
+                            pivotFieldValMap.put("Network", netWorkNVList);
+                        }
+                        map.put("pivos", pivotFieldValMap);
+                        map.put("numberFound", products.getNumFund());
                     }
                     if (products != null && products.getData().size() > 0) {
                         addProductVo2List(li, products.getData());

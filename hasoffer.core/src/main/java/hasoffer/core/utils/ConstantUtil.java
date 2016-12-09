@@ -1,7 +1,7 @@
 package hasoffer.core.utils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by hs on 2016年11月30日D
@@ -10,10 +10,23 @@ import java.util.List;
 public class ConstantUtil {
     public static final long API_ONE_BILLION_NUMBER = 1000000000;
     public static final String API_DEALS_ = "API_DEALS_";
-    public static final List<String> API_CATEGORY_PARAMS = new ArrayList<>();
+    //    public static final List<String> API_CATEGORY_PARAMS = new ArrayList<>();
+    public static final Map<String, String> API_CATEGORY_FILTER_PARAMS_MAP = new HashMap<>();
 
     static {
-        API_CATEGORY_PARAMS.add("Brand");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Network", "Network");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Network3G", "Network");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Network4G", "Network");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Screen_Resolution", "Screen Resolution");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Operating_System", "Operating System");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("queryRam", "Ram");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("queryScreenSize", "Screen Size");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("querySecondaryCamera", "Secondary Camera");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("queryBatteryCapacity", "Battery Capacity");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("queryPrimaryCamera", "Primary Camera");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("queryInternalMemory", "Internal Memory");
+
+       /* API_CATEGORY_PARAMS.add("Brand");
         API_CATEGORY_PARAMS.add("Network");
         API_CATEGORY_PARAMS.add("Ram");
         API_CATEGORY_PARAMS.add("Screen Size");
@@ -23,7 +36,7 @@ public class ConstantUtil {
         API_CATEGORY_PARAMS.add("Operating System");
         API_CATEGORY_PARAMS.add("Primary Camera");
         API_CATEGORY_PARAMS.add("Internal Memory");
-        API_CATEGORY_PARAMS.add("Expandable Memory");
+        API_CATEGORY_PARAMS.add("Expandable Memory");*/
     }
 
     public enum queryRam {
