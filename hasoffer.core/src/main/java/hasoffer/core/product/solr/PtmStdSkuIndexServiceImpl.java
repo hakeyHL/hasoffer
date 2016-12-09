@@ -21,6 +21,35 @@ import java.util.*;
  */
 @Service
 public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStdSkuModel> {
+    public static void main(String[] args) {
+        String aas = "_5D5_inchWMore";
+        StringBuilder sb = new StringBuilder();
+//        String s = aas.replaceAll("_", " ");
+        String s[] = aas.split("_");
+        for (String str : s) {
+            System.out.println(":" + str + ":");
+        }
+        int i = 0;
+        if (s[0] == "") {
+            i = 1;
+        }
+        for (; i < s.length; i++) {
+            if (s[i].contains("W")) {
+                s[i] = s[i].replaceAll("W", "&");
+                sb.append(s[i]);
+            } else if (s[i].contains("D")) {
+                s[i] = s[i].replaceAll("D", ".");
+                sb.append(s[i]);
+            } else {
+                sb.append(s[i]);
+            }
+            if (i >= 1 && i < s.length - 1) {
+                sb.append("-");
+            }
+        }
+        System.out.println(sb.toString());
+    }
+
     @Override
     protected String getSolrUrl() {
         return AppConfig.get(AppConfig.SOLR_PTMSTDSKU_URL);
@@ -81,16 +110,17 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
 
             for (int i = 0; i < pivotFieldSize; i++) {
                 String field = pivotFields.get(i);
+               /* if (field.equals()) {
 
+                }*/
                 List<PivotField> cate2List = nl.get(field);
-                for (PivotField pf : cate2List) {// string - object - long
-//                    System.out.println(pf.getValue() + "\t" + pf.getCount());
+                for (PivotField pf : cate2List) {
                     List<NameValue> nvs = pivotFieldVals.get(field);
                     if (nvs == null) {
                         nvs = new ArrayList<>();
                         pivotFieldVals.put(field, nvs);
                     }
-                    nvs.add(new NameValue<Long, Long>((Long) pf.getValue(), Long.valueOf(pf.getCount())));
+                    nvs.add(new NameValue<>(pf.getValue(), pf.getCount()));
                 }
             }
         }
@@ -170,5 +200,14 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
                 ptmStdSkuModel.setId(ApiUtils.addBillion(ptmStdSkuModel.getId()));
             }
         }
+    }
+
+    public String getCategoryFilterEnum(String enumString) {
+        if (enumString != null) {
+            //-按_ split D换成. W换成&
+            //除第一个_其他换空格
+//            enumString
+        }
+        return null;
     }
 }

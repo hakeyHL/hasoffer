@@ -30,18 +30,27 @@ public class PtmStdSkuModel implements IIdentifiable<Long> {
 
     private long searchCount = 0; // 搜索次数，表示商品热度
 
-   /* private int Ram;
-    private String Network;
-    private float Screen_Size;
-    private String Screen_Resolution;
-    private float Secondary_Camera;
-    private int  Battery_Capacity;
-    private String Operating_System;
-    private float Primary_Camera;
-    private  int Internal_Memory;
-    private String Expandable_Memory="Unavailable";*/
+    private int Ram;//3 GB  筛选类型:1GB-2GB 4GB&More less than 512MB 基本单位是MB GB都*1024
+    private String queryRam;
+    private String Network;//4G: Available (supports Indian bands) 3G: Available, 2G: Available    只显示2 3 4G的支持即可,判断用contains
+    private String Network3G;
+    private String Network4G;
+    private float Screen_Size;//5.5 inches (13.97 cm) 筛选: 3.5-5 inch less than  &More
+    private String queryScreenSize;
+    private String Screen_Resolution;//HD (720 x 1280 pixels)  仅显示
+    private float Secondary_Camera;//1. 叫Resolution 13 MP Primary Camera  2. 叫Resolution  5 MP Front Camera 筛选:0-1.9MP less than &More
+    private String querySecondaryCamera;
+    private int Battery_Capacity;//1. 叫Capacity 3150 mAh    筛选:1000-1999mAh less than &More ,单位确定mAh 用整型
+    private String queryBatteryCapacity;
+    private String Operating_System;//Operating System Android v5.1 (Lollipop) 仅显示
+    private float Primary_Camera;//1. 叫Resolution 13 MP Primary Camera  2. 叫Resolution  5 MP Front Camera  筛选:0-1.9MP、2-2.9MP、3-4.9MP、5-7.9MP、8MP&Above float
+    private String queryPrimaryCamera;
+    private int Internal_Memory;//32 GB 筛选:1GB-2GB less than &More
+    private String queryInternalMemory;
+    private int Expandable_Memory = 0;//Up to 128 GB : Up to和       0就是 Unavailable
 
     public PtmStdSkuModel() {
+
     }
 
     public PtmStdSkuModel(PtmStdSku ptmStdSku) {
@@ -180,4 +189,147 @@ public class PtmStdSkuModel implements IIdentifiable<Long> {
         this.searchCount = searchCount;
     }
 
+    public int getRam() {
+        return Ram;
+    }
+
+    public void setRam(int ram) {
+        Ram = ram;
+    }
+
+    public String getNetwork() {
+        return Network;
+    }
+
+    public void setNetwork(String network) {
+        Network = network;
+    }
+
+    public float getScreen_Size() {
+        return Screen_Size;
+    }
+
+    public void setScreen_Size(float screen_Size) {
+        Screen_Size = screen_Size;
+    }
+
+    public String getScreen_Resolution() {
+        return Screen_Resolution;
+    }
+
+    public void setScreen_Resolution(String screen_Resolution) {
+        Screen_Resolution = screen_Resolution;
+    }
+
+    public float getSecondary_Camera() {
+        return Secondary_Camera;
+    }
+
+    public void setSecondary_Camera(float secondary_Camera) {
+        Secondary_Camera = secondary_Camera;
+    }
+
+    public int getBattery_Capacity() {
+        return Battery_Capacity;
+    }
+
+    public void setBattery_Capacity(int battery_Capacity) {
+        Battery_Capacity = battery_Capacity;
+    }
+
+    public String getOperating_System() {
+        return Operating_System;
+    }
+
+    public void setOperating_System(String operating_System) {
+        Operating_System = operating_System;
+    }
+
+    public float getPrimary_Camera() {
+        return Primary_Camera;
+    }
+
+    public void setPrimary_Camera(float primary_Camera) {
+        Primary_Camera = primary_Camera;
+    }
+
+    public int getInternal_Memory() {
+        return Internal_Memory;
+    }
+
+    public void setInternal_Memory(int internal_Memory) {
+        Internal_Memory = internal_Memory;
+    }
+
+    public int getExpandable_Memory() {
+        return Expandable_Memory;
+    }
+
+    public void setExpandable_Memory(int expandable_Memory) {
+        Expandable_Memory = expandable_Memory;
+    }
+
+    public String getNetwork3G() {
+        return Network3G;
+    }
+
+    public void setNetwork3G(String network3G) {
+        Network3G = network3G;
+    }
+
+    public String getNetwork4G() {
+        return Network4G;
+    }
+
+    public void setNetwork4G(String network4G) {
+        Network4G = network4G;
+    }
+
+    public String getQueryRam() {
+        return queryRam;
+    }
+
+    public void setQueryRam(String queryRam) {
+        this.queryRam = queryRam;
+    }
+
+    public String getQueryScreenSize() {
+        return queryScreenSize;
+    }
+
+    public void setQueryScreenSize(String queryScreenSize) {
+        this.queryScreenSize = queryScreenSize;
+    }
+
+    public String getQuerySecondaryCamera() {
+        return querySecondaryCamera;
+    }
+
+    public void setQuerySecondaryCamera(String querySecondaryCamera) {
+        this.querySecondaryCamera = querySecondaryCamera;
+    }
+
+    public String getQueryBatteryCapacity() {
+        return queryBatteryCapacity;
+    }
+
+    public void setQueryBatteryCapacity(String queryBatteryCapacity) {
+        this.queryBatteryCapacity = queryBatteryCapacity;
+    }
+
+    public String getQueryPrimaryCamera() {
+        return queryPrimaryCamera;
+    }
+
+    public void setQueryPrimaryCamera(String queryPrimaryCamera) {
+        this.queryPrimaryCamera = queryPrimaryCamera;
+    }
+
+    public String getQueryInternalMemory() {
+        return queryInternalMemory;
+    }
+
+    public void setQueryInternalMemory(String queryInternalMemory) {
+        this.queryInternalMemory = queryInternalMemory;
+    }
 }

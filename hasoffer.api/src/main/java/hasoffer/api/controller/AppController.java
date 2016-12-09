@@ -660,14 +660,48 @@ public class AppController {
                 break;
             case 2:
                 //search by title
+          /*      criteria.setPivotFields(Arrays.asList("cate2", "cate3", "Network",
+                        "Network3G", "Network4G",
+                        "Screen_Resolution", "Operating_System", "queryRam",
+                        "queryScreenSize", "querySecondaryCamera",
+                        "queryBatteryCapacity", "queryPrimaryCamera",
+                        "queryInternalMemory,brand"));*/
                 criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
                 PageableResult p;
                 p = ptmStdSkuIndexService.searchProducts(criteria);
+                if (p != null && p.getData() != null && p.getData().size() > 0) {
+                    map.put("numberFound", p.getNumFund());
+                    Map<String, List<NameValue>> pivotFieldVals = p.getPivotFieldVals();
+                    List<NameValue> brandValues = new ArrayList<>();
+                    NameValue nameValue = new NameValue();
+                    nameValue.setName("Mi");
+                    nameValue.setValue(4);
+                    brandValues.add(nameValue);
+                    nameValue.setName("apple");
+                    nameValue.setValue(8);
+                    brandValues.add(nameValue);
+
+                    pivotFieldVals.put("brand", brandValues);
+
+                    List<NameValue> netWorkValues = new ArrayList<>();
+                    NameValue netWorkValue = new NameValue();
+                    netWorkValue.setName("3G");
+                    netWorkValue.setValue(4);
+                    netWorkValues.add(netWorkValue);
+                    nameValue.setName("4G");
+                    nameValue.setValue(3);
+                    netWorkValues.add(nameValue);
+
+                    pivotFieldVals.put("NetWork", netWorkValues);
+
+                }
                 if (p == null || p.getData() == null || p.getData().size() < 1) {
+                    criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
                     p = productIndex2Service.searchProducts(criteria);
                 }
                 if (p != null && p.getData().size() > 0) {
                     System.out.println("getPivotFieldVals  " + p.getPivotFieldVals().size());
+                    map.put("pivos", p.getPivotFieldVals());
                     getSkuListByKeyword(map, p);
                     //如果是价格由低到高排序或者按照价格区间排序不过滤配件信息
                     boolean filterProductFlag = true;
@@ -746,23 +780,11 @@ public class AppController {
                         PtmCategory ptmCategory = appCacheManager.getCategoryById(cateId);
                         if (ptmCategory != null && ptmCategory.getLevel() == 2) {
                             //处理二级类目
-                            CategoryVo categoryVo = new CategoryVo();
-                            categoryVo.setId(ptmCategory.getId());
-                            categoryVo.setLevel(ptmCategory.getLevel());
-                            categoryVo.setParentId(ptmCategory.getParentId());
-                            categoryVo.setRank(ptmCategory.getRank());
-                            categoryVo.setName(ptmCategory.getName());
-                            categoryVo.setHasChildren(0);
+                            CategoryVo categoryVo = getCategoryVo(ptmCategory);
                             secondCategoryList.add(categoryVo);
                         } else if (ptmCategory != null && ptmCategory.getLevel() == 3) {
                             //处理三级类目
-                            CategoryVo categoryVo3 = new CategoryVo();
-                            categoryVo3.setId(ptmCategory.getId());
-                            categoryVo3.setLevel(ptmCategory.getLevel());
-                            categoryVo3.setParentId(ptmCategory.getParentId());
-                            categoryVo3.setRank(ptmCategory.getRank());
-                            categoryVo3.setName(ptmCategory.getName());
-                            categoryVo3.setHasChildren(0);
+                            CategoryVo categoryVo3 = getCategoryVo(ptmCategory);
                             thirdCategoryList.add(categoryVo3);
                         }
                     }
@@ -825,6 +847,17 @@ public class AppController {
             }
             map.put("categorys", categorys);
         }
+    }
+
+    private CategoryVo getCategoryVo(PtmCategory ptmCategory) {
+        CategoryVo categoryVo = new CategoryVo();
+        categoryVo.setId(ptmCategory.getId());
+        categoryVo.setLevel(ptmCategory.getLevel());
+        categoryVo.setParentId(ptmCategory.getParentId());
+        categoryVo.setRank(ptmCategory.getRank());
+        categoryVo.setName(ptmCategory.getName());
+        categoryVo.setHasChildren(0);
+        return categoryVo;
     }
 
     public void addProductVo2List(List desList, List sourceList) {
@@ -1074,7 +1107,7 @@ public class AppController {
                 Map<String, List<ThirdAppVo>> GOOGLEPLAY = new HashMap<>();
 
                 //添加GooglePlay渠道的app下载属性
-                List<ThirdAppVo> tempGOOGLEPLAY = new ArrayList<ThirdAppVo>();
+                List<ThirdAppVo> tempGOOGLEPLAY = new ArrayList<>();
                 ThirdAppVo googlePlayApps_Amazon = new ThirdAppVo(Website.AMAZON, AppAdController.packageMap.get(Website.AMAZON), "https://play.google.com/store/apps/details?id=com.amazon.mShop.android.shopping", WebsiteHelper.getLogoUrl(Website.AMAZON), "Browse,search & buy millions of products right from your Android device", 4.3f, "491,637", "50,000,000 - 100,000,000", "9.6MB");
                 ThirdAppVo googlePlayApps_Flipkart = new ThirdAppVo(Website.FLIPKART, AppAdController.packageMap.get(Website.FLIPKART), "https://play.google.com/store/apps/details?id=com.flipkart.android", WebsiteHelper.getLogoUrl(Website.FLIPKART), "Shop for electronics,apparels & more using our Flipart app Free shipping & COD", 4.2f, "2,044,978", "50,000,000 - 100,000,000", "10.0MB");
                 ThirdAppVo googlePlayApps_ShopClues = new ThirdAppVo(Website.SHOPCLUES, AppAdController.packageMap.get(Website.SHOPCLUES), "https://play.google.com/store/apps/details?id=com.shopclues", WebsiteHelper.getLogoUrl(Website.SHOPCLUES), "India's largest Online Marketplace is now in your Pocket - Install,Shop,Enjoy!", 3.9f, "235,468", "10,000,000 - 50,000,000", "7.1MB");

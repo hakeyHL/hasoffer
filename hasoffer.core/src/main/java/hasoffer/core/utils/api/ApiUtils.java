@@ -181,9 +181,23 @@ public class ApiUtils {
         Pattern p = Pattern.compile("[0-9\\.]+");
         Matcher m = p.matcher(stringNumber);
         if (m.find()) {
-            return Integer.parseInt(m.group(0));
+            if (!m.group(0).contains(".")) {
+                return Integer.parseInt(m.group(0));
+            } else {
+                return -1;
+            }
         } else {
             return 0;
+        }
+    }
+
+    public static String getStringNumberFromString(String stringNumber) {
+        Pattern p = Pattern.compile("[0-9\\.]+");
+        Matcher m = p.matcher(stringNumber);
+        if (m.find()) {
+            return m.group(0);
+        } else {
+            return "";
         }
     }
 
