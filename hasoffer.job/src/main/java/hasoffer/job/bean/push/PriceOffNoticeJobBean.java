@@ -87,13 +87,18 @@ public class PriceOffNoticeJobBean extends QuartzJobBean {
                 Long priceOffNoticeId = priceOffNotice.getId();
 
                 //针对单个priceoffnotice发送push
-                boolean flag = priceOffNoticeService.priceOffNoticeSinglePush(nowPrice, website, url, fetchedTitle, priceOffNoticeId);
+                try {
+                    boolean flag = priceOffNoticeService.priceOffNoticeSinglePush(nowPrice, website, url, fetchedTitle, priceOffNoticeId);
 
-                if (!flag) {
-                    //此处暂时使用这个对象的一个字段传值
-                    fetchUrlResult.setSkuId(priceOffNoticeId);
-                    String repushInfo = JSON.toJSONString(fetchUrlResult);
-                    redisListService.push(PUSH_FAIL_PRICEOFFNOTICE_INFO, repushInfo);
+                    if (!flag) {
+                        //此处暂时使用这个对象的一个字段传值
+                        fetchUrlResult.setSkuId(priceOffNoticeId);
+                        String repushInfo = JSON.toJSONString(fetchUrlResult);
+                        redisListService.push(PUSH_FAIL_PRICEOFFNOTICE_INFO, repushInfo);
+                    }
+                } catch (Exception e) {
+                    System.out.println("send price off notice push exception for " + priceOffNoticeId);
+                    e.printStackTrace();
                 }
             }
         }
