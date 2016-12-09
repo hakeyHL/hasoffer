@@ -71,12 +71,13 @@ public class SystemController {
             //有deal推送
             Iterator iterator = dealPushSet.iterator();
             while (iterator.hasNext()) {
-                String dealPushJson = (String) iterator.next();
-                pushList.add(dealPushJson);
+                String dealKey = (String) iterator.next();
+                pushList.add(redisStringService.get(dealKey, 0));
             }
         }
         //检查是否有属于该用户的降价提醒
-        UrmUser urmUser;
+        UrmUser urmUser = null;
+        long size = 0;
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
         if (StringUtils.isNotEmpty(userToken)) {
             String key = "user_" + userToken;
@@ -88,22 +89,31 @@ public class SystemController {
                 }
             }
             if (urmUser != null) {
-                String priceOffNoticeString = (String) redisListService.pop(PRICEOFFNOTICE_PUSH_PREFIX + currentDate + urmUser.getId());
-                if (StringUtils.isNotEmpty(priceOffNoticeString)) {
-                    pushList.add(priceOffNoticeString);
+                size = redisListService.size(PRICEOFFNOTICE_PUSH_PREFIX + currentDate + "_" + urmUser.getId());
+                if (size > 0) {
+                    List<String> range = redisListService.range(PRICEOFFNOTICE_PUSH_PREFIX + currentDate + "_" + urmUser.getId(), 0, size);
+                    for (String str : range) {
+                        pushList.add(str);
+                    }
                 }
             }
         }
+        if (pushList.size() > 0) {
+            //没有,结束
+            resultVo.getData().put("have", true);
+        }
         switch (type) {
             case 0:
-                if (pushList.size() > 0) {
-                    //没有,结束
-                    resultVo.getData().put("have", true);
-                }
                 jsonObject.put("data", resultVo.getData());
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             case 1:
+                if (size > 0) {
+                    for (int i = 0; i < size; i++) {
+                        redisListService.pop(PRICEOFFNOTICE_PUSH_PREFIX + currentDate + "_" + urmUser.getId());
+                    }
+                }
+                resultVo.getData().put("pushList", pushList);
                 jsonObject.put("data", resultVo.getData());
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;

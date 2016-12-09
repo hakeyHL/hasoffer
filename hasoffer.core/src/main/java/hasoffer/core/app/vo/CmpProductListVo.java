@@ -140,9 +140,9 @@ public class CmpProductListVo {
     public CmpProductListVo(PtmStdPrice stdPrice, String ptmStdSkuImage, String logoImage) {
         this.id = ApiUtils.addBillion(stdPrice.getId());
         this.coins = stdPrice.getWebsite() == Website.FLIPKART ? Math.round(0.075 * stdPrice.getPrice()) : 0;
-        this.ratingNum = 0;
+        this.ratingNum = stdPrice.getRatings();
         this.imageUrl = ptmStdSkuImage;
-        this.totalRatingsNum = 0l;
+        this.totalRatingsNum = stdPrice.getCommentsNumber();
         this.image = logoImage;
         this.title = stdPrice.getTitle() == null ? "" : stdPrice.getTitle();
         this.status = stdPrice.getSkuStatus();
