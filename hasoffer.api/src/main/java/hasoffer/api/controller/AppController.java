@@ -671,7 +671,7 @@ public class AppController {
                 p = ptmStdSkuIndexService.searchProducts(criteria);
                 if (p != null && p.getData() != null && p.getData().size() > 0) {
                     map.put("numberFound", p.getNumFund());
-                    Map<String, List<NameValue>> pivotFieldVals = p.getPivotFieldVals();
+                    Map<String, List<NameValue>> pivotFieldVals = new HashMap<>();
                     List<NameValue> brandValues = new ArrayList<>();
                     NameValue nameValue = new NameValue();
                     nameValue.setName("Mi");

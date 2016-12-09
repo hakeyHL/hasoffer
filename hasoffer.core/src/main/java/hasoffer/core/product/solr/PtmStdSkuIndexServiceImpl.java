@@ -110,9 +110,6 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
 
             for (int i = 0; i < pivotFieldSize; i++) {
                 String field = pivotFields.get(i);
-               /* if (field.equals()) {
-
-                }*/
                 List<PivotField> cate2List = nl.get(field);
                 for (PivotField pf : cate2List) {
                     List<NameValue> nvs = pivotFieldVals.get(field);
@@ -120,7 +117,7 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
                         nvs = new ArrayList<>();
                         pivotFieldVals.put(field, nvs);
                     }
-                    nvs.add(new NameValue<>(pf.getValue(), pf.getCount()));
+                    nvs.add(new NameValue<Long, Long>((Long) pf.getValue(), Long.valueOf(pf.getCount())));
                 }
             }
         }
