@@ -21,8 +21,8 @@
             <list>
                 <ref bean="priceOffNoticeTrigger"/>
                 <ref bean="pushFailRePushTrigger"/>
-                <!--<ref bean="priceOffDealUpdateTrigger"/>-->
-                <ref bean="priceOffGetDealTrigger"/>
+                <ref bean="priceOffDealUpdateTrigger"/>
+                <!--<ref bean="priceOffGetDealTrigger"/>-->
                 <ref bean="adminPushTrigger"/>
                 <ref bean="statLogCountBeanTrigger"/>
                 <ref bean="dealSiteFetchTrigger"/>
