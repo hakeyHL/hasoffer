@@ -95,24 +95,6 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
                     continue;
                 }
 
-                //主商品被访问超过50次创建deal，暂时注释掉
-//                long productId = sku.getProductId();
-//
-//                System.out.println("CheckGetPriceOffDealJobBean pop get product id is " + productId);
-//                String yesterdayYmd = TimeUtils.parse(TimeUtils.addDay(TimeUtils.nowDate(), -1), "yyyyMMdd");
-//                System.out.println("CheckGetPriceOffDealJobBean pop get yesterday is " + yesterdayYmd);
-//
-//                SrmProductSearchCount productSearchCount = dbm.querySingle("SELECT t FROM SrmProductSearchCount t WHERE t.productId = ?0 AND t.ymd = ?1", Arrays.asList(productId, yesterdayYmd));
-//                if (productSearchCount == null) {//这种情况用来应付超过0点后的情况
-//                    productSearchCount = dbm.querySingle("SELECT t FROM SrmProductSearchCount t WHERE t.productId = ?0 AND t.ymd = ?1", Arrays.asList(productId, TimeUtils.parse(TimeUtils.addDay(TimeUtils.nowDate(), -2), "yyyyMMdd")));
-//                }
-//                System.out.println("CheckGetPriceOffDealJobBean pop get SrmProductSearchCount is " + productSearchCount.getId());
-//                System.out.println("CheckGetPriceOffDealJobBean pop get SrmProductSearchCount count is " + productSearchCount.getCount());
-//
-//                if (productSearchCount.getCount() < 50) {
-//                    continue;
-//                }
-
                 float newPrice = sku.getPrice();
                 float oriPrice = sku.getOriPrice();
 
@@ -129,11 +111,13 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
                     continue;
                 }
 
+                //历史最低价格
                 PtmCmpSkuHistoryPrice historyPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, skuid);
-
                 float minPrice = getMinPrice(historyPrice);
-                System.out.println("minPrice " + minPrice);
-                System.out.println("newPrice " + newPrice);
+                if (newPrice > minPrice) {
+                    System.out.println("minPrice =" + minPrice + "_ newPrice =" + newPrice + "_ skuid = " + skuid + " continue");
+                    continue;
+                }
 
                 if (newPrice < minPrice * 1.1) {//符合条件，创建deal
 
