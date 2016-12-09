@@ -177,6 +177,16 @@ public class ApiUtils {
         return matched;
     }
 
+    public static int getNumberFromString(String stringNumber) {
+        Pattern p = Pattern.compile("[0-9\\.]+");
+        Matcher m = p.matcher(stringNumber);
+        if (m.find()) {
+            return Integer.parseInt(m.group(0));
+        } else {
+            return 0;
+        }
+    }
+
     /**
      * 在数据对象返回客户端之前检测其域是否都有值,除对象成员外都赋初始值
      *

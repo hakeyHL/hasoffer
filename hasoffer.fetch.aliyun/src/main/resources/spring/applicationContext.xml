@@ -10,5 +10,5 @@
     <description>框架全局配置</description>
 
     <!-- 自动扫描包 -->
-    <context:component-scan base-package="hasoffer.*.service;hasoffer.*.dao" annotation-config="true"/>
+    <context:component-scan base-package="hasoffer.*.service" annotation-config="true"/>
 </beans>

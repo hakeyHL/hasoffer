@@ -29,6 +29,18 @@ public class PtmStdSkuModel implements IIdentifiable<Long> {
     private int storeCount = 0;// site 数量
 
     private long searchCount = 0; // 搜索次数，表示商品热度
+
+   /* private int Ram;
+    private String Network;
+    private float Screen_Size;
+    private String Screen_Resolution;
+    private float Secondary_Camera;
+    private int  Battery_Capacity;
+    private String Operating_System;
+    private float Primary_Camera;
+    private  int Internal_Memory;
+    private String Expandable_Memory="Unavailable";*/
+
     public PtmStdSkuModel() {
     }
 
@@ -167,4 +179,5 @@ public class PtmStdSkuModel implements IIdentifiable<Long> {
     public void setSearchCount(long searchCount) {
         this.searchCount = searchCount;
     }
+
 }

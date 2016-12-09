@@ -36,10 +36,26 @@ import static hasoffer.base.utils.http.XPathUtils.getSubNodeByXPath;
 public class HttpTest {
 
     public static final String WEBSITE_91MOBILE_URL_PREFIEX = "http://www.91mobiles.com";
+    public static final String WEBSITE_IDEALO_URL_PREFIEX = "http://www.idealo.in";
     public static final String WEBSITE_DX_URL_PREFIEX = "http://www.dx.com/";
 
 //    @Resource
 //    IProductService productService;
+
+    @Test
+    public void testIdealo() throws Exception {
+
+        TagNode root = HtmlUtils.getUrlRootTagNode("http://www.idealo.in/mvc/CategoryResultList/category/26151/filters/none/start/0/sort/none");
+        List<TagNode> productUrlListNode = XPathUtils.getSubNodesByXPath(root, "//div[@data-offer='false']/a", null);
+
+        for (TagNode node : productUrlListNode) {
+
+            String productUrl = node.getAttributeByName("href");
+            productUrl = WEBSITE_IDEALO_URL_PREFIEX + productUrl;
+
+            System.out.println(productUrl);
+        }
+    }
 
     @Test
     public void test_desc() throws Exception {

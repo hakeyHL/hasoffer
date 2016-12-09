@@ -1,4 +1,4 @@
-package hasoffer.job.dao;
+package hasoffer.alivpc.dao;
 
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;

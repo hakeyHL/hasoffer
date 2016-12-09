@@ -690,7 +690,9 @@ public class Compare2Controller {
                     comparedPricemnMap.put(mc, ptmStdPriceModel);
                 }
             }
-            sio.set(comparedPricemnMap.get(maxMc));
+            if (maxMc > 0) {
+                sio.set(comparedPricemnMap.get(maxMc));
+            }
         }
     }
 
@@ -779,26 +781,13 @@ public class Compare2Controller {
                     sum += cmpProductListVo.getTotalRatingsNum() * cmpProductListVo.getRatingNum();
                     tempTotalComments += cmpProductListVo.getTotalRatingsNum();
                 }
-                PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, cmpProductListVo.getId());
                 List<String> offer = new ArrayList<>();
-                if (ptmCmpSkuDescription != null) {
-                    String offers = ptmCmpSkuDescription.getOffers();
-                    if (!StringUtils.isEmpty(offers)) {
-                        String[] temps = offers.split(",");
-                        for (String str : temps) {
-                            offer.add(str);
-                        }
-                        cmpProductListVo.setOffers(offer);
-                    }
-                }
                 if (cmpProductListVo.getWebsite().name().equals("FLIPKART")) {
                     offer.add("Extra " + cmpProductListVo.getCoins() + " Hasoffer Coins");
-
                 }
                 tempCmpProductListVos.add(cmpProductListVo);
             }
             //移除之前加进列表的所有的sku列表
-            comparedSkuVos = null;
             comparedSkuVos = new ArrayList<>();
             //将新的加入的放入到列表中
             comparedSkuVos.addAll(tempCmpProductListVos);
