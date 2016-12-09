@@ -663,32 +663,6 @@ public class AppController {
                 criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
                 PageableResult p;
                 p = ptmStdSkuIndexService.searchProducts(criteria);
-                if (p != null && p.getData() != null && p.getData().size() > 0) {
-                    map.put("numberFound", p.getNumFund());
-                    Map<String, List<NameValue>> pivotFieldVals = new HashMap<>();
-                    List<NameValue> brandValues = new ArrayList<>();
-                    NameValue nameValue = new NameValue();
-                    nameValue.setName("Mi");
-                    nameValue.setValue(4);
-                    brandValues.add(nameValue);
-                    nameValue.setName("apple");
-                    nameValue.setValue(8);
-                    brandValues.add(nameValue);
-
-                    pivotFieldVals.put("brand", brandValues);
-
-                    List<NameValue> netWorkValues = new ArrayList<>();
-                    NameValue netWorkValue = new NameValue();
-                    netWorkValue.setName("3G");
-                    netWorkValue.setValue(4);
-                    netWorkValues.add(netWorkValue);
-                    nameValue.setName("4G");
-                    nameValue.setValue(3);
-                    netWorkValues.add(nameValue);
-
-                    pivotFieldVals.put("NetWork", netWorkValues);
-
-                }
                 if (p == null || p.getData() == null || p.getData().size() < 1) {
                     criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
                     p = productIndex2Service.searchProducts(criteria);
@@ -715,12 +689,21 @@ public class AppController {
                 break;
             case 3:
                 //类目搜索
-                criteria.setPivotFields(Arrays.asList("Network",
-                        "Network3G", "Network4G",
-                        "Screen_Resolution", "Operating_System", "queryRam",
-                        "queryScreenSize", "querySecondaryCamera",
-                        "queryBatteryCapacity", "queryPrimaryCamera",
-                        "queryInternalMemory", "brand"));
+                //根据版本过滤
+                DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+                if (StringUtils.isNotEmpty(deviceInfoVo.getAppVersion())) {
+                    String appVersion = deviceInfoVo.getAppVersion();
+                    int version = Integer.parseInt(appVersion);
+                    if (version >= 36) {
+                        criteria.setPivotFields(Arrays.asList("Network",
+                                "Network3G", "Network4G",
+                                "Screen_Resolution", "Operating_System", "queryRam",
+                                "queryScreenSize", "querySecondaryCamera",
+                                "queryBatteryCapacity", "queryPrimaryCamera",
+                                "queryInternalMemory", "brand"));
+                    }
+
+                }
                 //category level page size
                 if (StringUtils.isNotBlank(criteria.getCategoryId())) {
                     //search by category
@@ -732,30 +715,30 @@ public class AppController {
                         //1. 换名字
                         //2. 合并NetWork
                         //3. 指定的排序
-                        Map<String, List<NameValue<String, Long>>> pivotFieldValMap = new HashMap<>();
                         Map<String, List<NameValue<String, Long>>> pivotFieldVals = products.getPivotFieldVals();
-
-                        List<NameValue<String, Long>> netWorkNVList = new ArrayList<>();
-
-                        Set<Map.Entry<String, List<NameValue<String, Long>>>> entries = pivotFieldVals.entrySet();
-                        Iterator<Map.Entry<String, List<NameValue<String, Long>>>> iterator = entries.iterator();
-                        while (iterator.hasNext()) {
-                            Map.Entry<String, List<NameValue<String, Long>>> next = iterator.next();
-                            String key = next.getKey();
-                            List<NameValue<String, Long>> value = next.getValue();
-                            if (key.equals("Network3G") || key.equals("Network4G") || key.equals("Network")) {
-                                netWorkNVList.addAll(value);
+                        if (pivotFieldVals != null && pivotFieldVals.size() > 0) {
+                            Map<String, List<NameValue<String, Long>>> pivotFieldValMap = new HashMap<>();
+                            List<NameValue<String, Long>> netWorkNVList = new ArrayList<>();
+                            Set<Map.Entry<String, List<NameValue<String, Long>>>> entries = pivotFieldVals.entrySet();
+                            Iterator<Map.Entry<String, List<NameValue<String, Long>>>> iterator = entries.iterator();
+                            while (iterator.hasNext()) {
+                                Map.Entry<String, List<NameValue<String, Long>>> next = iterator.next();
+                                String key = next.getKey();
+                                List<NameValue<String, Long>> value = next.getValue();
+                                if (key.equals("Network3G") || key.equals("Network4G") || key.equals("Network")) {
+                                    netWorkNVList.addAll(value);
+                                }
+                                String cateFilterValue = ConstantUtil.API_CATEGORY_FILTER_PARAMS_MAP.get(key);
+                                if (cateFilterValue != null) {
+                                    pivotFieldValMap.put(cateFilterValue, value);
+                                }
                             }
-                            String cateFilterValue = ConstantUtil.API_CATEGORY_FILTER_PARAMS_MAP.get(key);
-                            if (cateFilterValue != null) {
-                                pivotFieldValMap.put(cateFilterValue, value);
+                            if (netWorkNVList.size() > 0) {
+                                pivotFieldValMap.put("Network", netWorkNVList);
                             }
+                            map.put("pivos", pivotFieldValMap);
+                            map.put("numberFound", products.getNumFund());
                         }
-                        if (netWorkNVList.size() > 0) {
-                            pivotFieldValMap.put("Network", netWorkNVList);
-                        }
-                        map.put("pivos", pivotFieldValMap);
-                        map.put("numberFound", products.getNumFund());
                     }
                     if (products != null && products.getData().size() > 0) {
                         addProductVo2List(li, products.getData());
