@@ -55,7 +55,7 @@
 
 <script>
     var $table = $('#table');
-    var $dateStr = $('#queryDate').val();
+
     function initTable() {
         $table.bootstrapTable({
             height: getHeight(),
@@ -106,6 +106,9 @@
     }
 
     function queryUpdateState() {
+
+        var $dateStr = $('#queryDate').val();
+
         var url = "${ctx}/updateState/selectUpdateByDay/" + $dateStr;
 
         $.ajax({
@@ -116,7 +119,6 @@
             dataType: 'json',
             async: false,
             success: function (data) {
-                console.info(data);
                 $table.bootstrapTable('load', data);
             }
         });
