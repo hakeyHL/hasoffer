@@ -77,7 +77,7 @@ public class FixController {
     public static final String WEBSITE_91MOBILE_URL_PREFIEX = "http://www.91mobiles.com";
 
     private static final String Q_SKU_PRODUCTID = "SELECT t FROM PtmCmpSku t WHERE t.productId = ?0 ORDER BY t.id";
-    private static final String Q_PTMCMPSKU = "SELECT t FROM PtmCmpSku t WHERE t.productId < 100000";
+    private static final String Q_PTMCMPSKU = "SELECT t FROM PtmCmpSku t WHERE t.status='ONSALE' and t.price >0";
     private static final String Q_INDEX = "SELECT t FROM PtmCmpSkuIndex2 t ORDER BY t.id ASC";
 
     private final static String Q_TITLE_COUNT = "SELECT t.title,COUNT(t.id) FROM PtmProduct t WHERE t.title is not null GROUP BY t.title HAVING COUNT(t.id) > 1 ORDER BY COUNT(t.id) DESC";

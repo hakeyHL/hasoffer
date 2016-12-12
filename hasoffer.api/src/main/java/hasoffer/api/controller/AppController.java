@@ -664,10 +664,12 @@ public class AppController {
                 PageableResult p;
                 p = ptmStdSkuIndexService.searchProducts(criteria);
                 if (p == null || p.getData() == null || p.getData().size() < 1) {
+                    criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
                     p = productIndex2Service.searchProducts(criteria);
                 }
                 if (p != null && p.getData().size() > 0) {
                     System.out.println("getPivotFieldVals  " + p.getPivotFieldVals().size());
+                    map.put("pivos", p.getPivotFieldVals());
                     getSkuListByKeyword(map, p);
                     //如果是价格由低到高排序或者按照价格区间排序不过滤配件信息
                     boolean filterProductFlag = true;
@@ -687,12 +689,56 @@ public class AppController {
                 break;
             case 3:
                 //类目搜索
+                //根据版本过滤
+                DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+                if (StringUtils.isNotEmpty(deviceInfoVo.getAppVersion())) {
+                    String appVersion = deviceInfoVo.getAppVersion();
+                    int version = Integer.parseInt(appVersion);
+                    if (version >= 36) {
+                        criteria.setPivotFields(Arrays.asList("Network",
+                                "Network3G", "Network4G",
+                                "Screen_Resolution", "Operating_System", "queryRam",
+                                "queryScreenSize", "querySecondaryCamera",
+                                "queryBatteryCapacity", "queryPrimaryCamera",
+                                "queryInternalMemory", "brand"));
+                    }
+
+                }
                 //category level page size
                 if (StringUtils.isNotBlank(criteria.getCategoryId())) {
                     //search by category
                     products = ptmStdSkuIndexService.searchStdPricesByCategory(criteria);
                     if (products == null || products.getData() == null || products.getData().size() < 1) {
                         products = productIndex2Service.searchPro(criteria);
+                    } else {
+                        //处理下返回结果
+                        //1. 换名字
+                        //2. 合并NetWork
+                        //3. 指定的排序
+                        Map<String, List<NameValue<String, Long>>> pivotFieldVals = products.getPivotFieldVals();
+                        if (pivotFieldVals != null && pivotFieldVals.size() > 0) {
+                            Map<String, List<NameValue<String, Long>>> pivotFieldValMap = new HashMap<>();
+                            List<NameValue<String, Long>> netWorkNVList = new ArrayList<>();
+                            Set<Map.Entry<String, List<NameValue<String, Long>>>> entries = pivotFieldVals.entrySet();
+                            Iterator<Map.Entry<String, List<NameValue<String, Long>>>> iterator = entries.iterator();
+                            while (iterator.hasNext()) {
+                                Map.Entry<String, List<NameValue<String, Long>>> next = iterator.next();
+                                String key = next.getKey();
+                                List<NameValue<String, Long>> value = next.getValue();
+                                if (key.equals("Network3G") || key.equals("Network4G") || key.equals("Network")) {
+                                    netWorkNVList.addAll(value);
+                                }
+                                String cateFilterValue = ConstantUtil.API_CATEGORY_FILTER_PARAMS_MAP.get(key);
+                                if (cateFilterValue != null) {
+                                    pivotFieldValMap.put(cateFilterValue, value);
+                                }
+                            }
+                            if (netWorkNVList.size() > 0) {
+                                pivotFieldValMap.put("Network", netWorkNVList);
+                            }
+                            map.put("pivos", pivotFieldValMap);
+                            map.put("numberFound", products.getNumFund());
+                        }
                     }
                     if (products != null && products.getData().size() > 0) {
                         addProductVo2List(li, products.getData());
@@ -746,23 +792,11 @@ public class AppController {
                         PtmCategory ptmCategory = appCacheManager.getCategoryById(cateId);
                         if (ptmCategory != null && ptmCategory.getLevel() == 2) {
                             //处理二级类目
-                            CategoryVo categoryVo = new CategoryVo();
-                            categoryVo.setId(ptmCategory.getId());
-                            categoryVo.setLevel(ptmCategory.getLevel());
-                            categoryVo.setParentId(ptmCategory.getParentId());
-                            categoryVo.setRank(ptmCategory.getRank());
-                            categoryVo.setName(ptmCategory.getName());
-                            categoryVo.setHasChildren(0);
+                            CategoryVo categoryVo = getCategoryVo(ptmCategory);
                             secondCategoryList.add(categoryVo);
                         } else if (ptmCategory != null && ptmCategory.getLevel() == 3) {
                             //处理三级类目
-                            CategoryVo categoryVo3 = new CategoryVo();
-                            categoryVo3.setId(ptmCategory.getId());
-                            categoryVo3.setLevel(ptmCategory.getLevel());
-                            categoryVo3.setParentId(ptmCategory.getParentId());
-                            categoryVo3.setRank(ptmCategory.getRank());
-                            categoryVo3.setName(ptmCategory.getName());
-                            categoryVo3.setHasChildren(0);
+                            CategoryVo categoryVo3 = getCategoryVo(ptmCategory);
                             thirdCategoryList.add(categoryVo3);
                         }
                     }
@@ -825,6 +859,17 @@ public class AppController {
             }
             map.put("categorys", categorys);
         }
+    }
+
+    private CategoryVo getCategoryVo(PtmCategory ptmCategory) {
+        CategoryVo categoryVo = new CategoryVo();
+        categoryVo.setId(ptmCategory.getId());
+        categoryVo.setLevel(ptmCategory.getLevel());
+        categoryVo.setParentId(ptmCategory.getParentId());
+        categoryVo.setRank(ptmCategory.getRank());
+        categoryVo.setName(ptmCategory.getName());
+        categoryVo.setHasChildren(0);
+        return categoryVo;
     }
 
     public void addProductVo2List(List desList, List sourceList) {
@@ -1074,7 +1119,7 @@ public class AppController {
                 Map<String, List<ThirdAppVo>> GOOGLEPLAY = new HashMap<>();
 
                 //添加GooglePlay渠道的app下载属性
-                List<ThirdAppVo> tempGOOGLEPLAY = new ArrayList<ThirdAppVo>();
+                List<ThirdAppVo> tempGOOGLEPLAY = new ArrayList<>();
                 ThirdAppVo googlePlayApps_Amazon = new ThirdAppVo(Website.AMAZON, AppAdController.packageMap.get(Website.AMAZON), "https://play.google.com/store/apps/details?id=com.amazon.mShop.android.shopping", WebsiteHelper.getLogoUrl(Website.AMAZON), "Browse,search & buy millions of products right from your Android device", 4.3f, "491,637", "50,000,000 - 100,000,000", "9.6MB");
                 ThirdAppVo googlePlayApps_Flipkart = new ThirdAppVo(Website.FLIPKART, AppAdController.packageMap.get(Website.FLIPKART), "https://play.google.com/store/apps/details?id=com.flipkart.android", WebsiteHelper.getLogoUrl(Website.FLIPKART), "Shop for electronics,apparels & more using our Flipart app Free shipping & COD", 4.2f, "2,044,978", "50,000,000 - 100,000,000", "10.0MB");
                 ThirdAppVo googlePlayApps_ShopClues = new ThirdAppVo(Website.SHOPCLUES, AppAdController.packageMap.get(Website.SHOPCLUES), "https://play.google.com/store/apps/details?id=com.shopclues", WebsiteHelper.getLogoUrl(Website.SHOPCLUES), "India's largest Online Marketplace is now in your Pocket - Install,Shop,Enjoy!", 3.9f, "235,468", "10,000,000 - 50,000,000", "7.1MB");

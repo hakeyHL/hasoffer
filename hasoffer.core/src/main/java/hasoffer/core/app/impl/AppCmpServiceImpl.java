@@ -94,11 +94,11 @@ public class AppCmpServiceImpl implements AppCmpService {
                 PageableResult<PtmStdPrice> pagedPtmStdPriceList = stdPriceService.getPagedPtmStdPriceList(stdSku.getId(), SkuStatus.ONSALE, sio.getPage(), sio.getSize());
                 if (pagedPtmStdPriceList != null && pagedPtmStdPriceList.getData() != null && pagedPtmStdPriceList.getData().size() > 0) {
                     List<CmpProductListVo> cmpProductListVoList = new ArrayList<>();
+                    List<PtmStdPrice> data = pagedPtmStdPriceList.getData();
+                    sortByPriceAsc(data);
+                    cr.setBestPrice(data.get(0).getPrice());
+                    cr.getProductVo().setCurrentLowestPrice(cr.getBestPrice());
                     if (sio.getCliPrice() <= 0) {
-                        List<PtmStdPrice> data = pagedPtmStdPriceList.getData();
-                        sortByPriceAsc(data);
-                        cr.setBestPrice(data.get(0).getPrice());
-                        cr.getProductVo().setCurrentLowestPrice(cr.getBestPrice());
                         sio.setCliPrice(data.get(data.size() - 1).getPrice());
                     }
                     //计算列表中最大价格
