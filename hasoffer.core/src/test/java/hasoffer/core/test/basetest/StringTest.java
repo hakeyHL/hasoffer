@@ -13,6 +13,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -23,6 +24,13 @@ import java.util.regex.Pattern;
  * Created on 2016/5/16.
  */
 public class StringTest {
+
+    @Test
+    public void testABTest() {
+        String test = "%3B152479990235431";
+        test = URLDecoder.decode(test);
+        System.out.println(test);
+    }
 
     @Test
     public void testYmd() {
