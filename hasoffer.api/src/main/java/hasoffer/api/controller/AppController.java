@@ -20,7 +20,6 @@ import hasoffer.core.admin.IOrderStatsAnalysisService;
 import hasoffer.core.admin.impl.DealServiceImpl;
 import hasoffer.core.app.vo.*;
 import hasoffer.core.bo.product.Banners;
-import hasoffer.core.bo.product.CategoryVo;
 import hasoffer.core.bo.push.*;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.cache.AppCacheManager;
@@ -33,16 +32,13 @@ import hasoffer.core.persistence.enums.AppdealSource;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.*;
-import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.urm.*;
-import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.product.solr.PtmStdSkuIndexServiceImpl;
-import hasoffer.core.product.solr.PtmStdSkuModel;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.IAppService;
@@ -81,6 +77,8 @@ public class AppController {
     ICacheService<UrmUser> userICacheService;
     @Resource
     ICacheService iCacheService;
+    @Resource
+    ApiUtils apiUtils;
     private Logger logger = LoggerFactory.getLogger(AppController.class);
     @Resource
     private IAppService appService;
@@ -92,8 +90,6 @@ public class AppController {
     private ProductIndex2ServiceImpl productIndex2Service;
     @Resource
     private ProductServiceImpl productService;
-    @Resource
-    private ICmpSkuService cmpSkuService;
     @Resource
     private AppCacheManager appCacheManager;
     @Resource
@@ -290,7 +286,7 @@ public class AppController {
         // 获取基本配置
         Map<Integer, Integer> afwCfgMap = appService.getSignAwardNum();
         if (user != null) {
-            calculateHasofferCoin(Collections.singletonList(user), data);
+            apiUtils.calculateHasofferCoin(Collections.singletonList(user), data);
             //添加返回:
             UrmSignCoin urmSignCoin = appService.getSignCoinByUserId(user.getId());
 
@@ -647,7 +643,7 @@ public class AppController {
         switch (type) {
             case 0:
                 List<PtmProduct> products2s = productCacheManager.getTopSellins(criteria.getPage(), criteria.getPageSize());
-                addProductVo2List(li, products2s);
+                apiUtils.addProductVo2List(li, products2s);
                 if (products2s != null && products2s.size() > 4) {
                     li = li.subList(0, 5);
                 }
@@ -655,7 +651,7 @@ public class AppController {
                 break;
             case 1:
                 List<PtmProduct> topSellins = productCacheManager.getTopSellins(criteria.getPage(), criteria.getPageSize());
-                addProductVo2List(li, topSellins);
+                apiUtils.addProductVo2List(li, topSellins);
                 map.put("product", li);
                 break;
             case 2:
@@ -670,7 +666,7 @@ public class AppController {
                 if (p != null && p.getData().size() > 0) {
                     System.out.println("getPivotFieldVals  " + p.getPivotFieldVals().size());
                     map.put("pivos", p.getPivotFieldVals());
-                    getSkuListByKeyword(map, p);
+                    apiUtils.getSkuListByKeyword(map, p);
                     //如果是价格由低到高排序或者按照价格区间排序不过滤配件信息
                     boolean filterProductFlag = true;
                     if (criteria.getSort().name().equals("PRICEL2H")) {
@@ -683,7 +679,7 @@ public class AppController {
                     if (filterProductFlag) {
                         filterProducts(p.getData(), criteria.getKeyword());
                     }
-                    addProductVo2List(li, p.getData());
+                    apiUtils.addProductVo2List(li, p.getData());
                 }
                 map.put("product", li);
                 break;
@@ -741,7 +737,7 @@ public class AppController {
                         }
                     }
                     if (products != null && products.getData().size() > 0) {
-                        addProductVo2List(li, products.getData());
+                        apiUtils.addProductVo2List(li, products.getData());
                     }
                 }
                 break;
@@ -751,13 +747,13 @@ public class AppController {
                     //search by category
                     products = productIndex2Service.searchPro(criteria);
                     if (products != null && products.getData().size() > 0) {
-                        addProductVo2List(li, products.getData());
+                        apiUtils.addProductVo2List(li, products.getData());
                     }
                 } else if (StringUtils.isNotBlank(criteria.getKeyword())) {
                     PageableResult pKeywordResult = productIndex2Service.searchProducts(criteria);
                     if (pKeywordResult != null && pKeywordResult.getData().size() > 0) {
                         filterProducts(pKeywordResult.getData(), criteria.getKeyword());
-                        addProductVo2List(li, pKeywordResult.getData());
+                        apiUtils.addProductVo2List(li, pKeywordResult.getData());
                         map.put("product", li);
                     }
                 }
@@ -770,191 +766,6 @@ public class AppController {
         mv.addObject("data", map);
         System.out.println("time " + (System.currentTimeMillis() - l) / 1000);
         return mv;
-    }
-
-    private void getSkuListByKeyword(Map map, PageableResult p) {
-        if (p.getPivotFieldVals() != null && p.getPivotFieldVals().size() > 0) {
-            // List<CategoryVo>
-            List<CategoryVo> secondCategoryList = new ArrayList();
-            List<CategoryVo> categorys = new ArrayList();
-            List<CategoryVo> thirdCategoryList = new ArrayList();
-            Map pivotFieldVals = p.getPivotFieldVals();
-            Set<Map.Entry> set = pivotFieldVals.entrySet();
-            Iterator<Map.Entry> iterator = set.iterator();
-            while (iterator.hasNext()) {
-                Map.Entry next = iterator.next();
-                List<NameValue> nameValues = (List<NameValue>) next.getValue();
-                System.out.println("cate " + next.getKey() + " ::: nameValues  :" + nameValues.size());
-                for (NameValue nameValue : nameValues) {
-                    Long cateId = Long.valueOf(nameValue.getName() + "");
-                    //可能是二级也可能是三级 ,二级的放一块,三级的放一块
-                    if (cateId > 0) {
-                        PtmCategory ptmCategory = appCacheManager.getCategoryById(cateId);
-                        if (ptmCategory != null && ptmCategory.getLevel() == 2) {
-                            //处理二级类目
-                            CategoryVo categoryVo = getCategoryVo(ptmCategory);
-                            secondCategoryList.add(categoryVo);
-                        } else if (ptmCategory != null && ptmCategory.getLevel() == 3) {
-                            //处理三级类目
-                            CategoryVo categoryVo3 = getCategoryVo(ptmCategory);
-                            thirdCategoryList.add(categoryVo3);
-                        }
-                    }
-                }
-            }
-            //获取到类目id appCacheManager.getCategorys(categoryId);
-            //先获取一级类目列表
-            List<CategoryVo> firstCategoryList = appCacheManager.getCategorys("");
-            //对二级类目按照rank排序
-            Collections.sort(secondCategoryList, new Comparator<CategoryVo>() {
-                @Override
-                public int compare(CategoryVo o1, CategoryVo o2) {
-                    if (o1.getRank() > o2.getRank()) {
-                        return 1;
-                    } else if (o1.getRank() < o2.getRank()) {
-                        return -1;
-                    }
-                    return 0;
-                }
-            });
-
-            //遍历一级类目将二级类目匹配排序
-            for (CategoryVo firstPtmCategory : firstCategoryList) {
-                for (CategoryVo cate : secondCategoryList) {
-                    //遍历所有,如果父类id是其则加入list
-                    if (cate.getParentId().equals(firstPtmCategory.getId())) {
-                        categorys.add(cate);
-                    }
-                }
-            }
-
-            //遍历二级类目,将三级类目匹配排序和归类
-            Iterator<CategoryVo> iterator1 = categorys.iterator();
-            while (iterator1.hasNext()) {
-                List<CategoryVo> tempThirdCategoryList = new ArrayList();
-                CategoryVo next = iterator1.next();
-                for (CategoryVo cate : thirdCategoryList) {
-                    //遍历所有,如果父类id是其则加入list
-                    if (cate.getParentId().equals(next.getId())) {
-                        tempThirdCategoryList.add(cate);
-                    }
-                }
-
-                //对三级类目按照rank排序
-                Collections.sort(tempThirdCategoryList, new Comparator<CategoryVo>() {
-                    @Override
-                    public int compare(CategoryVo o1, CategoryVo o2) {
-                        if (o1.getRank() > o2.getRank()) {
-                            return 1;
-                        } else if (o1.getRank() < o2.getRank()) {
-                            return -1;
-                        }
-                        return 0;
-                    }
-                });
-                if (tempThirdCategoryList.size() > 0) {
-                    next.setHasChildren(1);
-                }
-                next.setCategorys(tempThirdCategoryList);
-            }
-            map.put("categorys", categorys);
-        }
-    }
-
-    private CategoryVo getCategoryVo(PtmCategory ptmCategory) {
-        CategoryVo categoryVo = new CategoryVo();
-        categoryVo.setId(ptmCategory.getId());
-        categoryVo.setLevel(ptmCategory.getLevel());
-        categoryVo.setParentId(ptmCategory.getParentId());
-        categoryVo.setRank(ptmCategory.getRank());
-        categoryVo.setName(ptmCategory.getName());
-        categoryVo.setHasChildren(0);
-        return categoryVo;
-    }
-
-    public void addProductVo2List(List desList, List sourceList) {
-
-        if (sourceList != null && sourceList.size() > 0) {
-            if (PtmProduct.class.isInstance(sourceList.get(0))) {
-                Iterator<PtmProduct> ptmList = sourceList.iterator();
-                while (ptmList.hasNext()) {
-                    PtmProduct ptmProduct = ptmList.next();
-                    int count = cmpSkuService.getSkuSoldStoreNum(ptmProduct.getId());
-                    if (count > 0) {
-                        ProductListVo productListVo = new ProductListVo();
-                        productListVo.setId(ptmProduct.getId());
-                        productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
-                        productListVo.setName(ptmProduct.getTitle());
-                        productListVo.setPrice(Math.round(ptmProduct.getPrice()));
-                        productListVo.setStoresNum(count);
-                        setCommentNumAndRatins(productListVo);
-                        desList.add(productListVo);
-                    }
-                }
-            } else if (ProductModel2.class.isInstance(sourceList.get(0))) {
-                Iterator<ProductModel2> ptmList = sourceList.iterator();
-                while (ptmList.hasNext()) {
-                    ProductModel2 ptmProduct = ptmList.next();
-                    ProductListVo productListVo = new ProductListVo();
-                    productListVo.setId(ptmProduct.getId());
-                    productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
-                    productListVo.setName(ptmProduct.getTitle());
-                    productListVo.setPrice(Math.round(ptmProduct.getMinPrice()));
-                    productListVo.setRatingNum(ptmProduct.getRating());
-                    productListVo.setCommentNum(Long.valueOf(ptmProduct.getReview()));
-                    productListVo.setStoresNum(ptmProduct.getStoreCount());
-                    desList.add(productListVo);
-                }
-            } else if (PtmStdSkuModel.class.isInstance(sourceList.get(0))) {
-                Iterator<PtmStdSkuModel> ptmList = sourceList.iterator();
-                while (ptmList.hasNext()) {
-                    PtmStdSkuModel ptmStdSkuModel = ptmList.next();
-                    ProductListVo productListVo = new ProductListVo();
-                    productListVo.setId(ptmStdSkuModel.getId());
-                    productListVo.setImageUrl(productCacheManager.getPtmStdSkuImageUrl(ApiUtils.rmoveBillion(ptmStdSkuModel.getId())));
-                    productListVo.setName(ptmStdSkuModel.getTitle());
-                    productListVo.setPrice(Math.round(ptmStdSkuModel.getMinPrice()));
-                    productListVo.setRatingNum(ptmStdSkuModel.getRating());
-                    productListVo.setCommentNum(Long.valueOf(ptmStdSkuModel.getReview()));
-                    productListVo.setStoresNum(ptmStdSkuModel.getStoreCount());
-                    desList.add(productListVo);
-                }
-            }
-        }
-    }
-
-    public void setCommentNumAndRatins(ProductListVo productListVo) {
-        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productListVo.getId(), 1, 20);
-        if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
-            List<PtmCmpSku> tempSkuList = pagedCmpskus.getData();
-            //计算评论数*星级的总和
-            int sum = 0;
-            //统计site
-            Set<Website> websiteSet = new HashSet<Website>();
-            for (PtmCmpSku ptmCmpSku : tempSkuList) {
-                websiteSet.add(ptmCmpSku.getWebsite());
-            }
-            Long totalCommentNum = Long.valueOf(0);
-            for (PtmCmpSku ptmCmpSku2 : tempSkuList) {
-                if (websiteSet.size() <= 0) {
-                    break;
-                }
-                if (websiteSet.contains(ptmCmpSku2.getWebsite())) {
-                    websiteSet.remove(ptmCmpSku2.getWebsite());
-//                    System.out.println("count comment ans stats exclude  ebay ");
-                    if (!ptmCmpSku2.getWebsite().equals(Website.EBAY)) {
-                        //评论数*星级 累加 除以评论数和
-                        sum += ptmCmpSku2.getRatings() * ptmCmpSku2.getCommentsNumber();
-                        //去除列表中除此之外的其他此site的数据
-                        totalCommentNum += ptmCmpSku2.getCommentsNumber();
-                    }
-                }
-            }
-//            System.out.println("totalCommentNum   " + totalCommentNum);
-            productListVo.setCommentNum(totalCommentNum);
-            int rating = ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(totalCommentNum == 0 ? 1 : totalCommentNum), 0, BigDecimal.ROUND_HALF_UP).longValue());
-            productListVo.setRatingNum(rating <= 0 ? 90 : rating);
-        }
     }
 
     @RequestMapping(value = "/push")
@@ -1029,47 +840,6 @@ public class AppController {
                 }
             }
         }
-    }
-
-    public void calculateHasofferCoin(List<UrmUser> users, BackDetailVo data) {
-        List<OrderVo> transcations = new ArrayList<OrderVo>();
-        BigDecimal pendingCoins = BigDecimal.ZERO;
-        BigDecimal verifiedCoins = BigDecimal.ZERO;
-        for (UrmUser user : users) {
-            List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
-            for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
-                if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
-                    OrderVo orderVo = new OrderVo();
-                    BigDecimal tempPrice = orderStatsAnalysisPO.getSaleAmount().multiply(BigDecimal.valueOf(0.075)).min(orderStatsAnalysisPO.getTentativeAmount());
-                    //乘以10再取整
-                    tempPrice = tempPrice.multiply(BigDecimal.TEN);
-                    orderVo.setAccount(tempPrice.divide(BigDecimal.ONE, 1, BigDecimal.ROUND_HALF_UP));
-                    orderVo.setChannel(orderStatsAnalysisPO.getChannel());
-                    orderVo.setOrderId(orderStatsAnalysisPO.getOrderId());
-                    orderVo.setOrderTime(orderStatsAnalysisPO.getOrderTime());
-                    orderVo.setWebsite(orderStatsAnalysisPO.getWebSite());
-                    orderVo.setStatus(orderStatsAnalysisPO.getOrderStatus());
-                    transcations.add(orderVo);
-                    if (orderStatsAnalysisPO.getOrderStatus() != null) {
-                        if (!orderStatsAnalysisPO.getOrderStatus().equals("cancelled") && !orderStatsAnalysisPO.getOrderStatus().equals("disapproved")) {
-                            if (!orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
-                                pendingCoins = pendingCoins.add(tempPrice);
-                            }
-                        }
-                        if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
-                            verifiedCoins = verifiedCoins.add(tempPrice);
-                        }
-                    }
-
-                }
-            }
-        }
-        //待定的
-        data.setPendingCoins(pendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
-        //可以使用的
-        verifiedCoins = verifiedCoins.multiply(BigDecimal.TEN);
-        data.setVerifiedCoins(verifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
-        data.setTranscations(transcations);
     }
 
     private ModelAndView callBackMethod(HttpServletRequest request, @RequestParam CallbackAction action) {
