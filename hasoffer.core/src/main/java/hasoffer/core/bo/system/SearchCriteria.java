@@ -23,9 +23,8 @@ public class SearchCriteria {
     private SearchResultSort sort = SearchResultSort.RELEVANCE;
 
 
-    //String
     private String[] brand;
-    private String[] netWork;
+    private String[] network;
     private String[] screenResolution;
     private String[] opreatingSystem;
     private String[] expandableMemory;
@@ -153,7 +152,7 @@ public class SearchCriteria {
                 ", pivotFields=" + pivotFields +
                 ", sort=" + sort +
                 ", brand=" + Arrays.toString(brand) +
-                ", netWork=" + Arrays.toString(netWork) +
+                ", netWork=" + Arrays.toString(network) +
                 ", screenResolution=" + Arrays.toString(screenResolution) +
                 ", opreatingSystem=" + Arrays.toString(opreatingSystem) +
                 ", expandableMemory=" + Arrays.toString(expandableMemory) +
@@ -174,12 +173,12 @@ public class SearchCriteria {
         this.brand = brand;
     }
 
-    public String[] getNetWork() {
-        return netWork;
+    public String[] getNetwork() {
+        return network;
     }
 
-    public void setNetWork(String[] netWork) {
-        this.netWork = netWork;
+    public void setNetwork(String[] network) {
+        this.network = network;
     }
 
     public String[] getScreenResolution() {
