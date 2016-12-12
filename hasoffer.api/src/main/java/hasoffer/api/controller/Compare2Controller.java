@@ -676,7 +676,7 @@ public class Compare2Controller {
     }
 
     public void getPtmStdPriceBySioFromSolr(SearchIO sio) {
-        PageableResult<PtmStdPriceModel> pricesList = ptmStdPriceIndexService.searchPrices(sio, 1, 5);
+        PageableResult<PtmStdPriceModel> pricesList = ptmStdPriceIndexService.searchPrices(sio, 1, 4);
         //选最大的
         float maxMc = 0;
         Map<Float, PtmStdPriceModel> comparedPricemnMap = new HashMap<>();
