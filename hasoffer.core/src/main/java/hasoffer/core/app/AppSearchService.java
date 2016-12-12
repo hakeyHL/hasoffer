@@ -1,14 +1,13 @@
 package hasoffer.core.app;
 
-import hasoffer.core.app.vo.ProductListVo;
+import hasoffer.base.model.PageableResult;
 import hasoffer.core.bo.system.SearchCriteria;
-
-import java.util.List;
+import hasoffer.core.product.solr.PtmStdSkuModel;
 
 /**
  * Created by hs on 2016年12月12日.
  * Time 14:48
  */
 public interface AppSearchService {
-    List<ProductListVo> filterByParams(SearchCriteria searchCriteria);
+    PageableResult<PtmStdSkuModel> filterByParams(SearchCriteria searchCriteria);
 }
