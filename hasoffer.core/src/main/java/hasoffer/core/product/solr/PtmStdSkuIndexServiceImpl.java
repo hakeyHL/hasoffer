@@ -121,16 +121,8 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
                 }
             }
         }
-        PageableResult<PtmStdSkuModel> pagedPms = new PageableResult<PtmStdSkuModel>(sr.getResult(), sr.getTotalCount(), sc.getPage(), sc.getPageSize(), pivotFieldVals);
+        PageableResult<PtmStdSkuModel> pagedPms = new PageableResult<>(sr.getResult(), sr.getTotalCount(), sc.getPage(), sc.getPageSize(), pivotFieldVals);
         addBillion2ListEle(pagedPms);
-        //遍历列表修改id
-       /* if (pagedPms != null && pagedPms.getData() != null && pagedPms.getData().size() > 0) {
-            Iterator<PtmStdSkuModel> iterator = pagedPms.getData().iterator();
-            while (iterator.hasNext()) {
-                PtmStdSkuModel ptmStdSkuModel = iterator.next();
-                ptmStdSkuModel.setId(ApiUtils.addBillion(ptmStdSkuModel.getId()));
-            }
-        }*/
         return pagedPms;
     }
 
@@ -171,21 +163,10 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
         if (level < 1 || level > 3) {
             return null;
         }
-        List<FilterQuery> fqList = new ArrayList<FilterQuery>();
+        List<FilterQuery> fqList = new ArrayList<>();
         int priceFrom = criteria.getPriceFrom(), priceTo = criteria.getPriceTo();
         String priceFromStr = "*", priceToStr = "*";
-        if (priceFrom < priceTo && priceFrom >= 0) {
-            if (priceFrom <= 0) {
-                priceFrom = 1;
-            }
-            priceFromStr = String.valueOf(priceFrom);
-            if (priceTo > 0) {
-                priceToStr = String.valueOf(priceTo);
-            }
-            fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", priceFromStr, priceToStr)));
-        } else {
-            fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", "1", "*")));
-        }
+        ApiUtils.setPriceSearchScope(fqList, priceFrom, priceTo, priceToStr);
         Sort[] sorts = new Sort[1];
         SearchResultSort resultSort = criteria.getSort();
         sorts = getSorts(sorts, resultSort);
@@ -214,6 +195,27 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
         return ptmStdSkuModelPageableResult;
     }
 
+    public PageableResult<PtmStdSkuModel> filterStdSkuOnCategoryByCriteria(SearchCriteria searchCriteria) {
+        String queryString = "*:*";
+        List<FilterQuery> fqList = new ArrayList<>();
+
+        int level = searchCriteria.getLevel();
+        String cateId = searchCriteria.getCategoryId();
+        int page = searchCriteria.getPage();
+        int size = searchCriteria.getPageSize();
+        fqList.add(new FilterQuery("cate" + level, String.valueOf(cateId)));
+        addQuerParams2List(searchCriteria, fqList);
+        FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
+
+        int priceFrom = searchCriteria.getPriceFrom(), priceTo = searchCriteria.getPriceTo();
+        String priceFromStr = "*", priceToStr = "*";
+        ApiUtils.setPriceSearchScope(fqList, priceFrom, priceTo, priceToStr);
+        SearchResult<PtmStdSkuModel> sr = searchObjs(queryString, fqs, null, null, page <= 1 ? 1 : page, size, true);
+        PageableResult<PtmStdSkuModel> ptmStdSkuModelPageableResult = new PageableResult<>(sr.getResult(), sr.getTotalCount(), page, size, null);
+        addBillion2ListEle(ptmStdSkuModelPageableResult);
+        return ptmStdSkuModelPageableResult;
+    }
+
     private void addBillion2ListEle(PageableResult<PtmStdSkuModel> ptmStdSkuModelPageableResult) {
         if (ptmStdSkuModelPageableResult != null && ptmStdSkuModelPageableResult.getData() != null && ptmStdSkuModelPageableResult.getData().size() > 0) {
             Iterator<PtmStdSkuModel> iterator = ptmStdSkuModelPageableResult.getData().iterator();
@@ -224,12 +226,76 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
         }
     }
 
-    public String getCategoryFilterEnum(String enumString) {
-        if (enumString != null) {
-            //-按_ split D换成. W换成&
-            //除第一个_其他换空格
-//            enumString
+    private String joinQueryParams(String[] params, String param) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < params.length; i++) {
+            sb.append(params[i]);
+            if (i > 0 && i < param.length() - 1) {
+                sb.append(")");
+            }
+            if (i < params.length - 1) {
+                sb.append(" OR ");
+                sb.append("(" + param + ":");
+            }
         }
-        return null;
+        return sb.toString();
+    }
+
+    private void addQuerParams2List(SearchCriteria searchCriteria, List<FilterQuery> fqList) {
+        //1. brand
+        if (searchCriteria.getBrand() != null && searchCriteria.getBrand().length > 0) {
+            String[] brands = searchCriteria.getBrand();
+            fqList.add(new FilterQuery("brand", joinQueryParams(brands, "brand")));
+        }
+        //2. network --2G 3G 4G 处理下 TODO
+        if (searchCriteria.getNetwork() != null && searchCriteria.getNetwork().length > 0) {
+            String[] networks = searchCriteria.getNetwork();
+            fqList.add(new FilterQuery("Network", joinQueryParams(networks, "Network")));
+        }
+        //3. screenResolution
+        if (searchCriteria.getScreenResolution() != null && searchCriteria.getScreenResolution().length > 0) {
+            String[] screenResolutions = searchCriteria.getScreenResolution();
+            fqList.add(new FilterQuery("Screen_Resolution", joinQueryParams(screenResolutions, "Screen_Resolution")));
+        }
+        //4. operatingSystem
+        if (searchCriteria.getOpreatingSystem() != null && searchCriteria.getOpreatingSystem().length > 0) {
+            String[] opreatingSystems = searchCriteria.getOpreatingSystem();
+            fqList.add(new FilterQuery("Operating_System", joinQueryParams(opreatingSystems, "Operating_System")));
+        }
+        //5. expandableMemory
+        if (searchCriteria.getExpandableMemory() != null && searchCriteria.getExpandableMemory().length > 0) {
+            String[] expandableMemorys = searchCriteria.getExpandableMemory();
+            fqList.add(new FilterQuery("Expandable_Memory", joinQueryParams(expandableMemorys, "Expandable_Memory")));
+        }
+        //6. ram
+        if (searchCriteria.getRam() != null && searchCriteria.getRam().length > 0) {
+            String[] rams = searchCriteria.getRam();
+            fqList.add(new FilterQuery("queryRam", joinQueryParams(rams, "queryRam")));
+        }
+        //7. batteryCapacity
+        if (searchCriteria.getBatteryCapacity() != null && searchCriteria.getBatteryCapacity().length > 0) {
+            String[] batteryCapacitys = searchCriteria.getBatteryCapacity();
+            fqList.add(new FilterQuery("queryBatteryCapacity", joinQueryParams(batteryCapacitys, "queryBatteryCapacity")));
+        }
+        //8. internalMemory
+        if (searchCriteria.getInternalMemory() != null && searchCriteria.getInternalMemory().length > 0) {
+            String[] internalMemorys = searchCriteria.getInternalMemory();
+            fqList.add(new FilterQuery("queryInternalMemory", joinQueryParams(internalMemorys, "queryInternalMemory")));
+        }
+        //9. primaryCamera
+        if (searchCriteria.getPrimaryCamera() != null && searchCriteria.getPrimaryCamera().length > 0) {
+            String[] primaryCameras = searchCriteria.getPrimaryCamera();
+            fqList.add(new FilterQuery("queryPrimaryCamera", joinQueryParams(primaryCameras, "queryPrimaryCamera")));
+        }
+        //10.secondaryCamera
+        if (searchCriteria.getSecondaryCamera() != null && searchCriteria.getSecondaryCamera().length > 0) {
+            String[] secondaryCameras = searchCriteria.getSecondaryCamera();
+            fqList.add(new FilterQuery("querySecondaryCamera", joinQueryParams(secondaryCameras, "querySecondaryCamera")));
+        }
+        //11.screenSize
+        if (searchCriteria.getScreenSize() != null && searchCriteria.getScreenSize().length > 0) {
+            String[] screenSizes = searchCriteria.getScreenSize();
+            fqList.add(new FilterQuery("queryScreenSize", joinQueryParams(screenSizes, "queryScreenSize")));
+        }
     }
 }
