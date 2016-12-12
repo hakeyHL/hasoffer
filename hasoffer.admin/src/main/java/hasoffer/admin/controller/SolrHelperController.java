@@ -66,6 +66,19 @@ public class SolrHelperController {
     }
 
     @ResponseBody
+    @RequestMapping("importStdSku2SolrBySkuId")
+    public String importNewStructData2SolrT(final Long stdSkuId) {
+        if (stdSkuId > 0) {
+            PtmStdSku ptmStdSku = iPtmStdSkuService.getStdSkuById(stdSkuId);
+            if (ptmStdSku != null) {
+                iPtmStdSkuService.importPtmStdSku2Solr(ptmStdSku);
+            }
+
+        }
+        return "ok";
+    }
+
+    @ResponseBody
     @RequestMapping("importstdprice2solrbyminid")
     public String importSkuPrice2Solr(@RequestParam(defaultValue = "0") final Long minId) {
 

@@ -74,9 +74,16 @@ public class PriceOffNoticeJobBean extends QuartzJobBean {
             }
 
             float nowPrice = fetchProduct.getPrice();
+            if (nowPrice <= 0) {
+                continue;
+            }
+
             Website website = fetchUrlResult.getFetchProduct().getWebsite();
             String url = fetchUrlResult.getFetchProduct().getUrl();
             String fetchedTitle = fetchUrlResult.getFetchProduct().getTitle();
+            if (StringUtils.isEmpty(fetchedTitle) || "null".equals(fetchedTitle)) {
+                continue;
+            }
 
             //找到订阅当前skuid的降价提醒记录
             List<PriceOffNotice> priceOffNoticeList = dbm.query("SELECT t FROM PriceOffNotice t WHERE t.skuid = ?0 ", Arrays.asList(skuId));

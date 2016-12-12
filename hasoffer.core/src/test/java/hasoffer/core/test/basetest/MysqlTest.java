@@ -9,6 +9,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
@@ -86,8 +87,16 @@ public class MysqlTest {
     IPtmCmpSkuImageService ptmCmpSkuImageService;
     @Resource
     IDeviceService deviceService;
+    @Resource
+    IDealService dealService;
     private Logger logger = LoggerFactory.getLogger(MysqlTest.class);
     private ConcurrentLinkedQueue<PtmCmpSku> skuQueue = new ConcurrentLinkedQueue<PtmCmpSku>();
+
+    @Test
+    public void testHibernateLimit() {
+        AppDeal appDeal = dealService.getDealBySourceId(1231L);
+        System.out.println(appDeal);
+    }
 
     @Test
     public void testClone() throws Exception {

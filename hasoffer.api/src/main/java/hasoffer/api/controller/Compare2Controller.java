@@ -676,14 +676,14 @@ public class Compare2Controller {
     }
 
     public void getPtmStdPriceBySioFromSolr(SearchIO sio) {
-        PageableResult<PtmStdPriceModel> pricesList = ptmStdPriceIndexService.searchPrices(sio, 1, 5);
+        PageableResult<PtmStdPriceModel> pricesList = ptmStdPriceIndexService.searchPrices(sio, 1, 4);
         //选最大的
         float maxMc = 0;
         Map<Float, PtmStdPriceModel> comparedPricemnMap = new HashMap<>();
         if (pricesList != null && pricesList.getData() != null && pricesList.getData().size() > 0) {
             for (PtmStdPriceModel ptmStdPriceModel : pricesList.getData()) {
                 float mc = StringUtils.wordMatchD(StringUtils.toLowerCase(ptmStdPriceModel.getTitle()), sio.getCliQ());
-                if (mc >= 0.5) {
+                if (mc >= 0.6) {
                     if (mc > maxMc) {
                         maxMc = mc;
                     }
