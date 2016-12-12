@@ -665,7 +665,7 @@ public class AppController {
                 }
                 if (p != null && p.getData().size() > 0) {
                     System.out.println("getPivotFieldVals  " + p.getPivotFieldVals().size());
-                    map.put("pivos", p.getPivotFieldVals());
+//                    map.put("pivos", p.getPivotFieldVals());
                     apiUtils.getSkuListByKeyword(map, p);
                     //如果是价格由低到高排序或者按照价格区间排序不过滤配件信息
                     boolean filterProductFlag = true;
