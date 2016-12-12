@@ -683,7 +683,7 @@ public class Compare2Controller {
         if (pricesList != null && pricesList.getData() != null && pricesList.getData().size() > 0) {
             for (PtmStdPriceModel ptmStdPriceModel : pricesList.getData()) {
                 float mc = StringUtils.wordMatchD(StringUtils.toLowerCase(ptmStdPriceModel.getTitle()), sio.getCliQ());
-                if (mc >= 0.5) {
+                if (mc >= 0.6) {
                     if (mc > maxMc) {
                         maxMc = mc;
                     }
