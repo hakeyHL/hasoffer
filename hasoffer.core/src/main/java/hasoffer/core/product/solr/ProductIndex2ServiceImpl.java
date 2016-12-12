@@ -5,6 +5,7 @@ import hasoffer.base.enums.SearchResultSort;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.bo.system.SearchCriteria;
+import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.data.solr.*;
 import jodd.util.NameValue;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -150,10 +151,7 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         } else {
             priceFromStr = String.valueOf(priceFrom);
         }
-        System.out.println("priceFromStr   " + priceFromStr + "   priceToStr   " + priceToStr);
-
         fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", priceFromStr, priceToStr)));
-
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
 
         String keyword = sc.getKeyword();
@@ -203,21 +201,8 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
         List<FilterQuery> fqList = new ArrayList<FilterQuery>();
         int priceFrom = criteria.getPriceFrom(), priceTo = criteria.getPriceTo();
         String priceFromStr = "*", priceToStr = "*";
-        if (priceFrom < priceTo && priceFrom >= 0) {
-            if (priceFrom <= 0) {
-                priceFrom = 1;
-            }
-            priceFromStr = String.valueOf(priceFrom);
-            if (priceTo > 0) {
-                priceToStr = String.valueOf(priceTo);
-            }
-            fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", priceFromStr, priceToStr)));
-        } else {
-            fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", "1", "*")));
-        }
-//        Sort[] sorts = null;
+        ApiUtils.setPriceSearchScope(fqList, priceFrom, priceTo, priceToStr);
         Sort[] sorts = new Sort[1];
-        // sort by
         SearchResultSort resultSort = criteria.getSort();
         if (resultSort == null) {
             sorts[0] = new Sort("searchCount", Order.DESC);
