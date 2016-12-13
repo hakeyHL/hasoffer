@@ -20,6 +20,7 @@ import hasoffer.core.product.solr.DealModel;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.utils.JsonHelper;
+import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
@@ -113,17 +114,7 @@ public class AppDealController {
             deals.addAll(mobileDeals);
 //            System.out.println("current size   :" + deals.size());
             //其他deal按照点击次数排序
-            Collections.sort(list, new Comparator<AppDeal>() {
-                @Override
-                public int compare(AppDeal o1, AppDeal o2) {
-                    if (o1.getDealClickCount() > o2.getDealClickCount()) {
-                        return -1;
-                    } else if (o1.getDealClickCount() < o2.getDealClickCount()) {
-                        return 1;
-                    }
-                    return 0;
-                }
-            });
+            ApiUtils.getSortedDealListByClicCountAsc(list);
 //            System.out.println("last  list size   :" + list.size());
             for (AppDeal appDeal : list) {
                 DealVo dealVo = new DealVo();
