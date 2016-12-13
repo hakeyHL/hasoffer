@@ -338,6 +338,37 @@ public class ApiUtils {
         pageableResult.setData(JSONArray.parseArray(JSON.toJSONString(pageableResult.getData()), classzz));
     }
 
+    public static void resolvePivotFields(Map map, PageableResult products, Map<String, List<NameValue<String, Long>>> pivotFieldVals) {
+        if (pivotFieldVals != null && pivotFieldVals.size() > 0) {
+            Map<String, List<NameValue<String, Long>>> pivotFieldValMap = new HashMap<>();
+            List<NameValue<String, Long>> netWorkNVList = new ArrayList<>();
+            Set<Map.Entry<String, List<NameValue<String, Long>>>> entries = pivotFieldVals.entrySet();
+            Iterator<Map.Entry<String, List<NameValue<String, Long>>>> iterator = entries.iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<String, List<NameValue<String, Long>>> next = iterator.next();
+                String key = next.getKey();
+                List<NameValue<String, Long>> value = next.getValue();
+                if (key.equals("Network3G") || key.equals("Network4G") || key.equals("Network")) {
+                    netWorkNVList.addAll(value);
+                }
+                String cateFilterValue = ConstantUtil.API_CATEGORY_FILTER_PARAMS_MAP.get(key);
+                //  //brand需要按照指定顺序返回
+                //SamSung Xiaomi Motorola Lenovo Huawei Micromax Lava Gionee
+                if (cateFilterValue.equals("brand")) {
+                    ApiUtils.setBrandSorted(value);
+                }
+                if (cateFilterValue != null) {
+                    pivotFieldValMap.put(cateFilterValue, value);
+                }
+            }
+            if (netWorkNVList.size() > 0) {
+                pivotFieldValMap.put("Network", netWorkNVList);
+            }
+            map.put("pivos", pivotFieldValMap);
+            map.put("numberFound", products.getNumFund());
+        }
+    }
+
     /**
      * 在数据对象返回客户端之前检测其域是否都有值,除对象成员外都赋初始值
      *
