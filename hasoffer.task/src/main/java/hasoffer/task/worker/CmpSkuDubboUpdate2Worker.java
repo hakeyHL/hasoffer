@@ -72,7 +72,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                 String fetchUrlResultStr = fetchDubboService.popFetchUrlResult(TaskTarget.SKU_UPDATE);
                 if (fetchUrlResultStr == null) {
 //                    TimeUnit.MINUTES.sleep(3);
-                    TimeUnit.SECONDS.sleep(10);
+                    TimeUnit.MINUTES.sleep(10);
                     logger.info("fetchUrlResult get null sleep 10 MINUTES");
                     continue;
                 }
