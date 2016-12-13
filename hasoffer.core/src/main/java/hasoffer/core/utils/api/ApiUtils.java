@@ -1,12 +1,14 @@
 package hasoffer.core.utils.api;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.app.vo.BackDetailVo;
+import hasoffer.core.app.vo.CmpProductListVo;
 import hasoffer.core.app.vo.OrderVo;
 import hasoffer.core.app.vo.ProductListVo;
 import hasoffer.core.bo.product.CategoryVo;
@@ -14,6 +16,7 @@ import hasoffer.core.cache.AppCacheManager;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
+import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.urm.PriceOffNotice;
 import hasoffer.core.persistence.po.urm.UrmUser;
@@ -89,9 +92,16 @@ public class ApiUtils {
         }
     }
 
-    private static boolean FilterProducts(String title, String keyword) {
+    public static boolean FilterProducts(String title, String keyword) {
         String[] filterWords = new String[]{"case", "cover", "glass", "battery", "for", "back", "guard", "cable"};
         boolean flag = true;
+        Boolean x = filterAccessories(title, keyword, filterWords);
+        if (x != null) return x;
+        //默认放行
+        return flag;
+    }
+
+    public static Boolean filterAccessories(String title, String keyword, String[] filterWords) {
         if (!StringUtils.isEmpty(title) && !StringUtils.isEmpty(keyword)) {
             for (String str : filterWords) {
                 if (title.trim().toLowerCase().contains(str)) {
@@ -115,8 +125,7 @@ public class ApiUtils {
                 }
             }
         }
-        //默认放行
-        return flag;
+        return null;
     }
 
     //去十亿
@@ -232,6 +241,198 @@ public class ApiUtils {
         } else {
             fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", "1", "*")));
         }
+    }
+
+    public static void setBrandSorted(List<NameValue<String, Long>> value) {
+        replaceBrandString(value);
+        //按字典排序
+        Collections.sort(value, new Comparator<NameValue<String, Long>>() {
+            @Override
+            public int compare(NameValue<String, Long> o1, NameValue<String, Long> o2) {
+                if (o1.getName().compareToIgnoreCase(o2.getName()) > 0) {
+                    return 1;
+                }
+                if (o1.getName().compareToIgnoreCase(o2.getName()) < 0) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
+        replaceBrandString(value);
+    }
+
+    private static void replaceBrandString(List<NameValue<String, Long>> value) {
+        Iterator<NameValue<String, Long>> brandIterator = value.iterator();
+        while (brandIterator.hasNext()) {
+            NameValue<String, Long> next = brandIterator.next();
+            String name = next.getName();
+            if (name.equalsIgnoreCase("SamSung")) {
+                next.setName("1");
+                continue;
+            } else if (name.equalsIgnoreCase("1")) {
+                next.setName("SamSung");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Xiaomi")) {
+                next.setName("2");
+                continue;
+            } else if (name.equalsIgnoreCase("2")) {
+                next.setName("Xiaomi");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Motorola")) {
+                next.setName("3");
+                continue;
+            } else if (name.equalsIgnoreCase("3")) {
+                next.setName("Motorola");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Lenovo")) {
+                next.setName("4");
+                continue;
+            } else if (name.equalsIgnoreCase("4")) {
+                next.setName("Lenovo");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Huawei")) {
+                next.setName("5");
+                continue;
+            } else if (name.equalsIgnoreCase("5")) {
+                next.setName("Huawei");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Micromax")) {
+                next.setName("6");
+                continue;
+            } else if (name.equalsIgnoreCase("6")) {
+                next.setName("Micromax");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Lava")) {
+                next.setName("7");
+                continue;
+            } else if (name.equalsIgnoreCase("7")) {
+                next.setName("Lava");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Gionee")) {
+                next.setName("8");
+                continue;
+            } else if (name.equalsIgnoreCase("8")) {
+                next.setName("Gionee");
+                continue;
+            }
+
+
+        }
+    }
+
+    public static void parseString2Pageable(String jsonString, Class classzz, PageableResult pageableResult) {
+        pageableResult = (PageableResult<PtmStdSkuModel>) JSON.parseObject(jsonString, PageableResult.class);
+        pageableResult.setData(JSONArray.parseArray(JSON.toJSONString(pageableResult.getData()), classzz));
+    }
+
+    public static void resolvePivotFields(Map map, PageableResult products, Map<String, List<NameValue<String, Long>>> pivotFieldVals) {
+        if (pivotFieldVals != null && pivotFieldVals.size() > 0) {
+            Map<String, List<NameValue<String, Long>>> pivotFieldValMap = new HashMap<>();
+            List<NameValue<String, Long>> netWorkNVList = new ArrayList<>();
+            Set<Map.Entry<String, List<NameValue<String, Long>>>> entries = pivotFieldVals.entrySet();
+            Iterator<Map.Entry<String, List<NameValue<String, Long>>>> iterator = entries.iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<String, List<NameValue<String, Long>>> next = iterator.next();
+                String key = next.getKey();
+                List<NameValue<String, Long>> value = next.getValue();
+                if (key.equals("Network3G") || key.equals("Network4G") || key.equals("Network")) {
+                    netWorkNVList.addAll(value);
+                }
+                String cateFilterValue = ConstantUtil.API_CATEGORY_FILTER_PARAMS_MAP.get(key);
+                //  //brand需要按照指定顺序返回
+                //SamSung Xiaomi Motorola Lenovo Huawei Micromax Lava Gionee
+                if (cateFilterValue.equals("brand")) {
+                    ApiUtils.setBrandSorted(value);
+                }
+                if (cateFilterValue != null) {
+                    pivotFieldValMap.put(cateFilterValue, value);
+                }
+            }
+            if (netWorkNVList.size() > 0) {
+                pivotFieldValMap.put("Network", netWorkNVList);
+            }
+            map.put("pivos", pivotFieldValMap);
+            map.put("numberFound", products.getNumFund());
+        }
+    }
+
+    //sort list area =================================================================
+    public static void getSortedDealListByClicCountAsc(List<AppDeal> deals) {
+        Collections.sort(deals, new Comparator<AppDeal>() {
+            @Override
+            public int compare(AppDeal o1, AppDeal o2) {
+                if (o1.getDealClickCount() > o2.getDealClickCount()) {
+                    return -1;
+                } else if (o1.getDealClickCount() < o2.getDealClickCount()) {
+                    return 1;
+                }
+                return 0;
+            }
+        });
+    }
+
+    public static void getSortedProListVoListByClicCountAsc(List<CmpProductListVo> comparedSkuVos) {
+        Collections.sort(comparedSkuVos, new Comparator<CmpProductListVo>() {
+            @Override
+            public int compare(CmpProductListVo o1, CmpProductListVo o2) {
+                if (o1.getPrice() > o2.getPrice()) {
+                    return 1;
+                } else if (o1.getPrice() < o2.getPrice()) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
+    }
+
+    public static void getSortedStdPriceListByClicCountAsc(List<PtmStdPrice> data) {
+        Collections.sort(data, new Comparator<PtmStdPrice>() {
+            @Override
+            public int compare(PtmStdPrice o1, PtmStdPrice o2) {
+                if (o1.getPrice() < o2.getPrice()) {
+                    return -1;
+                }
+                if (o1.getPrice() > o2.getPrice()) {
+                    return 1;
+                }
+                return 0;
+            }
+        });
+    }
+
+    public static void getSortedCateVoListByClicCountAsc(List<CategoryVo> tempThirdCategoryList) {
+        Collections.sort(tempThirdCategoryList, new Comparator<CategoryVo>() {
+            @Override
+            public int compare(CategoryVo o1, CategoryVo o2) {
+                if (o1.getRank() > o2.getRank()) {
+                    return 1;
+                } else if (o1.getRank() < o2.getRank()) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
     }
 
     /**
@@ -452,17 +653,7 @@ public class ApiUtils {
             //先获取一级类目列表
             List<CategoryVo> firstCategoryList = appCacheManager.getCategorys("");
             //对二级类目按照rank排序
-            Collections.sort(secondCategoryList, new Comparator<CategoryVo>() {
-                @Override
-                public int compare(CategoryVo o1, CategoryVo o2) {
-                    if (o1.getRank() > o2.getRank()) {
-                        return 1;
-                    } else if (o1.getRank() < o2.getRank()) {
-                        return -1;
-                    }
-                    return 0;
-                }
-            });
+            getSortedCateVoListByClicCountAsc(secondCategoryList);
 
             //遍历一级类目将二级类目匹配排序
             for (CategoryVo firstPtmCategory : firstCategoryList) {
@@ -487,17 +678,7 @@ public class ApiUtils {
                 }
 
                 //对三级类目按照rank排序
-                Collections.sort(tempThirdCategoryList, new Comparator<CategoryVo>() {
-                    @Override
-                    public int compare(CategoryVo o1, CategoryVo o2) {
-                        if (o1.getRank() > o2.getRank()) {
-                            return 1;
-                        } else if (o1.getRank() < o2.getRank()) {
-                            return -1;
-                        }
-                        return 0;
-                    }
-                });
+                getSortedCateVoListByClicCountAsc(tempThirdCategoryList);
                 if (tempThirdCategoryList.size() > 0) {
                     next.setHasChildren(1);
                 }
@@ -558,4 +739,5 @@ public class ApiUtils {
         data.setVerifiedCoins(verifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
     }
+    //sort list area =================================================================
 }

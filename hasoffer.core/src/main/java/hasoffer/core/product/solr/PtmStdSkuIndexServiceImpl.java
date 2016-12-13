@@ -22,32 +22,6 @@ import java.util.*;
 @Service
 public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStdSkuModel> {
     public static void main(String[] args) {
-        String aas = "_5D5_inchWMore";
-        StringBuilder sb = new StringBuilder();
-//        String s = aas.replaceAll("_", " ");
-        String s[] = aas.split("_");
-        for (String str : s) {
-            System.out.println(":" + str + ":");
-        }
-        int i = 0;
-        if (s[0] == "") {
-            i = 1;
-        }
-        for (; i < s.length; i++) {
-            if (s[i].contains("W")) {
-                s[i] = s[i].replaceAll("W", "&");
-                sb.append(s[i]);
-            } else if (s[i].contains("D")) {
-                s[i] = s[i].replaceAll("D", ".");
-                sb.append(s[i]);
-            } else {
-                sb.append(s[i]);
-            }
-            if (i >= 1 && i < s.length - 1) {
-                sb.append("-");
-            }
-        }
-        System.out.println(sb.toString());
     }
 
     @Override
@@ -107,7 +81,6 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
         Map<String, List<NameValue>> pivotFieldVals = new HashMap<>();
         if (pivotFieldSize > 0) {
             NamedList<List<PivotField>> nl = sr.getFacetPivot();
-
             for (int i = 0; i < pivotFieldSize; i++) {
                 String field = pivotFields.get(i);
                 List<PivotField> cate2List = nl.get(field);
@@ -117,7 +90,7 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
                         nvs = new ArrayList<>();
                         pivotFieldVals.put(field, nvs);
                     }
-                    nvs.add(new NameValue<Long, Long>((Long) pf.getValue(), Long.valueOf(pf.getCount())));
+                    nvs.add(new NameValue(pf.getValue(), Long.valueOf(pf.getCount())));
                 }
             }
         }
@@ -211,6 +184,8 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
         String priceFromStr = "*", priceToStr = "*";
         ApiUtils.setPriceSearchScope(fqList, priceFrom, priceTo, priceToStr);
         SearchResult<PtmStdSkuModel> sr = searchObjs(queryString, fqs, null, null, page <= 1 ? 1 : page, size, true);
+        //缓存以及从缓存中取
+
         PageableResult<PtmStdSkuModel> ptmStdSkuModelPageableResult = new PageableResult<>(sr.getResult(), sr.getTotalCount(), page, size, null);
         addBillion2ListEle(ptmStdSkuModelPageableResult);
         return ptmStdSkuModelPageableResult;
@@ -247,10 +222,20 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
             String[] brands = searchCriteria.getBrand();
             fqList.add(new FilterQuery("brand", joinQueryParams(brands, "brand")));
         }
-        //2. network --2G 3G 4G 处理下 TODO
+        //2. network --2G 3G 4G 处理下
         if (searchCriteria.getNetwork() != null && searchCriteria.getNetwork().length > 0) {
             String[] networks = searchCriteria.getNetwork();
-            fqList.add(new FilterQuery("Network", joinQueryParams(networks, "Network")));
+            for (String network : networks) {
+                if (network.equalsIgnoreCase("3G")) {
+                    fqList.add(new FilterQuery("Network3G", joinQueryParams(new String[]{"3G"}, "Network3G")));
+                }
+                if (network.equalsIgnoreCase("4G")) {
+                    fqList.add(new FilterQuery("Network4G", joinQueryParams(new String[]{"4G"}, "Network4G")));
+                }
+                if (network.equalsIgnoreCase("2G")) {
+                    fqList.add(new FilterQuery("Network", joinQueryParams(networks, "Network")));
+                }
+            }
         }
         //3. screenResolution
         if (searchCriteria.getScreenResolution() != null && searchCriteria.getScreenResolution().length > 0) {
