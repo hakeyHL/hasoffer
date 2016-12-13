@@ -22,32 +22,6 @@ import java.util.*;
 @Service
 public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStdSkuModel> {
     public static void main(String[] args) {
-        String aas = "_5D5_inchWMore";
-        StringBuilder sb = new StringBuilder();
-//        String s = aas.replaceAll("_", " ");
-        String s[] = aas.split("_");
-        for (String str : s) {
-            System.out.println(":" + str + ":");
-        }
-        int i = 0;
-        if (s[0] == "") {
-            i = 1;
-        }
-        for (; i < s.length; i++) {
-            if (s[i].contains("W")) {
-                s[i] = s[i].replaceAll("W", "&");
-                sb.append(s[i]);
-            } else if (s[i].contains("D")) {
-                s[i] = s[i].replaceAll("D", ".");
-                sb.append(s[i]);
-            } else {
-                sb.append(s[i]);
-            }
-            if (i >= 1 && i < s.length - 1) {
-                sb.append("-");
-            }
-        }
-        System.out.println(sb.toString());
     }
 
     @Override
@@ -107,7 +81,6 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
         Map<String, List<NameValue>> pivotFieldVals = new HashMap<>();
         if (pivotFieldSize > 0) {
             NamedList<List<PivotField>> nl = sr.getFacetPivot();
-
             for (int i = 0; i < pivotFieldSize; i++) {
                 String field = pivotFields.get(i);
                 List<PivotField> cate2List = nl.get(field);
@@ -117,7 +90,7 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
                         nvs = new ArrayList<>();
                         pivotFieldVals.put(field, nvs);
                     }
-                    nvs.add(new NameValue<Long, Long>((Long) pf.getValue(), Long.valueOf(pf.getCount())));
+                    nvs.add(new NameValue(pf.getValue(), Long.valueOf(pf.getCount())));
                 }
             }
         }
