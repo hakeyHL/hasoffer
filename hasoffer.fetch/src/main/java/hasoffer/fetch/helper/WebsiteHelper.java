@@ -109,40 +109,40 @@ public class WebsiteHelper {
 //        return getMgsvcUrl(urlId, dl);
 //    }
 
-    public static String getUrlWithAff(String url) {
-        Website website = getWebSite(url);
-
-        String[] affs = new String[0];
-
-        switch (website) {
-            case FLIPKART:
-                return FlipkartHelper.getUrlWithAff(url, affs);
-            case PAYTM:
-                return PaytmHelper.getUrlWithAff(url);
-            case AMAZON:
+//    public static String getUrlWithAff(String url) {
+//        Website website = getWebSite(url);
+//
+//        String[] affs = new String[0];
+//
+//        switch (website) {
+//            case FLIPKART:
+//                return FlipkartHelper.getUrlWithAff(url, affs);
+//            case PAYTM:
+//                return PaytmHelper.getUrlWithAff(url);
+//            case AMAZON:
 //                return AmazonHelper.getUrlWithAff(url);
-            case SNAPDEAL:
-//                url = SnapdealHelper.getCleanUrl(url);
-//                return getMgsvcUrl(String.valueOf(skuId), url);
-                return SnapdealHelper.appendAff(SnapdealHelper.getDeeplink(url), affs);
-            case SHOPCLUES:
-                return ShopcluesHelper.getUrlWithAff(url, affs);
-            case EBAY:
-                return EbayHelper.getUrlWithAff(url);
-            case INFIBEAM:
-                return InfibeamHelper.getUrlWithAff(url, affs);
-            case INDIATIMES:
-                return IndiatimesHelper.getUrlWithAff(url);
-            case CROMARETAIL:
-            case THEITDEPOT:
-            case ASKMEBAZAAR:
-                break;
-            default:
-                break;
-        }
-
-        return url;
-    }
+//            case SNAPDEAL:
+////                url = SnapdealHelper.getCleanUrl(url);
+////                return getMgsvcUrl(String.valueOf(skuId), url);
+//                return SnapdealHelper.appendAff(SnapdealHelper.getDeeplink(url), affs);
+//            case SHOPCLUES:
+//                return ShopcluesHelper.getUrlWithAff(url, affs);
+//            case EBAY:
+//                return EbayHelper.getUrlWithAff(url);
+//            case INFIBEAM:
+//                return InfibeamHelper.getUrlWithAff(url, affs);
+//            case INDIATIMES:
+//                return IndiatimesHelper.getUrlWithAff(url);
+//            case CROMARETAIL:
+//            case THEITDEPOT:
+//            case ASKMEBAZAAR:
+//                break;
+//            default:
+//                break;
+//        }
+//
+//        return url;
+//    }
 
     public static String getDealUrlWithAff(Website website, String url, String[] affs) {
         if (StringUtils.isEmpty(url)) {
@@ -152,14 +152,18 @@ public class WebsiteHelper {
         if (website == null) {
             website = getWebSite(url);
         }
-
+        MarketChannel marketChannel = MarketChannel.NONE;
+        if (affs != null && affs.length > 0) {
+            marketChannel = MarketChannel.valueOfString(affs[0]);
+        }
         switch (website) {
             case FLIPKART:
                 return FlipkartHelper.getDealUrlWithAff(url, affs);
             case PAYTM:
                 return url;
             case AMAZON:
-//                return AmazonHelper.getUrlWithAff(url);
+
+                return AmazonHelper.getUrlWithAff(url, marketChannel);
             case SNAPDEAL:
                 return getUrlWithAff(website, url, affs);
             case SHOPCLUES:
@@ -191,14 +195,18 @@ public class WebsiteHelper {
             website = getWebSite(url);
         }
 
+        MarketChannel marketChannel = MarketChannel.NONE;
+        if (affs != null && affs.length > 0) {
+            marketChannel = MarketChannel.valueOfString(affs[0]);
+        }
+
         switch (website) {
             case FLIPKART:
                 return FlipkartHelper.getUrlWithAff(url, affs);
             case PAYTM:
                 return PaytmHelper.getUrlWithAff(url);
             case AMAZON:
-//                String urlWithAff = AmazonHelper.getUrlWithAff(url);
-//                return urlWithAff;
+                return AmazonHelper.getUrlWithAff(url, marketChannel);
             case SNAPDEAL:
 //                url = SnapdealHelper.getCleanUrl(url);
 //                return getMgsvcUrl(String.valueOf(skuId), url);
