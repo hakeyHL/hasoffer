@@ -108,18 +108,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
             return null;
         }
         //按价格排序
-        Collections.sort(priceList, new Comparator<PtmStdPrice>() {
-            @Override
-            public int compare(PtmStdPrice o1, PtmStdPrice o2) {
-                if (o1.getPrice() < o2.getPrice()) {
-                    return -1;
-                }
-                if (o1.getPrice() > o2.getPrice()) {
-                    return 1;
-                }
-                return 0;
-            }
-        });
+        ApiUtils.getSortedStdPriceListByClicCountAsc(priceList);
         PtmStdSkuDetail ptmStdSkuDetail = mongoDbManager.queryOne(PtmStdSkuDetail.class, ptmStdSku1.getId());
         if (ptmStdSkuDetail != null) {
             List<PtmStdSkuParamGroup> paramGroups = ptmStdSkuDetail.getParamGroups();

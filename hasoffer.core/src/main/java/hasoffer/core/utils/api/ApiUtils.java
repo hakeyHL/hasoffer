@@ -8,6 +8,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.app.vo.BackDetailVo;
+import hasoffer.core.app.vo.CmpProductListVo;
 import hasoffer.core.app.vo.OrderVo;
 import hasoffer.core.app.vo.ProductListVo;
 import hasoffer.core.bo.product.CategoryVo;
@@ -15,6 +16,7 @@ import hasoffer.core.cache.AppCacheManager;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
+import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.urm.PriceOffNotice;
 import hasoffer.core.persistence.po.urm.UrmUser;
@@ -90,9 +92,16 @@ public class ApiUtils {
         }
     }
 
-    private static boolean FilterProducts(String title, String keyword) {
+    public static boolean FilterProducts(String title, String keyword) {
         String[] filterWords = new String[]{"case", "cover", "glass", "battery", "for", "back", "guard", "cable"};
         boolean flag = true;
+        Boolean x = filterAccessories(title, keyword, filterWords);
+        if (x != null) return x;
+        //默认放行
+        return flag;
+    }
+
+    public static Boolean filterAccessories(String title, String keyword, String[] filterWords) {
         if (!StringUtils.isEmpty(title) && !StringUtils.isEmpty(keyword)) {
             for (String str : filterWords) {
                 if (title.trim().toLowerCase().contains(str)) {
@@ -116,8 +125,7 @@ public class ApiUtils {
                 }
             }
         }
-        //默认放行
-        return flag;
+        return null;
     }
 
     //去十亿
@@ -369,6 +377,64 @@ public class ApiUtils {
         }
     }
 
+    //sort list area =================================================================
+    public static void getSortedDealListByClicCountAsc(List<AppDeal> deals) {
+        Collections.sort(deals, new Comparator<AppDeal>() {
+            @Override
+            public int compare(AppDeal o1, AppDeal o2) {
+                if (o1.getDealClickCount() > o2.getDealClickCount()) {
+                    return -1;
+                } else if (o1.getDealClickCount() < o2.getDealClickCount()) {
+                    return 1;
+                }
+                return 0;
+            }
+        });
+    }
+
+    public static void getSortedProListVoListByClicCountAsc(List<CmpProductListVo> comparedSkuVos) {
+        Collections.sort(comparedSkuVos, new Comparator<CmpProductListVo>() {
+            @Override
+            public int compare(CmpProductListVo o1, CmpProductListVo o2) {
+                if (o1.getPrice() > o2.getPrice()) {
+                    return 1;
+                } else if (o1.getPrice() < o2.getPrice()) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
+    }
+
+    public static void getSortedStdPriceListByClicCountAsc(List<PtmStdPrice> data) {
+        Collections.sort(data, new Comparator<PtmStdPrice>() {
+            @Override
+            public int compare(PtmStdPrice o1, PtmStdPrice o2) {
+                if (o1.getPrice() < o2.getPrice()) {
+                    return -1;
+                }
+                if (o1.getPrice() > o2.getPrice()) {
+                    return 1;
+                }
+                return 0;
+            }
+        });
+    }
+
+    public static void getSortedCateVoListByClicCountAsc(List<CategoryVo> tempThirdCategoryList) {
+        Collections.sort(tempThirdCategoryList, new Comparator<CategoryVo>() {
+            @Override
+            public int compare(CategoryVo o1, CategoryVo o2) {
+                if (o1.getRank() > o2.getRank()) {
+                    return 1;
+                } else if (o1.getRank() < o2.getRank()) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
+    }
+
     /**
      * 在数据对象返回客户端之前检测其域是否都有值,除对象成员外都赋初始值
      *
@@ -587,17 +653,7 @@ public class ApiUtils {
             //先获取一级类目列表
             List<CategoryVo> firstCategoryList = appCacheManager.getCategorys("");
             //对二级类目按照rank排序
-            Collections.sort(secondCategoryList, new Comparator<CategoryVo>() {
-                @Override
-                public int compare(CategoryVo o1, CategoryVo o2) {
-                    if (o1.getRank() > o2.getRank()) {
-                        return 1;
-                    } else if (o1.getRank() < o2.getRank()) {
-                        return -1;
-                    }
-                    return 0;
-                }
-            });
+            getSortedCateVoListByClicCountAsc(secondCategoryList);
 
             //遍历一级类目将二级类目匹配排序
             for (CategoryVo firstPtmCategory : firstCategoryList) {
@@ -622,17 +678,7 @@ public class ApiUtils {
                 }
 
                 //对三级类目按照rank排序
-                Collections.sort(tempThirdCategoryList, new Comparator<CategoryVo>() {
-                    @Override
-                    public int compare(CategoryVo o1, CategoryVo o2) {
-                        if (o1.getRank() > o2.getRank()) {
-                            return 1;
-                        } else if (o1.getRank() < o2.getRank()) {
-                            return -1;
-                        }
-                        return 0;
-                    }
-                });
+                getSortedCateVoListByClicCountAsc(tempThirdCategoryList);
                 if (tempThirdCategoryList.size() > 0) {
                     next.setHasChildren(1);
                 }
@@ -693,4 +739,5 @@ public class ApiUtils {
         data.setVerifiedCoins(verifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
     }
+    //sort list area =================================================================
 }

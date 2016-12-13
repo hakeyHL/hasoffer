@@ -426,7 +426,7 @@ public class Compare2Controller {
         String imageUrl = productCacheManager.getProductMasterImageUrl(sio.getHsProId());//productService.getProductMasterImageUrl(sio.getHsProId());
         ProductVo productVo = new ProductVo(sio.getHsProId(), sio.getCliQ(), imageUrl, minPrice, currentDeeplink);
 
-        return new CmpResult(priceOff, productVo, new PageableResult<ComparedSkuVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize()));
+        return new CmpResult(priceOff, productVo, new PageableResult<>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize()));
     }
 
     private List<String> getAffs(SearchIO sio) {
@@ -570,17 +570,7 @@ public class Compare2Controller {
                     throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", product.getTitle(), product.getPrice());
                 }
                 //根据价格排序
-                Collections.sort(comparedSkuVos, new Comparator<CmpProductListVo>() {
-                    @Override
-                    public int compare(CmpProductListVo o1, CmpProductListVo o2) {
-                        if (o1.getPrice() > o2.getPrice()) {
-                            return 1;
-                        } else if (o1.getPrice() < o2.getPrice()) {
-                            return -1;
-                        }
-                        return 0;
-                    }
-                });
+                ApiUtils.getSortedProListVoListByClicCountAsc(comparedSkuVos);
 
             } else {
                 logger.debug("Found skus size is 0 .");
@@ -758,17 +748,7 @@ public class Compare2Controller {
                     throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", ptmStdSku.getTitle(), ptmStdSku.getRefPrice());
                 }
                 //根据价格排序
-                Collections.sort(comparedSkuVos, new Comparator<CmpProductListVo>() {
-                    @Override
-                    public int compare(CmpProductListVo o1, CmpProductListVo o2) {
-                        if (o1.getPrice() > o2.getPrice()) {
-                            return 1;
-                        } else if (o1.getPrice() < o2.getPrice()) {
-                            return -1;
-                        }
-                        return 0;
-                    }
-                });
+                ApiUtils.getSortedProListVoListByClicCountAsc(comparedSkuVos);
 
             } else {
                 logger.debug("Found skus size is 0 .");
