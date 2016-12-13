@@ -222,10 +222,20 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
             String[] brands = searchCriteria.getBrand();
             fqList.add(new FilterQuery("brand", joinQueryParams(brands, "brand")));
         }
-        //2. network --2G 3G 4G 处理下 TODO
+        //2. network --2G 3G 4G 处理下
         if (searchCriteria.getNetwork() != null && searchCriteria.getNetwork().length > 0) {
             String[] networks = searchCriteria.getNetwork();
-            fqList.add(new FilterQuery("Network", joinQueryParams(networks, "Network")));
+            for (String network : networks) {
+                if (network.equalsIgnoreCase("3G")) {
+                    fqList.add(new FilterQuery("Network3G", joinQueryParams(new String[]{"3G"}, "Network3G")));
+                }
+                if (network.equalsIgnoreCase("4G")) {
+                    fqList.add(new FilterQuery("Network4G", joinQueryParams(new String[]{"4G"}, "Network4G")));
+                }
+                if (network.equalsIgnoreCase("2G")) {
+                    fqList.add(new FilterQuery("Network", joinQueryParams(networks, "Network")));
+                }
+            }
         }
         //3. screenResolution
         if (searchCriteria.getScreenResolution() != null && searchCriteria.getScreenResolution().length > 0) {
