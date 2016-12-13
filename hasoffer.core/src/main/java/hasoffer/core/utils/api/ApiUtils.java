@@ -341,6 +341,88 @@ public class ApiUtils {
         }
     }
 
+
+    private static void replacePivos(List<NameValue<String, Long>> value) {
+        Iterator<NameValue<String, Long>> brandIterator = value.iterator();
+        while (brandIterator.hasNext()) {
+            NameValue<String, Long> next = brandIterator.next();
+            String name = next.getName();
+            if (name.equalsIgnoreCase("SamSung")) {
+                next.setName("1");
+                continue;
+            } else if (name.equalsIgnoreCase("1")) {
+                next.setName("SamSung");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Xiaomi")) {
+                next.setName("2");
+                continue;
+            } else if (name.equalsIgnoreCase("2")) {
+                next.setName("Xiaomi");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Motorola")) {
+                next.setName("3");
+                continue;
+            } else if (name.equalsIgnoreCase("3")) {
+                next.setName("Motorola");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Lenovo")) {
+                next.setName("4");
+                continue;
+            } else if (name.equalsIgnoreCase("4")) {
+                next.setName("Lenovo");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Huawei")) {
+                next.setName("5");
+                continue;
+            } else if (name.equalsIgnoreCase("5")) {
+                next.setName("Huawei");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Micromax")) {
+                next.setName("6");
+                continue;
+            } else if (name.equalsIgnoreCase("6")) {
+                next.setName("Micromax");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Lava")) {
+                next.setName("7");
+                continue;
+            } else if (name.equalsIgnoreCase("7")) {
+                next.setName("Lava");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Gionee")) {
+                next.setName("8");
+                continue;
+            } else if (name.equalsIgnoreCase("8")) {
+                next.setName("Gionee");
+                continue;
+            }
+
+
+        }
+    }
+
+
     public static void parseString2Pageable(String jsonString, Class classzz, PageableResult pageableResult) {
         pageableResult = (PageableResult<PtmStdSkuModel>) JSON.parseObject(jsonString, PageableResult.class);
         pageableResult.setData(JSONArray.parseArray(JSON.toJSONString(pageableResult.getData()), classzz));
@@ -372,6 +454,8 @@ public class ApiUtils {
             if (netWorkNVList.size() > 0) {
                 pivotFieldValMap.put("Network", netWorkNVList);
             }
+            //处理下返回顺序
+            pivotFieldValMap = sortedPivotFieldValMap(pivotFieldValMap);
             map.put("pivos", pivotFieldValMap);
             map.put("numberFound", products.getNumFund());
         }
@@ -433,6 +517,123 @@ public class ApiUtils {
                 return 0;
             }
         });
+    }
+
+    /**
+     * 将指定的pivotFieldValMap换成按照执行顺序的map
+     * @param pivotFieldValMap
+     * @return
+     */
+    private static Map<String, List<NameValue<String, Long>>> sortedPivotFieldValMap(Map<String, List<NameValue<String, Long>>> pivotFieldValMap) {
+        Map<String, List<NameValue<String, Long>>> tempFieldValMap = new LinkedHashMap<>();
+
+        Set<Map.Entry<String, List<NameValue<String, Long>>>> entries = pivotFieldValMap.entrySet();
+        Iterator<Map.Entry<String, List<NameValue<String, Long>>>> iterator = entries.iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, List<NameValue<String, Long>>> next = iterator.next();
+            String key = next.getKey();
+            List<NameValue<String, Long>> value = next.getValue();
+            replaceCategoryParmsKey(key, tempFieldValMap, value);
+        }
+        //将指定字符串换成数字
+        if (tempFieldValMap.size() > 0) {
+            String[] strings = tempFieldValMap.keySet().toArray(new String[]{});
+            Arrays.sort(strings);
+            Map<String, List<NameValue<String, Long>>> tempFieldValMap2 = new LinkedHashMap<>();
+            for (int i = 0; i < strings.length; i++) {
+                List<NameValue<String, Long>> nameValues = tempFieldValMap.get(strings[i]);
+                if (nameValues != null) {
+                    tempFieldValMap2.put(strings[i], nameValues);
+                }
+            }
+            pivotFieldValMap = tempFieldValMap2;
+            //按字典排序
+            //将数字换成指定字符串
+            tempFieldValMap = new LinkedHashMap<>();
+            Set<Map.Entry<String, List<NameValue<String, Long>>>> entries2 = pivotFieldValMap.entrySet();
+            Iterator<Map.Entry<String, List<NameValue<String, Long>>>> iterator2 = entries2.iterator();
+            //TODO 待优化
+            while (iterator2.hasNext()) {
+                Map.Entry<String, List<NameValue<String, Long>>> next = iterator2.next();
+                String key = next.getKey();
+                List<NameValue<String, Long>> value = next.getValue();
+                replaceCategoryParmsKey(key, tempFieldValMap, value);
+            }
+        }
+        return tempFieldValMap;
+    }
+
+    /**
+     * 将指定的key按其顺序换成数字
+     * 返回的pivos列表
+     */
+    public static void replaceCategoryParmsKey(String key, Map<String, List<NameValue<String, Long>>> tempReplacePivos, List<NameValue<String, Long>> value) {
+        if (key.equals("brand")) {
+            tempReplacePivos.put("1", value);
+        } else if (key.equals("1")) {
+            tempReplacePivos.put("brand", value);
+        }
+
+
+        if (key.equals("Network")) {
+            tempReplacePivos.put("3", value);
+        } else if (key.equals("3")) {
+            tempReplacePivos.put("Network", value);
+        }
+
+        if (key.equals("Screen Resolution")) {
+            tempReplacePivos.put("5", value);
+        } else if (key.equals("5")) {
+            tempReplacePivos.put("Screen Resolution", value);
+        }
+
+        if (key.equals("Operating System")) {
+            tempReplacePivos.put("8", value);
+        } else if (key.equals("8")) {
+            tempReplacePivos.put("Operating System", value);
+        }
+
+        if (key.equals("Ram")) {
+            tempReplacePivos.put("2", value);
+        } else if (key.equals("2")) {
+            tempReplacePivos.put("Ram", value);
+        }
+
+        if (key.equals("Screen Size")) {
+            tempReplacePivos.put("4", value);
+        } else if (key.equals("4")) {
+            tempReplacePivos.put("Screen Size", value);
+        }
+
+        if (key.equals("Secondary Camera")) {
+            tempReplacePivos.put("6", value);
+        } else if (key.equals("6")) {
+            tempReplacePivos.put("Secondary Camera", value);
+        }
+
+        if (key.equals("Battery Capacity")) {
+            tempReplacePivos.put("7", value);
+        } else if (key.equals("7")) {
+            tempReplacePivos.put("Battery Capacity", value);
+        }
+
+        if (key.equals("Primary Camera")) {
+            tempReplacePivos.put("9", value);
+        } else if (key.equals("9")) {
+            tempReplacePivos.put("Primary Camera", value);
+        }
+
+        if (key.equals("Internal Memory")) {
+            tempReplacePivos.put("a0", value);
+        } else if (key.equals("a0")) {
+            tempReplacePivos.put("Internal Memory", value);
+        }
+
+        if (key.equals("Expandable Memory")) {
+            tempReplacePivos.put("a1", value);
+        } else if (key.equals("a1")) {
+            tempReplacePivos.put("Expandable Memory", value);
+        }
     }
 
     /**
@@ -687,7 +888,14 @@ public class ApiUtils {
             map.put("categorys", categorys);
         }
     }
+    //sort list area =================================================================
 
+    /**
+     * 获取类目Vo
+     *
+     * @param ptmCategory
+     * @return
+     */
     private CategoryVo getCategoryVo(PtmCategory ptmCategory) {
         CategoryVo categoryVo = new CategoryVo();
         categoryVo.setId(ptmCategory.getId());
@@ -699,6 +907,11 @@ public class ApiUtils {
         return categoryVo;
     }
 
+    /**
+     * 计算hasofferCoin
+     * @param users
+     * @param data
+     */
     public void calculateHasofferCoin(List<UrmUser> users, BackDetailVo data) {
         List<OrderVo> transcations = new ArrayList<OrderVo>();
         BigDecimal pendingCoins = BigDecimal.ZERO;
@@ -739,5 +952,6 @@ public class ApiUtils {
         data.setVerifiedCoins(verifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
     }
-    //sort list area =================================================================
+
+
 }

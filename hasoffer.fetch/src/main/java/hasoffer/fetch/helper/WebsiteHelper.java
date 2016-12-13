@@ -120,7 +120,7 @@ public class WebsiteHelper {
             case PAYTM:
                 return PaytmHelper.getUrlWithAff(url);
             case AMAZON:
-                return AmazonHelper.getUrlWithAff(url);
+//                return AmazonHelper.getUrlWithAff(url);
             case SNAPDEAL:
 //                url = SnapdealHelper.getCleanUrl(url);
 //                return getMgsvcUrl(String.valueOf(skuId), url);
@@ -159,7 +159,7 @@ public class WebsiteHelper {
             case PAYTM:
                 return url;
             case AMAZON:
-                return AmazonHelper.getUrlWithAff(url);
+//                return AmazonHelper.getUrlWithAff(url);
             case SNAPDEAL:
                 return getUrlWithAff(website, url, affs);
             case SHOPCLUES:
@@ -197,8 +197,8 @@ public class WebsiteHelper {
             case PAYTM:
                 return PaytmHelper.getUrlWithAff(url);
             case AMAZON:
-                String urlWithAff = AmazonHelper.getUrlWithAff(url);
-                return urlWithAff;
+//                String urlWithAff = AmazonHelper.getUrlWithAff(url);
+//                return urlWithAff;
             case SNAPDEAL:
 //                url = SnapdealHelper.getCleanUrl(url);
 //                return getMgsvcUrl(String.valueOf(skuId), url);

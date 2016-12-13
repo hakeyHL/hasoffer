@@ -462,16 +462,17 @@ public class AppServiceImpl implements IAppService {
     }
 
     private String getAmazonIndexUrl(MarketChannel marketChannel, String deviceId) {
+        return null;
 //        Random random = new Random();
 //        String amazonUrl = "";
 //        if (random.nextInt(3) == 1) {
 //        }
-        String affId = AffliIdHelper.getAffidByChannelForAmazon(marketChannel);
-        if (StringUtils.isNotBlank(affId)) {
-            affId = AffliIdHelper.getAffidByChannelForAmazon(MarketChannel.NONE);
-        }
-        String amazonUrl = "intent://amazon.in/?tag=" + affId + "&camp=3638&ref=as_li_tl#Intent;scheme=com.amazon.mobile.shopping;package=in.amazon.mShop.android.shopping;S.browser_fallback_url=https://play.google.com/store/apps/details?id=in.amazon.mShop.android.shopping;end";
-        return new String(org.apache.commons.codec.binary.Base64.encodeBase64(amazonUrl.getBytes(Charset.forName("UTF-8"))));
+//        String affId = AffliIdHelper.getAffidByChannelForAmazon(marketChannel);
+//        if (StringUtils.isNotBlank(affId)) {
+//            affId = AffliIdHelper.getAffidByChannelForAmazon(MarketChannel.NONE);
+//        }
+//        String amazonUrl = "intent://amazon.in/?tag=" + affId + "&camp=3638&ref=as_li_tl#Intent;scheme=com.amazon.mobile.shopping;package=in.amazon.mShop.android.shopping;S.browser_fallback_url=https://play.google.com/store/apps/details?id=in.amazon.mShop.android.shopping;end";
+//        return new String(org.apache.commons.codec.binary.Base64.encodeBase64(amazonUrl.getBytes(Charset.forName("UTF-8"))));
     }
 
 
