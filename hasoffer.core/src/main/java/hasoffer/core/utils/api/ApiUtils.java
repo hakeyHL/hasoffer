@@ -234,6 +234,104 @@ public class ApiUtils {
         }
     }
 
+    public static void setBrandSorted(List<NameValue<String, Long>> value) {
+        replaceBrandString(value);
+        //按字典排序
+        Collections.sort(value, new Comparator<NameValue<String, Long>>() {
+            @Override
+            public int compare(NameValue<String, Long> o1, NameValue<String, Long> o2) {
+                if (o1.getName().compareToIgnoreCase(o2.getName()) > 0) {
+                    return 1;
+                }
+                if (o1.getName().compareToIgnoreCase(o2.getName()) < 0) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
+        replaceBrandString(value);
+    }
+
+    private static void replaceBrandString(List<NameValue<String, Long>> value) {
+        Iterator<NameValue<String, Long>> brandIterator = value.iterator();
+        while (brandIterator.hasNext()) {
+            NameValue<String, Long> next = brandIterator.next();
+            String name = next.getName();
+            if (name.equalsIgnoreCase("SamSung")) {
+                next.setName("1");
+                continue;
+            } else if (name.equalsIgnoreCase("1")) {
+                next.setName("SamSung");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Xiaomi")) {
+                next.setName("2");
+                continue;
+            } else if (name.equalsIgnoreCase("2")) {
+                next.setName("Xiaomi");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Motorola")) {
+                next.setName("3");
+                continue;
+            } else if (name.equalsIgnoreCase("3")) {
+                next.setName("Motorola");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Lenovo")) {
+                next.setName("4");
+                continue;
+            } else if (name.equalsIgnoreCase("4")) {
+                next.setName("Lenovo");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Huawei")) {
+                next.setName("5");
+                continue;
+            } else if (name.equalsIgnoreCase("5")) {
+                next.setName("Huawei");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Micromax")) {
+                next.setName("6");
+                continue;
+            } else if (name.equalsIgnoreCase("6")) {
+                next.setName("Micromax");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Lava")) {
+                next.setName("7");
+                continue;
+            } else if (name.equalsIgnoreCase("7")) {
+                next.setName("Lava");
+                continue;
+            }
+
+
+            if (name.equalsIgnoreCase("Gionee")) {
+                next.setName("8");
+                continue;
+            } else if (name.equalsIgnoreCase("8")) {
+                next.setName("Gionee");
+                continue;
+            }
+
+
+        }
+    }
+
     /**
      * 在数据对象返回客户端之前检测其域是否都有值,除对象成员外都赋初始值
      *
