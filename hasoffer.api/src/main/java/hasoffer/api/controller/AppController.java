@@ -725,6 +725,11 @@ public class AppController {
                                     netWorkNVList.addAll(value);
                                 }
                                 String cateFilterValue = ConstantUtil.API_CATEGORY_FILTER_PARAMS_MAP.get(key);
+                                //  //brand需要按照指定顺序返回
+                                //SamSung Xiaomi Motorola Lenovo Huawei Micromax Lava Gionee
+                                if (cateFilterValue.equals("brand")) {
+                                    ApiUtils.setBrandSorted(value);
+                                }
                                 if (cateFilterValue != null) {
                                     pivotFieldValMap.put(cateFilterValue, value);
                                 }

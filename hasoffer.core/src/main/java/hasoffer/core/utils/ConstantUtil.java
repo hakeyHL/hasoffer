@@ -14,6 +14,7 @@ public class ConstantUtil {
     public static final Map<String, String> API_CATEGORY_FILTER_PARAMS_MAP = new HashMap<>();
 
     static {
+        API_CATEGORY_FILTER_PARAMS_MAP.put("brand", "brand");
         API_CATEGORY_FILTER_PARAMS_MAP.put("Network", "Network");
         API_CATEGORY_FILTER_PARAMS_MAP.put("Network3G", "Network");
         API_CATEGORY_FILTER_PARAMS_MAP.put("Network4G", "Network");
