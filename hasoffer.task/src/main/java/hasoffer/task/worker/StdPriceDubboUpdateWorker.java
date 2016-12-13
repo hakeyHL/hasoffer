@@ -46,7 +46,7 @@ public class StdPriceDubboUpdateWorker implements Runnable {
 
                 String fetchUrlResultStr = fetchDubboService.popFetchUrlResult(TaskTarget.STDPRICE_UPDATE);
                 if (fetchUrlResultStr == null) {
-                    TimeUnit.MINUTES.sleep(3);
+                    TimeUnit.MINUTES.sleep(10);
                     System.out.println("fetchUrlResult get null sleep 10 MINUTES StdPriceDubboUpdateWorker");
                     continue;
                 }

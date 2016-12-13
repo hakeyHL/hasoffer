@@ -90,67 +90,70 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
 //                break;
 //            }
 
-            Object pop = redisListService.pop(UPDATE_WAIT_QUEUE + ymd);
-            if (pop == null) {//如果队列没有数据了，休息5分钟
-                try {
-                    logger.info("sku update pop get null sleep 30 min " + tomorrowDayStart);
-                    TimeUnit.MINUTES.sleep(5);
-                } catch (InterruptedException e) {
-                    logger.info("ListNeedUpdateFromRedisWorker list pop from redis InterruptedException");
+            try {
+
+
+                Object pop = redisListService.pop(UPDATE_WAIT_QUEUE + ymd);
+                if (pop == null) {//如果队列没有数据了，休息5分钟
+                    try {
+                        logger.info("sku update pop get null sleep 30 min " + tomorrowDayStart);
+                        TimeUnit.MINUTES.sleep(5);
+                    } catch (InterruptedException e) {
+                        logger.info("ListNeedUpdateFromRedisWorker list pop from redis InterruptedException");
+                    }
+                    continue;
                 }
-                continue;
-            }
 
 //            testPopProductNumber++;
 
-            //if proceded set has this productId，continue next one
-            logger.info("pop from wait update queue");
-            if (redisSetService.contains(KEY_PROCESSED_SET + ymd, (String) pop)) {
-                logger.info("proceded set has this productId，continue next one");
-                continue;
-            }
+                //if proceded set has this productId，continue next one
+                logger.info("pop from wait update queue");
+                if (redisSetService.contains(KEY_PROCESSED_SET + ymd, (String) pop)) {
+                    logger.info("proceded set has this productId，continue next one");
+                    continue;
+                }
 
-            //根据商品id，发起更新任务
-            logger.info("proceded set do not hava this productid get skuList");
-            Long productId = Long.valueOf((String) pop);
+                //根据商品id，发起更新任务
+                logger.info("proceded set do not hava this productid get skuList");
+                Long productId = Long.valueOf((String) pop);
 
-            List<PtmCmpSku> ptmCmpSkuList = cmpSkuService.listCmpSkus(productId);
+                List<PtmCmpSku> ptmCmpSkuList = cmpSkuService.listCmpSkus(productId);
 //            testProcedProductNumber++;
 
-            //在加入队列的时候进行一些必要的判断
-            if (ptmCmpSkuList != null && ptmCmpSkuList.size() > 0) {
+                //在加入队列的时候进行一些必要的判断
+                if (ptmCmpSkuList != null && ptmCmpSkuList.size() > 0) {
 
-                for (PtmCmpSku sku : ptmCmpSkuList) {
+                    for (PtmCmpSku sku : ptmCmpSkuList) {
 
 //                    testTotalPtmCmpSkuNumber++;
 
-                    //offsale的不再更新
-                    if (SkuStatus.OFFSALE.equals(sku.getStatus())) {
-                        continue;
-                    }
-
-                    Website website = sku.getWebsite();
-
-                    //暂时过滤掉myntra
-                    if (Website.MYNTRA.equals(website)) {
-                        continue;
-                    }
-
-                    //高优先级的网站
-                    if (Website.SNAPDEAL.equals(website) || Website.FLIPKART.equals(website) || Website.AMAZON.equals(website)) {
-
-                        //过滤掉snapdeal中viewAllSeller的情况
-                        if (Website.SNAPDEAL.equals(website)) {
-                            String url = sku.getUrl();
-                            url = StringUtils.filterAndTrim(url, Arrays.asList("/viewAllSellers"));
-                            sku.setUrl(url);
+                        //offsale的不再更新
+                        if (SkuStatus.OFFSALE.equals(sku.getStatus())) {
+                            continue;
                         }
-                        //过滤掉amazon中gp/offer-listing的url,该url没有描述等信息
-                        if (Website.AMAZON.equals(website)) {
-                            String url = sku.getUrl();
-                            url = url.replace("gp/offer-listing", "dp");
-                            sku.setUrl(url);
+
+                        Website website = sku.getWebsite();
+
+                        //暂时过滤掉myntra
+                        if (Website.MYNTRA.equals(website)) {
+                            continue;
                         }
+
+                        //高优先级的网站
+                        if (Website.SNAPDEAL.equals(website) || Website.FLIPKART.equals(website) || Website.AMAZON.equals(website)) {
+
+                            //过滤掉snapdeal中viewAllSeller的情况
+                            if (Website.SNAPDEAL.equals(website)) {
+                                String url = sku.getUrl();
+                                url = StringUtils.filterAndTrim(url, Arrays.asList("/viewAllSellers"));
+                                sku.setUrl(url);
+                            }
+                            //过滤掉amazon中gp/offer-listing的url,该url没有描述等信息
+                            if (Website.AMAZON.equals(website)) {
+                                String url = sku.getUrl();
+                                url = url.replace("gp/offer-listing", "dp");
+                                sku.setUrl(url);
+                            }
 
 //                        if (Website.FLIPKART.equals(website)) {
 //                            testSendFlipkartNumber++;
@@ -159,21 +162,25 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
 //                            testSendSnapdealNumber++;
 //                        }
 
-                        fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_3);
-                        logger.info("send url request succes for " + sku.getWebsite() + " sku id is _" + sku.getId() + "_");
+                            fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_3);
+                            logger.info("send url request succes for " + sku.getWebsite() + " sku id is _" + sku.getId() + "_");
 //                        testSendPtmCmpSkuNumber++;
-                    } else {
-                        fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_5);
-                        logger.info("send url request succes for " + sku.getWebsite() + " sku id is _" + sku.getId() + "_");
+                        } else {
+                            fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_5);
+                            logger.info("send url request succes for " + sku.getWebsite() + " sku id is _" + sku.getId() + "_");
 //                        testSendPtmCmpSkuNumber++;
+                        }
+
+
                     }
 
+                    //now productid hava been sended ,add to processed set
+                    productCacheManager.put2UpdateProcessedSet(productId, ymd);
+//                    redisSetService.add(KEY_PROCESSED_SET, );
 
                 }
+            } catch (Exception e) {
 
-                //now productid hava been sended ,add to processed set
-                productCacheManager.put2UpdateProcessedSet(productId, ymd);
-//                    redisSetService.add(KEY_PROCESSED_SET, );
             }
         }
     }
