@@ -813,7 +813,7 @@ public class AppController {
                 while (ptmList.hasNext()) {
                     //筛选title
                     ProductModel2 next = ptmList.next();
-                    boolean b = ClientHelper.FilterProducts(next.getTitle(), keyord);
+                    boolean b = ApiUtils.FilterProducts(next.getTitle(), keyord);
                     if (!b) {
                         //false移除
                         ptmList.remove();
