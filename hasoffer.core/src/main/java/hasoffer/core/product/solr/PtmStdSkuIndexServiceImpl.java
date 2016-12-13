@@ -211,6 +211,8 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
         String priceFromStr = "*", priceToStr = "*";
         ApiUtils.setPriceSearchScope(fqList, priceFrom, priceTo, priceToStr);
         SearchResult<PtmStdSkuModel> sr = searchObjs(queryString, fqs, null, null, page <= 1 ? 1 : page, size, true);
+        //缓存以及从缓存中取
+
         PageableResult<PtmStdSkuModel> ptmStdSkuModelPageableResult = new PageableResult<>(sr.getResult(), sr.getTotalCount(), page, size, null);
         addBillion2ListEle(ptmStdSkuModelPageableResult);
         return ptmStdSkuModelPageableResult;

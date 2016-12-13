@@ -139,10 +139,6 @@ public class SearchCriteria {
     @Override
     public String toString() {
         return "SearchCriteria{" +
-                "comment=" + comment +
-                ", minPrice=" + minPrice +
-                ", maxPrice=" + maxPrice +
-                ", keyword='" + keyword + '\'' +
                 ", categoryId='" + categoryId + '\'' +
                 ", page=" + page +
                 ", pageSize=" + pageSize +

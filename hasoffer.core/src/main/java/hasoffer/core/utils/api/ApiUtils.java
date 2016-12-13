@@ -1,6 +1,7 @@
 package hasoffer.core.utils.api;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
@@ -330,6 +331,11 @@ public class ApiUtils {
 
 
         }
+    }
+
+    public static void parseString2Pageable(String jsonString, Class classzz, PageableResult pageableResult) {
+        pageableResult = (PageableResult<PtmStdSkuModel>) JSON.parseObject(jsonString, PageableResult.class);
+        pageableResult.setData(JSONArray.parseArray(JSON.toJSONString(pageableResult.getData()), classzz));
     }
 
     /**
