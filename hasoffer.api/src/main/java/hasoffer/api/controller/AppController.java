@@ -674,6 +674,7 @@ public class AppController {
                 PageableResult p;
                 p = ptmStdSkuIndexService.searchProducts(criteria);
                 if (p == null || p.getData() == null || p.getData().size() < 1) {
+                    criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
                     p = productIndex2Service.searchProducts(criteria);
                 }
                 if (p != null && p.getData().size() > 0) {
