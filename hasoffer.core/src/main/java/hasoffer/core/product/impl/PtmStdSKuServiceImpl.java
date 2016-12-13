@@ -8,7 +8,6 @@ import hasoffer.core.cache.CategoryCacheManager;
 import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.*;
-import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.product.IPtmStdPriceService;
 import hasoffer.core.product.IPtmStdSkuService;
 import hasoffer.core.product.solr.PtmStdSkuIndexServiceImpl;
@@ -119,10 +118,10 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         int ratingNumber = ApiUtils.returnNumberBetween0And5(BigDecimal.valueOf(tempRatingNumber).divide(BigDecimal.valueOf(totalCommentNumber == 0 ? 1 : totalCommentNumber), 0, BigDecimal.ROUND_HALF_UP).longValue());
         ptmStdSkuModel.setRating(ratingNumber);
         ptmStdSkuModel.setReview(totalCommentNumber);
-        SrmProductSearchCount searchCount = searchService.findSearchCountByProductId(ptmStdSku1.getId());
+//        SrmProductSearchCount searchCount = searchService.findSearchCountByProductId(ptmStdSku1.getId());
         ptmStdSkuModel.setMinPrice(minPrice);
         ptmStdSkuModel.setMaxPrice(maxPrice);
-        ptmStdSkuModel.setSearchCount(searchCount == null ? 0 : searchCount.getCount());
+//        ptmStdSkuModel.setSearchCount(searchCount == null ? 0 : searchCount.getCount());
         ptmStdSkuModel.setStoreCount(websiteSet.size());
         return ptmStdSkuModel;
     }
@@ -215,7 +214,15 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
                 }
 
                 if (compareIgnoreCase(name, CategoryFilterParams.SCREEN_RESOLUTION)) {
-                    ptmStdSkuModel.setScreen_Resolution(ptmStdSkuParamNode.getValue());
+                    //处理一下
+                    //"Screen Resolution"中分为五类分别是 4096x2160（4K）、 2048x1536（2K）、1920x1080（Full HD）、1280x720（HD）、High PPI Display
+                    if (name.replaceAll(" ", "").toLowerCase().contains("1920x1080") || name.replaceAll(" ", "").toLowerCase().contains("1080x1920")) {
+                        ptmStdSkuModel.setScreen_Resolution("1920x1080 (Full HD)");
+                    } else if (name.replaceAll(" ", "").toLowerCase().contains("1280x720") || name.replaceAll(" ", "").toLowerCase().contains("720x1280")) {
+                        ptmStdSkuModel.setScreen_Resolution("1280x720 (HD)");
+                    } else {
+                        ptmStdSkuModel.setScreen_Resolution("Others");
+                    }
                     continue;
                 }
                 if (compareIgnoreCase(name, CategoryFilterParams.RESOLUTION)) {
