@@ -438,9 +438,9 @@ public class ApiUtils {
                 Map.Entry<String, List<NameValue<String, Long>>> next = iterator.next();
                 String key = next.getKey();
                 List<NameValue<String, Long>> value = next.getValue();
-                if (key.equals("Network3G") || key.equals("Network4G") || key.equals("Network")) {
+              /*  if (key.equals("Network3G") || key.equals("Network4G") || key.equals("Network")) {
                     netWorkNVList.addAll(value);
-                }
+                }*/
                 String cateFilterValue = ConstantUtil.API_CATEGORY_FILTER_PARAMS_MAP.get(key);
                 //  //brand需要按照指定顺序返回
                 //SamSung Xiaomi Motorola Lenovo Huawei Micromax Lava Gionee
@@ -451,9 +451,9 @@ public class ApiUtils {
                     pivotFieldValMap.put(cateFilterValue, value);
                 }
             }
-            if (netWorkNVList.size() > 0) {
+             /* if (netWorkNVList.size() > 0) {
                 pivotFieldValMap.put("Network", netWorkNVList);
-            }
+            }*/
             //处理下返回顺序
             pivotFieldValMap = sortedPivotFieldValMap(pivotFieldValMap);
             map.put("pivos", pivotFieldValMap);
