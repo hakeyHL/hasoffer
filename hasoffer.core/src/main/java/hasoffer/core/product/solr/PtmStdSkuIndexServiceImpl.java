@@ -1,5 +1,6 @@
 package hasoffer.core.product.solr;
 
+import com.alibaba.fastjson.JSON;
 import hasoffer.base.config.AppConfig;
 import hasoffer.base.enums.SearchResultSort;
 import hasoffer.base.model.PageableResult;
@@ -9,7 +10,11 @@ import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.data.solr.*;
 import jodd.util.NameValue;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.PivotField;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
 import org.springframework.stereotype.Service;
 
@@ -284,4 +289,23 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
             fqList.add(new FilterQuery("queryScreenSize", joinQueryParams(screenSizes, "queryScreenSize")));
         }
     }
+
+    public PtmStdSkuModel getStdSkuModelById(long stdSkuId) {
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery("id:" + stdSkuId);
+        try {
+            QueryResponse query = query(solrQuery);
+            SolrDocumentList results = query.getResults();
+            if (results.size() > 0) {
+                String jsonSkuModel = JSON.toJSONString(results.get(0));
+                PtmStdSkuModel ptmStdSkuModel = JSON.parseObject(jsonSkuModel, PtmStdSkuModel.class);
+                return ptmStdSkuModel;
+            }
+        } catch (SolrServerException e) {
+            System.out.println("=========================  get stdSku by Id from solr exception ." + e.getMessage() + "==========================");
+        }
+        return null;
+    }
+
+
 }

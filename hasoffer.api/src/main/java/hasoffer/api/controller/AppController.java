@@ -805,6 +805,34 @@ public class AppController {
         return modelAndView;
     }
 
+    /**
+     * 获取参数意义
+     *
+     * @return
+     */
+    @RequestMapping(value = "getParamMeaning", method = RequestMethod.GET)
+    public ModelAndView getParamMeaning(@RequestParam(defaultValue = "") String param) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("errorCode", "00000");
+        modelAndView.addObject("msg", "success");
+        Map resultMap = null;
+        if (StringUtils.isEmpty(param)) {
+            modelAndView.addObject("errorCode", "10000");
+            modelAndView.addObject("msg", "param can not be empty ");
+            return modelAndView;
+        }
+        String paramMeaning = ConstantUtil.API_PTMSTDSKU_PARAM_MEAN_MAP.get(param);
+        if (StringUtils.isEmpty(paramMeaning)) {
+            modelAndView.addObject("errorCode", "10000");
+            modelAndView.addObject("msg", "not have this param meaning .");
+            return modelAndView;
+        }
+        resultMap = new HashMap();
+        resultMap.put(param, paramMeaning);
+        modelAndView.addObject("data", resultMap);
+        return modelAndView;
+    }
+
     public void filterProducts(List productList, String keyord) {
         if (productList != null && productList.size() > 0) {
             if (ProductModel2.class.isInstance(productList.get(0))) {
