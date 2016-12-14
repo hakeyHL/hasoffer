@@ -286,6 +286,16 @@ public class WebsiteHelper {
         return AppConfig.get(AppConfig.IMAGE_SITELOGO_PATH) + path;
     }
 
+    public static String getSiteUrl(Website website) {
+        String path = "";
+        if (website == null) {
+            path = path + "NULL.png";
+        } else {
+            path = path + website.name() + ".jpg";
+        }
+        return AppConfig.get(AppConfig.IMAGE_SITELOGO3_PATH) + path;
+    }
+
     public static String getBiggerLogoUrl(Website website) {
         String path = "";
         if (website == null) {
