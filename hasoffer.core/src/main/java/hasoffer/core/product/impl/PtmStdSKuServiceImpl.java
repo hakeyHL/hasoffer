@@ -194,10 +194,10 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
                         ptmStdSkuModel.setNetwork("2G");
                     }
                     if (netWorkString.contains("3")) {
-                        ptmStdSkuModel.setNetwork3G("3G");
+                        ptmStdSkuModel.setNetwork("3G");
                     }
                     if (netWorkString.contains("4")) {
-                        ptmStdSkuModel.setNetwork4G("4G");
+                        ptmStdSkuModel.setNetwork("4G");
                     }
                     continue;
                 }
