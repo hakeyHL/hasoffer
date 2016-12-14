@@ -444,7 +444,7 @@ public class ApiUtils {
                 String cateFilterValue = ConstantUtil.API_CATEGORY_FILTER_PARAMS_MAP.get(key);
                 //  //brand需要按照指定顺序返回
                 //SamSung Xiaomi Motorola Lenovo Huawei Micromax Lava Gionee
-                if (cateFilterValue.equals("brand")) {
+                if (cateFilterValue != null && cateFilterValue.equals("brand")) {
                     ApiUtils.setBrandSorted(value);
                 }
                 if (cateFilterValue != null) {
@@ -521,6 +521,7 @@ public class ApiUtils {
 
     /**
      * 将指定的pivotFieldValMap换成按照执行顺序的map
+     *
      * @param pivotFieldValMap
      * @return
      */
@@ -909,6 +910,7 @@ public class ApiUtils {
 
     /**
      * 计算hasofferCoin
+     *
      * @param users
      * @param data
      */

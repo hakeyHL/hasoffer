@@ -226,7 +226,7 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
         if (searchCriteria.getNetwork() != null && searchCriteria.getNetwork().length > 0) {
             String[] networks = searchCriteria.getNetwork();
             for (String network : networks) {
-                if (network.equalsIgnoreCase("3G")) {
+        /*        if (network.equalsIgnoreCase("3G")) {
                     fqList.add(new FilterQuery("Network3G", joinQueryParams(new String[]{"3G"}, "Network3G")));
                 }
                 if (network.equalsIgnoreCase("4G")) {
@@ -234,7 +234,8 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
                 }
                 if (network.equalsIgnoreCase("2G")) {
                     fqList.add(new FilterQuery("Network", joinQueryParams(networks, "Network")));
-                }
+                }*/
+                fqList.add(new FilterQuery("Network", joinQueryParams(networks, "Network")));
             }
         }
         //3. screenResolution
