@@ -33,8 +33,6 @@ public class PtmStdSkuModel implements IIdentifiable<Long> {
     private int Ram;//3 GB  筛选类型:1GB-2GB 4GB&More less than 512MB 基本单位是MB GB都*1024
     private String queryRam;
     private String Network;//4G: Available (supports Indian bands) 3G: Available, 2G: Available    只显示2 3 4G的支持即可,判断用contains
-    private String Network3G;
-    private String Network4G;
     private float Screen_Size;//5.5 inches (13.97 cm) 筛选: 3.5-5 inch less than  &More
     private String queryScreenSize;
     private String Screen_Resolution;//HD (720 x 1280 pixels)  仅显示
@@ -267,22 +265,6 @@ public class PtmStdSkuModel implements IIdentifiable<Long> {
 
     public void setExpandable_Memory(int expandable_Memory) {
         Expandable_Memory = expandable_Memory;
-    }
-
-    public String getNetwork3G() {
-        return Network3G;
-    }
-
-    public void setNetwork3G(String network3G) {
-        Network3G = network3G;
-    }
-
-    public String getNetwork4G() {
-        return Network4G;
-    }
-
-    public void setNetwork4G(String network4G) {
-        Network4G = network4G;
     }
 
     public String getQueryRam() {
