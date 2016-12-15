@@ -262,8 +262,9 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
                 }
 
                 if (compareIgnoreCase(name, CategoryFilterParams.OPERATING_SYSTEM)) {
-                    ptmStdSkuModel.setOperating_System(ptmStdSkuParamNode.getValue());
-                    continue;
+                    String opreatingSystem = ptmStdSkuParamNode.getValue();
+                    setOpeartingSystem(opreatingSystem, ptmStdSkuModel);
+//                    ptmStdSkuModel.setOperating_System(opreatingSystem);
                 }
 
                 if (compareIgnoreCase(name, CategoryFilterParams.INTERNAL_MEMORY)) {
@@ -409,6 +410,75 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
                 ptmStdSkuModel.setQueryInternalMemory("128GB");
                 break;
             default:
+        }
+    }
+
+    private void setOpeartingSystem(String opreatingSystem, PtmStdSkuModel ptmStdSkuModel) {
+        if (StringUtils.isNotEmpty(opreatingSystem)) {
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Android".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Android");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Bada".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Bada");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Blackberry".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Blackberry");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Blackberry OS".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Blackberry OS");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Brew".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Brew");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Firefox".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Firefox");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("iOS".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("iOS");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Linux".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Linux");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Nokia".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Nokia");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Asha".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Asha");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Nokia X Software".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Nokia X Software");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Propreitory".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Propreitory");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Sailfish".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Sailfish");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Symbian".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Symbian");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Tizen".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Tizen");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Windows".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Windows");
+                return;
+            }
         }
     }
 }
