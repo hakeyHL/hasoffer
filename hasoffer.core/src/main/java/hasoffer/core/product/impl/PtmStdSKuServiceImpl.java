@@ -14,6 +14,7 @@ import hasoffer.core.product.solr.PtmStdSkuIndexServiceImpl;
 import hasoffer.core.product.solr.PtmStdSkuModel;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.utils.api.ApiUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -214,14 +215,17 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
                 }
 
                 if (compareIgnoreCase(name, CategoryFilterParams.SCREEN_RESOLUTION)) {
+                    String screenResolution = ptmStdSkuParamNode.getValue();
                     //处理一下
-                    //"Screen Resolution"中分为五类分别是 4096x2160（4K）、 2048x1536（2K）、1920x1080（Full HD）、1280x720（HD）、High PPI Display
-                    if (name.replaceAll(" ", "").toLowerCase().contains("1920x1080") || name.replaceAll(" ", "").toLowerCase().contains("1080x1920")) {
-                        ptmStdSkuModel.setScreen_Resolution("1920x1080 (Full HD)");
-                    } else if (name.replaceAll(" ", "").toLowerCase().contains("1280x720") || name.replaceAll(" ", "").toLowerCase().contains("720x1280")) {
-                        ptmStdSkuModel.setScreen_Resolution("1280x720 (HD)");
-                    } else {
-                        ptmStdSkuModel.setScreen_Resolution("Others");
+                    if (StringUtils.isNotEmpty(screenResolution)) {
+                        //"Screen Resolution"中分为五类分别是 4096x2160（4K）、 2048x1536（2K）、1920x1080（Full HD）、1280x720（HD）、High PPI Display
+                        if (screenResolution.replaceAll(" ", "").toLowerCase().contains("1920x1080") || screenResolution.replaceAll(" ", "").toLowerCase().contains("1080x1920")) {
+                            ptmStdSkuModel.setScreen_Resolution("1920x1080 (Full HD)");
+                        } else if (screenResolution.replaceAll(" ", "").toLowerCase().contains("1280x720") || screenResolution.replaceAll(" ", "").toLowerCase().contains("720x1280")) {
+                            ptmStdSkuModel.setScreen_Resolution("1280x720 (HD)");
+                        } else {
+                            ptmStdSkuModel.setScreen_Resolution("Others");
+                        }
                     }
                     continue;
                 }
