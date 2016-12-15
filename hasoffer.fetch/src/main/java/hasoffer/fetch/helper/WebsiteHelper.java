@@ -77,18 +77,26 @@ public class WebsiteHelper {
                 URL u = new URL(url);
                 String[] ss = u.getHost().split("\\.");
 
-                String websiteString = ss[ss.length - 2].toUpperCase();
+                String websiteString = "";
 
-                if (StringUtils.isEmpty(websiteString)) {
-                    throw new RuntimeException();
+                if (ss.length < 2) {
+                    return "";
+                } else if (ss.length == 2) {
+                    websiteString = ss[0];
+                } else if (ss.length >= 3) {
+                    websiteString = ss[1];
                 }
 
-                return websiteString;
+                if (StringUtils.isEmpty(websiteString)) {
+                    return "";
+                }
+
+                return websiteString.toUpperCase();
             }
         } catch (Exception e) {
-            return null;
+            return "";
         }
-        return null;
+        return "";
     }
 
     public static String getPackage(Website website) {
@@ -459,5 +467,12 @@ public class WebsiteHelper {
                 //默认直接返回url
                 return url;
         }
+    }
+
+    public static void main(String[] args) {
+
+        String allWebSiteString = getAllWebSiteString("https://www.facebook.com/friends/center/");
+        System.out.println(allWebSiteString);
+
     }
 }

@@ -69,8 +69,6 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
         } else {
             priceFromStr = String.valueOf(priceFrom);
         }
-        System.out.println("priceFromStr   " + priceFromStr + "   priceToStr   " + priceToStr);
-
         fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", priceFromStr, priceToStr)));
 
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);

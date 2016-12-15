@@ -626,6 +626,7 @@ public class AppController {
         Map map = new HashMap();
         PageableResult products;
         int version = 0;
+        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
 //        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
 
@@ -659,6 +660,17 @@ public class AppController {
                 break;
             case 2:
                 //search by title
+                if (StringUtils.isNotEmpty(deviceInfoVo.getAppVersion()) && criteria.getCategoryId().equals("5") && criteria.getLevel() == 2) {
+                    String appVersion = deviceInfoVo.getAppVersion();
+                    version = Integer.parseInt(appVersion);
+                    if (version >= 36) {
+                        criteria.setPivotFields(Arrays.asList("Network",
+                                "Screen_Resolution", "Operating_System", "queryRam",
+                                "queryScreenSize", "querySecondaryCamera",
+                                "queryBatteryCapacity", "queryPrimaryCamera",
+                                "queryInternalMemory", "brand"));
+                    }
+                }
                 PageableResult p;
                 p = ptmStdSkuIndexService.searchProducts(criteria);
                 if (p == null || p.getData() == null || p.getData().size() < 1) {
@@ -691,7 +703,6 @@ public class AppController {
             case 3:
                 //类目搜索
                 //根据版本过滤
-                DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
                 //关键词搜索不返回
                 if (StringUtils.isNotEmpty(deviceInfoVo.getAppVersion())) {
                     String appVersion = deviceInfoVo.getAppVersion();
