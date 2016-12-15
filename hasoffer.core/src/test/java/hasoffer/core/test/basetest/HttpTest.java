@@ -45,16 +45,21 @@ public class HttpTest {
     @Test
     public void testIdealo() throws Exception {
 
-        TagNode root = HtmlUtils.getUrlRootTagNode("http://www.idealo.in/mvc/CategoryResultList/category/26151/filters/none/start/0/sort/none");
-        List<TagNode> productUrlListNode = XPathUtils.getSubNodesByXPath(root, "//div[@data-offer='false']/a", null);
+        Map<String, String> header = new HashMap<>();
 
-        for (TagNode node : productUrlListNode) {
+        header.put("Cookie", "__gads=ID=88ee8312d09581a1:T=1481079407:S=ALNI_MbWY7_4E5ElST-ZCBViQzNrynrArQ; _ga=GA1.2.870805199.1481268002; cbk=e1d4b1e04818f98be820dcd6ef93b3177114f81367feb64750ea740b25cc14fb; JSESSIONID=aaaPzf_0boE9s6aYfX3Jv; wt_fa=lv~1481684713161|1497236713161#cv~4|1497236713161#fv~2016-12|1496820006850#vf~1|1497236713160#; nmatf=1; wt3_eid=%3B152479990235431%7C2148161758100055317%232148168474600441450; wt3_sid=%3B152479990235431; wt_fa_s=start~1|1513220746465#; ab_tests=%7B%22variants%22%3A%7B%22optin_modal%22%3A%7B%22variant%22%3A%22A%22%7D%2C%22cat_navigation%22%3A%7B%22variant%22%3A%22A%22%7D%2C%22oop_rwd_de_1%22%3A%7B%22variant%22%3A%22A%22%7D%2C%22pcat_by_opensearch%22%3A%7B%22variant%22%3A%22B%22%7D%2C%22sp_personalize%22%3A%7B%22variant%22%3A%22B%22%7D%2C%22oop_rwd_fr_2%22%3A%7B%22variant%22%3A%22B%22%7D%7D%7D; ipcuid=01y90rb700iwn8rg1c; icda=1");
+        header.put("Host", "www.idealo.in");
+        header.put("Proxy-Connection", "keep-alive");
+        header.put("Cache-Control", "max-age=0");
+        header.put("Upgrade-Insecure-Requests", "1");
+        header.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36");
+        header.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+        header.put("Accept-Encoding", "gzip, deflate, sdch");
+        header.put("Accept-Language", "zh-CN,zh;q=0.8,en;q=0.6,it;q=0.4");
 
-            String productUrl = node.getAttributeByName("href");
-            productUrl = WEBSITE_IDEALO_URL_PREFIEX + productUrl;
+        HttpResponseModel httpResponseModel = HttpUtils.getByRedirect("http://www.idealo.in/go/845649125.html?categoryId=26151&pos=1&price=1606.0&productid=4403794&sid=300314&type=offer", header);
 
-            System.out.println(productUrl);
-        }
+        System.out.println(httpResponseModel);
     }
 
     @Test

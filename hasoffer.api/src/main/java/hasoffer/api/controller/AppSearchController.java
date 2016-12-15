@@ -55,11 +55,10 @@ public class AppSearchController {
         if (pageableResult != null && pageableResult.getData().size() > 0) {
             apiUtils.addProductVo2List(ptmStdSkuList, pageableResult.getData());
             map.put("numberFound", pageableResult.getNumFund());
-            map.put("currentPage", pageableResult.getCurrentPage());
+            map.put("currentPage", pageableResult.getCurrentPage() <= 1 ? 1 : pageableResult.getCurrentPage());
             map.put("totalPage", pageableResult.getTotalPage());
             map.put("pageSize", pageableResult.getPageSize());
         }
-
         if (ptmStdSkuList.size() < 1) {
             modelAndView.addObject("errorCode", "10000");
             modelAndView.addObject("msg", "failed , size is zero .");

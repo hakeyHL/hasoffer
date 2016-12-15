@@ -4,9 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.api.helper.Httphelper;
+import hasoffer.base.model.Website;
 import hasoffer.core.app.AppClientCfgService;
 import hasoffer.core.app.vo.ResultVo;
+import hasoffer.core.app.vo.ThirdAppVo;
 import hasoffer.core.redis.impl.CacheServiceImpl;
+import hasoffer.fetch.helper.WebsiteHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,7 +105,20 @@ public class AppCliCfgController {
                 }
                 resultVo.setData(map);
                 break;
-            default:
+            case 5:
+                List<ThirdAppVo> tempGOOGLEPLAY = new ArrayList<>();
+                ThirdAppVo apps_Amazon = new ThirdAppVo(Website.AMAZON, AppAdController.packageMap.get(Website.AMAZON), "https://play.google.com/store/apps/details?id=com.amazon.mShop.android.shopping", WebsiteHelper.getSiteUrl(Website.AMAZON), "Browse,search & buy millions of products right from your Android device", 4.3f, "491,637", "50,000,000 - 100,000,000", "9.6MB");
+                ThirdAppVo apps_Flipkart = new ThirdAppVo(Website.FLIPKART, AppAdController.packageMap.get(Website.FLIPKART), "http://dl.flipkart.com/dl/install-app?affid=zhangchen", WebsiteHelper.getSiteUrl(Website.FLIPKART), "Shop for electronics,apparels & more using our Flipart app Free shipping & COD", 4.2f, "2,044,978", "50,000,000 - 100,000,000", "10.0MB");
+                ThirdAppVo apps_ShopClues = new ThirdAppVo(Website.SHOPCLUES, AppAdController.packageMap.get(Website.SHOPCLUES), "https://play.google.com/store/apps/details?id=com.shopclues", WebsiteHelper.getSiteUrl(Website.SHOPCLUES), "India's largest Online Marketplace is now in your Pocket - Install,Shop,Enjoy!", 3.9f, "235,468", "10,000,000 - 50,000,000", "7.1MB");
+                ThirdAppVo apps_eBay = new ThirdAppVo(Website.EBAY, AppAdController.packageMap.get(Website.EBAY), "https://play.google.com/store/apps/details?id=com.ebay.mobile", WebsiteHelper.getSiteUrl(Website.EBAY), "Buy,bid & sell! Deals & Discounts to Save Money on Home,Collectables & Cars", 4.2f, "1,759,547", "100,000,000 - 500,000,000", "20.6MB");
+                ThirdAppVo apps_Paytm = new ThirdAppVo(Website.PAYTM, AppAdController.packageMap.get(Website.PAYTM), "https://play.google.com/store/apps/details?id=net.one97.paytm", WebsiteHelper.getSiteUrl(Website.PAYTM), "Best Mobile Recharge and DTH Recharge, Bill Payment and Shipping Experience", 4.3f, "1,401,209", "10,000,000 - 50,000,000", "13.0MB");
+                ThirdAppVo apps_Snapdeal = new ThirdAppVo(Website.SNAPDEAL, AppAdController.packageMap.get(Website.SNAPDEAL), "https://play.google.com/store/apps/details?id=com.snapdeal.main", WebsiteHelper.getSiteUrl(Website.SNAPDEAL), "Best deals on women & men's fashion,home essentials,electronics & gadgets!", 4.1f, "1,035,900", "10,000,000 - 50,000,000", "12.0MB");
+                ThirdAppVo apps_Jabong = new ThirdAppVo(Website.JABONG, AppAdController.packageMap.get(Website.JABONG), "https://play.google.com/store/apps/details?id=com.jabong.android", WebsiteHelper.getSiteUrl(Website.JABONG), "India's Best Online Shopping App To Buy Latest Fashion for Men,Women,Kids", 3.9f, "171,487", "10,000,000 - 50,000,000", "6.1MB");
+                ThirdAppVo apps_VOONIK = new ThirdAppVo(Website.VOONIK, AppAdController.packageMap.get(Website.VOONIK), "https://play.google.com/store/apps/details?id=com.voonik.android", WebsiteHelper.getSiteUrl(Website.VOONIK), "Online Shopping for women clothing,ethnic wear,sarees,kurtis,lingere in India", 4.2f, "129,079", "5,000,000 - 10,000,000", "5.8MB");
+                ThirdAppVo apps_INFIBEAM = new ThirdAppVo(Website.INFIBEAM, AppAdController.packageMap.get(Website.INFIBEAM), "https://play.google.com/store/apps/details?id=com.infibeam.infibeamapp", WebsiteHelper.getSiteUrl(Website.INFIBEAM), "Infibeam.com-Buy Mobiles,Electronics,Books,Gifts,Clothes & more", 3.7f, "8,424", "1,000,000 - 5,000,000", "26.2MB");
+                ThirdAppVo apps_Myntra = new ThirdAppVo(Website.MYNTRA, AppAdController.packageMap.get(Website.MYNTRA), "https://play.google.com/store/apps/details?id=com.myntra.android&hl=en", WebsiteHelper.getSiteUrl(Website.MYNTRA), "Online shopping for fashion clothes,footwear,accessories for Men,Women & Kids", 4.1f, "509,053", "10,000,000 - 50,000,000", "17.2MB");
+                tempGOOGLEPLAY.addAll(Arrays.asList(apps_Amazon, apps_Flipkart, apps_ShopClues, apps_eBay, apps_Paytm, apps_Snapdeal, apps_Jabong, apps_VOONIK, apps_INFIBEAM, apps_Myntra));
+                resultVo.getData().put("shopApps", tempGOOGLEPLAY);
                 break;
         }
         Httphelper.sendJsonMessage(JSON.toJSONString(resultVo), response);
@@ -116,7 +132,6 @@ public class AppCliCfgController {
                                   String stringThird) {
         ResultVo resultVo = new ResultVo();
         //change home page redeem tip
-        logger.info("enter home copy swap ");
         if (StringUtils.isNotEmpty(stringFirst) && StringUtils.isNotEmpty(stringSecond) && StringUtils.isNotEmpty(stringThird)) {
             //set
             List<String> redeemStrings = Arrays.asList(stringFirst, stringSecond, stringThird);
@@ -168,5 +183,29 @@ public class AppCliCfgController {
         resultVo.getData().put("scanInterval", 10);
         modelAndView.addObject("data", resultVo.getData());
         return modelAndView;
+    }
+
+    /**
+     * 配置返回shop list的图标返回
+     * 后续可能还会配置其他图片的返回
+     *
+     * @return
+     */
+    @RequestMapping(value = "/app/picCfg")
+    public ModelAndView picCfg(@RequestParam(defaultValue = "") String picType) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("errorCode", "00000");
+        modelAndView.addObject("msg", "success");
+        Map dataMap = new HashMap();
+        switch (picType) {
+            case "index_shopApp_icon":
+                dataMap.put("index_shopApp_icon", "http://img1.hasofferimage.com/cate/shopAppIcon.png");
+                modelAndView.addObject("data", dataMap);
+                return modelAndView;
+            default:
+                modelAndView.addObject("errorCode", "10000");
+                modelAndView.addObject("msg", "no this type " + picType);
+                return modelAndView;
+        }
     }
 }

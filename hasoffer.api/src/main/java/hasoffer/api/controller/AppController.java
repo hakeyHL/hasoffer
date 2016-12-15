@@ -639,6 +639,23 @@ public class AppController {
         List li = new ArrayList();
         Map map = new HashMap();
         PageableResult products;
+        int version = 0;
+//        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
+
+        //关键词搜索不返回
+      /*  if (StringUtils.isNotEmpty(deviceInfoVo.getAppVersion())) {
+            String appVersion = deviceInfoVo.getAppVersion();
+            version = Integer.parseInt(appVersion);
+            if (version >= 36) {
+                criteria.setPivotFields(Arrays.asList("Network",
+                        "Network3G", "Network4G",
+                        "Screen_Resolution", "Operating_System", "queryRam",
+                        "queryScreenSize", "querySecondaryCamera",
+                        "queryBatteryCapacity", "queryPrimaryCamera",
+                        "queryInternalMemory", "brand"));
+            }
+        }*/
         //查询热卖商品
         switch (type) {
             case 0:
@@ -656,7 +673,6 @@ public class AppController {
                 break;
             case 2:
                 //search by title
-                criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
                 PageableResult p;
                 p = ptmStdSkuIndexService.searchProducts(criteria);
                 if (p == null || p.getData() == null || p.getData().size() < 1) {
@@ -664,8 +680,11 @@ public class AppController {
                     p = productIndex2Service.searchProducts(criteria);
                 }
                 if (p != null && p.getData().size() > 0) {
-                    System.out.println("getPivotFieldVals  " + p.getPivotFieldVals().size());
-                    map.put("pivos", p.getPivotFieldVals());
+                    if (version >= 36 && criteria.getPivotFields().size() > 2) {
+                        map.put("pivos", p.getPivotFieldVals());
+                        ApiUtils.resolvePivotFields(map, p, p.getPivotFieldVals());
+                        p.setPivotFieldVals(null);
+                    }
                     apiUtils.getSkuListByKeyword(map, p);
                     //如果是价格由低到高排序或者按照价格区间排序不过滤配件信息
                     boolean filterProductFlag = true;
@@ -686,20 +705,6 @@ public class AppController {
             case 3:
                 //类目搜索
                 //根据版本过滤
-                DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-                if (StringUtils.isNotEmpty(deviceInfoVo.getAppVersion())) {
-                    String appVersion = deviceInfoVo.getAppVersion();
-                    int version = Integer.parseInt(appVersion);
-                    if (version >= 36) {
-                        criteria.setPivotFields(Arrays.asList("Network",
-                                "Network3G", "Network4G",
-                                "Screen_Resolution", "Operating_System", "queryRam",
-                                "queryScreenSize", "querySecondaryCamera",
-                                "queryBatteryCapacity", "queryPrimaryCamera",
-                                "queryInternalMemory", "brand"));
-                    }
-
-                }
                 //category level page size
                 if (StringUtils.isNotBlank(criteria.getCategoryId())) {
                     //search by category
@@ -712,29 +717,7 @@ public class AppController {
                         //2. 合并NetWork
                         //3. 指定的排序
                         Map<String, List<NameValue<String, Long>>> pivotFieldVals = products.getPivotFieldVals();
-                        if (pivotFieldVals != null && pivotFieldVals.size() > 0) {
-                            Map<String, List<NameValue<String, Long>>> pivotFieldValMap = new HashMap<>();
-                            List<NameValue<String, Long>> netWorkNVList = new ArrayList<>();
-                            Set<Map.Entry<String, List<NameValue<String, Long>>>> entries = pivotFieldVals.entrySet();
-                            Iterator<Map.Entry<String, List<NameValue<String, Long>>>> iterator = entries.iterator();
-                            while (iterator.hasNext()) {
-                                Map.Entry<String, List<NameValue<String, Long>>> next = iterator.next();
-                                String key = next.getKey();
-                                List<NameValue<String, Long>> value = next.getValue();
-                                if (key.equals("Network3G") || key.equals("Network4G") || key.equals("Network")) {
-                                    netWorkNVList.addAll(value);
-                                }
-                                String cateFilterValue = ConstantUtil.API_CATEGORY_FILTER_PARAMS_MAP.get(key);
-                                if (cateFilterValue != null) {
-                                    pivotFieldValMap.put(cateFilterValue, value);
-                                }
-                            }
-                            if (netWorkNVList.size() > 0) {
-                                pivotFieldValMap.put("Network", netWorkNVList);
-                            }
-                            map.put("pivos", pivotFieldValMap);
-                            map.put("numberFound", products.getNumFund());
-                        }
+                        ApiUtils.resolvePivotFields(map, products, pivotFieldVals);
                     }
                     if (products != null && products.getData().size() > 0) {
                         apiUtils.addProductVo2List(li, products.getData());
@@ -824,15 +807,42 @@ public class AppController {
         return modelAndView;
     }
 
+    /**
+     * 获取参数意义
+     *
+     * @return
+     */
+    @RequestMapping(value = "getParamMeaning", method = RequestMethod.GET)
+    public ModelAndView getParamMeaning(@RequestParam(defaultValue = "") String param) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("errorCode", "00000");
+        modelAndView.addObject("msg", "success");
+        Map resultMap = null;
+        if (StringUtils.isEmpty(param)) {
+            modelAndView.addObject("errorCode", "10000");
+            modelAndView.addObject("msg", "param can not be empty ");
+            return modelAndView;
+        }
+        String paramMeaning = ConstantUtil.API_PTMSTDSKU_PARAM_MEAN_MAP.get(param);
+        if (StringUtils.isEmpty(paramMeaning)) {
+            modelAndView.addObject("errorCode", "10000");
+            modelAndView.addObject("msg", "not have this param meaning .");
+            return modelAndView;
+        }
+        resultMap = new HashMap();
+        resultMap.put(param, paramMeaning);
+        modelAndView.addObject("data", resultMap);
+        return modelAndView;
+    }
+
     public void filterProducts(List productList, String keyord) {
         if (productList != null && productList.size() > 0) {
             if (ProductModel2.class.isInstance(productList.get(0))) {
-                System.out.println("enter enter enter .....");
                 Iterator<ProductModel2> ptmList = productList.iterator();
                 while (ptmList.hasNext()) {
                     //筛选title
                     ProductModel2 next = ptmList.next();
-                    boolean b = ClientHelper.FilterProducts(next.getTitle(), keyord);
+                    boolean b = ApiUtils.FilterProducts(next.getTitle(), keyord);
                     if (!b) {
                         //false移除
                         ptmList.remove();
