@@ -424,6 +424,7 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
                                 new AppMsgDisplay(title + content, title, content),
                                 new AppMsgClick(AppMsgClickType.DEEPLINK, deepLinkUrl, WebsiteHelper.getPackage(website))
                         );
+                        System.out.println("priceOffNoticeId = " + priceOffNoticeId + " content _" + JSONUtil.toJSON(message));
 
 //-------------------------------------将push的内容写到redis新的push的key中-----------------------------------------//
                         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -431,7 +432,7 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
                         String PRICEOFFNOTICE_PUSH_YMD_USERID = PRICEOFFNOTICE_PUSH_PREFIX + YMD + "_" + userid;
                         redisListService.push(PRICEOFFNOTICE_PUSH_YMD_USERID, JSONUtil.toJSON(message));
 //------------------------------------------------------------------------------------------------------------------//                        
-                        
+
 
                         AppPushBo appPushBo = new AppPushBo("5x1", "15:10", message);
 
