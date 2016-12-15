@@ -640,9 +640,11 @@ public class AppController {
         Map map = new HashMap();
         PageableResult products;
         int version = 0;
-        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+//        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
-        if (StringUtils.isNotEmpty(deviceInfoVo.getAppVersion())) {
+
+        //关键词搜索不返回
+      /*  if (StringUtils.isNotEmpty(deviceInfoVo.getAppVersion())) {
             String appVersion = deviceInfoVo.getAppVersion();
             version = Integer.parseInt(appVersion);
             if (version >= 36) {
@@ -653,7 +655,7 @@ public class AppController {
                         "queryBatteryCapacity", "queryPrimaryCamera",
                         "queryInternalMemory", "brand"));
             }
-        }
+        }*/
         //查询热卖商品
         switch (type) {
             case 0:
