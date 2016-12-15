@@ -12,7 +12,6 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.JSONUtil;
-import hasoffer.base.utils.StringUtils;
 import hasoffer.core.app.impl.AppCmpServiceImpl;
 import hasoffer.core.app.vo.*;
 import hasoffer.core.cache.CmpSkuCacheManager;
@@ -32,20 +31,19 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IPtmStdPriceService;
 import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
-import hasoffer.core.product.solr.CmpSkuModel;
-import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
-import hasoffer.core.product.solr.PtmStdPriceIndexServiceImpl;
-import hasoffer.core.product.solr.PtmStdPriceModel;
+import hasoffer.core.product.solr.*;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.exception.NonMatchedProductException;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.core.utils.JsonHelper;
 import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import hasoffer.webcommon.helper.PageHelper;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -99,6 +97,8 @@ public class Compare2Controller {
     IPtmStdPriceService ptmStdPriceService;
     @Resource
     PtmStdPriceIndexServiceImpl ptmStdPriceIndexService;
+    @Resource
+    PtmStdSkuIndexServiceImpl stdSkuIndexService;
     private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
 
     public static void main(String[] args) throws Exception {
@@ -106,9 +106,9 @@ public class Compare2Controller {
             String dealUrlWithAff = WebsiteHelper.getDeeplinkWithAff(Website.SNAPDEAL, "https://www.snapdeal.com/product/jbl-sb350-soundbar-with-wirless/1602277955", new String[]{MarketChannel.SHANCHUAN.name(), "dfecc858243a616a"});
             System.out.println(dealUrlWithAff);
         }*/
-        float v = StringUtils.wordMatchD(StringUtils.toLowerCase("SAMSUNG Galaxy On Nxt (Black, 32 GB)"),
+       /* float v = StringUtils.wordMatchD(StringUtils.toLowerCase("SAMSUNG Galaxy On Nxt (Black, 32 GB)"),
                 "Samsung Galaxy On Nxt");
-        System.out.println(v);
+        System.out.println(v);*/
     }
 
     private static void addVo(List<ComparedSkuVo> comparedSkuVos, ComparedSkuVo comparedSkuVo) {
@@ -414,7 +414,7 @@ public class Compare2Controller {
                 }*/
             } else if (clientCmpSku != null) {
                 if (!cmpSkuCacheManager.isFlowControlled(sio.getDeviceId(), sio.getCliSite())) {
-                    if (StringUtils.isEqual(clientCmpSku.getSkuTitle(), sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
+                    if (hasoffer.base.utils.StringUtils.isEqual(clientCmpSku.getSkuTitle(), sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
                         currentDeeplink = WebsiteHelper.getDeeplinkWithAff(clientCmpSku.getWebsite(), clientCmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
                     }
                 }
@@ -426,7 +426,7 @@ public class Compare2Controller {
         String imageUrl = productCacheManager.getProductMasterImageUrl(sio.getHsProId());//productService.getProductMasterImageUrl(sio.getHsProId());
         ProductVo productVo = new ProductVo(sio.getHsProId(), sio.getCliQ(), imageUrl, minPrice, currentDeeplink);
 
-        return new CmpResult(priceOff, productVo, new PageableResult<ComparedSkuVo>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize()));
+        return new CmpResult(priceOff, productVo, new PageableResult<>(comparedSkuVos, pagedCmpskus.getNumFund(), pagedCmpskus.getCurrentPage(), pagedCmpskus.getPageSize()));
     }
 
     private List<String> getAffs(SearchIO sio) {
@@ -480,6 +480,68 @@ public class Compare2Controller {
         }
 
         return json;
+    }
+
+    /**
+     * 获取PtmStdSku的参数
+     *
+     * @param pId
+     * @return
+     */
+    @RequestMapping("getStdParams")
+    public ModelAndView getStdSkuCmpParams(@RequestParam(defaultValue = "0") long pId) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("errorCode", "00000");
+        modelAndView.addObject("msg", "success");
+        Map dataMap = new HashMap();
+        //验证id是否大于10亿
+        if (pId - ConstantUtil.API_ONE_BILLION_NUMBER <= 0) {
+            //不是就拒绝
+            modelAndView.addObject("errorCode", "10000");
+            modelAndView.addObject("msg", "pId error .");
+            return modelAndView;
+        }
+        //是,根据id从solr中获取此id的stdSkuModel
+        PtmStdSkuModel ptmStdSkuModel = stdSkuIndexService.getStdSkuModelById(ApiUtils.rmoveBillion(pId));
+        if (ptmStdSkuModel == null) {
+            //无,返回错误信息
+            modelAndView.addObject("errorCode", "10000");
+            modelAndView.addObject("msg", "product not exist.");
+            return modelAndView;
+        } else {
+            //去参数
+            //改参数
+            Map<String, String> resultMap = new HashMap();
+            resultMap.put("Brand", ptmStdSkuModel.getBrand() == null ? "" : ptmStdSkuModel.getBrand());
+            resultMap.put("Model", ptmStdSkuModel.getModel() == null ? "" : ptmStdSkuModel.getModel());
+            resultMap.put("Price", ptmStdSkuModel.getMinPrice() + "");
+            resultMap.put("Ram", ptmStdSkuModel.getRam() >= 1024 ? ptmStdSkuModel.getRam() / 1024 + " GB" : ptmStdSkuModel.getRam() + "MB");
+            resultMap.put("Screen Size", ptmStdSkuModel.getScreen_Size() + " inch");
+            resultMap.put("Secondary Camera", ptmStdSkuModel.getSecondary_Camera() + " MP");
+            resultMap.put("Primary Camera", ptmStdSkuModel.getPrimary_Camera() + " MP");
+            resultMap.put("Internal Memory", ptmStdSkuModel.getInternal_Memory() >= 1024 ? ptmStdSkuModel.getInternal_Memory() + " GB" : ptmStdSkuModel.getInternal_Memory() + " MB");
+            resultMap.put("Battery Capacity", ptmStdSkuModel.getBattery_Capacity() + " mAh");
+            resultMap.put("Expandable Memory", ptmStdSkuModel.getExpandable_Memory() == 0 ? "Unavailable" : "Up to " + ptmStdSkuModel.getExpandable_Memory() + " GB");
+            resultMap.put("Screen Resolution", ptmStdSkuModel.getScreen_Resolution() == null ? "" : ptmStdSkuModel.getBrand());
+            resultMap.put("Operating System", ptmStdSkuModel.getOperating_System() == null ? "" : ptmStdSkuModel.getBrand());
+            resultMap.put("Network", ptmStdSkuModel.getNetwork());
+
+            //遍历去除空值
+            Set<Map.Entry<String, String>> entries = resultMap.entrySet();
+            Iterator<Map.Entry<String, String>> iterator = entries.iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<String, String> next = iterator.next();
+                String value = next.getValue();
+                if (StringUtils.isEmpty(value)) {
+                    iterator.remove();
+                    System.out.println("remove " + next.getKey());
+                }
+            }
+            dataMap.put("productParams", resultMap);
+        }
+        //有,返回
+        modelAndView.addObject("data", dataMap);
+        return modelAndView;
     }
 
     /**
@@ -570,17 +632,7 @@ public class Compare2Controller {
                     throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", product.getTitle(), product.getPrice());
                 }
                 //根据价格排序
-                Collections.sort(comparedSkuVos, new Comparator<CmpProductListVo>() {
-                    @Override
-                    public int compare(CmpProductListVo o1, CmpProductListVo o2) {
-                        if (o1.getPrice() > o2.getPrice()) {
-                            return 1;
-                        } else if (o1.getPrice() < o2.getPrice()) {
-                            return -1;
-                        }
-                        return 0;
-                    }
-                });
+                ApiUtils.getSortedProListVoListByClicCountAsc(comparedSkuVos);
 
             } else {
                 logger.debug("Found skus size is 0 .");
@@ -682,7 +734,7 @@ public class Compare2Controller {
         Map<Float, PtmStdPriceModel> comparedPricemnMap = new HashMap<>();
         if (pricesList != null && pricesList.getData() != null && pricesList.getData().size() > 0) {
             for (PtmStdPriceModel ptmStdPriceModel : pricesList.getData()) {
-                float mc = StringUtils.wordMatchD(StringUtils.toLowerCase(ptmStdPriceModel.getTitle()), sio.getCliQ());
+                float mc = hasoffer.base.utils.StringUtils.wordMatchD(hasoffer.base.utils.StringUtils.toLowerCase(ptmStdPriceModel.getTitle()), sio.getCliQ());
                 if (mc >= 0.6) {
                     if (mc > maxMc) {
                         maxMc = mc;
@@ -702,7 +754,7 @@ public class Compare2Controller {
      * @param sio
      */
     public void searchForResult(SearchIO sio) throws NonMatchedProductException {
-        String _q = StringUtils.getSearchKey(sio.getCliQ());
+        String _q = hasoffer.base.utils.StringUtils.getSearchKey(sio.getCliQ());
 
         // 搜索SKU
         PageableResult<CmpSkuModel> pagedCmpskuModels = cmpskuIndexService.searchSku(_q, 1, 5);
@@ -714,7 +766,7 @@ public class Compare2Controller {
         Map<Float, CmpSkuModel> comparedSkuMap = new HashMap<>();
         float maxMc = 0;
         for (CmpSkuModel cmpSkuModel : skuModels) {
-            float mc = StringUtils.wordMatchD(StringUtils.toLowerCase(cmpSkuModel.getTitle()), _q);
+            float mc = hasoffer.base.utils.StringUtils.wordMatchD(hasoffer.base.utils.StringUtils.toLowerCase(cmpSkuModel.getTitle()), _q);
             if (mc >= 0.5) {
                 if (mc > maxMc) {
                     maxMc = mc;
@@ -758,17 +810,7 @@ public class Compare2Controller {
                     throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", ptmStdSku.getTitle(), ptmStdSku.getRefPrice());
                 }
                 //根据价格排序
-                Collections.sort(comparedSkuVos, new Comparator<CmpProductListVo>() {
-                    @Override
-                    public int compare(CmpProductListVo o1, CmpProductListVo o2) {
-                        if (o1.getPrice() > o2.getPrice()) {
-                            return 1;
-                        } else if (o1.getPrice() < o2.getPrice()) {
-                            return -1;
-                        }
-                        return 0;
-                    }
-                });
+                ApiUtils.getSortedProListVoListByClicCountAsc(comparedSkuVos);
 
             } else {
                 logger.debug("Found skus size is 0 .");

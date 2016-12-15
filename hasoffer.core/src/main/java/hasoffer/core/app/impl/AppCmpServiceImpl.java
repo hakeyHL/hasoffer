@@ -95,7 +95,7 @@ public class AppCmpServiceImpl implements AppCmpService {
                 if (pagedPtmStdPriceList != null && pagedPtmStdPriceList.getData() != null && pagedPtmStdPriceList.getData().size() > 0) {
                     List<CmpProductListVo> cmpProductListVoList = new ArrayList<>();
                     List<PtmStdPrice> data = pagedPtmStdPriceList.getData();
-                    sortByPriceAsc(data);
+                    ApiUtils.getSortedStdPriceListByClicCountAsc(data);
                     cr.setBestPrice(data.get(0).getPrice());
                     cr.getProductVo().setCurrentLowestPrice(cr.getBestPrice());
                     if (sio.getCliPrice() <= 0) {
@@ -174,21 +174,6 @@ public class AppCmpServiceImpl implements AppCmpService {
         }
         jsonObject.put("data", JSONObject.toJSON(cr));
         return JSON.toJSONString(jsonObject, propertyFilter);
-    }
-
-    private void sortByPriceAsc(List<PtmStdPrice> data) {
-        Collections.sort(data, new Comparator<PtmStdPrice>() {
-            @Override
-            public int compare(PtmStdPrice o1, PtmStdPrice o2) {
-                if (o1.getPrice() < o2.getPrice()) {
-                    return -1;
-                }
-                if (o1.getPrice() > o2.getPrice()) {
-                    return 1;
-                }
-                return 0;
-            }
-        });
     }
 
     private CmpResult fillCmpResult(CmpResult cr) {
@@ -276,17 +261,7 @@ public class AppCmpServiceImpl implements AppCmpService {
                     throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), "productid_" + sio.getHsProId(), sio.getCliPrice());
                 }
                 //根据价格排序
-                Collections.sort(comparedSkuVos, new Comparator<CmpProductListVo>() {
-                    @Override
-                    public int compare(CmpProductListVo o1, CmpProductListVo o2) {
-                        if (o1.getPrice() > o2.getPrice()) {
-                            return 1;
-                        } else if (o1.getPrice() < o2.getPrice()) {
-                            return -1;
-                        }
-                        return 0;
-                    }
-                });
+                ApiUtils.getSortedProListVoListByClicCountAsc(comparedSkuVos);
                 //如果客户端传价格无法解析则重新计算save
                 if (sio.getCliPrice() <= 0) {
                     int maxPrice = comparedSkuVos.get(comparedSkuVos.size() - 1).getPrice();

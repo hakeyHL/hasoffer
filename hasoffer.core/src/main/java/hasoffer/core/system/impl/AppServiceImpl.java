@@ -466,10 +466,10 @@ public class AppServiceImpl implements IAppService {
 //        String amazonUrl = "";
 //        if (random.nextInt(3) == 1) {
 //        }
-        String affId = AffliIdHelper.getAffidByChannelForAmazon(marketChannel);
-        if (StringUtils.isNotBlank(affId)) {
-            affId = AffliIdHelper.getAffidByChannelForAmazon(MarketChannel.NONE);
-        }
+        String affId = AffliIdHelper.getAffIdByChannelForAmazon(marketChannel);
+        //if (StringUtils.isNotBlank(affId)) {
+        //    affId = AffliIdHelper.getAffIdByChannelForAmazon(MarketChannel.NONE);
+        //}
         String amazonUrl = "intent://amazon.in/?tag=" + affId + "&camp=3638&ref=as_li_tl#Intent;scheme=com.amazon.mobile.shopping;package=in.amazon.mShop.android.shopping;S.browser_fallback_url=https://play.google.com/store/apps/details?id=in.amazon.mShop.android.shopping;end";
         return new String(org.apache.commons.codec.binary.Base64.encodeBase64(amazonUrl.getBytes(Charset.forName("UTF-8"))));
     }
