@@ -79,7 +79,6 @@ public class AppController {
     ICacheService iCacheService;
     @Resource
     ApiUtils apiUtils;
-    private Logger logger = LoggerFactory.getLogger(AppController.class);
     @Resource
     private IAppService appService;
     @Resource
@@ -103,20 +102,7 @@ public class AppController {
     @Resource
     private PtmStdSkuIndexServiceImpl ptmStdSkuIndexService;
 
-    public static void main(String[] args) {
-
-        //Date date1 = null;
-        //try {
-        //    date1 = DateUtils.parseDate("2016-10-05 19:11:00", "yyyy-MM-dd HH:mm:ss");
-        //    Date date2 = DateUtils.parseDate("2016-10-02 21:11:00", "yyyy-MM-dd HH:mm:ss");
-        //    long days = date1.getTime() / TimeUtils.MILLISECONDS_OF_1_DAY - date2.getTime() / TimeUtils.MILLISECONDS_OF_1_DAY;
-        //    System.out.println(days);
-        //} catch (ParseException e) {
-        //    System.out.println(e.getMessage());
-        //    System.out.println(e.getLocalizedMessage());
-        //}
-
-    }
+    private Logger logger = LoggerFactory.getLogger(AppController.class);
 
     @RequestMapping(value = "/newconfig", method = RequestMethod.GET)
     public ModelAndView config(HttpServletRequest request) {
@@ -752,7 +738,13 @@ public class AppController {
     }
 
     @RequestMapping(value = "/push")
-    public ModelAndView psuhMessage(String title, String content, String app, String version, String marketChannel, String outline, String packageName, String type, String id, int number) {
+    public ModelAndView psuhMessage(String title,
+                                    String content,
+                                    String app,
+                                    String version,
+                                    String marketChannel,
+                                    String outline,
+                                    String packageName, String type, String id, int number) {
         ModelAndView mv = new ModelAndView();
         mv.addObject("errorCode", "00000");
         mv.addObject("msg", "ok");
