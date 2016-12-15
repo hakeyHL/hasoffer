@@ -658,21 +658,6 @@ public class AppController {
                 map.put("product", li);
                 break;
             case 2:
-                DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-                //关键词搜索不返回
-                if (StringUtils.isNotEmpty(deviceInfoVo.getAppVersion())) {
-                    String appVersion = deviceInfoVo.getAppVersion();
-                    version = Integer.parseInt(appVersion);
-                    if (version >= 36) {
-                        criteria.setPivotFields(Arrays.asList("Network",
-                                "Network3G", "Network4G",
-                                "Screen_Resolution", "Operating_System", "queryRam",
-                                "queryScreenSize", "querySecondaryCamera",
-                                "queryBatteryCapacity", "queryPrimaryCamera",
-                                "queryInternalMemory", "brand"));
-                    }
-                }
-
                 //search by title
                 PageableResult p;
                 p = ptmStdSkuIndexService.searchProducts(criteria);
@@ -706,6 +691,19 @@ public class AppController {
             case 3:
                 //类目搜索
                 //根据版本过滤
+                DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+                //关键词搜索不返回
+                if (StringUtils.isNotEmpty(deviceInfoVo.getAppVersion())) {
+                    String appVersion = deviceInfoVo.getAppVersion();
+                    version = Integer.parseInt(appVersion);
+                    if (version >= 36) {
+                        criteria.setPivotFields(Arrays.asList("Network",
+                                "Screen_Resolution", "Operating_System", "queryRam",
+                                "queryScreenSize", "querySecondaryCamera",
+                                "queryBatteryCapacity", "queryPrimaryCamera",
+                                "queryInternalMemory", "brand"));
+                    }
+                }
                 //category level page size
                 if (StringUtils.isNotBlank(criteria.getCategoryId())) {
                     //search by category
@@ -824,7 +822,7 @@ public class AppController {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "success");
-        Map resultMap = null;
+        Map resultMap;
         if (StringUtils.isEmpty(param)) {
             modelAndView.addObject("errorCode", "10000");
             modelAndView.addObject("msg", "param can not be empty ");
