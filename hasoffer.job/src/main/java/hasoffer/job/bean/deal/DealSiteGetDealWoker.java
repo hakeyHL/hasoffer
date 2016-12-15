@@ -139,9 +139,9 @@ public class DealSiteGetDealWoker implements Runnable {
         StringBuilder sb = new StringBuilder();
         if (false) {
             //has description {//100%-110%
-//            //如果现价不低于史低价
-//            //文案 Rs.现价 is almost history lowest price(History lowest price is Rs.更新前的史低价). Click here to check price history（点击此行展示价格走势浮层）. Good offer always expire in hours.Good time to get it,Hurry up!
-//            sb.append("Rs.").append(newPrice).append(" is almost history lowest price(History lowest price is Rs.").append(minPrice).append(").Click here to check price history.Good offer always expire in hours.Good time to get it,Hurry up!");
+            //如果现价不低于史低价
+            //文案 Rs.现价 is almost history lowest price(History lowest price is Rs.更新前的史低价). Click here to check price history（点击此行展示价格走势浮层）. Good offer always expire in hours.Good time to get it,Hurry up!
+            //sb.append("Rs.").append(newPrice).append(" is almost history lowest price(History lowest price is Rs.").append(minPrice).append(").Click here to check price history.Good offer always expire in hours.Good time to get it,Hurry up!");
         } else {//小于100%
 
             sb.append(webSiteString).append(" is offering ").append(fetchedDealInfo.getTitle()).append(" .\n");
@@ -159,7 +159,13 @@ public class DealSiteGetDealWoker implements Runnable {
         appdeal.setPresentPrice(fetchedDealInfo.getPrice());
         appdeal.setPriceDescription("Rs." + fetchedDealInfo.getPrice());
         appdeal.setOriginPrice(fetchedDealInfo.getOriPrice());
-        appdeal.setDiscount((int) ((1 - fetchedDealInfo.getPrice() / fetchedDealInfo.getOriPrice()) * 100));
+
+        float oriPrice = fetchedDealInfo.getOriPrice();
+        if (oriPrice != 0) {
+            appdeal.setDiscount((int) ((1 - fetchedDealInfo.getPrice() / fetchedDealInfo.getOriPrice()) * 100));
+        } else {
+            appdeal.setDiscount(100);
+        }
 
         //url重复不创建
         boolean flag = true;

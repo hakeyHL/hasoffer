@@ -11,6 +11,22 @@ import java.util.regex.Pattern;
 public class RegexTest {
 
     @Test
+    public void testGroup() {
+
+        Pattern pattern1 = Pattern.compile(".*(\\d{0,10}).*$");
+
+        String str = "http://www.idealo.in/compare/4403794/wrangler-greensboro.html";
+
+        Matcher matcher = pattern1.matcher(str);
+
+        if (matcher.matches()) {
+            System.out.println(matcher.group(1));
+        }
+
+    }
+
+
+    @Test
     public void testRegex() {
 
         Pattern pattern1 = Pattern.compile(".*(action=shop)$");
