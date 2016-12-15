@@ -97,10 +97,10 @@
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
                 <button type="submit" class="btn btn-default">确认无误,推送</button>
+                点击推送后,请转到<a href="http://job.hasoffer.cn" target="_blank">job.hasoffer.cn</a>执行adminPushTrigger,来完成推送操作
             </div>
         </div>
     </form>
-
     <jsp:include page="../include/page.jsp"/>
 </div>
 <script>
