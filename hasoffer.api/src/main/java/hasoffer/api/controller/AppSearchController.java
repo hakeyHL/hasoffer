@@ -3,7 +3,6 @@ package hasoffer.api.controller;
 import hasoffer.base.model.PageableResult;
 import hasoffer.core.app.AppSearchService;
 import hasoffer.core.bo.system.SearchCriteria;
-import hasoffer.core.product.solr.PtmStdSkuModel;
 import hasoffer.core.utils.api.ApiUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,10 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hs on 2016年12月12日.
@@ -50,7 +46,12 @@ public class AppSearchController {
         }
 
         //3. 业务逻辑
-        PageableResult<PtmStdSkuModel> pageableResult = appSearchService.filterByParams(searchCriteria);
+        searchCriteria.setPivotFields(Arrays.asList("Network",
+                "Screen_Resolution", "Operating_System", "queryRam",
+                "queryScreenSize", "querySecondaryCamera",
+                "queryBatteryCapacity", "queryPrimaryCamera",
+                "queryInternalMemory", "brand"));
+        PageableResult pageableResult = appSearchService.filterByParams(searchCriteria);
 
         if (pageableResult != null && pageableResult.getData().size() > 0) {
             apiUtils.addProductVo2List(ptmStdSkuList, pageableResult.getData());
@@ -61,7 +62,7 @@ public class AppSearchController {
 
             //处理facet返回
             map.put("pivos", pageableResult.getPivotFieldVals());
-//            ApiUtils.resolvePivotFields(map, pageableResult, pageableResult.getPivotFieldVals());
+            ApiUtils.resolvePivotFields(map, pageableResult, pageableResult.getPivotFieldVals());
         }
         if (ptmStdSkuList.size() < 1) {
             modelAndView.addObject("errorCode", "10000");
