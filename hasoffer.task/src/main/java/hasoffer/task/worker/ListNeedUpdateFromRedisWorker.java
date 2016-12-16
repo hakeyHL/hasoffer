@@ -153,7 +153,9 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
 
         List<PtmStdPrice> stdPriceList = stdSkuService.listStdPrice(ApiUtils.removeBillion(productId));
 
-        if (stdPriceList == null || stdPriceList.size() == 0) {
+        if (stdPriceList != null && stdPriceList.size() > 0) {
+
+            logger.info("get stdPriceList size is " + stdPriceList.size());
 
             for (PtmStdPrice stdPrice : stdPriceList) {
 
@@ -193,6 +195,8 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                 }
             }
 
+        } else {
+            logger.info("get empty stdPriceList for productid " + productId);
         }
 
     }
