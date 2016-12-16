@@ -38,7 +38,7 @@
 
     <bean id="EipJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="EipJob"/>
-        <property name="cronExpression" value="0 58 0/1 * * ?"/>
+        <property name="cronExpression" value="0 28/30 * * * ?"/>
     </bean>
 
     <bean name="UpdateStateJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">

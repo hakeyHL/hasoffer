@@ -39,9 +39,17 @@ public class ShowHomeController {
         return new ModelAndView("layout/index");
     }
 
+    @RequestMapping("/showUpdateGroupByDay")
+    public ModelAndView showUpdateGroupByDay() {
+        ModelAndView modelAndView = new ModelAndView("stats/updateStatus");
+        modelAndView.addObject("queryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
+        return modelAndView;
+    }
+
+
     @RequestMapping("/showUpdateStats")
     public ModelAndView showUpdateStats() {
-        ModelAndView modelAndView = new ModelAndView("stats/updateStatus");
+        ModelAndView modelAndView = new ModelAndView("stats/updateList");
         modelAndView.addObject("queryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
         return modelAndView;
     }
