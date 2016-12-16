@@ -24,9 +24,6 @@
         <module>hasoffer.fetch.api</module>
         <module>hasoffer.fetch.provider</module>
         <module>hasoffer.analysis.api</module>
-        <module>hasoffer.spider.provider</module>
-        <module>hasoffer.spider.task</module>
-        <module>hasoffer.spider.result</module>
         <module>hasoffer.offlinejob</module>
         <module>hasoffer.datafixes</module>
         <module>hasoffer.third.proxyip</module>

@@ -131,8 +131,8 @@ public class AppSkuController {
             return null;
         }
         Map map = new HashMap<>();
-        if (ApiUtils.rmoveBillion(id) > 0) {
-            PtmStdPrice ptmStdPriceById = ptmStdPriceService.getPtmStdPriceById(ApiUtils.rmoveBillion(id));
+        if (ApiUtils.removeBillion(id) > 0) {
+            PtmStdPrice ptmStdPriceById = ptmStdPriceService.getPtmStdPriceById(ApiUtils.removeBillion(id));
             if (ptmStdPriceById != null) {
                 PtmStdSkuDetail ptmCmpSkuDescription = mongoDbManager.queryOne(PtmStdSkuDetail.class, ptmStdPriceById.getStdSkuId());
                 Map<String, String> specsMap = new HashMap();
@@ -205,9 +205,9 @@ public class AppSkuController {
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
-        if (ApiUtils.rmoveBillion(id) > 0) {
+        if (ApiUtils.removeBillion(id) > 0) {
             //从新的搜索
-            PtmStdPriceHistoryPrice ptmStdPriceHistoryPrice = mongoDbManager.queryOne(PtmStdPriceHistoryPrice.class, ApiUtils.rmoveBillion(id));
+            PtmStdPriceHistoryPrice ptmStdPriceHistoryPrice = mongoDbManager.queryOne(PtmStdPriceHistoryPrice.class, ApiUtils.removeBillion(id));
             if (ptmStdPriceHistoryPrice != null) {
                 priceNodes = ptmStdPriceHistoryPrice.getPriceNodes();
             }
@@ -217,7 +217,7 @@ public class AppSkuController {
         PtmStdPrice ptmStdPrice = null;
         if (priceNodes == null) {
             if ((id + "").length() >= 10) {
-                ptmStdPrice = ptmStdPriceService.getPtmStdPriceById(ApiUtils.rmoveBillion(id));
+                ptmStdPrice = ptmStdPriceService.getPtmStdPriceById(ApiUtils.removeBillion(id));
             }
             if (ptmStdPrice != null) {
                 //如果不存在历史价格数据将当前sku价格作为历史数据返回
@@ -354,8 +354,8 @@ public class AppSkuController {
 
         //校验skuId
         //根据skuId获取其商品Id
-        if (ApiUtils.rmoveBillion(skuId) > 0) {
-            ptmStdPrice = ptmStdPriceService.getPtmStdPriceById(ApiUtils.rmoveBillion(skuId));
+        if (ApiUtils.removeBillion(skuId) > 0) {
+            ptmStdPrice = ptmStdPriceService.getPtmStdPriceById(ApiUtils.removeBillion(skuId));
             priceReportLog.setpId(ptmStdPrice.getStdSkuId());
             priceReportLog.setTitle(ptmStdPrice.getTitle());
             priceReportLog.setPrice(ptmStdPrice.getPrice());

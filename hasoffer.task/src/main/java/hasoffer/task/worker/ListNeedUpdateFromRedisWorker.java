@@ -11,6 +11,7 @@ import hasoffer.core.persistence.po.ptm.PtmStdPrice;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IPtmStdSkuService;
 import hasoffer.core.utils.ConstantUtil;
+import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.data.redis.IRedisSetService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
@@ -83,8 +84,8 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                 }
 
                 //根据商品id，发起更新任务
-                logger.info("proceded set do not hava this productid get skuList");
                 Long productId = Long.valueOf((String) pop);
+                logger.info("proceded set do not hava this productid " + productId + " get skuList");
 
                 if (productId > ConstantUtil.API_ONE_BILLION_NUMBER) {//ptmStdPrice
                     sendPtmStdPriceUrlUpdateReqest(productId);
@@ -139,10 +140,10 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                     }
 
                     fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_3);
-                    logger.info("send url request succes for " + sku.getWebsite() + " sku id is _" + sku.getId() + "_");
+                    logger.info("send ptmcmpsku url request succes for " + sku.getWebsite() + " sku id is _" + sku.getId() + "_");
                 } else {
                     fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_5);
-                    logger.info("send url request succes for " + sku.getWebsite() + " sku id is _" + sku.getId() + "_");
+                    logger.info("send ptmcmpsku url request succes for " + sku.getWebsite() + " sku id is _" + sku.getId() + "_");
                 }
             }
         }
@@ -150,7 +151,7 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
 
     void sendPtmStdPriceUrlUpdateReqest(long productId) {
 
-        List<PtmStdPrice> stdPriceList = stdSkuService.listStdPrice(productId);
+        List<PtmStdPrice> stdPriceList = stdSkuService.listStdPrice(ApiUtils.removeBillion(productId));
 
         if (stdPriceList == null || stdPriceList.size() == 0) {
 
@@ -185,10 +186,10 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                     }
 
                     fetchDubboService.sendUrlTask(stdPrice.getWebsite(), stdPrice.getUrl(), TaskTarget.STDPRICE_UPDATE, TaskLevel.LEVEL_3);
-                    logger.info("send url request succes for " + stdPrice.getWebsite() + " sku id is _" + stdPrice.getId() + "_");
+                    logger.info("send ptmstdprice url request succes for " + stdPrice.getWebsite() + " stdprice id is _" + stdPrice.getId() + "_");
                 } else {
                     fetchDubboService.sendUrlTask(stdPrice.getWebsite(), stdPrice.getUrl(), TaskTarget.STDPRICE_UPDATE, TaskLevel.LEVEL_5);
-                    logger.info("send url request succes for " + stdPrice.getWebsite() + " sku id is _" + stdPrice.getId() + "_");
+                    logger.info("send ptmstdprice url request succes for " + stdPrice.getWebsite() + " stdprice id is _" + stdPrice.getId() + "_");
                 }
             }
 
