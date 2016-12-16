@@ -299,7 +299,7 @@ public class WebsiteHelper {
         if (website == null) {
             path = path + "NULL.png";
         } else {
-            path = path + website.name() + ".jpg";
+            path = path + website.name() + ".png";
         }
         return AppConfig.get(AppConfig.IMAGE_SITELOGO3_PATH) + path;
     }

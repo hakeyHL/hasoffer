@@ -309,6 +309,8 @@ public class ProductCacheManager {
         if (!redisSetService.contains(key_added, String.valueOf(productId))) {
             redisSetService.add(key_added, String.valueOf(productId));
             redisListService.push(key, String.valueOf(productId));
+            System.out.println("put2UpdateQueue productid is " + productId);
+            System.out.println("put2UpdateQueue key is " + key);
         }
     }
 
