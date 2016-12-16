@@ -129,7 +129,7 @@ public class ApiUtils {
     }
 
     //去十亿
-    public static long rmoveBillion(long operatoredNumber) {
+    public static long removeBillion(long operatoredNumber) {
         long tempNumber = operatoredNumber;
         tempNumber = tempNumber - ConstantUtil.API_ONE_BILLION_NUMBER;
         return tempNumber;
@@ -779,7 +779,7 @@ public class ApiUtils {
                     PtmStdSkuModel ptmStdSkuModel = ptmList.next();
                     ProductListVo productListVo = new ProductListVo();
                     productListVo.setId(ptmStdSkuModel.getId());
-                    productListVo.setImageUrl(productCacheManager.getPtmStdSkuImageUrl(ApiUtils.rmoveBillion(ptmStdSkuModel.getId())));
+                    productListVo.setImageUrl(productCacheManager.getPtmStdSkuImageUrl(ApiUtils.removeBillion(ptmStdSkuModel.getId())));
                     productListVo.setName(ptmStdSkuModel.getTitle());
                     productListVo.setPrice(Math.round(ptmStdSkuModel.getMinPrice()));
                     productListVo.setRatingNum(ptmStdSkuModel.getRating());

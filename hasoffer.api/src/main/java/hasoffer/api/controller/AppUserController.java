@@ -160,7 +160,7 @@ public class AppUserController {
                 float priceOffSkuPrice;
                 if (skuId != 0) {
                     if ((skuId + "").length() >= 10) {
-                        PtmStdPrice ptmStdPrice = ptmStdPriceService.getPtmStdPriceById(ApiUtils.rmoveBillion(skuId));
+                        PtmStdPrice ptmStdPrice = ptmStdPriceService.getPtmStdPriceById(ApiUtils.removeBillion(skuId));
                         if (ptmStdPrice != null) {
                             priceOffSkuId = ApiUtils.addBillion(ptmStdPrice.getId());
                             priceOffSkuPrice = ptmStdPrice.getPrice();
