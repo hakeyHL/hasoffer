@@ -8,11 +8,17 @@ public enum AppMsgClickType {
 
     ACCESS,
     MAIN,
-    DEEPLINK,
     WEBVIEW,
-    GOOGLEPLAY,
-    PRODUCT,
-    DEAL,
     SIGN,
-    SKU
+    SKU,
+
+    GOOGLEPLAY,
+
+
+    DEEPLINK,
+
+
+    PRODUCT,
+    DEAL
 }
+
