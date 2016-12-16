@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -76,7 +77,15 @@ public class UpdateStateService {
         return updateStateDao.selectByDate(updateStr);
     }
 
-    enum TaskTarget {
+    public List<UpdateStateDMO> selectStats(String queryDay, String taskTarget) {
+        return updateStateDao.selectStats(queryDay, taskTarget);
+    }
+
+    public List<TaskTarget> selectTaskTarget() {
+        return Arrays.asList(TaskTarget.values());
+    }
+
+    public enum TaskTarget {
         DEAL_UPDATE, SKU_UPDATE, WAIT_URL_LIST, STDPRICE_UPDATE, PRICEOFF_NOTICE
     }
 

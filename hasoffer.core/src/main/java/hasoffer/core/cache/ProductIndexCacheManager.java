@@ -36,20 +36,20 @@ public class ProductIndexCacheManager {
      */
     public PageableResult<ProductModel2> searchProducts(SearchCriteria sc) {
         String key = this.getSearchCacheKey(sc);
-        PageableResult<ProductModel2> model2PageableResult = null;
+        PageableResult<ProductModel2> model2PageableResult;
         String pageableResultString = cacheService.get(key, 0);
         if (pageableResultString != null) {
             try {
                 JSONObject jsonObject = JSON.parseObject(pageableResultString);
                 Map<String, JSONArray> pivotFieldVals = jsonObject.getObject("pivotFieldVals", Map.class);
-                Map<String, List<NameValue>> pivotFieldVals2 = new HashMap<String, List<NameValue>>();
+                Map<String, List<NameValue>> pivotFieldVals2 = new HashMap<>();
                 Set<Map.Entry<String, JSONArray>> entries = pivotFieldVals.entrySet();
                 Iterator<Map.Entry<String, JSONArray>> iterator = entries.iterator();
                 while (iterator.hasNext()) {
                     Map.Entry<String, JSONArray> next = iterator.next();
                     pivotFieldVals2.put(next.getKey(), JSONArray.parseArray(next.getValue().toJSONString(), NameValue.class));
                 }
-                model2PageableResult = new PageableResult<ProductModel2>(JSONArray.parseArray(jsonObject.getString("data"), ProductModel2.class), jsonObject.getLong("numFund"), jsonObject.getLong("currentPage"), jsonObject.getLong("pageSize"), pivotFieldVals2);
+                model2PageableResult = new PageableResult<>(JSONArray.parseArray(jsonObject.getString("data"), ProductModel2.class), jsonObject.getLong("numFund"), jsonObject.getLong("currentPage"), jsonObject.getLong("pageSize"), pivotFieldVals2);
                 return model2PageableResult;
             } catch (Exception e) {
                 logger.error(" search products , get products from cache :" + e.getMessage());

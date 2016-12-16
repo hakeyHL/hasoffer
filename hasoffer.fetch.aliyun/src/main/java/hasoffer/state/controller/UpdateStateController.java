@@ -4,9 +4,7 @@ import hasoffer.state.dmo.UpdateStateDMO;
 import hasoffer.state.service.UpdateStateService;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -26,6 +24,21 @@ public class UpdateStateController {
             queryDay = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
         }
         return updateStateService.selectByDate(queryDay);
+    }
+
+    @RequestMapping(value = "/selectUpdateStats", method = RequestMethod.POST)
+    @ResponseBody
+    public List<UpdateStateDMO> selectUpdateStats(@RequestBody UpdateStateDMO updateStateDMO) {
+        if (updateStateDMO.getUpdateDate() == null) {
+            updateStateDMO.setUpdateDate(DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
+        }
+        return updateStateService.selectStats(updateStateDMO.getUpdateDate(), updateStateDMO.getTaskTarget());
+    }
+
+    @RequestMapping("/selectTaskTarget")
+    @ResponseBody
+    public List<UpdateStateService.TaskTarget> selectTaskTarget() {
+        return updateStateService.selectTaskTarget();
     }
 
 

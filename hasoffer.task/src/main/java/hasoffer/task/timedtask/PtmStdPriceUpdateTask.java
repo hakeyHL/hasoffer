@@ -12,7 +12,6 @@ import hasoffer.spider.enums.TaskTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -21,7 +20,7 @@ import java.util.List;
 /**
  * Created on 2016/11/30.
  */
-@Component
+//@Component
 public class PtmStdPriceUpdateTask {
 
     private static Logger logger = LoggerFactory.getLogger(PtmStdPriceUpdateTask.class);
