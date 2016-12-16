@@ -47,4 +47,18 @@ public interface UpdateStateDAO {
             "</script>"
     })
     List<Map<String, Integer>> selectGroupByDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+
+    @Select({
+            "<script>",
+            "select updateDate,taskTarget,webSite,pushNum,finishNum,exceptionNum,stopNum,logTime from t_update_url_stats where 1=1 ",
+            "<if test=\"queryDay!=null \">",
+            " and updateDate=#{queryDay} ",
+            "</if>",
+            "<if test=\"taskTarget!=null and taskTarget!='' \">",
+            " and taskTarget=#{taskTarget}",
+            "</if>",
+            "</script>"
+    })
+    List<UpdateStateDMO> selectStats(@Param("queryDay") String queryDay, @Param("taskTarget") String taskTarget);
 }
