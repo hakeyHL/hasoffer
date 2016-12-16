@@ -14,6 +14,7 @@ import hasoffer.core.product.solr.PtmStdSkuIndexServiceImpl;
 import hasoffer.core.product.solr.PtmStdSkuModel;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.utils.api.ApiUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -72,6 +73,11 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         } else {
             ptmStdSkuIndexServicel.createOrUpdate(ptmStdSKuModel);
         }
+    }
+
+    @Override
+    public List<PtmStdPrice> listStdPrice(long ptmStdSkuId) {
+        return dbm.query("SELECT t FROM PtmStdPrice t WHERE t.stdSkuId = ?0 ", Arrays.asList(ptmStdSkuId));
     }
 
     public PtmStdSkuModel getPtmStdSKuModel(PtmStdSku ptmStdSku1) {
@@ -214,14 +220,17 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
                 }
 
                 if (compareIgnoreCase(name, CategoryFilterParams.SCREEN_RESOLUTION)) {
+                    String screenResolution = ptmStdSkuParamNode.getValue();
                     //处理一下
-                    //"Screen Resolution"中分为五类分别是 4096x2160（4K）、 2048x1536（2K）、1920x1080（Full HD）、1280x720（HD）、High PPI Display
-                    if (name.replaceAll(" ", "").toLowerCase().contains("1920x1080") || name.replaceAll(" ", "").toLowerCase().contains("1080x1920")) {
-                        ptmStdSkuModel.setScreen_Resolution("1920x1080 (Full HD)");
-                    } else if (name.replaceAll(" ", "").toLowerCase().contains("1280x720") || name.replaceAll(" ", "").toLowerCase().contains("720x1280")) {
-                        ptmStdSkuModel.setScreen_Resolution("1280x720 (HD)");
-                    } else {
-                        ptmStdSkuModel.setScreen_Resolution("Others");
+                    if (StringUtils.isNotEmpty(screenResolution)) {
+                        //"Screen Resolution"中分为五类分别是 4096x2160（4K）、 2048x1536（2K）、1920x1080（Full HD）、1280x720（HD）、High PPI Display
+                        if (screenResolution.replaceAll(" ", "").toLowerCase().contains("1920x1080") || screenResolution.replaceAll(" ", "").toLowerCase().contains("1080x1920")) {
+                            ptmStdSkuModel.setScreen_Resolution("1920x1080 (Full HD)");
+                        } else if (screenResolution.replaceAll(" ", "").toLowerCase().contains("1280x720") || screenResolution.replaceAll(" ", "").toLowerCase().contains("720x1280")) {
+                            ptmStdSkuModel.setScreen_Resolution("1280x720 (HD)");
+                        } else {
+                            ptmStdSkuModel.setScreen_Resolution("Others");
+                        }
                     }
                     continue;
                 }
@@ -258,8 +267,9 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
                 }
 
                 if (compareIgnoreCase(name, CategoryFilterParams.OPERATING_SYSTEM)) {
-                    ptmStdSkuModel.setOperating_System(ptmStdSkuParamNode.getValue());
-                    continue;
+                    String opreatingSystem = ptmStdSkuParamNode.getValue();
+                    setOpeartingSystem(opreatingSystem, ptmStdSkuModel);
+//                    ptmStdSkuModel.setOperating_System(opreatingSystem);
                 }
 
                 if (compareIgnoreCase(name, CategoryFilterParams.INTERNAL_MEMORY)) {
@@ -405,6 +415,75 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
                 ptmStdSkuModel.setQueryInternalMemory("128GB");
                 break;
             default:
+        }
+    }
+
+    private void setOpeartingSystem(String opreatingSystem, PtmStdSkuModel ptmStdSkuModel) {
+        if (StringUtils.isNotEmpty(opreatingSystem)) {
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Android".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Android");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Bada".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Bada");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Blackberry".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Blackberry");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Blackberry OS".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Blackberry OS");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Brew".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Brew");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Firefox".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Firefox");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("iOS".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("iOS");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Linux".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Linux");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Nokia".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Nokia");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Asha".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Asha");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Nokia X Software".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Nokia X Software");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Propreitory".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Propreitory");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Sailfish".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Sailfish");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Symbian".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Symbian");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Tizen".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Tizen");
+                return;
+            }
+            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Windows".replaceAll(" ", "").toLowerCase())) {
+                ptmStdSkuModel.setOperating_System("Windows");
+                return;
+            }
         }
     }
 }

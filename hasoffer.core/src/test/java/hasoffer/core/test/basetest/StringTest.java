@@ -26,6 +26,11 @@ import java.util.regex.Pattern;
 public class StringTest {
 
     @Test
+    public void testGetWebsite() {
+        String url = "https://www.mcdelivery.co.in/?utm_source=Hasof&utm_medium=cpc&utm_campaign=Hasof_cpo";
+    }
+
+    @Test
     public void testABTest() {
         String test = "%3B152479990235431";
         test = URLDecoder.decode(test);

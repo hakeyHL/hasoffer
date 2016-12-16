@@ -234,9 +234,21 @@ public class Compare2Controller {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
-        if (org.apache.commons.lang3.StringUtils.isEmpty(id)) {
+        if (id.equals("0")) {
             jsonObject.put("msg", "id required .");
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            return null;
+        } else {
+            //加入更新队列
+            try {
+                searchLogCacheManager.countSearchedProduct(Long.parseLong(id));
+                searchLogCacheManager.countSearchedProductByHour(Long.parseLong(id));
+            } catch (Exception e) {
+                jsonObject.put("errorCode", "10000");
+                jsonObject.put("msg", "Exception occur !");
+                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                return null;
+            }
         }
         String userToken = Context.currentContext().getHeader("usertoken");
         PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"skuPrice", "deepLink", "saved", "priceOff", "productVo", "pagedComparedSkuVos", "copywriting", "displayMode", "std", "cashBack"});
@@ -744,6 +756,10 @@ public class Compare2Controller {
             }
             if (maxMc > 0) {
                 sio.set(comparedPricemnMap.get(maxMc));
+                //将此商品写到缓存中供更新用
+                searchLogCacheManager.countSearchedProduct(sio.getStdSkuId());
+                searchLogCacheManager.countSearchedProductByHour(sio.getStdSkuId());
+
             }
         }
     }

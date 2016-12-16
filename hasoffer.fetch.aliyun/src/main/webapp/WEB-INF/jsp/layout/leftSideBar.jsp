@@ -11,7 +11,10 @@
                     class="collapse-sign"><em class="fa fa-expand-o"></em></b></a>
             <ul>
                 <li>
-                    <a href="${ctx}/layout/showUpdateStats" target="frameContent">更新统计</a>
+                    <a href="${ctx}/layout/showUpdateGroupByDay" target="frameContent">更新统计</a>
+                </li>
+                <li>
+                    <a href="${ctx}/layout/showUpdateStats" target="frameContent">更新状态</a>
                 </li>
                 <li>
                     <a href="${ctx}/layout/showJob" target="frameContent">任务调度</a>

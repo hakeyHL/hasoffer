@@ -37,7 +37,7 @@ public class SolrHelperController {
         ListProcessTask<PtmStdSku> processTask = new ListProcessTask<>(new ILister() {
             @Override
             public PageableResult getData(int page) {
-                return iPtmStdSkuService.getPtmStdSkuListByMinId(minId, page, 200);
+                return iPtmStdSkuService.getPtmStdSkuListByMinId(minId, page, 2000);
             }
 
             @Override

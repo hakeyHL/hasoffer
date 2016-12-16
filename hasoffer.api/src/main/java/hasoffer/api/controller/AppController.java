@@ -79,7 +79,6 @@ public class AppController {
     ICacheService iCacheService;
     @Resource
     ApiUtils apiUtils;
-    private Logger logger = LoggerFactory.getLogger(AppController.class);
     @Resource
     private IAppService appService;
     @Resource
@@ -103,20 +102,7 @@ public class AppController {
     @Resource
     private PtmStdSkuIndexServiceImpl ptmStdSkuIndexService;
 
-    public static void main(String[] args) {
-
-        //Date date1 = null;
-        //try {
-        //    date1 = DateUtils.parseDate("2016-10-05 19:11:00", "yyyy-MM-dd HH:mm:ss");
-        //    Date date2 = DateUtils.parseDate("2016-10-02 21:11:00", "yyyy-MM-dd HH:mm:ss");
-        //    long days = date1.getTime() / TimeUtils.MILLISECONDS_OF_1_DAY - date2.getTime() / TimeUtils.MILLISECONDS_OF_1_DAY;
-        //    System.out.println(days);
-        //} catch (ParseException e) {
-        //    System.out.println(e.getMessage());
-        //    System.out.println(e.getLocalizedMessage());
-        //}
-
-    }
+    private Logger logger = LoggerFactory.getLogger(AppController.class);
 
     @RequestMapping(value = "/newconfig", method = RequestMethod.GET)
     public ModelAndView config(HttpServletRequest request) {
@@ -640,6 +626,7 @@ public class AppController {
         Map map = new HashMap();
         PageableResult products;
         int version = 0;
+        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
 //        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
 
@@ -673,6 +660,19 @@ public class AppController {
                 break;
             case 2:
                 //search by title
+                if (StringUtils.isNotEmpty(criteria.getCategoryId())) {
+                    if (StringUtils.isNotEmpty(deviceInfoVo.getAppVersion()) && criteria.getCategoryId().equals("5") && criteria.getLevel() == 2) {
+                        String appVersion = deviceInfoVo.getAppVersion();
+                        version = Integer.parseInt(appVersion);
+                        if (version >= 36) {
+                            criteria.setPivotFields(Arrays.asList("Network",
+                                    "Screen_Resolution", "Operating_System", "queryRam",
+                                    "queryScreenSize", "querySecondaryCamera",
+                                    "queryBatteryCapacity", "queryPrimaryCamera",
+                                    "queryInternalMemory", "brand"));
+                        }
+                    }
+                }
                 PageableResult p;
                 p = ptmStdSkuIndexService.searchProducts(criteria);
                 if (p == null || p.getData() == null || p.getData().size() < 1) {
@@ -705,6 +705,18 @@ public class AppController {
             case 3:
                 //类目搜索
                 //根据版本过滤
+                //关键词搜索不返回
+                if (StringUtils.isNotEmpty(deviceInfoVo.getAppVersion())) {
+                    String appVersion = deviceInfoVo.getAppVersion();
+                    version = Integer.parseInt(appVersion);
+                    if (version >= 36) {
+                        criteria.setPivotFields(Arrays.asList("Network",
+                                "Screen_Resolution", "Operating_System", "queryRam",
+                                "queryScreenSize", "querySecondaryCamera",
+                                "queryBatteryCapacity", "queryPrimaryCamera",
+                                "queryInternalMemory", "brand"));
+                    }
+                }
                 //category level page size
                 if (StringUtils.isNotBlank(criteria.getCategoryId())) {
                     //search by category
@@ -752,7 +764,13 @@ public class AppController {
     }
 
     @RequestMapping(value = "/push")
-    public ModelAndView psuhMessage(String title, String content, String app, String version, String marketChannel, String outline, String packageName, String type, String id, int number) {
+    public ModelAndView psuhMessage(String title,
+                                    String content,
+                                    String app,
+                                    String version,
+                                    String marketChannel,
+                                    String outline,
+                                    String packageName, String type, String id, int number) {
         ModelAndView mv = new ModelAndView();
         mv.addObject("errorCode", "00000");
         mv.addObject("msg", "ok");
@@ -817,7 +835,7 @@ public class AppController {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "success");
-        Map resultMap = null;
+        Map resultMap;
         if (StringUtils.isEmpty(param)) {
             modelAndView.addObject("errorCode", "10000");
             modelAndView.addObject("msg", "param can not be empty ");
