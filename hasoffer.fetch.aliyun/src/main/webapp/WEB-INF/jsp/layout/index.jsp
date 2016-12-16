@@ -36,7 +36,7 @@
     </section>
     <section id="right" class="main">
         <div id="mainFrame" class="mainFrame">
-            <iframe id="frameContent" src="${ctx}/layout/showUpdateStats" frameborder="0"></iframe>
+            <iframe id="frameContent" src="${ctx}/layout/showUpdateGroupByDay" frameborder="0"></iframe>
         </div>
     </section>
 </section>
