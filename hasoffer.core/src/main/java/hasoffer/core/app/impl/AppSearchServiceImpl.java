@@ -32,7 +32,7 @@ public class AppSearchServiceImpl implements AppSearchService {
         String key = ConstantUtil.API_SOLR_PTMSTDSKU_CATEGORY_SEARCH + "_" + Md5Utils.md5AsBase64(searchCriteria.toString().getBytes());
         String cacheValueByKey = appCacheService.getCacheValueByKey(key);
         if (StringUtils.isNotEmpty(cacheValueByKey)) {
-            ApiUtils.parseString2Pageable(cacheValueByKey, PtmStdSkuModel.class, pageableResult);
+            pageableResult = ApiUtils.parseString2Pageable(cacheValueByKey, PtmStdSkuModel.class);
         }
         if (pageableResult == null) {
             pageableResult = ptmStdSkuIndexService.filterStdSkuOnCategoryByCriteria(searchCriteria);

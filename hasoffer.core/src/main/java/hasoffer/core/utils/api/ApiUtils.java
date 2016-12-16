@@ -423,9 +423,13 @@ public class ApiUtils {
     }
 
 
-    public static void parseString2Pageable(String jsonString, Class classzz, PageableResult pageableResult) {
+    public static PageableResult parseString2Pageable(String jsonString, Class classzz) {
+        PageableResult pageableResult = null;
         pageableResult = (PageableResult<PtmStdSkuModel>) JSON.parseObject(jsonString, PageableResult.class);
-        pageableResult.setData(JSONArray.parseArray(JSON.toJSONString(pageableResult.getData()), classzz));
+        if (pageableResult != null) {
+            pageableResult.setData(JSONArray.parseArray(JSON.toJSONString(pageableResult.getData()), classzz));
+        }
+        return pageableResult;
     }
 
     public static void resolvePivotFields(Map map, PageableResult products, Map<String, List<NameValue<String, Long>>> pivotFieldVals) {
