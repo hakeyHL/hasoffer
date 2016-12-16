@@ -431,7 +431,6 @@ public class ApiUtils {
     public static void resolvePivotFields(Map map, PageableResult products, Map<String, List<NameValue<String, Long>>> pivotFieldVals) {
         if (pivotFieldVals != null && pivotFieldVals.size() > 0) {
             Map<String, List<NameValue<String, Long>>> pivotFieldValMap = new HashMap<>();
-            List<NameValue<String, Long>> netWorkNVList = new ArrayList<>();
             Set<Map.Entry<String, List<NameValue<String, Long>>>> entries = pivotFieldVals.entrySet();
             Iterator<Map.Entry<String, List<NameValue<String, Long>>>> iterator = entries.iterator();
             while (iterator.hasNext()) {

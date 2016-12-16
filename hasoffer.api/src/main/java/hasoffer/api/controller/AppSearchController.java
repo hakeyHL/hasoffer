@@ -58,6 +58,10 @@ public class AppSearchController {
             map.put("currentPage", pageableResult.getCurrentPage() <= 1 ? 1 : pageableResult.getCurrentPage());
             map.put("totalPage", pageableResult.getTotalPage());
             map.put("pageSize", pageableResult.getPageSize());
+
+            //处理facet返回
+            map.put("pivos", pageableResult.getPivotFieldVals());
+//            ApiUtils.resolvePivotFields(map, pageableResult, pageableResult.getPivotFieldVals());
         }
         if (ptmStdSkuList.size() < 1) {
             modelAndView.addObject("errorCode", "10000");
