@@ -259,7 +259,7 @@ public class Compare2Controller {
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         PtmStdSku ptmStdSku = null;
         if ((id).length() >= 10) {
-            id = ApiUtils.rmoveBillion(Long.valueOf(id)) + "";
+            id = ApiUtils.removeBillion(Long.valueOf(id)) + "";
             ptmStdSku = ptmStdSKuService.getStdSkuById(Long.valueOf(id));
         }
         if (ptmStdSku != null) {
@@ -514,7 +514,7 @@ public class Compare2Controller {
             return modelAndView;
         }
         //是,根据id从solr中获取此id的stdSkuModel
-        PtmStdSkuModel ptmStdSkuModel = stdSkuIndexService.getStdSkuModelById(ApiUtils.rmoveBillion(pId));
+        PtmStdSkuModel ptmStdSkuModel = stdSkuIndexService.getStdSkuModelById(ApiUtils.removeBillion(pId));
         if (ptmStdSkuModel == null) {
             //无,返回错误信息
             modelAndView.addObject("errorCode", "10000");
