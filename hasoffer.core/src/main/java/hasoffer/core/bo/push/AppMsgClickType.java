@@ -14,10 +14,10 @@ public enum AppMsgClickType {
 
     GOOGLEPLAY,
 
-
+    //--------跳转浏览器，忽略设备shopApp的问题
     DEEPLINK,
 
-
+    //--------跳转hasoffer的app里面的页面
     PRODUCT,
     DEAL
 }
