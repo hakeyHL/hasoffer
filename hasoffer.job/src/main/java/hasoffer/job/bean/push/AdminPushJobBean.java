@@ -117,22 +117,22 @@ public class AdminPushJobBean extends QuartzJobBean {
                 }
 
                 List<UrmDevice> urmDeviceList = pageableResult.getData();
-                List<String> shitGcmTokenList = new ArrayList<>();
-                int shitSize = 0;
+//                List<String> shitGcmTokenList = new ArrayList<>();
+//                int shitSize = 0;
                 for (UrmDevice urmDevice : urmDeviceList) {
                     //最多只要三个
-                    if (shitSize < 1) {
-                        if (urmDevice.getDeviceId() != null && urmDevice.getDeviceId().equals("101b92e896b93fc5")) {
-                            System.out.println("shitTime:" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "found ashit");
-                            List<UrmDevice> shitIds = deviceService.getDevicesByDeviceId(urmDevice.getDeviceId());
-                            for (UrmDevice urmDevice1 : shitIds) {
-                                if (!StringUtils.isEmpty(urmDevice1.getGcmToken())) {
-                                    shitGcmTokenList.add(urmDevice1.getGcmToken());
-                                    ++shitSize;
-                                }
-                            }
-                        }
-                    }
+//                    if (shitSize < 1) {
+//                        if (urmDevice.getDeviceId() != null && urmDevice.getDeviceId().equals("101b92e896b93fc5")) {
+//                            System.out.println("shitTime:" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "found ashit");
+//                            List<UrmDevice> shitIds = deviceService.getDevicesByDeviceId(urmDevice.getDeviceId());
+//                            for (UrmDevice urmDevice1 : shitIds) {
+//                                if (!StringUtils.isEmpty(urmDevice1.getGcmToken())) {
+//                                    shitGcmTokenList.add(urmDevice1.getGcmToken());
+//                                    ++shitSize;
+//                                }
+//                            }
+//                        }
+//                    }
 
 
                     String shopApp = urmDevice.getShopApp();
@@ -149,19 +149,19 @@ public class AdminPushJobBean extends QuartzJobBean {
                 }
 
                 try {
-                    if (shitGcmTokenList != null && shitGcmTokenList.size() > 0) {
-                        try {
-                            MulticastResult multicastResult = pushService.GroupPush(gcmTokenList, pushBo);
-                            System.out.println("shitPushResult = " + multicastResult.toString());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    if (gcmTokenList != null && gcmTokenList.contains("diME4RkV_6A:APA91bGHSgs6e6RyDjnKH2DPq3Ca7Q_D4cSRRq_JySvRO8txSIJgDgHFi1JULM7uM-EXwxTkswtP1PoKJzZ0l0jUdaAf88-VfZcVkE8C5rPEO-neb3hOdZjT0mjGsa002vLwdYHgyU3S")) {
-                        System.out.println("push to ashit ");
-                        String push = pushService.push(("diME4RkV_6A:APA91bGHSgs6e6RyDjnKH2DPq3Ca7Q_D4cSRRq_JySvRO8txSIJgDgHFi1JULM7uM-EXwxTkswtP1PoKJzZ0l0jUdaAf88-VfZcVkE8C5rPEO-neb3hOdZjT0mjGsa002vLwdYHgyU3S"), pushBo);
-                        System.out.println("push result = " + push);
-                    }
+//                    if (shitGcmTokenList != null && shitGcmTokenList.size() > 0) {
+//                        try {
+//                            MulticastResult multicastResult = pushService.GroupPush(gcmTokenList, pushBo);
+//                            System.out.println("shitPushResult = " + multicastResult.toString());
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                    if (gcmTokenList != null && gcmTokenList.contains("diME4RkV_6A:APA91bGHSgs6e6RyDjnKH2DPq3Ca7Q_D4cSRRq_JySvRO8txSIJgDgHFi1JULM7uM-EXwxTkswtP1PoKJzZ0l0jUdaAf88-VfZcVkE8C5rPEO-neb3hOdZjT0mjGsa002vLwdYHgyU3S")) {
+//                        System.out.println("push to ashit ");
+//                        String push = pushService.push(("diME4RkV_6A:APA91bGHSgs6e6RyDjnKH2DPq3Ca7Q_D4cSRRq_JySvRO8txSIJgDgHFi1JULM7uM-EXwxTkswtP1PoKJzZ0l0jUdaAf88-VfZcVkE8C5rPEO-neb3hOdZjT0mjGsa002vLwdYHgyU3S"), pushBo);
+//                        System.out.println("push result = " + push);
+//                    }
 
                     MulticastResult multicastResult = pushService.GroupPush(gcmTokenList, pushBo);
 
