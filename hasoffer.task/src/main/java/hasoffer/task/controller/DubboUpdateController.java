@@ -3,16 +3,12 @@ package hasoffer.task.controller;
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
-import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmStdSku;
-import hasoffer.core.product.ICmpSkuService;
-import hasoffer.core.product.IProductService;
-import hasoffer.core.product.IPtmCmpSkuImageService;
-import hasoffer.core.product.IPtmStdPriceService;
+import hasoffer.core.product.*;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.data.redis.IRedisSetService;
@@ -70,6 +66,8 @@ public class DubboUpdateController {
     @Resource
     ProductCacheManager productCacheManager;
     @Resource
+    IPtmStdSkuService stdSkuService;
+    @Resource
     IPtmStdPriceService ptmStdPriceService;
 
     /**
@@ -83,14 +81,13 @@ public class DubboUpdateController {
             return "task running.";
         }
 
-        long cacheSeconds = TimeUtils.MILLISECONDS_OF_1_HOUR * 2;
-
         ExecutorService es = Executors.newCachedThreadPool();
 
-        es.execute(new ListNeedUpdateFromRedisWorker(fetchDubboService, redisListService, redisSetService, cmpSkuService, cacheSeconds, productCacheManager));
+        es.execute(new ListNeedUpdateFromRedisWorker(fetchDubboService, redisListService, redisSetService, stdSkuService, cmpSkuService, productCacheManager));
 
         for (int i = 0; i < 10; i++) {
-            es.execute(new CmpSkuDubboUpdate2Worker(fetchDubboService, cmpSkuService, redisListService));
+            es.execute(new CmpSkuDubboUpdate2Worker(fetchDubboService, cmpSkuService, redisListService));//ptmcmpsku更新
+            es.execute(new StdPriceDubboUpdateWorker(fetchDubboService, redisListService, ptmStdPriceService));//ptmstdPrice更新
         }
 
         taskRunning4.set(true);
