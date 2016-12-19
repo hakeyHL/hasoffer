@@ -634,7 +634,6 @@ public class AppController {
             version = Integer.parseInt(appVersion);
             if (version >= 36) {
                 criteria.setPivotFields(Arrays.asList("Network",
-                        "Network3G", "Network4G",
                         "Screen_Resolution", "Operating_System", "queryRam",
                         "queryScreenSize", "querySecondaryCamera",
                         "queryBatteryCapacity", "queryPrimaryCamera",
