@@ -102,7 +102,7 @@ public class AppController {
     private Logger logger = LoggerFactory.getLogger(AppController.class);
 
     @RequestMapping(value = "/newconfig", method = RequestMethod.GET)
-    public ModelAndView config(HttpServletRequest request) {
+    public ModelAndView config() {
         ModelAndView mav = new ModelAndView();
 
         Map<Website, String> openDeepLinks = new HashMap<Website, String>();
@@ -143,7 +143,7 @@ public class AppController {
     }
 
     @RequestMapping(value = "/log", method = RequestMethod.POST)
-    public ModelAndView eventLog(HttpServletRequest request) {
+    public ModelAndView eventLog() {
         return new ModelAndView();
     }
 
