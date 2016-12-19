@@ -47,47 +47,43 @@ public class StdPriceDubboUpdateWorker implements Runnable {
                 String fetchUrlResultStr = fetchDubboService.popFetchUrlResult(TaskTarget.STDPRICE_UPDATE);
                 if (fetchUrlResultStr == null) {
                     TimeUnit.MINUTES.sleep(10);
-                    System.out.println("fetchUrlResult get null sleep 10 MINUTES StdPriceDubboUpdateWorker");
+                    logger.info("fetchUrlResult get null sleep 10 MINUTES StdPriceDubboUpdateWorker");
                     continue;
                 }
                 FetchUrlResult fetchUrlResult = JSONUtil.toObject(fetchUrlResultStr, FetchUrlResult.class);
-//                popNumber--;
                 if (fetchUrlResult.getUrl() == null) {
-                    System.out.println("fetchUrlResult.getUrl() null StdPriceDubboUpdateWorker");
+                    logger.info("fetchUrlResult.getUrl() null StdPriceDubboUpdateWorker");
                     continue;
                 }
 
-                System.out.println("pop get StdPriceDubboUpdateWorker response success " + fetchUrlResult.getWebsite());
+                logger.info("pop get StdPriceDubboUpdateWorker response success " + fetchUrlResult.getWebsite());
                 String url = fetchUrlResult.getUrl();
                 Website website = fetchUrlResult.getWebsite();
 
                 TaskStatus taskStatus = fetchUrlResult.getTaskStatus();
 
                 if (TaskStatus.FINISH.equals(taskStatus)) {
-                    System.out.println("taskStatus is finish StdPriceDubboUpdateWorker " + website);
-                    if (Website.FLIPKART.equals(website)) {
-                        System.out.println("pop get StdPriceDubboUpdateWorker flipkart finish result");
-                    }
+                    logger.info("taskStatus is finish StdPriceDubboUpdateWorker " + website);
 
                     String urlKey = HexDigestUtil.md5(url);
                     List<PtmStdPrice> stdPriceList = ptmStdPriceService.getPtmstdPriceListByUrlKey(urlKey);
 
                     if (stdPriceList == null || stdPriceList.size() == 0) {
-                        System.out.println("urkKey StdPriceDubboUpdateWorker not found " + website + "url = " + url);
+                        logger.info("urkKey StdPriceDubboUpdateWorker not found " + website + "url = " + url);
                     } else {
-                        System.out.println("urkKey found StdPriceDubboUpdateWorker " + website + " skulist begin to update " + stdPriceList.size());
+                        logger.info("urkKey found StdPriceDubboUpdateWorker " + website + " skulist begin to update " + stdPriceList.size());
                         for (PtmStdPrice ptmStdPrice : stdPriceList) {
                             updatePtmCmpSku(ptmStdPrice, fetchUrlResult);
-                            System.out.println("update success StdPriceDubboUpdateWorker for " + ptmStdPrice.getWebsite());
+                            logger.info("update success StdPriceDubboUpdateWorker for " + ptmStdPrice.getWebsite());
                         }
                     }
                 } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
-                    System.out.println("taskStatus is StdPriceDubboUpdateWorker exception " + website);
+                    logger.info("taskStatus is StdPriceDubboUpdateWorker exception " + website);
                 } else {
-                    System.out.println("taskStatus is StdPriceDubboUpdateWorker " + taskStatus + "_" + website);
+                    logger.info("taskStatus is StdPriceDubboUpdateWorker " + taskStatus + "_" + website);
                 }
             } catch (Exception e) {
-                System.out.println("StdPriceDubboUpdateWorker.run() exception.");
+                logger.info("StdPriceDubboUpdateWorker.run() exception.");
                 e.printStackTrace();
             }
         }
@@ -102,28 +98,26 @@ public class StdPriceDubboUpdateWorker implements Runnable {
         Website website = WebsiteHelper.getWebSite(url);
 
         if (website == null) {
-            System.out.println("website StdPriceDubboUpdateWorker is null for _" + stdPriceId + "_");
+            logger.info("website StdPriceDubboUpdateWorker is null for _" + stdPriceId + "_");
             return;
         }
 
         FetchedProduct fetchedProduct = fetchUrlResult.getFetchProduct();
 
-        System.out.println("fetch result is :" + fetchedProduct);
-
         try {
             //
             ptmStdPriceService.updatePtmStdPriceBySpiderFetchedProduct(stdPriceId, fetchedProduct);
         } catch (Exception e) {
-            System.out.println("StdPriceDubboUpdateWorker updatePtmStdPriceBySpiderFetchedProduct fail " + stdPriceId);
+            logger.info("StdPriceDubboUpdateWorker updatePtmStdPriceBySpiderFetchedProduct fail " + stdPriceId);
             e.printStackTrace();
         }
 
-        System.out.println("StdPriceDubboUpdateWorker success " + fetchedProduct.getWebsite() + "_" + fetchedProduct.getSkuStatus() + "_" + stdPriceId);
+        logger.info("StdPriceDubboUpdateWorker success " + fetchedProduct.getWebsite() + "_" + fetchedProduct.getSkuStatus() + "_" + stdPriceId);
 
         try {
             ptmStdPriceService.createPtmStdPriceImage(stdPriceId, fetchedProduct);
         } catch (Exception e) {
-            System.out.println("StdPriceDubboUpdateWorker createPtmStdPriceImage fail " + stdPriceId);
+            logger.info("StdPriceDubboUpdateWorker createPtmStdPriceImage fail " + stdPriceId);
         }
 
 //            如果降价且CommentsNumber 大于40写入队列，并且状态必须是onsale

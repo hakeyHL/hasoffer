@@ -25,18 +25,11 @@ import java.util.concurrent.TimeUnit;
 public class CmpSkuDubboUpdate2Worker implements Runnable {
 
     private static final String PRICE_DROP_SKUID_QUEUE = "PRICE_DROP_SKUID_QUEUE";
-    //    public static long popNumber = 0;
+
     private static Logger logger = LoggerFactory.getLogger(CmpSkuDubboUpdate2Worker.class);
     private IFetchDubboService fetchDubboService;
     private ICmpSkuService cmpSkuService;
     private IRedisListService redisListService;
-
-//    private long popFinishNumber = 0;
-//    private long popExceptionNumber = 0;
-//    private long urlKeyFoundNumber = 0;
-//    private long urlKeyNotFoundNumber = 0;
-//    private long testFlipkartNumber = 0;
-//    private long testSnapdealNumber = 0;
 
     public CmpSkuDubboUpdate2Worker(IFetchDubboService fetchDubboService, ICmpSkuService cmpSkuService, IRedisListService redisListService) {
         this.fetchDubboService = fetchDubboService;
@@ -50,34 +43,15 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
         while (true) {
 
             try {
-//                if (CmpSkuDubboUpdate2Worker.popNumber < 0) {
-//                    System.out.println("popNumber " + popNumber);
-//                    System.out.println("popFinishNumber " + popFinishNumber);
-//                    System.out.println("popExceptionNumber " + popExceptionNumber);
-//                    System.out.println("urlKeyFoundNumber " + urlKeyFoundNumber);
-//                    System.out.println("urlKeyNotFoundNumber " + urlKeyNotFoundNumber);
-//                    System.out.println("testFlipkartNumber " + testFlipkartNumber);
-//                    System.out.println("testSnapdealNumber " + testSnapdealNumber);
-//                    break;
-//                } else {
-//                    System.out.println("popNumber " + popNumber);
-//                    System.out.println("popFinishNumber " + popFinishNumber);
-//                    System.out.println("popExceptionNumber " + popExceptionNumber);
-//                    System.out.println("urlKeyFoundNumber " + urlKeyFoundNumber);
-//                    System.out.println("urlKeyNotFoundNumber " + urlKeyNotFoundNumber);
-//                    System.out.println("testFlipkartNumber " + testFlipkartNumber);
-//                    System.out.println("testSnapdealNumber " + testSnapdealNumber);
-//                }
 
                 String fetchUrlResultStr = fetchDubboService.popFetchUrlResult(TaskTarget.SKU_UPDATE);
                 if (fetchUrlResultStr == null) {
-//                    TimeUnit.MINUTES.sleep(3);
                     TimeUnit.MINUTES.sleep(10);
                     logger.info("fetchUrlResult get null sleep 10 MINUTES");
                     continue;
                 }
                 FetchUrlResult fetchUrlResult = JSONUtil.toObject(fetchUrlResultStr, FetchUrlResult.class);
-//                popNumber--;
+
                 if (fetchUrlResult.getUrl() == null) {
                     logger.info("fetchUrlResult.getUrl() null");
                     continue;
@@ -90,27 +64,15 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                 TaskStatus taskStatus = fetchUrlResult.getTaskStatus();
 
                 if (TaskStatus.FINISH.equals(taskStatus)) {
-//                    popFinishNumber++;
+
                     logger.info("taskStatus is finish " + website);
-                    if (Website.FLIPKART.equals(website)) {
-                        logger.info("pop get flipkart finish result");
-                    }
 
                     String urlKey = HexDigestUtil.md5(url);
                     List<PtmCmpSku> skuList = cmpSkuService.getPtmCmpSkuListByUrlKey(urlKey);
 
-//                    if (Website.FLIPKART.equals(fetchUrlResult.getWebsite())) {
-//                        testFlipkartNumber++;
-//                    }
-//                    if (Website.SNAPDEAL.equals(fetchUrlResult.getWebsite())) {
-//                        testSnapdealNumber++;
-//                    }
-
                     if (skuList == null || skuList.size() == 0) {
-//                        urlKeyNotFoundNumber++;
                         logger.info("urkKey not found " + website + "url = " + url);
                     } else {
-//                        urlKeyFoundNumber++;
                         logger.info("urkKey found " + website + " skulist begin to update " + skuList.size());
                         for (PtmCmpSku ptmCmpSku : skuList) {
                             //更新商品的信息，写入多图数据，写入描述/参数
@@ -120,11 +82,6 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                     }
                 } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
                     logger.info("taskStatus is exception " + website);
-//                    if (Website.AMAZON.equals(website)) {
-//                        String amazonUrl = fetchUrlResult.getUrl();
-//                        amazonUrl = amazonUrl.replace("gp/offer-listing", "dp");
-//                        fetchDubboService.sendUrlTask(Website.AMAZON, amazonUrl, TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_3);
-//                    }
                 } else {
                     logger.info("taskStatus is " + taskStatus + "_" + website);
                 }
