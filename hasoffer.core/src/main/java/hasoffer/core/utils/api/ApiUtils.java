@@ -765,6 +765,9 @@ public class ApiUtils {
                     ProductModel2 ptmProduct = ptmList.next();
                     ProductListVo productListVo = new ProductListVo();
                     productListVo.setId(ptmProduct.getId());
+                    if (ptmProduct.getCate2() == 5l) {
+                        productListVo.setComparable(true);
+                    }
                     productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
                     productListVo.setName(ptmProduct.getTitle());
                     productListVo.setPrice(Math.round(ptmProduct.getMinPrice()));
@@ -779,6 +782,9 @@ public class ApiUtils {
                     PtmStdSkuModel ptmStdSkuModel = ptmList.next();
                     ProductListVo productListVo = new ProductListVo();
                     productListVo.setId(ptmStdSkuModel.getId());
+                    if (ptmStdSkuModel.getCate2() == 5l) {
+                        productListVo.setComparable(true);
+                    }
                     productListVo.setImageUrl(productCacheManager.getPtmStdSkuImageUrl(ApiUtils.removeBillion(ptmStdSkuModel.getId())));
                     productListVo.setName(ptmStdSkuModel.getTitle());
                     productListVo.setPrice(Math.round(ptmStdSkuModel.getMinPrice()));
