@@ -5,8 +5,8 @@
     <properties>
         <property name="dialect" value="mysql"/>
     </properties>
-    <!--<plugins>-->
-    <!--<plugin interceptor="com.shangde.crm.interceptor.PerformanceInterceptor"/>-->
-    <!--</plugins>-->
+    <plugins>
+        <plugin interceptor="hasoffer.common.interceptor.DBSqlInterceptor"/>
+    </plugins>
 
 </configuration>

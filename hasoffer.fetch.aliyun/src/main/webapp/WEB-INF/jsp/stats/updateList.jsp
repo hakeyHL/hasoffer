@@ -48,6 +48,12 @@
                     <input id="taskTarget" value="${taskTarget}" class="form-control"/>
                 </td>
                 <td style="vertical-align: middle; text-align: center;">
+                    <label>抓取网站</label>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <input id="webSite" value="${webSite}" class="form-control"/>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
                     <a href="#" onclick="queryUpdateState()" class="btn btn-sm btn-info">查找</a>
                 </td>
         </table>
@@ -127,11 +133,13 @@
 
         var $dateStr = $('#queryDate').val();
         var $taskTarget = $('#taskTarget').val();
+        var $webSite = $('#webSite').val();
 
         var url = "${ctx}/updateState/selectUpdateStats";
         var jsonObject = {
             updateDate: $dateStr,
             taskTarget: $taskTarget,
+            webSite: $webSite
         };
         $.ajax({
             cache: true,
@@ -158,6 +166,22 @@
             async: false,
             success: function (data) {
                 $('#taskTarget').select2({
+                    data: data,
+                    placeholder: '请选择',
+                    allowClear: true
+                })
+            }
+        });
+
+        $.ajax({
+            cache: true,
+            type: 'POST',
+            url: '${ctx}/updateState/selectWebSite',
+            contentType: 'application/json',
+            dataType: 'json',
+            async: false,
+            success: function (data) {
+                $('#webSite').select2({
                     data: data,
                     placeholder: '请选择',
                     allowClear: true

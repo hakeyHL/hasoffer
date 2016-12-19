@@ -9,7 +9,7 @@
 <html lang="zh-cn">
 <head>
     <meta charset="UTF-8">
-    <title>管理员登录</title>
+    <title>抓取统计与IP管理</title>
     <link rel="stylesheet" href="<%=contextPath2%>/css/b.css">
     <link rel="stylesheet" href="<%=contextPath2%>/css/f.css">
     <link rel="stylesheet" href="<%=contextPath2%>/css/g.css">
@@ -39,7 +39,7 @@
 <body class="login">
 <div class="col-center">
     <div class="well no-padding">
-        <h1 class="main-title">离线Jobs管理</h1>
+        <h1 class="main-title">抓取统计与IP管理</h1>
         <!-- use param.error assuming FormLoginConfigurer#failureUrl contains the query parameter error -->
         <form role="form" action="${ctx}/login" method="post">
             <fieldset>
