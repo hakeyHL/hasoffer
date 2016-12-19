@@ -411,13 +411,13 @@ public class Compare2Controller {
 
         List paramsMapList = new ArrayList();
         for (String param : params) {
-            Map<String, Boolean> paramtersMap = new HashMap();
+            Map<String, Boolean> parametersMap = new HashMap();
             if (StringUtils.isNotEmpty(ConstantUtil.API_PTMSTDSKU_PARAM_MEAN_MAP.get(param))) {
-                paramtersMap.put(param, true);
+                parametersMap.put(param, true);
             } else {
-                paramtersMap.put(param, false);
+                parametersMap.put(param, false);
             }
-            paramsMapList.add(paramtersMap);
+            paramsMapList.add(parametersMap);
         }
         map.put("params", paramsMapList);
         modelAndView.addObject("data", map);
