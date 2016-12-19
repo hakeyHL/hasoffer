@@ -58,7 +58,10 @@ public interface UpdateStateDAO {
             "<if test=\"taskTarget!=null and taskTarget!='' \">",
             " and taskTarget=#{taskTarget}",
             "</if>",
+            "<if test=\"webSite!=null and webSite!='' \">",
+            " and webSite=#{webSite}",
+            "</if>",
             "</script>"
     })
-    List<UpdateStateDMO> selectStats(@Param("queryDay") String queryDay, @Param("taskTarget") String taskTarget);
+    List<UpdateStateDMO> selectStats(@Param("queryDay") String queryDay, @Param("taskTarget") String taskTarget, @Param("webSite") String webSite);
 }

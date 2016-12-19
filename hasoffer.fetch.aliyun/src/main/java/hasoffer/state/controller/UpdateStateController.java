@@ -32,7 +32,7 @@ public class UpdateStateController {
         if (updateStateDMO.getUpdateDate() == null) {
             updateStateDMO.setUpdateDate(DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
         }
-        return updateStateService.selectStats(updateStateDMO.getUpdateDate(), updateStateDMO.getTaskTarget());
+        return updateStateService.selectStats(updateStateDMO.getUpdateDate(), updateStateDMO.getTaskTarget(), updateStateDMO.getWebSite());
     }
 
     @RequestMapping("/selectTaskTarget")
@@ -41,5 +41,10 @@ public class UpdateStateController {
         return updateStateService.selectTaskTarget();
     }
 
+    @RequestMapping("/selectWebSite")
+    @ResponseBody
+    public List<UpdateStateService.WebSite> selectWebSite() {
+        return updateStateService.selectWebSite();
+    }
 
 }

@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="${ctx}/css/doctype.css">
 <header id="header" class="navbar navbar-default">
     <nav class="collapse navbar-collapse">
-        <a href="#" class="navbar-brand">Jobs-Monitor</a>
+        <a href="#" class="navbar-brand">抓取管理</a>
         <ul class="nav navbar-nav navbar-right">
             <li><a href="#">
                 <s:property value="userSessionInfo.userNickName"/>，您已经成功登录</a></li>
