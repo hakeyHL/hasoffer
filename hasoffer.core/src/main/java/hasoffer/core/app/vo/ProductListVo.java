@@ -5,13 +5,14 @@ package hasoffer.core.app.vo;
  * Created by hs on 2016/6/21.
  */
 public class ProductListVo {
-    private  Long id;
-    private  String name;
+    private Long id;
+    private String name;
     private int price;
-    private  int storesNum;
+    private int storesNum;
     private Long commentNum;
-    private  String  imageUrl;
+    private String imageUrl;
     private int ratingNum;
+    private boolean comparable = false;
 
     public int getRatingNum() {
         return ratingNum;
@@ -67,5 +68,13 @@ public class ProductListVo {
 
     public void setCommentNum(Long commentNum) {
         this.commentNum = commentNum;
+    }
+
+    public boolean isComparable() {
+        return comparable;
+    }
+
+    public void setComparable(boolean comparable) {
+        this.comparable = comparable;
     }
 }
