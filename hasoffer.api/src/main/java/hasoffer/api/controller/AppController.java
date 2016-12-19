@@ -22,7 +22,6 @@ import hasoffer.core.app.vo.*;
 import hasoffer.core.bo.product.Banners;
 import hasoffer.core.bo.push.*;
 import hasoffer.core.bo.system.SearchCriteria;
-import hasoffer.core.cache.AppCacheManager;
 import hasoffer.core.cache.CmpSkuCacheManager;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
@@ -89,8 +88,6 @@ public class AppController {
     private ProductIndex2ServiceImpl productIndex2Service;
     @Resource
     private ProductServiceImpl productService;
-    @Resource
-    private AppCacheManager appCacheManager;
     @Resource
     private IPushService pushService;
     @Resource
@@ -594,20 +591,6 @@ public class AppController {
             userVo.setUserIcon(user.getAvatarPath());
             mv.addObject("data", userVo);
         }
-        return mv;
-    }
-
-    /**
-     * 商品类目
-     *
-     * @return
-     */
-    @RequestMapping(value = "/category", method = RequestMethod.GET)
-    public ModelAndView category(String categoryId) {
-        ModelAndView mv = new ModelAndView();
-        List categorys = null;
-        categorys = appCacheManager.getCategorys(categoryId);
-        mv.addObject("data", categorys);
         return mv;
     }
 
