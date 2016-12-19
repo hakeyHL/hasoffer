@@ -223,6 +223,48 @@ public class Compare2Controller {
         return null;
     }
 
+    /**
+     * 给vc开发用的
+     *
+     * @param url
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @DataSource(value = DataSourceType.Slave)
+    @RequestMapping(value = "/newnewconfig", method = RequestMethod.POST)
+    @ResponseBody
+    public String newnewconfig(@RequestParam String url,
+                               @RequestParam(defaultValue = "1") int page,
+                               @RequestParam(defaultValue = "20") int pageSize) {
+
+        String json = "";
+
+        //先手sourceSid匹配，如果沒有数据，再走原有的接口
+        //上传的url不为空
+        if (!org.apache.commons.lang3.StringUtils.isBlank(url)) {
+
+            Website website = WebsiteHelper.getWebSite(url);
+
+            String sourceSid = WebsiteHelper.getSkuIdFromUrl(website, url);
+
+            //todo 这个方法没有加缓存
+            json = getSkuListBySourceSidAndWebsite(website, sourceSid, page, pageSize);
+
+            //判断如果上面还是空的,走/cmp/sdk/cmpskus
+            if (StringUtils.isEmpty(json)) {
+
+//                SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, pageSize);
+                SearchIO sio = new SearchIO(sourceSid, "", "", website.name(), "0", null, "", page, pageSize);
+                getSioBySearch(sio);
+                json = appCmpService.sdkCmpSku(sio);
+
+            }
+        }
+
+        return json;
+    }
+
     @DataSource(value = DataSourceType.Slave)
     @RequestMapping(value = "/cmpsku", method = RequestMethod.GET)
     public ModelAndView cmpsku(@RequestParam(defaultValue = "0") String id,
@@ -292,6 +334,85 @@ public class Compare2Controller {
 
     }
 
+    /**
+     * 获取PtmStdSku的参数
+     *
+     * @param pId
+     * @return
+     */
+    @RequestMapping("getStdParams")
+    public ModelAndView getStdSkuCmpParams(@RequestParam(defaultValue = "0") long pId) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("errorCode", "00000");
+        modelAndView.addObject("msg", "success");
+        Map dataMap = new HashMap();
+        //验证id是否大于10亿
+        if (pId - ConstantUtil.API_ONE_BILLION_NUMBER <= 0) {
+            //不是就拒绝
+            modelAndView.addObject("errorCode", "10000");
+            modelAndView.addObject("msg", "pId error .");
+            return modelAndView;
+        }
+        //是,根据id从solr中获取此id的stdSkuModel
+        PtmStdSkuModel ptmStdSkuModel = stdSkuIndexService.getStdSkuModelById(ApiUtils.removeBillion(pId));
+        if (ptmStdSkuModel == null) {
+            //无,返回错误信息
+            modelAndView.addObject("errorCode", "10000");
+            modelAndView.addObject("msg", "product not exist.");
+            return modelAndView;
+        } else {
+            //去参数
+            //改参数
+            Map<String, String> resultMap = new HashMap();
+            resultMap.put("Brand", ptmStdSkuModel.getBrand() == null ? "" : ptmStdSkuModel.getBrand());
+            resultMap.put("Model", ptmStdSkuModel.getModel() == null ? "" : ptmStdSkuModel.getModel());
+            resultMap.put("Price", ptmStdSkuModel.getMinPrice() + "");
+            resultMap.put("Ram", ptmStdSkuModel.getRam() >= 1024 ? ptmStdSkuModel.getRam() / 1024 + " GB" : ptmStdSkuModel.getRam() + "MB");
+            resultMap.put("Screen Size", ptmStdSkuModel.getScreen_Size() + " inch");
+            resultMap.put("Secondary Camera", ptmStdSkuModel.getSecondary_Camera() + " MP");
+            resultMap.put("Primary Camera", ptmStdSkuModel.getPrimary_Camera() + " MP");
+            resultMap.put("Internal Memory", ptmStdSkuModel.getInternal_Memory() >= 1024 ? ptmStdSkuModel.getInternal_Memory() + " GB" : ptmStdSkuModel.getInternal_Memory() + " MB");
+            resultMap.put("Battery Capacity", ptmStdSkuModel.getBattery_Capacity() + " mAh");
+            resultMap.put("Expandable Memory", ptmStdSkuModel.getExpandable_Memory() == 0 ? "Unavailable" : "Up to " + ptmStdSkuModel.getExpandable_Memory() + " GB");
+            resultMap.put("Screen Resolution", ptmStdSkuModel.getScreen_Resolution() == null ? "" : ptmStdSkuModel.getBrand());
+            resultMap.put("Operating System", ptmStdSkuModel.getOperating_System() == null ? "" : ptmStdSkuModel.getBrand());
+            resultMap.put("Network", ptmStdSkuModel.getNetwork());
+
+            //遍历去除空值
+            Set<Map.Entry<String, String>> entries = resultMap.entrySet();
+            Iterator<Map.Entry<String, String>> iterator = entries.iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<String, String> next = iterator.next();
+                String value = next.getValue();
+                if (StringUtils.isEmpty(value)) {
+                    iterator.remove();
+                    System.out.println("remove " + next.getKey());
+                }
+            }
+            dataMap.put("productParams", resultMap);
+        }
+        //有,返回
+        modelAndView.addObject("data", dataMap);
+        return modelAndView;
+    }
+
+    /**
+     * 获取参数对比的左边参数列表
+     *
+     * @return
+     */
+    @RequestMapping("compareParams")
+    public ModelAndView getCompareParams() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("errorCode", "00000");
+        modelAndView.addObject("msg", "success");
+        Map map = new HashMap<>();
+        String[] params = ConstantUtil.API_PTMSTDSKU_PARAM_MEAN_MAP.keySet().toArray(new String[]{});
+        map.put("params", params);
+        modelAndView.addObject("data", map);
+        return modelAndView;
+    }
+
     private CmpResult getDefaultCmpResult(SearchIO sio, PtmCmpSkuIndex2 cmpSkuIndex) {
         String currentDeeplink = "";
         if (cmpSkuIndex != null && cmpSkuIndex.getId() != null && cmpSkuIndex.getId() > 0) {
@@ -313,7 +434,7 @@ public class Compare2Controller {
 
     private CmpResult getCmpResult(SearchIO sio, PtmCmpSkuIndex2 cmpSkuIndex) {
 
-        List<ComparedSkuVo> comparedSkuVos = new ArrayList<ComparedSkuVo>();
+        List<ComparedSkuVo> comparedSkuVos = new ArrayList<>();
 
         /**
          * 如果匹配到商品，proId是匹配到的商品ID，cmpSkuId是比价列表中对应该网站的skuId
@@ -442,7 +563,7 @@ public class Compare2Controller {
     }
 
     private List<String> getAffs(SearchIO sio) {
-        List<String> affs = new ArrayList<String>();
+        List<String> affs = new ArrayList<>();
         affs.add(sio.getMarketChannel().name());
         affs.add(sio.getDeviceId());
         UrmUser urmUser = appService.getUserByUserToken((String) Context.currentContext().get(StaticContext.USER_TOKEN));
@@ -450,110 +571,6 @@ public class Compare2Controller {
             affs.add(urmUser.getId().toString());
         }
         return affs;
-    }
-
-    /**
-     * 给vc开发用的
-     *
-     * @param url
-     * @param page
-     * @param pageSize
-     * @return
-     */
-    @DataSource(value = DataSourceType.Slave)
-    @RequestMapping(value = "/newnewconfig", method = RequestMethod.POST)
-    @ResponseBody
-    public String newnewconfig(@RequestParam String url,
-                               @RequestParam(defaultValue = "1") int page,
-                               @RequestParam(defaultValue = "20") int pageSize) {
-
-        String json = "";
-
-        //先手sourceSid匹配，如果沒有数据，再走原有的接口
-        //上传的url不为空
-        if (!org.apache.commons.lang3.StringUtils.isBlank(url)) {
-
-            Website website = WebsiteHelper.getWebSite(url);
-
-            String sourceSid = WebsiteHelper.getSkuIdFromUrl(website, url);
-
-            //todo 这个方法没有加缓存
-            json = getSkuListBySourceSidAndWebsite(website, sourceSid, page, pageSize);
-
-            //判断如果上面还是空的,走/cmp/sdk/cmpskus
-            if (StringUtils.isEmpty(json)) {
-
-//                SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, pageSize);
-                SearchIO sio = new SearchIO(sourceSid, "", "", website.name(), "0", null, "", page, pageSize);
-                getSioBySearch(sio);
-                json = appCmpService.sdkCmpSku(sio);
-
-            }
-        }
-
-        return json;
-    }
-
-    /**
-     * 获取PtmStdSku的参数
-     *
-     * @param pId
-     * @return
-     */
-    @RequestMapping("getStdParams")
-    public ModelAndView getStdSkuCmpParams(@RequestParam(defaultValue = "0") long pId) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("errorCode", "00000");
-        modelAndView.addObject("msg", "success");
-        Map dataMap = new HashMap();
-        //验证id是否大于10亿
-        if (pId - ConstantUtil.API_ONE_BILLION_NUMBER <= 0) {
-            //不是就拒绝
-            modelAndView.addObject("errorCode", "10000");
-            modelAndView.addObject("msg", "pId error .");
-            return modelAndView;
-        }
-        //是,根据id从solr中获取此id的stdSkuModel
-        PtmStdSkuModel ptmStdSkuModel = stdSkuIndexService.getStdSkuModelById(ApiUtils.removeBillion(pId));
-        if (ptmStdSkuModel == null) {
-            //无,返回错误信息
-            modelAndView.addObject("errorCode", "10000");
-            modelAndView.addObject("msg", "product not exist.");
-            return modelAndView;
-        } else {
-            //去参数
-            //改参数
-            Map<String, String> resultMap = new HashMap();
-            resultMap.put("Brand", ptmStdSkuModel.getBrand() == null ? "" : ptmStdSkuModel.getBrand());
-            resultMap.put("Model", ptmStdSkuModel.getModel() == null ? "" : ptmStdSkuModel.getModel());
-            resultMap.put("Price", ptmStdSkuModel.getMinPrice() + "");
-            resultMap.put("Ram", ptmStdSkuModel.getRam() >= 1024 ? ptmStdSkuModel.getRam() / 1024 + " GB" : ptmStdSkuModel.getRam() + "MB");
-            resultMap.put("Screen Size", ptmStdSkuModel.getScreen_Size() + " inch");
-            resultMap.put("Secondary Camera", ptmStdSkuModel.getSecondary_Camera() + " MP");
-            resultMap.put("Primary Camera", ptmStdSkuModel.getPrimary_Camera() + " MP");
-            resultMap.put("Internal Memory", ptmStdSkuModel.getInternal_Memory() >= 1024 ? ptmStdSkuModel.getInternal_Memory() + " GB" : ptmStdSkuModel.getInternal_Memory() + " MB");
-            resultMap.put("Battery Capacity", ptmStdSkuModel.getBattery_Capacity() + " mAh");
-            resultMap.put("Expandable Memory", ptmStdSkuModel.getExpandable_Memory() == 0 ? "Unavailable" : "Up to " + ptmStdSkuModel.getExpandable_Memory() + " GB");
-            resultMap.put("Screen Resolution", ptmStdSkuModel.getScreen_Resolution() == null ? "" : ptmStdSkuModel.getBrand());
-            resultMap.put("Operating System", ptmStdSkuModel.getOperating_System() == null ? "" : ptmStdSkuModel.getBrand());
-            resultMap.put("Network", ptmStdSkuModel.getNetwork());
-
-            //遍历去除空值
-            Set<Map.Entry<String, String>> entries = resultMap.entrySet();
-            Iterator<Map.Entry<String, String>> iterator = entries.iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<String, String> next = iterator.next();
-                String value = next.getValue();
-                if (StringUtils.isEmpty(value)) {
-                    iterator.remove();
-                    System.out.println("remove " + next.getKey());
-                }
-            }
-            dataMap.put("productParams", resultMap);
-        }
-        //有,返回
-        modelAndView.addObject("data", dataMap);
-        return modelAndView;
     }
 
     /**
