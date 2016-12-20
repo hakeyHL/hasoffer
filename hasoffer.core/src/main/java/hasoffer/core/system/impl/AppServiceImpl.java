@@ -131,6 +131,7 @@ public class AppServiceImpl implements IAppService {
     private String Q_APP_GETPRODUCTS =
             "SELECT t FROM PtmProduct t " +
                     " where 1=1 and ";
+    private List<UrmSignCoin> userSignRecord;
 
     @Override
     public AppVersion getLatestVersion(AppType appType) {
