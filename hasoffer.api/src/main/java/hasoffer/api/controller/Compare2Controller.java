@@ -409,23 +409,25 @@ public class Compare2Controller {
         Map map = new HashMap<>();
         String[] params = ConstantUtil.API_PTMSTDSKU_PARAM_MEAN_MAP.keySet().toArray(new String[]{});
 
-        List summaryParamsMapList = new ArrayList();
-        List othersParamsMapList = new ArrayList();
+        Map summaryParamsMap = new HashMap();
+        Map othersParamsMap = new HashMap();
         for (String param : params) {
-            Map<String, Boolean> parametersMap = new HashMap();
             if (StringUtils.isNotEmpty(ConstantUtil.API_PTMSTDSKU_PARAM_MEAN_MAP.get(param))) {
-                parametersMap.put(param, true);
+                if (summaryParamsMap.size() < 8) {
+                    summaryParamsMap.put(param, true);
+                } else {
+                    othersParamsMap.put(param, true);
+                }
             } else {
-                parametersMap.put(param, false);
-            }
-            if (summaryParamsMapList.size() < 8) {
-                summaryParamsMapList.add(parametersMap);
-            } else {
-                othersParamsMapList.add(parametersMap);
+                if (summaryParamsMap.size() < 8) {
+                    summaryParamsMap.put(param, false);
+                } else {
+                    othersParamsMap.put(param, false);
+                }
             }
         }
-        map.put("Summary", summaryParamsMapList);
-        map.put("Others", othersParamsMapList);
+        map.put("Summary", summaryParamsMap);
+        map.put("Others", othersParamsMap);
         modelAndView.addObject("data", map);
         return modelAndView;
     }
