@@ -41,7 +41,7 @@ public class AppCategoryController {
      *
      * @return
      */
-    @RequestMapping(value = "app/topCategory", method = RequestMethod.GET)
+    @RequestMapping(value = "app/category/topcates", method = RequestMethod.GET)
     public ModelAndView getTopCategory() {
         ModelAndView mv = new ModelAndView();
         mv.addObject("errorCode", "00000");
