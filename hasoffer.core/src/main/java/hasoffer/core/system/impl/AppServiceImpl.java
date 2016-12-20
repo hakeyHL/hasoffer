@@ -95,7 +95,7 @@ public class AppServiceImpl implements IAppService {
     private static final String Q_APP_DEAL_GET_SIMILAR =
             "SELECT t FROM AppDeal t where  t.display='1' and    " +
                     "t.expireTime >= ?0   and t.listPageImage is not null " +
-                    " order by t.dealClickCount,t.id desc  ";
+                    " order by t.dealClickCount,t.createTime desc  ";
 
 
     private static final String Q_APP_GETUSERS = "SELECT t FROM  UrmSignCoin t where t.conSignNum>1 or t.maxConSignNum > 1 ";
