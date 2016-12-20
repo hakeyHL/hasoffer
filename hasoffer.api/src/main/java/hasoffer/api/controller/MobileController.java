@@ -1,5 +1,6 @@
 package hasoffer.api.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -9,5 +10,12 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 public class MobileController {
-
+    public static void main(String[] args) {
+        StringBuilder stringBuilder = new StringBuilder();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("a", "b");
+        jsonObject.put("c", "d");
+        jsonObject.writeJSONString(stringBuilder);
+        System.out.println("1");
+    }
 }
