@@ -132,11 +132,9 @@ public class AppServiceImpl implements IAppService {
     private String Q_APP_GETPRODUCTS =
             "SELECT t FROM PtmProduct t " +
                     " where 1=1 and ";
-    private List<UrmSignCoin> userSignRecord;
 
     @Override
     public AppVersion getLatestVersion(AppType appType) {
-//        return dbm.get(AppVersion.class, 3L);
         List<AppVersion> versions = dbm.query(Q_APP_VERSION, Arrays.asList(appType));
 
         return ArrayUtils.hasObjs(versions) ? versions.get(0) : null;
