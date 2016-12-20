@@ -126,6 +126,7 @@ public class AppServiceImpl implements IAppService {
             "SELECT t FROM HasofferCoinsExchangeGift t order by t.coinPrice asc ";
 
     @Resource
+
     IDataBaseManager dbm;
 
     private String Q_APP_GETPRODUCTS =
