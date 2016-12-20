@@ -88,9 +88,9 @@ public class AppServiceImpl implements IAppService {
                     " where t.deviceId=?0";
 
     private static final String Q_APP_GETDEALS =
-            "SELECT t FROM AppDeal t where  t.display='1' and    " +
+            "SELECT t FROM AppDeal t where  t.display='1' and   " +
                     "t.expireTime >= ?0   and t.listPageImage is not null " +
-                    " order by t.weight desc,t.id desc  ";
+                    " order by t.weight desc,t.createTime desc  ";
 
     private static final String Q_APP_DEAL_GET_SIMILAR =
             "SELECT t FROM AppDeal t where  t.display='1' and    " +
