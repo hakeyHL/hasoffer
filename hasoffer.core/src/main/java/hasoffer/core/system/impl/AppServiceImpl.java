@@ -15,8 +15,6 @@ import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.urm.*;
 import hasoffer.core.system.IAppService;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,9 +28,6 @@ import java.util.*;
 @Service
 @Transactional
 public class AppServiceImpl implements IAppService {
-
-    private static final Logger logger = LoggerFactory.getLogger(AppServiceImpl.class);
-
     private static final String Q_APP_VERSION =
             "SELECT t FROM AppVersion t " +
                     " WHERE t.appType = ?0 and marketChannel != 'ZUK'" +
@@ -97,6 +92,12 @@ public class AppServiceImpl implements IAppService {
                     "t.expireTime >= ?0   and t.listPageImage is not null " +
                     " order by t.weight desc,t.id desc  ";
 
+    private static final String Q_APP_DEAL_GET_SIMILAR =
+            "SELECT t FROM AppDeal t where  t.display='1' and    " +
+                    "t.expireTime >= ?0   and t.listPageImage is not null " +
+                    " order by t.dealClickCount,t.id desc  ";
+
+
     private static final String Q_APP_GETUSERS = "SELECT t FROM  UrmSignCoin t where t.conSignNum>1 or t.maxConSignNum > 1 ";
 
     private static final String Q_APP_GETDEALS_TEMP =
@@ -130,7 +131,6 @@ public class AppServiceImpl implements IAppService {
     private String Q_APP_GETPRODUCTS =
             "SELECT t FROM PtmProduct t " +
                     " where 1=1 and ";
-    private List<UrmSignCoin> userSignRecord;
 
     @Override
     public AppVersion getLatestVersion(AppType appType) {
@@ -569,5 +569,9 @@ public class AppServiceImpl implements IAppService {
         return dbm.get(UrmUserRedeemGroup.class, id);
     }
 
+    @Override
+    public List<AppDeal> getSimilarDeals() {
+        return dbm.query(Q_APP_DEAL_GET_SIMILAR, 1, 3, Arrays.asList(new Date()));
+    }
 
 }

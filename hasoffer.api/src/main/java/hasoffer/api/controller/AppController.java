@@ -955,6 +955,7 @@ public class AppController {
     private ModelAndView getDealInfoMethod(@RequestParam String id, ModelAndView mv) {
         Map map = new HashMap();
         DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        List<DealVo> similarDealList = new ArrayList<>();
         if (deviceInfoVo != null) {
             String appVersion = deviceInfoVo.getAppVersion();
             if (!StringUtils.isEmpty(appVersion)) {
@@ -971,6 +972,18 @@ public class AppController {
                     if (appDeal != null) {
                         //获取点赞数和评论数以及该用户的点赞和点踩状态
                         getDealThuAndComNums(appDeal.getId(), map);
+
+                        //查询获得Similar Deals
+                        //生效的 3个 生成时间降序
+                        List<AppDeal> similarDeals = appService.getSimilarDeals();
+                        for (AppDeal appDeal1 : similarDeals) {
+                            DealVo dealvo = new DealVo();
+                            setDeal(appDeal1, dealvo);
+                            similarDealList.add(dealvo);
+                        }
+
+                        map.put("similarDeals", similarDealList);
+
                         if (vsion < 23) {
                             map.put("image", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
                             map.put("title", appDeal.getTitle());
