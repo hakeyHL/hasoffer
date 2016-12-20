@@ -425,7 +425,7 @@ public class DealServiceImpl implements IDealService {
 
     @Override
     public PageableResult<AppDeal> getDealsByTitle(String keyword, int page, int size) {
-        return dbm.queryPage(Q_DEALS_LIKE_TITLE, page, size, Arrays.asList(keyword));
+        return dbm.queryPage(Q_DEALS_LIKE_TITLE, page, size, Arrays.asList("%" + keyword + "%"));
     }
 
 }
