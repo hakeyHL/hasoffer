@@ -48,7 +48,8 @@ public class DealServiceImpl implements IDealService {
     //手动导入deal的sql
 //    private static final String IMPORT_SQL = "insert into appdeal(website, title, linkUrl, expireTime, priceDescription ,description, createTime,  push ,display ,imageUrl,discount,dealCategoryId,dealClickCount,appdealSource,ptmcmpskuid) values(?,?, ?, ?, ?, ? ,?, ?, ?, ?,?,?,?,'MANUAL_INPUT',0)";
 
-    private static final String Q_DEALS = "SELECT t FROM AppDeal t";
+    private static final String Q_DEALS = "SELECT t FROM AppDeal t ";
+    private static final String Q_DEALS_LIKE_TITLE = "SELECT t FROM AppDeal t where t.title like ?0";
     private static final String Q_THUMB_UIDDID = "SELECT t FROM AppDealThumb t where t.userId=?0 and t.dealId=?1";
     private static final String Q_THUMB_TOTAL = "SELECT sum(t.action) FROM AppDealThumb t where t.dealId=?0";
     private static final String Q_COMMENTS_DEALID = "SELECT t FROM AppDealComment t where t.dealId=?0 order by t.createTime desc ";
@@ -420,6 +421,11 @@ public class DealServiceImpl implements IDealService {
     @Override
     public PageableResult<AppDealComment> getPageAbleDealComment(Long dealId, int page, int pageSize) {
         return dbm.queryPage(Q_COMMENTS_DEALID, page, pageSize, Arrays.asList(dealId));
+    }
+
+    @Override
+    public PageableResult<AppDeal> getDealsByTitle(String keyword, int page, int size) {
+        return dbm.queryPage(Q_DEALS_LIKE_TITLE, page, size, Arrays.asList(keyword));
     }
 
 }
