@@ -1,5 +1,7 @@
 package hasoffer.core.bo.product;
 
+import hasoffer.core.persistence.po.ptm.PtmCategory;
+
 import java.util.List;
 
 /**
@@ -9,13 +11,13 @@ import java.util.List;
 public class CategoryVo {
 
     List<CategoryVo> categorys;
-    private String  name;
-    private  String image;
+    private String name;
+    private String image;
     private Long id;
     private int hasChildren;
-    private  Long  parentId;
-    private  int rank;
-    private  int  level;
+    private Long parentId;
+    private int rank;
+    private int level;
 
     public CategoryVo() {
     }
@@ -28,6 +30,16 @@ public class CategoryVo {
         this.parentId = parentId;
         this.rank = rank;
         this.level = level;
+    }
+
+    public CategoryVo(PtmCategory ptmCategory) {
+        this.name = ptmCategory.getName();
+        this.image = ptmCategory.getImageUrl();
+        this.id = ptmCategory.getId();
+        this.parentId = ptmCategory.getParentId();
+        this.rank = ptmCategory.getRank();
+        this.level = ptmCategory.getLevel();
+        this.hasChildren = 1;
     }
 
     public List<CategoryVo> getCategorys() {
