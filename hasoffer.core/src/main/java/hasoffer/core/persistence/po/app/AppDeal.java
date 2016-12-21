@@ -68,6 +68,8 @@ public class AppDeal implements Identifiable<Long> {
     private Float presentPrice;//现价
     private Integer dealThumbNumber = new Random().nextInt(10); //deal 点赞数
 
+    private String oriLinkUrl;//deal站抓取的deal需要保存最原始的link
+
     //保留空参构造
     public AppDeal() {
     }
@@ -250,41 +252,50 @@ public class AppDeal implements Identifiable<Long> {
         this.dealThumbNumber = dealThumbNumber;
     }
 
+    public String getOriLinkUrl() {
+        return oriLinkUrl;
+    }
+
+    public void setOriLinkUrl(String oriLinkUrl) {
+        this.oriLinkUrl = oriLinkUrl;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        AppDeal appDeal = (AppDeal) o;
+        AppDeal deal = (AppDeal) o;
 
-        if (weight != appDeal.weight) return false;
-        if (push != appDeal.push) return false;
-        if (display != appDeal.display) return false;
-        if (discount != appDeal.discount) return false;
-        if (ptmcmpskuid != appDeal.ptmcmpskuid) return false;
-        if (id != null ? !id.equals(appDeal.id) : appDeal.id != null) return false;
-        if (website != appDeal.website) return false;
-        if (appdealSource != appDeal.appdealSource) return false;
-        if (title != null ? !title.equals(appDeal.title) : appDeal.title != null) return false;
-        if (linkUrl != null ? !linkUrl.equals(appDeal.linkUrl) : appDeal.linkUrl != null) return false;
-        if (imageUrl != null ? !imageUrl.equals(appDeal.imageUrl) : appDeal.imageUrl != null) return false;
-        if (createTime != null ? !createTime.equals(appDeal.createTime) : appDeal.createTime != null) return false;
-        if (expireTime != null ? !expireTime.equals(appDeal.expireTime) : appDeal.expireTime != null) return false;
-        if (description != null ? !description.equals(appDeal.description) : appDeal.description != null) return false;
-        if (priceDescription != null ? !priceDescription.equals(appDeal.priceDescription) : appDeal.priceDescription != null)
+        if (weight != deal.weight) return false;
+        if (push != deal.push) return false;
+        if (display != deal.display) return false;
+        if (discount != deal.discount) return false;
+        if (ptmcmpskuid != deal.ptmcmpskuid) return false;
+        if (id != null ? !id.equals(deal.id) : deal.id != null) return false;
+        if (website != deal.website) return false;
+        if (appdealSource != deal.appdealSource) return false;
+        if (title != null ? !title.equals(deal.title) : deal.title != null) return false;
+        if (linkUrl != null ? !linkUrl.equals(deal.linkUrl) : deal.linkUrl != null) return false;
+        if (imageUrl != null ? !imageUrl.equals(deal.imageUrl) : deal.imageUrl != null) return false;
+        if (createTime != null ? !createTime.equals(deal.createTime) : deal.createTime != null) return false;
+        if (expireTime != null ? !expireTime.equals(deal.expireTime) : deal.expireTime != null) return false;
+        if (description != null ? !description.equals(deal.description) : deal.description != null) return false;
+        if (priceDescription != null ? !priceDescription.equals(deal.priceDescription) : deal.priceDescription != null)
             return false;
-        if (listPageImage != null ? !listPageImage.equals(appDeal.listPageImage) : appDeal.listPageImage != null)
+        if (listPageImage != null ? !listPageImage.equals(deal.listPageImage) : deal.listPageImage != null)
             return false;
-        if (infoPageImage != null ? !infoPageImage.equals(appDeal.infoPageImage) : appDeal.infoPageImage != null)
+        if (infoPageImage != null ? !infoPageImage.equals(deal.infoPageImage) : deal.infoPageImage != null)
             return false;
-        if (dealClickCount != null ? !dealClickCount.equals(appDeal.dealClickCount) : appDeal.dealClickCount != null)
+        if (dealClickCount != null ? !dealClickCount.equals(deal.dealClickCount) : deal.dealClickCount != null)
             return false;
-        if (dealCategoryId != null ? !dealCategoryId.equals(appDeal.dealCategoryId) : appDeal.dealCategoryId != null)
+        if (dealCategoryId != null ? !dealCategoryId.equals(deal.dealCategoryId) : deal.dealCategoryId != null)
             return false;
-        if (originPrice != null ? !originPrice.equals(appDeal.originPrice) : appDeal.originPrice != null) return false;
-        if (presentPrice != null ? !presentPrice.equals(appDeal.presentPrice) : appDeal.presentPrice != null)
+        if (originPrice != null ? !originPrice.equals(deal.originPrice) : deal.originPrice != null) return false;
+        if (presentPrice != null ? !presentPrice.equals(deal.presentPrice) : deal.presentPrice != null) return false;
+        if (dealThumbNumber != null ? !dealThumbNumber.equals(deal.dealThumbNumber) : deal.dealThumbNumber != null)
             return false;
-        return dealThumbNumber != null ? dealThumbNumber.equals(appDeal.dealThumbNumber) : appDeal.dealThumbNumber == null;
+        return !(oriLinkUrl != null ? !oriLinkUrl.equals(deal.oriLinkUrl) : deal.oriLinkUrl != null);
 
     }
 
@@ -312,6 +323,7 @@ public class AppDeal implements Identifiable<Long> {
         result = 31 * result + (originPrice != null ? originPrice.hashCode() : 0);
         result = 31 * result + (presentPrice != null ? presentPrice.hashCode() : 0);
         result = 31 * result + (dealThumbNumber != null ? dealThumbNumber.hashCode() : 0);
+        result = 31 * result + (oriLinkUrl != null ? oriLinkUrl.hashCode() : 0);
         return result;
     }
 }
