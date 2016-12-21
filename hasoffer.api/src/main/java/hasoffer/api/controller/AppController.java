@@ -236,6 +236,8 @@ public class AppController {
         AppVersion appVersion = null;
         if (marketChannel != null && marketChannel.name().equals("ZUK")) {
             appVersion = appService.getLatestVersion(marketChannel, appType);
+        } else if (marketChannel != null && marketChannel.name().equals("SCLITE")) {
+            appVersion = appService.getLatestVersion(marketChannel, appType);
         } else {
             appVersion = appService.getLatestVersion(appType);
         }
