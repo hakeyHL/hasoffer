@@ -143,6 +143,7 @@
                 <thead>
                 <tr>
                     <td><input type="checkbox" id="checkAll"/>全选</td>
+                    <td>ID</td>
                     <td>创建时间</td>
                     <td>Deal来源网站</td>
                     <td>Deal图片</td>
@@ -167,6 +168,7 @@
                 <c:forEach items="${datas}" var="data">
                     <tr>
                         <td><input type="checkbox" name="subBox" value="${data.id}"/></td>
+                        <td>${data.id}</td>
                         <td>${data.createTime}</td>
                         <td>${data.website}</td>
                         <td>

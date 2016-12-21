@@ -5,10 +5,12 @@ import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmStdSku;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.IPtmStdSkuService;
+import hasoffer.core.redis.ICacheService;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -19,11 +21,13 @@ public class PtmProductPriceUpdateWorker implements Runnable {
     private IDataBaseManager dbm;
     private IProductService productService;
     private IPtmStdSkuService ptmStdSkuService;
+    private ICacheService cacheService;
 
-    public PtmProductPriceUpdateWorker(IDataBaseManager dbm, IProductService productService, IPtmStdSkuService ptmStdSkuService) {
+    public PtmProductPriceUpdateWorker(IDataBaseManager dbm, IProductService productService, IPtmStdSkuService ptmStdSkuService, ICacheService cacheService) {
         this.dbm = dbm;
         this.productService = productService;
         this.ptmStdSkuService = ptmStdSkuService;
+        this.cacheService = cacheService;
     }
 
     @Override
@@ -57,6 +61,22 @@ public class PtmProductPriceUpdateWorker implements Runnable {
                     productService.updatePtmProductPrice(productid);
                 } catch (Exception e) {
                     System.out.println("update success then reimport product to solr fail for " + productid);
+                }
+
+                //清除商品缓存
+                cacheService.del("PRODUCT_" + productid);
+                //清除sku缓存        PRODUCT__listPagedCmpSkus_3198_1_10
+                Set<String> keys = cacheService.keys("PRODUCT__listPagedCmpSkus_" + productid + "_*");
+
+                for (String key : keys) {
+                    cacheService.del(key);
+                }
+
+                //清除topselling缓存        PRODUCT__listPagedCmpSkus_TopSelling_0_20
+                Set<String> topsellingCache = cacheService.keys("PRODUCT__listPagedCmpSkus_TopSelling" + "_*");
+
+                for (String topCache : topsellingCache) {
+                    cacheService.del(topCache);
                 }
 
             }
