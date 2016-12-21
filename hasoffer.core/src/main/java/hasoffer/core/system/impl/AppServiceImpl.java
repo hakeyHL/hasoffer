@@ -501,8 +501,14 @@ public class AppServiceImpl implements IAppService {
 
     private String getLiveDemo(Website website, MarketChannel marketChannel, String deviceId) {
         Map<Website, String> liveDemoMap = new HashMap<>();
+        Random random = new Random();
+        String flipkartAffid = AffliIdHelper.FLIKART_YEAHMOBI_FLIDS[random.nextInt(AffliIdHelper.FLIKART_YEAHMOBI_FLIDS.length)];
         String extParam1 = AffliIdHelper.getMarketId(marketChannel);
-        liveDemoMap.put(Website.FLIPKART, "http://dl.flipkart.com/dl/apple-iphone-5s/p/itme8ra4f4twtsva?affid=affiliate357&affExtParam1=" + extParam1 + "&affExtParam2=" + extParam1 + "_" + deviceId + "_0");
+        if (Arrays.asList(AffliIdHelper.FLIKART_YEAHMOBI_FLIDS).contains(flipkartAffid)) {
+            String[] affExtParams = new String[]{"103662", "103650", "103647", "103643"};
+            extParam1 = affExtParams[random.nextInt(affExtParams.length)];
+        }
+        liveDemoMap.put(Website.FLIPKART, "http://dl.flipkart.com/dl/apple-iphone-5s/p/itme8ra4f4twtsva?affid=" + flipkartAffid + "&affExtParam1=" + extParam1 + "&affExtParam2=" + extParam1 + "_" + deviceId + "_0");
         liveDemoMap.put(Website.SNAPDEAL, "android-app://com.snapdeal.main/snapdeal/m.snapdeal.com/product/apple-iphone-5s-16-gb/1204769399?aff_id=82856&utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_sub=" + extParam1 + "&aff_sub2=" + extParam1 + "_" + deviceId + "_0");
         liveDemoMap.put(Website.SHOPCLUES, "http://www.shopclues.com/apple-iphone-5s-16gb-44.html?ty=0&id=none&mcid=aff&utm_source=Hasoffer&OfferId=15");
         //liveDemoMap.put(Website.EBAY, "http://genlin.ss");

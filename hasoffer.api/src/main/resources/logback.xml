@@ -191,8 +191,8 @@
         <appender-ref ref="AppUserFileOut"/>
     </logger>
 
-    <logger name="IndexUrl" level="DEBUG">
-        <appender-ref ref="hasoffer.IndexUrl"/>
+    <logger name="hasoffer.IndexUrl" level="DEBUG">
+        <appender-ref ref="IndexUrlFileOut"/>
     </logger>
 
     <!-- Hibernate SQL -->
