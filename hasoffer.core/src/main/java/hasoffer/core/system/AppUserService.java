@@ -16,4 +16,6 @@ public interface AppUserService {
     UrmUser getUrmUserByUserNameAndPwd(String userName, String passwd);
 
     void updateUrmUser(UrmUser urmUser);
+
+    UrmUser getUrmUserByUserNameAndType(String userName, int type);
 }

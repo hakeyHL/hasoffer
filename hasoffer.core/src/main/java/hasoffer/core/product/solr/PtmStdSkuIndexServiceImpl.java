@@ -179,12 +179,12 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
         int page = searchCriteria.getPage();
         int size = searchCriteria.getPageSize();
         fqList.add(new FilterQuery("cate" + level, String.valueOf(cateId)));
-        addQuerParams2List(searchCriteria, fqList);
-        FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
 
         int priceFrom = searchCriteria.getPriceFrom(), priceTo = searchCriteria.getPriceTo();
         String priceFromStr = "*", priceToStr = "*";
         ApiUtils.setPriceSearchScope(fqList, priceFrom, priceTo, priceToStr);
+        addQuerParams2List(searchCriteria, fqList);
+        FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
         SearchResult<PtmStdSkuModel> sr = searchObjs(queryString, fqs, null, pivotFacets, page <= 1 ? 1 : page, size, true);
         //缓存以及从缓存中取
         Map<String, List<NameValue>> pivotFieldVals = new HashMap<>();

@@ -105,25 +105,40 @@
     <div class="col-lg-12" style="margin: 10px"></div>
 
 
-    <div class="col-lg-2">
+    <div class="col-lg-8">
         <div name="appType" class="input-group">
             <span class="input-group-addon">deal类型</span>
 
             <form id="reListDealByType" action="/deal/list" method="get">
-                <select id="typeSelect" class="form-control" name="type" onchange="reListDealByType()">
-                    <option
-                            <c:if test="${type==0}">selected</c:if> value="0">选择类型
-                    </option>
-                    <option
-                            <c:if test="${type==1}">selected</c:if> value="1">手动导入
-                    </option>
-                    <option
-                            <c:if test="${type==2}">selected</c:if> value="2">降价生成
-                    </option>
-                    <option
-                            <c:if test="${type==3}">selected</c:if> value="3">DEAL网站
-                    </option>
-                </select>
+                <div class="col-lg-2">
+                    <select id="typeSelect" class="form-control" name="type" onchange="reListDealByType()">
+                        <option
+                                <c:if test="${type==0}">selected</c:if> value="0">选择类型
+                        </option>
+                        <option
+                                <c:if test="${type==1}">selected</c:if> value="1">手动导入
+                        </option>
+                        <option
+                                <c:if test="${type==2}">selected</c:if> value="2">降价生成
+                        </option>
+                        <option
+                                <c:if test="${type==3}">selected</c:if> value="3">DEAL网站
+                        </option>
+                    </select>
+                </div>
+                <div class="col-lg-4">
+                    <span class="input-group-addon">关键字</span>
+                    <input type="text" name="keyword" class="form-control" placeholder="Search for..."
+                           value="${page.pageParams.keyword}">
+                </div>
+                <div class="col-lg-2">
+                    <span class="input-group-addon">dealId</span>
+                    <input type="text" name="keyId" class="form-control" placeholder="deal id..."
+                           value="${page.pageParams.keyId}">
+                </div>
+                <div class="col-lg-2">
+                    <button type="submit" class="btn btn-primary">查询</button>
+                </div>
             </form>
         </div>
     </div>
@@ -143,6 +158,7 @@
                 <thead>
                 <tr>
                     <td><input type="checkbox" id="checkAll"/>全选</td>
+                    <td>ID</td>
                     <td>创建时间</td>
                     <td>Deal来源网站</td>
                     <td>Deal图片</td>
@@ -167,6 +183,7 @@
                 <c:forEach items="${datas}" var="data">
                     <tr>
                         <td><input type="checkbox" name="subBox" value="${data.id}"/></td>
+                        <td>${data.id}</td>
                         <td>${data.createTime}</td>
                         <td>${data.website}</td>
                         <td>

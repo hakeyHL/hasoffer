@@ -12,8 +12,9 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import javax.annotation.Resource;
 import java.util.Date;
 
-public class OrderSAsisJobBean extends QuartzJobBean {
-    private static Logger logger = LoggerFactory.getLogger(OrderSAsisJobBean.class);
+public class OrderSAJobBean extends QuartzJobBean {
+
+    private static Logger logger = LoggerFactory.getLogger(OrderSAJobBean.class);
 
     @Resource
     IOrderStatsAnalysisService orderStatsAnalysisService;

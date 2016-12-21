@@ -91,4 +91,6 @@ public interface IAppService {
     int addUserRedeemGroup(List<UrmUserRedeemGroup> groupList);
 
     UrmUserRedeemGroup getUrmRedeemGroupById(Long id);
+
+    List<AppDeal> getSimilarDeals();
 }

@@ -17,6 +17,7 @@ import java.util.List;
 @Service
 public class AppUserServiceImpl implements AppUserService {
     private final String API_URMUSER_GET_BY_EMAIL = "select t from UrmUser t where t.email=?0 and type=1 ";
+    private final String API_URMUSER_GET_BY_USERNAME_TYPE = "select t from UrmUser t where t.userName=?0 and type=?1";
     private final String API_URMUSER_GET_BY_USERNAME_PASSWD = "select t from UrmUser t where t.userName=?0 and t.passwd=?1 and type=1";
     @Resource
     IDataBaseManager dbm;
@@ -51,5 +52,10 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public void updateUrmUser(UrmUser urmUser) {
         dbm.update(urmUser);
+    }
+
+    @Override
+    public UrmUser getUrmUserByUserNameAndType(String userName, int type) {
+        return dbm.querySingle(API_URMUSER_GET_BY_USERNAME_TYPE, Arrays.asList(userName, type));
     }
 }

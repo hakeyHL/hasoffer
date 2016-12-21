@@ -80,4 +80,6 @@ public interface IDealService {
     Long getTotalDealThumb(long dealId);
 
     PageableResult<AppDealComment> getPageAbleDealComment(Long dealId, int page, int pageSize);
+
+    PageableResult<AppDeal> getDealsByTitle(String keyword, int page, int size);
 }

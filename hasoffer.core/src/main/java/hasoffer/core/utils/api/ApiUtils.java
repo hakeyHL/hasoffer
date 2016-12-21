@@ -7,12 +7,12 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.core.app.AppCategoryService;
 import hasoffer.core.app.vo.BackDetailVo;
 import hasoffer.core.app.vo.CmpProductListVo;
 import hasoffer.core.app.vo.OrderVo;
 import hasoffer.core.app.vo.ProductListVo;
 import hasoffer.core.bo.product.CategoryVo;
-import hasoffer.core.cache.AppCacheManager;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
@@ -62,7 +62,7 @@ public class ApiUtils {
     @Resource
     private ProductCacheManager productCacheManager;
     @Resource
-    private AppCacheManager appCacheManager;
+    private AppCategoryService appCategoryService;
 
     public static void filterProducts(List productList, String keyword) {
         if (productList != null && productList.size() > 0) {
@@ -342,85 +342,6 @@ public class ApiUtils {
     }
 
 
-    private static void replacePivos(List<NameValue<String, Long>> value) {
-        Iterator<NameValue<String, Long>> brandIterator = value.iterator();
-        while (brandIterator.hasNext()) {
-            NameValue<String, Long> next = brandIterator.next();
-            String name = next.getName();
-            if (name.equalsIgnoreCase("SamSung")) {
-                next.setName("1");
-                continue;
-            } else if (name.equalsIgnoreCase("1")) {
-                next.setName("SamSung");
-                continue;
-            }
-
-
-            if (name.equalsIgnoreCase("Xiaomi")) {
-                next.setName("2");
-                continue;
-            } else if (name.equalsIgnoreCase("2")) {
-                next.setName("Xiaomi");
-                continue;
-            }
-
-
-            if (name.equalsIgnoreCase("Motorola")) {
-                next.setName("3");
-                continue;
-            } else if (name.equalsIgnoreCase("3")) {
-                next.setName("Motorola");
-                continue;
-            }
-
-
-            if (name.equalsIgnoreCase("Lenovo")) {
-                next.setName("4");
-                continue;
-            } else if (name.equalsIgnoreCase("4")) {
-                next.setName("Lenovo");
-                continue;
-            }
-
-
-            if (name.equalsIgnoreCase("Huawei")) {
-                next.setName("5");
-                continue;
-            } else if (name.equalsIgnoreCase("5")) {
-                next.setName("Huawei");
-                continue;
-            }
-
-
-            if (name.equalsIgnoreCase("Micromax")) {
-                next.setName("6");
-                continue;
-            } else if (name.equalsIgnoreCase("6")) {
-                next.setName("Micromax");
-                continue;
-            }
-
-
-            if (name.equalsIgnoreCase("Lava")) {
-                next.setName("7");
-                continue;
-            } else if (name.equalsIgnoreCase("7")) {
-                next.setName("Lava");
-                continue;
-            }
-
-
-            if (name.equalsIgnoreCase("Gionee")) {
-                next.setName("8");
-                continue;
-            } else if (name.equalsIgnoreCase("8")) {
-                next.setName("Gionee");
-                continue;
-            }
-
-
-        }
-    }
 
 
     public static PageableResult parseString2Pageable(String jsonString, Class classzz) {
@@ -765,6 +686,9 @@ public class ApiUtils {
                     ProductModel2 ptmProduct = ptmList.next();
                     ProductListVo productListVo = new ProductListVo();
                     productListVo.setId(ptmProduct.getId());
+                    if (ptmProduct.getCate2() == 5l) {
+                        productListVo.setComparable(true);
+                    }
                     productListVo.setImageUrl(productCacheManager.getProductMasterImageUrl(ptmProduct.getId()));
                     productListVo.setName(ptmProduct.getTitle());
                     productListVo.setPrice(Math.round(ptmProduct.getMinPrice()));
@@ -779,6 +703,9 @@ public class ApiUtils {
                     PtmStdSkuModel ptmStdSkuModel = ptmList.next();
                     ProductListVo productListVo = new ProductListVo();
                     productListVo.setId(ptmStdSkuModel.getId());
+                    if (ptmStdSkuModel.getCate2() == 5l) {
+                        productListVo.setComparable(true);
+                    }
                     productListVo.setImageUrl(productCacheManager.getPtmStdSkuImageUrl(ApiUtils.removeBillion(ptmStdSkuModel.getId())));
                     productListVo.setName(ptmStdSkuModel.getTitle());
                     productListVo.setPrice(Math.round(ptmStdSkuModel.getMinPrice()));
@@ -841,7 +768,7 @@ public class ApiUtils {
                     Long cateId = Long.valueOf(nameValue.getName() + "");
                     //可能是二级也可能是三级 ,二级的放一块,三级的放一块
                     if (cateId > 0) {
-                        PtmCategory ptmCategory = appCacheManager.getCategoryById(cateId);
+                        PtmCategory ptmCategory = appCategoryService.getCategoryById(cateId);
                         if (ptmCategory != null && ptmCategory.getLevel() == 2) {
                             //处理二级类目
                             CategoryVo categoryVo = getCategoryVo(ptmCategory);
@@ -856,7 +783,7 @@ public class ApiUtils {
             }
             //获取到类目id appCacheManager.getCategorys(categoryId);
             //先获取一级类目列表
-            List<CategoryVo> firstCategoryList = appCacheManager.getCategorys("");
+            List<CategoryVo> firstCategoryList = appCategoryService.getCategorys("");
             //对二级类目按照rank排序
             getSortedCateVoListByClicCountAsc(secondCategoryList);
 

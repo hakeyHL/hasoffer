@@ -77,12 +77,16 @@ public class UpdateStateService {
         return updateStateDao.selectByDate(updateStr);
     }
 
-    public List<UpdateStateDMO> selectStats(String queryDay, String taskTarget) {
-        return updateStateDao.selectStats(queryDay, taskTarget);
+    public List<UpdateStateDMO> selectStats(String queryDay, String taskTarget, String webSite) {
+        return updateStateDao.selectStats(queryDay, taskTarget, webSite);
     }
 
     public List<TaskTarget> selectTaskTarget() {
         return Arrays.asList(TaskTarget.values());
+    }
+
+    public List<WebSite> selectWebSite() {
+        return Arrays.asList(WebSite.values());
     }
 
     public enum TaskTarget {
@@ -94,7 +98,7 @@ public class UpdateStateService {
         LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5
     }
 
-    enum WebSite {
+    public enum WebSite {
         SNAPDEAL, VOONIK, FLIPKART, AMAZON, PAYTM, INFIBEAM, JABONG, EBAY, SHOPCLUES
     }
 

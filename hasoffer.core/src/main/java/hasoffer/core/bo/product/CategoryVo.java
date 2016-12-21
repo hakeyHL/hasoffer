@@ -8,6 +8,7 @@ import java.util.List;
  */
 public class CategoryVo {
 
+    List<CategoryVo> categorys;
     private String  name;
     private  String image;
     private Long id;
@@ -16,7 +17,18 @@ public class CategoryVo {
     private  int rank;
     private  int  level;
 
-    List<CategoryVo> categorys;
+    public CategoryVo() {
+    }
+
+    public CategoryVo(Long id, String name, String image, int hasChildren, Long parentId, int rank, int level) {
+        this.name = name;
+        this.image = image;
+        this.id = id;
+        this.hasChildren = hasChildren;
+        this.parentId = parentId;
+        this.rank = rank;
+        this.level = level;
+    }
 
     public List<CategoryVo> getCategorys() {
         return categorys;
