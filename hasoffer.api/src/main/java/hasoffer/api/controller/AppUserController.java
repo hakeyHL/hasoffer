@@ -528,10 +528,11 @@ public class AppUserController {
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "success");
         //用户名为邮箱
+        //现在用户名只能是邮箱
         if (StringUtils.isEmpty(passwd)) {
             //拒绝
             modelAndView.addObject("errorCode", "10000");
-            modelAndView.addObject("msg", "passwd can not be empty .");
+            modelAndView.addObject("msg", "password is required .");
             return modelAndView;
         }
         Map resultMap = new HashMap();
@@ -542,22 +543,19 @@ public class AppUserController {
                 if (StringUtils.isEmpty(email)) {
                     //拒绝
                     modelAndView.addObject("errorCode", "10000");
-                    modelAndView.addObject("msg", "email can not be empty .");
-                    modelAndView.addObject("data", resultMap);
+                    modelAndView.addObject("msg", "email is required .");
                     return modelAndView;
                 }
                 if (!ApiUtils.emailCheck(email)) {
                     modelAndView.addObject("errorCode", "10000");
-                    modelAndView.addObject("msg", "email illegal.");
-                    modelAndView.addObject("data", resultMap);
+                    modelAndView.addObject("msg", "Please enter a valid email.");
                     return modelAndView;
                 }
                 UrmUser urmUser = appUserService.getUrmUserByEmail(email);
                 if (urmUser != null) {
                     //已存在,拒绝
                     modelAndView.addObject("errorCode", "10000");
-                    modelAndView.addObject("msg", "email had registered.");
-                    modelAndView.addObject("data", resultMap);
+                    modelAndView.addObject("msg", "The mail has been registered");
                     return modelAndView;
                 }
                 //添加
@@ -574,29 +572,45 @@ public class AppUserController {
                 } catch (Exception e) {
                     System.out.println("add user failed ." + e.getMessage());
                     modelAndView.addObject("errorCode", "10000");
-                    modelAndView.addObject("msg", "add user failed ,please try again later .");
+                    //注册失败
+                    modelAndView.addObject("msg", "Sign up failed,Please try again.");
+                    return modelAndView;
                 }
-                modelAndView.addObject("data", resultMap);
-                return modelAndView;
             case 1:
-                //登录
+                //登录,用户名现在是邮箱
+                if (!ApiUtils.emailCheck(userName)) {
+                    modelAndView.addObject("errorCode", "10000");
+                    modelAndView.addObject("msg", "Please enter a valid email");
+                    return modelAndView;
+                }
                 if (StringUtils.isEmpty(userName)) {
                     //拒绝
                     modelAndView.addObject("errorCode", "10000");
-                    modelAndView.addObject("msg", "userName can not be empty .");
+                    modelAndView.addObject("msg", "email can not be empty .");
+                    return modelAndView;
                 }
-                //按照用户名和密码与去搜索
-                UrmUser authedUrmUser = appUserService.getUrmUserByUserNameAndPwd(userName, Md5Utils.md5AsBase64(passwd.getBytes()));
+                UrmUser authedUrmUser;
+                //如果是登录,但是是未注册的邮箱,应该显示 The mail is not registered.
+                //按照用户名和type去搜索
+                authedUrmUser = appUserService.getUrmUserByUserNameAndType(userName, 1);
                 if (authedUrmUser == null) {
                     modelAndView.addObject("errorCode", "10000");
-                    modelAndView.addObject("msg", "userName or password  are not corrected.");
+                    modelAndView.addObject("msg", "The mail is not registered.");
+                    return modelAndView;
                 } else {
-                    authedUrmUser.setUserToken(UUID.randomUUID().toString());
-                    appUserService.updateUrmUser(authedUrmUser);
-                    resultMap.put("userToken", authedUrmUser.getUserToken());
+                    //按照用户名和密码与去搜索
+                    //登录失败 Sign in failed,Please try again. , 暂时应该用不到
+                    authedUrmUser = appUserService.getUrmUserByUserNameAndPwd(userName, Md5Utils.md5AsBase64(passwd.getBytes()));
+                    if (authedUrmUser == null) {
+                        modelAndView.addObject("errorCode", "10000");
+                        modelAndView.addObject("msg", "The mail and password are inconsistent");
+                        return modelAndView;
+                    } else {
+                        authedUrmUser.setUserToken(UUID.randomUUID().toString());
+                        appUserService.updateUrmUser(authedUrmUser);
+                        resultMap.put("userToken", authedUrmUser.getUserToken());
+                    }
                 }
-                modelAndView.addObject("data", resultMap);
-                return modelAndView;
             default:
         }
         modelAndView.addObject("data", resultMap);
