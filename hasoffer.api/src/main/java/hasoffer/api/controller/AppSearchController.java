@@ -4,6 +4,7 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.core.app.AppSearchService;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.utils.api.ApiUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -71,6 +72,55 @@ public class AppSearchController {
         }
         map.put("product", ptmStdSkuList);
         //4. 返回结果
+        modelAndView.addObject("data", map);
+        return modelAndView;
+    }
+
+    /**
+     * 获取筛选参数
+     *
+     * @param searchCriteria
+     * @return
+     */
+    @RequestMapping("filterParams")
+    public ModelAndView getFilterParams(SearchCriteria searchCriteria) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("errorCode", "00000");
+        modelAndView.addObject("msg", "success");
+        Map map = new HashMap<>();
+        map.put("access", false);
+        //1. 正确的逻辑是按照facet参数查询有没有结果来告知是否可以参数筛选
+        //2. 现在是只是类目id是5,级别是2的筛选
+        if (StringUtils.isEmpty(searchCriteria.getCategoryId()) || searchCriteria.getLevel() < 1) {
+            modelAndView.addObject("errorCode", "10000");
+            modelAndView.addObject("msg", "filed , categoryId or level required.");
+            return modelAndView;
+        }
+
+        if (!"5".equals(searchCriteria.getCategoryId()) && searchCriteria.getLevel() != 2) {
+            modelAndView.addObject("errorCode", "10000");
+            modelAndView.addObject("msg", "filed , categoryId or level not accessed.");
+            return modelAndView;
+        }
+        // 关键词为空也拒绝
+        if (StringUtils.isEmpty(searchCriteria.getKeyword())) {
+            modelAndView.addObject("errorCode", "10000");
+            modelAndView.addObject("msg", "filed , keyword is required.");
+            return modelAndView;
+        }
+        //3. 在关键词搜索、筛选时预先放入缓存,在这里获取
+        searchCriteria.setPivotFields(Arrays.asList("Network",
+                "Screen_Resolution", "Operating_System", "queryRam",
+                "queryScreenSize", "querySecondaryCamera",
+                "queryBatteryCapacity", "queryPrimaryCamera",
+                "queryInternalMemory", "brand"));
+
+        PageableResult pageableResult = appSearchService.filterByParams(searchCriteria);
+        if (pageableResult != null && pageableResult.getPivotFieldVals() != null && pageableResult.getPivotFieldVals().size() > 0) {
+            map.put("access", true);
+            map.put("pivos", pageableResult.getPivotFieldVals());
+            ApiUtils.resolvePivotFields(map, pageableResult, pageableResult.getPivotFieldVals());
+        }
         modelAndView.addObject("data", map);
         return modelAndView;
     }
