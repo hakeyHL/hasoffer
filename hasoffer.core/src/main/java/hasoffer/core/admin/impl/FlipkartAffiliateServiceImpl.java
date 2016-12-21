@@ -41,24 +41,24 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
     @Resource
     private IUrmAffAccountService urmAffAccountService;
 
-    private static MarketChannel getChannelByAffId(String affId) {
-        if (affId == null) {
-            return MarketChannel.NONE;
-        }
-        if (Arrays.asList(AffliIdHelper.FLIKART_SHANCHUAN_FLIDS).contains(affId)) {
-            return MarketChannel.SHANCHUAN;
-        } else if (Arrays.asList(AffliIdHelper.FLIKART_NINEAPPS_FLIDS).contains(affId)) {
-            return MarketChannel.NINEAPPS;
-        } else if (Arrays.asList(AffliIdHelper.FLIKART_LEO_FLIDS).contains(affId)) {
-            return MarketChannel.LEO;
-        } else if (Arrays.asList(AffliIdHelper.FLIKART_GOOGLEPLAY_FLIDS).contains(affId)) {
-            return MarketChannel.GOOGLEPLAY;
-        } else if (Arrays.asList(AffliIdHelper.FLIKART_ZUK_FLIDS).contains(affId)) {
-            return MarketChannel.ZUK;
-        }
-        return MarketChannel.NONE;
-
-    }
+    //private static MarketChannel getChannelByAffId(String affId) {
+    //    if (affId == null) {
+    //        return MarketChannel.NONE;
+    //    }
+    //    if (Arrays.asList(AffliIdHelper.FLIKART_SHANCHUAN_FLIDS).contains(affId)) {
+    //        return MarketChannel.SHANCHUAN;
+    //    } else if (Arrays.asList(AffliIdHelper.FLIKART_NINEAPPS_FLIDS).contains(affId)) {
+    //        return MarketChannel.NINEAPPS;
+    //    } else if (Arrays.asList(AffliIdHelper.FLIKART_LEO_FLIDS).contains(affId)) {
+    //        return MarketChannel.LEO;
+    //    } else if (Arrays.asList(AffliIdHelper.FLIKART_GOOGLEPLAY_FLIDS).contains(affId)) {
+    //        return MarketChannel.GOOGLEPLAY;
+    //    } else if (Arrays.asList(AffliIdHelper.FLIKART_ZUK_FLIDS).contains(affId)) {
+    //        return MarketChannel.ZUK;
+    //    }
+    //    return MarketChannel.NONE;
+    //
+    //}
 
 //    private List<UrmDeviceRequestLog> getLogMap(String deviceId, Date before24H, Date endTime) {
 //

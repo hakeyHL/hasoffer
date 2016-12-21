@@ -15,6 +15,8 @@ import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.urm.*;
 import hasoffer.core.system.IAppService;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +30,8 @@ import java.util.*;
 @Service
 @Transactional
 public class AppServiceImpl implements IAppService {
+    private final static Logger logger = LoggerFactory.getLogger("hasoffer.IndexUrl");
+
     private static final String Q_APP_VERSION =
             "SELECT t FROM AppVersion t " +
                     " WHERE t.appType = ?0 and marketChannel != 'ZUK'" +
@@ -126,7 +130,6 @@ public class AppServiceImpl implements IAppService {
             "SELECT t FROM HasofferCoinsExchangeGift t order by t.coinPrice asc ";
 
     @Resource
-
     IDataBaseManager dbm;
 
     private String Q_APP_GETPRODUCTS =
@@ -423,7 +426,6 @@ public class AppServiceImpl implements IAppService {
         flipkartMap.put("Z", getLiveDemo(Website.FLIPKART, marketChannel, deviceId));
         flipkartMap.put("I", getInstallUrl(Website.FLIPKART));
         flipkartMap.put("J", Website.FLIPKART.toString());
-
         mapList.add(flipkartMap);
 
         Map<String, String> snapDealMap = new HashMap<>();
@@ -517,6 +519,7 @@ public class AppServiceImpl implements IAppService {
             flipkartExtParam1 = affExtParams[random.nextInt(affExtParams.length)];
         }
         String url = "http://dl.flipkart.com/dl/?affid=" + flipkartAffid + "&affExtParam1=" + flipkartExtParam1 + "&affExtParam2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0";
+        logger.info("INDEXPAGE: marketChannel: {}, AffId:{}", marketChannel, flipkartExtParam1 + ":" + AffliIdHelper.getMarketId(marketChannel));
         return new String(org.apache.commons.codec.binary.Base64.encodeBase64(url.getBytes(Charset.forName("UTF-8"))));
     }
 
