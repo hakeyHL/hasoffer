@@ -15,4 +15,8 @@ public interface AppCategoryService {
     PtmCategory getCategoryById(Long cateId);
 
     List<CategoryVo> getTopCategoryList();
+
+    List<PtmCategory> getSecondaryList();
+
+    int getChildCates(Long id);
 }
