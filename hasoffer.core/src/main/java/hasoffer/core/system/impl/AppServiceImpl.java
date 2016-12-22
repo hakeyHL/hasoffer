@@ -15,6 +15,8 @@ import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.urm.*;
 import hasoffer.core.system.IAppService;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +30,8 @@ import java.util.*;
 @Service
 @Transactional
 public class AppServiceImpl implements IAppService {
+    private final static Logger logger = LoggerFactory.getLogger("hasoffer.IndexUrl");
+
     private static final String Q_APP_VERSION =
             "SELECT t FROM AppVersion t " +
                     " WHERE t.appType = ?0 and marketChannel != 'ZUK'" +
@@ -126,7 +130,6 @@ public class AppServiceImpl implements IAppService {
             "SELECT t FROM HasofferCoinsExchangeGift t order by t.coinPrice asc ";
 
     @Resource
-
     IDataBaseManager dbm;
 
     private String Q_APP_GETPRODUCTS =
@@ -423,7 +426,6 @@ public class AppServiceImpl implements IAppService {
         flipkartMap.put("Z", getLiveDemo(Website.FLIPKART, marketChannel, deviceId));
         flipkartMap.put("I", getInstallUrl(Website.FLIPKART));
         flipkartMap.put("J", Website.FLIPKART.toString());
-
         mapList.add(flipkartMap);
 
         Map<String, String> snapDealMap = new HashMap<>();
@@ -499,8 +501,14 @@ public class AppServiceImpl implements IAppService {
 
     private String getLiveDemo(Website website, MarketChannel marketChannel, String deviceId) {
         Map<Website, String> liveDemoMap = new HashMap<>();
+        Random random = new Random();
+        String flipkartAffid = AffliIdHelper.FLIKART_YEAHMOBI_FLIDS[random.nextInt(AffliIdHelper.FLIKART_YEAHMOBI_FLIDS.length)];
         String extParam1 = AffliIdHelper.getMarketId(marketChannel);
-        liveDemoMap.put(Website.FLIPKART, "http://dl.flipkart.com/dl/apple-iphone-5s/p/itme8ra4f4twtsva?affid=affiliate357&affExtParam1=" + extParam1 + "&affExtParam2=" + extParam1 + "_" + deviceId + "_0");
+        if (Arrays.asList(AffliIdHelper.FLIKART_YEAHMOBI_FLIDS).contains(flipkartAffid)) {
+            String[] affExtParams = new String[]{"103662", "103650", "103647", "103643"};
+            extParam1 = affExtParams[random.nextInt(affExtParams.length)];
+        }
+        liveDemoMap.put(Website.FLIPKART, "http://dl.flipkart.com/dl/apple-iphone-5s/p/itme8ra4f4twtsva?affid=" + flipkartAffid + "&affExtParam1=" + extParam1 + "&affExtParam2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0");
         liveDemoMap.put(Website.SNAPDEAL, "android-app://com.snapdeal.main/snapdeal/m.snapdeal.com/product/apple-iphone-5s-16-gb/1204769399?aff_id=82856&utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_sub=" + extParam1 + "&aff_sub2=" + extParam1 + "_" + deviceId + "_0");
         liveDemoMap.put(Website.SHOPCLUES, "http://www.shopclues.com/apple-iphone-5s-16gb-44.html?ty=0&id=none&mcid=aff&utm_source=Hasoffer&OfferId=15");
         //liveDemoMap.put(Website.EBAY, "http://genlin.ss");
@@ -517,6 +525,7 @@ public class AppServiceImpl implements IAppService {
             flipkartExtParam1 = affExtParams[random.nextInt(affExtParams.length)];
         }
         String url = "http://dl.flipkart.com/dl/?affid=" + flipkartAffid + "&affExtParam1=" + flipkartExtParam1 + "&affExtParam2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0";
+        logger.info("INDEXPAGE: marketChannel: {}, AffId:{}", marketChannel, flipkartExtParam1 + ":" + AffliIdHelper.getMarketId(marketChannel));
         return new String(org.apache.commons.codec.binary.Base64.encodeBase64(url.getBytes(Charset.forName("UTF-8"))));
     }
 

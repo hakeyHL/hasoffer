@@ -1,9 +1,11 @@
 package hasoffer.core.app.impl;
 
+import hasoffer.base.model.PageableResult;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.app.AppCategoryService;
 import hasoffer.core.bo.product.CategoryBo;
 import hasoffer.core.bo.product.CategoryVo;
+import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.impl.AppServiceImpl;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,7 +24,9 @@ import java.util.List;
  */
 @Service
 public class AppCategoryServiceImpl implements AppCategoryService {
-    private static final String CACHE_KEY_PRE = "APP_PTM_CATEGORY";
+    private static final String API_CATEGORY_CACHE_KEY_PRE_ = "API_CATEGORY_CACHE_KEY_PRE_";
+    private static final String API_CATEGORY_GET_SECONDARY_ = "select t from PtmCategory t where t.level = 2 and t.parentId in (1,257,1317,4552,4662,7577) order by t.parentId";
+    private static final String API_CATEGORY_GET_COUNT_CHILDS_ = "select t from PtmCategory t where t.parentId= ?0";
     private static final long CACHE_EXPIRE_TIME = TimeUtils.MILLISECONDS_OF_1_DAY;
     @Resource
     ICacheService<CategoryBo> CategoryBoService;
@@ -29,12 +34,16 @@ public class AppCategoryServiceImpl implements AppCategoryService {
     ICacheService<PtmCategory> PtmCategoryService;
     @Resource
     AppServiceImpl appService;
+    @Resource
+    IDataBaseManager dbm;
+    @Resource
+    ICacheService iCacheService;
 
     public List getCategorys(String categoryId) {
         String key;
         List categorys = new ArrayList();
         if (StringUtils.isBlank(categoryId)) {
-            key = CACHE_KEY_PRE + "_LEVEL1";
+            key = API_CATEGORY_CACHE_KEY_PRE_ + "_LEVEL1";
             CategoryBo categoryBo = CategoryBoService.get(CategoryBo.class, key, 0);
             if (categoryBo != null) {
                 categorys = categoryBo.getCategorys();
@@ -63,7 +72,7 @@ public class AppCategoryServiceImpl implements AppCategoryService {
                 CategoryBoService.add(key, categoryBo, CACHE_EXPIRE_TIME);
             }
         } else {
-            key = CACHE_KEY_PRE + categoryId;
+            key = API_CATEGORY_CACHE_KEY_PRE_ + categoryId;
             CategoryBo categoryBo = CategoryBoService.get(CategoryBo.class, key, 0);
             if (categoryBo != null) {
                 categorys = categoryBo.getCategorys();
@@ -112,7 +121,7 @@ public class AppCategoryServiceImpl implements AppCategoryService {
     public PtmCategory getCategoryById(Long cateId) {
         PtmCategory ptmCategory;
         String key;
-        key = CACHE_KEY_PRE + "_BYID_" + cateId;
+        key = API_CATEGORY_CACHE_KEY_PRE_ + "_BYID_" + cateId;
         ptmCategory = PtmCategoryService.get(PtmCategory.class, key, 0);
         if (ptmCategory != null) {
             //缓存中有
@@ -158,5 +167,30 @@ public class AppCategoryServiceImpl implements AppCategoryService {
         categoryVos.add(new CategoryVo(4552l, "Home and Furniture", "", 1, 0l, 2, 1));
 
         return categoryVos;
+    }
+
+    @Override
+    public List<PtmCategory> getSecondaryList() {
+        return dbm.query(API_CATEGORY_GET_SECONDARY_);
+    }
+
+    @Override
+    public int getChildCates(Long id) {
+        int count;
+        String key = "API_CATEGORY_CACHE_KEY_PRE_" + id;
+        String childCount = iCacheService.get(key, 0);
+        if (StringUtils.isNotEmpty(childCount)) {
+            count = Integer.parseInt(childCount);
+            return count;
+        } else {
+            PageableResult<PtmCategory> objectPageableResult = dbm.queryPage(API_CATEGORY_GET_COUNT_CHILDS_, 1, 2, Arrays.asList(id));
+            if (objectPageableResult != null && objectPageableResult.getData() != null && objectPageableResult.getData().size() > 0) {
+                count = objectPageableResult.getData().size();
+                iCacheService.add(key, count + "", -1);
+                return count;
+            } else {
+                return 0;
+            }
+        }
     }
 }
