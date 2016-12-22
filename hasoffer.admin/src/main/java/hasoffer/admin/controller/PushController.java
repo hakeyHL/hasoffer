@@ -204,6 +204,10 @@ public class PushController {
 
         //创建apppush对象
         pushService.createAppPush(appPush);
+
+        //在加入队列前，将队列清空
+        redisListService.deleteAll(ADMIN_PUSH_QUEUE);
+
         //加入队列,由别的线程来完成push操作
         redisListService.push(ADMIN_PUSH_QUEUE, JSONUtil.toJSON(appPush));
 
