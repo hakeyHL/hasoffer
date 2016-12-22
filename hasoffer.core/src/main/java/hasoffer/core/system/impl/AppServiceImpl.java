@@ -30,7 +30,7 @@ import java.util.*;
 @Service
 @Transactional
 public class AppServiceImpl implements IAppService {
-    private final static Logger logger = LoggerFactory.getLogger("hasoffer.IndexUrl");
+    private final static Logger loggerIndexUrl = LoggerFactory.getLogger("hasoffer.IndexUrl");
 
     private static final String Q_APP_VERSION =
             "SELECT t FROM AppVersion t " +
@@ -525,7 +525,7 @@ public class AppServiceImpl implements IAppService {
             flipkartExtParam1 = affExtParams[random.nextInt(affExtParams.length)];
         }
         String url = "http://dl.flipkart.com/dl/?affid=" + flipkartAffid + "&affExtParam1=" + flipkartExtParam1 + "&affExtParam2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0";
-        logger.info("INDEXPAGE: marketChannel: {}, AffId:{}", marketChannel, flipkartExtParam1 + ":" + AffliIdHelper.getMarketId(marketChannel));
+        loggerIndexUrl.info("INDEXPAGE: marketChannel: {}, deviceId:{}, AffId:{}", marketChannel, deviceId, flipkartAffid);
         return new String(org.apache.commons.codec.binary.Base64.encodeBase64(url.getBytes(Charset.forName("UTF-8"))));
     }
 
