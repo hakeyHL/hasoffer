@@ -29,7 +29,7 @@ public class AppDeal implements Identifiable<Long> {
     private AppdealSource appdealSource = AppdealSource.MANUAL_INPUT;
 
     private String title;//deal标题
-    @Column(columnDefinition = "text", nullable = false)
+    @Column(columnDefinition = "text")
     private String linkUrl;//deal跳转地址
 
     @Column(columnDefinition = "text")
