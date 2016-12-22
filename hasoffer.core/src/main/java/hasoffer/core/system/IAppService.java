@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public interface IAppService {
 
-    AppVersion getLatestVersion(AppType appType);
+    AppVersion getLatestVersion(AppType appType, MarketChannel marketChannel);
 
     AppVersion getLatestVersion(MarketChannel marketChannel, AppType appType);
 
