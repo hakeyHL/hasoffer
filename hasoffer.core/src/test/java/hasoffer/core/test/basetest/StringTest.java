@@ -8,6 +8,7 @@ import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.mongo.MobileCateDescription;
+import hasoffer.fetch.helper.WebsiteHelper;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.junit.Test;
@@ -27,6 +28,9 @@ public class StringTest {
 
     @Test
     public void testGetWebsite() {
+
+        String aPackage = WebsiteHelper.getPackage(Website.UNKNOWN) == null ? "" : WebsiteHelper.getPackage(Website.UNKNOWN);
+
         String url = "https://www.mcdelivery.co.in/?utm_source=Hasof&utm_medium=cpc&utm_campaign=Hasof_cpo";
     }
 

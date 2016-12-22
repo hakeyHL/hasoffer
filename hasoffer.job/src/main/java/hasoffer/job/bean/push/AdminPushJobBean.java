@@ -81,9 +81,14 @@ public class AdminPushJobBean extends QuartzJobBean {
                 website = dbm.get(AppDeal.class, Long.valueOf(appPush.getSourceId())).getWebsite();
             }
 
+            String packageName = WebsiteHelper.getPackage(website);
+            if (packageName == null) {
+                packageName = "";
+            }
+
             AppPushMessage message = new AppPushMessage(
                     new AppMsgDisplay(appPush.getTitle() + appPush.getContent(), appPush.getTitle(), appPush.getContent(), appPush.getPushImageUrl()),
-                    new AppMsgClick(clickType, appPush.getSourceId(), WebsiteHelper.getPackage(website))
+                    new AppMsgClick(clickType, appPush.getSourceId(), packageName)
             );
 
 //-------------------------------------将push的内容写到redis新的push的key中-----------------------------------------//
