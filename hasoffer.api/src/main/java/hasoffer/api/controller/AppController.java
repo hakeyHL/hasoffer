@@ -71,6 +71,7 @@ import java.util.*;
 @Controller
 @RequestMapping(value = "/app")
 public class AppController {
+    private final static Logger loggerIndexUrl = LoggerFactory.getLogger("hasoffer.IndexUrl");
 
     @Resource
     ICacheService<UrmUser> userICacheService;
@@ -868,7 +869,7 @@ public class AppController {
                 //marketChannel = deviceInfo.getMarketChannel();
                 String affiIds = AffliIdHelper.getAffiIds(marketChannel);
                 map.put("info", affiIds);
-                logger.info("HOMEPAGE : marketChannel: {}, deviceId:{}, AffId:{}", marketChannel, deviceId, affiIds);
+                loggerIndexUrl.info("HOMEPAGE : marketChannel: {}, deviceId:{}, AffId:{}", marketChannel, deviceId, affiIds);
                 modelAndView.addObject("data", map);
                 break;
             case INDEXPAGE:
