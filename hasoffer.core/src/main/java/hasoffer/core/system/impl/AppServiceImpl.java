@@ -30,8 +30,9 @@ import java.util.*;
 public class AppServiceImpl implements IAppService {
     private static final String Q_APP_VERSION =
             "SELECT t FROM AppVersion t " +
-                    " WHERE t.appType = ?0 and marketChannel != 'ZUK'" +
+                    " WHERE t.appType = ?0 and marketChannel =?1" +
                     " ORDER BY t.publishTime DESC";
+
     private static final String Q_CHANNEL_APP_VERSION =
             "SELECT t FROM AppVersion t " +
                     " WHERE t.appType = ?0  and marketChannel = ?1" +
@@ -134,8 +135,8 @@ public class AppServiceImpl implements IAppService {
                     " where 1=1 and ";
 
     @Override
-    public AppVersion getLatestVersion(AppType appType) {
-        List<AppVersion> versions = dbm.query(Q_APP_VERSION, Arrays.asList(appType));
+    public AppVersion getLatestVersion(AppType appType, MarketChannel marketChannel) {
+        List<AppVersion> versions = dbm.query(Q_APP_VERSION, Arrays.asList(appType, marketChannel));
 
         return ArrayUtils.hasObjs(versions) ? versions.get(0) : null;
     }
