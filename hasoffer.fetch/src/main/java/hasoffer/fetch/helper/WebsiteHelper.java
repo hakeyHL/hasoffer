@@ -473,7 +473,7 @@ public class WebsiteHelper {
 
         //String allWebSiteString = getAllWebSiteString("https://www.facebook.com/friends/center/");
         for (int i = 0; i < 100; i++) {
-            String allWebSiteString = getDeeplinkWithAff(Website.FLIPKART, "https://www.flipkart.com/lg-80cm-32-hd-ready-led-tv/p/itmejhz2grzacpar?pid=TVSEJHZ2RNMC45JV", new String[]{MarketChannel.LEO.name(), "testDeviceId"});
+            String allWebSiteString = getDeeplinkWithAff(Website.FLIPKART, "https://www.flipkart.com/lg-80cm-32-hd-ready-led-tv/p/itmejhz2grzacpar?pid=TVSEJHZ2RNMC45JV", new String[]{MarketChannel.VC.name(), "testDeviceId"});
             System.out.println(allWebSiteString);
 
         }
