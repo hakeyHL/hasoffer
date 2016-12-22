@@ -69,6 +69,7 @@ public class AppDeal implements Identifiable<Long> {
     private Integer dealThumbNumber = new Random().nextInt(10); //deal 点赞数
 
     private String oriLinkUrl;//deal站抓取的deal需要保存最原始的link
+    private String category;//类目名称
 
     //保留空参构造
     public AppDeal() {
@@ -260,6 +261,14 @@ public class AppDeal implements Identifiable<Long> {
         this.oriLinkUrl = oriLinkUrl;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -295,7 +304,8 @@ public class AppDeal implements Identifiable<Long> {
         if (presentPrice != null ? !presentPrice.equals(deal.presentPrice) : deal.presentPrice != null) return false;
         if (dealThumbNumber != null ? !dealThumbNumber.equals(deal.dealThumbNumber) : deal.dealThumbNumber != null)
             return false;
-        return !(oriLinkUrl != null ? !oriLinkUrl.equals(deal.oriLinkUrl) : deal.oriLinkUrl != null);
+        if (oriLinkUrl != null ? !oriLinkUrl.equals(deal.oriLinkUrl) : deal.oriLinkUrl != null) return false;
+        return !(category != null ? !category.equals(deal.category) : deal.category != null);
 
     }
 
@@ -324,6 +334,7 @@ public class AppDeal implements Identifiable<Long> {
         result = 31 * result + (presentPrice != null ? presentPrice.hashCode() : 0);
         result = 31 * result + (dealThumbNumber != null ? dealThumbNumber.hashCode() : 0);
         result = 31 * result + (oriLinkUrl != null ? oriLinkUrl.hashCode() : 0);
+        result = 31 * result + (category != null ? category.hashCode() : 0);
         return result;
     }
 }

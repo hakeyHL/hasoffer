@@ -71,6 +71,7 @@ import java.util.*;
 @Controller
 @RequestMapping(value = "/app")
 public class AppController {
+    private final static Logger loggerIndexUrl = LoggerFactory.getLogger("hasoffer.IndexUrl");
 
     @Resource
     ICacheService<UrmUser> userICacheService;
@@ -842,6 +843,7 @@ public class AppController {
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "ok");
         DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
         MarketChannel marketChannel = MarketChannel.NONE;
         if (deviceInfoVo != null) {
             marketChannel = deviceInfoVo.getMarketChannel();
@@ -851,7 +853,7 @@ public class AppController {
                 // 流量拦截成功
                 try {
                     //DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-                    String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+                    //String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
                     cmpSkuCacheManager.recordFlowControll(deviceId, deviceInfoVo.getCurShopApp());
                 } catch (Exception e) {
                     logger.debug(e.getMessage());
@@ -861,11 +863,13 @@ public class AppController {
                 Map map = new HashMap();
                 //DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
                 //marketChannel = deviceInfo.getMarketChannel();
-                map.put("info", AffliIdHelper.getAffiIds(marketChannel));
+                String affiIds = AffliIdHelper.getAffiIds(marketChannel);
+                map.put("info", affiIds);
+                loggerIndexUrl.info("HOMEPAGE : marketChannel: {}, deviceId:{}, AffId:{}", marketChannel, deviceId, affiIds);
                 modelAndView.addObject("data", map);
                 break;
             case INDEXPAGE:
-                String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+                //String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
                 List<Map<String, String>> list = appService.getIndexPage(marketChannel, deviceId);
                 modelAndView.addObject("data", list);
                 break;

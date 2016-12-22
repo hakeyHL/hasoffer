@@ -164,6 +164,23 @@
         </encoder>
     </appender>
 
+    <appender name="IndexUrlFileOut"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.base}/indexUrl.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${log.base}/indexUrl.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <MaxHistory>30</MaxHistory>
+                <!-- or whenever the file size reaches 100MB -->
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%date [%thread][IP:%X{ip}|USER:%X{user}][%-8level%logger{80}] %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <!-- code info log info to info log, error to error log. -->
     <logger name="hasoffer" level="INFO">
         <appender-ref ref="InfoLoggerFileOut"/>
@@ -172,6 +189,10 @@
 
     <logger name="hasoffer.api.controller.AppUserController" level="DEBUG">
         <appender-ref ref="AppUserFileOut"/>
+    </logger>
+
+    <logger name="hasoffer.IndexUrl" level="DEBUG">
+        <appender-ref ref="IndexUrlFileOut"/>
     </logger>
 
     <!-- Hibernate SQL -->
