@@ -2,7 +2,6 @@ package hasoffer.job.bean.deal;
 
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
-import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
@@ -16,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -72,7 +70,7 @@ public class DealSiteGetDealWoker implements Runnable {
 
                         for (FetchedDealInfo fetchedDealInfo : dealInfoList) {
 
-                            System.out.println("fetchedDealInfo " + fetchDealResult.toString());
+                            System.out.println("fetchedDealInfo " + fetchedDealInfo.toString());
 
                             AppDeal deal = getDeal(fetchedDealInfo, dbm);
 
@@ -101,12 +99,6 @@ public class DealSiteGetDealWoker implements Runnable {
 
         Website webSite = WebsiteHelper.getWebSite(fetchedDealInfo.getLink());
 
-        String webSiteString = WebsiteHelper.getAllWebSiteString(fetchedDealInfo.getLink());
-
-        if (StringUtils.isEmpty(webSiteString)) {
-            return null;
-        }
-
         if (webSite == null) {
             webSite = Website.UNKNOWN;
         }
@@ -128,18 +120,6 @@ public class DealSiteGetDealWoker implements Runnable {
         appdeal.setPriceDescription("Rs." + fetchedDealInfo.getPrice());
         appdeal.setOriginPrice(fetchedDealInfo.getOriPrice());
         appdeal.setDiscount(fetchedDealInfo.getDiscount());
-
-        //url重复不创建
-        boolean flag = true;
-        List<AppDeal> appdealList = dbm.query("SELECT t FROM AppDeal t WHERE t.linkUrl = ?0", Arrays.asList(fetchedDealInfo.getLink()));
-        if (appdealList != null && appdealList.size() != 0) {
-            System.out.println("query by url get " + appdealList.size() + " sku");
-            flag = false;
-            System.out.println("flag " + flag + " then convert image");
-            return null;
-        }
-
-        System.out.println("flag " + flag + " then convert image");
 
         return appdeal;
 
