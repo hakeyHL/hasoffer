@@ -99,7 +99,7 @@ public class MobileController {
                 Iterator<Map.Entry<String, String>> iterator = set.iterator();
                 while (iterator.hasNext()) {
                     Map.Entry<String, String> next = iterator.next();
-                    //key 有 price  brand  特征1  特征2
+                    //key 有 price  brand  --特征1  特征2
                     String key = next.getKey();
 
                     String value = next.getValue();
