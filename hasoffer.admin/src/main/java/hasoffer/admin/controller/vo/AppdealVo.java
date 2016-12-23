@@ -34,6 +34,7 @@ public class AppdealVo {
     private String infoPageImage;//deal详情页图片
 
     private Long dealClickCount = 0l;//deal的点击次数
+    private Long originClickCount;//只针对appdealsource=deal_site的数据，保留抓取时deal的点击次数
 
     private Long dealCategoryId = -1l;//deal的目录id
 
@@ -229,5 +230,13 @@ public class AppdealVo {
 
     public void setOriLinkUrl(String oriLinkUrl) {
         this.oriLinkUrl = oriLinkUrl;
+    }
+
+    public Long getOriginClickCount() {
+        return originClickCount;
+    }
+
+    public void setOriginClickCount(Long originClickCount) {
+        this.originClickCount = originClickCount;
     }
 }

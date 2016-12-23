@@ -172,8 +172,11 @@
                     <td>权重</td>
                     <td>生效时间</td>
                     <td>失效时间</td>
+                    <c:if test="${type eq 3}">
+                        <td>初始化点击次数</td>
+                    </c:if>
                     <td>
-                        <a href="#" onclick="orderByCount()">点击次数</a>
+                        <a href="#" onclick="orderByCount()">目前点击次数</a>
                     </td>
                     <td colspan="3">操作</td>
                     <td>当前状态</td>
@@ -231,6 +234,11 @@
                         <td>${data.weight}</td>
                         <td>${data.createTime}</td>
                         <td>${data.expireTime}</td>
+                        <c:if test="${type eq 3}">
+                            <td>
+                                    ${data.originClickCount}
+                            </td>
+                        </c:if>
                         <td>
                                 ${data.dealClickCount}
                         </td>

@@ -120,6 +120,7 @@ public class DealSiteGetDealWoker implements Runnable {
         appdeal.setPriceDescription("Rs." + fetchedDealInfo.getPrice());
         appdeal.setOriginPrice(fetchedDealInfo.getOriPrice());
         appdeal.setDiscount(fetchedDealInfo.getDiscount());
+        appdeal.setOriginClickCount(Long.valueOf(fetchedDealInfo.getView()));
 
         return appdeal;
 
