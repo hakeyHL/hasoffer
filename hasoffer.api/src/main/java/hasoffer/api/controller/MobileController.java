@@ -6,6 +6,7 @@ import hasoffer.core.app.AppSearchService;
 import hasoffer.core.app.vo.ResultVo;
 import hasoffer.core.app.vo.mobile.SiteMapKeyVo;
 import hasoffer.core.bo.system.SearchCriteria;
+import hasoffer.core.persistence.po.ptm.PtmStdSku;
 import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
 import hasoffer.core.product.solr.PtmStdSkuModel;
 import hasoffer.core.utils.api.ApiUtils;
@@ -39,14 +40,12 @@ public class MobileController {
     Logger logger = LoggerFactory.getLogger(MobileController.class);
 
     @RequestMapping("siteMap")
-    public ModelAndView siteMapHasoffer() {
+    public ModelAndView siteMapHasoffer(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "2000") int pageSize) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "success");
 
-        List<SiteMapKeyVo> siteMapKeyVos = new ArrayList<>();
-
-        Map keyMap = new HashMap();
+        Map<String, List> keyMap = new HashMap();
         //key 1
         Map proMap = new HashMap();
         keyMap.put("Mobile Finder On Hasoffer", Arrays.asList(new SiteMapKeyVo("Latest Mobiles", 0)));
@@ -54,14 +53,14 @@ public class MobileController {
         //key 2
         proMap.clear();
 
-        keyMap.put("All Mobile Models In India", Arrays.asList(
-                new SiteMapKeyVo("Top Mobile Phones", 0),
-                new SiteMapKeyVo("Gionee Elife S6", 3).buildePid(1),
-                new SiteMapKeyVo("Oppo R9 Plus", 3).buildePid(2),
-                new SiteMapKeyVo("Samsung Z1", 3).buildePid(3),
-                new SiteMapKeyVo("Honor 7", 3).buildePid(4),
-                new SiteMapKeyVo("Oppo A30", 3).buildePid(5)));
-
+        //获取categoryId 为5  level 为2 的所有商品
+        List<SiteMapKeyVo> stdSkuKeyVoList = new ArrayList<>();
+        stdSkuKeyVoList.add(new SiteMapKeyVo("Top Mobile Phones", 0));
+        PageableResult<PtmStdSku> ptmStdSkuList = ptmStdSKuService.getPtmStdSkuListByMinId(0l, page, pageSize);
+        for (PtmStdSku ptmStdSku : ptmStdSkuList.getData()) {
+            stdSkuKeyVoList.add(new SiteMapKeyVo(ptmStdSku.getTitle(), 3).buildePid(ptmStdSku.getId()));
+        }
+        keyMap.put("All Mobile Models In India", stdSkuKeyVoList);
         //key 3
         keyMap.put("Top 10 Mobiles", Arrays.asList(
                 new SiteMapKeyVo("Top 10  Mobiles  Below 5000", 2).builderProMap("price", "5000"),
