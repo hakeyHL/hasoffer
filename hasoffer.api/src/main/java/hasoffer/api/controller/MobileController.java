@@ -1,9 +1,20 @@
 package hasoffer.api.controller;
 
+import hasoffer.base.enums.SearchResultSort;
+import hasoffer.base.model.PageableResult;
+import hasoffer.core.app.AppSearchService;
 import hasoffer.core.app.vo.ResultVo;
 import hasoffer.core.app.vo.mobile.SiteMapKeyVo;
+import hasoffer.core.bo.system.SearchCriteria;
+import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
+import hasoffer.core.product.solr.PtmStdSkuModel;
+import hasoffer.core.utils.api.ApiUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -18,6 +29,15 @@ import java.util.*;
 @Controller
 @RequestMapping("m")
 public class MobileController {
+    @Autowired
+    AppSearchService appSearchService;
+    @Autowired
+    ApiUtils apiUtils;
+    @Autowired
+    PtmStdSKuServiceImpl ptmStdSKuService;
+
+    Logger logger = LoggerFactory.getLogger(MobileController.class);
+
     @RequestMapping("siteMap")
     public ModelAndView siteMapHasoffer() {
         ModelAndView modelAndView = new ModelAndView();
@@ -36,11 +56,11 @@ public class MobileController {
 
         keyMap.put("All Mobile Models In India", Arrays.asList(
                 new SiteMapKeyVo("Top Mobile Phones", 0),
-                new SiteMapKeyVo("Gionee Elife S6", 3),
-                new SiteMapKeyVo("Oppo R9 Plus", 3),
-                new SiteMapKeyVo("Samsung Z1", 3),
-                new SiteMapKeyVo("Honor 7", 3),
-                new SiteMapKeyVo("Oppo A30", 3)));
+                new SiteMapKeyVo("Gionee Elife S6", 3).buildePid(1),
+                new SiteMapKeyVo("Oppo R9 Plus", 3).buildePid(2),
+                new SiteMapKeyVo("Samsung Z1", 3).buildePid(3),
+                new SiteMapKeyVo("Honor 7", 3).buildePid(4),
+                new SiteMapKeyVo("Oppo A30", 3).buildePid(5)));
 
         //key 3
         keyMap.put("Top 10 Mobiles", Arrays.asList(
@@ -57,6 +77,9 @@ public class MobileController {
                 new SiteMapKeyVo("Top 10 Lg Optimus Series Mobiles", 2).buildeShortName("Lg Optimus Series"),
                 new SiteMapKeyVo("Top 10 Nokia Lumia Series Mobiles", 2).buildeShortName("Nokia Lumia Series"),
                 new SiteMapKeyVo("Top 10 Nokia Asha Series Mobiles", 2).buildeShortName("Nokia Asha Series"),
+                new SiteMapKeyVo("Top 10 T Series Mobiles", 2).buildeShortName("T Series"),
+                new SiteMapKeyVo("Top 10 T Series Camera Mobiles", 2).buildeShortName("T Series"),
+                new SiteMapKeyVo("Top 10 T Series Dual Sim Mobiles", 2).buildeShortName("T Series"),
                 //Top 10 + “品牌名称” + Mobiles + Below +“价格参数”
                 new SiteMapKeyVo("Top 10 HTC Mobiles Below 50000", 2).builderProMap("price", "5000").builderProMap("brand", "HTC")
         ));
@@ -67,53 +90,87 @@ public class MobileController {
     /**
      * 处理前端的关键字"搜索"
      *
-     * @param shortName
-     * @param name
-     * @param type
-     * @param pros
      * @return
      */
-    public ResultVo resolveKeyWordsSearch(String shortName, String name, @RequestParam(defaultValue = "0") int type, Map pros, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int pageSize) {
-        switch (type) {
+    @RequestMapping("keySearch")
+    public ModelAndView resolveKeyWordsSearch(@RequestBody SiteMapKeyVo siteMapKeyVo, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int pageSize) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("errorCode", "00000");
+        modelAndView.addObject("msg", "success");
+
+        ResultVo resultVo = new ResultVo();
+        PageableResult<PtmStdSkuModel> pageableResult = null;
+        List ProductList = new ArrayList();
+        SearchCriteria searchCriteria = new SearchCriteria();
+        searchCriteria.setCategoryId("5");
+        searchCriteria.setLevel(2);
+        searchCriteria.setPage(page);
+        searchCriteria.setPageSize(pageSize);
+        searchCriteria.setSort(SearchResultSort.RATING);
+        switch (siteMapKeyVo.getType()) {
             case 0:
                 //0 是把name 发回来
-                if (StringUtils.isNotEmpty(name)) {
-                    if (name.equals("Latest Mobiles")) {
+                if (StringUtils.isNotEmpty(siteMapKeyVo.getName())) {
+                    if (siteMapKeyVo.getName().equals("Latest Mobiles")) {
                         //获取发布日期为最近的10部手机 -- 创建时间降序
+                        //暂时为评论数降序排列的列表 sort 为 POPULARITY 或者null即可
+                        searchCriteria.setSort(SearchResultSort.POPULARITY);
                     }
-                    if (name.equals("Top Mobile Phone")) {
+                   /* if (name.equals("Top Mobile Phone")) {
                         //评分数前十的手机
-                    }
+                        //默认是评分数前十的手机
+                    }*/
                 }
                 break;
             case 1:
                 //1 是把shortName 发回来
-                if (StringUtils.isNotEmpty(shortName)) {
-                    //从数据库中like查询 series 系列商品
-
+                if (StringUtils.isNotEmpty(siteMapKeyVo.getShortName())) {
+                    searchCriteria.setKeyword(siteMapKeyVo.getShortName());
                 }
                 break;
             case 2:
                 // 2 是把pros中的数据发回来
-                Set<Map.Entry<String, String>> set = pros.entrySet();
-                Iterator<Map.Entry<String, String>> iterator = set.iterator();
-                while (iterator.hasNext()) {
-                    Map.Entry<String, String> next = iterator.next();
-                    //key 有 price  brand  --特征1  特征2
-                    String key = next.getKey();
-
-                    String value = next.getValue();
-
-
+                if (siteMapKeyVo.getPros() != null) {
+                    Set<Map.Entry<String, String>> set = siteMapKeyVo.getPros().entrySet();
+                    Iterator<Map.Entry<String, String>> iterator = set.iterator();
+                    while (iterator.hasNext()) {
+                        Map.Entry<String, String> next = iterator.next();
+                        //key 有 price  brand  --特征1  特征2
+                        String key = next.getKey();
+                        String value = next.getValue();
+                        if (StringUtils.isNotEmpty(key) && StringUtils.isNotEmpty(value)) {
+                            if (key.equals("brand")) {
+                                searchCriteria.setBrand(new String[]{key});
+                            }
+                            if (key.equals("price")) {
+                                searchCriteria.setPriceFrom(1);
+                                searchCriteria.setPriceTo(Integer.parseInt(value));
+                            }
+                        }
+                    }
                 }
                 break;
-            case 3:
-                // 3 是按照name去调用搜索接口
-                break;
-
+          /*  case 3:
+                // 3 是获取商品详情页数据
+                searchCriteria.setKeyword(siteMapKeyVo.getName());
+                break;*/
             default:
         }
-        return null;
+        try {
+            pageableResult = appSearchService.filterByParams(searchCriteria);
+        } catch (Exception e) {
+            logger.error(" error  message : {}  threadId :  time: ", e.getMessage(), Thread.currentThread().getId(), new Date());
+            modelAndView.addObject("errorCode", "10000");
+            modelAndView.addObject("msg", "error ,please try again later.");
+            return modelAndView;
+        }
+        if (pageableResult != null && pageableResult.getData().size() > 0) {
+            apiUtils.addProductVo2List(ProductList, pageableResult.getData());
+            resultVo.getData().put("pList", ProductList);
+            modelAndView.addObject("data", resultVo.getData());
+
+        }
+        return modelAndView;
     }
 
 }
