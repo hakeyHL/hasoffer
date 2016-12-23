@@ -24,6 +24,9 @@
         <input type="hidden" name="website" value="${deal.website}">
         <input type="hidden" name="appdealSource" value="${deal.appdealSource}">
         <input type="hidden" name="dealClickCount" value="${deal.dealClickCount}">
+        <input type="hidden" name="originClickCount" value="${deal.originClickCount}">
+        <input type="hidden" name="category" value="${deal.category}">
+        <input type="hidden" name="oriLinkUrl" value="${deal.oriLinkUrl}">
 
         <div class="form-group">
             <label class="col-sm-3 control-label">Deal标题：</label>
