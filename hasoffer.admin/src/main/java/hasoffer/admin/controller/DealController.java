@@ -92,7 +92,16 @@ public class DealController {
             appdealVo.setTitle(appDeal.getTitle());
             appdealVo.setPriceDescription(appDeal.getPriceDescription());
             appdealVo.setExpireTime(appDeal.getExpireTime());
-            appdealVo.setDealClickCount(appDeal.getDealClickCount());
+            Long dealClickCount = appDeal.getDealClickCount();
+            Long originClickCount = appDeal.getOriginClickCount();
+            if (dealClickCount != null) {
+                if (originClickCount != null) {
+                    appdealVo.setDealClickCount(appDeal.getDealClickCount() - appDeal.getOriginClickCount());
+                } else {
+                    appdealVo.setDealClickCount(appDeal.getDealClickCount());
+                }
+            }
+
             appdealVo.setLinkUrl(appDeal.getLinkUrl());
             appdealVo.setWeight(appDeal.getWeight());
             appdealVo.setDiscount(appDeal.getDiscount());
