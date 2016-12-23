@@ -18,4 +18,5 @@ public interface IPtmStdSkuService {
     void importPtmStdSku2Solr(PtmStdSku ptmStdSku);
 
     List<PtmStdPrice> listStdPrice(long ptmStdSkuId);
+
 }
