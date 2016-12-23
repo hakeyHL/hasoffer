@@ -15,8 +15,6 @@ import hasoffer.core.product.solr.PtmStdSkuModel;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.utils.api.ApiUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -31,7 +29,6 @@ import java.util.*;
 public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
     private static final String SOLR_GET_PTMSTDSKU_BY_MINID = " select t from PtmStdSku t where id >= ?0";
     private static final String API_GET_PTMSTDSKU_BY_SKUID = " select t from PtmStdSku t where id = ?0 and t.";
-    Logger logger = LoggerFactory.getLogger(PtmStdSKuServiceImpl.class);
     @Resource
     CategoryCacheManager categoryCacheManager;
     @Resource

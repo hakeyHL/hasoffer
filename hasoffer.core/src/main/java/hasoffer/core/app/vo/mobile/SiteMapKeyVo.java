@@ -15,6 +15,7 @@ public class SiteMapKeyVo {
 
     private String shortName;
     private int type = 0;
+    private long pId;
 
     public SiteMapKeyVo() {
     }
@@ -35,6 +36,11 @@ public class SiteMapKeyVo {
 
     public SiteMapKeyVo buildeShortName(String shortName) {
         this.shortName = shortName;
+        return this;
+    }
+
+    public SiteMapKeyVo buildePid(long pId) {
+        this.pId = pId;
         return this;
     }
 
@@ -68,5 +74,13 @@ public class SiteMapKeyVo {
 
     public void setShortName(String shortName) {
         this.shortName = shortName;
+    }
+
+    public long getpId() {
+        return pId;
+    }
+
+    public void setpId(long pId) {
+        this.pId = pId;
     }
 }
