@@ -217,7 +217,12 @@
                         </td>
 
                         <td>
-                            <a href="${data.linkUrl}">${data.title}</a>
+                            <c:if test="${empty data.linkUrl}">
+                                ${data.title}
+                            </c:if>
+                            <c:if test="${!empty data.linkUrl}">
+                                <a href="${data.linkUrl}">${data.title}</a>
+                            </c:if>
                         </td>
                         <td>${data.discount}</td>
                         <td>${data.priceDescription}</td>
