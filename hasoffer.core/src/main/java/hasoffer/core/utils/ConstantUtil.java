@@ -12,23 +12,101 @@ public class ConstantUtil {
     //哪个服务的,操作者,哪个对象.操作类型
     public static final long API_ONE_BILLION_NUMBER = 1000000000;
     public static final String API_DEALS_ = "API_DEALS_";//deal列表缓存的key前缀
-    public static final String API_FILTER_PARAMS_ = "API_FILTER_PARAMS_";//缓存关键字以及类目id和级别下的筛选参数列表的key
+    //    public static final String API_FILTER_PARAMS_ = "API_FILTER_PARAMS_";//缓存关键字以及类目id和级别下的筛选参数列表的key
     public static final String API_SOLR_PTMSTDSKU_CATEGORY_SEARCH = "API_SOLR_PTMSTDSKU_CATEGORY_SEARCH_";
     public static final Map<String, String> API_CATEGORY_FILTER_PARAMS_MAP = new HashMap<>();
     public static final Map<String, String> API_PTMSTDSKU_PARAM_MEAN_MAP = new HashMap<>();
 
     static {
-        API_CATEGORY_FILTER_PARAMS_MAP.put("brand", "Brand");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Network", "Network");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Screen_Resolution", "Screen Resolution");
+        //下面为General属性---------------------------------------------------------------------------------------------
+        //格式是这样的 February 3, 2016 (Official)
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Launch_Date", "Launch Date");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Brand", "Brand");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Model", "Model");
         API_CATEGORY_FILTER_PARAMS_MAP.put("Operating_System", "Operating System");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("queryRam", "Ram");
+        //只要,前面的
+        API_CATEGORY_FILTER_PARAMS_MAP.put("SIM_Slot", "SIM Slot(s)");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("SIM_Size", "SIM Size");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Network", "Network");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Fingerprint_Sensor", "Fingerprint Sensor");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Quick_Charging", "Quick Charging");
+
+
+        //下面为Design属性----------------------------------------------------------------------------------------------
+        //147 grams 只要值,注意下单位
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Weight", "Weight");
+
+        //下面为Display属性---------------------------------------------------------------------------------------------
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Screen_Resolution", "Screen Resolution");
         API_CATEGORY_FILTER_PARAMS_MAP.put("queryScreenSize", "Screen Size");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("querySecondaryCamera", "Secondary Camera");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("queryBatteryCapacity", "Battery Capacity");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("queryPrimaryCamera", "Primary Camera");
+        //267 ppi  只要值,注意下单位
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Pixel_Density", "Pixel Density");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Touch_Screen", "Touch Screen");
+        //73.42 % 只要值
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Screen_to_Body_Ratio", "Screen to Body Ratio");
+
+        //下面为Performance属性-----------------------------------------------------------------------------------------
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Processor", "Processor");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Graphics", "Graphics");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("queryRam", "Ram");
+
+        //下面为Storage属性---------------------------------------------------------------------------------------------
         API_CATEGORY_FILTER_PARAMS_MAP.put("queryInternalMemory", "Internal Memory");
         API_CATEGORY_FILTER_PARAMS_MAP.put("Expandable_Memory", "Expandable Memory");
+
+
+        //关于Camera属性的存储,之前是根据值判断的,不靠谱
+        //判断大name 如果是 Main Camera 其Resolution 为Primary　Camera 否则为Front Camera  --->Secondary Camera
+
+        //下面为摄像头属性----------------------------------------------------------------------------------------------
+        API_CATEGORY_FILTER_PARAMS_MAP.put("querySecondaryCamera", "Secondary Camera");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("queryPrimaryCamera", "Primary Camera");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Sensor", "Sensor");
+        //能与不能 value有且不为No 即为能
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Autofocus", "Autofocus");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("secondaryAutofocus", "secondaryAutofocus");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Aperture", "Aperture");
+        //能与不能 No为不能
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Flash", "Flash");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("SecondaryFlash", "SecondaryFlash");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Image_Resolution", "Image Resolution");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Camera_Features", "Camera Features");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Video_Recording", "Video Recording");
+
+        //下面为Battery 属性--------------------------------------------------------------------------------------------
+        API_CATEGORY_FILTER_PARAMS_MAP.put("queryBatteryCapacity", "Battery Capacity");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Type", "Type");
+        //能与不能
+        API_CATEGORY_FILTER_PARAMS_MAP.put("User_Replaceable", "User Replaceable");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Quick_Charging", "Quick Charging");
+
+        //下面为Network & Connectivity----------------------------------------------------------------------------------
+        API_CATEGORY_FILTER_PARAMS_MAP.put("SIM_Size", "SIM Size");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("VoLTE", "VoLTE");
+        //支不支持
+        API_CATEGORY_FILTER_PARAMS_MAP.put("WiFi", "Wi-Fi");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Bluetooth", "Bluetooth");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("GPS", "GPS");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("NFC", "NFC");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("GPS", "GPS");
+
+        //Multimedia 属性-----------------------------------------------------------------------------------------------
+        API_CATEGORY_FILTER_PARAMS_MAP.put("FM_Radio", "FM Radio");//能与不能
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Loudspeaker", "Loudspeaker");//能与不能
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Audio_Jack", "Audio Jack");
+
+
+        //Special Features属性------------------------------------------------------------------------------------------
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Fingerprint_Sensor", "Fingerprint Sensor");//能与不能
+        API_CATEGORY_FILTER_PARAMS_MAP.put("Other_Sensors", "Other Sensors");
+
+
+
+
+
+
+
+
 
         //=====================================分界线=============================================
 
@@ -97,9 +175,6 @@ public class ConstantUtil {
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Fingerprint Sensor", "It allows you to secure your phone by using your fingerprints to unlock the smartphone.");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Fingerprint Sensor Position", "");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Other Sensors", "");
-
-
-
     }
 
 }
