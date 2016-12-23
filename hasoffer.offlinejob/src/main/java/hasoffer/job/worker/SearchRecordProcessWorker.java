@@ -73,8 +73,6 @@ public class SearchRecordProcessWorker implements Runnable {
                 String serRegion = AppConfig.get(AppConfig.SER_REGION);
                 if (HasofferRegion.INDIA.toString().equals(serRegion)) {
                     isFetch = fetchForIndia(autoSearchResult);
-                } else if (HasofferRegion.USA.toString().equals(serRegion)) {
-                    isFetch = fetchForUsa(autoSearchResult);
                 }
                 //fetchByTaskSchedule(autoSearchResult);
 
@@ -175,33 +173,35 @@ public class SearchRecordProcessWorker implements Runnable {
         FetchResult amazonFetchResult = getFetchResult(Website.AMAZON, keyword, sitePros);
         FetchResult snapdealFetchResult = getFetchResult(Website.SNAPDEAL, keyword, sitePros);
         FetchResult shopcluesFetchResult = getFetchResult(Website.SHOPCLUES, keyword, sitePros);
-        FetchResult paytmFetchResult = getFetchResult(Website.PAYTM, keyword, sitePros);
-        FetchResult ebayFetchResult = getFetchResult(Website.EBAY, keyword, sitePros);
+        //FetchResult paytmFetchResult = getFetchResult(Website.PAYTM, keyword, sitePros);
+        //FetchResult ebayFetchResult = getFetchResult(Website.EBAY, keyword, sitePros);
         //FetchResult myntraFetchResult = getFetchResult(Website.MYNTRA, keyword, sitePros);
-        FetchResult jabongFetchResult = getFetchResult(Website.JABONG, keyword, sitePros);
-        FetchResult voonikFetchResult = getFetchResult(Website.VOONIK, keyword, sitePros);
-        FetchResult homeShopResult = getFetchResult(Website.HOMESHOP18, keyword, sitePros);
-        FetchResult limeRoadResult = getFetchResult(Website.LIMEROAD, keyword, sitePros);
+        //FetchResult jabongFetchResult = getFetchResult(Website.JABONG, keyword, sitePros);
+        //FetchResult voonikFetchResult = getFetchResult(Website.VOONIK, keyword, sitePros);
+        //FetchResult homeShopResult = getFetchResult(Website.HOMESHOP18, keyword, sitePros);
+        //FetchResult limeRoadResult = getFetchResult(Website.LIMEROAD, keyword, sitePros);
         initResultMap(autoSearchResult, flipkartFetchResult);
         initResultMap(autoSearchResult, amazonFetchResult);
         initResultMap(autoSearchResult, snapdealFetchResult);
         initResultMap(autoSearchResult, shopcluesFetchResult);
-        initResultMap(autoSearchResult, paytmFetchResult);
-        initResultMap(autoSearchResult, ebayFetchResult);
+        //initResultMap(autoSearchResult, paytmFetchResult);
+        //initResultMap(autoSearchResult, ebayFetchResult);
         //initResultMap(autoSearchResult, myntraFetchResult);
-        initResultMap(autoSearchResult, jabongFetchResult);
-        initResultMap(autoSearchResult, voonikFetchResult);
-        initResultMap(autoSearchResult, homeShopResult);
-        initResultMap(autoSearchResult, limeRoadResult);
+        //initResultMap(autoSearchResult, jabongFetchResult);
+        //initResultMap(autoSearchResult, voonikFetchResult);
+        //initResultMap(autoSearchResult, homeShopResult);
+        //initResultMap(autoSearchResult, limeRoadResult);
 
-        Boolean isUpdate = isUpdate(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
         //Boolean isUpdate = isUpdate(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, myntraFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
+        //Boolean isUpdate = isUpdate(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
+        Boolean isUpdate = isUpdate(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult);
         if (isUpdate) {
             updateMongo(autoSearchResult);
             analysisAndRelate(autoSearchResult);
         }
         //return isReFetch(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, myntraFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
-        return isReFetch(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
+        //return isReFetch(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult, paytmFetchResult, ebayFetchResult, jabongFetchResult, voonikFetchResult, homeShopResult, limeRoadResult);
+        return isReFetch(flipkartFetchResult, amazonFetchResult, snapdealFetchResult, shopcluesFetchResult);
     }
 
     private boolean isReFetch(FetchResult... fetchResultList) {
