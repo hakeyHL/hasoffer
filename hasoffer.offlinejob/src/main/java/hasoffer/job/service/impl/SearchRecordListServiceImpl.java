@@ -25,8 +25,9 @@ public class SearchRecordListServiceImpl implements ISearchRecordListService {
     public PageableResult<SrmSearchLog> getLastNoProductLog() {
         String SQL_SEARCHLOG = "select t from SrmSearchLog t where  t.ptmProductId=0  order by t.updateTime desc ";
         if (dbm != null) {
-            logger.info("query search log.");
-            return dbm.queryPage(SQL_SEARCHLOG, 1, 1000);
+            PageableResult<SrmSearchLog> srmSearchLogPageableResult = dbm.queryPage(SQL_SEARCHLOG, 1, 1000);
+            logger.info("query search log. size:{}", srmSearchLogPageableResult.getData().size());
+            return srmSearchLogPageableResult;
         }
         return null;
     }
