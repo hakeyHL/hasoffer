@@ -4,7 +4,8 @@ public enum ProductModel2SortField {
 
     F_RELEVANCE(""),
     F_POPULARITY("searchCount"),
-    F_PRICE("minPrice");
+    F_PRICE("minPrice"),
+    F_RATING("rating");
 
     private String fieldName;
 

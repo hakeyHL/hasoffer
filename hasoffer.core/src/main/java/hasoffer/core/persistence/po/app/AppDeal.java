@@ -56,6 +56,7 @@ public class AppDeal implements Identifiable<Long> {
     private String infoPageImage;//deal详情页图片
 
     private Long dealClickCount = 0l;//deal的点击次数
+    private Long originClickCount;//只针对appdealsource=deal_site的数据，保留抓取时deal的点击次数
 
     private Long dealCategoryId = -1l;//deal的目录id
 
@@ -269,6 +270,14 @@ public class AppDeal implements Identifiable<Long> {
         this.category = category;
     }
 
+    public Long getOriginClickCount() {
+        return originClickCount;
+    }
+
+    public void setOriginClickCount(Long originClickCount) {
+        this.originClickCount = originClickCount;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -297,6 +306,8 @@ public class AppDeal implements Identifiable<Long> {
         if (infoPageImage != null ? !infoPageImage.equals(deal.infoPageImage) : deal.infoPageImage != null)
             return false;
         if (dealClickCount != null ? !dealClickCount.equals(deal.dealClickCount) : deal.dealClickCount != null)
+            return false;
+        if (originClickCount != null ? !originClickCount.equals(deal.originClickCount) : deal.originClickCount != null)
             return false;
         if (dealCategoryId != null ? !dealCategoryId.equals(deal.dealCategoryId) : deal.dealCategoryId != null)
             return false;
@@ -327,6 +338,7 @@ public class AppDeal implements Identifiable<Long> {
         result = 31 * result + (listPageImage != null ? listPageImage.hashCode() : 0);
         result = 31 * result + (infoPageImage != null ? infoPageImage.hashCode() : 0);
         result = 31 * result + (dealClickCount != null ? dealClickCount.hashCode() : 0);
+        result = 31 * result + (originClickCount != null ? originClickCount.hashCode() : 0);
         result = 31 * result + (dealCategoryId != null ? dealCategoryId.hashCode() : 0);
         result = 31 * result + discount;
         result = 31 * result + (int) (ptmcmpskuid ^ (ptmcmpskuid >>> 32));
