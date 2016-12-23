@@ -44,8 +44,6 @@ public class MobileController {
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "success");
 
-        List<SiteMapKeyVo> siteMapKeyVos = new ArrayList<>();
-
         Map keyMap = new HashMap();
         //key 1
         Map proMap = new HashMap();
