@@ -493,10 +493,10 @@ public class ApiUtils {
      * 返回的pivos列表
      */
     public static void replaceCategoryParmsKey(String key, Map<String, List<NameValue<String, Long>>> tempReplacePivos, List<NameValue<String, Long>> value) {
-        if (key.equals("brand")) {
+        if (key.equals("Brand")) {
             tempReplacePivos.put("1", value);
         } else if (key.equals("1")) {
-            tempReplacePivos.put("brand", value);
+            tempReplacePivos.put("Brand", value);
         }
 
 
