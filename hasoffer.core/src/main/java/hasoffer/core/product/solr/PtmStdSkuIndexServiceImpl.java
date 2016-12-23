@@ -100,6 +100,9 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
             } else if (resultSort == SearchResultSort.PRICEH2L) {
                 sorts = new Sort[1];
                 sorts[0] = new Sort(ProductModel2SortField.F_PRICE.getFieldName(), Order.DESC);
+            } else if (resultSort == SearchResultSort.RATING) {
+                sorts = new Sort[1];
+                sorts[0] = new Sort(ProductModel2SortField.F_RATING.getFieldName(), Order.DESC);
             }
         } else {
             sorts[0] = new Sort("review", Order.DESC);
@@ -162,7 +165,14 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
     }
 
     public PageableResult<PtmStdSkuModel> filterStdSkuOnCategoryByCriteria(SearchCriteria searchCriteria) {
-        String queryString = "*:*";
+        String queryString = searchCriteria.getKeyword();
+        if (org.apache.commons.lang3.StringUtils.isEmpty(queryString)) {
+            queryString = "*:*";
+        }
+        Sort[] sorts = new Sort[1];
+        SearchResultSort resultSort = searchCriteria.getSort();
+        sorts = getSorts(sorts, resultSort);
+
         List<FilterQuery> fqList = new ArrayList<>();
         //处理 facet
         List<String> pivotFields = searchCriteria.getPivotFields();
@@ -185,7 +195,7 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
         ApiUtils.setPriceSearchScope(fqList, priceFrom, priceTo, priceToStr);
         addQuerParams2List(searchCriteria, fqList);
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
-        SearchResult<PtmStdSkuModel> sr = searchObjs(queryString, fqs, null, pivotFacets, page <= 1 ? 1 : page, size, true);
+        SearchResult<PtmStdSkuModel> sr = searchObjs(queryString, fqs, sorts, pivotFacets, page <= 1 ? 1 : page, size, true);
         //缓存以及从缓存中取
         Map<String, List<NameValue>> pivotFieldVals = new HashMap<>();
         setFacetValues(pivotFields, pivotFieldSize, sr, pivotFieldVals);
