@@ -293,6 +293,13 @@
     });
 
     function dosubmit() {
+
+        var linkUrl = $("input[name='linkUrl']").val();
+        if (linkUrl == "") {
+            alert("输入链接")
+            return;
+        }
+
         var inlineRadio1 = $("#inlineRadio1");
         var inlineRadio3 = $("#inlineRadio3");
         var checked = inlineRadio1.attr("checked");

@@ -183,7 +183,12 @@
                 <c:forEach items="${datas}" var="data">
                     <tr>
                         <td><input type="checkbox" name="subBox" value="${data.id}"/></td>
-                        <td>${data.id}</td>
+                        <c:if test="${data.appdealSource eq 'DEAL_SITE'}">
+                            <td><a href="${data.oriLinkUrl}" target="_blank">${data.id}</a></td>
+                        </c:if>
+                        <c:if test="${data.appdealSource ne 'DEAL_SITE'}">
+                            <td>${data.id}</td>
+                        </c:if>
                         <td>${data.createTime}</td>
                         <td>${data.website}</td>
                         <td>
@@ -212,7 +217,12 @@
                         </td>
 
                         <td>
-                            <a href="${data.linkUrl}">${data.title}</a>
+                            <c:if test="${empty data.linkUrl}">
+                                ${data.title}
+                            </c:if>
+                            <c:if test="${!empty data.linkUrl}">
+                                <a href="${data.linkUrl}">${data.title}</a>
+                            </c:if>
                         </td>
                         <td>${data.discount}</td>
                         <td>${data.priceDescription}</td>
