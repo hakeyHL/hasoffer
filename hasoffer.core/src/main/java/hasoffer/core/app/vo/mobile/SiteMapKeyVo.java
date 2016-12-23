@@ -33,6 +33,11 @@ public class SiteMapKeyVo {
         return this;
     }
 
+    public SiteMapKeyVo buildeShortName(String shortName) {
+        this.shortName = shortName;
+        return this;
+    }
+
     public String getName() {
         return name;
     }
