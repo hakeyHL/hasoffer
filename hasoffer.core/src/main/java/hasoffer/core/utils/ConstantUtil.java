@@ -18,7 +18,7 @@ public class ConstantUtil {
     public static final Map<String, String> API_PTMSTDSKU_PARAM_MEAN_MAP = new HashMap<>();
 
     static {
-        API_CATEGORY_FILTER_PARAMS_MAP.put("brand", "brand");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("brand", "Brand");
         API_CATEGORY_FILTER_PARAMS_MAP.put("Network", "Network");
         API_CATEGORY_FILTER_PARAMS_MAP.put("Screen_Resolution", "Screen Resolution");
         API_CATEGORY_FILTER_PARAMS_MAP.put("Operating_System", "Operating System");
