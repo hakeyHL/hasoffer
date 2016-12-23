@@ -316,7 +316,7 @@ public class AppServiceImpl implements IAppService {
 
     @Override
     public void countDealClickCount(AppDeal appDeal) {
-        appDeal.setDealClickCount(appDeal.getDealClickCount() + 1);
+        appDeal.setDealClickCount(appDeal.getDealClickCount() == null ? 0 : appDeal.getDealClickCount() + 1);
         List deals = Arrays.asList(appDeal);
         dbm.update(deals);
     }
