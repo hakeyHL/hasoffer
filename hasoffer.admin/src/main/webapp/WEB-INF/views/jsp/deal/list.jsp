@@ -238,10 +238,16 @@
                             <td>
                                     ${data.originClickCount}
                             </td>
+                            <td>
+                                    <%--这个值在vo中经过运算返回前台--%>
+                                    ${data.dealClickCount}
+                            </td>
                         </c:if>
-                        <td>
-                                ${data.dealClickCount}
-                        </td>
+                        <c:if test="${type ne 3}">
+                            <td>
+                                    ${data.dealClickCount}
+                            </td>
+                        </c:if>
                         <td><a href="detail/${data.id}">编辑</a></td>
                         <td><a href="javascript:void(0)"
                                onclick="deleteById('<%=contextPath%>/deal/delete/${data.id}')"
