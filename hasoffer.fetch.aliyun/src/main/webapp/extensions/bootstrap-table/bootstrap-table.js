@@ -519,7 +519,7 @@
         valign: undefined, // top, middle, bottom
         width: undefined,
         sortable: false,
-        order: 'asc', // asc, desc
+        order: undefined, // undefined, asc, desc
         visible: true,
         switchable: true,
         clickToSelect: true,
@@ -1912,6 +1912,7 @@
     };
 
     BootstrapTable.prototype.initServer = function (silent, query, url) {
+        // debugger;
         var that = this,
             data = {},
             params = {
@@ -1950,6 +1951,10 @@
             params.filter = JSON.stringify(this.filterColumnsPartial, null);
         }
 
+        // data = calculateObjectValue(this.options, this.options.queryParams, [params], data);
+        if (!this.options.sortable) {
+            params.order = undefined;
+        }
         data = calculateObjectValue(this.options, this.options.queryParams, [params], data);
 
         $.extend(data, query || {});
