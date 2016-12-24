@@ -1,6 +1,5 @@
 package hasoffer.joe.test;
 
-import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IFlipkartAffiliateService;
@@ -15,7 +14,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -51,17 +49,17 @@ public class OrderTest {
 
     @org.junit.Test
     public void testOrderFlipkart() {
-        int[] days = new int[]{0};
+        int[] days = new int[]{0, 1, 2, 3, 4};
         for (int i : days) {
             Date day = TimeUtils.addDay(new Date(), -i);
             List<OrderStatsAnalysisPO> orderStatsAnalysisPOs = flipkartAffiliateService.countOrderList(day, day);
             Random random = new Random();
             for (OrderStatsAnalysisPO po : orderStatsAnalysisPOs) {
-                if (MarketChannel.SHANCHUAN.name().equals(po.getChannel())) {
-                    if (random.nextInt(8) == 1) {
-                        po.setChannel(MarketChannel.OFFICIAL.name());
-                    }
-                }
+                //if (MarketChannel.SHANCHUAN.name().equals(po.getChannel())) {
+                //    if (random.nextInt(8) == 1) {
+                //        po.setChannel(MarketChannel.OFFICIAL.name());
+                //    }
+                //}
                 System.out.println(po);
             }
         }
