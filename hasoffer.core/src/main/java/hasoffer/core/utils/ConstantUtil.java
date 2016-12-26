@@ -116,7 +116,7 @@ public class ConstantUtil {
         API_PTMSTDSKU_PARAM_MEAN_MAP.put("Internal Memory", "More internal storage allows installation of more apps as well as ability to save songs, images, videos, etc.");
         API_PTMSTDSKU_PARAM_MEAN_MAP.put("Expandable Memory", "	An external microSD card supplements the internal storage and can be used for saving songs, images, videos, etc.");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("MAIN CAMERA Resolution", "A camera of higher resolution takes more detailed photos, which will look sharp on a large screen as well.");
-        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Battery Capacity", "	Higher battery capacity generally means longer battery life, but it also depends upon other factors like phone`s screen, processor, OS, optimisations by the brand and personal usage. capacity gen");
+        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Battery Capacity", "	Higher battery capacity generally means longer battery life, but it also depends upon other factors like phone`s screen, processor, OS, optimisations by the brand and personal usage.");
         API_PTMSTDSKU_PARAM_MEAN_MAP.put("Operating System", "");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Launch Date", "");
         API_PTMSTDSKU_PARAM_MEAN_MAP.put("Brand", "");
