@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 @Transactional
 public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
 
-    private final Logger logger = LoggerFactory.getLogger(FlipkartAffiliateServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger("hasoffer.affiliate.order");
 
     private IAffiliateProcessor<AffiliateOrder> flipProcessor = new FlipkartAffiliateProductProcessor();
 
