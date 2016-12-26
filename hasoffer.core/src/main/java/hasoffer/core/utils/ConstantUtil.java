@@ -123,7 +123,6 @@ public class ConstantUtil {
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Model", "");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Custom UI", "The brand’s own interface that runs on top of Android OS, and offers certain additional or different features.");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("General SIM Size", "");
-        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Network", "");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Fingerprint Sensor", "It allows you to secure your phone by using your fingerprints to unlock the smartphone");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Quick Charging", "Allows you to charge your phone faster (up to 50% in half an hour).Usually works with the phone’s official charger.");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Dimensions", "");
@@ -133,7 +132,6 @@ public class ConstantUtil {
         API_PTMSTDSKU_PARAM_MEAN_MAP.put("Screen Resolution", "In phone of the same screen size,higher  resolution indicates a sharper display.");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Pixel Density", "High pixel density indicates a sharper display.");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Display Type", "In-Plane Switching Liquid Crystal Display (IPS LCD) offers more sharpness, shows more realistic looking images, displays more natural colours and perform better in bright sunlight compared to LCD displays.");
-        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Screen Protection", "An additional layer that protects smartphone’s screen against scratches and minor knocks.");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Touch Screen", "");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Screen to Body Ratio", "Screen to body ratio tells how much of the phone size is covered by the screen; the higher the better");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Chipset", "");
