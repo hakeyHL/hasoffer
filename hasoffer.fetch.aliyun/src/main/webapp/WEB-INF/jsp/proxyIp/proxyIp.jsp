@@ -195,6 +195,7 @@
         var $ip = $("#ip").val();
         var $port = $("#port").val();
 
+
         var url = "${ctx}/proxyIP/insertProxyIP";
         var args = {
             ip: $ip,
@@ -211,6 +212,8 @@
             success: function (data) {
                 $table.bootstrapTable('refresh');
                 alert(data.msg);
+                $("#ip").val("");
+                $("#port").val("");
             }
         });
     }
