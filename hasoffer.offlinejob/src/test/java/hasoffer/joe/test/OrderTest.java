@@ -8,6 +8,7 @@ import hasoffer.core.admin.ISnapdealAffiliateService;
 import hasoffer.core.admin.IUrmAffAccountService;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.admin.UrmAffAccount;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -17,7 +18,6 @@ import javax.annotation.Resource;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:spring-beans.xml"})
@@ -49,11 +49,26 @@ public class OrderTest {
 
     @org.junit.Test
     public void testOrderFlipkart() {
-        int[] days = new int[]{0, 1, 2, 3, 4};
+        //int[] days = new int[]{0, 1, 2, 3, 4};
+        int[] days = new int[]{6};
         for (int i : days) {
             Date day = TimeUtils.addDay(new Date(), -i);
-            List<OrderStatsAnalysisPO> orderStatsAnalysisPOs = flipkartAffiliateService.countOrderList(day, day);
-            Random random = new Random();
+            String formatStartTime = DateFormatUtils.format(day, "yyyy-MM-dd 00:00:00.000");
+            Date startTime = null;
+            try {
+                startTime = DateUtils.parseDate(formatStartTime, "yyyy-MM-dd HH:mm:ss.SSS");
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            String formatEndTime = DateFormatUtils.format(day, "yyyy-MM-dd 00:00:00.000");
+            Date endTime = null;
+            try {
+                endTime = DateUtils.parseDate(formatEndTime, "yyyy-MM-dd HH:mm:ss.SSS");
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            List<OrderStatsAnalysisPO> orderStatsAnalysisPOs = flipkartAffiliateService.countOrderList(startTime, endTime);
+            //Random random = new Random();
             for (OrderStatsAnalysisPO po : orderStatsAnalysisPOs) {
                 //if (MarketChannel.SHANCHUAN.name().equals(po.getChannel())) {
                 //    if (random.nextInt(8) == 1) {
