@@ -376,7 +376,7 @@ public class Compare2Controller {
             resultMap.put("Expandable Memory", ptmStdSkuModel.getExpandable_Memory() == 0 ? "Unavailable" : "Up to " + ptmStdSkuModel.getExpandable_Memory() + " GB");
             resultMap.put("Screen Resolution", ptmStdSkuModel.getScreen_Resolution() == null ? "" : ptmStdSkuModel.getScreen_Resolution());
             resultMap.put("Operating System", ptmStdSkuModel.getOperating_System() == null ? "" : ptmStdSkuModel.getOperating_System());
-            resultMap.put("Network", ptmStdSkuModel.getNetwork());
+            resultMap.put("Network Support", ptmStdSkuModel.getNetwork() == null ? "" : ptmStdSkuModel.getNetwork());
 
             //遍历去除空值
             Set<Map.Entry<String, String>> entries = resultMap.entrySet();
