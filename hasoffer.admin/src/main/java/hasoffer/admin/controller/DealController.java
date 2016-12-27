@@ -185,11 +185,11 @@ public class DealController {
             //修改了图片
             if (!bannerFile.isEmpty()) {
                 try {
-                File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
-                FileUtil.writeBytes(imageFile, bannerFile.getBytes());
+                    File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
+                    FileUtil.writeBytes(imageFile, bannerFile.getBytes());
                     bannerImageUrl = ImageUtil.uploadImage(imageFile);
                 } catch (Exception e) {
-                    logger.error("banner image upload fail");
+                    logger.error("banner image upload fail ,{}", e.getMessage());
                     return new ModelAndView("redirect:/deal/list");
                 }
             }
@@ -204,7 +204,7 @@ public class DealController {
                     dealBigPath = ImageUtil.uploadImage(imageFile, 316, 180);
                     dealSmallPath = ImageUtil.uploadImage(imageFile, 180, 180);
                 } catch (Exception e) {
-                    logger.error("deal image upload fail");
+                    logger.error("deal image upload fail , {}", e.getMessage());
                     return new ModelAndView("redirect:/deal/list");
                 }
             }
