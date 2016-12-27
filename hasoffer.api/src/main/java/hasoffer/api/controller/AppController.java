@@ -357,7 +357,9 @@ public class AppController {
                 while (iterator.hasNext()) {
                     lastDayReward = iterator.next();
                 }
-                data.setSignMoreCoin(sinDaysRewardsCfg.get(lastDayReward));
+                if (sinDaysRewardsCfg.get(lastDayReward) != null) {
+                    data.setSignMoreCoin(sinDaysRewardsCfg.get(lastDayReward));
+                }
             }
         }
         mv.addObject("data", data);
@@ -615,11 +617,11 @@ public class AppController {
             String appVersion = deviceInfoVo.getAppVersion();
             version = Integer.parseInt(appVersion);
             if (version >= 36) {
-                criteria.setPivotFields(Arrays.asList("Network",
+                criteria.setPivotFields(Arrays.asList("Network_Support",
                         "Screen_Resolution", "Operating_System", "queryRam",
                         "queryScreenSize", "querySecondaryCamera",
                         "queryBatteryCapacity", "queryPrimaryCamera",
-                        "queryInternalMemory", "brand"));
+                        "queryInternalMemory", "Brand"));
             }
         }
         //查询热卖商品
