@@ -44,6 +44,55 @@ public class MobileController {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("errorCode", "00000");
         modelAndView.addObject("msg", "success");
+        List<Integer> priceList = new LinkedList<>();
+        priceList.add(5000);
+        priceList.add(10000);
+        priceList.add(15000);
+        priceList.add(20000);
+        priceList.add(25000);
+        priceList.add(30000);
+
+
+        //获取distinct的品牌列表
+        List<String> brandList = ptmStdSKuService.getPtmStdSkuBrandList();
+        //--特征1
+        //FM radio --FM_Radio 能与不能
+        //SIM_SLOT 包含Dual Sim
+        //Network_Support 包含 3G 4G
+        //OperatingSystem  包含windows
+        //Touch Screen 能与不能
+        //Bluetooth 能与不能
+        //Camera  不管前置还是后置
+        Map<String, Map<String, String>> characteristicMap1 = new HashMap();
+        characteristicMap1.put("Wireless Fm", ApiUtils.getBuilderMap("FM_Radio", "yes", null));
+        characteristicMap1.put("Dual Sim", ApiUtils.getBuilderMap("SIM_Slot", "Dual Sim", null));
+        characteristicMap1.put("3g", ApiUtils.getBuilderMap("Network_Support", "3G", null));
+        characteristicMap1.put("Camera", ApiUtils.getBuilderMap("Camera", "yes", null));
+        characteristicMap1.put("Windows", ApiUtils.getBuilderMap("Operating_System", "Windows", null));
+        characteristicMap1.put("Touch Screen", ApiUtils.getBuilderMap("Touch_Screen", "yes", null));
+        characteristicMap1.put("Bluetooth", ApiUtils.getBuilderMap("Bluetooth", "yes", null));
+        characteristicMap1.put("4g", ApiUtils.getBuilderMap("Network_Support", "4G", null));
+
+        //--特征2
+        //Camera  不管前置还是后置
+        //SIM_SLOT 包含Dual Sim
+        //Network_Support 包含 3G
+        //Bluetooth 能与不能
+        //OperatingSystem  包含Android
+        //Touch Screen 能与不能
+        //Processor 为双核Dual Core
+        //Wi Fi 能与不能
+
+        Map<String, Map<String, String>> characteristicMap2 = new HashMap();
+        characteristicMap2.put("Wireless Fm", ApiUtils.getBuilderMap("FM_Radio", "yes", null));
+        characteristicMap2.put("Dual Sim", ApiUtils.getBuilderMap("SIM_Slot", "Dual Sim", null));
+        characteristicMap2.put("3g", ApiUtils.getBuilderMap("Network_Support", "3G", null));
+        characteristicMap2.put("Camera", ApiUtils.getBuilderMap("Camera", "yes", null));
+        characteristicMap2.put("Android", ApiUtils.getBuilderMap("Operating_System", "Android", null));
+        characteristicMap2.put("WiFi", ApiUtils.getBuilderMap("WiFi", "yes", null));
+        characteristicMap2.put("Touch Screen", ApiUtils.getBuilderMap("Touch_Screen", "yes", null));
+        characteristicMap2.put("Bluetooth", ApiUtils.getBuilderMap("Bluetooth", "yes", null));
+        characteristicMap2.put("Processor", ApiUtils.getBuilderMap("Processor", "Dual Core", null));
 
         Map<String, List> keyMap = new HashMap();
         //key 1
@@ -62,14 +111,75 @@ public class MobileController {
         }
         keyMap.put("All Mobile Models In India", stdSkuKeyVoList);
         //key 3
-        keyMap.put("Top 10 Mobiles", Arrays.asList(
-                new SiteMapKeyVo("Top 10  Mobiles  Below 5000", 2).builderProMap("price", "5000"),
-                new SiteMapKeyVo("Top 10  Mobiles  Below 10000", 2).builderProMap("price", "10000"),
-                new SiteMapKeyVo("Top 10  Mobiles  Below 15000", 2).builderProMap("price", "15000"),
-                new SiteMapKeyVo("Top 10  Mobiles  Below 20000", 2).builderProMap("price", "20000"),
-                new SiteMapKeyVo("Top 10  Mobiles  Below 25000", 2).builderProMap("price", "25000"),
-                new SiteMapKeyVo("Top 10  Mobiles  Below 30000", 2).builderProMap("price", "30000"),
+        List<SiteMapKeyVo> top10MobilesList = new LinkedList<>();
+        top10MobilesList.addAll(Arrays.asList(
+                //1. Top 10 + Mobiles + Below +“价格参数”
+                new SiteMapKeyVo("Top 10  Mobiles  Below 5000", 2).builderProMap("minPrice", "5000"),
+                new SiteMapKeyVo("Top 10  Mobiles  Below 10000", 2).builderProMap("minPrice", "10000"),
+                new SiteMapKeyVo("Top 10  Mobiles  Below 15000", 2).builderProMap("minPrice", "15000"),
+                new SiteMapKeyVo("Top 10  Mobiles  Below 20000", 2).builderProMap("minPrice", "20000"),
+                new SiteMapKeyVo("Top 10  Mobiles  Below 25000", 2).builderProMap("minPrice", "25000"),
+                new SiteMapKeyVo("Top 10  Mobiles  Below 30000", 2).builderProMap("minPrice", "30000"),
 
+                new SiteMapKeyVo("SamSung mobile", 2).builderProMap("Brand", "Samsung"),
+                new SiteMapKeyVo("SamSung mobile Below 5000", 2).builderProMap("minPrice", "5000"),
+                new SiteMapKeyVo("SamSung mobile Below 10000", 2).builderProMap("minPrice", "10000"),
+                new SiteMapKeyVo("SamSung mobile Below 15000", 2).builderProMap("minPrice", "15000"),
+                new SiteMapKeyVo("SamSung mobile Below 20000", 2).builderProMap("minPrice", "20000"),
+                new SiteMapKeyVo("SamSung mobile Below 25000", 2).builderProMap("minPrice", "25000"),
+                new SiteMapKeyVo("SamSung mobile Below 30000", 2).builderProMap("minPrice", "30000"),
+
+                new SiteMapKeyVo("Redmi Note 3 mobile", 2).builderProMap("Model", "Redmi Note 3"),
+                new SiteMapKeyVo("Redmi Note 3 mobile Below 5000", 2).builderProMap("minPrice", "5000"),
+                new SiteMapKeyVo("Redmi Note 3 mobile Below 10000", 2).builderProMap("minPrice", "10000"),
+                new SiteMapKeyVo("Redmi Note 3 mobile Below 15000", 2).builderProMap("minPrice", "15000"),
+                new SiteMapKeyVo("Redmi Note 3 mobile Below 20000", 2).builderProMap("minPrice", "20000"),
+                new SiteMapKeyVo("Redmi Note 3 mobile Below 25000", 2).builderProMap("minPrice", "25000"),
+                new SiteMapKeyVo("Redmi Note 3 mobile Below 30000", 2).builderProMap("minPrice", "30000")));
+        //2. Top 10 + “品牌名称” + Mobiles
+        for (String brand : brandList) {
+            top10MobilesList.add(new SiteMapKeyVo(brand, 2).builderProMap("Brand", brand));
+        }
+
+        //3. Top 10 + “品牌名称” + Mobiles + Below +“价格参数”
+//                new SiteMapKeyVo("Top 10 HTC Mobiles Below 5000", 2).builderProMap("minPrice", "5000").builderProMap("Brand", "HTC"),
+        for (String brand : brandList) {
+            for (Integer price : priceList) {
+                top10MobilesList.add(new SiteMapKeyVo("Top 10 " + brand + " Mobiles Below " + price, 2).builderProMap("minPrice", price + "").builderProMap("Brand", brand));
+            }
+        }
+
+        //4. Top 10 + 手机特征1+ Mobiles
+        String[] map1Keys = characteristicMap1.keySet().toArray(new String[]{});
+        for (String key : map1Keys) {
+            top10MobilesList.add(new SiteMapKeyVo("Top 10 " + key + " Mobiles", 2).builderProMap(characteristicMap1.get(key)));
+        }
+        //5. Top 10 +手机特征2 + Smart Phones
+        String[] map2Keys = characteristicMap2.keySet().toArray(new String[]{});
+        for (String key : map2Keys) {
+            top10MobilesList.add(new SiteMapKeyVo("Top 10 " + key + " Smart Phones", 2).builderProMap(characteristicMap2.get(key)));
+        }
+        //6. Top 10 +品牌+手机特征2+Mobiles
+        for (String brand : brandList) {
+            for (String key : map2Keys) {
+                top10MobilesList.add(new SiteMapKeyVo("Top 10 " + brand + " " + key + " Mobiles", 2).builderProMap(characteristicMap2.get(key)).builderProMap("Brand", brand));
+            }
+        }
+        //7. Top 10+手机特征2 + Mobiles+Below+价格参数
+        for (String key : map2Keys) {
+            for (Integer price : priceList) {
+                top10MobilesList.add(new SiteMapKeyVo("Top 10 " + key + " Mobiles Below " + price, 2).builderProMap(characteristicMap2.get(key)).builderProMap("minPrice", price + ""));
+            }
+        }
+        //8. Top 10 +品牌+手机特征2+Mobiles+Below+价格参数
+        for (String brand : brandList) {
+            for (String key : map2Keys) {
+                for (Integer price : priceList) {
+                    top10MobilesList.add(new SiteMapKeyVo("Top 10 " + brand + " " + key + " Mobiles Below " + price, 2).builderProMap(characteristicMap2.get(key)).builderProMap("minPrice", price + "").builderProMap("Brand", brand));
+                }
+            }
+        }
+        top10MobilesList.addAll(Arrays.asList(
                 new SiteMapKeyVo("Top 10 Htc Desire Series Mobiles", 1).buildeShortName("Htc Desire Series"),
                 new SiteMapKeyVo("Top 10 Sony Xperia Series Mobiles", 1).buildeShortName("Sony Xperia Series"),
                 new SiteMapKeyVo("Top 10 Samsung Galaxy Series Mobiles", 1).buildeShortName("Samsung Galaxy Series"),
@@ -78,10 +188,9 @@ public class MobileController {
                 new SiteMapKeyVo("Top 10 Nokia Asha Series Mobiles", 1).buildeShortName("Nokia Asha Series"),
                 new SiteMapKeyVo("Top 10 T Series Mobiles", 1).buildeShortName("T Series"),
                 new SiteMapKeyVo("Top 10 T Series Camera Mobiles", 1).buildeShortName("T Series"),
-                new SiteMapKeyVo("Top 10 T Series Dual Sim Mobiles", 1).buildeShortName("T Series"),
-                //Top 10 + “品牌名称” + Mobiles + Below +“价格参数”
-                new SiteMapKeyVo("Top 10 HTC Mobiles Below 50000", 2).builderProMap("price", "5000").builderProMap("brand", "HTC")
+                new SiteMapKeyVo("Top 10 T Series Dual Sim Mobiles", 1).buildeShortName("T Series")
         ));
+        keyMap.put("Top 10 Mobiles", top10MobilesList);
         modelAndView.addObject("data", keyMap);
         return modelAndView;
     }
@@ -144,6 +253,9 @@ public class MobileController {
                             if (key.equals("price")) {
                                 searchCriteria.setPriceFrom(1);
                                 searchCriteria.setPriceTo(Integer.parseInt(value));
+                            }
+                            if (key.equals("model")) {
+                                searchCriteria.setModel(new String[]{value});
                             }
                         }
                     }
