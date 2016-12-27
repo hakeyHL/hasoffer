@@ -357,7 +357,9 @@ public class AppController {
                 while (iterator.hasNext()) {
                     lastDayReward = iterator.next();
                 }
-                data.setSignMoreCoin(sinDaysRewardsCfg.get(lastDayReward));
+                if (sinDaysRewardsCfg.get(lastDayReward) != null) {
+                    data.setSignMoreCoin(sinDaysRewardsCfg.get(lastDayReward));
+                }
             }
         }
         mv.addObject("data", data);
@@ -615,11 +617,11 @@ public class AppController {
             String appVersion = deviceInfoVo.getAppVersion();
             version = Integer.parseInt(appVersion);
             if (version >= 36) {
-                criteria.setPivotFields(Arrays.asList("Network",
+                criteria.setPivotFields(Arrays.asList("Network_Support",
                         "Screen_Resolution", "Operating_System", "queryRam",
                         "queryScreenSize", "querySecondaryCamera",
                         "queryBatteryCapacity", "queryPrimaryCamera",
-                        "queryInternalMemory", "brand"));
+                        "queryInternalMemory", "Brand"));
             }
         }
         //查询热卖商品
@@ -961,7 +963,6 @@ public class AppController {
         if (deviceInfoVo != null) {
             String appVersion = deviceInfoVo.getAppVersion();
             if (!StringUtils.isEmpty(appVersion)) {
-                //暂时只是去除空格,未来要加上正则匹配,希望根林不要坑我...
                 appVersion = appVersion.trim();
                 Integer vsion = Integer.valueOf(appVersion);
                 if (StringUtils.isEmpty(id)) {
@@ -1120,7 +1121,6 @@ public class AppController {
                         }
                         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
                         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-                        System.out.println("link url is  :" + appDeal.getLinkUrl());
                         String s = appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId});
                         logger.info(" dealInfo record deal deepLink :" + s);
                         map.put("deeplink", s);

@@ -1,5 +1,6 @@
 package hasoffer.core.bo.system;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import hasoffer.base.enums.SearchResultSort;
 
 import java.util.Arrays;
@@ -22,21 +23,31 @@ public class SearchCriteria {
     private List<String> pivotFields;
     private SearchResultSort sort = SearchResultSort.RELEVANCE;
 
-
+    @JsonProperty(value = "Brand")
     private String[] brand;
-    private String[] network;
+    @JsonProperty(value = "NetworkSupport")
+    private String[] networkSupport;
+    @JsonProperty(value = "ScreenResolution")
     private String[] screenResolution;
+    @JsonProperty(value = "OpreatingSystem")
     private String[] opreatingSystem;
+    @JsonProperty(value = "ExpandableMemory")
     private String[] expandableMemory;
 
     //int filter
+    @JsonProperty(value = "RAM")
     private String[] ram;
+    @JsonProperty(value = "BatteryCapacity")
     private String[] batteryCapacity;
+    @JsonProperty(value = "InternalMemory")
     private String[] internalMemory;
 
     //float
+    @JsonProperty(value = "PrimaryCamera")
     private String[] primaryCamera;
+    @JsonProperty(value = "SecondaryCamera")
     private String[] secondaryCamera;
+    @JsonProperty(value = "ScreenSize")
     private String[] screenSize;
 
 
@@ -149,7 +160,7 @@ public class SearchCriteria {
                 ", pivotFields=" + pivotFields +
                 ", sort=" + sort +
                 ", brand=" + Arrays.toString(brand) +
-                ", netWork=" + Arrays.toString(network) +
+                ", networkSupport=" + Arrays.toString(networkSupport) +
                 ", screenResolution=" + Arrays.toString(screenResolution) +
                 ", opreatingSystem=" + Arrays.toString(opreatingSystem) +
                 ", expandableMemory=" + Arrays.toString(expandableMemory) +
@@ -170,12 +181,12 @@ public class SearchCriteria {
         this.brand = brand;
     }
 
-    public String[] getNetwork() {
-        return network;
+    public String[] getNetworkSupport() {
+        return networkSupport;
     }
 
-    public void setNetwork(String[] network) {
-        this.network = network;
+    public void setNetworkSupport(String[] networkSupport) {
+        this.networkSupport = networkSupport;
     }
 
     public String[] getScreenResolution() {

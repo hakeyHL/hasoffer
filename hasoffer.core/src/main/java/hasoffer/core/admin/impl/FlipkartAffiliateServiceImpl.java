@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 @Transactional
 public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
 
-    private final Logger logger = LoggerFactory.getLogger(FlipkartAffiliateServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger("hasoffer.affiliate.order");
 
     private IAffiliateProcessor<AffiliateOrder> flipProcessor = new FlipkartAffiliateProductProcessor();
 
@@ -129,10 +129,12 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
         }
         try {
             for (UrmAffAccount affAccount : affAccounts) {
-                orderList.addAll(getOrderList(affAccount.getTrackingId(), affAccount.getToken(), FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime));
+                List<AffiliateOrder> tenOrderList = getOrderList(affAccount.getTrackingId(), affAccount.getToken(), FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime);
+                orderList.addAll(tenOrderList);
                 TimeUnit.SECONDS.sleep(3);
-                orderList.addAll(getOrderList(affAccount.getTrackingId(), affAccount.getToken(), FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime));
-                logger.info("over affId:{}, order.size:{}, date:{} ", affAccount.getLoginName(), orderList.size(), startTime);
+                List<AffiliateOrder> approvedOrderList = getOrderList(affAccount.getTrackingId(), affAccount.getToken(), FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime);
+                orderList.addAll(approvedOrderList);
+                logger.info("over affId:{}, count.order.size:{}, affId.order.size:{}, date:{} ", affAccount.getLoginName(), orderList.size(), tenOrderList.size() + approvedOrderList.size(), startTime);
                 TimeUnit.SECONDS.sleep(3);
             }
 

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -157,130 +158,46 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
     private void setStdModel(List<PtmStdSkuParamGroup> ptmStdSkuParamGroups, PtmStdSkuModel ptmStdSkuModel) {
 //        try {
         for (PtmStdSkuParamGroup ptmStdSkuParamGroup : ptmStdSkuParamGroups) {
+            String groupName = ptmStdSkuParamGroup.getName();
             List<PtmStdSkuParamNode> params = ptmStdSkuParamGroup.getParams();
             for (PtmStdSkuParamNode ptmStdSkuParamNode : params) {
                 String name = ptmStdSkuParamNode.getName();
-                if (compareIgnoreCase(name, CategoryFilterParams.BRAND)) {
-                    ptmStdSkuModel.setBrand(ptmStdSkuParamNode.getValue());
-                    continue;
-                }
-                if (compareIgnoreCase(name, CategoryFilterParams.RAM)) {
-                    String ram = ptmStdSkuParamNode.getValue();
-                    int numberFromString = ApiUtils.getNumberFromString(ram);
-                    if (numberFromString != -1) {
-                        //整数
-                        if (ram.contains("GB")) {
-                            ptmStdSkuModel.setRam(numberFromString * 1024);
-                            setQueryRam(ptmStdSkuModel, numberFromString);
-                        } else {
-                            //MB
-                            calcMBRam(ptmStdSkuModel, numberFromString);
-                            ptmStdSkuModel.setRam(numberFromString);
-                        }
-                    } else {
-                        //小数,只处理GB
-                        String stringRam = ApiUtils.getStringNumberFromString(ram);
-                        if (!stringRam.equals("")) {
-                            if (ram.contains("GB")) {
-                                int mbNumber = BigDecimal.valueOf(Float.parseFloat(stringRam)).multiply(BigDecimal.valueOf(1024)).intValue();
-                                calcMBRam(ptmStdSkuModel, numberFromString);
-                                ptmStdSkuModel.setRam(mbNumber);
-                            }
-                            //TODO MB如果有小数先不处理
-                        }
-                    }
-                    continue;
-                }
-                if (compareIgnoreCase(name, CategoryFilterParams.NETWORK)) {
-                    String netWorkString = ptmStdSkuParamNode.getValue();
-                    if (netWorkString.contains("2")) {
-                        ptmStdSkuModel.setNetwork("2G");
-                    }
-                    if (netWorkString.contains("3")) {
-                        ptmStdSkuModel.setNetwork("3G");
-                    }
-                    if (netWorkString.contains("4")) {
-                        ptmStdSkuModel.setNetwork("4G");
-                    }
-                    continue;
-                }
-                if (compareIgnoreCase(name, CategoryFilterParams.SCREEN_SIZE)) {
-                    String screenSize = ptmStdSkuParamNode.getValue();
-                    int inch = screenSize.indexOf("inch");
-                    if (inch != -1) {
-                        screenSize = screenSize.substring(0, inch).replaceAll(" ", "");
-                        float size = Float.parseFloat(screenSize);
-                        ptmStdSkuModel.setScreen_Size(size);
-                        setQueryScreenSize(ptmStdSkuModel, size);
-                    }
-                    continue;
-                }
-
-                if (compareIgnoreCase(name, CategoryFilterParams.SCREEN_RESOLUTION)) {
-                    String screenResolution = ptmStdSkuParamNode.getValue();
-                    //处理一下
-                    if (StringUtils.isNotEmpty(screenResolution)) {
-                        //"Screen Resolution"中分为五类分别是 4096x2160（4K）、 2048x1536（2K）、1920x1080（Full HD）、1280x720（HD）、High PPI Display
-                        if (screenResolution.replaceAll(" ", "").toLowerCase().contains("1920x1080") || screenResolution.replaceAll(" ", "").toLowerCase().contains("1080x1920")) {
-                            ptmStdSkuModel.setScreen_Resolution("1920x1080 (Full HD)");
-                        } else if (screenResolution.replaceAll(" ", "").toLowerCase().contains("1280x720") || screenResolution.replaceAll(" ", "").toLowerCase().contains("720x1280")) {
-                            ptmStdSkuModel.setScreen_Resolution("1280x720 (HD)");
-                        } else {
-                            ptmStdSkuModel.setScreen_Resolution("Others");
-                        }
-                    }
-                    continue;
-                }
-                if (compareIgnoreCase(name, CategoryFilterParams.RESOLUTION)) {
-                    String resolution = ptmStdSkuParamNode.getValue();
-                    if (resolution.contains("Camera")) {
-                        int mp = resolution.indexOf("MP");
-                        if (mp != -1) {
-                            float floatResolution = Float.parseFloat(resolution.substring(0, mp).replaceAll(" ", ""));
-                            if (resolution.toLowerCase().contains("primary")) {
-                                ptmStdSkuModel.setPrimary_Camera(floatResolution);
-                                setQuerySecPriCamera(ptmStdSkuModel, floatResolution, true);
-                            } else {
-                                ptmStdSkuModel.setSecondary_Camera(floatResolution);
-                                setQuerySecPriCamera(ptmStdSkuModel, floatResolution, false);
-                            }
-                        }
-                    }
-                    continue;
-                }
-
-                if (compareIgnoreCase(name, CategoryFilterParams.CAPACITY)) {
-                    String batteryCapacity = ptmStdSkuParamNode.getValue();
-                    if (batteryCapacity.toLowerCase().contains("mah")) {
-                        int mAh = batteryCapacity.indexOf("mAh");
-                        if (mAh != -1) {
-                            batteryCapacity = batteryCapacity.substring(0, mAh).replaceAll(" ", "");
-                            int numberFromString = ApiUtils.getNumberFromString(batteryCapacity);
-                            ptmStdSkuModel.setBattery_Capacity(numberFromString);
-                            setQueryBatteryCapacity(ptmStdSkuModel, numberFromString);
-                        }
-                    }
-                    continue;
-                }
-
-                if (compareIgnoreCase(name, CategoryFilterParams.OPERATING_SYSTEM)) {
-                    String opreatingSystem = ptmStdSkuParamNode.getValue();
-                    setOpeartingSystem(opreatingSystem, ptmStdSkuModel);
-//                    ptmStdSkuModel.setOperating_System(opreatingSystem);
-                }
-
-                if (compareIgnoreCase(name, CategoryFilterParams.INTERNAL_MEMORY)) {
-                    String internalMemory = ptmStdSkuParamNode.getValue();
-                    int numberFromString = ApiUtils.getNumberFromString(internalMemory);
-                    ptmStdSkuModel.setInternal_Memory(numberFromString);
-                    setQueryInternalMemory(ptmStdSkuModel, numberFromString);
-                    continue;
-                }
-
-                if (compareIgnoreCase(name, CategoryFilterParams.EXPANDABLE_MEMORY)) {
-                    String expandableMemory = ptmStdSkuParamNode.getValue();
-                    ptmStdSkuModel.setExpandable_Memory(ApiUtils.getNumberFromString(expandableMemory));
-                    continue;
+                //General---> launch Date,brand,model,操作系统
+                switch (groupName) {
+                    case "General":
+                        setGeneral(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        break;
+                    case "Design":
+                        setDesign(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        break;
+                    case "Display":
+                        setDisplays(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        break;
+                    case "Performance":
+                        setPerformance(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        break;
+                    case "Storage":
+                        setStorage(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        break;
+                    case "Main Camera":
+                        setMainCamera(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        break;
+                    case "Front Camera":
+                        setFontCamera(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        break;
+                    case "Battery":
+                        setBattery(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        break;
+                    case "Network & Connectivity":
+                        setNetworkConnectivity(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        break;
+                    case "Multimedia":
+                        setMultimedia(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        break;
+                    case "Special Features":
+                        setSpecialFeatures(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        break;
+                    default:
                 }
             }
         }
@@ -380,9 +297,11 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
 
     private void setQueryInternalMemory(PtmStdSkuModel ptmStdSkuModel, int internalMemory) {
         //1GB-2GB、128GB、16GB、2GB-4GB、256GB&Above、32GB、4GB、64GB、8GB、Less than 1GB
-        //暂时去掉Less than 1GB
-        //TODO 这儿不合理
-        if (internalMemory <= 2) {
+        internalMemory = internalMemory / 1024;
+        if (internalMemory < 1) {
+            ptmStdSkuModel.setQueryInternalMemory("Less than 1GB");
+            return;
+        } else if (internalMemory <= 2) {
             ptmStdSkuModel.setQueryInternalMemory("1GB-2GB");
             return;
         } else if (2 <= internalMemory && internalMemory <= 4) {
@@ -481,6 +400,372 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
                 ptmStdSkuModel.setOperating_System("Windows");
                 return;
             }
+        }
+    }
+
+    /**
+     * 设置General 组数据
+     *
+     * @param ptmStdSkuModel
+     * @param ptmStdSkuParamNode
+     * @param name
+     */
+    public void setGeneral(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH);
+        if (compareIgnoreCase(name, CategoryFilterParams.Brand)) {
+            ptmStdSkuModel.setBrand(ptmStdSkuParamNode.getValue());
+            return;
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.Model)) {
+            ptmStdSkuModel.setModel(ptmStdSkuParamNode.getValue());
+            return;
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.Launch_Date)) {
+            String launchDateString = ptmStdSkuParamNode.getValue();
+            //February 3, 2016 (Official)
+            if (launchDateString.contains(" (Official)")) {
+                launchDateString = launchDateString.replace(" (Official)", "");
+            }
+            try {
+                Date launchDate = simpleDateFormat.parse(launchDateString);
+                ptmStdSkuModel.setLaunch_Date(launchDate);
+            } catch (Exception e) {
+                return;
+            }
+            return;
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.Operating_System)) {
+            String opreatingSystem = ptmStdSkuParamNode.getValue();
+            setOpeartingSystem(opreatingSystem, ptmStdSkuModel);
+            return;
+        }
+        if (name.equals("SIM Slot(s)")) {
+            ptmStdSkuModel.setSIM_Slot(ptmStdSkuParamNode.getValue());
+            return;
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.SIM_Size)) {
+            ptmStdSkuModel.setSIM_Size(ptmStdSkuParamNode.getValue().split(",")[0]);
+            return;
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.Network)) {
+            String netWorkString = ptmStdSkuParamNode.getValue();
+            StringBuilder stringBuilder = new StringBuilder();
+            if (netWorkString.contains("2")) {
+                stringBuilder.append("2G");
+            }
+            if (netWorkString.contains("3")) {
+                stringBuilder.append("hasoffer");
+                stringBuilder.append("3G");
+            }
+            if (netWorkString.contains("4")) {
+                stringBuilder.append("hasoffer");
+                stringBuilder.append("4G");
+            }
+            ptmStdSkuModel.setNetwork_Support(stringBuilder.toString());
+            return;
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.Fingerprint_Sensor)) {
+            ptmStdSkuModel.setFingerprint_Sensor(ptmStdSkuParamNode.getValue());
+        }
+    }
+
+    public void setDesign(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+        //Weight
+        if (compareIgnoreCase(name, CategoryFilterParams.Weight)) {
+            int numberFromString = ApiUtils.getNumberFromString(ptmStdSkuParamNode.getValue());
+            ptmStdSkuModel.setWeight(numberFromString);
+        }
+    }
+
+    public void setDisplays(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+        //Screen_Resolution  Screen_Size queryScreenSize  Pixel_Density  Touch_Screen  Screen_to_Body_Ratio
+        if (compareIgnoreCase(name, CategoryFilterParams.Screen_Size)) {
+            String screenSize = ptmStdSkuParamNode.getValue();
+            int inch = screenSize.indexOf("inch");
+            if (inch != -1) {
+                screenSize = screenSize.substring(0, inch).replaceAll(" ", "");
+                float size = Float.parseFloat(screenSize);
+                ptmStdSkuModel.setScreen_Size(size);
+                setQueryScreenSize(ptmStdSkuModel, size);
+            }
+            return;
+        }
+
+        if (compareIgnoreCase(name, CategoryFilterParams.Screen_Resolution)) {
+            String screenResolution = ptmStdSkuParamNode.getValue();
+            //处理一下
+            if (StringUtils.isNotEmpty(screenResolution)) {
+                //"Screen Resolution"中分为五类分别是 4096x2160（4K）、 2048x1536（2K）、1920x1080（Full HD）、1280x720（HD）、High PPI Display
+                if (screenResolution.replaceAll(" ", "").toLowerCase().contains("1920x1080") || screenResolution.replaceAll(" ", "").toLowerCase().contains("1080x1920")) {
+                    ptmStdSkuModel.setScreen_Resolution("1920x1080 (Full HD)");
+                } else if (screenResolution.replaceAll(" ", "").toLowerCase().contains("1280x720") || screenResolution.replaceAll(" ", "").toLowerCase().contains("720x1280")) {
+                    ptmStdSkuModel.setScreen_Resolution("1280x720 (HD)");
+                } else {
+                    ptmStdSkuModel.setScreen_Resolution("Others");
+                }
+            }
+            return;
+        }
+
+        if (compareIgnoreCase(name, CategoryFilterParams.Pixel_Density)) {
+            String value = ptmStdSkuParamNode.getValue();
+            int numberFromString = ApiUtils.getNumberFromString(value);
+            if (numberFromString > 0) {
+                ptmStdSkuModel.setPixel_Density(numberFromString);
+            }
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.Touch_Screen)) {
+            ptmStdSkuModel.setTouch_Screen(ptmStdSkuParamNode.getValue());
+
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.Screen_to_Body_Ratio)) {
+            String value = ptmStdSkuParamNode.getValue();
+            if (StringUtils.isNotEmpty(value) && value.contains("%")) {
+                value = value.substring(0, value.indexOf("%")).replaceAll(" ", "");
+                ptmStdSkuModel.setScreen_to_Body_Ratio(Float.parseFloat(value));
+            }
+        }
+    }
+
+    public void setPerformance(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+        //Processor  Graphics  queryRam RAM
+        if (compareIgnoreCase(name, CategoryFilterParams.RAM)) {
+            String ram = ptmStdSkuParamNode.getValue();
+            int numberFromString = ApiUtils.getNumberFromString(ram);
+            if (numberFromString != -1) {
+                //整数
+                if (ram.contains("GB")) {
+                    ptmStdSkuModel.setRAM(numberFromString * 1024);
+                    setQueryRam(ptmStdSkuModel, numberFromString);
+                } else {
+                    //MB
+                    calcMBRam(ptmStdSkuModel, numberFromString);
+                    ptmStdSkuModel.setRAM(numberFromString);
+                }
+            } else {
+                //小数,只处理GB
+                String stringRam = ApiUtils.getStringNumberFromString(ram);
+                if (!stringRam.equals("")) {
+                    if (ram.contains("GB")) {
+                        int mbNumber = BigDecimal.valueOf(Float.parseFloat(stringRam)).multiply(BigDecimal.valueOf(1024)).intValue();
+                        calcMBRam(ptmStdSkuModel, numberFromString);
+                        ptmStdSkuModel.setRAM(mbNumber);
+                    }
+                    //TODO MB如果有小数先不处理
+                }
+            }
+            return;
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.Processor)) {
+            ptmStdSkuModel.setProcessor(ptmStdSkuParamNode.getValue());
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.Graphics)) {
+            ptmStdSkuModel.setGraphics(ptmStdSkuParamNode.getValue());
+        }
+    }
+
+    public void setStorage(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+        //queryInternalMemory  InternalMemory  Expandable_Memory
+        if (compareIgnoreCase(name, CategoryFilterParams.Internal_Memory)) {
+            String internalMemory = ptmStdSkuParamNode.getValue();
+            int numberFromString = ApiUtils.getNumberFromString(internalMemory);
+            if (numberFromString != -1) {
+                //整数
+                if (internalMemory.contains("GB")) {
+                    numberFromString = numberFromString * 1024;
+                    ptmStdSkuModel.setInternal_Memory(numberFromString);
+                } else {
+                    //MB
+                    ptmStdSkuModel.setInternal_Memory(numberFromString);
+                }
+            } else {
+                //小数,只处理GB
+                String stringRam = ApiUtils.getStringNumberFromString(internalMemory);
+                if (!stringRam.equals("")) {
+                    if (internalMemory.contains("GB")) {
+                        numberFromString = BigDecimal.valueOf(Float.parseFloat(stringRam)).multiply(BigDecimal.valueOf(1024)).intValue();
+                        ptmStdSkuModel.setInternal_Memory(numberFromString);
+                    }
+                    //TODO MB如果有小数先不处理
+                }
+            }
+            //传过去MB单位的
+            setQueryInternalMemory(ptmStdSkuModel, numberFromString);
+            return;
+        }
+
+        if (compareIgnoreCase(name, CategoryFilterParams.Expandable_Memory)) {
+            String expandableMemory = ptmStdSkuParamNode.getValue();
+            ptmStdSkuModel.setExpandable_Memory(ApiUtils.getNumberFromString(expandableMemory));
+            return;
+        }
+    }
+
+    public void setMainCamera(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+        //Sensor queryPrimaryCamera  Autofocus Aperture  Flash Image_Resolution  Camera_Features  Video_Recording
+        if (compareIgnoreCase(name, CategoryFilterParams.RESOLUTION)) {
+
+            String resolution = ptmStdSkuParamNode.getValue();
+            int mp = resolution.indexOf("MP");
+            if (mp != -1) {
+                float floatResolution = Float.parseFloat(resolution.substring(0, mp).replaceAll(" ", ""));
+                ptmStdSkuModel.setPrimary_Camera(floatResolution);
+                setQuerySecPriCamera(ptmStdSkuModel, floatResolution, true);
+            }
+            return;
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.Autofocus)) {
+            if ("No".equals(ptmStdSkuParamNode.getValue())) {
+                ptmStdSkuModel.setAutofocus("No");
+            } else {
+                ptmStdSkuModel.setAutofocus("yes");
+            }
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.Aperture)) {
+            ptmStdSkuModel.setAperture(ptmStdSkuParamNode.getValue());
+        }
+
+        if (compareIgnoreCase(name, CategoryFilterParams.Flash)) {
+            if ("No".equals(ptmStdSkuParamNode.getValue())) {
+                ptmStdSkuModel.setFlash("No");
+            } else {
+                ptmStdSkuModel.setFlash("yes");
+            }
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.Image_Resolution)) {
+            ptmStdSkuModel.setImage_Resolution(ptmStdSkuParamNode.getValue());
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.Camera_Features)) {
+            ptmStdSkuModel.setCamera_Features(ptmStdSkuParamNode.getValue());
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.Video_Recording)) {
+            ptmStdSkuModel.setVideo_Recording(ptmStdSkuParamNode.getValue());
+        }
+    }
+
+    public void setFontCamera(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+        //querySecondaryCamera secondaryAutofocus SecondaryFlash
+        if (compareIgnoreCase(name, CategoryFilterParams.RESOLUTION)) {
+            String resolution = ptmStdSkuParamNode.getValue();
+            int mp = resolution.indexOf("MP");
+            if (mp != -1) {
+                float floatResolution = Float.parseFloat(resolution.substring(0, mp).replaceAll(" ", ""));
+                ptmStdSkuModel.setPrimary_Camera(floatResolution);
+                setQuerySecPriCamera(ptmStdSkuModel, floatResolution, false);
+            }
+            return;
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.Autofocus)) {
+            if ("No".equals(ptmStdSkuParamNode.getValue())) {
+                ptmStdSkuModel.setSecondaryAutofocus("No");
+            } else {
+                ptmStdSkuModel.setSecondaryAutofocus("yes");
+            }
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.SecondaryFlash)) {
+            if ("No".equals(ptmStdSkuParamNode.getValue())) {
+                ptmStdSkuModel.setSecondaryFlash("No");
+            } else {
+                ptmStdSkuModel.setSecondaryFlash("yes");
+            }
+        }
+
+    }
+
+    public void setBattery(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+        //queryBatteryCapacity  Type  User_Replaceable  Quick_Charging
+        if (compareIgnoreCase(name, CategoryFilterParams.CAPACITY)) {
+            String batteryCapacity = ptmStdSkuParamNode.getValue();
+            if (batteryCapacity.toLowerCase().contains("mah")) {
+                int mAh = batteryCapacity.indexOf("mAh");
+                if (mAh != -1) {
+                    batteryCapacity = batteryCapacity.substring(0, mAh).replaceAll(" ", "");
+                    int numberFromString = ApiUtils.getNumberFromString(batteryCapacity);
+                    ptmStdSkuModel.setBattery_Capacity(numberFromString);
+                    setQueryBatteryCapacity(ptmStdSkuModel, numberFromString);
+                }
+            }
+            return;
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.Type)) {
+            ptmStdSkuModel.setType(ptmStdSkuParamNode.getValue());
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.User_Replaceable)) {
+            ptmStdSkuModel.setUser_Replaceable(ptmStdSkuParamNode.getValue());
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.Quick_Charging)) {
+            ptmStdSkuModel.setQuick_Charging(ptmStdSkuParamNode.getValue());
+        }
+    }
+
+    public void setNetworkConnectivity(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+        //VoLTE  WiFi  Bluetooth  GPS  NFC
+        if (compareIgnoreCase(name, CategoryFilterParams.VoLTE)) {
+            ptmStdSkuModel.setVoLTE(ptmStdSkuParamNode.getValue());
+        }
+        if (name.equals("Wi-Fi")) {
+            String value = ptmStdSkuParamNode.getValue();
+            if (value.equals("No")) {
+                ptmStdSkuModel.setWiFi("No");
+            } else {
+                ptmStdSkuModel.setWiFi("yes");
+            }
+
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.Bluetooth)) {
+            String value = ptmStdSkuParamNode.getValue();
+            if (value.equals("No")) {
+                ptmStdSkuModel.setBluetooth("No");
+            } else {
+                ptmStdSkuModel.setBluetooth("yes");
+            }
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.GPS)) {
+            String value = ptmStdSkuParamNode.getValue();
+            if (value.equals("No")) {
+                ptmStdSkuModel.setGPS("No");
+            } else {
+                ptmStdSkuModel.setGPS("yes");
+            }
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.NFC)) {
+            String value = ptmStdSkuParamNode.getValue();
+            if (value.equals("No")) {
+                ptmStdSkuModel.setNFC("No");
+            } else {
+                ptmStdSkuModel.setNFC("yes");
+            }
+        }
+    }
+
+    public void setMultimedia(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+        //FM_Radio  Loudspeaker  Audio_Jack
+        if (compareIgnoreCase(name, CategoryFilterParams.FM_Radio)) {
+            String value = ptmStdSkuParamNode.getValue();
+            if (value.equals("No")) {
+                ptmStdSkuModel.setFM_Radio("No");
+            } else {
+                ptmStdSkuModel.setFM_Radio("yes");
+            }
+        }
+        if (compareIgnoreCase(name, CategoryFilterParams.Loudspeaker)) {
+            String value = ptmStdSkuParamNode.getValue();
+            if (value.equals("No")) {
+                ptmStdSkuModel.setLoudspeaker("No");
+            } else {
+                ptmStdSkuModel.setLoudspeaker("yes");
+            }
+        }
+
+        if (compareIgnoreCase(name, CategoryFilterParams.Audio_Jack)) {
+            ptmStdSkuModel.setAudio_Jack(ptmStdSkuParamNode.getValue());
+        }
+    }
+
+    public void setSpecialFeatures(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+        //Other_Sensors
+        if (compareIgnoreCase(name, CategoryFilterParams.Other_Sensors)) {
+            ptmStdSkuModel.setOther_Sensors(ptmStdSkuParamNode.getValue());
         }
     }
 }

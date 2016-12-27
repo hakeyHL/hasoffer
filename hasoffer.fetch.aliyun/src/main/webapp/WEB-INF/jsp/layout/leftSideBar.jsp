@@ -10,6 +10,7 @@
             <a href="javascript:;"><i class="fa fa-lg fa-fw fa-inbox"></i> <span class="menu-item-parent">功能菜单</span><b
                     class="collapse-sign"><em class="fa fa-expand-o"></em></b></a>
             <ul>
+
                 <li>
                     <a href="${ctx}/layout/showUpdateGroupByDay" target="frameContent">更新统计</a>
                 </li>
@@ -17,7 +18,10 @@
                     <a href="${ctx}/layout/showUpdateStats" target="frameContent">更新状态</a>
                 </li>
                 <li>
-                    <a href="${ctx}/layout/showJob" target="frameContent">任务调度</a>
+                    <a href="${ctx}/layout/showProxyIP" target="frameContent">IP代理</a>
+                </li>
+                <li>
+                    <a href="${ctx}/job/showJob" target="frameContent">任务调度</a>
                 </li>
             </ul>
         </li>

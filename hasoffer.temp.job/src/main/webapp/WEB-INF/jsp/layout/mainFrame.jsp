@@ -29,16 +29,16 @@
 
             $("#pause").click(function () {
                 var triggerName = $("input[type=radio]:checked").parent().parent().find(".triggerClass").html();
-                $(this).attr("href", "${ctx}/layout/pause?triggerName=" + triggerName);
+                $(this).attr("href", "${ctx}/job/pause?triggerName=" + triggerName);
             });
 
             $("#resume").click(function () {
                 var triggerName = $("input[type=radio]:checked").parent().parent().find(".triggerClass").html();
-                $(this).attr("href", "${ctx}/layout/resumeTrigger?triggerName=" + triggerName);
+                $(this).attr("href", "${ctx}/job/resumeTrigger?triggerName=" + triggerName);
             });
 
             $("#goback").click(function () {
-                window.location.href = "${ctx}/layout/showHome";
+                window.location.href = "${ctx}/job/showHome";
             });
 
             $("#layer").hide();
@@ -53,7 +53,7 @@
                             var targetBizDate = $("input[type=date]").val();
                             var officeId = $("input[type=text]").val();
                             debugger;
-                            window.location.href = "${ctx}/layout/runNow?triggerName=" + triggerName + "&targetBizDate=" + targetBizDate + "&officeId=" + officeId;
+                            window.location.href = "${ctx}/job/runNow?triggerName=" + triggerName + "&targetBizDate=" + targetBizDate + "&officeId=" + officeId;
                         }
                     }
                 });

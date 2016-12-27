@@ -20,39 +20,38 @@ public class ConstantUtil {
     static {
         //下面为General属性---------------------------------------------------------------------------------------------
         //格式是这样的 February 3, 2016 (Official)
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Launch_Date", "Launch Date");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Brand", "Brand");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Model", "Model");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Operating_System", "Operating System");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Launch_Date", "Launch Date");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Brand", "Brand");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Model", "Model");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Operating_System", "Operating System");
         //只要,前面的
         API_CATEGORY_FILTER_PARAMS_MAP.put("SIM_Slot", "SIM Slot(s)");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("SIM_Size", "SIM Size");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Network", "Network");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Fingerprint_Sensor", "Fingerprint Sensor");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Quick_Charging", "Quick Charging");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("SIM_Size", "SIM Size");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Network_Support", "Network Support");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Fingerprint_Sensor", "Fingerprint Sensor");
 
 
         //下面为Design属性----------------------------------------------------------------------------------------------
         //147 grams 只要值,注意下单位
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Weight", "Weight");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Weight", "Weight");
 
         //下面为Display属性---------------------------------------------------------------------------------------------
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Screen_Resolution", "Screen Resolution");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Screen_Resolution", "Screen Resolution");
         API_CATEGORY_FILTER_PARAMS_MAP.put("queryScreenSize", "Screen Size");
         //267 ppi  只要值,注意下单位
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Pixel_Density", "Pixel Density");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Touch_Screen", "Touch Screen");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Pixel_Density", "Pixel Density");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Touch_Screen", "Touch Screen");
         //73.42 % 只要值
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Screen_to_Body_Ratio", "Screen to Body Ratio");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Screen_to_Body_Ratio", "Screen to Body Ratio");
 
         //下面为Performance属性-----------------------------------------------------------------------------------------
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Processor", "Processor");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Graphics", "Graphics");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("queryRam", "Ram");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Processor", "Processor");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Graphics", "Graphics");
+        API_CATEGORY_FILTER_PARAMS_MAP.put("queryRam", "RAM");
 
         //下面为Storage属性---------------------------------------------------------------------------------------------
-        API_CATEGORY_FILTER_PARAMS_MAP.put("queryInternalMemory", "Internal Memory");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Expandable_Memory", "Expandable Memory");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("queryInternalMemory", "Internal Memory");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Expandable_Memory", "Expandable Memory");
 
 
         //关于Camera属性的存储,之前是根据值判断的,不靠谱
@@ -61,51 +60,42 @@ public class ConstantUtil {
         //下面为摄像头属性----------------------------------------------------------------------------------------------
         API_CATEGORY_FILTER_PARAMS_MAP.put("querySecondaryCamera", "Secondary Camera");
         API_CATEGORY_FILTER_PARAMS_MAP.put("queryPrimaryCamera", "Primary Camera");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Sensor", "Sensor");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Sensor", "Sensor");
         //能与不能 value有且不为No 即为能
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Autofocus", "Autofocus");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("secondaryAutofocus", "secondaryAutofocus");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Aperture", "Aperture");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Autofocus", "Autofocus");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("secondaryAutofocus", "secondaryAutofocus");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Aperture", "Aperture");
         //能与不能 No为不能
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Flash", "Flash");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("SecondaryFlash", "SecondaryFlash");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Image_Resolution", "Image Resolution");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Camera_Features", "Camera Features");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Video_Recording", "Video Recording");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Flash", "Flash");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("SecondaryFlash", "SecondaryFlash");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Image_Resolution", "Image Resolution");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Camera_Features", "Camera Features");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Video_Recording", "Video Recording");
 
         //下面为Battery 属性--------------------------------------------------------------------------------------------
         API_CATEGORY_FILTER_PARAMS_MAP.put("queryBatteryCapacity", "Battery Capacity");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Type", "Type");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Type", "Type");
         //能与不能
-        API_CATEGORY_FILTER_PARAMS_MAP.put("User_Replaceable", "User Replaceable");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Quick_Charging", "Quick Charging");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("User_Replaceable", "User Replaceable");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Quick_Charging", "Quick Charging");
 
         //下面为Network & Connectivity----------------------------------------------------------------------------------
-        API_CATEGORY_FILTER_PARAMS_MAP.put("SIM_Size", "SIM Size");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("VoLTE", "VoLTE");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("VoLTE", "VoLTE");
         //支不支持
         API_CATEGORY_FILTER_PARAMS_MAP.put("WiFi", "Wi-Fi");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Bluetooth", "Bluetooth");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("GPS", "GPS");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("NFC", "NFC");
-        API_CATEGORY_FILTER_PARAMS_MAP.put("GPS", "GPS");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Bluetooth", "Bluetooth");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("GPS", "GPS");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("NFC", "NFC");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("GPS", "GPS");
 
         //Multimedia 属性-----------------------------------------------------------------------------------------------
-        API_CATEGORY_FILTER_PARAMS_MAP.put("FM_Radio", "FM Radio");//能与不能
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Loudspeaker", "Loudspeaker");//能与不能
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Audio_Jack", "Audio Jack");
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("FM_Radio", "FM Radio");//能与不能
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Loudspeaker", "Loudspeaker");//能与不能
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Audio_Jack", "Audio Jack");
 
 
         //Special Features属性------------------------------------------------------------------------------------------
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Fingerprint_Sensor", "Fingerprint Sensor");//能与不能
-        API_CATEGORY_FILTER_PARAMS_MAP.put("Other_Sensors", "Other Sensors");
-
-
-
-
-
-
-
+//        API_CATEGORY_FILTER_PARAMS_MAP.put("Other_Sensors", "Other Sensors");
 
 
         //=====================================分界线=============================================
@@ -116,14 +106,13 @@ public class ConstantUtil {
         API_PTMSTDSKU_PARAM_MEAN_MAP.put("Internal Memory", "More internal storage allows installation of more apps as well as ability to save songs, images, videos, etc.");
         API_PTMSTDSKU_PARAM_MEAN_MAP.put("Expandable Memory", "	An external microSD card supplements the internal storage and can be used for saving songs, images, videos, etc.");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("MAIN CAMERA Resolution", "A camera of higher resolution takes more detailed photos, which will look sharp on a large screen as well.");
-        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Battery Capacity", "	Higher battery capacity generally means longer battery life, but it also depends upon other factors like phone`s screen, processor, OS, optimisations by the brand and personal usage. capacity gen");
+        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Battery Capacity", "	Higher battery capacity generally means longer battery life, but it also depends upon other factors like phone`s screen, processor, OS, optimisations by the brand and personal usage.");
         API_PTMSTDSKU_PARAM_MEAN_MAP.put("Operating System", "");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Launch Date", "");
         API_PTMSTDSKU_PARAM_MEAN_MAP.put("Brand", "");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Model", "");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Custom UI", "The brand’s own interface that runs on top of Android OS, and offers certain additional or different features.");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("General SIM Size", "");
-        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Network", "");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Fingerprint Sensor", "It allows you to secure your phone by using your fingerprints to unlock the smartphone");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Quick Charging", "Allows you to charge your phone faster (up to 50% in half an hour).Usually works with the phone’s official charger.");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Dimensions", "");
@@ -133,7 +122,6 @@ public class ConstantUtil {
         API_PTMSTDSKU_PARAM_MEAN_MAP.put("Screen Resolution", "In phone of the same screen size,higher  resolution indicates a sharper display.");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Pixel Density", "High pixel density indicates a sharper display.");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Display Type", "In-Plane Switching Liquid Crystal Display (IPS LCD) offers more sharpness, shows more realistic looking images, displays more natural colours and perform better in bright sunlight compared to LCD displays.");
-        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Screen Protection", "An additional layer that protects smartphone’s screen against scratches and minor knocks.");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Touch Screen", "");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Screen to Body Ratio", "Screen to body ratio tells how much of the phone size is covered by the screen; the higher the better");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Chipset", "");

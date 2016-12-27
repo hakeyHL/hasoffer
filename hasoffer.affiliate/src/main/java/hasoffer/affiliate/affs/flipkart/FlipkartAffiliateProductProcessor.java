@@ -37,7 +37,7 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
     private static final String AFFILIATE_BASE_URL = "https://affiliate-api.flipkart.net/affiliate/api/" + TRACKINGID + ".json";
     private static final String AFFILIATE_KEYWORDQUERY_URL = "https://affiliate-api.flipkart.net/affiliate/search/json";
     private static final String AFFILIATE_PRODUCTID_URL = "https://affiliate-api.flipkart.net/affiliate/1.0/product.json?id=";
-    private static Logger logger = LoggerFactory.getLogger(FlipkartAffiliateProductProcessor.class);
+    private static Logger logger = LoggerFactory.getLogger("hasoffer.affiliate.order");
     //    private static final String TOKEN_URL = "https://affiliate.flipkart.com/api/a_generateToken";
     private static String TOKEN = "56e46c994b92488c91e43fad138d5c71";
 
@@ -149,7 +149,10 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
         try {
             String respJson = sendRequest(url, headerMap, parameterMap);
             Gson gson = new Gson();
-            logger.info("Resp json={}", respJson);
+            logger.info("Source Resp json={}", respJson);
+            respJson = respJson.replaceAll("I should not be here", "").replaceAll("failed to authenticate: timeout", "").trim();
+            respJson = respJson.replaceAll("\n", "").trim();
+            logger.info("Edit   Resp json={}", respJson);
             AffiliateOrderReport report = gson.fromJson(respJson, AffiliateOrderReport.class);
             List<AffiliateOrder> orderList = new ArrayList<AffiliateOrder>();
             if (report.getOrderList() != null) {

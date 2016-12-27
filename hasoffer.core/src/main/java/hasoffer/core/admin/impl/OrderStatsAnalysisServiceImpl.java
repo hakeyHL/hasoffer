@@ -32,7 +32,7 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
     private static final String D_BASE = "delete from report_ordersatas where webSite=? and orderInTime>=DATE_FORMAT(?,'%Y-%m-%d %H:%i:%S') and orderInTime<DATE_FORMAT(?,'%Y-%m-%d %H:%i:%S') and dataSource=0";
     @Resource
     IDataBaseManager dbm;
-    private Logger logger = LoggerFactory.getLogger(OrderStatsAnalysisServiceImpl.class);
+    private Logger logger = LoggerFactory.getLogger("hasoffer.affiliate.order");
     @Resource
     private FlipkartAffiliateServiceImpl flipkartAffiliateService;
 
@@ -67,6 +67,7 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
         if (Website.FLIPKART.name().equals(webSite)) {
             List<OrderStatsAnalysisPO> flipkartPOList = flipkartAffiliateService.countOrderList(startTime, endTime);
             if (flipkartPOList != null && flipkartPOList.size() > 0) {
+                logger.info("Flipkart date:{}, orderSize:{}", startTime, flipkartPOList.size());
                 //先获取订单，然后再删除以前的订单，防止没有获取而直接删除造成订单错误。
                 delete(Website.FLIPKART.name(), startTime, delEndTime);
                 Random random = new Random();
@@ -84,6 +85,7 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
         if (Website.SNAPDEAL.name().equals(webSite)) {
             List<OrderStatsAnalysisPO> snapDealPoList = snapdealAffiliateService.countOrderList(startTime, endTime);
             if (snapDealPoList != null && snapDealPoList.size() > 0) {
+                logger.info("SnapDeal date:{}, orderSize:{}", startTime, snapDealPoList.size());
                 delete(Website.SNAPDEAL.name(), startTime, delEndTime);
                 for (OrderStatsAnalysisPO po : snapDealPoList) {
                     insert(po);
