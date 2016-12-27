@@ -164,5 +164,4 @@ public class ConstantUtil {
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Fingerprint Sensor Position", "");
 //        API_PTMSTDSKU_PARAM_MEAN_MAP.put("Other Sensors", "");
     }
-
 }

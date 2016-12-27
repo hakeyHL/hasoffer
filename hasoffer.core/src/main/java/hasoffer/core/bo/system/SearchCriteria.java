@@ -22,7 +22,7 @@ public class SearchCriteria {
     private int priceTo = -1;
     private List<String> pivotFields;
     private SearchResultSort sort = SearchResultSort.RELEVANCE;
-
+    private String[] model;
     @JsonProperty(value = "Brand")
     private String[] brand;
     @JsonProperty(value = "NetworkSupport")
@@ -129,6 +129,14 @@ public class SearchCriteria {
 
     public void setPriceTo(int priceTo) {
         this.priceTo = priceTo;
+    }
+
+    public String[] getModel() {
+        return model;
+    }
+
+    public void setModel(String[] model) {
+        this.model = model;
     }
 
     public SearchResultSort getSort() {

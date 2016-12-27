@@ -296,6 +296,11 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
             String[] screenSizes = searchCriteria.getScreenSize();
             fqList.add(new FilterQuery("queryScreenSize", joinQueryParams(screenSizes, "queryScreenSize")));
         }
+        //12. model
+        if (searchCriteria.getModel() != null && searchCriteria.getModel().length > 0) {
+            String[] models = searchCriteria.getModel();
+            fqList.add(new FilterQuery("Model", joinQueryParams(models, "Model")));
+        }
     }
 
     public PtmStdSkuModel getStdSkuModelById(long stdSkuId) {

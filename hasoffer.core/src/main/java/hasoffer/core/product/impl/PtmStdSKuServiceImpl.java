@@ -78,6 +78,12 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         return dbm.query("SELECT t FROM PtmStdPrice t WHERE t.stdSkuId = ?0 ", Arrays.asList(ptmStdSkuId));
     }
 
+    @Override
+    public List<String> getPtmStdSkuBrandList() {
+        List<String> brandList = dbm.query("select distinct(t.brand) from PtmStdSku t ");
+        return brandList;
+    }
+
     public PtmStdSkuModel getPtmStdSKuModel(PtmStdSku ptmStdSku1) {
         PtmStdSkuModel ptmStdSkuModel = new PtmStdSkuModel(ptmStdSku1);
         //  递归获取类目树类目
