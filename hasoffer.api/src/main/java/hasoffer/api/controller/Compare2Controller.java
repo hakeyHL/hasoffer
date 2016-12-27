@@ -371,7 +371,7 @@ public class Compare2Controller {
             resultMap.put("Screen Size", ptmStdSkuModel.getScreen_Size() + " inch");
             resultMap.put("Secondary Camera", ptmStdSkuModel.getSecondary_Camera() + " MP");
             resultMap.put("Primary Camera", ptmStdSkuModel.getPrimary_Camera() + " MP");
-            resultMap.put("Internal Memory", ptmStdSkuModel.getInternal_Memory() >= 1024 ? ptmStdSkuModel.getInternal_Memory() + " GB" : ptmStdSkuModel.getInternal_Memory() + " MB");
+            resultMap.put("Internal Memory", ptmStdSkuModel.getInternal_Memory() >= 1024 ? ptmStdSkuModel.getInternal_Memory() / 1024 + " GB" : ptmStdSkuModel.getInternal_Memory() + " MB");
             resultMap.put("Battery Capacity", ptmStdSkuModel.getBattery_Capacity() + " mAh");
             resultMap.put("Expandable Memory", ptmStdSkuModel.getExpandable_Memory() == 0 ? "Unavailable" : "Up to " + ptmStdSkuModel.getExpandable_Memory() + " GB");
             resultMap.put("Screen Resolution", ptmStdSkuModel.getScreen_Resolution() == null ? "" : ptmStdSkuModel.getScreen_Resolution());
