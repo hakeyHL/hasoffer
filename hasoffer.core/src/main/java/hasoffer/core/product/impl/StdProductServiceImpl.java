@@ -10,10 +10,14 @@ import hasoffer.core.bo.stdsku.StdSkuImage;
 import hasoffer.core.bo.stdsku.StdSkuPrice;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.mongo.PtmStdBrandCard;
+import hasoffer.core.persistence.mongo.PtmStdSkuDescription;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmStdImageUpdater;
 import hasoffer.core.product.IStdProductService;
 import hasoffer.core.utils.ImageUtil;
+import hasoffer.spider.model.FetchedProductReview;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -98,6 +102,61 @@ public class StdProductServiceImpl implements IStdProductService {
 
         dbm.update(updater);
 
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void createPtmStdSkuDescription(PtmStdSkuDescription ptmStdSkuDescription) {
+        mdm.save(ptmStdSkuDescription);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updatePtmStdSkuDescription(PtmStdSkuDescription newPtmStdSkuDescription, PtmStdSkuDescription oldPtmStdSkuDescription) {
+
+        String newFeathers = newPtmStdSkuDescription.getFeatures();
+        String newSummary = newPtmStdSkuDescription.getSummary();
+        List<FetchedProductReview> newFetchedProductReviewList = newPtmStdSkuDescription.getFetchedProductReviewList();
+
+        String oldFeathers = oldPtmStdSkuDescription.getFeatures();
+        String oldSummary = oldPtmStdSkuDescription.getSummary();
+        List<FetchedProductReview> oldFetchedProductReviewList = oldPtmStdSkuDescription.getFetchedProductReviewList();
+
+        Update update = new Update();
+        boolean flagFeather = false;
+        boolean flagSummary = false;
+        boolean flagReview = false;
+
+        if (!StringUtils.isEqual(newFeathers, oldFeathers)) {
+            update.set("features", newFeathers);
+            flagFeather = true;
+        }
+
+        if (!StringUtils.isEqual(newSummary, oldSummary)) {
+            update.set("summary", newSummary);
+            flagSummary = true;
+        }
+
+        for (FetchedProductReview newReview : newFetchedProductReviewList) {
+            if (!oldFetchedProductReviewList.contains(newReview)) {
+                oldFetchedProductReviewList.add(newReview);
+                flagReview = true;
+            }
+        }
+
+        if (flagReview == true) {
+            update.set("fetchedProductReviewList", oldFetchedProductReviewList);
+        }
+
+        if (flagFeather || flagSummary || flagReview) {
+            mdm.update(PtmStdSkuDescription.class, oldPtmStdSkuDescription.getId(), update);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void createBrandCard(PtmStdBrandCard ptmStdBrandCard) {
+        mdm.save(ptmStdBrandCard);
     }
 
     private List<StdSkuImage> findImages(long skuId) {
