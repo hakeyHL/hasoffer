@@ -297,9 +297,11 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
 
     private void setQueryInternalMemory(PtmStdSkuModel ptmStdSkuModel, int internalMemory) {
         //1GB-2GB、128GB、16GB、2GB-4GB、256GB&Above、32GB、4GB、64GB、8GB、Less than 1GB
-        //暂时去掉Less than 1GB
-        //TODO 这儿不合理
-        if (internalMemory <= 2) {
+        internalMemory = internalMemory / 1024;
+        if (internalMemory < 1) {
+            ptmStdSkuModel.setQueryInternalMemory("Less than 1GB");
+            return;
+        } else if (internalMemory <= 2) {
             ptmStdSkuModel.setQueryInternalMemory("1GB-2GB");
             return;
         } else if (2 <= internalMemory && internalMemory <= 4) {
@@ -447,15 +449,19 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
         if (compareIgnoreCase(name, CategoryFilterParams.Network)) {
             String netWorkString = ptmStdSkuParamNode.getValue();
+            StringBuilder stringBuilder = new StringBuilder();
             if (netWorkString.contains("2")) {
-                ptmStdSkuModel.setNetwork_Support("2G");
+                stringBuilder.append("2G");
             }
             if (netWorkString.contains("3")) {
-                ptmStdSkuModel.setNetwork_Support("3G");
+                stringBuilder.append("hasoffer");
+                stringBuilder.append("3G");
             }
             if (netWorkString.contains("4")) {
-                ptmStdSkuModel.setNetwork_Support("4G");
+                stringBuilder.append("hasoffer");
+                stringBuilder.append("4G");
             }
+            ptmStdSkuModel.setNetwork_Support(stringBuilder.toString());
             return;
         }
         if (compareIgnoreCase(name, CategoryFilterParams.Fingerprint_Sensor)) {
@@ -563,7 +569,27 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         if (compareIgnoreCase(name, CategoryFilterParams.Internal_Memory)) {
             String internalMemory = ptmStdSkuParamNode.getValue();
             int numberFromString = ApiUtils.getNumberFromString(internalMemory);
-            ptmStdSkuModel.setInternal_Memory(numberFromString);
+            if (numberFromString != -1) {
+                //整数
+                if (internalMemory.contains("GB")) {
+                    numberFromString = numberFromString * 1024;
+                    ptmStdSkuModel.setInternal_Memory(numberFromString);
+                } else {
+                    //MB
+                    ptmStdSkuModel.setInternal_Memory(numberFromString);
+                }
+            } else {
+                //小数,只处理GB
+                String stringRam = ApiUtils.getStringNumberFromString(internalMemory);
+                if (!stringRam.equals("")) {
+                    if (internalMemory.contains("GB")) {
+                        numberFromString = BigDecimal.valueOf(Float.parseFloat(stringRam)).multiply(BigDecimal.valueOf(1024)).intValue();
+                        ptmStdSkuModel.setInternal_Memory(numberFromString);
+                    }
+                    //TODO MB如果有小数先不处理
+                }
+            }
+            //传过去MB单位的
             setQueryInternalMemory(ptmStdSkuModel, numberFromString);
             return;
         }
