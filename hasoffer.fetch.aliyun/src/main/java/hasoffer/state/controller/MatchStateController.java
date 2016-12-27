@@ -26,7 +26,8 @@ public class MatchStateController {
         if (queryDay == null) {
             queryDay = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
         }
-        return matchStateService.selectStateMatchByDay(queryDay);
+//        return matchStateService.selectStateMatchByDay(queryDay);
+        return null;
     }
 
 
