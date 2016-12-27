@@ -565,6 +565,14 @@ public class ApiUtils {
         }
     }
 
+    public static String removeSpecialSymbol(String str) {
+        String regEx = "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】'；：”“’。，、？]";
+//        String   str   =   "*a dCVs*34_a _09_b5*[/435^*&()^$$&*).{}+.|.)%%*(*.}34{45[]12.fd'*&999￥……{}【】。，；’“'”？";
+        Pattern p = Pattern.compile(regEx);
+        Matcher m = p.matcher(str);
+        return m.replaceAll("").trim();
+    }
+
     /**
      * 在数据对象返回客户端之前检测其域是否都有值,除对象成员外都赋初始值
      *
@@ -754,6 +762,7 @@ public class ApiUtils {
             productListVo.setRatingNum(rating <= 0 ? 90 : rating);
         }
     }
+    //sort list area =================================================================
 
     public void getSkuListByKeyword(Map map, PageableResult p) {
         if (p.getPivotFieldVals() != null && p.getPivotFieldVals().size() > 0) {
@@ -823,7 +832,6 @@ public class ApiUtils {
             map.put("categorys", categorys);
         }
     }
-    //sort list area =================================================================
 
     /**
      * 获取类目Vo
@@ -888,6 +896,5 @@ public class ApiUtils {
         data.setVerifiedCoins(verifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
     }
-
 
 }
