@@ -2,9 +2,9 @@ package hasoffer.job.bean.deal;
 
 import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
-import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.enums.AppdealSource;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
@@ -36,11 +36,9 @@ public class DealSiteGetDealWoker implements Runnable {
     }
 
     private IFetchDubboService fetchDubboService;
-    private IDataBaseManager dbm;
     private IDealService dealService;
 
-    public DealSiteGetDealWoker(IDataBaseManager dbm, IFetchDubboService fetchDubboService, IDealService dealService) {
-        this.dbm = dbm;
+    public DealSiteGetDealWoker(IFetchDubboService fetchDubboService, IDealService dealService) {
         this.fetchDubboService = fetchDubboService;
         this.dealService = dealService;
     }
@@ -72,7 +70,7 @@ public class DealSiteGetDealWoker implements Runnable {
 
                             System.out.println("fetchedDealInfo " + fetchedDealInfo.toString());
 
-                            AppDeal deal = getDeal(fetchedDealInfo, dbm);
+                            AppDeal deal = getDeal(fetchedDealInfo);
 
                             if (deal != null) {
                                 dealService.createAppDealByPriceOff(deal);
@@ -81,7 +79,6 @@ public class DealSiteGetDealWoker implements Runnable {
 
                         break;
                     }
-
                 }
 
                 TimeUnit.MINUTES.sleep(20);
@@ -93,7 +90,7 @@ public class DealSiteGetDealWoker implements Runnable {
     }
 
 
-    public AppDeal getDeal(FetchedDealInfo fetchedDealInfo, IDataBaseManager dbm) {
+    public AppDeal getDeal(FetchedDealInfo fetchedDealInfo) {
 
         AppDeal appdeal = new AppDeal();
 
@@ -115,7 +112,7 @@ public class DealSiteGetDealWoker implements Runnable {
         appdeal.setTitle(fetchedDealInfo.getTitle());
         appdeal.setCategory(fetchedDealInfo.getCategoryName());
         appdeal.setDealClickCount(Long.valueOf(fetchedDealInfo.getView()));
-        appdeal.setDescription(fetchedDealInfo.getDescription());
+        appdeal.setDescription(StringUtils.unescapeHtml(fetchedDealInfo.getDescription()));
         appdeal.setPresentPrice(fetchedDealInfo.getPrice());
         appdeal.setPriceDescription("Rs." + fetchedDealInfo.getPrice());
         appdeal.setOriginPrice(fetchedDealInfo.getOriPrice());
@@ -123,6 +120,5 @@ public class DealSiteGetDealWoker implements Runnable {
         appdeal.setOriginClickCount(Long.valueOf(fetchedDealInfo.getView()));
 
         return appdeal;
-
     }
 }
