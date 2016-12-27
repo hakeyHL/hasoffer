@@ -30,6 +30,7 @@
                 <ref bean="statSearchLogTrigger"/>
                 <ref bean="compareWebsiteSendFetchRequestTrigger"/>
                 <ref bean="compareWebsiteParseFetchResultTrigger"/>
+                <ref bean="stdSkuReviewFetchJobTrigger"/>
             </list>
         </property>
 
@@ -149,6 +150,15 @@
           class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="compareWebsiteParseFetchResultJob"/>
         <property name="cronExpression" value="0 0 1 1 1 ? 2066"/>
+    </bean>
+
+    <!-- MOBILE91评论数据抓取-->
+    <bean name="stdSkuReviewFetchJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.fetch.PtmStdSkuFetchReviewJobBean"/>
+    </bean>
+    <bean id="stdSkuReviewFetchJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="stdSkuReviewFetchJob"/>
+        <property name="cronExpression" value="0 00 20 ? * 1"/>
     </bean>
     <!--<bean name="topSellingTaskJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
     <!--<property name="jobClass" value="hasoffer.job.bean.fetch.TopSellingTaskJobBean"/>-->
