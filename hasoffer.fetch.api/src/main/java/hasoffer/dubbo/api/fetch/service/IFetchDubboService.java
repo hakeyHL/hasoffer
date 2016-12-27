@@ -114,12 +114,12 @@ public interface IFetchDubboService {
 
     /**
      * 发送一个比较网站的详情页的url抓取请求
-     *
      * @param website   比价网站的名称
      * @param url       比价网站的某个商品的详情页
      * @param taskLevel 任务优先级
+     * @param flagId    一些用于分析返回值得id，比如第一次抓取时，写入categoryId，补充数据抓取时，可以写stdSkuId
      */
-    void sendCompareWebsiteFetchTask(Website website, String url, TaskLevel taskLevel, long categoryId);
+    void sendCompareWebsiteFetchTask(Website website, String url, TaskLevel taskLevel, long flagId);
 
 
     FetchCompareWebsiteResult getCompareWebsiteFetchResult(Website webSite);
