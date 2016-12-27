@@ -150,6 +150,8 @@ public class FlipkartAffiliateProductProcessor implements IAffiliateProcessor<Af
             String respJson = sendRequest(url, headerMap, parameterMap);
             Gson gson = new Gson();
             logger.info("Resp json={}", respJson);
+            respJson = respJson.replaceAll("I should not be here", "").replaceAll("failed to authenticate: timeout", "").trim();
+            respJson = respJson.replaceAll("\n", "").trim();
             AffiliateOrderReport report = gson.fromJson(respJson, AffiliateOrderReport.class);
             List<AffiliateOrder> orderList = new ArrayList<AffiliateOrder>();
             if (report.getOrderList() != null) {
