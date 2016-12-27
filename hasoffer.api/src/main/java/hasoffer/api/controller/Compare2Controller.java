@@ -367,7 +367,7 @@ public class Compare2Controller {
             resultMap.put("Brand", ptmStdSkuModel.getBrand() == null ? "" : ptmStdSkuModel.getBrand());
             resultMap.put("Model", ptmStdSkuModel.getModel() == null ? "" : ptmStdSkuModel.getModel());
             resultMap.put("Price", ptmStdSkuModel.getMinPrice() + "");
-            resultMap.put("RAM", ptmStdSkuModel.getRam() >= 1024 ? ptmStdSkuModel.getRam() / 1024 + " GB" : ptmStdSkuModel.getRam() + "MB");
+            resultMap.put("RAM", ptmStdSkuModel.getRAM() >= 1024 ? ptmStdSkuModel.getRAM() / 1024 + " GB" : ptmStdSkuModel.getRAM() + "MB");
             resultMap.put("Screen Size", ptmStdSkuModel.getScreen_Size() + " inch");
             resultMap.put("Secondary Camera", ptmStdSkuModel.getSecondary_Camera() + " MP");
             resultMap.put("Primary Camera", ptmStdSkuModel.getPrimary_Camera() + " MP");
@@ -376,7 +376,7 @@ public class Compare2Controller {
             resultMap.put("Expandable Memory", ptmStdSkuModel.getExpandable_Memory() == 0 ? "Unavailable" : "Up to " + ptmStdSkuModel.getExpandable_Memory() + " GB");
             resultMap.put("Screen Resolution", ptmStdSkuModel.getScreen_Resolution() == null ? "" : ptmStdSkuModel.getScreen_Resolution());
             resultMap.put("Operating System", ptmStdSkuModel.getOperating_System() == null ? "" : ptmStdSkuModel.getOperating_System());
-            resultMap.put("Network Support", ptmStdSkuModel.getNetwork() == null ? "" : ptmStdSkuModel.getNetwork());
+            resultMap.put("Network Support", ptmStdSkuModel.getNetwork_Support() == null ? "" : ptmStdSkuModel.getNetwork_Support());
 
             //遍历去除空值
             Set<Map.Entry<String, String>> entries = resultMap.entrySet();

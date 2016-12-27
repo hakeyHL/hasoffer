@@ -143,7 +143,7 @@ public class AppCategoryServiceImpl implements AppCategoryService {
 
         //id name image hasChildren parentId rank level
 
-        categoryVos.add(new CategoryVo(0l, "Deal & Offers", "http://img1.hasofferimage.com/topcate/Mobiles.png", 0, 0l, 0, 0));
+        categoryVos.add(new CategoryVo(0l, "Deal & Offers", "http://img1.hasofferimage.com/topcate/Deal&Offers.png", 0, 0l, 0, 0));
 
         categoryVos.add(new CategoryVo(5l, "Mobiles", "http://img1.hasofferimage.com/topcate/Mobiles.png", 1, 1l, 0, 2));
 

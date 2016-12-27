@@ -233,11 +233,11 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
         //1. brand
         if (searchCriteria.getBrand() != null && searchCriteria.getBrand().length > 0) {
             String[] brands = searchCriteria.getBrand();
-            fqList.add(new FilterQuery("brand", joinQueryParams(brands, "brand")));
+            fqList.add(new FilterQuery("Brand", joinQueryParams(brands, "Brand")));
         }
         //2. network --2G 3G 4G 处理下
-        if (searchCriteria.getNetwork() != null && searchCriteria.getNetwork().length > 0) {
-            String[] networks = searchCriteria.getNetwork();
+        if (searchCriteria.getNetworkSupport() != null && searchCriteria.getNetworkSupport().length > 0) {
+            String[] networks = searchCriteria.getNetworkSupport();
             for (String network : networks) {
         /*        if (network.equalsIgnoreCase("3G")) {
                     fqList.add(new FilterQuery("Network3G", joinQueryParams(new String[]{"3G"}, "Network3G")));
@@ -248,7 +248,7 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
                 if (network.equalsIgnoreCase("2G")) {
                     fqList.add(new FilterQuery("Network", joinQueryParams(networks, "Network")));
                 }*/
-                fqList.add(new FilterQuery("Network", joinQueryParams(networks, "Network")));
+                fqList.add(new FilterQuery("Network_Support", joinQueryParams(networks, "Network_Support")));
             }
         }
         //3. screenResolution

@@ -342,8 +342,6 @@ public class ApiUtils {
     }
 
 
-
-
     public static PageableResult parseString2Pageable(String jsonString, Class classzz) {
         PageableResult pageableResult = null;
         pageableResult = (PageableResult<PtmStdSkuModel>) JSON.parseObject(jsonString, PageableResult.class);
@@ -359,13 +357,19 @@ public class ApiUtils {
             Set<Map.Entry<String, List<NameValue<String, Long>>>> entries = pivotFieldVals.entrySet();
             Iterator<Map.Entry<String, List<NameValue<String, Long>>>> iterator = entries.iterator();
             while (iterator.hasNext()) {
+                String cateFilterValue;
                 Map.Entry<String, List<NameValue<String, Long>>> next = iterator.next();
                 String key = next.getKey();
                 List<NameValue<String, Long>> value = next.getValue();
               /*  if (key.equals("Network3G") || key.equals("Network4G") || key.equals("Network")) {
                     netWorkNVList.addAll(value);
                 }*/
-                String cateFilterValue = ConstantUtil.API_CATEGORY_FILTER_PARAMS_MAP.get(key);
+                cateFilterValue = key;
+                if (key.contains("_")) {
+                    cateFilterValue = key.replaceAll("_", " ");
+                } else if (ConstantUtil.API_CATEGORY_FILTER_PARAMS_MAP.get(key) != null) {
+                    cateFilterValue = ConstantUtil.API_CATEGORY_FILTER_PARAMS_MAP.get(key);
+                }
                 //  //brand需要按照指定顺序返回
                 //SamSung Xiaomi Motorola Lenovo Huawei Micromax Lava Gionee
                 if (cateFilterValue != null && cateFilterValue.equals("Brand")) {
@@ -500,10 +504,10 @@ public class ApiUtils {
         }
 
 
-        if (key.equals("Network")) {
+        if (key.equals("Network Support")) {
             tempReplacePivos.put("3", value);
         } else if (key.equals("3")) {
-            tempReplacePivos.put("Network", value);
+            tempReplacePivos.put("Network Support", value);
         }
 
         if (key.equals("Screen Resolution")) {
@@ -518,10 +522,10 @@ public class ApiUtils {
             tempReplacePivos.put("Operating System", value);
         }
 
-        if (key.equals("Ram")) {
+        if (key.equals("RAM")) {
             tempReplacePivos.put("2", value);
         } else if (key.equals("2")) {
-            tempReplacePivos.put("Ram", value);
+            tempReplacePivos.put("RAM", value);
         }
 
         if (key.equals("Screen Size")) {
