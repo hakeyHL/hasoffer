@@ -58,7 +58,7 @@ public class MobileController {
         stdSkuKeyVoList.add(new SiteMapKeyVo("Top Mobile Phones", 0));
         PageableResult<PtmStdSku> ptmStdSkuList = ptmStdSKuService.getPtmStdSkuListByMinId(0l, page, pageSize);
         for (PtmStdSku ptmStdSku : ptmStdSkuList.getData()) {
-            stdSkuKeyVoList.add(new SiteMapKeyVo(ApiUtils.removeSpecialSymbol(ptmStdSku.getTitle()), 3).buildePid(ptmStdSku.getId()));
+            stdSkuKeyVoList.add(new SiteMapKeyVo(ApiUtils.removeSpecialSymbol(ptmStdSku.getTitle()), 3).buildePid(ApiUtils.addBillion(ptmStdSku.getId())));
         }
         keyMap.put("All Mobile Models In India", stdSkuKeyVoList);
         //key 3
