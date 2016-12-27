@@ -70,15 +70,15 @@ public class MobileController {
                 new SiteMapKeyVo("Top 10  Mobiles  Below 25000", 2).builderProMap("price", "25000"),
                 new SiteMapKeyVo("Top 10  Mobiles  Below 30000", 2).builderProMap("price", "30000"),
 
-                new SiteMapKeyVo("Top 10 Htc Desire Series Mobiles", 2).buildeShortName("Htc Desire Series"),
-                new SiteMapKeyVo("Top 10 Sony Xperia Series Mobiles", 2).buildeShortName("Sony Xperia Series"),
-                new SiteMapKeyVo("Top 10 Samsung Galaxy Series Mobiles", 2).buildeShortName("Samsung Galaxy Series"),
-                new SiteMapKeyVo("Top 10 Lg Optimus Series Mobiles", 2).buildeShortName("Lg Optimus Series"),
-                new SiteMapKeyVo("Top 10 Nokia Lumia Series Mobiles", 2).buildeShortName("Nokia Lumia Series"),
-                new SiteMapKeyVo("Top 10 Nokia Asha Series Mobiles", 2).buildeShortName("Nokia Asha Series"),
-                new SiteMapKeyVo("Top 10 T Series Mobiles", 2).buildeShortName("T Series"),
-                new SiteMapKeyVo("Top 10 T Series Camera Mobiles", 2).buildeShortName("T Series"),
-                new SiteMapKeyVo("Top 10 T Series Dual Sim Mobiles", 2).buildeShortName("T Series"),
+                new SiteMapKeyVo("Top 10 Htc Desire Series Mobiles", 1).buildeShortName("Htc Desire Series"),
+                new SiteMapKeyVo("Top 10 Sony Xperia Series Mobiles", 1).buildeShortName("Sony Xperia Series"),
+                new SiteMapKeyVo("Top 10 Samsung Galaxy Series Mobiles", 1).buildeShortName("Samsung Galaxy Series"),
+                new SiteMapKeyVo("Top 10 Lg Optimus Series Mobiles", 1).buildeShortName("Lg Optimus Series"),
+                new SiteMapKeyVo("Top 10 Nokia Lumia Series Mobiles", 1).buildeShortName("Nokia Lumia Series"),
+                new SiteMapKeyVo("Top 10 Nokia Asha Series Mobiles", 1).buildeShortName("Nokia Asha Series"),
+                new SiteMapKeyVo("Top 10 T Series Mobiles", 1).buildeShortName("T Series"),
+                new SiteMapKeyVo("Top 10 T Series Camera Mobiles", 1).buildeShortName("T Series"),
+                new SiteMapKeyVo("Top 10 T Series Dual Sim Mobiles", 1).buildeShortName("T Series"),
                 //Top 10 + “品牌名称” + Mobiles + Below +“价格参数”
                 new SiteMapKeyVo("Top 10 HTC Mobiles Below 50000", 2).builderProMap("price", "5000").builderProMap("brand", "HTC")
         ));
