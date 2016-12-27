@@ -64,14 +64,14 @@ public class MobileController {
         //Bluetooth 能与不能
         //Camera  不管前置还是后置
         Map<String, Map<String, String>> characteristicMap1 = new HashMap();
-        characteristicMap1.put("Wireless Fm", ApiUtils.getBuilderMap("FM_Radio", "yes", null));
-        characteristicMap1.put("Dual Sim", ApiUtils.getBuilderMap("SIM_Slot", "Dual Sim", null));
-        characteristicMap1.put("3g", ApiUtils.getBuilderMap("Network_Support", "3G", null));
-        characteristicMap1.put("Camera", ApiUtils.getBuilderMap("Camera", "yes", null));
-        characteristicMap1.put("Windows", ApiUtils.getBuilderMap("Operating_System", "Windows", null));
-        characteristicMap1.put("Touch Screen", ApiUtils.getBuilderMap("Touch_Screen", "yes", null));
-        characteristicMap1.put("Bluetooth", ApiUtils.getBuilderMap("Bluetooth", "yes", null));
-        characteristicMap1.put("4g", ApiUtils.getBuilderMap("Network_Support", "4G", null));
+        characteristicMap1.put("Wireless Fm", ApiUtils.getBuilderMap("FM_Radio", "yes", new HashMap()));
+        characteristicMap1.put("Dual Sim", ApiUtils.getBuilderMap("SIM_Slot", "Dual Sim", new HashMap()));
+        characteristicMap1.put("3g", ApiUtils.getBuilderMap("Network_Support", "3G", new HashMap()));
+        characteristicMap1.put("Camera", ApiUtils.getBuilderMap("Camera", "yes", new HashMap()));
+        characteristicMap1.put("Windows", ApiUtils.getBuilderMap("Operating_System", "Windows", new HashMap()));
+        characteristicMap1.put("Touch Screen", ApiUtils.getBuilderMap("Touch_Screen", "yes", new HashMap()));
+        characteristicMap1.put("Bluetooth", ApiUtils.getBuilderMap("Bluetooth", "yes", new HashMap()));
+        characteristicMap1.put("4g", ApiUtils.getBuilderMap("Network_Support", "4G", new HashMap()));
 
         //--特征2
         //Camera  不管前置还是后置
@@ -84,15 +84,15 @@ public class MobileController {
         //Wi Fi 能与不能
 
         Map<String, Map<String, String>> characteristicMap2 = new HashMap();
-        characteristicMap2.put("Wireless Fm", ApiUtils.getBuilderMap("FM_Radio", "yes", null));
-        characteristicMap2.put("Dual Sim", ApiUtils.getBuilderMap("SIM_Slot", "Dual Sim", null));
-        characteristicMap2.put("3g", ApiUtils.getBuilderMap("Network_Support", "3G", null));
-        characteristicMap2.put("Camera", ApiUtils.getBuilderMap("Camera", "yes", null));
-        characteristicMap2.put("Android", ApiUtils.getBuilderMap("Operating_System", "Android", null));
-        characteristicMap2.put("WiFi", ApiUtils.getBuilderMap("WiFi", "yes", null));
-        characteristicMap2.put("Touch Screen", ApiUtils.getBuilderMap("Touch_Screen", "yes", null));
-        characteristicMap2.put("Bluetooth", ApiUtils.getBuilderMap("Bluetooth", "yes", null));
-        characteristicMap2.put("Processor", ApiUtils.getBuilderMap("Processor", "Dual Core", null));
+        characteristicMap2.put("Wireless Fm", ApiUtils.getBuilderMap("FM_Radio", "yes", new HashMap()));
+        characteristicMap2.put("Dual Sim", ApiUtils.getBuilderMap("SIM_Slot", "Dual Sim", new HashMap()));
+        characteristicMap2.put("3g", ApiUtils.getBuilderMap("Network_Support", "3G", new HashMap()));
+        characteristicMap2.put("Camera", ApiUtils.getBuilderMap("Camera", "yes", new HashMap()));
+        characteristicMap2.put("Android", ApiUtils.getBuilderMap("Operating_System", "Android", new HashMap()));
+        characteristicMap2.put("WiFi", ApiUtils.getBuilderMap("WiFi", "yes", new HashMap()));
+        characteristicMap2.put("Touch Screen", ApiUtils.getBuilderMap("Touch_Screen", "yes", new HashMap()));
+        characteristicMap2.put("Bluetooth", ApiUtils.getBuilderMap("Bluetooth", "yes", new HashMap()));
+        characteristicMap2.put("Processor", ApiUtils.getBuilderMap("Processor", "Dual Core", new HashMap()));
 
         Map<String, List> keyMap = new HashMap();
         //key 1

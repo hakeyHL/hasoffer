@@ -173,7 +173,7 @@ public class DealController {
     }
 
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
-    public ModelAndView edit(AppDeal deal, MultipartFile dealFile, MultipartFile bannerFile, String bannerImageUrl) throws IOException {
+    public ModelAndView edit(AppDeal deal, MultipartFile dealFile, MultipartFile bannerFile, String bannerImageUrl) {
         /**
          * 无关属性: 不需要展示,不需要修改的属性,
          * 不要忘记放入jsp文件中,否则信息丢失
@@ -184,10 +184,9 @@ public class DealController {
         if (StringUtils.isEmpty(bannerImageUrl)) {
             //修改了图片
             if (!bannerFile.isEmpty()) {
+                try {
                 File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
                 FileUtil.writeBytes(imageFile, bannerFile.getBytes());
-                try {
-
                     bannerImageUrl = ImageUtil.uploadImage(imageFile);
                 } catch (Exception e) {
                     logger.error("banner image upload fail");
@@ -198,9 +197,9 @@ public class DealController {
         if (StringUtils.isEmpty(deal.getImageUrl())) {
 
             if (!dealFile.isEmpty()) {
-                File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
-                FileUtil.writeBytes(imageFile, dealFile.getBytes());
                 try {
+                    File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
+                    FileUtil.writeBytes(imageFile, dealFile.getBytes());
                     dealPath = ImageUtil.uploadImage(imageFile);
                     dealBigPath = ImageUtil.uploadImage(imageFile, 316, 180);
                     dealSmallPath = ImageUtil.uploadImage(imageFile, 180, 180);
