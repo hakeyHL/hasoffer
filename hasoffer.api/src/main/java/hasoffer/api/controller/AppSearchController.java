@@ -47,11 +47,11 @@ public class AppSearchController {
         }
 
         //3. 业务逻辑
-        searchCriteria.setPivotFields(Arrays.asList("Network",
+        searchCriteria.setPivotFields(Arrays.asList("Network_Support",
                 "Screen_Resolution", "Operating_System", "queryRam",
                 "queryScreenSize", "querySecondaryCamera",
                 "queryBatteryCapacity", "queryPrimaryCamera",
-                "queryInternalMemory", "brand"));
+                "queryInternalMemory", "Brand"));
         PageableResult pageableResult = appSearchService.filterByParams(searchCriteria);
 
         if (pageableResult != null && pageableResult.getData().size() > 0) {

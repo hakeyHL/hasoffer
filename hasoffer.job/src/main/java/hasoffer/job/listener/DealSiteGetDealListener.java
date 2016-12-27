@@ -3,7 +3,6 @@ package hasoffer.job.listener;
 import hasoffer.base.utils.DaemonThreadFactory;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.admin.impl.DealServiceImpl;
-import hasoffer.core.persistence.dbm.Hibernate4DataBaseManager;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.job.bean.deal.DealSiteGetDealWoker;
 import org.springframework.web.context.ContextLoaderListener;
@@ -30,13 +29,12 @@ public class DealSiteGetDealListener extends ContextLoaderListener {
 
     private void serverInitialized() {
 
-        Hibernate4DataBaseManager dbm = springContext.getBean(Hibernate4DataBaseManager.class);
         IFetchDubboService fetchDubboService = springContext.getBean(IFetchDubboService.class);
         IDealService dealService = springContext.getBean(DealServiceImpl.class);
 
         ExecutorService es = Executors.newCachedThreadPool();
 
-        es.execute(DaemonThreadFactory.create(new DealSiteGetDealWoker(dbm, fetchDubboService, dealService)));
+        es.execute(DaemonThreadFactory.create(new DealSiteGetDealWoker(fetchDubboService, dealService)));
     }
 
     @Override

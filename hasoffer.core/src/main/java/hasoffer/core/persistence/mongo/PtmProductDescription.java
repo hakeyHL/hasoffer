@@ -1,6 +1,7 @@
 package hasoffer.core.persistence.mongo;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -15,6 +16,10 @@ public class PtmProductDescription {
     private String jsonParam;//参数
 
     private String jsonDescription;
+
+    @PersistenceConstructor
+    public PtmProductDescription() {
+    }
 
     public String getJsonDescription() {
         return jsonDescription;

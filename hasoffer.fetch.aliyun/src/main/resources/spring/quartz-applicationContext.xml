@@ -17,7 +17,7 @@
         <property name="applicationContextSchedulerContextKey" value="applicationContextKey"/>
         <property name="triggers">
             <list>
-                <ref bean="EipJobTrigger"/>
+                <!--<ref bean="EipJobTrigger"/>-->
                 <ref bean="UpdateStateJobTrigger"/>
             </list>
         </property>
@@ -32,14 +32,14 @@
     <bean id="historyJobListener" class="hasoffer.spring.quartz.listener.HistoryJobListener"/>
 
 
-    <bean name="EipJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="hasoffer.job.bean.EipJobBean"/>
-    </bean>
+    <!--<bean name="EipJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
+    <!--<property name="jobClass" value="hasoffer.job.bean.EipJobBean"/>-->
+    <!--</bean>-->
 
-    <bean id="EipJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-        <property name="jobDetail" ref="EipJob"/>
-        <property name="cronExpression" value="0 28/30 * * * ?"/>
-    </bean>
+    <!--<bean id="EipJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
+    <!--<property name="jobDetail" ref="EipJob"/>-->
+    <!--<property name="cronExpression" value="0 28/30 * * * ?"/>-->
+    <!--</bean>-->
 
     <bean name="UpdateStateJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="hasoffer.job.bean.UpdateStateJobBean"/>

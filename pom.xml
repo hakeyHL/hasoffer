@@ -26,7 +26,6 @@
         <module>hasoffer.analysis.api</module>
         <module>hasoffer.offlinejob</module>
         <module>hasoffer.datafixes</module>
-        <module>hasoffer.third.proxyip</module>
         <module>hasoffer.temp.job</module>
         <module>hasoffer.fetch.aliyun</module>
         <module>hasoffer.fetch.worker</module>
