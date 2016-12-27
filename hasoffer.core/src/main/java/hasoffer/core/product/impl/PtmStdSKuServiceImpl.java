@@ -165,7 +165,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
                 //General---> launch Date,brand,model,操作系统
                 switch (groupName) {
                     case "General":
-                        setGenaral(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        setGeneral(ptmStdSkuModel, ptmStdSkuParamNode, name);
                         break;
                     case "Design":
                         setDesign(ptmStdSkuModel, ptmStdSkuParamNode, name);
@@ -408,7 +408,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
      * @param ptmStdSkuParamNode
      * @param name
      */
-    public void setGenaral(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+    public void setGeneral(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH);
         if (compareIgnoreCase(name, CategoryFilterParams.Brand)) {
             ptmStdSkuModel.setBrand(ptmStdSkuParamNode.getValue());
