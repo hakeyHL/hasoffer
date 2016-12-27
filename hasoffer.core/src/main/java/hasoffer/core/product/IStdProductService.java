@@ -2,6 +2,8 @@ package hasoffer.core.product;
 
 import hasoffer.base.exception.ImageDownloadOrUploadException;
 import hasoffer.core.bo.stdsku.StdSkuBo;
+import hasoffer.core.persistence.mongo.PtmStdBrandCard;
+import hasoffer.core.persistence.mongo.PtmStdSkuDescription;
 
 /**
  * Created by chevy on 2016/8/12.
@@ -23,5 +25,11 @@ public interface IStdProductService {
     void fixImage(long imageId);
 
     void downLoadImage(long imageId) throws ImageDownloadOrUploadException;
+
+    void createPtmStdSkuDescription(PtmStdSkuDescription ptmStdSkuDescription);
+
+    void updatePtmStdSkuDescription(PtmStdSkuDescription newPtmStdSkuDescription, PtmStdSkuDescription oldPtmStdSkuDescription);
+
+    void createBrandCard(PtmStdBrandCard ptmStdBrandCard);
 
 }
