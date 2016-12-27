@@ -579,15 +579,10 @@ public class ApiUtils {
      *
      * @param key
      * @param value
-     * @param map
      * @return
      */
     public static Map getBuilderMap(Object key, Object value, Map map) {
-        if (map != null) {
-            map.put(key, value);
-            map = new HashMap();
-            map.put(key, value);
-        }
+        map.put(key, value);
         return map;
     }
 
