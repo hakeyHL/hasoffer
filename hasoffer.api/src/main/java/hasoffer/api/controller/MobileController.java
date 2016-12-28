@@ -248,15 +248,17 @@ public class MobileController {
                         String key = next.getKey();
                         String value = next.getValue();
                         if (StringUtils.isNotEmpty(key) && StringUtils.isNotEmpty(value)) {
-                            if (key.equals("brand")) {
-                                searchCriteria.setBrand(new String[]{key});
-                            }
-                            if (key.equals("price")) {
-                                searchCriteria.setPriceFrom(1);
-                                searchCriteria.setPriceTo(Integer.parseInt(value));
-                            }
-                            if (key.equals("model")) {
-                                searchCriteria.setModel(new String[]{value});
+                            switch (key) {
+                                case "Brand":
+                                    searchCriteria.setBrand(new String[]{key});
+                                    break;
+                                case "minPrice":
+                                    searchCriteria.setPriceFrom(1);
+                                    searchCriteria.setPriceTo(Integer.parseInt(value));
+                                    break;
+                                case "Model":
+                                    searchCriteria.setModel(new String[]{value});
+                                    break;
                             }
                         }
                     }
