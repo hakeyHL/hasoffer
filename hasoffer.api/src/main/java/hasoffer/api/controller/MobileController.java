@@ -40,6 +40,10 @@ public class MobileController {
     PtmStdSkuIndexServiceImpl stdSkuIndexService;
     Logger logger = LoggerFactory.getLogger(MobileController.class);
 
+    public static void main(String[] args) {
+        System.out.println(new Date().getTime());
+    }
+
     @RequestMapping("siteMap")
     public ModelAndView siteMapHasoffer(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "2000") int pageSize) {
         ModelAndView modelAndView = new ModelAndView();
@@ -325,5 +329,4 @@ public class MobileController {
         }
         return modelAndView;
     }
-
 }
