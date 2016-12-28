@@ -1,5 +1,6 @@
 package hasoffer.admin.controller;
 
+import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
@@ -9,12 +10,23 @@ import hasoffer.core.cache.CmpSkuCacheManager;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
+import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
+import hasoffer.core.persistence.dbm.osql.datasource.DataSource;
+import hasoffer.core.persistence.dbm.osql.datasource.DataSourceType;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
+import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.search.SrmProductSearchCount;
+import hasoffer.core.persistence.po.stat.StatCmpCategory;
 import hasoffer.core.persistence.po.stat.StatSkuUpdateResult;
+import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
+import hasoffer.core.task.ListProcessTask;
+import hasoffer.core.task.worker.ILister;
+import hasoffer.core.task.worker.IProcessor;
 import hasoffer.manager.SkuUpdateStatManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +39,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Date : 2016/1/22
@@ -56,7 +67,95 @@ public class StatController {
     ProductCacheManager productCacheManager;
     @Resource
     SkuUpdateStatManager skuUpdateStatManager;
+    @Resource
+    ICategoryService categoryService;
+    @Resource
+    IDataBaseManager dbm;
     private Logger logger = LoggerFactory.getLogger(StatController.class);
+
+    @RequestMapping(value = "/stat_cmp_category", method = RequestMethod.GET)
+    public void stat_cmp_category(final String ymd) {
+
+        final String Q_SEARCHCOUNT = "SELECT t FROM SrmProductSearchCount t WHERE t.ymd=?0";
+
+        final Map<Long, AtomicLong> cateCount = new HashMap<>();
+
+        ListProcessTask<SrmProductSearchCount> statTask = new ListProcessTask<>(
+                new ILister() {
+                    @Override
+                    @DataSource(DataSourceType.Slave)
+                    public PageableResult getData(int page) {
+                        return dbm.queryPage(Q_SEARCHCOUNT, page, 1000, Arrays.asList(ymd));
+                    }
+
+                    @Override
+                    public boolean isRunForever() {
+                        return false;
+                    }
+
+                    @Override
+                    public void setRunForever(boolean runForever) {
+
+                    }
+                },
+                new IProcessor<SrmProductSearchCount>() {
+                    @Override
+                    public void process(SrmProductSearchCount o) {
+                        PtmProduct product = productService.getProduct(o.getProductId());
+
+                        if (product == null) {
+                            return;
+                        }
+
+                        long categoryid = product.getCategoryId();
+
+                        if (categoryid <= 0) {
+//                            categoryid = 0;
+                            return;
+                        }
+
+                        AtomicLong count = cateCount.get(categoryid);
+                        if (count == null) {
+                            count = new AtomicLong(o.getCount());
+                            cateCount.put(categoryid, count);
+                        } else {
+                            count.addAndGet(o.getCount());
+                        }
+                    }
+                }
+        );
+
+        statTask.go();
+
+        while (!statTask.isAllFinished()) {
+            try {
+                TimeUnit.SECONDS.sleep(5);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        long totalCount = 0;
+        for (Map.Entry<Long, AtomicLong> kv : cateCount.entrySet()) {
+            totalCount += kv.getValue().get();
+        }
+
+        for (Map.Entry<Long, AtomicLong> kv : cateCount.entrySet()) {
+            long cateid = kv.getKey();
+            long count = kv.getValue().get();
+
+            float per = (float) count / totalCount;
+
+            if (per < 0.01) {
+                continue;
+            }
+
+            PtmCategory category = categoryService.getCategory(cateid);
+
+            // ymd, cateid, catename, count, totalcount
+            searchService.saveStatCmpCategory(new StatCmpCategory(ymd, cateid, category.getName(), count, totalCount));
+        }
+    }
 
     @RequestMapping(value = "/show_updates", method = RequestMethod.GET)
     public ModelAndView show_updates(@RequestParam(defaultValue = "") String ymd) {
