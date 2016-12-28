@@ -20,11 +20,13 @@ import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.urm.PriceOffNotice;
 import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.persistence.po.urm.UrmUserCoinRepair;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.product.solr.PtmStdSkuModel;
+import hasoffer.core.system.AppUserService;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.core.utils.ConstantUtil;
@@ -39,8 +41,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,6 +53,8 @@ import java.util.regex.Pattern;
 public class ApiUtils {
     @Resource
     AppServiceImpl appService;
+    @Resource
+    AppUserService appUserService;
     @Resource
     IPriceOffNoticeService iPriceOffNoticeService;
     @Resource
@@ -872,7 +874,8 @@ public class ApiUtils {
      * @param data
      */
     public void calculateHasofferCoin(List<UrmUser> users, BackDetailVo data) {
-        //订单分隔时间 2016年12月28日 12:00:00
+        boolean addFlag = false;
+       /* //订单分隔时间 2016年12月28日 12:00:00
         String splitTime = "2016/12/28 12:00:00";
         Date splitDate;
         try {
@@ -880,14 +883,16 @@ public class ApiUtils {
         } catch (ParseException e) {
             System.out.println("transfer time failed .");
             return;
-        }
+        }*/
         List<OrderVo> transcations = new ArrayList<OrderVo>();
         BigDecimal pendingCoins = BigDecimal.ZERO;
-        BigDecimal multipliedVerifiedCoins = BigDecimal.ZERO;
-        BigDecimal addedVerifiedCoins = BigDecimal.ZERO;
+        BigDecimal verifiedCoins = BigDecimal.ZERO;
         for (UrmUser user : users) {
             List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
-
+            UrmUserCoinRepair urmUserCoinRepair = appUserService.getUrmUserCoinSignRecordById(user.getId());
+            if (urmUserCoinRepair != null) {
+                addFlag = true;
+            }
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
                 if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
                     OrderVo orderVo = new OrderVo();
@@ -908,11 +913,7 @@ public class ApiUtils {
                             }
                         }
                         if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
-                            if (orderStatsAnalysisPO.getOrderTime().compareTo(splitDate) == -1) {
-                                multipliedVerifiedCoins = multipliedVerifiedCoins.add(tempPrice);
-                            } else {
-                                addedVerifiedCoins = addedVerifiedCoins.add(tempPrice);
-                            }
+                            verifiedCoins = verifiedCoins.add(tempPrice);
                         }
                     }
 
@@ -922,8 +923,10 @@ public class ApiUtils {
         //待定的
         data.setPendingCoins(pendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         //可以使用的
-//        multipliedVerifiedCoins = multipliedVerifiedCoins.multiply(BigDecimal.TEN).add(addedVerifiedCoins);
-        data.setVerifiedCoins(multipliedVerifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+        if (addFlag) {
+            verifiedCoins = verifiedCoins.multiply(BigDecimal.TEN);
+        }
+        data.setVerifiedCoins(verifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
     }
 }
