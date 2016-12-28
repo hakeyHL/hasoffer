@@ -135,6 +135,17 @@ public class FixController {
             Website.ZOOMIN
     };
 
+    @RequestMapping(value = "/skuImageDownLoad/{skuId}", method = RequestMethod.GET)
+    @ResponseBody
+    public String skuImageDownLoad(@PathVariable long skuid) {
+
+        PtmCmpSku cmpSkuById = cmpSkuService.getCmpSkuById(skuid);
+
+        cmpSkuService.downloadImage2(cmpSkuById);
+
+        return "";
+    }
+
     //fixdata/addUrlKeyForStdPrice
     @RequestMapping(value = "/addUrlKeyForStdPrice", method = RequestMethod.GET)
     @ResponseBody
