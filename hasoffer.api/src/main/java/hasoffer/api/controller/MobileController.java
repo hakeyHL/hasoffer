@@ -6,8 +6,8 @@ import hasoffer.core.app.AppSearchService;
 import hasoffer.core.app.vo.ResultVo;
 import hasoffer.core.app.vo.mobile.SiteMapKeyVo;
 import hasoffer.core.bo.system.SearchCriteria;
-import hasoffer.core.persistence.po.ptm.PtmStdSku;
 import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
+import hasoffer.core.product.solr.PtmStdSkuIndexServiceImpl;
 import hasoffer.core.product.solr.PtmStdSkuModel;
 import hasoffer.core.utils.api.ApiUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -36,7 +36,8 @@ public class MobileController {
     ApiUtils apiUtils;
     @Autowired
     PtmStdSKuServiceImpl ptmStdSKuService;
-
+    @Autowired
+    PtmStdSkuIndexServiceImpl stdSkuIndexService;
     Logger logger = LoggerFactory.getLogger(MobileController.class);
 
     @RequestMapping("siteMap")
@@ -106,9 +107,18 @@ public class MobileController {
         //获取categoryId 为5  level 为2 的所有商品
         List<SiteMapKeyVo> stdSkuKeyVoList = new ArrayList<>();
         stdSkuKeyVoList.add(new SiteMapKeyVo("Top Mobile Phones", 0));
-        PageableResult<PtmStdSku> ptmStdSkuList = ptmStdSKuService.getPtmStdSkuListByMinId(0l, page, pageSize);
-        for (PtmStdSku ptmStdSku : ptmStdSkuList.getData()) {
-            stdSkuKeyVoList.add(new SiteMapKeyVo(ApiUtils.removeSpecialSymbol(ptmStdSku.getTitle()), 3).buildePid(ApiUtils.addBillion(ptmStdSku.getId())));
+//        PageableResult<PtmStdSku> ptmStdSkuList = ptmStdSKuService.getPtmStdSkuListByMinId(0l, page, pageSize);
+
+        SearchCriteria searchCriteria = new SearchCriteria();
+        searchCriteria.setPage(page);
+        searchCriteria.setPageSize(pageSize);
+        searchCriteria.setCategoryId("5");
+        searchCriteria.setLevel(2);
+
+        PageableResult<PtmStdSkuModel> pageableResult = stdSkuIndexService.filterStdSkuOnCategoryByCriteria(searchCriteria);
+
+        for (PtmStdSkuModel ptmStdSkuModel : pageableResult.getData()) {
+            stdSkuKeyVoList.add(new SiteMapKeyVo(ApiUtils.removeSpecialSymbol(ptmStdSkuModel.getTitle()), 3).buildePid(ApiUtils.addBillion(ptmStdSkuModel.getId())));
         }
         keyMap.put("All Mobile Models In India", stdSkuKeyVoList);
         //key 3

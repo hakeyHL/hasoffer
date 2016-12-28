@@ -20,6 +20,7 @@ public class SearchCriteria {
     private int level;
     private int priceFrom = -1;
     private int priceTo = -1;
+
     private List<String> pivotFields;
     private SearchResultSort sort = SearchResultSort.RELEVANCE;
     private String[] model;
