@@ -51,6 +51,16 @@ public class SearchCriteria {
     @JsonProperty(value = "ScreenSize")
     private String[] screenSize;
 
+    private String fmRadio;
+    private String simSlot;
+    private String operatingSystem;
+    private String touchScreen;
+    private String bluetooth;
+    private String wiFi;
+    private String processor;
+    private String queryPrimaryCamera;
+    private String querySecondaryCamera;
+
 
     public int getLevel() {
         return level;
@@ -268,5 +278,77 @@ public class SearchCriteria {
 
     public void setScreenSize(String[] screenSize) {
         this.screenSize = screenSize;
+    }
+
+    public String getFmRadio() {
+        return fmRadio;
+    }
+
+    public void setFmRadio(String fmRadio) {
+        this.fmRadio = fmRadio;
+    }
+
+    public String getSimSlot() {
+        return simSlot;
+    }
+
+    public void setSimSlot(String simSlot) {
+        this.simSlot = simSlot;
+    }
+
+    public String getOperatingSystem() {
+        return operatingSystem;
+    }
+
+    public void setOperatingSystem(String operatingSystem) {
+        this.operatingSystem = operatingSystem;
+    }
+
+    public String getTouchScreen() {
+        return touchScreen;
+    }
+
+    public void setTouchScreen(String touchScreen) {
+        this.touchScreen = touchScreen;
+    }
+
+    public String getBluetooth() {
+        return bluetooth;
+    }
+
+    public void setBluetooth(String bluetooth) {
+        this.bluetooth = bluetooth;
+    }
+
+    public String getWiFi() {
+        return wiFi;
+    }
+
+    public void setWiFi(String wiFi) {
+        this.wiFi = wiFi;
+    }
+
+    public String getProcessor() {
+        return processor;
+    }
+
+    public void setProcessor(String processor) {
+        this.processor = processor;
+    }
+
+    public String getQueryPrimaryCamera() {
+        return queryPrimaryCamera;
+    }
+
+    public void setQueryPrimaryCamera(String queryPrimaryCamera) {
+        this.queryPrimaryCamera = queryPrimaryCamera;
+    }
+
+    public String getQuerySecondaryCamera() {
+        return querySecondaryCamera;
+    }
+
+    public void setQuerySecondaryCamera(String querySecondaryCamera) {
+        this.querySecondaryCamera = querySecondaryCamera;
     }
 }

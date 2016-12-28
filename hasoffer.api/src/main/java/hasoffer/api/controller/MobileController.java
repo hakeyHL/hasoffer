@@ -271,31 +271,32 @@ public class MobileController {
                                     searchCriteria.setModel(new String[]{value});
                                     break;
                                 case "FM_Radio":
-                                    searchCriteria.setModel(new String[]{value});
+                                    searchCriteria.setFmRadio(value);
                                     break;
                                 case "SIM_Slot":
-                                    searchCriteria.setModel(new String[]{value});
+                                    searchCriteria.setSimSlot(value);
                                     break;
                                 case "Network_Support":
-                                    searchCriteria.setModel(new String[]{value});
+                                    searchCriteria.setNetworkSupport(new String[]{value});
                                     break;
-                                case "Camera":
-                                    searchCriteria.setModel(new String[]{value});
-                                    break;
+                               /* case "Camera":
+                                    searchCriteria.setQueryPrimaryCamera(ConstantUtil.SOLR_DEFAULT_VALUE_NOTEMPTY_FIELD);
+                                    searchCriteria.setQuerySecondaryCamera(ConstantUtil.SOLR_DEFAULT_VALUE_NOTEMPTY_FIELD);
+                                    break;*/
                                 case "Operating_System":
-                                    searchCriteria.setModel(new String[]{value});
+                                    searchCriteria.setOpreatingSystem(new String[]{value});
                                     break;
                                 case "Touch_Screen":
-                                    searchCriteria.setModel(new String[]{value});
+                                    searchCriteria.setTouchScreen(value);
                                     break;
                                 case "Bluetooth":
-                                    searchCriteria.setModel(new String[]{value});
+                                    searchCriteria.setBluetooth(value);
                                     break;
                                 case "WiFi":
-                                    searchCriteria.setModel(new String[]{value});
+                                    searchCriteria.setWiFi(value);
                                     break;
                                 case "Processor":
-                                    searchCriteria.setModel(new String[]{value});
+                                    searchCriteria.setProcessor(value);
                                     break;
                             }
                         }

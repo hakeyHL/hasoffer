@@ -13,6 +13,7 @@ import hasoffer.core.product.IPtmStdSkuService;
 import hasoffer.core.product.solr.PtmStdSkuIndexServiceImpl;
 import hasoffer.core.product.solr.PtmStdSkuModel;
 import hasoffer.core.search.ISearchService;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.core.utils.api.ApiUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -460,11 +461,11 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
                 stringBuilder.append("2G");
             }
             if (netWorkString.contains("3")) {
-                stringBuilder.append("hasoffer");
+                stringBuilder.append(ConstantUtil.SOLR_DEFAULT_MULTIVALUEDVALUE_FIELD_SPLIT);
                 stringBuilder.append("3G");
             }
             if (netWorkString.contains("4")) {
-                stringBuilder.append("hasoffer");
+                stringBuilder.append(ConstantUtil.SOLR_DEFAULT_MULTIVALUEDVALUE_FIELD_SPLIT);
                 stringBuilder.append("4G");
             }
             ptmStdSkuModel.setNetwork_Support(stringBuilder.toString());
