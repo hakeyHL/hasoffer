@@ -574,6 +574,19 @@ public class ApiUtils {
     }
 
     /**
+     * yi以put值的方式获得一个map
+     * 或像先用mapput值返回此map
+     *
+     * @param key
+     * @param value
+     * @return
+     */
+    public static Map getBuilderMap(Object key, Object value, Map map) {
+        map.put(key, value);
+        return map;
+    }
+
+    /**
      * 在数据对象返回客户端之前检测其域是否都有值,除对象成员外都赋初始值
      *
      * @param object
@@ -729,6 +742,7 @@ public class ApiUtils {
             }
         }
     }
+    //sort list area =================================================================
 
     public void setCommentNumAndRatins(ProductListVo productListVo) {
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productListVo.getId(), 1, 20);
@@ -762,7 +776,6 @@ public class ApiUtils {
             productListVo.setRatingNum(rating <= 0 ? 90 : rating);
         }
     }
-    //sort list area =================================================================
 
     public void getSkuListByKeyword(Map map, PageableResult p) {
         if (p.getPivotFieldVals() != null && p.getPivotFieldVals().size() > 0) {
@@ -896,5 +909,4 @@ public class ApiUtils {
         data.setVerifiedCoins(verifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
     }
-
 }

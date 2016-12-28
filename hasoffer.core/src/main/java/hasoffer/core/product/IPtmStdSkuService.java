@@ -19,4 +19,6 @@ public interface IPtmStdSkuService {
 
     List<PtmStdPrice> listStdPrice(long ptmStdSkuId);
 
+    List<String> getPtmStdSkuBrandList();
+
 }

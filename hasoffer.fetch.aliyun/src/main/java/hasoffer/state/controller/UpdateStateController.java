@@ -1,5 +1,6 @@
 package hasoffer.state.controller;
 
+import hasoffer.aliyun.enums.WebSite;
 import hasoffer.state.dmo.UpdateStateDMO;
 import hasoffer.state.service.UpdateStateService;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -43,7 +44,7 @@ public class UpdateStateController {
 
     @RequestMapping("/selectWebSite")
     @ResponseBody
-    public List<UpdateStateService.WebSite> selectWebSite() {
+    public List<WebSite> selectWebSite() {
         return updateStateService.selectWebSite();
     }
 
