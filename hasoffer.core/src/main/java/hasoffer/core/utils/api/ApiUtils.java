@@ -905,7 +905,7 @@ public class ApiUtils {
         //待定的
         data.setPendingCoins(pendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         //可以使用的
-        verifiedCoins = verifiedCoins.multiply(BigDecimal.TEN);
+//        verifiedCoins = verifiedCoins.multiply(BigDecimal.TEN);
         data.setVerifiedCoins(verifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
     }
