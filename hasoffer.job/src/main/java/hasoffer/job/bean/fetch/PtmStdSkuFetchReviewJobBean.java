@@ -113,6 +113,10 @@ public class PtmStdSkuFetchReviewJobBean extends QuartzJobBean {
                 String summary = fetchedProduct.getSummary();
                 List<FetchedProductReview> fetchedProductReviewList = fetchedProduct.getFetchedProductReviewList();
 
+                if (brandName == null) {
+                    logger.info("PtmStdSkuFetchReviewJobBean fetchedProduct brandName is null");
+                    continue;
+                }
                 String brandCardId = HexDigestUtil.md5(brandName.toUpperCase());
 
 /**---------------------------关于PtmStdBrandCard如果不存在就创建，如果存在就跳过-------------------------------------------------*/
