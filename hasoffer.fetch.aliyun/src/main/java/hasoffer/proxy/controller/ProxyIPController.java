@@ -1,6 +1,7 @@
 package hasoffer.proxy.controller;
 
 import hasoffer.aliyun.enums.Group;
+import hasoffer.aliyun.enums.IPState;
 import hasoffer.proxy.dmo.ProxyIPDMO;
 import hasoffer.proxy.service.ProxyIPService;
 import org.springframework.stereotype.Controller;
@@ -43,6 +44,10 @@ public class ProxyIPController {
         proxyIPDMO.setCreateTime(new Date());
         proxyIPDMO.setStatus("Y");
         proxyIPDMO.setDeleteFlag("N");
+        String preActiveGroup = proxyIPService.selectGroupName(IPState.Y);
+        if (preActiveGroup != null && !preActiveGroup.equals(proxyIPDMO.getxGroup())) {
+            proxyIPDMO.setStatus("N");
+        }
         List<ProxyIPDMO> proxyIPDMOList = proxyIPService.selectByIP(proxyIPDMO.getIp());
         if (proxyIPDMOList == null || proxyIPDMOList.size() == 0) {
             proxyIPService.insertProxyIP(proxyIPDMO);
