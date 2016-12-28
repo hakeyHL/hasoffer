@@ -19,6 +19,7 @@
             <list>
                 <!--<ref bean="EipJobTrigger"/>-->
                 <ref bean="UpdateStateJobTrigger"/>
+                <ref bean="SwitchIPJobTrigger"/>
             </list>
         </property>
 
@@ -48,5 +49,14 @@
     <bean id="UpdateStateJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="UpdateStateJob"/>
         <property name="cronExpression" value="0 0/30 * * * ?"/>
+    </bean>
+
+    <bean name="SwitchIPJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.IPSwitchJobBean"/>
+    </bean>
+
+    <bean id="SwitchIPJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="SwitchIPJob"/>
+        <property name="cronExpression" value="0 0 0/1 * * ?"/>
     </bean>
 </beans>
