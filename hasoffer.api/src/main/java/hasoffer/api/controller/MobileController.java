@@ -114,6 +114,7 @@ public class MobileController {
         searchCriteria.setPageSize(pageSize);
         searchCriteria.setCategoryId("5");
         searchCriteria.setLevel(2);
+        searchCriteria.setSort(SearchResultSort.RATING);
 
         PageableResult<PtmStdSkuModel> pageableResult = stdSkuIndexService.filterStdSkuOnCategoryByCriteria(searchCriteria);
 
@@ -267,6 +268,33 @@ public class MobileController {
                                     searchCriteria.setPriceTo(Integer.parseInt(value));
                                     break;
                                 case "Model":
+                                    searchCriteria.setModel(new String[]{value});
+                                    break;
+                                case "FM_Radio":
+                                    searchCriteria.setModel(new String[]{value});
+                                    break;
+                                case "SIM_Slot":
+                                    searchCriteria.setModel(new String[]{value});
+                                    break;
+                                case "Network_Support":
+                                    searchCriteria.setModel(new String[]{value});
+                                    break;
+                                case "Camera":
+                                    searchCriteria.setModel(new String[]{value});
+                                    break;
+                                case "Operating_System":
+                                    searchCriteria.setModel(new String[]{value});
+                                    break;
+                                case "Touch_Screen":
+                                    searchCriteria.setModel(new String[]{value});
+                                    break;
+                                case "Bluetooth":
+                                    searchCriteria.setModel(new String[]{value});
+                                    break;
+                                case "WiFi":
+                                    searchCriteria.setModel(new String[]{value});
+                                    break;
+                                case "Processor":
                                     searchCriteria.setModel(new String[]{value});
                                     break;
                             }
