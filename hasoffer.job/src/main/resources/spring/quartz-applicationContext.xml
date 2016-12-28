@@ -26,6 +26,7 @@
                 <ref bean="adminPushTrigger"/>
                 <ref bean="statLogCountBeanTrigger"/>
                 <ref bean="dealSiteFetchTrigger"/>
+                <ref bean="stdSkuReviewFetchJobTrigger"/>
             </list>
         </property>
 
@@ -108,6 +109,15 @@
     <bean id="dealSiteFetchTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="dealSiteFetch"/>
         <property name="cronExpression" value="0 33 0/1 * * ?"/>
+    </bean>
+
+    <!-- MOBILE91评论数据抓取-->
+    <bean name="stdSkuReviewFetchJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.fetch.PtmStdSkuFetchReviewJobBean"/>
+    </bean>
+    <bean id="stdSkuReviewFetchJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="stdSkuReviewFetchJob"/>
+        <property name="cronExpression" value="0 00 20 ? * 1"/>
     </bean>
 
 </beans>
