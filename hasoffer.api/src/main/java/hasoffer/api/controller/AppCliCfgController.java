@@ -85,10 +85,10 @@ public class AppCliCfgController {
                 map.put("001", false);
 
                 //wishlist
-                map.put("002", false);
+                map.put("002", true);
 
                 //购物车
-                map.put("003", false);
+                map.put("003", true);
 
                 //email and phone get
                 map.put("004", true);

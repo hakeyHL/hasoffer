@@ -196,15 +196,12 @@ public class MobileController {
             }
         }
         top10MobilesList.addAll(Arrays.asList(
-                new SiteMapKeyVo("Top 10 Htc Desire Series Mobiles", 1).buildeShortName("Htc Desire Series"),
-                new SiteMapKeyVo("Top 10 Sony Xperia Series Mobiles", 1).buildeShortName("Sony Xperia Series"),
-                new SiteMapKeyVo("Top 10 Samsung Galaxy Series Mobiles", 1).buildeShortName("Samsung Galaxy Series"),
-                new SiteMapKeyVo("Top 10 Lg Optimus Series Mobiles", 1).buildeShortName("Lg Optimus Series"),
-                new SiteMapKeyVo("Top 10 Nokia Lumia Series Mobiles", 1).buildeShortName("Nokia Lumia Series"),
-                new SiteMapKeyVo("Top 10 Nokia Asha Series Mobiles", 1).buildeShortName("Nokia Asha Series"),
-                new SiteMapKeyVo("Top 10 T Series Mobiles", 1).buildeShortName("T Series"),
-                new SiteMapKeyVo("Top 10 T Series Camera Mobiles", 1).buildeShortName("T Series"),
-                new SiteMapKeyVo("Top 10 T Series Dual Sim Mobiles", 1).buildeShortName("T Series")
+                new SiteMapKeyVo("Top 10 Htc Desire Series Mobiles", 1).buildeShortName("Htc Desire"),
+                new SiteMapKeyVo("Top 10 Sony Xperia Series Mobiles", 1).buildeShortName("Sony Xperia"),
+                new SiteMapKeyVo("Top 10 Samsung Galaxy Series Mobiles", 1).buildeShortName("Samsung Galaxy"),
+                new SiteMapKeyVo("Top 10 Lg Optimus Series Mobiles", 1).buildeShortName("Lg Optimus"),
+                new SiteMapKeyVo("Top 10 Nokia Lumia Series Mobiles", 1).buildeShortName("Nokia Lumia"),
+                new SiteMapKeyVo("Top 10 Nokia Asha Series Mobiles", 1).buildeShortName("Nokia Asha")
         ));
         keyMap.put("Top 10 Mobiles", top10MobilesList);
         modelAndView.addObject("data", keyMap);
