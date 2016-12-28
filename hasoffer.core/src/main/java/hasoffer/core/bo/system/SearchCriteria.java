@@ -169,6 +169,9 @@ public class SearchCriteria {
     @Override
     public String toString() {
         return "SearchCriteria{" +
+                "comment=" + comment +
+                ", minPrice=" + minPrice +
+                ", maxPrice=" + maxPrice +
                 ", keyword='" + keyword + '\'' +
                 ", categoryId='" + categoryId + '\'' +
                 ", page=" + page +
@@ -178,6 +181,7 @@ public class SearchCriteria {
                 ", priceTo=" + priceTo +
                 ", pivotFields=" + pivotFields +
                 ", sort=" + sort +
+                ", model=" + Arrays.toString(model) +
                 ", brand=" + Arrays.toString(brand) +
                 ", networkSupport=" + Arrays.toString(networkSupport) +
                 ", screenResolution=" + Arrays.toString(screenResolution) +
@@ -189,6 +193,15 @@ public class SearchCriteria {
                 ", primaryCamera=" + Arrays.toString(primaryCamera) +
                 ", secondaryCamera=" + Arrays.toString(secondaryCamera) +
                 ", screenSize=" + Arrays.toString(screenSize) +
+                ", fmRadio='" + fmRadio + '\'' +
+                ", simSlot='" + simSlot + '\'' +
+                ", operatingSystem='" + operatingSystem + '\'' +
+                ", touchScreen='" + touchScreen + '\'' +
+                ", bluetooth='" + bluetooth + '\'' +
+                ", wiFi='" + wiFi + '\'' +
+                ", processor='" + processor + '\'' +
+                ", queryPrimaryCamera='" + queryPrimaryCamera + '\'' +
+                ", querySecondaryCamera='" + querySecondaryCamera + '\'' +
                 '}';
     }
 
