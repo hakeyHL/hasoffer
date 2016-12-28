@@ -74,6 +74,7 @@ public class PtmStdSkuFetchReviewJobBean extends QuartzJobBean {
                     }
                 }
             }
+            curPage++;
         }
 
         //while true receive result
