@@ -9,8 +9,8 @@ import java.util.List;
 public interface ProxyIPDAO {
 
     @Insert({
-            " INSERT INTO t_proxy_ip (ip, port, status, reqNum, finishNum, exceptionNum, startDate, stopDate) ",
-            " VALUES (#{dmo.ip,jdbcType=VARCHAR}, #{dmo.port,jdbcType=INTEGER}, #{dmo.status,jdbcType=CHAR},  #{dmo.reqNum,jdbcType=INTEGER},  #{dmo.finishNum,jdbcType=INTEGER},  #{dmo.exceptionNum,jdbcType=INTEGER},  #{dmo.startDate,jdbcType=TIMESTAMP}, #{dmo.stopDate,jdbcType=TIMESTAMP} )"
+            " INSERT INTO t_proxy_ip (ip, xGroup, port, status, reqNum, finishNum, exceptionNum, createTime, deleteTime, deleteFlag) ",
+            " VALUES (#{dmo.ip,jdbcType=VARCHAR}, #{dmo.xGroup,jdbcType=VARCHAR}, #{dmo.port,jdbcType=INTEGER}, #{dmo.status,jdbcType=CHAR},  #{dmo.reqNum,jdbcType=INTEGER},  #{dmo.finishNum,jdbcType=INTEGER},  #{dmo.exceptionNum,jdbcType=INTEGER},  #{dmo.createTime,jdbcType=TIMESTAMP}, #{dmo.deleteTime,jdbcType=TIMESTAMP}, #{dmo.deleteFlag,jdbcType=CHAR})"
     })
     void insert(@Param("dmo") ProxyIPDMO dmo);
 
@@ -35,11 +35,11 @@ public interface ProxyIPDAO {
             "<if test=\"dmo.exceptionNum!=null \">",
             " ,exceptionNum=#{dmo.exceptionNum,jdbcType=INTEGER}",
             "</if>",
-            "<if test=\"dmo.startDate!=null \">",
-            " ,startDate=#{dmo.startDate,jdbcType=TIMESTAMP} ",
+            "<if test=\"dmo.createTime!=null \">",
+            " ,createTime=#{dmo.createTime,jdbcType=TIMESTAMP} ",
             "</if>",
-            "<if test=\"dmo.stopDate!=null \">",
-            " ,stopDate=#{dmo.stopDate,jdbcType=TIMESTAMP} ",
+            "<if test=\"dmo.deleteTime!=null \">",
+            " ,deleteTime=#{dmo.deleteTime,jdbcType=TIMESTAMP} ",
             "</if>",
             " WHERE id=#{dmo.id,jdbcType=VARCHAR}",
             "</script>"
@@ -48,27 +48,42 @@ public interface ProxyIPDAO {
 
     @Select({
             "<script>",
-            "select id, ip, port, status, reqNum, finishNum, exceptionNum, startDate, stopDate from t_proxy_ip where 1=1 ",
+            "select id, xGroup, ip, port, status, reqNum, finishNum, exceptionNum, createTime, deleteTime from t_proxy_ip where 1=1 ",
             "<if test=\"req.id!=null \">",
             " and id=#{req.id} ",
             "</if>",
             "<if test=\"req.ip!=null and req.ip!='' \">",
             " and ip=#{req.ip}",
             "</if>",
-            " order by startDate desc",
+            " order by createTime desc",
             "</script>"
     })
     @Results({
             @Result(column = "id", property = "id", jdbcType = JdbcType.INTEGER),
+            @Result(column = "xGroup", property = "xGroup", jdbcType = JdbcType.VARCHAR),
             @Result(column = "ip", property = "ip", jdbcType = JdbcType.VARCHAR),
             @Result(column = "port", property = "port", jdbcType = JdbcType.INTEGER),
             @Result(column = "status", property = "status", jdbcType = JdbcType.CHAR),
             @Result(column = "reqNum", property = "reqNum", jdbcType = JdbcType.INTEGER),
             @Result(column = "finishNum", property = "finishNum", jdbcType = JdbcType.INTEGER),
             @Result(column = "exceptionNum", property = "exceptionNum", jdbcType = JdbcType.INTEGER),
-            @Result(column = "startDate", property = "startDate", jdbcType = JdbcType.TIMESTAMP),
-            @Result(column = "stopDate", property = "stopDate", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "createTime", property = "createTime", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "deleteTime", property = "deleteTime", jdbcType = JdbcType.TIMESTAMP),
     })
     List<ProxyIPDMO> select(@Param("req") ProxyIPDMO proxyIPDMO);
 
+    @Select({
+            "<script>",
+            "select DISTINCT xGroup from t_proxy_ip where status=#{ipState}",
+            "</script>"
+    })
+    String selectGroupName(@Param("ipState") String ipState);
+
+    @Update({
+            "<script>",
+            " UPDATE t_proxy_ip SET status=#{status,jdbcType=CHAR}",
+            " WHERE xGroup=#{group,jdbcType=VARCHAR}",
+            "</script>"
+    })
+    void updateByGroup(@Param("group") String group, @Param("status") String s);
 }
