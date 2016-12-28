@@ -1,6 +1,6 @@
 package hasoffer.job.bean;
 
-import hasoffer.base.enums.WebSite;
+import hasoffer.aliyun.enums.WebSite;
 import hasoffer.data.redis.IRedisService;
 import hasoffer.state.dmo.UpdateStateDMO;
 import hasoffer.state.service.UpdateStateService;

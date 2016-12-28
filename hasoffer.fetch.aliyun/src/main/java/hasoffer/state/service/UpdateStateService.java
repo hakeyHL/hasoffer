@@ -1,6 +1,6 @@
 package hasoffer.state.service;
 
-import hasoffer.base.enums.WebSite;
+import hasoffer.aliyun.enums.WebSite;
 import hasoffer.state.dao.UpdateStateDAO;
 import hasoffer.state.dmo.UpdateStateDMO;
 import org.slf4j.Logger;
