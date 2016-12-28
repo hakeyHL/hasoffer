@@ -54,7 +54,8 @@ public class MobileController {
 
 
         //获取distinct的品牌列表
-        List<String> brandList = ptmStdSKuService.getPtmStdSkuBrandList();
+//        List<String> brandList = ptmStdSKuService.getPtmStdSkuBrandList();
+        List<String> brandList = Arrays.asList("Samsung", "Lenovo", "Motorola", "Xiaomi", "Oppo", "Lyf", "Apple", "LeEco", "Coolpad", "ZUK");
         //--特征1
         //FM radio --FM_Radio 能与不能
         //SIM_SLOT 包含Dual Sim
@@ -247,15 +248,17 @@ public class MobileController {
                         String key = next.getKey();
                         String value = next.getValue();
                         if (StringUtils.isNotEmpty(key) && StringUtils.isNotEmpty(value)) {
-                            if (key.equals("brand")) {
-                                searchCriteria.setBrand(new String[]{key});
-                            }
-                            if (key.equals("price")) {
-                                searchCriteria.setPriceFrom(1);
-                                searchCriteria.setPriceTo(Integer.parseInt(value));
-                            }
-                            if (key.equals("model")) {
-                                searchCriteria.setModel(new String[]{value});
+                            switch (key) {
+                                case "Brand":
+                                    searchCriteria.setBrand(new String[]{key});
+                                    break;
+                                case "minPrice":
+                                    searchCriteria.setPriceFrom(1);
+                                    searchCriteria.setPriceTo(Integer.parseInt(value));
+                                    break;
+                                case "Model":
+                                    searchCriteria.setModel(new String[]{value});
+                                    break;
                             }
                         }
                     }
