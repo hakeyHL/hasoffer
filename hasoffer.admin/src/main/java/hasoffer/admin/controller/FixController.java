@@ -135,15 +135,44 @@ public class FixController {
             Website.ZOOMIN
     };
 
-    @RequestMapping(value = "/skuImageDownLoad/{skuId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/skuImageDownLoad/{skuid}", method = RequestMethod.GET)
     @ResponseBody
-    public String skuImageDownLoad(@PathVariable long skuid) {
+    public String skuImageDownLoad(@PathVariable int skuid) {
 
         PtmCmpSku cmpSkuById = cmpSkuService.getCmpSkuById(skuid);
 
         cmpSkuService.downloadImage2(cmpSkuById);
 
         return "";
+    }
+
+    //fixdata/addUrlKeyForPtmCmpSku
+    @RequestMapping(value = "/addUrlKeyForPtmCmpSku/{type}/{ptmcmpskuId}", method = RequestMethod.GET)
+    @ResponseBody
+    public String addUrlKeyForPtmCmpSku(@PathVariable long ptmcmpskuId, @PathVariable int type) throws Exception {
+
+        String queryString = "";
+
+        ExecutorService executorService = Executors.newCachedThreadPool();
+
+
+        ListProcessWorkerStatus<PtmCmpSku> ws = new ListProcessWorkerStatus<>();
+
+        if (type == 0) {//更新urlKey为null的
+            queryString = "SELECT t FROM PtmCmpSku t WHERE t.urlKey is null ORDER BY t.id";
+            executorService.execute(new MysqlListWorker2(queryString, ws, dbm));
+        } else if (type == 1) {//从指定的最小id开始更新
+            queryString = "SELECT t FROM PtmCmpSku t WHERE t.id > ?0 ORDER BY t.id";
+            executorService.execute(new MysqlListWorker2(queryString, ws, dbm, ptmcmpskuId));
+        } else {
+            return "error";
+        }
+
+        for (int i = 0; i < 50; i++) {
+            executorService.execute(new UrlKeyFixWorker(ws, cmpSkuService));
+        }
+
+        return "ok";
     }
 
     //fixdata/addUrlKeyForStdPrice
@@ -235,35 +264,6 @@ public class FixController {
             for (PtmStdImage image : imageList) {
                 stdProductService.fixImage(image.getId());
             }
-        }
-
-        return "ok";
-    }
-
-    //fixdata/addUrlKeyForPtmCmpSku
-    @RequestMapping(value = "/addUrlKeyForPtmCmpSku/{type}/{ptmcmpskuId}", method = RequestMethod.GET)
-    @ResponseBody
-    public String addUrlKeyForPtmCmpSku(@PathVariable long ptmcmpskuId, @PathVariable int type) throws Exception {
-
-        String queryString = "";
-
-        ExecutorService executorService = Executors.newCachedThreadPool();
-
-
-        ListProcessWorkerStatus<PtmCmpSku> ws = new ListProcessWorkerStatus<>();
-
-        if (type == 0) {//更新urlKey为null的
-            queryString = "SELECT t FROM PtmCmpSku t WHERE t.urlKey is null ORDER BY t.id";
-            executorService.execute(new MysqlListWorker2(queryString, ws, dbm));
-        } else if (type == 1) {//从指定的最小id开始更新
-            queryString = "SELECT t FROM PtmCmpSku t WHERE t.id > ?0 ORDER BY t.id";
-            executorService.execute(new MysqlListWorker2(queryString, ws, dbm, ptmcmpskuId));
-        } else {
-            return "error";
-        }
-
-        for (int i = 0; i < 50; i++) {
-            executorService.execute(new UrlKeyFixWorker(ws, cmpSkuService));
         }
 
         return "ok";
