@@ -106,6 +106,7 @@ public class PtmStdSkuFetchReviewJobBean extends QuartzJobBean {
                     logger.info("PtmStdSkuFetchReviewJobBean fetchedProduct is null");
                     continue;
                 }
+                logger.info("PtmStdSkuFetchReviewJobBean fetchedProduct " + fetchedProduct);
 
                 String brandName = fetchedProduct.getBrand();
                 String brandCardString = fetchedProduct.getBrandCard();
