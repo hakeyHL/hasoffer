@@ -140,6 +140,11 @@
                     align: 'right',
                     halign: 'center'
                 }, {
+                    field: 'deleteFlag',
+                    title: '删除状态',
+                    align: 'right',
+                    halign: 'center'
+                }, {
                     field: 'deleteTime',
                     title: '删除时间',
                     align: 'right',
@@ -207,12 +212,14 @@
 
         var $ip = $("#ip").val();
         var $port = $("#port").val();
+        var $group = $("#groupSelect").val();
 
 
         var url = "${ctx}/proxyIP/insertProxyIP";
         var args = {
             ip: $ip,
-            port: $port
+            port: $port,
+            xGroup: $group
         };
         $.ajax({
             cache: true,

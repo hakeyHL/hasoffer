@@ -38,6 +38,9 @@ public interface ProxyIPDAO {
             "<if test=\"dmo.createTime!=null \">",
             " ,createTime=#{dmo.createTime,jdbcType=TIMESTAMP} ",
             "</if>",
+            "<if test=\"dmo.deleteFlag!=null \">",
+            " ,deleteFlag=#{dmo.deleteFlag,jdbcType=CHAR} ",
+            "</if>",
             "<if test=\"dmo.deleteTime!=null \">",
             " ,deleteTime=#{dmo.deleteTime,jdbcType=TIMESTAMP} ",
             "</if>",
@@ -48,13 +51,14 @@ public interface ProxyIPDAO {
 
     @Select({
             "<script>",
-            "select id, xGroup, ip, port, status, reqNum, finishNum, exceptionNum, createTime, deleteTime from t_proxy_ip where 1=1 ",
+            "select id, xGroup, ip, port, status, reqNum, finishNum, exceptionNum, createTime, deleteFlag, deleteTime from t_proxy_ip where 1=1 ",
             "<if test=\"req.id!=null \">",
             " and id=#{req.id} ",
             "</if>",
             "<if test=\"req.ip!=null and req.ip!='' \">",
             " and ip=#{req.ip}",
             "</if>",
+            " and deleteFlag='N' ",
             " order by createTime desc",
             "</script>"
     })
@@ -68,13 +72,14 @@ public interface ProxyIPDAO {
             @Result(column = "finishNum", property = "finishNum", jdbcType = JdbcType.INTEGER),
             @Result(column = "exceptionNum", property = "exceptionNum", jdbcType = JdbcType.INTEGER),
             @Result(column = "createTime", property = "createTime", jdbcType = JdbcType.TIMESTAMP),
-            @Result(column = "deleteTime", property = "deleteTime", jdbcType = JdbcType.TIMESTAMP),
+            @Result(column = "deleteFlag", property = "deleteFlag", jdbcType = JdbcType.CHAR),
+            @Result(column = "deleteTime", property = "deleteTime", jdbcType = JdbcType.TIMESTAMP)
     })
     List<ProxyIPDMO> select(@Param("req") ProxyIPDMO proxyIPDMO);
 
     @Select({
             "<script>",
-            "select DISTINCT xGroup from t_proxy_ip where status=#{ipState}",
+            "select DISTINCT xGroup from t_proxy_ip where status=#{ipState} and deleteFlag='N'",
             "</script>"
     })
     String selectGroupName(@Param("ipState") String ipState);
@@ -82,7 +87,7 @@ public interface ProxyIPDAO {
     @Update({
             "<script>",
             " UPDATE t_proxy_ip SET status=#{status,jdbcType=CHAR}",
-            " WHERE xGroup=#{group,jdbcType=VARCHAR}",
+            " WHERE xGroup=#{group,jdbcType=VARCHAR} and deleteFlag='N'",
             "</script>"
     })
     void updateByGroup(@Param("group") String group, @Param("status") String s);
