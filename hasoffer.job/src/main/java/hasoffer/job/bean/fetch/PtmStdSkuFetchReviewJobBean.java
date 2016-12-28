@@ -118,19 +118,24 @@ public class PtmStdSkuFetchReviewJobBean extends QuartzJobBean {
                     continue;
                 }
                 String brandCardId = HexDigestUtil.md5(brandName.toUpperCase());
+                logger.info("PtmStdSkuFetchReviewJobBean brandCardId " + brandCardId + " " + brandName);
 
 /**---------------------------关于PtmStdBrandCard如果不存在就创建，如果存在就跳过-------------------------------------------------*/
                 try {
                     PtmStdBrandCard ptmStdBrandCard = mdm.queryOne(PtmStdBrandCard.class, brandCardId);
+
                     if (ptmStdBrandCard == null) {
+                        logger.info("PtmStdSkuFetchReviewJobBean queryOne  PtmStdBrandCard get null");
                         ptmStdBrandCard = new PtmStdBrandCard();
                         ptmStdBrandCard.setId(brandCardId);
                         ptmStdBrandCard.setBrandName(brandName);
                         ptmStdBrandCard.setBrandCardString(brandCardString);
                         stdProductService.createBrandCard(ptmStdBrandCard);
+                    } else {
+                        logger.info("PtmStdSkuFetchReviewJobBean queryOne  PtmStdBrandCard get not null");
                     }
                 } catch (Exception e) {
-                    logger.error("PtmStdSkuFetchReviewJobBean create ptmStdBrandCard fail" + brandName);
+                    logger.info("PtmStdSkuFetchReviewJobBean create ptmStdBrandCard fail" + brandName);
                     e.printStackTrace();
                 }
 /**---------------------------关于PtmStdBrandCard如果不存在就创建，如果存在就跳过-------------------------------------------------*/
@@ -147,14 +152,18 @@ public class PtmStdSkuFetchReviewJobBean extends QuartzJobBean {
                     newPtmStdSkuDescription.setFeatures(feathers);
                     newPtmStdSkuDescription.setFetchedProductReviewList(fetchedProductReviewList);
 
+                    logger.info("PtmStdSkuDescription newPtmStdSkuDescription " + newPtmStdSkuDescription);
+
                     if (oldPtmStdSkuDescription == null) {
                         stdProductService.createPtmStdSkuDescription(newPtmStdSkuDescription);
+                        logger.info("PtmStdSkuDescription createPtmStdSkuDescription success");
                     } else {
                         stdProductService.updatePtmStdSkuDescription(newPtmStdSkuDescription, oldPtmStdSkuDescription);
+                        logger.info("PtmStdSkuDescription updatePtmStdSkuDescription success");
                     }
 
                 } catch (Exception e) {
-                    logger.error("PtmStdSkuFetchReviewJobBean saveOrUpdateptm StdSkuDescription fail " + ptmstdSkuId);
+                    logger.info("PtmStdSkuFetchReviewJobBean saveOrUpdateptm StdSkuDescription fail " + ptmstdSkuId);
                     e.printStackTrace();
                 }
 /**---------------------------关于PtmStdSkuDescription如果不存在就创建，如果存在需要更新-------------------------------------------------*/
