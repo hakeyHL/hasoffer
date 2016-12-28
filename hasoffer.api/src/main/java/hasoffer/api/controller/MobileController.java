@@ -280,10 +280,12 @@ public class MobileController {
                                 case "Network_Support":
                                     searchCriteria.setNetworkSupport(new String[]{value});
                                     break;
-                               /* case "Camera":
-                                    searchCriteria.setQueryPrimaryCamera(ConstantUtil.SOLR_DEFAULT_VALUE_NOTEMPTY_FIELD);
-                                    searchCriteria.setQuerySecondaryCamera(ConstantUtil.SOLR_DEFAULT_VALUE_NOTEMPTY_FIELD);
-                                    break;*/
+                                case "Camera":
+        /*                            searchCriteria.setQueryPrimaryCamera(ConstantUtil.SOLR_DEFAULT_VALUE_NOTEMPTY_FIELD);
+                                    searchCriteria.setQuerySecondaryCamera(ConstantUtil.SOLR_DEFAULT_VALUE_NOTEMPTY_FIELD);*/
+                                    searchCriteria.setQueryPrimaryCamera("*");
+                                    searchCriteria.setQuerySecondaryCamera("*");
+                                    break;
                                 case "Operating_System":
                                     searchCriteria.setOpreatingSystem(new String[]{value});
                                     break;

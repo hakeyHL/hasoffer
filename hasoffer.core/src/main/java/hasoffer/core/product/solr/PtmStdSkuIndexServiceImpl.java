@@ -230,6 +230,7 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
     }
 
     private void addQuerParams2List(SearchCriteria searchCriteria, List<FilterQuery> fqList) {
+        //TODO 待优化 2016.12.28
         //1. brand
         if (searchCriteria.getBrand() != null && searchCriteria.getBrand().length > 0) {
             String[] brands = searchCriteria.getBrand();
@@ -239,15 +240,6 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
         if (searchCriteria.getNetworkSupport() != null && searchCriteria.getNetworkSupport().length > 0) {
             String[] networks = searchCriteria.getNetworkSupport();
             for (String network : networks) {
-        /*        if (network.equalsIgnoreCase("3G")) {
-                    fqList.add(new FilterQuery("Network3G", joinQueryParams(new String[]{"3G"}, "Network3G")));
-                }
-                if (network.equalsIgnoreCase("4G")) {
-                    fqList.add(new FilterQuery("Network4G", joinQueryParams(new String[]{"4G"}, "Network4G")));
-                }
-                if (network.equalsIgnoreCase("2G")) {
-                    fqList.add(new FilterQuery("Network", joinQueryParams(networks, "Network")));
-                }*/
                 fqList.add(new FilterQuery("Network_Support", joinQueryParams(networks, "Network_Support")));
             }
         }
@@ -300,6 +292,38 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
         if (searchCriteria.getModel() != null && searchCriteria.getModel().length > 0) {
             String[] models = searchCriteria.getModel();
             fqList.add(new FilterQuery("Model", joinQueryParams(models, "Model")));
+        }
+        //13. FM Radio
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(searchCriteria.getFmRadio())) {
+            String[] fmRadios = new String[]{searchCriteria.getFmRadio()};
+            fqList.add(new FilterQuery("FM_Radio", joinQueryParams(fmRadios, "FM_Radio")));
+        }
+        //14. SIM_Slot
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(searchCriteria.getSimSlot())) {
+            String[] simSlots = new String[]{searchCriteria.getSimSlot()};
+            fqList.add(new FilterQuery("SIM_Slot", joinQueryParams(simSlots, "SIM_Slot")));
+        }
+        //15. Bluetooth
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(searchCriteria.getBluetooth())) {
+            String[] bluetooths = new String[]{searchCriteria.getBluetooth()};
+            fqList.add(new FilterQuery("Bluetooth", joinQueryParams(bluetooths, "Bluetooth")));
+        }
+
+        //16. Touch_Screen
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(searchCriteria.getTouchScreen())) {
+            String[] touchs = new String[]{searchCriteria.getTouchScreen()};
+            fqList.add(new FilterQuery("Touch_Screen", joinQueryParams(touchs, "Touch_Screen")));
+        }
+
+        //17. WiFi
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(searchCriteria.getWiFi())) {
+            String[] wifis = new String[]{searchCriteria.getWiFi()};
+            fqList.add(new FilterQuery("WiFi", joinQueryParams(wifis, "WiFi")));
+        }
+        //18. Processor
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(searchCriteria.getProcessor())) {
+            String[] processors = new String[]{searchCriteria.getProcessor()};
+            fqList.add(new FilterQuery("Processor", joinQueryParams(processors, "Processor")));
         }
     }
 
