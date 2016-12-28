@@ -54,7 +54,8 @@ public class MobileController {
 
 
         //获取distinct的品牌列表
-        List<String> brandList = ptmStdSKuService.getPtmStdSkuBrandList();
+//        List<String> brandList = ptmStdSKuService.getPtmStdSkuBrandList();
+        List<String> brandList = Arrays.asList("Samsung", "Lenovo", "Motorola", "Xiaomi", "Oppo", "Lyf", "Apple", "LeEco", "Coolpad", "ZUK");
         //--特征1
         //FM radio --FM_Radio 能与不能
         //SIM_SLOT 包含Dual Sim
