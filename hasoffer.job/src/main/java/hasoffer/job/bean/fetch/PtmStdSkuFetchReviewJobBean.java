@@ -132,7 +132,9 @@ public class PtmStdSkuFetchReviewJobBean extends QuartzJobBean {
                             ptmStdBrandCard.setId(brandCardId);
                             ptmStdBrandCard.setBrandName(brandName);
                             ptmStdBrandCard.setBrandCardString(brandCardString);
-                            stdProductService.createBrandCard(ptmStdBrandCard);
+                            if (!StringUtils.isEmpty(brandCardString)) {
+                                stdProductService.createBrandCard(ptmStdBrandCard);
+                            }
                         } else {
                             logger.info("PtmStdSkuFetchReviewJobBean queryOne  PtmStdBrandCard get not null");
                         }

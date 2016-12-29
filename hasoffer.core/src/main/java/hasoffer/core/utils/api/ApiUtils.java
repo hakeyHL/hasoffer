@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.app.AppCategoryService;
@@ -15,6 +16,9 @@ import hasoffer.core.app.vo.ProductListVo;
 import hasoffer.core.bo.product.CategoryVo;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
+import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
+import hasoffer.core.persistence.mongo.PtmStdBrandCard;
+import hasoffer.core.persistence.mongo.PtmStdSkuDescription;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.ptm.*;
@@ -31,6 +35,7 @@ import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.core.utils.ConstantUtil;
 import hasoffer.data.solr.FilterQuery;
+import hasoffer.spider.model.FetchedProductReview;
 import jodd.util.NameValue;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -63,6 +68,8 @@ public class ApiUtils {
     SearchLogCacheManager searchLogCacheManager;
     @Resource
     CmpskuIndexServiceImpl cmpskuIndexService;
+    @Resource
+    MongoDbManager mongoDbManager;
     @Resource
     private ICmpSkuService cmpSkuService;
     @Resource
@@ -937,5 +944,44 @@ public class ApiUtils {
         }
         data.setVerifiedCoins(multipliedVerifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
+    }
+
+    public Map setEvaluateBrandFeaturesCompetitorsSummaryMap(PtmStdSku ptmStdSku) {
+        Map stdSkuParametersMap = new HashMap();
+        if (ptmStdSku == null) {
+            return stdSkuParametersMap;
+        }
+        Long stdSkuId = ptmStdSku.getId();
+        if (stdSkuId < 0) {
+            return stdSkuParametersMap;
+        }
+        PtmStdSkuDescription ptmStdSkuDescription = mongoDbManager.queryOne(PtmStdSkuDescription.class, stdSkuId);
+        if (ptmStdSkuDescription == null) {
+            return stdSkuParametersMap;
+        }
+        String features = ptmStdSkuDescription.getFeatures();
+        stdSkuParametersMap.put("features", features);
+
+        String summary = ptmStdSkuDescription.getSummary();
+        stdSkuParametersMap.put("summary", summary);
+
+        List<FetchedProductReview> fetchedProductReviewList = ptmStdSkuDescription.getFetchedProductReviewList();
+        stdSkuParametersMap.put("comments", fetchedProductReviewList);
+
+
+        //获取品牌card
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(ptmStdSku.getBrand())) {
+            String brandCardId = HexDigestUtil.md5(ptmStdSku.getBrand().toUpperCase());
+            if (org.apache.commons.lang3.StringUtils.isNotEmpty(brandCardId)) {
+                PtmStdBrandCard ptmStdBrandCard = mongoDbManager.queryOne(PtmStdBrandCard.class, brandCardId);
+                if (ptmStdBrandCard != null && org.apache.commons.lang3.StringUtils.isNotEmpty(ptmStdBrandCard.getBrandCardString())) {
+                    stdSkuParametersMap.put("brandCard", ptmStdBrandCard.getBrandCardString());
+                }
+            }
+
+        }
+        //bestCompetitors
+
+        return stdSkuParametersMap;
     }
 }
