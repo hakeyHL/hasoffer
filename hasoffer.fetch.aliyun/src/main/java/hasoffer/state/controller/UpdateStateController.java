@@ -1,5 +1,6 @@
 package hasoffer.state.controller;
 
+import hasoffer.aliyun.enums.TaskTarget;
 import hasoffer.aliyun.enums.WebSite;
 import hasoffer.state.dmo.UpdateStateDMO;
 import hasoffer.state.service.UpdateStateService;
@@ -38,7 +39,7 @@ public class UpdateStateController {
 
     @RequestMapping("/selectTaskTarget")
     @ResponseBody
-    public List<UpdateStateService.TaskTarget> selectTaskTarget() {
+    public List<TaskTarget> selectTaskTarget() {
         return updateStateService.selectTaskTarget();
     }
 
