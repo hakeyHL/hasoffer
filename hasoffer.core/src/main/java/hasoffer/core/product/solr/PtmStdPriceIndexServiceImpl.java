@@ -50,13 +50,16 @@ public class PtmStdPriceIndexServiceImpl extends AbstractIndexService<Long, PtmS
         return new PageableResult<>(sr.getResult(), sr.getTotalCount(), page, size);
     }
 
-    public PageableResult<PtmStdPriceModel> filterStdSkuOnCategoryByCriteria(SearchCriteria searchCriteria) {
+    public PageableResult<PtmStdPriceModel> filterStdPriceByCriteria(SearchCriteria searchCriteria) {
         String queryString = searchCriteria.getKeyword();
         if (org.apache.commons.lang3.StringUtils.isEmpty(queryString)) {
             queryString = "*:*";
         }
         Sort[] sorts = new Sort[1];
-        SearchResultSort resultSort = searchCriteria.getSort();
+        if (searchCriteria.getSort() == SearchResultSort.RELEVANCE) {
+            //默认是星级
+            searchCriteria.setSort(SearchResultSort.RATING);
+        }
         List<FilterQuery> fqList = new ArrayList<>();
         //处理 facet
         List<String> pivotFields = searchCriteria.getPivotFields();

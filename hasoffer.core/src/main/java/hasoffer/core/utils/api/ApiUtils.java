@@ -28,14 +28,13 @@ import hasoffer.core.persistence.po.urm.UrmUserCoinRepair;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
-import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
-import hasoffer.core.product.solr.ProductModel2;
-import hasoffer.core.product.solr.PtmStdSkuModel;
+import hasoffer.core.product.solr.*;
 import hasoffer.core.system.AppUserService;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.core.utils.ConstantUtil;
 import hasoffer.data.solr.FilterQuery;
+import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchedProductReview;
 import jodd.util.NameValue;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -73,6 +72,8 @@ public class ApiUtils {
     MongoDbManager mongoDbManager;
     @Resource
     PtmStdSKuServiceImpl ptmStdSKuService;
+    @Resource
+    PtmStdPriceIndexServiceImpl ptmStdPriceIndexService;
     @Resource
     private ICmpSkuService cmpSkuService;
     @Resource
@@ -984,7 +985,49 @@ public class ApiUtils {
 
         }
         //bestCompetitors
-        List<CmpProductListVo> competitors = ptmStdSKuService.getSimilaryPricesByPriceAndRating(ptmStdSku);
+//        List<CmpProductListVo> competitors = ptmStdSKuService.getSimilaryPricesByPriceAndRating(ptmStdSku);
+       /* int priceFrom = BigDecimal.valueOf(ptmStdSku.getRefPrice()).multiply(BigDecimal.valueOf(0.8)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).intValue();
+        int priceTo = BigDecimal.valueOf(ptmStdSku.getRefPrice()).multiply(BigDecimal.valueOf(1.2)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).intValue();
+        PageableResult<PtmStdPriceModel> ptmStdPriceModelPageableResult = ptmStdPriceIndexService.filterStdPriceByCriteria(new SearchCriteria(1, 3, priceFrom, priceTo));
+        if (ptmStdPriceModelPageableResult != null && ptmStdPriceModelPageableResult.getData() != null) {
+
+        }*/
         return stdSkuParametersMap;
+    }
+
+    /**
+     * 获取详情页sku列表
+     *
+     * @return
+     */
+    public List<CmpProductListVo> getCmpProductListVos(List skuList, String[] affs, String userToken, List desList) {
+        if (skuList != null && skuList.size() > 0) {
+            if (PtmStdPrice.class.isInstance(skuList.get(0))) {
+                Iterator<PtmStdPrice> ptmList = skuList.iterator();
+                while (ptmList.hasNext()) {
+                    PtmStdPrice next = ptmList.next();
+                    CmpProductListVo cplv = new CmpProductListVo(next, productCacheManager.getPtmStdSkuImageUrl(next.getStdSkuId()), WebsiteHelper.getLogoUrl(next.getWebsite()));
+                    cplv.setDeepLinkUrl(WebsiteHelper.getDeeplinkWithAff((next.getWebsite()), next.getUrl(), new String[]{"渠道", "设备id", "用户id"}));
+                    cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff((next.getWebsite()), next.getUrl(), new String[]{"渠道", "设备id", "用户id"}));
+                    if (!org.apache.commons.lang3.StringUtils.isEmpty(userToken)) {
+                        cplv.setIsAlert(isPriceOffAlert(userToken, cplv.getId()));
+                    }
+                    desList.add(cplv);
+                }
+            } else if (PtmStdPriceModel.class.isInstance(skuList.get(0))) {
+                Iterator<PtmStdPriceModel> ptmList = skuList.iterator();
+                while (ptmList.hasNext()) {
+                    PtmStdPriceModel next = ptmList.next();
+                    CmpProductListVo cplv = new CmpProductListVo(next, productCacheManager.getPtmStdSkuImageUrl(next.getId()), WebsiteHelper.getLogoUrl(Website.valueOf(next.getSite())));
+                    cplv.setDeepLinkUrl(WebsiteHelper.getDeeplinkWithAff(Website.valueOf(next.getSite()), next.getSkuUrl(), affs));
+                    cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(Website.valueOf(next.getSite()), next.getSkuUrl(), affs));
+                    if (!org.apache.commons.lang3.StringUtils.isEmpty(userToken)) {
+                        cplv.setIsAlert(isPriceOffAlert(userToken, cplv.getId()));
+                    }
+                    desList.add(cplv);
+                }
+            }
+        }
+        return null;
     }
 }
