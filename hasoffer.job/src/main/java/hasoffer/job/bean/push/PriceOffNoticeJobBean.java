@@ -95,7 +95,7 @@ public class PriceOffNoticeJobBean extends QuartzJobBean {
 
                 //针对单个priceoffnotice发送push
                 try {
-                    boolean flag = priceOffNoticeService.priceOffNoticeSinglePush(nowPrice, website, url, fetchedTitle, priceOffNoticeId);
+                    boolean flag = priceOffNoticeService.priceOffNoticeSinglePush(nowPrice, website, url, fetchedTitle, priceOffNoticeId, true);
 
                     if (!flag) {
                         //此处暂时使用这个对象的一个字段传值

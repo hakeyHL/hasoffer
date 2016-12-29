@@ -5,6 +5,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmStdPrice;
+import hasoffer.core.product.solr.PtmStdPriceModel;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.core.utils.api.ApiUtils;
 
@@ -151,6 +152,23 @@ public class CmpProductListVo {
         this.freight = stdPrice.getShippingFee();
         this.distributionTime = null;
         this.backRate = stdPrice.getWebsite() == Website.FLIPKART ? 7.5f : 0;
+        this.returnGuarantee = 0;
+    }
+
+    public CmpProductListVo(PtmStdPriceModel ptmStdPriceModel, String ptmStdSkuImage, String logoImage) {
+        this.id = ApiUtils.addBillion(ptmStdPriceModel.getId());
+        this.coins = Website.valueOf(ptmStdPriceModel.getSite()) == Website.FLIPKART ? Math.round(0.075 * ptmStdPriceModel.getPrice()) : 0;
+        this.ratingNum = ptmStdPriceModel.getRatings();
+        this.imageUrl = ptmStdSkuImage;
+        this.totalRatingsNum = ptmStdPriceModel.getCommentsNumber();
+        this.image = logoImage;
+        this.title = ptmStdPriceModel.getTitle() == null ? "" : ptmStdPriceModel.getTitle();
+        this.status = org.apache.commons.lang3.StringUtils.isEmpty(ptmStdPriceModel.getSkuStatus()) ? null : SkuStatus.valueOf(ptmStdPriceModel.getSkuStatus());
+        this.price = Math.round(ptmStdPriceModel.getPrice());
+        this.website = Website.valueOf(ptmStdPriceModel.getSite());
+        this.freight = 0;
+        this.distributionTime = null;
+        this.backRate = Website.valueOf(ptmStdPriceModel.getSite()) == Website.FLIPKART ? 7.5f : 0;
         this.returnGuarantee = 0;
     }
 

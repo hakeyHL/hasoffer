@@ -62,6 +62,16 @@ public class SearchCriteria {
     private String querySecondaryCamera;
 
 
+    public SearchCriteria() {
+    }
+
+    public SearchCriteria(int page, int pageSize, int priceFrom, int priceTo) {
+        this.page = page;
+        this.pageSize = pageSize;
+        this.priceFrom = priceFrom;
+        this.priceTo = priceTo;
+    }
+
     public int getLevel() {
         return level;
     }

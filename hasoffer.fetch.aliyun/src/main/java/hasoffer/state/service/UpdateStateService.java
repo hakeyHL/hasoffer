@@ -1,5 +1,6 @@
 package hasoffer.state.service;
 
+import hasoffer.aliyun.enums.TaskTarget;
 import hasoffer.aliyun.enums.WebSite;
 import hasoffer.state.dao.UpdateStateDAO;
 import hasoffer.state.dmo.UpdateStateDMO;
@@ -48,17 +49,4 @@ public class UpdateStateService {
         return Arrays.asList(WebSite.values());
     }
 
-    public enum TaskTarget {
-        DEAL_UPDATE, SKU_UPDATE, WAIT_URL_LIST, STDPRICE_UPDATE, PRICEOFF_NOTICE
-    }
-
-
-    public enum TaskLevel {
-        LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5
-    }
-
-
-    public enum TaskStatus {
-        FINISH, EXCEPTION, STOP
-    }
 }

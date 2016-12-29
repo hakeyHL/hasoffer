@@ -1,7 +1,6 @@
 package hasoffer.core.product;
 
 import hasoffer.base.model.PageableResult;
-import hasoffer.core.app.vo.CmpProductListVo;
 import hasoffer.core.persistence.po.ptm.PtmStdPrice;
 import hasoffer.core.persistence.po.ptm.PtmStdSku;
 
@@ -22,5 +21,5 @@ public interface IPtmStdSkuService {
 
     List<String> getPtmStdSkuBrandList();
 
-    List<CmpProductListVo> getSimilaryPricesByPriceAndRating(PtmStdSku ptmStdSku);
+    List<PtmStdPrice> getSimilaryPricesByPriceAndRating(PtmStdSku ptmStdSku);
 }
