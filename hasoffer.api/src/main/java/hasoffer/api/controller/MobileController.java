@@ -175,25 +175,25 @@ public class MobileController {
         }
 
         //4. Top 10 + 手机特征1+ Mobiles
-        String[] map1Keys = characteristicMap1.keySet().toArray(new String[]{});
+     /*   String[] map1Keys = characteristicMap1.keySet().toArray(new String[]{});
         for (String key : map1Keys) {
             SiteMapKeyVo siteMapKeyVo = new SiteMapKeyVo("Top 10 " + key + " Mobiles", 2);
             Map map = new HashMap<>();
             map.putAll(characteristicMap1.get(key));
             siteMapKeyVo.setPros(map);
             top10MobilesList.add(siteMapKeyVo);
-        }
+        }*/
         //5. Top 10 +手机特征2 + Smart Phones
-        String[] map2Keys = characteristicMap2.keySet().toArray(new String[]{});
+    /*    String[] map2Keys = characteristicMap2.keySet().toArray(new String[]{});
         for (String key : map2Keys) {
             SiteMapKeyVo siteMapKeyVo = new SiteMapKeyVo("Top 10 " + key + " Smart Phones", 2);
             Map map = new HashMap<>();
             map.putAll(characteristicMap2.get(key));
             siteMapKeyVo.setPros(map);
             top10MobilesList.add(siteMapKeyVo);
-        }
+        }*/
         //6. Top 10 +品牌+手机特征2+Mobiles
-        for (String brand : brandList) {
+       /* for (String brand : brandList) {
             for (String key : map2Keys) {
                 SiteMapKeyVo siteMapKeyVo = new SiteMapKeyVo("Top 10 " + brand + " " + key + " Mobiles", 2);
                 Map map = new HashMap<>();
@@ -202,9 +202,9 @@ public class MobileController {
                 siteMapKeyVo.setPros(map);
                 top10MobilesList.add(siteMapKeyVo);
             }
-        }
+        }*/
         //7. Top 10+手机特征2 + Mobiles+Below+价格参数
-        for (String key : map2Keys) {
+        /*for (String key : map2Keys) {
             for (Integer price : priceList) {
                 SiteMapKeyVo siteMapKeyVo = new SiteMapKeyVo("Top 10 " + key + " Mobiles Below " + price, 2);
                 Map map = new HashMap<>();
@@ -213,9 +213,9 @@ public class MobileController {
                 siteMapKeyVo.setPros(map);
                 top10MobilesList.add(siteMapKeyVo);
             }
-        }
+        }*/
         //8. Top 10 +品牌+手机特征2+Mobiles+Below+价格参数
-        for (String brand : brandList) {
+       /* for (String brand : brandList) {
             for (String key : map2Keys) {
                 for (Integer price : priceList) {
                     SiteMapKeyVo siteMapKeyVo = new SiteMapKeyVo("Top 10 " + brand + " " + key + " Mobiles Below " + price, 2);
@@ -227,7 +227,7 @@ public class MobileController {
                     top10MobilesList.add(siteMapKeyVo);
                 }
             }
-        }
+        }*/
         top10MobilesList.addAll(Arrays.asList(
                 new SiteMapKeyVo("Top 10 Htc Desire Series Mobiles", 1).buildeShortName("Htc Desire"),
                 new SiteMapKeyVo("Top 10 Sony Xperia Series Mobiles", 1).buildeShortName("Sony Xperia"),
