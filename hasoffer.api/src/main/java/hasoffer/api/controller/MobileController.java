@@ -123,7 +123,7 @@ public class MobileController {
         PageableResult<PtmStdSkuModel> pageableResult = stdSkuIndexService.filterStdSkuOnCategoryByCriteria(searchCriteria);
 
         for (PtmStdSkuModel ptmStdSkuModel : pageableResult.getData()) {
-            stdSkuKeyVoList.add(new SiteMapKeyVo(ApiUtils.removeSpecialSymbol(ptmStdSkuModel.getTitle()), 3).buildePid(ApiUtils.addBillion(ptmStdSkuModel.getId())));
+            stdSkuKeyVoList.add(new SiteMapKeyVo(ApiUtils.removeSpecialSymbol(ptmStdSkuModel.getTitle()), 3).buildePid(ptmStdSkuModel.getId()));
         }
         keyMap.put("All Mobile Models In India", stdSkuKeyVoList);
         //key 3
