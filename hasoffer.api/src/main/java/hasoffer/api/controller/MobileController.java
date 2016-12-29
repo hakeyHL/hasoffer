@@ -262,7 +262,7 @@ public class MobileController {
                         if (StringUtils.isNotEmpty(key) && StringUtils.isNotEmpty(value)) {
                             switch (key) {
                                 case "Brand":
-                                    searchCriteria.setBrand(new String[]{key});
+                                    searchCriteria.setBrand(new String[]{value});
                                     break;
                                 case "minPrice":
                                     searchCriteria.setPriceFrom(Integer.parseInt(value) - 5000);
