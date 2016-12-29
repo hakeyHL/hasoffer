@@ -584,4 +584,10 @@ public class AppServiceImpl implements IAppService {
         return dbm.query(Q_APP_DEAL_GET_SIMILAR, 1, 3, Arrays.asList(new Date()));
     }
 
+    @Override
+    @Transactional
+    public void updateDeal(AppDeal appDeal) {
+        dbm.update(appDeal);
+    }
+
 }
