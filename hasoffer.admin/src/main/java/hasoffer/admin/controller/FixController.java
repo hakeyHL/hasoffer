@@ -17,6 +17,7 @@ import hasoffer.core.persistence.mongo.HijackLog;
 import hasoffer.core.persistence.mongo.MobileCateDescription;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
+import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
@@ -2280,6 +2281,35 @@ http://www.s2d6.com/x/?x=c&z=s&v=5953892&k=||1477299419|28983|553|detail|&t=http
                 }
                 int resultCount = appService.addUserRedeemGroup(groupList);
                 logger.info("list size : {} and batchSaveSize is : {}  ", groupList.size(), resultCount);
+            }
+        }
+        return "ok";
+    }
+
+    @ResponseBody
+    @RequestMapping("fixDealSite")
+    public String fixDealWebSite() {
+        PageableResult<AppDeal> deals = appService.getDeals(1l, 500l);
+
+        long currentPage = 1;
+        long totalPage = deals.getTotalPage();
+        long pageSize = 500;
+
+        for (long i = currentPage; i < totalPage; i++) {
+            System.out.println("currentPage : " + i);
+            PageableResult<AppDeal> deals1 = appService.getDeals(i, pageSize);
+            for (AppDeal appDeal : deals1.getData()) {
+                if (Website.UNKNOWN.equals(appDeal.getWebsite())) {
+                    String siteString = WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl());
+                    System.out.println(siteString);
+                    try {
+                        Website dealSite = Website.valueOf(siteString);
+                        appDeal.setWebsite(dealSite);
+                        appService.updateDeal(appDeal);
+                    } catch (Exception e) {
+                        continue;
+                    }
+                }
             }
         }
         return "ok";
