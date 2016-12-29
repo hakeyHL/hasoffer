@@ -4,6 +4,7 @@ import hasoffer.base.enums.CategoryFilterParams;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
+import hasoffer.core.app.vo.CmpProductListVo;
 import hasoffer.core.cache.CategoryCacheManager;
 import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
@@ -83,6 +84,12 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
     public List<String> getPtmStdSkuBrandList() {
         List<String> brandList = dbm.query("select distinct(t.brand) from PtmStdSku t ");
         return brandList;
+    }
+
+    @Override
+    public List<CmpProductListVo> getSimilaryPricesByPriceAndRating(PtmStdSku ptmStdSku) {
+
+        return null;
     }
 
     public PtmStdSkuModel getPtmStdSKuModel(PtmStdSku ptmStdSku1) {

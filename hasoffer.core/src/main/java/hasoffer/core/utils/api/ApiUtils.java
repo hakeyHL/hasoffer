@@ -27,6 +27,7 @@ import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserCoinRepair;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.ICmpSkuService;
+import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.product.solr.PtmStdSkuModel;
@@ -70,6 +71,8 @@ public class ApiUtils {
     CmpskuIndexServiceImpl cmpskuIndexService;
     @Resource
     MongoDbManager mongoDbManager;
+    @Resource
+    PtmStdSKuServiceImpl ptmStdSKuService;
     @Resource
     private ICmpSkuService cmpSkuService;
     @Resource
@@ -981,7 +984,7 @@ public class ApiUtils {
 
         }
         //bestCompetitors
-
+        List<CmpProductListVo> competitors = ptmStdSKuService.getSimilaryPricesByPriceAndRating(ptmStdSku);
         return stdSkuParametersMap;
     }
 }

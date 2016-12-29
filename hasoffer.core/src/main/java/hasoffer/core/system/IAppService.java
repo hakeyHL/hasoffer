@@ -93,4 +93,6 @@ public interface IAppService {
     UrmUserRedeemGroup getUrmRedeemGroupById(Long id);
 
     List<AppDeal> getSimilarDeals();
+
+    void updateDeal(AppDeal appDeal);
 }
