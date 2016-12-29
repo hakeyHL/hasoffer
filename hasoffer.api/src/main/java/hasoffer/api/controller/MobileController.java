@@ -154,44 +154,77 @@ public class MobileController {
                 new SiteMapKeyVo("Redmi Note 3 mobile Below 30000", 2).builderProMap("minPrice", "30000")));
         //2. Top 10 + “品牌名称” + Mobiles
         for (String brand : brandList) {
-            top10MobilesList.add(new SiteMapKeyVo(brand, 2).builderProMap("Brand", brand));
+            SiteMapKeyVo siteMapKeyVo = new SiteMapKeyVo(brand, 2);
+            Map map = new HashMap<>();
+            map.put("Brand", brand);
+            siteMapKeyVo.setPros(map);
+            top10MobilesList.add(siteMapKeyVo);
         }
 
         //3. Top 10 + “品牌名称” + Mobiles + Below +“价格参数”
 //                new SiteMapKeyVo("Top 10 HTC Mobiles Below 5000", 2).builderProMap("minPrice", "5000").builderProMap("Brand", "HTC"),
         for (String brand : brandList) {
             for (Integer price : priceList) {
-                top10MobilesList.add(new SiteMapKeyVo("Top 10 " + brand + " Mobiles Below " + price, 2).builderProMap("minPrice", price + "").builderProMap("Brand", brand));
+                SiteMapKeyVo siteMapKeyVo = new SiteMapKeyVo("Top 10 " + brand + " Mobiles Below " + price, 2);
+                Map map = new HashMap<>();
+                map.put("minPrice", price + "");
+                map.put("Brand", brand);
+                siteMapKeyVo.setPros(map);
+                top10MobilesList.add(siteMapKeyVo);
             }
         }
 
         //4. Top 10 + 手机特征1+ Mobiles
         String[] map1Keys = characteristicMap1.keySet().toArray(new String[]{});
         for (String key : map1Keys) {
-            top10MobilesList.add(new SiteMapKeyVo("Top 10 " + key + " Mobiles", 2).builderProMap(characteristicMap1.get(key)));
+            SiteMapKeyVo siteMapKeyVo = new SiteMapKeyVo("Top 10 " + key + " Mobiles", 2);
+            Map map = new HashMap<>();
+            map.putAll(characteristicMap1.get(key));
+            siteMapKeyVo.setPros(map);
+            top10MobilesList.add(siteMapKeyVo);
         }
         //5. Top 10 +手机特征2 + Smart Phones
         String[] map2Keys = characteristicMap2.keySet().toArray(new String[]{});
         for (String key : map2Keys) {
-            top10MobilesList.add(new SiteMapKeyVo("Top 10 " + key + " Smart Phones", 2).builderProMap(characteristicMap2.get(key)));
+            SiteMapKeyVo siteMapKeyVo = new SiteMapKeyVo("Top 10 " + key + " Smart Phones", 2);
+            Map map = new HashMap<>();
+            map.putAll(characteristicMap2.get(key));
+            siteMapKeyVo.setPros(map);
+            top10MobilesList.add(siteMapKeyVo);
         }
         //6. Top 10 +品牌+手机特征2+Mobiles
         for (String brand : brandList) {
             for (String key : map2Keys) {
-                top10MobilesList.add(new SiteMapKeyVo("Top 10 " + brand + " " + key + " Mobiles", 2).builderProMap(characteristicMap2.get(key)).builderProMap("Brand", brand));
+                SiteMapKeyVo siteMapKeyVo = new SiteMapKeyVo("Top 10 " + brand + " " + key + " Mobiles", 2);
+                Map map = new HashMap<>();
+                map.putAll(characteristicMap2.get(key));
+                map.put("Brand", brand);
+                siteMapKeyVo.setPros(map);
+                top10MobilesList.add(siteMapKeyVo);
             }
         }
         //7. Top 10+手机特征2 + Mobiles+Below+价格参数
         for (String key : map2Keys) {
             for (Integer price : priceList) {
-                top10MobilesList.add(new SiteMapKeyVo("Top 10 " + key + " Mobiles Below " + price, 2).builderProMap(characteristicMap2.get(key)).builderProMap("minPrice", price + ""));
+                SiteMapKeyVo siteMapKeyVo = new SiteMapKeyVo("Top 10 " + key + " Mobiles Below " + price, 2);
+                Map map = new HashMap<>();
+                map.putAll(characteristicMap2.get(key));
+                map.put("minPrice", price + "");
+                siteMapKeyVo.setPros(map);
+                top10MobilesList.add(siteMapKeyVo);
             }
         }
         //8. Top 10 +品牌+手机特征2+Mobiles+Below+价格参数
         for (String brand : brandList) {
             for (String key : map2Keys) {
                 for (Integer price : priceList) {
-                    top10MobilesList.add(new SiteMapKeyVo("Top 10 " + brand + " " + key + " Mobiles Below " + price, 2).builderProMap(characteristicMap2.get(key)).builderProMap("minPrice", price + "").builderProMap("Brand", brand));
+                    SiteMapKeyVo siteMapKeyVo = new SiteMapKeyVo("Top 10 " + brand + " " + key + " Mobiles Below " + price, 2);
+                    Map map = new HashMap<>();
+                    map.putAll(characteristicMap2.get(key));
+                    map.put("minPrice", price + "");
+                    map.put("Brand", brand);
+                    siteMapKeyVo.setPros(map);
+                    top10MobilesList.add(siteMapKeyVo);
                 }
             }
         }
