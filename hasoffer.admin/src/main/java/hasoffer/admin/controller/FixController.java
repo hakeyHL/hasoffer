@@ -2296,10 +2296,12 @@ http://www.s2d6.com/x/?x=c&z=s&v=5953892&k=||1477299419|28983|553|detail|&t=http
         long pageSize = 500;
 
         for (long i = currentPage; i < totalPage; i++) {
-            PageableResult<AppDeal> deals1 = appService.getDeals(currentPage, pageSize);
+            System.out.println("currentPage : " + i);
+            PageableResult<AppDeal> deals1 = appService.getDeals(i, pageSize);
             for (AppDeal appDeal : deals1.getData()) {
                 if (Website.UNKNOWN.equals(appDeal.getWebsite())) {
                     String siteString = WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl());
+                    System.out.println(siteString);
                     try {
                         Website dealSite = Website.valueOf(siteString);
                         appDeal.setWebsite(dealSite);
