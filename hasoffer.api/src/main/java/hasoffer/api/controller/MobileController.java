@@ -265,7 +265,7 @@ public class MobileController {
                                     searchCriteria.setBrand(new String[]{value});
                                     break;
                                 case "minPrice":
-                                    searchCriteria.setPriceFrom(Integer.parseInt(value) - 5000);
+                                    searchCriteria.setPriceFrom(1);
                                     searchCriteria.setPriceTo(Integer.parseInt(value));
                                     break;
                                 case "Model":
