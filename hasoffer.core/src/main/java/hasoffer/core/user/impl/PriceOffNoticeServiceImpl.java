@@ -375,7 +375,7 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
     }
 
     @Override
-    public boolean priceOffNoticeSinglePush(float nowPrice, Website website, String url, String fetchedTitle, long priceOffNoticeId) {
+    public boolean priceOffNoticeSinglePush(float nowPrice, Website website, String url, String fetchedTitle, long priceOffNoticeId, boolean addToPriceOffNoticeQueue) {
 
         PriceOffNotice priceOffNotice = dbm.get(PriceOffNotice.class, priceOffNoticeId);
 
