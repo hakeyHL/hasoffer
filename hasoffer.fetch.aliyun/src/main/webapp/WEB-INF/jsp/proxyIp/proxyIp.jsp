@@ -13,6 +13,7 @@
     <%@ include file="/common/commonCss.jsp" %>
     <link rel="stylesheet" href="<%=contextPath%>/css/page.css">
     <link rel="stylesheet" href="<%=contextPath%>/css/icomoon.min.css">
+    <link rel="stylesheet" href="<%=contextPath%>/extensions/select2/css/select2.css">
 
     <script src="<%=contextPath%>/extensions/jquery.min.js"></script>
     <script src="<%=contextPath%>/js/WdatePicker.js"></script>
@@ -20,6 +21,7 @@
     <script src="<%=contextPath%>/extensions/bootstrap-table/bootstrap-table.js"></script>
     <script src="<%=contextPath%>/extensions/bootstrap-table/extensions/exporttable/js/bootstrap-table-export.js"></script>
     <script src="<%=contextPath%>/extensions/bootstrap-table/extensions/exporttable/js/exporttable.js"></script>
+    <script src="<%=contextPath%>/extensions/select2/js/select2.full.js"></script>
 </head>
 <body class="scrollY frameContent" style="OVERFLOW-X: scroll">
 <div class="col-infos" id="info-div">
@@ -52,6 +54,12 @@
                 <td colspan="5" style="vertical-align: middle; text-align: left;">新增IP</td>
             </tr>
             <tr class="odd">
+                <td style="vertical-align: middle; text-align: center;">
+                    <label>组名称</label>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <input id="groupSelect" type="text" class="form-control"/>
+                </td>
                 <td style="vertical-align: middle; text-align: center;">
                     <label>IP</label>
                 </td>
@@ -92,6 +100,11 @@
             idField: 'id',
             columns: [
                 [{
+                    field: 'xGroup',
+                    title: 'Group',
+                    align: 'right',
+                    halign: 'center'
+                }, {
                     field: 'ip',
                     title: 'IP',
                     align: 'right',
@@ -122,13 +135,18 @@
                     align: 'right',
                     halign: 'center'
                 }, {
-                    field: 'startDate',
-                    title: '启用时间',
+                    field: 'createTime',
+                    title: '创建时间',
                     align: 'right',
                     halign: 'center'
                 }, {
-                    field: 'stopDate',
-                    title: '关闭时间',
+                    field: 'deleteFlag',
+                    title: '删除状态',
+                    align: 'right',
+                    halign: 'center'
+                }, {
+                    field: 'deleteTime',
+                    title: '删除时间',
                     align: 'right',
                     halign: 'center'
                 }, {
@@ -194,12 +212,14 @@
 
         var $ip = $("#ip").val();
         var $port = $("#port").val();
+        var $group = $("#groupSelect").val();
 
 
         var url = "${ctx}/proxyIP/insertProxyIP";
         var args = {
             ip: $ip,
-            port: $port
+            port: $port,
+            xGroup: $group
         };
         $.ajax({
             cache: true,
@@ -237,7 +257,28 @@
         });
     }
 
+    function initSelect2() {
+
+        $.ajax({
+            cache: true,
+            type: 'POST',
+            url: '${ctx}/proxyIP/initGroupSelect',
+            contentType: 'application/json',
+            dataType: 'json',
+            async: false,
+            success: function (data) {
+                $('#groupSelect').select2({
+                    data: data,
+                    placeholder: '请选择',
+                    allowClear: true
+                })
+            }
+        });
+
+    }
+
     $(function () {
+        initSelect2();
         initTable();
     });
 

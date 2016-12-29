@@ -6,8 +6,8 @@ import hasoffer.core.app.AppSearchService;
 import hasoffer.core.app.vo.ResultVo;
 import hasoffer.core.app.vo.mobile.SiteMapKeyVo;
 import hasoffer.core.bo.system.SearchCriteria;
-import hasoffer.core.persistence.po.ptm.PtmStdSku;
 import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
+import hasoffer.core.product.solr.PtmStdSkuIndexServiceImpl;
 import hasoffer.core.product.solr.PtmStdSkuModel;
 import hasoffer.core.utils.api.ApiUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -36,8 +36,13 @@ public class MobileController {
     ApiUtils apiUtils;
     @Autowired
     PtmStdSKuServiceImpl ptmStdSKuService;
-
+    @Autowired
+    PtmStdSkuIndexServiceImpl stdSkuIndexService;
     Logger logger = LoggerFactory.getLogger(MobileController.class);
+
+    public static void main(String[] args) {
+        System.out.println(new Date().getTime());
+    }
 
     @RequestMapping("siteMap")
     public ModelAndView siteMapHasoffer(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "2000") int pageSize) {
@@ -106,9 +111,19 @@ public class MobileController {
         //获取categoryId 为5  level 为2 的所有商品
         List<SiteMapKeyVo> stdSkuKeyVoList = new ArrayList<>();
         stdSkuKeyVoList.add(new SiteMapKeyVo("Top Mobile Phones", 0));
-        PageableResult<PtmStdSku> ptmStdSkuList = ptmStdSKuService.getPtmStdSkuListByMinId(0l, page, pageSize);
-        for (PtmStdSku ptmStdSku : ptmStdSkuList.getData()) {
-            stdSkuKeyVoList.add(new SiteMapKeyVo(ApiUtils.removeSpecialSymbol(ptmStdSku.getTitle()), 3).buildePid(ApiUtils.addBillion(ptmStdSku.getId())));
+//        PageableResult<PtmStdSku> ptmStdSkuList = ptmStdSKuService.getPtmStdSkuListByMinId(0l, page, pageSize);
+
+        SearchCriteria searchCriteria = new SearchCriteria();
+        searchCriteria.setPage(page);
+        searchCriteria.setPageSize(pageSize);
+        searchCriteria.setCategoryId("5");
+        searchCriteria.setLevel(2);
+        searchCriteria.setSort(SearchResultSort.RATING);
+
+        PageableResult<PtmStdSkuModel> pageableResult = stdSkuIndexService.filterStdSkuOnCategoryByCriteria(searchCriteria);
+
+        for (PtmStdSkuModel ptmStdSkuModel : pageableResult.getData()) {
+            stdSkuKeyVoList.add(new SiteMapKeyVo(ApiUtils.removeSpecialSymbol(ptmStdSkuModel.getTitle()), 3).buildePid(ptmStdSkuModel.getId()));
         }
         keyMap.put("All Mobile Models In India", stdSkuKeyVoList);
         //key 3
@@ -181,15 +196,12 @@ public class MobileController {
             }
         }
         top10MobilesList.addAll(Arrays.asList(
-                new SiteMapKeyVo("Top 10 Htc Desire Series Mobiles", 1).buildeShortName("Htc Desire Series"),
-                new SiteMapKeyVo("Top 10 Sony Xperia Series Mobiles", 1).buildeShortName("Sony Xperia Series"),
-                new SiteMapKeyVo("Top 10 Samsung Galaxy Series Mobiles", 1).buildeShortName("Samsung Galaxy Series"),
-                new SiteMapKeyVo("Top 10 Lg Optimus Series Mobiles", 1).buildeShortName("Lg Optimus Series"),
-                new SiteMapKeyVo("Top 10 Nokia Lumia Series Mobiles", 1).buildeShortName("Nokia Lumia Series"),
-                new SiteMapKeyVo("Top 10 Nokia Asha Series Mobiles", 1).buildeShortName("Nokia Asha Series"),
-                new SiteMapKeyVo("Top 10 T Series Mobiles", 1).buildeShortName("T Series"),
-                new SiteMapKeyVo("Top 10 T Series Camera Mobiles", 1).buildeShortName("T Series"),
-                new SiteMapKeyVo("Top 10 T Series Dual Sim Mobiles", 1).buildeShortName("T Series")
+                new SiteMapKeyVo("Top 10 Htc Desire Series Mobiles", 1).buildeShortName("Htc Desire"),
+                new SiteMapKeyVo("Top 10 Sony Xperia Series Mobiles", 1).buildeShortName("Sony Xperia"),
+                new SiteMapKeyVo("Top 10 Samsung Galaxy Series Mobiles", 1).buildeShortName("Samsung Galaxy"),
+                new SiteMapKeyVo("Top 10 Lg Optimus Series Mobiles", 1).buildeShortName("Lg Optimus"),
+                new SiteMapKeyVo("Top 10 Nokia Lumia Series Mobiles", 1).buildeShortName("Nokia Lumia"),
+                new SiteMapKeyVo("Top 10 Nokia Asha Series Mobiles", 1).buildeShortName("Nokia Asha")
         ));
         keyMap.put("Top 10 Mobiles", top10MobilesList);
         modelAndView.addObject("data", keyMap);
@@ -259,6 +271,36 @@ public class MobileController {
                                 case "Model":
                                     searchCriteria.setModel(new String[]{value});
                                     break;
+                                case "FM_Radio":
+                                    searchCriteria.setFmRadio(value);
+                                    break;
+                                case "SIM_Slot":
+                                    searchCriteria.setSimSlot(value);
+                                    break;
+                                case "Network_Support":
+                                    searchCriteria.setNetworkSupport(new String[]{value});
+                                    break;
+                                case "Camera":
+        /*                            searchCriteria.setQueryPrimaryCamera(ConstantUtil.SOLR_DEFAULT_VALUE_NOTEMPTY_FIELD);
+                                    searchCriteria.setQuerySecondaryCamera(ConstantUtil.SOLR_DEFAULT_VALUE_NOTEMPTY_FIELD);*/
+                                    searchCriteria.setQueryPrimaryCamera("*");
+                                    searchCriteria.setQuerySecondaryCamera("*");
+                                    break;
+                                case "Operating_System":
+                                    searchCriteria.setOpreatingSystem(new String[]{value});
+                                    break;
+                                case "Touch_Screen":
+                                    searchCriteria.setTouchScreen(value);
+                                    break;
+                                case "Bluetooth":
+                                    searchCriteria.setBluetooth(value);
+                                    break;
+                                case "WiFi":
+                                    searchCriteria.setWiFi(value);
+                                    break;
+                                case "Processor":
+                                    searchCriteria.setProcessor(value);
+                                    break;
                             }
                         }
                     }
@@ -286,5 +328,4 @@ public class MobileController {
         }
         return modelAndView;
     }
-
 }

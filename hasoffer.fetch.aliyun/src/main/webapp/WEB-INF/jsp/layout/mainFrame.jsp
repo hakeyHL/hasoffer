@@ -52,7 +52,7 @@
                             var targetBizDate = $("input[type=date]").val();
                             var officeId = $("input[type=text]").val();
                             debugger;
-                            window.location.href = "${ctx}/layout/runNow?triggerName=" + triggerName + "&targetBizDate=" + targetBizDate + "&officeId=" + officeId;
+                            window.location.href = "${ctx}/job/runNow?triggerName=" + triggerName + "&targetBizDate=" + targetBizDate + "&officeId=" + officeId;
                         }
                     }
                 });

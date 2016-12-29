@@ -244,6 +244,9 @@ public class DealController {
         if (!StringUtils.isEmpty(dealPath)) {
             deal.setImageUrl(dealPath);
         }
+        if (deal.getWebsite() != null) {
+            deal.setWebsite(deal.getWebsite());
+        }
         if (!StringUtils.isEmpty(dealBigPath)) {
             deal.setInfoPageImage(dealBigPath);
         }

@@ -20,11 +20,13 @@ import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.urm.PriceOffNotice;
 import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.persistence.po.urm.UrmUserCoinRepair;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.product.solr.PtmStdSkuModel;
+import hasoffer.core.system.AppUserService;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.core.utils.ConstantUtil;
@@ -53,6 +55,8 @@ import java.util.regex.Pattern;
 public class ApiUtils {
     @Resource
     AppServiceImpl appService;
+    @Resource
+    AppUserService appUserService;
     @Resource
     IPriceOffNoticeService iPriceOffNoticeService;
     @Resource
@@ -872,6 +876,7 @@ public class ApiUtils {
      * @param data
      */
     public void calculateHasofferCoin(List<UrmUser> users, BackDetailVo data) {
+        boolean addFlag = false;
         //订单分隔时间 2016年12月28日 12:00:00
         String splitTime = "2016/12/28 12:00:00";
         Date splitDate;
@@ -887,7 +892,10 @@ public class ApiUtils {
         BigDecimal addedVerifiedCoins = BigDecimal.ZERO;
         for (UrmUser user : users) {
             List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
-
+            UrmUserCoinRepair urmUserCoinRepair = appUserService.getUrmUserCoinSignRecordById(user.getId());
+            if (urmUserCoinRepair != null) {
+                addFlag = true;
+            }
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
                 if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
                     OrderVo orderVo = new OrderVo();
@@ -922,7 +930,11 @@ public class ApiUtils {
         //待定的
         data.setPendingCoins(pendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         //可以使用的
-//        multipliedVerifiedCoins = multipliedVerifiedCoins.multiply(BigDecimal.TEN).add(addedVerifiedCoins);
+        if (addFlag) {
+            multipliedVerifiedCoins = multipliedVerifiedCoins.multiply(BigDecimal.TEN).add(addedVerifiedCoins);
+        } else {
+            multipliedVerifiedCoins = multipliedVerifiedCoins.add(addedVerifiedCoins);
+        }
         data.setVerifiedCoins(multipliedVerifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
     }

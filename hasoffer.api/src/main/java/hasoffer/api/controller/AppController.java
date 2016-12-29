@@ -40,6 +40,7 @@ import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.product.solr.PtmStdSkuIndexServiceImpl;
 import hasoffer.core.push.IPushService;
 import hasoffer.core.redis.ICacheService;
+import hasoffer.core.system.AppUserService;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.utils.ConstantUtil;
 import hasoffer.core.utils.ImageUtil;
@@ -80,6 +81,8 @@ public class AppController {
     @Resource
     ApiUtils apiUtils;
     @Resource
+    AppUserService appUserService;
+    @Resource
     private IAppService appService;
     @Resource
     private CmpSkuCacheManager cmpSkuCacheManager;
@@ -99,7 +102,6 @@ public class AppController {
     private DealServiceImpl dealService;
     @Resource
     private PtmStdSkuIndexServiceImpl ptmStdSkuIndexService;
-
     private Logger logger = LoggerFactory.getLogger(AppController.class);
 
     @RequestMapping(value = "/newconfig", method = RequestMethod.GET)
@@ -566,7 +568,12 @@ public class AppController {
         BigDecimal coins = BigDecimal.ZERO;
         String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
         UrmUser user = appService.getUserByUserToken(userToken);
+        boolean addFlag = false;
         if (user != null) {
+            UrmUserCoinRepair urmUserCoinRepair = appUserService.getUrmUserCoinSignRecordById(user.getId());
+            if (urmUserCoinRepair != null) {
+                addFlag = true;
+            }
 //            BackDetailVo backDetailVo = new BackDetailVo();
 //            calculateHasofferCoin(Collections.singletonList(user), backDetailVo);
             UserVo userVo = new UserVo();
@@ -580,6 +587,9 @@ public class AppController {
                 }
             }
             coins = coins.multiply(BigDecimal.TEN);
+            if (addFlag) {
+                coins = coins.multiply(BigDecimal.TEN);
+            }
 //            coins = coins.add(backDetailVo.getPendingCoins());
 //            coins = coins.add(backDetailVo.getVerifiedCoins());
 //            coins = coins.multiply(BigDecimal.TEN);
