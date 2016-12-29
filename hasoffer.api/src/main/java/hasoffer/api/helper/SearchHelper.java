@@ -16,7 +16,13 @@ public class SearchHelper {
 
     public static void addToLog(SearchIO sio) {
         if (sio.getCliSite() != null) {
-            SearchLogBo searchLogBo = new SearchLogBo(sio.getCliSourceId(), sio.getCliQ(), sio.getCliQBrand(), sio.getCliSite().name(), sio.getHsCateId(), sio.getHsProId(), sio.getHsSkuId(), sio.getCliPrice());
+            SearchLogBo searchLogBo = null;
+            try {
+                searchLogBo = new SearchLogBo(sio.getCliSourceId(), sio.getCliQ(), sio.getCliQBrand(), sio.getCliSite().name(), sio.getHsCateId(), sio.getHsProId(), sio.getHsSkuId(), sio.getCliPrice());
+            } catch (Exception e) {
+                System.out.println("new SearchLogBo exception , cmp/cmpsku");
+                return;
+            }
             ActorRef defaultActorRef = AkkaActorRef.getDefaultActorRef();
             AkkaJobConfigMessage message = new AkkaJobConfigMessage(SearchLogActor.class, 1);
             defaultActorRef.tell(message, ActorRef.noSender());

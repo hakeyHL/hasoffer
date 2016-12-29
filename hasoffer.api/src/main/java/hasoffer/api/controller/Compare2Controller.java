@@ -273,6 +273,13 @@ public class Compare2Controller {
                                HttpServletResponse response,
                                HttpServletRequest request
     ) {
+        //以下数据与sku列表不耦合,有就可以返回
+        //返回评价Card
+        //品牌Card
+        //Unique Features
+        //Best Competitors
+        //Summary
+
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("errorCode", "00000");
         jsonObject.put("msg", "ok");
@@ -329,6 +336,7 @@ public class Compare2Controller {
         logger.debug(sio.toString());
         apiUtils.resloveClass(cr);
         jsonObject.put("data", JSONObject.toJSON(cr));
+        jsonObject.putAll(apiUtils.setEvaluateBrandFeaturesCompetitorsSummaryMap(ptmStdSku));
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
         return null;
 
