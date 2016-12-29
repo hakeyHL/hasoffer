@@ -41,6 +41,8 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -875,7 +877,7 @@ public class ApiUtils {
      */
     public void calculateHasofferCoin(List<UrmUser> users, BackDetailVo data) {
         boolean addFlag = false;
-       /* //订单分隔时间 2016年12月28日 12:00:00
+        //订单分隔时间 2016年12月28日 12:00:00
         String splitTime = "2016/12/28 12:00:00";
         Date splitDate;
         try {
@@ -883,10 +885,11 @@ public class ApiUtils {
         } catch (ParseException e) {
             System.out.println("transfer time failed .");
             return;
-        }*/
+        }
         List<OrderVo> transcations = new ArrayList<OrderVo>();
         BigDecimal pendingCoins = BigDecimal.ZERO;
-        BigDecimal verifiedCoins = BigDecimal.ZERO;
+        BigDecimal multipliedVerifiedCoins = BigDecimal.ZERO;
+        BigDecimal addedVerifiedCoins = BigDecimal.ZERO;
         for (UrmUser user : users) {
             List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
             UrmUserCoinRepair urmUserCoinRepair = appUserService.getUrmUserCoinSignRecordById(user.getId());
@@ -913,7 +916,11 @@ public class ApiUtils {
                             }
                         }
                         if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
-                            verifiedCoins = verifiedCoins.add(tempPrice);
+                            if (orderStatsAnalysisPO.getOrderTime().compareTo(splitDate) == -1) {
+                                multipliedVerifiedCoins = multipliedVerifiedCoins.add(tempPrice);
+                            } else {
+                                addedVerifiedCoins = addedVerifiedCoins.add(tempPrice);
+                            }
                         }
                     }
 
@@ -924,9 +931,11 @@ public class ApiUtils {
         data.setPendingCoins(pendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         //可以使用的
         if (addFlag) {
-            verifiedCoins = verifiedCoins.multiply(BigDecimal.TEN);
+            multipliedVerifiedCoins = multipliedVerifiedCoins.multiply(BigDecimal.TEN).add(addedVerifiedCoins);
+        } else {
+            multipliedVerifiedCoins = multipliedVerifiedCoins.add(addedVerifiedCoins);
         }
-        data.setVerifiedCoins(verifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+        data.setVerifiedCoins(multipliedVerifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
     }
 }
