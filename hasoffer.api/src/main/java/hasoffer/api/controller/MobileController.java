@@ -49,7 +49,7 @@ public class MobileController {
     public ModelAndView siteMapHasoffer(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "2000") int pageSize) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         List<Integer> priceList = new LinkedList<>();
         priceList.add(5000);
         priceList.add(10000);
@@ -61,7 +61,7 @@ public class MobileController {
 
         //获取distinct的品牌列表
 //        List<String> brandList = ptmStdSKuService.getPtmStdSkuBrandList();
-        List<String> brandList = Arrays.asList("Samsung", "Lenovo", "Motorola", "Xiaomi", "Oppo", "Lyf", "Apple", "LeEco", "Coolpad", "ZUK");
+        List<String> brandList = Arrays.asList("Samsung", "Lenovo", "Motorola", "Xiaomi", "Oppo", "Lyf", "Apple", "LeEco", "Coolpad");
         //--特征1
         //FM radio --FM_Radio 能与不能
         //SIM_SLOT 包含Dual Sim
@@ -238,7 +238,7 @@ public class MobileController {
                 new SiteMapKeyVo("Top 10 Nokia Asha Series Mobiles", 1).buildeShortName("Nokia Asha")
         ));
         keyMap.put("Top 10 Mobiles", top10MobilesList);
-        modelAndView.addObject("data", keyMap);
+        modelAndView.addObject(ConstantUtil.API_NAME_DATA, keyMap);
         return modelAndView;
     }
 
@@ -251,7 +251,7 @@ public class MobileController {
     public ModelAndView resolveKeyWordsSearch(@RequestBody SiteMapKeyVo siteMapKeyVo, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int pageSize) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
 
         ResultVo resultVo = new ResultVo();
         PageableResult<PtmStdSkuModel> pageableResult = null;
@@ -357,7 +357,7 @@ public class MobileController {
         if (pageableResult != null && pageableResult.getData().size() > 0) {
             apiUtils.addProductVo2List(ProductList, pageableResult.getData());
             resultVo.getData().put("pList", ProductList);
-            modelAndView.addObject("data", resultVo.getData());
+            modelAndView.addObject(ConstantUtil.API_NAME_DATA, resultVo.getData());
 
         }
         return modelAndView;

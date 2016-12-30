@@ -188,11 +188,11 @@ public class AppCliCfgController {
         ModelAndView modelAndView = new ModelAndView();
         ResultVo resultVo = new ResultVo();
         modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         resultVo.getData().put("open", true);
         resultVo.getData().put("unit", "m");//d 天 h 小时 m 分钟
         resultVo.getData().put("scanInterval", 10);
-        modelAndView.addObject("data", resultVo.getData());
+        modelAndView.addObject(ConstantUtil.API_NAME_DATA, resultVo.getData());
         return modelAndView;
     }
 
@@ -206,12 +206,12 @@ public class AppCliCfgController {
     public ModelAndView picCfg(@RequestParam(defaultValue = "") String picType) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         Map dataMap = new HashMap();
         switch (picType) {
             case "index_shopApp_icon":
                 dataMap.put("index_shopApp_icon", "http://img1.hasofferimage.com/cate/shopAppIcon.png");
-                modelAndView.addObject("data", dataMap);
+                modelAndView.addObject(ConstantUtil.API_NAME_DATA, dataMap);
                 return modelAndView;
             default:
                 modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);

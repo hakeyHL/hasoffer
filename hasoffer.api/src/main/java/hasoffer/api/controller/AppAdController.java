@@ -85,7 +85,7 @@ public class AppAdController {
 //        logger.info(" get advertisement ");
         Map map = new HashMap<>();
         modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         List<Adt> adt = advertiseService.getAdByCategory();
         //如果当前展示广告app设备已安装则过滤
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
@@ -109,12 +109,12 @@ public class AppAdController {
                     }
                 }
                 map.put("ads", adt);
-                modelAndView.addObject("data", map);
+                modelAndView.addObject(ConstantUtil.API_NAME_DATA, map);
             }
         } else {
             //如果deviceInfo为null的话就不返回了
             map.put("ads", null);
-            modelAndView.addObject("data", map);
+            modelAndView.addObject(ConstantUtil.API_NAME_DATA, map);
         }
         return modelAndView;
     }
