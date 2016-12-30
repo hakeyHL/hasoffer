@@ -14,6 +14,7 @@ import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import org.apache.commons.lang.StringUtils;
