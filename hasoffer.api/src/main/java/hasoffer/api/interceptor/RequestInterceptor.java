@@ -151,7 +151,7 @@ public class RequestInterceptor implements HandlerInterceptor {
                 //4. 相等,过
             }
             //2. 为空,过
-            modelAndView.addObject("result", new ResultVo(ConstantUtil.API_ERRORCODE_SUCCESS, ConstantUtil.API_ERRORCODE_SUCCESS_MSG));
+            modelAndView.addObject("result", new ResultVo(ConstantUtil.API_ERRORCODE_SUCCESS, ConstantUtil.API_NAME_MSG_SUCCESS));
                 /*List<String> ids = null;
                 String deviceId = JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).getString("deviceId");
                 String deviceKey = "urmDevice_ids_mapKey_" + deviceId;

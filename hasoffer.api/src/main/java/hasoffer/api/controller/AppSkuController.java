@@ -124,7 +124,7 @@ public class AppSkuController {
     public String getSkuInfo(@RequestParam(defaultValue = "0") Long id, HttpServletResponse response) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         if (id <= 0) {
             jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             jsonObject.put(ConstantUtil.API_NAME_MSG, "id le zero ");
@@ -181,7 +181,7 @@ public class AppSkuController {
             }
         }
         map.put("distribution", 5);
-        jsonObject.put("data", JSONObject.toJSON(map));
+        jsonObject.put(ConstantUtil.API_NAME_DATA, JSONObject.toJSON(map));
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
@@ -197,7 +197,7 @@ public class AppSkuController {
     public String getPriceCurve(@RequestParam(defaultValue = "0") Long id, HttpServletResponse response) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         List<PriceNode> priceNodes = null;
         //1. 先拿到所有的价格数据
         if (id <= 0) {
@@ -276,13 +276,13 @@ public class AppSkuController {
             if (flag) {
                 PriceCurveVo priceCurveVo = getPriceCurveVo(priceNodes, false);
                 priceCurveVo.setDistanceX2X(20);
-                jsonObject.put("data", JSONObject.toJSON(priceCurveVo));
+                jsonObject.put(ConstantUtil.API_NAME_DATA, JSONObject.toJSON(priceCurveVo));
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             } else {
                 PriceCurveVo priceCurveVo = getPriceCurveVo(priceNodes, true);
                 priceCurveVo.setDistanceX2X(20);
-                jsonObject.put("data", JSONObject.toJSON(priceCurveVo));
+                jsonObject.put(ConstantUtil.API_NAME_DATA, JSONObject.toJSON(priceCurveVo));
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             }
@@ -296,7 +296,7 @@ public class AppSkuController {
     public ModelAndView priceReport(@RequestParam(defaultValue = "0") long skuId) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         Date currentDate = new Date();
         //要skuId
         if (skuId <= 0) {
@@ -335,7 +335,7 @@ public class AppSkuController {
             priceReportLog.setUserId(user.getId());
         }
 
-        priceReportLog.setSaveResult(ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        priceReportLog.setSaveResult(ConstantUtil.API_NAME_MSG_SUCCESS);
         priceReportLog.setErrorMsg("no");
         priceReportLog.setId(skuId);
         priceReportLog.setTime(TimeUtils.parse(currentDate, "yyyyMMdd"));
@@ -345,7 +345,7 @@ public class AppSkuController {
             priceReportStatistics.setId(skuId);
             priceReportStatistics.setTime(TimeUtils.parse(currentDate, "yyyyMMdd"));
             priceReportStatistics.setStamp(currentDate.getTime());
-            priceReportStatistics.setSaveResult(ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+            priceReportStatistics.setSaveResult(ConstantUtil.API_NAME_MSG_SUCCESS);
             priceReportStatistics.setErrorMsg("no");
             priceReportStatistics.setCount(priceReportStatistics.getCount() + 1);
         }

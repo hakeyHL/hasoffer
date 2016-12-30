@@ -62,7 +62,7 @@ public class SystemController {
     public ResultVo checkGetPushMsg(@RequestParam(defaultValue = "100") int type, HttpServletResponse response) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         ResultVo resultVo = new ResultVo();
         resultVo.getData().put("have", false);
         String currentDate = TimeUtils.parse(new Date(), "yyyyMMdd");
@@ -106,7 +106,7 @@ public class SystemController {
         }
         switch (type) {
             case 0:
-                jsonObject.put("data", resultVo.getData());
+                jsonObject.put(ConstantUtil.API_NAME_DATA, resultVo.getData());
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             case 1:
@@ -116,11 +116,11 @@ public class SystemController {
                     }
                 }
                 resultVo.getData().put("pushList", pushList);
-                jsonObject.put("data", resultVo.getData());
+                jsonObject.put(ConstantUtil.API_NAME_DATA, resultVo.getData());
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             default:
-                jsonObject.put("data", resultVo.getData());
+                jsonObject.put(ConstantUtil.API_NAME_DATA, resultVo.getData());
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
         }
@@ -131,6 +131,6 @@ public class SystemController {
     @RequestMapping(value = "app/testArray", method = RequestMethod.GET)
     public String checkGetPushMsg(String[] a) {
         System.out.println("1");
-        return ConstantUtil.API_ERRORCODE_SUCCESS_MSG;
+        return ConstantUtil.API_NAME_MSG_SUCCESS;
     }
 }

@@ -98,13 +98,13 @@ public class AppUserController {
             affs = new String[]{sio.getMarketChannel().name(), sio.getDeviceId(), urmUser.getId() + ""};
         } else {
             map.put("deeplink", deepLink);
-            modelAndView.addObject("data", map);
+            modelAndView.addObject(ConstantUtil.API_NAME_DATA, map);
             return modelAndView;
         }
         String affsUrl = WebsiteHelper.getDealUrlWithAff(Website.valueOf(website), deepLink, affs);
         logger.info("addUserId2DeepLink(): success ,time : " + currentTime + "  userId : " + urmUser.getId() + " ,sourceLink : " + deepLink + " ,result : " + affsUrl);
         map.put("deeplink", affsUrl);
-        modelAndView.addObject("data", map);
+        modelAndView.addObject(ConstantUtil.API_NAME_DATA, map);
         return modelAndView;
     }
 
@@ -116,7 +116,7 @@ public class AppUserController {
                                 HttpServletRequest request) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         //绑定用户设备关系
         if (skuId <= 0) {
             jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
@@ -239,7 +239,7 @@ public class AppUserController {
                 if (priceOffNotice != null) {
                     System.out.println("user has concerned this sku :" + skuId);
                     jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-                    jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+                    jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
                 }
             }
         }
@@ -399,7 +399,7 @@ public class AppUserController {
             endTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(toDate).getTime();
         }
         jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
 //        Query query = new Query();
 //        query.addCriteria(Criteria.where("signDate").gte(startTime).lt(endTime));
         List<UserSignLog> userSignLogs = mongoDbManager.query(UserSignLog.class, new Query().addCriteria(Criteria.where("signDate").gte(startTime).lt(endTime)));
@@ -415,7 +415,7 @@ public class AppUserController {
         } else {
             jsonObject.put(ConstantUtil.API_NAME_MSG, "no data ");
         }
-        jsonObject.put("data", JSON.toJSONString(map));
+        jsonObject.put(ConstantUtil.API_NAME_DATA, JSON.toJSONString(map));
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
 
@@ -436,7 +436,7 @@ public class AppUserController {
         long startTime = System.currentTimeMillis();
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         if (StringUtils.isEmpty(telephone) && StringUtils.isEmpty(email)) {
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
@@ -527,7 +527,7 @@ public class AppUserController {
         //邮箱校验
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         //用户名为邮箱
         //现在用户名只能是邮箱
         if (StringUtils.isEmpty(passwd)) {
@@ -614,7 +614,7 @@ public class AppUserController {
                 }
             default:
         }
-        modelAndView.addObject("data", resultMap);
+        modelAndView.addObject(ConstantUtil.API_NAME_DATA, resultMap);
         return modelAndView;
     }
 }

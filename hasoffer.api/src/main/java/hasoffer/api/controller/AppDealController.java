@@ -67,7 +67,7 @@ public class AppDealController {
         //TODO 从Solr搜索Deal列表
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         List<DealVo> deals = new ArrayList<DealVo>();
@@ -131,7 +131,7 @@ public class AppDealController {
         }
         Map map = new HashMap();
         map.put("deals", deals);
-        jsonObject.put("data", JSONObject.toJSON(map));
+        jsonObject.put(ConstantUtil.API_NAME_DATA, JSONObject.toJSON(map));
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
         return null;
     }
@@ -142,13 +142,13 @@ public class AppDealController {
         AppDeal appDeal = dealService.getDealById(id);
         Map hashMap = new HashMap<>();
         jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         hashMap.put("provisions", "• Taxs are applicable.\n• This offer cannot be clubbed with any other ongoing offer.\n• Offer cannot be redeemed for cash.\n• No coupon code required.\n• Company has the right to end this offer without prior notice.\n");
         if (appDeal != null) {
 //            logger.info("has this deal " + id);
             hashMap.put("description", appDeal.getDescription());
         }
-        jsonObject.put("data", hashMap);
+        jsonObject.put(ConstantUtil.API_NAME_DATA, hashMap);
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
@@ -161,7 +161,7 @@ public class AppDealController {
         Map hashMap = new HashMap<>();
         int intAction = Integer.parseInt(action);
         jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         UrmUser urmUser;
         Date currentDate = new Date();
         if (dealId != 0) {
@@ -225,7 +225,7 @@ public class AppDealController {
             jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             jsonObject.put(ConstantUtil.API_NAME_MSG, "dealId is not exist .");
         }
-        jsonObject.put("data", hashMap);
+        jsonObject.put(ConstantUtil.API_NAME_DATA, hashMap);
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
@@ -239,7 +239,7 @@ public class AppDealController {
         JSONObject jsonObject = new JSONObject();
         Map hashMap = new HashMap<>();
         jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         Date currentDate = new Date();
         UrmUser urmUser;
         if (StringUtils.isNotEmpty(content)) {
@@ -282,7 +282,7 @@ public class AppDealController {
             jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             jsonObject.put(ConstantUtil.API_NAME_MSG, "comment content is required .");
         }
-        jsonObject.put("data", hashMap);
+        jsonObject.put(ConstantUtil.API_NAME_DATA, hashMap);
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
@@ -295,7 +295,7 @@ public class AppDealController {
         //默认不匿名
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         List<DealCommentVo> dealCommentVos = new ArrayList<>();
         if (dealId == 0) {
             jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
@@ -332,7 +332,7 @@ public class AppDealController {
 
                 }
             }
-            jsonObject.put("data", dealCommentVos);
+            jsonObject.put(ConstantUtil.API_NAME_DATA, dealCommentVos);
         } else {
             jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             jsonObject.put(ConstantUtil.API_NAME_MSG, "no data in database.");

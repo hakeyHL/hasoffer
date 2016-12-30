@@ -282,7 +282,7 @@ public class Compare2Controller {
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         if (id.equals("0")) {
             jsonObject.put(ConstantUtil.API_NAME_MSG, "id required .");
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
@@ -326,7 +326,7 @@ public class Compare2Controller {
         } catch (Exception e) {
             logger.error("exception occur while get cmpSkuList on interface cmpsku , id is : {} and ptmStdSku ,PtmProduct ", ptmStdSku == null ? product.getId() : ptmStdSku.getId(), ptmStdSku, product);
 //            logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, pageSize));
-            jsonObject.put("data", JSONObject.toJSON(cr));
+            jsonObject.put(ConstantUtil.API_NAME_DATA, JSONObject.toJSON(cr));
             System.out.println(e.getMessage());
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
             return null;
@@ -335,7 +335,7 @@ public class Compare2Controller {
         SearchHelper.addToLog(sio);
         logger.debug(sio.toString());
         apiUtils.resloveClass(cr);
-        jsonObject.put("data", JSONObject.toJSON(cr));
+        jsonObject.put(ConstantUtil.API_NAME_DATA, JSONObject.toJSON(cr));
         jsonObject.putAll(apiUtils.setEvaluateBrandFeaturesCompetitorsSummaryMap(ptmStdSku));
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
         return null;
@@ -352,7 +352,7 @@ public class Compare2Controller {
     public ModelAndView getStdSkuCmpParams(@RequestParam(defaultValue = "0") long pId) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         Map dataMap = new HashMap();
         //验证id是否大于10亿
         if (pId - ConstantUtil.API_ONE_BILLION_NUMBER <= 0) {
@@ -400,7 +400,7 @@ public class Compare2Controller {
             dataMap.put("productParams", resultMap);
         }
         //有,返回
-        modelAndView.addObject("data", dataMap);
+        modelAndView.addObject(ConstantUtil.API_NAME_DATA, dataMap);
         return modelAndView;
     }
 
@@ -413,7 +413,7 @@ public class Compare2Controller {
     public ModelAndView getCompareParams() {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         Map map = new HashMap<>();
         String[] params = ConstantUtil.API_PTMSTDSKU_PARAM_MEAN_MAP.keySet().toArray(new String[]{});
 
@@ -436,7 +436,7 @@ public class Compare2Controller {
         }
         map.put("Summary", summaryParamsMap);
         map.put("Others", othersParamsMap);
-        modelAndView.addObject("data", map);
+        modelAndView.addObject(ConstantUtil.API_NAME_DATA, map);
         return modelAndView;
     }
 

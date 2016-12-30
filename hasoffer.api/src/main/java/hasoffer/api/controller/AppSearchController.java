@@ -31,7 +31,7 @@ public class AppSearchController {
     public ModelAndView stdSkuCategoryFilter(@RequestBody SearchCriteria searchCriteria) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         List ptmStdSkuList = new ArrayList();
         Map map = new HashMap<>();
         //1. 非空校验
@@ -73,7 +73,7 @@ public class AppSearchController {
         }
         map.put("product", ptmStdSkuList);
         //4. 返回结果
-        modelAndView.addObject("data", map);
+        modelAndView.addObject(ConstantUtil.API_NAME_DATA, map);
         return modelAndView;
     }
 
@@ -87,7 +87,7 @@ public class AppSearchController {
     public ModelAndView getFilterParams(SearchCriteria searchCriteria) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         Map map = new HashMap<>();
         map.put("access", false);
         //1. 正确的逻辑是按照facet参数查询有没有结果来告知是否可以参数筛选
@@ -122,7 +122,7 @@ public class AppSearchController {
             map.put("pivos", pageableResult.getPivotFieldVals());
             ApiUtils.resolvePivotFields(map, pageableResult, pageableResult.getPivotFieldVals());
         }
-        modelAndView.addObject("data", map);
+        modelAndView.addObject(ConstantUtil.API_NAME_DATA, map);
         return modelAndView;
     }
 }
