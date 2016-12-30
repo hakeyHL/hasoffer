@@ -28,7 +28,11 @@
         <filter-name>exceptFilter</filter-name>
         <filter-class>hasoffer.webcommon.filter.ExceptionFilter</filter-class>
     </filter>-->
-
+    <error-page>
+        <error-code>500</error-code>
+        <location>/views/jsp/error.jsp</location>
+        <exception-type>java.lang.RuntimeException</exception-type>
+    </error-page>
     <filter-mapping>
         <filter-name>encodingFilter</filter-name>
         <url-pattern>/*</url-pattern>
