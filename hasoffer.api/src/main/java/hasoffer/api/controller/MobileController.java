@@ -132,7 +132,7 @@ public class MobileController {
         top10MobilesList.addAll(Arrays.asList(
                 //1. Top 10 + Mobiles + Below +“价格参数”
                 new SiteMapKeyVo("Top 10  Mobiles  Below 5000", 2).builderProMap("minPrice", "5000"),
-                new SiteMapKeyVo("Top 10  Mobiles  Below 10000", 2).builderProMap("minPrice", "10000"),
+                new SiteMapKeyVo("Top 10  Mobiles  Below 10000", 2).builderProMap("minPrice", ConstantUtil.API_ERRORCODE_FAILED_LOGIC),
                 new SiteMapKeyVo("Top 10  Mobiles  Below 15000", 2).builderProMap("minPrice", "15000"),
                 new SiteMapKeyVo("Top 10  Mobiles  Below 20000", 2).builderProMap("minPrice", "20000"),
                 new SiteMapKeyVo("Top 10  Mobiles  Below 25000", 2).builderProMap("minPrice", "25000"),
@@ -140,7 +140,7 @@ public class MobileController {
 
                 new SiteMapKeyVo("SamSung mobile", 2).builderProMap("Brand", "Samsung"),
                 new SiteMapKeyVo("SamSung mobile Below 5000", 2).builderProMap("minPrice", "5000"),
-                new SiteMapKeyVo("SamSung mobile Below 10000", 2).builderProMap("minPrice", "10000"),
+                new SiteMapKeyVo("SamSung mobile Below 10000", 2).builderProMap("minPrice", ConstantUtil.API_ERRORCODE_FAILED_LOGIC),
                 new SiteMapKeyVo("SamSung mobile Below 15000", 2).builderProMap("minPrice", "15000"),
                 new SiteMapKeyVo("SamSung mobile Below 20000", 2).builderProMap("minPrice", "20000"),
                 new SiteMapKeyVo("SamSung mobile Below 25000", 2).builderProMap("minPrice", "25000"),
@@ -148,7 +148,7 @@ public class MobileController {
 
                 new SiteMapKeyVo("Redmi Note 3 mobile", 2).builderProMap("Model", "Redmi Note 3"),
                 new SiteMapKeyVo("Redmi Note 3 mobile Below 5000", 2).builderProMap("minPrice", "5000"),
-                new SiteMapKeyVo("Redmi Note 3 mobile Below 10000", 2).builderProMap("minPrice", "10000"),
+                new SiteMapKeyVo("Redmi Note 3 mobile Below 10000", 2).builderProMap("minPrice", ConstantUtil.API_ERRORCODE_FAILED_LOGIC),
                 new SiteMapKeyVo("Redmi Note 3 mobile Below 15000", 2).builderProMap("minPrice", "15000"),
                 new SiteMapKeyVo("Redmi Note 3 mobile Below 20000", 2).builderProMap("minPrice", "20000"),
                 new SiteMapKeyVo("Redmi Note 3 mobile Below 25000", 2).builderProMap("minPrice", "25000"),
@@ -350,7 +350,7 @@ public class MobileController {
             pageableResult = appSearchService.filterByParams(searchCriteria);
         } catch (Exception e) {
             logger.error(" error  message : {}  threadId :  time: ", e.getMessage(), Thread.currentThread().getId(), new Date());
-            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             modelAndView.addObject(ConstantUtil.API_NAME_MSG, "error ,please try again later.");
             return modelAndView;
         }

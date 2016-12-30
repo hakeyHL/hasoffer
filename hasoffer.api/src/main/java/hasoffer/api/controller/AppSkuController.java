@@ -126,7 +126,7 @@ public class AppSkuController {
         jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
         jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
         if (id <= 0) {
-            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             jsonObject.put(ConstantUtil.API_NAME_MSG, "id le zero ");
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
@@ -201,7 +201,7 @@ public class AppSkuController {
         List<PriceNode> priceNodes = null;
         //1. 先拿到所有的价格数据
         if (id <= 0) {
-            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             jsonObject.put(ConstantUtil.API_NAME_MSG, "id ls zero ");
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
@@ -300,7 +300,7 @@ public class AppSkuController {
         Date currentDate = new Date();
         //要skuId
         if (skuId <= 0) {
-            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             modelAndView.addObject(ConstantUtil.API_NAME_MSG, "is ls zero .");
         }
 
@@ -380,7 +380,7 @@ public class AppSkuController {
         try {
             mongoDbManager.save(priceReportLog);
         } catch (Exception e) {
-            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             modelAndView.addObject(ConstantUtil.API_NAME_MSG, "failed");
             Update update = new Update();
             update.set("saveResult", "failed");
@@ -394,7 +394,7 @@ public class AppSkuController {
                 priceReportStatistics.setUpdateStamp(currentDate.getTime());
                 mongoDbManager.save(priceReportStatistics);
             } catch (Exception e) {
-                modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
                 modelAndView.addObject(ConstantUtil.API_NAME_MSG, "failed");
                 Update update = new Update();
                 Date failDate = new Date();

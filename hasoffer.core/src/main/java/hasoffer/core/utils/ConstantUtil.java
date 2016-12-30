@@ -9,6 +9,7 @@ import java.util.Map;
  */
 public class ConstantUtil {
     public static final String API_ERRORCODE_SUCCESS = "00000";
+    public static final String API_ERRORCODE_FAILED_LOGIC = "10000";
     public static final String API_NAME_ERRORCODE = "errorCode";
     public static final String API_NAME_MSG = "msg";
     public static final String API_ERRORCODE_SUCCESS_MSG = "success";

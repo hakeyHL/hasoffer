@@ -46,7 +46,7 @@ public class AppCliCfgController {
     }
 
     @RequestMapping(value = "/app/homeCfg")
-    public String homePageRewardsConfig(@RequestParam(defaultValue = "10000") int action,
+    public String homePageRewardsConfig(@RequestParam(defaultValue = ConstantUtil.API_ERRORCODE_FAILED_LOGIC) int action,
                                         HttpServletResponse response,
                                         String stringFirst,
                                         String stringSecond) {
@@ -214,7 +214,7 @@ public class AppCliCfgController {
                 modelAndView.addObject("data", dataMap);
                 return modelAndView;
             default:
-                modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
                 modelAndView.addObject(ConstantUtil.API_NAME_MSG, "no this type " + picType);
                 return modelAndView;
         }

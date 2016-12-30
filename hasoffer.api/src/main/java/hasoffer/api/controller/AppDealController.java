@@ -213,16 +213,16 @@ public class AppDealController {
                             }
                         }
                     } else {
-                        jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                        jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
                         jsonObject.put(ConstantUtil.API_NAME_MSG, "user record is not exist --" + userToken);
                     }
                 }
             } else {
-                jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
                 jsonObject.put(ConstantUtil.API_NAME_MSG, "deal record is not exist --" + dealId);
             }
         } else {
-            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             jsonObject.put(ConstantUtil.API_NAME_MSG, "dealId is not exist .");
         }
         jsonObject.put("data", hashMap);
@@ -263,23 +263,23 @@ public class AppDealController {
                                     Integer.parseInt(anonymous),
                                     dealId));
                         } else {
-                            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
                             jsonObject.put(ConstantUtil.API_NAME_MSG, "no record  for this userToken  : " + userToken);
                         }
                     } else {
-                        jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                        jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
                         jsonObject.put(ConstantUtil.API_NAME_MSG, "userToken is required ");
                     }
                 } else {
-                    jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                    jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
                     jsonObject.put(ConstantUtil.API_NAME_MSG, "no record for this id : " + dealId);
                 }
             } else {
-                jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
                 jsonObject.put(ConstantUtil.API_NAME_MSG, "dealId is required.");
             }
         } else {
-            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             jsonObject.put(ConstantUtil.API_NAME_MSG, "comment content is required .");
         }
         jsonObject.put("data", hashMap);
@@ -298,14 +298,14 @@ public class AppDealController {
         jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
         List<DealCommentVo> dealCommentVos = new ArrayList<>();
         if (dealId == 0) {
-            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             jsonObject.put(ConstantUtil.API_NAME_MSG, "dealId is required .");
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
         AppDeal appDeal = dealService.getDealById(dealId);
         if (appDeal == null) {
-            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             jsonObject.put(ConstantUtil.API_NAME_MSG, "deal record is not exist for dealId : " + dealId);
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
@@ -334,7 +334,7 @@ public class AppDealController {
             }
             jsonObject.put("data", dealCommentVos);
         } else {
-            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             jsonObject.put(ConstantUtil.API_NAME_MSG, "no data in database.");
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
