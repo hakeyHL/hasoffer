@@ -21,7 +21,7 @@
             <list>
                 <ref bean="priceOffNoticeTrigger"/>
                 <ref bean="pushFailRePushTrigger"/>
-                <!--<ref bean="priceOffDealUpdateTrigger"/>-->
+                <ref bean="priceOffDealUpdateTrigger"/>
                 <!--<ref bean="priceOffGetDealTrigger"/>-->
                 <ref bean="adminPushTrigger"/>
                 <ref bean="statLogCountBeanTrigger"/>
@@ -72,14 +72,14 @@
     </bean>
 
     <!--price off create deal -->
-    <bean name="priceOffGetDealJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="hasoffer.job.bean.deal.CheckGetPriceOffDealJobBean"/>
-    </bean>
+    <!--<bean name="priceOffGetDealJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
+    <!--<property name="jobClass" value="hasoffer.job.bean.deal.CheckGetPriceOffDealJobBean"/>-->
+    <!--</bean>-->
 
-    <bean id="priceOffGetDealTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-        <property name="jobDetail" ref="priceOffGetDealJob"/>
-        <property name="cronExpression" value="0 0/10 * * * ?"/>
-    </bean>
+    <!--<bean id="priceOffGetDealTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
+    <!--<property name="jobDetail" ref="priceOffGetDealJob"/>-->
+    <!--<property name="cronExpression" value="0 0/10 * * * ?"/>-->
+    <!--</bean>-->
 
     <!--price off deal update-->
     <bean name="priceOffDealUpdateJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
