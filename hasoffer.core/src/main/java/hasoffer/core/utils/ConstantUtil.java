@@ -8,6 +8,10 @@ import java.util.Map;
  * Time 17:18
  */
 public class ConstantUtil {
+    public static final String API_ERRORCODE_SUCCESS = "00000";
+    public static final String API_NAME_ERRORCODE = "errorCode";
+    public static final String API_NAME_MSG = "msg";
+    public static final String API_ERRORCODE_SUCCESS_MSG = "success";
     //变量名定义规则
     //哪个服务的,操作者,哪个对象.操作类型
     public static final long API_ONE_BILLION_NUMBER = 1000000000;

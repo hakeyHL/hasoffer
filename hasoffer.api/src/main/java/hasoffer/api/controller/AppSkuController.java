@@ -20,6 +20,7 @@ import hasoffer.core.product.IPtmStdImageService;
 import hasoffer.core.product.IPtmStdPriceService;
 import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.system.impl.AppServiceImpl;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.webcommon.context.Context;
@@ -122,11 +123,11 @@ public class AppSkuController {
     @RequestMapping("info")
     public String getSkuInfo(@RequestParam(defaultValue = "0") Long id, HttpServletResponse response) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("errorCode", "00000");
-        jsonObject.put("msg", "ok");
+        jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
         if (id <= 0) {
-            jsonObject.put("errorCode", "10000");
-            jsonObject.put("msg", "id le zero ");
+            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            jsonObject.put(ConstantUtil.API_NAME_MSG, "id le zero ");
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
@@ -195,13 +196,13 @@ public class AppSkuController {
     @RequestMapping("curve")
     public String getPriceCurve(@RequestParam(defaultValue = "0") Long id, HttpServletResponse response) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("errorCode", "00000");
-        jsonObject.put("msg", "ok");
+        jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
         List<PriceNode> priceNodes = null;
         //1. 先拿到所有的价格数据
         if (id <= 0) {
-            jsonObject.put("errorCode", "10000");
-            jsonObject.put("msg", "id ls zero ");
+            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            jsonObject.put(ConstantUtil.API_NAME_MSG, "id ls zero ");
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
@@ -294,13 +295,13 @@ public class AppSkuController {
     @RequestMapping("priceReport")
     public ModelAndView priceReport(@RequestParam(defaultValue = "0") long skuId) {
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("errorCode", "00000");
-        modelAndView.addObject("msg", "success");
+        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
         Date currentDate = new Date();
         //要skuId
         if (skuId <= 0) {
-            modelAndView.addObject("errorCode", "10000");
-            modelAndView.addObject("msg", "is ls zero .");
+            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            modelAndView.addObject(ConstantUtil.API_NAME_MSG, "is ls zero .");
         }
 
 
@@ -334,7 +335,7 @@ public class AppSkuController {
             priceReportLog.setUserId(user.getId());
         }
 
-        priceReportLog.setSaveResult("success");
+        priceReportLog.setSaveResult(ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
         priceReportLog.setErrorMsg("no");
         priceReportLog.setId(skuId);
         priceReportLog.setTime(TimeUtils.parse(currentDate, "yyyyMMdd"));
@@ -344,7 +345,7 @@ public class AppSkuController {
             priceReportStatistics.setId(skuId);
             priceReportStatistics.setTime(TimeUtils.parse(currentDate, "yyyyMMdd"));
             priceReportStatistics.setStamp(currentDate.getTime());
-            priceReportStatistics.setSaveResult("success");
+            priceReportStatistics.setSaveResult(ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
             priceReportStatistics.setErrorMsg("no");
             priceReportStatistics.setCount(priceReportStatistics.getCount() + 1);
         }
@@ -379,8 +380,8 @@ public class AppSkuController {
         try {
             mongoDbManager.save(priceReportLog);
         } catch (Exception e) {
-            modelAndView.addObject("errorCode", "10000");
-            modelAndView.addObject("msg", "failed");
+            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            modelAndView.addObject(ConstantUtil.API_NAME_MSG, "failed");
             Update update = new Update();
             update.set("saveResult", "failed");
             update.set("errorMsg", e.getMessage());
@@ -393,8 +394,8 @@ public class AppSkuController {
                 priceReportStatistics.setUpdateStamp(currentDate.getTime());
                 mongoDbManager.save(priceReportStatistics);
             } catch (Exception e) {
-                modelAndView.addObject("errorCode", "10000");
-                modelAndView.addObject("msg", "failed");
+                modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                modelAndView.addObject(ConstantUtil.API_NAME_MSG, "failed");
                 Update update = new Update();
                 Date failDate = new Date();
                 update.set("saveResult", "failed");

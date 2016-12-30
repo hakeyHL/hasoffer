@@ -26,6 +26,7 @@ import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.AppUserService;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
@@ -114,12 +115,12 @@ public class AppUserController {
                                 HttpServletResponse response,
                                 HttpServletRequest request) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("errorCode", "00000");
-        jsonObject.put("msg", "ok");
+        jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
         //绑定用户设备关系
         if (skuId <= 0) {
-            jsonObject.put("errorCode", "10000");
-            jsonObject.put("msg", "id le than zero ");
+            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            jsonObject.put(ConstantUtil.API_NAME_MSG, "id le than zero ");
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
@@ -195,17 +196,17 @@ public class AppUserController {
                                 //set
                                 if (truelySkuPrice <= 0) {
                                     //not exist before
-                                    boolean notice = iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", priceOffSkuId, priceOffSkuPrice, priceOffSkuPrice);
+                                    iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", priceOffSkuId, priceOffSkuPrice, priceOffSkuPrice);
 
                                 } else {
                                     //not exist before
-                                    boolean notice = iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", priceOffSkuId, truelySkuPrice, truelySkuPrice);
+                                    iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", priceOffSkuId, truelySkuPrice, truelySkuPrice);
                                 }
                                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                                 return null;
                             default:
-                                jsonObject.put("errorCode", "10001");
-                                jsonObject.put("msg", "type error ");
+                                jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10001");
+                                jsonObject.put(ConstantUtil.API_NAME_MSG, "type error ");
                                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                                 return null;
                         }
@@ -221,11 +222,11 @@ public class AppUserController {
     public String checkPriceOff(@RequestParam(defaultValue = "0") long skuId,
                                 HttpServletResponse response) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("errorCode", "10001");
-        jsonObject.put("msg", "no");
+        jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10001");
+        jsonObject.put(ConstantUtil.API_NAME_MSG, "no");
         if (skuId <= 0) {
-            jsonObject.put("errorCode", "10001");
-            jsonObject.put("msg", "id le zero ");
+            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10001");
+            jsonObject.put(ConstantUtil.API_NAME_MSG, "id le zero ");
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
@@ -237,8 +238,8 @@ public class AppUserController {
                 PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + "", skuId);
                 if (priceOffNotice != null) {
                     System.out.println("user has concerned this sku :" + skuId);
-                    jsonObject.put("errorCode", "00000");
-                    jsonObject.put("msg", "ok");
+                    jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+                    jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
                 }
             }
         }
@@ -256,8 +257,8 @@ public class AppUserController {
     public String userSign(HttpServletResponse response) {
         String signFailMsg = "Unable to sign in, please contact customer service.";
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("errorCode", "10001");
-        jsonObject.put("msg", signFailMsg);
+        jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10001");
+        jsonObject.put(ConstantUtil.API_NAME_MSG, signFailMsg);
         // 无论用户是否存在，应该记住用户签到记录，防止由于某些信息错误，丢失用户签到记录。
         String userToken = Context.currentContext().getHeader("usertoken");
         String deviceInfo = Context.currentContext().getHeader("deviceinfo");
@@ -271,7 +272,7 @@ public class AppUserController {
             //注意：此处加一层Redis缓存，拦截。
             if (s != null) {
                 logger.info("userSign(): repetitive  operation ,UserToken:{} has been  signed today  !", userToken);
-                jsonObject.put("msg", "Request is being processed, please wait 5 seconds and try again later. ");
+                jsonObject.put(ConstantUtil.API_NAME_MSG, "Request is being processed, please wait 5 seconds and try again later. ");
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             }
@@ -307,7 +308,7 @@ public class AppUserController {
                 if (daysAfterLastSing < 1) {
                     //如果今天已经签到,over
                     logger.info("userSign(): repetitive  operation , has been  signed today  !");
-                    jsonObject.put("msg", "you have signed today , please come tomorrow. ");
+                    jsonObject.put(ConstantUtil.API_NAME_MSG, "you have signed today , please come tomorrow. ");
                     Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                     return null;
                 } else if (daysAfterLastSing == 1) {//相隔一天,代表是连续的,连续+1
@@ -352,8 +353,8 @@ public class AppUserController {
                 }
                 long endTime = System.currentTimeMillis();
                 logger.info("userSign(): user: {} sign, and cost {} ms. ", urmUser.getId(), endTime - startTime);
-                jsonObject.put("errorCode", "00000");
-                jsonObject.put("msg", "sign success ! ");
+                jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+                jsonObject.put(ConstantUtil.API_NAME_MSG, "sign success ! ");
                 //插入记录到签到历史表
                 UserSignLog userSignLog = new UserSignLog(urmSignCoin.getUserId(), urmSignCoin.getLastSignTime());
                 mongoDbManager.save(userSignLog);
@@ -380,14 +381,14 @@ public class AppUserController {
         JSONObject jsonObject = new JSONObject();
         Long startTime;
         Long endTime;
-        jsonObject.put("errorCode", "10000");
-        jsonObject.put("msg", "date error");
+        jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10000");
+        jsonObject.put(ConstantUtil.API_NAME_MSG, "date error");
         if (StringUtils.isEmpty(fromDate) && StringUtils.isEmpty(toDate)) {
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
         if (StringUtils.isEmpty(fromDate)) {
-            jsonObject.put("msg", "from date  not empty ");
+            jsonObject.put(ConstantUtil.API_NAME_MSG, "from date  not empty ");
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
@@ -397,8 +398,8 @@ public class AppUserController {
         } else {
             endTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(toDate).getTime();
         }
-        jsonObject.put("errorCode", "00000");
-        jsonObject.put("msg", "ok");
+        jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
 //        Query query = new Query();
 //        query.addCriteria(Criteria.where("signDate").gte(startTime).lt(endTime));
         List<UserSignLog> userSignLogs = mongoDbManager.query(UserSignLog.class, new Query().addCriteria(Criteria.where("signDate").gte(startTime).lt(endTime)));
@@ -412,7 +413,7 @@ public class AppUserController {
                 }
             }
         } else {
-            jsonObject.put("msg", "no data ");
+            jsonObject.put(ConstantUtil.API_NAME_MSG, "no data ");
         }
         jsonObject.put("data", JSON.toJSONString(map));
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
@@ -434,8 +435,8 @@ public class AppUserController {
                                        @RequestParam(defaultValue = "") String email) {
         long startTime = System.currentTimeMillis();
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("errorCode", "00000");
-        jsonObject.put("msg", "ok");
+        jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
         if (StringUtils.isEmpty(telephone) && StringUtils.isEmpty(email)) {
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
@@ -525,14 +526,14 @@ public class AppUserController {
     public ModelAndView regOrLogin(@RequestParam(defaultValue = "4") int type, String email, String passwd, String userName) {
         //邮箱校验
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("errorCode", "00000");
-        modelAndView.addObject("msg", "success");
+        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
         //用户名为邮箱
         //现在用户名只能是邮箱
         if (StringUtils.isEmpty(passwd)) {
             //拒绝
-            modelAndView.addObject("errorCode", "10000");
-            modelAndView.addObject("msg", "password is required .");
+            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            modelAndView.addObject(ConstantUtil.API_NAME_MSG, "password is required .");
             return modelAndView;
         }
         Map resultMap = new HashMap();
@@ -542,20 +543,20 @@ public class AppUserController {
                 //注册
                 if (StringUtils.isEmpty(email)) {
                     //拒绝
-                    modelAndView.addObject("errorCode", "10000");
-                    modelAndView.addObject("msg", "email is required .");
+                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                    modelAndView.addObject(ConstantUtil.API_NAME_MSG, "email is required .");
                     return modelAndView;
                 }
                 if (!ApiUtils.emailCheck(email)) {
-                    modelAndView.addObject("errorCode", "10000");
-                    modelAndView.addObject("msg", "Please enter a valid email.");
+                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                    modelAndView.addObject(ConstantUtil.API_NAME_MSG, "Please enter a valid email.");
                     return modelAndView;
                 }
                 UrmUser urmUser = appUserService.getUrmUserByEmail(email);
                 if (urmUser != null) {
                     //已存在,拒绝
-                    modelAndView.addObject("errorCode", "10000");
-                    modelAndView.addObject("msg", "The mail has been registered");
+                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                    modelAndView.addObject(ConstantUtil.API_NAME_MSG, "The mail has been registered");
                     return modelAndView;
                 }
                 //添加
@@ -571,22 +572,22 @@ public class AppUserController {
                     resultMap.put("userToken", newUrmUser.getUserToken());
                 } catch (Exception e) {
                     System.out.println("add user failed ." + e.getMessage());
-                    modelAndView.addObject("errorCode", "10000");
+                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
                     //注册失败
-                    modelAndView.addObject("msg", "Sign up failed,Please try again.");
+                    modelAndView.addObject(ConstantUtil.API_NAME_MSG, "Sign up failed,Please try again.");
                     return modelAndView;
                 }
             case 1:
                 //登录,用户名现在是邮箱
                 if (!ApiUtils.emailCheck(userName)) {
-                    modelAndView.addObject("errorCode", "10000");
-                    modelAndView.addObject("msg", "Please enter a valid email");
+                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                    modelAndView.addObject(ConstantUtil.API_NAME_MSG, "Please enter a valid email");
                     return modelAndView;
                 }
                 if (StringUtils.isEmpty(userName)) {
                     //拒绝
-                    modelAndView.addObject("errorCode", "10000");
-                    modelAndView.addObject("msg", "email can not be empty .");
+                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                    modelAndView.addObject(ConstantUtil.API_NAME_MSG, "email can not be empty .");
                     return modelAndView;
                 }
                 UrmUser authedUrmUser;
@@ -594,16 +595,16 @@ public class AppUserController {
                 //按照用户名和type去搜索
                 authedUrmUser = appUserService.getUrmUserByUserNameAndType(userName, 1);
                 if (authedUrmUser == null) {
-                    modelAndView.addObject("errorCode", "10000");
-                    modelAndView.addObject("msg", "The mail is not registered.");
+                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                    modelAndView.addObject(ConstantUtil.API_NAME_MSG, "The mail is not registered.");
                     return modelAndView;
                 } else {
                     //按照用户名和密码与去搜索
                     //登录失败 Sign in failed,Please try again. , 暂时应该用不到
                     authedUrmUser = appUserService.getUrmUserByUserNameAndPwd(userName, Md5Utils.md5AsBase64(passwd.getBytes()));
                     if (authedUrmUser == null) {
-                        modelAndView.addObject("errorCode", "10000");
-                        modelAndView.addObject("msg", "The mail and password are inconsistent");
+                        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                        modelAndView.addObject(ConstantUtil.API_NAME_MSG, "The mail and password are inconsistent");
                         return modelAndView;
                     } else {
                         authedUrmUser.setUserToken(UUID.randomUUID().toString());

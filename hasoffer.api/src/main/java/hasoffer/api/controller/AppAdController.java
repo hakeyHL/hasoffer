@@ -10,6 +10,7 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.core.app.AdvertiseService;
 import hasoffer.core.app.vo.DeviceInfoVo;
 import hasoffer.core.persistence.po.admin.Adt;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.webcommon.context.Context;
 import org.slf4j.Logger;
@@ -83,8 +84,8 @@ public class AppAdController {
         ModelAndView modelAndView = new ModelAndView();
 //        logger.info(" get advertisement ");
         Map map = new HashMap<>();
-        modelAndView.addObject("errorCode", "00000");
-        modelAndView.addObject("msg", "ok");
+        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
         List<Adt> adt = advertiseService.getAdByCategory();
         //如果当前展示广告app设备已安装则过滤
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
@@ -97,13 +98,11 @@ public class AppAdController {
                 while (iterator.hasNext()) {
                     Adt ad = iterator.next();
                     boolean result = judgeIfAffi(ad.getAderName());
-                    if (appType != null && appType.name().equals("APP")) {
+                    if (appType != null && appType.name().equals("APP") && ad.getAderName().equals("HASOFFER")) {
                         //如果是appType是APP判断当前是否为hasoffer自己
-                        if (ad.getAderName().equals("HASOFFER")) {
                             //如果是自己，跳过
                             iterator.remove();
                             continue;
-                        }
                     }
                     if (!StringUtils.isEmpty(ad.getAdLink())) {
                         ad.setAdLink(WebsiteHelper.getAdtUrlByWebSite(result == true ? Website.valueOf(ad.getAderName()) : null, ad.getAdLink(), marketChannel));

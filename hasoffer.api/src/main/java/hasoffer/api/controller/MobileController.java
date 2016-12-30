@@ -9,6 +9,7 @@ import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
 import hasoffer.core.product.solr.PtmStdSkuIndexServiceImpl;
 import hasoffer.core.product.solr.PtmStdSkuModel;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.core.utils.api.ApiUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -47,8 +48,8 @@ public class MobileController {
     @RequestMapping("siteMap")
     public ModelAndView siteMapHasoffer(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "2000") int pageSize) {
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("errorCode", "00000");
-        modelAndView.addObject("msg", "success");
+        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
         List<Integer> priceList = new LinkedList<>();
         priceList.add(5000);
         priceList.add(10000);
@@ -249,8 +250,8 @@ public class MobileController {
     @RequestMapping("keySearch")
     public ModelAndView resolveKeyWordsSearch(@RequestBody SiteMapKeyVo siteMapKeyVo, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int pageSize) {
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("errorCode", "00000");
-        modelAndView.addObject("msg", "success");
+        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
 
         ResultVo resultVo = new ResultVo();
         PageableResult<PtmStdSkuModel> pageableResult = null;
@@ -349,8 +350,8 @@ public class MobileController {
             pageableResult = appSearchService.filterByParams(searchCriteria);
         } catch (Exception e) {
             logger.error(" error  message : {}  threadId :  time: ", e.getMessage(), Thread.currentThread().getId(), new Date());
-            modelAndView.addObject("errorCode", "10000");
-            modelAndView.addObject("msg", "error ,please try again later.");
+            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            modelAndView.addObject(ConstantUtil.API_NAME_MSG, "error ,please try again later.");
             return modelAndView;
         }
         if (pageableResult != null && pageableResult.getData().size() > 0) {
