@@ -88,6 +88,11 @@ public class RequestInterceptor implements HandlerInterceptor {
             }
 
         } catch (Exception e) {
+            //判断是否为H5,如果是,不传deviceInfo也可以通过
+            String visitType = httpServletRequest.getHeader("visitType");
+            if ("web".equals(visitType)) {
+                return true;
+            }
             logger.error(String.format("RequestInterceptor Has Error: %s. request = [%s]. query = [%s] .device=[%s]",
                     e.getMessage(), requestUri, queryStr, deviceInfoStr));
             // + e.getMessage() + " , device = [" + deviceInfoStr + "]"
@@ -125,7 +130,9 @@ public class RequestInterceptor implements HandlerInterceptor {
                 }
             }
         }
-        System.out.println("----------------------------------" + JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).toJSONString() + "-------------------");
+        if (httpServletRequest.getHeader("deviceinfo") != null) {
+            System.out.println("----------------------------------" + JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).toJSONString() + "-------------------");
+        }
         if (modelAndView == null) {
             modelAndView = new ModelAndView();
         }

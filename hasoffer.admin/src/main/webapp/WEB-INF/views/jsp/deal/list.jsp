@@ -16,10 +16,13 @@
     <div class="alert alert-warning" id="delete_fail" role="alert" style="display: none">删除失败</div>
 
     <div class="col-lg-12" style="margin: 10px"></div>
-
-    <!-- 文件下载 -->
+    <!--创建deal-->
     <div class="row" style="margin: 5px; font-size: 12px">
         <span>Excel模板下载: <a href="<%=contextPath%>/deal/download">下载链接</a></span>
+    </div>
+    <!-- 文件下载 -->
+    <div class="row" style="margin: 5px; font-size: 12px">
+        <span>创建deal: <a href="<%=contextPath%>/deal/createDeal">手动创建Deal(create Deal)</a></span>
     </div>
 
     <!-- 导入结果提示 -->
