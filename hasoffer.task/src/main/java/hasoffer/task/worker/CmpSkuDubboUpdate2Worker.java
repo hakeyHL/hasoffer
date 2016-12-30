@@ -136,32 +136,38 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
         logger.info("updateCmpSkuBySpiderFetchedProduct success " + fetchedProduct.getWebsite() + "_" + fetchedProduct.getSkuStatus() + "_" + skuid);
 
         //获取最低价
-        PtmCmpSkuHistoryPrice ptmCmpSkuHistoryPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, skuid);
-        float minPrice = getMinPrice(ptmCmpSkuHistoryPrice);
+        try {
+            PtmCmpSkuHistoryPrice ptmCmpSkuHistoryPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, skuid);
+            float minPrice = getMinPrice(ptmCmpSkuHistoryPrice);
 
-        if (fetchedProduct.getPrice() <= minPrice                                        //更新后的价格小于等于更新前的历史最低价格
-                && SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())                   //状态onsale
-                && fetchedProduct.getCommentsNumber() > 40                                  //评论大于40
-                && skuOriPrice != 0.0                                                       //原价不为空
-                && fetchedProduct.getPrice() < skuOriPrice                                  //现价低于原价
-                && fetchedProduct.getPrice() != 0.0                                         //现价不为0
-                && fetchedProduct.getPrice() < skuPrice) {                                  //现价比更新前的价格低
+            if (fetchedProduct.getPrice() <= minPrice                                        //更新后的价格小于等于更新前的历史最低价格
+                    && SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())                   //状态onsale
+                    && fetchedProduct.getCommentsNumber() > 40                                  //评论大于40
+                    && skuOriPrice != 0.0                                                       //原价不为空
+                    && fetchedProduct.getPrice() < skuOriPrice                                  //现价低于原价
+                    && fetchedProduct.getPrice() != 0.0                                         //现价不为0
+                    && fetchedProduct.getPrice() < skuPrice) {                                  //现价比更新前的价格低
 
 //            对现价进行判断，如果更新后的价格小于更新前的历史最低价格，且商品更新前有两个不同的历史价格（价格是0的不计入），则将创建deal的标题最前方加上【New Lowest Price】（表示新低价）
-            if (fetchedProduct.getPrice() < minPrice && ptmCmpSkuHistoryPrice.getPriceNodes().size() > 1) {
-                createDeal(skuid, "NEWLOWEST", fetchedProduct);
-            }
+                if (fetchedProduct.getPrice() < minPrice && ptmCmpSkuHistoryPrice.getPriceNodes().size() > 1) {
+                    createDeal(skuid, "NEWLOWEST", fetchedProduct);
+                }
 
 //            对现价进行判断，如果更新后的价格等于更新前的历史最低价格，且现价不大于150卢比，且商品有flipkart assured或 Fulfilled by Amazon的标识，则将创建的deal的标题最前方加上【Add on】
-            if (fetchedProduct.getPrice() == minPrice && fetchedProduct.getPrice() <= 150 && (Boolean) fetchedProduct.getFlagMap().get("ADDABLE")) {
-                createDeal(skuid, "ADDON", fetchedProduct);
-            }
+                if (fetchedProduct.getPrice() == minPrice && fetchedProduct.getPrice() <= 150 && (Boolean) fetchedProduct.getFlagMap().get("ADDABLE")) {
+                    createDeal(skuid, "ADDON", fetchedProduct);
+                }
 
 //            对现价进行判断，如果更新后的价格等于更新前的历史最低价格，且现价高于150卢比，则将按常规方式创建deal；
-            if (fetchedProduct.getPrice() == minPrice && fetchedProduct.getPrice() > 150) {
-                createDeal(skuid, "", fetchedProduct);
+                if (fetchedProduct.getPrice() == minPrice && fetchedProduct.getPrice() > 150) {
+                    createDeal(skuid, "", fetchedProduct);
+                }
             }
+        } catch (Exception e) {
+            logger.info("CmpSkuDubboUpdate2Worker  create deal fail " + skuid);
         }
+
+        logger.info("CmpSkuDubboUpdate2Worker  create deal success " + skuid);
     }
 
     private void createDeal(long skuid, String titleFlagString, FetchedProduct fetchedProduct) {
