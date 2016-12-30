@@ -49,6 +49,20 @@ public class RequestInterceptor implements HandlerInterceptor {
         String userToken = Context.currentContext().getHeader("usertoken", "");
         String requestUri = httpServletRequest.getRequestURI();
         String queryStr = httpServletRequest.getQueryString();
+        Context.currentContext().set("visitType", "app");
+        String visitType = httpServletRequest.getHeader("visitType");
+        if ("web".equals(visitType)) {
+            Context.currentContext().set("visitType", "web");
+            DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+            if (deviceInfo == null) {
+                DeviceInfoVo deviceInfoVo = new DeviceInfoVo();
+                deviceInfoVo.setMarketChannel(MarketChannel.H5);
+                Context.currentContext().set(Context.DEVICE_INFO, deviceInfoVo);
+            } else {
+                deviceInfo.setMarketChannel(MarketChannel.H5);
+            }
+            return true;
+        }
         try {
             DeviceInfoVo deviceInfoVo = gson.fromJson(deviceInfoStr, DeviceInfoVo.class);
 
@@ -89,10 +103,6 @@ public class RequestInterceptor implements HandlerInterceptor {
 
         } catch (Exception e) {
             //判断是否为H5,如果是,不传deviceInfo也可以通过
-            String visitType = httpServletRequest.getHeader("visitType");
-            if ("web".equals(visitType)) {
-                return true;
-            }
             logger.error(String.format("RequestInterceptor Has Error: %s. request = [%s]. query = [%s] .device=[%s]",
                     e.getMessage(), requestUri, queryStr, deviceInfoStr));
             // + e.getMessage() + " , device = [" + deviceInfoStr + "]"
