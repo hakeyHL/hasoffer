@@ -60,8 +60,8 @@ public class SystemController {
     @RequestMapping(value = "app/push/check", method = RequestMethod.GET)
     public ResultVo checkGetPushMsg(@RequestParam(defaultValue = "100") int type, HttpServletResponse response) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("errorCode", "00000");
-        jsonObject.put("msg", "ok");
+        jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
         ResultVo resultVo = new ResultVo();
         resultVo.getData().put("have", false);
         String currentDate = TimeUtils.parse(new Date(), "yyyyMMdd");
@@ -130,6 +130,6 @@ public class SystemController {
     @RequestMapping(value = "app/testArray", method = RequestMethod.GET)
     public String checkGetPushMsg(String[] a) {
         System.out.println("1");
-        return "ok";
+        return ConstantUtil.API_ERRORCODE_SUCCESS_MSG;
     }
 }
