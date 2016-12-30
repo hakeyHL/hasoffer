@@ -293,7 +293,7 @@ public class Compare2Controller {
                 searchLogCacheManager.countSearchedProduct(Long.parseLong(id));
                 searchLogCacheManager.countSearchedProductByHour(Long.parseLong(id));
             } catch (Exception e) {
-                jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
                 jsonObject.put(ConstantUtil.API_NAME_MSG, "Exception occur !");
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
@@ -357,7 +357,7 @@ public class Compare2Controller {
         //验证id是否大于10亿
         if (pId - ConstantUtil.API_ONE_BILLION_NUMBER <= 0) {
             //不是就拒绝
-            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             modelAndView.addObject(ConstantUtil.API_NAME_MSG, "pId error .");
             return modelAndView;
         }
@@ -365,7 +365,7 @@ public class Compare2Controller {
         PtmStdSkuModel ptmStdSkuModel = stdSkuIndexService.getStdSkuModelById(ApiUtils.removeBillion(pId));
         if (ptmStdSkuModel == null) {
             //无,返回错误信息
-            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             modelAndView.addObject(ConstantUtil.API_NAME_MSG, "product not exist.");
             return modelAndView;
         } else {

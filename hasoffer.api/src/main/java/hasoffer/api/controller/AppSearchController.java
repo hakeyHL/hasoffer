@@ -36,13 +36,13 @@ public class AppSearchController {
         Map map = new HashMap<>();
         //1. 非空校验
         if (searchCriteria.getCategoryId() == null) {
-            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             modelAndView.addObject(ConstantUtil.API_NAME_MSG, "failed , categoryId can not be empty .");
             return modelAndView;
         }
         //2. 合法性校验
         if (searchCriteria.getLevel() < 1 || searchCriteria.getLevel() > 3) {
-            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             modelAndView.addObject(ConstantUtil.API_NAME_MSG, "failed , level less than one .");
             return modelAndView;
         }
@@ -67,7 +67,7 @@ public class AppSearchController {
             ApiUtils.resolvePivotFields(map, pageableResult, pageableResult.getPivotFieldVals());
         }
         if (ptmStdSkuList.size() < 1) {
-            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             modelAndView.addObject(ConstantUtil.API_NAME_MSG, "failed , size is zero .");
             return modelAndView;
         }
@@ -93,19 +93,19 @@ public class AppSearchController {
         //1. 正确的逻辑是按照facet参数查询有没有结果来告知是否可以参数筛选
         //2. 现在是只是类目id是5,级别是2的筛选
         if (StringUtils.isEmpty(searchCriteria.getCategoryId()) || searchCriteria.getLevel() < 1) {
-            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             modelAndView.addObject(ConstantUtil.API_NAME_MSG, "filed , categoryId or level required.");
             return modelAndView;
         }
 
         if (!"5".equals(searchCriteria.getCategoryId()) && searchCriteria.getLevel() != 2) {
-            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             modelAndView.addObject(ConstantUtil.API_NAME_MSG, "filed , categoryId or level not accessed.");
             return modelAndView;
         }
         // 关键词为空也拒绝
         if (StringUtils.isEmpty(searchCriteria.getKeyword())) {
-            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             modelAndView.addObject(ConstantUtil.API_NAME_MSG, "filed , keyword is required.");
             return modelAndView;
         }

@@ -119,7 +119,7 @@ public class AppUserController {
         jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
         //绑定用户设备关系
         if (skuId <= 0) {
-            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             jsonObject.put(ConstantUtil.API_NAME_MSG, "id le than zero ");
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
@@ -381,7 +381,7 @@ public class AppUserController {
         JSONObject jsonObject = new JSONObject();
         Long startTime;
         Long endTime;
-        jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10000");
+        jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
         jsonObject.put(ConstantUtil.API_NAME_MSG, "date error");
         if (StringUtils.isEmpty(fromDate) && StringUtils.isEmpty(toDate)) {
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
@@ -532,7 +532,7 @@ public class AppUserController {
         //现在用户名只能是邮箱
         if (StringUtils.isEmpty(passwd)) {
             //拒绝
-            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             modelAndView.addObject(ConstantUtil.API_NAME_MSG, "password is required .");
             return modelAndView;
         }
@@ -543,19 +543,19 @@ public class AppUserController {
                 //注册
                 if (StringUtils.isEmpty(email)) {
                     //拒绝
-                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
                     modelAndView.addObject(ConstantUtil.API_NAME_MSG, "email is required .");
                     return modelAndView;
                 }
                 if (!ApiUtils.emailCheck(email)) {
-                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
                     modelAndView.addObject(ConstantUtil.API_NAME_MSG, "Please enter a valid email.");
                     return modelAndView;
                 }
                 UrmUser urmUser = appUserService.getUrmUserByEmail(email);
                 if (urmUser != null) {
                     //已存在,拒绝
-                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
                     modelAndView.addObject(ConstantUtil.API_NAME_MSG, "The mail has been registered");
                     return modelAndView;
                 }
@@ -572,7 +572,7 @@ public class AppUserController {
                     resultMap.put("userToken", newUrmUser.getUserToken());
                 } catch (Exception e) {
                     System.out.println("add user failed ." + e.getMessage());
-                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
                     //注册失败
                     modelAndView.addObject(ConstantUtil.API_NAME_MSG, "Sign up failed,Please try again.");
                     return modelAndView;
@@ -580,13 +580,13 @@ public class AppUserController {
             case 1:
                 //登录,用户名现在是邮箱
                 if (!ApiUtils.emailCheck(userName)) {
-                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
                     modelAndView.addObject(ConstantUtil.API_NAME_MSG, "Please enter a valid email");
                     return modelAndView;
                 }
                 if (StringUtils.isEmpty(userName)) {
                     //拒绝
-                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
                     modelAndView.addObject(ConstantUtil.API_NAME_MSG, "email can not be empty .");
                     return modelAndView;
                 }
@@ -595,7 +595,7 @@ public class AppUserController {
                 //按照用户名和type去搜索
                 authedUrmUser = appUserService.getUrmUserByUserNameAndType(userName, 1);
                 if (authedUrmUser == null) {
-                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                    modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
                     modelAndView.addObject(ConstantUtil.API_NAME_MSG, "The mail is not registered.");
                     return modelAndView;
                 } else {
@@ -603,7 +603,7 @@ public class AppUserController {
                     //登录失败 Sign in failed,Please try again. , 暂时应该用不到
                     authedUrmUser = appUserService.getUrmUserByUserNameAndPwd(userName, Md5Utils.md5AsBase64(passwd.getBytes()));
                     if (authedUrmUser == null) {
-                        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+                        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
                         modelAndView.addObject(ConstantUtil.API_NAME_MSG, "The mail and password are inconsistent");
                         return modelAndView;
                     } else {

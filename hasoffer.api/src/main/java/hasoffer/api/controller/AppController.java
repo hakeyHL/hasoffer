@@ -817,13 +817,13 @@ public class AppController {
         modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_ERRORCODE_SUCCESS_MSG);
         Map resultMap;
         if (StringUtils.isEmpty(param)) {
-            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             modelAndView.addObject(ConstantUtil.API_NAME_MSG, "param can not be empty ");
             return modelAndView;
         }
         String paramMeaning = ConstantUtil.API_PTMSTDSKU_PARAM_MEAN_MAP.get(param);
         if (StringUtils.isEmpty(paramMeaning)) {
-            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, "10000");
+            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             modelAndView.addObject(ConstantUtil.API_NAME_MSG, "not have this param meaning .");
             return modelAndView;
         }
