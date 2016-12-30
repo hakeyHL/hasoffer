@@ -51,7 +51,6 @@ public class MobileController {
         modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
         modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         List<Integer> priceList = new LinkedList<>();
-        priceList.add(5000);
         priceList.add(10000);
         priceList.add(15000);
         priceList.add(20000);
@@ -139,7 +138,7 @@ public class MobileController {
                 new SiteMapKeyVo("Top 10  Mobiles  Below 30000", 2).builderProMap("minPrice", "30000"),
 
                 new SiteMapKeyVo("SamSung mobile", 2).builderProMap("Brand", "Samsung"),
-                new SiteMapKeyVo("SamSung mobile Below 5000", 2).builderProMap("minPrice", "5000"),
+//                new SiteMapKeyVo("SamSung mobile Below 5000", 2).builderProMap("minPrice", "5000"),
                 new SiteMapKeyVo("SamSung mobile Below 10000", 2).builderProMap("minPrice", ConstantUtil.API_ERRORCODE_FAILED_LOGIC),
                 new SiteMapKeyVo("SamSung mobile Below 15000", 2).builderProMap("minPrice", "15000"),
                 new SiteMapKeyVo("SamSung mobile Below 20000", 2).builderProMap("minPrice", "20000"),
@@ -147,7 +146,7 @@ public class MobileController {
                 new SiteMapKeyVo("SamSung mobile Below 30000", 2).builderProMap("minPrice", "30000"),
 
                 new SiteMapKeyVo("Redmi Note 3 mobile", 2).builderProMap("Model", "Redmi Note 3"),
-                new SiteMapKeyVo("Redmi Note 3 mobile Below 5000", 2).builderProMap("minPrice", "5000"),
+//                new SiteMapKeyVo("Redmi Note 3 mobile Below 5000", 2).builderProMap("minPrice", "5000"),
                 new SiteMapKeyVo("Redmi Note 3 mobile Below 10000", 2).builderProMap("minPrice", ConstantUtil.API_ERRORCODE_FAILED_LOGIC),
                 new SiteMapKeyVo("Redmi Note 3 mobile Below 15000", 2).builderProMap("minPrice", "15000"),
                 new SiteMapKeyVo("Redmi Note 3 mobile Below 20000", 2).builderProMap("minPrice", "20000"),
