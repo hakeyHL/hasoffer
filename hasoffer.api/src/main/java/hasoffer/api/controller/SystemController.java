@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -127,10 +129,24 @@ public class SystemController {
 
     }
 
+    /**
+     * 测试获取web.xml中的entry
+     *
+     * @param name
+     * @return
+     */
     @ResponseBody
-    @RequestMapping(value = "app/testArray", method = RequestMethod.GET)
-    public String checkGetPushMsg(String[] a) {
-        System.out.println("1");
-        return ConstantUtil.API_NAME_MSG_SUCCESS;
+    @RequestMapping("jndiTest")
+    public String JNDITest(@RequestParam String name) {
+        try {
+            javax.naming.Context initCtx = new InitialContext();
+            javax.naming.Context envCtx = (javax.naming.Context) initCtx.lookup("java:comp/env");
+            String ParamValue = (String) envCtx.lookup(name);
+            System.out.println(name + " :" + ParamValue);
+        } catch (NamingException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return "ok";
     }
 }

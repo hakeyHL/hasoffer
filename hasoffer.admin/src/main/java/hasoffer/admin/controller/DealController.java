@@ -287,6 +287,12 @@ public class DealController {
         }
     }
 
+    @RequestMapping("/createDeal")
+    public ModelAndView redirect2DealDetail() {
+        ModelAndView mav = new ModelAndView("deal/edit");
+        return mav;
+    }
+
     /**
      * 提供文件下载
      *
