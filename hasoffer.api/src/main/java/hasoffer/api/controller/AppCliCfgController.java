@@ -6,10 +6,13 @@ import com.alibaba.fastjson.JSONObject;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.base.model.Website;
 import hasoffer.core.app.AppClientCfgService;
+import hasoffer.core.app.vo.DeviceInfoVo;
 import hasoffer.core.app.vo.ResultVo;
 import hasoffer.core.app.vo.ThirdAppVo;
 import hasoffer.core.redis.impl.CacheServiceImpl;
+import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.helper.WebsiteHelper;
+import hasoffer.webcommon.context.Context;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,13 +86,19 @@ public class AppCliCfgController {
                 // config
                 //search
                 map.put("001", false);
-
                 //wishlist
-                map.put("002", true);
+                map.put("002", false);
 
                 //购物车
-                map.put("003", true);
+                map.put("003", false);
 
+                if (ApiUtils.currenVersionCompare2compareversion((DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO), 36) >= 0) {
+                    //wishlist
+                    map.put("002", true);
+
+                    //购物车
+                    map.put("003", true);
+                }
                 //email and phone get
                 map.put("004", true);
 

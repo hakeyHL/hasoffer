@@ -9,10 +9,7 @@ import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.app.AppCategoryService;
-import hasoffer.core.app.vo.BackDetailVo;
-import hasoffer.core.app.vo.CmpProductListVo;
-import hasoffer.core.app.vo.OrderVo;
-import hasoffer.core.app.vo.ProductListVo;
+import hasoffer.core.app.vo.*;
 import hasoffer.core.bo.product.CategoryVo;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
@@ -604,6 +601,27 @@ public class ApiUtils {
     }
 
     /**
+     * @param deviceInfoVo   当前版本
+     * @param compareVersion 要比较的版本数
+     * @return 比指定version大返回1 小返回-1 等于返回0
+     */
+    public static int currenVersionCompare2compareversion(DeviceInfoVo deviceInfoVo, int compareVersion) {
+        if (deviceInfoVo != null) {
+            String appVersion = deviceInfoVo.getAppVersion();
+            if (org.apache.commons.lang3.StringUtils.isNotEmpty(appVersion)) {
+                int version = getNumberFromString(appVersion);
+                if (version > compareVersion) {
+                    return 1;
+                }
+                if (version < compareVersion) {
+                    return -1;
+                }
+            }
+        }
+        return 0;
+    }
+
+    /**
      * 在数据对象返回客户端之前检测其域是否都有值,除对象成员外都赋初始值
      *
      * @param object
@@ -702,6 +720,7 @@ public class ApiUtils {
         // 发送邮件
         mailSender.send(mailMessage);
     }
+    //sort list area =================================================================
 
     public void addProductVo2List(List desList, List sourceList) {
 
@@ -759,7 +778,6 @@ public class ApiUtils {
             }
         }
     }
-    //sort list area =================================================================
 
     public void setCommentNumAndRatins(ProductListVo productListVo) {
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productListVo.getId(), 1, 20);
