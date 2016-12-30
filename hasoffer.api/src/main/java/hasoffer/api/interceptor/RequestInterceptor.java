@@ -61,7 +61,6 @@ public class RequestInterceptor implements HandlerInterceptor {
             } else {
                 deviceInfo.setMarketChannel(MarketChannel.H5);
             }
-            DeviceInfoVo deviceInfo2 = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
             return true;
         }
         try {
