@@ -8,6 +8,7 @@ import hasoffer.core.app.vo.ResultVo;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.impl.AppServiceImpl;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
