@@ -6,8 +6,6 @@ import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.enums.AppdealSource;
-import hasoffer.core.persistence.mongo.PriceNode;
-import hasoffer.core.persistence.mongo.PtmCmpSkuHistoryPrice;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.utils.ImageUtil;
@@ -28,6 +26,7 @@ import java.util.List;
 /**
  * Created on 2016/9/14.
  */
+@Deprecated
 public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
 
     /**
@@ -45,27 +44,6 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
     @Resource
     IRedisListService redisListService;
 
-    private float getMinPrice(PtmCmpSkuHistoryPrice historyPrice) {
-
-        float minPrice = 0.0f;
-
-        //获取历史最低价格
-        List<PriceNode> priceNodes = historyPrice.getPriceNodes();
-        for (int i = 0; i < priceNodes.size(); i++) {
-
-            if (i == 0) {
-                minPrice = priceNodes.get(i).getPrice();
-            } else {
-                float anotherPrice = priceNodes.get(i).getPrice();
-                if (anotherPrice < minPrice) {
-                    minPrice = anotherPrice;
-                }
-            }
-        }
-
-        return minPrice;
-    }
-
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 
@@ -81,8 +59,8 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
                 Object pop = redisListService.pop(PRICE_DROP_SKUID_QUEUE, true);
 
                 if (pop == null) {
-                    System.out.println("queue size =" + redisListService.size(PRICE_DROP_SKUID_QUEUE));
-                    System.out.println("CheckGetPriceOffDealJobBean pop get 0 skuid go to die");
+                    logger.info("queue size =" + redisListService.size(PRICE_DROP_SKUID_QUEUE));
+                    logger.info("CheckGetPriceOffDealJobBean pop get 0 skuid go to die");
                     break;
                 }
 
@@ -95,29 +73,11 @@ public class CheckGetPriceOffDealJobBean extends QuartzJobBean {
                     continue;
                 }
 
+                //暂时 todo   (该方法废弃，不再使用)
+                float minPrice = 0.0f;
+
                 float newPrice = sku.getPrice();
                 float oriPrice = sku.getOriPrice();
-
-                //SKU的原价不为空
-                if (oriPrice <= 0.0) {
-                    continue;
-                }
-                //SKU现价不为0
-                if (newPrice <= 0.0) {
-                    continue;
-                }
-                //SKU的现价小于原价
-                if (newPrice >= oriPrice) {
-                    continue;
-                }
-
-                //历史最低价格
-                PtmCmpSkuHistoryPrice historyPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, skuid);
-                float minPrice = getMinPrice(historyPrice);
-                if (newPrice > minPrice) {
-                    System.out.println("minPrice =" + minPrice + "_ newPrice =" + newPrice + "_ skuid = " + skuid + " continue");
-                    continue;
-                }
 
                 if (newPrice < minPrice * 1.1) {//符合条件，创建deal
 

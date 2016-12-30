@@ -285,6 +285,11 @@ public class DealServiceImpl implements IDealService {
                         System.out.println("update clone deal update ptmcmpsku price for " + ptmcmpskuid);
                     }
                 }
+
+                if (newDeal.getShippingFee() == 0.0 && newDeal.getPresentPrice() < 500) {
+                    newDeal.setShippingFee(null);
+                }
+
                 //创建新克隆的appdeal
                 createAppDealByPriceOff(newDeal);
                 System.out.println("clone deal info id " + newDeal.getId() + "_now parice " + newDeal.getPresentPrice() + "_oriPrice " + originPrice);
