@@ -692,7 +692,13 @@ public class ApiUtils {
         return str2;
     }
 
-    public boolean isPriceOffAlert(String userToken, Long skuId) {
+    public boolean isPriceOffAlert(String userToken, Long skuId, Long... userId) {
+        if (userId.length > 0 && userId[0] > 0) {
+            PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(userId[0] + "", skuId);
+            if (priceOffNotice != null) {
+                return true;
+            }
+        }
         if (!StringUtils.isEmpty(userToken)) {
             UrmUser urmUser = appService.getUserByUserToken(userToken);
             if (urmUser != null) {
@@ -973,7 +979,7 @@ public class ApiUtils {
         data.setTranscations(transcations);
     }
 
-    public Map setEvaluateBrandFeaturesCompetitorsSummaryMap(PtmStdSku ptmStdSku) {
+    public Map setEvaluateBrandFeaturesCompetitorsSummaryMap(PtmStdSku ptmStdSku, String[] affs) {
         Map stdSkuParametersMap = new HashMap();
         if (ptmStdSku == null) {
             return stdSkuParametersMap;
@@ -1012,7 +1018,8 @@ public class ApiUtils {
         int priceTo = BigDecimal.valueOf(ptmStdSku.getRefPrice()).multiply(BigDecimal.valueOf(1.2)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).intValue();
         PageableResult<PtmStdPriceModel> ptmStdPriceModelPageableResult = ptmStdPriceIndexService.filterStdPriceByCriteria(new SearchCriteria(1, 3, priceFrom, priceTo));
         if (ptmStdPriceModelPageableResult != null && ptmStdPriceModelPageableResult.getData() != null) {
-
+            List<CmpProductListVo> cmpProductListVos = getCmpProductListVos(ptmStdPriceModelPageableResult.getData(), affs);
+            stdSkuParametersMap.put("competitors", cmpProductListVos);
         }
         return stdSkuParametersMap;
     }
@@ -1022,19 +1029,23 @@ public class ApiUtils {
      *
      * @return
      */
-    public List<CmpProductListVo> getCmpProductListVos(List skuList, String[] affs, String userToken, List desList) {
+    public List<CmpProductListVo> getCmpProductListVos(List skuList, String[] affs) {
+        List<CmpProductListVo> cmpProductListVoList = new ArrayList<>();
         if (skuList != null && skuList.size() > 0) {
             if (PtmStdPrice.class.isInstance(skuList.get(0))) {
                 Iterator<PtmStdPrice> ptmList = skuList.iterator();
                 while (ptmList.hasNext()) {
                     PtmStdPrice next = ptmList.next();
                     CmpProductListVo cplv = new CmpProductListVo(next, productCacheManager.getPtmStdSkuImageUrl(next.getStdSkuId()), WebsiteHelper.getLogoUrl(next.getWebsite()));
-                    cplv.setDeepLinkUrl(WebsiteHelper.getDeeplinkWithAff((next.getWebsite()), next.getUrl(), new String[]{"渠道", "设备id", "用户id"}));
-                    cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff((next.getWebsite()), next.getUrl(), new String[]{"渠道", "设备id", "用户id"}));
-                    if (!org.apache.commons.lang3.StringUtils.isEmpty(userToken)) {
-                        cplv.setIsAlert(isPriceOffAlert(userToken, cplv.getId()));
+                    cplv.setDeepLinkUrl(WebsiteHelper.getDeeplinkWithAff((next.getWebsite()), next.getUrl(), affs));
+                    cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff((next.getWebsite()), next.getUrl(), affs));
+                    if (affs.length > 2) {
+                        long userId = Long.parseLong(affs[2]);
+                        if (userId > 0) {
+                            cplv.setIsAlert(isPriceOffAlert(null, cplv.getId(), userId));
+                        }
                     }
-                    desList.add(cplv);
+                    cmpProductListVoList.add(cplv);
                 }
             } else if (PtmStdPriceModel.class.isInstance(skuList.get(0))) {
                 Iterator<PtmStdPriceModel> ptmList = skuList.iterator();
@@ -1043,13 +1054,16 @@ public class ApiUtils {
                     CmpProductListVo cplv = new CmpProductListVo(next, productCacheManager.getPtmStdSkuImageUrl(next.getId()), WebsiteHelper.getLogoUrl(Website.valueOf(next.getSite())));
                     cplv.setDeepLinkUrl(WebsiteHelper.getDeeplinkWithAff(Website.valueOf(next.getSite()), next.getSkuUrl(), affs));
                     cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(Website.valueOf(next.getSite()), next.getSkuUrl(), affs));
-                    if (!org.apache.commons.lang3.StringUtils.isEmpty(userToken)) {
-                        cplv.setIsAlert(isPriceOffAlert(userToken, cplv.getId()));
+                    if (affs.length > 2) {
+                        long userId = Long.parseLong(affs[2]);
+                        if (userId > 0) {
+                            cplv.setIsAlert(isPriceOffAlert(null, cplv.getId(), userId));
+                        }
                     }
-                    desList.add(cplv);
+                    cmpProductListVoList.add(cplv);
                 }
             }
         }
-        return null;
+        return cmpProductListVoList;
     }
 }
