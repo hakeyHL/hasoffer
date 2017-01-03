@@ -111,7 +111,7 @@ public class StdPriceDubboUpdateWorker implements Runnable {
             e.printStackTrace();
         }
 
-        logger.info("StdPriceDubboUpdateWorker success " + fetchedProduct.getWebsite() + "_" + fetchedProduct.getSkuStatus() + "_" + stdPriceId);
+//        logger.info("StdPriceDubboUpdateWorker success " + fetchedProduct.getWebsite() + "_" + fetchedProduct.getSkuStatus() + "_" + stdPriceId);
 
         try {
             ptmStdPriceService.createPtmStdPriceImage(stdPriceId, fetchedProduct);
