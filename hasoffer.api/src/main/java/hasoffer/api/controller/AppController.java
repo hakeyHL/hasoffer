@@ -970,7 +970,7 @@ public class AppController {
         List<DealVo> similarDealList = new ArrayList<>();
         if (deviceInfoVo != null) {
             String appVersion = deviceInfoVo.getAppVersion();
-            if (!StringUtils.isEmpty(appVersion)) {
+            if (!StringUtils.isEmpty(appVersion) || MarketChannel.H5.equals(deviceInfoVo.getMarketChannel())) {
                 appVersion = appVersion.trim();
                 Integer vsion = Integer.valueOf(appVersion);
                 if (StringUtils.isEmpty(id)) {
