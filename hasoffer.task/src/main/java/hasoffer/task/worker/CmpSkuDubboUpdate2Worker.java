@@ -262,8 +262,10 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
         appdeal.setInfoPageImage(dealBigPath);
         appdeal.setListPageImage(dealSmallPath);
 
-        if ((Boolean) fetchedProduct.getFlagMap().get("ADDABLE") && fetchedProduct.getPrice() > 500) {
-            appdeal.setShippingFee(0.0f);
+        if (fetchedProduct.getFlagMap().size() != 0) {
+            if ((Boolean) fetchedProduct.getFlagMap().get("ADDABLE") && fetchedProduct.getPrice() > 500) {
+                appdeal.setShippingFee(0.0f);
+            }
         }
 
         dealService.createAppDealByPriceOff(appdeal);
