@@ -143,6 +143,8 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                 logger.info("update ptmcmpsku priceHistory get null");
             } else {
                 float minPrice = getMinPrice(ptmCmpSkuHistoryPrice);
+                logger.info("minPrice " + minPrice);
+                logger.info("fetchedProduct.getPrice() " + fetchedProduct.getPrice());
 
                 if (minPrice != 0.0f
                         && fetchedProduct.getPrice() <= minPrice                                    //更新后的价格小于等于更新前的历史最低价格
