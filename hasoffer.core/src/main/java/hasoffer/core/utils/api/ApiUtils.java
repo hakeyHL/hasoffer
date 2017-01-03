@@ -976,6 +976,15 @@ public class ApiUtils {
         List<UrmUserCoinExchangeRecord> exchangeRecords = appUserService.getCoinExchangeRecordByUserId(users.get(0).getId());
         for (UrmUserCoinExchangeRecord urmUserCoinExchangeRecordL : exchangeRecords) {
             multipliedVerifiedCoins = multipliedVerifiedCoins.subtract(BigDecimal.valueOf(urmUserCoinExchangeRecordL.getCoinTotal() == null ? 0 : urmUserCoinExchangeRecordL.getCoinTotal()));
+            OrderVo orderVo = new OrderVo();
+            //乘以10再取整
+            orderVo.setAccount(BigDecimal.valueOf(urmUserCoinExchangeRecordL.getCoinTotal()));
+            orderVo.setChannel("HASOFFER");
+            orderVo.setOrderId(urmUserCoinExchangeRecordL.getId() + "");
+            orderVo.setOrderTime(new Date(urmUserCoinExchangeRecordL.getOperateTime()));
+            orderVo.setWebsite("HASOFFER");
+            orderVo.setStatus("approved");
+            transcations.add(orderVo);
         }
         data.setVerifiedCoins(multipliedVerifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
