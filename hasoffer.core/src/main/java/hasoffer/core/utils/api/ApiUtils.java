@@ -11,6 +11,7 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.core.app.AppCategoryService;
 import hasoffer.core.app.vo.*;
 import hasoffer.core.bo.product.CategoryVo;
+import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
@@ -241,7 +242,11 @@ public class ApiUtils {
         }
     }
 
-    public static void setPriceSearchScope(List<FilterQuery> fqList, int priceFrom, int priceTo, String priceToStr) {
+    public static void setPriceSearchScope(List<FilterQuery> fqList, int priceFrom, int priceTo, String priceToStr, String... priceName) {
+        String priceKey = "minPrice";
+        if (priceName.length == 1 && priceName[0].equals("price")) {
+            priceKey = "price";
+        }
         String priceFromStr;
         if (priceFrom < priceTo && priceFrom >= 0) {
             if (priceFrom <= 0) {
@@ -251,9 +256,9 @@ public class ApiUtils {
             if (priceTo > 0) {
                 priceToStr = String.valueOf(priceTo);
             }
-            fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", priceFromStr, priceToStr)));
+            fqList.add(new FilterQuery(priceKey, String.format("[%s TO %s]", priceFromStr, priceToStr)));
         } else {
-            fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", "1", "*")));
+            fqList.add(new FilterQuery(priceKey, String.format("[%s TO %s]", "1", "*")));
         }
     }
 
@@ -978,18 +983,17 @@ public class ApiUtils {
             return stdSkuParametersMap;
         }
         PtmStdSkuDescription ptmStdSkuDescription = mongoDbManager.queryOne(PtmStdSkuDescription.class, stdSkuId);
-        if (ptmStdSkuDescription == null) {
-            return stdSkuParametersMap;
+
+        if (ptmStdSkuDescription != null) {
+            String features = ptmStdSkuDescription.getFeatures();
+            stdSkuParametersMap.put("features", features);
+
+            String summary = ptmStdSkuDescription.getSummary();
+            stdSkuParametersMap.put("summary", summary);
+
+            List<FetchedProductReview> fetchedProductReviewList = ptmStdSkuDescription.getFetchedProductReviewList();
+            stdSkuParametersMap.put("comments", fetchedProductReviewList);
         }
-        String features = ptmStdSkuDescription.getFeatures();
-        stdSkuParametersMap.put("features", features);
-
-        String summary = ptmStdSkuDescription.getSummary();
-        stdSkuParametersMap.put("summary", summary);
-
-        List<FetchedProductReview> fetchedProductReviewList = ptmStdSkuDescription.getFetchedProductReviewList();
-        stdSkuParametersMap.put("comments", fetchedProductReviewList);
-
 
         //获取品牌card
         if (org.apache.commons.lang3.StringUtils.isNotEmpty(ptmStdSku.getBrand())) {
@@ -1004,12 +1008,12 @@ public class ApiUtils {
         }
         //bestCompetitors
 //        List<CmpProductListVo> competitors = ptmStdSKuService.getSimilaryPricesByPriceAndRating(ptmStdSku);
-       /* int priceFrom = BigDecimal.valueOf(ptmStdSku.getRefPrice()).multiply(BigDecimal.valueOf(0.8)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).intValue();
+        int priceFrom = BigDecimal.valueOf(ptmStdSku.getRefPrice()).multiply(BigDecimal.valueOf(0.8)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).intValue();
         int priceTo = BigDecimal.valueOf(ptmStdSku.getRefPrice()).multiply(BigDecimal.valueOf(1.2)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).intValue();
         PageableResult<PtmStdPriceModel> ptmStdPriceModelPageableResult = ptmStdPriceIndexService.filterStdPriceByCriteria(new SearchCriteria(1, 3, priceFrom, priceTo));
         if (ptmStdPriceModelPageableResult != null && ptmStdPriceModelPageableResult.getData() != null) {
 
-        }*/
+        }
         return stdSkuParametersMap;
     }
 

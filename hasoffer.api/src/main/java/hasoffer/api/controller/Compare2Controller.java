@@ -333,10 +333,10 @@ public class Compare2Controller {
         }
         // 速度优化
         SearchHelper.addToLog(sio);
-        logger.debug(sio.toString());
         apiUtils.resloveClass(cr);
         jsonObject.put(ConstantUtil.API_NAME_DATA, JSONObject.toJSON(cr));
-        jsonObject.putAll(apiUtils.setEvaluateBrandFeaturesCompetitorsSummaryMap(ptmStdSku));
+        Map map = apiUtils.setEvaluateBrandFeaturesCompetitorsSummaryMap(ptmStdSku);
+        jsonObject.putAll(map);
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
         return null;
 
