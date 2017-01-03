@@ -14,14 +14,13 @@ import java.text.SimpleDateFormat;
 public class UrmUserCoinExchangeRecord implements Identifiable<Long> {
     //以用户ID作为主键
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(unique = true, nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private Long userId;//用户id
     private String userName;//用户名
     private Long operateTime;//操作时间
     private String operateStringTime;
-    @Column(columnDefinition = "default 0")
     private Long coinTotal;//总兑换金额
     private Float orderCoin;//兑换使用订单总金额
     private String orderInfo;//订单详情
