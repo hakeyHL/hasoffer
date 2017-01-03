@@ -125,16 +125,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
         FetchedProduct fetchedProduct = fetchUrlResult.getFetchProduct();
 //        logger.info(fetchedProduct.toString());
 
-        try {
-            //
-            cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
-        } catch (Exception e) {
-//            logger.info("updateCmpSkuBySpiderFetchedProduct fail " + skuid);
-            e.printStackTrace();
-        }
-
-//        logger.info("updateCmpSkuBySpiderFetchedProduct success " + fetchedProduct.getWebsite() + "_" + fetchedProduct.getSkuStatus() + "_" + skuid);
-
+//        由于部分deal要增加新的最低价标识，所以deal的生成策略要写在更新之前
         //获取最低价
         try {
             PtmCmpSkuHistoryPrice ptmCmpSkuHistoryPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, skuid);
@@ -179,6 +170,17 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
             logger.info("CmpSkuDubboUpdate2Worker  create deal fail " + skuid);
             e.printStackTrace();
         }
+
+
+        try {
+            //
+            cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
+        } catch (Exception e) {
+//            logger.info("updateCmpSkuBySpiderFetchedProduct fail " + skuid);
+            e.printStackTrace();
+        }
+
+//        logger.info("updateCmpSkuBySpiderFetchedProduct success " + fetchedProduct.getWebsite() + "_" + fetchedProduct.getSkuStatus() + "_" + skuid);
     }
 
     private void createDeal(long skuid, String titleFlagString, FetchedProduct fetchedProduct) {
