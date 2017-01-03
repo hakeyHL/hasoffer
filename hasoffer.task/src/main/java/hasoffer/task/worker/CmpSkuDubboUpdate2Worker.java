@@ -173,8 +173,6 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
         } catch (Exception e) {
             logger.info("CmpSkuDubboUpdate2Worker  create deal fail " + skuid);
         }
-
-        logger.info("CmpSkuDubboUpdate2Worker  create deal success " + skuid);
     }
 
     private void createDeal(long skuid, String titleFlagString, FetchedProduct fetchedProduct) {
