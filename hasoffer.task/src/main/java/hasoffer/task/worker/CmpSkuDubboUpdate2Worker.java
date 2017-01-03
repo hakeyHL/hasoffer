@@ -172,6 +172,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
 
         } catch (Exception e) {
             logger.info("CmpSkuDubboUpdate2Worker  create deal fail " + skuid);
+            e.printStackTrace();
         }
     }
 
