@@ -143,6 +143,8 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                 logger.info("update ptmcmpsku priceHistory get null");
             } else {
                 float minPrice = getMinPrice(ptmCmpSkuHistoryPrice);
+                logger.info("minPrice " + minPrice);
+                logger.info("fetchedProduct.getPrice() " + fetchedProduct.getPrice());
 
                 if (minPrice != 0.0f
                         && fetchedProduct.getPrice() <= minPrice                                    //更新后的价格小于等于更新前的历史最低价格
@@ -155,16 +157,19 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
 
 //            对现价进行判断，如果更新后的价格小于更新前的历史最低价格，且商品更新前有两个不同的历史价格（价格是0的不计入），则将创建deal的标题最前方加上【New Lowest Price】（表示新低价）
                     if (fetchedProduct.getPrice() < minPrice && ptmCmpSkuHistoryPrice.getPriceNodes().size() > 1) {
+                        logger.info("create NEWLOWEST deal");
                         createDeal(skuid, "NEWLOWEST", fetchedProduct);
                     }
 
 //            对现价进行判断，如果更新后的价格等于更新前的历史最低价格，且现价不大于150卢比，且商品有flipkart assured或 Fulfilled by Amazon的标识，则将创建的deal的标题最前方加上【Add on】
                     if (fetchedProduct.getPrice() == minPrice && fetchedProduct.getPrice() <= 150 && (Boolean) fetchedProduct.getFlagMap().get("ADDABLE")) {
+                        logger.info("create ADDON deal");
                         createDeal(skuid, "ADDON", fetchedProduct);
                     }
 
 //            对现价进行判断，如果更新后的价格等于更新前的历史最低价格，且现价高于150卢比，则将按常规方式创建deal；
                     if (fetchedProduct.getPrice() == minPrice && fetchedProduct.getPrice() > 150) {
+                        logger.info("create default deal");
                         createDeal(skuid, "", fetchedProduct);
                     }
                 }
@@ -177,6 +182,8 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
     }
 
     private void createDeal(long skuid, String titleFlagString, FetchedProduct fetchedProduct) {
+
+        logger.info("createDeal method " + titleFlagString);
 
         PtmCmpSku sku = cmpSkuService.getCmpSkuById(skuid);
         if (sku == null) {
@@ -195,10 +202,13 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
 
         if (StringUtils.isEqual(titleFlagString, "NEWLOWEST")) {
             appdeal.setTitle("【New Lowest Price】 " + sku.getTitle());
+            logger.info("【New Lowest Price】 dealTitle");
         } else if (StringUtils.isEqual(titleFlagString, "ADDON")) {
             appdeal.setTitle("【Add on】 " + sku.getTitle());
+            logger.info("【Add on】 dealTitle");
         } else {
             appdeal.setTitle(sku.getTitle());
+            logger.info("default dealTitle");
         }
 
         appdeal.setPtmcmpskuid(sku.getId());
