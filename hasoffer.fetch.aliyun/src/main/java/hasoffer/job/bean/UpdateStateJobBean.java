@@ -1,5 +1,8 @@
 package hasoffer.job.bean;
 
+import hasoffer.aliyun.enums.TaskLevel;
+import hasoffer.aliyun.enums.TaskStatus;
+import hasoffer.aliyun.enums.TaskTarget;
 import hasoffer.aliyun.enums.WebSite;
 import hasoffer.data.redis.IRedisService;
 import hasoffer.state.dmo.UpdateStateDMO;
@@ -33,7 +36,7 @@ public class UpdateStateJobBean extends QuartzJobBean {
     }
 
     private void stateTask() {
-        for (UpdateStateService.TaskTarget taskTarget : UpdateStateService.TaskTarget.values()) {
+        for (TaskTarget taskTarget : TaskTarget.values()) {
             for (WebSite website : WebSite.values()) {
                 UpdateStateDMO updateStateDMO = new UpdateStateDMO();
                 int pushNum = 0;
@@ -41,23 +44,23 @@ public class UpdateStateJobBean extends QuartzJobBean {
                 int exceptionNum = 0;
                 int stopNum = 0;
                 String ymd = DateFormatUtils.format(new Date(), "yyyyMMdd");
-                for (UpdateStateService.TaskLevel taskLevel : UpdateStateService.TaskLevel.values()) {
+                for (TaskLevel taskLevel : TaskLevel.values()) {
                     String key = "SPIDER_PUSH_NUM_" + taskTarget.name() + "_" + website.name() + "_" + taskLevel.name() + "_" + ymd;
                     String s = redisService.get(key, -1);
                     pushNum = Integer.valueOf(s == null ? "0" : s) + pushNum;
                     logger.info(key + " value: {}", s);
                 }
-                String finishKey = "SPIDER_POP_NUM_" + taskTarget.name() + "_" + website.name() + "_" + UpdateStateService.TaskStatus.FINISH + "_" + ymd;
+                String finishKey = "SPIDER_POP_NUM_" + taskTarget.name() + "_" + website.name() + "_" + TaskStatus.FINISH + "_" + ymd;
                 String finishNumStr = redisService.get(finishKey, -1);
                 logger.info(finishKey + " value: {}", finishNumStr);
                 finishNum = Integer.valueOf(finishNumStr == null ? "0" : finishNumStr) + finishNum;
 
-                String exceptionKey = "SPIDER_POP_NUM_" + taskTarget.name() + "_" + website.name() + "_" + UpdateStateService.TaskStatus.EXCEPTION + "_" + ymd;
+                String exceptionKey = "SPIDER_POP_NUM_" + taskTarget.name() + "_" + website.name() + "_" + TaskStatus.EXCEPTION + "_" + ymd;
                 String exceptionNumStr = redisService.get(exceptionKey, -1);
                 logger.info(exceptionKey + " value: {}", exceptionNumStr);
                 exceptionNum = Integer.valueOf(exceptionNumStr == null ? "0" : exceptionNumStr) + exceptionNum;
 
-                String stopKey = "SPIDER_POP_NUM_" + taskTarget.name() + "_" + website.name() + "_" + UpdateStateService.TaskStatus.STOP + "_" + ymd;
+                String stopKey = "SPIDER_POP_NUM_" + taskTarget.name() + "_" + website.name() + "_" + TaskStatus.STOP + "_" + ymd;
                 String stopNumStr = redisService.get(stopKey, -1);
                 logger.info(stopKey + " value: {}", stopNumStr);
                 stopNum = Integer.valueOf(stopNumStr == null ? "0" : stopNumStr) + stopNum;

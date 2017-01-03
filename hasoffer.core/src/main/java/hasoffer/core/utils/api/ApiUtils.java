@@ -5,30 +5,34 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.app.AppCategoryService;
-import hasoffer.core.app.vo.BackDetailVo;
-import hasoffer.core.app.vo.CmpProductListVo;
-import hasoffer.core.app.vo.OrderVo;
-import hasoffer.core.app.vo.ProductListVo;
+import hasoffer.core.app.vo.*;
 import hasoffer.core.bo.product.CategoryVo;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
+import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
+import hasoffer.core.persistence.mongo.PtmStdBrandCard;
+import hasoffer.core.persistence.mongo.PtmStdSkuDescription;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.urm.PriceOffNotice;
 import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.persistence.po.urm.UrmUserCoinRepair;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.product.ICmpSkuService;
-import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
-import hasoffer.core.product.solr.ProductModel2;
-import hasoffer.core.product.solr.PtmStdSkuModel;
+import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
+import hasoffer.core.product.solr.*;
+import hasoffer.core.system.AppUserService;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.core.utils.ConstantUtil;
 import hasoffer.data.solr.FilterQuery;
+import hasoffer.fetch.helper.WebsiteHelper;
+import hasoffer.spider.model.FetchedProductReview;
 import jodd.util.NameValue;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -54,11 +58,19 @@ public class ApiUtils {
     @Resource
     AppServiceImpl appService;
     @Resource
+    AppUserService appUserService;
+    @Resource
     IPriceOffNoticeService iPriceOffNoticeService;
     @Resource
     SearchLogCacheManager searchLogCacheManager;
     @Resource
     CmpskuIndexServiceImpl cmpskuIndexService;
+    @Resource
+    MongoDbManager mongoDbManager;
+    @Resource
+    PtmStdSKuServiceImpl ptmStdSKuService;
+    @Resource
+    PtmStdPriceIndexServiceImpl ptmStdPriceIndexService;
     @Resource
     private ICmpSkuService cmpSkuService;
     @Resource
@@ -589,6 +601,27 @@ public class ApiUtils {
     }
 
     /**
+     * @param deviceInfoVo   当前版本
+     * @param compareVersion 要比较的版本数
+     * @return 比指定version大返回1 小返回-1 等于返回0
+     */
+    public static int currenVersionCompare2compareversion(DeviceInfoVo deviceInfoVo, int compareVersion) {
+        if (deviceInfoVo != null) {
+            String appVersion = deviceInfoVo.getAppVersion();
+            if (org.apache.commons.lang3.StringUtils.isNotEmpty(appVersion)) {
+                int version = getNumberFromString(appVersion);
+                if (version > compareVersion) {
+                    return 1;
+                }
+                if (version < compareVersion) {
+                    return -1;
+                }
+            }
+        }
+        return 0;
+    }
+
+    /**
      * 在数据对象返回客户端之前检测其域是否都有值,除对象成员外都赋初始值
      *
      * @param object
@@ -687,6 +720,7 @@ public class ApiUtils {
         // 发送邮件
         mailSender.send(mailMessage);
     }
+    //sort list area =================================================================
 
     public void addProductVo2List(List desList, List sourceList) {
 
@@ -744,7 +778,6 @@ public class ApiUtils {
             }
         }
     }
-    //sort list area =================================================================
 
     public void setCommentNumAndRatins(ProductListVo productListVo) {
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productListVo.getId(), 1, 20);
@@ -872,6 +905,7 @@ public class ApiUtils {
      * @param data
      */
     public void calculateHasofferCoin(List<UrmUser> users, BackDetailVo data) {
+        boolean addFlag = false;
         //订单分隔时间 2016年12月28日 12:00:00
         String splitTime = "2016/12/28 12:00:00";
         Date splitDate;
@@ -887,7 +921,10 @@ public class ApiUtils {
         BigDecimal addedVerifiedCoins = BigDecimal.ZERO;
         for (UrmUser user : users) {
             List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
-
+            UrmUserCoinRepair urmUserCoinRepair = appUserService.getUrmUserCoinSignRecordById(user.getId());
+            if (urmUserCoinRepair != null) {
+                addFlag = true;
+            }
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
                 if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
                     OrderVo orderVo = new OrderVo();
@@ -922,8 +959,93 @@ public class ApiUtils {
         //待定的
         data.setPendingCoins(pendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         //可以使用的
-//        multipliedVerifiedCoins = multipliedVerifiedCoins.multiply(BigDecimal.TEN).add(addedVerifiedCoins);
+        if (addFlag) {
+            multipliedVerifiedCoins = multipliedVerifiedCoins.multiply(BigDecimal.TEN).add(addedVerifiedCoins);
+        } else {
+            multipliedVerifiedCoins = multipliedVerifiedCoins.add(addedVerifiedCoins);
+        }
         data.setVerifiedCoins(multipliedVerifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
+    }
+
+    public Map setEvaluateBrandFeaturesCompetitorsSummaryMap(PtmStdSku ptmStdSku) {
+        Map stdSkuParametersMap = new HashMap();
+        if (ptmStdSku == null) {
+            return stdSkuParametersMap;
+        }
+        Long stdSkuId = ptmStdSku.getId();
+        if (stdSkuId < 0) {
+            return stdSkuParametersMap;
+        }
+        PtmStdSkuDescription ptmStdSkuDescription = mongoDbManager.queryOne(PtmStdSkuDescription.class, stdSkuId);
+        if (ptmStdSkuDescription == null) {
+            return stdSkuParametersMap;
+        }
+        String features = ptmStdSkuDescription.getFeatures();
+        stdSkuParametersMap.put("features", features);
+
+        String summary = ptmStdSkuDescription.getSummary();
+        stdSkuParametersMap.put("summary", summary);
+
+        List<FetchedProductReview> fetchedProductReviewList = ptmStdSkuDescription.getFetchedProductReviewList();
+        stdSkuParametersMap.put("comments", fetchedProductReviewList);
+
+
+        //获取品牌card
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(ptmStdSku.getBrand())) {
+            String brandCardId = HexDigestUtil.md5(ptmStdSku.getBrand().toUpperCase());
+            if (org.apache.commons.lang3.StringUtils.isNotEmpty(brandCardId)) {
+                PtmStdBrandCard ptmStdBrandCard = mongoDbManager.queryOne(PtmStdBrandCard.class, brandCardId);
+                if (ptmStdBrandCard != null && org.apache.commons.lang3.StringUtils.isNotEmpty(ptmStdBrandCard.getBrandCardString())) {
+                    stdSkuParametersMap.put("brandCard", ptmStdBrandCard.getBrandCardString());
+                }
+            }
+
+        }
+        //bestCompetitors
+//        List<CmpProductListVo> competitors = ptmStdSKuService.getSimilaryPricesByPriceAndRating(ptmStdSku);
+       /* int priceFrom = BigDecimal.valueOf(ptmStdSku.getRefPrice()).multiply(BigDecimal.valueOf(0.8)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).intValue();
+        int priceTo = BigDecimal.valueOf(ptmStdSku.getRefPrice()).multiply(BigDecimal.valueOf(1.2)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).intValue();
+        PageableResult<PtmStdPriceModel> ptmStdPriceModelPageableResult = ptmStdPriceIndexService.filterStdPriceByCriteria(new SearchCriteria(1, 3, priceFrom, priceTo));
+        if (ptmStdPriceModelPageableResult != null && ptmStdPriceModelPageableResult.getData() != null) {
+
+        }*/
+        return stdSkuParametersMap;
+    }
+
+    /**
+     * 获取详情页sku列表
+     *
+     * @return
+     */
+    public List<CmpProductListVo> getCmpProductListVos(List skuList, String[] affs, String userToken, List desList) {
+        if (skuList != null && skuList.size() > 0) {
+            if (PtmStdPrice.class.isInstance(skuList.get(0))) {
+                Iterator<PtmStdPrice> ptmList = skuList.iterator();
+                while (ptmList.hasNext()) {
+                    PtmStdPrice next = ptmList.next();
+                    CmpProductListVo cplv = new CmpProductListVo(next, productCacheManager.getPtmStdSkuImageUrl(next.getStdSkuId()), WebsiteHelper.getLogoUrl(next.getWebsite()));
+                    cplv.setDeepLinkUrl(WebsiteHelper.getDeeplinkWithAff((next.getWebsite()), next.getUrl(), new String[]{"渠道", "设备id", "用户id"}));
+                    cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff((next.getWebsite()), next.getUrl(), new String[]{"渠道", "设备id", "用户id"}));
+                    if (!org.apache.commons.lang3.StringUtils.isEmpty(userToken)) {
+                        cplv.setIsAlert(isPriceOffAlert(userToken, cplv.getId()));
+                    }
+                    desList.add(cplv);
+                }
+            } else if (PtmStdPriceModel.class.isInstance(skuList.get(0))) {
+                Iterator<PtmStdPriceModel> ptmList = skuList.iterator();
+                while (ptmList.hasNext()) {
+                    PtmStdPriceModel next = ptmList.next();
+                    CmpProductListVo cplv = new CmpProductListVo(next, productCacheManager.getPtmStdSkuImageUrl(next.getId()), WebsiteHelper.getLogoUrl(Website.valueOf(next.getSite())));
+                    cplv.setDeepLinkUrl(WebsiteHelper.getDeeplinkWithAff(Website.valueOf(next.getSite()), next.getSkuUrl(), affs));
+                    cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(Website.valueOf(next.getSite()), next.getSkuUrl(), affs));
+                    if (!org.apache.commons.lang3.StringUtils.isEmpty(userToken)) {
+                        cplv.setIsAlert(isPriceOffAlert(userToken, cplv.getId()));
+                    }
+                    desList.add(cplv);
+                }
+            }
+        }
+        return null;
     }
 }

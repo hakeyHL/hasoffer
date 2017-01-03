@@ -1,6 +1,7 @@
 package hasoffer.core.system;
 
 import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.persistence.po.urm.UrmUserCoinRepair;
 
 /**
  * Created by hs on 2016年12月06日.
@@ -18,4 +19,6 @@ public interface AppUserService {
     void updateUrmUser(UrmUser urmUser);
 
     UrmUser getUrmUserByUserNameAndType(String userName, int type);
+
+    UrmUserCoinRepair getUrmUserCoinSignRecordById(Long id);
 }

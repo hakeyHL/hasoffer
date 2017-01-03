@@ -21,7 +21,6 @@
         <input type="hidden" name="dealThumbNumber" value="${deal.dealThumbNumber}">
         <input type="hidden" name="listPageImage" value="${deal.listPageImage}">
         <input type="hidden" name="infoPageImage" value="${deal.infoPageImage}">
-        <input type="hidden" name="website" value="${deal.website}">
         <input type="hidden" name="appdealSource" value="${deal.appdealSource}">
         <input type="hidden" name="dealClickCount" value="${deal.dealClickCount}">
         <input type="hidden" name="originClickCount" value="${deal.originClickCount}">
@@ -142,6 +141,14 @@
 
             <div class="col-sm-6">
                 <input type="number" name="weight" id="weight" value="${deal.weight}"
+                       class="form-control">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">网站(website)：</label>
+
+            <div class="col-sm-6">
+                <input type="text" name="website" id="website" value="${deal.website}"
                        class="form-control">
             </div>
         </div>

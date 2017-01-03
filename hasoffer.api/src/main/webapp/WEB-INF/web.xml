@@ -70,7 +70,11 @@
             <param-value>true</param-value>
         </init-param>
     </filter>
-
+    <error-page>
+        <location>/views/jsp/error.jsp</location>
+        <error-code>500</error-code>
+        <exception-type>java.lang.Exception</exception-type>
+    </error-page>
     <!-- 配置druid数据监控 -->
     <!--<filter>-->
         <!--<filter-name>DruidWebStatFilter</filter-name>-->

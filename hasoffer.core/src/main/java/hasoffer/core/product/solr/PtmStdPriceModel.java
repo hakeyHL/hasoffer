@@ -11,9 +11,12 @@ public class PtmStdPriceModel implements IIdentifiable<Long> {
     private Long id;
     private long stdSkuId;
     private String title;
+    private float price;
     private String site;
     private String skuUrl;
     private String skuStatus;
+    private long commentsNumber = 0;//评论数
+    private int ratings = 0;//星级，存放百分比的整数位如 88即表示88%
 
     public PtmStdPriceModel() {
     }
@@ -74,5 +77,29 @@ public class PtmStdPriceModel implements IIdentifiable<Long> {
 
     public void setSkuStatus(String skuStatus) {
         this.skuStatus = skuStatus;
+    }
+
+    public long getCommentsNumber() {
+        return commentsNumber;
+    }
+
+    public void setCommentsNumber(long commentsNumber) {
+        this.commentsNumber = commentsNumber;
+    }
+
+    public int getRatings() {
+        return ratings;
+    }
+
+    public void setRatings(int ratings) {
+        this.ratings = ratings;
+    }
+
+    public float getPrice() {
+        return price;
+    }
+
+    public void setPrice(float price) {
+        this.price = price;
     }
 }

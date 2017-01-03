@@ -4,6 +4,7 @@ import hasoffer.core.app.AppCategoryService;
 import hasoffer.core.bo.product.CategoryVo;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.system.impl.AppServiceImpl;
+import hasoffer.core.utils.ConstantUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,7 +35,7 @@ public class AppCategoryController {
         ModelAndView mv = new ModelAndView();
         List categorys;
         categorys = appCategoryService.getCategorys(categoryId);
-        mv.addObject("data", categorys);
+        mv.addObject(ConstantUtil.API_NAME_DATA, categorys);
         return mv;
     }
 
@@ -46,13 +47,13 @@ public class AppCategoryController {
     @RequestMapping(value = "app/category/topcates", method = RequestMethod.GET)
     public ModelAndView getTopCategory() {
         ModelAndView mv = new ModelAndView();
-        mv.addObject("errorCode", "00000");
-        mv.addObject("msg", "success");
+        mv.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        mv.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         List<CategoryVo> categoryVos = appCategoryService.getTopCategoryList();
         Map dataMap = new HashMap<>();
         //只给8个
         dataMap.put("topcates", categoryVos.subList(0, 8));
-        mv.addObject("data", dataMap);
+        mv.addObject(ConstantUtil.API_NAME_DATA, dataMap);
         return mv;
     }
 
@@ -64,8 +65,8 @@ public class AppCategoryController {
     @RequestMapping(value = "app/category/secondary", method = RequestMethod.GET)
     public ModelAndView getSecondaryCate() {
         ModelAndView mv = new ModelAndView();
-        mv.addObject("errorCode", "00000");
-        mv.addObject("msg", "success");
+        mv.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        mv.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         List<CategoryVo> topSecondaryCates = new LinkedList<>();
         //只要前7个
         List<CategoryVo> topCates = appCategoryService.getTopCategoryList();
@@ -103,7 +104,7 @@ public class AppCategoryController {
         }
         Map dataMap = new HashMap<>();
         dataMap.put("secondaryCate", topSecondaryCates);
-        mv.addObject("data", dataMap);
+        mv.addObject(ConstantUtil.API_NAME_DATA, dataMap);
         long eee = System.currentTimeMillis();
         System.out.println(eee - sss);
         return mv;

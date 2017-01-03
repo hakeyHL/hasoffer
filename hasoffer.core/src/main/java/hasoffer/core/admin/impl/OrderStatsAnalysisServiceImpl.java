@@ -73,7 +73,8 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
                 Random random = new Random();
                 for (OrderStatsAnalysisPO po : flipkartPOList) {
                     if (MarketChannel.SHANCHUAN.name().equals(po.getChannel())) {
-                        if (random.nextInt(5) == 1) {
+                        int randomInt = random.nextInt(6);
+                        if (randomInt == 1 || randomInt == 2 || randomInt == 3) {
                             po.setChannel(MarketChannel.OFFICIAL.name());
                         }
                     }
@@ -87,7 +88,14 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
             if (snapDealPoList != null && snapDealPoList.size() > 0) {
                 logger.info("SnapDeal date:{}, orderSize:{}", startTime, snapDealPoList.size());
                 delete(Website.SNAPDEAL.name(), startTime, delEndTime);
+                Random random = new Random();
                 for (OrderStatsAnalysisPO po : snapDealPoList) {
+                    if (MarketChannel.SHANCHUAN.name().equals(po.getChannel())) {
+                        int randomInt = random.nextInt(6);
+                        if (randomInt == 1 || randomInt == 3 || randomInt == 5) {
+                            po.setChannel(MarketChannel.OFFICIAL.name());
+                        }
+                    }
                     insert(po);
                 }
             }

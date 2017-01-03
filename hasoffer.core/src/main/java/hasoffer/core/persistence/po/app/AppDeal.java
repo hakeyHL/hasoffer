@@ -72,6 +72,8 @@ public class AppDeal implements Identifiable<Long> {
     private String oriLinkUrl;//deal站抓取的deal需要保存最原始的link
     private String category;//类目名称
 
+    private Float shippingFee;//运费
+
     //保留空参构造
     public AppDeal() {
     }
@@ -278,6 +280,14 @@ public class AppDeal implements Identifiable<Long> {
         this.originClickCount = originClickCount;
     }
 
+    public Float getShippingFee() {
+        return shippingFee;
+    }
+
+    public void setShippingFee(Float shippingFee) {
+        this.shippingFee = shippingFee;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -316,7 +326,8 @@ public class AppDeal implements Identifiable<Long> {
         if (dealThumbNumber != null ? !dealThumbNumber.equals(deal.dealThumbNumber) : deal.dealThumbNumber != null)
             return false;
         if (oriLinkUrl != null ? !oriLinkUrl.equals(deal.oriLinkUrl) : deal.oriLinkUrl != null) return false;
-        return !(category != null ? !category.equals(deal.category) : deal.category != null);
+        if (category != null ? !category.equals(deal.category) : deal.category != null) return false;
+        return !(shippingFee != null ? !shippingFee.equals(deal.shippingFee) : deal.shippingFee != null);
 
     }
 
@@ -347,6 +358,39 @@ public class AppDeal implements Identifiable<Long> {
         result = 31 * result + (dealThumbNumber != null ? dealThumbNumber.hashCode() : 0);
         result = 31 * result + (oriLinkUrl != null ? oriLinkUrl.hashCode() : 0);
         result = 31 * result + (category != null ? category.hashCode() : 0);
+        result = 31 * result + (shippingFee != null ? shippingFee.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "AppDeal{" +
+                "appdealSource=" + appdealSource +
+                ", id=" + id +
+                ", weight=" + weight +
+                ", website=" + website +
+                ", title='" + title + '\'' +
+                ", linkUrl='" + linkUrl + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", createTime=" + createTime +
+                ", expireTime=" + expireTime +
+                ", push=" + push +
+                ", description='" + description + '\'' +
+                ", priceDescription='" + priceDescription + '\'' +
+                ", display=" + display +
+                ", listPageImage='" + listPageImage + '\'' +
+                ", infoPageImage='" + infoPageImage + '\'' +
+                ", dealClickCount=" + dealClickCount +
+                ", originClickCount=" + originClickCount +
+                ", dealCategoryId=" + dealCategoryId +
+                ", discount=" + discount +
+                ", ptmcmpskuid=" + ptmcmpskuid +
+                ", originPrice=" + originPrice +
+                ", presentPrice=" + presentPrice +
+                ", dealThumbNumber=" + dealThumbNumber +
+                ", oriLinkUrl='" + oriLinkUrl + '\'' +
+                ", category='" + category + '\'' +
+                ", shippingFee=" + shippingFee +
+                '}';
     }
 }

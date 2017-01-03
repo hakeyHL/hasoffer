@@ -1,7 +1,6 @@
 package hasoffer.task.worker;
 
 import hasoffer.base.enums.TaskStatus;
-import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.JSONUtil;
@@ -24,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class StdPriceDubboUpdateWorker implements Runnable {
 
-    private static final String STDPRICE_DROP_SKUID_QUEUE = "STDPRICE_DROP_SKUID_QUEUE";
+//    private static final String STDPRICE_DROP_SKUID_QUEUE = "STDPRICE_DROP_SKUID_QUEUE";
 
     private static Logger logger = LoggerFactory.getLogger(StdPriceDubboUpdateWorker.class);
     private IFetchDubboService fetchDubboService;
@@ -119,11 +118,12 @@ public class StdPriceDubboUpdateWorker implements Runnable {
         } catch (Exception e) {
             logger.info("StdPriceDubboUpdateWorker createPtmStdPriceImage fail " + stdPriceId);
         }
-
-//            如果降价且CommentsNumber 大于40写入队列，并且状态必须是onsale
-        if (price > fetchedProduct.getPrice() && fetchedProduct.getCommentsNumber() > 40 && SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
-            redisListService.push(STDPRICE_DROP_SKUID_QUEUE, stdPriceId + "");
-            System.out.println("price drop StdPriceDubboUpdateWorker add to queue success " + stdPriceId);
-        }
     }
 }
+
+
+//            如果降价且CommentsNumber 大于40写入队列，并且状态必须是onsale
+//        if (price > fetchedProduct.getPrice() && fetchedProduct.getCommentsNumber() > 40 && SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
+//            redisListService.push(STDPRICE_DROP_SKUID_QUEUE, stdPriceId + "");
+//            System.out.println("price drop StdPriceDubboUpdateWorker add to queue success " + stdPriceId);
+//        }

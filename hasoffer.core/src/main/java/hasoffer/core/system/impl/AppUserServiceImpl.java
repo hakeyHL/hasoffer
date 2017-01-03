@@ -2,6 +2,7 @@ package hasoffer.core.system.impl;
 
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.persistence.po.urm.UrmUserCoinRepair;
 import hasoffer.core.system.AppUserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,5 +58,10 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public UrmUser getUrmUserByUserNameAndType(String userName, int type) {
         return dbm.querySingle(API_URMUSER_GET_BY_USERNAME_TYPE, Arrays.asList(userName, type));
+    }
+
+    @Override
+    public UrmUserCoinRepair getUrmUserCoinSignRecordById(Long id) {
+        return dbm.get(UrmUserCoinRepair.class, id);
     }
 }
