@@ -181,6 +181,8 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
 
     private void createDeal(long skuid, String titleFlagString, FetchedProduct fetchedProduct) {
 
+        logger.info("createDeal method " + titleFlagString);
+
         PtmCmpSku sku = cmpSkuService.getCmpSkuById(skuid);
         if (sku == null) {
             return;
