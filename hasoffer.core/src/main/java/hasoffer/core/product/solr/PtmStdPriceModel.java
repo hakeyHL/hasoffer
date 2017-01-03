@@ -28,6 +28,9 @@ public class PtmStdPriceModel implements IIdentifiable<Long> {
         this.site = ptmStdPrice.getWebsite().name();
         this.skuUrl = ptmStdPrice.getUrl();
         this.skuStatus = ptmStdPrice.getSkuStatus().name();
+        this.commentsNumber = ptmStdPrice.getCommentsNumber();
+        this.ratings = ptmStdPrice.getRatings();
+        this.price = ptmStdPrice.getPrice();
     }
 
     @Override
