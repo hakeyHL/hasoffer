@@ -20,10 +20,7 @@ import hasoffer.core.persistence.mongo.PtmStdSkuDescription;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.ptm.*;
-import hasoffer.core.persistence.po.urm.PriceOffNotice;
-import hasoffer.core.persistence.po.urm.UrmUser;
-import hasoffer.core.persistence.po.urm.UrmUserCoinRepair;
-import hasoffer.core.persistence.po.urm.UrmUserDevice;
+import hasoffer.core.persistence.po.urm.*;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
 import hasoffer.core.product.solr.*;
@@ -974,6 +971,11 @@ public class ApiUtils {
             multipliedVerifiedCoins = multipliedVerifiedCoins.multiply(BigDecimal.TEN).add(addedVerifiedCoins);
         } else {
             multipliedVerifiedCoins = multipliedVerifiedCoins.add(addedVerifiedCoins);
+        }
+        //去掉已兑换的
+        List<UrmUserCoinExchangeRecord> exchangeRecords = appUserService.getCoinExchangeRecordByUserId(users.get(0).getId());
+        for (UrmUserCoinExchangeRecord urmUserCoinExchangeRecordL : exchangeRecords) {
+            multipliedVerifiedCoins = multipliedVerifiedCoins.subtract(BigDecimal.valueOf(urmUserCoinExchangeRecordL.getCoinTotal() == null ? 0 : urmUserCoinExchangeRecordL.getCoinTotal()));
         }
         data.setVerifiedCoins(multipliedVerifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);

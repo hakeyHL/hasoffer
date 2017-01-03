@@ -1,7 +1,10 @@
 package hasoffer.core.system;
 
 import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.persistence.po.urm.UrmUserCoinExchangeRecord;
 import hasoffer.core.persistence.po.urm.UrmUserCoinRepair;
+
+import java.util.List;
 
 /**
  * Created by hs on 2016年12月06日.
@@ -21,4 +24,7 @@ public interface AppUserService {
     UrmUser getUrmUserByUserNameAndType(String userName, int type);
 
     UrmUserCoinRepair getUrmUserCoinSignRecordById(Long id);
+
+
+    List<UrmUserCoinExchangeRecord> getCoinExchangeRecordByUserId(Long id);
 }
