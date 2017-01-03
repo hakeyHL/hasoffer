@@ -978,7 +978,7 @@ public class ApiUtils {
             multipliedVerifiedCoins = multipliedVerifiedCoins.subtract(BigDecimal.valueOf(urmUserCoinExchangeRecordL.getCoinTotal() == null ? 0 : urmUserCoinExchangeRecordL.getCoinTotal()));
             OrderVo orderVo = new OrderVo();
             //乘以10再取整
-            orderVo.setAccount(BigDecimal.valueOf(urmUserCoinExchangeRecordL.getCoinTotal()));
+            orderVo.setAccount(BigDecimal.ZERO.subtract(BigDecimal.valueOf(urmUserCoinExchangeRecordL.getCoinTotal())));
             orderVo.setChannel("HASOFFER");
             orderVo.setOrderId(urmUserCoinExchangeRecordL.getId() + "");
             orderVo.setOrderTime(new Date(urmUserCoinExchangeRecordL.getOperateTime()));
