@@ -3,6 +3,8 @@ package hasoffer.core.persistence.po.urm;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 
 import javax.persistence.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 /**
  * Created by hs on 2017年01月03日.
@@ -18,6 +20,8 @@ public class UrmUserCoinExchangeRecord implements Identifiable<Long> {
     private Long userId;//用户id
     private String userName;//用户名
     private Long operateTime;//操作时间
+    private String operateStringTime;
+    @Column(columnDefinition = "default 0")
     private Long coinTotal;//总兑换金额
     private Float orderCoin;//兑换使用订单总金额
     private String orderInfo;//订单详情
@@ -49,7 +53,12 @@ public class UrmUserCoinExchangeRecord implements Identifiable<Long> {
     }
 
     public void setOperateTime(Long operateTime) {
-        this.operateTime = operateTime;
+        try {
+            long time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(operateStringTime).getTime();
+            this.operateTime = time;
+        } catch (ParseException e) {
+            return;
+        }
     }
 
     public Long getCoinTotal() {
@@ -116,6 +125,14 @@ public class UrmUserCoinExchangeRecord implements Identifiable<Long> {
         this.userName = userName;
     }
 
+    public String getOperateStringTime() {
+        return operateStringTime;
+    }
+
+    public void setOperateStringTime(String operateStringTime) {
+        this.operateStringTime = operateStringTime;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -128,6 +145,8 @@ public class UrmUserCoinExchangeRecord implements Identifiable<Long> {
         if (userId != null ? !userId.equals(that.userId) : that.userId != null) return false;
         if (userName != null ? !userName.equals(that.userName) : that.userName != null) return false;
         if (operateTime != null ? !operateTime.equals(that.operateTime) : that.operateTime != null) return false;
+        if (operateStringTime != null ? !operateStringTime.equals(that.operateStringTime) : that.operateStringTime != null)
+            return false;
         if (coinTotal != null ? !coinTotal.equals(that.coinTotal) : that.coinTotal != null) return false;
         if (orderCoin != null ? !orderCoin.equals(that.orderCoin) : that.orderCoin != null) return false;
         if (orderInfo != null ? !orderInfo.equals(that.orderInfo) : that.orderInfo != null) return false;
@@ -143,6 +162,7 @@ public class UrmUserCoinExchangeRecord implements Identifiable<Long> {
         result = 31 * result + (userId != null ? userId.hashCode() : 0);
         result = 31 * result + (userName != null ? userName.hashCode() : 0);
         result = 31 * result + (operateTime != null ? operateTime.hashCode() : 0);
+        result = 31 * result + (operateStringTime != null ? operateStringTime.hashCode() : 0);
         result = 31 * result + (coinTotal != null ? coinTotal.hashCode() : 0);
         result = 31 * result + (orderCoin != null ? orderCoin.hashCode() : 0);
         result = 31 * result + (orderInfo != null ? orderInfo.hashCode() : 0);
