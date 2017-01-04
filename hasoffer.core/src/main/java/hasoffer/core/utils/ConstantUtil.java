@@ -23,6 +23,11 @@ public class ConstantUtil {
     //    public static final String API_FILTER_PARAMS_ = "API_FILTER_PARAMS_";//缓存关键字以及类目id和级别下的筛选参数列表的key
     public static final String API_SOLR_PTMSTDSKU_CATEGORY_SEARCH = "API_SOLR_PTMSTDSKU_CATEGORY_SEARCH_";
     public static final String API_PREFIX_CACAHE_CMP_CMPLIST_ = "API_PREFIX_CACAHE_CMP_CMPLIST_";
+
+    public static final String API_PREFIX_CACAHE_PTMSTDSKU_ = "API_PREFIX_CACAHE_PTMSTDSKU_";
+    public static final String API_PREFIX_CACAHE_PTMPRODUCT_ = "API_PREFIX_CACAHE_PTMPRODUCT_";
+    public static final String API_PREFIX_CACAHE_PTMSTDPRICE_ = "API_PREFIX_CACAHE_PTMSTDPRICE_";
+    public static final String API_PREFIX_CACAHE_PTMSKU_ = "API_PREFIX_CACAHE_PTMSKU_";
     public static final Map<String, String> API_CATEGORY_FILTER_PARAMS_MAP = new HashMap<>();
     public static final Map<String, String> API_PTMSTDSKU_PARAM_MEAN_MAP = new HashMap<>();
 
