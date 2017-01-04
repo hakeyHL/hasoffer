@@ -72,19 +72,21 @@ public class SearchRecordProcessWorker implements Runnable {
      * 1.判断是否需要更新该网站（website）的该商品（keyword）<br>
      * 2.需要的话，则加入更新队列。并返回一个实体。如果不需要，则返回空。
      *
+     *
+     * @param id
      * @param website
      * @param keyword
      * @param sitePros
      * @return
      */
-    private FetchResult sendTask(Website website, String keyword, Map<Website, WebFetchResult> sitePros) {
+    private FetchResult sendTask(String id, Website website, String keyword, Map<Website, WebFetchResult> sitePros) {
         WebFetchResult fetchResult = sitePros.get(website);
         long updateCycle = TimeUtils.MILLISECONDS_OF_1_HOUR * 12;
         //判断是否需要更新该网站（website）的该商品（keyword）
         boolean isFetch = fetchResult == null || System.currentTimeMillis() - fetchResult.getlUpdateDate() > updateCycle;
         // 需要的话，则加入更新队列。并返回一个实体。如果不需要，这返回空
         if (isFetch) {
-            fetchService.sendKeyWordTask(website, keyword);
+            fetchService.sendKeyWordTask(id, website, keyword);
         }
         return null;
     }
@@ -92,10 +94,10 @@ public class SearchRecordProcessWorker implements Runnable {
     private void fetchForIndia(SrmAutoSearchResult autoSearchResult) {
         String keyword = StringUtils.getCleanWordString(autoSearchResult.getTitle());
         Map<Website, WebFetchResult> sitePros = autoSearchResult.getSitePros();
-        sendTask(Website.FLIPKART, keyword, sitePros);
-        sendTask(Website.AMAZON, keyword, sitePros);
-        sendTask(Website.SNAPDEAL, keyword, sitePros);
-        sendTask(Website.SHOPCLUES, keyword, sitePros);
+        sendTask(autoSearchResult.getId(), Website.FLIPKART, keyword, sitePros);
+        sendTask(autoSearchResult.getId(), Website.AMAZON, keyword, sitePros);
+        sendTask(autoSearchResult.getId(), Website.SNAPDEAL, keyword, sitePros);
+        sendTask(autoSearchResult.getId(), Website.SHOPCLUES, keyword, sitePros);
     }
 
 }
