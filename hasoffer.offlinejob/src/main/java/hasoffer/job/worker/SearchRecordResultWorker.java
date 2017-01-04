@@ -82,6 +82,9 @@ public class SearchRecordResultWorker implements Runnable {
     }
 
     private void analysisAndRelate(SrmAutoSearchResult autoSearchResult) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("analysisAndRelate: {}", autoSearchResult);
+        }
         try {
             searchService.analysisAndRelate(autoSearchResult);
         } catch (Exception e) {
