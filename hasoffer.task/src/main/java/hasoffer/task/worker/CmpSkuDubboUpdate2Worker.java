@@ -140,7 +140,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                 if (minPrice != 0.0f
                         && fetchedProduct.getPrice() <= minPrice                                    //更新后的价格小于等于更新前的历史最低价格
                         && SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())                   //状态onsale
-                        && fetchedProduct.getCommentsNumber() > 40                                  //评论大于40
+                        && fetchedProduct.getCommentsNumber() > 100                                  //评论大于40 大于100
                         && skuOriPrice != 0.0                                                       //原价不为空
                         && fetchedProduct.getPrice() < skuOriPrice                                  //现价低于原价
                         && fetchedProduct.getPrice() != 0.0                                         //现价不为0

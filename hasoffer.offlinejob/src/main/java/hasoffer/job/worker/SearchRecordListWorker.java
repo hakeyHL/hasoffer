@@ -79,6 +79,7 @@ public class SearchRecordListWorker implements Runnable {
         SrmAutoSearchResult autoSearchResult = searchProductService.getSearchResult(searchLog);
         if (autoSearchResult == null) {
             autoSearchResult = new SrmAutoSearchResult(searchLog);
+            searchProductService.saveSearchProducts(autoSearchResult);
         }
         return autoSearchResult;
     }

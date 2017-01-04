@@ -72,7 +72,7 @@ public class SearchServiceImpl implements ISearchService {
     private static final String STAT_SEARCH_COUNT4 = "SELECT COUNT(t.id) FROM SrmSearchLog t WHERE t.lUpdateTime>?0 AND t.lUpdateTime<?1 AND t.ptmProductId>0 ";
     private static final String Q_SEARCH_COUNT_BY_PRODUCTID =
             "SELECT t FROM SrmProductSearchCount t WHERE t.productId = ?0 ORDER BY t.ymd DESC";
-    private final Logger searchLog = LoggerFactory.getLogger("StatSearchLogJobBean.log");
+    private static final Logger searchLog = LoggerFactory.getLogger("StatSearchLogJobBean.log");
     @Resource
     IDataBaseManager dbm;
     @Resource
