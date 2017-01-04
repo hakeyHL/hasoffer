@@ -9,7 +9,6 @@ import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.job.service.ISearchRecordListService;
 import hasoffer.job.service.IWebSiteFetchService;
 import hasoffer.job.worker.SearchRecordListWorker;
-import hasoffer.job.worker.SearchRecordProcessWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -46,9 +45,9 @@ public class WebSiteFetchServiceImpl implements IWebSiteFetchService {
         String threadName = "SearchRecordProcessWorker-Thread";
         HasofferThreadFactory factory = new HasofferThreadFactory(threadName);
         es = Executors.newCachedThreadPool(factory);
-        for (int i = 0; i < 10; i++) {
-            es.execute(new SearchRecordProcessWorker(searchProductService, fetchDubboService, searchLogQueue));
-        }
+        //for (int i = 0; i < 10; i++) {
+        //    es.execute(new SearchRecordProcessWorker(searchProductService, fetchDubboService, searchLogQueue));
+        //}
 
         while (true) {
             try {

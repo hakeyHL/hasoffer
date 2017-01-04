@@ -48,21 +48,21 @@ public class UpdateStateJobBean extends QuartzJobBean {
                     String key = "SPIDER_PUSH_NUM_" + taskTarget.name() + "_" + website.name() + "_" + taskLevel.name() + "_" + ymd;
                     String s = redisService.get(key, -1);
                     pushNum = Integer.valueOf(s == null ? "0" : s) + pushNum;
-                    logger.info(key + " value: {}", s);
+                    //logger.info(key + " value: {}", s);
                 }
                 String finishKey = "SPIDER_POP_NUM_" + taskTarget.name() + "_" + website.name() + "_" + TaskStatus.FINISH + "_" + ymd;
                 String finishNumStr = redisService.get(finishKey, -1);
-                logger.info(finishKey + " value: {}", finishNumStr);
+                //logger.info(finishKey + " value: {}", finishNumStr);
                 finishNum = Integer.valueOf(finishNumStr == null ? "0" : finishNumStr) + finishNum;
 
                 String exceptionKey = "SPIDER_POP_NUM_" + taskTarget.name() + "_" + website.name() + "_" + TaskStatus.EXCEPTION + "_" + ymd;
                 String exceptionNumStr = redisService.get(exceptionKey, -1);
-                logger.info(exceptionKey + " value: {}", exceptionNumStr);
+                //logger.info(exceptionKey + " value: {}", exceptionNumStr);
                 exceptionNum = Integer.valueOf(exceptionNumStr == null ? "0" : exceptionNumStr) + exceptionNum;
 
                 String stopKey = "SPIDER_POP_NUM_" + taskTarget.name() + "_" + website.name() + "_" + TaskStatus.STOP + "_" + ymd;
                 String stopNumStr = redisService.get(stopKey, -1);
-                logger.info(stopKey + " value: {}", stopNumStr);
+                //logger.info(stopKey + " value: {}", stopNumStr);
                 stopNum = Integer.valueOf(stopNumStr == null ? "0" : stopNumStr) + stopNum;
                 String updateStr = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
                 updateStateDMO.setTaskTarget(taskTarget.name());

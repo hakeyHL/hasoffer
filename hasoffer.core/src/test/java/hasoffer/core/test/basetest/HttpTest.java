@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.model.HttpResponseModel;
+import hasoffer.base.model.Website;
 import hasoffer.base.utils.HtmlUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.http.HttpUtils;
@@ -41,6 +42,136 @@ public class HttpTest {
 
 //    @Resource
 //    IProductService productService;
+
+    @Test
+    public void testKeywordRepository() throws Exception {
+
+        List<KeywordRepository> keywordRepositoryList = new ArrayList<>();
+
+        getFlipkartKeyword(keywordRepositoryList);
+        getSnapdealKeyword(keywordRepositoryList);
+        getMyntraKeyword(keywordRepositoryList);
+
+        System.out.println(keywordRepositoryList);
+
+    }
+
+    private void getMyntraKeyword(List<KeywordRepository> keywordRepositoryList) {
+
+        try {
+
+            String category = "CLOTHING";
+
+            HttpResponseModel responseModel = HttpUtils.get("http://www.myntra.com/", null);
+
+            String urlHtml = responseModel.getBodyString();
+
+//            String urlHtml = HtmlUtils.getUrlHtml("http://www.myntra.com/");
+
+            String[] subStr = urlHtml.split("window.__myx_seo__ = \\[\\[");
+
+            String keywordString = StringUtils.filterAndTrim(subStr[1].substring(0, subStr[1].indexOf(';')), Arrays.asList("\\]", "\\["));
+
+            String[] subStr1 = keywordString.split("\"name\":\"");
+
+            for (int i = 1; i < subStr1.length; i++) {
+
+                String keyword = subStr1[i].substring(0, subStr1[i].indexOf('\"'));
+
+                KeywordRepository keywordRepository = new KeywordRepository();
+
+                keywordRepository.categoryName = category;
+                keywordRepository.keyword = keyword;
+                keywordRepository.sourceSite = Website.MYNTRA;
+
+                keywordRepositoryList.add(keywordRepository);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void getSnapdealKeyword(List<KeywordRepository> keywordRepositoryList) {
+
+        try {
+
+            TagNode root = HtmlUtils.getUrlRootTagNode("https://www.snapdeal.com/");
+
+            List<TagNode> divNodeList = getSubNodesByXPath(root, "//div[@class='brandContainerFooter']");
+
+            for (int i = 0; i < divNodeList.size(); i++) {
+
+                TagNode divNode = divNodeList.get(i);
+
+                TagNode categoryNode = getSubNodeByXPath(divNode, "/span/ul/a", null);
+
+                String category = StringUtils.filterAndTrim(categoryNode.getText().toString(), Arrays.asList(":"));
+
+                List<TagNode> keywordList = getSubNodesByXPath(divNode, "/span/ul/li/a");
+
+                for (TagNode keywordNode : keywordList) {
+
+                    String keyword = keywordNode.getText().toString().trim();
+
+                    KeywordRepository keywordRepository = new KeywordRepository();
+
+                    keywordRepository.categoryName = category;
+                    keywordRepository.keyword = keyword;
+                    keywordRepository.sourceSite = Website.SNAPDEAL;
+
+                    keywordRepositoryList.add(keywordRepository);
+
+                }
+            }
+
+        } catch (Exception e) {
+
+        }
+
+    }
+
+    public void getFlipkartKeyword(List<KeywordRepository> keywordRepositoryList) {
+
+        try {
+
+            TagNode root = HtmlUtils.getUrlRootTagNode("https://www.flipkart.com/");
+
+            List<TagNode> divNodeList = getSubNodesByXPath(root, "//div[@class='col gu12 gY-jFd']/div");
+
+            for (int i = 1; i < divNodeList.size(); i++) {
+
+                TagNode divNode = divNodeList.get(i);
+
+                TagNode categoryNode = getSubNodeByXPath(divNode, "/div/div", null);
+
+                String category = categoryNode.getText().toString();
+
+                String[] subStr = category.split(":");
+
+                category = subStr[0].trim();
+
+                List<TagNode> keywordList = getSubNodesByXPath(divNode, "/div/div/a");
+
+                for (TagNode keywordNode : keywordList) {
+
+                    String keyword = keywordNode.getText().toString().trim();
+
+                    KeywordRepository keywordRepository = new KeywordRepository();
+
+                    keywordRepository.categoryName = category;
+                    keywordRepository.keyword = keyword;
+                    keywordRepository.sourceSite = Website.FLIPKART;
+
+                    keywordRepositoryList.add(keywordRepository);
+
+                }
+            }
+
+        } catch (Exception e) {
+
+        }
+    }
 
     @Test
     public void testIdealo() throws Exception {
@@ -204,7 +335,6 @@ public class HttpTest {
 
     }
 
-
     @Test
     public void test91Mobile() throws HttpFetchException, XPatherException, ContentParseException {
 
@@ -299,6 +429,14 @@ public class HttpTest {
 
         }
 
+
+    }
+
+    class KeywordRepository {
+
+        public String keyword;
+        public Website sourceSite;
+        public String categoryName;
 
     }
 

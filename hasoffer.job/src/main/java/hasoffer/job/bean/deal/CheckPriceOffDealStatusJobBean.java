@@ -156,6 +156,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                             FetchedProduct fetchedProduct = fetchUrlResult1.getFetchProduct();
                             if (fetchedProduct == null) {
                                 logger.info("deal update fetchedProduct is null");
+                                continue;
                             } else {
                                 logger.info("deal update fetchedProduct : " + (fetchedProduct).toString());
                             }
