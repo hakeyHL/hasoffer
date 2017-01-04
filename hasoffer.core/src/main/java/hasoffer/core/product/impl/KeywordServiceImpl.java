@@ -26,7 +26,7 @@ public class KeywordServiceImpl implements IKeywordService {
             return;
         }
 
-        KeywordCollection oldKeywordCollection = dbm.querySingle(keywordCollection.getId());
+        KeywordCollection oldKeywordCollection = dbm.get(KeywordCollection.class, keywordCollection.getId());
 
         if (oldKeywordCollection == null) {
             dbm.create(keywordCollection);
