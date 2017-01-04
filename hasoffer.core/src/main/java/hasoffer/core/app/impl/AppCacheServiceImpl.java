@@ -5,12 +5,15 @@ import hasoffer.core.redis.ICacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.ParameterizedType;
+import java.util.List;
+
 /**
  * Created by hs on 2016年12月13日.
  * Time 11:49
  */
 @Service
-public class AppCacheServiceImpl implements AppCacheService {
+public class AppCacheServiceImpl<T> implements AppCacheService<T> {
     @Autowired
     ICacheService iCacheService;
 
@@ -32,6 +35,19 @@ public class AppCacheServiceImpl implements AppCacheService {
     @Override
     public boolean addObjectCache(String key, Object value, long seconds) {
         return iCacheService.add(key, value, seconds);
+    }
+
+    @Override
+    public List<T> getObjectListFromCache(String key, long seconds) {
+        Class clazz = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
+
+        return null;
+    }
+
+    @Override
+    public boolean addObjectListToCache(String key, String value, long seconds) {
+
+        return true;
     }
 
 }
