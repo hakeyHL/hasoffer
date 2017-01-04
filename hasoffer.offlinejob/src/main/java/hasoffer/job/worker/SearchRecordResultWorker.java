@@ -70,7 +70,7 @@ public class SearchRecordResultWorker implements Runnable {
     private void fetchForIndia(FetchResult fetchResult) {
         String key = HexDigestUtil.md5(fetchResult.getKeyword());
         SrmAutoSearchResult autoSearchResult = searchProductService.getSearchResultById(key);
-        logger.info("fetchForIndia: {}", autoSearchResult);
+        logger.info("fetchForIndia: fetchResult:{}, autoSearchResult:{}", fetchResult, autoSearchResult);
         if (autoSearchResult == null) {
             return;
         }
