@@ -6,10 +6,14 @@ import com.alibaba.fastjson.JSONObject;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.base.model.Website;
 import hasoffer.core.app.AppClientCfgService;
+import hasoffer.core.app.vo.DeviceInfoVo;
 import hasoffer.core.app.vo.ResultVo;
 import hasoffer.core.app.vo.ThirdAppVo;
 import hasoffer.core.redis.impl.CacheServiceImpl;
+import hasoffer.core.utils.ConstantUtil;
+import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.helper.WebsiteHelper;
+import hasoffer.webcommon.context.Context;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +46,7 @@ public class AppCliCfgController {
     }
 
     @RequestMapping(value = "/app/homeCfg")
-    public String homePageRewardsConfig(@RequestParam(defaultValue = "10000") int action,
+    public String homePageRewardsConfig(@RequestParam(defaultValue = ConstantUtil.API_ERRORCODE_FAILED_LOGIC) int action,
                                         HttpServletResponse response,
                                         String stringFirst,
                                         String stringSecond) {
@@ -83,13 +87,19 @@ public class AppCliCfgController {
                 // config
                 //search
                 map.put("001", false);
-
                 //wishlist
-                map.put("002", true);
+                map.put("002", false);
 
                 //购物车
-                map.put("003", true);
+                map.put("003", false);
 
+                if (ApiUtils.currenVersionCompare2compareversion((DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO), 36) >= 0) {
+                    //wishlist
+                    map.put("002", true);
+
+                    //购物车
+                    map.put("003", true);
+                }
                 //email and phone get
                 map.put("004", true);
 
@@ -131,13 +141,14 @@ public class AppCliCfgController {
                                   String stringSecond,
                                   String stringThird) {
         ResultVo resultVo = new ResultVo();
+        String bootIndexKey = "bootIndex";
         //change home page redeem tip
         if (StringUtils.isNotEmpty(stringFirst) && StringUtils.isNotEmpty(stringSecond) && StringUtils.isNotEmpty(stringThird)) {
             //set
             List<String> redeemStrings = Arrays.asList(stringFirst, stringSecond, stringThird);
             //get home page redeem tip
             String homeRedeemTip2 = cacheService.get(HOME_INDEX_COPY, 0);
-            resultVo.getData().put("bootIndex", redeemStrings);
+            resultVo.getData().put(bootIndexKey, redeemStrings);
             if (!StringUtils.isEmpty(homeRedeemTip2)) {
                 //delete
                 cacheService.del(HOME_INDEX_COPY);
@@ -152,16 +163,16 @@ public class AppCliCfgController {
             if (!StringUtils.isEmpty(bootIndex)) {
                 try {
                     JSONObject jsonObject = JSON.parseObject(bootIndex);
-                    List<String> bootIndex1 = JSONArray.parseArray(jsonObject.getString("bootIndex"), String.class);
-                    resultVo.getData().put("bootIndex", bootIndex1);
+                    List<String> bootIndex1 = JSONArray.parseArray(jsonObject.getString(bootIndexKey), String.class);
+                    resultVo.getData().put(bootIndexKey, bootIndex1);
                 } catch (Exception e) {
                     //出现异常时返回默认
-                    resultVo.getData().put("bootIndex", Arrays.asList("GET YOUR DAILY COINS!",
+                    resultVo.getData().put(bootIndexKey, Arrays.asList("GET YOUR DAILY COINS!",
                             "100 Coins=1 Rupee!The more often you check in,the more you will earn",
                             "REEDEM COINS FOR SUPER GIFT!"));
                 }
             } else {
-                resultVo.getData().put("bootIndex", Arrays.asList("GET YOUR DAILY COINS!",
+                resultVo.getData().put(bootIndexKey, Arrays.asList("GET YOUR DAILY COINS!",
                         "100 Coins=1 Rupee!The more often you check in,the more you will earn",
                         "REEDEM COINS FOR SUPER GIFT!"));
                 //add to cache
@@ -176,12 +187,12 @@ public class AppCliCfgController {
     public ModelAndView appPushConfig() {
         ModelAndView modelAndView = new ModelAndView();
         ResultVo resultVo = new ResultVo();
-        modelAndView.addObject("errorCode", "00000");
-        modelAndView.addObject("msg", "ok");
+        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         resultVo.getData().put("open", true);
         resultVo.getData().put("unit", "m");//d 天 h 小时 m 分钟
         resultVo.getData().put("scanInterval", 10);
-        modelAndView.addObject("data", resultVo.getData());
+        modelAndView.addObject(ConstantUtil.API_NAME_DATA, resultVo.getData());
         return modelAndView;
     }
 
@@ -194,17 +205,17 @@ public class AppCliCfgController {
     @RequestMapping(value = "/app/picCfg")
     public ModelAndView picCfg(@RequestParam(defaultValue = "") String picType) {
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("errorCode", "00000");
-        modelAndView.addObject("msg", "success");
+        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         Map dataMap = new HashMap();
         switch (picType) {
             case "index_shopApp_icon":
                 dataMap.put("index_shopApp_icon", "http://img1.hasofferimage.com/cate/shopAppIcon.png");
-                modelAndView.addObject("data", dataMap);
+                modelAndView.addObject(ConstantUtil.API_NAME_DATA, dataMap);
                 return modelAndView;
             default:
-                modelAndView.addObject("errorCode", "10000");
-                modelAndView.addObject("msg", "no this type " + picType);
+                modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+                modelAndView.addObject(ConstantUtil.API_NAME_MSG, "no this type " + picType);
                 return modelAndView;
         }
     }

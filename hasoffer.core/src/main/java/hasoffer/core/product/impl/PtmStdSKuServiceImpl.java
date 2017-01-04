@@ -85,6 +85,12 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         return brandList;
     }
 
+    @Override
+    public List<PtmStdPrice> getSimilaryPricesByPriceAndRating(PtmStdSku ptmStdSku) {
+
+        return null;
+    }
+
     public PtmStdSkuModel getPtmStdSKuModel(PtmStdSku ptmStdSku1) {
         PtmStdSkuModel ptmStdSkuModel = new PtmStdSkuModel(ptmStdSku1);
         //  递归获取类目树类目

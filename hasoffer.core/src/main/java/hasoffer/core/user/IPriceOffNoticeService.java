@@ -48,5 +48,14 @@ public interface IPriceOffNoticeService {
     //针对push失败的用户重新发送
     boolean pushFailRePush(long id, boolean cacheFail);
 
-    boolean priceOffNoticeSinglePush(float nowPrice, Website website, String url, String fetchedTitle, long priceOffNoticeId);
+    /**
+     * @param nowPrice
+     * @param website
+     * @param url
+     * @param fetchedTitle
+     * @param priceOffNoticeId
+     * @param addToPriceOffNoticeQueue 如果是第一次发送，true表示第一次发送，false表示重发，不加入新push队列
+     * @return
+     */
+    boolean priceOffNoticeSinglePush(float nowPrice, Website website, String url, String fetchedTitle, long priceOffNoticeId, boolean addToPriceOffNoticeQueue);
 }

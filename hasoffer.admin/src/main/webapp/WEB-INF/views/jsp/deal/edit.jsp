@@ -21,7 +21,6 @@
         <input type="hidden" name="dealThumbNumber" value="${deal.dealThumbNumber}">
         <input type="hidden" name="listPageImage" value="${deal.listPageImage}">
         <input type="hidden" name="infoPageImage" value="${deal.infoPageImage}">
-        <input type="hidden" name="website" value="${deal.website}">
         <input type="hidden" name="appdealSource" value="${deal.appdealSource}">
         <input type="hidden" name="dealClickCount" value="${deal.dealClickCount}">
         <input type="hidden" name="originClickCount" value="${deal.originClickCount}">

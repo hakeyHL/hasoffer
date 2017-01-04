@@ -244,6 +244,9 @@ public class DealController {
         if (!StringUtils.isEmpty(dealPath)) {
             deal.setImageUrl(dealPath);
         }
+        if (deal.getWebsite() != null) {
+            deal.setWebsite(deal.getWebsite());
+        }
         if (!StringUtils.isEmpty(dealBigPath)) {
             deal.setInfoPageImage(dealBigPath);
         }
@@ -282,6 +285,12 @@ public class DealController {
             logger.error("download excel template fail");
             e.printStackTrace();
         }
+    }
+
+    @RequestMapping("/createDeal")
+    public ModelAndView redirect2DealDetail() {
+        ModelAndView mav = new ModelAndView("deal/edit");
+        return mav;
     }
 
     /**

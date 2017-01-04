@@ -21,4 +21,5 @@ public interface IPtmStdSkuService {
 
     List<String> getPtmStdSkuBrandList();
 
+    List<PtmStdPrice> getSimilaryPricesByPriceAndRating(PtmStdSku ptmStdSku);
 }

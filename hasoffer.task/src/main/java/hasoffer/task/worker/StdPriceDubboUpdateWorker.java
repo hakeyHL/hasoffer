@@ -1,7 +1,6 @@
 package hasoffer.task.worker;
 
 import hasoffer.base.enums.TaskStatus;
-import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.JSONUtil;
@@ -24,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class StdPriceDubboUpdateWorker implements Runnable {
 
-    private static final String STDPRICE_DROP_SKUID_QUEUE = "STDPRICE_DROP_SKUID_QUEUE";
+//    private static final String STDPRICE_DROP_SKUID_QUEUE = "STDPRICE_DROP_SKUID_QUEUE";
 
     private static Logger logger = LoggerFactory.getLogger(StdPriceDubboUpdateWorker.class);
     private IFetchDubboService fetchDubboService;
@@ -47,40 +46,40 @@ public class StdPriceDubboUpdateWorker implements Runnable {
                 String fetchUrlResultStr = fetchDubboService.popFetchUrlResult(TaskTarget.STDPRICE_UPDATE);
                 if (fetchUrlResultStr == null) {
                     TimeUnit.MINUTES.sleep(10);
-                    logger.info("fetchUrlResult get null sleep 10 MINUTES StdPriceDubboUpdateWorker");
+//                    logger.info("fetchUrlResult get null sleep 10 MINUTES StdPriceDubboUpdateWorker");
                     continue;
                 }
                 FetchUrlResult fetchUrlResult = JSONUtil.toObject(fetchUrlResultStr, FetchUrlResult.class);
                 if (fetchUrlResult.getUrl() == null) {
-                    logger.info("fetchUrlResult.getUrl() null StdPriceDubboUpdateWorker");
+//                    logger.info("fetchUrlResult.getUrl() null StdPriceDubboUpdateWorker");
                     continue;
                 }
 
-                logger.info("pop get StdPriceDubboUpdateWorker response success " + fetchUrlResult.getWebsite());
+//                logger.info("pop get StdPriceDubboUpdateWorker response success " + fetchUrlResult.getWebsite());
                 String url = fetchUrlResult.getUrl();
                 Website website = fetchUrlResult.getWebsite();
 
                 TaskStatus taskStatus = fetchUrlResult.getTaskStatus();
 
                 if (TaskStatus.FINISH.equals(taskStatus)) {
-                    logger.info("taskStatus is finish StdPriceDubboUpdateWorker " + website);
+//                    logger.info("taskStatus is finish StdPriceDubboUpdateWorker " + website);
 
                     String urlKey = HexDigestUtil.md5(url);
                     List<PtmStdPrice> stdPriceList = ptmStdPriceService.getPtmstdPriceListByUrlKey(urlKey);
 
                     if (stdPriceList == null || stdPriceList.size() == 0) {
-                        logger.info("urkKey StdPriceDubboUpdateWorker not found " + website + "url = " + url);
+//                        logger.info("urkKey StdPriceDubboUpdateWorker not found " + website + "url = " + url);
                     } else {
-                        logger.info("urkKey found StdPriceDubboUpdateWorker " + website + " skulist begin to update " + stdPriceList.size());
+//                        logger.info("urkKey found StdPriceDubboUpdateWorker " + website + " skulist begin to update " + stdPriceList.size());
                         for (PtmStdPrice ptmStdPrice : stdPriceList) {
                             updatePtmCmpSku(ptmStdPrice, fetchUrlResult);
-                            logger.info("update success StdPriceDubboUpdateWorker for " + ptmStdPrice.getWebsite());
+//                            logger.info("update success StdPriceDubboUpdateWorker for " + ptmStdPrice.getWebsite());
                         }
                     }
                 } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
-                    logger.info("taskStatus is StdPriceDubboUpdateWorker exception " + website);
+//                    logger.info("taskStatus is StdPriceDubboUpdateWorker exception " + website);
                 } else {
-                    logger.info("taskStatus is StdPriceDubboUpdateWorker " + taskStatus + "_" + website);
+//                    logger.info("taskStatus is StdPriceDubboUpdateWorker " + taskStatus + "_" + website);
                 }
             } catch (Exception e) {
                 logger.info("StdPriceDubboUpdateWorker.run() exception.");
@@ -98,7 +97,7 @@ public class StdPriceDubboUpdateWorker implements Runnable {
         Website website = WebsiteHelper.getWebSite(url);
 
         if (website == null) {
-            logger.info("website StdPriceDubboUpdateWorker is null for _" + stdPriceId + "_");
+//            logger.info("website StdPriceDubboUpdateWorker is null for _" + stdPriceId + "_");
             return;
         }
 
@@ -108,22 +107,23 @@ public class StdPriceDubboUpdateWorker implements Runnable {
             //
             ptmStdPriceService.updatePtmStdPriceBySpiderFetchedProduct(stdPriceId, fetchedProduct);
         } catch (Exception e) {
-            logger.info("StdPriceDubboUpdateWorker updatePtmStdPriceBySpiderFetchedProduct fail " + stdPriceId);
+//            logger.info("StdPriceDubboUpdateWorker updatePtmStdPriceBySpiderFetchedProduct fail " + stdPriceId);
             e.printStackTrace();
         }
 
-        logger.info("StdPriceDubboUpdateWorker success " + fetchedProduct.getWebsite() + "_" + fetchedProduct.getSkuStatus() + "_" + stdPriceId);
+//        logger.info("StdPriceDubboUpdateWorker success " + fetchedProduct.getWebsite() + "_" + fetchedProduct.getSkuStatus() + "_" + stdPriceId);
 
         try {
             ptmStdPriceService.createPtmStdPriceImage(stdPriceId, fetchedProduct);
         } catch (Exception e) {
-            logger.info("StdPriceDubboUpdateWorker createPtmStdPriceImage fail " + stdPriceId);
-        }
-
-//            如果降价且CommentsNumber 大于40写入队列，并且状态必须是onsale
-        if (price > fetchedProduct.getPrice() && fetchedProduct.getCommentsNumber() > 40 && SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
-            redisListService.push(STDPRICE_DROP_SKUID_QUEUE, stdPriceId + "");
-            System.out.println("price drop StdPriceDubboUpdateWorker add to queue success " + stdPriceId);
+//            logger.info("StdPriceDubboUpdateWorker createPtmStdPriceImage fail " + stdPriceId);
         }
     }
 }
+
+
+//            如果降价且CommentsNumber 大于40写入队列，并且状态必须是onsale
+//        if (price > fetchedProduct.getPrice() && fetchedProduct.getCommentsNumber() > 40 && SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
+//            redisListService.push(STDPRICE_DROP_SKUID_QUEUE, stdPriceId + "");
+//            System.out.println("price drop StdPriceDubboUpdateWorker add to queue success " + stdPriceId);
+//        }

@@ -8,6 +8,12 @@ import java.util.Map;
  * Time 17:18
  */
 public class ConstantUtil {
+    public static final String API_ERRORCODE_SUCCESS = "00000";
+    public static final String API_ERRORCODE_FAILED_LOGIC = "10000";
+    public static final String API_NAME_ERRORCODE = "errorCode";
+    public static final String API_NAME_MSG = "msg";
+    public static final String API_NAME_MSG_SUCCESS = "success";
+    public static final String API_NAME_DATA = "data";
     //变量名定义规则
     //哪个服务的,操作者,哪个对象.操作类型
     public static final long API_ONE_BILLION_NUMBER = 1000000000;
@@ -16,6 +22,7 @@ public class ConstantUtil {
     public static final String API_DEALS_ = "API_DEALS_";//deal列表缓存的key前缀
     //    public static final String API_FILTER_PARAMS_ = "API_FILTER_PARAMS_";//缓存关键字以及类目id和级别下的筛选参数列表的key
     public static final String API_SOLR_PTMSTDSKU_CATEGORY_SEARCH = "API_SOLR_PTMSTDSKU_CATEGORY_SEARCH_";
+    public static final String API_PREFIX_CACAHE_CMP_CMPLIST_ = "API_PREFIX_CACAHE_CMP_CMPLIST_";
     public static final Map<String, String> API_CATEGORY_FILTER_PARAMS_MAP = new HashMap<>();
     public static final Map<String, String> API_PTMSTDSKU_PARAM_MEAN_MAP = new HashMap<>();
 

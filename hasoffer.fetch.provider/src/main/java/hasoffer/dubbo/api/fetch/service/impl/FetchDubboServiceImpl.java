@@ -61,10 +61,8 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
 
 
     @Override
-    public FetchResult getProductsKeyWord(Website webSite, String keyword) {
-        FetchResult fetchResult = getFetchResultList(webSite, keyword);
-        logger.info("FetchDubboServiceImpl.getProductsKeyWord(webSite,url):{}, {} . Now is {} ", webSite, keyword, fetchResult);
-        return fetchResult;
+    public FetchResult popProductsKeyWord() {
+        return fetchCacheService.popFetchResult(RedisKeysUtils.SPIDER_MATCH_RESULT_LIST);
     }
 
     @Override
@@ -106,20 +104,12 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
                 return;
             }
             fetchCacheService.pushTaskList(RedisKeysUtils.WAIT_KEY_LIST, JSONUtil.toJSON(fetchResult));
-            fetchCacheService.setTaskStatusByKeyword(key, TaskStatus.START);
             SpiderLogger.debugSearchList("FetchDubboServiceImpl.sendKeyWordTask(FetchResult fetchResult) save {} into Redis List {} success", fetchResult.getWebsite() + "_" + fetchResult.getKeyword(), RedisKeysUtils.WAIT_KEY_LIST);
         } catch (Exception e) {
             SpiderLogger.debugSearchList("FetchDubboServiceImpl.sendKeyWordTask(FetchResult fetchResult) save {} into Redis List {} fail", fetchResult.getWebsite() + "_" + fetchResult.getKeyword(), RedisKeysUtils.WAIT_KEY_LIST, e);
         }
 
     }
-
-    @Override
-    public TaskStatus getKeyWordTaskStatus(Website webSite, String keyword) {
-        String cacheKey = FetchResult.getCacheKey(webSite, keyword);
-        return fetchCacheService.getTaskStatusByKeyword(cacheKey);
-    }
-
 
     @Override
     public void sendUrlTask(Website website, String url, TaskTarget taskTarget, TaskLevel taskLevel) {
