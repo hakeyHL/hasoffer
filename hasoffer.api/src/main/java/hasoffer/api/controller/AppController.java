@@ -7,6 +7,7 @@ import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.JsonHelper;
 import hasoffer.api.helper.ParseConfigHelper;
+import hasoffer.api.service.ApiHelperService;
 import hasoffer.api.worker.SearchLogQueue;
 import hasoffer.base.enums.AppType;
 import hasoffer.base.enums.MarketChannel;
@@ -72,8 +73,6 @@ import java.util.*;
 @Controller
 @RequestMapping(value = "/app")
 public class AppController {
-    private final static Logger loggerIndexUrl = LoggerFactory.getLogger("hasoffer.IndexUrl");
-
     @Resource
     ICacheService<UrmUser> userICacheService;
     @Resource
@@ -82,6 +81,8 @@ public class AppController {
     ApiUtils apiUtils;
     @Resource
     AppUserService appUserService;
+    @Resource
+    ApiHelperService apiHelperService;
     @Resource
     private IAppService appService;
     @Resource
@@ -172,8 +173,7 @@ public class AppController {
         ModelAndView modelAndView = new ModelAndView();
         List<HasofferCoinsExchangeGift> gifts = appService.getGiftList();
         //查询用户是否已登录
-        String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
-        UrmUser user = appService.getUserByUserToken(userToken);
+        UrmUser user = apiHelperService.getCurrentUser();
         if (user != null) {
             modelAndView.addObject("id", user.getId());
             //判断用户属于哪个组
@@ -265,8 +265,7 @@ public class AppController {
         mv.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_NAME_MSG);
         //若用户未登录显示为已连续签到0
         BackDetailVo data = new BackDetailVo();
-        String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
-        UrmUser user = appService.getUserByUserToken(userToken);
+        UrmUser user = apiHelperService.getCurrentUser();
         // 获取基本配置
         Map<Integer, Integer> afwCfgMap = appService.getSignAwardNum();
         if (user != null) {
@@ -566,8 +565,7 @@ public class AppController {
     public ModelAndView userInfo() {
         ModelAndView mv = new ModelAndView();
         BigDecimal coins = BigDecimal.ZERO;
-        String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
-        UrmUser user = appService.getUserByUserToken(userToken);
+        UrmUser user = apiHelperService.getCurrentUser();
         boolean addFlag = false;
         if (user != null) {
             UrmUserCoinRepair urmUserCoinRepair = appUserService.getUrmUserCoinSignRecordById(user.getId());
@@ -875,7 +873,7 @@ public class AppController {
                 //marketChannel = deviceInfo.getMarketChannel();
                 String affiIds = AffliIdHelper.getAffiIds(marketChannel);
                 map.put("info", affiIds);
-                loggerIndexUrl.info("HOMEPAGE : marketChannel: {}, deviceId:{}, AffId:{}", marketChannel, deviceId, affiIds);
+                logger.info("HOMEPAGE : marketChannel: {}, deviceId:{}, AffId:{}", marketChannel, deviceId, affiIds);
                 modelAndView.addObject(ConstantUtil.API_NAME_DATA, map);
                 break;
             case INDEXPAGE:
@@ -1241,29 +1239,18 @@ public class AppController {
         if (dealComments != null) {
             map.put("commentNumber", dealComments.getNumFund());
         }
+        UrmUser urmUser = apiHelperService.getCurrentUser();
         //是否已点赞是否已点踩
-        UrmUser urmUser;
-        String userToken = (String) Context.currentContext().get(StaticContext.USER_TOKEN);
-        if (StringUtils.isNotBlank(userToken)) {
-            String key = "user_" + userToken;
-            urmUser = userICacheService.get(UrmUser.class, key, 0);
-            if (urmUser == null) {
-                urmUser = appService.getUserByUserToken(userToken);
-                if (urmUser != null) {
-                    userICacheService.add(key, urmUser, TimeUtils.SECONDS_OF_1_DAY);
-                }
-            }
-            if (urmUser != null) {
-                AppDealThumb appDealThumb = dealService.getDealThumbByUidDid(urmUser.getId(), dealId);
-                if (appDealThumb != null) {
-                    int action = appDealThumb.getAction();
-                    if (action == -1) {
-                        //踩
-                        map.put("action", 2);
-                    } else if (action == 1) {
-                        //赞
-                        map.put("action", 1);
-                    }
+        if (urmUser != null) {
+            AppDealThumb appDealThumb = dealService.getDealThumbByUidDid(urmUser.getId(), dealId);
+            if (appDealThumb != null) {
+                int action = appDealThumb.getAction();
+                if (action == -1) {
+                    //踩
+                    map.put("action", 2);
+                } else if (action == 1) {
+                    //赞
+                    map.put("action", 1);
                 }
             }
         }
