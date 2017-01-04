@@ -1,7 +1,6 @@
 package hasoffer.dubbo.api.fetch.service;
 
 import hasoffer.base.enums.TaskLevel;
-import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.spider.enums.TaskTarget;
 import hasoffer.spider.model.FetchCompareWebsiteResult;
@@ -42,11 +41,9 @@ public interface IFetchDubboService {
     /**
      * 获取结果
      *
-     * @param webSite
-     * @param keyword
-     * @return
+     *  @return
      */
-    FetchResult getProductsKeyWord(Website webSite, String keyword);
+    FetchResult popProductsKeyWord();
 
     /**
      * 提交关键词任务
@@ -55,15 +52,6 @@ public interface IFetchDubboService {
      * @param keyword
      */
     void sendKeyWordTask(Website website, String keyword);
-
-    /**
-     * 获取关键词任务对应的状态
-     *
-     * @param webSite
-     * @param keyword
-     * @return
-     */
-    TaskStatus getKeyWordTaskStatus(Website webSite, String keyword);
 
 /*************************************************************************************************/
 

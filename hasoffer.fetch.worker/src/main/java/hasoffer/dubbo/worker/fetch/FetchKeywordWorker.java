@@ -45,13 +45,6 @@ public class FetchKeywordWorker implements Runnable {
     public void run() {
         while (true) {
             try {
-                String waitStr = mapService.getValue("ALI-VPC-STATUS", localIp);
-                boolean isWait = waitStr != null && "N".equals(waitStr);
-                logger.info("Local IP:{}, isWait(ALI-VPC-STATUS): {} ", localIp, isWait);
-                if (isWait) {
-                    TimeUnit.MINUTES.sleep(1);
-                    continue;
-                }
                 Object pop = fetchCacheService.popTaskList(RedisKeysUtils.WAIT_KEY_LIST);
                 if (pop == null) {
                     try {
@@ -81,14 +74,10 @@ public class FetchKeywordWorker implements Runnable {
         }
         try {
             fetchResult = fetchService.spiderProductSetByKeyword(fetchResult, 10);
+            fetchCacheService.pushFetchResult(RedisKeysUtils.SPIDER_MATCH_RESULT_LIST, fetchResult);
         } catch (UnSupportWebsiteException e) {
             logger.error("don't support this website.", e);
-            e.printStackTrace();
         }
-        logger.info("Fetch Success:website:{}, Key :{}, success:{}", fetchResult.getWebsite(), fetchResult.getKeyword(), fetchResult.getFetchProducts().size());
-        String cacheKey = FetchResult.getCacheKey(fetchResult);
-        fetchCacheService.setTaskStatusByKeyword(cacheKey, fetchResult.getTaskStatus());
-        fetchCacheService.cacheResult(cacheKey, fetchResult, FetchResult.expirySeconds(cacheKey));
     }
 
 }
