@@ -10,6 +10,7 @@ import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.exception.ImageDownloadOrUploadException;
 import hasoffer.base.model.*;
 import hasoffer.base.utils.*;
+import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.core.analysis.ProductAnalysisService;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
@@ -18,6 +19,7 @@ import hasoffer.core.persistence.mongo.MobileCateDescription;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
 import hasoffer.core.persistence.po.app.AppDeal;
+import hasoffer.core.persistence.po.h5.KeywordCollection;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
@@ -113,6 +115,9 @@ public class FixController {
     ICacheService cacheServiceImpl;
     @Resource
     IPtmStdPriceService ptmStdPriceService;
+    @Resource
+    IKeywordService keywordService;
+
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
 
     private Website[] websites = {
@@ -135,6 +140,142 @@ public class FixController {
             Website.NAAPTOL,
             Website.ZOOMIN
     };
+
+    @RequestMapping(value = "/keyword", method = RequestMethod.GET)
+    @ResponseBody
+    public String keyword() throws Exception {
+
+        getFlipkartKeyword();
+        getSnapdealKeyword();
+        getMyntraKeyword();
+
+        return "";
+    }
+
+    private void getMyntraKeyword() {
+
+        try {
+
+            String category = "CLOTHING";
+
+            HttpResponseModel responseModel = HttpUtils.get("http://www.myntra.com/", null);
+
+            String urlHtml = responseModel.getBodyString();
+
+            String[] subStr = urlHtml.split("window.__myx_seo__ = \\[\\[");
+
+            String keywordString = StringUtils.filterAndTrim(subStr[1].substring(0, subStr[1].indexOf(';')), Arrays.asList("\\]", "\\["));
+
+            String[] subStr1 = keywordString.split("\"name\":\"");
+
+            for (int i = 1; i < subStr1.length; i++) {
+
+                String keyword = subStr1[i].substring(0, subStr1[i].indexOf('\"'));
+
+                KeywordCollection keywordRepository = new KeywordCollection();
+
+                keywordRepository.setId(HexDigestUtil.md5(keyword.toUpperCase() + Website.MYNTRA));
+                keywordRepository.setKeyword(keyword);
+                keywordRepository.setKeywordKey(HexDigestUtil.md5(keyword.toUpperCase()));
+                keywordRepository.setKeywordSourceSite(Website.MYNTRA);
+                keywordRepository.setSourceSiteCategoryName(category);
+
+                System.out.println(keywordRepository);
+
+                keywordService.saveOrUpdate(keywordRepository);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void getSnapdealKeyword() {
+
+        try {
+
+            TagNode root = HtmlUtils.getUrlRootTagNode("https://www.snapdeal.com/");
+
+            List<TagNode> divNodeList = getSubNodesByXPath(root, "//div[@class='brandContainerFooter']");
+
+            for (int i = 0; i < divNodeList.size(); i++) {
+
+                TagNode divNode = divNodeList.get(i);
+
+                TagNode categoryNode = getSubNodeByXPath(divNode, "/span/ul/a", null);
+
+                String category = StringUtils.filterAndTrim(categoryNode.getText().toString(), Arrays.asList(":"));
+
+                List<TagNode> keywordList = getSubNodesByXPath(divNode, "/span/ul/li/a");
+
+                for (TagNode keywordNode : keywordList) {
+
+                    String keyword = keywordNode.getText().toString().trim();
+
+                    KeywordCollection keywordRepository = new KeywordCollection();
+
+                    keywordRepository.setId(HexDigestUtil.md5(keyword.toUpperCase() + Website.SNAPDEAL));
+                    keywordRepository.setKeyword(keyword);
+                    keywordRepository.setKeywordKey(HexDigestUtil.md5(keyword.toUpperCase()));
+                    keywordRepository.setKeywordSourceSite(Website.SNAPDEAL);
+                    keywordRepository.setSourceSiteCategoryName(category);
+
+                    System.out.println(keywordRepository);
+
+                    keywordService.saveOrUpdate(keywordRepository);
+                }
+            }
+
+        } catch (Exception e) {
+
+        }
+
+    }
+
+    public void getFlipkartKeyword() {
+
+        try {
+
+            TagNode root = HtmlUtils.getUrlRootTagNode("https://www.flipkart.com/");
+
+            List<TagNode> divNodeList = getSubNodesByXPath(root, "//div[@class='col gu12 gY-jFd']/div");
+
+            for (int i = 1; i < divNodeList.size(); i++) {
+
+                TagNode divNode = divNodeList.get(i);
+
+                TagNode categoryNode = getSubNodeByXPath(divNode, "/div/div", null);
+
+                String category = categoryNode.getText().toString();
+
+                String[] subStr = category.split(":");
+
+                category = subStr[0].trim();
+
+                List<TagNode> keywordList = getSubNodesByXPath(divNode, "/div/div/a");
+
+                for (TagNode keywordNode : keywordList) {
+
+                    String keyword = keywordNode.getText().toString().trim();
+
+                    KeywordCollection keywordRepository = new KeywordCollection();
+
+                    keywordRepository.setId(HexDigestUtil.md5(keyword.toUpperCase() + Website.FLIPKART));
+                    keywordRepository.setKeyword(keyword);
+                    keywordRepository.setKeywordKey(HexDigestUtil.md5(keyword.toUpperCase()));
+                    keywordRepository.setKeywordSourceSite(Website.FLIPKART);
+                    keywordRepository.setSourceSiteCategoryName(category);
+
+                    System.out.println(keywordRepository);
+
+                    keywordService.saveOrUpdate(keywordRepository);
+                }
+            }
+
+        } catch (Exception e) {
+
+        }
+    }
 
     @RequestMapping(value = "/skuImageDownLoad/{skuid}", method = RequestMethod.GET)
     @ResponseBody

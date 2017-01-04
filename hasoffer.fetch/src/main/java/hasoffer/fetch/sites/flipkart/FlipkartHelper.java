@@ -114,53 +114,21 @@ public class FlipkartHelper {
             }
         }
         StringBuilder sb = new StringBuilder(url);
-
+        if (marketChannelName.equals(MarketChannel.H5)) {
+            setAffidFromAdvertisingAlliance(affs, sb);
+            return sb.toString();
+        }
         String affid = AffliIdHelper.getAffiIdByWebsite(Website.FLIPKART, marketChannelName);
         //在这里设置一个随机,网盟占1/10 概率
         int randomInt = new Random().nextInt(10);
         if (randomInt > 5) {
-            //https://dl.flipkart.com/dl/yonex-carbonex-6000df-g4-strung-badminton-racquet/p/itmdfyr9jwgzd9dv?pid=RAQDFYR9JWGZD9DV&affid=raymondzh&affExtParam1=103662&affExtParam2=channel_deviceId_userid
-            //raymondzh  103662  channel_deviceId_userid
-            affid = "raymondzh";
-            if (sb.indexOf("?") > 0) {
-                sb.append("&affid=").append(affid);
-            } else {
-                sb.append("?affid=").append(affid);
-            }
-            if (affs.length >= 1) {
-                //affExtParam1 目前是固定的 103662
-                //affExtParam2 是 channel_deviceId_userid
-
-                sb.append("&affExtParam1=").append("103662");
-
-                String channel_deviceId_userid = "";
-                //按照第一个是渠道,第二个是设备id,第三个是用户id去拼接,如果不存在就是0
-                //渠道要用特殊符号表示
-
-                //要判断第一个是什么,第二个是什么,第三个是什么
-
-                //暂时按照约定顺序 1 渠道 2设备 3  用户id
-
-                //如果size 是2 是没有用户id
-                switch (affs.length) {
-                    case 2:
-                        channel_deviceId_userid += AffliIdHelper.getMarketId(affs[0]) + "_" + affs[1] + "_0";
-                        break;
-                    case 3:
-                        channel_deviceId_userid += AffliIdHelper.getMarketId(affs[0]) + "_" + affs[1] + "_" + affs[2];
-                        break;
-                    default:
-                }
-                sb.append("&affExtParam2=").append(channel_deviceId_userid);
-            }
-
+            setAffidFromAdvertisingAlliance(affs, sb);
         } else {
             if (sb.indexOf("?") > 0) {
                 sb.append("&affid=").append(affid);
             } else {
                 sb.append("?affid=").append(affid);
             }
-
             if (affs.length == 1) {
                 sb.append("&affExtParam1=").append(affs[0]).append("&affExtParam2=").append(AffliIdHelper.getMarketId(affs[0])).append("_").append("0").append("_").append("0");
             } else if (affs.length == 2) {
@@ -171,6 +139,43 @@ public class FlipkartHelper {
 
         }
         return sb.toString();
+    }
+
+    private static void setAffidFromAdvertisingAlliance(String[] affs, StringBuilder sb) {
+        String affid;//https://dl.flipkart.com/dl/yonex-carbonex-6000df-g4-strung-badminton-racquet/p/itmdfyr9jwgzd9dv?pid=RAQDFYR9JWGZD9DV&affid=raymondzh&affExtParam1=103662&affExtParam2=channel_deviceId_userid
+        //raymondzh  103662  channel_deviceId_userid
+        affid = "raymondzh";
+        if (sb.indexOf("?") > 0) {
+            sb.append("&affid=").append(affid);
+        } else {
+            sb.append("?affid=").append(affid);
+        }
+        if (affs.length >= 1) {
+            //affExtParam1 目前是固定的 103662
+            //affExtParam2 是 channel_deviceId_userid
+
+            sb.append("&affExtParam1=").append("103662");
+
+            String channel_deviceId_userid = "";
+            //按照第一个是渠道,第二个是设备id,第三个是用户id去拼接,如果不存在就是0
+            //渠道要用特殊符号表示
+
+            //要判断第一个是什么,第二个是什么,第三个是什么
+
+            //暂时按照约定顺序 1 渠道 2设备 3  用户id
+
+            //如果size 是2 是没有用户id
+            switch (affs.length) {
+                case 2:
+                    channel_deviceId_userid += AffliIdHelper.getMarketId(affs[0]) + "_" + affs[1] + "_0";
+                    break;
+                case 3:
+                    channel_deviceId_userid += AffliIdHelper.getMarketId(affs[0]) + "_" + affs[1] + "_" + affs[2];
+                    break;
+                default:
+            }
+            sb.append("&affExtParam2=").append(channel_deviceId_userid);
+        }
     }
 
     //public static void main(String[] args) {
