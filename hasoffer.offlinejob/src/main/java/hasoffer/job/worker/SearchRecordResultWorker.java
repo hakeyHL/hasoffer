@@ -54,7 +54,7 @@ public class SearchRecordResultWorker implements Runnable {
                 if (HasofferRegion.INDIA.toString().equals(serRegion)) {
                     FetchResult fetchResult = fetchService.popProductsKeyWord();
                     if (fetchResult == null || fetchResult.getKeyword() == null) {
-                        TimeUnit.MINUTES.sleep(10);
+                        TimeUnit.MINUTES.sleep(1);
                         continue;
                     }
                     fetchForIndia(fetchResult);
