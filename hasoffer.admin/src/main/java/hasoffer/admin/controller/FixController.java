@@ -227,7 +227,7 @@ public class FixController {
             }
 
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
     }
@@ -273,7 +273,7 @@ public class FixController {
             }
 
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 
