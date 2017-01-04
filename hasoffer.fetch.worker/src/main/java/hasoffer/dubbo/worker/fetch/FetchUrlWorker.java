@@ -91,7 +91,6 @@ public class FetchUrlWorker implements Runnable {
                     logger.info("pop wait taskLevel:{}, taskTarget:{}, size:{} ", TaskLevel.LEVEL_5, TaskTarget.PRICE_CHANGES, redisListService.size(RedisKeysUtils.getWaitUrlListKey(TaskLevel.LEVEL_5, TaskTarget.PRICE_CHANGES, website)));
                     SpiderLogger.infoFetchFlow("Spider this url: {}", pop);
                     FetchUrlResult fetchUrlResult = JSONUtil.toObject(pop.toString(), FetchUrlResult.class);
-                    fetchCacheService.execNum(fetchUrlResult.getWebsite().name());
                     fetch(fetchUrlResult);
                 }
             } catch (Exception e) {
