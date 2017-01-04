@@ -57,7 +57,7 @@ public class SearchRecordResultWorker implements Runnable {
                         TimeUnit.MINUTES.sleep(1);
                         continue;
                     }
-                    fetchForIndia(fetchResult);
+                    updateResult(fetchResult);
                 }
 
             } catch (Exception e) {
@@ -67,10 +67,10 @@ public class SearchRecordResultWorker implements Runnable {
     }
 
 
-    private void fetchForIndia(FetchResult fetchResult) {
+    private void updateResult(FetchResult fetchResult) {
         String key = HexDigestUtil.md5(fetchResult.getKeyword());
         SrmAutoSearchResult autoSearchResult = searchProductService.getSearchResultById(key);
-        logger.info("fetchForIndia: fetchResult:{}, autoSearchResult:{}", fetchResult, autoSearchResult);
+        logger.info("updateResult: fetchResult:{}, autoSearchResult:{}", fetchResult, autoSearchResult);
         if (autoSearchResult == null) {
             return;
         }
