@@ -75,7 +75,7 @@ public class PtmStdPriceIndexServiceImpl extends AbstractIndexService<Long, PtmS
         int size = searchCriteria.getPageSize();
         int priceFrom = searchCriteria.getPriceFrom(), priceTo = searchCriteria.getPriceTo();
         String priceFromStr = "*", priceToStr = "*";
-        ApiUtils.setPriceSearchScope(fqList, priceFrom, priceTo, priceToStr);
+        ApiUtils.setPriceSearchScope(fqList, priceFrom, priceTo, priceToStr, "price");
         FilterQuery[] fqs = fqList.toArray(new FilterQuery[0]);
         SearchResult<PtmStdPriceModel> sr = searchObjs(queryString, fqs, sorts, pivotFacets, page <= 1 ? 1 : page, size, true);
         //缓存以及从缓存中取

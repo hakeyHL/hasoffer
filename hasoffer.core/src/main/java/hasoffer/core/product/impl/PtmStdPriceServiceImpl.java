@@ -313,7 +313,9 @@ public class PtmStdPriceServiceImpl implements IPtmStdPriceService {
     protected PtmStdPriceModel getPtmStdPriceModel(PtmStdPrice ptmStdPrice) {
         //获取sku列表然后转成model
         if (SkuStatus.ONSALE.equals(ptmStdPrice.getSkuStatus())) {
-            return new PtmStdPriceModel(ptmStdPrice);
+            if (ptmStdPrice != null && SkuStatus.ONSALE.equals(ptmStdPrice.getSkuStatus())) {
+                return new PtmStdPriceModel(ptmStdPrice);
+            }
         }
         return null;
     }

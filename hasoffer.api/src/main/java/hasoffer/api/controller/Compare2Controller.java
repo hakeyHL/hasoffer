@@ -12,6 +12,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.JSONUtil;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.app.impl.AppCmpServiceImpl;
 import hasoffer.core.app.vo.*;
 import hasoffer.core.cache.CmpSkuCacheManager;
@@ -32,6 +33,7 @@ import hasoffer.core.product.IPtmStdPriceService;
 import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
 import hasoffer.core.product.solr.*;
+import hasoffer.core.redis.ICacheService;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.exception.NonMatchedProductException;
 import hasoffer.core.system.impl.AppServiceImpl;
@@ -99,6 +101,8 @@ public class Compare2Controller {
     PtmStdPriceIndexServiceImpl ptmStdPriceIndexService;
     @Resource
     PtmStdSkuIndexServiceImpl stdSkuIndexService;
+    @Resource
+    ICacheService cacheService;
     private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
 
     public static void main(String[] args) {
@@ -273,13 +277,7 @@ public class Compare2Controller {
                                HttpServletResponse response,
                                HttpServletRequest request
     ) {
-        //以下数据与sku列表不耦合,有就可以返回
-        //返回评价Card
-        //品牌Card
-        //Unique Features
-        //Best Competitors
-        //Summary
-
+        String cmpSkuCacheKey = ConstantUtil.API_PREFIX_CACAHE_CMP_CMPLIST_ + id + "_" + page + "_" + pageSize;
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
         jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
@@ -298,6 +296,11 @@ public class Compare2Controller {
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             }
+        }
+        String cmpSkuCacheValue = cacheService.get(cmpSkuCacheKey, 0);
+        if (StringUtils.isNotEmpty(cmpSkuCacheValue)) {
+            Httphelper.sendJsonMessage(cmpSkuCacheValue, response);
+            return null;
         }
         String userToken = Context.currentContext().getHeader("usertoken");
         PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"skuPrice", "deepLink", "saved", "priceOff", "productVo", "pagedComparedSkuVos", "copywriting", "displayMode", "std", "cashBack"});
@@ -333,10 +336,15 @@ public class Compare2Controller {
         }
         // 速度优化
         SearchHelper.addToLog(sio);
-        logger.debug(sio.toString());
         apiUtils.resloveClass(cr);
         jsonObject.put(ConstantUtil.API_NAME_DATA, JSONObject.toJSON(cr));
-        jsonObject.putAll(apiUtils.setEvaluateBrandFeaturesCompetitorsSummaryMap(ptmStdSku));
+        UrmUser urmUser = appService.getUserByUserToken(userToken);
+        if (urmUser != null) {
+            jsonObject.getJSONObject(ConstantUtil.API_NAME_DATA).putAll(apiUtils.setEvaluateBrandFeaturesCompetitorsSummaryMap(ptmStdSku, new String[]{deviceInfo.getMarketChannel().name(), deviceId, urmUser.getId() + ""}));
+        } else {
+            jsonObject.getJSONObject(ConstantUtil.API_NAME_DATA).putAll(apiUtils.setEvaluateBrandFeaturesCompetitorsSummaryMap(ptmStdSku, new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+        }
+        cacheService.add(cmpSkuCacheKey, JSON.toJSONString(jsonObject, propertyFilter), TimeUtils.MILLISECONDS_OF_1_HOUR * 2);
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
         return null;
 
@@ -573,9 +581,9 @@ public class Compare2Controller {
                     currentDeeplink = WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
                 }*/
             } else if (clientCmpSku != null & !cmpSkuCacheManager.isFlowControlled(sio.getDeviceId(), sio.getCliSite())) {
-                    if (hasoffer.base.utils.StringUtils.isEqual(clientCmpSku.getSkuTitle(), sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
-                        currentDeeplink = WebsiteHelper.getDeeplinkWithAff(clientCmpSku.getWebsite(), clientCmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
-                    }
+                if (hasoffer.base.utils.StringUtils.isEqual(clientCmpSku.getSkuTitle(), sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
+                    currentDeeplink = WebsiteHelper.getDeeplinkWithAff(clientCmpSku.getWebsite(), clientCmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
+                }
             }
         } catch (Exception e) {
             // logger.error(e.getMessage());
@@ -608,39 +616,39 @@ public class Compare2Controller {
     private String getSkuListBySourceSidAndWebsite(Website website, String sourceSid, int page, int pageSize) {
         //网站不为空
         if (website != null && Website.SNAPDEAL.equals(website) || Website.FLIPKART.equals(website)) {
-                List<PtmCmpSku> skuList = cmpSkuService.getPtmCmpSkuListBySourceSidAndWebsite(sourceSid, Website.FLIPKART, page, pageSize);
-                //这里返回的是一个sourceSid与请求url相同且网站是FLIPKART的集合
-                //可能会根据某个条件筛选来进行优化，
-                //此处暂时有数据就返回的策略
-                if (skuList != null && skuList.size() != 0) {
-                    //外层循环用来控制遍历数据库返回的skuList
-                    for (int i = 0; i < skuList.size() - 1; i++) {
+            List<PtmCmpSku> skuList = cmpSkuService.getPtmCmpSkuListBySourceSidAndWebsite(sourceSid, Website.FLIPKART, page, pageSize);
+            //这里返回的是一个sourceSid与请求url相同且网站是FLIPKART的集合
+            //可能会根据某个条件筛选来进行优化，
+            //此处暂时有数据就返回的策略
+            if (skuList != null && skuList.size() != 0) {
+                //外层循环用来控制遍历数据库返回的skuList
+                for (int i = 0; i < skuList.size() - 1; i++) {
 
-                        PtmCmpSku ptmCmpSku = skuList.get(i);
+                    PtmCmpSku ptmCmpSku = skuList.get(i);
 
-                        List<PtmCmpSku> resultSkuList = cmpSkuService.listCmpSkus(ptmCmpSku.getProductId());
+                    List<PtmCmpSku> resultSkuList = cmpSkuService.listCmpSkus(ptmCmpSku.getProductId());
 
-                        //内层循环用来控制遍历按照sku的productId返回的sku列表
-                        for (int j = resultSkuList.size() - 1; j >= 0; j--) {
-                            ptmCmpSku = resultSkuList.get(j);
-                            //价格为0过滤
-                            if (ptmCmpSku.getPrice() <= 0) {
-                                resultSkuList.remove(j);
-                                continue;
-                            }
-                            //状态不是onsale过滤
-                            if (ptmCmpSku.getStatus() != SkuStatus.ONSALE) {
-                                resultSkuList.remove(j);
-                                continue;
-                            }
+                    //内层循环用来控制遍历按照sku的productId返回的sku列表
+                    for (int j = resultSkuList.size() - 1; j >= 0; j--) {
+                        ptmCmpSku = resultSkuList.get(j);
+                        //价格为0过滤
+                        if (ptmCmpSku.getPrice() <= 0) {
+                            resultSkuList.remove(j);
+                            continue;
                         }
-
-                        //循环过滤完毕，判断时候有数据剩余
-                        if (skuList.size() != 0) {
-                            return JSONUtil.toJSON(resultSkuList);
+                        //状态不是onsale过滤
+                        if (ptmCmpSku.getStatus() != SkuStatus.ONSALE) {
+                            resultSkuList.remove(j);
+                            continue;
                         }
                     }
+
+                    //循环过滤完毕，判断时候有数据剩余
+                    if (skuList.size() != 0) {
+                        return JSONUtil.toJSON(resultSkuList);
+                    }
                 }
+            }
         }
         return "";
     }

@@ -11,6 +11,7 @@ import hasoffer.base.utils.StringUtils;
 import hasoffer.core.app.AppCategoryService;
 import hasoffer.core.app.vo.*;
 import hasoffer.core.bo.product.CategoryVo;
+import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
@@ -19,10 +20,7 @@ import hasoffer.core.persistence.mongo.PtmStdSkuDescription;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.ptm.*;
-import hasoffer.core.persistence.po.urm.PriceOffNotice;
-import hasoffer.core.persistence.po.urm.UrmUser;
-import hasoffer.core.persistence.po.urm.UrmUserCoinRepair;
-import hasoffer.core.persistence.po.urm.UrmUserDevice;
+import hasoffer.core.persistence.po.urm.*;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
 import hasoffer.core.product.solr.*;
@@ -241,7 +239,11 @@ public class ApiUtils {
         }
     }
 
-    public static void setPriceSearchScope(List<FilterQuery> fqList, int priceFrom, int priceTo, String priceToStr) {
+    public static void setPriceSearchScope(List<FilterQuery> fqList, int priceFrom, int priceTo, String priceToStr, String... priceName) {
+        String priceKey = "minPrice";
+        if (priceName.length == 1 && priceName[0].equals("price")) {
+            priceKey = "price";
+        }
         String priceFromStr;
         if (priceFrom < priceTo && priceFrom >= 0) {
             if (priceFrom <= 0) {
@@ -251,9 +253,9 @@ public class ApiUtils {
             if (priceTo > 0) {
                 priceToStr = String.valueOf(priceTo);
             }
-            fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", priceFromStr, priceToStr)));
+            fqList.add(new FilterQuery(priceKey, String.format("[%s TO %s]", priceFromStr, priceToStr)));
         } else {
-            fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", "1", "*")));
+            fqList.add(new FilterQuery(priceKey, String.format("[%s TO %s]", "1", "*")));
         }
     }
 
@@ -687,7 +689,13 @@ public class ApiUtils {
         return str2;
     }
 
-    public boolean isPriceOffAlert(String userToken, Long skuId) {
+    public boolean isPriceOffAlert(String userToken, Long skuId, Long... userId) {
+        if (userId.length > 0 && userId[0] > 0) {
+            PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(userId[0] + "", skuId);
+            if (priceOffNotice != null) {
+                return true;
+            }
+        }
         if (!StringUtils.isEmpty(userToken)) {
             UrmUser urmUser = appService.getUserByUserToken(userToken);
             if (urmUser != null) {
@@ -964,11 +972,25 @@ public class ApiUtils {
         } else {
             multipliedVerifiedCoins = multipliedVerifiedCoins.add(addedVerifiedCoins);
         }
+        //去掉已兑换的
+        List<UrmUserCoinExchangeRecord> exchangeRecords = appUserService.getCoinExchangeRecordByUserId(users.get(0).getId());
+        for (UrmUserCoinExchangeRecord urmUserCoinExchangeRecordL : exchangeRecords) {
+            multipliedVerifiedCoins = multipliedVerifiedCoins.subtract(BigDecimal.valueOf(urmUserCoinExchangeRecordL.getCoinTotal() == null ? 0 : urmUserCoinExchangeRecordL.getCoinTotal()));
+            OrderVo orderVo = new OrderVo();
+            //乘以10再取整
+            orderVo.setAccount(BigDecimal.ZERO.subtract(BigDecimal.valueOf(urmUserCoinExchangeRecordL.getCoinTotal())));
+            orderVo.setChannel("HASOFFER");
+            orderVo.setOrderId(urmUserCoinExchangeRecordL.getId() + "");
+            orderVo.setOrderTime(new Date(urmUserCoinExchangeRecordL.getOperateTime()));
+            orderVo.setWebsite("HASOFFER");
+            orderVo.setStatus("approved");
+            transcations.add(orderVo);
+        }
         data.setVerifiedCoins(multipliedVerifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
     }
 
-    public Map setEvaluateBrandFeaturesCompetitorsSummaryMap(PtmStdSku ptmStdSku) {
+    public Map setEvaluateBrandFeaturesCompetitorsSummaryMap(PtmStdSku ptmStdSku, String[] affs) {
         Map stdSkuParametersMap = new HashMap();
         if (ptmStdSku == null) {
             return stdSkuParametersMap;
@@ -978,18 +1000,17 @@ public class ApiUtils {
             return stdSkuParametersMap;
         }
         PtmStdSkuDescription ptmStdSkuDescription = mongoDbManager.queryOne(PtmStdSkuDescription.class, stdSkuId);
-        if (ptmStdSkuDescription == null) {
-            return stdSkuParametersMap;
+
+        if (ptmStdSkuDescription != null) {
+            String features = ptmStdSkuDescription.getFeatures();
+            stdSkuParametersMap.put("features", features);
+
+            String summary = ptmStdSkuDescription.getSummary();
+            stdSkuParametersMap.put("summary", summary);
+
+            List<FetchedProductReview> fetchedProductReviewList = ptmStdSkuDescription.getFetchedProductReviewList();
+            stdSkuParametersMap.put("comments", fetchedProductReviewList);
         }
-        String features = ptmStdSkuDescription.getFeatures();
-        stdSkuParametersMap.put("features", features);
-
-        String summary = ptmStdSkuDescription.getSummary();
-        stdSkuParametersMap.put("summary", summary);
-
-        List<FetchedProductReview> fetchedProductReviewList = ptmStdSkuDescription.getFetchedProductReviewList();
-        stdSkuParametersMap.put("comments", fetchedProductReviewList);
-
 
         //获取品牌card
         if (org.apache.commons.lang3.StringUtils.isNotEmpty(ptmStdSku.getBrand())) {
@@ -1004,12 +1025,13 @@ public class ApiUtils {
         }
         //bestCompetitors
 //        List<CmpProductListVo> competitors = ptmStdSKuService.getSimilaryPricesByPriceAndRating(ptmStdSku);
-       /* int priceFrom = BigDecimal.valueOf(ptmStdSku.getRefPrice()).multiply(BigDecimal.valueOf(0.8)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).intValue();
+        int priceFrom = BigDecimal.valueOf(ptmStdSku.getRefPrice()).multiply(BigDecimal.valueOf(0.8)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).intValue();
         int priceTo = BigDecimal.valueOf(ptmStdSku.getRefPrice()).multiply(BigDecimal.valueOf(1.2)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).intValue();
         PageableResult<PtmStdPriceModel> ptmStdPriceModelPageableResult = ptmStdPriceIndexService.filterStdPriceByCriteria(new SearchCriteria(1, 3, priceFrom, priceTo));
         if (ptmStdPriceModelPageableResult != null && ptmStdPriceModelPageableResult.getData() != null) {
-
-        }*/
+            List<CmpProductListVo> cmpProductListVos = getCmpProductListVos(ptmStdPriceModelPageableResult.getData(), affs);
+            stdSkuParametersMap.put("competitors", cmpProductListVos);
+        }
         return stdSkuParametersMap;
     }
 
@@ -1018,19 +1040,23 @@ public class ApiUtils {
      *
      * @return
      */
-    public List<CmpProductListVo> getCmpProductListVos(List skuList, String[] affs, String userToken, List desList) {
+    public List<CmpProductListVo> getCmpProductListVos(List skuList, String[] affs) {
+        List<CmpProductListVo> cmpProductListVoList = new ArrayList<>();
         if (skuList != null && skuList.size() > 0) {
             if (PtmStdPrice.class.isInstance(skuList.get(0))) {
                 Iterator<PtmStdPrice> ptmList = skuList.iterator();
                 while (ptmList.hasNext()) {
                     PtmStdPrice next = ptmList.next();
                     CmpProductListVo cplv = new CmpProductListVo(next, productCacheManager.getPtmStdSkuImageUrl(next.getStdSkuId()), WebsiteHelper.getLogoUrl(next.getWebsite()));
-                    cplv.setDeepLinkUrl(WebsiteHelper.getDeeplinkWithAff((next.getWebsite()), next.getUrl(), new String[]{"渠道", "设备id", "用户id"}));
-                    cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff((next.getWebsite()), next.getUrl(), new String[]{"渠道", "设备id", "用户id"}));
-                    if (!org.apache.commons.lang3.StringUtils.isEmpty(userToken)) {
-                        cplv.setIsAlert(isPriceOffAlert(userToken, cplv.getId()));
+                    cplv.setDeepLinkUrl(WebsiteHelper.getDeeplinkWithAff((next.getWebsite()), next.getUrl(), affs));
+                    cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff((next.getWebsite()), next.getUrl(), affs));
+                    if (affs.length > 2) {
+                        long userId = Long.parseLong(affs[2]);
+                        if (userId > 0) {
+                            cplv.setIsAlert(isPriceOffAlert(null, cplv.getId(), userId));
+                        }
                     }
-                    desList.add(cplv);
+                    cmpProductListVoList.add(cplv);
                 }
             } else if (PtmStdPriceModel.class.isInstance(skuList.get(0))) {
                 Iterator<PtmStdPriceModel> ptmList = skuList.iterator();
@@ -1039,13 +1065,17 @@ public class ApiUtils {
                     CmpProductListVo cplv = new CmpProductListVo(next, productCacheManager.getPtmStdSkuImageUrl(next.getId()), WebsiteHelper.getLogoUrl(Website.valueOf(next.getSite())));
                     cplv.setDeepLinkUrl(WebsiteHelper.getDeeplinkWithAff(Website.valueOf(next.getSite()), next.getSkuUrl(), affs));
                     cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(Website.valueOf(next.getSite()), next.getSkuUrl(), affs));
-                    if (!org.apache.commons.lang3.StringUtils.isEmpty(userToken)) {
-                        cplv.setIsAlert(isPriceOffAlert(userToken, cplv.getId()));
+                    if (affs.length > 2) {
+                        long userId = Long.parseLong(affs[2]);
+                        if (userId > 0) {
+                            cplv.setIsAlert(isPriceOffAlert(null, cplv.getId(), userId));
+                        }
                     }
-                    desList.add(cplv);
+                    cmpProductListVoList.add(cplv);
                 }
             }
         }
-        return null;
+        return cmpProductListVoList;
     }
+
 }
