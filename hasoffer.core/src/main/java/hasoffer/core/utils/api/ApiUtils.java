@@ -623,6 +623,29 @@ public class ApiUtils {
         return 0;
     }
 
+    public static List getIdList(List list) {
+        List<Long> idsList = new ArrayList<>();
+        for (Object object : list) {
+            Field[] declaredFields = object.getClass().getDeclaredFields();
+            for (int i = 0; i < declaredFields.length; i++) {
+                Field declaredField = declaredFields[i];
+                declaredField.setAccessible(true);
+                try {
+                    if (declaredField.getType().equals(Long.class) && declaredField.getName().equals("id")) {
+                        //if null ,set
+                        if (declaredField.get(object) != null) {
+                            Long id = (Long) declaredField.get(object);
+                            idsList.add(id);
+                        }
+                    }
+                } catch (Exception e) {
+                    continue;
+                }
+            }
+        }
+        return idsList;
+    }
+
     /**
      * 在数据对象返回客户端之前检测其域是否都有值,除对象成员外都赋初始值
      *
@@ -707,6 +730,7 @@ public class ApiUtils {
         }
         return false;
     }
+    //sort list area =================================================================
 
     public void sendEmail(String to, String content, boolean isHtml) throws MessagingException {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
@@ -728,7 +752,6 @@ public class ApiUtils {
         // 发送邮件
         mailSender.send(mailMessage);
     }
-    //sort list area =================================================================
 
     public void addProductVo2List(List desList, List sourceList) {
 
@@ -789,12 +812,12 @@ public class ApiUtils {
 
     public void setCommentNumAndRatins(ProductListVo productListVo) {
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productListVo.getId(), 1, 20);
-        if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
+        if (pagedCmpskus != null && pagedCmpskus.getData().size() > 0) {
             List<PtmCmpSku> tempSkuList = pagedCmpskus.getData();
             //计算评论数*星级的总和
             int sum = 0;
             //统计site
-            Set<Website> websiteSet = new HashSet<Website>();
+            Set<Website> websiteSet = new HashSet<>();
             for (PtmCmpSku ptmCmpSku : tempSkuList) {
                 websiteSet.add(ptmCmpSku.getWebsite());
             }
@@ -1077,5 +1100,4 @@ public class ApiUtils {
         }
         return cmpProductListVoList;
     }
-
 }
