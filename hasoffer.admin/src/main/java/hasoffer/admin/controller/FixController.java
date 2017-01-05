@@ -162,9 +162,9 @@ public class FixController {
 
             String urlHtml = responseModel.getBodyString();
 
-            String[] subStr = urlHtml.split("window.__myx_seo__ = \\[\\[");
+            String[] subStr = urlHtml.split("window.__myx_seo__ = ");
 
-            System.out.println(subStr[1]);
+            System.out.println(subStr[1].length());
 
             String resultString = subStr[1].substring(0, subStr[1].indexOf(';'));
 
@@ -172,7 +172,7 @@ public class FixController {
 
             String keywordString = StringUtils.filterAndTrim(resultString, Arrays.asList("]", "["));
 
-            String[] subStr1 = keywordString.split("\"name\":\"");
+            String[] subStr1 = keywordString.trim().split("\"name\":\"");
 
             for (int i = 1; i < subStr1.length; i++) {
 
