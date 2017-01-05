@@ -34,7 +34,7 @@ import java.util.List;
 public class ProductCacheManager {
 
     private static final Class CACHE_CLASS = PtmProduct.class;
-    private static final String CACHE_KEY_PRE = "PRODUCT_";
+    private static final String CACHE_KEY_PRE = "API_PRODUCT_";
     private static final long CACHE_EXPIRE_TIME = TimeUtils.SECONDS_OF_1_DAY;
 
     @Resource

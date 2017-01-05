@@ -361,4 +361,16 @@ public class MobileController {
         }
         return modelAndView;
     }
+
+    /**
+     * 从关键词库获取关键词列表
+     *
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    public ModelAndView getKeyWordsFromKeyRepo(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "2000") int pageSize) {
+
+        return null;
+    }
 }
