@@ -47,6 +47,7 @@ import hasoffer.core.utils.ConstantUtil;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.helper.WebsiteHelper;
+import hasoffer.fetch.sites.shopclues.ShopcluesHelper;
 import hasoffer.spider.model.FetchedProductReview;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
@@ -191,6 +192,17 @@ public class AppController {
         Map map = new HashMap();
         map.put("gList", gifts == null ? null : gifts);
         modelAndView.addObject(ConstantUtil.API_NAME_DATA, map);
+        return modelAndView;
+    }
+
+
+    @RequestMapping(value = "/vcAff", method = RequestMethod.GET)
+    public ModelAndView vcAff() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject(Website.AMAZON.name(), AffliIdHelper.getAffIdByChannelForAmazon(MarketChannel.VC));
+        modelAndView.addObject(Website.FLIPKART.name(), AffliIdHelper.getAffiIdByWebsite(Website.FLIPKART, MarketChannel.VC));
+        modelAndView.addObject(Website.SNAPDEAL.name(), AffliIdHelper.getAffiIdByWebsite(Website.SNAPDEAL, MarketChannel.VC));
+        modelAndView.addObject(Website.SHOPCLUES.name(), ShopcluesHelper.SHOPCLUES_URL);
         return modelAndView;
     }
 
