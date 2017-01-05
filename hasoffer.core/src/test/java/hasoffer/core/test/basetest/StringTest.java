@@ -27,6 +27,15 @@ import java.util.regex.Pattern;
 public class StringTest {
 
     @Test
+    public void testStringIndex() {
+        String str = "]][;";
+
+        int i = str.indexOf(';');
+
+        System.out.println(i);
+    }
+
+    @Test
     public void testUrlDecode() {
         String url = "https%3A%2F%2Fwww.tatacliq.com%2Felectronics-accessories-covers-cases%2Fc-msh1222101%3Fq%3D%253Aprice-asc%253AisLuxuryProduct%253Afalse%253AisLuxuryProduct%253Afalse%253Aprice%253A%25E2%2582%25B90-%25E2%2582%25B999999999%26isFacet%3Dtrue%26facetValue%3D%25E2%2582%25B90-%25E2%2582%25B999999999";
         System.out.println(URLDecoder.decode(URLDecoder.decode(url)));
