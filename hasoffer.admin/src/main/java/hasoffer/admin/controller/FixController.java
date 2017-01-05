@@ -170,7 +170,7 @@ public class FixController {
 
             System.out.println(resultString);
 
-            String keywordString = StringUtils.filterAndTrim(resultString, Arrays.asList("]", "["));
+            String keywordString = StringUtils.filterAndTrim(resultString, Arrays.asList("\\]", "\\["));
 
             String[] subStr1 = keywordString.split("\"name\":\"");
 
