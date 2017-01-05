@@ -162,7 +162,9 @@ public class FixController {
 
             String urlHtml = responseModel.getBodyString();
 
-            String[] subStr = urlHtml.split("window\\.__myx_seo__ =");
+            System.out.println(urlHtml);
+
+            String[] subStr = urlHtml.split("window.__myx_seo__ =");
 
             System.out.println(subStr.length);
 
