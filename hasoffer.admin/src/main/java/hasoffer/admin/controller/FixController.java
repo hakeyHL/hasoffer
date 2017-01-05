@@ -158,7 +158,7 @@ public class FixController {
 
             String category = "CLOTHING";
 
-            HttpResponseModel responseModel = HttpUtils.get("http://www.myntra.com/", null);
+            HttpResponseModel responseModel = HttpUtils.get("http://www.myntra.com", null);
 
             String urlHtml = responseModel.getBodyString();
 
