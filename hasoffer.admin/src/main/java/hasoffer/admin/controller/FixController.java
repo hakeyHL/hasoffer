@@ -158,7 +158,19 @@ public class FixController {
 
             String category = "CLOTHING";
 
-            HttpResponseModel responseModel = HttpUtils.get("http://www.myntra.com", null);
+            Map<String, String> headerMap = new HashMap<>();
+
+            headerMap.put("Connection", "keep-alive");
+            headerMap.put("Content-Encoding", "gzip");
+            headerMap.put("Content-Length", "20500");
+            headerMap.put("Content-Type", "text/html; charset=utf-8");
+            headerMap.put("Date", "Thu, 05 Jan 2017 04:22:30 GMT");
+            headerMap.put("ETag", "W/\"181b1-uhDuaT2E37oqTP0yYgdgWw\"");
+            headerMap.put("Vary", "Accept-Encoding");
+            headerMap.put("X-Frame-Options", "SAMEORIGIN");
+            headerMap.put("X-N", "S");
+
+            HttpResponseModel responseModel = HttpUtils.get("http://www.myntra.com/", headerMap);
 
             String urlHtml = responseModel.getBodyString();
 
