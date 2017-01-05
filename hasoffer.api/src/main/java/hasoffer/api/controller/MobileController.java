@@ -3,7 +3,9 @@ package hasoffer.api.controller;
 import hasoffer.base.enums.SearchResultSort;
 import hasoffer.base.model.PageableResult;
 import hasoffer.core.app.AppSearchService;
+import hasoffer.core.app.MobileService;
 import hasoffer.core.app.vo.ResultVo;
+import hasoffer.core.app.vo.mobile.KeyWordsVo;
 import hasoffer.core.app.vo.mobile.SiteMapKeyVo;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
@@ -39,6 +41,9 @@ public class MobileController {
     PtmStdSKuServiceImpl ptmStdSKuService;
     @Autowired
     PtmStdSkuIndexServiceImpl stdSkuIndexService;
+    @Autowired
+    MobileService mobileService;
+
     Logger logger = LoggerFactory.getLogger(MobileController.class);
 
     public static void main(String[] args) {
@@ -363,14 +368,46 @@ public class MobileController {
     }
 
     /**
-     * 从关键词库获取关键词列表
+     * @param page
+     * @param pageSize keyWordsVo.weight      按照权重排序字段 小于0 升序 大于等于0降序  默认1
+     *                 keyWordsVo.resultCount 按照结果个数排序字段小于0 升序 大于等于0降序  默认1
+     * @return
+     */
+    @RequestMapping("keyWords")
+    public ModelAndView getKeyWordsFromKeyRepo(@RequestParam(defaultValue = "1") int page,
+                                               @RequestParam(defaultValue = "200") int pageSize,
+                                               KeyWordsVo keyWordsVo) {
+
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
+        List<KeyWordsVo> keyWordsVoList = mobileService.getKeyWordsListFromRepo(keyWordsVo, page, pageSize);
+        Map dataMap = new HashMap();
+        dataMap.put("keyList", keyWordsVoList);
+        modelAndView.addObject(ConstantUtil.API_NAME_DATA, dataMap);
+        return modelAndView;
+    }
+
+    /**
+     * 关键词库的词搜索
      *
      * @param page
      * @param pageSize
+     * @param keyWordsVo
      * @return
      */
-    public ModelAndView getKeyWordsFromKeyRepo(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "2000") int pageSize) {
+    @RequestMapping("key/search")
+    public ModelAndView keySearch(@RequestParam(defaultValue = "1") int page,
+                                  @RequestParam(defaultValue = "200") int pageSize,
+                                  @RequestBody KeyWordsVo keyWordsVo) {
 
-        return null;
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
+//        List<KeyWordsVo> keyWordsVoList = mobileService.getKeyWordsListFromRepo(keyWordsVo, page, pageSize);
+//        Map dataMap = new HashMap();
+//        dataMap.put("keyList", keyWordsVoList);
+        modelAndView.addObject(ConstantUtil.API_NAME_DATA, null);
+        return modelAndView;
     }
 }
