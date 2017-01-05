@@ -4,6 +4,7 @@ import hasoffer.base.enums.SearchResultSort;
 import hasoffer.base.model.PageableResult;
 import hasoffer.core.app.AppSearchService;
 import hasoffer.core.app.MobileService;
+import hasoffer.core.app.vo.CmpProductListVo;
 import hasoffer.core.app.vo.ResultVo;
 import hasoffer.core.app.vo.mobile.KeyWordsVo;
 import hasoffer.core.app.vo.mobile.SiteMapKeyVo;
@@ -404,10 +405,10 @@ public class MobileController {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
         modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
-//        List<KeyWordsVo> keyWordsVoList = mobileService.getKeyWordsListFromRepo(keyWordsVo, page, pageSize);
-//        Map dataMap = new HashMap();
-//        dataMap.put("keyList", keyWordsVoList);
-        modelAndView.addObject(ConstantUtil.API_NAME_DATA, null);
+        List<CmpProductListVo> cmpProductListVoList = mobileService.searchFromSolrByKeyWordVo(keyWordsVo, page, pageSize);
+        Map dataMap = new HashMap();
+        dataMap.put("skuList", cmpProductListVoList);
+        modelAndView.addObject(ConstantUtil.API_NAME_DATA, dataMap);
         return modelAndView;
     }
 }
