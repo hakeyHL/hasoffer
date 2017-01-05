@@ -95,8 +95,8 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     }
 
     @Override
-    public void sendKeyWordTask(Website website, String keyword) {
-        FetchResult fetchResult = new FetchResult(website, keyword);
+    public void sendKeyWordTask(String asrId, Website website, String keyword) {
+        FetchResult fetchResult = new FetchResult(asrId, website, keyword);
         fetchResult.setTaskStatus(TaskStatus.START);
         try {
             String key = FetchResult.getCacheKey(fetchResult);
