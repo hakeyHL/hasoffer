@@ -145,8 +145,8 @@ public class FixController {
     @ResponseBody
     public String keyword() throws Exception {
 
-        getFlipkartKeyword();
-        getSnapdealKeyword();
+//        getFlipkartKeyword();
+//        getSnapdealKeyword();
         getMyntraKeyword();
 
         return "";
@@ -164,7 +164,13 @@ public class FixController {
 
             String[] subStr = urlHtml.split("window.__myx_seo__ = \\[\\[");
 
-            String keywordString = StringUtils.filterAndTrim(subStr[1].substring(0, subStr[1].indexOf(';')), Arrays.asList("\\]", "\\["));
+            System.out.println(subStr[1]);
+
+            String resultString = subStr[1].substring(0, subStr[1].indexOf(';'));
+
+            System.out.println(resultString);
+
+            String keywordString = StringUtils.filterAndTrim(resultString, Arrays.asList("]", "["));
 
             String[] subStr1 = keywordString.split("\"name\":\"");
 
