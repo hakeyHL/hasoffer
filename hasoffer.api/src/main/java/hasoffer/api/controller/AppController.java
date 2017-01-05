@@ -649,19 +649,6 @@ public class AppController {
                 break;
             case 2:
                 //search by title
-               /* if (StringUtils.isNotEmpty(criteria.getCategoryId())) {
-                    if (StringUtils.isNotEmpty(deviceInfoVo.getAppVersion()) && criteria.getCategoryId().equals("5") && criteria.getLevel() == 2) {
-                        String appVersion = deviceInfoVo.getAppVersion();
-                        version = Integer.parseInt(appVersion);
-                        if (version >= 36) {
-                            criteria.setPivotFields(Arrays.asList("Network",
-                                    "Screen_Resolution", "Operating_System", "queryRam",
-                                    "queryScreenSize", "querySecondaryCamera",
-                                    "queryBatteryCapacity", "queryPrimaryCamera",
-                                    "queryInternalMemory", "brand"));
-                        }
-                    }
-                }*/
                 criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
                 PageableResult p;
                 p = ptmStdSkuIndexService.searchProducts(criteria);

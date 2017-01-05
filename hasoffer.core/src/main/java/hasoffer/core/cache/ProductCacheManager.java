@@ -3,7 +3,6 @@ package hasoffer.core.cache;
 import com.alibaba.fastjson.JSONArray;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
-import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.app.AppCacheService;
@@ -241,10 +240,14 @@ public class ProductCacheManager {
             if (StringUtils.isEmpty(cmpSkusJson)) {
                 pagedCmpskus = productService.listNotOffSaleCmpSkus(proId, page, size);
                 if (pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
-                    cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
+                    cacheService.add(key, JSONArray.toJSONString(ApiUtils.getIdList(pagedCmpskus.getData())), TimeUtils.SECONDS_OF_1_HOUR * 8);
+//                    cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
                 }
             } else {
-                pagedCmpskus = ApiUtils.setPtmCmpSkuPageableResult(cmpSkusJson);
+//                pagedCmpskus = ApiUtils.setPtmCmpSkuPageableResult(cmpSkusJson);
+                pagedCmpskus = new PageableResult<>();
+                List cmpSkuList = appCacheService.getObjectListFromCache(new PtmProduct(), cmpSkusJson, 0);
+                pagedCmpskus.setData(cmpSkuList);
             }
         } catch (Exception e) {
             logger.error("deal skus from cache error {}", e.getMessage(), e);
