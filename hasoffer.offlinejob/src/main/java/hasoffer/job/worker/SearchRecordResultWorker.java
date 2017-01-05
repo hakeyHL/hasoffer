@@ -68,9 +68,13 @@ public class SearchRecordResultWorker implements Runnable {
 
 
     private void updateResult(FetchResult fetchResult) {
-        String key = HexDigestUtil.md5(fetchResult.getKeyword() + "-" + fetchResult.getWebsite());
+        String key = fetchResult.getAsrId();
+        logger.info("updateResult: AsrId: {}", key);
+        if (key == null || "".equals(key)) {
+            key = HexDigestUtil.md5(fetchResult.getKeyword() + "-" + fetchResult.getWebsite());
+        }
         SrmAutoSearchResult autoSearchResult = searchProductService.getSearchResultById(key);
-        logger.info("updateResult: fetchResult:{}, autoSearchResult:{}", fetchResult, autoSearchResult);
+        logger.info("updateResult: fetchResult:{}, \n autoSearchResult:{}", fetchResult, autoSearchResult);
         if (autoSearchResult == null) {
             return;
         }
