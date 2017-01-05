@@ -48,10 +48,11 @@ public interface IFetchDubboService {
     /**
      * 提交关键词任务
      *
+     * @param id
      * @param website
      * @param keyword
      */
-    void sendKeyWordTask(Website website, String keyword);
+    void sendKeyWordTask(String id, Website website, String keyword);
 
 /*************************************************************************************************/
 
