@@ -1,6 +1,7 @@
 package hasoffer.core.app.impl;
 
 import hasoffer.core.app.MobileService;
+import hasoffer.core.app.vo.CmpProductListVo;
 import hasoffer.core.app.vo.mobile.KeyWordsVo;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.h5.KeywordCollection;
@@ -64,5 +65,11 @@ public class MobileServiceImpl implements MobileService {
             keyWordsVoList.add(new KeyWordsVo(keywordCollection));
         }
         return keyWordsVoList;
+    }
+
+    @Override
+    public List<CmpProductListVo> searchFromSolrByKeyWordVo(KeyWordsVo keyWordsVo, int page, int pageSize) {
+        List<CmpProductListVo> cmpProductListVoList = new ArrayList<>();
+        return cmpProductListVoList;
     }
 }
