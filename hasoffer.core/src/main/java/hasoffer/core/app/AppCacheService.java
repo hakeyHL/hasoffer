@@ -1,12 +1,17 @@
 package hasoffer.core.app;
 
+import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.ptm.PtmStdPrice;
+import hasoffer.core.persistence.po.ptm.PtmStdSku;
+
 import java.util.List;
 
 /**
  * Created by hs on 2016年12月13日.
  * Time 11:48
  */
-public interface AppCacheService<T> {
+public interface AppCacheService {
     String getCacheValueByKey(String key);
 
     String getCacheValueByKey(String key, long seconds);
@@ -15,7 +20,13 @@ public interface AppCacheService<T> {
 
     boolean addObjectCache(String key, Object object, long seconds);
 
-    List<T> getObjectListFromCache(String key, long seconds);
+    List getObjectListFromCache(Object object, String idArrayString, long seconds);
 
-    boolean addObjectListToCache(String key, String value, long seconds);
+    PtmStdSku getPtmStdSku(long ptmStdSkuId, int... operateType);
+
+    PtmStdPrice getPtmStdPrice(long ptmStdPriceId, int... operateType);
+
+    PtmProduct getPtmProduct(long ptmProductId, int... operateType);
+
+    PtmCmpSku getPtmCmpSku(long ptmCmpSkuId, int... operateType);
 }

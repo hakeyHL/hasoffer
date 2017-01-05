@@ -145,8 +145,8 @@ public class FixController {
     @ResponseBody
     public String keyword() throws Exception {
 
-        getFlipkartKeyword();
-        getSnapdealKeyword();
+//        getFlipkartKeyword();
+//        getSnapdealKeyword();
         getMyntraKeyword();
 
         return "";
@@ -170,7 +170,8 @@ public class FixController {
             headerMap.put("X-Frame-Options", "SAMEORIGIN");
             headerMap.put("X-N", "S");
 
-            HttpResponseModel responseModel = HttpUtils.get("http://www.myntra.com/", headerMap);
+//            HttpResponseModel responseModel = HttpUtils.get("http://www.myntra.com/", headerMap);
+            HttpResponseModel responseModel = HttpUtils.get("http://www.myntra.com/", null);
 
             String urlHtml = responseModel.getBodyString();
 
