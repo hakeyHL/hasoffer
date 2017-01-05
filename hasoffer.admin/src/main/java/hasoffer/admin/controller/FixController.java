@@ -145,8 +145,8 @@ public class FixController {
     @ResponseBody
     public String keyword() throws Exception {
 
-//        getFlipkartKeyword();
-//        getSnapdealKeyword();
+        getFlipkartKeyword();
+        getSnapdealKeyword();
         getMyntraKeyword();
 
         return "";
