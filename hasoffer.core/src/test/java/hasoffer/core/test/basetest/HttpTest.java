@@ -48,8 +48,8 @@ public class HttpTest {
 
         List<KeywordRepository> keywordRepositoryList = new ArrayList<>();
 
-        getFlipkartKeyword(keywordRepositoryList);
-        getSnapdealKeyword(keywordRepositoryList);
+//        getFlipkartKeyword(keywordRepositoryList);
+//        getSnapdealKeyword(keywordRepositoryList);
         getMyntraKeyword(keywordRepositoryList);
 
         System.out.println(keywordRepositoryList);

@@ -3,9 +3,7 @@ package hasoffer.core.persistence.po.h5;
 import hasoffer.base.model.Website;
 import hasoffer.core.persistence.dbm.osql.Identifiable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * Created on 2017/1/4.
@@ -19,6 +17,8 @@ public class KeywordCollection implements Identifiable<String> {
     public String id;//keyword+keywordSourceSite的md5
     public String keyword;//关键字
     public String keywordKey;//关键字md5
+
+    @Enumerated(EnumType.STRING)
     public Website keywordSourceSite;//关键字来源
     public String sourceSiteCategoryName;//来源网站类目名称
     public float weight = 0.6f;//权重   0-1 ex:0.6

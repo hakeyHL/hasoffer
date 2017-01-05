@@ -54,10 +54,10 @@ public class SearchRecordResultWorker implements Runnable {
                 if (HasofferRegion.INDIA.toString().equals(serRegion)) {
                     FetchResult fetchResult = fetchService.popProductsKeyWord();
                     if (fetchResult == null || fetchResult.getKeyword() == null) {
-                        TimeUnit.MINUTES.sleep(10);
+                        TimeUnit.MINUTES.sleep(1);
                         continue;
                     }
-                    fetchForIndia(fetchResult);
+                    updateResult(fetchResult);
                 }
 
             } catch (Exception e) {
@@ -67,11 +67,12 @@ public class SearchRecordResultWorker implements Runnable {
     }
 
 
-    private void fetchForIndia(FetchResult fetchResult) {
-        String key = HexDigestUtil.md5(fetchResult.getKeyword());
+    private void updateResult(FetchResult fetchResult) {
+        String key = HexDigestUtil.md5(fetchResult.getKeyword() + "-" + fetchResult.getWebsite());
         SrmAutoSearchResult autoSearchResult = searchProductService.getSearchResultById(key);
-        if (logger.isDebugEnabled()) {
-            logger.debug("fetchForIndia: {}", autoSearchResult);
+        logger.info("updateResult: fetchResult:{}, autoSearchResult:{}", fetchResult, autoSearchResult);
+        if (autoSearchResult == null) {
+            return;
         }
         initResultMap(autoSearchResult, fetchResult);
         updateMongo(autoSearchResult);
