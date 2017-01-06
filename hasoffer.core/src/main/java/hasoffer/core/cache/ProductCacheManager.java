@@ -11,6 +11,7 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.IPtmStdImageService;
 import hasoffer.core.redis.ICacheService;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.data.redis.IRedisListService;
@@ -34,7 +35,7 @@ import java.util.List;
 public class ProductCacheManager {
 
     private static final Class CACHE_CLASS = PtmProduct.class;
-    private static final String CACHE_KEY_PRE = "API_PRODUCT_";
+    private static final String CACHE_KEY_PRE = "PRODUCT_";
     private static final long CACHE_EXPIRE_TIME = TimeUtils.SECONDS_OF_1_DAY;
 
     @Resource
@@ -170,7 +171,7 @@ public class ProductCacheManager {
      * @return
      */
     public PageableResult<PtmCmpSku> listPagedCmpSkus(long proId, int page, int size) {
-        String key = CACHE_KEY_PRE + "_listPagedCmpSkus_" + String.valueOf(proId) + "_" + page + "_" + size;
+        String key = ConstantUtil.API_PREFIX_CACAHE_CMP_CMPLIST_ + proId + "_" + page + "_" + size;
         String cmpSkusJson = cacheService.get(key, 0);
         //先不读缓存,也不存缓存
         PageableResult<PtmCmpSku> pagedCmpskus;
