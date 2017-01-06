@@ -11,27 +11,24 @@ import java.util.regex.Pattern;
  */
 public class ShopcluesHelper {
 
+    public static final String SHOPCLUES_URL = "http://affiliateshopclues.com/?a=2892&c=69&p=r&s1=VC&ckmrdr=";
     private static String SHOPCLUES_LOCAL_AFF_TEMP = "http://affiliateshopclues.com/?a=2892&c=22&p=r&s1=hasoffer&s2=%s&ckmrdr=%s";
-
     private static String SHOPCLUES_URL1 = "http://affiliateshopclues.com/?a=9&c=19&p=r&s1={affiliate_id}&s2={transaction_id}&ckmrdr=%s?utm_source=vcommission&utm_medium=CPS&s2=homepage";
-
     private static String SHOPCLUES_URL2 = "http://tracking.vcommission.com/aff_c?offer_id=122&aff_id=48424&url=";
-
-
     private static Pattern URL_PATTERN = Pattern.compile("http://www.shopclues.com/(.*).html.*");
     private static Pattern KEYWORD_PATTERN = Pattern.compile("(.*)-\\d+");
 
-    /**
-     * 使用了 第三方：vcommission 的联盟系统
-     *
-     * @param url
-     * @return
-     */
-    public static String getUrlWithAff(String url) {
-        String url1 = String.format(SHOPCLUES_URL1, url);
-
-        return SHOPCLUES_URL2 + StringUtils.urlEncode(url1);
-    }
+    ///**
+    // * 使用了 第三方：vcommission 的联盟系统
+    // *
+    // * @param url
+    // * @return
+    // */
+    //public static String getUrlWithAff(String url) {
+    //    String url1 = String.format(SHOPCLUES_URL1, url);
+    //
+    //    return SHOPCLUES_URL2 + StringUtils.urlEncode(url1);
+    //}
 
     public static String getKeywordFromSkuUrl(String url) {
         Matcher m = URL_PATTERN.matcher(url);

@@ -439,7 +439,8 @@ public class AppServiceImpl implements IAppService {
 
         Map<String, String> shopClueMap = new HashMap<>();
         shopClueMap.put("X", getPackageName(Website.SHOPCLUES));
-        shopClueMap.put("Y", getShopCluesIndexUrl());
+        //shopClueMap.put("Y", getShopCluesIndexUrl());
+        shopClueMap.put("Y", "");
         shopClueMap.put("Z", getLiveDemo(Website.SHOPCLUES, marketChannel, deviceId));
         shopClueMap.put("I", getInstallUrl(Website.SHOPCLUES));
         shopClueMap.put("J", Website.SHOPCLUES.toString());
@@ -544,6 +545,7 @@ public class AppServiceImpl implements IAppService {
     }
 
     private String getShopCluesIndexUrl() {
+        //"http://affiliateshopclues.com/?a=2892&c=69&p=r&s1=VC&ckmrdr="
         String url = "http://www.shopclues.com/?ty=0&id=none&mcid=aff&utm_source=Hasoffer&OfferId=15";
         return new String(org.apache.commons.codec.binary.Base64.encodeBase64(url.getBytes(Charset.forName("UTF-8"))));
     }

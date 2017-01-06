@@ -47,6 +47,7 @@ import hasoffer.core.utils.ConstantUtil;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.helper.WebsiteHelper;
+import hasoffer.fetch.sites.shopclues.ShopcluesHelper;
 import hasoffer.spider.model.FetchedProductReview;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
@@ -191,6 +192,17 @@ public class AppController {
         Map map = new HashMap();
         map.put("gList", gifts == null ? null : gifts);
         modelAndView.addObject(ConstantUtil.API_NAME_DATA, map);
+        return modelAndView;
+    }
+
+
+    @RequestMapping(value = "/vcAff", method = RequestMethod.GET)
+    public ModelAndView vcAff() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject(Website.AMAZON.name(), AffliIdHelper.getAffIdByChannelForAmazon(MarketChannel.VC));
+        modelAndView.addObject(Website.FLIPKART.name(), AffliIdHelper.getAffiIdByWebsite(Website.FLIPKART, MarketChannel.VC));
+        modelAndView.addObject(Website.SNAPDEAL.name(), AffliIdHelper.getAffiIdByWebsite(Website.SNAPDEAL, MarketChannel.VC));
+        modelAndView.addObject(Website.SHOPCLUES.name(), ShopcluesHelper.SHOPCLUES_URL);
         return modelAndView;
     }
 
@@ -649,19 +661,6 @@ public class AppController {
                 break;
             case 2:
                 //search by title
-               /* if (StringUtils.isNotEmpty(criteria.getCategoryId())) {
-                    if (StringUtils.isNotEmpty(deviceInfoVo.getAppVersion()) && criteria.getCategoryId().equals("5") && criteria.getLevel() == 2) {
-                        String appVersion = deviceInfoVo.getAppVersion();
-                        version = Integer.parseInt(appVersion);
-                        if (version >= 36) {
-                            criteria.setPivotFields(Arrays.asList("Network",
-                                    "Screen_Resolution", "Operating_System", "queryRam",
-                                    "queryScreenSize", "querySecondaryCamera",
-                                    "queryBatteryCapacity", "queryPrimaryCamera",
-                                    "queryInternalMemory", "brand"));
-                        }
-                    }
-                }*/
                 criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
                 PageableResult p;
                 p = ptmStdSkuIndexService.searchProducts(criteria);

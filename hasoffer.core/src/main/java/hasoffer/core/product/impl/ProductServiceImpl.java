@@ -882,9 +882,9 @@ public class ProductServiceImpl implements IProductService {
     public void setCommentNumAndRatins(ProductModel2 productModel2) {
         int count = cmpSkuService.getSkuSoldStoreNum(productModel2.getId());
         System.out.println(" count :" + count + " id :" + productModel2.getId());
-        PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productModel2.getId(), 1, 100);
-        if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
-            List<PtmCmpSku> tempSkuList = pagedCmpskus.getData();
+        PageableResult<PtmCmpSku> cmpSkuList = productCacheManager.listPagedCmpSkus(productModel2.getId(), 1, 100);
+        if (cmpSkuList != null && cmpSkuList.getData().size() > 0) {
+            List<PtmCmpSku> tempSkuList = cmpSkuList.getData();
 
             float maxPrice = Collections.max(tempSkuList, new Comparator<PtmCmpSku>() {
                 @Override

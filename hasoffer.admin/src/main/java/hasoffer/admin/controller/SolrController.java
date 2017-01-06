@@ -167,6 +167,18 @@ public class SolrController {
         listAndProcessTask2.go();
     }
 
+    @ResponseBody
+    @RequestMapping("importPtmProduct2SolrByProId")
+    public String importNewStructData2SolrT(final Long ptmProductId) {
+        if (ptmProductId > 0) {
+            PtmProduct ptmProduct = productService.getProduct(ptmProductId);
+            if (ptmProduct != null) {
+                productService.importProduct2Solr2(ptmProduct);
+            }
+        }
+        return "ok";
+    }
+
     private void import2Solr(PtmProduct o) {
         List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(o.getId(), SkuStatus.ONSALE);
 
