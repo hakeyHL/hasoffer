@@ -37,7 +37,8 @@ public class MobileServiceImpl implements MobileService {
 
     @Override
     public List<KeyWordsVo> getKeyWordsListFromRepo(KeyWordsVo keyWordsVo, int page, int pageSize) {
-        StringBuilder sql = new StringBuilder(API_KEYWORDCOLLECTION_GETBY_KEYWORDSVO);
+        StringBuilder sql = new StringBuilder();
+        sql.append(API_KEYWORDCOLLECTION_GETBY_KEYWORDSVO);
         List<KeyWordsVo> keyWordsVoList = new ArrayList<>();
         if (keyWordsVo == null) {
             return keyWordsVoList;
@@ -46,7 +47,7 @@ public class MobileServiceImpl implements MobileService {
             sql.append(" and  t.keyword=" + keyWordsVo.getName());
         }
 
-        if (keyWordsVo.getCategoryId() > 0) {
+        if (keyWordsVo.getCategoryId() != null && keyWordsVo.getCategoryId() > 0) {
             sql.append(" and  t.categoryid=" + keyWordsVo.getCategoryId());
         }
 
@@ -58,16 +59,16 @@ public class MobileServiceImpl implements MobileService {
             sql.append(" and  t.sourceSiteCategoryName=" + keyWordsVo.getSource().name());
         }
 
-        if (keyWordsVo.getResultCount() > 0) {
+        if (keyWordsVo.getResultCount() != null && keyWordsVo.getResultCount() > 0) {
             sql.append(" order by   t.keywordResult desc ");
         } else {
             sql.append(" order by   t.keywordResult asc ");
         }
 
-        if (keyWordsVo.getWeight() > 0) {
-            sql.append(" order by   t.weight desc ");
+        if (keyWordsVo.getWeight() != null && keyWordsVo.getWeight() > 0) {
+            sql.append(",t.weight desc ");
         } else {
-            sql.append(" order by   t.weight asc ");
+            sql.append(",t.weight asc ");
         }
         List<KeywordCollection> keywordCollections = dbm.query(sql.toString());
         for (KeywordCollection keywordCollection : keywordCollections) {
