@@ -80,7 +80,7 @@ public class MobileServiceImpl implements MobileService {
     @Override
     public List<CmpProductListVo> searchFromSolrByKeyWordVo(KeyWordsVo keyWordsVo, int page, int pageSize) {
         List<CmpProductListVo> cmpProductListVoList = new ArrayList<>();
-        //1. 按照关键词从ptmStdSku solr搜索商品列表  暂时只有,后期要后话的话再从ptmProduct中搜索
+        //1. 按照关键词从ptmStdSku solr搜索商品列表  暂时只有,后期要优化的话再从ptmProduct中搜索
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setKeyword(keyWordsVo.getName());
         searchCriteria.setPage(page);
