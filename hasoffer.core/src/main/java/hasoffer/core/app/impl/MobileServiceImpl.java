@@ -1,11 +1,16 @@
 package hasoffer.core.app.impl;
 
+import hasoffer.base.model.PageableResult;
 import hasoffer.core.app.MobileService;
 import hasoffer.core.app.vo.CmpProductListVo;
 import hasoffer.core.app.vo.mobile.KeyWordsVo;
+import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.h5.KeywordCollection;
+import hasoffer.core.product.solr.PtmStdSkuIndexServiceImpl;
+import hasoffer.core.product.solr.PtmStdSkuModel;
 import hasoffer.core.redis.ICacheService;
+import hasoffer.core.utils.api.ApiUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +30,10 @@ public class MobileServiceImpl implements MobileService {
     ICacheService iCacheService;
     @Resource
     IDataBaseManager dbm;
+    @Resource
+    PtmStdSkuIndexServiceImpl ptmStdSkuIndexService;
+    @Resource
+    ApiUtils apiUtils;
 
     @Override
     public List<KeyWordsVo> getKeyWordsListFromRepo(KeyWordsVo keyWordsVo, int page, int pageSize) {
@@ -70,6 +79,13 @@ public class MobileServiceImpl implements MobileService {
     @Override
     public List<CmpProductListVo> searchFromSolrByKeyWordVo(KeyWordsVo keyWordsVo, int page, int pageSize) {
         List<CmpProductListVo> cmpProductListVoList = new ArrayList<>();
+        //1. 按照关键词从ptmStdSku solr搜索商品列表  暂时只有,后期要后话的话再从ptmProduct中搜索
+        SearchCriteria searchCriteria = new SearchCriteria();
+        searchCriteria.setKeyword(keyWordsVo.getName());
+        searchCriteria.setPage(page);
+        searchCriteria.setPageSize(pageSize);
+        PageableResult<PtmStdSkuModel> ptmStdSkuModels = ptmStdSkuIndexService.filterStdSkuOnCategoryByCriteria(searchCriteria);
+        apiUtils.addProductVo2List(cmpProductListVoList, ptmStdSkuModels.getData());
         return cmpProductListVoList;
     }
 }
