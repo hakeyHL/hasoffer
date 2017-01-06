@@ -8,6 +8,7 @@ import hasoffer.core.cache.CategoryCacheManager;
 import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.ptm.*;
+import hasoffer.core.persistence.po.ptm.updater.PtmStdSkuUpdater;
 import hasoffer.core.product.IPtmStdPriceService;
 import hasoffer.core.product.IPtmStdSkuService;
 import hasoffer.core.product.solr.PtmStdSkuIndexServiceImpl;
@@ -30,7 +31,7 @@ import java.util.*;
 @Service
 public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
     private static final String SOLR_GET_PTMSTDSKU_BY_MINID = " select t from PtmStdSku t where id >= ?0";
-    private static final String API_GET_PTMSTDSKU_BY_SKUID = " select t from PtmStdSku t where id = ?0 and t.";
+    private static final String API_GET_PTMSTDPRICRE_BY_SKUID = " select t from PtmStdPrice  t where t.stdSkuId = ?0 and t.skuStatus='ONSALE'";
     @Resource
     CategoryCacheManager categoryCacheManager;
     @Resource
@@ -89,6 +90,38 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
     public List<PtmStdPrice> getSimilaryPricesByPriceAndRating(PtmStdSku ptmStdSku) {
 
         return null;
+    }
+
+    @Override
+    public void updatePtmStdSkuPrice(Long productId) {
+        //1. 获取price列表
+        float minPrice = 0;
+        PtmStdSku ptmStdSku = dbm.get(PtmStdSku.class, productId);
+        if (ptmStdSku != null) {
+            List<PtmStdPrice> priceList = dbm.query(API_GET_PTMSTDPRICRE_BY_SKUID, Arrays.asList(productId));
+            if (priceList != null && priceList.size() > 0) {
+                //2. 获取最低价格
+                minPrice = Collections.min(priceList, new Comparator<PtmStdPrice>() {
+                    @Override
+                    public int compare(PtmStdPrice o1, PtmStdPrice o2) {
+                        if (o1.getPrice() > o2.getPrice()) {
+                            return 1;
+                        }
+                        if (o1.getPrice() < o2.getPrice()) {
+                            return -1;
+                        }
+                        return 0;
+                    }
+                }).getPrice();
+            }
+        }
+        //3. 更新最低价格
+        if (minPrice > 0 && ptmStdSku.getRefPrice() > minPrice) {
+            PtmStdSkuUpdater updater = new PtmStdSkuUpdater(productId);
+            updater.getPo().setRefPrice(minPrice);
+            dbm.update(updater);
+        }
+
     }
 
     public PtmStdSkuModel getPtmStdSKuModel(PtmStdSku ptmStdSku1) {
