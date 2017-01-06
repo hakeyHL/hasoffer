@@ -82,7 +82,7 @@ public class StdPriceDubboUpdateWorker implements Runnable {
 //                    logger.info("taskStatus is StdPriceDubboUpdateWorker " + taskStatus + "_" + website);
                 }
             } catch (Exception e) {
-                logger.info("StdPriceDubboUpdateWorker.run() exception.");
+//                logger.info("StdPriceDubboUpdateWorker.run() exception.");
                 e.printStackTrace();
             }
         }

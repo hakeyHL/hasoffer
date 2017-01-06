@@ -28,7 +28,6 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -57,7 +56,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
 
     @Override
     protected void executeInternal(final JobExecutionContext context) throws JobExecutionException {
-        logger.info("CheckPriceOffDealStatusJobBean is run at {}", new Date());
+//        logger.info("CheckPriceOffDealStatusJobBean is run at {}", new Date());
 
         ExecutorService es = Executors.newCachedThreadPool();
 
@@ -71,18 +70,18 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                     PageableResult<AppDeal> pageableResult = dbm.queryPage(Q_PRICEOFF_DEAL, curPage, pageSize, Arrays.asList(TimeUtils.nowDate()));
 
                     long totalPage = pageableResult.getTotalPage();
-                    logger.info("price off deal status total page =" + totalPage);
+//                    logger.info("price off deal status total page =" + totalPage);
 
                     while (curPage <= totalPage) {
 
-                        logger.info("price off deal status curpage =" + curPage);
+//                        logger.info("price off deal status curpage =" + curPage);
 
                         if (curPage > 1) {
                             pageableResult = dbm.queryPage(Q_PRICEOFF_DEAL, curPage, pageSize, Arrays.asList(TimeUtils.nowDate()));
                         }
 
                         List<AppDeal> dealList = pageableResult.getData();
-                        logger.info("find appdeal size =" + dealList.size());
+//                        logger.info("find appdeal size =" + dealList.size());
 
                         for (AppDeal deal : dealList) {
 
@@ -91,7 +90,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                                 long ptmcmpskuid = deal.getPtmcmpskuid();
                                 PtmCmpSku ptmCmpSku = dbm.get(PtmCmpSku.class, ptmcmpskuid);
                                 if (ptmCmpSku == null) {
-                                    logger.info("get null sku,id = ptmcmpskuid");
+//                                    logger.info("get null sku,id = ptmcmpskuid");
                                     continue;
                                 }
                                 Website website = ptmCmpSku.getWebsite();
@@ -108,8 +107,8 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                             }
 
 
-                            logger.info("add price off deal to update queue success " + deal.getId());
-                            logger.info("add price off deal to update queue success type is " + deal.getAppdealSource());
+//                            logger.info("add price off deal to update queue success " + deal.getId());
+//                            logger.info("add price off deal to update queue success type is " + deal.getAppdealSource());
                         }
 
                         curPage++;
@@ -142,7 +141,7 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
 
                         if (StringUtils.isEmpty(pop)) {
                             try {
-                                logger.info("pop deal update list get null sleep 5 seconds");
+//                                logger.info("pop deal update list get null sleep 5 seconds");
                                 TimeUnit.MINUTES.sleep(5);
                             } catch (InterruptedException e) {
 
@@ -155,10 +154,10 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                             FetchUrlResult fetchUrlResult1 = JSONUtil.toObject(pop, FetchUrlResult.class);
                             FetchedProduct fetchedProduct = fetchUrlResult1.getFetchProduct();
                             if (fetchedProduct == null) {
-                                logger.info("deal update fetchedProduct is null");
+//                                logger.info("deal update fetchedProduct is null");
                                 continue;
                             } else {
-                                logger.info("deal update fetchedProduct : " + (fetchedProduct).toString());
+//                                logger.info("deal update fetchedProduct : " + (fetchedProduct).toString());
                             }
                             float nowPrice = fetchedProduct.getPrice();
 
@@ -185,11 +184,11 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                                             //降价，生成新deal；涨价，失效不显示
                                             if (nowPrice < oriPrice && SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
                                                 dealService.updateDealExpire(appdeal.getId(), nowPrice);
-                                                logger.info("deal site deal update delete old and create a new deal success");
+//                                                logger.info("deal site deal update delete old and create a new deal success");
                                             }
                                             if (nowPrice > oriPrice || !SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
                                                 dealService.updateDealExpire(appdeal.getId());
-                                                logger.info("deal site deal update orideal expire");
+//                                                logger.info("deal site deal update orideal expire");
                                             }
                                         }
                                     }
@@ -216,17 +215,17 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
                                     //降价，生成新deal；涨价，失效不显示
                                     if (nowPrice < sku.getPrice() && SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
                                         dealService.updateDealExpire(appdeal.getId(), nowPrice);
-                                        logger.info("price off deal update delete old and create a new deal success");
+//                                        logger.info("price off deal update delete old and create a new deal success");
                                     }
 
                                     if (nowPrice > sku.getPrice() || !SkuStatus.ONSALE.equals(fetchedProduct.getSkuStatus())) {
                                         dealService.updateDealExpire(appdeal.getId());
-                                        logger.info("price off deal update orideal expire");
+//                                        logger.info("price off deal update orideal expire");
                                     }
                                 }
                             }
                         } catch (Exception e) {
-                            logger.info("deal update pop string parse error");
+//                            logger.info("deal update pop string parse error");
                             e.printStackTrace();
                         }
                     }
@@ -234,6 +233,6 @@ public class CheckPriceOffDealStatusJobBean extends QuartzJobBean {
             });
         }
 
-        logger.info("CheckPriceOffDealStatusJobBean will stop at {}", new Date());
+//        logger.info("CheckPriceOffDealStatusJobBean will stop at {}", new Date());
     }
 }

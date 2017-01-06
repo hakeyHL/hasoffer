@@ -1,12 +1,11 @@
 package hasoffer.core.cache;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
-import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.app.AppCacheService;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
@@ -35,7 +34,7 @@ import java.util.List;
 public class ProductCacheManager {
 
     private static final Class CACHE_CLASS = PtmProduct.class;
-    private static final String CACHE_KEY_PRE = "PRODUCT_";
+    private static final String CACHE_KEY_PRE = "API_PRODUCT_";
     private static final long CACHE_EXPIRE_TIME = TimeUtils.SECONDS_OF_1_DAY;
 
     @Resource
@@ -50,6 +49,8 @@ public class ProductCacheManager {
     IRedisListService redisListService;
     @Resource
     IRedisSetService redisSetService;
+    @Resource
+    AppCacheService appCacheService;
     Logger logger = LoggerFactory.getLogger(ProductCacheManager.class);
     @Resource
     private IPtmStdImageService stdImageService;
@@ -178,13 +179,15 @@ public class ProductCacheManager {
                 pagedCmpskus = productService.listOnsaleCmpSkus(proId, page, size);
                 List<PtmCmpSku> data = pagedCmpskus.getData();
                 if (data != null && data.size() > 0) {
-                    cacheService.add(key, JSON.toJSONString(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
+                    cacheService.add(key, JSONArray.toJSONString(ApiUtils.getIdList(pagedCmpskus.getData())), TimeUtils.SECONDS_OF_1_HOUR * 8);
                 } else {
                     pagedCmpskus = new PageableResult<>();
                     pagedCmpskus.setData(new ArrayList<PtmCmpSku>());
                 }
             } else {
-                pagedCmpskus = ApiUtils.setPtmCmpSkuPageableResult(cmpSkusJson);
+                pagedCmpskus = new PageableResult<>();
+                List cmpSkuList = appCacheService.getObjectListFromCache(new PtmCmpSku(), cmpSkusJson, 0);
+                pagedCmpskus.setData(cmpSkuList);
             }
         } catch (Exception e) {
             logger.error("deal skus from cache error:{}", e.getMessage(), e);
@@ -196,7 +199,7 @@ public class ProductCacheManager {
     public List<PtmProduct> getTopSellins(int page, int size) {
         String key = CACHE_KEY_PRE + "_listPagedCmpSkus_TopSelling" + "_" + page + "_" + size;
         String ptmProductJson = cacheService.get(key, 0);
-        List<PtmProduct> products = new ArrayList<PtmProduct>();
+        List<PtmProduct> products = new ArrayList<>();
         try {
             if (StringUtils.isEmpty(ptmProductJson)) {
                 Calendar calendar = Calendar.getInstance();
@@ -208,8 +211,8 @@ public class ProductCacheManager {
                 long yesterdayStart = calendar.getTimeInMillis();
                 List<PtmTopSelling> ptmTopSellings = productService.getTopSellings(yesterdayStart, todayStart, page, size);
                 for (PtmTopSelling ptmTopSelling : ptmTopSellings) {
-                    PageableResult<PtmCmpSku> pageableResult = listPagedCmpSkus(ptmTopSelling.getId(), 0, 20);
-                    if (pageableResult != null && pageableResult.getData() != null && pageableResult.getData().size() > 0) {
+                    PageableResult<PtmCmpSku> cmpSkuList = listPagedCmpSkus(ptmTopSelling.getId(), 0, 20);
+                    if (cmpSkuList != null && cmpSkuList.getData().size() > 0) {
                         PtmProduct product = productService.getProduct(ptmTopSelling.getId());
                         if (product != null && product.getPrice() > 0) {
                             products.add(product);
@@ -217,15 +220,11 @@ public class ProductCacheManager {
                     }
                 }
                 if (products != null && products.size() > 0) {
-                    cacheService.add(key, JSONArray.toJSONString(products), TimeUtils.SECONDS_OF_1_HOUR * 8);
+                    //处理下products,为id列表
+                    cacheService.add(key, JSONArray.toJSONString(ApiUtils.getIdList(products)), TimeUtils.SECONDS_OF_1_HOUR * 8);
                 }
             } else {
-//                List<PtmCmpSku> ptmCmpSkus = JSONArray.parseArray(ptmProductJson, PtmCmpSku.class);
-//                System.out.println("size is : "+ptmCmpSkus.size());
-//                List<LinkedHashMap> maps = JSONUtil.toObject(ptmProductJson, List.class);
-//                products.add(new PtmProduct());
-                products = JSONArray.parseArray(ptmProductJson, PtmProduct.class);
-//                JsonHelper.transferJson2Object(maps, products);
+                products = appCacheService.getObjectListFromCache(new PtmProduct(), ptmProductJson, 0);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -241,10 +240,14 @@ public class ProductCacheManager {
             if (StringUtils.isEmpty(cmpSkusJson)) {
                 pagedCmpskus = productService.listNotOffSaleCmpSkus(proId, page, size);
                 if (pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
-                    cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
+                    cacheService.add(key, JSONArray.toJSONString(ApiUtils.getIdList(pagedCmpskus.getData())), TimeUtils.SECONDS_OF_1_HOUR * 8);
+//                    cacheService.add(key, JSONUtil.toJSON(pagedCmpskus), TimeUtils.SECONDS_OF_1_HOUR * 2);
                 }
             } else {
-                pagedCmpskus = ApiUtils.setPtmCmpSkuPageableResult(cmpSkusJson);
+//                pagedCmpskus = ApiUtils.setPtmCmpSkuPageableResult(cmpSkusJson);
+                pagedCmpskus = new PageableResult<>();
+                List cmpSkuList = appCacheService.getObjectListFromCache(new PtmProduct(), cmpSkusJson, 0);
+                pagedCmpskus.setData(cmpSkuList);
             }
         } catch (Exception e) {
             logger.error("deal skus from cache error {}", e.getMessage(), e);
