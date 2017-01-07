@@ -62,7 +62,7 @@ public class StdPriceDubboUpdateWorker implements Runnable {
                 TaskStatus taskStatus = fetchUrlResult.getTaskStatus();
 
                 if (TaskStatus.FINISH.equals(taskStatus)) {
-//                    logger.info("taskStatus is finish StdPriceDubboUpdateWorker " + website);
+                    logger.info("taskStatus is finish StdPriceDubboUpdateWorker " + website);
 
                     String urlKey = HexDigestUtil.md5(url);
                     List<PtmStdPrice> stdPriceList = ptmStdPriceService.getPtmstdPriceListByUrlKey(urlKey);
@@ -77,12 +77,12 @@ public class StdPriceDubboUpdateWorker implements Runnable {
                         }
                     }
                 } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
-//                    logger.info("taskStatus is StdPriceDubboUpdateWorker exception " + website);
+                    logger.info("taskStatus is StdPriceDubboUpdateWorker exception " + website);
                 } else {
-//                    logger.info("taskStatus is StdPriceDubboUpdateWorker " + taskStatus + "_" + website);
+                    logger.info("taskStatus is StdPriceDubboUpdateWorker " + taskStatus + "_" + website);
                 }
             } catch (Exception e) {
-//                logger.info("StdPriceDubboUpdateWorker.run() exception.");
+                logger.info("StdPriceDubboUpdateWorker.run() exception.");
                 e.printStackTrace();
             }
         }

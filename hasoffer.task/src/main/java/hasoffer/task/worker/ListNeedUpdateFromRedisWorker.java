@@ -140,10 +140,10 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                     }
 
                     fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_3);
-//                    logger.info("send ptmcmpsku url request succes for " + sku.getWebsite() + " sku id is _" + sku.getId() + "_");
+                    logger.info("send ptmcmpsku url request succes for " + sku.getWebsite() + " sku id is _" + sku.getId() + "_");
                 } else {
                     fetchDubboService.sendUrlTask(sku.getWebsite(), sku.getUrl(), TaskTarget.SKU_UPDATE, TaskLevel.LEVEL_5);
-//                    logger.info("send ptmcmpsku url request succes for " + sku.getWebsite() + " sku id is _" + sku.getId() + "_");
+                    logger.info("send ptmcmpsku url request succes for " + sku.getWebsite() + " sku id is _" + sku.getId() + "_");
                 }
             }
         }
@@ -188,10 +188,10 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                     }
 
                     fetchDubboService.sendUrlTask(stdPrice.getWebsite(), stdPrice.getUrl(), TaskTarget.STDPRICE_UPDATE, TaskLevel.LEVEL_3);
-//                    logger.info("send ptmstdprice url request succes for " + stdPrice.getWebsite() + " stdprice id is _" + stdPrice.getId() + "_");
+                    logger.info("send ptmstdprice url request succes for " + stdPrice.getWebsite() + " stdprice id is _" + stdPrice.getId() + "_");
                 } else {
                     fetchDubboService.sendUrlTask(stdPrice.getWebsite(), stdPrice.getUrl(), TaskTarget.STDPRICE_UPDATE, TaskLevel.LEVEL_5);
-//                    logger.info("send ptmstdprice url request succes for " + stdPrice.getWebsite() + " stdprice id is _" + stdPrice.getId() + "_");
+                    logger.info("send ptmstdprice url request succes for " + stdPrice.getWebsite() + " stdprice id is _" + stdPrice.getId() + "_");
                 }
             }
 
