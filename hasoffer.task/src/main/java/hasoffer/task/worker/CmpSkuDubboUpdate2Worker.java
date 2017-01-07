@@ -82,7 +82,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
 
                 if (TaskStatus.FINISH.equals(taskStatus)) {
 
-//                    logger.info("taskStatus is finish " + website);
+                    logger.info("taskStatus is finish " + website);
 
                     String urlKey = HexDigestUtil.md5(url);
                     List<PtmCmpSku> skuList = cmpSkuService.getPtmCmpSkuListByUrlKey(urlKey);
@@ -98,12 +98,13 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                         }
                     }
                 } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
-//                    logger.info("taskStatus is exception " + website);
+                    logger.info("taskStatus is exception " + website);
                 } else {
-//                    logger.info("taskStatus is " + taskStatus + "_" + website);
+                    logger.info("taskStatus is " + taskStatus + "_" + website);
                 }
             } catch (Exception e) {
-//                logger.info("CmpSkuDubboUpdate2Worker.run() exception.", e);
+                logger.info("CmpSkuDubboUpdate2Worker.run() exception.", e);
+                e.printStackTrace();
             }
         }
     }
