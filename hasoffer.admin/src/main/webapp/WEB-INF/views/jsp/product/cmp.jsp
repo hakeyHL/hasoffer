@@ -166,7 +166,8 @@
                                     <td>${cmpSku.updateTime}</td>
                                     <td>
                                         <a class="active" href="javascript:void(0);"
-                                           onclick="compareCtrl.preModify(${cmpSku.id}, '${cmpSku.url}', ${cmpSku.price}, '${cmpSku.size}', '${cmpSku.color}', '${cmpSku.status}')">
+                                            <%--onclick="compareCtrl.preModify(${cmpSku.id}, '${cmpSku.url}', ${cmpSku.price}, '${cmpSku.size}', '${cmpSku.color}', '${cmpSku.status}')">--%>
+                                           onclick="compareCtrl.preModify(${cmpSku.id}, '${cmpSku.url}', ${cmpSku.price}, '${cmpSku.status}')">
                                             <span>编辑</span><br/><span>Edit</span>
                                         </a>
                                     </td>
@@ -233,20 +234,20 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label class="col-sm-2 control-label">颜色/Color</label>
+                                <%-- <div class="form-group">
+                                     <label class="col-sm-2 control-label">颜色/Color</label>
 
-                                    <div class="col-sm-4">
-                                        <input type="text" class="form-control" name="color" id="color">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-2 control-label">大小/Size</label>
+                                     <div class="col-sm-4">
+                                         <input type="text" class="form-control" name="color" id="color">
+                                     </div>
+                                 </div>
+                                 <div class="form-group">
+                                     <label class="col-sm-2 control-label">大小/Size</label>
 
-                                    <div class="col-sm-4">
-                                        <input type="text" class="form-control" name="size" id="size">
-                                    </div>
-                                </div>
+                                     <div class="col-sm-4">
+                                         <input type="text" class="form-control" name="size" id="size">
+                                     </div>
+                                 </div>--%>
 
                                 <div class="form-group">
                                     <div class="col-sm-offset-2 col-sm-10">
@@ -267,12 +268,13 @@
 
 <script>
     var compareCtrl = {
-        preModify: function (id, url, price, size, color, status) {
+//        preModify: function (id, url, price, size, color, status) {
+        preModify: function (id, url, price, status) {
             $("#id").val(id);
             $("#url").val(url);
             $("#price").val(price);
-            $("#size").val(size);
-            $("#color").val(color);
+//            $("#size").val(size);
+//            $("#color").val(color);
             $("#statusSelect").val(status);
             $("#label_id").html("更新/Update - " + id);
             $("#btn_submit").html("更新/Update");
@@ -282,8 +284,8 @@
             $("#id").val("");
             $("#url").val("");
             $("#price").val("");
-            $("#size").val("");
-            $("#color").val("");
+//            $("#size").val("");
+//            $("#color").val("");
             $("#label_id").html("新建");
             $("#btn_submit").html("创建");
             document.body.scrollTop = 1000000;
@@ -312,10 +314,10 @@
         }
     };
 
-    $('#color').typeahead({source:  <c:forEach items="${skuColors}" var="co">${co}, </c:forEach>});
-    $('#size').typeahead({source:  <c:forEach items="${skuSizes}" var="co">${co}, </c:forEach>});
+    <%--$('#color').typeahead({source:  <c:forEach items="${skuColors}" var="co">${co}, </c:forEach>});--%>
+    <%--$('#size').typeahead({source:  <c:forEach items="${skuSizes}" var="co">${co}, </c:forEach>});--%>
 
-    $(function () {
+    /* $(function () {
         $('#priceLogs').highcharts({
             title: {
                 text: '',
@@ -349,7 +351,7 @@
             },
             series: ${priceMap}
         });
-    });
+     });*/
 </script>
 
 <script>
