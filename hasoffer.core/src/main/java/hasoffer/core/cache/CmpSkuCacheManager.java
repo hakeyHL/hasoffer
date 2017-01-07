@@ -12,6 +12,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmCmpSkuIndex2;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.redis.ICacheService;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.core.utils.JsonHelper;
 import hasoffer.data.redis.IRedisListService;
 import org.slf4j.Logger;
@@ -68,7 +69,7 @@ public class CmpSkuCacheManager {
     }
 
     public List<PtmCmpSku> listCmpSkus(long productId, SkuStatus skuStatus) {
-        String key = CACHE_KEY_PRE + "_listCmpSkus_" + String.valueOf(productId) + skuStatus.name();
+        String key = ConstantUtil.API_PREFIX_CACAHE_CMP_CMPLIST_ + "statusCmpSkus_" + String.valueOf(productId) + skuStatus.name();
 
         String cmpSkusJson = cacheService.get(key, 0);
 
