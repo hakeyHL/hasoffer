@@ -46,16 +46,16 @@ public class StdPriceDubboUpdateWorker implements Runnable {
                 String fetchUrlResultStr = fetchDubboService.popFetchUrlResult(TaskTarget.STDPRICE_UPDATE);
                 if (fetchUrlResultStr == null) {
                     TimeUnit.MINUTES.sleep(10);
-//                    logger.info("fetchUrlResult get null sleep 10 MINUTES StdPriceDubboUpdateWorker");
+                    logger.info("fetchUrlResult get null sleep 10 MINUTES StdPriceDubboUpdateWorker");
                     continue;
                 }
                 FetchUrlResult fetchUrlResult = JSONUtil.toObject(fetchUrlResultStr, FetchUrlResult.class);
                 if (fetchUrlResult.getUrl() == null) {
-//                    logger.info("fetchUrlResult.getUrl() null StdPriceDubboUpdateWorker");
+                    logger.info("fetchUrlResult.getUrl() null StdPriceDubboUpdateWorker");
                     continue;
                 }
 
-//                logger.info("pop get StdPriceDubboUpdateWorker response success " + fetchUrlResult.getWebsite());
+                logger.info("pop get StdPriceDubboUpdateWorker response success " + fetchUrlResult.getWebsite());
                 String url = fetchUrlResult.getUrl();
                 Website website = fetchUrlResult.getWebsite();
 
@@ -68,12 +68,12 @@ public class StdPriceDubboUpdateWorker implements Runnable {
                     List<PtmStdPrice> stdPriceList = ptmStdPriceService.getPtmstdPriceListByUrlKey(urlKey);
 
                     if (stdPriceList == null || stdPriceList.size() == 0) {
-//                        logger.info("urkKey StdPriceDubboUpdateWorker not found " + website + "url = " + url);
+                        logger.info("urkKey StdPriceDubboUpdateWorker not found " + website + "url = " + url);
                     } else {
-//                        logger.info("urkKey found StdPriceDubboUpdateWorker " + website + " skulist begin to update " + stdPriceList.size());
+                        logger.info("urkKey found StdPriceDubboUpdateWorker " + website + " skulist begin to update " + stdPriceList.size());
                         for (PtmStdPrice ptmStdPrice : stdPriceList) {
                             updatePtmCmpSku(ptmStdPrice, fetchUrlResult);
-//                            logger.info("update success StdPriceDubboUpdateWorker for " + ptmStdPrice.getWebsite());
+                            logger.info("update success StdPriceDubboUpdateWorker for " + ptmStdPrice.getWebsite());
                         }
                     }
                 } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
@@ -97,7 +97,7 @@ public class StdPriceDubboUpdateWorker implements Runnable {
         Website website = WebsiteHelper.getWebSite(url);
 
         if (website == null) {
-//            logger.info("website StdPriceDubboUpdateWorker is null for _" + stdPriceId + "_");
+            logger.info("website StdPriceDubboUpdateWorker is null for _" + stdPriceId + "_");
             return;
         }
 
@@ -107,16 +107,16 @@ public class StdPriceDubboUpdateWorker implements Runnable {
             //
             ptmStdPriceService.updatePtmStdPriceBySpiderFetchedProduct(stdPriceId, fetchedProduct);
         } catch (Exception e) {
-//            logger.info("StdPriceDubboUpdateWorker updatePtmStdPriceBySpiderFetchedProduct fail " + stdPriceId);
+            logger.info("StdPriceDubboUpdateWorker updatePtmStdPriceBySpiderFetchedProduct fail " + stdPriceId);
             e.printStackTrace();
         }
 
-//        logger.info("StdPriceDubboUpdateWorker success " + fetchedProduct.getWebsite() + "_" + fetchedProduct.getSkuStatus() + "_" + stdPriceId);
+        logger.info("StdPriceDubboUpdateWorker success " + fetchedProduct.getWebsite() + "_" + fetchedProduct.getSkuStatus() + "_" + stdPriceId);
 
         try {
             ptmStdPriceService.createPtmStdPriceImage(stdPriceId, fetchedProduct);
         } catch (Exception e) {
-//            logger.info("StdPriceDubboUpdateWorker createPtmStdPriceImage fail " + stdPriceId);
+            logger.info("StdPriceDubboUpdateWorker createPtmStdPriceImage fail " + stdPriceId);
         }
     }
 }

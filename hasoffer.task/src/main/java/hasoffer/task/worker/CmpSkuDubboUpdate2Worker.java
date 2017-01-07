@@ -64,17 +64,17 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                 String fetchUrlResultStr = fetchDubboService.popFetchUrlResult(TaskTarget.SKU_UPDATE);
                 if (fetchUrlResultStr == null) {
                     TimeUnit.MINUTES.sleep(10);
-//                    logger.info("fetchUrlResult get null sleep 10 MINUTES");
+                    logger.info("fetchUrlResult get null sleep 10 MINUTES");
                     continue;
                 }
                 FetchUrlResult fetchUrlResult = JSONUtil.toObject(fetchUrlResultStr, FetchUrlResult.class);
 
                 if (fetchUrlResult.getUrl() == null) {
-//                    logger.info("fetchUrlResult.getUrl() null");
+                    logger.info("fetchUrlResult.getUrl() null");
                     continue;
                 }
 
-//                logger.info("pop get response success " + fetchUrlResult.getWebsite());
+                logger.info("pop get response success " + fetchUrlResult.getWebsite());
                 String url = fetchUrlResult.getUrl();
                 Website website = fetchUrlResult.getWebsite();
 
@@ -88,13 +88,13 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                     List<PtmCmpSku> skuList = cmpSkuService.getPtmCmpSkuListByUrlKey(urlKey);
 
                     if (skuList == null || skuList.size() == 0) {
-//                        logger.info("urkKey not found " + website + "url = " + url);
+                        logger.info("urkKey not found " + website + "url = " + url);
                     } else {
-//                        logger.info("urkKey found " + website + " skulist begin to update " + skuList.size());
+                        logger.info("urkKey found " + website + " skulist begin to update " + skuList.size());
                         for (PtmCmpSku ptmCmpSku : skuList) {
                             //更新商品的信息，写入多图数据，写入描述/参数
                             updatePtmCmpSku(ptmCmpSku, fetchUrlResult);
-//                            logger.info("update success for " + ptmCmpSku.getWebsite());
+                            logger.info("update success for " + ptmCmpSku.getWebsite());
                         }
                     }
                 } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
@@ -119,12 +119,12 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
         Website website = WebsiteHelper.getWebSite(url);
 
         if (website == null) {
-//            logger.info("website is null for _" + skuid + "_");
+            logger.info("website is null for _" + skuid + "_");
             return;
         }
 
         FetchedProduct fetchedProduct = fetchUrlResult.getFetchProduct();
-//        logger.info(fetchedProduct.toString());
+        logger.info(fetchedProduct.toString());
 
 //        由于部分deal要增加新的最低价标识，所以deal的生成策略要写在更新之前
         //获取最低价
@@ -132,11 +132,11 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
             PtmCmpSkuHistoryPrice ptmCmpSkuHistoryPrice = mdm.queryOne(PtmCmpSkuHistoryPrice.class, skuid);
 
             if (ptmCmpSkuHistoryPrice == null) {
-//                logger.info("update ptmcmpsku priceHistory get null");
+                logger.info("update ptmcmpsku priceHistory get null");
             } else {
                 float minPrice = getMinPrice(ptmCmpSkuHistoryPrice);
-//                logger.info("minPrice " + minPrice);
-//                logger.info("fetchedProduct.getPrice() " + fetchedProduct.getPrice());
+                logger.info("minPrice " + minPrice);
+                logger.info("fetchedProduct.getPrice() " + fetchedProduct.getPrice());
 
                 if (minPrice != 0.0f
                         && fetchedProduct.getPrice() <= minPrice                                    //更新后的价格小于等于更新前的历史最低价格
@@ -149,19 +149,19 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
 
 //            对现价进行判断，如果更新后的价格小于更新前的历史最低价格，且商品更新前有两个不同的历史价格（价格是0的不计入），则将创建deal的标题最前方加上【New Lowest Price】（表示新低价）
                     if (fetchedProduct.getPrice() < minPrice && ptmCmpSkuHistoryPrice.getPriceNodes().size() > 1) {
-//                        logger.info("create NEWLOWEST deal");
+                        logger.info("create NEWLOWEST deal");
                         createDeal(skuid, "NEWLOWEST", fetchedProduct);
                     }
 
 //            对现价进行判断，如果更新后的价格等于更新前的历史最低价格，且现价不大于150卢比，且商品有flipkart assured或 Fulfilled by Amazon的标识，则将创建的deal的标题最前方加上【Add on】
                     if (fetchedProduct.getPrice() == minPrice && fetchedProduct.getPrice() <= 150 && (Boolean) fetchedProduct.getFlagMap().get("ADDABLE")) {
-//                        logger.info("create ADDON deal");
+                        logger.info("create ADDON deal");
                         createDeal(skuid, "ADDON", fetchedProduct);
                     }
 
 //            对现价进行判断，如果更新后的价格等于更新前的历史最低价格，且现价高于150卢比，则将按常规方式创建deal；
                     if (fetchedProduct.getPrice() == minPrice && fetchedProduct.getPrice() > 150) {
-//                        logger.info("create default deal");
+                        logger.info("create default deal");
                         createDeal(skuid, "", fetchedProduct);
                     }
                 }
@@ -177,11 +177,11 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
             //
             cmpSkuService.updateCmpSkuBySpiderFetchedProduct(skuid, fetchedProduct);
         } catch (Exception e) {
-//            logger.info("updateCmpSkuBySpiderFetchedProduct fail " + skuid);
+            logger.info("updateCmpSkuBySpiderFetchedProduct fail " + skuid);
             e.printStackTrace();
         }
 
-//        logger.info("updateCmpSkuBySpiderFetchedProduct success " + fetchedProduct.getWebsite() + "_" + fetchedProduct.getSkuStatus() + "_" + skuid);
+        logger.info("updateCmpSkuBySpiderFetchedProduct success " + fetchedProduct.getWebsite() + "_" + fetchedProduct.getSkuStatus() + "_" + skuid);
     }
 
     private void createDeal(long skuid, String titleFlagString, FetchedProduct fetchedProduct) {
