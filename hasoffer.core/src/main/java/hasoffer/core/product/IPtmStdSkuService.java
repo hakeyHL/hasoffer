@@ -19,4 +19,9 @@ public interface IPtmStdSkuService {
 
     List<PtmStdPrice> listStdPrice(long ptmStdSkuId);
 
+    List<String> getPtmStdSkuBrandList();
+
+    List<PtmStdPrice> getSimilaryPricesByPriceAndRating(PtmStdSku ptmStdSku);
+
+    void updatePtmStdSkuPrice(Long productId);
 }

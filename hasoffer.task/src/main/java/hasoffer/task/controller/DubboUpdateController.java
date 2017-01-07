@@ -3,6 +3,7 @@ package hasoffer.task.controller;
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
+import hasoffer.core.admin.IDealService;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
@@ -69,6 +70,8 @@ public class DubboUpdateController {
     IPtmStdSkuService stdSkuService;
     @Resource
     IPtmStdPriceService ptmStdPriceService;
+    @Resource
+    IDealService dealService;
 
     /**
      * Date：2016-11-1 10:34更新改成一直在更新，从redis中读取数据
@@ -86,7 +89,7 @@ public class DubboUpdateController {
         es.execute(new ListNeedUpdateFromRedisWorker(fetchDubboService, redisListService, redisSetService, stdSkuService, cmpSkuService, productCacheManager));
 
         for (int i = 0; i < 10; i++) {
-            es.execute(new CmpSkuDubboUpdate2Worker(fetchDubboService, cmpSkuService, redisListService));//ptmcmpsku更新
+            es.execute(new CmpSkuDubboUpdate2Worker(fetchDubboService, cmpSkuService, redisListService, mdm, dbm, dealService));//ptmcmpsku更新
             es.execute(new StdPriceDubboUpdateWorker(fetchDubboService, redisListService, ptmStdPriceService));//ptmstdPrice更新
         }
 

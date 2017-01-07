@@ -183,7 +183,7 @@ public class SearchProductService {
 //        getProductsFromMSP(listProductMap, keyword);
 
         //searchResult.setSitePros(listProductMap);
-        logger.info("job result info ：{}", searchResult.toString());
+        //logger.info("job result info ：{}", searchResult.toString());
         mdm.save(searchResult);
     }
 

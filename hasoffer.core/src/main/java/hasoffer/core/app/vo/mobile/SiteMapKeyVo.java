@@ -34,6 +34,11 @@ public class SiteMapKeyVo {
         return this;
     }
 
+    public SiteMapKeyVo builderProMap(Map pros) {
+        this.pros = pros;
+        return this;
+    }
+
     public SiteMapKeyVo buildeShortName(String shortName) {
         this.shortName = shortName;
         return this;

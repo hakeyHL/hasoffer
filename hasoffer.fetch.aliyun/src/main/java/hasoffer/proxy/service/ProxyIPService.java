@@ -1,5 +1,7 @@
 package hasoffer.proxy.service;
 
+import hasoffer.aliyun.enums.Group;
+import hasoffer.aliyun.enums.IPState;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.proxy.dao.ProxyIPDAO;
 import hasoffer.proxy.dmo.ProxyIPDMO;
@@ -22,9 +24,9 @@ public class ProxyIPService {
     @Resource
     private ProxyIPDAO proxyIPDAO;
 
-    public boolean vaildate(ProxyIPDMO proxyIPDMO) {
-        return false;
-    }
+    //public boolean vaildate(ProxyIPDMO proxyIPDMO) {
+    //    return false;
+    //}
 
     public List<ProxyIPDMO> select(ProxyIPDMO proxyIPDMO) {
         return proxyIPDAO.select(proxyIPDMO);
@@ -56,5 +58,19 @@ public class ProxyIPService {
                 logger.info("refresh {}, ip:port= {}:{},", RedisKeysUtils.SPIDER_PROXY_LIST, temp.getIp(), temp.getPort());
             }
         }
+    }
+
+    public List<ProxyIPDMO> selectByGroup(Group group) {
+        return null;
+    }
+
+    public String selectGroupName(IPState ipState) {
+        return proxyIPDAO.selectGroupName(ipState.toString());
+    }
+
+    public void updateProxyStausByGroup(String group, IPState state) {
+        proxyIPDAO.updateByGroup(group, state.toString());
+        refreshRedis();
+
     }
 }

@@ -14,6 +14,7 @@ import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.user.IDeviceService;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import org.apache.commons.lang.StringUtils;
@@ -48,6 +49,20 @@ public class RequestInterceptor implements HandlerInterceptor {
         String userToken = Context.currentContext().getHeader("usertoken", "");
         String requestUri = httpServletRequest.getRequestURI();
         String queryStr = httpServletRequest.getQueryString();
+        Context.currentContext().set("visitType", "app");
+        String visitType = httpServletRequest.getHeader("visitType");
+        if ("web".equals(visitType)) {
+            Context.currentContext().set("visitType", "web");
+            DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+            if (deviceInfo == null) {
+                DeviceInfoVo deviceInfoVo = new DeviceInfoVo();
+                deviceInfoVo.setMarketChannel(MarketChannel.H5);
+                Context.currentContext().set(Context.DEVICE_INFO, deviceInfoVo);
+            } else {
+                deviceInfo.setMarketChannel(MarketChannel.H5);
+            }
+            return true;
+        }
         try {
             DeviceInfoVo deviceInfoVo = gson.fromJson(deviceInfoStr, DeviceInfoVo.class);
 
@@ -87,6 +102,7 @@ public class RequestInterceptor implements HandlerInterceptor {
             }
 
         } catch (Exception e) {
+            //判断是否为H5,如果是,不传deviceInfo也可以通过
             logger.error(String.format("RequestInterceptor Has Error: %s. request = [%s]. query = [%s] .device=[%s]",
                     e.getMessage(), requestUri, queryStr, deviceInfoStr));
             // + e.getMessage() + " , device = [" + deviceInfoStr + "]"
@@ -124,7 +140,9 @@ public class RequestInterceptor implements HandlerInterceptor {
                 }
             }
         }
-        System.out.println("----------------------------------" + JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).toJSONString() + "-------------------");
+        if (httpServletRequest.getHeader("deviceinfo") != null) {
+            System.out.println("----------------------------------" + JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).toJSONString() + "-------------------");
+        }
         if (modelAndView == null) {
             modelAndView = new ModelAndView();
         }
@@ -150,7 +168,7 @@ public class RequestInterceptor implements HandlerInterceptor {
                 //4. 相等,过
             }
             //2. 为空,过
-            modelAndView.addObject("result", new ResultVo("00000", "ok"));
+            modelAndView.addObject("result", new ResultVo(ConstantUtil.API_ERRORCODE_SUCCESS, ConstantUtil.API_NAME_MSG_SUCCESS));
                 /*List<String> ids = null;
                 String deviceId = JSON.parseObject(httpServletRequest.getHeader("deviceinfo")).getString("deviceId");
                 String deviceKey = "urmDevice_ids_mapKey_" + deviceId;

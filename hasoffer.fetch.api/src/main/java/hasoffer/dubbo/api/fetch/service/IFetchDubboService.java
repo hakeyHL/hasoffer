@@ -1,7 +1,6 @@
 package hasoffer.dubbo.api.fetch.service;
 
 import hasoffer.base.enums.TaskLevel;
-import hasoffer.base.enums.TaskStatus;
 import hasoffer.base.model.Website;
 import hasoffer.spider.enums.TaskTarget;
 import hasoffer.spider.model.FetchCompareWebsiteResult;
@@ -42,28 +41,18 @@ public interface IFetchDubboService {
     /**
      * 获取结果
      *
-     * @param webSite
-     * @param keyword
-     * @return
+     *  @return
      */
-    FetchResult getProductsKeyWord(Website webSite, String keyword);
+    FetchResult popProductsKeyWord();
 
     /**
      * 提交关键词任务
      *
+     * @param id
      * @param website
      * @param keyword
      */
-    void sendKeyWordTask(Website website, String keyword);
-
-    /**
-     * 获取关键词任务对应的状态
-     *
-     * @param webSite
-     * @param keyword
-     * @return
-     */
-    TaskStatus getKeyWordTaskStatus(Website webSite, String keyword);
+    void sendKeyWordTask(String id, Website website, String keyword);
 
 /*************************************************************************************************/
 
@@ -114,12 +103,12 @@ public interface IFetchDubboService {
 
     /**
      * 发送一个比较网站的详情页的url抓取请求
-     *
      * @param website   比价网站的名称
      * @param url       比价网站的某个商品的详情页
      * @param taskLevel 任务优先级
+     * @param flagId    一些用于分析返回值得id，比如第一次抓取时，写入categoryId，补充数据抓取时，可以写stdSkuId
      */
-    void sendCompareWebsiteFetchTask(Website website, String url, TaskLevel taskLevel, long categoryId);
+    void sendCompareWebsiteFetchTask(Website website, String url, TaskLevel taskLevel, long flagId);
 
 
     FetchCompareWebsiteResult getCompareWebsiteFetchResult(Website webSite);

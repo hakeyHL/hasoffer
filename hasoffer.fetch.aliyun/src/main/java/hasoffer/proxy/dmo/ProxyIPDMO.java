@@ -6,6 +6,8 @@ public class ProxyIPDMO {
 
     private Integer id;
 
+    private String xGroup;
+
     private String ip;
 
     private Integer port;
@@ -18,9 +20,11 @@ public class ProxyIPDMO {
 
     private Long exceptionNum;
 
-    private Date startDate;
+    private Date createTime;
 
-    private Date stopDate;
+    private Date deleteTime;
+
+    private String deleteFlag = "N";
 
     public Integer getId() {
         return id;
@@ -28,6 +32,14 @@ public class ProxyIPDMO {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getxGroup() {
+        return xGroup;
+    }
+
+    public void setxGroup(String xGroup) {
+        this.xGroup = xGroup;
     }
 
     public String getIp() {
@@ -78,34 +90,44 @@ public class ProxyIPDMO {
         this.exceptionNum = exceptionNum;
     }
 
-    public Date getStartDate() {
-        return startDate;
+    public Date getCreateTime() {
+        return createTime;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
-    public Date getStopDate() {
-        return stopDate;
+    public Date getDeleteTime() {
+        return deleteTime;
     }
 
-    public void setStopDate(Date stopDate) {
-        this.stopDate = stopDate;
+    public void setDeleteTime(Date deleteTime) {
+        this.deleteTime = deleteTime;
+    }
+
+    public String getDeleteFlag() {
+        return deleteFlag;
+    }
+
+    public void setDeleteFlag(String deleteFlag) {
+        this.deleteFlag = deleteFlag;
     }
 
     @Override
     public String toString() {
         return "ProxyIPDMO{" +
                 "id=" + id +
+                ", xGroup='" + xGroup + '\'' +
                 ", ip='" + ip + '\'' +
                 ", port=" + port +
                 ", status='" + status + '\'' +
                 ", reqNum=" + reqNum +
                 ", finishNum=" + finishNum +
                 ", exceptionNum=" + exceptionNum +
-                ", startDate=" + startDate +
-                ", stopDate=" + stopDate +
+                ", createTime=" + createTime +
+                ", deleteTime=" + deleteTime +
+                ", deleteFlag='" + deleteFlag + '\'' +
                 '}';
     }
 }

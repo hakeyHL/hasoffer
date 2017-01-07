@@ -4,5 +4,5 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 
 public interface ISearchRecordListService {
-    PageableResult<SrmSearchLog> getLastNoProductLog();
+    PageableResult<SrmSearchLog> getLastNoProductLog(int pageNum, int pageSize);
 }

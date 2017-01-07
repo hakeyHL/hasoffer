@@ -189,7 +189,11 @@ public class WebsiteHelper {
             case ASKMEBAZAAR:
                 return url;
             default:
+//                if (url.contains("?")) {
+//                    return url.substring(0, url.indexOf("?"));
+//                } else {
                 return url;
+//                }
         }
     }
 

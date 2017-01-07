@@ -64,15 +64,15 @@ public class RePushPriceOffNoticeJobBean extends QuartzJobBean {
 
             //每天11,14,22点重发，最后一次失败不在缓存key
             if (TimeUtils.getHour() < 14) {
-                boolean status = priceOffNoticeService.priceOffNoticeSinglePush(nowPrice, website, url, fetchedTitle, priceOffNoticeId);
+                boolean status = priceOffNoticeService.priceOffNoticeSinglePush(nowPrice, website, url, fetchedTitle, priceOffNoticeId, false);
                 if (!status) {//push失败
                     redisListService.push(PUSH_FAIL_PRICEOFFNOTICE_INFO_14, JSON.toJSONString(fetchUrlResult));
                     System.out.println("repush fail cache to 14:00 queue " + TimeUtils.nowDate());
                 }
             } else if (TimeUtils.getHour() > 20) {
-                priceOffNoticeService.priceOffNoticeSinglePush(nowPrice, website, url, fetchedTitle, priceOffNoticeId);
+                priceOffNoticeService.priceOffNoticeSinglePush(nowPrice, website, url, fetchedTitle, priceOffNoticeId, false);
             } else {
-                boolean status = priceOffNoticeService.priceOffNoticeSinglePush(nowPrice, website, url, fetchedTitle, priceOffNoticeId);
+                boolean status = priceOffNoticeService.priceOffNoticeSinglePush(nowPrice, website, url, fetchedTitle, priceOffNoticeId, false);
                 if (!status) {//push失败
                     redisListService.push(PUSH_FAIL_PRICEOFFNOTICE_INFO_22, JSON.toJSONString(fetchUrlResult));
                     System.out.println("repush fail cache to 14:00 queue " + TimeUtils.nowDate());

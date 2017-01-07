@@ -173,7 +173,7 @@ public class DealController {
     }
 
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
-    public ModelAndView edit(AppDeal deal, MultipartFile dealFile, MultipartFile bannerFile, String bannerImageUrl) throws IOException {
+    public ModelAndView edit(AppDeal deal, MultipartFile dealFile, MultipartFile bannerFile, String bannerImageUrl) {
         /**
          * 无关属性: 不需要展示,不需要修改的属性,
          * 不要忘记放入jsp文件中,否则信息丢失
@@ -184,13 +184,12 @@ public class DealController {
         if (StringUtils.isEmpty(bannerImageUrl)) {
             //修改了图片
             if (!bannerFile.isEmpty()) {
-                File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
-                FileUtil.writeBytes(imageFile, bannerFile.getBytes());
                 try {
-
+                    File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
+                    FileUtil.writeBytes(imageFile, bannerFile.getBytes());
                     bannerImageUrl = ImageUtil.uploadImage(imageFile);
                 } catch (Exception e) {
-                    logger.error("banner image upload fail");
+                    logger.error("banner image upload fail ,{}", e.getMessage());
                     return new ModelAndView("redirect:/deal/list");
                 }
             }
@@ -198,14 +197,14 @@ public class DealController {
         if (StringUtils.isEmpty(deal.getImageUrl())) {
 
             if (!dealFile.isEmpty()) {
-                File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
-                FileUtil.writeBytes(imageFile, dealFile.getBytes());
                 try {
+                    File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
+                    FileUtil.writeBytes(imageFile, dealFile.getBytes());
                     dealPath = ImageUtil.uploadImage(imageFile);
                     dealBigPath = ImageUtil.uploadImage(imageFile, 316, 180);
                     dealSmallPath = ImageUtil.uploadImage(imageFile, 180, 180);
                 } catch (Exception e) {
-                    logger.error("deal image upload fail");
+                    logger.error("deal image upload fail , {}", e.getMessage());
                     return new ModelAndView("redirect:/deal/list");
                 }
             }
@@ -245,6 +244,9 @@ public class DealController {
         if (!StringUtils.isEmpty(dealPath)) {
             deal.setImageUrl(dealPath);
         }
+        if (deal.getWebsite() != null) {
+            deal.setWebsite(deal.getWebsite());
+        }
         if (!StringUtils.isEmpty(dealBigPath)) {
             deal.setInfoPageImage(dealBigPath);
         }
@@ -283,6 +285,12 @@ public class DealController {
             logger.error("download excel template fail");
             e.printStackTrace();
         }
+    }
+
+    @RequestMapping("/createDeal")
+    public ModelAndView redirect2DealDetail() {
+        ModelAndView mav = new ModelAndView("deal/edit");
+        return mav;
     }
 
     /**

@@ -20,7 +20,7 @@
         <property name="triggers">
             <list>
                 <ref bean="demoTrigger"/>
-                <ref bean="fetchTrigger"/>
+                <!--<ref bean="fetchTrigger"/>-->
                 <ref bean="orderSATrigger"/>
                 <ref bean="orderSCTrigger"/>
                 <ref bean="imageDownLoadTrigger"/>
@@ -52,10 +52,9 @@
         <property name="cronExpression" value="0 0 0/1 * * ? "/>
     </bean>
 
-    <!-- fetch job -->
+    <!--fetch job-->
     <bean name="fetchJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="hasoffer.job.bean.fetch.FetchJobBean"/>
-        <!--<property name="beanName" value="fetchJobBean"/>-->
     </bean>
 
     <bean id="fetchTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
@@ -78,7 +77,7 @@
     </bean>
     <bean id="orderSATrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="orderSAJob"/>
-        <property name="cronExpression" value="0 5 0/1 * * ? "/>
+        <property name="cronExpression" value="0 5 0/2 * * ? "/>
     </bean>
 
     <bean name="orderSCJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">

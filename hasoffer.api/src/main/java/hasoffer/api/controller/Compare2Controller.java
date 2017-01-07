@@ -6,12 +6,14 @@ import com.alibaba.fastjson.serializer.PropertyFilter;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.SearchHelper;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.JSONUtil;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.app.impl.AppCmpServiceImpl;
 import hasoffer.core.app.vo.*;
 import hasoffer.core.cache.CmpSkuCacheManager;
@@ -32,6 +34,7 @@ import hasoffer.core.product.IPtmStdPriceService;
 import hasoffer.core.product.impl.ProductServiceImpl;
 import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
 import hasoffer.core.product.solr.*;
+import hasoffer.core.redis.ICacheService;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.exception.NonMatchedProductException;
 import hasoffer.core.system.impl.AppServiceImpl;
@@ -99,9 +102,13 @@ public class Compare2Controller {
     PtmStdPriceIndexServiceImpl ptmStdPriceIndexService;
     @Resource
     PtmStdSkuIndexServiceImpl stdSkuIndexService;
+    @Resource
+    ICacheService cacheService;
     private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
+        String dealUrlWithAff = WebsiteHelper.getDeeplinkWithAff(Website.SNAPDEAL, "https://www.flipkart.com/hizone-hz203gd-gold-plated-analog-watch-men/p/itmechfgg7tpghzs?pid=WATECHFGRRGDAGHA&otracker=hp_reco_recently_viewed", new String[]{MarketChannel.SHANCHUAN.name(), "dfecc858243a616a"});
+        System.out.println(dealUrlWithAff);
        /* for (int i = 0; i < 10; i++) {
             String dealUrlWithAff = WebsiteHelper.getDeeplinkWithAff(Website.SNAPDEAL, "https://www.snapdeal.com/product/jbl-sb350-soundbar-with-wirless/1602277955", new String[]{MarketChannel.SHANCHUAN.name(), "dfecc858243a616a"});
             System.out.println(dealUrlWithAff);
@@ -273,11 +280,12 @@ public class Compare2Controller {
                                HttpServletResponse response,
                                HttpServletRequest request
     ) {
+        String cmpSkuCacheKey = ConstantUtil.API_PREFIX_CACAHE_CMP_CMPLIST_ + id + "_" + page + "_" + pageSize;
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("errorCode", "00000");
-        jsonObject.put("msg", "ok");
+        jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         if (id.equals("0")) {
-            jsonObject.put("msg", "id required .");
+            jsonObject.put(ConstantUtil.API_NAME_MSG, "id required .");
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         } else {
@@ -286,11 +294,16 @@ public class Compare2Controller {
                 searchLogCacheManager.countSearchedProduct(Long.parseLong(id));
                 searchLogCacheManager.countSearchedProductByHour(Long.parseLong(id));
             } catch (Exception e) {
-                jsonObject.put("errorCode", "10000");
-                jsonObject.put("msg", "Exception occur !");
+                jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+                jsonObject.put(ConstantUtil.API_NAME_MSG, "Exception occur !");
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             }
+        }
+        String cmpSkuCacheValue = cacheService.get(cmpSkuCacheKey, 0);
+        if (StringUtils.isNotEmpty(cmpSkuCacheValue)) {
+            Httphelper.sendJsonMessage(cmpSkuCacheValue, response);
+            return null;
         }
         String userToken = Context.currentContext().getHeader("usertoken");
         PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"skuPrice", "deepLink", "saved", "priceOff", "productVo", "pagedComparedSkuVos", "copywriting", "displayMode", "std", "cashBack"});
@@ -319,16 +332,22 @@ public class Compare2Controller {
         } catch (Exception e) {
             logger.error("exception occur while get cmpSkuList on interface cmpsku , id is : {} and ptmStdSku ,PtmProduct ", ptmStdSku == null ? product.getId() : ptmStdSku.getId(), ptmStdSku, product);
 //            logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, pageSize));
-            jsonObject.put("data", JSONObject.toJSON(cr));
+            jsonObject.put(ConstantUtil.API_NAME_DATA, JSONObject.toJSON(cr));
             System.out.println(e.getMessage());
             Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
             return null;
         }
         // 速度优化
         SearchHelper.addToLog(sio);
-        logger.debug(sio.toString());
         apiUtils.resloveClass(cr);
-        jsonObject.put("data", JSONObject.toJSON(cr));
+        jsonObject.put(ConstantUtil.API_NAME_DATA, JSONObject.toJSON(cr));
+        UrmUser urmUser = appService.getUserByUserToken(userToken);
+        if (urmUser != null) {
+            jsonObject.getJSONObject(ConstantUtil.API_NAME_DATA).putAll(apiUtils.setEvaluateBrandFeaturesCompetitorsSummaryMap(ptmStdSku, new String[]{deviceInfo.getMarketChannel().name(), deviceId, urmUser.getId() + ""}));
+        } else {
+            jsonObject.getJSONObject(ConstantUtil.API_NAME_DATA).putAll(apiUtils.setEvaluateBrandFeaturesCompetitorsSummaryMap(ptmStdSku, new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+        }
+        cacheService.add(cmpSkuCacheKey, JSON.toJSONString(jsonObject, propertyFilter), TimeUtils.MILLISECONDS_OF_1_HOUR * 2);
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
         return null;
 
@@ -343,22 +362,22 @@ public class Compare2Controller {
     @RequestMapping("getStdParams")
     public ModelAndView getStdSkuCmpParams(@RequestParam(defaultValue = "0") long pId) {
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("errorCode", "00000");
-        modelAndView.addObject("msg", "success");
+        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         Map dataMap = new HashMap();
         //验证id是否大于10亿
         if (pId - ConstantUtil.API_ONE_BILLION_NUMBER <= 0) {
             //不是就拒绝
-            modelAndView.addObject("errorCode", "10000");
-            modelAndView.addObject("msg", "pId error .");
+            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+            modelAndView.addObject(ConstantUtil.API_NAME_MSG, "pId error .");
             return modelAndView;
         }
         //是,根据id从solr中获取此id的stdSkuModel
         PtmStdSkuModel ptmStdSkuModel = stdSkuIndexService.getStdSkuModelById(ApiUtils.removeBillion(pId));
         if (ptmStdSkuModel == null) {
             //无,返回错误信息
-            modelAndView.addObject("errorCode", "10000");
-            modelAndView.addObject("msg", "product not exist.");
+            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+            modelAndView.addObject(ConstantUtil.API_NAME_MSG, "product not exist.");
             return modelAndView;
         } else {
             //去参数
@@ -367,16 +386,16 @@ public class Compare2Controller {
             resultMap.put("Brand", ptmStdSkuModel.getBrand() == null ? "" : ptmStdSkuModel.getBrand());
             resultMap.put("Model", ptmStdSkuModel.getModel() == null ? "" : ptmStdSkuModel.getModel());
             resultMap.put("Price", ptmStdSkuModel.getMinPrice() + "");
-            resultMap.put("RAM", ptmStdSkuModel.getRam() >= 1024 ? ptmStdSkuModel.getRam() / 1024 + " GB" : ptmStdSkuModel.getRam() + "MB");
+            resultMap.put("RAM", ptmStdSkuModel.getRAM() >= 1024 ? ptmStdSkuModel.getRAM() / 1024 + " GB" : ptmStdSkuModel.getRAM() + "MB");
             resultMap.put("Screen Size", ptmStdSkuModel.getScreen_Size() + " inch");
             resultMap.put("Secondary Camera", ptmStdSkuModel.getSecondary_Camera() + " MP");
             resultMap.put("Primary Camera", ptmStdSkuModel.getPrimary_Camera() + " MP");
-            resultMap.put("Internal Memory", ptmStdSkuModel.getInternal_Memory() >= 1024 ? ptmStdSkuModel.getInternal_Memory() + " GB" : ptmStdSkuModel.getInternal_Memory() + " MB");
+            resultMap.put("Internal Memory", ptmStdSkuModel.getInternal_Memory() >= 1024 ? ptmStdSkuModel.getInternal_Memory() / 1024 + " GB" : ptmStdSkuModel.getInternal_Memory() + " MB");
             resultMap.put("Battery Capacity", ptmStdSkuModel.getBattery_Capacity() + " mAh");
             resultMap.put("Expandable Memory", ptmStdSkuModel.getExpandable_Memory() == 0 ? "Unavailable" : "Up to " + ptmStdSkuModel.getExpandable_Memory() + " GB");
             resultMap.put("Screen Resolution", ptmStdSkuModel.getScreen_Resolution() == null ? "" : ptmStdSkuModel.getScreen_Resolution());
             resultMap.put("Operating System", ptmStdSkuModel.getOperating_System() == null ? "" : ptmStdSkuModel.getOperating_System());
-            resultMap.put("Network Support", ptmStdSkuModel.getNetwork() == null ? "" : ptmStdSkuModel.getNetwork());
+            resultMap.put("Network Support", ptmStdSkuModel.getNetwork_Support() == null ? "" : ptmStdSkuModel.getNetwork_Support());
 
             //遍历去除空值
             Set<Map.Entry<String, String>> entries = resultMap.entrySet();
@@ -392,7 +411,7 @@ public class Compare2Controller {
             dataMap.put("productParams", resultMap);
         }
         //有,返回
-        modelAndView.addObject("data", dataMap);
+        modelAndView.addObject(ConstantUtil.API_NAME_DATA, dataMap);
         return modelAndView;
     }
 
@@ -404,8 +423,8 @@ public class Compare2Controller {
     @RequestMapping("compareParams")
     public ModelAndView getCompareParams() {
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("errorCode", "00000");
-        modelAndView.addObject("msg", "success");
+        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         Map map = new HashMap<>();
         String[] params = ConstantUtil.API_PTMSTDSKU_PARAM_MEAN_MAP.keySet().toArray(new String[]{});
 
@@ -428,7 +447,7 @@ public class Compare2Controller {
         }
         map.put("Summary", summaryParamsMap);
         map.put("Others", othersParamsMap);
-        modelAndView.addObject("data", map);
+        modelAndView.addObject(ConstantUtil.API_NAME_DATA, map);
         return modelAndView;
     }
 
@@ -564,11 +583,9 @@ public class Compare2Controller {
                 if (cmpSku.getWebsite().equals(sio.getCliSite())) {
                     currentDeeplink = WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
                 }*/
-            } else if (clientCmpSku != null) {
-                if (!cmpSkuCacheManager.isFlowControlled(sio.getDeviceId(), sio.getCliSite())) {
-                    if (hasoffer.base.utils.StringUtils.isEqual(clientCmpSku.getSkuTitle(), sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
-                        currentDeeplink = WebsiteHelper.getDeeplinkWithAff(clientCmpSku.getWebsite(), clientCmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
-                    }
+            } else if (clientCmpSku != null & !cmpSkuCacheManager.isFlowControlled(sio.getDeviceId(), sio.getCliSite())) {
+                if (hasoffer.base.utils.StringUtils.isEqual(clientCmpSku.getSkuTitle(), sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
+                    currentDeeplink = WebsiteHelper.getDeeplinkWithAff(clientCmpSku.getWebsite(), clientCmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
                 }
             }
         } catch (Exception e) {
@@ -601,42 +618,37 @@ public class Compare2Controller {
      */
     private String getSkuListBySourceSidAndWebsite(Website website, String sourceSid, int page, int pageSize) {
         //网站不为空
-        if (website != null) {
+        if (website != null && Website.SNAPDEAL.equals(website) || Website.FLIPKART.equals(website)) {
+            List<PtmCmpSku> skuList = cmpSkuService.getPtmCmpSkuListBySourceSidAndWebsite(sourceSid, Website.FLIPKART, page, pageSize);
+            //这里返回的是一个sourceSid与请求url相同且网站是FLIPKART的集合
+            //可能会根据某个条件筛选来进行优化，
+            //此处暂时有数据就返回的策略
+            if (skuList != null && skuList.size() != 0) {
+                //外层循环用来控制遍历数据库返回的skuList
+                for (int i = 0; i < skuList.size() - 1; i++) {
 
-            if (Website.SNAPDEAL.equals(website) || Website.FLIPKART.equals(website)) {
+                    PtmCmpSku ptmCmpSku = skuList.get(i);
 
-                List<PtmCmpSku> skuList = cmpSkuService.getPtmCmpSkuListBySourceSidAndWebsite(sourceSid, Website.FLIPKART, page, pageSize);
+                    List<PtmCmpSku> resultSkuList = cmpSkuService.listCmpSkus(ptmCmpSku.getProductId());
 
-                //这里返回的是一个sourceSid与请求url相同且网站是FLIPKART的集合
-                //可能会根据某个条件筛选来进行优化，
-                //此处暂时有数据就返回的策略
-                if (skuList != null && skuList.size() != 0) {
-                    //外层循环用来控制遍历数据库返回的skuList
-                    for (int i = 0; i < skuList.size() - 1; i++) {
-
-                        PtmCmpSku ptmCmpSku = skuList.get(i);
-
-                        List<PtmCmpSku> resultSkuList = cmpSkuService.listCmpSkus(ptmCmpSku.getProductId());
-
-                        //内层循环用来控制遍历按照sku的productId返回的sku列表
-                        for (int j = resultSkuList.size() - 1; j >= 0; j--) {
-                            ptmCmpSku = resultSkuList.get(j);
-                            //价格为0过滤
-                            if (ptmCmpSku.getPrice() <= 0) {
-                                resultSkuList.remove(j);
-                                continue;
-                            }
-                            //状态不是onsale过滤
-                            if (ptmCmpSku.getStatus() != SkuStatus.ONSALE) {
-                                resultSkuList.remove(j);
-                                continue;
-                            }
+                    //内层循环用来控制遍历按照sku的productId返回的sku列表
+                    for (int j = resultSkuList.size() - 1; j >= 0; j--) {
+                        ptmCmpSku = resultSkuList.get(j);
+                        //价格为0过滤
+                        if (ptmCmpSku.getPrice() <= 0) {
+                            resultSkuList.remove(j);
+                            continue;
                         }
-
-                        //循环过滤完毕，判断时候有数据剩余
-                        if (skuList.size() != 0) {
-                            return JSONUtil.toJSON(resultSkuList);
+                        //状态不是onsale过滤
+                        if (ptmCmpSku.getStatus() != SkuStatus.ONSALE) {
+                            resultSkuList.remove(j);
+                            continue;
                         }
+                    }
+
+                    //循环过滤完毕，判断时候有数据剩余
+                    if (skuList.size() != 0) {
+                        return JSONUtil.toJSON(resultSkuList);
                     }
                 }
             }

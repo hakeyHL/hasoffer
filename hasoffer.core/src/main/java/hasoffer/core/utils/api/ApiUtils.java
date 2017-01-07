@@ -5,30 +5,32 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
+import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.app.AppCategoryService;
-import hasoffer.core.app.vo.BackDetailVo;
-import hasoffer.core.app.vo.CmpProductListVo;
-import hasoffer.core.app.vo.OrderVo;
-import hasoffer.core.app.vo.ProductListVo;
+import hasoffer.core.app.vo.*;
 import hasoffer.core.bo.product.CategoryVo;
+import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
+import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
+import hasoffer.core.persistence.mongo.PtmStdBrandCard;
+import hasoffer.core.persistence.mongo.PtmStdSkuDescription;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.ptm.*;
-import hasoffer.core.persistence.po.urm.PriceOffNotice;
-import hasoffer.core.persistence.po.urm.UrmUser;
-import hasoffer.core.persistence.po.urm.UrmUserDevice;
+import hasoffer.core.persistence.po.urm.*;
 import hasoffer.core.product.ICmpSkuService;
-import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
-import hasoffer.core.product.solr.ProductModel2;
-import hasoffer.core.product.solr.PtmStdSkuModel;
+import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
+import hasoffer.core.product.solr.*;
+import hasoffer.core.system.AppUserService;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.core.utils.ConstantUtil;
 import hasoffer.data.solr.FilterQuery;
+import hasoffer.fetch.helper.WebsiteHelper;
+import hasoffer.spider.model.FetchedProductReview;
 import jodd.util.NameValue;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -39,6 +41,8 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,11 +56,19 @@ public class ApiUtils {
     @Resource
     AppServiceImpl appService;
     @Resource
+    AppUserService appUserService;
+    @Resource
     IPriceOffNoticeService iPriceOffNoticeService;
     @Resource
     SearchLogCacheManager searchLogCacheManager;
     @Resource
     CmpskuIndexServiceImpl cmpskuIndexService;
+    @Resource
+    MongoDbManager mongoDbManager;
+    @Resource
+    PtmStdSKuServiceImpl ptmStdSKuService;
+    @Resource
+    PtmStdPriceIndexServiceImpl ptmStdPriceIndexService;
     @Resource
     private ICmpSkuService cmpSkuService;
     @Resource
@@ -227,7 +239,11 @@ public class ApiUtils {
         }
     }
 
-    public static void setPriceSearchScope(List<FilterQuery> fqList, int priceFrom, int priceTo, String priceToStr) {
+    public static void setPriceSearchScope(List<FilterQuery> fqList, int priceFrom, int priceTo, String priceToStr, String... priceName) {
+        String priceKey = "minPrice";
+        if (priceName.length == 1 && priceName[0].equals("price")) {
+            priceKey = "price";
+        }
         String priceFromStr;
         if (priceFrom < priceTo && priceFrom >= 0) {
             if (priceFrom <= 0) {
@@ -237,9 +253,9 @@ public class ApiUtils {
             if (priceTo > 0) {
                 priceToStr = String.valueOf(priceTo);
             }
-            fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", priceFromStr, priceToStr)));
+            fqList.add(new FilterQuery(priceKey, String.format("[%s TO %s]", priceFromStr, priceToStr)));
         } else {
-            fqList.add(new FilterQuery("minPrice", String.format("[%s TO %s]", "1", "*")));
+            fqList.add(new FilterQuery(priceKey, String.format("[%s TO %s]", "1", "*")));
         }
     }
 
@@ -342,8 +358,6 @@ public class ApiUtils {
     }
 
 
-
-
     public static PageableResult parseString2Pageable(String jsonString, Class classzz) {
         PageableResult pageableResult = null;
         pageableResult = (PageableResult<PtmStdSkuModel>) JSON.parseObject(jsonString, PageableResult.class);
@@ -359,13 +373,19 @@ public class ApiUtils {
             Set<Map.Entry<String, List<NameValue<String, Long>>>> entries = pivotFieldVals.entrySet();
             Iterator<Map.Entry<String, List<NameValue<String, Long>>>> iterator = entries.iterator();
             while (iterator.hasNext()) {
+                String cateFilterValue;
                 Map.Entry<String, List<NameValue<String, Long>>> next = iterator.next();
                 String key = next.getKey();
                 List<NameValue<String, Long>> value = next.getValue();
               /*  if (key.equals("Network3G") || key.equals("Network4G") || key.equals("Network")) {
                     netWorkNVList.addAll(value);
                 }*/
-                String cateFilterValue = ConstantUtil.API_CATEGORY_FILTER_PARAMS_MAP.get(key);
+                cateFilterValue = key;
+                if (key.contains("_")) {
+                    cateFilterValue = key.replaceAll("_", " ");
+                } else if (ConstantUtil.API_CATEGORY_FILTER_PARAMS_MAP.get(key) != null) {
+                    cateFilterValue = ConstantUtil.API_CATEGORY_FILTER_PARAMS_MAP.get(key);
+                }
                 //  //brand需要按照指定顺序返回
                 //SamSung Xiaomi Motorola Lenovo Huawei Micromax Lava Gionee
                 if (cateFilterValue != null && cateFilterValue.equals("Brand")) {
@@ -500,10 +520,10 @@ public class ApiUtils {
         }
 
 
-        if (key.equals("Network")) {
+        if (key.equals("Network Support")) {
             tempReplacePivos.put("3", value);
         } else if (key.equals("3")) {
-            tempReplacePivos.put("Network", value);
+            tempReplacePivos.put("Network Support", value);
         }
 
         if (key.equals("Screen Resolution")) {
@@ -518,10 +538,10 @@ public class ApiUtils {
             tempReplacePivos.put("Operating System", value);
         }
 
-        if (key.equals("Ram")) {
+        if (key.equals("RAM")) {
             tempReplacePivos.put("2", value);
         } else if (key.equals("2")) {
-            tempReplacePivos.put("Ram", value);
+            tempReplacePivos.put("RAM", value);
         }
 
         if (key.equals("Screen Size")) {
@@ -559,6 +579,71 @@ public class ApiUtils {
         } else if (key.equals("a1")) {
             tempReplacePivos.put("Expandable Memory", value);
         }
+    }
+
+    public static String removeSpecialSymbol(String str) {
+        String regEx = "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】'；：”“’。，、？]";
+//        String   str   =   "*a dCVs*34_a _09_b5*[/435^*&()^$$&*).{}+.|.)%%*(*.}34{45[]12.fd'*&999￥……{}【】。，；’“'”？";
+        Pattern p = Pattern.compile(regEx);
+        Matcher m = p.matcher(str);
+        return m.replaceAll("").trim();
+    }
+
+    /**
+     * yi以put值的方式获得一个map
+     * 或像先用mapput值返回此map
+     *
+     * @param key
+     * @param value
+     * @return
+     */
+    public static Map getBuilderMap(Object key, Object value, Map map) {
+        map.put(key, value);
+        return map;
+    }
+
+    /**
+     * @param deviceInfoVo   当前版本
+     * @param compareVersion 要比较的版本数
+     * @return 比指定version大返回1 小返回-1 等于返回0
+     */
+    public static int currenVersionCompare2compareversion(DeviceInfoVo deviceInfoVo, int compareVersion) {
+        if (deviceInfoVo != null) {
+            String appVersion = deviceInfoVo.getAppVersion();
+            if (org.apache.commons.lang3.StringUtils.isNotEmpty(appVersion)) {
+                int version = getNumberFromString(appVersion);
+                if (version > compareVersion) {
+                    return 1;
+                }
+                if (version < compareVersion) {
+                    return -1;
+                }
+            }
+        }
+        return 0;
+    }
+
+    public static List getIdList(List list) {
+        List<Long> idsList = new ArrayList<>();
+        for (Object object : list) {
+            Field[] declaredFields = object.getClass().getDeclaredFields();
+            for (int i = 0; i < declaredFields.length; i++) {
+                Field declaredField = declaredFields[i];
+                declaredField.setAccessible(true);
+                try {
+                    if (declaredField.getType().equals(Long.class) && declaredField.getName().equals("id")) {
+                        //if null ,set
+                        if (declaredField.get(object) != null) {
+                            Long id = (Long) declaredField.get(object);
+                            idsList.add(id);
+                        }
+                    }
+                } catch (Exception e) {
+                    continue;
+                }
+            }
+        }
+        return idsList;
     }
 
     /**
@@ -627,7 +712,13 @@ public class ApiUtils {
         return str2;
     }
 
-    public boolean isPriceOffAlert(String userToken, Long skuId) {
+    public boolean isPriceOffAlert(String userToken, Long skuId, Long... userId) {
+        if (userId.length > 0 && userId[0] > 0) {
+            PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(userId[0] + "", skuId);
+            if (priceOffNotice != null) {
+                return true;
+            }
+        }
         if (!StringUtils.isEmpty(userToken)) {
             UrmUser urmUser = appService.getUserByUserToken(userToken);
             if (urmUser != null) {
@@ -639,6 +730,7 @@ public class ApiUtils {
         }
         return false;
     }
+    //sort list area =================================================================
 
     public void sendEmail(String to, String content, boolean isHtml) throws MessagingException {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
@@ -720,12 +812,12 @@ public class ApiUtils {
 
     public void setCommentNumAndRatins(ProductListVo productListVo) {
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(productListVo.getId(), 1, 20);
-        if (pagedCmpskus != null && pagedCmpskus.getData() != null && pagedCmpskus.getData().size() > 0) {
+        if (pagedCmpskus != null && pagedCmpskus.getData().size() > 0) {
             List<PtmCmpSku> tempSkuList = pagedCmpskus.getData();
             //计算评论数*星级的总和
             int sum = 0;
             //统计site
-            Set<Website> websiteSet = new HashSet<Website>();
+            Set<Website> websiteSet = new HashSet<>();
             for (PtmCmpSku ptmCmpSku : tempSkuList) {
                 websiteSet.add(ptmCmpSku.getWebsite());
             }
@@ -819,7 +911,6 @@ public class ApiUtils {
             map.put("categorys", categorys);
         }
     }
-    //sort list area =================================================================
 
     /**
      * 获取类目Vo
@@ -845,11 +936,26 @@ public class ApiUtils {
      * @param data
      */
     public void calculateHasofferCoin(List<UrmUser> users, BackDetailVo data) {
+        boolean addFlag = false;
+        //订单分隔时间 2016年12月28日 12:00:00
+        String splitTime = "2016/12/28 12:00:00";
+        Date splitDate;
+        try {
+            splitDate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").parse(splitTime);
+        } catch (ParseException e) {
+            System.out.println("transfer time failed .");
+            return;
+        }
         List<OrderVo> transcations = new ArrayList<OrderVo>();
         BigDecimal pendingCoins = BigDecimal.ZERO;
-        BigDecimal verifiedCoins = BigDecimal.ZERO;
+        BigDecimal multipliedVerifiedCoins = BigDecimal.ZERO;
+        BigDecimal addedVerifiedCoins = BigDecimal.ZERO;
         for (UrmUser user : users) {
             List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
+            UrmUserCoinRepair urmUserCoinRepair = appUserService.getUrmUserCoinSignRecordById(user.getId());
+            if (urmUserCoinRepair != null) {
+                addFlag = true;
+            }
             for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
                 if (orderStatsAnalysisPO.getWebSite().equals(Website.FLIPKART.name())) {
                     OrderVo orderVo = new OrderVo();
@@ -870,7 +976,11 @@ public class ApiUtils {
                             }
                         }
                         if (orderStatsAnalysisPO.getOrderStatus().equals("approved")) {
-                            verifiedCoins = verifiedCoins.add(tempPrice);
+                            if (orderStatsAnalysisPO.getOrderTime().compareTo(splitDate) == -1) {
+                                multipliedVerifiedCoins = multipliedVerifiedCoins.add(tempPrice);
+                            } else {
+                                addedVerifiedCoins = addedVerifiedCoins.add(tempPrice);
+                            }
                         }
                     }
 
@@ -880,10 +990,114 @@ public class ApiUtils {
         //待定的
         data.setPendingCoins(pendingCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         //可以使用的
-        verifiedCoins = verifiedCoins.multiply(BigDecimal.TEN);
-        data.setVerifiedCoins(verifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
+        if (addFlag) {
+            multipliedVerifiedCoins = multipliedVerifiedCoins.multiply(BigDecimal.TEN).add(addedVerifiedCoins);
+        } else {
+            multipliedVerifiedCoins = multipliedVerifiedCoins.add(addedVerifiedCoins);
+        }
+        //去掉已兑换的
+        List<UrmUserCoinExchangeRecord> exchangeRecords = appUserService.getCoinExchangeRecordByUserId(users.get(0).getId());
+        for (UrmUserCoinExchangeRecord urmUserCoinExchangeRecordL : exchangeRecords) {
+            multipliedVerifiedCoins = multipliedVerifiedCoins.subtract(BigDecimal.valueOf(urmUserCoinExchangeRecordL.getCoinTotal() == null ? 0 : urmUserCoinExchangeRecordL.getCoinTotal()));
+            OrderVo orderVo = new OrderVo();
+            //乘以10再取整
+            orderVo.setAccount(BigDecimal.ZERO.subtract(BigDecimal.valueOf(urmUserCoinExchangeRecordL.getCoinTotal())));
+            orderVo.setChannel("HASOFFER");
+            orderVo.setOrderId(urmUserCoinExchangeRecordL.getId() + "");
+            orderVo.setOrderTime(new Date(urmUserCoinExchangeRecordL.getOperateTime()));
+            orderVo.setWebsite("HASOFFER");
+            orderVo.setStatus("approved");
+            transcations.add(orderVo);
+        }
+        data.setVerifiedCoins(multipliedVerifiedCoins.divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP));
         data.setTranscations(transcations);
     }
 
+    public Map setEvaluateBrandFeaturesCompetitorsSummaryMap(PtmStdSku ptmStdSku, String[] affs) {
+        Map stdSkuParametersMap = new HashMap();
+        if (ptmStdSku == null) {
+            return stdSkuParametersMap;
+        }
+        Long stdSkuId = ptmStdSku.getId();
+        if (stdSkuId < 0) {
+            return stdSkuParametersMap;
+        }
+        PtmStdSkuDescription ptmStdSkuDescription = mongoDbManager.queryOne(PtmStdSkuDescription.class, stdSkuId);
 
+        if (ptmStdSkuDescription != null) {
+            String features = ptmStdSkuDescription.getFeatures();
+            stdSkuParametersMap.put("features", features);
+
+            String summary = ptmStdSkuDescription.getSummary();
+            stdSkuParametersMap.put("summary", summary);
+
+            List<FetchedProductReview> fetchedProductReviewList = ptmStdSkuDescription.getFetchedProductReviewList();
+            stdSkuParametersMap.put("comments", fetchedProductReviewList);
+        }
+
+        //获取品牌card
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(ptmStdSku.getBrand())) {
+            String brandCardId = HexDigestUtil.md5(ptmStdSku.getBrand().toUpperCase());
+            if (org.apache.commons.lang3.StringUtils.isNotEmpty(brandCardId)) {
+                PtmStdBrandCard ptmStdBrandCard = mongoDbManager.queryOne(PtmStdBrandCard.class, brandCardId);
+                if (ptmStdBrandCard != null && org.apache.commons.lang3.StringUtils.isNotEmpty(ptmStdBrandCard.getBrandCardString())) {
+                    stdSkuParametersMap.put("brandCard", ptmStdBrandCard.getBrandCardString());
+                }
+            }
+
+        }
+        //bestCompetitors
+//        List<CmpProductListVo> competitors = ptmStdSKuService.getSimilaryPricesByPriceAndRating(ptmStdSku);
+        int priceFrom = BigDecimal.valueOf(ptmStdSku.getRefPrice()).multiply(BigDecimal.valueOf(0.8)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).intValue();
+        int priceTo = BigDecimal.valueOf(ptmStdSku.getRefPrice()).multiply(BigDecimal.valueOf(1.2)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).intValue();
+        PageableResult<PtmStdPriceModel> ptmStdPriceModelPageableResult = ptmStdPriceIndexService.filterStdPriceByCriteria(new SearchCriteria(1, 3, priceFrom, priceTo));
+        if (ptmStdPriceModelPageableResult != null && ptmStdPriceModelPageableResult.getData() != null) {
+            List<CmpProductListVo> cmpProductListVos = getCmpProductListVos(ptmStdPriceModelPageableResult.getData(), affs);
+            stdSkuParametersMap.put("competitors", cmpProductListVos);
+        }
+        return stdSkuParametersMap;
+    }
+
+    /**
+     * 获取详情页sku列表
+     *
+     * @return
+     */
+    public List<CmpProductListVo> getCmpProductListVos(List skuList, String[] affs) {
+        List<CmpProductListVo> cmpProductListVoList = new ArrayList<>();
+        if (skuList != null && skuList.size() > 0) {
+            if (PtmStdPrice.class.isInstance(skuList.get(0))) {
+                Iterator<PtmStdPrice> ptmList = skuList.iterator();
+                while (ptmList.hasNext()) {
+                    PtmStdPrice next = ptmList.next();
+                    CmpProductListVo cplv = new CmpProductListVo(next, productCacheManager.getPtmStdSkuImageUrl(next.getStdSkuId()), WebsiteHelper.getLogoUrl(next.getWebsite()));
+                    cplv.setDeepLinkUrl(WebsiteHelper.getDeeplinkWithAff((next.getWebsite()), next.getUrl(), affs));
+                    cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff((next.getWebsite()), next.getUrl(), affs));
+                    if (affs.length > 2) {
+                        long userId = Long.parseLong(affs[2]);
+                        if (userId > 0) {
+                            cplv.setIsAlert(isPriceOffAlert(null, cplv.getId(), userId));
+                        }
+                    }
+                    cmpProductListVoList.add(cplv);
+                }
+            } else if (PtmStdPriceModel.class.isInstance(skuList.get(0))) {
+                Iterator<PtmStdPriceModel> ptmList = skuList.iterator();
+                while (ptmList.hasNext()) {
+                    PtmStdPriceModel next = ptmList.next();
+                    CmpProductListVo cplv = new CmpProductListVo(next, productCacheManager.getPtmStdSkuImageUrl(next.getId()), WebsiteHelper.getLogoUrl(Website.valueOf(next.getSite())));
+                    cplv.setDeepLinkUrl(WebsiteHelper.getDeeplinkWithAff(Website.valueOf(next.getSite()), next.getSkuUrl(), affs));
+                    cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(Website.valueOf(next.getSite()), next.getSkuUrl(), affs));
+                    if (affs.length > 2) {
+                        long userId = Long.parseLong(affs[2]);
+                        if (userId > 0) {
+                            cplv.setIsAlert(isPriceOffAlert(null, cplv.getId(), userId));
+                        }
+                    }
+                    cmpProductListVoList.add(cplv);
+                }
+            }
+        }
+        return cmpProductListVoList;
+    }
 }

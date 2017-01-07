@@ -8,6 +8,7 @@ import hasoffer.core.app.vo.ResultVo;
 import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.impl.AppServiceImpl;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -60,8 +63,8 @@ public class SystemController {
     @RequestMapping(value = "app/push/check", method = RequestMethod.GET)
     public ResultVo checkGetPushMsg(@RequestParam(defaultValue = "100") int type, HttpServletResponse response) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("errorCode", "00000");
-        jsonObject.put("msg", "ok");
+        jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         ResultVo resultVo = new ResultVo();
         resultVo.getData().put("have", false);
         String currentDate = TimeUtils.parse(new Date(), "yyyyMMdd");
@@ -105,7 +108,7 @@ public class SystemController {
         }
         switch (type) {
             case 0:
-                jsonObject.put("data", resultVo.getData());
+                jsonObject.put(ConstantUtil.API_NAME_DATA, resultVo.getData());
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             case 1:
@@ -115,21 +118,35 @@ public class SystemController {
                     }
                 }
                 resultVo.getData().put("pushList", pushList);
-                jsonObject.put("data", resultVo.getData());
+                jsonObject.put(ConstantUtil.API_NAME_DATA, resultVo.getData());
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             default:
-                jsonObject.put("data", resultVo.getData());
+                jsonObject.put(ConstantUtil.API_NAME_DATA, resultVo.getData());
                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
         }
 
     }
 
+    /**
+     * 测试获取web.xml中的entry
+     *
+     * @param name
+     * @return
+     */
     @ResponseBody
-    @RequestMapping(value = "app/testArray", method = RequestMethod.GET)
-    public String checkGetPushMsg(String[] a) {
-        System.out.println("1");
+    @RequestMapping("jndiTest")
+    public String JNDITest(@RequestParam String name) {
+        try {
+            javax.naming.Context initCtx = new InitialContext();
+            javax.naming.Context envCtx = (javax.naming.Context) initCtx.lookup("java:comp/env");
+            String ParamValue = (String) envCtx.lookup(name);
+            System.out.println(name + " :" + ParamValue);
+        } catch (NamingException e) {
+            System.out.println(e.getMessage());
+        }
+
         return "ok";
     }
 }

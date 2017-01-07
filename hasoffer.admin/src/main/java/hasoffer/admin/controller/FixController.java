@@ -10,6 +10,7 @@ import hasoffer.base.exception.HttpFetchException;
 import hasoffer.base.exception.ImageDownloadOrUploadException;
 import hasoffer.base.model.*;
 import hasoffer.base.utils.*;
+import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.core.analysis.ProductAnalysisService;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
@@ -17,6 +18,8 @@ import hasoffer.core.persistence.mongo.HijackLog;
 import hasoffer.core.persistence.mongo.MobileCateDescription;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.mongo.UrmDeviceRequestLog;
+import hasoffer.core.persistence.po.app.AppDeal;
+import hasoffer.core.persistence.po.h5.KeywordCollection;
 import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuIndex2Updater;
 import hasoffer.core.persistence.po.ptm.updater.PtmCmpSkuUpdater;
@@ -112,6 +115,9 @@ public class FixController {
     ICacheService cacheServiceImpl;
     @Resource
     IPtmStdPriceService ptmStdPriceService;
+    @Resource
+    IKeywordService keywordService;
+
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
 
     private Website[] websites = {
@@ -134,6 +140,203 @@ public class FixController {
             Website.NAAPTOL,
             Website.ZOOMIN
     };
+
+    @RequestMapping(value = "/keyword", method = RequestMethod.GET)
+    @ResponseBody
+    public String keyword() throws Exception {
+
+//        getFlipkartKeyword();
+//        getSnapdealKeyword();
+        getMyntraKeyword();
+
+        return "";
+    }
+
+    private void getMyntraKeyword() {
+
+        try {
+
+            String category = "CLOTHING";
+
+            Map<String, String> headerMap = new HashMap<>();
+
+            headerMap.put("Connection", "keep-alive");
+            headerMap.put("Content-Encoding", "gzip");
+            headerMap.put("Content-Length", "20500");
+            headerMap.put("Content-Type", "text/html; charset=utf-8");
+            headerMap.put("Date", "Thu, 05 Jan 2017 04:22:30 GMT");
+            headerMap.put("ETag", "W/\"181b1-uhDuaT2E37oqTP0yYgdgWw\"");
+            headerMap.put("Vary", "Accept-Encoding");
+            headerMap.put("X-Frame-Options", "SAMEORIGIN");
+            headerMap.put("X-N", "S");
+
+//            HttpResponseModel responseModel = HttpUtils.get("http://www.myntra.com/", headerMap);
+            HttpResponseModel responseModel = HttpUtils.get("http://www.myntra.com/", null);
+
+            String urlHtml = responseModel.getBodyString();
+
+            System.out.println(urlHtml);
+
+            String[] subStr = urlHtml.split("window.__myx_seo__ =");
+
+            System.out.println(subStr.length);
+
+            String resultString = subStr[1].substring(0, subStr[1].indexOf(';'));
+
+            System.out.println(resultString);
+
+            String keywordString = StringUtils.filterAndTrim(resultString, Arrays.asList("\\]", "\\["));
+
+            String[] subStr1 = keywordString.split("\"name\":\"");
+
+            for (int i = 1; i < subStr1.length; i++) {
+
+                String keyword = subStr1[i].substring(0, subStr1[i].indexOf('\"'));
+
+                KeywordCollection keywordRepository = new KeywordCollection();
+
+                keywordRepository.setId(HexDigestUtil.md5(keyword.toUpperCase() + Website.MYNTRA));
+                keywordRepository.setKeyword(keyword);
+                keywordRepository.setKeywordKey(HexDigestUtil.md5(keyword.toUpperCase()));
+                keywordRepository.setKeywordSourceSite(Website.MYNTRA);
+                keywordRepository.setSourceSiteCategoryName(category);
+
+                System.out.println(keywordRepository);
+
+                keywordService.saveOrUpdate(keywordRepository);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void getSnapdealKeyword() {
+
+        try {
+
+            TagNode root = HtmlUtils.getUrlRootTagNode("https://www.snapdeal.com/");
+
+            List<TagNode> divNodeList = getSubNodesByXPath(root, "//div[@class='brandContainerFooter']");
+
+            for (int i = 0; i < divNodeList.size(); i++) {
+
+                TagNode divNode = divNodeList.get(i);
+
+                TagNode categoryNode = getSubNodeByXPath(divNode, "/span/ul/a", null);
+
+                String category = StringUtils.filterAndTrim(categoryNode.getText().toString(), Arrays.asList(":"));
+
+                List<TagNode> keywordList = getSubNodesByXPath(divNode, "/span/ul/li/a");
+
+                for (TagNode keywordNode : keywordList) {
+
+                    String keyword = keywordNode.getText().toString().trim();
+
+                    KeywordCollection keywordRepository = new KeywordCollection();
+
+                    keywordRepository.setId(HexDigestUtil.md5(keyword.toUpperCase() + Website.SNAPDEAL));
+                    keywordRepository.setKeyword(keyword);
+                    keywordRepository.setKeywordKey(HexDigestUtil.md5(keyword.toUpperCase()));
+                    keywordRepository.setKeywordSourceSite(Website.SNAPDEAL);
+                    keywordRepository.setSourceSiteCategoryName(category);
+
+                    System.out.println(keywordRepository);
+
+                    keywordService.saveOrUpdate(keywordRepository);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void getFlipkartKeyword() {
+
+        try {
+
+            TagNode root = HtmlUtils.getUrlRootTagNode("https://www.flipkart.com/");
+
+            List<TagNode> divNodeList = getSubNodesByXPath(root, "//div[@class='col gu12 gY-jFd']/div");
+
+            for (int i = 1; i < divNodeList.size(); i++) {
+
+                TagNode divNode = divNodeList.get(i);
+
+                TagNode categoryNode = getSubNodeByXPath(divNode, "/div/div", null);
+
+                String category = categoryNode.getText().toString();
+
+                String[] subStr = category.split(":");
+
+                category = subStr[0].trim();
+
+                List<TagNode> keywordList = getSubNodesByXPath(divNode, "/div/div/a");
+
+                for (TagNode keywordNode : keywordList) {
+
+                    String keyword = keywordNode.getText().toString().trim();
+
+                    KeywordCollection keywordRepository = new KeywordCollection();
+
+                    keywordRepository.setId(HexDigestUtil.md5(keyword.toUpperCase() + Website.FLIPKART));
+                    keywordRepository.setKeyword(keyword);
+                    keywordRepository.setKeywordKey(HexDigestUtil.md5(keyword.toUpperCase()));
+                    keywordRepository.setKeywordSourceSite(Website.FLIPKART);
+                    keywordRepository.setSourceSiteCategoryName(category);
+
+                    System.out.println(keywordRepository);
+
+                    keywordService.saveOrUpdate(keywordRepository);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @RequestMapping(value = "/skuImageDownLoad/{skuid}", method = RequestMethod.GET)
+    @ResponseBody
+    public String skuImageDownLoad(@PathVariable int skuid) {
+
+        PtmCmpSku cmpSkuById = cmpSkuService.getCmpSkuById(skuid);
+
+        cmpSkuService.downloadImage2(cmpSkuById);
+
+        return "";
+    }
+
+    //fixdata/addUrlKeyForPtmCmpSku
+    @RequestMapping(value = "/addUrlKeyForPtmCmpSku/{type}/{ptmcmpskuId}", method = RequestMethod.GET)
+    @ResponseBody
+    public String addUrlKeyForPtmCmpSku(@PathVariable long ptmcmpskuId, @PathVariable int type) throws Exception {
+
+        String queryString = "";
+
+        ExecutorService executorService = Executors.newCachedThreadPool();
+
+
+        ListProcessWorkerStatus<PtmCmpSku> ws = new ListProcessWorkerStatus<>();
+
+        if (type == 0) {//更新urlKey为null的
+            queryString = "SELECT t FROM PtmCmpSku t WHERE t.urlKey is null ORDER BY t.id";
+            executorService.execute(new MysqlListWorker2(queryString, ws, dbm));
+        } else if (type == 1) {//从指定的最小id开始更新
+            queryString = "SELECT t FROM PtmCmpSku t WHERE t.id > ?0 ORDER BY t.id";
+            executorService.execute(new MysqlListWorker2(queryString, ws, dbm, ptmcmpskuId));
+        } else {
+            return "error";
+        }
+
+        for (int i = 0; i < 50; i++) {
+            executorService.execute(new UrlKeyFixWorker(ws, cmpSkuService));
+        }
+
+        return "ok";
+    }
 
     //fixdata/addUrlKeyForStdPrice
     @RequestMapping(value = "/addUrlKeyForStdPrice", method = RequestMethod.GET)
@@ -224,35 +427,6 @@ public class FixController {
             for (PtmStdImage image : imageList) {
                 stdProductService.fixImage(image.getId());
             }
-        }
-
-        return "ok";
-    }
-
-    //fixdata/addUrlKeyForPtmCmpSku
-    @RequestMapping(value = "/addUrlKeyForPtmCmpSku/{type}/{ptmcmpskuId}", method = RequestMethod.GET)
-    @ResponseBody
-    public String addUrlKeyForPtmCmpSku(@PathVariable long ptmcmpskuId, @PathVariable int type) throws Exception {
-
-        String queryString = "";
-
-        ExecutorService executorService = Executors.newCachedThreadPool();
-
-
-        ListProcessWorkerStatus<PtmCmpSku> ws = new ListProcessWorkerStatus<>();
-
-        if (type == 0) {//更新urlKey为null的
-            queryString = "SELECT t FROM PtmCmpSku t WHERE t.urlKey is null ORDER BY t.id";
-            executorService.execute(new MysqlListWorker2(queryString, ws, dbm));
-        } else if (type == 1) {//从指定的最小id开始更新
-            queryString = "SELECT t FROM PtmCmpSku t WHERE t.id > ?0 ORDER BY t.id";
-            executorService.execute(new MysqlListWorker2(queryString, ws, dbm, ptmcmpskuId));
-        } else {
-            return "error";
-        }
-
-        for (int i = 0; i < 50; i++) {
-            executorService.execute(new UrlKeyFixWorker(ws, cmpSkuService));
         }
 
         return "ok";
@@ -2269,6 +2443,35 @@ http://www.s2d6.com/x/?x=c&z=s&v=5953892&k=||1477299419|28983|553|detail|&t=http
                 }
                 int resultCount = appService.addUserRedeemGroup(groupList);
                 logger.info("list size : {} and batchSaveSize is : {}  ", groupList.size(), resultCount);
+            }
+        }
+        return "ok";
+    }
+
+    @ResponseBody
+    @RequestMapping("fixDealSite")
+    public String fixDealWebSite() {
+        PageableResult<AppDeal> deals = appService.getDeals(1l, 500l);
+
+        long currentPage = 1;
+        long totalPage = deals.getTotalPage();
+        long pageSize = 500;
+
+        for (long i = currentPage; i < totalPage; i++) {
+            System.out.println("currentPage : " + i);
+            PageableResult<AppDeal> deals1 = appService.getDeals(i, pageSize);
+            for (AppDeal appDeal : deals1.getData()) {
+                if (Website.UNKNOWN.equals(appDeal.getWebsite())) {
+                    String siteString = WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl());
+                    System.out.println(siteString);
+                    try {
+                        Website dealSite = Website.valueOf(siteString);
+                        appDeal.setWebsite(dealSite);
+                        appService.updateDeal(appDeal);
+                    } catch (Exception e) {
+                        continue;
+                    }
+                }
             }
         }
         return "ok";

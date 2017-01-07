@@ -1,5 +1,6 @@
 package hasoffer.core.bo.system;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import hasoffer.base.enums.SearchResultSort;
 
 import java.util.Arrays;
@@ -19,26 +20,57 @@ public class SearchCriteria {
     private int level;
     private int priceFrom = -1;
     private int priceTo = -1;
+
     private List<String> pivotFields;
     private SearchResultSort sort = SearchResultSort.RELEVANCE;
-
-
+    private String[] model;
+    @JsonProperty(value = "Brand")
     private String[] brand;
-    private String[] network;
+    @JsonProperty(value = "NetworkSupport")
+    private String[] networkSupport;
+    @JsonProperty(value = "ScreenResolution")
     private String[] screenResolution;
+    @JsonProperty(value = "OpreatingSystem")
     private String[] opreatingSystem;
+    @JsonProperty(value = "ExpandableMemory")
     private String[] expandableMemory;
 
     //int filter
+    @JsonProperty(value = "RAM")
     private String[] ram;
+    @JsonProperty(value = "BatteryCapacity")
     private String[] batteryCapacity;
+    @JsonProperty(value = "InternalMemory")
     private String[] internalMemory;
 
     //float
+    @JsonProperty(value = "PrimaryCamera")
     private String[] primaryCamera;
+    @JsonProperty(value = "SecondaryCamera")
     private String[] secondaryCamera;
+    @JsonProperty(value = "ScreenSize")
     private String[] screenSize;
 
+    private String fmRadio;
+    private String simSlot;
+    private String operatingSystem;
+    private String touchScreen;
+    private String bluetooth;
+    private String wiFi;
+    private String processor;
+    private String queryPrimaryCamera;
+    private String querySecondaryCamera;
+
+
+    public SearchCriteria() {
+    }
+
+    public SearchCriteria(int page, int pageSize, int priceFrom, int priceTo) {
+        this.page = page;
+        this.pageSize = pageSize;
+        this.priceFrom = priceFrom;
+        this.priceTo = priceTo;
+    }
 
     public int getLevel() {
         return level;
@@ -120,6 +152,14 @@ public class SearchCriteria {
         this.priceTo = priceTo;
     }
 
+    public String[] getModel() {
+        return model;
+    }
+
+    public void setModel(String[] model) {
+        this.model = model;
+    }
+
     public SearchResultSort getSort() {
         return sort;
     }
@@ -139,6 +179,9 @@ public class SearchCriteria {
     @Override
     public String toString() {
         return "SearchCriteria{" +
+                "comment=" + comment +
+                ", minPrice=" + minPrice +
+                ", maxPrice=" + maxPrice +
                 ", keyword='" + keyword + '\'' +
                 ", categoryId='" + categoryId + '\'' +
                 ", page=" + page +
@@ -148,8 +191,9 @@ public class SearchCriteria {
                 ", priceTo=" + priceTo +
                 ", pivotFields=" + pivotFields +
                 ", sort=" + sort +
+                ", model=" + Arrays.toString(model) +
                 ", brand=" + Arrays.toString(brand) +
-                ", netWork=" + Arrays.toString(network) +
+                ", networkSupport=" + Arrays.toString(networkSupport) +
                 ", screenResolution=" + Arrays.toString(screenResolution) +
                 ", opreatingSystem=" + Arrays.toString(opreatingSystem) +
                 ", expandableMemory=" + Arrays.toString(expandableMemory) +
@@ -159,6 +203,15 @@ public class SearchCriteria {
                 ", primaryCamera=" + Arrays.toString(primaryCamera) +
                 ", secondaryCamera=" + Arrays.toString(secondaryCamera) +
                 ", screenSize=" + Arrays.toString(screenSize) +
+                ", fmRadio='" + fmRadio + '\'' +
+                ", simSlot='" + simSlot + '\'' +
+                ", operatingSystem='" + operatingSystem + '\'' +
+                ", touchScreen='" + touchScreen + '\'' +
+                ", bluetooth='" + bluetooth + '\'' +
+                ", wiFi='" + wiFi + '\'' +
+                ", processor='" + processor + '\'' +
+                ", queryPrimaryCamera='" + queryPrimaryCamera + '\'' +
+                ", querySecondaryCamera='" + querySecondaryCamera + '\'' +
                 '}';
     }
 
@@ -170,12 +223,12 @@ public class SearchCriteria {
         this.brand = brand;
     }
 
-    public String[] getNetwork() {
-        return network;
+    public String[] getNetworkSupport() {
+        return networkSupport;
     }
 
-    public void setNetwork(String[] network) {
-        this.network = network;
+    public void setNetworkSupport(String[] networkSupport) {
+        this.networkSupport = networkSupport;
     }
 
     public String[] getScreenResolution() {
@@ -248,5 +301,77 @@ public class SearchCriteria {
 
     public void setScreenSize(String[] screenSize) {
         this.screenSize = screenSize;
+    }
+
+    public String getFmRadio() {
+        return fmRadio;
+    }
+
+    public void setFmRadio(String fmRadio) {
+        this.fmRadio = fmRadio;
+    }
+
+    public String getSimSlot() {
+        return simSlot;
+    }
+
+    public void setSimSlot(String simSlot) {
+        this.simSlot = simSlot;
+    }
+
+    public String getOperatingSystem() {
+        return operatingSystem;
+    }
+
+    public void setOperatingSystem(String operatingSystem) {
+        this.operatingSystem = operatingSystem;
+    }
+
+    public String getTouchScreen() {
+        return touchScreen;
+    }
+
+    public void setTouchScreen(String touchScreen) {
+        this.touchScreen = touchScreen;
+    }
+
+    public String getBluetooth() {
+        return bluetooth;
+    }
+
+    public void setBluetooth(String bluetooth) {
+        this.bluetooth = bluetooth;
+    }
+
+    public String getWiFi() {
+        return wiFi;
+    }
+
+    public void setWiFi(String wiFi) {
+        this.wiFi = wiFi;
+    }
+
+    public String getProcessor() {
+        return processor;
+    }
+
+    public void setProcessor(String processor) {
+        this.processor = processor;
+    }
+
+    public String getQueryPrimaryCamera() {
+        return queryPrimaryCamera;
+    }
+
+    public void setQueryPrimaryCamera(String queryPrimaryCamera) {
+        this.queryPrimaryCamera = queryPrimaryCamera;
+    }
+
+    public String getQuerySecondaryCamera() {
+        return querySecondaryCamera;
+    }
+
+    public void setQuerySecondaryCamera(String querySecondaryCamera) {
+        this.querySecondaryCamera = querySecondaryCamera;
     }
 }
