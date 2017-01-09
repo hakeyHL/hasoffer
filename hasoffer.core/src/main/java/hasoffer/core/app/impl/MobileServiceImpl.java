@@ -107,7 +107,7 @@ public class MobileServiceImpl implements MobileService {
         int initSize = 0;
         List<KeywordCollection> keywordCollections = dbm.query(API_KEYWORDCOLLECTION_GET_SIMILAR_CATEGORYKEYS, Arrays.asList(keyWordsVo.getCategoryName()));
         for (KeywordCollection keywordCollection : keywordCollections) {
-            if (keywordCollection.getSourceSiteCategoryName().equals(keyWordsVo.getCategoryName()) && initSize < 3) {
+            if (keywordCollection.getSourceSiteCategoryName().equals(keyWordsVo.getCategoryName()) && initSize < 2) {
                 List<CmpProductListVo> cmpProductListVoList = searchFromSolrByKeyWordVo(new KeyWordsVo(keywordCollection), 0, 20);
                 similarProducts.addAll(cmpProductListVoList);
                 initSize++;
