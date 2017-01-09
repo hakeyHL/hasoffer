@@ -4,6 +4,7 @@ import hasoffer.aliyun.enums.TaskLevel;
 import hasoffer.aliyun.enums.TaskStatus;
 import hasoffer.aliyun.enums.TaskTarget;
 import hasoffer.aliyun.enums.WebSite;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.data.redis.IRedisService;
 import hasoffer.state.dmo.UpdateStateDMO;
 import hasoffer.state.service.UpdateStateService;
@@ -44,24 +45,26 @@ public class UpdateStateJobBean extends QuartzJobBean {
                 int exceptionNum = 0;
                 int stopNum = 0;
                 String ymd = DateFormatUtils.format(new Date(), "yyyyMMdd");
+                long cacheSeconds = TimeUtils.SECONDS_OF_1_DAY * 7;
                 for (TaskLevel taskLevel : TaskLevel.values()) {
                     String key = "SPIDER_PUSH_NUM_" + taskTarget.name() + "_" + website.name() + "_" + taskLevel.name() + "_" + ymd;
-                    String s = redisService.get(key, -1);
+                    String s = redisService.get(key, cacheSeconds);
                     pushNum = Integer.valueOf(s == null ? "0" : s) + pushNum;
                     //logger.info(key + " value: {}", s);
                 }
+
                 String finishKey = "SPIDER_POP_NUM_" + taskTarget.name() + "_" + website.name() + "_" + TaskStatus.FINISH + "_" + ymd;
-                String finishNumStr = redisService.get(finishKey, -1);
+                String finishNumStr = redisService.get(finishKey, cacheSeconds);
                 //logger.info(finishKey + " value: {}", finishNumStr);
                 finishNum = Integer.valueOf(finishNumStr == null ? "0" : finishNumStr) + finishNum;
 
                 String exceptionKey = "SPIDER_POP_NUM_" + taskTarget.name() + "_" + website.name() + "_" + TaskStatus.EXCEPTION + "_" + ymd;
-                String exceptionNumStr = redisService.get(exceptionKey, -1);
+                String exceptionNumStr = redisService.get(exceptionKey, cacheSeconds);
                 //logger.info(exceptionKey + " value: {}", exceptionNumStr);
                 exceptionNum = Integer.valueOf(exceptionNumStr == null ? "0" : exceptionNumStr) + exceptionNum;
 
                 String stopKey = "SPIDER_POP_NUM_" + taskTarget.name() + "_" + website.name() + "_" + TaskStatus.STOP + "_" + ymd;
-                String stopNumStr = redisService.get(stopKey, -1);
+                String stopNumStr = redisService.get(stopKey, cacheSeconds);
                 //logger.info(stopKey + " value: {}", stopNumStr);
                 stopNum = Integer.valueOf(stopNumStr == null ? "0" : stopNumStr) + stopNum;
                 String updateStr = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
