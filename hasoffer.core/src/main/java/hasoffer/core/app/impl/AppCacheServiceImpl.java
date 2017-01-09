@@ -59,7 +59,7 @@ public class AppCacheServiceImpl implements AppCacheService {
     public List getObjectListFromCache(Object object, String oCacheValueList, long seconds) {
         List list = new ArrayList();
         //1. 从缓存中获取id列表
-        List<Long> ids = JSON.parseArray(oCacheValueList, long.class);
+        List<Long> ids = JSON.parseArray(oCacheValueList, Long.class);
         if (ids == null || ids.size() < 1) {
             return list;
         }

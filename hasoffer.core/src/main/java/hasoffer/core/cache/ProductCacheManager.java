@@ -175,8 +175,8 @@ public class ProductCacheManager {
         String cmpSkusJson = cacheService.get(key, 0);
         //先不读缓存,也不存缓存
         PageableResult<PtmCmpSku> pagedCmpskus;
-        try {
-            if (StringUtils.isEmpty(cmpSkusJson)) {
+        if (StringUtils.isEmpty(cmpSkusJson)) {
+            try {
                 pagedCmpskus = productService.listOnsaleCmpSkus(proId, page, size);
                 List<PtmCmpSku> data = pagedCmpskus.getData();
                 if (data != null && data.size() > 0) {
@@ -185,14 +185,19 @@ public class ProductCacheManager {
                     pagedCmpskus = new PageableResult<>();
                     pagedCmpskus.setData(new ArrayList<PtmCmpSku>());
                 }
-            } else {
+            } catch (Exception e) {
+                logger.error("listPagedCmpSkus(): listOnsaleCmpSkus error.", e);
+                return null;
+            }
+        } else {
+            try {
                 pagedCmpskus = new PageableResult<>();
                 List cmpSkuList = appCacheService.getObjectListFromCache(new PtmCmpSku(), cmpSkusJson, 0);
                 pagedCmpskus.setData(cmpSkuList);
+            } catch (Exception e) {
+                logger.error("listPagedCmpSkus(): getObjectListFromCache error. cmpSkusJson:{}", cmpSkusJson, e);
+                return null;
             }
-        } catch (Exception e) {
-            logger.error("deal skus from cache error:{}", e.getMessage(), e);
-            return null;
         }
         return pagedCmpskus;
     }
