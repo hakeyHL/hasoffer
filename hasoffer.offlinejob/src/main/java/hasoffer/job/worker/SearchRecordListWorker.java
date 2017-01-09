@@ -36,20 +36,20 @@ public class SearchRecordListWorker implements Runnable {
 
     public void run() {
         //String PATTERN_TIME = "yyyy-MM-dd HH:mm:ss";
-        int pageNum = 1;
+        //int pageNum = 1;
         while (true) {
             try {
                 if (searchLogQueue.size() > 10000) {
-                    pageNum = 1;
+                    //pageNum = 1;
                     TimeUnit.MINUTES.sleep(10);
                     logger.debug("SearchRecordListWorker go to sleep!");
                     continue;
                 }
                 logger.debug("SearchRecordListWorker START {}.Queue size {}", TimeUtils.parse(new Date(), "yyyy-MM-dd HH:mm:ss"), searchLogQueue.size());
 
-                PageableResult<SrmSearchLog> pagedSearchLog = searchRecordListService.getLastNoProductLog(pageNum++, 1000);
+                PageableResult<SrmSearchLog> pagedSearchLog = searchRecordListService.getLastNoProductLog(1, 2000);
                 if (pagedSearchLog == null || pagedSearchLog.getData().size() == 0) {
-                    pageNum = 1;
+                    //pageNum = 1;
                     TimeUnit.MINUTES.sleep(10);
                     continue;
                 }
