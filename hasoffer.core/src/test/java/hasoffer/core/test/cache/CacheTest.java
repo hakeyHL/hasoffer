@@ -36,7 +36,7 @@ public class CacheTest {
     public void del() {
         //2a02a62ddd62eeae23e0984d031cb6c8
 //        searchLogCacheManager.delCache("2a02a62ddd62eeae23e0984d031cb6c8");
-        productCacheManager.put2UpdateQueue(1000);
+        productCacheManager.put2UpdateQueue(1000, add);
     }
 
     @Test

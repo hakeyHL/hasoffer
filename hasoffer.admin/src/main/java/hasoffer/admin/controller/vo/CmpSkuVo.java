@@ -4,7 +4,9 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmStdPrice;
 import hasoffer.core.utils.ImageUtil;
+import hasoffer.core.utils.api.ApiUtils;
 
 import java.util.Date;
 
@@ -38,14 +40,6 @@ public class CmpSkuVo {
     public CmpSkuVo() {
     }
 
-    public String getFlag() {
-        return flag;
-    }
-
-    public void setFlag(String flag) {
-        this.flag = flag;
-    }
-
     public CmpSkuVo(PtmCmpSku cmpSku) {
         this.id = cmpSku.getId();
         this.website = cmpSku.getWebsite();
@@ -64,6 +58,26 @@ public class CmpSkuVo {
         } else {
             this.imageUrl = ImageUtil.getImageUrl(cmpSku.getImagePath());
         }
+    }
+
+    public CmpSkuVo(PtmStdPrice ptmStdPrice) {
+        this.id = ApiUtils.addBillion(ptmStdPrice.getId());
+        this.website = ptmStdPrice.getWebsite();
+        this.seller = ptmStdPrice.getWebsite().name();
+        this.rating = ptmStdPrice.getRatings() + "";
+        this.title = ptmStdPrice.getTitle();
+        this.price = ptmStdPrice.getPrice();
+        this.url = ptmStdPrice.getUrl();
+        this.updateTime = ptmStdPrice.getUpdateTime();
+        this.status = ptmStdPrice.getSkuStatus().name();
+    }
+
+    public String getFlag() {
+        return flag;
+    }
+
+    public void setFlag(String flag) {
+        this.flag = flag;
     }
 
     public String getTitle() {

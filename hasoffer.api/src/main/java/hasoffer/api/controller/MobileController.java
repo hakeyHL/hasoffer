@@ -407,7 +407,7 @@ public class MobileController {
         modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         List<CmpProductListVo> cmpProductListVoList = mobileService.searchFromSolrByKeyWordVo(keyWordsVo, page, pageSize);
         Map dataMap = new HashMap();
-        dataMap.put("skuList", cmpProductListVoList);
+        dataMap.put("plist", cmpProductListVoList);
         modelAndView.addObject(ConstantUtil.API_NAME_DATA, dataMap);
         return modelAndView;
     }
