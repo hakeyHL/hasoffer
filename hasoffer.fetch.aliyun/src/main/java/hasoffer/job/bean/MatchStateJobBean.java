@@ -36,7 +36,8 @@ public class MatchStateJobBean extends QuartzJobBean {
     }
 
     private void stateTask() {
-        for (WebSite website : WebSite.values()) {
+        List<WebSite> webSites = matchStateService.selectWebSite();
+        for (WebSite website : webSites) {
             MatchStateDMO matchStateDMO = new MatchStateDMO();
             int pushNum = 0;
             int finishNum = 0;
@@ -67,7 +68,7 @@ public class MatchStateJobBean extends QuartzJobBean {
             matchStateDMO.setUpdateDate(updateStr);
             matchStateDMO.setLogTime(new Date());
 
-            List<MatchStateDMO> matchStateDMOs = matchStateService.selectByDate(updateStr);
+            List<MatchStateDMO> matchStateDMOs = matchStateService.selectStats(updateStr, website.name());
             if (matchStateDMOs.size() == 0) {
                 matchStateService.insert(matchStateDMO);
             } else {

@@ -42,12 +42,6 @@
                            onClick="WdatePicker()" data-errormessage-value-missing="* 请输入日期" value="${queryDate}"/>
                 </td>
                 <td style="vertical-align: middle; text-align: center;">
-                    <label>任务类型</label>
-                </td>
-                <td style="vertical-align: middle; text-align: center;">
-                    <input id="taskTarget" value="${taskTarget}" class="form-control"/>
-                </td>
-                <td style="vertical-align: middle; text-align: center;">
                     <label>抓取网站</label>
                 </td>
                 <td style="vertical-align: middle; text-align: center;">
@@ -80,11 +74,6 @@
                     align: 'right',
                     halign: 'center'
                 }, {
-                    field: 'taskTarget',
-                    title: '任务类型',
-                    align: 'right',
-                    halign: 'center'
-                }, {
                     field: 'webSite',
                     title: '网站',
                     align: 'right',
@@ -102,11 +91,6 @@
                 }, {
                     field: 'exceptionNum',
                     title: '异常',
-                    align: 'right',
-                    halign: 'center'
-                }, {
-                    field: 'stopNum',
-                    title: '停止',
                     align: 'right',
                     halign: 'center'
                 }, {
@@ -132,13 +116,11 @@
     function queryUpdateState() {
 
         var $dateStr = $('#queryDate').val();
-        var $taskTarget = $('#taskTarget').val();
         var $webSite = $('#webSite').val();
 
-        var url = "${ctx}/updateState/selectUpdateStats";
+        var url = "${ctx}/matchState/selectMatchState";
         var jsonObject = {
             updateDate: $dateStr,
-            taskTarget: $taskTarget,
             webSite: $webSite
         };
         $.ajax({
@@ -156,27 +138,10 @@
     }
 
     function initSelect2() {
-
         $.ajax({
             cache: true,
             type: 'POST',
-            url: '${ctx}/updateState/selectTaskTarget',
-            contentType: 'application/json',
-            dataType: 'json',
-            async: false,
-            success: function (data) {
-                $('#taskTarget').select2({
-                    data: data,
-                    placeholder: '请选择',
-                    allowClear: true
-                })
-            }
-        });
-
-        $.ajax({
-            cache: true,
-            type: 'POST',
-            url: '${ctx}/updateState/selectWebSite',
+            url: '${ctx}/matchState/selectWebSite',
             contentType: 'application/json',
             dataType: 'json',
             async: false,
