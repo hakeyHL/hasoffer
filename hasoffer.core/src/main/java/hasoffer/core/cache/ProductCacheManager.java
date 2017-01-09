@@ -311,9 +311,21 @@ public class ProductCacheManager {
 //        }
 
         // 如果没有添加过，就再次加入
-        if (!redisSetService.contains(key_added, String.valueOf(productId))) {
-            redisSetService.add(key_added, String.valueOf(productId));
+//        if (!redisSetService.contains(key_added, String.valueOf(productId))) {
+//            redisSetService.add(key_added, String.valueOf(productId));
+//            redisListService.push(key, String.valueOf(productId));
+//        }
+
+        boolean addFlag = redisSetService.contains(key_added, String.valueOf(productId));
+        logger.info("put2UpdateQueue addFlag " + addFlag);
+        if (!addFlag) {
+
+            long add = redisSetService.add(key_added, String.valueOf(productId));
+            logger.info("put2UpdateQueue add to added queue success " + add);
+
             redisListService.push(key, String.valueOf(productId));
+            logger.info("put2UpdateQueue push to wait4update queue success ");
+            logger.info("put2UpdateQueue push to queue " + key);
         }
     }
 
