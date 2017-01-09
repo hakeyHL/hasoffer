@@ -27,10 +27,14 @@ public interface MatchStateDAO {
 
     @Select({
             "<script>",
-            "select updateDate, sum(pushNum) as pushNum, sum(finishNum) as finishNum, sum(exceptionNum) as exceptionNum from t_product_match_stats  where updateDate=#{queryDate,jdbcType=CHAR} GROUP BY updateDate",
+            "select updateDate,webSite,pushNum,finishNum,exceptionNum,logTime from t_product_match_stats where 1=1 ",
+            "<if test=\"queryDay!=null \">",
+            " and updateDate=#{queryDay} ",
+            "</if>",
+            "<if test=\"webSite!=null and webSite!='' \">",
+            " and webSite=#{webSite}",
+            "</if>",
             "</script>"
     })
-    List<MatchStateDMO> selectByDate(@Param("queryDate") String date);
-
-
+    List<MatchStateDMO> selectStats(@Param("queryDay") String queryDay, @Param("webSite") String webSite);
 }

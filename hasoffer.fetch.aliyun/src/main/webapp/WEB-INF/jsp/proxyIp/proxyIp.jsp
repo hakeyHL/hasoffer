@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="<%=contextPath%>/extensions/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="<%=contextPath%>/extensions/bootstrap-table/bootstrap-table.css">
     <link rel="stylesheet" href="<%=contextPath%>/extensions/bootstrap-table/extensions/edittable/css/edittable.css">
-    <link href="<%=contextPath%>/bootstrap/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+    <%--<link href="<%=contextPath%>/bootstrap/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">--%>
     <%@ include file="/common/commonCss.jsp" %>
     <link rel="stylesheet" href="<%=contextPath%>/css/page.css">
     <link rel="stylesheet" href="<%=contextPath%>/css/icomoon.min.css">

@@ -34,6 +34,13 @@ public class ShowHomeController {
         return modelAndView;
     }
 
+    @RequestMapping("/showMatchStats")
+    public ModelAndView showMatchStats() {
+        ModelAndView modelAndView = new ModelAndView("stats/matchList");
+        modelAndView.addObject("queryDate", DateFormatUtils.format(new Date(), "yyyy-MM-dd"));
+        return modelAndView;
+    }
+
 
     @RequestMapping("/showProxyIP")
     public ModelAndView showProxyIP() {
