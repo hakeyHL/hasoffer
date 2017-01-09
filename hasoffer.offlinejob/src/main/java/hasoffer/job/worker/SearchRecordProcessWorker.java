@@ -9,7 +9,6 @@ import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.search.SearchProductService;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.model.WebFetchResult;
-import hasoffer.spider.model.FetchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,7 +78,7 @@ public class SearchRecordProcessWorker implements Runnable {
      * @param sitePros
      * @return
      */
-    private FetchResult sendTask(String id, Website website, String keyword, Map<Website, WebFetchResult> sitePros) {
+    private void sendTask(String id, Website website, String keyword, Map<Website, WebFetchResult> sitePros) {
         WebFetchResult fetchResult = sitePros.get(website);
         long updateCycle = TimeUtils.MILLISECONDS_OF_1_HOUR * 12;
         //判断是否需要更新该网站（website）的该商品（keyword）
@@ -88,7 +87,7 @@ public class SearchRecordProcessWorker implements Runnable {
         if (isFetch) {
             fetchService.sendKeyWordTask(id, website, keyword);
         }
-        return null;
+        //return null;
     }
 
     private void fetchForIndia(SrmAutoSearchResult autoSearchResult) {
