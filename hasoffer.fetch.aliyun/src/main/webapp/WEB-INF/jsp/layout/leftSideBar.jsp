@@ -15,7 +15,10 @@
                     <a href="${ctx}/layout/showUpdateGroupByDay" target="frameContent">更新统计</a>
                 </li>
                 <li>
-                    <a href="${ctx}/layout/showUpdateStats" target="frameContent">更新状态</a>
+                    <a href="${ctx}/layout/showUpdateStats" target="frameContent">更新明细</a>
+                </li>
+                <li>
+                    <a href="${ctx}/layout/showMatchStats" target="frameContent">匹配明细</a>
                 </li>
                 <li>
                     <a href="${ctx}/layout/showProxyIP" target="frameContent">IP代理</a>
