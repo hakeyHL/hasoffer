@@ -81,7 +81,7 @@ public class AppDealController {
                     DealVo dealVo = new DealVo();
                     dealVo.setLogoUrl(dealModel.getWebsite() == null ? "" : WebsiteHelper.getBiggerLogoUrl(Website.valueOf(dealModel.getWebsite())));
                     dealVo.setTitle(dealModel.getTitle());
-                    dealVo.setWebsite(Website.valueOf(dealModel.getWebsite()).name());
+                    dealVo.setWebsite(dealModel.getWebsite().equals(Website.UNKNOWN.name()) ? WebsiteHelper.getAllWebSiteString(dealModel.getLinkUrl()) : dealModel.getWebsite());
                     dealVo.setId(dealModel.getId());
                     dealVo.setDiscount(dealModel.getDiscount());
                     dealVo.setDeepLink(dealModel.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(Website.valueOf(dealModel.getWebsite()), dealModel.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
