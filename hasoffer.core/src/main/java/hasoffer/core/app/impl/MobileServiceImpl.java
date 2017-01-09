@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -26,6 +27,7 @@ import java.util.List;
 @Service
 public class MobileServiceImpl implements MobileService {
     private static final String API_KEYWORDCOLLECTION_GETBY_KEYWORDSVO = "select t from KeywordCollection t where 1=1 ";
+    private static final String API_KEYWORDCOLLECTION_GET_SIMILAR_CATEGORYKEYS = "select t from KeywordCollection t where t.sourceSiteCategoryName=?0";
     @Autowired
     ICacheService iCacheService;
     @Resource
@@ -88,5 +90,29 @@ public class MobileServiceImpl implements MobileService {
         PageableResult<PtmStdSkuModel> ptmStdSkuModels = ptmStdSkuIndexService.filterStdSkuOnCategoryByCriteria(searchCriteria);
         apiUtils.addProductVo2List(cmpProductListVoList, ptmStdSkuModels.getData());
         return cmpProductListVoList;
+    }
+
+    /**
+     * 获取相关关键词列表
+     *
+     * @param keyWordsVo
+     * @return
+     */
+    @Override
+    public List<CmpProductListVo> getSimilarCategorys(KeyWordsVo keyWordsVo) {
+        List<CmpProductListVo> similarProducts = new ArrayList<>();
+        if (keyWordsVo == null || StringUtils.isEmpty(keyWordsVo.getCategoryName())) {
+            return similarProducts;
+        }
+        int initSize = 0;
+        List<KeywordCollection> keywordCollections = dbm.query(API_KEYWORDCOLLECTION_GET_SIMILAR_CATEGORYKEYS, Arrays.asList(keyWordsVo.getCategoryName()));
+        for (KeywordCollection keywordCollection : keywordCollections) {
+            if (keywordCollection.getSourceSiteCategoryName().equals(keyWordsVo.getCategoryName()) && initSize < 3) {
+                List<CmpProductListVo> cmpProductListVoList = searchFromSolrByKeyWordVo(new KeyWordsVo(keywordCollection), 0, 20);
+                similarProducts.addAll(cmpProductListVoList);
+                initSize++;
+            }
+        }
+        return similarProducts;
     }
 }

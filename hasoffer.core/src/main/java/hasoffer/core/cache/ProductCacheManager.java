@@ -217,7 +217,7 @@ public class ProductCacheManager {
                 long yesterdayStart = calendar.getTimeInMillis();
                 List<PtmTopSelling> ptmTopSellings = productService.getTopSellings(yesterdayStart, todayStart, page, size);
                 for (PtmTopSelling ptmTopSelling : ptmTopSellings) {
-                    PageableResult<PtmCmpSku> cmpSkuList = listPagedCmpSkus(ptmTopSelling.getId(), 0, 20);
+                    PageableResult<PtmCmpSku> cmpSkuList = listPagedCmpSkus(ptmTopSelling.getId(), page, size);
                     if (cmpSkuList != null && cmpSkuList.getData().size() > 0) {
                         PtmProduct product = productService.getProduct(ptmTopSelling.getId());
                         if (product != null && product.getPrice() > 0) {

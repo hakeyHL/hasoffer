@@ -13,4 +13,6 @@ public interface MobileService {
     List<KeyWordsVo> getKeyWordsListFromRepo(KeyWordsVo keyWordsVo, int page, int pageSize);
 
     List<CmpProductListVo> searchFromSolrByKeyWordVo(KeyWordsVo keyWordsVo, int page, int pageSize);
+
+    List<CmpProductListVo> getSimilarCategorys(KeyWordsVo keyWordsVo);
 }

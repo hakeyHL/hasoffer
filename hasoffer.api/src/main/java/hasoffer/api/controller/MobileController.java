@@ -408,6 +408,14 @@ public class MobileController {
         List<CmpProductListVo> cmpProductListVoList = mobileService.searchFromSolrByKeyWordVo(keyWordsVo, page, pageSize);
         Map dataMap = new HashMap();
         dataMap.put("plist", cmpProductListVoList);
+        //根据当前关键词找到相关的关键词的商品列表返回
+        //规则如下:
+        //-- 同一个分类 如果当前是id为1 那么推荐同分类的id为i+的关键词字调用搜索方法获取商品列表
+        List<CmpProductListVo> similarPros = mobileService.getSimilarCategorys(keyWordsVo);
+        //1. 找出id大于当前id且分类与当前分类一致的关键词,如果没有2个则从大于0的id开始重新搜索,依次循环
+        //2. 调用mobileService.search方法搜索
+        //3. 将结果封装到列表中
+        dataMap.put("similarPros", similarPros);
         modelAndView.addObject(ConstantUtil.API_NAME_DATA, dataMap);
         return modelAndView;
     }

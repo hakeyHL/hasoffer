@@ -13,7 +13,6 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.base.utils.JSONUtil;
-import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.app.impl.AppCmpServiceImpl;
 import hasoffer.core.app.vo.*;
 import hasoffer.core.cache.CmpSkuCacheManager;
@@ -280,7 +279,6 @@ public class Compare2Controller {
                                HttpServletResponse response,
                                HttpServletRequest request
     ) {
-        String cmpSkuCacheKey = ConstantUtil.API_PREFIX_CACAHE_CMP_CMPLIST_ + id + "_" + page + "_" + pageSize;
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
         jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
@@ -300,11 +298,11 @@ public class Compare2Controller {
                 return null;
             }
         }
-        String cmpSkuCacheValue = cacheService.get(cmpSkuCacheKey, 0);
-        if (StringUtils.isNotEmpty(cmpSkuCacheValue)) {
-            Httphelper.sendJsonMessage(cmpSkuCacheValue, response);
-            return null;
-        }
+//        String cmpSkuCacheValue = cacheService.get(cmpSkuCacheKey, 0);
+//        if (StringUtils.isNotEmpty(cmpSkuCacheValue)) {
+//            Httphelper.sendJsonMessage(cmpSkuCacheValue, response);
+//            return null;
+//        }
         String userToken = Context.currentContext().getHeader("usertoken");
         PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"skuPrice", "deepLink", "saved", "priceOff", "productVo", "pagedComparedSkuVos", "copywriting", "displayMode", "std", "cashBack"});
         CmpResult cr = new CmpResult();
@@ -347,7 +345,6 @@ public class Compare2Controller {
         } else {
             jsonObject.getJSONObject(ConstantUtil.API_NAME_DATA).putAll(apiUtils.setEvaluateBrandFeaturesCompetitorsSummaryMap(ptmStdSku, new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
         }
-        cacheService.add(cmpSkuCacheKey, JSON.toJSONString(jsonObject, propertyFilter), TimeUtils.MILLISECONDS_OF_1_HOUR * 2);
         Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
         return null;
 
