@@ -317,15 +317,15 @@ public class ProductCacheManager {
 //        }
 
         boolean addFlag = redisSetService.contains(key_added, String.valueOf(productId));
-        logger.info("put2UpdateQueue addFlag " + addFlag);
+        logger.info("put2UpdateQueue addFlag " + addFlag + "_" + productId);
         if (!addFlag) {
 
             long add = redisSetService.add(key_added, String.valueOf(productId));
-            logger.info("put2UpdateQueue add to added queue success " + add);
+            logger.info("put2UpdateQueue add to added queue success " + add + "_" + productId);
 
             redisListService.push(key, String.valueOf(productId));
             logger.info("put2UpdateQueue push to wait4update queue success ");
-            logger.info("put2UpdateQueue push to queue " + key);
+            logger.info("put2UpdateQueue push to queue " + key + "_" + productId);
         }
     }
 
