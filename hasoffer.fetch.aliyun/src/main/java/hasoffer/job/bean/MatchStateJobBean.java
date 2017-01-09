@@ -2,7 +2,9 @@ package hasoffer.job.bean;
 
 import hasoffer.aliyun.enums.TaskStatus;
 import hasoffer.aliyun.enums.WebSite;
+import hasoffer.base.utils.TimeUtils;
 import hasoffer.data.redis.IRedisService;
+import hasoffer.spider.constants.RedisKeysUtils;
 import hasoffer.state.dmo.MatchStateDMO;
 import hasoffer.state.service.MatchStateService;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -41,21 +43,27 @@ public class MatchStateJobBean extends QuartzJobBean {
             int exceptionNum = 0;
             String ymd = DateFormatUtils.format(new Date(), "yyyyMMdd");
 
-            String finishKey = "MATCH_POP_NUM_" + website.name() + "_" + TaskStatus.FINISH + "_" + ymd;
-            String finishNumStr = redisService.get(finishKey, -1);
+            String pushKey = RedisKeysUtils.MATCH_PUSH_NUM + "_" + website.name() + "_" + ymd;
+            long cacheSeconds = TimeUtils.SECONDS_OF_1_DAY * 7;
+            String pushNumStr = redisService.get(pushKey, cacheSeconds);
+            logger.info(pushKey + " value: {}", pushNumStr);
+            pushNum = Integer.valueOf(pushNumStr == null ? "0" : pushNumStr) + pushNum;
+
+            String finishKey = RedisKeysUtils.MATCH_POP_NUM + "_" + website.name() + "_" + TaskStatus.FINISH + "_" + ymd;
+            String finishNumStr = redisService.get(finishKey, cacheSeconds);
             logger.info(finishKey + " value: {}", finishNumStr);
             finishNum = Integer.valueOf(finishNumStr == null ? "0" : finishNumStr) + finishNum;
 
-            String exceptionKey = "MATCH_POP_NUM_" + website.name() + "_" + TaskStatus.EXCEPTION + "_" + ymd;
-            String exceptionNumStr = redisService.get(exceptionKey, -1);
+            String exceptionKey = RedisKeysUtils.MATCH_POP_NUM + "_" + website.name() + "_" + TaskStatus.EXCEPTION + "_" + ymd;
+            String exceptionNumStr = redisService.get(exceptionKey, cacheSeconds);
             logger.info(exceptionKey + " value: {}", exceptionNumStr);
             exceptionNum = Integer.valueOf(exceptionNumStr == null ? "0" : exceptionNumStr) + exceptionNum;
 
             String updateStr = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
             matchStateDMO.setWebSite(website.name());
             matchStateDMO.setPushNum(pushNum);
-            matchStateDMO.setExceptionNum(exceptionNum);
             matchStateDMO.setFinishNum(finishNum);
+            matchStateDMO.setExceptionNum(exceptionNum);
             matchStateDMO.setUpdateDate(updateStr);
             matchStateDMO.setLogTime(new Date());
 

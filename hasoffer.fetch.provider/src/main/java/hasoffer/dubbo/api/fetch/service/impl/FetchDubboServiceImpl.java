@@ -61,11 +61,6 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
 
 
     @Override
-    public FetchResult popProductsKeyWord() {
-        return fetchCacheService.popFetchResult(RedisKeysUtils.SPIDER_MATCH_RESULT_LIST);
-    }
-
-    @Override
     public void sendCompareWebsiteFetchTask(Website website, String url, TaskLevel taskLevel, long categoryId) {
 
         //先检查解析过的set中是否含有该url，如果有跳过，如果没有新增
@@ -103,13 +98,19 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
             if (key == null) {
                 return;
             }
-            fetchCacheService.pushTaskList(RedisKeysUtils.WAIT_KEY_LIST, JSONUtil.toJSON(fetchResult));
+            fetchCacheService.pushKeyWordList(RedisKeysUtils.WAIT_KEY_LIST, website, JSONUtil.toJSON(fetchResult));
             SpiderLogger.debugSearchList("FetchDubboServiceImpl.sendKeyWordTask(FetchResult fetchResult) save {} into Redis List {} success", fetchResult.getWebsite() + "_" + fetchResult.getKeyword(), RedisKeysUtils.WAIT_KEY_LIST);
         } catch (Exception e) {
             SpiderLogger.debugSearchList("FetchDubboServiceImpl.sendKeyWordTask(FetchResult fetchResult) save {} into Redis List {} fail", fetchResult.getWebsite() + "_" + fetchResult.getKeyword(), RedisKeysUtils.WAIT_KEY_LIST, e);
         }
 
     }
+
+    @Override
+    public FetchResult popProductsKeyWord() {
+        return fetchCacheService.popKeyWordResult(RedisKeysUtils.SPIDER_MATCH_RESULT_LIST);
+    }
+
 
     @Override
     public void sendUrlTask(Website website, String url, TaskTarget taskTarget, TaskLevel taskLevel) {
@@ -150,11 +151,11 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
         return fetchUrlResult;
     }
 
-    private FetchResult getFetchResultList(Website webSite, String keyWord) {
-        String fetchResultKey = FetchResult.getCacheKey(webSite, keyWord);
-        return fetchCacheService.getResultByKeyword(fetchResultKey);
-
-    }
+    //private FetchResult getFetchResultList(Website webSite, String keyWord) {
+    //    String fetchResultKey = FetchResult.getCacheKey(webSite, keyWord);
+    //    return fetchCacheService.getResultByKeyword(fetchResultKey);
+    //
+    //}
 
 
 }
