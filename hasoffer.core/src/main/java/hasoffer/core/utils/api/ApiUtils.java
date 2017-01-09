@@ -29,7 +29,6 @@ import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.user.IPriceOffNoticeService;
 import hasoffer.core.utils.ConstantUtil;
 import hasoffer.data.solr.FilterQuery;
-import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchedProductReview;
 import jodd.util.NameValue;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -69,6 +68,8 @@ public class ApiUtils {
     PtmStdSKuServiceImpl ptmStdSKuService;
     @Resource
     PtmStdPriceIndexServiceImpl ptmStdPriceIndexService;
+    @Resource
+    PtmStdSkuIndexServiceImpl ptmStdSkuIndexService;
     @Resource
     private ICmpSkuService cmpSkuService;
     @Resource
@@ -1013,7 +1014,7 @@ public class ApiUtils {
         data.setTranscations(transcations);
     }
 
-    public Map setEvaluateBrandFeaturesCompetitorsSummaryMap(PtmStdSku ptmStdSku, String[] affs) {
+    public Map setEvaluateBrandFeaturesCompetitorsSummaryMap(PtmStdSku ptmStdSku) {
         Map stdSkuParametersMap = new HashMap();
         if (ptmStdSku == null) {
             return stdSkuParametersMap;
@@ -1050,54 +1051,12 @@ public class ApiUtils {
 //        List<CmpProductListVo> competitors = ptmStdSKuService.getSimilaryPricesByPriceAndRating(ptmStdSku);
         int priceFrom = BigDecimal.valueOf(ptmStdSku.getRefPrice()).multiply(BigDecimal.valueOf(0.8)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).intValue();
         int priceTo = BigDecimal.valueOf(ptmStdSku.getRefPrice()).multiply(BigDecimal.valueOf(1.2)).divide(BigDecimal.ONE, 0, BigDecimal.ROUND_HALF_UP).intValue();
-        PageableResult<PtmStdPriceModel> ptmStdPriceModelPageableResult = ptmStdPriceIndexService.filterStdPriceByCriteria(new SearchCriteria(1, 3, priceFrom, priceTo));
-        if (ptmStdPriceModelPageableResult != null && ptmStdPriceModelPageableResult.getData() != null) {
-            List<CmpProductListVo> cmpProductListVos = getCmpProductListVos(ptmStdPriceModelPageableResult.getData(), affs);
-            stdSkuParametersMap.put("competitors", cmpProductListVos);
+        PageableResult<PtmStdSkuModel> ptmStdSkuModelPageableResult = ptmStdSkuIndexService.filterStdSkuOnCategoryByCriteria(new SearchCriteria(1, 3, priceFrom, priceTo));
+        if (ptmStdSkuModelPageableResult != null && ptmStdSkuModelPageableResult.getData() != null) {
+            List<ProductListVo> competitors = new ArrayList<>();
+            addProductVo2List(competitors, ptmStdSkuModelPageableResult.getData());
+            stdSkuParametersMap.put("competitors", competitors);
         }
         return stdSkuParametersMap;
-    }
-
-    /**
-     * 获取详情页sku列表
-     *
-     * @return
-     */
-    public List<CmpProductListVo> getCmpProductListVos(List skuList, String[] affs) {
-        List<CmpProductListVo> cmpProductListVoList = new ArrayList<>();
-        if (skuList != null && skuList.size() > 0) {
-            if (PtmStdPrice.class.isInstance(skuList.get(0))) {
-                Iterator<PtmStdPrice> ptmList = skuList.iterator();
-                while (ptmList.hasNext()) {
-                    PtmStdPrice next = ptmList.next();
-                    CmpProductListVo cplv = new CmpProductListVo(next, productCacheManager.getPtmStdSkuImageUrl(next.getStdSkuId()), WebsiteHelper.getLogoUrl(next.getWebsite()));
-                    cplv.setDeepLinkUrl(WebsiteHelper.getDeeplinkWithAff((next.getWebsite()), next.getUrl(), affs));
-                    cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff((next.getWebsite()), next.getUrl(), affs));
-                    if (affs.length > 2) {
-                        long userId = Long.parseLong(affs[2]);
-                        if (userId > 0) {
-                            cplv.setIsAlert(isPriceOffAlert(null, cplv.getId(), userId));
-                        }
-                    }
-                    cmpProductListVoList.add(cplv);
-                }
-            } else if (PtmStdPriceModel.class.isInstance(skuList.get(0))) {
-                Iterator<PtmStdPriceModel> ptmList = skuList.iterator();
-                while (ptmList.hasNext()) {
-                    PtmStdPriceModel next = ptmList.next();
-                    CmpProductListVo cplv = new CmpProductListVo(next, productCacheManager.getPtmStdSkuImageUrl(next.getId()), WebsiteHelper.getLogoUrl(Website.valueOf(next.getSite())));
-                    cplv.setDeepLinkUrl(WebsiteHelper.getDeeplinkWithAff(Website.valueOf(next.getSite()), next.getSkuUrl(), affs));
-                    cplv.setDeepLink(WebsiteHelper.getDeeplinkWithAff(Website.valueOf(next.getSite()), next.getSkuUrl(), affs));
-                    if (affs.length > 2) {
-                        long userId = Long.parseLong(affs[2]);
-                        if (userId > 0) {
-                            cplv.setIsAlert(isPriceOffAlert(null, cplv.getId(), userId));
-                        }
-                    }
-                    cmpProductListVoList.add(cplv);
-                }
-            }
-        }
-        return cmpProductListVoList;
     }
 }
