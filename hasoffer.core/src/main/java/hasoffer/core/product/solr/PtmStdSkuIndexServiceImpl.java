@@ -188,7 +188,9 @@ public class PtmStdSkuIndexServiceImpl extends AbstractIndexService<Long, PtmStd
         String cateId = searchCriteria.getCategoryId();
         int page = searchCriteria.getPage();
         int size = searchCriteria.getPageSize();
-        fqList.add(new FilterQuery("cate" + level, String.valueOf(cateId)));
+        if (level > 0 && org.apache.commons.lang3.StringUtils.isNotEmpty(cateId)) {
+            fqList.add(new FilterQuery("cate" + level, String.valueOf(cateId)));
+        }
 
         int priceFrom = searchCriteria.getPriceFrom(), priceTo = searchCriteria.getPriceTo();
         String priceFromStr = "*", priceToStr = "*";

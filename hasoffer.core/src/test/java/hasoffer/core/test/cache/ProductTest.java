@@ -33,11 +33,11 @@ public class ProductTest {
             searchLogCacheManager.countSearchedProductByHour(i);
         }
 
-        productCacheManager.put2UpdateQueue(100L);
+        productCacheManager.put2UpdateQueue(100L, add);
         String ymd = TimeUtils.parse(TimeUtils.today(), TimeUtils.PATTERN_YMD);
 
         productCacheManager.put2UpdateProcessedSet(1000L, ymd);
-        productCacheManager.put2UpdateQueue(1000L);
+        productCacheManager.put2UpdateQueue(1000L, add);
 
         skuUpdateStatManager.statUpdateResultToday();
     }

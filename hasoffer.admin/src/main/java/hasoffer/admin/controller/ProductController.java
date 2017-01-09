@@ -1,6 +1,5 @@
 package hasoffer.admin.controller;
 
-import hasoffer.admin.common.chart.ChartHelper;
 import hasoffer.admin.controller.vo.CategoryVo;
 import hasoffer.admin.controller.vo.CmpSkuVo;
 import hasoffer.admin.controller.vo.ProductVo;
@@ -10,27 +9,29 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
-import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.app.AppCacheService;
 import hasoffer.core.bo.system.SearchCriteria;
+import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.dbm.osql.datasource.DataSource;
 import hasoffer.core.persistence.dbm.osql.datasource.DataSourceType;
 import hasoffer.core.persistence.mongo.PtmCmpSkuLog;
-import hasoffer.core.persistence.po.ptm.PtmCategory;
-import hasoffer.core.persistence.po.ptm.PtmCmpSku;
-import hasoffer.core.persistence.po.ptm.PtmProduct;
+import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.persistence.po.sys.SysAdmin;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IFetchService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.exception.ProductNotFoundException;
+import hasoffer.core.product.impl.PtmStdPriceServiceImpl;
+import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.search.ISearchService;
+import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
@@ -44,7 +45,10 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created on 2015/12/22.
@@ -69,6 +73,14 @@ public class ProductController {
     IFetchService fetchService;
     @Resource
     ICacheService cacheServiceImpl;
+    @Resource
+    AppCacheService appCacheService;
+    @Resource
+    PtmStdPriceServiceImpl ptmStdPriceService;
+    @Resource
+    ProductCacheManager productCacheManager;
+    @Resource
+    PtmStdSKuServiceImpl ptmStdSKuService;
 
     @RequestMapping(value = "/cmp/del/{id}", method = RequestMethod.GET)
     public ModelAndView delCompare(@PathVariable long id) {
@@ -136,13 +148,20 @@ public class ProductController {
 
         String color = request.getParameter("color");
         String size = request.getParameter("size");
-
+        PtmCmpSku cmpSku = null;
         if (!StringUtils.isEmpty(id)) {
             // 更新
             cmpSkuService.updateCmpSku(Long.valueOf(id), url, color, size, price, skuStatus);
         } else {
             // 创建
-            cmpSkuService.createCmpSku(Long.valueOf(productId), url, color, size, price, skuStatus);
+            cmpSku = cmpSkuService.createCmpSku(Long.valueOf(productId), url, color, size, price, skuStatus);
+        }
+        //更新--清除缓存   创建 添加到缓存
+        appCacheService.getPtmCmpSku(Long.parseLong(id), 0);
+        if (cmpSku != null && cmpSku.getId() > 0) {
+            //虽然不可能有重复的id缓存,但是也清除一下
+            appCacheService.getPtmCmpSku(cmpSku.getId());
+            appCacheService.getPtmCmpSku(cmpSku.getId());
         }
         ModelAndView mav = new ModelAndView("redirect:/p/cmp/" + productId);
         return mav;
@@ -153,50 +172,67 @@ public class ProductController {
     public ModelAndView listCompares(@PathVariable long id) throws ProductNotFoundException {
         ModelAndView mav = new ModelAndView("product/cmp");
         mav.addObject("pId", id);
-        PtmProduct product = productService.getProduct(id);
-
-        if (product == null) {
-            throw new ProductNotFoundException(id + "");
+        PtmStdSku ptmStdSku = null;
+        PtmProduct product = null;
+        if (ApiUtils.removeBillion(id) > 0) {
+            ptmStdSku = appCacheService.getPtmStdSku(ApiUtils.removeBillion(id));
+        } else {
+            product = productService.getProduct(id);
         }
-        PageableResult<PtmCmpSku> pagedCmpSkus = productService.listPagedCmpSkus(id, 1, Integer.MAX_VALUE);
-        List<PtmCmpSku> cmpSkus = pagedCmpSkus.getData();
-
-        Set<String> colors = new HashSet<String>();
-        Set<String> sizes = new HashSet<String>();
-
-        List<CmpSkuVo> cmpSkuVos = new ArrayList<CmpSkuVo>();
-        Map<PtmCmpSku, List<PtmCmpSkuLog>> priceLogMap = new HashMap<PtmCmpSku, List<PtmCmpSkuLog>>();
-
-        if (ArrayUtils.hasObjs(cmpSkus)) {
-            for (PtmCmpSku cmpSku : cmpSkus) {
-                cmpSkuVos.add(new CmpSkuVo(cmpSku));
-
-                if (!StringUtils.isEmpty(cmpSku.getColor())) {
-                    colors.add(cmpSku.getColor());
+        PageableResult<PtmStdPrice> pagedCmpskus;
+        PageableResult<PtmCmpSku> pagedCmpSkus;
+        List<CmpSkuVo> cmpSkuVos = new ArrayList<>();
+        if (ptmStdSku != null) {
+            pagedCmpskus = ptmStdPriceService.getPagedPtmStdPriceList(ptmStdSku.getId(), SkuStatus.ONSALE, 1, Integer.MAX_VALUE);
+            if (pagedCmpskus != null) {
+                List<PtmStdPrice> data = pagedCmpskus.getData();
+                for (PtmStdPrice ptmStdPrice : data) {
+                    CmpSkuVo cmpSkuVo = new CmpSkuVo(ptmStdPrice);
+                    cmpSkuVo.setImageUrl(productCacheManager.getPtmStdSkuImageUrl(ptmStdPrice.getStdSkuId()));
+                    cmpSkuVos.add(cmpSkuVo);
                 }
-                if (!StringUtils.isEmpty(cmpSku.getSize())) {
-                    sizes.add(cmpSku.getSize());
-                }
+            }
+        } else if (product != null) {
+            pagedCmpSkus = productService.listPagedCmpSkus(id, 1, Integer.MAX_VALUE);
+            List<PtmCmpSku> cmpSkus = pagedCmpSkus.getData();
+//            Set<String> colors = new HashSet<String>();
+//            Set<String> sizes = new HashSet<String>();
+            if (ArrayUtils.hasObjs(cmpSkus)) {
+                for (PtmCmpSku cmpSku : cmpSkus) {
+                    cmpSkuVos.add(new CmpSkuVo(cmpSku));
 
-                List<PtmCmpSkuLog> logs = null;//cmpSkuService.listByPcsId(cmpSku.getId());
-                if (ArrayUtils.hasObjs(logs)) {
-                    priceLogMap.put(cmpSku, logs);
+//                    if (!StringUtils.isEmpty(cmpSku.getColor())) {
+//                        colors.add(cmpSku.getColor());
+//                    }
+//                    if (!StringUtils.isEmpty(cmpSku.getSize())) {
+//                        sizes.add(cmpSku.getSize());
+//                    }
+//                    List<PtmCmpSkuLog> logs = null;//cmpSkuService.listByPcsId(cmpSku.getId());
+//                    if (ArrayUtils.hasObjs(logs)) {
+//                        priceLogMap.put(cmpSku, logs);
+//                    }
                 }
             }
         }
         mav.addObject("cmpSkus", cmpSkuVos);
-        mav.addObject("product", getProductVo(product));
-
-        mav.addObject("skuColors", JSONUtil.toJSON(colors));
-        mav.addObject("skuSizes", JSONUtil.toJSON(sizes));
+        if (ptmStdSku == null) {
+            mav.addObject("product", getProductVo(product));
+        } else {
+            ProductVo productVo = new ProductVo(ptmStdSku);
+            productVo.setMasterImageUrl(productCacheManager.getPtmStdSkuImageUrl(ptmStdSku.getId()));
+            productVo.setCategories(getCategories(ptmStdSku.getCategoryId()));
+            mav.addObject("product", productVo);
+        }
+//        mav.addObject("skuColors", JSONUtil.toJSON(colors));
+//        mav.addObject("skuSizes", JSONUtil.toJSON(sizes));
         //获取sku状态列表
         mav.addObject("skuStatus", SkuStatus.values());
-        List<String> days = new ArrayList<String>();
-        Map<Website, List<Float>> priceMap = new HashMap<Website, List<Float>>();
-        getPriceLogs(priceLogMap, days, priceMap);
-        mav.addObject("priceMap", JSONUtil.toJSON(ChartHelper.getChartData(priceMap)));
-        mav.addObject("priceDays", JSONUtil.toJSON(days));
-        mav.addObject("showCharts", ArrayUtils.hasObjs(days));
+//        List<String> days = new ArrayList<String>();
+//        Map<Website, List<Float>> priceMap = new HashMap<Website, List<Float>>();
+//        getPriceLogs(priceLogMap, days, priceMap);
+//        mav.addObject("priceMap", JSONUtil.toJSON(ChartHelper.getChartData(priceMap)));
+//        mav.addObject("priceDays", JSONUtil.toJSON(days));
+//        mav.addObject("showCharts", ArrayUtils.hasObjs(days));
 
         return mav;
     }
@@ -446,6 +482,12 @@ public class ProductController {
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     @ResponseBody
     public PtmProduct createProduct(HttpServletRequest request, @RequestParam(defaultValue = "0") int category3) throws UnsupportedEncodingException {
+        //创建一个sku TODO 胡礼
+
+        //1. 在库中创建一个sku,如果此sku没有对应商品则创建一个商品,sku放入缓存
+        //2. 更新商品价格
+        //3. 重新导入solr
+
 
         long catagoryId = category3;
         String data = request.getParameter("data");
@@ -492,10 +534,18 @@ public class ProductController {
     @ResponseBody
     public boolean batchDelete(@RequestParam(value = "ids[]") Long[] ids) {
 //        cmpSkuService.batchDeleteCmpSku(ids);
+        //TODO 胡礼
+        //1. 先看有没有这个sku
+        //2. 有就删除,同时从缓存中删除,从solr中删除
+        //3. 没有也要删solr的sku
+        //4. 更新商品价格
+        //5. 重新导入solr
+        //6. 删除商品sku列表缓存
 
         long productId = 0L;
 
         for (long id : ids) {
+
             PtmCmpSku cmpSku = cmpSkuService.getCmpSkuById(id);
             if (cmpSku == null) {
                 cmpskuIndexService.remove(String.valueOf(id));
@@ -522,27 +572,23 @@ public class ProductController {
         Map<String, String> statusMap = new HashMap<>();
 
         try {
+            if (ApiUtils.removeBillion(productId) > 0) {
+                PtmStdSku ptmStdSku = ptmStdSKuService.getStdSkuById(ApiUtils.removeBillion(productId));
+                if (ptmStdSku != null) {
+                    //1. 更改商品价格,可能变更了最低价格
+                    ptmStdSKuService.updatePtmStdSkuPrice(ApiUtils.removeBillion(productId));
+                    //2. 重新导入solr
+                    ptmStdSKuService.importPtmStdSku2Solr(ptmStdSku);
+                    //3. 清除改stdSku的缓存
+                    appCacheService.getPtmStdSku(ApiUtils.removeBillion(productId), 0);
+                }
+            } else {
+                //1. 更新product价格,重新导入prodcut
+                productService.updatePtmProductPrice(productId);
 
-            //更新product价格,重新导入prodcut
-            productService.updatePtmProductPrice(productId);
-
-            //清除商品缓存
-            cacheServiceImpl.del("PRODUCT_" + productId);
-            //清除sku缓存        PRODUCT__listPagedCmpSkus_3198_1_10
-            Set<String> keys = cacheServiceImpl.keys("PRODUCT__listPagedCmpSkus_" + productId + "_*");
-
-            for (String key : keys) {
-                cacheServiceImpl.del(key);
+                //2. 清除商品缓存
+                appCacheService.getPtmProduct(productId, 0);
             }
-
-            //清除topselling缓存        PRODUCT__listPagedCmpSkus_TopSelling_0_20
-            Set<String> topsellingCache = cacheServiceImpl.keys("PRODUCT__listPagedCmpSkus_TopSelling" + "_*");
-
-            for (String topCache : topsellingCache) {
-                cacheServiceImpl.del(topCache);
-            }
-
-
             statusMap.put("status", "success");
 
         } catch (Exception e) {
