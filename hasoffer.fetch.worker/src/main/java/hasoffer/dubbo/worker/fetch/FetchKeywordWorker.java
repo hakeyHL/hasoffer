@@ -74,6 +74,7 @@ public class FetchKeywordWorker implements Runnable {
         }
         try {
             fetchResult = fetchService.spiderProductSetByKeyword(fetchResult, 10);
+            logger.info("fetch: match result: {}", fetchResult);
             fetchCacheService.pushFetchResult(RedisKeysUtils.SPIDER_MATCH_RESULT_LIST, fetchResult);
         } catch (UnSupportWebsiteException e) {
             logger.error("don't support this website.", e);
