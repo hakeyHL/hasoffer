@@ -148,13 +148,20 @@ public class ProductController {
 
         String color = request.getParameter("color");
         String size = request.getParameter("size");
-
+        PtmCmpSku cmpSku = null;
         if (!StringUtils.isEmpty(id)) {
             // 更新
             cmpSkuService.updateCmpSku(Long.valueOf(id), url, color, size, price, skuStatus);
         } else {
             // 创建
-            cmpSkuService.createCmpSku(Long.valueOf(productId), url, color, size, price, skuStatus);
+            cmpSku = cmpSkuService.createCmpSku(Long.valueOf(productId), url, color, size, price, skuStatus);
+        }
+        //更新--清除缓存   创建 添加到缓存
+        appCacheService.getPtmCmpSku(Long.parseLong(id), 0);
+        if (cmpSku != null && cmpSku.getId() > 0) {
+            //虽然不可能有重复的id缓存,但是也清除一下
+            appCacheService.getPtmCmpSku(cmpSku.getId());
+            appCacheService.getPtmCmpSku(cmpSku.getId());
         }
         ModelAndView mav = new ModelAndView("redirect:/p/cmp/" + productId);
         return mav;
