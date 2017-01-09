@@ -12,7 +12,7 @@ public interface MatchStateDAO {
 
 
     @Insert({
-            "INSERT INTO t_product_match_stats (updateDate, webSite, pushNum, finishNum, exceptionNum) ",
+            "INSERT INTO t_product_match_stats (updateDate, webSite, pushNum, finishNum, exceptionNum, logTime) ",
             " VALUES (#{dmo.updateDate,jdbcType=CHAR}, #{dmo.webSite,jdbcType=VARCHAR},  #{dmo.pushNum,jdbcType=INTEGER},  #{dmo.finishNum,jdbcType=INTEGER},  #{dmo.exceptionNum,jdbcType=INTEGER}, #{dmo.logTime,jdbcType=TIMESTAMP} )"
     })
     void insert(@Param("dmo") MatchStateDMO dmo);
