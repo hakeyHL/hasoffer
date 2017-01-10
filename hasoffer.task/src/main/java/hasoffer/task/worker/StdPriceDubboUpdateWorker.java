@@ -68,7 +68,7 @@ public class StdPriceDubboUpdateWorker implements Runnable {
                     List<PtmStdPrice> stdPriceList = ptmStdPriceService.getPtmstdPriceListByUrlKey(urlKey);
 
                     if (stdPriceList == null || stdPriceList.size() == 0) {
-                        logger.info("urkKey StdPriceDubboUpdateWorker not found " + website + "url = " + url);
+                        logger.info("urkKey StdPriceDubboUpdateWorker not found " + website + "_ url = " + url);
                     } else {
                         logger.info("urkKey found StdPriceDubboUpdateWorker " + website + " skulist begin to update " + stdPriceList.size());
                         for (PtmStdPrice ptmStdPrice : stdPriceList) {
@@ -77,9 +77,9 @@ public class StdPriceDubboUpdateWorker implements Runnable {
                         }
                     }
                 } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
-                    logger.info("taskStatus is StdPriceDubboUpdateWorker exception " + website);
+                    logger.info("taskStatus is StdPriceDubboUpdateWorker exception " + website + "_ url = " + url);
                 } else {
-                    logger.info("taskStatus is StdPriceDubboUpdateWorker " + taskStatus + "_" + website);
+                    logger.info("taskStatus is StdPriceDubboUpdateWorker " + taskStatus + "_" + website + "_ url = " + url);
                 }
             } catch (Exception e) {
                 logger.info("StdPriceDubboUpdateWorker.run() exception.");

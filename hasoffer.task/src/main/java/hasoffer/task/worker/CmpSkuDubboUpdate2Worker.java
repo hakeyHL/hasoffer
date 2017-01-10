@@ -88,7 +88,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                     List<PtmCmpSku> skuList = cmpSkuService.getPtmCmpSkuListByUrlKey(urlKey);
 
                     if (skuList == null || skuList.size() == 0) {
-                        logger.info("urkKey not found " + website + "url = " + url);
+                        logger.info("urkKey not found " + website + "_ url = " + url);
                     } else {
                         logger.info("urkKey found " + website + " skulist begin to update " + skuList.size());
                         for (PtmCmpSku ptmCmpSku : skuList) {
@@ -98,9 +98,9 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
                         }
                     }
                 } else if (TaskStatus.EXCEPTION.equals(taskStatus)) {
-                    logger.info("taskStatus is exception " + website);
+                    logger.info("taskStatus is exception " + website + "_ url = " + url);
                 } else {
-                    logger.info("taskStatus is " + taskStatus + "_" + website);
+                    logger.info("taskStatus is " + taskStatus + "_" + website + "_ url = " + url);
                 }
             } catch (Exception e) {
                 logger.info("CmpSkuDubboUpdate2Worker.run() exception.", e);
