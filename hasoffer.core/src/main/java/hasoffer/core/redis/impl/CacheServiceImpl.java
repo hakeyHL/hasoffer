@@ -12,10 +12,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Date : 2016/5/3
@@ -91,6 +88,19 @@ public class CacheServiceImpl<T extends Identifiable> implements ICacheService<T
                 return keySet;
             }
         });
+    }
+
+    @Override
+    public void delKeys(String keyPattern) {
+        Set keys = keys(keyPattern);
+        Iterator iterator = keys.iterator();
+        while (iterator.hasNext()) {
+            Object next = iterator.next();
+            if (next instanceof String) {
+                String key = (String) next;
+                del(key);
+            }
+        }
     }
 
     @Override

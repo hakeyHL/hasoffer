@@ -31,4 +31,8 @@ public interface IPtmStdPriceService {
     void initUrlKey(long stdPriceId);
 
     void importPtmStdPrice2Solr(PtmStdPrice ptmStdPrice);
+
+    void importPtmStdPrice2Solr(Long priceId);
+
+    void removePriceById(Long priceId);
 }

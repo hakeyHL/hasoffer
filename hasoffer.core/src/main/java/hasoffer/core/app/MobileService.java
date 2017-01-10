@@ -4,6 +4,7 @@ import hasoffer.core.app.vo.CmpProductListVo;
 import hasoffer.core.app.vo.mobile.KeyWordsVo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hs on 2017年01月05日.
@@ -14,5 +15,5 @@ public interface MobileService {
 
     List<CmpProductListVo> searchFromSolrByKeyWordVo(KeyWordsVo keyWordsVo, int page, int pageSize);
 
-    List<CmpProductListVo> getSimilarCategorys(KeyWordsVo keyWordsVo);
+    Map<String, List<CmpProductListVo>> getSimilarCategorys(KeyWordsVo keyWordsVo);
 }

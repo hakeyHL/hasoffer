@@ -16,9 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by hs on 2017年01月05日.
@@ -99,20 +97,19 @@ public class MobileServiceImpl implements MobileService {
      * @return
      */
     @Override
-    public List<CmpProductListVo> getSimilarCategorys(KeyWordsVo keyWordsVo) {
+    public Map<String, List<CmpProductListVo>> getSimilarCategorys(KeyWordsVo keyWordsVo) {
+        Map<String, List<CmpProductListVo>> similarKeyAndPros = new HashMap<>();
         List<CmpProductListVo> similarProducts = new ArrayList<>();
         if (keyWordsVo == null || StringUtils.isEmpty(keyWordsVo.getCategoryName())) {
-            return similarProducts;
+            return similarKeyAndPros;
         }
-        int initSize = 0;
         List<KeywordCollection> keywordCollections = dbm.query(API_KEYWORDCOLLECTION_GET_SIMILAR_CATEGORYKEYS, Arrays.asList(keyWordsVo.getCategoryName()));
         for (KeywordCollection keywordCollection : keywordCollections) {
-            if (keywordCollection.getSourceSiteCategoryName().equals(keyWordsVo.getCategoryName()) && initSize < 2) {
+            if (keywordCollection.getSourceSiteCategoryName().equals(keyWordsVo.getCategoryName()) && similarKeyAndPros.size() < 2) {
                 List<CmpProductListVo> cmpProductListVoList = searchFromSolrByKeyWordVo(new KeyWordsVo(keywordCollection), 0, 20);
-                similarProducts.addAll(cmpProductListVoList);
-                initSize++;
+                similarKeyAndPros.put(keywordCollection.getKeywordKey(), cmpProductListVoList);
             }
         }
-        return similarProducts;
+        return similarKeyAndPros;
     }
 }

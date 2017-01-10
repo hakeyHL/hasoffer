@@ -32,4 +32,6 @@ public interface ICacheService<T> {
     Map<String, String> mapGetAll(final String mName);
 
     Set<String> keys(final String pattern);
+
+    void delKeys(String keyPattern);
 }

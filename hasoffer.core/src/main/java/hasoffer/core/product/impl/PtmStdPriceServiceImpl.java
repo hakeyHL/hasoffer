@@ -264,6 +264,24 @@ public class PtmStdPriceServiceImpl implements IPtmStdPriceService {
         }
     }
 
+    @Override
+    public void importPtmStdPrice2Solr(Long priceId) {
+        if (priceId < 1) {
+            return;
+        }
+        PtmStdPrice ptmStdPrice = dbm.get(PtmStdPrice.class, priceId);
+        if (ptmStdPrice != null) {
+            importPtmStdPrice2Solr(ptmStdPrice);
+        }
+    }
+
+    @Override
+    public void removePriceById(Long priceId) {
+        if (priceId > 0) {
+            dbm.delete(PtmStdPrice.class, priceId);
+        }
+    }
+
     public void saveHistoryPrice(long id, Date time, float price) {
         saveHistoryPrice(id, Arrays.asList(new PriceNode(time, price)));
     }
