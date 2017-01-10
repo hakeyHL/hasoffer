@@ -107,7 +107,7 @@ public class MobileServiceImpl implements MobileService {
         for (KeywordCollection keywordCollection : keywordCollections) {
             if (keywordCollection.getSourceSiteCategoryName().equals(keyWordsVo.getCategoryName()) && similarKeyAndPros.size() < 2) {
                 List<CmpProductListVo> cmpProductListVoList = searchFromSolrByKeyWordVo(new KeyWordsVo(keywordCollection), 0, 20);
-                similarKeyAndPros.put(keywordCollection.getKeywordKey(), cmpProductListVoList);
+                similarKeyAndPros.put(keywordCollection.getKeyword(), cmpProductListVoList);
             }
         }
         return similarKeyAndPros;
