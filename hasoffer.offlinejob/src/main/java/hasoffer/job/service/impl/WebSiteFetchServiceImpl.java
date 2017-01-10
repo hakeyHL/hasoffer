@@ -46,13 +46,13 @@ public class WebSiteFetchServiceImpl implements IWebSiteFetchService {
 
         HasofferThreadFactory factory = new HasofferThreadFactory("SearchRecordProcessWorker-Thread");
         es = Executors.newCachedThreadPool(factory);
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 6; i++) {
             es.execute(new SearchRecordProcessWorker(searchProductService, fetchDubboService, searchLogQueue));
         }
 
         HasofferThreadFactory resultFactory = new HasofferThreadFactory("SearchRecordResultWorker-Thread");
         es = Executors.newCachedThreadPool(resultFactory);
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 5; i++) {
             es.execute(new SearchRecordResultWorker(searchProductService, fetchDubboService));
         }
 
