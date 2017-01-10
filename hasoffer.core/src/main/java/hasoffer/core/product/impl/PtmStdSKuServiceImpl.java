@@ -4,6 +4,7 @@ import hasoffer.base.enums.CategoryFilterParams;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
+import hasoffer.core.app.AppCacheService;
 import hasoffer.core.cache.CategoryCacheManager;
 import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
@@ -40,6 +41,8 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
     ISearchService searchService;
     @Resource
     MongoDbManager mongoDbManager;
+    @Resource
+    AppCacheService appCacheService;
     @Resource
     private IDataBaseManager dbm;
     @Resource
@@ -120,6 +123,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
             PtmStdSkuUpdater updater = new PtmStdSkuUpdater(productId);
             updater.getPo().setRefPrice(minPrice);
             dbm.update(updater);
+            appCacheService.getPtmStdSku(productId, 0);
         }
 
     }

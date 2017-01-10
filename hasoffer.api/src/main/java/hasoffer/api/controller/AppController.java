@@ -941,7 +941,7 @@ public class AppController {
                                 "com.leo.appmaster", "com.voodoo.android",
                                 "com.app.buyhatke", "com.makemytrip",
                                 "com.goibibo", "com.cleartrip.android",
-                                "com.yatra.base", "com.android.contacts"
+                                "com.yatra.base", "com.android.contacts", "com.mobile.indiapp"
                         ));
                 modelAndView.addObject(ConstantUtil.API_NAME_DATA, downloadConfigVo);
                 break;

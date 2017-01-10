@@ -36,7 +36,8 @@ public class PtmStdSkuModel implements IIdentifiable<Long> {
     private String Model;//型号
     private String Operating_System;//Operating System Android v5.1 (Lollipop) 仅显示
 
-
+    /* //hasoffer key ,用于h5的关键词搜索
+     private String hakey;*/
     private String SIM_Slot;
     private String SIM_Size;
     private String Network_Support;//4G: Available (supports Indian bands) 3G: Available, 2G: Available    只显示2 3 4G的支持即可,判断用contains
