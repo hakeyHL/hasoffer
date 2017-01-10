@@ -99,7 +99,6 @@ public class MobileServiceImpl implements MobileService {
     @Override
     public Map<String, List<CmpProductListVo>> getSimilarCategorys(KeyWordsVo keyWordsVo) {
         Map<String, List<CmpProductListVo>> similarKeyAndPros = new HashMap<>();
-        List<CmpProductListVo> similarProducts = new ArrayList<>();
         if (keyWordsVo == null || StringUtils.isEmpty(keyWordsVo.getCategoryName())) {
             return similarKeyAndPros;
         }
