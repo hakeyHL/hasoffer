@@ -94,6 +94,7 @@ public class StatSearchLogJobBean extends QuartzJobBean {
 
             searchService.saveLogCount(new SrmProductSearchCount(ymd, productId, searchCount, size));
 
+            //保存更新记录
             cmpSkuService.saveSkuUpdateResult(skuUpdateResult);
 
             productService.importProduct2Solr2(productId);

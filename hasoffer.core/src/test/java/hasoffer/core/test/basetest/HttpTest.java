@@ -43,6 +43,41 @@ public class HttpTest {
 //    IProductService productService;
 
     @Test
+    public void testTurkey() {
+
+        try {
+
+            HttpResponseModel responseModel = HttpUtils.get("https://www.groupon.com/browse/search/partial?_csrf=6TYJ19Bp-fm0vKcFU3JgOftLqP7Z5iGR05es&currentPageUrl=https%253A%252F%252Fwww.groupon.com%252Fbrowse%252Fchicago%253Fcontext%253Dlocal%2526page%253D2&division=chicago&context=local&page=2", null);
+
+            String bodyString = responseModel.getBodyString();
+
+            TagNode infoPageNode = HtmlUtils.getUrlRootTagNode("https://www.groupon.com/deals/superdawg-drive-in-11");
+
+            TagNode infoTitleNode = getSubNodeByXPath(infoPageNode, "//h1[@id='deal-title']", null);
+
+            String infoTitle = infoTitleNode.getText().toString();
+
+            TagNode root = HtmlUtils.getUrlRootTagNode("http://www.firsaton.com/firsatlar/bowling-firsatlari/istanbul");
+
+            List<TagNode> subNodesList = getSubNodesByXPath(root, "//div[@id='deal_list']/div[@class='col-xs-12 col-sm-6 d_outer']");
+
+            for (TagNode node : subNodesList) {
+
+                TagNode titleNode = getSubNodeByXPath(node, "//div[@class='d2_title']/a/span", null);
+
+                String title = titleNode.getText().toString();
+
+                System.out.println("title = " + title);
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Test
     public void testShipNum() throws Exception {
 
         List<String> shipNumList = new ArrayList<>();

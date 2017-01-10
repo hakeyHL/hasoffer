@@ -166,7 +166,9 @@ public class AppCmpServiceImpl implements AppCmpService {
                     return JSON.toJSONString(jsonObject, propertyFilter);
                 }
             } catch (Exception e) {
-                logger.error(String.format("sdk_cmp_  [NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", sio.getCliQ(), sio.getCliSite(), sio.getCliPrice(), sio.getPage(), sio.getSize()));
+                if (logger.isDebugEnabled()) {
+                    logger.debug(String.format("sdk_cmp_  [NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", sio.getCliQ(), sio.getCliSite(), sio.getCliPrice(), sio.getPage(), sio.getSize()));
+                }
                 cr = fillCmpResult(cr);
                 jsonObject.put("data", JSONObject.toJSON(cr));
                 return JSON.toJSONString(jsonObject, propertyFilter);
@@ -265,7 +267,7 @@ public class AppCmpServiceImpl implements AppCmpService {
                 //如果客户端传价格无法解析则重新计算save
                 if (sio.getCliPrice() <= 0) {
                     int maxPrice = comparedSkuVos.get(comparedSkuVos.size() - 1).getPrice();
-                    System.out.println(" can not analysis client's price ,use maxPrice instead of it " + maxPrice);
+                    //System.out.println(" can not analysis client's price ,use maxPrice instead of it " + maxPrice);
                     Iterator<CmpProductListVo> iterator = comparedSkuVos.iterator();
                     while (iterator.hasNext()) {
                         CmpProductListVo next = iterator.next();
@@ -280,7 +282,7 @@ public class AppCmpServiceImpl implements AppCmpService {
             List<CmpProductListVo> tempCmpProductListVos = new ArrayList<CmpProductListVo>();
             //每个site只保留一个且为最低价
 //            System.out.println("websiteSet :" + websiteSet.size());
-            long startTime = System.nanoTime();   //获取开始时间
+//            long startTime = System.nanoTime();   //获取开始时间
             for (CmpProductListVo cmpProductListVo : comparedSkuVos) {
                 if (websiteSet.size() <= 0) {
                     break;
@@ -292,13 +294,13 @@ public class AppCmpServiceImpl implements AppCmpService {
                 }
             }
             //移除之前加进列表的所有的sku列表
-            comparedSkuVos = null;
+            //comparedSkuVos = null;
             comparedSkuVos = new ArrayList<>();
             //将新的加入的放入到列表中
 //            System.out.println("tempCmpProductListVos" + tempCmpProductListVos.size());
             comparedSkuVos.addAll(tempCmpProductListVos);
-            long endTime = System.nanoTime(); //获取结束时间
-            System.out.println("total time is " + (endTime - startTime) / 1000000 + "");
+            //long endTime = System.nanoTime(); //获取结束时间
+            //System.out.println("total time is " + (endTime - startTime) / 1000000 + "");
         }
         String currentDeeplink = "";
         try {
@@ -310,13 +312,14 @@ public class AppCmpServiceImpl implements AppCmpService {
                 }
             } else if (clientCmpSku != null) {
                 if (!cmpSkuCacheManager.isFlowControlled(sio.getDeviceId(), sio.getCliSite())) {
-                    if (clientCmpSku.getSkuTitle().equalsIgnoreCase(sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
+                    if (sio.getCliQ().equalsIgnoreCase(clientCmpSku.getSkuTitle()) && clientCmpSku.getPrice() == cliPrice) {
                         currentDeeplink = WebsiteHelper.getDeeplinkWithAff(clientCmpSku.getWebsite(), clientCmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
                     }
                 }
             }
         } catch (Exception e) {
-            System.out.println("get deepLink failed ");
+            logger.error("get deepLink failed.", e);
+            //System.out.println("get deepLink failed ");
         }
         //取与客户端所传商品同一个site的sku作为sku匹配sku
         cmpResult.setProductVo(new ProductVo(sio.getHsProId(), sio.getCliQ(), productCacheManager.getProductMasterImageUrl(sio.getHsProId()), 0.0f, currentDeeplink));

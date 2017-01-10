@@ -16,7 +16,7 @@ public class SearchCriteria {
     private String keyword;
     private String categoryId;
     private int page = 1;
-    private int pageSize = 10;
+    private int pageSize = 20;
     private int level;
     private int priceFrom = -1;
     private int priceTo = -1;
@@ -121,7 +121,7 @@ public class SearchCriteria {
     }
 
     public int getPage() {
-        return page <= 1 ? 0 : page;
+        return page <= 1 ? 1 : page;
     }
 
     public void setPage(int page) {
@@ -129,7 +129,7 @@ public class SearchCriteria {
     }
 
     public int getPageSize() {
-        return pageSize <= 1 ? 20 : pageSize;
+        return pageSize < 1 ? 20 : pageSize;
     }
 
     public void setPageSize(int pageSize) {

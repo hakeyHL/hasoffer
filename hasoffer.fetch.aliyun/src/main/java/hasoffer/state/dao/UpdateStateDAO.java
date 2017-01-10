@@ -20,7 +20,7 @@ public interface UpdateStateDAO {
 
     @Select({
             "<script>",
-            "select taskTarget, updateDate, webSite,pushNum, finishNum, exceptionNum, stopNum from t_update_url_stats where updateDate=#{queryDate,jdbcType=CHAR} and taskTarget=#{taskTarget,jdbcType=VARCHAR} and webSite= #{webSite,jdbcType=VARCHAR}",
+            "select taskTarget, updateDate, webSite, pushNum, finishNum, exceptionNum, stopNum from t_update_url_stats where updateDate=#{queryDate,jdbcType=CHAR} and taskTarget=#{taskTarget,jdbcType=VARCHAR} and webSite= #{webSite,jdbcType=VARCHAR}",
             "</script>"
     })
     List<UpdateStateDMO> selectByTaskTargetDate(@Param("queryDate") String updateStr, @Param("taskTarget") String taskTarget, @Param("webSite") String webSite);
