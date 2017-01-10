@@ -967,9 +967,9 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         ptmCmpSkuUpdater.getPo().setUpdateTime(TimeUtils.nowDate());
         ptmCmpSkuUpdater.getPo().setUrl(url);
-//        ptmCmpSkuUpdater.getPo().setPrice(price);
+        ptmCmpSkuUpdater.getPo().setPrice(price);
 //        ptmCmpSkuUpdater.getPo().setColor(color);
-        ptmCmpSkuUpdater.getPo().setSize(size);
+//        ptmCmpSkuUpdater.getPo().setSize(size);
         ptmCmpSkuUpdater.getPo().setStatus(SkuStatus.valueOf(skuStatus));
 
         Website website = WebsiteHelper.getWebSite(url);

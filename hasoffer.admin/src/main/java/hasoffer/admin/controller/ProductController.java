@@ -133,6 +133,7 @@ public class ProductController {
         return map;
     }
 
+    @DataSource(value = DataSourceType.Master)
     @RequestMapping(value = "/cmp/save", method = RequestMethod.POST)
     public ModelAndView saveCompare(HttpServletRequest request) {
 

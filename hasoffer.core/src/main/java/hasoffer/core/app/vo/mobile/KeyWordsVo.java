@@ -14,6 +14,7 @@ public class KeyWordsVo {
     private Long categoryId;
     private Float weight;
     private Long resultCount;
+    private String categoryName;
 
     public KeyWordsVo() {
     }
@@ -25,6 +26,7 @@ public class KeyWordsVo {
         this.categoryId = keywordCollection.getCategoryid();
         this.weight = keywordCollection.getWeight();
         this.resultCount = keywordCollection.getKeywordResult();
+        this.categoryName = keywordCollection.getSourceSiteCategoryName();
     }
 
     public String getId() {
@@ -73,5 +75,13 @@ public class KeyWordsVo {
 
     public void setResultCount(Long resultCount) {
         this.resultCount = resultCount;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 }

@@ -74,7 +74,7 @@ public class SearchRecordResultWorker implements Runnable {
             key = HexDigestUtil.md5(fetchResult.getKeyword() + "-" + fetchResult.getWebsite());
         }
         SrmAutoSearchResult autoSearchResult = searchProductService.getSearchResultById(key);
-        logger.info("updateResult: fetchResult:{}, \n autoSearchResult:{}", fetchResult, autoSearchResult);
+        logger.info("updateResult: fetchResult:{}", fetchResult);
         if (autoSearchResult == null) {
             return;
         }
