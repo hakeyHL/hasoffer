@@ -1,10 +1,10 @@
 package hasoffer.job.listener;
 
 import hasoffer.base.utils.DaemonThreadFactory;
+import hasoffer.core.app.impl.AppCacheServiceImpl;
 import hasoffer.core.persistence.dbm.Hibernate4DataBaseManager;
-import hasoffer.core.product.impl.ProductServiceImpl;
+import hasoffer.core.product.impl.CmpSkuServiceImpl;
 import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
-import hasoffer.core.redis.impl.CacheServiceImpl;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -30,13 +30,13 @@ public class PtmProductPriceUpdateListener extends ContextLoaderListener {
     private void serverInitialized() {
 
         Hibernate4DataBaseManager dbm = springContext.getBean(Hibernate4DataBaseManager.class);
-        ProductServiceImpl productService = springContext.getBean(ProductServiceImpl.class);
         PtmStdSKuServiceImpl ptmStdSKuService = springContext.getBean(PtmStdSKuServiceImpl.class);
-        CacheServiceImpl cacheService = springContext.getBean(CacheServiceImpl.class);
+        AppCacheServiceImpl cacheService = springContext.getBean(AppCacheServiceImpl.class);
+        CmpSkuServiceImpl cmpSkuService = springContext.getBean(CmpSkuServiceImpl.class);
 
         ExecutorService es = Executors.newCachedThreadPool();
 
-        es.execute(DaemonThreadFactory.create(new PtmProductPriceUpdateWorker(dbm, productService, ptmStdSKuService, cacheService)));
+        es.execute(DaemonThreadFactory.create(new PtmProductPriceUpdateWorker(dbm, ptmStdSKuService, cacheService, cmpSkuService)));
     }
 
     @Override
