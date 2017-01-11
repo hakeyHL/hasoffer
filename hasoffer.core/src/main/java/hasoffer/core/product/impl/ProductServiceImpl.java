@@ -6,6 +6,7 @@ import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.app.AppCacheService;
 import hasoffer.core.bo.product.ProductBo;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.cache.CategoryCacheManager;
@@ -97,12 +98,13 @@ public class ProductServiceImpl implements IProductService {
     @Resource
     CategoryCacheManager categoryCacheManager;
     @Resource
+    AppCacheService appCacheService;
+    @Resource
     private IDataBaseManager dbm;
     @Resource
     private ICmpSkuService cmpSkuService;
     @Resource
     private ProductCacheManager productCacheManager;
-
     private Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     @Override
@@ -263,9 +265,7 @@ public class ProductServiceImpl implements IProductService {
                 dbm.update(updater);
             }
         }
-
-        //不管任何情况，重新导入product
-        importProduct2Solr2(ptmProduct);
+        appCacheService.getPtmProduct(id, 0);
     }
 
     @Override
@@ -724,22 +724,11 @@ public class ProductServiceImpl implements IProductService {
 //        List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(product.getId());
         List<PtmCmpSku> cmpSkus = cmpSkuService.listCmpSkus(product.getId(), SkuStatus.ONSALE);
         Map<Website, PtmCmpSku> cmpSkuMap = new HashMap<>();
+        List<PtmCmpSku> onsaleCmpSkuList = new ArrayList<>();
         //no skus ,skip .
         if (cmpSkus == null || cmpSkus.size() < 1) {
             return null;
-        } /*else {
-            //if has onsale sku
-            int onsaleSkuSize = 0;
-            for (PtmCmpSku cmpSku : cmpSkus) {
-                if (cmpSku.getStatus().name().equals("ONSALE")) {
-                    ++onsaleSkuSize;
-                    break;
-                }
-            }
-            if (onsaleSkuSize == 0) {
-                return null;
-            }
-        }*/
+        }
 
         for (PtmCmpSku cmpSku : cmpSkus) {
             if (!SkuStatus.ONSALE.equals(cmpSku.getStatus()) || cmpSku.getPrice() <= 0) {
@@ -750,8 +739,10 @@ public class ProductServiceImpl implements IProductService {
             if (website == null) {
                 continue;
             }
-
+            onsaleCmpSkuList.add(cmpSku);
             PtmCmpSku mSku = cmpSkuMap.get(website);
+            //一个site只要一个最低价如果此商品下只有一个site的sku,这个不能准确计算
+
             if (mSku == null || cmpSku.getPrice() < mSku.getPrice()) {
                 cmpSkuMap.put(website, cmpSku);
             }
@@ -763,22 +754,29 @@ public class ProductServiceImpl implements IProductService {
 
         int review = 0;
         Long rating = 0L;
-        float minPrice = 0.0f, maxPrice = 0.0f;
+        float minPrice = 0;
+        float maxPrice = 0;
+        if (onsaleCmpSkuList.size() > 0) {
+            Collections.sort(onsaleCmpSkuList, new Comparator<PtmCmpSku>() {
+                @Override
+                public int compare(PtmCmpSku o1, PtmCmpSku o2) {
+                    if (o1.getPrice() < o2.getPrice()) {
+                        return -1;
+                    }
+                    if (o1.getPrice() > o2.getPrice()) {
+                        return 1;
+                    }
+                    return 0;
+                }
+            });
+            minPrice = onsaleCmpSkuList.get(0).getPrice();
+            maxPrice = onsaleCmpSkuList.get(onsaleCmpSkuList.size() - 1).getPrice();
+        }
 
-        for (Map.Entry<Website, PtmCmpSku> kv : cmpSkuMap.entrySet()) {
-//            Website website = kv.getKey();
-            PtmCmpSku cmpSku = kv.getValue();
-
-            float price = cmpSku.getPrice();
-
-            if (minPrice > price || minPrice <= 0) {
-                minPrice = price;
+        for (PtmCmpSku cmpSku : onsaleCmpSkuList) {
+            if (cmpSku.getPrice() < 0) {
+                continue;
             }
-
-            if (maxPrice < price) {
-                maxPrice = price;
-            }
-
             review += cmpSku.getCommentsNumber();
             rating += cmpSku.getRatings() * cmpSku.getCommentsNumber();
         }

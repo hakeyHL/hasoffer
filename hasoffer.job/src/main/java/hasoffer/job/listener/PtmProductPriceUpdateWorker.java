@@ -1,16 +1,16 @@
 package hasoffer.job.listener;
 
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.app.AppCacheService;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
-import hasoffer.core.persistence.po.ptm.PtmStdSku;
-import hasoffer.core.product.IProductService;
+import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.persistence.po.ptm.PtmStdPrice;
+import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IPtmStdSkuService;
-import hasoffer.core.redis.ICacheService;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -19,15 +19,15 @@ import java.util.concurrent.TimeUnit;
 public class PtmProductPriceUpdateWorker implements Runnable {
 
     private IDataBaseManager dbm;
-    private IProductService productService;
     private IPtmStdSkuService ptmStdSkuService;
-    private ICacheService cacheService;
+    private AppCacheService cacheService;
+    private ICmpSkuService cmpSkuService;
 
-    public PtmProductPriceUpdateWorker(IDataBaseManager dbm, IProductService productService, IPtmStdSkuService ptmStdSkuService, ICacheService cacheService) {
+    public PtmProductPriceUpdateWorker(IDataBaseManager dbm, IPtmStdSkuService ptmStdSkuService, AppCacheService cacheService, ICmpSkuService cmpSkuService) {
         this.dbm = dbm;
-        this.productService = productService;
         this.ptmStdSkuService = ptmStdSkuService;
         this.cacheService = cacheService;
+        this.cmpSkuService = cmpSkuService;
     }
 
     @Override
@@ -57,27 +57,40 @@ public class PtmProductPriceUpdateWorker implements Runnable {
 
             for (long productid : productIdList) {
 
-                try {
-                    productService.updatePtmProductPrice(productid);
-                } catch (Exception e) {
-                    System.out.println("update success then reimport product to solr fail for " + productid);
+                List<PtmCmpSku> skuList = cmpSkuService.listCmpSkus(productid);
+
+                if (skuList == null || skuList.size() <= 0) {
+                    continue;
                 }
+                for (PtmCmpSku sku : skuList) {
+                    cacheService.getPtmCmpSku(sku.getId(), 0);
+                }
+
+                cacheService.getPtmCmpSku(skuList.get(0).getId(), 1);
+
+
+//                try {
+//                    productService.updatePtmProductPrice(productid);
+//                } catch (Exception e) {
+//                    System.out.println("update success then reimport product to solr fail for " + productid);
+//                }
+
 
                 //清除商品缓存
-                cacheService.del("PRODUCT_" + productid);
+//                cacheService.del("PRODUCT_" + productid);
                 //清除sku缓存        PRODUCT__listPagedCmpSkus_3198_1_10
-                Set<String> keys = cacheService.keys("PRODUCT__listPagedCmpSkus_" + productid + "_*");
+//                Set<String> keys = cacheService.keys("PRODUCT__listPagedCmpSkus_" + productid + "_*");
 
-                for (String key : keys) {
-                    cacheService.del(key);
-                }
+//                for (String key : keys) {
+//                    cacheService.del(key);
+//                }
 
                 //清除topselling缓存        PRODUCT__listPagedCmpSkus_TopSelling_0_20
-                Set<String> topsellingCache = cacheService.keys("PRODUCT__listPagedCmpSkus_TopSelling" + "_*");
-
-                for (String topCache : topsellingCache) {
-                    cacheService.del(topCache);
-                }
+//                Set<String> topsellingCache = cacheService.keys("PRODUCT__listPagedCmpSkus_TopSelling" + "_*");
+//
+//                for (String topCache : topsellingCache) {
+//                    cacheService.del(topCache);
+//                }
 
             }
 
@@ -85,13 +98,22 @@ public class PtmProductPriceUpdateWorker implements Runnable {
             List<Long> stdSkuIdList = dbm.query("SELECT distinct t.stdSkuId FROM PtmStdPrice t WHERE t.updateTime > ?0 and t.updateTime < ?1", Arrays.asList(t1, t2));
             for (long stdSkuId : stdSkuIdList) {
 
-                PtmStdSku ptmStdSku = dbm.get(PtmStdSku.class, stdSkuId);
+                List<PtmStdPrice> stdPriceList = ptmStdSkuService.listStdPrice(stdSkuId);
 
-                try {
-                    ptmStdSkuService.importPtmStdSku2Solr(ptmStdSku);
-                } catch (Exception e) {
-                    System.out.println("update success then reimport PtmStdSku to solr fail for " + stdSkuId);
+                if (stdPriceList == null || stdPriceList.size() <= 0) {
+                    continue;
                 }
+
+                for (PtmStdPrice stdPrice : stdPriceList) {
+                    cacheService.getPtmStdPrice(stdPrice.getId(), 0);
+                }
+                cacheService.getPtmStdPrice(stdPriceList.get(0).getId(), 1);
+
+//                try {
+//                    ptmStdSkuService.importPtmStdSku2Solr(ptmStdSku);
+//                } catch (Exception e) {
+//                    System.out.println("update success then reimport PtmStdSku to solr fail for " + stdSkuId);
+//                }
             }
 
 
