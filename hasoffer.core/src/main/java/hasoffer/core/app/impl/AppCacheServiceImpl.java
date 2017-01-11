@@ -223,10 +223,9 @@ public class AppCacheServiceImpl implements AppCacheService {
                 if (ptmCmpSku.getProductId() > 0) {
                     productService.updatePtmProductPrice(ptmCmpSku.getProductId());
                 }
-            } else {
-                iCacheService.del(cacheKey);
             }
             cmpskuIndexService.remove(String.valueOf(ptmCmpSku.getId()));
+            iCacheService.del(cacheKey);
             return null;
         }
         return ptmCmpSku;

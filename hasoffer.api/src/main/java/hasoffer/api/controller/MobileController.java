@@ -411,7 +411,7 @@ public class MobileController {
         //根据当前关键词找到相关的关键词的商品列表返回
         //规则如下:
         //-- 同一个分类 如果当前是id为1 那么推荐同分类的id为i+的关键词字调用搜索方法获取商品列表
-        Map<String, List<CmpProductListVo>> similarCategorys = mobileService.getSimilarCategorys(keyWordsVo);
+        Map<String, List<CmpProductListVo>> similarCategorys = mobileService.getSimilarCategorys(keyWordsVo, 2);
         //1. 找出id大于当前id且分类与当前分类一致的关键词,如果没有2个则从大于0的id开始重新搜索,依次循环
         //2. 调用mobileService.search方法搜索
         //3. 将结果封装到列表中
