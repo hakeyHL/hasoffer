@@ -88,8 +88,17 @@ public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
                     po.setDeviceId(tempArray[0]);
                     po.setUserId(tempArray[1]);
                 } else if (tempArray.length == 3) {
-                    po.setChannel(AffliIdHelper.getMarketChannelById(tempArray[0]).name());
-                    po.setChannelSrc(AffliIdHelper.getMarketChannelById(tempArray[0]).name());
+                    String name = AffliIdHelper.getMarketChannelById(tempArray[0]).name();
+                    if (Arrays.asList(AffliIdHelper.MARKET_CHANNEL_YEAHMOBI).contains(name)) {
+                        UrmDevice urmDevice = deviceRegTime.get(tempArray[1]);
+                        if (urmDevice != null) {
+                            po.setChannel(urmDevice.getMarketChannel().name());
+                            po.setChannelSrc(urmDevice.getMarketChannel().name());
+                        }
+                    } else {
+                        po.setChannel(name);
+                        po.setChannelSrc(name);
+                    }
                     po.setDeviceId(tempArray[1]);
                     po.setUserId(tempArray[2]);
                 }
