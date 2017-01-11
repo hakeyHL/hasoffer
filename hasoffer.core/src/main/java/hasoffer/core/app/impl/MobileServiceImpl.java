@@ -16,9 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by hs on 2017年01月05日.
@@ -99,20 +97,38 @@ public class MobileServiceImpl implements MobileService {
      * @return
      */
     @Override
-    public List<CmpProductListVo> getSimilarCategorys(KeyWordsVo keyWordsVo) {
-        List<CmpProductListVo> similarProducts = new ArrayList<>();
-        if (keyWordsVo == null || StringUtils.isEmpty(keyWordsVo.getCategoryName())) {
-            return similarProducts;
+    public Map<String, List<CmpProductListVo>> getSimilarCategorys(KeyWordsVo keyWordsVo, int size) {
+        if (size < 1) {
+            size = 2;
         }
-        int initSize = 0;
+        Map<String, List<CmpProductListVo>> similarKeyAndPros = new HashMap<>();
+        if (keyWordsVo == null || StringUtils.isEmpty(keyWordsVo.getCategoryName())) {
+            return similarKeyAndPros;
+        }
         List<KeywordCollection> keywordCollections = dbm.query(API_KEYWORDCOLLECTION_GET_SIMILAR_CATEGORYKEYS, Arrays.asList(keyWordsVo.getCategoryName()));
+        setSimilarCategory(similarKeyAndPros, keywordCollections, size, keyWordsVo.getCategoryName(), keyWordsVo.getName());
+        return similarKeyAndPros;
+    }
+
+    /**
+     * 循环将指定size的推荐列表放入到map中
+     *
+     * @param desMap
+     * @param keywordCollections
+     * @param size
+     * @param categoryName
+     */
+    private void setSimilarCategory(Map desMap, List<KeywordCollection> keywordCollections, int size, String categoryName, String keyword) {
         for (KeywordCollection keywordCollection : keywordCollections) {
-            if (keywordCollection.getSourceSiteCategoryName().equals(keyWordsVo.getCategoryName()) && initSize < 2) {
-                List<CmpProductListVo> cmpProductListVoList = searchFromSolrByKeyWordVo(new KeyWordsVo(keywordCollection), 0, 20);
-                similarProducts.addAll(cmpProductListVoList);
-                initSize++;
+            if (keywordCollection.getSourceSiteCategoryName().equals(categoryName) && desMap.size() < size) {
+                if (!keyword.equals(keywordCollection.getKeyword())) {
+                    List<CmpProductListVo> cmpProductListVoList = searchFromSolrByKeyWordVo(new KeyWordsVo(keywordCollection), 0, 20);
+                    desMap.put(keywordCollection.getKeyword(), cmpProductListVoList);
+                }
             }
         }
-        return similarProducts;
+        if (desMap.size() != size) {
+            setSimilarCategory(desMap, keywordCollections, size, categoryName, keyword);
+        }
     }
 }
