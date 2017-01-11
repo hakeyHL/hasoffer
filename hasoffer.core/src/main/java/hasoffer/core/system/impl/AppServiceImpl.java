@@ -538,7 +538,7 @@ public class AppServiceImpl implements IAppService {
         String snapDealExtParam1 = AffliIdHelper.getMarketId(marketChannel);
         // 112338是yeahmobi申请的snapdeal帐号
         if ("112338".equals(snapDealAffid)) {
-            snapDealExtParam1 = "103662";
+            snapDealExtParam1 = AffliIdHelper.MARKET_CHANNEL_YEAHMOBI[random.nextInt(AffliIdHelper.MARKET_CHANNEL_YEAHMOBI.length)];
         }
         String url = "android-app://com.snapdeal.main/snapdeal/m.snapdeal.com?aff_id=" + snapDealAffid + "&utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_sub=" + snapDealExtParam1 + "&aff_sub2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0";
         return new String(org.apache.commons.codec.binary.Base64.encodeBase64(url.getBytes(Charset.forName("UTF-8"))));
@@ -591,5 +591,12 @@ public class AppServiceImpl implements IAppService {
     public void updateDeal(AppDeal appDeal) {
         dbm.update(appDeal);
     }
+
+    //public static void main(String[] args) {
+    //    for (int i = 0; i < 1000; i++) {
+    //        MarketChannel marketChannel = MarketChannel.values()[new Random().nextInt(MarketChannel.values().length)];
+    //        getSnapDealIndexUrl(marketChannel, "414c84d6566c035f3845af4438b7448d");
+    //    }
+    //}
 
 }

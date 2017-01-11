@@ -123,4 +123,11 @@ public class SnapdealHelper {
     public static String getSkuIdByUrl(String url) {
         return getProductIdByUrl(url);
     }
+    //
+    //public static void main(String[] args) {
+    //    for (int i = 0; i < 1000; i++) {
+    //        MarketChannel marketChannel = MarketChannel.values()[new Random().nextInt(MarketChannel.values().length)];
+    //        System.out.println(appendAff("http://www.snapdeal.com", new String[]{marketChannel.name(), "414c84d6566c035f3845af4438b7448d"}));
+    //    }
+    //}
 }
