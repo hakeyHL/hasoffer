@@ -106,7 +106,7 @@ public class MobileServiceImpl implements MobileService {
             return similarKeyAndPros;
         }
         List<KeywordCollection> keywordCollections = dbm.query(API_KEYWORDCOLLECTION_GET_SIMILAR_CATEGORYKEYS, Arrays.asList(keyWordsVo.getCategoryName()));
-        setSimilarCategory(similarKeyAndPros, keywordCollections, size, keyWordsVo.getCategoryName());
+        setSimilarCategory(similarKeyAndPros, keywordCollections, size, keyWordsVo.getCategoryName(), keyWordsVo.getName());
         return similarKeyAndPros;
     }
 
@@ -118,15 +118,17 @@ public class MobileServiceImpl implements MobileService {
      * @param size
      * @param categoryName
      */
-    private void setSimilarCategory(Map desMap, List<KeywordCollection> keywordCollections, int size, String categoryName) {
+    private void setSimilarCategory(Map desMap, List<KeywordCollection> keywordCollections, int size, String categoryName, String keyword) {
         for (KeywordCollection keywordCollection : keywordCollections) {
             if (keywordCollection.getSourceSiteCategoryName().equals(categoryName) && desMap.size() < size) {
-                List<CmpProductListVo> cmpProductListVoList = searchFromSolrByKeyWordVo(new KeyWordsVo(keywordCollection), 0, 20);
-                desMap.put(keywordCollection.getKeyword(), cmpProductListVoList);
+                if (!keyword.equals(keywordCollection.getKeyword())) {
+                    List<CmpProductListVo> cmpProductListVoList = searchFromSolrByKeyWordVo(new KeyWordsVo(keywordCollection), 0, 20);
+                    desMap.put(keywordCollection.getKeyword(), cmpProductListVoList);
+                }
             }
         }
         if (desMap.size() != size) {
-            setSimilarCategory(desMap, keywordCollections, size, categoryName);
+            setSimilarCategory(desMap, keywordCollections, size, categoryName, keyword);
         }
     }
 }
