@@ -36,16 +36,56 @@ import static hasoffer.base.utils.http.XPathUtils.getSubNodeByXPath;
 public class HttpTest {
 
     public static final String WEBSITE_91MOBILE_URL_PREFIEX = "http://www.91mobiles.com";
-    public static final String WEBSITE_IDEALO_URL_PREFIEX = "http://www.idealo.in";
     public static final String WEBSITE_DX_URL_PREFIEX = "http://www.dx.com/";
 
-//    @Resource
-//    IProductService productService;
+    @Test
+    public void testProm() throws Exception {
+
+        String url = "https://www.promodescuentos.com";
+
+        TagNode root = HtmlUtils.getUrlRootTagNode(url);
+
+        List<TagNode> divNodeList = getSubNodesByXPath(root, "//div[@class='thread-cardWrapper']");
+
+        for (TagNode divNode : divNodeList) {
+
+            TagNode flagNode = getSubNodeByXPath(divNode, "//span[@class='hide--toW3 overflow--ellipsis']", null);
+
+            if (flagNode == null) {
+                TagNode titleNode = getSubNodeByXPath(root, "//a[@class='cept-tt linkPlain thread-title-text box--all-b']", null);
+                String title = titleNode.getText().toString();
+                System.out.println(title);
+                continue;
+            }
+
+
+        }
+
+    }
+
 
     @Test
     public void testTurkey() {
 
         try {
+
+            TagNode rootTagNode = HtmlUtils.getUrlRootTagNode("https://www.promodescuentos.com/?page=2");
+
+            List<TagNode> subNodeList = getSubNodesByXPath(rootTagNode, "//div[@class='thread-cardWrapper']");
+
+            int i = subNodeList.size();
+
+            for (TagNode node : subNodeList) {
+
+                try {
+
+                    TagNode flagNode = getSubNodeByXPath(node, "//article/div[@class='thread-content space--h-2 space--fromW3-h-3']/div[@class='tGrid width--all-12 space--mb-3']/div", new ContentParseException("div not found"));
+
+                } catch (Exception e) {
+                    System.out.println(i--);
+                }
+
+            }
 
             HttpResponseModel responseModel = HttpUtils.get("https://www.groupon.com/browse/search/partial?_csrf=6TYJ19Bp-fm0vKcFU3JgOftLqP7Z5iGR05es&currentPageUrl=https%253A%252F%252Fwww.groupon.com%252Fbrowse%252Fchicago%253Fcontext%253Dlocal%2526page%253D2&division=chicago&context=local&page=2", null);
 
