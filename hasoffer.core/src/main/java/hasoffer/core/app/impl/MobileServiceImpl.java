@@ -106,6 +106,22 @@ public class MobileServiceImpl implements MobileService {
             return similarKeyAndPros;
         }
         List<KeywordCollection> keywordCollections = dbm.query(API_KEYWORDCOLLECTION_GET_SIMILAR_CATEGORYKEYS, Arrays.asList(keyWordsVo.getCategoryName()));
+        if (keywordCollections == null || keywordCollections.size() < 1) {
+            return similarKeyAndPros;
+        }
+        //排序
+        Collections.sort(keywordCollections, new Comparator<KeywordCollection>() {
+            @Override
+            public int compare(KeywordCollection o1, KeywordCollection o2) {
+                if (o1.getKeyword().compareToIgnoreCase(o2.getKeyword()) < 0) {
+                    return -1;
+                }
+                if (o1.getKeyword().compareToIgnoreCase(o2.getKeyword()) > 0) {
+                    return 1;
+                }
+                return 0;
+            }
+        });
         setSimilarCategory(similarKeyAndPros, keywordCollections, size, keyWordsVo.getCategoryName(), keyWordsVo.getName());
         return similarKeyAndPros;
     }
