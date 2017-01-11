@@ -15,5 +15,5 @@ public interface MobileService {
 
     List<CmpProductListVo> searchFromSolrByKeyWordVo(KeyWordsVo keyWordsVo, int page, int pageSize);
 
-    Map<String, List<CmpProductListVo>> getSimilarCategorys(KeyWordsVo keyWordsVo);
+    Map<String, List<CmpProductListVo>> getSimilarCategorys(KeyWordsVo keyWordsVo, int size);
 }

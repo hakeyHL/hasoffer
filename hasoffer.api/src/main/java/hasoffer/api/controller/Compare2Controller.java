@@ -663,7 +663,7 @@ public class Compare2Controller {
      */
     private CmpResult getCmpProducts(SearchIO sio, PtmProduct product, String userToken) {
         //初始化一个空的用于存放比价商品列表的List
-        List<CmpProductListVo> comparedSkuVos = new ArrayList<CmpProductListVo>();
+        List<CmpProductListVo> comparedSkuVos = new ArrayList<>();
         CmpResult cmpResult = new CmpResult();
         //从ptmCmpSku表获取 productId为指定值、且状态为ONSALE 按照价格升序排列
         PageableResult<PtmCmpSku> pagedCmpskus = productCacheManager.listPagedCmpSkus(product.getId(), sio.getPage(), sio.getSize());
