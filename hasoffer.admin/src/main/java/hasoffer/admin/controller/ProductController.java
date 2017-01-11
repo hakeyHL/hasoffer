@@ -89,7 +89,7 @@ public class ProductController {
             PtmStdPrice ptmStdPrice = ptmStdPriceService.getPtmStdPriceById(ApiUtils.removeBillion(id));
             if (ptmStdPrice != null) {
                 ptmStdPriceService.removePriceById(ptmStdPrice.getId());
-                appCacheService.getPtmStdPrice(ptmStdPrice.getId(), 0);
+                appCacheService.getPtmStdPrice(ptmStdPrice.getId(), 1);
             } else {
                 ptmStdPriceService.importPtmStdPrice2Solr(ApiUtils.removeBillion(id));
             }
@@ -99,7 +99,7 @@ public class ProductController {
                 cmpskuIndexService.remove(String.valueOf(id));
             } else {
                 cmpSkuService.deleteCmpSku(id);
-                appCacheService.getPtmCmpSku(id, 0);
+                appCacheService.getPtmCmpSku(id, 1);
             }
         }
         ModelAndView mav = new ModelAndView();
@@ -155,16 +155,16 @@ public class ProductController {
         if (!StringUtils.isEmpty(id)) {
             // 有商品id就是更新
             cmpSkuService.updateCmpSku(Long.valueOf(id), url, color, size, price, skuStatus);
-            appCacheService.getPtmCmpSku(Long.parseLong(id), 0);
+            appCacheService.getPtmCmpSku(Long.parseLong(id), 1);
         } else {
             // 无商品id就是创建
             cmpSku = cmpSkuService.createCmpSku(Long.valueOf(productId), url, color, size, price, skuStatus);
         }
         //更新--清除缓存   创建 添加到缓存
-        appCacheService.getPtmCmpSku(Long.parseLong(id), 0);
+        appCacheService.getPtmCmpSku(Long.parseLong(id), 1);
         if (cmpSku != null && cmpSku.getId() > 0) {
             //虽然不可能有重复的id缓存,但是也清除一下
-            appCacheService.getPtmCmpSku(cmpSku.getId(), 0);
+            appCacheService.getPtmCmpSku(cmpSku.getId(), 1);
             appCacheService.getPtmCmpSku(cmpSku.getId());
         }
         return mav;
@@ -544,7 +544,7 @@ public class ProductController {
                     //1. 从数据库删除
                     ptmStdPriceService.removePriceById(ApiUtils.removeBillion(id));
                     //2. 从缓存中删除
-                    appCacheService.getPtmStdPrice(ApiUtils.removeBillion(id), 0);
+                    appCacheService.getPtmStdPrice(ApiUtils.removeBillion(id), 1);
                 } else {
                     ptmStdPriceService.importPtmStdPrice2Solr(ApiUtils.removeBillion(id));
                 }
@@ -552,7 +552,7 @@ public class ProductController {
                 PtmCmpSku cmpSku = cmpSkuService.getCmpSkuById(id);
                 if (cmpSku != null) {
                     cmpSkuService.deleteCmpSku(cmpSku.getId());
-                    appCacheService.getPtmCmpSku(cmpSku.getId(), 0);
+                    appCacheService.getPtmCmpSku(cmpSku.getId(), 1);
                 } else {
                     cmpskuIndexService.remove(String.valueOf(cmpSku.getId()));
                 }

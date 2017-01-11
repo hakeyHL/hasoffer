@@ -155,7 +155,7 @@ public class AppCacheServiceImpl implements AppCacheService {
             //2.商品重新导入solr
             //3. 将此sku重新导入到solr
             //4.删除此sku的缓存--最后清除
-            if (ptmStdPrice != null) {
+            if (ptmStdPrice != null && operateType[0] == 1) {
                 ptmStdSKuService.updatePtmStdSkuPrice(ptmStdPrice.getStdSkuId());
             }
             ptmStdPriceService.importPtmStdPrice2Solr(ptmStdPrice);
@@ -198,6 +198,8 @@ public class AppCacheServiceImpl implements AppCacheService {
 
     /**
      * @param operateType 传任意整数即为从缓存中删除此Object
+     * @param operateType 当 operateType 的数量为1 且数值为0时代表从缓存中删除此sku,此sku重新导入solr
+     * @param operateType 当 operateType 的数量为1 且数值为1时代表删除此sku对应的商品的缓存信息以及更新商品信息和重新导入solr
      * @return
      */
     @Override
@@ -220,7 +222,7 @@ public class AppCacheServiceImpl implements AppCacheService {
             //3. 将此sku重新导入到solr
             //4.删除此sku的缓存--最后清除
             if (ptmCmpSku != null) {
-                if (ptmCmpSku.getProductId() > 0) {
+                if (ptmCmpSku.getProductId() > 0 && operateType[0] == 1) {
                     productService.updatePtmProductPrice(ptmCmpSku.getProductId());
                 }
             }
