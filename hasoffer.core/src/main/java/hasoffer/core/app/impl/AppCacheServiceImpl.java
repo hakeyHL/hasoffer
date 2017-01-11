@@ -8,6 +8,10 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.PtmStdPrice;
 import hasoffer.core.persistence.po.ptm.PtmStdSku;
+import hasoffer.core.product.IProductService;
+import hasoffer.core.product.impl.PtmStdPriceServiceImpl;
+import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
+import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.utils.ConstantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +31,14 @@ public class AppCacheServiceImpl implements AppCacheService {
     ICacheService iCacheService;
     @Resource
     IDataBaseManager dbm;
+    @Resource
+    PtmStdSKuServiceImpl ptmStdSKuService;
+    @Resource
+    PtmStdPriceServiceImpl ptmStdPriceService;
+    @Resource
+    IProductService productService;
+    @Resource
+    CmpskuIndexServiceImpl cmpskuIndexService;
 
     @Override
     public String getCacheValueByKey(String key) {
@@ -101,8 +113,13 @@ public class AppCacheServiceImpl implements AppCacheService {
         }
         String cacheKey = ConstantUtil.API_PREFIX_CACAHE_PTMSTDSKU_ + ptmStdSkuId;
         if (operateType.length > 0) {
-            //删除
-            iCacheService.del(cacheKey);
+            //重新导入
+            PtmStdSku ptmStdSku = dbm.get(PtmStdSku.class, ptmStdSkuId);
+            if (ptmStdSku != null) {
+                ptmStdSKuService.importPtmStdSku2Solr(ptmStdSku);
+            }
+//            iCacheService.del(cacheKey);
+            iCacheService.delKeys("*" + ptmStdSkuId + "*");
             return null;
         }
         PtmStdSku ptmStdSku = (PtmStdSku) iCacheService.get(PtmStdSku.class, cacheKey, 0);
@@ -125,17 +142,25 @@ public class AppCacheServiceImpl implements AppCacheService {
             return null;
         }
         String cacheKey = ConstantUtil.API_PREFIX_CACAHE_PTMSTDPRICE_ + ptmStdPriceId;
-        if (operateType.length > 0) {
-            //删除
-            iCacheService.del(cacheKey);
-            return null;
-        }
         PtmStdPrice ptmStdPrice = (PtmStdPrice) iCacheService.get(PtmStdPrice.class, cacheKey, 0);
         if (ptmStdPrice == null) {
             ptmStdPrice = dbm.get(PtmStdPrice.class, ptmStdPriceId);
             if (ptmStdPrice != null) {
                 iCacheService.add(cacheKey, ptmStdPrice, TimeUtils.MILLISECONDS_OF_1_DAY);
             }
+        }
+        if (operateType.length > 0) {
+            //删除sku缓存时有必要和责任做如下事情
+            //1.更新商品信息
+            //2.商品重新导入solr
+            //3. 将此sku重新导入到solr
+            //4.删除此sku的缓存--最后清除
+            if (ptmStdPrice != null && operateType[0] == 1) {
+                ptmStdSKuService.updatePtmStdSkuPrice(ptmStdPrice.getStdSkuId());
+            }
+            ptmStdPriceService.importPtmStdPrice2Solr(ptmStdPrice);
+            iCacheService.del(cacheKey);
+            return null;
         }
         return ptmStdPrice;
     }
@@ -152,7 +177,13 @@ public class AppCacheServiceImpl implements AppCacheService {
         String cacheKey = ConstantUtil.API_PREFIX_CACAHE_PTMPRODUCT_ + ptmProductId;
         if (operateType.length > 0) {
             //删除
-            iCacheService.del(cacheKey);
+            PtmProduct ptmProduct = dbm.get(PtmProduct.class, ptmProductId);
+            if (ptmProduct != null) {
+                productService.importProduct2Solr2(ptmProduct);
+            }
+//            iCacheService.del(cacheKey);
+            //清除商品id的keys缓存
+            iCacheService.delKeys("*" + ptmProductId + "*");
             return null;
         }
         PtmProduct ptmProduct = (PtmProduct) iCacheService.get(PtmProduct.class, cacheKey, 0);
@@ -167,6 +198,8 @@ public class AppCacheServiceImpl implements AppCacheService {
 
     /**
      * @param operateType 传任意整数即为从缓存中删除此Object
+     * @param operateType 当 operateType 的数量为1 且数值为0时代表从缓存中删除此sku,此sku重新导入solr
+     * @param operateType 当 operateType 的数量为1 且数值为1时代表删除此sku对应的商品的缓存信息以及更新商品信息和重新导入solr
      * @return
      */
     @Override
@@ -175,17 +208,27 @@ public class AppCacheServiceImpl implements AppCacheService {
             return null;
         }
         String cacheKey = ConstantUtil.API_PREFIX_CACAHE_PTMSKU_ + ptmCmpSkuId;
-        if (operateType.length > 0) {
-            //删除
-            iCacheService.del(cacheKey);
-            return null;
-        }
         PtmCmpSku ptmCmpSku = (PtmCmpSku) iCacheService.get(PtmCmpSku.class, cacheKey, 0);
         if (ptmCmpSku == null) {
             ptmCmpSku = dbm.get(PtmCmpSku.class, ptmCmpSkuId);
             if (ptmCmpSku != null) {
                 iCacheService.add(cacheKey, ptmCmpSku, TimeUtils.MILLISECONDS_OF_1_DAY);
             }
+        }
+        if (operateType.length > 0) {
+            //删除sku缓存时有必要和责任做如下事情
+            //1.更新商品信息
+            //2.商品重新导入solr
+            //3. 将此sku重新导入到solr
+            //4.删除此sku的缓存--最后清除
+            if (ptmCmpSku != null) {
+                if (ptmCmpSku.getProductId() > 0 && operateType[0] == 1) {
+                    productService.updatePtmProductPrice(ptmCmpSku.getProductId());
+                }
+            }
+            cmpskuIndexService.remove(String.valueOf(ptmCmpSku.getId()));
+            iCacheService.del(cacheKey);
+            return null;
         }
         return ptmCmpSku;
     }

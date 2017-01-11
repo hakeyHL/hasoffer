@@ -102,7 +102,7 @@
     </bean>
     <bean id="imageDownLoadTrigger2" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="imageDownLoadJob2"/>
-        <property name="cronExpression" value="0 0 0/2 * * ?"/>
+        <property name="cronExpression" value="0 0 1/2 * * ?"/>
     </bean>
 
     <bean name="skuImageDownLoadJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">

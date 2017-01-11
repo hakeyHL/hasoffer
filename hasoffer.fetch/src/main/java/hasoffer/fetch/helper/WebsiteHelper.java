@@ -170,7 +170,6 @@ public class WebsiteHelper {
             case PAYTM:
                 return url;
             case AMAZON:
-
                 return AmazonHelper.getUrlWithAff(url, marketChannel);
             case SNAPDEAL:
                 return getUrlWithAff(website, url, affs);

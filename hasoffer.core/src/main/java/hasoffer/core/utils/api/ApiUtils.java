@@ -1043,6 +1043,7 @@ public class ApiUtils {
                 PtmStdBrandCard ptmStdBrandCard = mongoDbManager.queryOne(PtmStdBrandCard.class, brandCardId);
                 if (ptmStdBrandCard != null && org.apache.commons.lang3.StringUtils.isNotEmpty(ptmStdBrandCard.getBrandCardString())) {
                     stdSkuParametersMap.put("brandCard", ptmStdBrandCard.getBrandCardString());
+                    stdSkuParametersMap.put("brand", ptmStdBrandCard.getBrandName());
                 }
             }
 

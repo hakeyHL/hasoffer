@@ -85,24 +85,23 @@ public class ProductController {
     @RequestMapping(value = "/cmp/del/{id}", method = RequestMethod.GET)
     public ModelAndView delCompare(@PathVariable long id) {
 
-        PtmCmpSku cmpSku = cmpSkuService.getCmpSkuById(id);
-        if (cmpSku == null) {
-            cmpskuIndexService.remove(String.valueOf(id));
-        } else {
-            try {
-                System.out.println("cmpSkuService.deleteCmpSku start" + System.currentTimeMillis());
-                cmpSkuService.deleteCmpSku(id);
-                System.out.println("cmpSkuService.deleteCmpSku end" + System.currentTimeMillis());
-            } catch (Exception e) {
-                e.printStackTrace();
+        if (ApiUtils.removeBillion(id) > 0) {
+            PtmStdPrice ptmStdPrice = ptmStdPriceService.getPtmStdPriceById(ApiUtils.removeBillion(id));
+            if (ptmStdPrice != null) {
+                ptmStdPriceService.removePriceById(ptmStdPrice.getId());
+                appCacheService.getPtmStdPrice(ptmStdPrice.getId(), 1);
+            } else {
+                ptmStdPriceService.importPtmStdPrice2Solr(ApiUtils.removeBillion(id));
             }
-
-            //更新完价格有重新导入solr的动作
-            System.out.println("productService.updatePtmProductPrice start" + System.currentTimeMillis());
-            productService.updatePtmProductPrice(cmpSku.getProductId());
-            System.out.println("productService.updatePtmProductPrice end" + System.currentTimeMillis());
+        } else {
+            PtmCmpSku cmpSku = cmpSkuService.getCmpSkuById(id);
+            if (cmpSku == null) {
+                cmpskuIndexService.remove(String.valueOf(id));
+            } else {
+                cmpSkuService.deleteCmpSku(id);
+                appCacheService.getPtmCmpSku(id, 1);
+            }
         }
-
         ModelAndView mav = new ModelAndView();
         return mav;
     }
@@ -136,9 +135,12 @@ public class ProductController {
     @DataSource(value = DataSourceType.Master)
     @RequestMapping(value = "/cmp/save", method = RequestMethod.POST)
     public ModelAndView saveCompare(HttpServletRequest request) {
-
-        String id = request.getParameter("id");
         String productId = request.getParameter("productId");
+        ModelAndView mav = new ModelAndView("redirect:/p/cmp/" + productId);
+        String id = request.getParameter("id");
+        if (Long.parseLong(id) < 1) {
+            return mav;
+        }
         String url = request.getParameter("url");
         String skuStatus = request.getParameter("skuStatus");
         float price = 0.0f;
@@ -151,20 +153,20 @@ public class ProductController {
         String size = request.getParameter("size");
         PtmCmpSku cmpSku = null;
         if (!StringUtils.isEmpty(id)) {
-            // 更新
+            // 有商品id就是更新
             cmpSkuService.updateCmpSku(Long.valueOf(id), url, color, size, price, skuStatus);
+            appCacheService.getPtmCmpSku(Long.parseLong(id), 1);
         } else {
-            // 创建
+            // 无商品id就是创建
             cmpSku = cmpSkuService.createCmpSku(Long.valueOf(productId), url, color, size, price, skuStatus);
         }
         //更新--清除缓存   创建 添加到缓存
-        appCacheService.getPtmCmpSku(Long.parseLong(id), 0);
+        appCacheService.getPtmCmpSku(Long.parseLong(id), 1);
         if (cmpSku != null && cmpSku.getId() > 0) {
             //虽然不可能有重复的id缓存,但是也清除一下
-            appCacheService.getPtmCmpSku(cmpSku.getId());
+            appCacheService.getPtmCmpSku(cmpSku.getId(), 1);
             appCacheService.getPtmCmpSku(cmpSku.getId());
         }
-        ModelAndView mav = new ModelAndView("redirect:/p/cmp/" + productId);
         return mav;
     }
 
@@ -534,35 +536,28 @@ public class ProductController {
     @RequestMapping(value = "/batchDelete", method = RequestMethod.GET)
     @ResponseBody
     public boolean batchDelete(@RequestParam(value = "ids[]") Long[] ids) {
-//        cmpSkuService.batchDeleteCmpSku(ids);
-        //TODO 胡礼
-        //1. 先看有没有这个sku
-        //2. 有就删除,同时从缓存中删除,从solr中删除
-        //3. 没有也要删solr的sku
-        //4. 更新商品价格
-        //5. 重新导入solr
-        //6. 删除商品sku列表缓存
-
-        long productId = 0L;
-
         for (long id : ids) {
-
-            PtmCmpSku cmpSku = cmpSkuService.getCmpSkuById(id);
-            if (cmpSku == null) {
-                cmpskuIndexService.remove(String.valueOf(id));
-                continue;
+            if (ApiUtils.removeBillion(id) > 0) {
+                PtmStdPrice ptmStdPrice = ptmStdPriceService.getPtmStdPriceById(ApiUtils.removeBillion(id));
+                if (ptmStdPrice != null) {
+                    //如果存在
+                    //1. 从数据库删除
+                    ptmStdPriceService.removePriceById(ApiUtils.removeBillion(id));
+                    //2. 从缓存中删除
+                    appCacheService.getPtmStdPrice(ApiUtils.removeBillion(id), 1);
+                } else {
+                    ptmStdPriceService.importPtmStdPrice2Solr(ApiUtils.removeBillion(id));
+                }
             } else {
-                cmpSkuService.deleteCmpSku(id);
-            }
-
-            if (productId <= 0) {
-                productId = cmpSku.getProductId();
+                PtmCmpSku cmpSku = cmpSkuService.getCmpSkuById(id);
+                if (cmpSku != null) {
+                    cmpSkuService.deleteCmpSku(cmpSku.getId());
+                    appCacheService.getPtmCmpSku(cmpSku.getId(), 1);
+                } else {
+                    cmpskuIndexService.remove(String.valueOf(cmpSku.getId()));
+                }
             }
         }
-
-        //更新完价格会有reimport的动作
-        productService.updatePtmProductPrice(productId);
-
         return true;
     }
 

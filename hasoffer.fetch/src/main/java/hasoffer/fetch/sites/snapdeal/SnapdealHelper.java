@@ -68,15 +68,16 @@ public class SnapdealHelper {
 
         if (affs != null) {
             String marketChannel = AffliIdHelper.getMarketId(MarketChannel.valueOfString(affs[0]));
+            String affSub2 = marketChannel;
             if (Arrays.asList(AffliIdHelper.SNAPDEAL_YEAHMOBI_FLIDS).contains(affiIdByWebsite)) {
                 marketChannel = AffliIdHelper.MARKET_CHANNEL_YEAHMOBI[new Random().nextInt(AffliIdHelper.MARKET_CHANNEL_YEAHMOBI.length)];
             }
             if (affs.length == 1) {
-                sb.append("&aff_sub=").append(marketChannel).append("&aff_sub2=").append(marketChannel).append("_").append("0").append("_").append("0");
+                sb.append("&aff_sub=").append(marketChannel).append("&aff_sub2=").append(affSub2).append("_").append("0").append("_").append("0");
             } else if (affs.length == 2) {
-                sb.append("&aff_sub=").append(marketChannel).append("&aff_sub2=").append(marketChannel).append("_").append(affs[1]).append("_").append("0");
+                sb.append("&aff_sub=").append(marketChannel).append("&aff_sub2=").append(affSub2).append("_").append(affs[1]).append("_").append("0");
             } else if (affs.length == 3) {
-                sb.append("&aff_sub=").append(marketChannel).append("&aff_sub2=").append(marketChannel).append("_").append(affs[1]).append("_").append(affs[2]);
+                sb.append("&aff_sub=").append(marketChannel).append("&aff_sub2=").append(affSub2).append("_").append(affs[1]).append("_").append(affs[2]);
             }
         }
 
@@ -122,4 +123,11 @@ public class SnapdealHelper {
     public static String getSkuIdByUrl(String url) {
         return getProductIdByUrl(url);
     }
+    //
+    //public static void main(String[] args) {
+    //    for (int i = 0; i < 1000; i++) {
+    //        MarketChannel marketChannel = MarketChannel.values()[new Random().nextInt(MarketChannel.values().length)];
+    //        System.out.println(appendAff("http://www.snapdeal.com", new String[]{marketChannel.name(), "414c84d6566c035f3845af4438b7448d"}));
+    //    }
+    //}
 }
