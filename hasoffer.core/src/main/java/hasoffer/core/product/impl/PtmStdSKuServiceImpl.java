@@ -130,6 +130,12 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
 
     public PtmStdSkuModel getPtmStdSKuModel(PtmStdSku ptmStdSku1) {
         PtmStdSkuModel ptmStdSkuModel = new PtmStdSkuModel(ptmStdSku1);
+
+        //设置关键词title关键词
+        StringBuilder hakeySb = new StringBuilder();
+        hakeySb.append(ptmStdSkuModel.getTitle());
+
+
         //  递归获取类目树类目
         List<PtmCategory> routerCategoryList = categoryCacheManager.getRouterCategoryList(ptmStdSku1.getCategoryId());
         setCategoryList(ptmStdSkuModel, routerCategoryList);
@@ -162,19 +168,23 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
         //按价格排序
         ApiUtils.getSortedStdPriceListByClicCountAsc(priceList);
-        PtmStdSkuDetail ptmStdSkuDetail = mongoDbManager.queryOne(PtmStdSkuDetail.class, ptmStdSku1.getId());
-        if (ptmStdSkuDetail != null) {
-            List<PtmStdSkuParamGroup> paramGroups = ptmStdSkuDetail.getParamGroups();
-            setStdModel(paramGroups, ptmStdSkuModel);
-        }
         float minPrice = priceList.get(0).getPrice();
         float maxPrice = priceList.get(priceList.size() - 1).getPrice();
         int ratingNumber = ApiUtils.returnNumberBetween0And5(BigDecimal.valueOf(tempRatingNumber).divide(BigDecimal.valueOf(totalCommentNumber == 0 ? 1 : totalCommentNumber), 0, BigDecimal.ROUND_HALF_UP).longValue());
         ptmStdSkuModel.setRating(ratingNumber);
         ptmStdSkuModel.setReview(totalCommentNumber);
 //        SrmProductSearchCount searchCount = searchService.findSearchCountByProductId(ptmStdSku1.getId());
+
+
         ptmStdSkuModel.setMinPrice(minPrice);
         ptmStdSkuModel.setMaxPrice(maxPrice);
+
+
+        PtmStdSkuDetail ptmStdSkuDetail = mongoDbManager.queryOne(PtmStdSkuDetail.class, ptmStdSku1.getId());
+        if (ptmStdSkuDetail != null) {
+            List<PtmStdSkuParamGroup> paramGroups = ptmStdSkuDetail.getParamGroups();
+            setStdModel(paramGroups, ptmStdSkuModel, hakeySb);
+        }
 //        ptmStdSkuModel.setSearchCount(searchCount == null ? 0 : searchCount.getCount());
         ptmStdSkuModel.setStoreCount(websiteSet.size());
         return ptmStdSkuModel;
@@ -205,7 +215,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         return name.equals(paramString);
     }
 
-    private void setStdModel(List<PtmStdSkuParamGroup> ptmStdSkuParamGroups, PtmStdSkuModel ptmStdSkuModel) {
+    private void setStdModel(List<PtmStdSkuParamGroup> ptmStdSkuParamGroups, PtmStdSkuModel ptmStdSkuModel, StringBuilder hakeySb) {
 //        try {
         for (PtmStdSkuParamGroup ptmStdSkuParamGroup : ptmStdSkuParamGroups) {
             String groupName = ptmStdSkuParamGroup.getName();
@@ -215,37 +225,37 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
                 //General---> launch Date,brand,model,操作系统
                 switch (groupName) {
                     case "General":
-                        setGeneral(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        setGeneral(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
                         break;
                     case "Design":
-                        setDesign(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        setDesign(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
                         break;
                     case "Display":
-                        setDisplays(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        setDisplays(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
                         break;
                     case "Performance":
-                        setPerformance(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        setPerformance(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
                         break;
                     case "Storage":
-                        setStorage(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        setStorage(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
                         break;
                     case "Main Camera":
-                        setMainCamera(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        setMainCamera(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
                         break;
                     case "Front Camera":
-                        setFontCamera(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        setFontCamera(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
                         break;
                     case "Battery":
-                        setBattery(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        setBattery(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
                         break;
                     case "Network & Connectivity":
-                        setNetworkConnectivity(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        setNetworkConnectivity(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
                         break;
                     case "Multimedia":
-                        setMultimedia(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        setMultimedia(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
                         break;
                     case "Special Features":
-                        setSpecialFeatures(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        setSpecialFeatures(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
                         break;
                     default:
                 }
@@ -460,10 +470,30 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
      * @param ptmStdSkuParamNode
      * @param name
      */
-    public void setGeneral(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+    public void setGeneral(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH);
         if (compareIgnoreCase(name, CategoryFilterParams.Brand)) {
             ptmStdSkuModel.setBrand(ptmStdSkuParamNode.getValue());
+            //设置关键词的价格范围
+            String priceBelowScope = getPriceBelowScope(ptmStdSkuModel.getMinPrice());
+            if (priceBelowScope != null) {
+                if (hakeySb.length() > 0) {
+                    hakeySb.append(ConstantUtil.SOLR_DEFAULT_MULTIVALUEDVALUE_FIELD_SPLIT);
+                }
+                hakeySb.append("Top 10 Mobiles ").append(priceBelowScope);
+
+                if (hakeySb.length() > 0) {
+                    hakeySb.append(ConstantUtil.SOLR_DEFAULT_MULTIVALUEDVALUE_FIELD_SPLIT);
+                }
+
+                hakeySb.append("Top 10 ").append(ptmStdSkuParamNode.getValue()).append(" Mobiles ").append(priceBelowScope);
+            }
+
+            if (hakeySb.length() > 0) {
+                hakeySb.append(ConstantUtil.SOLR_DEFAULT_MULTIVALUEDVALUE_FIELD_SPLIT);
+            }
+            hakeySb.append(ptmStdSkuParamNode.getValue());
+            ptmStdSkuModel.setHakey(hakeySb.toString());
             return;
         }
         if (compareIgnoreCase(name, CategoryFilterParams.Model)) {
@@ -519,7 +549,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
     }
 
-    public void setDesign(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+    public void setDesign(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
         //Weight
         if (compareIgnoreCase(name, CategoryFilterParams.Weight)) {
             int numberFromString = ApiUtils.getNumberFromString(ptmStdSkuParamNode.getValue());
@@ -527,7 +557,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
     }
 
-    public void setDisplays(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+    public void setDisplays(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
         //Screen_Resolution  Screen_Size queryScreenSize  Pixel_Density  Touch_Screen  Screen_to_Body_Ratio
         if (compareIgnoreCase(name, CategoryFilterParams.Screen_Size)) {
             String screenSize = ptmStdSkuParamNode.getValue();
@@ -577,7 +607,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
     }
 
-    public void setPerformance(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+    public void setPerformance(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
         //Processor  Graphics  queryRam RAM
         if (compareIgnoreCase(name, CategoryFilterParams.RAM)) {
             String ram = ptmStdSkuParamNode.getValue();
@@ -614,7 +644,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
     }
 
-    public void setStorage(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+    public void setStorage(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
         //queryInternalMemory  InternalMemory  Expandable_Memory
         if (compareIgnoreCase(name, CategoryFilterParams.Internal_Memory)) {
             String internalMemory = ptmStdSkuParamNode.getValue();
@@ -651,7 +681,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
     }
 
-    public void setMainCamera(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+    public void setMainCamera(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
         //Sensor queryPrimaryCamera  Autofocus Aperture  Flash Image_Resolution  Camera_Features  Video_Recording
         if (compareIgnoreCase(name, CategoryFilterParams.RESOLUTION)) {
 
@@ -693,7 +723,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
     }
 
-    public void setFontCamera(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+    public void setFontCamera(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
         //querySecondaryCamera secondaryAutofocus SecondaryFlash
         if (compareIgnoreCase(name, CategoryFilterParams.RESOLUTION)) {
             String resolution = ptmStdSkuParamNode.getValue();
@@ -722,7 +752,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
 
     }
 
-    public void setBattery(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+    public void setBattery(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
         //queryBatteryCapacity  Type  User_Replaceable  Quick_Charging
         if (compareIgnoreCase(name, CategoryFilterParams.CAPACITY)) {
             String batteryCapacity = ptmStdSkuParamNode.getValue();
@@ -748,7 +778,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
     }
 
-    public void setNetworkConnectivity(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+    public void setNetworkConnectivity(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
         //VoLTE  WiFi  Bluetooth  GPS  NFC
         if (compareIgnoreCase(name, CategoryFilterParams.VoLTE)) {
             ptmStdSkuModel.setVoLTE(ptmStdSkuParamNode.getValue());
@@ -788,7 +818,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
     }
 
-    public void setMultimedia(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+    public void setMultimedia(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
         //FM_Radio  Loudspeaker  Audio_Jack
         if (compareIgnoreCase(name, CategoryFilterParams.FM_Radio)) {
             String value = ptmStdSkuParamNode.getValue();
@@ -812,10 +842,30 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
     }
 
-    public void setSpecialFeatures(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+    public void setSpecialFeatures(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
         //Other_Sensors
         if (compareIgnoreCase(name, CategoryFilterParams.Other_Sensors)) {
             ptmStdSkuModel.setOther_Sensors(ptmStdSkuParamNode.getValue());
         }
+    }
+
+    private String getPriceBelowScope(float price) {
+        String priceDesc;
+        if (price <= 5000) {
+            priceDesc = "Below 5000";
+        } else if (price <= 10000) {
+            priceDesc = "Below 10000";
+        } else if (price <= 15000) {
+            priceDesc = "Below 15000";
+        } else if (price <= 20000) {
+            priceDesc = "Below 20000";
+        } else if (price <= 25000) {
+            priceDesc = "Below 25000";
+        } else if (price <= 30000) {
+            priceDesc = "Below 30000";
+        } else {
+            return null;
+        }
+        return priceDesc;
     }
 }
