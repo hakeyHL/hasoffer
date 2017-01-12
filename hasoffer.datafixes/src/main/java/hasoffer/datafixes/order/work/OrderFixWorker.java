@@ -34,24 +34,30 @@ public class OrderFixWorker {
         logger.info("otherOrderList.size={}", otherOrderList.size());
 
         //3. 判断一共能有多少单
-        int sumList = hasList.size() + otherOrderList.size();
-        if (targetOrderNum > sumList) {
-            targetOrderNum = sumList;
-        }
+        int sumNum = hasList.size() + otherOrderList.size();
         //3. 记录当日已有的订单ID, 轮询当日订单， 并取随机数，直到订单数达到预期数字
         List<OrderStatsAnalysisPO> waitInsertList = new ArrayList<>();
-        Random random = new Random();
-        while (hasIdList.size() <= targetOrderNum) {
+        if (targetOrderNum >= sumNum) {
             for (OrderStatsAnalysisPO po : otherOrderList) {
-                if (random.nextInt(2) == 1 && !hasIdList.contains(po.getOrderId() + "_" + po.getWebSite())) {
-                    hasIdList.add(po.getOrderId() + "_" + po.getWebSite());
-                    waitInsertList.add(po);
-                }
-                if (hasIdList.size() > targetOrderNum) {
-                    break;
+                waitInsertList.add(po);
+            }
+        } else {
+            Random random = new Random();
+            while (hasIdList.size() <= targetOrderNum) {
+                for (OrderStatsAnalysisPO po : otherOrderList) {
+                    if (random.nextInt(3) == 1 && !hasIdList.contains(po.getOrderId() + "_" + po.getWebSite())) {
+                        hasIdList.add(po.getOrderId() + "_" + po.getWebSite());
+                        waitInsertList.add(po);
+                    }
+                    if (hasIdList.size() > targetOrderNum) {
+                        break;
+                    }
                 }
             }
+
         }
+        logger.info("sumNum.size={}", sumNum);
+        logger.info("targetOrderNum.size={}", targetOrderNum);
         logger.info("waitInsertList.size={}", waitInsertList.size());
         //4. 将结果的订单插入到结果中。
         for (OrderStatsAnalysisPO po : waitInsertList) {
