@@ -122,6 +122,7 @@ public class OrderController {
                 orderModel.setAffID(affID);
                 MarketChannel channel = AffliIdHelper.getChannelByAffIdForAmazon(affID);
                 orderModel.setChannel(channel.name());
+                orderModel.setChannelSrc(channel.name());
                 orderModel.setOrderInTime(date);
                 orderModel.setOrderTime(new Date(date.getTime() + TimeUtils.MILLISECONDS_OF_1_MINUTE * 150));
                 orderModel.setWebSite(Website.AMAZON.name());
