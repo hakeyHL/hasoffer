@@ -21,6 +21,8 @@ public interface IOrderStatsAnalysisService {
 
     PageableResult<Map<String, Object>> selectPageableResult(String webSite, String channel, String orderStatus, Date startYmd, Date endYmd, int page, int size);
 
+    List<OrderStatsAnalysisPO> selectOrderList(String orderDate, Integer dataSource, String... channels);
+
     void mergeOldUserOrderToNewUser(String oldUserId, String newUserId);
 
     @Transactional(rollbackFor = Exception.class)

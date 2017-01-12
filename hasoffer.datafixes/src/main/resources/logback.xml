@@ -2,7 +2,7 @@
 
 <configuration>
 
-    <substitutionProperty name="log.base" value="logs/data-fixes-logs"/>
+    <substitutionProperty name="log.base" value="${user.home}/logs/data-fixes-logs"/>
 
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
@@ -50,9 +50,26 @@
         </filter>
     </appender>
 
-    <appender name="FixLoggerFileOut"
+    <appender name="FixSignLoggerFileOut"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/fixSign.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${log.base}/fixSign.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <MaxHistory>10</MaxHistory>
+                <!-- or whenever the file size reaches 100MB -->
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%date [%thread][%-8level%logger{80}] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FixOrderLoggerFileOut"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.base}/fixOrder.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <FileNamePattern>${log.base}/fixSign.%d{yyyy-MM-dd}.%i.log.zip</FileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
@@ -73,8 +90,12 @@
         <appender-ref ref="ErrorLoggerFileOut"/>
     </logger>
 
-    <logger name="hasoffer.datafixes.signup.work.SignupFixWorker" level="DEBUG">
-        <appender-ref ref="FixLoggerFileOut"/>
+    <logger name="hasoffer.dataFixes.SignupFixWorker" level="DEBUG">
+        <appender-ref ref="FixSignLoggerFileOut"/>
+    </logger>
+
+    <logger name="hasoffer.dataFixes.OrderFixWorker" level="DEBUG">
+        <appender-ref ref="FixOrderLoggerFileOut"/>
     </logger>
 
     <root>
