@@ -620,11 +620,4 @@ public class AppServiceImpl implements IAppService {
         dbm.update(appDeal);
     }
 
-    //public static void main(String[] args) {
-    //    for (int i = 0; i < 1000; i++) {
-    //        MarketChannel marketChannel = MarketChannel.values()[new Random().nextInt(MarketChannel.values().length)];
-    //        getSnapDealIndexUrl(marketChannel, "414c84d6566c035f3845af4438b7448d");
-    //    }
-    //}
-
 }
