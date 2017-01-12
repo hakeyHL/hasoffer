@@ -47,11 +47,11 @@ public class OrderFixWorker {
                 for (OrderStatsAnalysisPO po : otherOrderList) {
                     int i = random.nextInt(3);
                     boolean contains = hasIdList.contains(po.getOrderId() + "_" + po.getWebSite());
-                    logger.info("hasIdList.size():{}, i:{},  isCon:{}", hasIdList.size(), i, contains);
                     if (i == 1 && !contains) {
                         hasIdList.add(po.getOrderId() + "_" + po.getWebSite());
                         waitInsertList.add(po);
                     }
+                    logger.info("hasIdList.size():{}, i:{},  isCon:{}", hasIdList.size(), i, contains);
                     if (hasIdList.size() > targetOrderNum) {
                         break;
                     }
