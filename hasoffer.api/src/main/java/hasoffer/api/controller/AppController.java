@@ -983,7 +983,7 @@ public class AppController {
 
                         //查询获得Similar Deals
                         //生效的 3个 生成时间降序
-                        List<AppDeal> similarDeals = appService.getSimilarDeals();
+                        List<AppDeal> similarDeals = appService.getSimilarDeals(3);
                         for (AppDeal appDeal1 : similarDeals) {
                             DealVo dealvo = new DealVo();
                             setDeal(appDeal1, dealvo);
