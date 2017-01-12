@@ -139,7 +139,7 @@ public class MobileServiceImpl implements MobileService {
         while (desMap.size() != size) {
             int nextCollectionIndex = getNextCollectionIndex(keywordCollections, categoryName, keyword);
             keywordCollection = keywordCollections.get(nextCollectionIndex);
-            categoryName = keywordCollection.getSourceSiteCategoryName();=
+            categoryName = keywordCollection.getSourceSiteCategoryName();
             keyword = keywordCollection.getKeyword();
             List<CmpProductListVo> cmpProductListVoList = searchFromSolrByKeyWordVo(new KeyWordsVo(keywordCollection), 0, 20);
             desMap.put(keywordCollection.getKeyword(), cmpProductListVoList);
