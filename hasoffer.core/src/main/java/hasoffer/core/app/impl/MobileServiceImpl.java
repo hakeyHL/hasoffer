@@ -154,7 +154,7 @@ public class MobileServiceImpl implements MobileService {
                 if (keyword.equals(keywordCollection.getKeyword())) {
                     //找到这个
                     index = keywordCollections.indexOf(keywordCollection) + 1;
-                    if (index >= keywordCollections.size()) {
+                    if (index > keywordCollections.size()) {
                         index = 0;
                     }
                 }
