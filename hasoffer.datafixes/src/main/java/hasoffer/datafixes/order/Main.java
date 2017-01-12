@@ -16,7 +16,7 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
                 "classpath:/spring-beans.xml",
-                "classpath:/spring/spring-init.xml");
+                "classpath:/spring/spring-order.xml");
         context.start();
         //logger.info("args:{}", args);
         if (args.length != 3) {
