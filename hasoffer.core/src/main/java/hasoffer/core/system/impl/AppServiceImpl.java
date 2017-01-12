@@ -98,8 +98,8 @@ public class AppServiceImpl implements IAppService {
                     " order by t.weight desc,t.createTime desc  ";
 
     private static final String Q_APP_DEAL_GET_SIMILAR =
-            "SELECT t FROM AppDeal t where  t.display='1' and    " +
-                    "t.expireTime >= ?0   and t.listPageImage is not null " +
+            "SELECT t FROM AppDeal t where  t.display='1' and  t.createTime>=?0 and " +
+                    "t.expireTime >= ?1   and t.listPageImage is not null " +
                     " order by t.dealClickCount,t.createTime desc  ";
 
 
@@ -582,8 +582,36 @@ public class AppServiceImpl implements IAppService {
     }
 
     @Override
-    public List<AppDeal> getSimilarDeals() {
-        return dbm.query(Q_APP_DEAL_GET_SIMILAR, 1, 3, Arrays.asList(new Date()));
+    public List<AppDeal> getSimilarDeals(int initSize) {
+        if (initSize < 1) {
+            initSize = 3;
+        }
+        List<AppDeal> similarDealList = new ArrayList<>();
+        //从当天和昨天未过期的deal随机
+        //1. 获取昨天00:00:00 到现在的未过期的deal列表
+        //2. 从其size中随机三个值然后取出返回
+
+        List<AppDeal> deals = dbm.query(Q_APP_DEAL_GET_SIMILAR, Arrays.asList(new Date(TimeUtils.yesterday(0, 0, 0)), new Date()));
+
+        if (deals == null) {
+            return similarDealList;
+        }
+        int size = deals.size();
+        if (size > 0) {
+            List<Integer> dealIndexArray = new ArrayList<>();
+            for (int i = 0; i < initSize; i++) {
+                int tempRandom = new Random().nextInt(size);
+                if (similarDealList.size() == initSize) {
+                    break;
+                }
+                if (!dealIndexArray.contains(tempRandom) && dealIndexArray.size() < initSize) {
+                    dealIndexArray.add(tempRandom);
+                    similarDealList.add(deals.get(tempRandom));
+                }
+            }
+        }
+        return similarDealList;
+
     }
 
     @Override
