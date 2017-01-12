@@ -38,6 +38,6 @@ if [ -n "$BITS" ]; then
 else
     JAVA_MEM_OPTS=" -server -Xms256m -Xmx128m -XX:SurvivorRatio=2 -XX:+UseParallelGC "
 fi
-echo -e "Starting the $SERVER_NAME ...\c"
-java $JAVA_OPTS $JAVA_MEM_OPTS $JAVA_DEBUG_OPTS $JAVA_JMX_OPTS -classpath $CONF_DIR:$LIB_JARS hasoffer.datafixes.order.Main $2 $3 $4
+echo -e "Starting the $SERVER_NAME ..."
+java $JAVA_OPTS $JAVA_MEM_OPTS $JAVA_DEBUG_OPTS $JAVA_JMX_OPTS -classpath $CONF_DIR:$LIB_JARS hasoffer.datafixes.order.Main $1 $2 $3
 echo "Finish and Success."
