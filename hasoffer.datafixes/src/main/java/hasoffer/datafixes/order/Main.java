@@ -11,7 +11,7 @@ import java.text.ParseException;
 import java.util.Date;
 
 public class Main {
-    private static final Logger logger = LoggerFactory.getLogger("hasoffer.orderfix");
+    private static final Logger logger = LoggerFactory.getLogger("hasoffer.dataFixes.OrderFixWorker");
 
     public static void main(String[] args) throws InterruptedException {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(

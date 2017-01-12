@@ -15,7 +15,7 @@ import java.util.Random;
 
 public class OrderFixWorker {
 
-    private static final Logger logger = LoggerFactory.getLogger(OrderFixWorker.class);
+    private static final Logger logger = LoggerFactory.getLogger("hasoffer.dataFixes.OrderFixWorker");
 
     @Resource
     IOrderStatsAnalysisService orderStatsAnalysisService;
@@ -24,13 +24,14 @@ public class OrderFixWorker {
 
         //1. 记录该渠道已有的订单数目
         List<OrderStatsAnalysisPO> hasList = orderStatsAnalysisService.selectOrderList(DateFormatUtils.format(orderDate, "yyyy-MM-dd"), null, marketChannel.name());
+        logger.info("hasList.size={}", hasList.size());
         List<String> hasIdList = new ArrayList<>();
         for (OrderStatsAnalysisPO po : hasList) {
             hasIdList.add(po.getOrderId() + "_" + po.getWebSite());
         }
         //2. 查询当日订单数，优先从google，none，shanChuan的渠道中查询，并按照订单时间排列;
         List<OrderStatsAnalysisPO> otherOrderList = orderStatsAnalysisService.selectOrderList(DateFormatUtils.format(orderDate, "yyyy-MM-dd"), 0, marketChannel.GOOGLEPLAY.name(), MarketChannel.NONE.name(), marketChannel.SHANCHUAN.name());
-        logger.info("order.size={}", otherOrderList.size());
+        logger.info("otherOrderList.size={}", otherOrderList.size());
 
         //3. 判断一共能有多少单
         int sumList = hasList.size() + otherOrderList.size();
@@ -51,7 +52,7 @@ public class OrderFixWorker {
                 }
             }
         }
-
+        logger.info("waitInsertList.size={}", waitInsertList.size());
         //4. 将结果的订单插入到结果中。
         for (OrderStatsAnalysisPO po : waitInsertList) {
             po.setDataSource(2);

@@ -12,7 +12,7 @@ import javax.annotation.Resource;
 import java.util.*;
 
 public class SignupFixWorker {
-    private static final Logger logger = LoggerFactory.getLogger(SignupFixWorker.class);
+    private static final Logger logger = LoggerFactory.getLogger("hasoffer.dataFixes.SignupFixWorker");
 
     @Resource
     private MongoDbManager mongoDbManager;
