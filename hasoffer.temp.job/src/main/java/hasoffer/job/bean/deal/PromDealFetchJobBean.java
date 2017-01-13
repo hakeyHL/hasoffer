@@ -40,7 +40,7 @@ public class PromDealFetchJobBean extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-
+        logger.info("PromDealFetchJobBean.executeInternal(): fetch prom deal start.");
         try {
 
             TagNode root = HtmlUtils.getUrlRootTagNode("https://www.promodescuentos.com/nuevas");
@@ -216,8 +216,8 @@ public class PromDealFetchJobBean extends QuartzJobBean {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("fetch prom deal error.", e);
         }
-
+        logger.info("PromDealFetchJobBean.executeInternal(): fetch prom deal end.");
     }
 }
