@@ -29,7 +29,8 @@ public class PtmStdSku implements Identifiable<Long> {
     private String sourceId; // sourceId
     private String sourceUrl; // source url
 
-    private PtmStdSku() {
+
+    public PtmStdSku() {
         this.createTime = TimeUtils.nowDate();
         this.stdProId = 0;
     }
