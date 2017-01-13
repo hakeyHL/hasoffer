@@ -67,7 +67,7 @@ public class PromDealFetchJobBean extends QuartzJobBean {
                     String minStr = subStr[1];
                     if (NumberUtils.isNumber(minStr)) {
                         int minNum = Integer.parseInt(minStr);
-                        if (minNum > 10) {
+                        if (minNum > 30) {
                             continue;
                         }
                     } else {
