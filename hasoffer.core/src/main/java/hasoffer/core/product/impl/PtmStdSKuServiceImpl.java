@@ -130,6 +130,12 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
 
     public PtmStdSkuModel getPtmStdSKuModel(PtmStdSku ptmStdSku1) {
         PtmStdSkuModel ptmStdSkuModel = new PtmStdSkuModel(ptmStdSku1);
+
+        //设置关键词title关键词
+        StringBuilder hakeySb = new StringBuilder();
+        hakeySb.append(ptmStdSkuModel.getTitle());
+
+
         //  递归获取类目树类目
         List<PtmCategory> routerCategoryList = categoryCacheManager.getRouterCategoryList(ptmStdSku1.getCategoryId());
         setCategoryList(ptmStdSkuModel, routerCategoryList);
@@ -162,19 +168,23 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
         //按价格排序
         ApiUtils.getSortedStdPriceListByClicCountAsc(priceList);
-        PtmStdSkuDetail ptmStdSkuDetail = mongoDbManager.queryOne(PtmStdSkuDetail.class, ptmStdSku1.getId());
-        if (ptmStdSkuDetail != null) {
-            List<PtmStdSkuParamGroup> paramGroups = ptmStdSkuDetail.getParamGroups();
-            setStdModel(paramGroups, ptmStdSkuModel);
-        }
         float minPrice = priceList.get(0).getPrice();
         float maxPrice = priceList.get(priceList.size() - 1).getPrice();
         int ratingNumber = ApiUtils.returnNumberBetween0And5(BigDecimal.valueOf(tempRatingNumber).divide(BigDecimal.valueOf(totalCommentNumber == 0 ? 1 : totalCommentNumber), 0, BigDecimal.ROUND_HALF_UP).longValue());
         ptmStdSkuModel.setRating(ratingNumber);
         ptmStdSkuModel.setReview(totalCommentNumber);
 //        SrmProductSearchCount searchCount = searchService.findSearchCountByProductId(ptmStdSku1.getId());
+
+
         ptmStdSkuModel.setMinPrice(minPrice);
         ptmStdSkuModel.setMaxPrice(maxPrice);
+
+
+        PtmStdSkuDetail ptmStdSkuDetail = mongoDbManager.queryOne(PtmStdSkuDetail.class, ptmStdSku1.getId());
+        if (ptmStdSkuDetail != null) {
+            List<PtmStdSkuParamGroup> paramGroups = ptmStdSkuDetail.getParamGroups();
+            setStdModel(paramGroups, ptmStdSkuModel, hakeySb);
+        }
 //        ptmStdSkuModel.setSearchCount(searchCount == null ? 0 : searchCount.getCount());
         ptmStdSkuModel.setStoreCount(websiteSet.size());
         return ptmStdSkuModel;
@@ -205,7 +215,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         return name.equals(paramString);
     }
 
-    private void setStdModel(List<PtmStdSkuParamGroup> ptmStdSkuParamGroups, PtmStdSkuModel ptmStdSkuModel) {
+    private void setStdModel(List<PtmStdSkuParamGroup> ptmStdSkuParamGroups, PtmStdSkuModel ptmStdSkuModel, StringBuilder hakeySb) {
 //        try {
         for (PtmStdSkuParamGroup ptmStdSkuParamGroup : ptmStdSkuParamGroups) {
             String groupName = ptmStdSkuParamGroup.getName();
@@ -215,7 +225,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
                 //General---> launch Date,brand,model,操作系统
                 switch (groupName) {
                     case "General":
-                        setGeneral(ptmStdSkuModel, ptmStdSkuParamNode, name);
+                        setGeneral(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
                         break;
                     case "Design":
                         setDesign(ptmStdSkuModel, ptmStdSkuParamNode, name);
@@ -460,10 +470,30 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
      * @param ptmStdSkuParamNode
      * @param name
      */
-    public void setGeneral(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
+    public void setGeneral(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH);
         if (compareIgnoreCase(name, CategoryFilterParams.Brand)) {
             ptmStdSkuModel.setBrand(ptmStdSkuParamNode.getValue());
+            //设置关键词的价格范围
+            String priceBelowScope = getPriceBelowScope(ptmStdSkuModel.getMinPrice());
+            if (priceBelowScope != null) {
+                if (hakeySb.length() > 0) {
+                    hakeySb.append(ConstantUtil.SOLR_DEFAULT_MULTIVALUEDVALUE_FIELD_SPLIT);
+                }
+                hakeySb.append("Top 10 Mobiles ").append(priceBelowScope);
+
+                if (hakeySb.length() > 0) {
+                    hakeySb.append(ConstantUtil.SOLR_DEFAULT_MULTIVALUEDVALUE_FIELD_SPLIT);
+                }
+
+                hakeySb.append("Top 10 ").append(ptmStdSkuParamNode.getValue()).append(" Mobiles ").append(priceBelowScope);
+            }
+
+            if (hakeySb.length() > 0) {
+                hakeySb.append(ConstantUtil.SOLR_DEFAULT_MULTIVALUEDVALUE_FIELD_SPLIT);
+            }
+            hakeySb.append(ptmStdSkuParamNode.getValue());
+            ptmStdSkuModel.setHakey(hakeySb.toString());
             return;
         }
         if (compareIgnoreCase(name, CategoryFilterParams.Model)) {
@@ -817,5 +847,27 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         if (compareIgnoreCase(name, CategoryFilterParams.Other_Sensors)) {
             ptmStdSkuModel.setOther_Sensors(ptmStdSkuParamNode.getValue());
         }
+    }
+
+    private String getPriceBelowScope(float price) {
+        String priceDesc;
+        if (price <= 30000) {
+            priceDesc = "Below 30000";
+        }
+//        } else if (price <= 10000) {
+//            priceDesc = "Below 10000";
+//        } else if (price <= 15000) {
+//            priceDesc = "Below 15000";
+//        } else if (price <= 20000) {
+//            priceDesc = "Below 20000";
+//        } else if (price <= 25000) {
+//            priceDesc = "Below 25000";
+//        } else if (price <= 30000) {
+//            priceDesc = "Below 30000";
+//        } else {
+        else {
+            return null;
+        }
+        return priceDesc;
     }
 }

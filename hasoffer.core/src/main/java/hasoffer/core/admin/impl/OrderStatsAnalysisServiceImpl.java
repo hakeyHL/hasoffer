@@ -141,8 +141,30 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
             param.add(orderStatus);
         }
         String execSql = sql.append(Q_BASE).append(whereSql).append(groupSql).append(" ORDER BY orderTime desc ").toString();
-        System.out.println(execSql + ":" + param.toArray());
         return dbm.findPageOfMapBySql(execSql, page, size, param.toArray());
+    }
+
+    @Override
+    public List<OrderStatsAnalysisPO> selectOrderList(String orderDate, Integer dataSource, String... channels) {
+        int paramIndex = 0;
+        List<Object> paramList = new ArrayList<>();
+        String jpaSql = "SELECT t FROM OrderStatsAnalysisPO t WHERE 1=1 and date_format(t.orderTime,'%Y-%m-%d') = ?" + paramIndex++;
+        paramList.add(orderDate);
+        if (dataSource != null) {
+            jpaSql = jpaSql + " and t.dataSource= ?" + paramIndex++;
+            paramList.add(dataSource);
+        }
+        if (channels != null && channels.length > 0) {
+            jpaSql = jpaSql + " and channel in ( 'x'";
+            for (String channel : channels) {
+                jpaSql = jpaSql + ", ?" + paramIndex++;
+                paramList.add(channel);
+            }
+            jpaSql = jpaSql + ")";
+        }
+        jpaSql = jpaSql + " order by orderTime ";
+        List<OrderStatsAnalysisPO> orderList = dbm.query(jpaSql, paramList);
+        return orderList;
     }
 
     @Override

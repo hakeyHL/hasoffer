@@ -106,6 +106,22 @@ public class MobileServiceImpl implements MobileService {
             return similarKeyAndPros;
         }
         List<KeywordCollection> keywordCollections = dbm.query(API_KEYWORDCOLLECTION_GET_SIMILAR_CATEGORYKEYS, Arrays.asList(keyWordsVo.getCategoryName()));
+        if (keywordCollections == null || keywordCollections.size() < 1) {
+            return similarKeyAndPros;
+        }
+        //排序
+        Collections.sort(keywordCollections, new Comparator<KeywordCollection>() {
+            @Override
+            public int compare(KeywordCollection o1, KeywordCollection o2) {
+                if (o1.getKeyword().compareToIgnoreCase(o2.getKeyword()) < 0) {
+                    return -1;
+                }
+                if (o1.getKeyword().compareToIgnoreCase(o2.getKeyword()) > 0) {
+                    return 1;
+                }
+                return 0;
+            }
+        });
         setSimilarCategory(similarKeyAndPros, keywordCollections, size, keyWordsVo.getCategoryName(), keyWordsVo.getName());
         return similarKeyAndPros;
     }
@@ -119,16 +135,31 @@ public class MobileServiceImpl implements MobileService {
      * @param categoryName
      */
     private void setSimilarCategory(Map desMap, List<KeywordCollection> keywordCollections, int size, String categoryName, String keyword) {
+        KeywordCollection keywordCollection;
+        while (desMap.size() != size) {
+            int nextCollectionIndex = getNextCollectionIndex(keywordCollections, categoryName, keyword);
+            keywordCollection = keywordCollections.get(nextCollectionIndex);
+            categoryName = keywordCollection.getSourceSiteCategoryName();
+            keyword = keywordCollection.getKeyword();
+            List<CmpProductListVo> cmpProductListVoList = searchFromSolrByKeyWordVo(new KeyWordsVo(keywordCollection), 0, 20);
+            desMap.put(keywordCollection.getKeyword(), cmpProductListVoList);
+        }
+    }
+
+    private int getNextCollectionIndex(List<KeywordCollection> keywordCollections, String categoryName, String keyword) {
+        //1. 获得开始填入的位置+1
+        int index = 0;
         for (KeywordCollection keywordCollection : keywordCollections) {
-            if (keywordCollection.getSourceSiteCategoryName().equals(categoryName) && desMap.size() < size) {
-                if (!keyword.equals(keywordCollection.getKeyword())) {
-                    List<CmpProductListVo> cmpProductListVoList = searchFromSolrByKeyWordVo(new KeyWordsVo(keywordCollection), 0, 20);
-                    desMap.put(keywordCollection.getKeyword(), cmpProductListVoList);
+            if (keywordCollection.getSourceSiteCategoryName().equals(categoryName)) {
+                if (keyword.equals(keywordCollection.getKeyword())) {
+                    //找到这个
+                    index = keywordCollections.indexOf(keywordCollection) + 1;
+                    if (index >= keywordCollections.size()) {
+                        index = 0;
+                    }
                 }
             }
         }
-        if (desMap.size() != size) {
-            setSimilarCategory(desMap, keywordCollections, size, categoryName, keyword);
-        }
+        return index;
     }
 }
