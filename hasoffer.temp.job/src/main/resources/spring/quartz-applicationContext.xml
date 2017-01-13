@@ -42,20 +42,6 @@
         <property name="cronExpression" value="0 0 0/1 * * ? "/>
     </bean>
 
-    <!--&lt;!&ndash; fetch job &ndash;&gt;-->
-    <!--<bean name="fetchJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
-    <!--<property name="jobClass" value="hasoffer.job.bean.fetch.FetchJobBean"/>-->
-    <!--&lt;!&ndash;<property name="beanName" value="fetchJobBean"/>&ndash;&gt;-->
-    <!--</bean>-->
-
-    <!--<bean id="fetchTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">-->
-    <!--<property name="jobDetail" ref="fetchJob"/>-->
-    <!--<property name="startDelay" value="1000"/>-->
-    <!--<property name="repeatInterval" value="2000"/>-->
-    <!--<property name="repeatCount" value="0"/>-->
-    <!--</bean>-->
-
-
     <!--prom。。。deal站数据抓取-->
     <bean name="promDealFetchJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
         <property name="jobClass" value="hasoffer.job.bean.deal.PromDealFetchJobBean"/>
