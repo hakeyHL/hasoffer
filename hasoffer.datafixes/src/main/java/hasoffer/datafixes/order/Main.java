@@ -1,5 +1,6 @@
 package hasoffer.datafixes.order;
 
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.datafixes.order.work.OrderFixWorker;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
@@ -10,38 +11,46 @@ import java.text.ParseException;
 import java.util.Date;
 
 public class Main {
-    private static final Logger logger = LoggerFactory.getLogger("hasoffer.orderfix");
+    private static final Logger logger = LoggerFactory.getLogger("hasoffer.dataFixes.OrderFixWorker");
 
     public static void main(String[] args) throws InterruptedException {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
                 "classpath:/spring-beans.xml",
-                "classpath:/spring/spring-init.xml");
+                "classpath:/spring/spring-order.xml");
         context.start();
         //logger.info("args:{}", args);
-        //if (args.length != 2) {
-        //    logger.error("Args is error. please input start time and end time, 'yyyy-mm-dd'");
-        //    return;
-        //}
-        String arg0 = "2016-08-01";
-        String arg1 = "2016-09-30";
-
-        Date startDate;
-        Date endDate;
-        try {
-            startDate = DateUtils.parseDate(arg0, "yyyy-MM-dd");
-        } catch (ParseException e) {
-            logger.error("Parse date is error. the startDate:{}", arg0, e);
+        if (args.length != 3) {
+            logger.error("Args is error. please input channelStr, orderDateStr, orderNumStr");
             return;
         }
+        String channelStr = args[0];
+        String orderDateStr = args[1];
+        String orderNumStr = args[2];
+
+
+        MarketChannel marketChannel = MarketChannel.valueOfString(channelStr);
+        if (MarketChannel.NONE.equals(marketChannel)) {
+            logger.error("Parse channel is error. the channelStr:{}", channelStr);
+            return;
+        }
+
+        Date orderDate;
         try {
-            endDate = DateUtils.parseDate(arg1, "yyyy-MM-dd");
+            orderDate = DateUtils.parseDate(orderDateStr, "yyyy-MM-dd");
         } catch (ParseException e) {
-            logger.error("Parse date is error. the endDate:{}", arg1, e);
+            logger.error("Parse orderDateStr is error. the orderDateStr:{}", orderDateStr, e);
+            return;
+        }
+        Integer orderNum;
+        try {
+            orderNum = Integer.valueOf(orderNumStr);
+        } catch (Exception e) {
+            logger.error("Parse orderNumStr is error. the orderNumStr:{}", orderNumStr, e);
             return;
         }
         logger.info("Job start.");
         OrderFixWorker bean = context.getBean(OrderFixWorker.class);
-        bean.runTask(startDate, endDate);
+        bean.runTask(marketChannel, orderDate, orderNum);
         logger.info("Job finish.");
     }
 }
