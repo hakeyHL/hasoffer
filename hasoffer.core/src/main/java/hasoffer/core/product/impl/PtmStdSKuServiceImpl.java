@@ -228,34 +228,34 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
                         setGeneral(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
                         break;
                     case "Design":
-                        setDesign(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
+                        setDesign(ptmStdSkuModel, ptmStdSkuParamNode, name);
                         break;
                     case "Display":
-                        setDisplays(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
+                        setDisplays(ptmStdSkuModel, ptmStdSkuParamNode, name);
                         break;
                     case "Performance":
-                        setPerformance(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
+                        setPerformance(ptmStdSkuModel, ptmStdSkuParamNode, name);
                         break;
                     case "Storage":
-                        setStorage(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
+                        setStorage(ptmStdSkuModel, ptmStdSkuParamNode, name);
                         break;
                     case "Main Camera":
-                        setMainCamera(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
+                        setMainCamera(ptmStdSkuModel, ptmStdSkuParamNode, name);
                         break;
                     case "Front Camera":
-                        setFontCamera(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
+                        setFontCamera(ptmStdSkuModel, ptmStdSkuParamNode, name);
                         break;
                     case "Battery":
-                        setBattery(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
+                        setBattery(ptmStdSkuModel, ptmStdSkuParamNode, name);
                         break;
                     case "Network & Connectivity":
-                        setNetworkConnectivity(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
+                        setNetworkConnectivity(ptmStdSkuModel, ptmStdSkuParamNode, name);
                         break;
                     case "Multimedia":
-                        setMultimedia(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
+                        setMultimedia(ptmStdSkuModel, ptmStdSkuParamNode, name);
                         break;
                     case "Special Features":
-                        setSpecialFeatures(ptmStdSkuModel, ptmStdSkuParamNode, name, hakeySb);
+                        setSpecialFeatures(ptmStdSkuModel, ptmStdSkuParamNode, name);
                         break;
                     default:
                 }
@@ -549,7 +549,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
     }
 
-    public void setDesign(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
+    public void setDesign(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
         //Weight
         if (compareIgnoreCase(name, CategoryFilterParams.Weight)) {
             int numberFromString = ApiUtils.getNumberFromString(ptmStdSkuParamNode.getValue());
@@ -557,7 +557,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
     }
 
-    public void setDisplays(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
+    public void setDisplays(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
         //Screen_Resolution  Screen_Size queryScreenSize  Pixel_Density  Touch_Screen  Screen_to_Body_Ratio
         if (compareIgnoreCase(name, CategoryFilterParams.Screen_Size)) {
             String screenSize = ptmStdSkuParamNode.getValue();
@@ -607,7 +607,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
     }
 
-    public void setPerformance(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
+    public void setPerformance(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
         //Processor  Graphics  queryRam RAM
         if (compareIgnoreCase(name, CategoryFilterParams.RAM)) {
             String ram = ptmStdSkuParamNode.getValue();
@@ -644,7 +644,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
     }
 
-    public void setStorage(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
+    public void setStorage(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
         //queryInternalMemory  InternalMemory  Expandable_Memory
         if (compareIgnoreCase(name, CategoryFilterParams.Internal_Memory)) {
             String internalMemory = ptmStdSkuParamNode.getValue();
@@ -681,7 +681,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
     }
 
-    public void setMainCamera(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
+    public void setMainCamera(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
         //Sensor queryPrimaryCamera  Autofocus Aperture  Flash Image_Resolution  Camera_Features  Video_Recording
         if (compareIgnoreCase(name, CategoryFilterParams.RESOLUTION)) {
 
@@ -723,7 +723,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
     }
 
-    public void setFontCamera(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
+    public void setFontCamera(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
         //querySecondaryCamera secondaryAutofocus SecondaryFlash
         if (compareIgnoreCase(name, CategoryFilterParams.RESOLUTION)) {
             String resolution = ptmStdSkuParamNode.getValue();
@@ -752,7 +752,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
 
     }
 
-    public void setBattery(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
+    public void setBattery(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
         //queryBatteryCapacity  Type  User_Replaceable  Quick_Charging
         if (compareIgnoreCase(name, CategoryFilterParams.CAPACITY)) {
             String batteryCapacity = ptmStdSkuParamNode.getValue();
@@ -778,7 +778,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
     }
 
-    public void setNetworkConnectivity(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
+    public void setNetworkConnectivity(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
         //VoLTE  WiFi  Bluetooth  GPS  NFC
         if (compareIgnoreCase(name, CategoryFilterParams.VoLTE)) {
             ptmStdSkuModel.setVoLTE(ptmStdSkuParamNode.getValue());
@@ -818,7 +818,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
     }
 
-    public void setMultimedia(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
+    public void setMultimedia(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
         //FM_Radio  Loudspeaker  Audio_Jack
         if (compareIgnoreCase(name, CategoryFilterParams.FM_Radio)) {
             String value = ptmStdSkuParamNode.getValue();
@@ -842,7 +842,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
     }
 
-    public void setSpecialFeatures(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
+    public void setSpecialFeatures(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name) {
         //Other_Sensors
         if (compareIgnoreCase(name, CategoryFilterParams.Other_Sensors)) {
             ptmStdSkuModel.setOther_Sensors(ptmStdSkuParamNode.getValue());
@@ -851,19 +851,21 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
 
     private String getPriceBelowScope(float price) {
         String priceDesc;
-        if (price <= 5000) {
-            priceDesc = "Below 5000";
-        } else if (price <= 10000) {
-            priceDesc = "Below 10000";
-        } else if (price <= 15000) {
-            priceDesc = "Below 15000";
-        } else if (price <= 20000) {
-            priceDesc = "Below 20000";
-        } else if (price <= 25000) {
-            priceDesc = "Below 25000";
-        } else if (price <= 30000) {
+        if (price <= 30000) {
             priceDesc = "Below 30000";
-        } else {
+        }
+//        } else if (price <= 10000) {
+//            priceDesc = "Below 10000";
+//        } else if (price <= 15000) {
+//            priceDesc = "Below 15000";
+//        } else if (price <= 20000) {
+//            priceDesc = "Below 20000";
+//        } else if (price <= 25000) {
+//            priceDesc = "Below 25000";
+//        } else if (price <= 30000) {
+//            priceDesc = "Below 30000";
+//        } else {
+        else {
             return null;
         }
         return priceDesc;
