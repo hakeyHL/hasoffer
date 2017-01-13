@@ -40,7 +40,7 @@ public class PromDealFetchJobBean extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-
+        logger.info("PromDealFetchJobBean.executeInternal(): fetch prom deal start.");
         try {
 
             TagNode root = HtmlUtils.getUrlRootTagNode("https://www.promodescuentos.com/nuevas");
@@ -67,7 +67,7 @@ public class PromDealFetchJobBean extends QuartzJobBean {
                     String minStr = subStr[1];
                     if (NumberUtils.isNumber(minStr)) {
                         int minNum = Integer.parseInt(minStr);
-                        if (minNum > 10) {
+                        if (minNum > 30) {
                             continue;
                         }
                     } else {
@@ -210,14 +210,14 @@ public class PromDealFetchJobBean extends QuartzJobBean {
                 mexicoAppDeal.setLinkUrl(url);
                 mexicoAppDeal.setDescription(descriptionWithOutHtml);
                 mexicoAppDeal.setCreateTime(TimeUtils.nowDate());
-                mexicoAppDeal.setCreateTime(TimeUtils.add(TimeUtils.nowDate(), TimeUtils.MILLISECONDS_OF_1_DAY * 2));
+                mexicoAppDeal.setExpireTime(TimeUtils.add(TimeUtils.nowDate(), TimeUtils.MILLISECONDS_OF_1_DAY * 2));
                 logger.info("insert into appDeal:{}", mexicoAppDeal.toString());
                 dealService.createAppDealByPriceOff(mexicoAppDeal);
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("fetch prom deal error.", e);
         }
-
+        logger.info("PromDealFetchJobBean.executeInternal(): fetch prom deal end.");
     }
 }
