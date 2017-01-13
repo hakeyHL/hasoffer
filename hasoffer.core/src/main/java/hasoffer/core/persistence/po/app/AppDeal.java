@@ -54,7 +54,8 @@ public class AppDeal implements Identifiable<Long> {
 
     @Column(columnDefinition = "text")
     private String infoPageImage;//deal详情页图片
-    @Column(columnDefinition = "default 0")
+
+    @Column(columnDefinition = "bigint default 0")
     private Long dealClickCount = 0l;//deal的点击次数
     private Long originClickCount;//只针对appdealsource=deal_site的数据，保留抓取时deal的点击次数
 
