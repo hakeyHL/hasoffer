@@ -48,6 +48,6 @@
     </bean>
     <bean id="promDealFetchJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="promDealFetchJob"/>
-        <property name="cronExpression" value="0 0/10 * * * ?"/>
+        <property name="cronExpression" value="0 0/30 * * * ?"/>
     </bean>
 </beans>
