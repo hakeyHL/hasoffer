@@ -1,13 +1,14 @@
 package hasoffer.job.bean.deal;
 
 import hasoffer.base.model.HttpResponseModel;
+import hasoffer.base.model.Website;
 import hasoffer.base.utils.HtmlUtils;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.base.utils.http.XPathUtils;
-import hasoffer.core.persistence.po.mexico.MexicoAppDeal;
-import hasoffer.core.product.IMexicoAppdealService;
+import hasoffer.core.admin.IDealService;
+import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.spider.util.HtmlHelper;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -35,7 +36,7 @@ public class PromDealFetchJobBean extends QuartzJobBean {
     private static final Logger logger = LoggerFactory.getLogger(PromDealFetchJobBean.class);
 
     @Resource
-    IMexicoAppdealService mexicoAppdealService;
+    IDealService dealService;
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
@@ -53,27 +54,27 @@ public class PromDealFetchJobBean extends QuartzJobBean {
                 String timeFlagString = timeFlagNode.getText().toString();
 
                 //带有小时的过滤   ex:2h,30m
-//                if (timeFlagString.contains("h,")) {
-//                    break;
-//                }
+                if (timeFlagString.contains("h,")) {
+                    break;
+                }
 
                 //取10分钟以内的
-//                String[] subStr = timeFlagString.split(" ");
-//                if (subStr.length < 3) {
-//                    logger.error("timeFlagString parse error");
-//                    continue;
-//                } else {
-//                    String minStr = subStr[1];
-//                    if (NumberUtils.isNumber(minStr)) {
-//                        int minNum = Integer.parseInt(minStr);
-//                        if (minNum > 10) {
-//                            continue;
-//                        }
-//                    } else {
-//                        logger.error("timeFlagString parse error");
-//                        continue;
-//                    }
-//                }
+                String[] subStr = timeFlagString.split(" ");
+                if (subStr.length < 3) {
+                    logger.error("timeFlagString parse error");
+                    continue;
+                } else {
+                    String minStr = subStr[1];
+                    if (NumberUtils.isNumber(minStr)) {
+                        int minNum = Integer.parseInt(minStr);
+                        if (minNum > 10) {
+                            continue;
+                        }
+                    } else {
+                        logger.error("timeFlagString parse error");
+                        continue;
+                    }
+                }
 
                 //失效样式
                 TagNode expireFlagNode = XPathUtils.getSubNodeByXPath(dealNode, "//span[@title='EXPIRADO']", null);
@@ -160,9 +161,9 @@ public class PromDealFetchJobBean extends QuartzJobBean {
 
                     redirectUrl = URLDecoder.decode(redirectUrl);
 
-                    String[] subStr = redirectUrl.split("/&ppref");
+                    String[] subStr3 = redirectUrl.split("/&ppref");
 
-                    url = subStr[0];
+                    url = subStr3[0];
                 }
 
                 //描述
@@ -191,12 +192,19 @@ public class PromDealFetchJobBean extends QuartzJobBean {
                 String dealBigPath = ImageUtil.uploadImage(imageFile, 316, 180);
                 String dealSmallPath = ImageUtil.uploadImage(imageFile, 180, 180);
 
-                MexicoAppDeal mexicoAppDeal = new MexicoAppDeal();
+                Website website = null;
+                try {
+                    website = Website.valueOf(websiteString.toUpperCase());
+                } catch (Exception e) {
+                    website = Website.UNKNOWN;
+                }
+
+                AppDeal mexicoAppDeal = new AppDeal();
 
                 mexicoAppDeal.setListPageImage(dealSmallPath);
                 mexicoAppDeal.setInfoPageImage(dealBigPath);
                 mexicoAppDeal.setCategory(categoryName);
-                mexicoAppDeal.setWebsite(websiteString);
+                mexicoAppDeal.setWebsite(website);
                 mexicoAppDeal.setTitle(title);
                 mexicoAppDeal.setImageUrl(dealPath);
                 mexicoAppDeal.setPresentPrice(price);
@@ -205,7 +213,7 @@ public class PromDealFetchJobBean extends QuartzJobBean {
                 mexicoAppDeal.setCreateTime(TimeUtils.nowDate());
                 mexicoAppDeal.setCreateTime(TimeUtils.add(TimeUtils.nowDate(), TimeUtils.MILLISECONDS_OF_1_DAY * 2));
 
-                mexicoAppdealService.createMexicoAppdeal(mexicoAppDeal);
+                dealService.createAppDealByPriceOff(mexicoAppDeal);
             }
 
         } catch (Exception e) {
