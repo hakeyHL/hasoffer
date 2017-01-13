@@ -88,10 +88,10 @@ public class PromDealFetchJobBean extends QuartzJobBean {
 
                 //重定向到详情页面
                 TagNode hrefRootNode = null;
-                String html = null;
+                //String html = null;
                 try {
                     hrefRootNode = HtmlUtils.getUrlRootTagNode(href);
-                    html = HtmlUtils.getUrlHtml(href);
+                    //html = HtmlUtils.getUrlHtml(href);
                 } catch (Exception e) {
                     e.printStackTrace();
                     continue;
@@ -200,7 +200,6 @@ public class PromDealFetchJobBean extends QuartzJobBean {
                 }
 
                 AppDeal mexicoAppDeal = new AppDeal();
-
                 mexicoAppDeal.setListPageImage(dealSmallPath);
                 mexicoAppDeal.setInfoPageImage(dealBigPath);
                 mexicoAppDeal.setCategory(categoryName);
@@ -212,7 +211,7 @@ public class PromDealFetchJobBean extends QuartzJobBean {
                 mexicoAppDeal.setDescription(descriptionWithOutHtml);
                 mexicoAppDeal.setCreateTime(TimeUtils.nowDate());
                 mexicoAppDeal.setCreateTime(TimeUtils.add(TimeUtils.nowDate(), TimeUtils.MILLISECONDS_OF_1_DAY * 2));
-
+                logger.info("insert into appDeal:{}", mexicoAppDeal.toString());
                 dealService.createAppDealByPriceOff(mexicoAppDeal);
             }
 
