@@ -265,7 +265,7 @@ public class ProductServiceImpl implements IProductService {
                 dbm.update(updater);
             }
         }
-        appCacheService.getPtmProduct(id, 0);
+        appCacheService.getPtmProduct(id, 1);
     }
 
     @Override
