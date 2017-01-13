@@ -5,6 +5,5 @@
        default-lazy-init="true">
 
     <bean class="hasoffer.datafixes.signup.work.SignupFixWorker" init-method="runTask"/>
-    <bean class="hasoffer.datafixes.order.work.OrderFixWorker"/>
 
 </beans>

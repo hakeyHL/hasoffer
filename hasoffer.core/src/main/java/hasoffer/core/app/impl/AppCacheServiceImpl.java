@@ -226,7 +226,7 @@ public class AppCacheServiceImpl implements AppCacheService {
                     productService.updatePtmProductPrice(ptmCmpSku.getProductId());
                 }
             }
-            cmpskuIndexService.remove(String.valueOf(ptmCmpSku.getId()));
+            cmpskuIndexService.remove(ptmCmpSkuId + "");
             iCacheService.del(cacheKey);
             return null;
         }

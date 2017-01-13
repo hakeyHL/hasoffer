@@ -554,7 +554,7 @@ public class ProductController {
                     cmpSkuService.deleteCmpSku(cmpSku.getId());
                     appCacheService.getPtmCmpSku(cmpSku.getId(), 1);
                 } else {
-                    cmpskuIndexService.remove(String.valueOf(cmpSku.getId()));
+                    cmpskuIndexService.remove(id + "");
                 }
             }
         }

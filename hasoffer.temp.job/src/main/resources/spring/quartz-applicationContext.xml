@@ -17,8 +17,8 @@
         <property name="applicationContextSchedulerContextKey" value="applicationContextKey"/>
         <property name="triggers">
             <list>
-                <ref bean="demoTrigger"/>
-                <ref bean="fetchTrigger"/>
+                <ref bean="promDealFetchJobTrigger"/>
+                <!--<ref bean="fetchTrigger"/>-->
             </list>
         </property>
 
@@ -42,26 +42,12 @@
         <property name="cronExpression" value="0 0 0/1 * * ? "/>
     </bean>
 
-    <!-- fetch job -->
-    <bean name="fetchJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="hasoffer.job.bean.fetch.FetchJobBean"/>
-        <!--<property name="beanName" value="fetchJobBean"/>-->
+    <!--prom。。。deal站数据抓取-->
+    <bean name="promDealFetchJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="hasoffer.job.bean.deal.PromDealFetchJobBean"/>
     </bean>
-
-    <bean id="fetchTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
-        <property name="jobDetail" ref="fetchJob"/>
-        <property name="startDelay" value="1000"/>
-        <property name="repeatInterval" value="2000"/>
-        <property name="repeatCount" value="0"/>
+    <bean id="promDealFetchJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="promDealFetchJob"/>
+        <property name="cronExpression" value="0 0/10 * * * ?"/>
     </bean>
-
-
-    <!--<bean name="topSellingTaskJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">-->
-    <!--<property name="jobClass" value="hasoffer.job.bean.fetch.TopSellingTaskJobBean"/>-->
-    <!--</bean>-->
-
-    <!--<bean id="topSellingTaskTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
-    <!--<property name="jobDetail" ref="topSellingTaskJob"/>-->
-    <!--<property name="cronExpression" value="0 0 0/1 * * ?"/>-->
-    <!--</bean>-->
 </beans>

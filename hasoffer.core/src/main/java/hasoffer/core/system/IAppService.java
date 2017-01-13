@@ -92,7 +92,7 @@ public interface IAppService {
 
     UrmUserRedeemGroup getUrmRedeemGroupById(Long id);
 
-    List<AppDeal> getSimilarDeals();
+    List<AppDeal> getSimilarDeals(int initSize);
 
     void updateDeal(AppDeal appDeal);
 }
