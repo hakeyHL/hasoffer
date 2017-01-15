@@ -124,7 +124,7 @@ public class OrderStatsAnalysisServiceImpl implements IOrderStatsAnalysisService
         List<Object> param = new ArrayList<Object>();
         endYmd = TimeUtils.addDay(endYmd, 1);
         StringBuilder groupSql = new StringBuilder(" group by DATE_FORMAT(orderTime,'%Y-%m-%d') ");
-        StringBuilder whereSql = new StringBuilder(" where orderTime>=? and orderTime<? ");
+        StringBuilder whereSql = new StringBuilder(" where datasource=0 and orderTime>=? and orderTime<? ");
         param.add(startYmd);
         param.add(endYmd);
         StringBuilder sql = new StringBuilder("select DATE_FORMAT(orderTime,'%Y-%m-%d') as dateTime, ");
