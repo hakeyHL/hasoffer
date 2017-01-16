@@ -138,9 +138,6 @@ public class ProductController {
         String productId = request.getParameter("productId");
         ModelAndView mav = new ModelAndView("redirect:/p/cmp/" + productId);
         String id = request.getParameter("id");
-        if (Long.parseLong(id) < 1) {
-            return mav;
-        }
         String url = request.getParameter("url");
         String skuStatus = request.getParameter("skuStatus");
         float price = 0.0f;
@@ -151,21 +148,38 @@ public class ProductController {
 
         String color = request.getParameter("color");
         String size = request.getParameter("size");
-        PtmCmpSku cmpSku = null;
         if (!StringUtils.isEmpty(id)) {
             // 有商品id就是更新
-            cmpSkuService.updateCmpSku(Long.valueOf(id), url, color, size, price, skuStatus);
-            appCacheService.getPtmCmpSku(Long.parseLong(id), 1);
+            if (ApiUtils.removeBillion(Long.parseLong(id)) < 0) {
+                cmpSkuService.updateCmpSku(Long.valueOf(id), url, color, size, price, skuStatus);
+                appCacheService.getPtmCmpSku(Long.parseLong(id), 1);
+            } else {
+                //大id
+                PtmStdPrice ptmStdPrice = appCacheService.getPtmStdPrice(ApiUtils.removeBillion(Long.parseLong(id)));
+                if (ptmStdPrice != null) {
+                    ptmStdPrice.setPrice(price);
+                    ptmStdPrice.setUrl(org.apache.commons.lang3.StringUtils.isEmpty(url) ? ptmStdPrice.getUrl() : url);
+                    ptmStdPrice.setSkuStatus(SkuStatus.valueOf(skuStatus));
+                    ptmStdPriceService.update(ptmStdPrice);
+                    appCacheService.getPtmStdPrice(ptmStdPrice.getId(), 1);
+                }
+            }
         } else {
-            // 无商品id就是创建
-            cmpSku = cmpSkuService.createCmpSku(Long.valueOf(productId), url, color, size, price, skuStatus);
-        }
-        //更新--清除缓存   创建 添加到缓存
-        appCacheService.getPtmCmpSku(Long.parseLong(id), 1);
-        if (cmpSku != null && cmpSku.getId() > 0) {
-            //虽然不可能有重复的id缓存,但是也清除一下
-            appCacheService.getPtmCmpSku(cmpSku.getId(), 1);
-            appCacheService.getPtmCmpSku(cmpSku.getId());
+            if (org.apache.commons.lang3.StringUtils.isNotEmpty(productId) && Long.parseLong(productId) > 0) {
+                if (ApiUtils.removeBillion(Long.parseLong(productId)) > 0) {
+                    Long aLong = ptmStdPriceService.create(new PtmStdPrice(Long.parseLong(productId), price, SkuStatus.valueOf(skuStatus), url));
+                    if (aLong > 0) {
+                        appCacheService.getPtmStdPrice(aLong, 1);
+                    }
+                } else {
+                    // 无商品id就是创建
+                    PtmCmpSku cmpSku = cmpSkuService.createCmpSku(Long.valueOf(productId), url, color, size, price, skuStatus);
+                    if (cmpSku != null) {
+                        appCacheService.getPtmCmpSku(cmpSku.getId(), 1);
+                    }
+                }
+            }
+
         }
         return mav;
     }

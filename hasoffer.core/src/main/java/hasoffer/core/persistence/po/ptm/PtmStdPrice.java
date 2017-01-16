@@ -59,6 +59,18 @@ public class PtmStdPrice implements Identifiable<Long> {
         this.urlKey = HexDigestUtil.md5(url);
     }
 
+    public PtmStdPrice(long stdSkuId, float price, SkuStatus skuStatus, String url) {
+        this.stdSkuId = stdSkuId;
+        this.price = price;
+        this.skuStatus = skuStatus;
+        this.url = url;
+        this.urlKey = HexDigestUtil.md5(url);
+        Date currentTime = new Date();
+        this.createTime = currentTime;
+        this.updateTime = currentTime;
+
+    }
+
     @Override
     public Long getId() {
         return id;
