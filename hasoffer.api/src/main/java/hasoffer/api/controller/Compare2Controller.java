@@ -49,10 +49,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
@@ -912,6 +909,24 @@ public class Compare2Controller {
             return cmpResult;
         }
         return cmpResult;
+    }
+
+    /**
+     * 异常控制器
+     *
+     * @return
+     */
+    @ExceptionHandler({Exception.class, RuntimeException.class})
+    public ModelAndView exceptionHandler(Exception e) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, "fail," + e.getMessage());
+        logger.info(Thread.currentThread().getId() + " : " + e.getMessage());
+        String[] exception = ApiUtils.getException(e, 2);
+        for (String str : exception) {
+            System.out.println(str);
+        }
+        return modelAndView;
     }
 
 }
