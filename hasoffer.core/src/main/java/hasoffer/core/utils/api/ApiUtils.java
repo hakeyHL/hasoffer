@@ -647,6 +647,21 @@ public class ApiUtils {
         return idsList;
     }
 
+    public static String[] getException(Exception e, int size) {
+        List<String> errorMsgArray = new ArrayList<>();
+        if (size < 1) {
+            size = 2;
+        }
+        StackTraceElement[] stackTrace = e.getStackTrace();
+        for (int i = 0; i < size; i++) {
+            if (i < stackTrace.length) {
+                StackTraceElement stackTraceElement = stackTrace[i];
+                errorMsgArray.add("fileName : " + stackTraceElement.getFileName() + "  class :  " + stackTraceElement.getClassName() + "  method: " + stackTraceElement.getMethodName() + "  lineNumber : " + stackTraceElement.getLineNumber());
+            }
+        }
+        return errorMsgArray.toArray(new String[]{});
+    }
+
     /**
      * 在数据对象返回客户端之前检测其域是否都有值,除对象成员外都赋初始值
      *
@@ -712,6 +727,7 @@ public class ApiUtils {
         }
         return str2;
     }
+    //sort list area =================================================================
 
     public boolean isPriceOffAlert(String userToken, Long skuId, Long... userId) {
         if (userId.length > 0 && userId[0] > 0) {
@@ -731,7 +747,6 @@ public class ApiUtils {
         }
         return false;
     }
-    //sort list area =================================================================
 
     public void sendEmail(String to, String content, boolean isHtml) throws MessagingException {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();

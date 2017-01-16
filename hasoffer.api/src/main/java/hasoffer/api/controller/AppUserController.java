@@ -627,8 +627,11 @@ public class AppUserController {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
         modelAndView.addObject(ConstantUtil.API_NAME_MSG, "fail," + e.getMessage());
-        logger.info(Thread.currentThread().getId() + " : " + e.getMessage());
-        logger.info(Thread.currentThread().getId() + " : " + e.getCause().getLocalizedMessage());
+        logger.error(Thread.currentThread().getId() + " : " + e.getMessage());
+        String[] exception = ApiUtils.getException(e, 2);
+        for (String str : exception) {
+            System.out.println(str);
+        }
         return modelAndView;
     }
 }
