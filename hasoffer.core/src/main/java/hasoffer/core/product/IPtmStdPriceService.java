@@ -35,4 +35,8 @@ public interface IPtmStdPriceService {
     void importPtmStdPrice2Solr(Long priceId);
 
     void removePriceById(Long priceId);
+
+    void update(PtmStdPrice ptmStdPrice);
+
+    Long create(PtmStdPrice ptmStdPrice);
 }

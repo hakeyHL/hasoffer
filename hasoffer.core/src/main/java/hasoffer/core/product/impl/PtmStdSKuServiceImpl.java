@@ -185,6 +185,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
             List<PtmStdSkuParamGroup> paramGroups = ptmStdSkuDetail.getParamGroups();
             setStdModel(paramGroups, ptmStdSkuModel, hakeySb);
         }
+        ptmStdSkuModel.setHakey(hakeySb.toString().replaceAll(" ", "-"));
 //        ptmStdSkuModel.setSearchCount(searchCount == null ? 0 : searchCount.getCount());
         ptmStdSkuModel.setStoreCount(websiteSet.size());
         return ptmStdSkuModel;
@@ -471,12 +472,15 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
      * @param name
      */
     public void setGeneral(PtmStdSkuModel ptmStdSkuModel, PtmStdSkuParamNode ptmStdSkuParamNode, String name, StringBuilder hakeySb) {
+        int getBrandSymbol = 0;
+        String priceBelowScope = getPriceBelowScope(ptmStdSkuModel.getMinPrice());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH);
         if (compareIgnoreCase(name, CategoryFilterParams.Brand)) {
+            getBrandSymbol++;
             ptmStdSkuModel.setBrand(ptmStdSkuParamNode.getValue());
             //设置关键词的价格范围
-            String priceBelowScope = getPriceBelowScope(ptmStdSkuModel.getMinPrice());
-            if (priceBelowScope != null) {
+            //如果为cate2:5才行
+            if (priceBelowScope != null && ptmStdSkuModel.getCate2() == 5l) {
                 if (hakeySb.length() > 0) {
                     hakeySb.append(ConstantUtil.SOLR_DEFAULT_MULTIVALUEDVALUE_FIELD_SPLIT);
                 }
@@ -485,7 +489,9 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
                 if (hakeySb.length() > 0) {
                     hakeySb.append(ConstantUtil.SOLR_DEFAULT_MULTIVALUEDVALUE_FIELD_SPLIT);
                 }
-
+                if (ptmStdSkuParamNode.getValue().toLowerCase().contains("mobiles")) {
+                    ptmStdSkuParamNode.setValue(ptmStdSkuParamNode.getValue().replaceAll("mobiles", " ").replaceAll(" ", ""));
+                }
                 hakeySb.append("Top 10 ").append(ptmStdSkuParamNode.getValue()).append(" Mobiles ").append(priceBelowScope);
             }
 
@@ -493,7 +499,6 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
                 hakeySb.append(ConstantUtil.SOLR_DEFAULT_MULTIVALUEDVALUE_FIELD_SPLIT);
             }
             hakeySb.append(ptmStdSkuParamNode.getValue());
-            ptmStdSkuModel.setHakey(hakeySb.toString());
             return;
         }
         if (compareIgnoreCase(name, CategoryFilterParams.Model)) {
@@ -546,6 +551,14 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         }
         if (compareIgnoreCase(name, CategoryFilterParams.Fingerprint_Sensor)) {
             ptmStdSkuModel.setFingerprint_Sensor(ptmStdSkuParamNode.getValue());
+        }
+        if (getBrandSymbol == 0) {
+            if (priceBelowScope != null) {
+                if (hakeySb.length() > 0) {
+                    hakeySb.append(ConstantUtil.SOLR_DEFAULT_MULTIVALUEDVALUE_FIELD_SPLIT);
+                }
+                hakeySb.append("Top 10 Mobiles ").append(priceBelowScope);
+            }
         }
     }
 

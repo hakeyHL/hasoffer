@@ -282,6 +282,18 @@ public class PtmStdPriceServiceImpl implements IPtmStdPriceService {
         }
     }
 
+    @Transactional
+    @Override
+    public void update(PtmStdPrice ptmStdPrice) {
+        dbm.update(ptmStdPrice);
+    }
+
+    @Transactional
+    @Override
+    public Long create(PtmStdPrice ptmStdPrice) {
+        return dbm.create(ptmStdPrice);
+    }
+
     public void saveHistoryPrice(long id, Date time, float price) {
         saveHistoryPrice(id, Arrays.asList(new PriceNode(time, price)));
     }
