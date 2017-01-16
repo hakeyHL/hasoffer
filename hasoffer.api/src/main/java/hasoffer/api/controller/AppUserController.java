@@ -428,7 +428,6 @@ public class AppUserController {
      * @param response
      * @return
      */
-    @ExceptionHandler(value = RuntimeException.class)
     @RequestMapping("user/getEAndP")
     public String getUserEmailAndPhone(HttpServletResponse response,
                                        @RequestParam(defaultValue = "") String telephone,
@@ -615,6 +614,21 @@ public class AppUserController {
             default:
         }
         modelAndView.addObject(ConstantUtil.API_NAME_DATA, resultMap);
+        return modelAndView;
+    }
+
+    /**
+     * 异常控制器
+     *
+     * @return
+     */
+    @ExceptionHandler({Exception.class, RuntimeException.class})
+    public ModelAndView exceptionHandler(Exception e) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, "fail," + e.getMessage());
+        logger.info(Thread.currentThread().getId() + " : " + e.getMessage());
+        logger.info(Thread.currentThread().getId() + " : " + e.getCause().getLocalizedMessage());
         return modelAndView;
     }
 }
