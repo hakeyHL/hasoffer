@@ -6,6 +6,7 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.*;
+import hasoffer.core.persistence.po.h5.KeywordCollection;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.urm.UrmSignCoin;
 import hasoffer.core.persistence.po.urm.UrmUser;
@@ -95,4 +96,6 @@ public interface IAppService {
     List<AppDeal> getSimilarDeals(int initSize);
 
     void updateDeal(AppDeal appDeal);
+
+    void updateKeyResultCount(KeywordCollection keywordCollection);
 }

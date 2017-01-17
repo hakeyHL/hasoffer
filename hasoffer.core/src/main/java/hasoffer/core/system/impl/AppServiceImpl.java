@@ -11,6 +11,7 @@ import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.*;
+import hasoffer.core.persistence.po.h5.KeywordCollection;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.urm.*;
 import hasoffer.core.system.IAppService;
@@ -620,4 +621,9 @@ public class AppServiceImpl implements IAppService {
         dbm.update(appDeal);
     }
 
+    @Transactional
+    @Override
+    public void updateKeyResultCount(KeywordCollection keywordCollection) {
+        dbm.update(keywordCollection);
+    }
 }
