@@ -7,8 +7,8 @@ import hasoffer.core.app.vo.mobile.KeyWordsVo;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.h5.KeywordCollection;
+import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
 import hasoffer.core.product.solr.PtmStdSkuIndexServiceImpl;
-import hasoffer.core.product.solr.PtmStdSkuModel;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.utils.api.ApiUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +34,8 @@ public class MobileServiceImpl implements MobileService {
     PtmStdSkuIndexServiceImpl ptmStdSkuIndexService;
     @Resource
     ApiUtils apiUtils;
+    @Resource
+    ProductIndex2ServiceImpl productIndex2Service;
 
     @Override
     public List<KeyWordsVo> getKeyWordsListFromRepo(KeyWordsVo keyWordsVo, int page, int pageSize) {
@@ -85,8 +87,12 @@ public class MobileServiceImpl implements MobileService {
         searchCriteria.setKeyword(keyWordsVo.getName());
         searchCriteria.setPage(page);
         searchCriteria.setPageSize(pageSize);
-        PageableResult<PtmStdSkuModel> ptmStdSkuModels = ptmStdSkuIndexService.filterStdSkuOnCategoryByCriteria(searchCriteria);
-        apiUtils.addProductVo2List(cmpProductListVoList, ptmStdSkuModels.getData());
+        PageableResult pModels = ptmStdSkuIndexService.filterStdSkuOnCategoryByCriteria(searchCriteria);
+        if (pModels == null || pModels.getData().size() < 1) {
+            //从product中搜索
+            pModels = productIndex2Service.searchProducts(searchCriteria);
+        }
+        apiUtils.addProductVo2List(cmpProductListVoList, pModels.getData());
         return cmpProductListVoList;
     }
 
