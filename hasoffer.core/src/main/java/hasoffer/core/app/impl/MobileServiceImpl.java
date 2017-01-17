@@ -1,6 +1,7 @@
 package hasoffer.core.app.impl;
 
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.core.app.MobileService;
 import hasoffer.core.app.vo.CmpProductListVo;
 import hasoffer.core.app.vo.mobile.KeyWordsVo;
@@ -14,6 +15,7 @@ import hasoffer.core.utils.api.ApiUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -93,6 +95,16 @@ public class MobileServiceImpl implements MobileService {
             pModels = productIndex2Service.searchProducts(searchCriteria);
         }
         apiUtils.addProductVo2List(cmpProductListVoList, pModels.getData());
+        ///keyword+keywordSourceSite的md5
+        //HexDigestUtil.md5(keyword.toUpperCase() + Website.SNAPDEAL)
+        String keyId = HexDigestUtil.md5(keyWordsVo.getName().toUpperCase() + keyWordsVo.getSource());
+        KeywordCollection keywordCollection = dbm.get(KeywordCollection.class, keyId);
+        if (keywordCollection != null) {
+            if (pModels.getNumFund() > 0 && keywordCollection.getKeywordResult() != pModels.getNumFund()) {
+                keywordCollection.setKeywordResult(pModels.getNumFund());
+                updateKeyResultCount(keywordCollection);
+            }
+        }
         return cmpProductListVoList;
     }
 
@@ -130,6 +142,12 @@ public class MobileServiceImpl implements MobileService {
         });
         setSimilarCategory(similarKeyAndPros, keywordCollections, size, keyWordsVo.getCategoryName(), keyWordsVo.getName());
         return similarKeyAndPros;
+    }
+
+    @Transactional
+    @Override
+    public void updateKeyResultCount(KeywordCollection keywordCollection) {
+        dbm.update(keywordCollection);
     }
 
     /**
