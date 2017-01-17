@@ -29,6 +29,7 @@ public class IPSwitchJobBean extends QuartzJobBean {
         String preActiveGroup = proxyIPService.selectGroupName(IPState.Y);
         logger.info(preActiveGroup);
         if (preActiveGroup == null || "".equals(preActiveGroup)) {
+            proxyIPService.updateProxyStausByGroup(Group.A.toString(), IPState.Y);
             return;
         }
         boolean isActive = false;
@@ -40,7 +41,6 @@ public class IPSwitchJobBean extends QuartzJobBean {
             if (isActive && !group.toString().equals(preActiveGroup)) {
                 nextActiveGroup = group;
                 isActive = false;
-
             }
         }
 

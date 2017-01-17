@@ -37,6 +37,11 @@ public class UpdateStateController {
         return updateStateService.selectStats(updateStateDMO.getUpdateDate(), updateStateDMO.getTaskTarget(), updateStateDMO.getWebSite());
     }
 
+    @RequestMapping(value = "/updateStateResult", method = RequestMethod.GET)
+    public void updateStateResult() {
+        updateStateService.cache2Db();
+    }
+
     @RequestMapping("/selectTaskTarget")
     @ResponseBody
     public List<TaskTarget> selectTaskTarget() {

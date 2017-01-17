@@ -54,7 +54,8 @@
                     <input id="webSite" value="${webSite}" class="form-control"/>
                 </td>
                 <td style="vertical-align: middle; text-align: center;">
-                    <a href="#" onclick="queryUpdateState()" class="btn btn-sm btn-info">查找</a>
+                    <a href="#" onclick="queryUpdateState()" class="btn btn-sm btn-primary">查找</a>&nbsp;&nbsp;
+                    <a href="#" onclick="updateStateResult()" class="btn btn-sm btn-info">刷新</a>
                 </td>
         </table>
     </div>
@@ -151,6 +152,23 @@
             async: false,
             success: function (data) {
                 $table.bootstrapTable('load', data);
+            }
+        });
+    }
+
+
+    function updateStateResult() {
+
+        var url = "${ctx}/updateState/updateStateResult";
+        $.ajax({
+            cache: true,
+            type: 'GET',
+            url: url,
+            contentType: 'application/json',
+            dataType: 'json',
+            async: false,
+            success: function (data) {
+                $table.bootstrapTable('refresh');
             }
         });
     }
