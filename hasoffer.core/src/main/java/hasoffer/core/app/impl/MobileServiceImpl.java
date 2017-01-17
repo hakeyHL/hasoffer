@@ -1,6 +1,7 @@
 package hasoffer.core.app.impl;
 
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.Website;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.core.app.MobileService;
 import hasoffer.core.app.vo.CmpProductListVo;
@@ -11,11 +12,11 @@ import hasoffer.core.persistence.po.h5.KeywordCollection;
 import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
 import hasoffer.core.product.solr.PtmStdSkuIndexServiceImpl;
 import hasoffer.core.redis.ICacheService;
+import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.utils.api.ApiUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -38,6 +39,13 @@ public class MobileServiceImpl implements MobileService {
     ApiUtils apiUtils;
     @Resource
     ProductIndex2ServiceImpl productIndex2Service;
+    @Autowired
+    AppServiceImpl appService;
+
+    public static void main(String[] args) {
+        String keyId = HexDigestUtil.md5("samsung".toUpperCase() + Website.EBAY);
+        System.out.println(keyId);
+    }
 
     @Override
     public List<KeyWordsVo> getKeyWordsListFromRepo(KeyWordsVo keyWordsVo, int page, int pageSize) {
@@ -102,7 +110,7 @@ public class MobileServiceImpl implements MobileService {
         if (keywordCollection != null) {
             if (pModels.getNumFund() > 0 && keywordCollection.getKeywordResult() != pModels.getNumFund()) {
                 keywordCollection.setKeywordResult(pModels.getNumFund());
-                updateKeyResultCount(keywordCollection);
+                appService.updateKeyResultCount(keywordCollection);
             }
         }
         return cmpProductListVoList;
@@ -142,12 +150,6 @@ public class MobileServiceImpl implements MobileService {
         });
         setSimilarCategory(similarKeyAndPros, keywordCollections, size, keyWordsVo.getCategoryName(), keyWordsVo.getName());
         return similarKeyAndPros;
-    }
-
-    @Transactional
-    @Override
-    public void updateKeyResultCount(KeywordCollection keywordCollection) {
-        dbm.update(keywordCollection);
     }
 
     /**

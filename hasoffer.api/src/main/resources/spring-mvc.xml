@@ -12,7 +12,9 @@
 
 
     <mvc:annotation-driven/>
-    <context:component-scan base-package="hasoffer.api.controller"/>
+    <context:component-scan base-package="hasoffer.api.controller">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+    </context:component-scan>
     <context:component-scan base-package="hasoffer.api.service"/>
 
     <mvc:resources location="/static/" mapping="/static/**"/>
