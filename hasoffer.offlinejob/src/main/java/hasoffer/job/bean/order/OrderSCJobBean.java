@@ -45,12 +45,27 @@ public class OrderSCJobBean extends QuartzJobBean {
             Date end10mTime = DateUtils.parseDate("2016-11-01", "yyyy-MM-dd");
             orderStatsAnalysisService.updateOrderToLow(start10mTime, end10mTime, 721200, x10);
 
-            Date targetDate11 = DateUtils.parseDate("2017-01-03 23:00:00", "yyyy-MM-dd HH:mm:ss");
+            Date targetDate11 = DateUtils.parseDate("2017-01-31 23:00:00", "yyyy-MM-dd HH:mm:ss");
             Long x11 = (targetDate11.getTime() - date.getTime()) / (1000 * 60 * 60);
             logger.info("OrderSCJobBean x11={}", x11);
             Date start11mTime = DateUtils.parseDate("2016-11-01", "yyyy-MM-dd");
             Date end11mTime = DateUtils.parseDate("2016-12-01", "yyyy-MM-dd");
             orderStatsAnalysisService.updateOrderToLow(start11mTime, end11mTime, 99200, x11);
+
+            Date targetDate12 = DateUtils.parseDate("2017-01-31 23:00:00", "yyyy-MM-dd HH:mm:ss");
+            Long x12 = (targetDate12.getTime() - date.getTime()) / (1000 * 60 * 60);
+            logger.info("OrderSCJobBean x12={}", x12);
+            Date start12mTime = DateUtils.parseDate("2016-12-01", "yyyy-MM-dd");
+            Date end12mTime = DateUtils.parseDate("2017-01-01", "yyyy-MM-dd");
+            orderStatsAnalysisService.updateOrderToLow(start12mTime, end12mTime, 98200, x12);
+
+            //Date targetDate1701 = DateUtils.parseDate("2017-02-18 23:00:00", "yyyy-MM-dd HH:mm:ss");
+            //Long x1701 = (targetDate11.getTime() - date.getTime()) / (1000 * 60 * 60);
+            //logger.info("OrderSCJobBean x1701={}", x1701);
+            //Date start1701mTime = DateUtils.parseDate("2017-01-01", "yyyy-MM-dd");
+            //Date end1701mTime = DateUtils.parseDate("2017-02-01", "yyyy-MM-dd");
+            //orderStatsAnalysisService.updateOrderToLow(start1701mTime, end1701mTime, 97200, x1701);
+
 
         } catch (Exception e) {
             logger.error("reportOrderStatistic: update order fail. DATE:" + new Date() + ": msg:", e);
