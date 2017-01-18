@@ -19,17 +19,17 @@
         <property name="applicationContextSchedulerContextKey" value="applicationContextKey"/>
         <property name="triggers">
             <list>
-                <ref bean="demoTrigger"/>
-                <ref bean="fetchTrigger"/>
+                <!--<ref bean="demoTrigger"/>-->
+                <!--<ref bean="fetchTrigger"/>-->
                 <ref bean="orderSATrigger"/>
-                <ref bean="orderSCTrigger"/>
-                <ref bean="imageDownLoadTrigger"/>
-                <ref bean="imageDownLoadTrigger2"/>
-                <ref bean="skuImageDownLoadTrigger"/>
-                <ref bean="skuImageListDownLoadTrigger"/>
-                <ref bean="statSearchLogTrigger"/>
-                <ref bean="compareWebsiteSendFetchRequestTrigger"/>
-                <ref bean="compareWebsiteParseFetchResultTrigger"/>
+                <!--<ref bean="orderSCTrigger"/>-->
+                <!--<ref bean="imageDownLoadTrigger"/>-->
+                <!--<ref bean="imageDownLoadTrigger2"/>-->
+                <!--<ref bean="skuImageDownLoadTrigger"/>-->
+                <!--<ref bean="skuImageListDownLoadTrigger"/>-->
+                <!--<ref bean="statSearchLogTrigger"/>-->
+                <!--<ref bean="compareWebsiteSendFetchRequestTrigger"/>-->
+                <!--<ref bean="compareWebsiteParseFetchResultTrigger"/>-->
             </list>
         </property>
 

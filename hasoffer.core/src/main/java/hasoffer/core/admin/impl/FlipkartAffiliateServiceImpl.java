@@ -12,7 +12,9 @@ import hasoffer.core.admin.IFlipkartAffiliateService;
 import hasoffer.core.admin.IUrmAffAccountService;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.admin.UrmAffAccount;
+import hasoffer.core.persistence.po.urm.DeviceLog;
 import hasoffer.core.persistence.po.urm.UrmDevice;
+import hasoffer.core.third.BigDataApi;
 import hasoffer.core.user.IDeviceService;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -31,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 @Transactional
 public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
 
-    private final Logger logger = LoggerFactory.getLogger("hasoffer.affiliate.order");
+    private static final Logger logger = LoggerFactory.getLogger("hasoffer.affiliate.order");
 
     private IAffiliateProcessor<AffiliateOrder> flipProcessor = new FlipkartAffiliateProductProcessor();
 
@@ -160,7 +162,7 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
             }
         }
 
-        Map<String, UrmDevice> deviceRegTime = getDeviceRegTime(deviceSet);
+        Map<String, UrmDevice> deviceRegTime = getDeviceInfo(deviceSet);
 
         // 因为导出Excel需要按照时间降序排列，所以要排序。
         Collections.sort(orderList, new Comparator<AffiliateOrder>() {
@@ -222,14 +224,20 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
                 device = deviceRegTime.get(deviceId);
             }
             if (device != null) {
-                po.setDeviceRegTime(device.getCreateTime());
-                po.setVersion(device.getAppVersion());
+                DeviceLog deviceLog = BigDataApi.getDeviceInfoFromLog(device.getDeviceId(), po.getOrderTime().getTime());
+                if (deviceLog == null) {
+                    po.setDeviceRegTime(device.getCreateTime());
+                    po.setVersion(device.getAppVersion());
+                } else {
+                    po.setDeviceRegTime(new Date(deviceLog.getFirstTimeReq()));
+                    po.setVersion(deviceLog.getAppVersion());
+                }
             }
             po.setUserType("NONE");
-            if (device != null && device.getCreateTime().compareTo(startTime) > 0) {
+            if (po.getDeviceRegTime() != null && po.getDeviceRegTime().compareTo(startTime) > 0) {
                 po.setUserType("NEW");
             }
-            if (device != null && device.getCreateTime().compareTo(startTime) <= 0) {
+            if (po.getDeviceRegTime() != null && po.getDeviceRegTime().compareTo(startTime) <= 0) {
                 po.setUserType("OLD");
             }
             po.setSaleAmount(new BigDecimal(order.getSaleAmount()));
@@ -287,9 +295,9 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
 //        return result;
 //    }
 
-    private Map<String, UrmDevice> getDeviceRegTime(Set<String> deviceSet) {
+    private Map<String, UrmDevice> getDeviceInfo(Set<String> deviceSet) {
         Map<String, UrmDevice> deviceMap = new HashMap<String, UrmDevice>();
-        List<UrmDevice> deviceByIdList = deviceService.findDeviceByIdList(new ArrayList<String>(deviceSet));
+        List<UrmDevice> deviceByIdList = deviceService.findDeviceByIdList(new ArrayList<>(deviceSet));
         if (deviceByIdList == null) {
             return deviceMap;
         }
