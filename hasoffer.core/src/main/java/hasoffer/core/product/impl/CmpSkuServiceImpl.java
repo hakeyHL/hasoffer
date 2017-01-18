@@ -466,6 +466,8 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         long skuid = dbm.create(ptmCmpSku);
 
+        logger.info("create sku: id:{}, obj:{}", skuid, ptmCmpSku);
+
         //创建sku的时候，将固定网站的商品导入到mongodb中,只导入url、website、id
 
         /*if (WebsiteHelper.DEFAULT_WEBSITES.contains(ptmCmpSku.getWebsite())) {
