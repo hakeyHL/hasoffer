@@ -21,7 +21,8 @@ public class ImageTest {
 
     @Test
     public void f() throws Exception {
-        String url = "http://img20.360buyimg.com/da/jfs/t2752/14/2642732614/92420/3092a687/576c9acbNcb1a36b0.jpg";
+//        String url = "http://img20.360buyimg.com/da/jfs/t2752/14/2642732614/92420/3092a687/576c9acbNcb1a36b0.jpg";
+        String url = "https://n4.sdlcdn.com/imgs/c/x/r/large/Samsung-On7-Pro-16GB-Black-SDL255724004-1-b7862.jpg";
 
 //        ImagePath imagePath = ImageUtil.downloadAndUpload2(url);
 //        System.out.println(imagePath.toString());
