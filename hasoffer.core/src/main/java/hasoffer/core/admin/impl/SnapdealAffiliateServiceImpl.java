@@ -9,7 +9,9 @@ import hasoffer.base.utils.AffliIdHelper;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.ISnapdealAffiliateService;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
+import hasoffer.core.persistence.po.urm.DeviceLog;
 import hasoffer.core.persistence.po.urm.UrmDevice;
+import hasoffer.core.third.BigDataApi;
 import hasoffer.core.user.IDeviceService;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.stereotype.Service;
@@ -110,14 +112,20 @@ public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
                 device = deviceRegTime.get(deviceId);
             }
             if (device != null) {
-                po.setDeviceRegTime(device.getCreateTime());
-                po.setVersion(device.getAppVersion());
+                DeviceLog deviceLog = BigDataApi.getDeviceInfoFromLog(device.getDeviceId(), po.getOrderTime().getTime());
+                if (deviceLog == null) {
+                    po.setDeviceRegTime(device.getCreateTime());
+                    po.setVersion(device.getAppVersion());
+                } else {
+                    po.setDeviceRegTime(new Date(deviceLog.getFirstTimeReq()));
+                    po.setVersion(deviceLog.getAppVersion());
+                }
             }
             po.setUserType("NONE");
-            if (device != null && device.getCreateTime().compareTo(startTime) > 0) {
+            if (po.getDeviceRegTime() != null && po.getDeviceRegTime().compareTo(startTime) > 0) {
                 po.setUserType("NEW");
             }
-            if (device != null && device.getCreateTime().compareTo(startTime) <= 0) {
+            if (po.getDeviceRegTime() != null && po.getDeviceRegTime().compareTo(startTime) <= 0) {
                 po.setUserType("OLD");
             }
             po.setSaleAmount(order.getSale());
