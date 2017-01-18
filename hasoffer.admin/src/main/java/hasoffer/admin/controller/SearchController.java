@@ -29,6 +29,7 @@ import hasoffer.core.product.IFetchService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
 import hasoffer.core.search.ISearchService;
+import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.core.IProductProcessor;
 import hasoffer.fetch.core.ISummaryProductProcessor;
 import hasoffer.fetch.helper.WebsiteHelper;
@@ -281,8 +282,7 @@ public class SearchController {
         sc.setPage(page);
         sc.setPageSize(size);
         pagedResults = productIndex2Service.searchProducts(sc);
-
-        List<PtmProduct> indexProducts = productService.getProducts(pagedResults.getData());
+        List<PtmProduct> indexProducts = productService.getProducts(ApiUtils.getIdList(pagedResults.getData()));
         indexProducts.remove(firstProduct);
 
         products.addAll(indexProducts);
