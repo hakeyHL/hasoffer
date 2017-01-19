@@ -56,8 +56,12 @@ public class PtmProductPriceUpdateWorker implements Runnable {
                 //PtmProduct重新导入solr
                 List<Long> productIdList = dbm.query("SELECT distinct t.productId FROM PtmCmpSku t WHERE t.updateTime > ?0 and t.updateTime < ?1", Arrays.asList(t1, t2));
 
-                for (long productid : productIdList) {
+                if (productIdList != null) {
+                    System.out.println("get update list size:" + productIdList.size());
+                }
 
+
+                for (long productid : productIdList) {
                     List<PtmCmpSku> skuList = cmpSkuService.listCmpSkus(productid);
 
                     if (skuList == null || skuList.size() <= 0) {
@@ -66,9 +70,8 @@ public class PtmProductPriceUpdateWorker implements Runnable {
                     for (PtmCmpSku sku : skuList) {
                         cacheService.getPtmCmpSku(sku.getId(), 0);
                     }
-
                     cacheService.getPtmCmpSku(skuList.get(0).getId(), 1);
-
+                    System.out.println("delete ptmProductProductId cache over " + skuList.get(0).getId());
 
 //                try {
 //                    productService.updatePtmProductPrice(productid);
@@ -97,6 +100,9 @@ public class PtmProductPriceUpdateWorker implements Runnable {
 
                 //PtmStdSku 重新导入solr
                 List<Long> stdSkuIdList = dbm.query("SELECT distinct t.stdSkuId FROM PtmStdPrice t WHERE t.updateTime > ?0 and t.updateTime < ?1", Arrays.asList(t1, t2));
+                if (stdSkuIdList != null) {
+                    System.out.println("get update stdSku list size:" + stdSkuIdList.size());
+                }
                 for (long stdSkuId : stdSkuIdList) {
 
                     List<PtmStdPrice> stdPriceList = ptmStdSkuService.listStdPrice(stdSkuId);
@@ -109,7 +115,7 @@ public class PtmProductPriceUpdateWorker implements Runnable {
                         cacheService.getPtmStdPrice(stdPrice.getId(), 0);
                     }
                     cacheService.getPtmStdPrice(stdPriceList.get(0).getId(), 1);
-
+                    System.out.println("delete stdSkuProductId cache over " + stdPriceList.get(0).getId());
 //                try {
 //                    ptmStdSkuService.importPtmStdSku2Solr(ptmStdSku);
 //                } catch (Exception e) {
