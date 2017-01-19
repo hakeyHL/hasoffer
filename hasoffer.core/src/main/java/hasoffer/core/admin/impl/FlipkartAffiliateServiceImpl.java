@@ -131,8 +131,10 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
         }
         try {
             for (UrmAffAccount affAccount : affAccounts) {
+                logger.info("over affId:{}, start TENTATIVE date:{} ", affAccount.getLoginName(), startTime);
                 List<AffiliateOrder> tenOrderList = getOrderList(affAccount.getTrackingId(), affAccount.getToken(), FlipkartAffiliateProductProcessor.R_ORDER_STATUS_TENTATIVE, startTime, endTime);
                 orderList.addAll(tenOrderList);
+                logger.info("over affId:{}, start APPROVED date:{} ", affAccount.getLoginName(), startTime);
                 TimeUnit.SECONDS.sleep(3);
                 List<AffiliateOrder> approvedOrderList = getOrderList(affAccount.getTrackingId(), affAccount.getToken(), FlipkartAffiliateProductProcessor.R_ORDER_STATUS_APPROVED, startTime, endTime);
                 orderList.addAll(approvedOrderList);
