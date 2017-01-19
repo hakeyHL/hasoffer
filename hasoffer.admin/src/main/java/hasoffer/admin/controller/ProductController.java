@@ -578,9 +578,7 @@ public class ProductController {
     @RequestMapping(value = "/removeCache/{productId}", method = RequestMethod.POST)
     @ResponseBody
     public Map removeCache(@PathVariable Long productId) {
-
         Map<String, String> statusMap = new HashMap<>();
-
         try {
             if (ApiUtils.removeBillion(productId) > 0) {
                 PtmStdSku ptmStdSku = ptmStdSKuService.getStdSkuById(ApiUtils.removeBillion(productId));
@@ -590,21 +588,18 @@ public class ProductController {
                     //2. 重新导入solr
                     ptmStdSKuService.importPtmStdSku2Solr(ptmStdSku);
                     //3. 清除改stdSku的缓存
-                    appCacheService.getPtmStdSku(ApiUtils.removeBillion(productId), 0);
+                    appCacheService.getPtmStdSku(ApiUtils.removeBillion(productId), 2);
                 }
             } else {
                 //1. 更新product价格,重新导入prodcut
                 productService.updatePtmProductPrice(productId);
-
                 //2. 清除商品缓存
-                appCacheService.getPtmProduct(productId, 0);
+                appCacheService.getPtmProduct(productId, 2);
             }
             statusMap.put("status", "success");
-
         } catch (Exception e) {
             statusMap.put("status", "fail");
         }
-
         return statusMap;
     }
 }

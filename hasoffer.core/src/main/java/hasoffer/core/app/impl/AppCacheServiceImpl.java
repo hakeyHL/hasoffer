@@ -8,6 +8,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.ptm.PtmStdPrice;
 import hasoffer.core.persistence.po.ptm.PtmStdSku;
+import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.impl.PtmStdPriceServiceImpl;
 import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -39,6 +41,8 @@ public class AppCacheServiceImpl implements AppCacheService {
     IProductService productService;
     @Resource
     CmpskuIndexServiceImpl cmpskuIndexService;
+    @Resource
+    ICmpSkuService cmpSkuService;
 
     @Override
     public String getCacheValueByKey(String key) {
@@ -104,6 +108,7 @@ public class AppCacheServiceImpl implements AppCacheService {
     /**
      * @param ptmStdSkuId
      * @param operateType 传任意整数即为从缓存中删除此Object
+     *                    当operateType [0]的值为2时会删除此商品下所有sku的缓存
      * @return
      */
     @Override
@@ -118,8 +123,11 @@ public class AppCacheServiceImpl implements AppCacheService {
             if (ptmStdSku != null) {
                 ptmStdSKuService.importPtmStdSku2Solr(ptmStdSku);
             }
-//            iCacheService.del(cacheKey);
-            iCacheService.delKeys("*" + ptmStdSkuId + "*");
+            if (operateType[0] == 2) {
+                removePtmStdSkuAndPricesCache(ptmStdSkuId);
+            } else {
+                iCacheService.delKeys("*" + ptmStdSkuId + "*");
+            }
             return null;
         }
         PtmStdSku ptmStdSku = (PtmStdSku) iCacheService.get(PtmStdSku.class, cacheKey, 0);
@@ -167,6 +175,7 @@ public class AppCacheServiceImpl implements AppCacheService {
 
     /**
      * @param operateType 传任意整数即为从缓存中删除此Object
+     *                    当operateType [0]的值为2时会删除此商品下所有sku的缓存
      * @return
      */
     @Override
@@ -181,9 +190,12 @@ public class AppCacheServiceImpl implements AppCacheService {
             if (ptmProduct != null) {
                 productService.importProduct2Solr2(ptmProduct);
             }
-//            iCacheService.del(cacheKey);
-            //清除商品id的keys缓存
-            iCacheService.delKeys("*" + ptmProductId + "*");
+            if (operateType[0] == 2) {
+                removePtmProductAndSkusCache(ptmProductId);
+            } else {
+                //清除商品id的keys缓存
+                iCacheService.delKeys("*" + ptmProductId + "*");
+            }
             return null;
         }
         PtmProduct ptmProduct = (PtmProduct) iCacheService.get(PtmProduct.class, cacheKey, 0);
@@ -233,4 +245,44 @@ public class AppCacheServiceImpl implements AppCacheService {
         return ptmCmpSku;
     }
 
+    /**
+     * 清除PtmStdSku的id系列缓存以及price缓存列表
+     *
+     * @param ptmStdSkuId
+     */
+    public void removePtmStdSkuAndPricesCache(long ptmStdSkuId) {
+        //1. 清除所有sku缓存
+        List<Long> stdSkuIdList = dbm.query("SELECT distinct t.stdSkuId FROM PtmStdPrice t WHERE t.stdSkuId=?0", Arrays.asList(ptmStdSkuId));
+        for (long stdSkuId : stdSkuIdList) {
+            List<PtmStdPrice> stdPriceList = ptmStdSKuService.listStdPrice(stdSkuId);
+            if (stdPriceList == null || stdPriceList.size() <= 0) {
+                continue;
+            }
+            for (PtmStdPrice stdPrice : stdPriceList) {
+                getPtmStdPrice(stdPrice.getId(), 0);
+            }
+        }
+        //2. 清除商品id的keys缓存
+        iCacheService.delKeys("*" + ptmStdSkuId + "*");
+    }
+
+
+    public void removePtmProductAndSkusCache(long ptmProductId) {
+        //1. 清除所有sku缓存
+        List<Long> productIdList = dbm.query("SELECT distinct t.productId FROM PtmCmpSku t WHERE t.productId > ?0", Arrays.asList(ptmProductId));
+        if (productIdList != null) {
+            System.out.println("get update list size:" + productIdList.size());
+        }
+        for (long productIdd : productIdList) {
+            List<PtmCmpSku> skuList = cmpSkuService.listCmpSkus(productIdd);
+            if (skuList == null || skuList.size() <= 0) {
+                continue;
+            }
+            for (PtmCmpSku sku : skuList) {
+                getPtmCmpSku(sku.getId(), 0);
+            }
+        }
+        //2. 清除商品id的keys缓存
+        iCacheService.delKeys("*" + ptmProductId + "*");
+    }
 }
