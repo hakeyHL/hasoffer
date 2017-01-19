@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BigDataApi {
@@ -32,16 +33,27 @@ public class BigDataApi {
             return lastLog;
         } else {
             try {
-                List<DeviceLog> deviceLogs = JSONUtil.toArray(responseStr, DeviceLog.class);
+                List<DeviceLog> deviceTempLogs = JSONUtil.toArray(responseStr, DeviceLog.class);
+                List<DeviceLog> deviceLogs = new ArrayList<>();
+                Long minDateLong = 1451577600000L;
+                Long maxDateLong = 1514736000000L;
+                for (DeviceLog log : deviceTempLogs) {
+                    if (log.getReqDate() < minDateLong || log.getFirstTimeReq() < minDateLong || log.getLastTimeReq() < minDateLong) {
+                        continue;
+                    }
+                    if (log.getReqDate() > maxDateLong || log.getFirstTimeReq() > maxDateLong || log.getLastTimeReq() > maxDateLong) {
+                        continue;
+                    }
+                    deviceLogs.add(log);
+                }
                 if (deviceLogs.size() == 0) {
                     return null;
                 } else if (deviceLogs.size() == 1) {
                     return deviceLogs.get(0);
                 } else {
-                    DeviceLog minLog = deviceLogs.get(0);
                     for (DeviceLog log : deviceLogs) {
-                        if (minLog.getReqDate() > log.getReqDate()) {
-                            minLog = log;
+                        if (log.getReqDate() < 0) {
+                            continue;
                         }
                         if (log.getReqDate() > orderTime) {
                             continue;
@@ -54,15 +66,14 @@ public class BigDataApi {
                             lastLog = log;
                         }
                     }
-                    if (lastLog == null) {
-                        lastLog = minLog;
-                    }
-                    for (DeviceLog log : deviceLogs) {
-                        if (lastLog.getFirstTimeReq() > log.getFirstTimeReq()) {
-                            lastLog.setFirstTimeReq(log.getFirstTimeReq());
-                        }
-                        if (lastLog.getLastTimeReq() < log.getLastTimeReq()) {
-                            lastLog.setLastTimeReq(log.getLastTimeReq());
+                    if (lastLog != null) {
+                        for (DeviceLog log : deviceLogs) {
+                            if (lastLog.getFirstTimeReq() > log.getFirstTimeReq()) {
+                                lastLog.setFirstTimeReq(log.getFirstTimeReq());
+                            }
+                            if (lastLog.getLastTimeReq() < log.getLastTimeReq()) {
+                                lastLog.setLastTimeReq(log.getLastTimeReq());
+                            }
                         }
                     }
                 }
@@ -75,6 +86,18 @@ public class BigDataApi {
     }
 
     public static void main(String[] args) {
-        System.out.println(getDeviceInfoFromLog("e10a826589cd2acd", 1489813666000L));
+        System.out.println(getDeviceInfoFromLog("7168377460d76302", 1489813666000L));
+        System.out.println(getDeviceInfoFromLog("e755ed6d75309c7b", 1489813666000L));
+        //System.out.println(new Date(947712482000L));
+        //System.out.println(new Date(159268439894000L));
+        //System.out.println(new Date(1483210218000L));
+        //System.out.println(new Date(1484593685000L));
+        //System.out.println(new Date(Long.MAX_VALUE));
+        //try {
+        //    System.out.println(DateUtils.parseDate("2016-01-01", "yyyy-MM-dd").getTime());
+        //    System.out.println(DateUtils.parseDate("2018-01-01", "yyyy-MM-dd").getTime());
+        //} catch (ParseException e) {
+        //    e.printStackTrace();
+        //}
     }
 }
