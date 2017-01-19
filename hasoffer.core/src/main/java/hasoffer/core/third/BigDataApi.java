@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class BigDataApi {
@@ -87,14 +88,14 @@ public class BigDataApi {
     }
 
     public static void main(String[] args) {
-        for (int i = 0; i < 1000; i++) {
-            System.out.println(getDeviceInfoFromLog("7168377460d76302", 1489813666000L));
-            System.out.println(getDeviceInfoFromLog("a2dccd0e66aab3dd", 1489813666000L));
-            System.out.println(getDeviceInfoFromLog("4e286dfbac3a0824", 1489813666000L));
-            System.out.println(getDeviceInfoFromLog("3ed971e5a439285f", 1489813666000L));
-            System.out.println(getDeviceInfoFromLog("c09b61d9d7787d9", 1489813666000L));
-        }
-        //System.out.println(new Date(947712482000L));
+        //for (int i = 0; i < 1000; i++) {
+        //    System.out.println(getDeviceInfoFromLog("7168377460d76302", 1489813666000L));
+        //    System.out.println(getDeviceInfoFromLog("a2dccd0e66aab3dd", 1489813666000L));
+        //    System.out.println(getDeviceInfoFromLog("4e286dfbac3a0824", 1489813666000L));
+        //    System.out.println(getDeviceInfoFromLog("3ed971e5a439285f", 1489813666000L));
+        //    System.out.println(getDeviceInfoFromLog("c09b61d9d7787d9", 1489813666000L));
+        //}
+        System.out.println(new Date(-947712482000L));
         //System.out.println(new Date(159268439894000L));
         //System.out.println(new Date(1483210218000L));
         //System.out.println(new Date(1484593685000L));
