@@ -122,7 +122,7 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
 
     @Override
     public List<OrderStatsAnalysisPO> countOrderList(Date startTime, Date endTime) {
-        List<OrderStatsAnalysisPO> orderPOList = new ArrayList<OrderStatsAnalysisPO>();
+        List<OrderStatsAnalysisPO> orderPOList = new ArrayList<>();
 //        Date before24H = new Date(startTime.getTime() - 1000 * 60 * 60 * 24);
         List<AffiliateOrder> orderList = new ArrayList<>();
         List<UrmAffAccount> affAccounts = urmAffAccountService.findAffAccountList(Website.FLIPKART);
