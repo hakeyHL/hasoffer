@@ -123,7 +123,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
             PtmStdSkuUpdater updater = new PtmStdSkuUpdater(productId);
             updater.getPo().setRefPrice(minPrice);
             dbm.update(updater);
-            appCacheService.getPtmStdSku(productId, 1);
+            appCacheService.getPtmStdSku(productId, 2);
         }
 
     }
