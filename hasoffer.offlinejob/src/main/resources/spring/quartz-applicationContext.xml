@@ -20,7 +20,7 @@
         <property name="triggers">
             <list>
                 <ref bean="demoTrigger"/>
-                <!--<ref bean="fetchTrigger"/>-->
+                <ref bean="fetchTrigger"/>
                 <ref bean="orderSATrigger"/>
                 <ref bean="orderSCTrigger"/>
                 <ref bean="imageDownLoadTrigger"/>

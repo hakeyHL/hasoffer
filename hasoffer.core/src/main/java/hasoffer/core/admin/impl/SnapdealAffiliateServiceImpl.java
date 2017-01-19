@@ -14,6 +14,8 @@ import hasoffer.core.persistence.po.urm.UrmDevice;
 import hasoffer.core.third.BigDataApi;
 import hasoffer.core.user.IDeviceService;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +25,7 @@ import java.util.*;
 @Service
 @Transactional
 public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
-
+    private static final Logger logger = LoggerFactory.getLogger("hasoffer.affiliate.order");
     private IAffiliateProcessor<SnapDealAffiliateOrder> snapDealProcessor = new SnapdealProductProcessor();
 
     @Resource
@@ -60,7 +62,7 @@ public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
             }
         });
 
-
+        logger.info("snapdeal order size:{}.", orderList.size());
         for (SnapDealAffiliateOrder order : orderList) {
             OrderStatsAnalysisPO po = new OrderStatsAnalysisPO();
             po.setAffID(order.getAffId());
@@ -112,6 +114,7 @@ public class SnapdealAffiliateServiceImpl implements ISnapdealAffiliateService {
                 device = deviceRegTime.get(deviceId);
             }
             if (device != null) {
+                //DeviceLog deviceLog = null;
                 DeviceLog deviceLog = BigDataApi.getDeviceInfoFromLog(device.getDeviceId(), po.getOrderTime().getTime());
                 if (deviceLog == null) {
                     po.setDeviceRegTime(device.getCreateTime());
