@@ -29,6 +29,7 @@ import hasoffer.core.persistence.po.sys.SysAdmin;
 import hasoffer.core.persistence.po.urm.UrmSignCoin;
 import hasoffer.core.persistence.po.urm.UrmUserRedeemGroup;
 import hasoffer.core.product.*;
+import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.redis.ICacheService;
@@ -121,6 +122,8 @@ public class FixController {
     IKeywordService keywordService;
     @Resource
     AppCacheService appCacheService;
+    @Resource
+    PtmStdSKuServiceImpl ptmStdSKuService;
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
 
     private Website[] websites = {
@@ -2508,5 +2511,76 @@ http://www.s2d6.com/x/?x=c&z=s&v=5953892&k=||1477299419|28983|553|detail|&t=http
             }
         }
         return "ok";
+    }
+
+    /**
+     * 尝试删除已经更新了的sku的缓存及更新商品信息
+     *
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("delProSkuList")
+    public String del(@RequestParam(defaultValue = "-1") int size) {
+        Date t1 = TimeUtils.addDay(TimeUtils.nowDate(), -1);
+        Date t2 = TimeUtils.add(t1, TimeUtils.MILLISECONDS_OF_1_MINUTE * 10);
+        try {
+            //保证更新时间与当前时间有1小时时差
+            if (TimeUtils.now() - t1.getTime() < TimeUtils.MILLISECONDS_OF_1_HOUR) {
+                try {
+                    TimeUnit.HOURS.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return "ok1";
+            }
+
+            //PtmProduct重新导入solr
+            List<Long> productIdList = dbm.query("SELECT distinct t.productId FROM PtmCmpSku t WHERE t.updateTime > ?0 and t.updateTime < ?1", Arrays.asList(t1, t2));
+
+            if (productIdList != null) {
+                System.out.println("get update list size:" + productIdList.size());
+            }
+
+            if (size == -1) {
+                size = productIdList.size();
+            }
+            for (long productid : productIdList) {
+                if (size < 1) {
+                    return "oko";
+                }
+                List<PtmCmpSku> skuList = cmpSkuService.listCmpSkus(productid);
+
+                if (skuList == null || skuList.size() <= 0) {
+                    continue;
+                }
+                for (PtmCmpSku sku : skuList) {
+                    appCacheService.getPtmCmpSku(sku.getId(), 0);
+                }
+
+                appCacheService.getPtmCmpSku(skuList.get(0).getId(), 1);
+                //PtmStdSku 重新导入solr
+                List<Long> stdSkuIdList = dbm.query("SELECT distinct t.stdSkuId FROM PtmStdPrice t WHERE t.updateTime > ?0 and t.updateTime < ?1", Arrays.asList(t1, t2));
+                for (long stdSkuId : stdSkuIdList) {
+
+                    List<PtmStdPrice> stdPriceList = ptmStdSKuService.listStdPrice(stdSkuId);
+
+                    if (stdPriceList == null || stdPriceList.size() <= 0) {
+                        continue;
+                    }
+
+                    for (PtmStdPrice stdPrice : stdPriceList) {
+                        appCacheService.getPtmStdPrice(stdPrice.getId(), 0);
+                    }
+                    appCacheService.getPtmStdPrice(stdPriceList.get(0).getId(), 1);
+
+                    t1 = t2;
+                    t2 = TimeUtils.add(t2, TimeUtils.MILLISECONDS_OF_1_MINUTE * 10);
+                }
+                size--;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "ok0";
     }
 }
