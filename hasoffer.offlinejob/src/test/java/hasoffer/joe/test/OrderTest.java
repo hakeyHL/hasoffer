@@ -50,7 +50,7 @@ public class OrderTest {
     @org.junit.Test
     public void testOrderFlipkart() {
         //int[] days = new int[]{0, 1, 2, 3, 4};
-        int[] days = new int[]{6};
+        int[] days = new int[]{1};
         for (int i : days) {
             Date day = TimeUtils.addDay(new Date(), -i);
             String formatStartTime = DateFormatUtils.format(day, "yyyy-MM-dd 00:00:00.000");
