@@ -16,7 +16,7 @@ public class BigDataApi {
     private static final Logger logger = LoggerFactory.getLogger(BigDataApi.class);
 
     public static DeviceLog getDeviceInfoFromLog(String androidId, Long orderTime) {
-        String url = "http://52.77.246.238:8090/device/id/" + androidId;
+        String url = "http://172.31.0.155:8090/device/id/" + androidId;
         logger.info("Get device, android:{} Info begin.", androidId);
         HttpResponseModel responseModel = HttpUtils.get(url, null, null);
         logger.info("Get device, android:{} Info End.", androidId);
@@ -87,8 +87,13 @@ public class BigDataApi {
     }
 
     public static void main(String[] args) {
-        System.out.println(getDeviceInfoFromLog("7168377460d76302", 1489813666000L));
-        System.out.println(getDeviceInfoFromLog("e755ed6d75309c7b", 1489813666000L));
+        for (int i = 0; i < 1000; i++) {
+            System.out.println(getDeviceInfoFromLog("7168377460d76302", 1489813666000L));
+            System.out.println(getDeviceInfoFromLog("a2dccd0e66aab3dd", 1489813666000L));
+            System.out.println(getDeviceInfoFromLog("4e286dfbac3a0824", 1489813666000L));
+            System.out.println(getDeviceInfoFromLog("3ed971e5a439285f", 1489813666000L));
+            System.out.println(getDeviceInfoFromLog("c09b61d9d7787d9", 1489813666000L));
+        }
         //System.out.println(new Date(947712482000L));
         //System.out.println(new Date(159268439894000L));
         //System.out.println(new Date(1483210218000L));
