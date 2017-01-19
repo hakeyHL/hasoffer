@@ -12,6 +12,7 @@ import hasoffer.base.model.*;
 import hasoffer.base.utils.*;
 import hasoffer.base.utils.http.HttpUtils;
 import hasoffer.core.analysis.ProductAnalysisService;
+import hasoffer.core.app.AppCacheService;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.mongo.HijackLog;
@@ -39,6 +40,7 @@ import hasoffer.core.task.worker.IProcessor;
 import hasoffer.core.task.worker.impl.ListProcessWorkerStatus;
 import hasoffer.core.user.IDeviceService;
 import hasoffer.core.utils.Httphelper;
+import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.sites.flipkart.FlipkartHelper;
 import hasoffer.fetch.sites.paytm.PaytmHelper;
@@ -117,7 +119,8 @@ public class FixController {
     IPtmStdPriceService ptmStdPriceService;
     @Resource
     IKeywordService keywordService;
-
+    @Resource
+    AppCacheService appCacheService;
     private LinkedBlockingQueue<TitleCountVo> titleCountQueue = new LinkedBlockingQueue<TitleCountVo>();
 
     private Website[] websites = {
@@ -2471,6 +2474,36 @@ http://www.s2d6.com/x/?x=c&z=s&v=5953892&k=||1477299419|28983|553|detail|&t=http
                     } catch (Exception e) {
                         continue;
                     }
+                }
+            }
+        }
+        return "ok";
+    }
+
+    /**
+     * 删除缓存方法
+     *
+     * @param skuId
+     * @param deletePro
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("delCmpSku")
+    public String deleteCache(@RequestParam(defaultValue = "0") long skuId, boolean deletePro) {
+        if (skuId > 0) {
+            if (ApiUtils.removeBillion(skuId) > 0) {
+                //ptmprice
+                if (deletePro) {
+                    appCacheService.getPtmStdPrice(skuId, 1);
+                } else {
+                    appCacheService.getPtmStdPrice(skuId, 0);
+                }
+            } else {
+                //cmpsku
+                if (deletePro) {
+                    appCacheService.getPtmCmpSku(skuId, 1);
+                } else {
+                    appCacheService.getPtmCmpSku(skuId, 0);
                 }
             }
         }
