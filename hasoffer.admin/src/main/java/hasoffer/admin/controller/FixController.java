@@ -2588,44 +2588,19 @@ http://www.s2d6.com/x/?x=c&z=s&v=5953892&k=||1477299419|28983|553|detail|&t=http
     @RequestMapping("delProAndSkuListByPid")
     public String delProductAndSkuListCache(@RequestParam(defaultValue = "-1") long productId, boolean newData) {
         try {
-            //保证更新时间与当前时间有1小时时差
-            //PtmProduct重新导入solr
             if (productId < 1) {
                 return "less than 1";
             }
             if (newData) {
                 //PtmStdSku 重新导入solr
-                List<Long> stdSkuIdList = dbm.query("SELECT distinct t.stdSkuId FROM PtmStdPrice t WHERE t.stdSkuId=?0", Arrays.asList(productId));
-                for (long stdSkuId : stdSkuIdList) {
-                    List<PtmStdPrice> stdPriceList = ptmStdSKuService.listStdPrice(stdSkuId);
-                    if (stdPriceList == null || stdPriceList.size() <= 0) {
-                        continue;
-                    }
-                    for (PtmStdPrice stdPrice : stdPriceList) {
-                        appCacheService.getPtmStdPrice(stdPrice.getId(), 0);
-                    }
-                    appCacheService.getPtmStdPrice(stdPriceList.get(0).getId(), 1);
-                }
+                appCacheService.removePtmStdSkuAndPricesCache(productId);
             } else {
-                List<Long> productIdList = dbm.query("SELECT distinct t.productId FROM PtmCmpSku t WHERE t.productId > ?0", Arrays.asList(productId));
-                if (productIdList != null) {
-                    System.out.println("get update list size:" + productIdList.size());
-                }
-                for (long productIdd : productIdList) {
-                    List<PtmCmpSku> skuList = cmpSkuService.listCmpSkus(productIdd);
-                    if (skuList == null || skuList.size() <= 0) {
-                        continue;
-                    }
-                    for (PtmCmpSku sku : skuList) {
-                        appCacheService.getPtmCmpSku(sku.getId(), 0);
-                    }
-                    appCacheService.getPtmCmpSku(skuList.get(0).getId(), 1);
-                }
+                appCacheService.removePtmProductAndSkusCache(productId);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return "ok";
     }
 }

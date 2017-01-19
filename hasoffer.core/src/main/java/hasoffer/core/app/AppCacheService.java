@@ -29,4 +29,9 @@ public interface AppCacheService {
     PtmProduct getPtmProduct(long ptmProductId, int... operateType);
 
     PtmCmpSku getPtmCmpSku(long ptmCmpSkuId, int... operateType);
+
+    void removePtmStdSkuAndPricesCache(long ptmStdSkuId);
+
+    void removePtmProductAndSkusCache(long ptmProductId);
+
 }
