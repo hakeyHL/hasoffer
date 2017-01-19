@@ -17,8 +17,9 @@ public class BigDataApi {
 
     public static DeviceLog getDeviceInfoFromLog(String androidId, Long orderTime) {
         String url = "http://52.77.246.238:8090/device/id/" + androidId;
+        logger.info("Get device, android:{} Info begin.", androidId);
         HttpResponseModel responseModel = HttpUtils.get(url, null, null);
-
+        logger.info("Get device, android:{} Info End.", androidId);
         int status = responseModel.getStatusCode();
         String responseStr = null;
         switch (status) {
