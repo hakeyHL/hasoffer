@@ -14,7 +14,7 @@ import java.util.List;
 
 public class BigDataApi {
 
-    private static final Logger logger = LoggerFactory.getLogger(BigDataApi.class);
+    private static final Logger logger = LoggerFactory.getLogger("hasoffer.affiliate.order");
 
     public static DeviceLog getDeviceInfoFromLog(String androidId, Long orderTime) {
         String url = "http://172.31.0.155:8090/device/id/" + androidId;

@@ -60,7 +60,7 @@ public class DealSiteGetDealWoker implements Runnable {
 
                     TaskStatus taskStatus = fetchDealResult.getTaskStatus();
 
-                    System.out.println("taskStatus " + taskStatus);
+                    logger.info("taskStatus " + taskStatus);
 
                     if (TaskStatus.FINISH.equals(taskStatus)) {
 
@@ -68,7 +68,7 @@ public class DealSiteGetDealWoker implements Runnable {
 
                         for (FetchedDealInfo fetchedDealInfo : dealInfoList) {
 
-                            System.out.println("fetchedDealInfo " + fetchedDealInfo.toString());
+                            logger.info("fetchedDealInfo " + fetchedDealInfo.toString());
 
                             AppDeal deal = getDeal(fetchedDealInfo);
 
@@ -83,7 +83,7 @@ public class DealSiteGetDealWoker implements Runnable {
 
                 TimeUnit.MINUTES.sleep(20);
             } catch (Exception e) {
-                System.out.println("deal site fetch exception");
+                logger.info("deal site fetch exception");
                 e.printStackTrace();
             }
         }
