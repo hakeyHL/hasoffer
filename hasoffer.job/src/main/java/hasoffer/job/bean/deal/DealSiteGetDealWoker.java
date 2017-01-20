@@ -55,6 +55,7 @@ public class DealSiteGetDealWoker implements Runnable {
                     FetchDealResult fetchDealResult = fetchDubboService.getDealInfo(website);
 
                     if (fetchDealResult == null) {
+                        logger.info("getDealInfo get null");
                         continue;
                     }
 
@@ -81,7 +82,7 @@ public class DealSiteGetDealWoker implements Runnable {
                     }
                 }
 
-                TimeUnit.MINUTES.sleep(20);
+                TimeUnit.SECONDS.sleep(20);
             } catch (Exception e) {
                 logger.info("deal site fetch exception");
                 e.printStackTrace();
