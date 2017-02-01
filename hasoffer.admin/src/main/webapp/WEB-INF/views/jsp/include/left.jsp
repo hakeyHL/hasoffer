@@ -129,9 +129,9 @@
                                 <li class="active">
                                     <a href="/showstat/alive"> 日活统计</a>
                                 </li>
-                                <%--<li class="active">--%>
-                                    <%--<a href="/showstat/listOrderReport"> 订单统计</a>--%>
-                                <%--</li>--%>
+                                <li class="active">
+                                    <a href="/showstat/listOrderReport"> 订单统计</a>
+                                </li>
                                 <li class="active">
                                     <a href="/showstat/listHiJackReport"> 流量劫持统计</a>
                                 </li>
