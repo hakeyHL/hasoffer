@@ -174,6 +174,13 @@ public class DealController {
 
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
     public ModelAndView edit(AppDeal deal, MultipartFile dealFile, MultipartFile bannerFile, String bannerImageUrl) {
+
+        if (dealFile == null) {
+            logger.error("deal.edit: dealFile is null.");
+        }
+        if (bannerFile == null) {
+            logger.error("deal.edit: bannerFile is null.");
+        }
         /**
          * 无关属性: 不需要展示,不需要修改的属性,
          * 不要忘记放入jsp文件中,否则信息丢失
@@ -183,7 +190,7 @@ public class DealController {
         String dealBigPath = "";
         if (StringUtils.isEmpty(bannerImageUrl)) {
             //修改了图片
-            if (!bannerFile.isEmpty()) {
+            if (bannerFile != null && !bannerFile.isEmpty()) {
                 try {
                     File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
                     FileUtil.writeBytes(imageFile, bannerFile.getBytes());
@@ -196,7 +203,7 @@ public class DealController {
         }
         if (StringUtils.isEmpty(deal.getImageUrl())) {
 
-            if (!dealFile.isEmpty()) {
+            if (dealFile != null && !dealFile.isEmpty()) {
                 try {
                     File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
                     FileUtil.writeBytes(imageFile, dealFile.getBytes());
