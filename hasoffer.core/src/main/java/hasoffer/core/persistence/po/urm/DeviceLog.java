@@ -15,9 +15,9 @@ public class DeviceLog {
     private String screen;
     private String screenSize;
     private String ramSize;
+    private String channel;
+    private Long regTime;
     private Long reqDate;
-    private Long firstTimeReq;
-    private Long lastTimeReq;
     private String reqTimes;
 
     public String getAndroidId() {
@@ -124,28 +124,28 @@ public class DeviceLog {
         this.ramSize = ramSize;
     }
 
+    public String getChannel() {
+        return channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
+    }
+
+    public Long getRegTime() {
+        return regTime;
+    }
+
+    public void setRegTime(Long regTime) {
+        this.regTime = regTime;
+    }
+
     public Long getReqDate() {
         return reqDate;
     }
 
     public void setReqDate(Long reqDate) {
         this.reqDate = reqDate;
-    }
-
-    public Long getFirstTimeReq() {
-        return firstTimeReq;
-    }
-
-    public void setFirstTimeReq(Long firstTimeReq) {
-        this.firstTimeReq = firstTimeReq;
-    }
-
-    public Long getLastTimeReq() {
-        return lastTimeReq;
-    }
-
-    public void setLastTimeReq(Long lastTimeReq) {
-        this.lastTimeReq = lastTimeReq;
     }
 
     public String getReqTimes() {
@@ -158,7 +158,7 @@ public class DeviceLog {
 
     @Override
     public String toString() {
-        return "DeviceInfo{" +
+        return "DeviceLog{" +
                 "androidId='" + androidId + '\'' +
                 ", mac='" + mac + '\'' +
                 ", imei='" + imei + '\'' +
@@ -172,9 +172,9 @@ public class DeviceLog {
                 ", screen='" + screen + '\'' +
                 ", screenSize='" + screenSize + '\'' +
                 ", ramSize='" + ramSize + '\'' +
+                ", channel='" + channel + '\'' +
+                ", regTime=" + regTime +
                 ", reqDate=" + reqDate +
-                ", firstTimeReq=" + firstTimeReq +
-                ", lastTimeReq=" + lastTimeReq +
                 ", reqTimes='" + reqTimes + '\'' +
                 '}';
     }

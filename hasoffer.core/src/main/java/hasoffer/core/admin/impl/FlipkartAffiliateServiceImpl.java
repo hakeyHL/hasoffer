@@ -14,6 +14,7 @@ import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.admin.UrmAffAccount;
 import hasoffer.core.persistence.po.urm.DeviceLog;
 import hasoffer.core.persistence.po.urm.UrmDevice;
+import hasoffer.core.third.BigDataApi;
 import hasoffer.core.user.IDeviceService;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -225,14 +226,15 @@ public class FlipkartAffiliateServiceImpl implements IFlipkartAffiliateService {
                 device = deviceRegTime.get(deviceId);
             }
             if (device != null) {
-                DeviceLog deviceLog = null;
-                //DeviceLog deviceLog = BigDataApi.getDeviceInfoFromLog(device.getDeviceId(), po.getOrderTime().getTime());
+                //DeviceLog deviceLog = null;
+                DeviceLog deviceLog = BigDataApi.getDeviceInfoFromLog(device.getDeviceId(), po.getOrderTime().getTime());
                 if (deviceLog == null) {
                     po.setDeviceRegTime(device.getCreateTime());
                     po.setVersion(device.getAppVersion());
                 } else {
-                    po.setDeviceRegTime(new Date(deviceLog.getFirstTimeReq()));
+                    po.setDeviceRegTime(new Date(deviceLog.getRegTime()));
                     po.setVersion(deviceLog.getAppVersion());
+                    po.setChannelSrc(deviceLog.getChannel());
                 }
             }
             po.setUserType("NONE");
