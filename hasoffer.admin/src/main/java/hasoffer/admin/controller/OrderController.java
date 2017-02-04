@@ -87,8 +87,8 @@ public class OrderController {
             List<Map<String, String>> mapList = ExcelUtils.readRows(2, temp);
             Date startDate = null;
             Date endDate = null;
-            for (Map<String, String> mapinfo : mapList) {
-                String dateStr = mapinfo.get("5");
+            for (Map<String, String> mapInfo : mapList) {
+                String dateStr = mapInfo.get("5");
                 Date date = null;
                 if (dateStr != null) {
                     try {
@@ -112,15 +112,18 @@ public class OrderController {
                     endDate = date;
                 }
 
-
                 OrderStatsAnalysisPO orderModel = new OrderStatsAnalysisPO();
-                orderModel.setCategory(mapinfo.get("0"));
-                orderModel.setTitle(mapinfo.get("1"));
-                orderModel.setProductId(mapinfo.get("2"));
+                orderModel.setCategory(mapInfo.get("0"));
+                orderModel.setTitle(mapInfo.get("1"));
+                orderModel.setProductId(mapInfo.get("2"));
                 //orderModel.setSeller(mapinfo.get("seller"));
-                String affID = mapinfo.get("4");
+                String affID = mapInfo.get("4");
                 orderModel.setAffID(affID);
                 MarketChannel channel = AffliIdHelper.getChannelByAffIdForAmazon(affID);
+                if (channel == null) {
+                    logger.info("this amazon affId id is not mark: {}", affID);
+                    continue;
+                }
                 orderModel.setChannel(channel.name());
                 orderModel.setChannelSrc(channel.name());
                 orderModel.setOrderInTime(date);
@@ -130,10 +133,10 @@ public class OrderController {
                 orderModel.setOrderStatus("tentative");
 
                 //orderModel.setShipped(mapinfo.get("shipped"));
-                orderModel.setSaleAmount(new BigDecimal(mapinfo.get("6")));
+                orderModel.setSaleAmount(new BigDecimal(mapInfo.get("6")));
                 //orderModel.setItemsShipped(mapinfo.get("itemsShipped"));
                 //orderModel.setReturns(mapinfo.get("returns"));
-                orderModel.setTentativeAmount(new BigDecimal(mapinfo.get("9")));
+                orderModel.setTentativeAmount(new BigDecimal(mapInfo.get("9")));
                 orderModelList.add(orderModel);
             }
             if (!ArrayUtils.isNullOrEmpty(orderModelList)) {
@@ -143,6 +146,7 @@ public class OrderController {
         } catch (IOException e) {
             logger.error("import amazon order file:{} fail.", temp.getName(), e);
         }
+        logger.info("import amazon order file:{} success.", temp.getName());
         return modelAndView;
 
     }
