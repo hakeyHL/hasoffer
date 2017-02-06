@@ -83,7 +83,8 @@ public class PromDealFetchJobBean extends QuartzJobBean {
                 }
 
                 //找到链接
-                TagNode hrefNode = XPathUtils.getSubNodeByXPath(dealNode, "//a[@class='cept-tt linkPlain thread-title-text box--all-b']", null);
+                //TagNode hrefNode = XPathUtils.getSubNodeByXPath(dealNode, "//a[@class='cept-tt linkPlain thread-title-text box--all-b']", null);
+                TagNode hrefNode = XPathUtils.getSubNodeByXPath(dealNode, "//a[@title='Ir a la oferta']", null);
                 String href = hrefNode.getAttributeByName("href");
 
                 //重定向到详情页面
