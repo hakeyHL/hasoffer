@@ -59,8 +59,8 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
             if (tomorrowDayStart < TimeUtils.now()) {
                 ymd = TimeUtils.parse(TimeUtils.today(), TimeUtils.PATTERN_YMD);
                 tomorrowDayStart = TimeUtils.getDayStart(TimeUtils.addDay(TimeUtils.nowDate(), 1).getTime());
-//                logger.info("current ymd = " + ymd);
-//                logger.info("current daystart is " + tomorrowDayStart);
+                logger.info("current ymd = " + ymd);
+                logger.info("current daystart is " + tomorrowDayStart);
             }
 
             try {
@@ -68,7 +68,7 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                 Object pop = redisListService.pop(UPDATE_WAIT_QUEUE + ymd);
                 if (pop == null) {//如果队列没有数据了，休息5分钟
                     try {
-//                        logger.info("sku update pop get null sleep 30 min " + tomorrowDayStart);
+                        logger.info("sku update pop get null sleep 30 min " + tomorrowDayStart);
                         TimeUnit.MINUTES.sleep(5);
                     } catch (InterruptedException e) {
                         logger.info("ListNeedUpdateFromRedisWorker list pop from redis InterruptedException");
@@ -77,15 +77,15 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
                 }
 
                 //if proceded set has this productId，continue next one
-//                logger.info("pop from wait update queue");
+                logger.info("pop from wait update queue");
                 if (redisSetService.contains(KEY_PROCESSED_SET + ymd, pop)) {
-//                    logger.info("proceded set has this productId，continue next one");
+                    logger.info("proceded set has this productId，continue next one");
                     continue;
                 }
 
                 //根据商品id，发起更新任务
                 Long productId = Long.valueOf((String) pop);
-//                logger.info("proceded set do not hava this productid " + productId + " get skuList");
+                logger.info("proceded set do not hava this productid " + productId + " get skuList");
 
                 if (productId > ConstantUtil.API_ONE_BILLION_NUMBER) {//ptmStdPrice
                     sendPtmStdPriceUrlUpdateReqest(productId);
@@ -155,7 +155,7 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
 
         if (stdPriceList != null && stdPriceList.size() > 0) {
 
-//            logger.info("get stdPriceList size is " + stdPriceList.size());
+            logger.info("get stdPriceList size is " + stdPriceList.size());
 
             for (PtmStdPrice stdPrice : stdPriceList) {
 
@@ -196,7 +196,7 @@ public class ListNeedUpdateFromRedisWorker implements Runnable {
             }
 
         } else {
-//            logger.info("get empty stdPriceList for productid " + productId);
+            logger.info("get empty stdPriceList for productid " + productId);
         }
 
     }
