@@ -134,6 +134,10 @@ public class ThirdServiceImple implements ThirdService {
         dataMap.put("totalPage", result.getTotalPage());
         dataMap.put("offerList", dealList);
         resultMap.put(ConstantUtil.API_NAME_DATA, dataMap);
+        if (filterProperties.length > 0) {
+            PropertyFilter propertyFilter = JsonHelper.filterProperty(filterProperties);
+            return JSON.toJSONString(resultMap, propertyFilter);
+        }
         return JSON.toJSONString(resultMap);
     }
 
@@ -184,7 +188,7 @@ public class ThirdServiceImple implements ThirdService {
     }
 
     @Override
-    public String getDealsForMexico(int page, int pageSize, String... filterProperties) {
+    public String getDealsForInveno(int page, int pageSize, String... filterProperties) {
         Map resultMap = new HashMap();
         Map dataMap = new HashMap();
         resultMap.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);

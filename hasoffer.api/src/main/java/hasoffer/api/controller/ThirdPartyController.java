@@ -73,11 +73,11 @@ public class ThirdPartyController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/offers/mexico", method = RequestMethod.GET)
+    @RequestMapping(value = "/offers/inveno", method = RequestMethod.GET)
     public String getDealsForMexico(@RequestParam(defaultValue = "1") int page,
                                     @RequestParam(defaultValue = "10") int pageSize,
                                     HttpServletResponse response) {
-        String dealsForMexico = thridPartyService.getDealsForMexico(page, pageSize, new String[]{"discount", "originPrice", "presentPrice"});
+        String dealsForMexico = thridPartyService.getDealsForInveno(page, pageSize, new String[]{"discount", "originPrice", "presentPrice"});
         Httphelper.sendJsonMessage(dealsForMexico, response);
         return null;
     }

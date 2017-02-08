@@ -9,7 +9,7 @@ public interface ThirdService {
 
     String getDealInfo(String id, String marketChannel, String deviceId, String... filterProperties);
 
-    String getDealsForMexico(int page, int pageSize, String... filterProperties);
+    String getDealsForInveno(int page, int pageSize, String... filterProperties);
 
     String getDealsForGmobi(int page, int pageSize, String... filterProperties);
 }
