@@ -62,7 +62,14 @@ public class ThirdPartyController {
         return null;
     }
 
-
+    /**
+     * mexico offer list
+     *
+     * @param page
+     * @param pageSize
+     * @param response
+     * @return
+     */
     @RequestMapping(value = "/offers/mexico", method = RequestMethod.GET)
     public String getDealsForMexico(@RequestParam(defaultValue = "1") int page,
                                     @RequestParam(defaultValue = "10") int pageSize,
