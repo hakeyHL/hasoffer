@@ -29,6 +29,8 @@ public class StringTest {
     @Test
     public void testSubString(){
 
+        int aaa = Integer.parseInt("aaa",16);
+
         String str = "afeajfeojafeafeaf";
 
         String str1 = str.substring(str.indexOf('e'));
