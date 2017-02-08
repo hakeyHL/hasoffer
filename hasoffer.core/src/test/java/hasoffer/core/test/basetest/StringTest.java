@@ -27,6 +27,19 @@ import java.util.regex.Pattern;
 public class StringTest {
 
     @Test
+    public void testSubString(){
+
+        String str = "afeajfeojafeafeaf";
+
+        String str1 = str.substring(str.indexOf('e'));
+
+        String str2 = str1.substring(0, str1.indexOf('o'));
+
+        System.out.println(str2);
+
+    }
+
+    @Test
     public void testStringIndex() {
         String html = "        <div style=\"position: relative\">\n" +
                 "          <div style=\"z-index: 3; padding: 30px 0px 40px 0px;background: #FAFBFC;\" id=\"web-footerMount\"><!-- react-empty: 1 --></div>\n" +
