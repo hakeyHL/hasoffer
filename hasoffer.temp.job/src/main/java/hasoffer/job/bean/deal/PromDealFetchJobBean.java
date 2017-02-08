@@ -191,7 +191,6 @@ public class PromDealFetchJobBean extends QuartzJobBean {
 
                     //描述图片处理
                     if (descriptionWithOutHtml != null && descriptionWithOutHtml.contains("<img")) {
-                        System.out.println(descriptionWithOutHtml);
 
                         String[] subDescriptionArray = descriptionWithOutHtml.split("src=\"");
 
@@ -248,6 +247,7 @@ public class PromDealFetchJobBean extends QuartzJobBean {
                     }
 
                     AppDeal mexicoAppDeal = new AppDeal();
+                    mexicoAppDeal.setOriLinkUrl(href);
                     mexicoAppDeal.setListPageImage(dealSmallPath);
                     mexicoAppDeal.setInfoPageImage(dealBigPath);
                     mexicoAppDeal.setCategory(categoryName);
