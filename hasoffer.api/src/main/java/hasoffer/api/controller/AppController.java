@@ -1,7 +1,6 @@
 package hasoffer.api.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
@@ -28,11 +27,9 @@ import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
 import hasoffer.core.persistence.dbm.osql.datasource.DataSource;
 import hasoffer.core.persistence.dbm.osql.datasource.DataSourceType;
-import hasoffer.core.persistence.enums.AppdealSource;
 import hasoffer.core.persistence.mongo.PtmCmpSkuDescription;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.*;
-import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.urm.*;
 import hasoffer.core.product.impl.ProductServiceImpl;
@@ -416,7 +413,7 @@ public class AppController {
         //1. 从数据库中查询到
         ModelAndView mv = new ModelAndView();
         //忽略前端传页面大小
-        PageableResult Result = appService.getDeals(Long.valueOf(page), Long.valueOf(8));
+        PageableResult Result = appService.getDeals(Integer.parseInt(page), 8);
         Map map = new HashMap();
         List li = new ArrayList();
        /* getDealsFromCache(li, Integer.parseInt(page), 8);
@@ -998,7 +995,7 @@ public class AppController {
                             map.put("website", appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
                             map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
                             map.put("logoUrl", appDeal.getWebsite() == null ? "" : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
-                            getModel1Deal(map, appDeal);
+                            map.put("description", getDealDes(appDeal));
                         } else {
                             map.put("discount", appDeal.getDiscount());
                             map.put("originPrice", appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
@@ -1021,29 +1018,9 @@ public class AppController {
 
                             //要判断deal的类型,手动导入和降价生成
                             if (appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
-                                //降价生成
                                 StringBuilder sb = new StringBuilder();
-                                String description = appDeal.getDescription();
-                                //网站名 is offering 商品名 for Rs.现价.
-                                //当支持货到付款时展示 : Cash On Delivery is available
-                                sb.append(appDeal.getWebsite().name()).append(" is offering ").append(appDeal.getTitle()).append(" for ").append(appDeal.getPriceDescription()).append(".");
-                                //是否支持COD
-                                PtmCmpSku cmpSkuById = cmpSkuCacheManager.getCmpSkuById(appDeal.getPtmcmpskuid());
-                                if (cmpSkuById != null) {
-                                    //如果存在此sku
-                                    String supportPayMethod = cmpSkuById.getSupportPayMethod();
-                                    if (!StringUtils.isBlank(supportPayMethod) && supportPayMethod.contains("COD")) {
-                                        sb.append("Cash On Delivery is available.");
-                                    }
-                                }
-                                //描述拼接完成
-                                map.put("description", sb.toString());
-                                //拼接Price Research
-                                if (StringUtils.isNotBlank(description)) {
-                                    //如果描述不为空,拼接描述然后换行,空行
-                                    sb = new StringBuilder();
-                                    sb.append(description).append("\n\n");
-                                }
+                                //降价生成
+                                map.put("description", apiUtils.getPriceOffDealDes(appDeal));
                                 if (appDeal.getPtmcmpskuid() > 0) {
                                     //如果存在skuId,将skuId返回
                                     map.put("skuId", appDeal.getPtmcmpskuid());
@@ -1106,11 +1083,13 @@ public class AppController {
                                     priceCurveDesc.put("fontColor", "#108ee9");
                                     map.put("clickConfig", priceCurveDesc);
                                 }
-                            } else if (AppdealSource.DEAL_SITE.equals(appDeal.getAppdealSource())) {
-                                getModel1Deal(map, appDeal);
-                            } else {
+                            }
+//                            else if (AppdealSource.DEAL_SITE.equals(appDeal.getAppdealSource())) {
+//                                map.put("description", getDealDes(appDeal));
+//                            }
+                            else {
                                 //手动导入,描述要用老的方式
-                                getModel1Deal(map, appDeal);
+                                map.put("description", getDealDes(appDeal));
                             }
                         }
                         map.put("extra", 0);
@@ -1136,7 +1115,7 @@ public class AppController {
         return mv;
     }
 
-    private void getModel1Deal(Map map, AppDeal appDeal) {
+    private String getDealDes(AppDeal appDeal) {
         StringBuilder sb = new StringBuilder();
         String description = appDeal.getDescription();
         sb.append(description == null ? "" : description);
@@ -1178,7 +1157,7 @@ public class AppController {
 
             }
         }
-        map.put("description", sb.toString());
+        return sb.toString();
     }
 
     private void setDeal(AppDeal appDeal, DealVo dealVo) {
@@ -1193,7 +1172,6 @@ public class AppController {
         if (appDeal.getWebsite() != null && appDeal.getWebsite().name().equals("FLIPKART")) {
             dealVo.setExtra(7.5);
         }
-        dealVo.setLogoUrl(WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
         dealVo.setExp(appDeal.getExpireTime());
         dealVo.setTitle(appDeal.getTitle());
         dealVo.setCreateTime(TimeUtils.getDifference2Date(new Date(), appDeal.getCreateTime()));
@@ -1253,21 +1231,5 @@ public class AppController {
                 }
             }
         }
-    }
-
-    public void getDealsFromCache(List list, int page, int size) {
-        String key = ConstantUtil.API_DEALS_ + page + "_" + +size;
-        String dealsString = iCacheService.get(key, 0);
-        if (org.apache.commons.lang3.StringUtils.isNotEmpty(dealsString)) {
-            List<DealVo> dealVos = JSONArray.parseArray(dealsString, DealVo.class);
-            if (dealVos != null && dealVos.size() > 0) {
-                list.addAll(dealVos);
-            }
-        }
-    }
-
-    public void setDeals2Cache(List list, int page, int size) {
-        String key = ConstantUtil.API_DEALS_ + page + "_" + size;
-        iCacheService.add(key, JSONArray.toJSONString(list), TimeUtils.MILLISECONDS_OF_1_MINUTE * 5);
     }
 }

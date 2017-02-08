@@ -33,7 +33,7 @@ public interface IAppService {
 
     OrderStatsAnalysisPO getOrderDetail(String orderId, String userId);
 
-    PageableResult getDeals(Long page, Long pageSize);
+    PageableResult getDeals(int page, int pageSize);
 
     PageableResult getDeals(Long page, Long pageSize, int temp);
 
@@ -98,4 +98,6 @@ public interface IAppService {
     void updateDeal(AppDeal appDeal);
 
     void updateKeyResultCount(KeywordCollection keywordCollection);
+
+    PageableResult<AppDeal> getDealsForMexico(int page, int pageSize);
 }

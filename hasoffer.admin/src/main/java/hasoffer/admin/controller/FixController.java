@@ -2457,13 +2457,13 @@ http://www.s2d6.com/x/?x=c&z=s&v=5953892&k=||1477299419|28983|553|detail|&t=http
     @ResponseBody
     @RequestMapping("fixDealSite")
     public String fixDealWebSite() {
-        PageableResult<AppDeal> deals = appService.getDeals(1l, 500l);
+        PageableResult<AppDeal> deals = appService.getDeals(1, 500);
 
-        long currentPage = 1;
+        int currentPage = 1;
         long totalPage = deals.getTotalPage();
-        long pageSize = 500;
+        int pageSize = 500;
 
-        for (long i = currentPage; i < totalPage; i++) {
+        for (int i = currentPage; i < totalPage; i++) {
             System.out.println("currentPage : " + i);
             PageableResult<AppDeal> deals1 = appService.getDeals(i, pageSize);
             for (AppDeal appDeal : deals1.getData()) {

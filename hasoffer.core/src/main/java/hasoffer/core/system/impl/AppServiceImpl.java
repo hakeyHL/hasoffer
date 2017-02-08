@@ -98,6 +98,10 @@ public class AppServiceImpl implements IAppService {
                     "t.expireTime >= ?0   and t.listPageImage is not null " +
                     " order by t.weight desc,t.createTime desc  ";
 
+    private static final String Q_APP_GETDEALS_BY_THUMB =
+            "SELECT t FROM AppDeal t where  t.display='1' and   " +
+                    "t.expireTime >= ?0   and t.listPageImage is not null and t.dealThumbNumber>0 " +
+                    " order by t.weight desc,t.createTime desc  ";
     private static final String Q_APP_DEAL_GET_SIMILAR =
             "SELECT t FROM AppDeal t where  t.display='1' and  t.createTime>=?0 and " +
                     "t.expireTime >= ?1   and t.listPageImage is not null " +
@@ -180,8 +184,8 @@ public class AppServiceImpl implements IAppService {
     }
 
     @Override
-    public PageableResult getDeals(Long page, Long pageSize) {
-        return dbm.queryPage(Q_APP_GETDEALS, page.intValue() <= 1 ? 1 : page.intValue(), pageSize.intValue(), Arrays.asList(new Date()));
+    public PageableResult getDeals(int page, int pageSize) {
+        return dbm.queryPage(Q_APP_GETDEALS, page <= 1 ? 1 : page, pageSize, Arrays.asList(new Date()));
 //        return dbm.queryPage(Q_APP_GETDEALS, page.intValue() <= 1 ? 1 : page.intValue(), pageSize.intValue(), Arrays.asList(new Date()));
     }
 
@@ -625,5 +629,10 @@ public class AppServiceImpl implements IAppService {
     @Override
     public void updateKeyResultCount(KeywordCollection keywordCollection) {
         dbm.update(keywordCollection);
+    }
+
+    @Override
+    public PageableResult<AppDeal> getDealsForMexico(int page, int pageSize) {
+        return dbm.queryPage(Q_APP_GETDEALS_BY_THUMB, page <= 1 ? 1 : page, pageSize, Arrays.asList(new Date()));
     }
 }
