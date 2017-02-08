@@ -16,6 +16,7 @@ import hasoffer.core.third.ThirdService;
 import hasoffer.core.utils.ConstantUtil;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.core.utils.JsonHelper;
+import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.helper.WebsiteHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -41,9 +42,10 @@ public class ThirdServiceImple implements ThirdService {
     CmpSkuServiceImpl cmpSkuService;
     @Resource
     IAppService appService;
+    @Resource
+    ApiUtils apiUtils;
     Logger logger = LoggerFactory.getLogger(ThirdServiceImple.class);
 
-    @Override
     public String getDeals(String acceptJson) {
         JSONObject resJson = new JSONObject();
         StringBuilder sb = new StringBuilder();
@@ -111,7 +113,7 @@ public class ThirdServiceImple implements ThirdService {
     }
 
     @Override
-    public String getDealsForIndia(int page, int pageSize) {
+    public String getDealsForIndia(int page, int pageSize, String... filterProperties) {
         Map resultMap = new HashMap();
         Map dataMap = new HashMap();
           /* 返回数据为
@@ -128,6 +130,8 @@ public class ThirdServiceImple implements ThirdService {
             getDealModel(appDeal, dealJson);
             dealList.add(dealJson);
         }
+        dataMap.put("currentPage", result.getCurrentPage());
+        dataMap.put("totalPage", result.getTotalPage());
         dataMap.put("offerList", dealList);
         resultMap.put(ConstantUtil.API_NAME_DATA, dataMap);
         return JSON.toJSONString(resultMap);
@@ -136,24 +140,23 @@ public class ThirdServiceImple implements ThirdService {
     private void getDealModel(AppDeal appDeal, JSONObject dealJson) {
         dealJson.put("id", appDeal.getId());
         dealJson.put("category", appDeal.getCategory());
-        dealJson.put("imageUrl", appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
+        dealJson.put("image", appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
         dealJson.put("title", appDeal.getTitle());
         dealJson.put("discount", appDeal.getDiscount());
-        dealJson.put("priceDes", appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
+        dealJson.put("priceDescription", appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
         dealJson.put("thumbCount", appDeal.getDealThumbNumber());
-        dealJson.put("site", appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
+        dealJson.put("website ", appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
         dealJson.put("createTime", TimeUtils.getDifference2Date(new Date(), appDeal.getCreateTime()));
+        dealJson.put("presentPrice", appDeal.getPresentPrice() == null ? 0 : appDeal.getPresentPrice());
+        dealJson.put("originPrice", appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
     }
 
     @Override
-    public String getDealInfoForIndia(String id) {
+    public String getDealInfo(String id, String marketChannel, String deviceId, String... filterProperties) {
         Map resultMap = new HashMap();
-        Map dataMap = new HashMap();
-
          /* 返回数据为
                 * id,deal类目名称、详情页图片、名称、折扣值、deal的价格描述、点赞数、site、创建时间,跳转链接
            */
-        resultMap.put(ConstantUtil.API_NAME_DATA, dataMap);
         resultMap.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
         if (StringUtils.isEmpty(id)) {
             resultMap.put(ConstantUtil.API_NAME_MSG, "id required");
@@ -166,8 +169,10 @@ public class ThirdServiceImple implements ThirdService {
                 JSONObject dealJson = new JSONObject();
                 getDealModel(appDeal, dealJson);
                 dealJson.put("imageUrl", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
-                dealJson.put("description", "");
-                dealJson.put("", "");
+                dealJson.put("description", apiUtils.getPriceOffDealDes(appDeal));
+                String deepLink = appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{marketChannel, deviceId});
+                dealJson.put("deepLink", deepLink);
+                resultMap.put(ConstantUtil.API_NAME_DATA, dealJson);
             } else {
                 resultMap.put(ConstantUtil.API_NAME_MSG, "not found this deal, with id " + id);
                 return JSON.toJSONString(resultMap);
@@ -175,7 +180,7 @@ public class ThirdServiceImple implements ThirdService {
         }
         resultMap.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
         resultMap.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
-        return null;
+        return JSON.toJSONString(resultMap);
     }
 
     @Override
@@ -193,7 +198,35 @@ public class ThirdServiceImple implements ThirdService {
             getDealModel(appDeal, dealJson);
             dealList.add(dealJson);
         }
+        dataMap.put("currentPage", result.getCurrentPage());
+        dataMap.put("totalPage", result.getTotalPage());
         dataMap.put("offerList", dealList);
+        resultMap.put(ConstantUtil.API_NAME_DATA, dataMap);
+        if (filterProperties.length > 0) {
+            PropertyFilter propertyFilter = JsonHelper.filterProperty(filterProperties);
+            return JSON.toJSONString(resultMap, propertyFilter);
+        }
+        return JSON.toJSONString(resultMap);
+    }
+
+    @Override
+    public String getDealsForGmobi(int page, int pageSize, String... filterProperties) {
+        Map resultMap = new HashMap();
+        Map dataMap = new HashMap();
+        resultMap.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        resultMap.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
+        //获取的是 有效的,display的,列表页图不为空的
+        PageableResult<AppDeal> result = appService.getDeals(page, pageSize);
+        //ArrayList,内部为数组实现,对元素快速随机访问
+        List dealList = new ArrayList();
+        for (AppDeal appDeal : result.getData()) {
+            JSONObject dealJson = new JSONObject();
+            getDealModel(appDeal, dealJson);
+            dealList.add(dealJson);
+        }
+        dataMap.put("offerList", dealList);
+        dataMap.put("currentPage", result.getCurrentPage());
+        dataMap.put("totalPage", result.getTotalPage());
         resultMap.put(ConstantUtil.API_NAME_DATA, dataMap);
         if (filterProperties.length > 0) {
             PropertyFilter propertyFilter = JsonHelper.filterProperty(filterProperties);
