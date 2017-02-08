@@ -30,9 +30,9 @@ public class ThirdPartyController {
      */
     @RequestMapping(value = "/api/deals", method = RequestMethod.POST)
     public String config(HttpServletRequest request, HttpServletResponse response) {
-        String acceptjson = Httphelper.getJsonFromRequest(request);
-//        logger.info("accept content is " + acceptjson);
-        String result = thridPartyService.getDeals(acceptjson);
+        String acceptJson = Httphelper.getJsonFromRequest(request);
+//        logger.info("accept content is " + acceptJson);
+        String result = thridPartyService.getDeals(acceptJson);
         Httphelper.sendJsonMessage(result, response);
         return null;
     }
@@ -45,7 +45,7 @@ public class ThirdPartyController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/api/deals", method = RequestMethod.GET)
+    @RequestMapping(value = "/offers/india", method = RequestMethod.GET)
     public String getDealsForIndia(@RequestParam(defaultValue = "1") int page,
                                    @RequestParam(defaultValue = "10") int pageSize,
                                    HttpServletResponse response) {
@@ -54,11 +54,21 @@ public class ThirdPartyController {
         return null;
     }
 
-    @RequestMapping(value = "/api/dealInfo/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/offer/dealInfo/{id}", method = RequestMethod.GET)
     public String getDealsForIndia(@RequestParam(defaultValue = "1") @PathVariable String id,
                                    HttpServletResponse response) {
         String dealInfoForIndia = thridPartyService.getDealInfoForIndia(id);
         Httphelper.sendJsonMessage(dealInfoForIndia, response);
+        return null;
+    }
+
+
+    @RequestMapping(value = "/offers/mexico", method = RequestMethod.GET)
+    public String getDealsForMexico(@RequestParam(defaultValue = "1") int page,
+                                    @RequestParam(defaultValue = "10") int pageSize,
+                                    HttpServletResponse response) {
+        String dealsForMexico = thridPartyService.getDealsForMexico(page, pageSize, new String[]{"discount"});
+        Httphelper.sendJsonMessage(dealsForMexico, response);
         return null;
     }
 }

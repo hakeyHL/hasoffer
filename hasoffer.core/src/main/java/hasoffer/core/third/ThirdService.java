@@ -5,9 +5,11 @@ package hasoffer.core.third;
  */
 
 public interface ThirdService {
-    String getDeals(String acceptjson);
+    String getDeals(String acceptJson);
 
     String getDealsForIndia(int page, int pageSize);
 
     String getDealInfoForIndia(String id);
+
+    String getDealsForMexico(int page, int pageSize, String... filterProperties);
 }
