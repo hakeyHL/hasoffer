@@ -12,6 +12,7 @@ import hasoffer.core.app.AppCategoryService;
 import hasoffer.core.app.vo.*;
 import hasoffer.core.bo.product.CategoryVo;
 import hasoffer.core.bo.system.SearchCriteria;
+import hasoffer.core.cache.CmpSkuCacheManager;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
 import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
@@ -70,6 +71,8 @@ public class ApiUtils {
     PtmStdPriceIndexServiceImpl ptmStdPriceIndexService;
     @Resource
     PtmStdSkuIndexServiceImpl ptmStdSkuIndexService;
+    @Resource
+    CmpSkuCacheManager cmpSkuCacheManager;
     @Resource
     private ICmpSkuService cmpSkuService;
     @Resource
@@ -1074,5 +1077,29 @@ public class ApiUtils {
             stdSkuParametersMap.put("competitors", competitors);
         }
         return stdSkuParametersMap;
+    }
+
+    public String getPriceOffDealDes(AppDeal appDeal) {
+        StringBuilder sb = new StringBuilder();
+        String description = appDeal.getDescription();
+        //网站名 is offering 商品名 for Rs.现价.
+        //当支持货到付款时展示 : Cash On Delivery is available
+        sb.append(appDeal.getWebsite().name()).append(" is offering ").append(appDeal.getTitle()).append(" for ").append(appDeal.getPriceDescription()).append(".");
+        //是否支持COD
+        PtmCmpSku cmpSkuById = cmpSkuCacheManager.getCmpSkuById(appDeal.getPtmcmpskuid());
+        if (cmpSkuById != null) {
+            //如果存在此sku
+            String supportPayMethod = cmpSkuById.getSupportPayMethod();
+            if (!org.apache.commons.lang3.StringUtils.isBlank(supportPayMethod) && supportPayMethod.contains("COD")) {
+                sb.append("Cash On Delivery is available.");
+            }
+        }
+        //拼接Price Research
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(description)) {
+            //如果描述不为空,拼接描述然后换行,空行
+            sb = new StringBuilder();
+            sb.append(description).append("\n\n");
+        }
+        return sb.toString();
     }
 }
