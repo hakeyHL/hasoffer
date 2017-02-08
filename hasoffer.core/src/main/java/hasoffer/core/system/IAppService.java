@@ -98,4 +98,6 @@ public interface IAppService {
     void updateDeal(AppDeal appDeal);
 
     void updateKeyResultCount(KeywordCollection keywordCollection);
+
+    PageableResult<AppDeal> getDealsForMexico(int page, int pageSize);
 }

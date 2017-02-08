@@ -128,7 +128,7 @@ public class ThirdServiceImple implements ThirdService {
             getDealModel(appDeal, dealJson);
             dealList.add(dealJson);
         }
-        dataMap.put("dealList", dealList);
+        dataMap.put("offerList", dealList);
         resultMap.put(ConstantUtil.API_NAME_DATA, dataMap);
         return JSON.toJSONString(resultMap);
     }
@@ -176,6 +176,30 @@ public class ThirdServiceImple implements ThirdService {
         resultMap.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
         resultMap.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         return null;
+    }
+
+    @Override
+    public String getDealsForMexico(int page, int pageSize, String... filterProperties) {
+        Map resultMap = new HashMap();
+        Map dataMap = new HashMap();
+        resultMap.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        resultMap.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
+        //获取的是 有效的,display的,列表页图不为空的
+        PageableResult<AppDeal> result = appService.getDealsForMexico(page, pageSize);
+        //ArrayList,内部为数组实现,对元素快速随机访问
+        List dealList = new ArrayList();
+        for (AppDeal appDeal : result.getData()) {
+            JSONObject dealJson = new JSONObject();
+            getDealModel(appDeal, dealJson);
+            dealList.add(dealJson);
+        }
+        dataMap.put("offerList", dealList);
+        resultMap.put(ConstantUtil.API_NAME_DATA, dataMap);
+        if (filterProperties.length > 0) {
+            PropertyFilter propertyFilter = JsonHelper.filterProperty(filterProperties);
+            return JSON.toJSONString(resultMap, propertyFilter);
+        }
+        return JSON.toJSONString(resultMap);
     }
 
 
