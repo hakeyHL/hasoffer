@@ -91,7 +91,7 @@ public class AppDealController {
 //            System.out.println("from solr get   :" + deals.size());
         }
         //再展示手机类deal id或parentid 为 5 level小于等于3
-        PageableResult pageableResult = appService.getDeals(page + 0l, pageSize + 0l);
+        PageableResult pageableResult = appService.getDeals(page, pageSize);
         if (pageableResult != null && pageableResult.getData() != null && pageableResult.getData().size() > 0) {
             List<AppDeal> list = pageableResult.getData();
 //            System.out.println("search from mysql get   :" + list.size());
