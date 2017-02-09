@@ -240,5 +240,18 @@ public class ThirdServiceImpl implements ThirdService {
         return JSON.toJSONString(resultMap);
     }
 
+    @Override
+    public String getOfferOrderInfo(Date dateStart, Date dateEnd) {
+        //获取内容如下
+        //每天各个网站的订单数--属于GMobi的
+        //订单金额
+        //佣金金额
+        //当日offer列表总展示次数,每次请求响应结束后都要计数--这个东西存哪儿去...
+        //offer的点击总次数
+
+
+        return null;
+    }
+
 
 }
