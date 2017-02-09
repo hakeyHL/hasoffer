@@ -9,6 +9,7 @@ import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.redis.ICacheService;
+import hasoffer.core.utils.ConstantUtil;
 import jodd.util.NameValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +70,7 @@ public class ProductIndexCacheManager {
         if (!StringUtils.isEmpty(sc.getCategoryId())) {
             key.append("_").append(sc.getCategoryId());
         }
-        if (!StringUtils.isEmpty(sc.getLevel() + "")) {
+        if (!StringUtils.isEmpty(sc.getLevel() + ConstantUtil.API_DATA_EMPTYSTRING)) {
             key.append("_").append(sc.getLevel());
         }
         if (sc.getPriceFrom() != -1) {

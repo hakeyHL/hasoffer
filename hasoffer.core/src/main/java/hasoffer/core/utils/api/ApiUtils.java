@@ -169,7 +169,7 @@ public class ApiUtils {
             if (!flag) {
                 UrmUserDevice urmUserDevice = new UrmUserDevice();
                 urmUserDevice.setDeviceId(id);
-                urmUserDevice.setUserId(urmUser.getId() + "");
+                urmUserDevice.setUserId(urmUser.getId() + ConstantUtil.API_DATA_EMPTYSTRING);
                 urmUserDevices.add(urmUserDevice);
             }
         }
@@ -239,7 +239,7 @@ public class ApiUtils {
         if (m.find()) {
             return m.group(0);
         } else {
-            return "";
+            return ConstantUtil.API_DATA_EMPTYSTRING;
         }
     }
 
@@ -590,7 +590,7 @@ public class ApiUtils {
 //        String   str   =   "*a dCVs*34_a _09_b5*[/435^*&()^$$&*).{}+.|.)%%*(*.}34{45[]12.fd'*&999￥……{}【】。，；’“'”？";
         Pattern p = Pattern.compile(regEx);
         Matcher m = p.matcher(str);
-        return m.replaceAll("").trim();
+        return m.replaceAll(ConstantUtil.API_DATA_EMPTYSTRING).trim();
     }
 
     /**
@@ -719,8 +719,8 @@ public class ApiUtils {
 
     public String getStringNum(String source) {
         source = source.trim();
-        String str2 = "";
-        if (source != null && !"".equals(source)) {
+        String str2 = ConstantUtil.API_DATA_EMPTYSTRING;
+        if (source != null && !ConstantUtil.API_DATA_EMPTYSTRING.equals(source)) {
             for (int i = 0; i < source.length(); i++) {
                 if (source.charAt(i) >= 48 && source.charAt(i) <= 57) {
                     str2 += source.charAt(i);
@@ -734,7 +734,7 @@ public class ApiUtils {
 
     public boolean isPriceOffAlert(String userToken, Long skuId, Long... userId) {
         if (userId.length > 0 && userId[0] > 0) {
-            PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(userId[0] + "", skuId);
+            PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(userId[0] + ConstantUtil.API_DATA_EMPTYSTRING, skuId);
             if (priceOffNotice != null) {
                 return true;
             }
@@ -742,7 +742,7 @@ public class ApiUtils {
         if (!StringUtils.isEmpty(userToken)) {
             UrmUser urmUser = appService.getUserByUserToken(userToken);
             if (urmUser != null) {
-                PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + "", skuId);
+                PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + ConstantUtil.API_DATA_EMPTYSTRING, skuId);
                 if (priceOffNotice != null) {
                     return true;
                 }
@@ -876,7 +876,7 @@ public class ApiUtils {
                 List<NameValue> nameValues = (List<NameValue>) next.getValue();
                 System.out.println("cate " + next.getKey() + " ::: nameValues  :" + nameValues.size());
                 for (NameValue nameValue : nameValues) {
-                    Long cateId = Long.valueOf(nameValue.getName() + "");
+                    Long cateId = Long.valueOf(nameValue.getName() + ConstantUtil.API_DATA_EMPTYSTRING);
                     //可能是二级也可能是三级 ,二级的放一块,三级的放一块
                     if (cateId > 0) {
                         PtmCategory ptmCategory = appCategoryService.getCategoryById(cateId);
@@ -894,7 +894,7 @@ public class ApiUtils {
             }
             //获取到类目id appCacheManager.getCategorys(categoryId);
             //先获取一级类目列表
-            List<CategoryVo> firstCategoryList = appCategoryService.getCategorys("");
+            List<CategoryVo> firstCategoryList = appCategoryService.getCategorys(ConstantUtil.API_DATA_EMPTYSTRING);
             //对二级类目按照rank排序
             getSortedCateVoListByClicCountAsc(secondCategoryList);
 
@@ -1022,7 +1022,7 @@ public class ApiUtils {
             //乘以10再取整
             orderVo.setAccount(BigDecimal.ZERO.subtract(BigDecimal.valueOf(urmUserCoinExchangeRecordL.getCoinTotal())));
             orderVo.setChannel("HASOFFER");
-            orderVo.setOrderId(urmUserCoinExchangeRecordL.getId() + "");
+            orderVo.setOrderId(urmUserCoinExchangeRecordL.getId() + ConstantUtil.API_DATA_EMPTYSTRING);
             orderVo.setOrderTime(new Date(urmUserCoinExchangeRecordL.getOperateTime()));
             orderVo.setWebsite("HASOFFER");
             orderVo.setStatus("approved");

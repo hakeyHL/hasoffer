@@ -3,6 +3,7 @@ package hasoffer.api.helper;
 import hasoffer.base.model.Website;
 import hasoffer.core.app.vo.ParseConfigSetting;
 import hasoffer.core.app.vo.ParseConfigVo;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
 
 import java.util.ArrayList;
@@ -114,28 +115,28 @@ public class ParseConfigHelper {
                 pcs.setSubTitleResIds(new String[]{});
                 pcs.setPriceResIds(new String[]{});
                 pcs.setKey(new String[]{});
-                pcs.setFlag("");
+                pcs.setFlag(ConstantUtil.API_DATA_EMPTYSTRING);
                 break;
             case HOMESHOP18:
                 pcs.setTitleResIds(new String[]{});
                 pcs.setSubTitleResIds(new String[]{});
                 pcs.setPriceResIds(new String[]{});
                 pcs.setKey(new String[]{});
-                pcs.setFlag("");
+                pcs.setFlag(ConstantUtil.API_DATA_EMPTYSTRING);
                 break;
             case JABONG:
                 pcs.setTitleResIds(new String[]{});
                 pcs.setSubTitleResIds(new String[]{});
                 pcs.setPriceResIds(new String[]{});
                 pcs.setKey(new String[]{});
-                pcs.setFlag("");
+                pcs.setFlag(ConstantUtil.API_DATA_EMPTYSTRING);
                 break;
             case PURPLLE:
                 pcs.setTitleResIds(new String[]{});
                 pcs.setSubTitleResIds(new String[]{});
                 pcs.setPriceResIds(new String[]{});
                 pcs.setKey(new String[]{});
-                pcs.setFlag("");
+                pcs.setFlag(ConstantUtil.API_DATA_EMPTYSTRING);
                 break;
         }
 
