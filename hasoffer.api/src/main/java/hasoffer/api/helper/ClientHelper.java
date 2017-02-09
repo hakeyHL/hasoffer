@@ -3,6 +3,8 @@ package hasoffer.api.helper;
 import hasoffer.base.utils.HexDigestUtil;
 import hasoffer.core.app.vo.DeviceInfoVo;
 import hasoffer.core.utils.api.ApiUtils;
+import hasoffer.webcommon.context.Context;
+import hasoffer.webcommon.context.StaticContext;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -113,5 +115,24 @@ public class ClientHelper {
         Matcher m_html = p_html.matcher(htmlStr);
         htmlStr = m_html.replaceAll(""); //过滤html标签
         return htmlStr.trim(); //返回文本字符串
+    }
+
+
+    /**
+     * 获取当前设备信息
+     *
+     * @return
+     */
+    public static DeviceInfoVo getDeviceInfo() {
+        return (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+    }
+
+    /**
+     * 获取安卓id
+     *
+     * @return
+     */
+    public static String getAndroidId() {
+        return (String) Context.currentContext().get(StaticContext.DEVICE_ID);
     }
 }
