@@ -261,6 +261,22 @@ public class PromDealFetchJobBean extends QuartzJobBean {
                     mexicoAppDeal.setExpireTime(TimeUtils.add(TimeUtils.nowDate(), TimeUtils.MILLISECONDS_OF_1_DAY * 2));
                     String priceString = "$" + price;
                     mexicoAppDeal.setPriceDescription(priceString.substring(0, priceString.indexOf('.')));
+
+                    //点赞数
+                    List<TagNode> strongNodeList = XPathUtils.getSubNodesByXPath(hrefRootNode, "//strong", null);
+                    if (strongNodeList != null && strongNodeList.size() > 1) {
+                        try {
+                            String thumbNumberString = strongNodeList.get(0).getText().toString();
+                            if (thumbNumberString.contains("-")) {
+                                continue;
+                            }
+                            int thumbNumber = Integer.parseInt(StringUtils.filterAndTrim(thumbNumberString, Arrays.asList("°")));
+                            mexicoAppDeal.setDealThumbNumber(thumbNumber);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                     logger.info("insert into appDeal:{}", mexicoAppDeal.toString());
                     dealService.createAppDealByPriceOff(mexicoAppDeal);
                 } catch (Exception e) {
