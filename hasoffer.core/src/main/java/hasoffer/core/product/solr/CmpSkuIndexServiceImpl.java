@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class CmpskuIndexServiceImpl extends AbstractIndexService<Long, CmpSkuModel> {
+public class CmpSkuIndexServiceImpl extends AbstractIndexService<Long, CmpSkuModel> {
     @Override
     protected String getSolrUrl() {
         return AppConfig.get(AppConfig.SOLR_CMPSKU_URL);

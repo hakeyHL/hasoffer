@@ -30,8 +30,8 @@ import hasoffer.core.persistence.po.urm.UrmSignCoin;
 import hasoffer.core.persistence.po.urm.UrmUserRedeemGroup;
 import hasoffer.core.product.*;
 import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
+import hasoffer.core.product.solr.CmpSkuIndexServiceImpl;
 import hasoffer.core.product.solr.CmpSkuModel;
-import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.system.IAppService;
@@ -111,7 +111,7 @@ public class FixController {
     @Resource
     IMongoDbManager mdm;
     @Resource
-    CmpskuIndexServiceImpl cmpskuIndexService;
+    CmpSkuIndexServiceImpl cmpskuIndexService;
     @Resource
     ICategoryService categoryservice;
     @Resource

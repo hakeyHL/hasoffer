@@ -22,7 +22,7 @@ import hasoffer.core.persistence.po.ptm.*;
 import hasoffer.core.product.IPtmStdPriceService;
 import hasoffer.core.product.IPtmStdSkuService;
 import hasoffer.core.product.impl.ProductServiceImpl;
-import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
+import hasoffer.core.product.solr.CmpSkuIndexServiceImpl;
 import hasoffer.core.product.solr.PtmStdSkuIndexServiceImpl;
 import hasoffer.core.search.ISearchService;
 import hasoffer.core.search.exception.NonMatchedProductException;
@@ -46,7 +46,7 @@ import java.util.*;
 @Service
 public class AppCmpServiceImpl implements AppCmpService {
     @Resource
-    CmpskuIndexServiceImpl cmpskuIndexService;
+    CmpSkuIndexServiceImpl cmpskuIndexService;
     @Resource
     CmpSkuCacheManager cmpSkuCacheManager;
     @Resource

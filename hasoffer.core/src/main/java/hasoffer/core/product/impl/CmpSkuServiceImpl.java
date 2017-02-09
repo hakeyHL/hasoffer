@@ -22,8 +22,8 @@ import hasoffer.core.persistence.po.stat.updater.StatSkuPriceUpdateResultUpdater
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IFetchService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
+import hasoffer.core.product.solr.CmpSkuIndexServiceImpl;
 import hasoffer.core.product.solr.CmpSkuModel;
-import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.utils.ConstantUtil;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
@@ -76,7 +76,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
     @Resource
     IMongoDbManager mdm;
     @Resource
-    CmpskuIndexServiceImpl cmpskuIndexService;
+    CmpSkuIndexServiceImpl cmpskuIndexService;
     @Resource
     IPtmCmpSkuImageService ptmCmpSkuImageService;
 
