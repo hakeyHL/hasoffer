@@ -25,8 +25,8 @@ import hasoffer.core.persistence.po.ptm.PtmImage;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.persistence.po.search.SrmProductSearchCount;
 import hasoffer.core.product.*;
+import hasoffer.core.product.solr.CmpSkuIndexServiceImpl;
 import hasoffer.core.product.solr.CmpSkuModel;
-import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.search.ISearchService;
@@ -68,7 +68,7 @@ public class ProductTest {
     private final static String Q_SEARCH_COUNT = "SELECT t.productId,COUNT(t.id) FROM SrmProductSearchCount t GROUP BY t.productId HAVING COUNT(t.id) > 10";
     private static String Q_PRODUCT_WEBSITE = "SELECT t from PtmProduct t where t.sourceSite = ?0";
     @Resource
-    CmpskuIndexServiceImpl cmpskuIndexService;
+    CmpSkuIndexServiceImpl cmpskuIndexService;
     @Resource
     IProductService productService;
     @Resource

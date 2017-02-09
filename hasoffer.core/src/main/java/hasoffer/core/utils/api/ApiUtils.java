@@ -62,7 +62,7 @@ public class ApiUtils {
     @Resource
     SearchLogCacheManager searchLogCacheManager;
     @Resource
-    CmpskuIndexServiceImpl cmpskuIndexService;
+    CmpSkuIndexServiceImpl cmpSkuIndexService;
     @Resource
     MongoDbManager mongoDbManager;
     @Resource
@@ -79,7 +79,6 @@ public class ApiUtils {
     private ProductCacheManager productCacheManager;
     @Resource
     private AppCategoryService appCategoryService;
-
     public static void filterProducts(List productList, String keyword) {
         if (productList != null && productList.size() > 0) {
             if (ProductModel2.class.isInstance(productList.get(0))) {

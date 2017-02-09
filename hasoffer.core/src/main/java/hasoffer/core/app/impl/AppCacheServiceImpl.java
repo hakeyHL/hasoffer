@@ -12,7 +12,7 @@ import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.product.impl.PtmStdPriceServiceImpl;
 import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
-import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
+import hasoffer.core.product.solr.CmpSkuIndexServiceImpl;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.utils.ConstantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class AppCacheServiceImpl implements AppCacheService {
     @Resource
     IProductService productService;
     @Resource
-    CmpskuIndexServiceImpl cmpskuIndexService;
+    CmpSkuIndexServiceImpl cmpskuIndexService;
     @Resource
     ICmpSkuService cmpSkuService;
 

@@ -23,8 +23,8 @@ import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICategoryService;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
+import hasoffer.core.product.solr.CmpSkuIndexServiceImpl;
 import hasoffer.core.product.solr.CmpSkuModel;
-import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.search.ISearchService;
@@ -95,7 +95,7 @@ public class ProductServiceImpl implements IProductService {
     @Resource
     SearchLogCacheManager searchLogCacheManager;
     @Resource
-    CmpskuIndexServiceImpl cmpskuIndexService;
+    CmpSkuIndexServiceImpl cmpskuIndexService;
     @Resource
     CategoryCacheManager categoryCacheManager;
     @Resource

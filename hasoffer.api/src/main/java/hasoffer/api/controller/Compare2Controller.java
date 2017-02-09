@@ -65,7 +65,7 @@ import java.util.*;
 @RequestMapping(value = "/cmp")
 public class Compare2Controller {
     @Resource
-    CmpskuIndexServiceImpl cmpskuIndexService;
+    CmpSkuIndexServiceImpl cmpskuIndexService;
     @Resource
     ProductCacheManager productCacheManager;
     @Resource

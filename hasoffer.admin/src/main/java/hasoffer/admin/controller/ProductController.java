@@ -26,7 +26,7 @@ import hasoffer.core.product.IProductService;
 import hasoffer.core.product.exception.ProductNotFoundException;
 import hasoffer.core.product.impl.PtmStdPriceServiceImpl;
 import hasoffer.core.product.impl.PtmStdSKuServiceImpl;
-import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
+import hasoffer.core.product.solr.CmpSkuIndexServiceImpl;
 import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.redis.ICacheService;
@@ -66,7 +66,7 @@ public class ProductController {
     @Resource
     ProductIndex2ServiceImpl productIndex2Service;
     @Resource
-    CmpskuIndexServiceImpl cmpskuIndexService;
+    CmpSkuIndexServiceImpl cmpskuIndexService;
     @Resource
     ICmpSkuService cmpSkuService;
     @Resource
