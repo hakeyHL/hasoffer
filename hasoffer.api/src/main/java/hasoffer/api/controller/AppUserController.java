@@ -91,11 +91,11 @@ public class AppUserController {
         DeviceInfoVo deviceInfo = null;
         String currentTime = new SimpleDateFormat("MMM dd,yyyy ", Locale.ENGLISH).format(new Date());
         deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-        SearchIO sio = new SearchIO("", "", "", website, "", deviceInfo.getMarketChannel(), deviceId, 0, 0);
+        SearchIO sio = new SearchIO(ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, website, ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, deviceInfo.getMarketChannel(), deviceId, 0, 0);
         UrmUser urmUser = appService.getUserByUserToken((String) Context.currentContext().get(StaticContext.USER_TOKEN));
         String affs[] = null;
         if (urmUser != null) {
-            affs = new String[]{sio.getMarketChannel().name(), sio.getDeviceId(), urmUser.getId() + ""};
+            affs = new String[]{sio.getMarketChannel().name(), sio.getDeviceId(), urmUser.getId() + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime};
         } else {
             map.put("deeplink", deepLink);
             modelAndView.addObject(ConstantUtil.API_NAME_DATA, map);
@@ -151,7 +151,7 @@ public class AppUserController {
                     map.put("urmDevice_ids", ids);
                     urmDeviceService.add(deviceKey, JSONUtil.toJSON(map), TimeUtils.SECONDS_OF_1_DAY);
                 }
-                List<String> deviceIds = appService.getUserDevicesByUserId(urmUser.getId() + "");
+                List<String> deviceIds = appService.getUserDevicesByUserId(urmUser.getId() + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
                 List<UrmUserDevice> urmUserDevices = new ArrayList<>();
                 ApiUtils.bindUserAndDevices(urmUser, ids, deviceIds, urmUserDevices);
                 //将关联关系插入到关联表中
@@ -160,7 +160,7 @@ public class AppUserController {
                 long priceOffSkuId;
                 float priceOffSkuPrice;
                 if (skuId != 0) {
-                    if ((skuId + "").length() >= 10) {
+                    if ((skuId + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).length() >= 10) {
                         PtmStdPrice ptmStdPrice = ptmStdPriceService.getPtmStdPriceById(ApiUtils.removeBillion(skuId));
                         if (ptmStdPrice != null) {
                             priceOffSkuId = ApiUtils.addBillion(ptmStdPrice.getId());
@@ -176,16 +176,16 @@ public class AppUserController {
                         priceOffSkuPrice = cmpSku.getPrice();
                     }
                     if (priceOffSkuId != 0) {
-                        PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + "", priceOffSkuId);
+                        PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, priceOffSkuId);
                         if (priceOffNotice != null) {
-                            iPriceOffNoticeService.deletePriceOffNotice(urmUser.getId() + "", priceOffSkuId);
+                            iPriceOffNoticeService.deletePriceOffNotice(urmUser.getId() + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, priceOffSkuId);
                         }
                         switch (type) {
                             case 0:
                                 //cancel
                                 System.out.println("cancel ");
                                 if (priceOffNotice != null) {
-                                    iPriceOffNoticeService.deletePriceOffNotice(urmUser.getId() + "", priceOffSkuId);
+                                    iPriceOffNoticeService.deletePriceOffNotice(urmUser.getId() + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, priceOffSkuId);
                                     Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                                     return null;
                                 } else {
@@ -196,11 +196,11 @@ public class AppUserController {
                                 //set
                                 if (truelySkuPrice <= 0) {
                                     //not exist before
-                                    iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", priceOffSkuId, priceOffSkuPrice, priceOffSkuPrice);
+                                    iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, priceOffSkuId, priceOffSkuPrice, priceOffSkuPrice);
 
                                 } else {
                                     //not exist before
-                                    iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + "", priceOffSkuId, truelySkuPrice, truelySkuPrice);
+                                    iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, priceOffSkuId, truelySkuPrice, truelySkuPrice);
                                 }
                                 Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                                 return null;
@@ -235,7 +235,7 @@ public class AppUserController {
             System.out.println("usertoken is :" + userToken);
             UrmUser urmUser = appService.getUserByUserToken(userToken);
             if (urmUser != null) {
-                PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + "", skuId);
+                PriceOffNotice priceOffNotice = iPriceOffNoticeService.getPriceOffNotice(urmUser.getId() + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, skuId);
                 if (priceOffNotice != null) {
                     System.out.println("user has concerned this sku :" + skuId);
                     jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
@@ -430,8 +430,8 @@ public class AppUserController {
      */
     @RequestMapping("user/getEAndP")
     public String getUserEmailAndPhone(HttpServletResponse response,
-                                       @RequestParam(defaultValue = "") String telephone,
-                                       @RequestParam(defaultValue = "") String email) {
+                                       @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String telephone,
+                                       @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String email) {
         long startTime = System.currentTimeMillis();
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);

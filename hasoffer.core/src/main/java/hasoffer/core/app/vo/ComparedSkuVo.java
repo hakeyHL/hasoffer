@@ -20,11 +20,11 @@ public class ComparedSkuVo {
     private long productId; // MspProduct # id
 
     private Website website;
-    private String websiteLogoUrl = "";
+    private String websiteLogoUrl = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
     private String seller;
 
-    private String rating = "";
-    private String title = "";
+    private String rating = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
+    private String title = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
     private float price;
 
     private String priceStr;
@@ -33,13 +33,13 @@ public class ComparedSkuVo {
 
     private String priceOffStr;
 
-    private String url = "";
-    private String deeplink = "";
+    private String url = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
+    private String deeplink = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
 
     private String color;
     private String size;
 
-    private String imageUrl = "";
+    private String imageUrl = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
     private boolean hasImgTitle;
 
     public ComparedSkuVo(Website website, String title, double price) {
@@ -181,7 +181,7 @@ public class ComparedSkuVo {
 
     public String getPriceStr() {
         if (price == 0) {
-            return "";
+            return ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
         } else {
             NumberFormat ddf1 = NumberFormat.getNumberInstance();
             ddf1.setMaximumFractionDigits(2);
@@ -194,7 +194,7 @@ public class ComparedSkuVo {
 
     public String getPriceOffStr() {
         if (priceOff == 0) {
-            return "";
+            return ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
         } else {
             NumberFormat ddf1 = NumberFormat.getNumberInstance();
             ddf1.setMaximumFractionDigits(2);

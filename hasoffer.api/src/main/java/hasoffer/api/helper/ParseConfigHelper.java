@@ -114,28 +114,28 @@ public class ParseConfigHelper {
                 pcs.setSubTitleResIds(new String[]{});
                 pcs.setPriceResIds(new String[]{});
                 pcs.setKey(new String[]{});
-                pcs.setFlag("");
+                pcs.setFlag(ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
                 break;
             case HOMESHOP18:
                 pcs.setTitleResIds(new String[]{});
                 pcs.setSubTitleResIds(new String[]{});
                 pcs.setPriceResIds(new String[]{});
                 pcs.setKey(new String[]{});
-                pcs.setFlag("");
+                pcs.setFlag(ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
                 break;
             case JABONG:
                 pcs.setTitleResIds(new String[]{});
                 pcs.setSubTitleResIds(new String[]{});
                 pcs.setPriceResIds(new String[]{});
                 pcs.setKey(new String[]{});
-                pcs.setFlag("");
+                pcs.setFlag(ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
                 break;
             case PURPLLE:
                 pcs.setTitleResIds(new String[]{});
                 pcs.setSubTitleResIds(new String[]{});
                 pcs.setPriceResIds(new String[]{});
                 pcs.setKey(new String[]{});
-                pcs.setFlag("");
+                pcs.setFlag(ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
                 break;
         }
 

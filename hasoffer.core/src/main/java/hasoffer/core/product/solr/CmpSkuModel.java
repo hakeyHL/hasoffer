@@ -40,7 +40,7 @@ public class CmpSkuModel implements IIdentifiable<Long> {
     public CmpSkuModel(PtmCmpSku cmpSku) {
         this.id = cmpSku.getId();
         this.productId = cmpSku.getProductId();
-        this.website = cmpSku.getWebsite() != null ? cmpSku.getWebsite().name() : "";
+        this.website = cmpSku.getWebsite() != null ? cmpSku.getWebsite().name() : ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
         this.skuTitle = cmpSku.getSkuTitle();
         this.title = cmpSku.getTitle();
         this.price = cmpSku.getPrice();

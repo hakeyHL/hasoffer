@@ -503,7 +503,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 //
 //        //在fetch包暂时无法跟新升级的时候，先在这里回避掉这种错误
 //        if (StringUtils.isEqual("[]", description)) {
-//            description = "";
+//            description = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
 //        }
 //
 //        //save ptmcmpskuDescription
@@ -652,7 +652,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         //在fetch包暂时无法跟新升级的时候，先在这里回避掉这种错误
         if (StringUtils.isEqual("[]", description)) {
-            description = "";
+            description = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
         }
 
         //save ptmcmpskuDescription
@@ -733,7 +733,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         //在fetch包暂时无法跟新升级的时候，先在这里回避掉这种错误
         if (StringUtils.isEqual("[]", description)) {
-            description = "";
+            description = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
         }
 
         //save productDescription

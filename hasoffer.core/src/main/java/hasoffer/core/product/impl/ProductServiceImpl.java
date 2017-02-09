@@ -694,7 +694,7 @@ public class ProductServiceImpl implements IProductService {
 
         // 类目关键词
         long cate1 = 0L, cate2 = 0L, cate3 = 0L;
-        String cate1name = "", cate2name = "", cate3name = "", cateTag = "";
+        String cate1name = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, cate2name = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, cate3name = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, cateTag = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
 
         List<PtmCategory> categories = categoryCacheManager.getRouterCategoryList(product.getCategoryId());
 

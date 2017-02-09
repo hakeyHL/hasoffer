@@ -48,7 +48,7 @@ public class CmpProductListVo {
         this.id = cmpSku.getId();
         this.coins = cmpSku.getWebsite() == Website.FLIPKART ? Math.round(0.075 * cmpSku.getPrice()) : 0;
         this.ratingNum = cmpSku.getWebsite().equals(Website.EBAY) ? 0 : cmpSku.getRatings();
-        this.imageUrl = cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath());
+        this.imageUrl = cmpSku.getSmallImagePath() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : ImageUtil.getImageUrl(cmpSku.getSmallImagePath());
         this.totalRatingsNum = cmpSku.getWebsite().equals(Website.EBAY) ? 0 : cmpSku.getCommentsNumber();
         this.image = logoImage;
         if (cmpSku.getWebsite().equals(Website.FLIPKART)) {
@@ -63,7 +63,7 @@ public class CmpProductListVo {
                 }
             }
         } else {
-            this.title = cmpSku.getTitle() == null ? "" : cmpSku.getTitle();
+            this.title = cmpSku.getTitle() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : cmpSku.getTitle();
         }
         this.status = cmpSku.getStatus();
         this.price = Math.round(cmpSku.getPrice());
@@ -99,15 +99,15 @@ public class CmpProductListVo {
         this.imageUrl = smallImageUrl;
         this.totalRatingsNum = 0l;
         this.image = logoImage;
-        this.title = ptmStdPrice.getTitle() == null ? "" : ptmStdPrice.getTitle();
+        this.title = ptmStdPrice.getTitle() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : ptmStdPrice.getTitle();
         this.status = ptmStdPrice.getSkuStatus();
         this.price = Math.round(ptmStdPrice.getPrice());
         this.website = ptmStdPrice.getWebsite();
         this.freight = -1;
-        this.distributionTime = "";
+        this.distributionTime = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
         this.returnGuarantee = -1;
         this.cashBack = 0;
-        String tempPrice = Math.round(ptmStdPrice.getPrice()) + "";
+        String tempPrice = Math.round(ptmStdPrice.getPrice()) + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
         StringBuffer sb = new StringBuffer();
         for (int i = tempPrice.length() - 1; i >= 0; i--) {
             sb.append(tempPrice.charAt(i));
@@ -122,10 +122,10 @@ public class CmpProductListVo {
         this.id = cmpSku.getId();
         this.status = cmpSku.getStatus();
         this.title = cmpSku.getTitle();
-        this.imageUrl = cmpSku.getSmallImagePath() == null ? "" : ImageUtil.getImageUrl(cmpSku.getSmallImagePath());
+        this.imageUrl = cmpSku.getSmallImagePath() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : ImageUtil.getImageUrl(cmpSku.getSmallImagePath());
         this.cashBack = cmpSku.getCashBack();
         this.saved = cliPrice == 0 ? 0 : Math.round(cliPrice - cmpSku.getPrice());
-        String tempPrice = Math.round(cmpSku.getPrice()) + "";
+        String tempPrice = Math.round(cmpSku.getPrice()) + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
         StringBuffer sb = new StringBuffer();
         for (int i = tempPrice.length() - 1; i >= 0; i--) {
             sb.append(tempPrice.charAt(i));
@@ -145,7 +145,7 @@ public class CmpProductListVo {
         this.imageUrl = ptmStdSkuImage;
         this.totalRatingsNum = stdPrice.getCommentsNumber();
         this.image = logoImage;
-        this.title = stdPrice.getTitle() == null ? "" : stdPrice.getTitle();
+        this.title = stdPrice.getTitle() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : stdPrice.getTitle();
         this.status = stdPrice.getSkuStatus();
         this.price = Math.round(stdPrice.getPrice());
         this.website = stdPrice.getWebsite();
@@ -162,7 +162,7 @@ public class CmpProductListVo {
         this.imageUrl = ptmStdSkuImage;
         this.totalRatingsNum = ptmStdPriceModel.getCommentsNumber();
         this.image = logoImage;
-        this.title = ptmStdPriceModel.getTitle() == null ? "" : ptmStdPriceModel.getTitle();
+        this.title = ptmStdPriceModel.getTitle() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : ptmStdPriceModel.getTitle();
         this.status = org.apache.commons.lang3.StringUtils.isEmpty(ptmStdPriceModel.getSkuStatus()) ? null : SkuStatus.valueOf(ptmStdPriceModel.getSkuStatus());
         this.price = Math.round(ptmStdPriceModel.getPrice());
         this.website = Website.valueOf(ptmStdPriceModel.getSite());

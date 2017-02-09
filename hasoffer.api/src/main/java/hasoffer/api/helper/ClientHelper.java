@@ -40,7 +40,7 @@ public class ClientHelper {
         StringBuilder stringBuilder = new StringBuilder();
         for (String key : keyArray) {
             String value = param.get(key);
-            if (value != null && !value.equals("")) {
+            if (value != null && !value.equals(ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime)) {
                 stringBuilder.append(key).append(param.get(key));
             }
         }
@@ -105,15 +105,15 @@ public class ClientHelper {
 
         Pattern p_script = Pattern.compile(regEx_script, Pattern.CASE_INSENSITIVE);
         Matcher m_script = p_script.matcher(htmlStr);
-        htmlStr = m_script.replaceAll(""); //过滤script标签
+        htmlStr = m_script.replaceAll(ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime); //过滤script标签
 
         Pattern p_style = Pattern.compile(regEx_style, Pattern.CASE_INSENSITIVE);
         Matcher m_style = p_style.matcher(htmlStr);
-        htmlStr = m_style.replaceAll(""); //过滤style标签
+        htmlStr = m_style.replaceAll(ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime); //过滤style标签
 
         Pattern p_html = Pattern.compile(regEx_html, Pattern.CASE_INSENSITIVE);
         Matcher m_html = p_html.matcher(htmlStr);
-        htmlStr = m_html.replaceAll(""); //过滤html标签
+        htmlStr = m_html.replaceAll(ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime); //过滤html标签
         return htmlStr.trim(); //返回文本字符串
     }
 

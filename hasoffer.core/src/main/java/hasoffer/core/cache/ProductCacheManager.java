@@ -58,7 +58,7 @@ public class ProductCacheManager {
 
     public static void main(String[] args) {
         BigDecimal a = BigDecimal.valueOf(10);
-        String price = a + "";
+        String price = a + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
         System.out.println(price);
         float floatAblePrice = Float.valueOf(price);
         System.out.println(floatAblePrice);
@@ -271,7 +271,7 @@ public class ProductCacheManager {
 //            System.out.println(" get onsale ptmcmpsku : i " + i);
             JSONArray jsonArray = JSONArray.parseArray(JSONArray.toJSONString(object));
             String website = (String) jsonArray.get(0);
-            String price = jsonArray.get(1) + "";
+            String price = jsonArray.get(1) + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
             //根据price和site定位需要的sku
             List<PtmCmpSku> cmpSkus = skuCacheService.getCmpSkusBySiteAndPrice(Float.valueOf(price), Website.valueOf(website), productId);
             if (cmpSkus != null) {
