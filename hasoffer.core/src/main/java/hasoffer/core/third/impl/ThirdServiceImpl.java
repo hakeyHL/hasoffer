@@ -148,7 +148,7 @@ public class ThirdServiceImpl implements ThirdService {
         dealJson.put("title", appDeal.getTitle());
         dealJson.put("discount", appDeal.getDiscount());
         dealJson.put("priceDescription", appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
-        dealJson.put("thumbCount", appDeal.getDealThumbNumber());
+        dealJson.put("thumbCount", appDeal.getDealThumbNumber() == null ? 0 : appDeal.getDealThumbNumber());
         dealJson.put("website ", appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
         dealJson.put("createTime", TimeUtils.getDifference2Date(new Date(), appDeal.getCreateTime()));
         dealJson.put("presentPrice", appDeal.getPresentPrice() == null ? 0 : appDeal.getPresentPrice());
