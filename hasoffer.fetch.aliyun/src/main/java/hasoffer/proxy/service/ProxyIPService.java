@@ -54,7 +54,7 @@ public class ProxyIPService {
         List<ProxyIPDMO> proxyIPDMOList = select(new ProxyIPDMO());
         for (ProxyIPDMO temp : proxyIPDMOList) {
             if (temp.getStatus() != null && "Y".equals(temp.getStatus())) {
-                listService.push(RedisKeysUtils.SPIDER_PROXY_LIST, temp.getIp() + ":" + temp.getPort());
+                listService.push(RedisKeysUtils.SPIDER_PROXY_LIST, temp.getIp() + ":" + temp.getPort(), RedisKeysUtils.DEFAULT_EXPIRE_TIME);
                 logger.info("refresh {}, ip:port= {}:{},", RedisKeysUtils.SPIDER_PROXY_LIST, temp.getIp(), temp.getPort());
             }
         }

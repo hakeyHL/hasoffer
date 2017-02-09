@@ -209,7 +209,7 @@ public class PushController {
         redisListService.deleteAll(ADMIN_PUSH_QUEUE);
 
         //加入队列,由别的线程来完成push操作
-        redisListService.push(ADMIN_PUSH_QUEUE, JSONUtil.toJSON(appPush));
+        redisListService.push(ADMIN_PUSH_QUEUE, JSONUtil.toJSON(appPush), -1L);
 
         return "ok";
     }

@@ -15,6 +15,7 @@ import hasoffer.core.redis.ICacheService;
 import hasoffer.core.utils.ConstantUtil;
 import hasoffer.core.utils.JsonHelper;
 import hasoffer.data.redis.IRedisListService;
+import hasoffer.spider.constants.RedisKeysUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -203,7 +204,7 @@ public class CmpSkuCacheManager {
             cacheService.expire(key, TimeUtils.SECONDS_OF_1_HOUR * 2);
         }
 
-        redisListService.push(key, String.valueOf(cmpSku.getId()));
+        redisListService.push(key, String.valueOf(cmpSku.getId()), RedisKeysUtils.DEFAULT_EXPIRE_TIME);
     }
 
     public List getFailedUpdate(int start, int count) {
