@@ -31,6 +31,7 @@ import hasoffer.core.search.ISearchService;
 import hasoffer.core.task.ListProcessTask;
 import hasoffer.core.task.worker.ILister;
 import hasoffer.core.task.worker.IProcessor;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.helper.WebsiteHelper;
@@ -694,7 +695,7 @@ public class ProductServiceImpl implements IProductService {
 
         // 类目关键词
         long cate1 = 0L, cate2 = 0L, cate3 = 0L;
-        String cate1name = "", cate2name = "", cate3name = "", cateTag = "";
+        String cate1name = ConstantUtil.API_DATA_EMPTYSTRING, cate2name = ConstantUtil.API_DATA_EMPTYSTRING, cate3name = ConstantUtil.API_DATA_EMPTYSTRING, cateTag = ConstantUtil.API_DATA_EMPTYSTRING;
 
         List<PtmCategory> categories = categoryCacheManager.getRouterCategoryList(product.getCategoryId());
 

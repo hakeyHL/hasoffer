@@ -173,7 +173,7 @@ public class MobileController {
             for (Integer price : priceList) {
                 SiteMapKeyVo siteMapKeyVo = new SiteMapKeyVo("Top 10 " + brand + " Mobiles Below " + price, 2);
                 Map map = new HashMap<>();
-                map.put("minPrice", price + "");
+                map.put("minPrice", price + ConstantUtil.API_DATA_EMPTYSTRING);
                 map.put("Brand", brand);
                 siteMapKeyVo.setPros(map);
                 top10MobilesList.add(siteMapKeyVo);
@@ -215,7 +215,7 @@ public class MobileController {
                 SiteMapKeyVo siteMapKeyVo = new SiteMapKeyVo("Top 10 " + key + " Mobiles Below " + price, 2);
                 Map map = new HashMap<>();
                 map.putAll(characteristicMap2.get(key));
-                map.put("minPrice", price + "");
+                map.put("minPrice", price + ConstantUtil.API_DATA_EMPTYSTRING);
                 siteMapKeyVo.setPros(map);
                 top10MobilesList.add(siteMapKeyVo);
             }
@@ -227,7 +227,7 @@ public class MobileController {
                     SiteMapKeyVo siteMapKeyVo = new SiteMapKeyVo("Top 10 " + brand + " " + key + " Mobiles Below " + price, 2);
                     Map map = new HashMap<>();
                     map.putAll(characteristicMap2.get(key));
-                    map.put("minPrice", price + "");
+                    map.put("minPrice", price + ConstantUtil.API_DATA_EMPTYSTRING);
                     map.put("Brand", brand);
                     siteMapKeyVo.setPros(map);
                     top10MobilesList.add(siteMapKeyVo);

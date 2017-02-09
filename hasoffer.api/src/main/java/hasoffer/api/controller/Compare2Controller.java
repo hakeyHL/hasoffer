@@ -125,10 +125,10 @@ public class Compare2Controller {
     // Model And View 不是可序列化的 会抛出  java.io.NotSerializableException 异常
     @RequestMapping(value = "/getcmpskus", method = RequestMethod.GET)
     public ModelAndView getcmpskus(HttpServletRequest request,
-                                   @RequestParam(defaultValue = "") final String q,
-                                   @RequestParam(defaultValue = "") final String brand,
-                                   @RequestParam(defaultValue = "") final String sourceId,
-                                   @RequestParam(defaultValue = "") String site,
+                                   @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) final String q,
+                                   @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) final String brand,
+                                   @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) final String sourceId,
+                                   @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String site,
                                    @RequestParam(defaultValue = "0") String price,
                                    @RequestParam(defaultValue = "1") int page,
                                    @RequestParam(defaultValue = "10") int size) {
@@ -178,10 +178,10 @@ public class Compare2Controller {
      */
     @DataSource(value = DataSourceType.Slave)
     @RequestMapping("sdk/cmpskus")
-    public String cmpSkus(@RequestParam(defaultValue = "") final String q,
-                          @RequestParam(defaultValue = "") final String brand,
-                          @RequestParam(defaultValue = "") final String sourceId,
-                          @RequestParam(defaultValue = "") String site,
+    public String cmpSkus(@RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) final String q,
+                          @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) final String brand,
+                          @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) final String sourceId,
+                          @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String site,
                           @RequestParam(defaultValue = "0") String price,
                           @RequestParam(defaultValue = "1") int page,
                           @RequestParam(defaultValue = "20") int pageSize,
@@ -241,7 +241,7 @@ public class Compare2Controller {
                                @RequestParam(defaultValue = "1") int page,
                                @RequestParam(defaultValue = "20") int pageSize) {
 
-        String json = "";
+        String json = ConstantUtil.API_DATA_EMPTYSTRING;
 
         //先手sourceSid匹配，如果沒有数据，再走原有的接口
         //上传的url不为空
@@ -258,7 +258,7 @@ public class Compare2Controller {
             if (StringUtils.isEmpty(json)) {
 
 //                SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, pageSize);
-                SearchIO sio = new SearchIO(sourceSid, "", "", website.name(), "0", null, "", page, pageSize);
+                SearchIO sio = new SearchIO(sourceSid, ConstantUtil.API_DATA_EMPTYSTRING, ConstantUtil.API_DATA_EMPTYSTRING, website.name(), "0", null, ConstantUtil.API_DATA_EMPTYSTRING, page, pageSize);
                 getSioBySearch(sio);
                 json = appCmpService.sdkCmpSku(sio);
 
@@ -309,16 +309,16 @@ public class Compare2Controller {
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         PtmStdSku ptmStdSku = null;
         if ((id).length() >= 10) {
-            id = ApiUtils.removeBillion(Long.valueOf(id)) + "";
+            id = ApiUtils.removeBillion(Long.valueOf(id)) + ConstantUtil.API_DATA_EMPTYSTRING;
             ptmStdSku = ptmStdSKuService.getStdSkuById(Long.valueOf(id));
         }
         if (ptmStdSku != null) {
-            sio = new SearchIO(ptmStdSku.getSourceId(), ptmStdSku.getTitle(), "", "", ptmStdSku.getRefPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, pageSize);
+            sio = new SearchIO(ptmStdSku.getSourceId(), ptmStdSku.getTitle(), ConstantUtil.API_DATA_EMPTYSTRING, ConstantUtil.API_DATA_EMPTYSTRING, ptmStdSku.getRefPrice() + ConstantUtil.API_DATA_EMPTYSTRING, deviceInfo.getMarketChannel(), deviceId, page, pageSize);
             cr = getCmpPrices(sio, ptmStdSku, userToken);
         } else {
             product = productService.getProduct(Long.valueOf(id));
             if (product != null) {
-                sio = new SearchIO(product.getSourceId(), product.getTitle(), "", StringUtils.isEmpty(product.getSourceSite()) == true ? null : product.getSourceSite(), product.getPrice() + "", deviceInfo.getMarketChannel(), deviceId, page, pageSize);
+                sio = new SearchIO(product.getSourceId(), product.getTitle(), ConstantUtil.API_DATA_EMPTYSTRING, StringUtils.isEmpty(product.getSourceSite()) == true ? null : product.getSourceSite(), product.getPrice() + ConstantUtil.API_DATA_EMPTYSTRING, deviceInfo.getMarketChannel(), deviceId, page, pageSize);
                 cr = getCmpProducts(sio, product, userToken);
             }
         }
@@ -339,7 +339,7 @@ public class Compare2Controller {
         jsonObject.getJSONObject(ConstantUtil.API_NAME_DATA).putAll(apiUtils.setEvaluateBrandFeaturesCompetitorsSummaryMap(ptmStdSku));
 /*        UrmUser urmUser = appService.getUserByUserToken(userToken);
         if (urmUser != null) {
-            jsonObject.getJSONObject(ConstantUtil.API_NAME_DATA).putAll(apiUtils.setEvaluateBrandFeaturesCompetitorsSummaryMap(ptmStdSku, new String[]{deviceInfo.getMarketChannel().name(), deviceId, urmUser.getId() + ""}));
+            jsonObject.getJSONObject(ConstantUtil.API_NAME_DATA).putAll(apiUtils.setEvaluateBrandFeaturesCompetitorsSummaryMap(ptmStdSku, new String[]{deviceInfo.getMarketChannel().name(), deviceId, urmUser.getId() + ConstantUtil.API_DATA_EMPTYSTRING}));
         } else {
             jsonObject.getJSONObject(ConstantUtil.API_NAME_DATA).putAll(apiUtils.setEvaluateBrandFeaturesCompetitorsSummaryMap(ptmStdSku, new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
         }*/
@@ -378,9 +378,9 @@ public class Compare2Controller {
             //去参数
             //改参数
             Map<String, String> resultMap = new HashMap();
-            resultMap.put("Brand", ptmStdSkuModel.getBrand() == null ? "" : ptmStdSkuModel.getBrand());
-            resultMap.put("Model", ptmStdSkuModel.getModel() == null ? "" : ptmStdSkuModel.getModel());
-            resultMap.put("Price", ptmStdSkuModel.getMinPrice() + "");
+            resultMap.put("Brand", ptmStdSkuModel.getBrand() == null ? ConstantUtil.API_DATA_EMPTYSTRING : ptmStdSkuModel.getBrand());
+            resultMap.put("Model", ptmStdSkuModel.getModel() == null ? ConstantUtil.API_DATA_EMPTYSTRING : ptmStdSkuModel.getModel());
+            resultMap.put("Price", ptmStdSkuModel.getMinPrice() + ConstantUtil.API_DATA_EMPTYSTRING);
             resultMap.put("RAM", ptmStdSkuModel.getRAM() >= 1024 ? ptmStdSkuModel.getRAM() / 1024 + " GB" : ptmStdSkuModel.getRAM() + "MB");
             resultMap.put("Screen Size", ptmStdSkuModel.getScreen_Size() + " inch");
             resultMap.put("Secondary Camera", ptmStdSkuModel.getSecondary_Camera() + " MP");
@@ -388,9 +388,9 @@ public class Compare2Controller {
             resultMap.put("Internal Memory", ptmStdSkuModel.getInternal_Memory() >= 1024 ? ptmStdSkuModel.getInternal_Memory() / 1024 + " GB" : ptmStdSkuModel.getInternal_Memory() + " MB");
             resultMap.put("Battery Capacity", ptmStdSkuModel.getBattery_Capacity() + " mAh");
             resultMap.put("Expandable Memory", ptmStdSkuModel.getExpandable_Memory() == 0 ? "Unavailable" : "Up to " + ptmStdSkuModel.getExpandable_Memory() + " GB");
-            resultMap.put("Screen Resolution", ptmStdSkuModel.getScreen_Resolution() == null ? "" : ptmStdSkuModel.getScreen_Resolution());
-            resultMap.put("Operating System", ptmStdSkuModel.getOperating_System() == null ? "" : ptmStdSkuModel.getOperating_System());
-            resultMap.put("Network Support", ptmStdSkuModel.getNetwork_Support() == null ? "" : ptmStdSkuModel.getNetwork_Support());
+            resultMap.put("Screen Resolution", ptmStdSkuModel.getScreen_Resolution() == null ? ConstantUtil.API_DATA_EMPTYSTRING : ptmStdSkuModel.getScreen_Resolution());
+            resultMap.put("Operating System", ptmStdSkuModel.getOperating_System() == null ? ConstantUtil.API_DATA_EMPTYSTRING : ptmStdSkuModel.getOperating_System());
+            resultMap.put("Network Support", ptmStdSkuModel.getNetwork_Support() == null ? ConstantUtil.API_DATA_EMPTYSTRING : ptmStdSkuModel.getNetwork_Support());
 
             //遍历去除空值
             Set<Map.Entry<String, String>> entries = resultMap.entrySet();
@@ -447,7 +447,7 @@ public class Compare2Controller {
     }
 
     private CmpResult getDefaultCmpResult(SearchIO sio, PtmCmpSkuIndex2 cmpSkuIndex) {
-        String currentDeeplink = "";
+        String currentDeeplink = ConstantUtil.API_DATA_EMPTYSTRING;
         if (cmpSkuIndex != null && cmpSkuIndex.getId() != null && cmpSkuIndex.getId() > 0) {
             PtmCmpSku cmpSku = cmpSkuCacheManager.getCmpSkuById(cmpSkuIndex.getId());
 
@@ -460,7 +460,7 @@ public class Compare2Controller {
         comparedSkuVos.add(new ComparedSkuVo(sio.getCliSite(), sio.getCliQ(), sio.getCliPrice()));
 
         return new CmpResult(0,
-                new ProductVo(0L, sio.getCliQ(), "", sio.getCliPrice(), currentDeeplink),
+                new ProductVo(0L, sio.getCliQ(), ConstantUtil.API_DATA_EMPTYSTRING, sio.getCliPrice(), currentDeeplink),
                 new PageableResult<ComparedSkuVo>(comparedSkuVos, 0, 1, 10)
         );
     }
@@ -531,7 +531,7 @@ public class Compare2Controller {
 
             if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {
                 logger.error("Compared SKU VO IS EMPTY");
-                throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", sio.getCliQ(), sio.getCliPrice());
+                throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, ConstantUtil.API_DATA_EMPTYSTRING, sio.getCliQ(), sio.getCliPrice());
             }
 
             float standPrice = maxPrice;
@@ -568,7 +568,7 @@ public class Compare2Controller {
         }
 
         sio.setHsSkuId(cmpSkuId);
-        String currentDeeplink = "";
+        String currentDeeplink = ConstantUtil.API_DATA_EMPTYSTRING;
         try {
             if (cmpSkuIndex != null && cmpSkuIndex.getId() > 0) {
                 if (cmpSkuIndex.getWebsite().equals(sio.getCliSite())) {
@@ -648,7 +648,7 @@ public class Compare2Controller {
                 }
             }
         }
-        return "";
+        return ConstantUtil.API_DATA_EMPTYSTRING;
     }
 
 
@@ -684,7 +684,7 @@ public class Compare2Controller {
                     comparedSkuVos.add(cplv);
                 }
                 if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {
-                    throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", product.getTitle(), product.getPrice());
+                    throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, ConstantUtil.API_DATA_EMPTYSTRING, product.getTitle(), product.getPrice());
                 }
                 //根据价格排序
                 ApiUtils.getSortedProListVoListByClicCountAsc(comparedSkuVos);
@@ -739,7 +739,7 @@ public class Compare2Controller {
             int rating = ClientHelper.returnNumberBetween0And5(BigDecimal.valueOf(sum).divide(BigDecimal.valueOf(tempTotalComments == 0 ? 1 : tempTotalComments), 0, BigDecimal.ROUND_HALF_UP).longValue());
             cmpResult.setRatingNum(rating);
             PtmProductDescription ptmProductDescription = mongoDbManager.queryOne(PtmProductDescription.class, product.getId());
-            String specs = "";
+            String specs = ConstantUtil.API_DATA_EMPTYSTRING;
             if (ptmProductDescription != null) {
                 specs = ptmProductDescription.getJsonDescription();
             }
@@ -765,7 +765,7 @@ public class Compare2Controller {
                 || srmSearchLog.getPrecise() == SearchPrecise.MANUALSET)) {
 
             if (srmSearchLog.getPtmProductId() <= 0) {
-                throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), "", 0);
+                throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, sio.getCliQ(), ConstantUtil.API_DATA_EMPTYSTRING, 0);
             }
 
             sio.set(srmSearchLog.getCategory(), srmSearchLog.getPtmProductId(), srmSearchLog.getPtmCmpSkuId());
@@ -819,7 +819,7 @@ public class Compare2Controller {
         PageableResult<CmpSkuModel> pagedCmpskuModels = cmpskuIndexService.searchSku(_q, 1, 5);
         List<CmpSkuModel> skuModels = pagedCmpskuModels.getData();
         if (ArrayUtils.isNullOrEmpty(skuModels)) {
-            throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, "", 0);
+            throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, ConstantUtil.API_DATA_EMPTYSTRING, 0);
         }
         CmpSkuModel skuModel = null;
         Map<Float, CmpSkuModel> comparedSkuMap = new HashMap<>();
@@ -836,7 +836,7 @@ public class Compare2Controller {
 
         // 匹配度如果小于40%, 则认为不匹配
         if (comparedSkuMap.size() < 1) {
-            throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, "", maxMc);
+            throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, ConstantUtil.API_DATA_EMPTYSTRING, maxMc);
         } else {
             skuModel = comparedSkuMap.get(maxMc);
         }
@@ -866,7 +866,7 @@ public class Compare2Controller {
                     comparedSkuVos.add(cplv);
                 }
                 if (ArrayUtils.isNullOrEmpty(comparedSkuVos)) {
-                    throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, "", ptmStdSku.getTitle(), ptmStdSku.getRefPrice());
+                    throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, ConstantUtil.API_DATA_EMPTYSTRING, ptmStdSku.getTitle(), ptmStdSku.getRefPrice());
                 }
                 //根据价格排序
                 ApiUtils.getSortedProListVoListByClicCountAsc(comparedSkuVos);

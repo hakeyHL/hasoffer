@@ -5,6 +5,7 @@ import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserCoinExchangeRecord;
 import hasoffer.core.persistence.po.urm.UrmUserCoinRepair;
 import hasoffer.core.system.AppUserService;
+import hasoffer.core.utils.ConstantUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +41,7 @@ public class AppUserServiceImpl implements AppUserService {
     public UrmUser getUrmUserByEmail(String email) {
         List<UrmUser> userList = dbm.query(API_URMUSER_GET_BY_EMAIL, Arrays.asList(email));
         if (userList.size() > 0) {
-            System.out.println(userList.size() > 1 ? "price userSize " + userList.size() : "");
+            System.out.println(userList.size() > 1 ? "price userSize " + userList.size() : ConstantUtil.API_DATA_EMPTYSTRING);
             return userList.get(0);
         }
         return null;

@@ -46,7 +46,7 @@ public class RequestInterceptor implements HandlerInterceptor {
         Gson gson = new Gson();
 
         String deviceInfoStr = Context.currentContext().getHeader("deviceinfo");
-        String userToken = Context.currentContext().getHeader("usertoken", "");
+        String userToken = Context.currentContext().getHeader("usertoken", ConstantUtil.API_DATA_EMPTYSTRING);
         String requestUri = httpServletRequest.getRequestURI();
         String queryStr = httpServletRequest.getQueryString();
         Context.currentContext().set("visitType", "app");
@@ -189,7 +189,7 @@ public class RequestInterceptor implements HandlerInterceptor {
                     urmDeviceService.add(deviceKey, JSONUtil.toJSON(map), TimeUtils.SECONDS_OF_1_DAY);
                 }
                 System.out.println("update user and device relationship ");
-                List<String> deviceIds = appService.getUserDevicesByUserId(urmUser.getId() + "");
+                List<String> deviceIds = appService.getUserDevicesByUserId(urmUser.getId() + ConstantUtil.API_DATA_EMPTYSTRING);
                 System.out.println("get ids  by userId from urmUserDevice :" + deviceIds.size());
                 List<UrmUserDevice> urmUserDevices = new ArrayList<>();
                 for (String id : ids) {
@@ -206,7 +206,7 @@ public class RequestInterceptor implements HandlerInterceptor {
                         System.out.println("id :" + id + " is not exist before ");
                         UrmUserDevice urmUserDevice = new UrmUserDevice();
                         urmUserDevice.setDeviceId(id);
-                        urmUserDevice.setUserId(urmUser.getId() + "");
+                        urmUserDevice.setUserId(urmUser.getId() + ConstantUtil.API_DATA_EMPTYSTRING);
                         urmUserDevices.add(urmUserDevice);
                     }
                 }

@@ -2,6 +2,7 @@ package hasoffer.core.product.solr;
 
 import hasoffer.base.model.SkuStatus;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.data.solr.IIdentifiable;
 
 /**
@@ -40,7 +41,7 @@ public class CmpSkuModel implements IIdentifiable<Long> {
     public CmpSkuModel(PtmCmpSku cmpSku) {
         this.id = cmpSku.getId();
         this.productId = cmpSku.getProductId();
-        this.website = cmpSku.getWebsite() != null ? cmpSku.getWebsite().name() : "";
+        this.website = cmpSku.getWebsite() != null ? cmpSku.getWebsite().name() : ConstantUtil.API_DATA_EMPTYSTRING;
         this.skuTitle = cmpSku.getSkuTitle();
         this.title = cmpSku.getTitle();
         this.price = cmpSku.getPrice();

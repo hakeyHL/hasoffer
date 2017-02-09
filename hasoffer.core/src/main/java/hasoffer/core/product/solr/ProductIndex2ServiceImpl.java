@@ -390,7 +390,7 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
     }
 
     public SearchResult<ProductModel2> searchObjs(String q, FilterQuery[] fqs, Sort[] sorts, PivotFacet[] pivotFacets, int pageNumber, int pageSize, boolean useCache) {
-        Query[] qs = new Query[]{new Query("", q)};
+        Query[] qs = new Query[]{new Query(ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, q)};
         QueryResponse rsp = searchSolr(qs, fqs, sorts, pivotFacets, pageNumber, pageSize, useCache);
 
         Class clazz = (Class<ProductModel2>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
@@ -439,6 +439,6 @@ public class ProductIndex2ServiceImpl extends AbstractIndexService<Long, Product
 //    }
 //
 //    public static void main(String[] args) {
-//        ProductIndex2ServiceImpl.parseCacheString2Object("", PageableResult.class);
+//        ProductIndex2ServiceImpl.parseCacheString2Object(ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, PageableResult.class);
 //    }
 }

@@ -61,7 +61,7 @@ public class ProductModel2 implements IIdentifiable<Long> {
 
 //    private void initKeys() {
 //        key0 = title;
-//        key1 = "";
+//        key1 = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
 //        if (StringUtils.isEmpty(title)) {
 //            return;
 //        }

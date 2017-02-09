@@ -29,6 +29,7 @@ import hasoffer.core.persistence.po.stat.StatCmpCategory;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
 import hasoffer.core.search.ISearchService;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.model.ListProduct;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -289,7 +290,7 @@ public class SearchServiceImpl implements ISearchService {
                     continue;
                 }
                 PtmCmpSku cmpSku = productService.createCmpsku(ptmProductId, listProduct.getPrice(),
-                        listProduct.getUrl(), listProduct.getTitle(), listProduct.getImageUrl(), "");
+                        listProduct.getUrl(), listProduct.getTitle(), listProduct.getImageUrl(), ConstantUtil.API_DATA_EMPTYSTRING);
             }
         }
 
@@ -769,7 +770,7 @@ public class SearchServiceImpl implements ISearchService {
             if (srmSearchTemp == null) {
                 srmSearchTemp = searchLogCacheManager.findSrmSearchLogById(keywordMd5);
                 if (srmSearchTemp == null) {
-                    if (sourceId == null || "".equals(sourceId)) {
+                    if (sourceId == null || ConstantUtil.API_DATA_EMPTYSTRING.equals(sourceId)) {
                         sourceId = "0";
                     }
                     srmSearchTemp = new SrmSearchLog(keywordMd5, site, sourceId, keyword, brand, price, category, productId, ptmCmpSkuId);

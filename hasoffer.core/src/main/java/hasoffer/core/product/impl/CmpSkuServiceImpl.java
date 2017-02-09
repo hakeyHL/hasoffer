@@ -24,6 +24,7 @@ import hasoffer.core.product.IFetchService;
 import hasoffer.core.product.IPtmCmpSkuImageService;
 import hasoffer.core.product.solr.CmpSkuModel;
 import hasoffer.core.product.solr.CmpskuIndexServiceImpl;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.model.OriFetchedProduct;
@@ -503,7 +504,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 //
 //        //在fetch包暂时无法跟新升级的时候，先在这里回避掉这种错误
 //        if (StringUtils.isEqual("[]", description)) {
-//            description = "";
+//            description = ConstantUtil.API_DATA_EMPTYSTRING;
 //        }
 //
 //        //save ptmcmpskuDescription
@@ -652,7 +653,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         //在fetch包暂时无法跟新升级的时候，先在这里回避掉这种错误
         if (StringUtils.isEqual("[]", description)) {
-            description = "";
+            description = ConstantUtil.API_DATA_EMPTYSTRING;
         }
 
         //save ptmcmpskuDescription
@@ -733,7 +734,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
         //在fetch包暂时无法跟新升级的时候，先在这里回避掉这种错误
         if (StringUtils.isEqual("[]", description)) {
-            description = "";
+            description = ConstantUtil.API_DATA_EMPTYSTRING;
         }
 
         //save productDescription

@@ -11,6 +11,7 @@ import hasoffer.core.persistence.mongo.SrmAutoSearchResult;
 import hasoffer.core.persistence.po.search.SrmSearchLog;
 import hasoffer.core.product.ICmpSkuService;
 import hasoffer.core.product.IProductService;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.fetch.core.IListProcessor;
 import hasoffer.fetch.helper.WebsiteProcessorFactory;
 import hasoffer.fetch.model.ListProduct;
@@ -88,7 +89,7 @@ public class SearchProductService {
 
                         listProducts1.add(
                                 new ListProduct(
-                                        0L, "", cmpSku.getUrl(), "",
+                                        0L, ConstantUtil.API_DATA_EMPTYSTRING, cmpSku.getUrl(), ConstantUtil.API_DATA_EMPTYSTRING,
                                         listProduct.getTitle(),
                                         cmpSku.getPrice(),
                                         cmpSku.getWebsite(), ProductStatus.ONSALE
