@@ -5,6 +5,7 @@ import hasoffer.api.helper.Httphelper;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.core.app.vo.DeviceInfoVo;
 import hasoffer.core.third.impl.ThirdServiceImpl;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,13 +14,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by hs on 2016/7/4.
  */
 @Controller
 @RequestMapping(value = "/third")
-public class ThirdPartyController {
+public class OfferController {
     @Resource
     ThirdServiceImpl thridPartyService;
 
@@ -89,6 +92,35 @@ public class ThirdPartyController {
                                     HttpServletResponse response) {
         String dealsForMexico = thridPartyService.getDealsForInveno(page, pageSize, new String[]{"discount", "originPrice", "presentPrice"});
         Httphelper.sendJsonMessage(dealsForMexico, response);
+        return null;
+    }
+
+    /**
+     * 获取订单详情
+     *
+     * @param dateFrom 开始日期
+     * @param dateTo   结束日期
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/offer/orderInfo", method = RequestMethod.GET)
+    public String getOrderInfo(
+            @DateTimeFormat(pattern = "yyyyMMdd") Date dateFrom,
+            @DateTimeFormat(pattern = "yyyyMMdd") Date dateTo,
+            HttpServletResponse response) {
+        //如果起始日期或者结束日期为空则默认返回昨天开始30天的数据
+        Calendar currentCalendar = Calendar.getInstance();
+        currentCalendar.set(currentCalendar.YEAR, Calendar.MONTH, Calendar.DATE);
+
+        Date dateEnd = currentCalendar.getTime();
+        Date dateStart = new Date(dateEnd.getTime() - 1000 * 60 * 60 * 24 * 30);
+
+        if (dateFrom != null && dateTo != null) {
+            dateStart = dateFrom;
+            dateEnd = dateTo;
+        }
+        String orderInfo = thridPartyService.getOfferOrderInfo(dateStart, dateEnd);
+        Httphelper.sendJsonMessage(orderInfo, response);
         return null;
     }
 }

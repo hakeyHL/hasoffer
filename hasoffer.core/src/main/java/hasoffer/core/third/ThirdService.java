@@ -1,5 +1,7 @@
 package hasoffer.core.third;
 
+import java.util.Date;
+
 /**
  * Created by hs on 2016/7/4.
  */
@@ -12,4 +14,6 @@ public interface ThirdService {
     String getDealsForInveno(int page, int pageSize, String... filterProperties);
 
     String getDealsForGmobi(int page, int pageSize, String... filterProperties);
+
+    String getOfferOrderInfo(Date dateStart, Date dateEnd);
 }
