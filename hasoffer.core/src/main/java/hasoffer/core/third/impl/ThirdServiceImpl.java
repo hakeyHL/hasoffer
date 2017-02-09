@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.PropertyFilter;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
@@ -175,6 +176,9 @@ public class ThirdServiceImpl implements ThirdService {
                 getDealModel(appDeal, dealJson);
                 dealJson.put("imageUrl", appDeal.getInfoPageImage() == null ? ConstantUtil.API_DATA_EMPTYSTRING : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
                 dealJson.put("description", apiUtils.getPriceOffDealDes(appDeal));
+                if (MarketChannel.INVENO.name().equals(marketChannel)) {
+
+                }
                 String deepLink = appDeal.getLinkUrl() == null ? ConstantUtil.API_DATA_EMPTYSTRING : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{marketChannel, deviceId});
                 dealJson.put("deeplink", deepLink);
                 resultMap.put(ConstantUtil.API_NAME_DATA, dealJson);
