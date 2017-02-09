@@ -391,7 +391,7 @@ public class AppController {
             Banners banner = new Banners();
             banner.setRank(appBanner.getRank());
             banner.setSource(1);
-            banner.setSourceUrl(appBanner.getImageUrl() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : ImageUtil.getImageUrl(appBanner.getImageUrl()));
+            banner.setSourceUrl(appBanner.getImageUrl() == null ? ConstantUtil.API_DATA_EMPTYSTRING : ImageUtil.getImageUrl(appBanner.getImageUrl()));
             banner.setExpireDate(appBanner.getDeadline());
             banner.setDealId(Long.valueOf(appBanner.getSourceId()));
             banners.add(banner);
@@ -495,7 +495,7 @@ public class AppController {
             uUser.setUserToken(userToken);
             uUser.setAvatarPath(userVO.getUserIcon());
             uUser.setCreateTime(new Date());
-            uUser.setTelephone(userVO.getTelephone() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : userVO.getTelephone());
+            uUser.setTelephone(userVO.getTelephone() == null ? ConstantUtil.API_DATA_EMPTYSTRING : userVO.getTelephone());
             uUser.setThirdPlatform(userVO.getPlatform());
             uUser.setThirdToken(userVO.getToken());
             uUser.setUserName(userVO.getUserName());
@@ -515,7 +515,7 @@ public class AppController {
             if (!StringUtils.isEmpty(lastTimeUserToken)) {
                 lastTimeUserToken = userToken;
             }
-            List<String> deviceIds = appService.getUserDevicesByUserId(uUser.getId() + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
+            List<String> deviceIds = appService.getUserDevicesByUserId(uUser.getId() + ConstantUtil.API_DATA_EMPTYSTRING);
             List<UrmUserDevice> urmUserDevices = new ArrayList<>();
             ApiUtils.bindUserAndDevices(uUser, ids, deviceIds, urmUserDevices);
             //将关联关系插入到关联表中
@@ -547,14 +547,14 @@ public class AppController {
             if (!StringUtils.equals(thirdId, oldThirdId) && oldUserList.size() == 1) {
                 //可能是老版本的用户升级,要将老版本用户的订单迁移到新版本
                 for (int i = 0; i < oldUserList.size(); i++) {
-                    orderService.mergeOldUserOrderToNewUser(oldUserList.get(i).getId() + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, uUser.getId() + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);//转移订单
+                    orderService.mergeOldUserOrderToNewUser(oldUserList.get(i).getId() + ConstantUtil.API_DATA_EMPTYSTRING, uUser.getId() + ConstantUtil.API_DATA_EMPTYSTRING);//转移订单
                     appService.bakUserInfo(oldUserList.get(i));//备份用户数据
                 }
             } else {
                 //size一定是大于1的
                 for (int i = 1; i < oldUserList.size(); i++) {
                     //取出id最大的用户记录,将其他记录的订单数据都更新到此记录中
-                    orderService.mergeOldUserOrderToNewUser(oldUserList.get(i).getId() + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, oldUserList.get(0).getId() + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);//转移订单
+                    orderService.mergeOldUserOrderToNewUser(oldUserList.get(i).getId() + ConstantUtil.API_DATA_EMPTYSTRING, oldUserList.get(0).getId() + ConstantUtil.API_DATA_EMPTYSTRING);//转移订单
                     appService.bakUserInfo(oldUserList.get(i));//备份用户数据
                 }
             }
@@ -787,7 +787,7 @@ public class AppController {
 
     //搜索词提示
     @RequestMapping(value = "candidateKeyword", method = RequestMethod.GET)
-    public ModelAndView getSearchKeyWordsTip(@RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String keyWord) {
+    public ModelAndView getSearchKeyWordsTip(@RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String keyWord) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
         modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
@@ -805,7 +805,7 @@ public class AppController {
      * @return
      */
     @RequestMapping(value = "getParamMeaning", method = RequestMethod.GET)
-    public ModelAndView getParamMeaning(@RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String param) {
+    public ModelAndView getParamMeaning(@RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String param) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
         modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
@@ -990,17 +990,17 @@ public class AppController {
                         map.put("similarDeals", similarDealList);
 
                         if (vsion < 23) {
-                            map.put("image", appDeal.getInfoPageImage() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
+                            map.put("image", appDeal.getInfoPageImage() == null ? ConstantUtil.API_DATA_EMPTYSTRING : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
                             map.put("title", appDeal.getTitle());
                             map.put("website", appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
                             map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(appDeal.getExpireTime()));
-                            map.put("logoUrl", appDeal.getWebsite() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                            map.put("logoUrl", appDeal.getWebsite() == null ? ConstantUtil.API_DATA_EMPTYSTRING : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
                             map.put("description", getDealDes(appDeal));
                         } else {
                             map.put("discount", appDeal.getDiscount());
                             map.put("originPrice", appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
-                            map.put("priceDescription", appDeal.getPriceDescription() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : appDeal.getPriceDescription());
-                            map.put("image", appDeal.getInfoPageImage() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
+                            map.put("priceDescription", appDeal.getPriceDescription() == null ? ConstantUtil.API_DATA_EMPTYSTRING : appDeal.getPriceDescription());
+                            map.put("image", appDeal.getInfoPageImage() == null ? ConstantUtil.API_DATA_EMPTYSTRING : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
                             map.put("title", appDeal.getTitle());
                             //返回deal的处境时间距离现在时间的时间,多少天,小时,分钟..
                             map.put("createTime", TimeUtils.getDifference2Date(new Date(), appDeal.getCreateTime()));
@@ -1014,7 +1014,7 @@ public class AppController {
                                 createTime.setTime(createTime.getTime() + 1000 * 60 * 60 * 24 * 7);
                                 map.put("exp", new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH).format(createTime));
                             }
-                            map.put("logoUrl", appDeal.getWebsite() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+                            map.put("logoUrl", appDeal.getWebsite() == null ? ConstantUtil.API_DATA_EMPTYSTRING : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
 
                             //要判断deal的类型,手动导入和降价生成
                             if (appDeal.getAppdealSource().name().equals("PRICE_OFF")) {
@@ -1034,7 +1034,7 @@ public class AppController {
                                                 if (!StringUtils.isEmpty(reviewContent)) {
                                                     reviewContent = ClientHelper.delHTMLTag(reviewContent);
                                                     //处理下换行符号
-                                                    String replaceResult = reviewContent.replaceAll("\n", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
+                                                    String replaceResult = reviewContent.replaceAll("\n", ConstantUtil.API_DATA_EMPTYSTRING);
                                                     reviewContent = replaceResult;
                                                 }
                                                 if (!StringUtils.isEmpty(reviewContent) && commentList.size() < 4) {
@@ -1043,9 +1043,9 @@ public class AppController {
                                                     if (!StringUtils.isEmpty(reviewTitle)) {
                                                         reviewTitle = ClientHelper.delHTMLTag(reviewTitle);
                                                         //处理下换行符号
-                                                        String replaceResult = reviewTitle.replaceAll("\n", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
+                                                        String replaceResult = reviewTitle.replaceAll("\n", ConstantUtil.API_DATA_EMPTYSTRING);
                                                         reviewTitle = replaceResult;
-                                                        commentList.add(reviewTitle == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : reviewTitle + "." + reviewContent);
+                                                        commentList.add(reviewTitle == null ? ConstantUtil.API_DATA_EMPTYSTRING : reviewTitle + "." + reviewContent);
                                                     } else {
                                                         commentList.add(reviewContent);
                                                     }
@@ -1103,7 +1103,7 @@ public class AppController {
                         }
                         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
                         DeviceInfoVo deviceInfo = ClientHelper.getDeviceInfo();
-                        String s = appDeal.getLinkUrl() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId});
+                        String s = appDeal.getLinkUrl() == null ? ConstantUtil.API_DATA_EMPTYSTRING : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId});
                         logger.info(" dealInfo record deal deepLink :" + s);
                         map.put("deeplink", s);
                         mv.addObject(ConstantUtil.API_NAME_DATA, map);
@@ -1118,7 +1118,7 @@ public class AppController {
     private String getDealDes(AppDeal appDeal) {
         StringBuilder sb = new StringBuilder();
         String description = appDeal.getDescription();
-        sb.append(description == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : description);
+        sb.append(description == null ? ConstantUtil.API_DATA_EMPTYSTRING : description);
         if (description.lastIndexOf('\n') > 0) {
             if (description.lastIndexOf('\n') == description.length() - 1) {
                 //最后有换行,再加一个换行
@@ -1166,9 +1166,9 @@ public class AppController {
         }
         dealVo.setId(appDeal.getId());
         dealVo.setType(appDeal.getWeight() >= 1 ? 1 : 0);
-        dealVo.setImage(appDeal.getListPageImage() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : ImageUtil.getImageUrl(appDeal.getListPageImage()));
+        dealVo.setImage(appDeal.getListPageImage() == null ? ConstantUtil.API_DATA_EMPTYSTRING : ImageUtil.getImageUrl(appDeal.getListPageImage()));
         dealVo.setExtra(0d);
-        dealVo.setLogoUrl(appDeal.getWebsite() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
+        dealVo.setLogoUrl(appDeal.getWebsite() == null ? ConstantUtil.API_DATA_EMPTYSTRING : WebsiteHelper.getLogoUrl(appDeal.getWebsite()));
         if (appDeal.getWebsite() != null && appDeal.getWebsite().name().equals("FLIPKART")) {
             dealVo.setExtra(7.5);
         }
@@ -1178,7 +1178,7 @@ public class AppController {
         dealVo.setPresentPrice(appDeal.getPresentPrice() == null ? 0 : appDeal.getPresentPrice());
         dealVo.setDiscount(appDeal.getDiscount());
         dealVo.setOriginPrice(appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
-        dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : appDeal.getPriceDescription());
+        dealVo.setPriceDescription(appDeal.getPriceDescription() == null ? ConstantUtil.API_DATA_EMPTYSTRING : appDeal.getPriceDescription());
         dealVo.setWebsite(appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
         //计算总评论数
         //计算总点赞数

@@ -1,8 +1,10 @@
 package hasoffer.core.product.solr;
 
+import hasoffer.core.utils.ConstantUtil;
+
 public enum ProductModel2SortField {
 
-    F_RELEVANCE(ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime),
+    F_RELEVANCE(ConstantUtil.API_DATA_EMPTYSTRING),
     F_POPULARITY("searchCount"),
     F_PRICE("minPrice"),
     F_RATING("rating");

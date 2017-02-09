@@ -60,7 +60,7 @@ public class AppDealController {
      * @return modelAndView
      */
     @RequestMapping("product")
-    public ModelAndView getDealsByProductTitle(@RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String title,
+    public ModelAndView getDealsByProductTitle(@RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String title,
                                                @RequestParam(defaultValue = "1") int page,
                                                @RequestParam(defaultValue = "20") int pageSize,
                                                HttpServletResponse response) {
@@ -79,12 +79,12 @@ public class AppDealController {
             for (DealModel dealModel : dealModels) {
                 if (dealModel.getExpireTime().compareTo(new Date()) != 1 && dealModel.isDisplay()) {
                     DealVo dealVo = new DealVo();
-                    dealVo.setLogoUrl(dealModel.getWebsite() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : WebsiteHelper.getBiggerLogoUrl(Website.valueOf(dealModel.getWebsite())));
+                    dealVo.setLogoUrl(dealModel.getWebsite() == null ? ConstantUtil.API_DATA_EMPTYSTRING : WebsiteHelper.getBiggerLogoUrl(Website.valueOf(dealModel.getWebsite())));
                     dealVo.setTitle(dealModel.getTitle());
                     dealVo.setWebsite(dealModel.getWebsite().equals(Website.UNKNOWN.name()) ? WebsiteHelper.getAllWebSiteString(dealModel.getLinkUrl()) : dealModel.getWebsite());
                     dealVo.setId(dealModel.getId());
                     dealVo.setDiscount(dealModel.getDiscount());
-                    dealVo.setDeepLink(dealModel.getLinkUrl() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : WebsiteHelper.getDealUrlWithAff(Website.valueOf(dealModel.getWebsite()), dealModel.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+                    dealVo.setDeepLink(dealModel.getLinkUrl() == null ? ConstantUtil.API_DATA_EMPTYSTRING : WebsiteHelper.getDealUrlWithAff(Website.valueOf(dealModel.getWebsite()), dealModel.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
                     deals.add(dealVo);
                 }
             }
@@ -101,12 +101,12 @@ public class AppDealController {
                 AppDeal appDeal = dealIterator.next();
                 if (appDeal.getDealCategoryId() == 5) {
                     DealVo dealVo = new DealVo();
-                    dealVo.setLogoUrl(appDeal.getWebsite() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : WebsiteHelper.getBiggerLogoUrl(appDeal.getWebsite()));
+                    dealVo.setLogoUrl(appDeal.getWebsite() == null ? ConstantUtil.API_DATA_EMPTYSTRING : WebsiteHelper.getBiggerLogoUrl(appDeal.getWebsite()));
                     dealVo.setTitle(appDeal.getTitle());
                     dealVo.setWebsite(appDeal.getWebsite().name());
                     dealVo.setId(appDeal.getId());
                     dealVo.setDiscount(appDeal.getDiscount());
-                    dealVo.setDeepLink(appDeal.getLinkUrl() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+                    dealVo.setDeepLink(appDeal.getLinkUrl() == null ? ConstantUtil.API_DATA_EMPTYSTRING : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
                     mobileDeals.add(dealVo);
                     dealIterator.remove();
                 }
@@ -119,12 +119,12 @@ public class AppDealController {
 //            System.out.println("last  list size   :" + list.size());
             for (AppDeal appDeal : list) {
                 DealVo dealVo = new DealVo();
-                dealVo.setLogoUrl(appDeal.getWebsite() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : WebsiteHelper.getBiggerLogoUrl(appDeal.getWebsite()));
+                dealVo.setLogoUrl(appDeal.getWebsite() == null ? ConstantUtil.API_DATA_EMPTYSTRING : WebsiteHelper.getBiggerLogoUrl(appDeal.getWebsite()));
                 dealVo.setTitle(appDeal.getTitle());
                 dealVo.setWebsite(appDeal.getWebsite().name());
                 dealVo.setId(appDeal.getId());
                 dealVo.setDiscount(appDeal.getDiscount());
-                dealVo.setDeepLink(appDeal.getLinkUrl() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
+                dealVo.setDeepLink(appDeal.getLinkUrl() == null ? ConstantUtil.API_DATA_EMPTYSTRING : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
                 deals.add(dealVo);
             }
 //            System.out.println("current  deals size   :" + deals.size());
@@ -233,7 +233,7 @@ public class AppDealController {
     @RequestMapping("comment")
     public String commentDeal(@RequestParam(defaultValue = "0") Long dealId,
                               @RequestParam(defaultValue = "0") String anonymous,
-                              @RequestParam(value = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String content,
+                              @RequestParam(value = ConstantUtil.API_DATA_EMPTYSTRING) String content,
                               HttpServletResponse response) {
         //默认不匿名
         JSONObject jsonObject = new JSONObject();
@@ -325,9 +325,9 @@ public class AppDealController {
                         }
                         dealCommentVos.add(new DealCommentVo(TimeUtils.getDifference2Date(new Date(),
                                 new Date(appDealComment.getCreateTime())),
-                                StringUtils.isEmpty(userName) ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : userName,
-                                urmUser.getAvatarPath() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : urmUser.getAvatarPath(),
-                                appDealComment.getContent() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : appDealComment.getContent()));
+                                StringUtils.isEmpty(userName) ? ConstantUtil.API_DATA_EMPTYSTRING : userName,
+                                urmUser.getAvatarPath() == null ? ConstantUtil.API_DATA_EMPTYSTRING : urmUser.getAvatarPath(),
+                                appDealComment.getContent() == null ? ConstantUtil.API_DATA_EMPTYSTRING : appDealComment.getContent()));
                     }
 
                 }

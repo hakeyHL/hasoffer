@@ -203,7 +203,7 @@ public class AppCliCfgController {
      * @return
      */
     @RequestMapping(value = "/app/picCfg")
-    public ModelAndView picCfg(@RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String picType) {
+    public ModelAndView picCfg(@RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String picType) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
         modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);

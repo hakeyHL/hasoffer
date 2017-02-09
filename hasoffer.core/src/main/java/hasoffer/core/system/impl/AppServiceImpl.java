@@ -15,6 +15,7 @@ import hasoffer.core.persistence.po.h5.KeywordCollection;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.urm.*;
 import hasoffer.core.system.IAppService;
+import hasoffer.core.utils.ConstantUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -234,7 +235,7 @@ public class AppServiceImpl implements IAppService {
         int i = 0;
         String categoryId = criteria.getCategoryId();
         if (StringUtils.isNotBlank(categoryId)) {
-            sb.append(" categoryId = ?" + i + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
+            sb.append(" categoryId = ?" + i + ConstantUtil.API_DATA_EMPTYSTRING);
             i++;
         }
         int comment = criteria.getComment();
@@ -445,7 +446,7 @@ public class AppServiceImpl implements IAppService {
         Map<String, String> shopClueMap = new HashMap<>();
         shopClueMap.put("X", getPackageName(Website.SHOPCLUES));
         //shopClueMap.put("Y", getShopCluesIndexUrl());
-        shopClueMap.put("Y", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
+        shopClueMap.put("Y", ConstantUtil.API_DATA_EMPTYSTRING);
         shopClueMap.put("Z", getLiveDemo(Website.SHOPCLUES, marketChannel, deviceId));
         shopClueMap.put("I", getInstallUrl(Website.SHOPCLUES));
         shopClueMap.put("J", Website.SHOPCLUES.toString());
@@ -454,16 +455,16 @@ public class AppServiceImpl implements IAppService {
         Map<String, String> aliExpressMap = new HashMap<>();
         aliExpressMap.put("X", getPackageName(Website.ALIEXPRESS));
         aliExpressMap.put("Y", getAliExpressIndexUrl(marketChannel, deviceId));
-        aliExpressMap.put("Z", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
-        aliExpressMap.put("I", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
+        aliExpressMap.put("Z", ConstantUtil.API_DATA_EMPTYSTRING);
+        aliExpressMap.put("I", ConstantUtil.API_DATA_EMPTYSTRING);
         aliExpressMap.put("J", Website.ALIEXPRESS.toString());
         mapList.add(aliExpressMap);
 
         Map<String, String> amazonMap = new HashMap<>();
         amazonMap.put("X", getPackageName(Website.AMAZON));
         amazonMap.put("Y", getAmazonIndexUrl(marketChannel, deviceId));
-        amazonMap.put("Z", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
-        amazonMap.put("I", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
+        amazonMap.put("Z", ConstantUtil.API_DATA_EMPTYSTRING);
+        amazonMap.put("I", ConstantUtil.API_DATA_EMPTYSTRING);
         amazonMap.put("J", Website.AMAZON.toString());
         mapList.add(amazonMap);
 
@@ -472,7 +473,7 @@ public class AppServiceImpl implements IAppService {
 
     private String getAmazonIndexUrl(MarketChannel marketChannel, String deviceId) {
 //        Random random = new Random();
-//        String amazonUrl = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
+//        String amazonUrl = ConstantUtil.API_DATA_EMPTYSTRING;
 //        if (random.nextInt(3) == 1) {
 //        }
         String affId = AffliIdHelper.getAffIdByChannelForAmazon(marketChannel);
@@ -489,9 +490,9 @@ public class AppServiceImpl implements IAppService {
         Random random = new Random();
         Map<Website, String> packageMap = new HashMap<>();
         packageMap.put(Website.FLIPKART, "http://dl.flipkart.com/dl/install-app?affid=" + flipkart[random.nextInt(flipkart.length)]);
-        packageMap.put(Website.SNAPDEAL, ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
-        packageMap.put(Website.SHOPCLUES, ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
-        //packageMap.put(Website.EBAY, ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
+        packageMap.put(Website.SNAPDEAL, ConstantUtil.API_DATA_EMPTYSTRING);
+        packageMap.put(Website.SHOPCLUES, ConstantUtil.API_DATA_EMPTYSTRING);
+        //packageMap.put(Website.EBAY, ConstantUtil.API_DATA_EMPTYSTRING);
         return packageMap.get(website);
     }
 
@@ -557,7 +558,7 @@ public class AppServiceImpl implements IAppService {
 
     private String getAliExpressIndexUrl(MarketChannel marketChannel, String deviceId) {
         Random random = new Random();
-        String url = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
+        String url = ConstantUtil.API_DATA_EMPTYSTRING;
         if (random.nextInt(5) != 1) {
             url = "http://s.click.aliexpress.com/e/qbA6QFyv3";
         }

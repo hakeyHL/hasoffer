@@ -4,6 +4,7 @@ import hasoffer.base.utils.JSONUtil;
 import hasoffer.base.utils.UrlUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
 import hasoffer.core.persistence.mongo.UrmFbLog;
+import hasoffer.core.utils.ConstantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -35,29 +36,29 @@ public class AppxController {
 
     @RequestMapping(value = "/callback/adjust", method = RequestMethod.GET)
     public void callback_adjust(HttpServletRequest request,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String idfa,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String android_id,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String deviceName,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String osName,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String osVersion,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String country,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String language,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String timezone,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String userAgent,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String deviceIp,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String appName,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String appVersion,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String trackerId,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String trackerName,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String eventTime,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String campaign_name,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String adgroup_name,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String fb_campaign_group_name,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String fb_campaign_group_id,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String fb_campaign_name,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String fb_campaign_id,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String fb_adgroup_name,
-                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime) String fb_adgroup_id) {
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String idfa,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String android_id,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String deviceName,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String osName,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String osVersion,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String country,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String language,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String timezone,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String userAgent,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String deviceIp,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String appName,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String appVersion,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String trackerId,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String trackerName,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String eventTime,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String campaign_name,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String adgroup_name,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String fb_campaign_group_name,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String fb_campaign_group_id,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String fb_campaign_name,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String fb_campaign_id,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String fb_adgroup_name,
+                                @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String fb_adgroup_id) {
 
         String url = request.getRequestURL().toString();
         String queryJson = JSONUtil.toJSON(UrlUtils.getParams(url));
