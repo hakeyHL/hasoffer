@@ -187,7 +187,7 @@ public class PromDealFetchJobBean extends QuartzJobBean {
                     //描述
                     TagNode descNode = XPathUtils.getSubNodeByXPath(hrefRootNode, "//div[@class='page2-space--h-p']/div[2]/div[2]", null);
                     String descriptionWithHtml = HtmlUtils.getInnerHTML(descNode);
-                    String descriptionWithOutHtml = HtmlHelper.delHTMLTagExclusion(descriptionWithHtml).replaceAll("/n", "<br/>");
+                    String descriptionWithOutHtml = HtmlHelper.delHTMLTagExclusion(descriptionWithHtml).replaceAll("/n", "<br>");
 
                     //描述图片处理
                     if (descriptionWithOutHtml != null && descriptionWithOutHtml.contains("<img")) {
@@ -209,7 +209,7 @@ public class PromDealFetchJobBean extends QuartzJobBean {
 
                             }
 
-                            descriptionWithOutHtml = stringBuilder.toString().replaceAll("<img", "<br/> <img");
+                            descriptionWithOutHtml = stringBuilder.toString().replaceAll("<img", "<br> <img");
                         }
                     }
 
@@ -261,6 +261,22 @@ public class PromDealFetchJobBean extends QuartzJobBean {
                     mexicoAppDeal.setExpireTime(TimeUtils.add(TimeUtils.nowDate(), TimeUtils.MILLISECONDS_OF_1_DAY * 2));
                     String priceString = "$" + price;
                     mexicoAppDeal.setPriceDescription(priceString.substring(0, priceString.indexOf('.')));
+
+                    //点赞数
+                    List<TagNode> strongNodeList = XPathUtils.getSubNodesByXPath(hrefRootNode, "//strong", null);
+                    if (strongNodeList != null && strongNodeList.size() > 1) {
+                        try {
+                            String thumbNumberString = strongNodeList.get(0).getText().toString();
+                            if (thumbNumberString.contains("-")) {
+                                continue;
+                            }
+                            int thumbNumber = Integer.parseInt(StringUtils.filterAndTrim(thumbNumberString, Arrays.asList("°")));
+                            mexicoAppDeal.setDealThumbNumber(thumbNumber);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                     logger.info("insert into appDeal:{}", mexicoAppDeal.toString());
                     dealService.createAppDealByPriceOff(mexicoAppDeal);
                 } catch (Exception e) {
