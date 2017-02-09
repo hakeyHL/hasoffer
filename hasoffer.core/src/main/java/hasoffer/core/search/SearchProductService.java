@@ -88,7 +88,7 @@ public class SearchProductService {
 
                         listProducts1.add(
                                 new ListProduct(
-                                        0L, "", cmpSku.getUrl(), "",
+                                        0L, ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, cmpSku.getUrl(), ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime,
                                         listProduct.getTitle(),
                                         cmpSku.getPrice(),
                                         cmpSku.getWebsite(), ProductStatus.ONSALE

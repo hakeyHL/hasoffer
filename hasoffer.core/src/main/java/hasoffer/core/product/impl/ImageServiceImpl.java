@@ -107,7 +107,7 @@ public class ImageServiceImpl implements IImageService {
         } catch (Exception e) {
             logger.error(e.toString());
             ptmImageUpdater.getPo().setErrTimes(image.getErrTimes() + 1);
-//            ptmImageUpdater.getPo().setPath2("");
+//            ptmImageUpdater.getPo().setPath2(ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
             return false;
         } finally {
             // 删除图片

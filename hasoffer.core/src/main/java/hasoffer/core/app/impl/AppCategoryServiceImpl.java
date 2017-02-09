@@ -55,7 +55,7 @@ public class AppCategoryServiceImpl implements AppCategoryService {
                     CategoryVo categoryVo = new CategoryVo();
                     categoryVo.setId(ptmCategory.getId());
                     categoryVo.setHasChildren(1);
-                    categoryVo.setImage(ptmCategory.getImageUrl() == null ? "" : ImageUtil.getImageUrl(ptmCategory.getImageUrl()));
+                    categoryVo.setImage(ptmCategory.getImageUrl() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : ImageUtil.getImageUrl(ptmCategory.getImageUrl()));
                     categoryVo.setLevel(ptmCategory.getLevel());
                     categoryVo.setName(ptmCategory.getName());
                     categoryVo.setParentId(ptmCategory.getParentId());
@@ -84,7 +84,7 @@ public class AppCategoryServiceImpl implements AppCategoryService {
                     List childCategory = new ArrayList();
                     CategoryVo categoryVo = new CategoryVo();
                     categoryVo.setId(ptmCategory.getId());
-                    categoryVo.setImage(ptmCategory.getImageUrl() == null ? "" : ImageUtil.getImageUrl(ptmCategory.getImageUrl()));
+                    categoryVo.setImage(ptmCategory.getImageUrl() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : ImageUtil.getImageUrl(ptmCategory.getImageUrl()));
                     categoryVo.setLevel(ptmCategory.getLevel());
                     categoryVo.setName(ptmCategory.getName());
                     categoryVo.setParentId(ptmCategory.getParentId());
@@ -96,7 +96,7 @@ public class AppCategoryServiceImpl implements AppCategoryService {
                             CategoryVo cate = new CategoryVo();
                             cate.setId(ptmCates.getId());
                             cate.setHasChildren(0);
-                            cate.setImage(ptmCates.getImageUrl() == null ? "" : ImageUtil.getImageUrl(ptmCates.getImageUrl()));
+                            cate.setImage(ptmCates.getImageUrl() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : ImageUtil.getImageUrl(ptmCates.getImageUrl()));
                             cate.setLevel(ptmCates.getLevel());
                             cate.setName(ptmCates.getName());
                             cate.setParentId(ptmCates.getParentId());
@@ -160,11 +160,11 @@ public class AppCategoryServiceImpl implements AppCategoryService {
 
         categoryVos.add(new CategoryVo(0l, "All Categories", "http://img1.hasofferimage.com/topcate/AllCategories.png", 0, 0l, 0, 0));
 
-        categoryVos.add(new CategoryVo(1l, "Electronics", "", 1, 0l, 0, 1));
+        categoryVos.add(new CategoryVo(1l, "Electronics", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, 1, 0l, 0, 1));
 
-        categoryVos.add(new CategoryVo(7577l, "Lifestyle", "", 1, 0l, 1, 1));
+        categoryVos.add(new CategoryVo(7577l, "Lifestyle", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, 1, 0l, 1, 1));
 
-        categoryVos.add(new CategoryVo(4552l, "Home and Furniture", "", 1, 0l, 2, 1));
+        categoryVos.add(new CategoryVo(4552l, "Home and Furniture", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, 1, 0l, 2, 1));
 
         return categoryVos;
     }
@@ -186,7 +186,7 @@ public class AppCategoryServiceImpl implements AppCategoryService {
             PageableResult<PtmCategory> objectPageableResult = dbm.queryPage(API_CATEGORY_GET_COUNT_CHILDS_, 1, 2, Arrays.asList(id));
             if (objectPageableResult != null && objectPageableResult.getData() != null && objectPageableResult.getData().size() > 0) {
                 count = objectPageableResult.getData().size();
-                iCacheService.add(key, count + "", -1);
+                iCacheService.add(key, count + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime, -1);
                 return count;
             } else {
                 return 0;

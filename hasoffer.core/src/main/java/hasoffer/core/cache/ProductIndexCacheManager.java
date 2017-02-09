@@ -69,7 +69,7 @@ public class ProductIndexCacheManager {
         if (!StringUtils.isEmpty(sc.getCategoryId())) {
             key.append("_").append(sc.getCategoryId());
         }
-        if (!StringUtils.isEmpty(sc.getLevel() + "")) {
+        if (!StringUtils.isEmpty(sc.getLevel() + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime)) {
             key.append("_").append(sc.getLevel());
         }
         if (sc.getPriceFrom() != -1) {

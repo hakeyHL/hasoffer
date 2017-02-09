@@ -33,7 +33,8 @@ import java.util.*;
  */
 @Service
 public class ThirdServiceImpl implements ThirdService {
-    private static String THIRD_GMOBI_DEALS = "SELECT t from AppDeal t where t.createTime <=?0  and t.expireTime >= ?1  ";
+    private static final String THIRD_GMOBI_DEALS = "SELECT t from AppDeal t where t.createTime <=?0  and t.expireTime >= ?1  ";
+    private static final String str_createTime = "createTime";
     @Resource
     Hibernate4DataBaseManager hdm;
     @Resource
@@ -52,21 +53,21 @@ public class ThirdServiceImpl implements ThirdService {
         sb.append(THIRD_GMOBI_DEALS);
         if (StringUtils.isEmpty(acceptJson)) {
             logger.error(String.format("json parseException , %s is not a json String", acceptJson));
-            resJson.put("errorCode", "10001");
-            resJson.put("msg", "you should send a json String ,start with '{' and end with '}' ");
+            resJson.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+            resJson.put(ConstantUtil.API_NAME_MSG, "you should send a json String ,start with '{' and end with '}' ");
             return resJson.toJSONString();
         }
         JSONObject jsonObject = JSONObject.parseObject(acceptJson);
         SimpleDateFormat sf = new SimpleDateFormat("yyyyMMddHHmmss");
         Date createTime = new Date();
         try {
-            if (StringUtils.isNotEmpty(jsonObject.getString("createTime"))) {
-                createTime = sf.parse(jsonObject.getString("createTime"));
+            if (StringUtils.isNotEmpty(jsonObject.getString(str_createTime))) {
+                createTime = sf.parse(jsonObject.getString(str_createTime));
             }
         } catch (ParseException e) {
-            logger.error("dataFormat  " + jsonObject.getString("createTime") + " to format yyyyMMddHHmmss failed ");
-            resJson.put("errorCode", "10001");
-            resJson.put("msg", "can't parse your createTime " + jsonObject.getString("createTime") + "  , because it is not the pattern as yyyyMMddHHmmss ");
+            logger.error("dataFormat  " + jsonObject.getString(str_createTime) + " to format yyyyMMddHHmmss failed ");
+            resJson.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+            resJson.put(ConstantUtil.API_NAME_MSG, "can't parse your createTime " + jsonObject.getString(str_createTime) + "  , because it is not the pattern as yyyyMMddHHmmss ");
             return resJson.toJSONString();
         }
         JSONArray sites = null;
@@ -74,8 +75,8 @@ public class ThirdServiceImpl implements ThirdService {
             sites = jsonObject.getJSONArray("sites");
         } catch (Exception e) {
             logger.error(" sites is not a JsonArray String ");
-            resJson.put("errorCode", "10001");
-            resJson.put("msg", "required a Array like [\"a\",\"b\"] ");
+            resJson.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+            resJson.put(ConstantUtil.API_NAME_MSG, "required a Array like [\"a\",\"b\"] ");
             return resJson.toJSONString();
         }
         List dataList = new ArrayList();
@@ -107,8 +108,8 @@ public class ThirdServiceImpl implements ThirdService {
             appDeal.setImageUrl(ImageUtil.getImageUrl(appDeal.getImageUrl()));
         }
         resJson.put("deals", dataList);
-        resJson.put("errorCode", "00000");
-        resJson.put("msg", "ok");
+        resJson.put(ConstantUtil.API_NAME_ERRORCODE, "00000");
+        resJson.put(ConstantUtil.API_NAME_MSG, "ok");
         return JSON.toJSONString(resJson, propertyFilter);
     }
 
@@ -144,13 +145,13 @@ public class ThirdServiceImpl implements ThirdService {
     private void getDealModel(AppDeal appDeal, JSONObject dealJson) {
         dealJson.put("id", appDeal.getId());
         dealJson.put("category", appDeal.getCategory());
-        dealJson.put("image", appDeal.getListPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getListPageImage()));
+        dealJson.put("image", appDeal.getListPageImage() == null ? ConstantUtil.API_DATA_EMPTYSTRING : ImageUtil.getImageUrl(appDeal.getListPageImage()));
         dealJson.put("title", appDeal.getTitle());
         dealJson.put("discount", appDeal.getDiscount());
-        dealJson.put("priceDescription", appDeal.getPriceDescription() == null ? "" : appDeal.getPriceDescription());
+        dealJson.put("priceDescription", appDeal.getPriceDescription() == null ? ConstantUtil.API_DATA_EMPTYSTRING : appDeal.getPriceDescription());
         dealJson.put("thumbCount", appDeal.getDealThumbNumber() == null ? 0 : appDeal.getDealThumbNumber());
         dealJson.put("website ", appDeal.getWebsite() == Website.UNKNOWN ? WebsiteHelper.getAllWebSiteString(appDeal.getLinkUrl()) : appDeal.getWebsite().name());
-        dealJson.put("createTime", TimeUtils.getDifference2Date(new Date(), appDeal.getCreateTime()));
+        dealJson.put(str_createTime, TimeUtils.getDifference2Date(new Date(), appDeal.getCreateTime()));
         dealJson.put("presentPrice", appDeal.getPresentPrice() == null ? 0 : appDeal.getPresentPrice());
         dealJson.put("originPrice", appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
     }
@@ -172,9 +173,9 @@ public class ThirdServiceImpl implements ThirdService {
             if (appDeal != null) {
                 JSONObject dealJson = new JSONObject();
                 getDealModel(appDeal, dealJson);
-                dealJson.put("imageUrl", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
+                dealJson.put("imageUrl", appDeal.getInfoPageImage() == null ? ConstantUtil.API_DATA_EMPTYSTRING : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
                 dealJson.put("description", apiUtils.getPriceOffDealDes(appDeal));
-                String deepLink = appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{marketChannel, deviceId});
+                String deepLink = appDeal.getLinkUrl() == null ? ConstantUtil.API_DATA_EMPTYSTRING : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{marketChannel, deviceId});
                 dealJson.put("deeplink", deepLink);
                 resultMap.put(ConstantUtil.API_NAME_DATA, dealJson);
             } else {

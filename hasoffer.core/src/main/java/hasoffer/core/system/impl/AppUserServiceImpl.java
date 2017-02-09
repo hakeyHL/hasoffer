@@ -40,7 +40,7 @@ public class AppUserServiceImpl implements AppUserService {
     public UrmUser getUrmUserByEmail(String email) {
         List<UrmUser> userList = dbm.query(API_URMUSER_GET_BY_EMAIL, Arrays.asList(email));
         if (userList.size() > 0) {
-            System.out.println(userList.size() > 1 ? "price userSize " + userList.size() : "");
+            System.out.println(userList.size() > 1 ? "price userSize " + userList.size() : ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
             return userList.get(0);
         }
         return null;

@@ -253,12 +253,12 @@ public class PtmStdPriceServiceImpl implements IPtmStdPriceService {
         PtmStdPrice ptmStdPrice1 = dbm.get(PtmStdPrice.class, ptmStdPrice.getId());
         if (ptmStdPrice1 == null) {
             //delete it from solr ,if it exist .
-            ptmStdPriceIndexService.remove(ptmStdPrice.getId() + "");
+            ptmStdPriceIndexService.remove(ptmStdPrice.getId() + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
             return;
         }
         PtmStdPriceModel ptmStdPriceModel = getPtmStdPriceModel(ptmStdPrice1);
         if (ptmStdPriceModel == null) {
-            ptmStdPriceIndexService.remove(ptmStdPrice.getId() + "");
+            ptmStdPriceIndexService.remove(ptmStdPrice.getId() + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
         } else {
             ptmStdPriceIndexService.createOrUpdate(ptmStdPriceModel);
         }

@@ -67,12 +67,12 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         PtmStdSku ptmStdSku1 = dbm.get(PtmStdSku.class, ptmStdSku.getId());
         if (ptmStdSku1 == null) {
             //delete it from solr ,if it exist .
-            ptmStdSkuIndexServicel.remove(ptmStdSku.getId() + "");
+            ptmStdSkuIndexServicel.remove(ptmStdSku.getId() + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
             return;
         }
         PtmStdSkuModel ptmStdSKuModel = getPtmStdSKuModel(ptmStdSku);
         if (ptmStdSKuModel == null) {
-            ptmStdSkuIndexServicel.remove(ptmStdSku.getId() + "");
+            ptmStdSkuIndexServicel.remove(ptmStdSku.getId() + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
         } else {
             ptmStdSkuIndexServicel.createOrUpdate(ptmStdSKuModel);
         }
@@ -208,10 +208,10 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
     }
 
     private boolean compareIgnoreCase(String name, CategoryFilterParams params) {
-        name = name.toLowerCase().replaceAll(" ", "");
+        name = name.toLowerCase().replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
         String paramString = params.name().toLowerCase();
         if (paramString.contains("_")) {
-            paramString = paramString.replaceAll("_", "");
+            paramString = paramString.replaceAll("_", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
         }
         return name.equals(paramString);
     }
@@ -397,67 +397,67 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
 
     private void setOpeartingSystem(String opreatingSystem, PtmStdSkuModel ptmStdSkuModel) {
         if (StringUtils.isNotEmpty(opreatingSystem)) {
-            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Android".replaceAll(" ", "").toLowerCase())) {
+            if (opreatingSystem.replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase().contains("Android".replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase())) {
                 ptmStdSkuModel.setOperating_System("Android");
                 return;
             }
-            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Bada".replaceAll(" ", "").toLowerCase())) {
+            if (opreatingSystem.replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase().contains("Bada".replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase())) {
                 ptmStdSkuModel.setOperating_System("Bada");
                 return;
             }
-            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Blackberry".replaceAll(" ", "").toLowerCase())) {
+            if (opreatingSystem.replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase().contains("Blackberry".replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase())) {
                 ptmStdSkuModel.setOperating_System("Blackberry");
                 return;
             }
-            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Blackberry OS".replaceAll(" ", "").toLowerCase())) {
+            if (opreatingSystem.replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase().contains("Blackberry OS".replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase())) {
                 ptmStdSkuModel.setOperating_System("Blackberry OS");
                 return;
             }
-            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Brew".replaceAll(" ", "").toLowerCase())) {
+            if (opreatingSystem.replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase().contains("Brew".replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase())) {
                 ptmStdSkuModel.setOperating_System("Brew");
                 return;
             }
-            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Firefox".replaceAll(" ", "").toLowerCase())) {
+            if (opreatingSystem.replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase().contains("Firefox".replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase())) {
                 ptmStdSkuModel.setOperating_System("Firefox");
                 return;
             }
-            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("iOS".replaceAll(" ", "").toLowerCase())) {
+            if (opreatingSystem.replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase().contains("iOS".replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase())) {
                 ptmStdSkuModel.setOperating_System("iOS");
                 return;
             }
-            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Linux".replaceAll(" ", "").toLowerCase())) {
+            if (opreatingSystem.replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase().contains("Linux".replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase())) {
                 ptmStdSkuModel.setOperating_System("Linux");
                 return;
             }
-            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Nokia".replaceAll(" ", "").toLowerCase())) {
+            if (opreatingSystem.replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase().contains("Nokia".replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase())) {
                 ptmStdSkuModel.setOperating_System("Nokia");
                 return;
             }
-            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Asha".replaceAll(" ", "").toLowerCase())) {
+            if (opreatingSystem.replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase().contains("Asha".replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase())) {
                 ptmStdSkuModel.setOperating_System("Asha");
                 return;
             }
-            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Nokia X Software".replaceAll(" ", "").toLowerCase())) {
+            if (opreatingSystem.replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase().contains("Nokia X Software".replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase())) {
                 ptmStdSkuModel.setOperating_System("Nokia X Software");
                 return;
             }
-            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Propreitory".replaceAll(" ", "").toLowerCase())) {
+            if (opreatingSystem.replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase().contains("Propreitory".replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase())) {
                 ptmStdSkuModel.setOperating_System("Propreitory");
                 return;
             }
-            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Sailfish".replaceAll(" ", "").toLowerCase())) {
+            if (opreatingSystem.replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase().contains("Sailfish".replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase())) {
                 ptmStdSkuModel.setOperating_System("Sailfish");
                 return;
             }
-            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Symbian".replaceAll(" ", "").toLowerCase())) {
+            if (opreatingSystem.replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase().contains("Symbian".replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase())) {
                 ptmStdSkuModel.setOperating_System("Symbian");
                 return;
             }
-            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Tizen".replaceAll(" ", "").toLowerCase())) {
+            if (opreatingSystem.replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase().contains("Tizen".replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase())) {
                 ptmStdSkuModel.setOperating_System("Tizen");
                 return;
             }
-            if (opreatingSystem.replaceAll(" ", "").toLowerCase().contains("Windows".replaceAll(" ", "").toLowerCase())) {
+            if (opreatingSystem.replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase().contains("Windows".replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase())) {
                 ptmStdSkuModel.setOperating_System("Windows");
                 return;
             }
@@ -490,7 +490,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
                     hakeySb.append(ConstantUtil.SOLR_DEFAULT_MULTIVALUEDVALUE_FIELD_SPLIT);
                 }
                 if (ptmStdSkuParamNode.getValue().toLowerCase().contains("mobiles")) {
-                    ptmStdSkuParamNode.setValue(ptmStdSkuParamNode.getValue().replaceAll("mobiles", " ").replaceAll(" ", ""));
+                    ptmStdSkuParamNode.setValue(ptmStdSkuParamNode.getValue().replaceAll("mobiles", " ").replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime));
                 }
                 hakeySb.append("Top 10 ").append(ptmStdSkuParamNode.getValue()).append(" Mobiles ").append(priceBelowScope);
             }
@@ -509,7 +509,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
             String launchDateString = ptmStdSkuParamNode.getValue();
             //February 3, 2016 (Official)
             if (launchDateString.contains(" (Official)")) {
-                launchDateString = launchDateString.replace(" (Official)", "");
+                launchDateString = launchDateString.replace(" (Official)", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
             }
             try {
                 Date launchDate = simpleDateFormat.parse(launchDateString);
@@ -576,7 +576,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
             String screenSize = ptmStdSkuParamNode.getValue();
             int inch = screenSize.indexOf("inch");
             if (inch != -1) {
-                screenSize = screenSize.substring(0, inch).replaceAll(" ", "");
+                screenSize = screenSize.substring(0, inch).replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
                 float size = Float.parseFloat(screenSize);
                 ptmStdSkuModel.setScreen_Size(size);
                 setQueryScreenSize(ptmStdSkuModel, size);
@@ -589,9 +589,9 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
             //处理一下
             if (StringUtils.isNotEmpty(screenResolution)) {
                 //"Screen Resolution"中分为五类分别是 4096x2160（4K）、 2048x1536（2K）、1920x1080（Full HD）、1280x720（HD）、High PPI Display
-                if (screenResolution.replaceAll(" ", "").toLowerCase().contains("1920x1080") || screenResolution.replaceAll(" ", "").toLowerCase().contains("1080x1920")) {
+                if (screenResolution.replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase().contains("1920x1080") || screenResolution.replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase().contains("1080x1920")) {
                     ptmStdSkuModel.setScreen_Resolution("1920x1080 (Full HD)");
-                } else if (screenResolution.replaceAll(" ", "").toLowerCase().contains("1280x720") || screenResolution.replaceAll(" ", "").toLowerCase().contains("720x1280")) {
+                } else if (screenResolution.replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase().contains("1280x720") || screenResolution.replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).toLowerCase().contains("720x1280")) {
                     ptmStdSkuModel.setScreen_Resolution("1280x720 (HD)");
                 } else {
                     ptmStdSkuModel.setScreen_Resolution("Others");
@@ -614,7 +614,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
         if (compareIgnoreCase(name, CategoryFilterParams.Screen_to_Body_Ratio)) {
             String value = ptmStdSkuParamNode.getValue();
             if (StringUtils.isNotEmpty(value) && value.contains("%")) {
-                value = value.substring(0, value.indexOf("%")).replaceAll(" ", "");
+                value = value.substring(0, value.indexOf("%")).replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
                 ptmStdSkuModel.setScreen_to_Body_Ratio(Float.parseFloat(value));
             }
         }
@@ -638,7 +638,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
             } else {
                 //小数,只处理GB
                 String stringRam = ApiUtils.getStringNumberFromString(ram);
-                if (!stringRam.equals("")) {
+                if (!stringRam.equals(ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime)) {
                     if (ram.contains("GB")) {
                         int mbNumber = BigDecimal.valueOf(Float.parseFloat(stringRam)).multiply(BigDecimal.valueOf(1024)).intValue();
                         calcMBRam(ptmStdSkuModel, numberFromString);
@@ -674,7 +674,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
             } else {
                 //小数,只处理GB
                 String stringRam = ApiUtils.getStringNumberFromString(internalMemory);
-                if (!stringRam.equals("")) {
+                if (!stringRam.equals(ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime)) {
                     if (internalMemory.contains("GB")) {
                         numberFromString = BigDecimal.valueOf(Float.parseFloat(stringRam)).multiply(BigDecimal.valueOf(1024)).intValue();
                         ptmStdSkuModel.setInternal_Memory(numberFromString);
@@ -701,7 +701,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
             String resolution = ptmStdSkuParamNode.getValue();
             int mp = resolution.indexOf("MP");
             if (mp != -1) {
-                float floatResolution = Float.parseFloat(resolution.substring(0, mp).replaceAll(" ", ""));
+                float floatResolution = Float.parseFloat(resolution.substring(0, mp).replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime));
                 ptmStdSkuModel.setPrimary_Camera(floatResolution);
                 setQuerySecPriCamera(ptmStdSkuModel, floatResolution, true);
             }
@@ -742,7 +742,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
             String resolution = ptmStdSkuParamNode.getValue();
             int mp = resolution.indexOf("MP");
             if (mp != -1) {
-                float floatResolution = Float.parseFloat(resolution.substring(0, mp).replaceAll(" ", ""));
+                float floatResolution = Float.parseFloat(resolution.substring(0, mp).replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime));
                 ptmStdSkuModel.setPrimary_Camera(floatResolution);
                 setQuerySecPriCamera(ptmStdSkuModel, floatResolution, false);
             }
@@ -772,7 +772,7 @@ public class PtmStdSKuServiceImpl implements IPtmStdSkuService {
             if (batteryCapacity.toLowerCase().contains("mah")) {
                 int mAh = batteryCapacity.indexOf("mAh");
                 if (mAh != -1) {
-                    batteryCapacity = batteryCapacity.substring(0, mAh).replaceAll(" ", "");
+                    batteryCapacity = batteryCapacity.substring(0, mAh).replaceAll(" ", ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
                     int numberFromString = ApiUtils.getNumberFromString(batteryCapacity);
                     ptmStdSkuModel.setBattery_Capacity(numberFromString);
                     setQueryBatteryCapacity(ptmStdSkuModel, numberFromString);

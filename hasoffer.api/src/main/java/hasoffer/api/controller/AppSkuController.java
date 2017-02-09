@@ -164,7 +164,7 @@ public class AppSkuController {
                 PtmCmpSkuDescription ptmCmpSkuDescription = mongoDbManager.queryOne(PtmCmpSkuDescription.class, ptmCmpSku.getId());
                 logger.info("get sku totalWeight from  mongo " + ptmCmpSkuDescription);
                 if (ptmCmpSkuDescription != null) {
-                    map.put("description", ptmCmpSkuDescription.getJsonDescription() == null ? "" : ClientHelper.delHTMLTag(ptmCmpSkuDescription.getJsonDescription()));//描述
+                    map.put("description", ptmCmpSkuDescription.getJsonDescription() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : ClientHelper.delHTMLTag(ptmCmpSkuDescription.getJsonDescription()));//描述
                     String tempJsonParam = ptmCmpSkuDescription.getJsonParam();
                     //去除html标签
                     if (!StringUtils.isEmpty(tempJsonParam)) {
@@ -176,7 +176,7 @@ public class AppSkuController {
                 if (ptmCmpSkuImages != null && ptmCmpSkuImages.size() > 0) {
                     map.put("images", getImageArray(ptmCmpSkuImages));
                 } else {
-                    map.put("images", Arrays.asList(ptmCmpSku.getBigImagePath() == null ? "" : ImageUtil.getImageUrl(ptmCmpSku.getBigImagePath())));
+                    map.put("images", Arrays.asList(ptmCmpSku.getBigImagePath() == null ? ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime : ImageUtil.getImageUrl(ptmCmpSku.getBigImagePath())));
                 }
             }
         }
@@ -217,7 +217,7 @@ public class AppSkuController {
         }
         PtmStdPrice ptmStdPrice = null;
         if (priceNodes == null) {
-            if ((id + "").length() >= 10) {
+            if ((id + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime).length() >= 10) {
                 ptmStdPrice = ptmStdPriceService.getPtmStdPriceById(ApiUtils.removeBillion(id));
             }
             if (ptmStdPrice != null) {

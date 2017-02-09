@@ -77,7 +77,7 @@ public class AppCmpServiceImpl implements AppCmpService {
         jsonObject.put("msg", "ok");
         PropertyFilter propertyFilter = JsonHelper.filterProperty(new String[]{"ratingNum", "bestPrice", "backRate", "support", "price", "returnGuarantee", "freight"});
         CmpResult cr = null;
-        String currentDeeplink = "";
+        String currentDeeplink = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
         //优先从91mobile solr中搜索匹配
         //deal还要走原来的推荐
         if (sio.getStdSkuId() > 0) {
@@ -300,9 +300,9 @@ public class AppCmpServiceImpl implements AppCmpService {
 //            System.out.println("tempCmpProductListVos" + tempCmpProductListVos.size());
             comparedSkuVos.addAll(tempCmpProductListVos);
             //long endTime = System.nanoTime(); //获取结束时间
-            //System.out.println("total time is " + (endTime - startTime) / 1000000 + "");
+            //System.out.println("total time is " + (endTime - startTime) / 1000000 + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
         }
-        String currentDeeplink = "";
+        String currentDeeplink = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
         try {
             if (ptmCmpSkuIndex2 != null && ptmCmpSkuIndex2.getId() > 0) {
                 if (ptmCmpSkuIndex2.getWebsite().equals(sio.getCliSite())) {
