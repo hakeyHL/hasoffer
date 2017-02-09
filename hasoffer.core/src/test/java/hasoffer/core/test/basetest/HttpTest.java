@@ -36,7 +36,50 @@ import static hasoffer.base.utils.http.XPathUtils.getSubNodeByXPath;
 public class HttpTest {
 
     public static final String WEBSITE_91MOBILE_URL_PREFIEX = "http://www.91mobiles.com";
+    public static final String WEBSITE_MYSMARTPRICE_URL_PREFIEX = "https://www.mysmartprice.com";
     public static final String WEBSITE_DX_URL_PREFIEX = "http://www.dx.com/";
+
+    @Test
+    public void mySmartPrice() throws Exception {
+
+        String url = "https://www.mysmartprice.com/deals/index.php?viewall=true&parameter=today";
+
+        TagNode root = HtmlUtils.getUrlRootTagNode(url);
+
+        List<TagNode> nodeList = XPathUtils.getSubNodesByXPath(root, "//div[@data-dealtype='today']/a/@href", null);
+
+        for (TagNode hrefNode : nodeList) {
+
+            String dealUrl = hrefNode.getAttributeByName("href");
+
+            dealUrl = WEBSITE_MYSMARTPRICE_URL_PREFIEX + dealUrl;
+
+            TagNode dealRootNode = HtmlUtils.getUrlRootTagNode(dealUrl);
+
+            TagNode titleNode = XPathUtils.getSubNodeByXPath(dealRootNode, "//h1", null);
+            String title = titleNode.getText().toString();
+
+            TagNode viewAllNode = XPathUtils.getSubNodeByXPath(dealRootNode, "//a[@class='sctn__view-all']", null);
+            String category = viewAllNode.getAttributeByName("href").split("tags/")[1].split("-deals")[0].replace('-',' ');
+
+            //span[@class='prdct-dtl__mrp']原价
+            TagNode originPriceNode = XPathUtils.getSubNodeByXPath(dealRootNode, "//span[@class='prdct-dtl__mrp']", null);
+            String oriPriceString = StringUtils.filterAndTrim(originPriceNode.getText().toString(), Arrays.asList("₹"));
+
+            //span[@class='prdct-dtl__dscnt']折扣
+            TagNode discountNode = XPathUtils.getSubNodeByXPath(dealRootNode, "//span[@class='prdct-dtl__mrp']", null);
+            String discountString = StringUtils.filterAndTrim(discountNode.getText().toString(), Arrays.asList("[", "]"));
+
+            //div[@class='prdct-dtl__prc']现价
+            TagNode presentPriceNode = XPathUtils.getSubNodeByXPath(dealRootNode, "//div[@class='prdct-dtl__prc']", null);
+            String presentPriceString = StringUtils.filterAndTrim(presentPriceNode.getText().toString(), Arrays.asList("₹"));
+
+
+
+        }
+
+        System.out.println();
+    }
 
     @Test
     public void testProm() throws Exception {

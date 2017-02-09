@@ -238,7 +238,7 @@ public class CmpSkuDubboUpdate2Worker implements Runnable {
         appdeal.setOriginPrice(oriPrice);
         appdeal.setDiscount((int) ((1 - newPrice / oriPrice) * 100));
         //默认显示  2017-02-07
-        appdeal.setDisplay(true);
+//        appdeal.setDisplay(true);
 
         //url重复不创建
         List<AppDeal> appdealList = dbm.query("SELECT t FROM AppDeal t WHERE t.linkUrl = ?0", Arrays.asList(sku.getUrl()));
