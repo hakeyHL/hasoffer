@@ -187,7 +187,7 @@ public class PromDealFetchJobBean extends QuartzJobBean {
                     //描述
                     TagNode descNode = XPathUtils.getSubNodeByXPath(hrefRootNode, "//div[@class='page2-space--h-p']/div[2]/div[2]", null);
                     String descriptionWithHtml = HtmlUtils.getInnerHTML(descNode);
-                    String descriptionWithOutHtml = HtmlHelper.delHTMLTagExclusion(descriptionWithHtml).replaceAll("/n", "<br/>");
+                    String descriptionWithOutHtml = HtmlHelper.delHTMLTagExclusion(descriptionWithHtml).replaceAll("/n", "<br>");
 
                     //描述图片处理
                     if (descriptionWithOutHtml != null && descriptionWithOutHtml.contains("<img")) {
@@ -209,7 +209,7 @@ public class PromDealFetchJobBean extends QuartzJobBean {
 
                             }
 
-                            descriptionWithOutHtml = stringBuilder.toString().replaceAll("<img", "<br/> <img");
+                            descriptionWithOutHtml = stringBuilder.toString().replaceAll("<img", "<br> <img");
                         }
                     }
 
