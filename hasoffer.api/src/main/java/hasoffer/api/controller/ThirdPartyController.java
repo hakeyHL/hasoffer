@@ -2,7 +2,7 @@ package hasoffer.api.controller;
 
 import hasoffer.api.helper.Httphelper;
 import hasoffer.core.app.vo.DeviceInfoVo;
-import hasoffer.core.third.impl.ThirdServiceImple;
+import hasoffer.core.third.impl.ThirdServiceImpl;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import org.springframework.stereotype.Controller;
@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping(value = "/third")
 public class ThirdPartyController {
     @Resource
-    ThirdServiceImple thridPartyService;
+    ThirdServiceImpl thridPartyService;
 
     /**
      * provide API to get deals for Gmobi

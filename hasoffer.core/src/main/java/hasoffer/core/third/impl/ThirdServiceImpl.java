@@ -32,7 +32,7 @@ import java.util.*;
  * Created by hs on 2016/7/4.
  */
 @Service
-public class ThirdServiceImple implements ThirdService {
+public class ThirdServiceImpl implements ThirdService {
     private static String THIRD_GMOBI_DEALS = "SELECT t from AppDeal t where t.createTime <=?0  and t.expireTime >= ?1  ";
     @Resource
     Hibernate4DataBaseManager hdm;
@@ -44,7 +44,7 @@ public class ThirdServiceImple implements ThirdService {
     IAppService appService;
     @Resource
     ApiUtils apiUtils;
-    Logger logger = LoggerFactory.getLogger(ThirdServiceImple.class);
+    Logger logger = LoggerFactory.getLogger(ThirdServiceImpl.class);
 
     public String getDeals(String acceptJson) {
         JSONObject resJson = new JSONObject();
@@ -175,7 +175,7 @@ public class ThirdServiceImple implements ThirdService {
                 dealJson.put("imageUrl", appDeal.getInfoPageImage() == null ? "" : ImageUtil.getImageUrl(appDeal.getInfoPageImage()));
                 dealJson.put("description", apiUtils.getPriceOffDealDes(appDeal));
                 String deepLink = appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{marketChannel, deviceId});
-                dealJson.put("deepLink", deepLink);
+                dealJson.put("deeplink", deepLink);
                 resultMap.put(ConstantUtil.API_NAME_DATA, dealJson);
             } else {
                 resultMap.put(ConstantUtil.API_NAME_MSG, "not found this deal, with id " + id);

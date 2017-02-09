@@ -155,8 +155,8 @@ public class AppController {
         String action = request.getParameter("action");
         if ("rediToAffiliateUrl".equals(action)) {
             try {
-                String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-                DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+                String deviceId = ClientHelper.getAndroidId();
+                DeviceInfoVo deviceInfo = ClientHelper.getDeviceInfo();
                 cmpSkuCacheManager.recordFlowControll(deviceId, deviceInfo.getCurShopApp());
             } catch (Exception e) {
                 logger.debug(e.getMessage());
@@ -238,7 +238,7 @@ public class AppController {
 
         AppType appType = null;
 
-        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        DeviceInfoVo deviceInfoVo = ClientHelper.getDeviceInfo();
         MarketChannel marketChannel = deviceInfoVo.getMarketChannel();
         if (deviceInfoVo == null || deviceInfoVo.getAppType() == null) {
             appType = AppType.APP;
@@ -481,7 +481,7 @@ public class AppController {
 
         Map map = new HashMap();
         String userToken = UUID.randomUUID().toString();
-        String deviceId = JSON.parseObject(request.getHeader("deviceinfo")).getString("deviceId");
+        String deviceId = ClientHelper.getAndroidId();
         //String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
 //        System.out.println(" get deviceId is : " + deviceId);
         //1. 根据deviceId获得device 的id列表
@@ -627,7 +627,7 @@ public class AppController {
         Map map = new HashMap();
         PageableResult products;
         int version = 0;
-        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        DeviceInfoVo deviceInfoVo = ClientHelper.getDeviceInfo();
         criteria.setPivotFields(Arrays.asList("cate2", "cate3"));
 
         if (StringUtils.isNotEmpty(deviceInfoVo.getAppVersion())) {
@@ -846,8 +846,8 @@ public class AppController {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
         modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
-        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+        DeviceInfoVo deviceInfoVo = ClientHelper.getDeviceInfo();
+        String deviceId = ClientHelper.getAndroidId();
         MarketChannel marketChannel = MarketChannel.NONE;
         if (deviceInfoVo != null) {
             marketChannel = deviceInfoVo.getMarketChannel();
@@ -960,7 +960,7 @@ public class AppController {
 
     private ModelAndView getDealInfoMethod(@RequestParam String id, ModelAndView mv) {
         Map map = new HashMap();
-        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        DeviceInfoVo deviceInfoVo = ClientHelper.getDeviceInfo();
         List<DealVo> similarDealList = new ArrayList<>();
         if (deviceInfoVo != null) {
             String appVersion = deviceInfoVo.getAppVersion();
@@ -1102,7 +1102,7 @@ public class AppController {
                                     "5  Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
                         }
                         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-                        DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+                        DeviceInfoVo deviceInfo = ClientHelper.getDeviceInfo();
                         String s = appDeal.getLinkUrl() == null ? "" : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId});
                         logger.info(" dealInfo record deal deepLink :" + s);
                         map.put("deeplink", s);
