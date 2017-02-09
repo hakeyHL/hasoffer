@@ -101,7 +101,7 @@ public class PriceOffNoticeJobBean extends QuartzJobBean {
                         //此处暂时使用这个对象的一个字段传值
                         fetchUrlResult.setSkuId(priceOffNoticeId);
                         String repushInfo = JSON.toJSONString(fetchUrlResult);
-                        redisListService.push(PUSH_FAIL_PRICEOFFNOTICE_INFO, repushInfo);
+                        redisListService.push(PUSH_FAIL_PRICEOFFNOTICE_INFO, repushInfo, -1L);
                     }
                 } catch (Exception e) {
                     System.out.println("send price off notice push exception for " + priceOffNoticeId);

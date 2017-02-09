@@ -260,7 +260,7 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
                     System.out.println("update lastpushstatus push fail for priceOffNoticeid" + id);
                     //是否需要将失败写入缓存
                     if (cacheFail) {
-                        redisListService.push(PUSH_FAIL_PRICEOFFNOTICE_ID, priceOffNotice.getId() + "");
+                        redisListService.push(PUSH_FAIL_PRICEOFFNOTICE_ID, priceOffNotice.getId() + "", TimeUtils.SECONDS_OF_1_DAY * 3);
                         System.out.println("cache push fail success for " + priceOffNotice.getId());
                     }
                 }
@@ -366,7 +366,7 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
             System.out.println("update lastpushstatus push fail for priceOffNoticeid" + id);
             //是否需要将失败写入缓存
             if (cacheFail) {
-                redisListService.push(PUSH_FAIL_PRICEOFFNOTICE_ID, priceOffNotice.getId() + "");
+                redisListService.push(PUSH_FAIL_PRICEOFFNOTICE_ID, priceOffNotice.getId() + "", TimeUtils.SECONDS_OF_1_DAY * 3);
                 System.out.println("cache push fail success for " + priceOffNotice.getId());
             }
         }
@@ -430,7 +430,7 @@ public class PriceOffNoticeServiceImpl implements IPriceOffNoticeService {
                         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
                         String YMD = simpleDateFormat.format(TimeUtils.nowDate());
                         String PRICEOFFNOTICE_PUSH_YMD_USERID = PRICEOFFNOTICE_PUSH_PREFIX + YMD + "_" + userid;
-                        redisListService.push(PRICEOFFNOTICE_PUSH_YMD_USERID, JSONUtil.toJSON(message));
+                        redisListService.push(PRICEOFFNOTICE_PUSH_YMD_USERID, JSONUtil.toJSON(message), TimeUtils.SECONDS_OF_1_DAY * 3);
 //------------------------------------------------------------------------------------------------------------------//                        
 
 

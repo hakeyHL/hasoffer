@@ -16,6 +16,7 @@ import hasoffer.core.utils.ImageUtil;
 import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.data.redis.IRedisListService;
 import hasoffer.data.redis.IRedisSetService;
+import hasoffer.spider.constants.RedisKeysUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -324,10 +325,10 @@ public class ProductCacheManager {
         logger.info("put2UpdateQueue addFlag " + addFlag + "_" + productId);
         if (!addFlag) {
 
-            long add = redisSetService.add(key_added, String.valueOf(productId));
+            long add = redisSetService.add(key_added, RedisKeysUtils.DEFAULT_EXPIRE_TIME, String.valueOf(productId));
             logger.info("put2UpdateQueue add to added queue success " + add + "_" + productId);
 
-            redisListService.push(key, String.valueOf(productId));
+            redisListService.push(key, String.valueOf(productId), RedisKeysUtils.DEFAULT_EXPIRE_TIME);
             logger.info("put2UpdateQueue push to wait4update queue success ");
             logger.info("put2UpdateQueue push to queue " + key + "_" + productId);
         }
@@ -338,7 +339,7 @@ public class ProductCacheManager {
 
         String key_updated = CACHE_KEY_PRE + "UPDATE_PROCESSED_" + ymd;
 
-        redisSetService.add(key_updated, String.valueOf(productId));
+        redisSetService.add(key_updated, RedisKeysUtils.DEFAULT_EXPIRE_TIME, String.valueOf(productId));
     }
 
     public long getWait4UpdateProductCount(String ymd) {
