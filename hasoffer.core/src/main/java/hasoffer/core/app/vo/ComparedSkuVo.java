@@ -5,6 +5,7 @@ import hasoffer.base.enums.HasofferRegion;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.core.persistence.po.ptm.PtmCmpSku;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.core.utils.ImageUtil;
 import hasoffer.fetch.helper.WebsiteHelper;
 
@@ -20,11 +21,11 @@ public class ComparedSkuVo {
     private long productId; // MspProduct # id
 
     private Website website;
-    private String websiteLogoUrl = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
+    private String websiteLogoUrl = ConstantUtil.API_DATA_EMPTYSTRING;
     private String seller;
 
-    private String rating = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
-    private String title = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
+    private String rating = ConstantUtil.API_DATA_EMPTYSTRING;
+    private String title = ConstantUtil.API_DATA_EMPTYSTRING;
     private float price;
 
     private String priceStr;
@@ -33,13 +34,13 @@ public class ComparedSkuVo {
 
     private String priceOffStr;
 
-    private String url = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
-    private String deeplink = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
+    private String url = ConstantUtil.API_DATA_EMPTYSTRING;
+    private String deeplink = ConstantUtil.API_DATA_EMPTYSTRING;
 
     private String color;
     private String size;
 
-    private String imageUrl = ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
+    private String imageUrl = ConstantUtil.API_DATA_EMPTYSTRING;
     private boolean hasImgTitle;
 
     public ComparedSkuVo(Website website, String title, double price) {
@@ -181,7 +182,7 @@ public class ComparedSkuVo {
 
     public String getPriceStr() {
         if (price == 0) {
-            return ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
+            return ConstantUtil.API_DATA_EMPTYSTRING;
         } else {
             NumberFormat ddf1 = NumberFormat.getNumberInstance();
             ddf1.setMaximumFractionDigits(2);
@@ -194,7 +195,7 @@ public class ComparedSkuVo {
 
     public String getPriceOffStr() {
         if (priceOff == 0) {
-            return ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime;
+            return ConstantUtil.API_DATA_EMPTYSTRING;
         } else {
             NumberFormat ddf1 = NumberFormat.getNumberInstance();
             ddf1.setMaximumFractionDigits(2);

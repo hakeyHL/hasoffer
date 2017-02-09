@@ -17,6 +17,7 @@ import hasoffer.core.persistence.po.ptm.updater.PtmStdPriceUpdater;
 import hasoffer.core.product.IPtmStdPriceService;
 import hasoffer.core.product.solr.PtmStdPriceIndexServiceImpl;
 import hasoffer.core.product.solr.PtmStdPriceModel;
+import hasoffer.core.utils.ConstantUtil;
 import hasoffer.spider.model.FetchedProduct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -253,12 +254,12 @@ public class PtmStdPriceServiceImpl implements IPtmStdPriceService {
         PtmStdPrice ptmStdPrice1 = dbm.get(PtmStdPrice.class, ptmStdPrice.getId());
         if (ptmStdPrice1 == null) {
             //delete it from solr ,if it exist .
-            ptmStdPriceIndexService.remove(ptmStdPrice.getId() + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
+            ptmStdPriceIndexService.remove(ptmStdPrice.getId() + ConstantUtil.API_DATA_EMPTYSTRING);
             return;
         }
         PtmStdPriceModel ptmStdPriceModel = getPtmStdPriceModel(ptmStdPrice1);
         if (ptmStdPriceModel == null) {
-            ptmStdPriceIndexService.remove(ptmStdPrice.getId() + ConstantUtil.API_DATA_EMPTYSTRINGstr_createTime);
+            ptmStdPriceIndexService.remove(ptmStdPrice.getId() + ConstantUtil.API_DATA_EMPTYSTRING);
         } else {
             ptmStdPriceIndexService.createOrUpdate(ptmStdPriceModel);
         }
