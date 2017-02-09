@@ -1,10 +1,10 @@
 package hasoffer.api.controller;
 
+import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.core.app.vo.DeviceInfoVo;
 import hasoffer.core.third.impl.ThirdServiceImpl;
-import hasoffer.webcommon.context.Context;
-import hasoffer.webcommon.context.StaticContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,7 +33,7 @@ public class ThirdPartyController {
     public String config(@RequestParam(defaultValue = "1") int page,
                          @RequestParam(defaultValue = "10") int pageSize,
                          HttpServletResponse response) {
-        String result = thridPartyService.getDealsForGmobi(page, pageSize, new String[]{"discount"});
+        String result = thridPartyService.getDealsForGmobi(page, pageSize, new String[]{"discount", "category"});
         Httphelper.sendJsonMessage(result, response);
         return null;
     }
@@ -58,9 +58,19 @@ public class ThirdPartyController {
     @RequestMapping(value = "/offer/dealInfo/{id}", method = RequestMethod.GET)
     public String getDealsForIndia(@PathVariable("id") String id,
                                    HttpServletResponse response) {
-        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
-        DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
-        String dealInfoForIndia = thridPartyService.getDealInfo(id, deviceInfo.getMarketChannel().name(), deviceId);
+        String deviceId = ClientHelper.getAndroidId();
+        DeviceInfoVo deviceInfo = ClientHelper.getDeviceInfo();
+        MarketChannel marketChannel = deviceInfo.getMarketChannel();
+        String[] filterProperties = new String[]{};
+        switch (marketChannel) {
+            case GMOBI:
+                filterProperties[0] = "category";
+                break;
+//            case INVENO:
+//                break;
+            default:
+        }
+        String dealInfoForIndia = thridPartyService.getDealInfo(id, deviceInfo.getMarketChannel().name(), deviceId, filterProperties);
         Httphelper.sendJsonMessage(dealInfoForIndia, response);
         return null;
     }
