@@ -24,7 +24,7 @@ import java.util.Date;
 @RequestMapping(value = "/third")
 public class OfferController {
     @Resource
-    ThirdServiceImpl thridPartyService;
+    ThirdServiceImpl thirdService;
 
     /**
      * provide API to get deals for Gmobi
@@ -36,7 +36,7 @@ public class OfferController {
     public String config(@RequestParam(defaultValue = "1") int page,
                          @RequestParam(defaultValue = "10") int pageSize,
                          HttpServletResponse response) {
-        String result = thridPartyService.getDealsForGmobi(page, pageSize, new String[]{"discount", "category"});
+        String result = thirdService.getDealsForGmobi(page, pageSize, new String[]{"discount", "category"});
         Httphelper.sendJsonMessage(result, response);
         return null;
     }
@@ -53,7 +53,7 @@ public class OfferController {
     public String getDealsForIndia(@RequestParam(defaultValue = "1") int page,
                                    @RequestParam(defaultValue = "10") int pageSize,
                                    HttpServletResponse response) {
-        String dealsForIndia = thridPartyService.getDealsForIndia(page, pageSize, "originPrice", "presentPrice");
+        String dealsForIndia = thirdService.getDealsForIndia(page, pageSize, "originPrice", "presentPrice");
         Httphelper.sendJsonMessage(dealsForIndia, response);
         return null;
     }
@@ -73,7 +73,7 @@ public class OfferController {
 //                break;
             default:
         }
-        String dealInfoForIndia = thridPartyService.getDealInfo(id, deviceInfo.getMarketChannel().name(), deviceId, filterProperties);
+        String dealInfoForIndia = thirdService.getDealInfo(id, deviceInfo.getMarketChannel().name(), deviceId, filterProperties);
         Httphelper.sendJsonMessage(dealInfoForIndia, response);
         return null;
     }
@@ -90,7 +90,7 @@ public class OfferController {
     public String getDealsForMexico(@RequestParam(defaultValue = "1") int page,
                                     @RequestParam(defaultValue = "10") int pageSize,
                                     HttpServletResponse response) {
-        String dealsForMexico = thridPartyService.getDealsForInveno(page, pageSize, new String[]{"discount", "originPrice", "presentPrice"});
+        String dealsForMexico = thirdService.getDealsForInveno(page, pageSize, new String[]{"discount", "originPrice", "presentPrice"});
         Httphelper.sendJsonMessage(dealsForMexico, response);
         return null;
     }
@@ -119,7 +119,7 @@ public class OfferController {
             dateStart = dateFrom;
             dateEnd = dateTo;
         }
-        String orderInfo = thridPartyService.getOfferOrderInfo(dateStart, dateEnd);
+        String orderInfo = thirdService.getOfferOrderInfo(dateStart, dateEnd);
         Httphelper.sendJsonMessage(orderInfo, response);
         return null;
     }
