@@ -32,6 +32,7 @@ public class DealSiteGetDealWoker implements Runnable {
 
     //初始化deal抓取的网站
     static {
+        dealSiteList.add(Website.MYSMARTPRICE);
         dealSiteList.add(Website.DESIDIME);
     }
 
@@ -70,8 +71,13 @@ public class DealSiteGetDealWoker implements Runnable {
                         for (FetchedDealInfo fetchedDealInfo : dealInfoList) {
 
                             logger.info("fetchedDealInfo " + fetchedDealInfo.toString());
+                            AppDeal deal = null;
 
-                            AppDeal deal = getDeal(fetchedDealInfo);
+                            if (Website.DESIDIME.equals(website)) {
+                                deal = getDesidimeDeal(fetchedDealInfo);
+                            } else {
+                                deal = getMySmartPriceDeal(fetchedDealInfo);
+                            }
 
                             if (deal != null) {
                                 dealService.createAppDealByPriceOff(deal);
@@ -90,8 +96,45 @@ public class DealSiteGetDealWoker implements Runnable {
         }
     }
 
+    public AppDeal getMySmartPriceDeal(FetchedDealInfo fetchedDealInfo) {
 
-    public AppDeal getDeal(FetchedDealInfo fetchedDealInfo) {
+        AppDeal appdeal = new AppDeal();
+
+        Website webSite = WebsiteHelper.getWebSite(fetchedDealInfo.getLink());
+
+        if (webSite == null) {
+            webSite = Website.UNKNOWN;
+        }
+
+        appdeal.setWebsite(webSite);
+        appdeal.setAppdealSource(AppdealSource.DEAL_SITE);
+        appdeal.setCreateTime(TimeUtils.nowDate());
+        appdeal.setExpireTime(fetchedDealInfo.getExpireTime());
+//        appdeal.setDisplay(true);
+        appdeal.setDisplay(false);
+        appdeal.setLinkUrl(fetchedDealInfo.getLink());
+        appdeal.setOriLinkUrl(fetchedDealInfo.getOriLink());
+        appdeal.setPush(false);
+        appdeal.setTitle(fetchedDealInfo.getTitle());
+        appdeal.setCategory(fetchedDealInfo.getCategoryName());
+        appdeal.setDealClickCount(Long.valueOf(fetchedDealInfo.getView()));
+        appdeal.setDescription(StringUtils.unescapeHtml(fetchedDealInfo.getDescription()));
+        appdeal.setOriginClickCount(Long.valueOf(fetchedDealInfo.getView()));
+
+        if (StringUtils.isEmpty(fetchedDealInfo.getPriceString())) {
+            appdeal.setPresentPrice(fetchedDealInfo.getPrice());
+            appdeal.setOriginPrice(fetchedDealInfo.getOriPrice());
+            appdeal.setPriceDescription("Rs." + fetchedDealInfo.getPrice());
+            appdeal.setDiscount(fetchedDealInfo.getDiscount());
+        } else {
+            appdeal.setPriceDescription(fetchedDealInfo.getPriceString());
+        }
+
+        return appdeal;
+
+    }
+
+    public AppDeal getDesidimeDeal(FetchedDealInfo fetchedDealInfo) {
 
         AppDeal appdeal = new AppDeal();
 

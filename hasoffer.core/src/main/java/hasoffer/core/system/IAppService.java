@@ -13,6 +13,7 @@ import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.persistence.po.urm.UrmUserRedeemGroup;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -100,4 +101,13 @@ public interface IAppService {
     void updateKeyResultCount(KeywordCollection keywordCollection);
 
     PageableResult<AppDeal> getDealsForMexico(int page, int pageSize);
+
+    void recordOfferClickCount(MarketChannel marketChannel, long offerId);
+
+    Long recordOfferReturnCount(MarketChannel marketChannel);
+
+    List<OrderStatsAnalysisPO> getOrderDetailByAffId(String affId, Date startDate, Date endDate);
+
+    List<AppOfferStatistics> getOfferClickCountBetDate(Date dateStart, Date dateEnd, MarketChannel marketChannel);
+
 }

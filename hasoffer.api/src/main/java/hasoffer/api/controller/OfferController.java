@@ -1,10 +1,15 @@
 package hasoffer.api.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.base.enums.MarketChannel;
+import hasoffer.base.utils.AffliIdHelper;
 import hasoffer.core.app.vo.DeviceInfoVo;
+import hasoffer.core.system.IAppService;
 import hasoffer.core.third.impl.ThirdServiceImpl;
+import hasoffer.core.utils.ConstantUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +21,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Created by hs on 2016/7/4.
@@ -24,7 +30,9 @@ import java.util.Date;
 @RequestMapping(value = "/third")
 public class OfferController {
     @Resource
-    ThirdServiceImpl thridPartyService;
+    ThirdServiceImpl thirdService;
+    @Resource
+    IAppService appService;
 
     /**
      * provide API to get deals for Gmobi
@@ -36,7 +44,9 @@ public class OfferController {
     public String config(@RequestParam(defaultValue = "1") int page,
                          @RequestParam(defaultValue = "10") int pageSize,
                          HttpServletResponse response) {
-        String result = thridPartyService.getDealsForGmobi(page, pageSize, new String[]{"discount", "category"});
+        String result = thirdService.getDealsForGmobi(page, pageSize, new String[]{"discount", "category"});
+        //增加返回次数
+        appService.recordOfferReturnCount(ClientHelper.getDeviceInfo().getMarketChannel());
         Httphelper.sendJsonMessage(result, response);
         return null;
     }
@@ -53,7 +63,7 @@ public class OfferController {
     public String getDealsForIndia(@RequestParam(defaultValue = "1") int page,
                                    @RequestParam(defaultValue = "10") int pageSize,
                                    HttpServletResponse response) {
-        String dealsForIndia = thridPartyService.getDealsForIndia(page, pageSize, "originPrice", "presentPrice");
+        String dealsForIndia = thirdService.getDealsForIndia(page, pageSize, "originPrice", "presentPrice");
         Httphelper.sendJsonMessage(dealsForIndia, response);
         return null;
     }
@@ -61,19 +71,28 @@ public class OfferController {
     @RequestMapping(value = "/offer/dealInfo/{id}", method = RequestMethod.GET)
     public String getDealsForIndia(@PathVariable("id") String id,
                                    HttpServletResponse response) {
+        if (StringUtils.isEmpty(id) || !StringUtils.isNumericSpace(id)) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+            jsonObject.put(ConstantUtil.API_NAME_MSG, "id is empty");
+            jsonObject.put(ConstantUtil.API_NAME_DATA, new HashMap<>());
+            Httphelper.sendJsonMessage(jsonObject.toJSONString(), response);
+            return null;
+        }
         String deviceId = ClientHelper.getAndroidId();
         DeviceInfoVo deviceInfo = ClientHelper.getDeviceInfo();
         MarketChannel marketChannel = deviceInfo.getMarketChannel();
-        String[] filterProperties = new String[]{};
+        String[] filterProperties = null;
         switch (marketChannel) {
             case GMOBI:
-                filterProperties[0] = "category";
+                filterProperties = new String[]{"category"};
                 break;
 //            case INVENO:
 //                break;
             default:
         }
-        String dealInfoForIndia = thridPartyService.getDealInfo(id, deviceInfo.getMarketChannel().name(), deviceId, filterProperties);
+        String dealInfoForIndia = thirdService.getDealInfo(id, deviceInfo.getMarketChannel().name(), deviceId, filterProperties);
+        appService.recordOfferClickCount(marketChannel, Long.parseLong(id));
         Httphelper.sendJsonMessage(dealInfoForIndia, response);
         return null;
     }
@@ -90,7 +109,7 @@ public class OfferController {
     public String getDealsForMexico(@RequestParam(defaultValue = "1") int page,
                                     @RequestParam(defaultValue = "10") int pageSize,
                                     HttpServletResponse response) {
-        String dealsForMexico = thridPartyService.getDealsForInveno(page, pageSize, new String[]{"discount", "originPrice", "presentPrice"});
+        String dealsForMexico = thirdService.getDealsForInveno(page, pageSize, new String[]{"discount", "originPrice", "presentPrice"});
         Httphelper.sendJsonMessage(dealsForMexico, response);
         return null;
     }
@@ -103,23 +122,27 @@ public class OfferController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/offer/orderInfo", method = RequestMethod.GET)
+    @RequestMapping(value = "/offer/orderInfo")
     public String getOrderInfo(
             @DateTimeFormat(pattern = "yyyyMMdd") Date dateFrom,
             @DateTimeFormat(pattern = "yyyyMMdd") Date dateTo,
             HttpServletResponse response) {
         //如果起始日期或者结束日期为空则默认返回昨天开始30天的数据
         Calendar currentCalendar = Calendar.getInstance();
-        currentCalendar.set(currentCalendar.YEAR, Calendar.MONTH, Calendar.DATE);
+        currentCalendar.set(currentCalendar.get(Calendar.YEAR), currentCalendar.get(currentCalendar.MONTH), currentCalendar.get(currentCalendar.DATE), 0, 0, 0);
 
         Date dateEnd = currentCalendar.getTime();
-        Date dateStart = new Date(dateEnd.getTime() - 1000 * 60 * 60 * 24 * 30);
-
+        Date dateStart = new Date(dateEnd.getTime() - (1000 * 60 * 60 * 24 * 30l));
         if (dateFrom != null && dateTo != null) {
             dateStart = dateFrom;
             dateEnd = dateTo;
         }
-        String orderInfo = thridPartyService.getOfferOrderInfo(dateStart, dateEnd);
+        String[] affIds = null;
+        DeviceInfoVo deviceInfo = ClientHelper.getDeviceInfo();
+        if (deviceInfo != null && deviceInfo.getMarketChannel() != null) {
+            affIds = AffliIdHelper.getAffIdsByChannel(deviceInfo.getMarketChannel());
+        }
+        String orderInfo = thirdService.getOfferOrderInfo(dateStart, dateEnd, affIds, deviceInfo.getMarketChannel());
         Httphelper.sendJsonMessage(orderInfo, response);
         return null;
     }
