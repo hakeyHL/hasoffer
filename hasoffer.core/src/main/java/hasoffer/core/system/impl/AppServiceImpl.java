@@ -8,9 +8,11 @@ import hasoffer.base.utils.AffliIdHelper;
 import hasoffer.base.utils.ArrayUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.bo.system.SearchCriteria;
+import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
 import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.*;
+import hasoffer.core.persistence.po.app.mongo.AppOfferRecord;
 import hasoffer.core.persistence.po.h5.KeywordCollection;
 import hasoffer.core.persistence.po.ptm.PtmCategory;
 import hasoffer.core.persistence.po.urm.*;
@@ -19,6 +21,9 @@ import hasoffer.core.utils.ConstantUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +37,8 @@ import java.util.*;
 @Service
 @Transactional
 public class AppServiceImpl implements IAppService {
+    static final String API_SQL_GET_APPOFFERST_BY_MARKETCHANNEL_AND_YMD = "select t from AppOfferStatistics t where t.marketChannel=?0 and t.ymd=?1";
+
     private final static Logger loggerIndexUrl = LoggerFactory.getLogger("hasoffer.IndexUrl");
 
     private static final String Q_APP_VERSION =
@@ -138,7 +145,8 @@ public class AppServiceImpl implements IAppService {
 
     @Resource
     IDataBaseManager dbm;
-
+    @Resource
+    MongoDbManager mongoDbManager;
     private String Q_APP_GETPRODUCTS =
             "SELECT t FROM PtmProduct t " +
                     " where 1=1 and ";
@@ -635,5 +643,88 @@ public class AppServiceImpl implements IAppService {
     @Override
     public PageableResult<AppDeal> getDealsForMexico(int page, int pageSize) {
         return dbm.queryPage(Q_APP_GETDEALS_BY_THUMB, page <= 1 ? 1 : page, pageSize, Arrays.asList(new Date()));
+    }
+
+    /**
+     * 记录某个渠道的offer返回次数
+     *
+     * @param marketChannel
+     */
+    @Transactional
+    public void recordOfferReturnCount(MarketChannel marketChannel) {
+        if (marketChannel == null) {
+            System.out.println("marketChannel is null");
+            return;
+        }
+        boolean newFlag = false;
+        AppOfferStatistics appOfferStatistics = dbm.querySingle(API_SQL_GET_APPOFFERST_BY_MARKETCHANNEL_AND_YMD, Arrays.asList(marketChannel, TimeUtils.parse(new Date(), "yyyyMMdd")));
+        if (appOfferStatistics == null) {
+            newFlag = true;
+            //创建一个
+            appOfferStatistics = new AppOfferStatistics();
+            appOfferStatistics.setMarketChannel(marketChannel);
+        }
+        Long offerScanCount = appOfferStatistics.getOfferScanCount();
+        appOfferStatistics.setOfferScanCount(offerScanCount + 1);
+        if (newFlag) {
+            dbm.create(appOfferStatistics);
+        } else {
+            dbm.update(appOfferStatistics);
+        }
+    }
+
+    /**
+     * 记录offer的点击
+     *
+     * @param marketChannel 渠道
+     * @param offerId       offer的id
+     */
+    @Transactional
+    public void recordOfferClickCount(MarketChannel marketChannel, long offerId) {
+        String yyyyMMdd = TimeUtils.parse(new Date(), "yyyyMMdd");
+        long time = new Date().getTime();
+        //按理说,只有获取了列表才能点击,但是不排除直接-点击-的情况,所以要创建
+        boolean newFlag = false;
+        AppOfferStatistics appOfferStatistics = dbm.querySingle(API_SQL_GET_APPOFFERST_BY_MARKETCHANNEL_AND_YMD, Arrays.asList(marketChannel, yyyyMMdd));
+        if (appOfferStatistics == null) {
+            newFlag = true;
+            //创建一个
+            appOfferStatistics = new AppOfferStatistics();
+            appOfferStatistics.setMarketChannel(marketChannel);
+        }
+        Long clickCount = appOfferStatistics.getOfferClickCount();
+        appOfferStatistics.setOfferClickCount(clickCount + 1);
+        if (newFlag) {
+            dbm.create(appOfferStatistics);
+        } else {
+            dbm.update(appOfferStatistics);
+        }
+
+        //记录到mongo
+        //1. 根据deal的id和ymd以及渠道获取每天唯一的记录
+        //2. 不存在则创建
+        //3. 存在则更新
+        AppOfferRecord appOfferRecord;
+        List<AppOfferRecord> offerRecords = mongoDbManager.query(AppOfferRecord.class, new Query().addCriteria(Criteria.where("ymd").is(yyyyMMdd).and("marketChannel").is(marketChannel.name()).and("offerId").is(offerId)));
+        if (offerRecords != null && offerRecords.size() > 0) {
+            if (offerRecords.size() > 1) {
+                System.out.println("error , more than one record  " + yyyyMMdd + "  " + offerId + "  " + marketChannel);
+                return;
+            }
+            appOfferRecord = offerRecords.get(0);
+            Update update = new Update();
+            update.set("clickCount", appOfferRecord.getClickCount() + 1);
+            update.set("currentTime", time);
+            mongoDbManager.update(AppOfferRecord.class, appOfferRecord.getId(), update);
+        } else {
+            //之前没有
+            appOfferRecord = new AppOfferRecord();
+            appOfferRecord.setYmd(yyyyMMdd);
+            appOfferRecord.setClickCount(1);
+            appOfferRecord.setCurrentTime(time);
+            appOfferRecord.setMarketChannel(marketChannel.name());
+            appOfferRecord.setOfferId(offerId);
+            mongoDbManager.save(appOfferRecord);
+        }
     }
 }
