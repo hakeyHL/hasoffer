@@ -38,6 +38,8 @@ import java.util.*;
 @Transactional
 public class AppServiceImpl implements IAppService {
     static final String API_SQL_GET_APPOFFERST_BY_MARKETCHANNEL_AND_YMD = "select t from AppOfferStatistics t where t.marketChannel=?0 and t.ymd=?1";
+    static final String API_SQL_GET_APPOFFERST_BY_MARKETCHANNEL_AND_YMDBT = "select t from AppOfferStatistics t where t.marketChannel=?0 and t.ymd>=?1 and t.ymd<=?2";
+    static final String API_SQL_GET_ORDERS_BY_AFFID = "select t from OrderStatsAnalysisPO t where t.affID=?0 and t.orderStatus='approved' and t.orderTime >=?1 and t.orderTime <=?2";
 
     private final static Logger loggerIndexUrl = LoggerFactory.getLogger("hasoffer.IndexUrl");
 
@@ -647,14 +649,15 @@ public class AppServiceImpl implements IAppService {
 
     /**
      * 记录某个渠道的offer返回次数
+     * 会返回当天的offer的返回次数
      *
      * @param marketChannel
      */
     @Transactional
-    public void recordOfferReturnCount(MarketChannel marketChannel) {
+    public Long recordOfferReturnCount(MarketChannel marketChannel) {
         if (marketChannel == null) {
             System.out.println("marketChannel is null");
-            return;
+            return 0l;
         }
         boolean newFlag = false;
         AppOfferStatistics appOfferStatistics = dbm.querySingle(API_SQL_GET_APPOFFERST_BY_MARKETCHANNEL_AND_YMD, Arrays.asList(marketChannel, TimeUtils.parse(new Date(), "yyyyMMdd")));
@@ -671,6 +674,34 @@ public class AppServiceImpl implements IAppService {
         } else {
             dbm.update(appOfferStatistics);
         }
+        return appOfferStatistics.getOfferScanCount();
+    }
+
+    /**
+     * 根据联盟id获取订单记录
+     *
+     * @param affId
+     * @return
+     */
+    @Override
+    public List<OrderStatsAnalysisPO> getOrderDetailByAffId(String affId, Date startDate, Date endDate) {
+//        affID
+        return dbm.query(API_SQL_GET_ORDERS_BY_AFFID, Arrays.asList(affId, startDate, endDate));
+    }
+
+    /**
+     * 按照日期返回和渠道获取offer点击和返回记录
+     *
+     * @param dateStart
+     * @param dateEnd
+     * @param marketChannel
+     * @return
+     */
+    @Override
+    public List<AppOfferStatistics> getOfferClickCountBetDate(Date dateStart, Date dateEnd, MarketChannel marketChannel) {
+        String startYmd = TimeUtils.parse(dateStart, "yyyyMMdd");
+        String endYmd = TimeUtils.parse(dateEnd, "yyyyMMdd");
+        return dbm.query(API_SQL_GET_APPOFFERST_BY_MARKETCHANNEL_AND_YMDBT, Arrays.asList(marketChannel, startYmd, endYmd));
     }
 
     /**
