@@ -140,7 +140,7 @@ public class OfferController {
         String[] affIds = null;
         DeviceInfoVo deviceInfo = ClientHelper.getDeviceInfo();
         if (deviceInfo != null && deviceInfo.getMarketChannel() != null) {
-            affIds = AffliIdHelper.amazonFlIdByChannelMap.get(deviceInfo.getMarketChannel());
+            affIds = AffliIdHelper.getAffIdsByChannel(deviceInfo.getMarketChannel());
         }
         String orderInfo = thirdService.getOfferOrderInfo(dateStart, dateEnd, affIds, deviceInfo.getMarketChannel());
         Httphelper.sendJsonMessage(orderInfo, response);
