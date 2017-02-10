@@ -64,10 +64,10 @@ public class OfferController {
         String deviceId = ClientHelper.getAndroidId();
         DeviceInfoVo deviceInfo = ClientHelper.getDeviceInfo();
         MarketChannel marketChannel = deviceInfo.getMarketChannel();
-        String[] filterProperties = new String[]{};
+        String[] filterProperties = null;
         switch (marketChannel) {
             case GMOBI:
-                filterProperties[0] = "category";
+                filterProperties = new String[]{"category"};
                 break;
 //            case INVENO:
 //                break;
