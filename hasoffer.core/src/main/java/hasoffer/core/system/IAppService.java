@@ -13,6 +13,7 @@ import hasoffer.core.persistence.po.urm.UrmUser;
 import hasoffer.core.persistence.po.urm.UrmUserDevice;
 import hasoffer.core.persistence.po.urm.UrmUserRedeemGroup;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -103,5 +104,10 @@ public interface IAppService {
 
     void recordOfferClickCount(MarketChannel marketChannel, long offerId);
 
-    void recordOfferReturnCount(MarketChannel marketChannel);
+    Long recordOfferReturnCount(MarketChannel marketChannel);
+
+    List<OrderStatsAnalysisPO> getOrderDetailByAffId(String affId, Date startDate, Date endDate);
+
+    List<AppOfferStatistics> getOfferClickCountBetDate(Date dateStart, Date dateEnd, MarketChannel marketChannel);
+
 }
