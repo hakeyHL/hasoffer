@@ -1,5 +1,7 @@
 package hasoffer.core.third;
 
+import hasoffer.base.enums.MarketChannel;
+
 import java.util.Date;
 
 /**
@@ -15,5 +17,5 @@ public interface ThirdService {
 
     String getDealsForGmobi(int page, int pageSize, String... filterProperties);
 
-    String getOfferOrderInfo(Date dateStart, Date dateEnd);
+    String getOfferOrderInfo(Date dateStart, Date dateEnd, String[] affIds, MarketChannel marketChannel);
 }

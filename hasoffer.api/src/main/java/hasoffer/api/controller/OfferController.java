@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.Httphelper;
 import hasoffer.base.enums.MarketChannel;
+import hasoffer.base.utils.AffliIdHelper;
 import hasoffer.core.app.vo.DeviceInfoVo;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.third.impl.ThirdServiceImpl;
@@ -121,23 +122,27 @@ public class OfferController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/offer/orderInfo", method = RequestMethod.GET)
+    @RequestMapping(value = "/offer/orderInfo")
     public String getOrderInfo(
             @DateTimeFormat(pattern = "yyyyMMdd") Date dateFrom,
             @DateTimeFormat(pattern = "yyyyMMdd") Date dateTo,
             HttpServletResponse response) {
         //如果起始日期或者结束日期为空则默认返回昨天开始30天的数据
         Calendar currentCalendar = Calendar.getInstance();
-        currentCalendar.set(currentCalendar.YEAR, Calendar.MONTH, Calendar.DATE);
+        currentCalendar.set(currentCalendar.get(Calendar.YEAR), currentCalendar.get(currentCalendar.MONTH), currentCalendar.get(currentCalendar.DATE), 0, 0, 0);
 
         Date dateEnd = currentCalendar.getTime();
-        Date dateStart = new Date(dateEnd.getTime() - 1000 * 60 * 60 * 24 * 30);
-
+        Date dateStart = new Date(dateEnd.getTime() - (1000 * 60 * 60 * 24 * 30l));
         if (dateFrom != null && dateTo != null) {
             dateStart = dateFrom;
             dateEnd = dateTo;
         }
-        String orderInfo = thirdService.getOfferOrderInfo(dateStart, dateEnd);
+        String[] affIds = null;
+        DeviceInfoVo deviceInfo = ClientHelper.getDeviceInfo();
+        if (deviceInfo != null && deviceInfo.getMarketChannel() != null) {
+            affIds = AffliIdHelper.getAffIdsByChannel(deviceInfo.getMarketChannel());
+        }
+        String orderInfo = thirdService.getOfferOrderInfo(dateStart, dateEnd, affIds, deviceInfo.getMarketChannel());
         Httphelper.sendJsonMessage(orderInfo, response);
         return null;
     }

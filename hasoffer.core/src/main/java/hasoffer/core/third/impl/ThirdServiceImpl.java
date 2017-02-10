@@ -8,9 +8,12 @@ import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.app.vo.AppOfferOrderDetailVo;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.dbm.Hibernate4DataBaseManager;
+import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.AppDeal;
+import hasoffer.core.persistence.po.app.AppOfferStatistics;
 import hasoffer.core.product.impl.CmpSkuServiceImpl;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.third.ThirdService;
@@ -25,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -249,17 +253,79 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
     @Override
-    public String getOfferOrderInfo(Date dateStart, Date dateEnd) {
+    public String getOfferOrderInfo(Date dateStart, Date dateEnd, String[] affIds, MarketChannel marketChannel) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+        JSONObject resultJsonObject = new JSONObject();
+        resultJsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        resultJsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
+
+        //一个map集合,用户存放yrm的vo对象
+        Map<String, AppOfferOrderDetailVo> appOfferOrderDetailVoMap = new HashMap<>();
+
+        BigDecimal orderTotal = BigDecimal.ZERO;
+        BigDecimal commissionTotal = BigDecimal.ZERO;
         //获取内容如下
         //每天各个网站的订单数--属于GMobi的
         //订单金额
         //佣金金额
-        //当日offer列表总展示次数,每次请求响应结束后都要计数--这个东西存哪儿去...
+        //当日offer列表总展示次数
         //offer的点击总次数
 
+        //分析每一天的订单的各个site的订单数
 
-        return null;
+        for (String affId : affIds) {
+            List<OrderStatsAnalysisPO> orders = appService.getOrderDetailByAffId(affId, dateStart, dateEnd);
+            for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
+                orderTotal = orderTotal.add(orderStatsAnalysisPO.getSaleAmount());
+                commissionTotal = commissionTotal.add(orderStatsAnalysisPO.getTentativeAmount());
+
+                String ymd = simpleDateFormat.format(orderStatsAnalysisPO.getOrderTime());
+                //以ymd为key获取vo对象
+                AppOfferOrderDetailVo appOfferOrderDetailVo = appOfferOrderDetailVoMap.get(ymd);
+                if (appOfferOrderDetailVo != null) {
+
+                    //算每个site的订单数
+                    List<Map<String, Integer>> siteOrderList = appOfferOrderDetailVo.getSiteOrderList();
+                    if (siteOrderList.size() > 0) {
+                        for (Map<String, Integer> map : siteOrderList) {
+                            Integer siteOrderCount = map.get(orderStatsAnalysisPO.getWebSite());
+                            if (map.get(orderStatsAnalysisPO.getWebSite()) != null) {
+                                //已经有此site的数据
+                                siteOrderCount += 1;
+                                map.put(orderStatsAnalysisPO.getWebSite(), siteOrderCount);
+                            } else {
+                                map.put(orderStatsAnalysisPO.getWebSite(), 1);
+                            }
+                        }
+                    } else {
+                        Map<String, Integer> tempSiteOrderMap = new HashMap<>();
+                        tempSiteOrderMap.put(orderStatsAnalysisPO.getWebSite(), 1);
+                        siteOrderList.add(tempSiteOrderMap);
+                    }
+                } else {
+                    appOfferOrderDetailVo = new AppOfferOrderDetailVo();
+                    appOfferOrderDetailVoMap.put(ymd, appOfferOrderDetailVo);
+                }
+                //算ymd的订单金额和佣金金额
+                appOfferOrderDetailVo.setTotalOrderAmount(appOfferOrderDetailVo.getTotalOrderAmount().add(orderStatsAnalysisPO.getSaleAmount()));
+                appOfferOrderDetailVo.setTotalCommissionAmount(appOfferOrderDetailVo.getTotalCommissionAmount().add(orderStatsAnalysisPO.getTentativeAmount()));
+            }
+        }
+        //请求返回次数,按日期范围查询
+        List<AppOfferStatistics> offerRecords = appService.getOfferClickCountBetDate(dateStart, dateEnd, marketChannel);
+
+        for (AppOfferStatistics appOfferStatistics : offerRecords) {
+            //遍历voMap的key与此ymd对照然后更新
+            Set<String> ymds = appOfferOrderDetailVoMap.keySet();
+            for (String ymd : ymds) {
+                if (ymd.equals(appOfferStatistics.getYmd())) {
+                    AppOfferOrderDetailVo appOfferOrderDetailVo = appOfferOrderDetailVoMap.get(ymd);
+                    appOfferOrderDetailVo.setClickCount(appOfferStatistics.getOfferClickCount());
+                    appOfferOrderDetailVo.setShowCount(appOfferStatistics.getOfferScanCount());
+                }
+            }
+        }
+        resultJsonObject.put(ConstantUtil.API_NAME_DATA, appOfferOrderDetailVoMap);
+        return resultJsonObject.toJSONString();
     }
-
-
 }
