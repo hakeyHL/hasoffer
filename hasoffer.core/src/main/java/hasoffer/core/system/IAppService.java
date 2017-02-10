@@ -100,4 +100,8 @@ public interface IAppService {
     void updateKeyResultCount(KeywordCollection keywordCollection);
 
     PageableResult<AppDeal> getDealsForMexico(int page, int pageSize);
+
+    void recordOfferClickCount(MarketChannel marketChannel, long offerId);
+
+    void recordOfferReturnCount(MarketChannel marketChannel);
 }
