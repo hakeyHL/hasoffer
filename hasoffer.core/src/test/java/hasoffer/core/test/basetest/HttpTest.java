@@ -46,7 +46,7 @@ public class HttpTest {
 
         TagNode root = HtmlUtils.getUrlRootTagNode(url);
 
-        List<TagNode> nodeList = XPathUtils.getSubNodesByXPath(root, "//div[@data-dealtype='today']/a/@href", null);
+        List<TagNode> nodeList = XPathUtils.getSubNodesByXPath(root, "//div[@data-dealtype='today']/a", null);
 
         for (TagNode hrefNode : nodeList) {
 
@@ -60,21 +60,62 @@ public class HttpTest {
             String title = titleNode.getText().toString();
 
             TagNode viewAllNode = XPathUtils.getSubNodeByXPath(dealRootNode, "//a[@class='sctn__view-all']", null);
-            String category = viewAllNode.getAttributeByName("href").split("tags/")[1].split("-deals")[0].replace('-',' ');
+            String category = viewAllNode.getAttributeByName("href").split("tags/")[1].split("-deals")[0].replace('-', ' ');
 
             //span[@class='prdct-dtl__mrp']原价
+            String oriPriceString = "";
             TagNode originPriceNode = XPathUtils.getSubNodeByXPath(dealRootNode, "//span[@class='prdct-dtl__mrp']", null);
-            String oriPriceString = StringUtils.filterAndTrim(originPriceNode.getText().toString(), Arrays.asList("₹"));
+            if (originPriceNode != null) {
+                oriPriceString = StringUtils.filterAndTrim(originPriceNode.getText().toString(), Arrays.asList("₹"));
+            }
 
             //span[@class='prdct-dtl__dscnt']折扣
-            TagNode discountNode = XPathUtils.getSubNodeByXPath(dealRootNode, "//span[@class='prdct-dtl__mrp']", null);
-            String discountString = StringUtils.filterAndTrim(discountNode.getText().toString(), Arrays.asList("[", "]"));
+            String discountString = "";
+            TagNode discountNode = XPathUtils.getSubNodeByXPath(dealRootNode, "//span[@class='prdct-dtl__dscnt']", null);
+            if (discountNode != null) {
+                discountString = discountNode.getText().toString().replace('[', ' ').replace(']', ' ');
+                discountString = StringUtils.filterAndTrim(discountString, null);
+            }
 
             //div[@class='prdct-dtl__prc']现价
             TagNode presentPriceNode = XPathUtils.getSubNodeByXPath(dealRootNode, "//div[@class='prdct-dtl__prc']", null);
             String presentPriceString = StringUtils.filterAndTrim(presentPriceNode.getText().toString(), Arrays.asList("₹"));
 
+            //link url
+            TagNode linkUrlNode = XPathUtils.getSubNodeByXPath(dealRootNode, "//div[@class='bttn bttn--gts js-grab-deal']", null);
+            String dealLink = linkUrlNode.getAttributeByName("data-url");
+            String[] subUrlArray = dealLink.split("&url=");
+            if (subUrlArray.length > 1) {
+                dealLink = subUrlArray[1];
+            }
 
+            //desc
+            String desc = "";
+            List<TagNode> descHeaderNodeList = XPathUtils.getSubNodesByXPath(dealRootNode, "//div[@class='sctn__hdr clearfix']", null);
+            List<TagNode> descInfoNodeList = XPathUtils.getSubNodesByXPath(dealRootNode, "//div[@class='sctn__inr clearfix']", null);
+
+            if (descHeaderNodeList != null && descInfoNodeList != null && descHeaderNodeList.size() == descInfoNodeList.size()) {
+
+                StringBuilder stringBuilder = new StringBuilder();
+
+                for (int i = 0; i < descHeaderNodeList.size(); i++) {
+
+                    String header = descHeaderNodeList.get(i).getText().toString().replaceAll("\\n", "");
+                    String info = descInfoNodeList.get(i).getText().toString();
+
+                    if (header != null) {
+                        if (header.contains("Comments") || header.contains("RECOMMENDED DEALS"))
+                            continue;
+                    }
+
+                    stringBuilder.append(StringUtils.unescapeHtml(header) + StringUtils.unescapeHtml(info) + "\n");
+                }
+
+                desc = stringBuilder.toString();
+            }
+
+
+            System.out.println();
 
         }
 

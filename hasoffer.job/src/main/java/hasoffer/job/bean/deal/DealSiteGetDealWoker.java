@@ -32,6 +32,7 @@ public class DealSiteGetDealWoker implements Runnable {
 
     //初始化deal抓取的网站
     static {
+        dealSiteList.add(Website.MYSMARTPRICE);
         dealSiteList.add(Website.DESIDIME);
     }
 
