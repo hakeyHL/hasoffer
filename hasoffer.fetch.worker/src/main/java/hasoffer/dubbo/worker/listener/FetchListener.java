@@ -40,6 +40,7 @@ public class FetchListener extends ContextLoaderListener {
         HasofferThreadFactory factory = new HasofferThreadFactory("FetchDealWorker");
         ExecutorService es = Executors.newCachedThreadPool(factory);
         for (int i = 0; i < 1; i++) {
+            es.execute(new FetchDealWorker(springContext, Website.MYSMARTPRICE));
             es.execute(new FetchDealWorker(springContext, Website.DESIDIME));
         }
     }
