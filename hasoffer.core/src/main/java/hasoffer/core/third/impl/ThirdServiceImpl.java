@@ -282,30 +282,11 @@ public class ThirdServiceImpl implements ThirdService {
                 String ymd = simpleDateFormat.format(orderStatsAnalysisPO.getOrderTime());
                 //以ymd为key获取vo对象
                 AppOfferOrderDetailVo appOfferOrderDetailVo = appOfferOrderDetailVoMap.get(ymd);
-                if (appOfferOrderDetailVo != null) {
-
-                    //算每个site的订单数
-                    List<Map<String, Integer>> siteOrderList = appOfferOrderDetailVo.getSiteOrderList();
-                    if (siteOrderList.size() > 0) {
-                        for (Map<String, Integer> map : siteOrderList) {
-                            Integer siteOrderCount = map.get(orderStatsAnalysisPO.getWebSite());
-                            if (map.get(orderStatsAnalysisPO.getWebSite()) != null) {
-                                //已经有此site的数据
-                                siteOrderCount += 1;
-                                map.put(orderStatsAnalysisPO.getWebSite(), siteOrderCount);
-                            } else {
-                                map.put(orderStatsAnalysisPO.getWebSite(), 1);
-                            }
-                        }
-                    } else {
-                        Map<String, Integer> tempSiteOrderMap = new HashMap<>();
-                        tempSiteOrderMap.put(orderStatsAnalysisPO.getWebSite(), 1);
-                        siteOrderList.add(tempSiteOrderMap);
-                    }
-                } else {
+                if (appOfferOrderDetailVo == null) {
                     appOfferOrderDetailVo = new AppOfferOrderDetailVo();
                     appOfferOrderDetailVoMap.put(ymd, appOfferOrderDetailVo);
                 }
+                fillSiteOrderList(orderStatsAnalysisPO, appOfferOrderDetailVo);
                 //算ymd的订单金额和佣金金额
                 appOfferOrderDetailVo.setTotalOrderAmount(appOfferOrderDetailVo.getTotalOrderAmount().add(orderStatsAnalysisPO.getSaleAmount()));
                 appOfferOrderDetailVo.setTotalCommissionAmount(appOfferOrderDetailVo.getTotalCommissionAmount().add(orderStatsAnalysisPO.getTentativeAmount()));
@@ -327,5 +308,26 @@ public class ThirdServiceImpl implements ThirdService {
         }
         resultJsonObject.put(ConstantUtil.API_NAME_DATA, appOfferOrderDetailVoMap);
         return resultJsonObject.toJSONString();
+    }
+
+    private void fillSiteOrderList(OrderStatsAnalysisPO orderStatsAnalysisPO, AppOfferOrderDetailVo appOfferOrderDetailVo) {
+        //算每个site的订单数
+        List<Map<String, Integer>> siteOrderList = appOfferOrderDetailVo.getSiteOrderList();
+        if (siteOrderList.size() > 0) {
+            for (Map<String, Integer> map : siteOrderList) {
+                Integer siteOrderCount = map.get(orderStatsAnalysisPO.getWebSite());
+                if (map.get(orderStatsAnalysisPO.getWebSite()) != null) {
+                    //已经有此site的数据
+                    siteOrderCount += 1;
+                    map.put(orderStatsAnalysisPO.getWebSite(), siteOrderCount);
+                } else {
+                    map.put(orderStatsAnalysisPO.getWebSite(), 1);
+                }
+            }
+        } else {
+            Map<String, Integer> tempSiteOrderMap = new HashMap<>();
+            tempSiteOrderMap.put(orderStatsAnalysisPO.getWebSite(), 1);
+            siteOrderList.add(tempSiteOrderMap);
+        }
     }
 }
