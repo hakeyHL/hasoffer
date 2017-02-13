@@ -298,12 +298,20 @@ public class ThirdServiceImpl implements ThirdService {
         for (AppOfferStatistics appOfferStatistics : offerRecords) {
             //遍历voMap的key与此ymd对照然后更新
             Set<String> ymds = appOfferOrderDetailVoMap.keySet();
-            for (String ymd : ymds) {
-                if (ymd.equals(appOfferStatistics.getYmd())) {
-                    AppOfferOrderDetailVo appOfferOrderDetailVo = appOfferOrderDetailVoMap.get(ymd);
-                    appOfferOrderDetailVo.setClickCount(appOfferStatistics.getOfferClickCount());
-                    appOfferOrderDetailVo.setShowCount(appOfferStatistics.getOfferScanCount());
+            if (ymds.size() > 0) {
+                for (String ymd : ymds) {
+                    if (ymd.equals(appOfferStatistics.getYmd())) {
+                        AppOfferOrderDetailVo appOfferOrderDetailVo = appOfferOrderDetailVoMap.get(ymd);
+                        appOfferOrderDetailVo.setClickCount(appOfferStatistics.getOfferClickCount());
+                        appOfferOrderDetailVo.setShowCount(appOfferStatistics.getOfferScanCount());
+                    }
                 }
+            } else {
+                //即使没有订单也要返回点击和展示数据
+                appOfferOrderDetailVoMap.put(appOfferStatistics.getYmd(), new AppOfferOrderDetailVo());
+                AppOfferOrderDetailVo appOfferOrderDetailVo = appOfferOrderDetailVoMap.get(appOfferStatistics.getYmd());
+                appOfferOrderDetailVo.setClickCount(appOfferStatistics.getOfferClickCount());
+                appOfferOrderDetailVo.setShowCount(appOfferStatistics.getOfferScanCount());
             }
         }
         resultJsonObject.put(ConstantUtil.API_NAME_DATA, appOfferOrderDetailVoMap);
