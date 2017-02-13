@@ -7,21 +7,14 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.enums.AppdealSource;
 import hasoffer.core.persistence.po.app.AppDeal;
-<<<<<<< HEAD
-import hasoffer.core.utils.Httphelper;
-import hasoffer.core.utils.ImageUtil;
-=======
->>>>>>> dev
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchDealResult;
 import hasoffer.spider.model.FetchedDealInfo;
-import jodd.io.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
