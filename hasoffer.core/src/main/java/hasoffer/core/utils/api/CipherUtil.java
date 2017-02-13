@@ -4,6 +4,7 @@ import hasoffer.base.enums.MarketChannel;
 import org.apache.commons.lang3.StringUtils;
 
 import java.security.MessageDigest;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,6 +49,10 @@ public class CipherUtil {
     public static boolean validationWithSHA256(MarketChannel marketChannel, String key, String timeStamp) {
         boolean isRight = false;
         if (marketChannel == null || StringUtils.isEmpty(key) || StringUtils.isEmpty(timeStamp)) {
+            return isRight;
+        }
+        //时间戳的有效期为5分钟
+        if (StringUtils.isNumericSpace(timeStamp) && (new Date().getTime() - Long.parseLong(timeStamp)) > 1000 * 60 * 5) {
             return isRight;
         }
         StringBuilder sb = new StringBuilder();
