@@ -27,6 +27,11 @@ public class ImageTest {
     @Test
     public void testImageDownload() throws Exception {
 
+<<<<<<< HEAD
+=======
+        File file = ImageUtil.downloadImage("https://assets.mysmartprice.com/t_d-desktop-single,f_auto/d/242356.jpg");
+
+>>>>>>> dev
         String response = Httphelper.doGetWithHeaer("https://assets.mysmartprice.com/t_d-desktop-single,f_auto/d/242356.jpg", new HashMap());
 
         byte[] bodyBytes = response.getBytes();
