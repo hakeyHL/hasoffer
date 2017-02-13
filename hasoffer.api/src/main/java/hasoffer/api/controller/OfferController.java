@@ -9,6 +9,7 @@ import hasoffer.core.app.vo.DeviceInfoVo;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.third.impl.ThirdServiceImpl;
 import hasoffer.core.utils.ConstantUtil;
+import hasoffer.core.utils.api.CipherUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -116,16 +117,32 @@ public class OfferController {
     /**
      * 获取订单详情
      *
-     * @param dateFrom 开始日期
-     * @param dateTo   结束日期
+     * @param dateFrom  开始日期
+     * @param dateTo    结束日期
      * @param response
+     * @param key       加密后的key
+     * @param timestamp 时间戳
      * @return
      */
     @RequestMapping(value = "/offer/orderInfo")
     public String getOrderInfo(
             @DateTimeFormat(pattern = "yyyyMMdd") Date dateFrom,
             @DateTimeFormat(pattern = "yyyyMMdd") Date dateTo,
+            @RequestParam String key,
+            @RequestParam String timestamp,
             HttpServletResponse response) {
+
+        //验证key和时间戳
+        DeviceInfoVo deviceInfo = ClientHelper.getDeviceInfo();
+        boolean accessed = CipherUtil.validationWithSHA256(deviceInfo.getMarketChannel(), key, timestamp);
+        if (!accessed) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+            jsonObject.put(ConstantUtil.API_NAME_MSG, "request refused.");
+            jsonObject.put(ConstantUtil.API_NAME_DATA, new HashMap<>());
+            Httphelper.sendJsonMessage(jsonObject.toJSONString(), response);
+            return null;
+        }
         //如果起始日期或者结束日期为空则默认返回昨天开始30天的数据
         Calendar currentCalendar = Calendar.getInstance();
         currentCalendar.set(currentCalendar.get(Calendar.YEAR), currentCalendar.get(currentCalendar.MONTH), currentCalendar.get(currentCalendar.DATE), 0, 0, 0);
@@ -137,7 +154,6 @@ public class OfferController {
             dateEnd = dateTo;
         }
         String[] affIds = null;
-        DeviceInfoVo deviceInfo = ClientHelper.getDeviceInfo();
         if (deviceInfo != null && deviceInfo.getMarketChannel() != null) {
             affIds = AffliIdHelper.getAffIdsByChannel(deviceInfo.getMarketChannel());
         }
