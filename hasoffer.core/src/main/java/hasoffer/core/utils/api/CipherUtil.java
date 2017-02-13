@@ -62,7 +62,6 @@ public class CipherUtil {
 
         }
         StringBuilder sb = new StringBuilder();
-        String s = channelDefaultKeyMap.get(marketChannel);
         sb.append(marketChannel.name()).append(timeStamp).append(channelDefaultKeyMap.get(marketChannel));
         if (key.equals(encryptWithSHA256(sb.toString()))) {
             isRight = true;
