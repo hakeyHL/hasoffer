@@ -137,54 +137,6 @@ public class DealSiteGetDealWoker implements Runnable {
             appdeal.setPriceDescription(fetchedDealInfo.getPriceString());
         }
 
-<<<<<<< HEAD
-
-        String dealPath = "";
-        String dealBigPath = "";
-        String dealSmallPath = "";
-
-        try {
-            String response = Httphelper.doGetWithHeaer("https://assets.mysmartprice.com/t_d-desktop-single,f_auto/d/242356.jpg", new HashMap());
-
-            byte[] bodyBytes = response.getBytes();
-
-            File imageFile = FileUtil.createTempFile("mysmartprice", ".jpg", null);
-
-            FileUtil.writeBytes(imageFile, bodyBytes);
-
-            dealPath = ImageUtil.uploadImage(imageFile);
-            dealBigPath = ImageUtil.uploadImage(imageFile, 316, 180);
-            dealSmallPath = ImageUtil.uploadImage(imageFile, 180, 180);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("check get priceoff deal image download error");
-            return null;
-        }
-
-        appdeal.setImageUrl(dealPath);
-        appdeal.setInfoPageImage(dealBigPath);
-        appdeal.setListPageImage(dealSmallPath);
-=======
-//        String dealPath = "";
-//        String dealBigPath = "";
-//        String dealSmallPath = "";
-//
-//        try {
-//            File imageFile = ImageUtil.downloadImage(fetchedDealInfo.getImageUrl());
-//
-//            dealPath = ImageUtil.uploadImage(imageFile);
-//            dealBigPath = ImageUtil.uploadImage(imageFile, 316, 180);
-//            dealSmallPath = ImageUtil.uploadImage(imageFile, 180, 180);
-//        } catch (Exception e) {
-//            logger.info("check get priceoff deal image download error");
-//            return null;
-//        }
-//
-//        appdeal.setImageUrl(dealPath);
-//        appdeal.setInfoPageImage(dealBigPath);
-//        appdeal.setListPageImage(dealSmallPath);
->>>>>>> dev
-
         return appdeal;
 
     }
