@@ -75,6 +75,8 @@ public class AppDeal implements Identifiable<Long> {
 
     private Float shippingFee;//运费
 
+    private String couponCode;//优惠码
+
     //保留空参构造
     public AppDeal() {
     }
@@ -289,6 +291,14 @@ public class AppDeal implements Identifiable<Long> {
         this.shippingFee = shippingFee;
     }
 
+    public String getCouponCode() {
+        return couponCode;
+    }
+
+    public void setCouponCode(String couponCode) {
+        this.couponCode = couponCode;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -328,7 +338,8 @@ public class AppDeal implements Identifiable<Long> {
             return false;
         if (oriLinkUrl != null ? !oriLinkUrl.equals(deal.oriLinkUrl) : deal.oriLinkUrl != null) return false;
         if (category != null ? !category.equals(deal.category) : deal.category != null) return false;
-        return !(shippingFee != null ? !shippingFee.equals(deal.shippingFee) : deal.shippingFee != null);
+        if (shippingFee != null ? !shippingFee.equals(deal.shippingFee) : deal.shippingFee != null) return false;
+        return !(couponCode != null ? !couponCode.equals(deal.couponCode) : deal.couponCode != null);
 
     }
 
@@ -360,6 +371,7 @@ public class AppDeal implements Identifiable<Long> {
         result = 31 * result + (oriLinkUrl != null ? oriLinkUrl.hashCode() : 0);
         result = 31 * result + (category != null ? category.hashCode() : 0);
         result = 31 * result + (shippingFee != null ? shippingFee.hashCode() : 0);
+        result = 31 * result + (couponCode != null ? couponCode.hashCode() : 0);
         return result;
     }
 
@@ -392,6 +404,7 @@ public class AppDeal implements Identifiable<Long> {
                 ", oriLinkUrl='" + oriLinkUrl + '\'' +
                 ", category='" + category + '\'' +
                 ", shippingFee=" + shippingFee +
+                ", couponCode='" + couponCode + '\'' +
                 '}';
     }
 }

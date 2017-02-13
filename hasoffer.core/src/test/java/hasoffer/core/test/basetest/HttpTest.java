@@ -40,6 +40,17 @@ public class HttpTest {
     public static final String WEBSITE_DX_URL_PREFIEX = "http://www.dx.com/";
 
     @Test
+    public void testWuXiaWorld() throws Exception {
+
+        String url = "http://www.wuxiaworld.com/pw-index/pw-prologue/";
+
+        String html = HtmlUtils.getUrlHtml(url);
+
+        System.out.println(html);
+
+    }
+
+    @Test
     public void mySmartPrice() throws Exception {
 
         String url = "https://www.mysmartprice.com/deals/index.php?viewall=true&parameter=today";
