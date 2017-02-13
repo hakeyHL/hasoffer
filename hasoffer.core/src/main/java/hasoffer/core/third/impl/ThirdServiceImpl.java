@@ -197,6 +197,9 @@ public class ThirdServiceImpl implements ThirdService {
             PropertyFilter propertyFilter = JsonHelper.filterProperty(filterProperties);
             return JSON.toJSONString(resultMap, propertyFilter);
         }
+
+        appService.recordOfferClickCount(MarketChannel.valueOf(marketChannel), Long.parseLong(id));
+
         return JSON.toJSONString(resultMap);
     }
 
