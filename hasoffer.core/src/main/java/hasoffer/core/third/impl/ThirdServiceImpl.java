@@ -197,6 +197,9 @@ public class ThirdServiceImpl implements ThirdService {
             PropertyFilter propertyFilter = JsonHelper.filterProperty(filterProperties);
             return JSON.toJSONString(resultMap, propertyFilter);
         }
+
+        appService.recordOfferClickCount(MarketChannel.valueOf(marketChannel), Long.parseLong(id));
+
         return JSON.toJSONString(resultMap);
     }
 
@@ -295,10 +298,14 @@ public class ThirdServiceImpl implements ThirdService {
         //请求返回次数,按日期范围查询
         List<AppOfferStatistics> offerRecords = appService.getOfferClickCountBetDate(dateStart, dateEnd, marketChannel);
 
+        boolean isOfferOrderMapEmpty = false;
+        Set<String> ymds = appOfferOrderDetailVoMap.keySet();
+        if (ymds.size() < 1) {
+            isOfferOrderMapEmpty = true;
+        }
         for (AppOfferStatistics appOfferStatistics : offerRecords) {
             //遍历voMap的key与此ymd对照然后更新
-            Set<String> ymds = appOfferOrderDetailVoMap.keySet();
-            if (ymds.size() > 0) {
+            if (!isOfferOrderMapEmpty) {
                 for (String ymd : ymds) {
                     if (ymd.equals(appOfferStatistics.getYmd())) {
                         AppOfferOrderDetailVo appOfferOrderDetailVo = appOfferOrderDetailVoMap.get(ymd);

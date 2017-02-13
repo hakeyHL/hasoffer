@@ -92,7 +92,6 @@ public class OfferController {
             default:
         }
         String dealInfoForIndia = thirdService.getDealInfo(id, deviceInfo.getMarketChannel().name(), deviceId, filterProperties);
-        appService.recordOfferClickCount(marketChannel, Long.parseLong(id));
         Httphelper.sendJsonMessage(dealInfoForIndia, response);
         return null;
     }
