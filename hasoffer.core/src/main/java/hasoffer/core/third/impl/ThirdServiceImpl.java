@@ -14,6 +14,8 @@ import hasoffer.core.persistence.dbm.Hibernate4DataBaseManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppOfferStatistics;
+import hasoffer.core.persistence.po.ptm.PtmStdPrice;
+import hasoffer.core.product.IPtmStdPriceService;
 import hasoffer.core.product.impl.CmpSkuServiceImpl;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.third.ThirdService;
@@ -50,6 +52,8 @@ public class ThirdServiceImpl implements ThirdService {
     IAppService appService;
     @Resource
     ApiUtils apiUtils;
+    @Resource
+    IPtmStdPriceService ptmStdPriceService;
     Logger logger = LoggerFactory.getLogger(ThirdServiceImpl.class);
 
     public String getDeals(String acceptJson) {
@@ -75,7 +79,7 @@ public class ThirdServiceImpl implements ThirdService {
             resJson.put(ConstantUtil.API_NAME_MSG, "can't parse your createTime " + jsonObject.getString(str_createTime) + "  , because it is not the pattern as yyyyMMddHHmmss ");
             return resJson.toJSONString();
         }
-        JSONArray sites = null;
+        JSONArray sites;
         try {
             sites = jsonObject.getJSONArray("sites");
         } catch (Exception e) {
@@ -159,6 +163,7 @@ public class ThirdServiceImpl implements ThirdService {
         dealJson.put(str_createTime, TimeUtils.getDifference2Date(new Date(), appDeal.getCreateTime()));
         dealJson.put("presentPrice", appDeal.getPresentPrice() == null ? 0 : appDeal.getPresentPrice());
         dealJson.put("originPrice", appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
+        dealJson.put("couponCode", appDeal.getCouponCode() == null ? ConstantUtil.API_DATA_EMPTYSTRING : appDeal.getCouponCode());
     }
 
     @Override
@@ -323,6 +328,28 @@ public class ThirdServiceImpl implements ThirdService {
         }
         resultJsonObject.put(ConstantUtil.API_NAME_DATA, appOfferOrderDetailVoMap);
         return resultJsonObject.toJSONString();
+    }
+
+    /**
+     * 获取热卖商品列表
+     *
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public String getTopSkusForNineApps(String page, String pageSize, Date updateTime, int thumbNumber) {
+        //从91mobile的sku中筛选状态是onsale , 评论数值大于1000,最近价格更新时间12小时以内按照更新时间降序返回
+        if (thumbNumber == 0) {
+            thumbNumber = 1000;
+        }
+        if (updateTime == null) {
+            //12个小时
+            updateTime = new Date(new Date().getTime() - 1000 * 60 * 60 * 12);
+        }
+        PageableResult<PtmStdPrice> pagedTopPtmStdPrice = ptmStdPriceService.getPagedTopPtmStdPrice(page, pageSize, updateTime, thumbNumber);
+
+        return null;
     }
 
     private void fillSiteOrderList(OrderStatsAnalysisPO orderStatsAnalysisPO, AppOfferOrderDetailVo appOfferOrderDetailVo) {

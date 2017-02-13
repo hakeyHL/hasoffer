@@ -35,6 +35,8 @@ import java.util.*;
 public class PtmStdPriceServiceImpl implements IPtmStdPriceService {
     private static final String API_PTMSTDPRICE_GET_PRICELIST_BY_SKUID = "SELECT t  from PtmStdPrice t where t.stdSkuId=?0 and t.skuStatus=?1";
     private static final String API_PTMSTDPRICE_GET_PRICELIST_BY_MINID = "SELECT t  from PtmStdPrice t where t.id >=?0 ";
+    private static final String API_THIRD_NINEAPP_TOPSKUS = "select t  from PtmStdPrice t where t.skuStatus='ONSALE' and t.commentsNumber>?0 and t.updateTime>?1 group by t.stdSkuId order by t.updatetime desc";
+
     @Resource
     IDataBaseManager dbm;
     @Resource
@@ -293,6 +295,18 @@ public class PtmStdPriceServiceImpl implements IPtmStdPriceService {
     @Override
     public Long create(PtmStdPrice ptmStdPrice) {
         return dbm.create(ptmStdPrice);
+    }
+
+    /**
+     * 获取热卖sku列表
+     *
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public PageableResult<PtmStdPrice> getPagedTopPtmStdPrice(String page, String pageSize, Date updateTime, int thumbNumber) {
+        return dbm.queryPage(API_THIRD_NINEAPP_TOPSKUS, Integer.parseInt(page), Integer.parseInt(pageSize), Arrays.asList(thumbNumber, updateTime));
     }
 
     public void saveHistoryPrice(long id, Date time, float price) {

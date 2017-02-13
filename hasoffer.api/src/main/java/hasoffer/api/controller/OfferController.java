@@ -66,7 +66,7 @@ public class OfferController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/offers/india", method = RequestMethod.GET)
+    @RequestMapping(value = "/offers/nineapp", method = RequestMethod.GET)
     public String getDealsForIndia(@RequestParam(defaultValue = "1") int page,
                                    @RequestParam(defaultValue = "10") int pageSize,
                                    HttpServletResponse response) {
@@ -92,10 +92,14 @@ public class OfferController {
         String[] filterProperties = null;
         switch (marketChannel) {
             case GMOBI:
-                filterProperties = new String[]{"category"};
+                filterProperties = new String[]{"category", "couponCode"};
                 break;
 //            case INVENO:
 //                break;
+            case NINEAPPS:
+                //把coupon code返回
+                filterProperties = new String[]{"category"};
+                break;
             default:
         }
         String dealInfoForIndia = thirdService.getDealInfo(id, deviceInfo.getMarketChannel().name(), deviceId, filterProperties);
