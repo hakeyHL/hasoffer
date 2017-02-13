@@ -35,6 +35,14 @@ public class OfferController {
     @Resource
     IAppService appService;
 
+    public static void main(String[] args) {
+        String key = "GMOBI20170213142800HRGI";
+        String s = CipherUtil.encryptWithSHA256(key);
+        System.out.println(s);
+    }
+
+    //offer for india
+
     /**
      * provide API to get deals for Gmobi
      *
@@ -51,8 +59,6 @@ public class OfferController {
         Httphelper.sendJsonMessage(result, response);
         return null;
     }
-
-    //offer for india
 
     /**
      * get方式获取deal列表数据
@@ -128,8 +134,8 @@ public class OfferController {
     public String getOrderInfo(
             @DateTimeFormat(pattern = "yyyyMMdd") Date dateFrom,
             @DateTimeFormat(pattern = "yyyyMMdd") Date dateTo,
-            @RequestParam String key,
-            @RequestParam String timestamp,
+            String key,
+            String timestamp,
             HttpServletResponse response) {
 
         //验证key和时间戳

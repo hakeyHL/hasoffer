@@ -4,6 +4,8 @@ import hasoffer.base.enums.MarketChannel;
 import org.apache.commons.lang3.StringUtils;
 
 import java.security.MessageDigest;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +18,7 @@ public class CipherUtil {
     private static final String SHA256ALGORITHM = "SHA-256";
     public static Map<MarketChannel, String> channelDefaultKeyMap = new HashMap<>();
 
-    {
+    static {
         channelDefaultKeyMap.put(MarketChannel.GMOBI, "HRGI");
     }
 
@@ -52,10 +54,15 @@ public class CipherUtil {
             return isRight;
         }
         //时间戳的有效期为5分钟
-        if (StringUtils.isNumericSpace(timeStamp) && (new Date().getTime() - Long.parseLong(timeStamp)) > 1000 * 60 * 5) {
-            return isRight;
+        try {
+            if (StringUtils.isNumericSpace(timeStamp) && (new Date().getTime() - new SimpleDateFormat("yyyyMMddHHmmss").parse(timeStamp).getTime()) > 1000 * 60 * 5) {
+                return isRight;
+            }
+        } catch (ParseException e) {
+
         }
         StringBuilder sb = new StringBuilder();
+        String s = channelDefaultKeyMap.get(marketChannel);
         sb.append(marketChannel.name()).append(timeStamp).append(channelDefaultKeyMap.get(marketChannel));
         if (key.equals(encryptWithSHA256(sb.toString()))) {
             isRight = true;
