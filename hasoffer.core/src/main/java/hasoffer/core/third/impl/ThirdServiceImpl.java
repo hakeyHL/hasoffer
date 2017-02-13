@@ -340,6 +340,9 @@ public class ThirdServiceImpl implements ThirdService {
     @Override
     public String getTopSkusForNineApps(String page, String pageSize, Date updateTime, int thumbNumber) {
         //从91mobile的sku中筛选状态是onsale , 评论数值大于1000,最近价格更新时间12小时以内按照更新时间降序返回
+        JSONObject resultJsonObject = new JSONObject();
+        resultJsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        resultJsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         if (thumbNumber == 0) {
             thumbNumber = 1000;
         }
@@ -348,7 +351,20 @@ public class ThirdServiceImpl implements ThirdService {
             updateTime = new Date(new Date().getTime() - 1000 * 60 * 60 * 12);
         }
         PageableResult<PtmStdPrice> pagedTopPtmStdPrice = ptmStdPriceService.getPagedTopPtmStdPrice(page, pageSize, updateTime, thumbNumber);
-
+        if (pagedTopPtmStdPrice != null) {
+            for (PtmStdPrice ptmStdPrice : pagedTopPtmStdPrice.getData()) {
+                //来源网站,原价,现价,折扣值,名称,图片,link
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("id", ptmStdPrice.getId());
+                jsonObject.put("website", ptmStdPrice.getWebsite());
+                jsonObject.put("originPrice", "");
+                jsonObject.put("presentPrice", ptmStdPrice.getPrice());
+                jsonObject.put("discount", "");
+                jsonObject.put("title", ptmStdPrice.getTitle());
+                jsonObject.put("imageUrl", "");
+                jsonObject.put("deepLink", "");
+            }
+        }
         return null;
     }
 

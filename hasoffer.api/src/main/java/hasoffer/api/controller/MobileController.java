@@ -244,6 +244,14 @@ public class MobileController {
         ));
         keyMap.put("Top 10 Mobiles", top10MobilesList);
         modelAndView.addObject(ConstantUtil.API_NAME_DATA, keyMap);
+
+        //显式内存释放
+        top10MobilesList = null;
+        stdSkuKeyVoList = null;
+        pageableResult.setData(null);
+        pageableResult = null;
+
+
         return modelAndView;
     }
 
@@ -386,6 +394,11 @@ public class MobileController {
         Map dataMap = new HashMap();
         dataMap.put("keyList", keyWordsVoList);
         modelAndView.addObject(ConstantUtil.API_NAME_DATA, dataMap);
+
+        //显式释放内存
+        keyWordsVoList = null;
+        dataMap = null;
+
         return modelAndView;
     }
 
@@ -417,6 +430,11 @@ public class MobileController {
         //3. 将结果封装到列表中
         dataMap.put("similarPros", similarCategorys);
         modelAndView.addObject(ConstantUtil.API_NAME_DATA, dataMap);
+
+        //显式释放内存
+        similarCategorys.clear();
+        cmpProductListVoList.clear();
+        dataMap.clear();
         return modelAndView;
     }
 }

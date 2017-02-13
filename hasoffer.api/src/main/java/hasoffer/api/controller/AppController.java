@@ -686,6 +686,10 @@ public class AppController {
                     }
                     apiUtils.addProductVo2List(li, p.getData());
                 }
+                //显式内存释放
+                p.setData(null);
+                p = null;
+
                 map.put("product", li);
                 break;
             case 3:
@@ -941,6 +945,10 @@ public class AppController {
                                 "com.yatra.base", "com.android.contacts", "com.mobile.indiapp"
                         ));
                 modelAndView.addObject(ConstantUtil.API_NAME_DATA, downloadConfigVo);
+
+                //显式内存释放
+                apps.clear();
+                downloadConfigVo = null;
                 break;
             case COMADD:
                 Map nMap = new HashMap();
