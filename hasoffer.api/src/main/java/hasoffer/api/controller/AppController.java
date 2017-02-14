@@ -1,7 +1,6 @@
 package hasoffer.api.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import hasoffer.api.helper.ApiHttpHelper;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.JsonHelper;
@@ -50,8 +49,6 @@ import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import jodd.util.NameValue;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -70,7 +67,7 @@ import java.util.*;
  */
 @Controller
 @RequestMapping(value = "/app")
-public class AppController {
+public class AppController extends BaseController {
     private final static String STRING_ACTION = "action";
     private final static String STRING_PRODUCT = "product";
     @Resource
@@ -103,13 +100,10 @@ public class AppController {
     private DealServiceImpl dealService;
     @Resource
     private PtmStdSkuIndexServiceImpl ptmStdSkuIndexService;
-    private Logger logger = LoggerFactory.getLogger(AppController.class);
 
     @RequestMapping(value = "/newconfig", method = RequestMethod.GET)
     public ModelAndView config() {
-        ModelAndView mav = new ModelAndView();
-
-        Map<Website, String> openDeepLinks = new HashMap<Website, String>();
+        Map<Website, String> openDeepLinks = new HashMap<>();
         openDeepLinks.put(Website.FLIPKART, "http://dl.flipkart.com/dl/apple-iphone-6s/p/itmebysga78az3qh?affid=affiliate357");
         openDeepLinks.put(Website.SNAPDEAL, "https://m.snapdeal.com/product/iphone-6s-16gb/663413326062?utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_id=82856");
 //        openDeepLinks.put(Website.SNAPDEAL, "android-app://com.snapdeal.main/snapdeal/m.snapdeal.com/product/iphone-6s-16gb/663413326062?utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_id=82856");
@@ -128,13 +122,13 @@ public class AppController {
                 new AppCooperative("shanchuan", "cn.xender", 2, "com.hasoffer.plug.androrid.service.ServiceAccess")
         };
 
-        mav.addObject("openDeepLinks", openDeepLinks);
-        mav.addObject("siteSort", siteSort);
-        mav.addObject("test", configVo);
-        mav.addObject("cooperations", acs);
-        mav.addObject("noSelfJump", noSelfJump);
+        modelAndView.addObject("openDeepLinks", openDeepLinks);
+        modelAndView.addObject("siteSort", siteSort);
+        modelAndView.addObject("test", configVo);
+        modelAndView.addObject("cooperations", acs);
+        modelAndView.addObject("noSelfJump", noSelfJump);
 
-        return mav;
+        return modelAndView;
     }
 
     @RequestMapping(value = "/parseconfig", method = RequestMethod.GET)
@@ -170,7 +164,6 @@ public class AppController {
 
     @RequestMapping(value = "/giftList", method = RequestMethod.GET)
     public ModelAndView getGiftList() {
-        ModelAndView modelAndView = new ModelAndView();
         List<HasofferCoinsExchangeGift> gifts = appService.getGiftList();
         //查询用户是否已登录
         UrmUser user = apiHelperService.getCurrentUser();
@@ -186,18 +179,13 @@ public class AppController {
                 }
             }
         }
-        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
-        Map map = new HashMap();
-        map.put("gList", gifts == null ? null : gifts);
-        modelAndView.addObject(ConstantUtil.API_NAME_DATA, map);
+        getDataMap().put("gList", gifts == null ? null : gifts);
         return modelAndView;
     }
 
 
     @RequestMapping(value = "/vcAff", method = RequestMethod.GET)
     public ModelAndView vcAff() {
-        ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject(Website.AMAZON.name(), AffliIdHelper.getAffIdByChannelForAmazon(MarketChannel.VC));
         modelAndView.addObject(Website.FLIPKART.name(), AffliIdHelper.getAffiIdByWebsite(Website.FLIPKART, MarketChannel.VC));
         modelAndView.addObject(Website.SNAPDEAL.name(), AffliIdHelper.getAffiIdByWebsite(Website.SNAPDEAL, MarketChannel.VC));
@@ -221,9 +209,8 @@ public class AppController {
     public ModelAndView site() {
         List<AppWebsite> appWebsites = appService.getWebsites(true);
 
-        List<AppWebsiteVo> vos = new ArrayList<AppWebsiteVo>();
+        List<AppWebsiteVo> vos = new ArrayList<>();
 
-        ModelAndView mav = new ModelAndView();
         if (ArrayUtils.hasObjs(appWebsites)) {
             for (AppWebsite appWebsite : appWebsites) {
                 vos.add(new AppWebsiteVo(appWebsite.getWebsite(),
@@ -231,8 +218,8 @@ public class AppController {
             }
         }
 
-        mav.addObject("sites", vos);
-        return mav;
+        modelAndView.addObject("sites", vos);
+        return modelAndView;
     }
 
     @RequestMapping(value = "/latest", method = RequestMethod.GET)
@@ -251,29 +238,19 @@ public class AppController {
         if (marketChannel != null) {
             appVersion = appService.getLatestVersion(appType, marketChannel);
         }
-
-        ModelAndView mav = new ModelAndView();
-
-        mav.addObject("version", new AppVersionVo(appVersion));
-        mav.addObject("getversion", appVersion != null);
-
-        return mav;
+        modelAndView.addObject("version", new AppVersionVo(appVersion));
+        modelAndView.addObject("getversion", appVersion != null);
+        return modelAndView;
     }
 
     @RequestMapping(value = "/accessinfo", method = RequestMethod.GET)
     public ModelAndView accessinfo() {
-        ModelAndView mav = new ModelAndView();
-
-        mav.addObject("searchLogs", SearchLogQueue.getCount());
-
-        return mav;
+        modelAndView.addObject("searchLogs", SearchLogQueue.getCount());
+        return modelAndView;
     }
 
     @RequestMapping(value = "/backDetail", method = RequestMethod.GET)
     public ModelAndView backDetail() {
-        ModelAndView mv = new ModelAndView();
-        mv.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        mv.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_NAME_MSG);
         //若用户未登录显示为已连续签到0
         BackDetailVo data = new BackDetailVo();
         UrmUser user = apiHelperService.getCurrentUser();
@@ -374,8 +351,8 @@ public class AppController {
                 }
             }
         }
-        mv.addObject(ConstantUtil.API_NAME_DATA, data);
-        return mv;
+        modelAndView.addObject(ConstantUtil.API_NAME_DATA, data);
+        return modelAndView;
     }
 
 
@@ -386,7 +363,6 @@ public class AppController {
      */
     @RequestMapping(value = "/banners", method = RequestMethod.GET)
     public ModelAndView banners() {
-        ModelAndView mv = new ModelAndView();
         List banners = new ArrayList();
         List<AppBanner> list = appService.getBanners();
         for (AppBanner appBanner : list) {
@@ -398,10 +374,8 @@ public class AppController {
             banner.setDealId(Long.valueOf(appBanner.getSourceId()));
             banners.add(banner);
         }
-        Map map = new HashMap();
-        map.put("banners", banners);
-        mv.addObject(ConstantUtil.API_NAME_DATA, map);
-        return mv;
+        getDataMap().put("banners", banners);
+        return modelAndView;
     }
 
     /**
@@ -413,7 +387,6 @@ public class AppController {
     @RequestMapping(value = "/deals", method = RequestMethod.GET)
     public ModelAndView deals(@RequestParam(defaultValue = "0") String page, @RequestParam(defaultValue = "8") String pageSize) {
         //1. 从数据库中查询到
-        ModelAndView mv = new ModelAndView();
         //忽略前端传页面大小
         PageableResult Result = appService.getDeals(Integer.parseInt(page), 8);
         Map map = new HashMap();
@@ -440,14 +413,13 @@ public class AppController {
      /*   if (li.size() > 0 && flag) {
             setDeals2Cache(li, Integer.parseInt(page), 8);
         }*/
-        map.put("deals", li);
-        map.put("currentPage", Result.getCurrentPage());
-        map.put("NumFund", Result.getNumFund());
-        map.put("page", Result.getPageSize());
-        map.put("pageSize", Result.getPageSize());
-        map.put("totalPage", Result.getTotalPage());
-        mv.addObject(ConstantUtil.API_NAME_DATA, map);
-        return mv;
+        getDataMap().put("deals", li);
+        getDataMap().put("currentPage", Result.getCurrentPage());
+        getDataMap().put("NumFund", Result.getNumFund());
+        getDataMap().put("page", Result.getPageSize());
+        getDataMap().put("pageSize", Result.getPageSize());
+        getDataMap().put("totalPage", Result.getTotalPage());
+        return modelAndView;
     }
 
     /**
@@ -460,10 +432,7 @@ public class AppController {
     @RequestMapping(value = "/dealInfo", method = RequestMethod.GET)
     public ModelAndView getdealInfo(@RequestParam String id) {
         //临时按照appVersion区分返回描述
-        ModelAndView mv = new ModelAndView();
-        mv.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        mv.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
-        return getDealInfoMethod(id, mv);
+        return getDealInfoMethod(id, modelAndView);
     }
 
     /**
@@ -476,12 +445,7 @@ public class AppController {
                                HttpServletRequest request,
                                HttpServletResponse response) {
 
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         String lastTimeUserToken = request.getHeader("oldUserToken");
-
-        Map map = new HashMap();
         String userToken = UUID.randomUUID().toString();
         String deviceId = ClientHelper.getAndroidId();
         //String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
@@ -523,11 +487,10 @@ public class AppController {
             //将关联关系插入到关联表中
             appService.addUrmUserDevice(urmUserDevices);
         }
-        map.put("userToken", userToken);
-        jsonObject.put(ConstantUtil.API_NAME_DATA, map);
+        getJsonDataObj().put("userToken", userToken);
         String thirdId = userVO.getThirdId();
         if (StringUtils.isEmpty(lastTimeUserToken) || StringUtils.isEmpty(thirdId)) {//如果userToken或者thirdId为空
-            ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            ApiHttpHelper.sendJsonMessage(resultJsonObj.toJSONString(), response);
             return null;
         }
         //如果是third不变的情况下,usertoken已经被更新了,应该用新的usertoken操作
@@ -538,12 +501,12 @@ public class AppController {
             String oldThirdId = userByLastUserToken.getThirdId();
             List<UrmUser> oldUserList = appService.getIdDescUserListByThirdId(oldThirdId);
             if (oldUserList == null || oldUserList.size() == 0) {
-                ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                ApiHttpHelper.sendJsonMessage(JSON.toJSONString(resultJsonObj), response);
                 return null;
             }
             if (StringUtils.equals(thirdId, oldThirdId)) {//如果同样的userToken对应的记录只有一条并且thirdId一致，认为是正确的用户信息
                 //如果老的thirdId和新的thirdId一样的话要清除此third下的多个记录的问题
-                ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                ApiHttpHelper.sendJsonMessage(JSON.toJSONString(resultJsonObj), response);
                 return null;
             }
             if (!StringUtils.equals(thirdId, oldThirdId) && oldUserList.size() == 1) {
@@ -561,7 +524,7 @@ public class AppController {
                 }
             }
         }
-        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(resultJsonObj), response);
         return null;
     }
 
@@ -574,7 +537,6 @@ public class AppController {
     @DataSource(value = DataSourceType.Slave)
     @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
     public ModelAndView userInfo() {
-        ModelAndView mv = new ModelAndView();
         BigDecimal coins = BigDecimal.ZERO;
         UrmUser user = apiHelperService.getCurrentUser();
         boolean addFlag = false;
@@ -583,8 +545,6 @@ public class AppController {
             if (urmUserCoinRepair != null) {
                 addFlag = true;
             }
-//            BackDetailVo backDetailVo = new BackDetailVo();
-//            calculateHasofferCoin(Collections.singletonList(user), backDetailVo);
             UserVo userVo = new UserVo();
             userVo.setName(user.getUserName());
             List<OrderStatsAnalysisPO> orders = appService.getBackDetails(user.getId().toString());
@@ -599,9 +559,6 @@ public class AppController {
             if (addFlag) {
                 coins = coins.multiply(BigDecimal.TEN);
             }
-//            coins = coins.add(backDetailVo.getPendingCoins());
-//            coins = coins.add(backDetailVo.getVerifiedCoins());
-//            coins = coins.multiply(BigDecimal.TEN);
             UrmSignCoin urmSignCoin = appService.getSignCoinByUserId(user.getId());
             if (urmSignCoin != null) {
                 coins = coins.add(BigDecimal.valueOf(urmSignCoin.getSignCoin()));
@@ -609,9 +566,9 @@ public class AppController {
             coins = coins.setScale(1, BigDecimal.ROUND_HALF_UP);
             userVo.setCoins(coins);
             userVo.setUserIcon(user.getAvatarPath());
-            mv.addObject(ConstantUtil.API_NAME_DATA, userVo);
+            modelAndView.addObject(ConstantUtil.API_NAME_DATA, userVo);
         }
-        return mv;
+        return modelAndView;
     }
 
     /**
@@ -624,9 +581,7 @@ public class AppController {
     public ModelAndView productsList(SearchCriteria criteria, @RequestParam(defaultValue = "4") int type) {
         long l = System.currentTimeMillis();
         System.out.println(Thread.currentThread().getName() + " :  criteria : " + criteria.toString());
-        ModelAndView mv = new ModelAndView();
         List li = new ArrayList();
-        Map map = new HashMap();
         PageableResult products;
         int version = 0;
         DeviceInfoVo deviceInfoVo = ClientHelper.getDeviceInfo();
@@ -651,12 +606,12 @@ public class AppController {
                 if (products2s != null && products2s.size() > 4) {
                     li = li.subList(0, 5);
                 }
-                map.put(STRING_PRODUCT, li);
+                getDataMap().put(STRING_PRODUCT, li);
                 break;
             case 1:
                 List<PtmProduct> topSellins = productCacheManager.getTopSellins(criteria.getPage(), criteria.getPageSize());
                 apiUtils.addProductVo2List(li, topSellins);
-                map.put(STRING_PRODUCT, li);
+                getDataMap().put(STRING_PRODUCT, li);
                 break;
             case 2:
                 //search by title
@@ -669,11 +624,11 @@ public class AppController {
                 }
                 if (p != null && p.getData().size() > 0) {
                     if (version >= 36 && criteria.getPivotFields().size() > 2) {
-                        map.put("pivos", p.getPivotFieldVals());
-                        ApiUtils.resolvePivotFields(map, p, p.getPivotFieldVals());
+                        getDataMap().put("pivos", p.getPivotFieldVals());
+                        ApiUtils.resolvePivotFields(getDataMap(), p, p.getPivotFieldVals());
                         p.setPivotFieldVals(null);
                     }
-                    apiUtils.getSkuListByKeyword(map, p);
+                    apiUtils.getSkuListByKeyword(getDataMap(), p);
                     //如果是价格由低到高排序或者按照价格区间排序不过滤配件信息
                     boolean filterProductFlag = true;
                     if (criteria.getSort().name().equals("PRICEL2H")) {
@@ -692,7 +647,7 @@ public class AppController {
                 p.setData(null);
                 p = null;
 
-                map.put(STRING_PRODUCT, li);
+                getDataMap().put(STRING_PRODUCT, li);
                 break;
             case 3:
                 //类目搜索
@@ -709,7 +664,7 @@ public class AppController {
                         //2. 合并NetWork
                         //3. 指定的排序
                         Map<String, List<NameValue<String, Long>>> pivotFieldVals = products.getPivotFieldVals();
-                        ApiUtils.resolvePivotFields(map, products, pivotFieldVals);
+                        ApiUtils.resolvePivotFields(getDataMap(), products, pivotFieldVals);
                     }
                     if (products != null && products.getData().size() > 0) {
                         apiUtils.addProductVo2List(li, products.getData());
@@ -729,18 +684,17 @@ public class AppController {
                     if (pKeywordResult != null && pKeywordResult.getData().size() > 0) {
                         filterProducts(pKeywordResult.getData(), criteria.getKeyword());
                         apiUtils.addProductVo2List(li, pKeywordResult.getData());
-                        map.put(STRING_PRODUCT, li);
+                        getDataMap().put(STRING_PRODUCT, li);
                     }
                 }
             default:
                 break;
         }
         if (li != null && li.size() > 0) {
-            map.put(STRING_PRODUCT, li);
+            getDataMap().put(STRING_PRODUCT, li);
         }
-        mv.addObject(ConstantUtil.API_NAME_DATA, map);
         System.out.println("time " + (System.currentTimeMillis() - l) / 1000);
-        return mv;
+        return modelAndView;
     }
 
     @RequestMapping(value = "/push")
@@ -751,11 +705,8 @@ public class AppController {
                                     String marketChannel,
                                     String outline,
                                     String packageName, String type, String id, int number) {
-        ModelAndView mv = new ModelAndView();
-        mv.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        mv.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         try {
-            List<String> gcmTokens = new ArrayList<String>();
+            List<String> gcmTokens = new ArrayList<>();
             AppPushMessage message = new AppPushMessage(
                     new AppMsgDisplay(outline, title, content),
                     new AppMsgClick(AppMsgClickType.valueOf(type), id, packageName)
@@ -774,29 +725,21 @@ public class AppController {
                     }
                 }
             }
-            int i = 0;
             for (String gcmToken : gcmTokens) {
                 pushService.push(gcmToken, pushBo);
-                i++;
             }
         } catch (Exception e) {
-            mv.addObject(ConstantUtil.API_NAME_MSG, "faild " + e.getMessage());
-            return mv;
+            modelAndView.addObject(ConstantUtil.API_NAME_MSG, "faild " + e.getMessage());
         }
-        return mv;
+        return modelAndView;
     }
 
     //搜索词提示
     @RequestMapping(value = "candidateKeyword", method = RequestMethod.GET)
     public ModelAndView getSearchKeyWordsTip(@RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String keyWord) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
-        Map map = new HashMap();
         List<String> spellcheck = productService.spellcheck(keyWord);
         int size = spellcheck.size() > 2 ? 3 : spellcheck.size();
-        map.put("words", spellcheck.subList(0, size));
-        modelAndView.addObject(ConstantUtil.API_NAME_DATA, map);
+        getDataMap().put("words", spellcheck.subList(0, size));
         return modelAndView;
     }
 
@@ -807,10 +750,6 @@ public class AppController {
      */
     @RequestMapping(value = "getParamMeaning", method = RequestMethod.GET)
     public ModelAndView getParamMeaning(@RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String param) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
-        Map resultMap;
         if (StringUtils.isEmpty(param)) {
             modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             modelAndView.addObject(ConstantUtil.API_NAME_MSG, "param can not be empty ");
@@ -822,9 +761,7 @@ public class AppController {
             modelAndView.addObject(ConstantUtil.API_NAME_MSG, "not have this param meaning .");
             return modelAndView;
         }
-        resultMap = new HashMap();
-        resultMap.put(param, paramMeaning);
-        modelAndView.addObject(ConstantUtil.API_NAME_DATA, resultMap);
+        getDataMap().put(param, paramMeaning);
         return modelAndView;
     }
 
@@ -844,7 +781,6 @@ public class AppController {
     }
 
     private ModelAndView callBackMethod(HttpServletRequest request, @RequestParam CallbackAction action) {
-        ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
         modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         DeviceInfoVo deviceInfoVo = ClientHelper.getDeviceInfo();
