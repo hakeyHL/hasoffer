@@ -461,7 +461,7 @@ public class Compare2Controller {
 
         return new CmpResult(0,
                 new ProductVo(0L, sio.getCliQ(), ConstantUtil.API_DATA_EMPTYSTRING, sio.getCliPrice(), currentDeeplink),
-                new PageableResult<ComparedSkuVo>(comparedSkuVos, 0, 1, 10)
+                new PageableResult<>(comparedSkuVos, 0, 1, 10)
         );
     }
 

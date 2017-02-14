@@ -19,5 +19,5 @@ public interface ThirdService {
 
     String getOfferOrderInfo(Date dateStart, Date dateEnd, String[] affIds, MarketChannel marketChannel);
 
-    String getTopSkusForNineApps(String page, String pageSize, Date updateTime, int thumbNumber);
+    String getTopSkusForNineApps(String page, String pageSize, Date updateTime, int thumbNumber, String[] affs);
 }

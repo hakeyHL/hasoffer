@@ -888,7 +888,7 @@ public class AppController {
                 break;
             case DOWNLOADBOOTCONFIG:
                 //app下载引导
-                List<Map<String, List<ThirdAppVo>>> apps = new ArrayList<Map<String, List<ThirdAppVo>>>();
+                List<Map<String, List<ThirdAppVo>>> apps = new ArrayList<>();
                 Map<String, List<ThirdAppVo>> NINEAPP = new HashMap<>();
                 Map<String, List<ThirdAppVo>> GOOGLEPLAY = new HashMap<>();
 
