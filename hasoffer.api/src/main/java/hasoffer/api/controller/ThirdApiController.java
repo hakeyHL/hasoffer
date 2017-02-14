@@ -1,9 +1,12 @@
 package hasoffer.api.controller;
 
 import hasoffer.api.helper.ApiHttpHelper;
+import hasoffer.api.helper.ClientHelper;
+import hasoffer.core.app.vo.DeviceInfoVo;
 import hasoffer.core.third.ThirdService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -26,8 +29,12 @@ public class ThirdApiController {
      * @param response
      * @return
      */
-    public String getTopSkusForNineApp(String page, String pageSize, HttpServletResponse response) {
-        String topSkus = thirdService.getTopSkusForNineApps(page, pageSize, null, 0);
+    @RequestMapping("topselling")
+    public String getTopSkusForNineApp(@RequestParam(defaultValue = "1") String page,
+                                       @RequestParam(defaultValue = "10") String pageSize,
+                                       HttpServletResponse response) {
+        DeviceInfoVo deviceInfo = ClientHelper.getDeviceInfo();
+        String topSkus = thirdService.getTopSkusForNineApps(page, pageSize, null, 0, new String[]{deviceInfo.getMarketChannel().name(), ClientHelper.getAndroidId()});
         ApiHttpHelper.sendJsonMessage(topSkus, response);
         return null;
     }
