@@ -131,6 +131,9 @@ public class MobileController {
         for (PtmStdSkuModel ptmStdSkuModel : pageableResult.getData()) {
             stdSkuKeyVoList.add(new SiteMapKeyVo(ApiUtils.removeSpecialSymbol(ptmStdSkuModel.getTitle()), 3).buildePid(ptmStdSkuModel.getId()));
         }
+        //显式释放内存
+        pageableResult.setData(null);
+        pageableResult = null;
         keyMap.put("All Mobile Models In India", stdSkuKeyVoList);
         //key 3
         List<SiteMapKeyVo> top10MobilesList = new LinkedList<>();
@@ -248,10 +251,6 @@ public class MobileController {
         //显式内存释放
         top10MobilesList = null;
         stdSkuKeyVoList = null;
-        pageableResult.setData(null);
-        pageableResult = null;
-
-
         return modelAndView;
     }
 
