@@ -1,6 +1,5 @@
 package hasoffer.api.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import hasoffer.api.helper.ApiHttpHelper;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.base.enums.MarketChannel;
@@ -22,18 +21,18 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 
 /**
  * Created by hs on 2016/7/4.
  */
 @Controller
 @RequestMapping(value = "/third")
-public class OfferController {
+public class OfferController extends BaseController {
     @Resource
     ThirdServiceImpl thirdService;
     @Resource
     IAppService appService;
+
     /**
      * provide API to get deals for Gmobi
      *
@@ -70,11 +69,9 @@ public class OfferController {
     public String getDealsForIndia(@PathVariable("id") String id,
                                    HttpServletResponse response) {
         if (StringUtils.isEmpty(id) || !StringUtils.isNumericSpace(id)) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
-            jsonObject.put(ConstantUtil.API_NAME_MSG, "id is empty");
-            jsonObject.put(ConstantUtil.API_NAME_DATA, new HashMap<>());
-            ApiHttpHelper.sendJsonMessage(jsonObject.toJSONString(), response);
+            getJsonDataObj().put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+            getJsonDataObj().put(ConstantUtil.API_NAME_MSG, "id is empty");
+            ApiHttpHelper.sendJsonMessage(resultJsonObj.toJSONString(), response);
             return null;
         }
         String deviceId = ClientHelper.getAndroidId();
@@ -137,11 +134,9 @@ public class OfferController {
         DeviceInfoVo deviceInfo = ClientHelper.getDeviceInfo();
         boolean accessed = CipherUtil.validationWithSHA256(deviceInfo.getMarketChannel(), key, timestamp);
         if (!accessed) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
-            jsonObject.put(ConstantUtil.API_NAME_MSG, "request refused.");
-            jsonObject.put(ConstantUtil.API_NAME_DATA, new HashMap<>());
-            ApiHttpHelper.sendJsonMessage(jsonObject.toJSONString(), response);
+            getJsonDataObj().put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+            getJsonDataObj().put(ConstantUtil.API_NAME_MSG, "request refused.");
+            ApiHttpHelper.sendJsonMessage(resultJsonObj.toJSONString(), response);
             return null;
         }
         //如果起始日期或者结束日期为空则默认返回昨天开始30天的数据
