@@ -3,9 +3,8 @@ package hasoffer.api.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import hasoffer.api.helper.Httphelper;
+import hasoffer.api.helper.ApiHttpHelper;
 import hasoffer.base.model.Website;
-import hasoffer.core.app.AppClientCfgService;
 import hasoffer.core.app.vo.DeviceInfoVo;
 import hasoffer.core.app.vo.ResultVo;
 import hasoffer.core.app.vo.ThirdAppVo;
@@ -39,9 +38,6 @@ public class AppCliCfgController {
     @Autowired
     private CacheServiceImpl cacheService;
     private Logger logger = LoggerFactory.getLogger(AppCliCfgController.class);
-    @Autowired
-    private AppClientCfgService appClientCfgService;
-
     public static void main(String[] args) {
     }
 
@@ -131,7 +127,7 @@ public class AppCliCfgController {
                 resultVo.getData().put("shopApps", tempGOOGLEPLAY);
                 break;
         }
-        Httphelper.sendJsonMessage(JSON.toJSONString(resultVo), response);
+        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(resultVo), response);
         return null;
     }
 
@@ -179,7 +175,7 @@ public class AppCliCfgController {
                 cacheService.add(HOME_INDEX_COPY, JSON.toJSONString(resultVo.getData()), -1);
             }
         }
-        Httphelper.sendJsonMessage(JSON.toJSONString(resultVo), response);
+        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(resultVo), response);
         return null;
     }
 

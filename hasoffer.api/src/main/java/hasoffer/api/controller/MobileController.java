@@ -34,6 +34,11 @@ import java.util.*;
 @Controller
 @RequestMapping("m")
 public class MobileController {
+    private static final String STRING_YES = "yes";
+    private static final String STRING_NETWORK_SUPPORT = "Network_Support";
+    private static final String STRING_CAMERA = "Camera";
+    private static final String STRING_BLUETOOTH = "Bluetooth";
+    private static final String STRING_BRAND = "Brand";
     @Autowired
     AppSearchService appSearchService;
     @Autowired
@@ -44,12 +49,7 @@ public class MobileController {
     PtmStdSkuIndexServiceImpl stdSkuIndexService;
     @Autowired
     MobileService mobileService;
-
     Logger logger = LoggerFactory.getLogger(MobileController.class);
-
-    public static void main(String[] args) {
-        System.out.println(new Date().getTime());
-    }
 
     @RequestMapping("siteMap")
     public ModelAndView siteMapHasoffer(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "2000") int pageSize) {
@@ -76,14 +76,14 @@ public class MobileController {
         //Bluetooth 能与不能
         //Camera  不管前置还是后置
         Map<String, Map<String, String>> characteristicMap1 = new HashMap();
-        characteristicMap1.put("Wireless Fm", ApiUtils.getBuilderMap("FM_Radio", "yes", new HashMap()));
+        characteristicMap1.put("Wireless Fm", ApiUtils.getBuilderMap("FM_Radio", STRING_YES, new HashMap()));
         characteristicMap1.put("Dual Sim", ApiUtils.getBuilderMap("SIM_Slot", "Dual Sim", new HashMap()));
-        characteristicMap1.put("3g", ApiUtils.getBuilderMap("Network_Support", "3G", new HashMap()));
-        characteristicMap1.put("Camera", ApiUtils.getBuilderMap("Camera", "yes", new HashMap()));
+        characteristicMap1.put("3g", ApiUtils.getBuilderMap(STRING_NETWORK_SUPPORT, "3G", new HashMap()));
+        characteristicMap1.put(STRING_CAMERA, ApiUtils.getBuilderMap(STRING_CAMERA, STRING_YES, new HashMap()));
         characteristicMap1.put("Windows", ApiUtils.getBuilderMap("Operating_System", "Windows", new HashMap()));
-        characteristicMap1.put("Touch Screen", ApiUtils.getBuilderMap("Touch_Screen", "yes", new HashMap()));
-        characteristicMap1.put("Bluetooth", ApiUtils.getBuilderMap("Bluetooth", "yes", new HashMap()));
-        characteristicMap1.put("4g", ApiUtils.getBuilderMap("Network_Support", "4G", new HashMap()));
+        characteristicMap1.put("Touch Screen", ApiUtils.getBuilderMap("Touch_Screen", STRING_YES, new HashMap()));
+        characteristicMap1.put(STRING_BLUETOOTH, ApiUtils.getBuilderMap(STRING_BLUETOOTH, STRING_YES, new HashMap()));
+        characteristicMap1.put("4g", ApiUtils.getBuilderMap(STRING_NETWORK_SUPPORT, "4G", new HashMap()));
 
         //--特征2
         //Camera  不管前置还是后置
@@ -96,14 +96,14 @@ public class MobileController {
         //Wi Fi 能与不能
 
         Map<String, Map<String, String>> characteristicMap2 = new HashMap();
-        characteristicMap2.put("Wireless Fm", ApiUtils.getBuilderMap("FM_Radio", "yes", new HashMap()));
+        characteristicMap2.put("Wireless Fm", ApiUtils.getBuilderMap("FM_Radio", STRING_YES, new HashMap()));
         characteristicMap2.put("Dual Sim", ApiUtils.getBuilderMap("SIM_Slot", "Dual Sim", new HashMap()));
-        characteristicMap2.put("3g", ApiUtils.getBuilderMap("Network_Support", "3G", new HashMap()));
-        characteristicMap2.put("Camera", ApiUtils.getBuilderMap("Camera", "yes", new HashMap()));
+        characteristicMap2.put("3g", ApiUtils.getBuilderMap(STRING_NETWORK_SUPPORT, "3G", new HashMap()));
+        characteristicMap2.put(STRING_CAMERA, ApiUtils.getBuilderMap(STRING_CAMERA, STRING_YES, new HashMap()));
         characteristicMap2.put("Android", ApiUtils.getBuilderMap("Operating_System", "Android", new HashMap()));
-        characteristicMap2.put("WiFi", ApiUtils.getBuilderMap("WiFi", "yes", new HashMap()));
-        characteristicMap2.put("Touch Screen", ApiUtils.getBuilderMap("Touch_Screen", "yes", new HashMap()));
-        characteristicMap2.put("Bluetooth", ApiUtils.getBuilderMap("Bluetooth", "yes", new HashMap()));
+        characteristicMap2.put("WiFi", ApiUtils.getBuilderMap("WiFi", STRING_YES, new HashMap()));
+        characteristicMap2.put("Touch Screen", ApiUtils.getBuilderMap("Touch_Screen", STRING_YES, new HashMap()));
+        characteristicMap2.put(STRING_BLUETOOTH, ApiUtils.getBuilderMap(STRING_BLUETOOTH, STRING_YES, new HashMap()));
         characteristicMap2.put("Processor", ApiUtils.getBuilderMap("Processor", "Dual Core", new HashMap()));
 
         Map<String, List> keyMap = new HashMap();
@@ -139,45 +139,45 @@ public class MobileController {
         List<SiteMapKeyVo> top10MobilesList = new LinkedList<>();
         top10MobilesList.addAll(Arrays.asList(
                 //1. Top 10 + Mobiles + Below +“价格参数”
-                new SiteMapKeyVo("Top 10  Mobiles  Below 5000", 2).builderProMap("minPrice", "5000"),
-                new SiteMapKeyVo("Top 10  Mobiles  Below 10000", 2).builderProMap("minPrice", ConstantUtil.API_ERRORCODE_FAILED_LOGIC),
-                new SiteMapKeyVo("Top 10  Mobiles  Below 15000", 2).builderProMap("minPrice", "15000"),
-                new SiteMapKeyVo("Top 10  Mobiles  Below 20000", 2).builderProMap("minPrice", "20000"),
-                new SiteMapKeyVo("Top 10  Mobiles  Below 25000", 2).builderProMap("minPrice", "25000"),
-                new SiteMapKeyVo("Top 10  Mobiles  Below 30000", 2).builderProMap("minPrice", "30000"),
+                new SiteMapKeyVo("Top 10  Mobiles  Below 5000", 2).builderProMap(ConstantUtil.API_NAME_VARIABLE_MINPRICE, "5000"),
+                new SiteMapKeyVo("Top 10  Mobiles  Below 10000", 2).builderProMap(ConstantUtil.API_NAME_VARIABLE_MINPRICE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC),
+                new SiteMapKeyVo("Top 10  Mobiles  Below 15000", 2).builderProMap(ConstantUtil.API_NAME_VARIABLE_MINPRICE, "15000"),
+                new SiteMapKeyVo("Top 10  Mobiles  Below 20000", 2).builderProMap(ConstantUtil.API_NAME_VARIABLE_MINPRICE, "20000"),
+                new SiteMapKeyVo("Top 10  Mobiles  Below 25000", 2).builderProMap(ConstantUtil.API_NAME_VARIABLE_MINPRICE, "25000"),
+                new SiteMapKeyVo("Top 10  Mobiles  Below 30000", 2).builderProMap(ConstantUtil.API_NAME_VARIABLE_MINPRICE, "30000"),
 
-                new SiteMapKeyVo("SamSung mobile", 2).builderProMap("Brand", "Samsung"),
-//                new SiteMapKeyVo("SamSung mobile Below 5000", 2).builderProMap("minPrice", "5000"),
-                new SiteMapKeyVo("SamSung mobile Below 10000", 2).builderProMap("minPrice", ConstantUtil.API_ERRORCODE_FAILED_LOGIC),
-                new SiteMapKeyVo("SamSung mobile Below 15000", 2).builderProMap("minPrice", "15000"),
-                new SiteMapKeyVo("SamSung mobile Below 20000", 2).builderProMap("minPrice", "20000"),
-                new SiteMapKeyVo("SamSung mobile Below 25000", 2).builderProMap("minPrice", "25000"),
-                new SiteMapKeyVo("SamSung mobile Below 30000", 2).builderProMap("minPrice", "30000"),
+                new SiteMapKeyVo("SamSung mobile", 2).builderProMap(STRING_BRAND, "Samsung"),
+//                new SiteMapKeyVo("SamSung mobile Below 5000", 2).builderProMap(ConstantUtil.API_NAME_VARIABLE_MINPRICE, "5000"),
+                new SiteMapKeyVo("SamSung mobile Below 10000", 2).builderProMap(ConstantUtil.API_NAME_VARIABLE_MINPRICE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC),
+                new SiteMapKeyVo("SamSung mobile Below 15000", 2).builderProMap(ConstantUtil.API_NAME_VARIABLE_MINPRICE, "15000"),
+                new SiteMapKeyVo("SamSung mobile Below 20000", 2).builderProMap(ConstantUtil.API_NAME_VARIABLE_MINPRICE, "20000"),
+                new SiteMapKeyVo("SamSung mobile Below 25000", 2).builderProMap(ConstantUtil.API_NAME_VARIABLE_MINPRICE, "25000"),
+                new SiteMapKeyVo("SamSung mobile Below 30000", 2).builderProMap(ConstantUtil.API_NAME_VARIABLE_MINPRICE, "30000"),
 
                 new SiteMapKeyVo("Redmi Note 3 mobile", 2).builderProMap("Model", "Redmi Note 3"),
-//                new SiteMapKeyVo("Redmi Note 3 mobile Below 5000", 2).builderProMap("minPrice", "5000"),
-                new SiteMapKeyVo("Redmi Note 3 mobile Below 10000", 2).builderProMap("minPrice", ConstantUtil.API_ERRORCODE_FAILED_LOGIC),
-                new SiteMapKeyVo("Redmi Note 3 mobile Below 15000", 2).builderProMap("minPrice", "15000"),
-                new SiteMapKeyVo("Redmi Note 3 mobile Below 20000", 2).builderProMap("minPrice", "20000"),
-                new SiteMapKeyVo("Redmi Note 3 mobile Below 25000", 2).builderProMap("minPrice", "25000"),
-                new SiteMapKeyVo("Redmi Note 3 mobile Below 30000", 2).builderProMap("minPrice", "30000")));
+//                new SiteMapKeyVo("Redmi Note 3 mobile Below 5000", 2).builderProMap(ConstantUtil.API_NAME_VARIABLE_MINPRICE, "5000"),
+                new SiteMapKeyVo("Redmi Note 3 mobile Below 10000", 2).builderProMap(ConstantUtil.API_NAME_VARIABLE_MINPRICE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC),
+                new SiteMapKeyVo("Redmi Note 3 mobile Below 15000", 2).builderProMap(ConstantUtil.API_NAME_VARIABLE_MINPRICE, "15000"),
+                new SiteMapKeyVo("Redmi Note 3 mobile Below 20000", 2).builderProMap(ConstantUtil.API_NAME_VARIABLE_MINPRICE, "20000"),
+                new SiteMapKeyVo("Redmi Note 3 mobile Below 25000", 2).builderProMap(ConstantUtil.API_NAME_VARIABLE_MINPRICE, "25000"),
+                new SiteMapKeyVo("Redmi Note 3 mobile Below 30000", 2).builderProMap(ConstantUtil.API_NAME_VARIABLE_MINPRICE, "30000")));
         //2. Top 10 + “品牌名称” + Mobiles
         for (String brand : brandList) {
             SiteMapKeyVo siteMapKeyVo = new SiteMapKeyVo(brand, 2);
             Map map = new HashMap<>();
-            map.put("Brand", brand);
+            map.put(STRING_BRAND, brand);
             siteMapKeyVo.setPros(map);
             top10MobilesList.add(siteMapKeyVo);
         }
 
         //3. Top 10 + “品牌名称” + Mobiles + Below +“价格参数”
-//                new SiteMapKeyVo("Top 10 HTC Mobiles Below 5000", 2).builderProMap("minPrice", "5000").builderProMap("Brand", "HTC"),
+//                new SiteMapKeyVo("Top 10 HTC Mobiles Below 5000", 2).builderProMap(ConstantUtil.API_NAME_VARIABLE_MINPRICE, "5000").builderProMap(STRING_BRAND, "HTC"),
         for (String brand : brandList) {
             for (Integer price : priceList) {
                 SiteMapKeyVo siteMapKeyVo = new SiteMapKeyVo("Top 10 " + brand + " Mobiles Below " + price, 2);
                 Map map = new HashMap<>();
-                map.put("minPrice", price + ConstantUtil.API_DATA_EMPTYSTRING);
-                map.put("Brand", brand);
+                map.put(ConstantUtil.API_NAME_VARIABLE_MINPRICE, price + ConstantUtil.API_DATA_EMPTYSTRING);
+                map.put(STRING_BRAND, brand);
                 siteMapKeyVo.setPros(map);
                 top10MobilesList.add(siteMapKeyVo);
             }
@@ -207,7 +207,7 @@ public class MobileController {
                 SiteMapKeyVo siteMapKeyVo = new SiteMapKeyVo("Top 10 " + brand + " " + key + " Mobiles", 2);
                 Map map = new HashMap<>();
                 map.putAll(characteristicMap2.get(key));
-                map.put("Brand", brand);
+                map.put(STRING_BRAND, brand);
                 siteMapKeyVo.setPros(map);
                 top10MobilesList.add(siteMapKeyVo);
             }
@@ -218,7 +218,7 @@ public class MobileController {
                 SiteMapKeyVo siteMapKeyVo = new SiteMapKeyVo("Top 10 " + key + " Mobiles Below " + price, 2);
                 Map map = new HashMap<>();
                 map.putAll(characteristicMap2.get(key));
-                map.put("minPrice", price + ConstantUtil.API_DATA_EMPTYSTRING);
+                map.put(ConstantUtil.API_NAME_VARIABLE_MINPRICE, price + ConstantUtil.API_DATA_EMPTYSTRING);
                 siteMapKeyVo.setPros(map);
                 top10MobilesList.add(siteMapKeyVo);
             }
@@ -230,8 +230,8 @@ public class MobileController {
                     SiteMapKeyVo siteMapKeyVo = new SiteMapKeyVo("Top 10 " + brand + " " + key + " Mobiles Below " + price, 2);
                     Map map = new HashMap<>();
                     map.putAll(characteristicMap2.get(key));
-                    map.put("minPrice", price + ConstantUtil.API_DATA_EMPTYSTRING);
-                    map.put("Brand", brand);
+                    map.put(ConstantUtil.API_NAME_VARIABLE_MINPRICE, price + ConstantUtil.API_DATA_EMPTYSTRING);
+                    map.put(STRING_BRAND, brand);
                     siteMapKeyVo.setPros(map);
                     top10MobilesList.add(siteMapKeyVo);
                 }
@@ -277,12 +277,10 @@ public class MobileController {
         switch (siteMapKeyVo.getType()) {
             case 0:
                 //0 是把name 发回来
-                if (StringUtils.isNotEmpty(siteMapKeyVo.getName())) {
-                    if (siteMapKeyVo.getName().equals("Latest Mobiles")) {
-                        //获取发布日期为最近的10部手机 -- 创建时间降序
-                        //暂时为评论数降序排列的列表 sort 为 POPULARITY 或者null即可
-                        searchCriteria.setSort(SearchResultSort.POPULARITY);
-                    }
+                if (StringUtils.isNotEmpty(siteMapKeyVo.getName()) && siteMapKeyVo.getName().equals("Latest Mobiles")) {
+                    //获取发布日期为最近的10部手机 -- 创建时间降序
+                    //暂时为评论数降序排列的列表 sort 为 POPULARITY 或者null即可
+                    searchCriteria.setSort(SearchResultSort.POPULARITY);
                    /* if (name.equals("Top Mobile Phone")) {
                         //评分数前十的手机
                         //默认是评分数前十的手机
@@ -307,10 +305,10 @@ public class MobileController {
                         String value = next.getValue();
                         if (StringUtils.isNotEmpty(key) && StringUtils.isNotEmpty(value)) {
                             switch (key) {
-                                case "Brand":
+                                case STRING_BRAND:
                                     searchCriteria.setBrand(new String[]{value});
                                     break;
-                                case "minPrice":
+                                case ConstantUtil.API_NAME_VARIABLE_MINPRICE:
                                     searchCriteria.setPriceFrom(1);
                                     searchCriteria.setPriceTo(Integer.parseInt(value));
                                     break;
@@ -323,10 +321,10 @@ public class MobileController {
                                 case "SIM_Slot":
                                     searchCriteria.setSimSlot(value);
                                     break;
-                                case "Network_Support":
+                                case STRING_NETWORK_SUPPORT:
                                     searchCriteria.setNetworkSupport(new String[]{value});
                                     break;
-                                case "Camera":
+                                case STRING_CAMERA:
         /*                            searchCriteria.setQueryPrimaryCamera(ConstantUtil.SOLR_DEFAULT_VALUE_NOTEMPTY_FIELD);
                                     searchCriteria.setQuerySecondaryCamera(ConstantUtil.SOLR_DEFAULT_VALUE_NOTEMPTY_FIELD);*/
                                     searchCriteria.setQueryPrimaryCamera("*");
@@ -338,7 +336,7 @@ public class MobileController {
                                 case "Touch_Screen":
                                     searchCriteria.setTouchScreen(value);
                                     break;
-                                case "Bluetooth":
+                                case STRING_BLUETOOTH:
                                     searchCriteria.setBluetooth(value);
                                     break;
                                 case "WiFi":

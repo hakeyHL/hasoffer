@@ -12,6 +12,9 @@ public class ConstantUtil {
     public static final String API_ERRORCODE_FAILED_LOGIC = "10000";
     public static final String API_NAME_ERRORCODE = "errorCode";
     public static final String API_NAME_MSG = "msg";
+    public static final String API_NAME_VARIABLE_MINPRICE = "minPrice";
+    public static final String API_NAME_VARIABLE_ENCODE_UTF8 = "UTF-8";
+    public static final String API_NAME_VARIABLE_SITE_DOWNLOADCOUNT = "10,000,000 - 50,000,000";
     public static final String API_NAME_MSG_SUCCESS = "success";
     public static final String API_NAME_DATA = "data";
     public static final String API_DATA_EMPTYSTRING = "";

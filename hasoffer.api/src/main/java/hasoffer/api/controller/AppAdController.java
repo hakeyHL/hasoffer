@@ -51,7 +51,6 @@ public class AppAdController {
     AdvertiseService advertiseService;
 
     public static void main(String[] args) {
-        System.out.println("1");
        /* try {
             Sender sender = new Sender("AIzaSyCZrHjOkZ57j3Dvq_TpvYW8Mt38Ej1dzQA");
             String userMessage = "{\n" +
@@ -131,7 +130,6 @@ public class AppAdController {
         try {
             result = sender.send(message, "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd", 2);
             String errorCodeName = result.getErrorCodeName();
-            System.out.println(errorCodeName);
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
