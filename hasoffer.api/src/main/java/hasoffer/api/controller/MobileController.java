@@ -15,8 +15,6 @@ import hasoffer.core.product.solr.PtmStdSkuModel;
 import hasoffer.core.utils.ConstantUtil;
 import hasoffer.core.utils.api.ApiUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,7 +31,7 @@ import java.util.*;
  */
 @Controller
 @RequestMapping("m")
-public class MobileController {
+public class MobileController extends BaseController {
     private static final String STRING_YES = "yes";
     private static final String STRING_NETWORK_SUPPORT = "Network_Support";
     private static final String STRING_CAMERA = "Camera";
@@ -49,13 +47,8 @@ public class MobileController {
     PtmStdSkuIndexServiceImpl stdSkuIndexService;
     @Autowired
     MobileService mobileService;
-    Logger logger = LoggerFactory.getLogger(MobileController.class);
-
     @RequestMapping("siteMap")
     public ModelAndView siteMapHasoffer(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "2000") int pageSize) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         List<Integer> priceList = new LinkedList<>();
         priceList.add(10000);
         priceList.add(15000);
@@ -261,10 +254,6 @@ public class MobileController {
      */
     @RequestMapping("keySearch")
     public ModelAndView resolveKeyWordsSearch(@RequestBody SiteMapKeyVo siteMapKeyVo, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int pageSize) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
-
         ResultVo resultVo = new ResultVo();
         PageableResult<PtmStdSkuModel> pageableResult = null;
         List ProductList = new ArrayList();
@@ -383,10 +372,6 @@ public class MobileController {
     public ModelAndView getKeyWordsFromKeyRepo(@RequestParam(defaultValue = "1") int page,
                                                @RequestParam(defaultValue = "200") int pageSize,
                                                KeyWordsVo keyWordsVo) {
-
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         List<KeyWordsVo> keyWordsVoList = mobileService.getKeyWordsListFromRepo(keyWordsVo, page, pageSize);
         Map dataMap = new HashMap();
         dataMap.put("keyList", keyWordsVoList);
@@ -411,10 +396,6 @@ public class MobileController {
     public ModelAndView keySearch(@RequestParam(defaultValue = "1") int page,
                                   @RequestParam(defaultValue = "200") int pageSize,
                                   @RequestBody KeyWordsVo keyWordsVo) {
-
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         List<CmpProductListVo> cmpProductListVoList = mobileService.searchFromSolrByKeyWordVo(keyWordsVo, page, pageSize);
         Map dataMap = new HashMap();
         dataMap.put("plist", cmpProductListVoList);
