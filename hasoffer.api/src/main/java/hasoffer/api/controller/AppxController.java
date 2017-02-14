@@ -1,12 +1,7 @@
 package hasoffer.api.controller;
 
-import hasoffer.base.utils.JSONUtil;
-import hasoffer.base.utils.UrlUtils;
 import hasoffer.core.persistence.dbm.nosql.IMongoDbManager;
-import hasoffer.core.persistence.mongo.UrmFbLog;
 import hasoffer.core.utils.ConstantUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,8 +21,6 @@ public class AppxController {
 
     @Resource
     IMongoDbManager mdm;
-    private Logger logger = LoggerFactory.getLogger(AppxController.class);
-
     //www.allbuy.com/api/callback/adjust/intall
     // ?idfa={idfa}&android_id={android_id}&deviceName={device_name}&osName={os_name}&osVersion={os_version}&country={country}&language={language}&timezone={timezone}&userAgent={user_agent}&deviceIp={ip_address}&appName={app_name}
     // &appVersion={app_version}&trackerId={tracker}&trackerName={tracker_name}&eventTime={created_at}
@@ -60,17 +53,17 @@ public class AppxController {
                                 @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String fb_adgroup_name,
                                 @RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String fb_adgroup_id) {
 
-        String url = request.getRequestURL().toString();
-        String queryJson = JSONUtil.toJSON(UrlUtils.getParams(url));
+//        String url = request.getRequestURL().toString();
+//        String queryJson = JSONUtil.toJSON(UrlUtils.getParams(url));
 
-        UrmFbLog fbLog = new UrmFbLog(queryJson, idfa, android_id, deviceName,
+       /* UrmFbLog fbLog = new UrmFbLog(queryJson, idfa, android_id, deviceName,
                 osName, osVersion, country, language, timezone,
                 userAgent, deviceIp, appName, appVersion,
                 trackerId, trackerName, eventTime,
                 campaign_name, adgroup_name,
                 fb_campaign_group_name,
                 fb_campaign_group_id, fb_campaign_name, fb_campaign_id,
-                fb_adgroup_name, fb_adgroup_id);
+                fb_adgroup_name, fb_adgroup_id);*/
 
 //        mdm.save(fbLog);
 

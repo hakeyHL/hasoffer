@@ -2,8 +2,8 @@ package hasoffer.api.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import hasoffer.api.helper.ApiHttpHelper;
 import hasoffer.api.helper.ClientHelper;
-import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.JsonHelper;
 import hasoffer.api.helper.ParseConfigHelper;
 import hasoffer.api.service.ApiHelperService;
@@ -71,6 +71,8 @@ import java.util.*;
 @Controller
 @RequestMapping(value = "/app")
 public class AppController {
+    private final static String STRING_ACTION = "action";
+    private final static String STRING_PRODUCT = "product";
     @Resource
     ICacheService<UrmUser> userICacheService;
     @Resource
@@ -152,7 +154,7 @@ public class AppController {
     @RequestMapping(value = "/dot", method = RequestMethod.GET)
     public ModelAndView dot(HttpServletRequest request) {
 
-        String action = request.getParameter("action");
+        String action = request.getParameter(STRING_ACTION);
         if ("rediToAffiliateUrl".equals(action)) {
             try {
                 String deviceId = ClientHelper.getAndroidId();
@@ -525,7 +527,7 @@ public class AppController {
         jsonObject.put(ConstantUtil.API_NAME_DATA, map);
         String thirdId = userVO.getThirdId();
         if (StringUtils.isEmpty(lastTimeUserToken) || StringUtils.isEmpty(thirdId)) {//如果userToken或者thirdId为空
-            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
         //如果是third不变的情况下,usertoken已经被更新了,应该用新的usertoken操作
@@ -536,12 +538,12 @@ public class AppController {
             String oldThirdId = userByLastUserToken.getThirdId();
             List<UrmUser> oldUserList = appService.getIdDescUserListByThirdId(oldThirdId);
             if (oldUserList == null || oldUserList.size() == 0) {
-                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             }
             if (StringUtils.equals(thirdId, oldThirdId)) {//如果同样的userToken对应的记录只有一条并且thirdId一致，认为是正确的用户信息
                 //如果老的thirdId和新的thirdId一样的话要清除此third下的多个记录的问题
-                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             }
             if (!StringUtils.equals(thirdId, oldThirdId) && oldUserList.size() == 1) {
@@ -559,7 +561,7 @@ public class AppController {
                 }
             }
         }
-        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
 
@@ -649,12 +651,12 @@ public class AppController {
                 if (products2s != null && products2s.size() > 4) {
                     li = li.subList(0, 5);
                 }
-                map.put("product", li);
+                map.put(STRING_PRODUCT, li);
                 break;
             case 1:
                 List<PtmProduct> topSellins = productCacheManager.getTopSellins(criteria.getPage(), criteria.getPageSize());
                 apiUtils.addProductVo2List(li, topSellins);
-                map.put("product", li);
+                map.put(STRING_PRODUCT, li);
                 break;
             case 2:
                 //search by title
@@ -690,7 +692,7 @@ public class AppController {
                 p.setData(null);
                 p = null;
 
-                map.put("product", li);
+                map.put(STRING_PRODUCT, li);
                 break;
             case 3:
                 //类目搜索
@@ -727,14 +729,14 @@ public class AppController {
                     if (pKeywordResult != null && pKeywordResult.getData().size() > 0) {
                         filterProducts(pKeywordResult.getData(), criteria.getKeyword());
                         apiUtils.addProductVo2List(li, pKeywordResult.getData());
-                        map.put("product", li);
+                        map.put(STRING_PRODUCT, li);
                     }
                 }
             default:
                 break;
         }
         if (li != null && li.size() > 0) {
-            map.put("product", li);
+            map.put(STRING_PRODUCT, li);
         }
         mv.addObject(ConstantUtil.API_NAME_DATA, map);
         System.out.println("time " + (System.currentTimeMillis() - l) / 1000);
@@ -765,20 +767,15 @@ public class AppController {
                 String shopApps = urmDevice.getShopApp();
                 String[] split = shopApps.split(",");
                 for (String str : split) {
-                    if (urmDevice.getMarketChannel() != null) {
-                        if (str.equals(app) && urmDevice.getMarketChannel().name().equals(marketChannel)) {
-                            if (gcmTokens.size() < number && !StringUtils.isEmpty(urmDevice.getGcmToken())) {
-                                gcmTokens.add(urmDevice.getGcmToken());
-                            } else {
-                                break;
-                            }
-                        }
+                    if (urmDevice.getMarketChannel() != null && str.equals(app) && urmDevice.getMarketChannel().name().equals(marketChannel) && gcmTokens.size() < number && !StringUtils.isEmpty(urmDevice.getGcmToken())) {
+                        gcmTokens.add(urmDevice.getGcmToken());
+                    } else {
+                        break;
                     }
                 }
             }
             int i = 0;
             for (String gcmToken : gcmTokens) {
-                System.out.println("____  " + i + "  ____");
                 pushService.push(gcmToken, pushBo);
                 i++;
             }
@@ -899,14 +896,14 @@ public class AppController {
                 List<ThirdAppVo> tempGOOGLEPLAY = new ArrayList<>();
                 ThirdAppVo googlePlayApps_Amazon = new ThirdAppVo(Website.AMAZON, AppAdController.packageMap.get(Website.AMAZON), "https://play.google.com/store/apps/details?id=com.amazon.mShop.android.shopping", WebsiteHelper.getLogoUrl(Website.AMAZON), "Browse,search & buy millions of products right from your Android device", 4.3f, "491,637", "50,000,000 - 100,000,000", "9.6MB");
                 ThirdAppVo googlePlayApps_Flipkart = new ThirdAppVo(Website.FLIPKART, AppAdController.packageMap.get(Website.FLIPKART), "https://play.google.com/store/apps/details?id=com.flipkart.android", WebsiteHelper.getLogoUrl(Website.FLIPKART), "Shop for electronics,apparels & more using our Flipart app Free shipping & COD", 4.2f, "2,044,978", "50,000,000 - 100,000,000", "10.0MB");
-                ThirdAppVo googlePlayApps_ShopClues = new ThirdAppVo(Website.SHOPCLUES, AppAdController.packageMap.get(Website.SHOPCLUES), "https://play.google.com/store/apps/details?id=com.shopclues", WebsiteHelper.getLogoUrl(Website.SHOPCLUES), "India's largest Online Marketplace is now in your Pocket - Install,Shop,Enjoy!", 3.9f, "235,468", "10,000,000 - 50,000,000", "7.1MB");
+                ThirdAppVo googlePlayApps_ShopClues = new ThirdAppVo(Website.SHOPCLUES, AppAdController.packageMap.get(Website.SHOPCLUES), "https://play.google.com/store/apps/details?id=com.shopclues", WebsiteHelper.getLogoUrl(Website.SHOPCLUES), "India's largest Online Marketplace is now in your Pocket - Install,Shop,Enjoy!", 3.9f, "235,468", ConstantUtil.API_NAME_VARIABLE_SITE_DOWNLOADCOUNT, "7.1MB");
                 ThirdAppVo googlePlayApps_eBay = new ThirdAppVo(Website.EBAY, AppAdController.packageMap.get(Website.EBAY), "https://play.google.com/store/apps/details?id=com.ebay.mobile", WebsiteHelper.getLogoUrl(Website.EBAY), "Buy,bid & sell! Deals & Discounts to Save Money on Home,Collectables & Cars", 4.2f, "1,759,547", "100,000,000 - 500,000,000", "20.6MB");
-                ThirdAppVo googlePlayApps_Paytm = new ThirdAppVo(Website.PAYTM, AppAdController.packageMap.get(Website.PAYTM), "https://play.google.com/store/apps/details?id=net.one97.paytm", WebsiteHelper.getLogoUrl(Website.PAYTM), "Best Mobile Recharge and DTH Recharge, Bill Payment and Shipping Experience", 4.3f, "1,401,209", "10,000,000 - 50,000,000", "13.0MB");
-                ThirdAppVo googlePlayApps_Snapdeal = new ThirdAppVo(Website.SNAPDEAL, AppAdController.packageMap.get(Website.SNAPDEAL), "https://play.google.com/store/apps/details?id=com.snapdeal.main", WebsiteHelper.getLogoUrl(Website.SNAPDEAL), "Best deals on women & men's fashion,home essentials,electronics & gadgets!", 4.1f, "1,035,900", "10,000,000 - 50,000,000", "12.0MB");
-                ThirdAppVo googlePlayApps_Jabong = new ThirdAppVo(Website.JABONG, AppAdController.packageMap.get(Website.JABONG), "https://play.google.com/store/apps/details?id=com.jabong.android", WebsiteHelper.getLogoUrl(Website.JABONG), "India's Best Online Shopping App To Buy Latest Fashion for Men,Women,Kids", 3.9f, "171,487", "10,000,000 - 50,000,000", "6.1MB");
+                ThirdAppVo googlePlayApps_Paytm = new ThirdAppVo(Website.PAYTM, AppAdController.packageMap.get(Website.PAYTM), "https://play.google.com/store/apps/details?id=net.one97.paytm", WebsiteHelper.getLogoUrl(Website.PAYTM), "Best Mobile Recharge and DTH Recharge, Bill Payment and Shipping Experience", 4.3f, "1,401,209", ConstantUtil.API_NAME_VARIABLE_SITE_DOWNLOADCOUNT, "13.0MB");
+                ThirdAppVo googlePlayApps_Snapdeal = new ThirdAppVo(Website.SNAPDEAL, AppAdController.packageMap.get(Website.SNAPDEAL), "https://play.google.com/store/apps/details?id=com.snapdeal.main", WebsiteHelper.getLogoUrl(Website.SNAPDEAL), "Best deals on women & men's fashion,home essentials,electronics & gadgets!", 4.1f, "1,035,900", ConstantUtil.API_NAME_VARIABLE_SITE_DOWNLOADCOUNT, "12.0MB");
+                ThirdAppVo googlePlayApps_Jabong = new ThirdAppVo(Website.JABONG, AppAdController.packageMap.get(Website.JABONG), "https://play.google.com/store/apps/details?id=com.jabong.android", WebsiteHelper.getLogoUrl(Website.JABONG), "India's Best Online Shopping App To Buy Latest Fashion for Men,Women,Kids", 3.9f, "171,487", ConstantUtil.API_NAME_VARIABLE_SITE_DOWNLOADCOUNT, "6.1MB");
                 ThirdAppVo googlePlayApps_VOONIK = new ThirdAppVo(Website.VOONIK, AppAdController.packageMap.get(Website.VOONIK), "https://play.google.com/store/apps/details?id=com.voonik.android", WebsiteHelper.getLogoUrl(Website.VOONIK), "Online Shopping for women clothing,ethnic wear,sarees,kurtis,lingere in India", 4.2f, "129,079", "5,000,000 - 10,000,000", "5.8MB");
                 ThirdAppVo googlePlayApps_INFIBEAM = new ThirdAppVo(Website.INFIBEAM, AppAdController.packageMap.get(Website.INFIBEAM), "https://play.google.com/store/apps/details?id=com.infibeam.infibeamapp", WebsiteHelper.getLogoUrl(Website.INFIBEAM), "Infibeam.com-Buy Mobiles,Electronics,Books,Gifts,Clothes & more", 3.7f, "8,424", "1,000,000 - 5,000,000", "26.2MB");
-                ThirdAppVo googlePlayApps_Myntra = new ThirdAppVo(Website.MYNTRA, AppAdController.packageMap.get(Website.MYNTRA), "https://play.google.com/store/apps/details?id=com.myntra.android&hl=en", WebsiteHelper.getLogoUrl(Website.MYNTRA), "Online shopping for fashion clothes,footwear,accessories for Men,Women & Kids", 4.1f, "509,053", "10,000,000 - 50,000,000", "17.2MB");
+                ThirdAppVo googlePlayApps_Myntra = new ThirdAppVo(Website.MYNTRA, AppAdController.packageMap.get(Website.MYNTRA), "https://play.google.com/store/apps/details?id=com.myntra.android&hl=en", WebsiteHelper.getLogoUrl(Website.MYNTRA), "Online shopping for fashion clothes,footwear,accessories for Men,Women & Kids", 4.1f, "509,053", ConstantUtil.API_NAME_VARIABLE_SITE_DOWNLOADCOUNT, "17.2MB");
 
                 tempGOOGLEPLAY.addAll(Arrays.asList(googlePlayApps_Amazon, googlePlayApps_Flipkart, googlePlayApps_ShopClues, googlePlayApps_eBay, googlePlayApps_Paytm, googlePlayApps_Snapdeal, googlePlayApps_Jabong, googlePlayApps_VOONIK, googlePlayApps_INFIBEAM, googlePlayApps_Myntra));
                 GOOGLEPLAY.put("GOOGLEPLAY", tempGOOGLEPLAY);
@@ -915,14 +912,14 @@ public class AppController {
                 List<ThirdAppVo> tempNINEAPP = new ArrayList<ThirdAppVo>();
                 ThirdAppVo nineApp_Amazon = new ThirdAppVo(Website.AMAZON, AppAdController.packageMap.get(Website.AMAZON), "http://www.9apps.com/android-apps/Amazon-India-Shopping/", WebsiteHelper.getLogoUrl(Website.AMAZON), "Browse,search & buy millions of products right from your Android device", 4.3f, "491,637", "50,000,000 - 100,000,000", "9.6MB");
                 ThirdAppVo nineApp_Flipkart = new ThirdAppVo(Website.FLIPKART, AppAdController.packageMap.get(Website.FLIPKART), "http://www.9apps.com/android-apps/Flipkart-Amazing-Discounts-Everyday/", WebsiteHelper.getLogoUrl(Website.FLIPKART), "Shop for electronics,apparels & more using our Flipart app Free shipping & COD", 4.2f, "2,044,978", "50,000,000 - 100,000,000", "10.0MB");
-                ThirdAppVo nineApp_ShopClues = new ThirdAppVo(Website.SHOPCLUES, AppAdController.packageMap.get(Website.SHOPCLUES), "http://www.9apps.com/android-apps/ShopClues/", WebsiteHelper.getLogoUrl(Website.SHOPCLUES), "India's largest Online Marketplace is now in your Pocket - Install,Shop,Enjoy!", 3.9f, "235,468", "10,000,000 - 50,000,000", "7.1MB");
+                ThirdAppVo nineApp_ShopClues = new ThirdAppVo(Website.SHOPCLUES, AppAdController.packageMap.get(Website.SHOPCLUES), "http://www.9apps.com/android-apps/ShopClues/", WebsiteHelper.getLogoUrl(Website.SHOPCLUES), "India's largest Online Marketplace is now in your Pocket - Install,Shop,Enjoy!", 3.9f, "235,468", ConstantUtil.API_NAME_VARIABLE_SITE_DOWNLOADCOUNT, "7.1MB");
                 ThirdAppVo nineApp_eBay = new ThirdAppVo(Website.EBAY, AppAdController.packageMap.get(Website.EBAY), "http://www.9apps.com/android-apps/eBay/", WebsiteHelper.getLogoUrl(Website.EBAY), "Buy,bid & sell! Deals & Discounts to Save Money on Home,Collectables & Cars", 4.2f, "1,759,547", "100,000,000 - 500,000,000", "20.6MB");
-                ThirdAppVo nineApp_Paytm = new ThirdAppVo(Website.PAYTM, AppAdController.packageMap.get(Website.PAYTM), "http://www.9apps.com/android-apps/Recharge-Shop-and-Wallet-Paytm/", WebsiteHelper.getLogoUrl(Website.PAYTM), "Best Mobile Recharge and DTH Recharge, Bill Payment and Shipping Experience", 4.3f, "1,401,209", "10,000,000 - 50,000,000", "13.0MB");
-                ThirdAppVo nineApp_Snapdeal = new ThirdAppVo(Website.SNAPDEAL, AppAdController.packageMap.get(Website.SNAPDEAL), "http://www.9apps.com/android-apps/Snapdeal-Online-Shopping-India/", WebsiteHelper.getLogoUrl(Website.SNAPDEAL), "Best deals on women & men's fashion,home essentials,electronics & gadgets!", 4.1f, "1,035,900", "10,000,000 - 50,000,000", "12.0MB");
-                ThirdAppVo nineApp_Jabong = new ThirdAppVo(Website.JABONG, AppAdController.packageMap.get(Website.JABONG), "http://www.9apps.com/android-apps/Jabong-Online-Fashion-Shopping/", WebsiteHelper.getLogoUrl(Website.JABONG), "India's Best Online Shopping App To Buy Latest Fashion for Men,Women,Kids", 3.9f, "171,487", "10,000,000 - 50,000,000", "6.1MB");
+                ThirdAppVo nineApp_Paytm = new ThirdAppVo(Website.PAYTM, AppAdController.packageMap.get(Website.PAYTM), "http://www.9apps.com/android-apps/Recharge-Shop-and-Wallet-Paytm/", WebsiteHelper.getLogoUrl(Website.PAYTM), "Best Mobile Recharge and DTH Recharge, Bill Payment and Shipping Experience", 4.3f, "1,401,209", ConstantUtil.API_NAME_VARIABLE_SITE_DOWNLOADCOUNT, "13.0MB");
+                ThirdAppVo nineApp_Snapdeal = new ThirdAppVo(Website.SNAPDEAL, AppAdController.packageMap.get(Website.SNAPDEAL), "http://www.9apps.com/android-apps/Snapdeal-Online-Shopping-India/", WebsiteHelper.getLogoUrl(Website.SNAPDEAL), "Best deals on women & men's fashion,home essentials,electronics & gadgets!", 4.1f, "1,035,900", ConstantUtil.API_NAME_VARIABLE_SITE_DOWNLOADCOUNT, "12.0MB");
+                ThirdAppVo nineApp_Jabong = new ThirdAppVo(Website.JABONG, AppAdController.packageMap.get(Website.JABONG), "http://www.9apps.com/android-apps/Jabong-Online-Fashion-Shopping/", WebsiteHelper.getLogoUrl(Website.JABONG), "India's Best Online Shopping App To Buy Latest Fashion for Men,Women,Kids", 3.9f, "171,487", ConstantUtil.API_NAME_VARIABLE_SITE_DOWNLOADCOUNT, "6.1MB");
                 ThirdAppVo nineApp_VOONIK = new ThirdAppVo(Website.VOONIK, AppAdController.packageMap.get(Website.VOONIK), "http://www.9apps.com/android-apps/Voonik-Shopping-App-For-Women/", WebsiteHelper.getLogoUrl(Website.VOONIK), "Online Shopping for women clothing,ethnic wear,sarees,kurtis,lingere in India", 4.2f, "129,079", "5,000,000 - 10,000,000", "5.8MB");
                 ThirdAppVo nineApp_INFIBEAM = new ThirdAppVo(Website.INFIBEAM, AppAdController.packageMap.get(Website.INFIBEAM), "http://www.9apps.com/android-apps/Infibeam-Online-Shopping-App/", WebsiteHelper.getLogoUrl(Website.INFIBEAM), "Infibeam.com-Buy Mobiles,Electronics,Books,Gifts,Clothes & more", 3.7f, "8,424", "1,000,000 - 5,000,000", "26.2MB");
-                ThirdAppVo nineApp_Myntra = new ThirdAppVo(Website.MYNTRA, AppAdController.packageMap.get(Website.MYNTRA), "http://www.9apps.com/android-apps/Myntra-Fashion-Shopping-App/", WebsiteHelper.getLogoUrl(Website.MYNTRA), "Online shopping for fashion clothes,footwear,accessories for Men,Women & Kids", 4.1f, "509,053", "10,000,000 - 50,000,000", "17.2MB");
+                ThirdAppVo nineApp_Myntra = new ThirdAppVo(Website.MYNTRA, AppAdController.packageMap.get(Website.MYNTRA), "http://www.9apps.com/android-apps/Myntra-Fashion-Shopping-App/", WebsiteHelper.getLogoUrl(Website.MYNTRA), "Online shopping for fashion clothes,footwear,accessories for Men,Women & Kids", 4.1f, "509,053", ConstantUtil.API_NAME_VARIABLE_SITE_DOWNLOADCOUNT, "17.2MB");
 
                 tempNINEAPP.addAll(Arrays.asList(nineApp_Amazon, nineApp_Flipkart, nineApp_ShopClues, nineApp_eBay, nineApp_Paytm, nineApp_Snapdeal, nineApp_Jabong, nineApp_VOONIK, nineApp_INFIBEAM, nineApp_Myntra));
                 NINEAPP.put("NINEAPP", tempNINEAPP);
@@ -1203,7 +1200,7 @@ public class AppController {
     }
 
     public void getDealThuAndComNums(Long dealId, Map map) {
-        map.put("action", 0);
+        map.put(STRING_ACTION, 0);
         map.put("commentNumber", 0);
         map.put("thumbNumber", 0);
         Long totalDealThumb = dealService.getTotalDealThumb(dealId);
@@ -1232,10 +1229,10 @@ public class AppController {
                 int action = appDealThumb.getAction();
                 if (action == -1) {
                     //踩
-                    map.put("action", 2);
+                    map.put(action, 2);
                 } else if (action == 1) {
                     //赞
-                    map.put("action", 1);
+                    map.put(action, 1);
                 }
             }
         }

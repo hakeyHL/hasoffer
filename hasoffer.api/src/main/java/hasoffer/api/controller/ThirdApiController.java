@@ -1,6 +1,6 @@
 package hasoffer.api.controller;
 
-import hasoffer.api.helper.Httphelper;
+import hasoffer.api.helper.ApiHttpHelper;
 import hasoffer.core.third.ThirdService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +28,7 @@ public class ThirdApiController {
      */
     public String getTopSkusForNineApp(String page, String pageSize, HttpServletResponse response) {
         String topSkus = thirdService.getTopSkusForNineApps(page, pageSize, null, 0);
-        Httphelper.sendJsonMessage(topSkus, response);
+        ApiHttpHelper.sendJsonMessage(topSkus, response);
         return null;
     }
 

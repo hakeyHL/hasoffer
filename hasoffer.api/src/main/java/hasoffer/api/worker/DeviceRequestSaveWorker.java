@@ -25,7 +25,6 @@ public class DeviceRequestSaveWorker implements Runnable {
 
     @Override
     public void run() {
-        int sleep = 3;
         int sleepCount = 0;
         while (true) {
             try {

@@ -21,7 +21,7 @@ public class ClientRequestInterceptor implements HandlerInterceptor {
     @Resource
     IDeviceService deviceService;
 
-    public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
+    public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) {
 
         String requestVersion = Context.currentContext().getHeader("request-version");
 

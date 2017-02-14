@@ -3,7 +3,7 @@ package hasoffer.api.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.PropertyFilter;
-import hasoffer.api.helper.Httphelper;
+import hasoffer.api.helper.ApiHttpHelper;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
@@ -132,7 +132,7 @@ public class AppDealController {
         Map map = new HashMap();
         map.put("deals", deals);
         jsonObject.put(ConstantUtil.API_NAME_DATA, JSONObject.toJSON(map));
-        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
+        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
         return null;
     }
 
@@ -149,7 +149,7 @@ public class AppDealController {
             hashMap.put("description", appDeal.getDescription());
         }
         jsonObject.put(ConstantUtil.API_NAME_DATA, hashMap);
-        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
 
@@ -226,7 +226,7 @@ public class AppDealController {
             jsonObject.put(ConstantUtil.API_NAME_MSG, "dealId is not exist .");
         }
         jsonObject.put(ConstantUtil.API_NAME_DATA, hashMap);
-        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
 
@@ -283,7 +283,7 @@ public class AppDealController {
             jsonObject.put(ConstantUtil.API_NAME_MSG, "comment content is required .");
         }
         jsonObject.put(ConstantUtil.API_NAME_DATA, hashMap);
-        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
 
@@ -300,14 +300,14 @@ public class AppDealController {
         if (dealId == 0) {
             jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             jsonObject.put(ConstantUtil.API_NAME_MSG, "dealId is required .");
-            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
         AppDeal appDeal = dealService.getDealById(dealId);
         if (appDeal == null) {
             jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             jsonObject.put(ConstantUtil.API_NAME_MSG, "deal record is not exist for dealId : " + dealId);
-            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
 
@@ -336,10 +336,10 @@ public class AppDealController {
         } else {
             jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             jsonObject.put(ConstantUtil.API_NAME_MSG, "no data in database.");
-            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
-        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
 }

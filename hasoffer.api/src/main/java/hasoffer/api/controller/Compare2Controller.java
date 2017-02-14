@@ -3,8 +3,8 @@ package hasoffer.api.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.PropertyFilter;
+import hasoffer.api.helper.ApiHttpHelper;
 import hasoffer.api.helper.ClientHelper;
-import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.SearchHelper;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
@@ -222,7 +222,7 @@ public class Compare2Controller {
             getSioBySearch(sio);
         }
         String jsonResult = appCmpService.sdkCmpSku(sio);
-        Httphelper.sendJsonMessage(jsonResult, response);
+        ApiHttpHelper.sendJsonMessage(jsonResult, response);
         return null;
     }
 
@@ -281,7 +281,7 @@ public class Compare2Controller {
         jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         if (id.equals("0")) {
             jsonObject.put(ConstantUtil.API_NAME_MSG, "id required .");
-            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         } else {
             //加入更新队列
@@ -291,13 +291,13 @@ public class Compare2Controller {
             } catch (Exception e) {
                 jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
                 jsonObject.put(ConstantUtil.API_NAME_MSG, "Exception occur !");
-                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             }
         }
 //        String cmpSkuCacheValue = cacheService.get(cmpSkuCacheKey, 0);
 //        if (StringUtils.isNotEmpty(cmpSkuCacheValue)) {
-//            Httphelper.sendJsonMessage(cmpSkuCacheValue, response);
+//            ApiHttpHelper.sendJsonMessage(cmpSkuCacheValue, response);
 //            return null;
 //        }
         String userToken = Context.currentContext().getHeader("usertoken");
@@ -329,7 +329,7 @@ public class Compare2Controller {
 //            logger.error(String.format("[NonMatchedProductException]:query=[%s].site=[%s].price=[%s].page=[%d, %d]", product.getTitle(), product.getSourceSite(), product.getPrice(), page, pageSize));
             jsonObject.put(ConstantUtil.API_NAME_DATA, JSONObject.toJSON(cr));
             System.out.println(e.getMessage());
-            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
+            ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
             return null;
         }
         // 速度优化
@@ -343,7 +343,7 @@ public class Compare2Controller {
         } else {
             jsonObject.getJSONObject(ConstantUtil.API_NAME_DATA).putAll(apiUtils.setEvaluateBrandFeaturesCompetitorsSummaryMap(ptmStdSku, new String[]{deviceInfo.getMarketChannel().name(), deviceId}));
         }*/
-        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
+        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject, propertyFilter), response);
         return null;
 
     }
@@ -578,10 +578,8 @@ public class Compare2Controller {
                 if (cmpSku.getWebsite().equals(sio.getCliSite())) {
                     currentDeeplink = WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
                 }*/
-            } else if (clientCmpSku != null & !cmpSkuCacheManager.isFlowControlled(sio.getDeviceId(), sio.getCliSite())) {
-                if (hasoffer.base.utils.StringUtils.isEqual(clientCmpSku.getSkuTitle(), sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
+            } else if (clientCmpSku != null & !cmpSkuCacheManager.isFlowControlled(sio.getDeviceId(), sio.getCliSite()) && hasoffer.base.utils.StringUtils.isEqual(clientCmpSku.getSkuTitle(), sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
                     currentDeeplink = WebsiteHelper.getDeeplinkWithAff(clientCmpSku.getWebsite(), clientCmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
-                }
             }
         } catch (Exception e) {
             // logger.error(e.getMessage());

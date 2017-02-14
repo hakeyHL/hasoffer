@@ -2,7 +2,7 @@ package hasoffer.api.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import hasoffer.api.helper.Httphelper;
+import hasoffer.api.helper.ApiHttpHelper;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.app.vo.ResultVo;
 import hasoffer.core.persistence.po.urm.UrmUser;
@@ -44,12 +44,6 @@ public class SystemController {
     @Resource
     AppServiceImpl appService;
 
-    public static void main(String[] args) {
-        long dayStart6 = TimeUtils.getDayStart("2016-10-29", "yyyy-MM-dd");
-        System.out.println(dayStart6);
-        long dayStart7 = TimeUtils.time(2016, 10, 30, 22, 0, 0);
-        System.out.println(dayStart7);
-    }
 
     @RequestMapping(value = "/error", method = RequestMethod.GET)
     public ModelAndView config(HttpServletRequest request) {
@@ -109,7 +103,7 @@ public class SystemController {
         switch (type) {
             case 0:
                 jsonObject.put(ConstantUtil.API_NAME_DATA, resultVo.getData());
-                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             case 1:
                 if (size > 0) {
@@ -119,11 +113,11 @@ public class SystemController {
                 }
                 resultVo.getData().put("pushList", pushList);
                 jsonObject.put(ConstantUtil.API_NAME_DATA, resultVo.getData());
-                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             default:
                 jsonObject.put(ConstantUtil.API_NAME_DATA, resultVo.getData());
-                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
         }
 

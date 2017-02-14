@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.amazonaws.util.Md5Utils;
-import hasoffer.api.helper.Httphelper;
+import hasoffer.api.helper.ApiHttpHelper;
 import hasoffer.base.model.Website;
 import hasoffer.base.redis.RedisKey;
 import hasoffer.base.utils.JSONUtil;
@@ -72,17 +72,6 @@ public class AppUserController {
     IPtmStdPriceService ptmStdPriceService;
     @Resource
     AppUserService appUserService;
-
-    public static void main(String[] args) {
-        //String affs[] = null;
-        //affs = new String[]{"GOOGLEPLAY", "240a00b4f81c11da"};
-        //String affsUrl = WebsiteHelper.getDealUrlWithAff(Website.SNAPDEAL,
-        //        "http://m.snapdeal.com?utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_id=82856", affs);
-        //System.out.println(affsUrl);
-        System.out.println(new SimpleDateFormat("yyyy-MM-dd").format(1475397136114L));
-        System.out.println((System.currentTimeMillis() - 1475226587161L) / 1000 / 60 / 60);
-    }
-
     @RequestMapping("common/addUserId2DeepLink")
     public ModelAndView addUserId2DeepLink(@RequestParam String deepLink, @RequestParam String website) {
         String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
@@ -121,7 +110,7 @@ public class AppUserController {
         if (skuId <= 0) {
             jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             jsonObject.put(ConstantUtil.API_NAME_MSG, "id le than zero ");
-            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
         skuPrice = apiUtils.getStringNum(skuPrice);
@@ -183,13 +172,12 @@ public class AppUserController {
                         switch (type) {
                             case 0:
                                 //cancel
-                                System.out.println("cancel ");
                                 if (priceOffNotice != null) {
                                     iPriceOffNoticeService.deletePriceOffNotice(urmUser.getId() + ConstantUtil.API_DATA_EMPTYSTRING, priceOffSkuId);
-                                    Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                                    ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                                     return null;
                                 } else {
-                                    Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                                    ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                                     return null;
                                 }
                             case 1:
@@ -202,19 +190,19 @@ public class AppUserController {
                                     //not exist before
                                     iPriceOffNoticeService.createPriceOffNotice(urmUser.getId() + ConstantUtil.API_DATA_EMPTYSTRING, priceOffSkuId, truelySkuPrice, truelySkuPrice);
                                 }
-                                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                                ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                                 return null;
                             default:
-                                jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10001");
+                                jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
                                 jsonObject.put(ConstantUtil.API_NAME_MSG, "type error ");
-                                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                                ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                                 return null;
                         }
                     }
                 }
             }
         }
-        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
 
@@ -227,7 +215,7 @@ public class AppUserController {
         if (skuId <= 0) {
             jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, "10001");
             jsonObject.put(ConstantUtil.API_NAME_MSG, "id le zero ");
-            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
         String userToken = Context.currentContext().getHeader("usertoken");
@@ -243,7 +231,7 @@ public class AppUserController {
                 }
             }
         }
-        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
 
@@ -273,14 +261,14 @@ public class AppUserController {
             if (s != null) {
                 logger.info("userSign(): repetitive  operation ,UserToken:{} has been  signed today  !", userToken);
                 jsonObject.put(ConstantUtil.API_NAME_MSG, "Request is being processed, please wait 5 seconds and try again later. ");
-                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             }
             urmDeviceService.add(RedisKey.USER_SIGN_LAST_OP_TIME + userToken, "true", 5);
             Map<Integer, Integer> afwCfgMap = appService.getSignAwardNum();
             if (afwCfgMap.size() == 0) {
                 logger.info("userSign():No award config data, over !");
-                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             }
             Set<Integer> integers = afwCfgMap.keySet();
@@ -309,7 +297,7 @@ public class AppUserController {
                     //如果今天已经签到,over
                     logger.info("userSign(): repetitive  operation , has been  signed today  !");
                     jsonObject.put(ConstantUtil.API_NAME_MSG, "you have signed today , please come tomorrow. ");
-                    Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                    ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                     return null;
                 } else if (daysAfterLastSing == 1) {//相隔一天,代表是连续的,连续+1
                     Integer conSignNum = urmSignCoin.getConSignNum() + 1;
@@ -348,7 +336,7 @@ public class AppUserController {
                 } catch (Exception e) {
                     //异常,结束
                     logger.error("userSign(): update sign fail ,message is :{}", e.getMessage(), e);
-                    Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                    ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                     return null;
                 }
                 long endTime = System.currentTimeMillis();
@@ -361,18 +349,18 @@ public class AppUserController {
             } else {
                 //token未查询到用户
                 logger.info("userSign(): this userToken not get record " + userToken);
-                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             }
         } else {
             //无token,over
             logger.info("userSign(): userToken is empty ,over  !");
-            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
 
         logger.info("userSign(): response result is : " + JSON.toJSONString(jsonObject));
-        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
 
@@ -384,12 +372,12 @@ public class AppUserController {
         jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
         jsonObject.put(ConstantUtil.API_NAME_MSG, "date error");
         if (StringUtils.isEmpty(fromDate) && StringUtils.isEmpty(toDate)) {
-            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
         if (StringUtils.isEmpty(fromDate)) {
             jsonObject.put(ConstantUtil.API_NAME_MSG, "from date  not empty ");
-            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
         startTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(fromDate).getTime();
@@ -416,7 +404,7 @@ public class AppUserController {
             jsonObject.put(ConstantUtil.API_NAME_MSG, "no data ");
         }
         jsonObject.put(ConstantUtil.API_NAME_DATA, JSON.toJSONString(map));
-        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
 
     }
@@ -437,7 +425,7 @@ public class AppUserController {
         jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
         jsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         if (StringUtils.isEmpty(telephone) && StringUtils.isEmpty(email)) {
-            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         } else {
             //1.userToken 验证和用户查询
@@ -517,7 +505,7 @@ public class AppUserController {
             //9.其他,放弃
         }
         System.out.println("totalTime : " + (BigDecimal.valueOf(System.currentTimeMillis()).subtract(BigDecimal.valueOf(startTime)).divide(BigDecimal.valueOf(1000), 1, BigDecimal.ROUND_HALF_UP)));
-        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
 
