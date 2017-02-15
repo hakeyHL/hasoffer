@@ -8,6 +8,7 @@ import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.app.AppCacheService;
 import hasoffer.core.app.vo.AppOfferOrderDetailVo;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.dbm.Hibernate4DataBaseManager;
@@ -56,6 +57,8 @@ public class ThirdServiceImpl implements ThirdService {
     @Resource
     IPtmStdPriceService ptmStdPriceService;
     Logger logger = LoggerFactory.getLogger(ThirdServiceImpl.class);
+    @Resource
+    private AppCacheService appCacheService;
 
     public String getDeals(String acceptJson) {
         JSONObject resJson = new JSONObject();
@@ -351,19 +354,22 @@ public class ThirdServiceImpl implements ThirdService {
             //12个小时
             updateTime = new Date(new Date().getTime() - 1000 * 60 * 60 * 12);
         }
-        PageableResult<PtmStdPrice> pagedTopPtmStdPrice = null;
+        PageableResult pagedTopPtmStdPrice = null;
         try {
             pagedTopPtmStdPrice = ptmStdPriceService.getPagedTopPtmStdPrice(page, pageSize, updateTime, commentNumber);
         } catch (NullPointerException e) {
 
         }
         List priceList = new LinkedList();
+        PtmStdPrice ptmStdPrice;
         JSONObject dataJsonObj = new JSONObject();
         if (pagedTopPtmStdPrice != null) {
             dataJsonObj.put("currentPage", pagedTopPtmStdPrice.getCurrentPage());
             dataJsonObj.put("totalPage", pagedTopPtmStdPrice.getTotalPage());
-            for (PtmStdPrice ptmStdPrice : pagedTopPtmStdPrice.getData()) {
+            for (Object stdSkuId : pagedTopPtmStdPrice.getData()) {
                 //来源网站,原价,现价,折扣值,名称,图片,link
+                //从缓存中获取ptmSTDPrice'
+                ptmStdPrice = appCacheService.getPtmStdPrice(Long.parseLong(stdSkuId + ""));
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("id", ptmStdPrice.getId());
                 jsonObject.put("website", ptmStdPrice.getWebsite());

@@ -41,5 +41,5 @@ public interface IPtmStdPriceService {
 
     Long create(PtmStdPrice ptmStdPrice);
 
-    PageableResult<PtmStdPrice> getPagedTopPtmStdPrice(String page, String pageSize, Date updateTime, int commentNumber);
+    PageableResult getPagedTopPtmStdPrice(String page, String pageSize, Date updateTime, int commentNumber);
 }
