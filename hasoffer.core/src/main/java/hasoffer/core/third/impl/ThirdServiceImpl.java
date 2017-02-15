@@ -363,6 +363,7 @@ public class ThirdServiceImpl implements ThirdService {
         List priceList = new LinkedList();
         PtmStdPrice ptmStdPrice;
         JSONObject dataJsonObj = new JSONObject();
+        JSONObject jsonObject;
         if (pagedTopPtmStdPrice != null) {
             dataJsonObj.put("currentPage", pagedTopPtmStdPrice.getCurrentPage());
             dataJsonObj.put("totalPage", pagedTopPtmStdPrice.getTotalPage());
@@ -370,14 +371,16 @@ public class ThirdServiceImpl implements ThirdService {
                 //来源网站,原价,现价,折扣值,名称,图片,link
                 //从缓存中获取ptmSTDPrice'
                 ptmStdPrice = appCacheService.getPtmStdPrice(Long.parseLong(stdSkuId + ""));
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("id", ptmStdPrice.getId());
-                jsonObject.put("website", ptmStdPrice.getWebsite());
-                jsonObject.put("price", ptmStdPrice.getPrice());
-                jsonObject.put("title", ptmStdPrice.getTitle());
-                jsonObject.put("imageUrl", productCacheManager.getPtmStdSkuImageUrl(ptmStdPrice.getStdSkuId()));
-                jsonObject.put("deepLink", WebsiteHelper.getDeeplinkWithAff(ptmStdPrice.getWebsite(), ptmStdPrice.getUrl(), affs));
-                priceList.add(jsonObject);
+                if (ptmStdPrice != null) {
+                    jsonObject = new JSONObject();
+                    jsonObject.put("id", ptmStdPrice.getId());
+                    jsonObject.put("website", ptmStdPrice.getWebsite());
+                    jsonObject.put("price", ptmStdPrice.getPrice());
+                    jsonObject.put("title", ptmStdPrice.getTitle());
+                    jsonObject.put("imageUrl", productCacheManager.getPtmStdSkuImageUrl(ptmStdPrice.getStdSkuId()));
+                    jsonObject.put("deepLink", WebsiteHelper.getDeeplinkWithAff(ptmStdPrice.getWebsite(), ptmStdPrice.getUrl(), affs));
+                    priceList.add(jsonObject);
+                }
             }
         }
         dataJsonObj.put("proList", priceList);
