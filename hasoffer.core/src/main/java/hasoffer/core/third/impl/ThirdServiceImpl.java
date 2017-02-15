@@ -367,10 +367,11 @@ public class ThirdServiceImpl implements ThirdService {
         if (pagedTopPtmStdPrice != null) {
             dataJsonObj.put("currentPage", pagedTopPtmStdPrice.getCurrentPage());
             dataJsonObj.put("totalPage", pagedTopPtmStdPrice.getTotalPage());
-            for (Object stdSkuId : pagedTopPtmStdPrice.getData()) {
+            for (Object stdPriceId : pagedTopPtmStdPrice.getData()) {
                 //来源网站,原价,现价,折扣值,名称,图片,link
                 //从缓存中获取ptmSTDPrice'
-                ptmStdPrice = appCacheService.getPtmStdPrice(Long.parseLong(stdSkuId + ""));
+                String strPriceId = String.valueOf(stdPriceId);
+                ptmStdPrice = appCacheService.getPtmStdPrice(Long.parseLong(strPriceId));
                 if (ptmStdPrice != null) {
                     jsonObject = new JSONObject();
                     jsonObject.put("id", ptmStdPrice.getId());
