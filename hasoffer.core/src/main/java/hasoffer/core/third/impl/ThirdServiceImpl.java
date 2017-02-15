@@ -379,7 +379,7 @@ public class ThirdServiceImpl implements ThirdService {
                     jsonObject.put("website", ptmStdPrice.getWebsite());
                     jsonObject.put("price", ptmStdPrice.getPrice());
                     jsonObject.put("title", ptmStdPrice.getTitle());
-                    jsonObject.put("imageUrl", productCacheManager.getPtmStdSkuImageUrl(ptmStdPrice.getStdSkuId()));
+                    jsonObject.put("imageUrl", productCacheManager.getPtmStdPriceImageUrl(ptmStdPrice));
                     jsonObject.put("deepLink", WebsiteHelper.getDeeplinkWithAff(ptmStdPrice.getWebsite(), ptmStdPrice.getUrl(), affs));
                     priceList.add(jsonObject);
                 }
