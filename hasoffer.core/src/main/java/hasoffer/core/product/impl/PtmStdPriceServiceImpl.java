@@ -35,7 +35,7 @@ import java.util.*;
 public class PtmStdPriceServiceImpl implements IPtmStdPriceService {
     private static final String API_PTMSTDPRICE_GET_PRICELIST_BY_SKUID = "SELECT t  from PtmStdPrice t where t.stdSkuId=?0 and t.skuStatus=?1";
     private static final String API_PTMSTDPRICE_GET_PRICELIST_BY_MINID = "SELECT t  from PtmStdPrice t where t.id >=?0 ";
-    private static final String API_THIRD_NINEAPP_TOPSKUS = "select t  from PtmStdPrice t where t.skuStatus='ONSALE' and t.commentsNumber>?0 and t.updateTime>?1 group by t.stdSkuId order by t.updateTime desc";
+    private static final String API_THIRD_NINEAPP_TOPSKUS = "select t  from PtmStdPrice t where t.skuStatus='ONSALE' and t.commentsNumber>?0 and t.updateTime>?1  order by t.updateTime desc";
 
     @Resource
     IDataBaseManager dbm;
