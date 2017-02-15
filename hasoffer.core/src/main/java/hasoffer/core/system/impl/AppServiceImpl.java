@@ -687,7 +687,7 @@ public class AppServiceImpl implements IAppService {
     @Override
     public List<OrderStatsAnalysisPO> getOrderDetailByAffId(Date startDate, Date endDate, MarketChannel marketChannel) {
 //        affID
-        return dbm.query(API_SQL_GET_ORDERS_BY_AFFID, Arrays.asList(startDate, endDate, marketChannel));
+        return dbm.query(API_SQL_GET_ORDERS_BY_AFFID, Arrays.asList(startDate, endDate, marketChannel.name()));
     }
 
     /**
