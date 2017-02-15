@@ -39,7 +39,7 @@ import java.util.*;
 public class AppServiceImpl implements IAppService {
     static final String API_SQL_GET_APPOFFERST_BY_MARKETCHANNEL_AND_YMD = "select t from AppOfferStatistics t where t.marketChannel=?0 and t.ymd=?1";
     static final String API_SQL_GET_APPOFFERST_BY_MARKETCHANNEL_AND_YMDBT = "select t from AppOfferStatistics t where t.marketChannel=?0 and t.ymd>=?1 and t.ymd<=?2";
-    static final String API_SQL_GET_ORDERS_BY_AFFID = "select t from OrderStatsAnalysisPO t where t.affID=?0 and t.orderStatus='approved' and t.orderTime >=?1 and t.orderTime <=?2";
+    static final String API_SQL_GET_ORDERS_BY_AFFID = "select t from OrderStatsAnalysisPO t where  t.orderStatus='approved' and channelSrc=?2 and t.orderTime >=?0 and t.orderTime <=?1";
 
     private final static Logger loggerIndexUrl = LoggerFactory.getLogger("hasoffer.IndexUrl");
 
@@ -682,14 +682,12 @@ public class AppServiceImpl implements IAppService {
 
     /**
      * 根据联盟id获取订单记录
-     *
-     * @param affId
      * @return
      */
     @Override
-    public List<OrderStatsAnalysisPO> getOrderDetailByAffId(String affId, Date startDate, Date endDate) {
+    public List<OrderStatsAnalysisPO> getOrderDetailByAffId(Date startDate, Date endDate, MarketChannel marketChannel) {
 //        affID
-        return dbm.query(API_SQL_GET_ORDERS_BY_AFFID, Arrays.asList(affId, startDate, endDate));
+        return dbm.query(API_SQL_GET_ORDERS_BY_AFFID, Arrays.asList(startDate, endDate, marketChannel));
     }
 
     /**

@@ -106,7 +106,7 @@ public interface IAppService {
 
     Long recordOfferReturnCount(MarketChannel marketChannel);
 
-    List<OrderStatsAnalysisPO> getOrderDetailByAffId(String affId, Date startDate, Date endDate);
+    List<OrderStatsAnalysisPO> getOrderDetailByAffId(Date startDate, Date endDate, MarketChannel marketChannel);
 
     List<AppOfferStatistics> getOfferClickCountBetDate(Date dateStart, Date dateEnd, MarketChannel marketChannel);
 

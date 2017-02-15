@@ -3,7 +3,6 @@ package hasoffer.api.controller;
 import hasoffer.api.helper.ApiHttpHelper;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.base.enums.MarketChannel;
-import hasoffer.base.utils.AffliIdHelper;
 import hasoffer.core.app.vo.DeviceInfoVo;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.third.impl.ThirdServiceImpl;
@@ -149,11 +148,7 @@ public class OfferController extends BaseController {
             dateStart = dateFrom;
             dateEnd = dateTo;
         }
-        String[] affIds = null;
-        if (deviceInfo != null && deviceInfo.getMarketChannel() != null) {
-            affIds = AffliIdHelper.getAffIdsByChannel(deviceInfo.getMarketChannel());
-        }
-        String orderInfo = thirdService.getOfferOrderInfo(dateStart, dateEnd, affIds, deviceInfo.getMarketChannel());
+        String orderInfo = thirdService.getOfferOrderInfo(dateStart, dateEnd, deviceInfo.getMarketChannel());
         ApiHttpHelper.sendJsonMessage(orderInfo, response);
         return null;
     }

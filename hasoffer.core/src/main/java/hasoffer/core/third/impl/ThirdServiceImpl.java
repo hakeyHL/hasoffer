@@ -265,7 +265,7 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
     @Override
-    public String getOfferOrderInfo(Date dateStart, Date dateEnd, String[] affIds, MarketChannel marketChannel) {
+    public String getOfferOrderInfo(Date dateStart, Date dateEnd, MarketChannel marketChannel) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         JSONObject resultJsonObject = new JSONObject();
         resultJsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
@@ -284,25 +284,22 @@ public class ThirdServiceImpl implements ThirdService {
         //offer的点击总次数
 
         //分析每一天的订单的各个site的订单数
+        List<OrderStatsAnalysisPO> orders = appService.getOrderDetailByAffId(dateStart, dateEnd, marketChannel);
+        for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
+            orderTotal = orderTotal.add(orderStatsAnalysisPO.getSaleAmount());
+            commissionTotal = commissionTotal.add(orderStatsAnalysisPO.getTentativeAmount());
 
-        for (String affId : affIds) {
-            List<OrderStatsAnalysisPO> orders = appService.getOrderDetailByAffId(affId, dateStart, dateEnd);
-            for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
-                orderTotal = orderTotal.add(orderStatsAnalysisPO.getSaleAmount());
-                commissionTotal = commissionTotal.add(orderStatsAnalysisPO.getTentativeAmount());
-
-                String ymd = simpleDateFormat.format(orderStatsAnalysisPO.getOrderTime());
-                //以ymd为key获取vo对象
-                AppOfferOrderDetailVo appOfferOrderDetailVo = appOfferOrderDetailVoMap.get(ymd);
-                if (appOfferOrderDetailVo == null) {
-                    appOfferOrderDetailVo = new AppOfferOrderDetailVo();
-                    appOfferOrderDetailVoMap.put(ymd, appOfferOrderDetailVo);
-                }
-                fillSiteOrderList(orderStatsAnalysisPO, appOfferOrderDetailVo);
-                //算ymd的订单金额和佣金金额
-                appOfferOrderDetailVo.setTotalOrderAmount(appOfferOrderDetailVo.getTotalOrderAmount().add(orderStatsAnalysisPO.getSaleAmount()));
-                appOfferOrderDetailVo.setTotalCommissionAmount(appOfferOrderDetailVo.getTotalCommissionAmount().add(orderStatsAnalysisPO.getTentativeAmount()));
+            String ymd = simpleDateFormat.format(orderStatsAnalysisPO.getOrderTime());
+            //以ymd为key获取vo对象
+            AppOfferOrderDetailVo appOfferOrderDetailVo = appOfferOrderDetailVoMap.get(ymd);
+            if (appOfferOrderDetailVo == null) {
+                appOfferOrderDetailVo = new AppOfferOrderDetailVo();
+                appOfferOrderDetailVoMap.put(ymd, appOfferOrderDetailVo);
             }
+            fillSiteOrderList(orderStatsAnalysisPO, appOfferOrderDetailVo);
+            //算ymd的订单金额和佣金金额
+            appOfferOrderDetailVo.setTotalOrderAmount(appOfferOrderDetailVo.getTotalOrderAmount().add(orderStatsAnalysisPO.getSaleAmount()));
+            appOfferOrderDetailVo.setTotalCommissionAmount(appOfferOrderDetailVo.getTotalCommissionAmount().add(orderStatsAnalysisPO.getTentativeAmount()));
         }
         //请求返回次数,按日期范围查询
         List<AppOfferStatistics> offerRecords = appService.getOfferClickCountBetDate(dateStart, dateEnd, marketChannel);
