@@ -18,7 +18,6 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IOrderStatsAnalysisService;
 import hasoffer.core.admin.impl.DealServiceImpl;
 import hasoffer.core.app.vo.*;
-import hasoffer.core.bo.product.Banners;
 import hasoffer.core.bo.push.*;
 import hasoffer.core.bo.system.SearchCriteria;
 import hasoffer.core.cache.CmpSkuCacheManager;
@@ -366,7 +365,7 @@ public class AppController extends BaseController {
         List banners = new ArrayList();
         List<AppBanner> list = appService.getBanners();
         for (AppBanner appBanner : list) {
-            Banners banner = new Banners();
+            BannerVo banner = new BannerVo();
             banner.setRank(appBanner.getRank());
             banner.setSource(1);
             banner.setSourceUrl(appBanner.getImageUrl() == null ? ConstantUtil.API_DATA_EMPTYSTRING : ImageUtil.getImageUrl(appBanner.getImageUrl()));

@@ -157,4 +157,7 @@ public class OfferController extends BaseController {
         ApiHttpHelper.sendJsonMessage(orderInfo, response);
         return null;
     }
+
+    //还要再写两个接口banner的详情和商品详情
+
 }
