@@ -351,7 +351,12 @@ public class ThirdServiceImpl implements ThirdService {
             //12个小时
             updateTime = new Date(new Date().getTime() - 1000 * 60 * 60 * 12);
         }
-        PageableResult<PtmStdPrice> pagedTopPtmStdPrice = ptmStdPriceService.getPagedTopPtmStdPrice(page, pageSize, updateTime, commentNumber);
+        PageableResult<PtmStdPrice> pagedTopPtmStdPrice = null;
+        try {
+            pagedTopPtmStdPrice = ptmStdPriceService.getPagedTopPtmStdPrice(page, pageSize, updateTime, commentNumber);
+        } catch (NullPointerException e) {
+
+        }
         List priceList = new LinkedList();
         JSONObject dataJsonObj = new JSONObject();
         if (pagedTopPtmStdPrice != null) {
