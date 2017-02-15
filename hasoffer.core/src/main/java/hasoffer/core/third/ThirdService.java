@@ -18,7 +18,7 @@ public interface ThirdService {
 
     String getDealsForGmobi(int page, int pageSize, String... filterProperties);
 
-    String getOfferOrderInfo(Date dateStart, Date dateEnd, String[] affIds, MarketChannel marketChannel);
+    String getOfferOrderInfo(Date dateStart, Date dateEnd, MarketChannel marketChannel);
 
     String getTopSkusForNineApps(String page, String pageSize, Date updateTime, int thumbNumber, String[] affs);
 
