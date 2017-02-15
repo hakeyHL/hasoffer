@@ -357,6 +357,7 @@ public class ThirdServiceImpl implements ThirdService {
         PageableResult pagedTopPtmStdPrice = null;
         try {
             pagedTopPtmStdPrice = ptmStdPriceService.getPagedTopPtmStdPrice(page, pageSize, updateTime, commentNumber);
+            System.out.println("dataSize = " + pagedTopPtmStdPrice.getData().size());
         } catch (NullPointerException e) {
 
         }
