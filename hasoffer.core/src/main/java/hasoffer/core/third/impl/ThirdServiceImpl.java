@@ -12,6 +12,7 @@ import hasoffer.core.app.vo.AppOfferOrderDetailVo;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.dbm.Hibernate4DataBaseManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
+import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppOfferStatistics;
 import hasoffer.core.persistence.po.ptm.PtmStdPrice;
@@ -371,6 +372,21 @@ public class ThirdServiceImpl implements ThirdService {
         dataJsonObj.put("proList", priceList);
         resultJsonObject.put(ConstantUtil.API_NAME_DATA, dataJsonObj);
         return resultJsonObject.toJSONString();
+    }
+
+    @Override
+    public List getBannerForNineApp() {
+        List<AppBanner> banners = appService.getBannersForNineApp().getData();
+        List bList = new LinkedList();
+        for (AppBanner appBanner : banners) {
+            JSONObject bannerJsonObj = new JSONObject();
+            bannerJsonObj.put("rank", appBanner.getRank());
+            bannerJsonObj.put("imageUrl", appBanner.getImageUrl() == null ? ConstantUtil.API_DATA_EMPTYSTRING : ImageUtil.getImageUrl(appBanner.getImageUrl()));
+            bannerJsonObj.put("expireDate", appBanner.getDeadline());
+            bannerJsonObj.put("id", Long.valueOf(appBanner.getSourceId()));
+            bList.add(bannerJsonObj);
+        }
+        return bList;
     }
 
     private void fillSiteOrderList(OrderStatsAnalysisPO orderStatsAnalysisPO, AppOfferOrderDetailVo appOfferOrderDetailVo) {

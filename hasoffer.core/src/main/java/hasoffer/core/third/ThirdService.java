@@ -3,6 +3,7 @@ package hasoffer.core.third;
 import hasoffer.base.enums.MarketChannel;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by hs on 2016/7/4.
@@ -20,4 +21,7 @@ public interface ThirdService {
     String getOfferOrderInfo(Date dateStart, Date dateEnd, String[] affIds, MarketChannel marketChannel);
 
     String getTopSkusForNineApps(String page, String pageSize, Date updateTime, int thumbNumber, String[] affs);
+
+    List getBannerForNineApp();
+
 }

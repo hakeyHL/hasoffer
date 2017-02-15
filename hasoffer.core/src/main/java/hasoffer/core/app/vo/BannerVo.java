@@ -1,4 +1,4 @@
-package hasoffer.core.bo.product;
+package hasoffer.core.app.vo;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -6,7 +6,7 @@ import java.util.Date;
 /**
  * Created by hs on 2016/6/21.
  */
-public class Banners {
+public class BannerVo {
     private  String sourceUrl;
     private  int source;
     private  Long rank;

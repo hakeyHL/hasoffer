@@ -129,6 +129,9 @@ public class AppServiceImpl implements IAppService {
     private static final String Q_APP_GETBANNERS =
             " SELECT t from AppBanner t where t.deadline >=?0 ORDER BY t.id desc";
 
+    private static final String Q_APP_GETBANNERS_NINEAPP =
+            " SELECT t from AppBanner t where t.deadline >=?0 and t.bannerFrom='DEAL' ORDER BY t.createTime desc";
+
     private static final String Q_APP_GEDEALDETAIL =
             " SELECT t from AppDeal t where t.id=?0";
 
@@ -702,6 +705,16 @@ public class AppServiceImpl implements IAppService {
         String startYmd = TimeUtils.parse(dateStart, "yyyyMMdd");
         String endYmd = TimeUtils.parse(dateEnd, "yyyyMMdd");
         return dbm.query(API_SQL_GET_APPOFFERST_BY_MARKETCHANNEL_AND_YMDBT, Arrays.asList(marketChannel, startYmd, endYmd));
+    }
+
+    /**
+     * 获取Banner列表NineApp
+     *
+     * @return
+     */
+    @Override
+    public PageableResult<AppBanner> getBannersForNineApp() {
+        return dbm.queryPage(Q_APP_GETBANNERS_NINEAPP, 1, 5, Arrays.asList(new Date()));
     }
 
     /**

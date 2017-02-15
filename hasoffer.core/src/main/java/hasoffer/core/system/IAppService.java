@@ -110,4 +110,6 @@ public interface IAppService {
 
     List<AppOfferStatistics> getOfferClickCountBetDate(Date dateStart, Date dateEnd, MarketChannel marketChannel);
 
+    PageableResult<AppBanner> getBannersForNineApp();
+
 }
