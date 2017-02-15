@@ -306,6 +306,11 @@ public class PtmStdPriceServiceImpl implements IPtmStdPriceService {
      */
     @Override
     public PageableResult<PtmStdPrice> getPagedTopPtmStdPrice(String page, String pageSize, Date updateTime, int commentNumber) {
+        System.out.println("---------------------------------------------");
+        System.out.println(TimeUtils.parse(updateTime, "yyyyMMdd HH:mm:ss"));
+        System.out.println("comment " + commentNumber);
+        System.out.println(API_THIRD_NINEAPP_TOPSKUS);
+        System.out.println("---------------------------------------------");
         return dbm.queryPage(API_THIRD_NINEAPP_TOPSKUS, Integer.parseInt(page), Integer.parseInt(pageSize), Arrays.asList(commentNumber + 0l, updateTime));
     }
 
