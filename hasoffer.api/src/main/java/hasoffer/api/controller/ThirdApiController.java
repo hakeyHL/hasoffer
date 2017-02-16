@@ -52,15 +52,4 @@ public class ThirdApiController extends BaseController {
         ApiHttpHelper.sendJsonMessage(JSON.toJSONString(resultJsonObj), response);
         return null;
     }
-
-    //获取banner详情
-    @RequestMapping("banners")
-    public String getBannersForNineApp(HttpServletResponse response) {
-        //仅返回5个,最多返回5个
-        //规则为:跳转类型为Deal且未失效,按照创建时间降序返回
-        List dataList = thirdService.listBannerForNineApp();
-        resultJsonObj.put(ConstantUtil.API_NAME_DATA, dataList);
-        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(resultJsonObj), response);
-        return null;
-    }
 }
