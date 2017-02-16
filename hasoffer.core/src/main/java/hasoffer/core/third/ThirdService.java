@@ -10,18 +10,18 @@ import java.util.List;
  */
 
 public interface ThirdService {
-    String getDealsForIndia(int page, int pageSize, String... filterProperties);
+    String listDealsForIndia(int page, int pageSize, String... filterProperties);
 
     String getDealInfo(String id, String marketChannel, String deviceId, String... filterProperties);
 
-    String getDealsForInveno(int page, int pageSize, String... filterProperties);
+    String listDealsForInveno(int page, int pageSize, String... filterProperties);
 
-    String getDealsForGmobi(int page, int pageSize, String... filterProperties);
+    String listDealsForGmobi(int page, int pageSize, String... filterProperties);
 
     String getOfferOrderInfo(Date dateStart, Date dateEnd, MarketChannel marketChannel);
 
-    String getTopSkusForNineApps(String page, String pageSize, Date updateTime, int thumbNumber, String[] affs);
+    String listTopSkusForNineApps(String page, String pageSize, Date updateTime, int thumbNumber, String[] affs);
 
-    List getBannerForNineApp();
+    List listBannerForNineApp();
 
 }

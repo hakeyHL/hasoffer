@@ -127,7 +127,7 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
     @Override
-    public String getDealsForIndia(int page, int pageSize, String... filterProperties) {
+    public String listDealsForIndia(int page, int pageSize, String... filterProperties) {
         Map resultMap = new HashMap();
         Map dataMap = new HashMap();
           /* 返回数据为
@@ -213,7 +213,7 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
     @Override
-    public String getDealsForInveno(int page, int pageSize, String... filterProperties) {
+    public String listDealsForInveno(int page, int pageSize, String... filterProperties) {
         Map resultMap = new HashMap();
         Map dataMap = new HashMap();
         resultMap.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
@@ -239,7 +239,7 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
     @Override
-    public String getDealsForGmobi(int page, int pageSize, String... filterProperties) {
+    public String listDealsForGmobi(int page, int pageSize, String... filterProperties) {
         Map resultMap = new HashMap();
         Map dataMap = new HashMap();
         resultMap.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
@@ -339,7 +339,7 @@ public class ThirdServiceImpl implements ThirdService {
      * @return
      */
     @Override
-    public String getTopSkusForNineApps(String page, String pageSize, Date updateTime, int commentNumber, String[] affs) {
+    public String listTopSkusForNineApps(String page, String pageSize, Date updateTime, int commentNumber, String[] affs) {
         //从91mobile的sku中筛选状态是onsale , 评论数值大于1000,最近价格更新时间12小时以内按照更新时间降序返回
         JSONObject resultJsonObject = new JSONObject();
         resultJsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
@@ -388,7 +388,7 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
     @Override
-    public List getBannerForNineApp() {
+    public List listBannerForNineApp() {
         List<AppBanner> banners = appService.getBannersForNineApp().getData();
         List bList = new LinkedList();
         for (AppBanner appBanner : banners) {

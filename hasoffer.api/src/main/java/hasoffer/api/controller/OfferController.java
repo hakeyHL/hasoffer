@@ -42,7 +42,7 @@ public class OfferController extends BaseController {
     public String config(@RequestParam(defaultValue = "1") int page,
                          @RequestParam(defaultValue = "10") int pageSize,
                          HttpServletResponse response) {
-        String result = thirdService.getDealsForGmobi(page, pageSize, new String[]{"discount", "category"});
+        String result = thirdService.listDealsForGmobi(page, pageSize, new String[]{"discount", "category"});
         //增加返回次数
         appService.recordOfferReturnCount(ClientHelper.getDeviceInfo().getMarketChannel());
         ApiHttpHelper.sendJsonMessage(result, response);
@@ -59,7 +59,7 @@ public class OfferController extends BaseController {
     public String getDealsForIndia(@RequestParam(defaultValue = "1") int page,
                                    @RequestParam(defaultValue = "10") int pageSize,
                                    HttpServletResponse response) {
-        String dealsForIndia = thirdService.getDealsForIndia(page, pageSize, "originPrice", "presentPrice");
+        String dealsForIndia = thirdService.listDealsForIndia(page, pageSize, "originPrice", "presentPrice");
         ApiHttpHelper.sendJsonMessage(dealsForIndia, response);
         return null;
     }
@@ -106,7 +106,7 @@ public class OfferController extends BaseController {
     public String getDealsForMexico(@RequestParam(defaultValue = "1") int page,
                                     @RequestParam(defaultValue = "10") int pageSize,
                                     HttpServletResponse response) {
-        String dealsForMexico = thirdService.getDealsForInveno(page, pageSize, new String[]{"discount", "originPrice", "presentPrice"});
+        String dealsForMexico = thirdService.listDealsForInveno(page, pageSize, new String[]{"discount", "originPrice", "presentPrice"});
         ApiHttpHelper.sendJsonMessage(dealsForMexico, response);
         return null;
     }
@@ -152,7 +152,4 @@ public class OfferController extends BaseController {
         ApiHttpHelper.sendJsonMessage(orderInfo, response);
         return null;
     }
-
-    //还要再写两个接口banner的详情和商品详情
-
 }
