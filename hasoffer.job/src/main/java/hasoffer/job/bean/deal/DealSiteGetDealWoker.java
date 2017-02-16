@@ -151,7 +151,6 @@ public class DealSiteGetDealWoker implements Runnable {
         appdeal.setInfoPageImage(dealBigPath);
         appdeal.setListPageImage(dealSmallPath);
         return appdeal;
-
     }
 
     public AppDeal getDesidimeDeal(FetchedDealInfo fetchedDealInfo) {
