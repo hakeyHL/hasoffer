@@ -37,20 +37,30 @@ public class ThirdApiController extends BaseController {
                                        @RequestParam(defaultValue = "10") String pageSize,
                                        HttpServletResponse response) {
         DeviceInfoVo deviceInfo = ClientHelper.getDeviceInfo();
-        String topSkus = thirdService.getTopSkusForNineApps(page, pageSize, null, 0, new String[]{deviceInfo.getMarketChannel().name(), ClientHelper.getAndroidId()});
+        String topSkus = thirdService.listTopSkusForNineApps(page, pageSize, null, 0, new String[]{deviceInfo.getMarketChannel().name(), ClientHelper.getAndroidId()});
         ApiHttpHelper.sendJsonMessage(topSkus, response);
         return null;
     }
 
     //将点击跳转类型为deal且当前时间在生效与失效日期之间的Banner按照创建时间降序返回
     @RequestMapping("banners")
-    public String getBannersForNineApp(HttpServletResponse response) {
+    public String listBannersForNineApp(HttpServletResponse response) {
         //仅返回5个,最多返回5个
         //规则为:跳转类型为Deal且未失效,按照创建时间降序返回
-        List dataList = thirdService.getBannerForNineApp();
+        List dataList = thirdService.listBannerForNineApp();
         resultJsonObj.put(ConstantUtil.API_NAME_DATA, dataList);
         ApiHttpHelper.sendJsonMessage(JSON.toJSONString(resultJsonObj), response);
         return null;
     }
 
+    //获取banner详情
+    @RequestMapping("banners")
+    public String getBannersForNineApp(HttpServletResponse response) {
+        //仅返回5个,最多返回5个
+        //规则为:跳转类型为Deal且未失效,按照创建时间降序返回
+        List dataList = thirdService.listBannerForNineApp();
+        resultJsonObj.put(ConstantUtil.API_NAME_DATA, dataList);
+        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(resultJsonObj), response);
+        return null;
+    }
 }
