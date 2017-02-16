@@ -132,9 +132,6 @@ public class DealSiteGetDealWoker implements Runnable {
         } else {
             appdeal.setPriceDescription(fetchedDealInfo.getPriceString());
         }
-
-<<<<<<< HEAD
-=======
         String dealPath = "";
         String dealBigPath = "";
         String dealSmallPath = "";
@@ -153,8 +150,6 @@ public class DealSiteGetDealWoker implements Runnable {
         appdeal.setImageUrl(dealPath);
         appdeal.setInfoPageImage(dealBigPath);
         appdeal.setListPageImage(dealSmallPath);
-
->>>>>>> dev
         return appdeal;
 
     }
