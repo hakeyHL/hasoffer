@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.exception.ContentParseException;
 import hasoffer.base.exception.HttpFetchException;
+import hasoffer.base.exception.ImageDownloadException;
 import hasoffer.base.model.HttpResponseModel;
 import hasoffer.base.utils.HtmlUtils;
 import hasoffer.base.utils.StringUtils;
@@ -14,6 +15,7 @@ import hasoffer.core.persistence.po.ptm.PtmCmpSku;
 import hasoffer.core.persistence.po.ptm.PtmImage2;
 import hasoffer.core.persistence.po.ptm.PtmProduct;
 import hasoffer.core.utils.Httphelper;
+import hasoffer.core.utils.ImageUtil;
 import org.apache.commons.io.FileUtils;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
@@ -38,6 +40,15 @@ public class HttpTest {
     public static final String WEBSITE_91MOBILE_URL_PREFIEX = "http://www.91mobiles.com";
     public static final String WEBSITE_MYSMARTPRICE_URL_PREFIEX = "https://www.mysmartprice.com";
     public static final String WEBSITE_DX_URL_PREFIEX = "http://www.dx.com/";
+
+    @Test
+    public void imageDownload() throws ImageDownloadException {
+
+        String url = "http://assets.mysmartprice.com/t_d-desktop-single,f_auto/d/243719.jpg";
+        File file = ImageUtil.downloadImage(url);
+        System.out.println(file);
+
+    }
 
     @Test
     public void testWuXiaWorld() throws Exception {
