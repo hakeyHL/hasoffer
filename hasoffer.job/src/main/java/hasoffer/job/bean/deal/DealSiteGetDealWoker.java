@@ -7,6 +7,7 @@ import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.admin.IDealService;
 import hasoffer.core.persistence.enums.AppdealSource;
 import hasoffer.core.persistence.po.app.AppDeal;
+import hasoffer.core.utils.ImageUtil;
 import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.spider.model.FetchDealResult;
@@ -14,6 +15,7 @@ import hasoffer.spider.model.FetchedDealInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -131,24 +133,24 @@ public class DealSiteGetDealWoker implements Runnable {
             appdeal.setPriceDescription(fetchedDealInfo.getPriceString());
         }
 
-//        String dealPath = "";
-//        String dealBigPath = "";
-//        String dealSmallPath = "";
-//
-//        try {
-//            File imageFile = ImageUtil.downloadImage(fetchedDealInfo.getImageUrl());
-//
-//            dealPath = ImageUtil.uploadImage(imageFile);
-//            dealBigPath = ImageUtil.uploadImage(imageFile, 316, 180);
-//            dealSmallPath = ImageUtil.uploadImage(imageFile, 180, 180);
-//        } catch (Exception e) {
-//            logger.info("check get priceoff deal image download error");
-//            return null;
-//        }
-//
-//        appdeal.setImageUrl(dealPath);
-//        appdeal.setInfoPageImage(dealBigPath);
-//        appdeal.setListPageImage(dealSmallPath);
+        String dealPath = "";
+        String dealBigPath = "";
+        String dealSmallPath = "";
+
+        try {
+            File imageFile = ImageUtil.downloadImage(fetchedDealInfo.getImageUrl().replaceAll("https","http"));
+
+            dealPath = ImageUtil.uploadImage(imageFile);
+            dealBigPath = ImageUtil.uploadImage(imageFile, 316, 180);
+            dealSmallPath = ImageUtil.uploadImage(imageFile, 180, 180);
+        } catch (Exception e) {
+            logger.info("check get priceoff deal image download error");
+            return null;
+        }
+
+        appdeal.setImageUrl(dealPath);
+        appdeal.setInfoPageImage(dealBigPath);
+        appdeal.setListPageImage(dealSmallPath);
 
         return appdeal;
 
