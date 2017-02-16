@@ -1,15 +1,11 @@
 package hasoffer.api.controller;
 
-import hasoffer.core.product.solr.ProductModel2;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.CommonParams;
 import org.hibernate.annotations.common.util.impl.LoggerFactory;
 import org.jboss.logging.Logger;
@@ -20,10 +16,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Date : 2016/5/17
@@ -118,7 +110,7 @@ public class FeedbackController {
         }
     }
 
-    private static List<ProductModel2> convert(SolrDocumentList results) {
+  /*  private static List<ProductModel2> convert(SolrDocumentList results) {
         List<ProductModel2> list = new ArrayList<ProductModel2>();
         Iterator<SolrDocument> iter = results.iterator();
         while (iter.hasNext()) {
@@ -134,9 +126,9 @@ public class FeedbackController {
             }
         }
         return list;
-    }
+    }*/
 
-    public void solrAddDoc(SolrInputDocument solrInputDocument) {
+   /* public void solrAddDoc(SolrInputDocument solrInputDocument) {
         try {
             UpdateResponse add = httpSolrServer.add(solrInputDocument);
             System.out.println(add.getStatus());
@@ -162,7 +154,7 @@ public class FeedbackController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     @RequestMapping(method = RequestMethod.POST)
     public ModelAndView feedback(HttpServletRequest request) {

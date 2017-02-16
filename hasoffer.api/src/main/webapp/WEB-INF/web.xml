@@ -41,10 +41,10 @@
         <listener-class>hasoffer.webcommon.listener.ServerSessionListener</listener-class>
     </listener>
 
-    <listener>
-        <display-name>web_listener</display-name>
-        <listener-class>hasoffer.api.listener.ApplicationListener</listener-class>
-    </listener>
+    <!-- <listener>
+         <display-name>web_listener</display-name>
+         <listener-class>hasoffer.api.listener.ApplicationListener</listener-class>
+     </listener>-->
 
     <filter>
         <description>ExceptionFilter</description>

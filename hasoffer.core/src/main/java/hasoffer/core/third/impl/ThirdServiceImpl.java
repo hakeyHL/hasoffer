@@ -8,12 +8,16 @@ import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.TimeUtils;
+import hasoffer.core.app.AppCacheService;
 import hasoffer.core.app.vo.AppOfferOrderDetailVo;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.dbm.Hibernate4DataBaseManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
+import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppOfferStatistics;
+import hasoffer.core.persistence.po.ptm.PtmStdPrice;
+import hasoffer.core.product.IPtmStdPriceService;
 import hasoffer.core.product.impl.CmpSkuServiceImpl;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.third.ThirdService;
@@ -50,7 +54,11 @@ public class ThirdServiceImpl implements ThirdService {
     IAppService appService;
     @Resource
     ApiUtils apiUtils;
+    @Resource
+    IPtmStdPriceService ptmStdPriceService;
     Logger logger = LoggerFactory.getLogger(ThirdServiceImpl.class);
+    @Resource
+    private AppCacheService appCacheService;
 
     public String getDeals(String acceptJson) {
         JSONObject resJson = new JSONObject();
@@ -75,7 +83,7 @@ public class ThirdServiceImpl implements ThirdService {
             resJson.put(ConstantUtil.API_NAME_MSG, "can't parse your createTime " + jsonObject.getString(str_createTime) + "  , because it is not the pattern as yyyyMMddHHmmss ");
             return resJson.toJSONString();
         }
-        JSONArray sites = null;
+        JSONArray sites;
         try {
             sites = jsonObject.getJSONArray("sites");
         } catch (Exception e) {
@@ -119,7 +127,7 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
     @Override
-    public String getDealsForIndia(int page, int pageSize, String... filterProperties) {
+    public String listDealsForIndia(int page, int pageSize, String... filterProperties) {
         Map resultMap = new HashMap();
         Map dataMap = new HashMap();
           /* 返回数据为
@@ -159,6 +167,7 @@ public class ThirdServiceImpl implements ThirdService {
         dealJson.put(str_createTime, TimeUtils.getDifference2Date(new Date(), appDeal.getCreateTime()));
         dealJson.put("presentPrice", appDeal.getPresentPrice() == null ? 0 : appDeal.getPresentPrice());
         dealJson.put("originPrice", appDeal.getOriginPrice() == null ? 0 : appDeal.getOriginPrice());
+        dealJson.put("couponCode", appDeal.getCouponCode() == null ? ConstantUtil.API_DATA_EMPTYSTRING : appDeal.getCouponCode());
     }
 
     @Override
@@ -204,7 +213,7 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
     @Override
-    public String getDealsForInveno(int page, int pageSize, String... filterProperties) {
+    public String listDealsForInveno(int page, int pageSize, String... filterProperties) {
         Map resultMap = new HashMap();
         Map dataMap = new HashMap();
         resultMap.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
@@ -230,7 +239,7 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
     @Override
-    public String getDealsForGmobi(int page, int pageSize, String... filterProperties) {
+    public String listDealsForGmobi(int page, int pageSize, String... filterProperties) {
         Map resultMap = new HashMap();
         Map dataMap = new HashMap();
         resultMap.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
@@ -256,7 +265,7 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
     @Override
-    public String getOfferOrderInfo(Date dateStart, Date dateEnd, String[] affIds, MarketChannel marketChannel) {
+    public String getOfferOrderInfo(Date dateStart, Date dateEnd, MarketChannel marketChannel) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         JSONObject resultJsonObject = new JSONObject();
         resultJsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
@@ -275,25 +284,22 @@ public class ThirdServiceImpl implements ThirdService {
         //offer的点击总次数
 
         //分析每一天的订单的各个site的订单数
+        List<OrderStatsAnalysisPO> orders = appService.getOrderDetailByAffId(dateStart, dateEnd, marketChannel);
+        for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
+            orderTotal = orderTotal.add(orderStatsAnalysisPO.getSaleAmount());
+            commissionTotal = commissionTotal.add(orderStatsAnalysisPO.getTentativeAmount());
 
-        for (String affId : affIds) {
-            List<OrderStatsAnalysisPO> orders = appService.getOrderDetailByAffId(affId, dateStart, dateEnd);
-            for (OrderStatsAnalysisPO orderStatsAnalysisPO : orders) {
-                orderTotal = orderTotal.add(orderStatsAnalysisPO.getSaleAmount());
-                commissionTotal = commissionTotal.add(orderStatsAnalysisPO.getTentativeAmount());
-
-                String ymd = simpleDateFormat.format(orderStatsAnalysisPO.getOrderTime());
-                //以ymd为key获取vo对象
-                AppOfferOrderDetailVo appOfferOrderDetailVo = appOfferOrderDetailVoMap.get(ymd);
-                if (appOfferOrderDetailVo == null) {
-                    appOfferOrderDetailVo = new AppOfferOrderDetailVo();
-                    appOfferOrderDetailVoMap.put(ymd, appOfferOrderDetailVo);
-                }
-                fillSiteOrderList(orderStatsAnalysisPO, appOfferOrderDetailVo);
-                //算ymd的订单金额和佣金金额
-                appOfferOrderDetailVo.setTotalOrderAmount(appOfferOrderDetailVo.getTotalOrderAmount().add(orderStatsAnalysisPO.getSaleAmount()));
-                appOfferOrderDetailVo.setTotalCommissionAmount(appOfferOrderDetailVo.getTotalCommissionAmount().add(orderStatsAnalysisPO.getTentativeAmount()));
+            String ymd = simpleDateFormat.format(orderStatsAnalysisPO.getOrderTime());
+            //以ymd为key获取vo对象
+            AppOfferOrderDetailVo appOfferOrderDetailVo = appOfferOrderDetailVoMap.get(ymd);
+            if (appOfferOrderDetailVo == null) {
+                appOfferOrderDetailVo = new AppOfferOrderDetailVo();
+                appOfferOrderDetailVoMap.put(ymd, appOfferOrderDetailVo);
             }
+            fillSiteOrderList(orderStatsAnalysisPO, appOfferOrderDetailVo);
+            //算ymd的订单金额和佣金金额
+            appOfferOrderDetailVo.setTotalOrderAmount(appOfferOrderDetailVo.getTotalOrderAmount().add(orderStatsAnalysisPO.getSaleAmount()));
+            appOfferOrderDetailVo.setTotalCommissionAmount(appOfferOrderDetailVo.getTotalCommissionAmount().add(orderStatsAnalysisPO.getTentativeAmount()));
         }
         //请求返回次数,按日期范围查询
         List<AppOfferStatistics> offerRecords = appService.getOfferClickCountBetDate(dateStart, dateEnd, marketChannel);
@@ -323,6 +329,77 @@ public class ThirdServiceImpl implements ThirdService {
         }
         resultJsonObject.put(ConstantUtil.API_NAME_DATA, appOfferOrderDetailVoMap);
         return resultJsonObject.toJSONString();
+    }
+
+    /**
+     * 获取热卖商品列表
+     *
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public String listTopSkusForNineApps(String page, String pageSize, Date updateTime, int commentNumber, String[] affs) {
+        //从91mobile的sku中筛选状态是onsale , 评论数值大于1000,最近价格更新时间12小时以内按照更新时间降序返回
+        JSONObject resultJsonObject = new JSONObject();
+        resultJsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        resultJsonObject.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
+        if (commentNumber == 0) {
+            commentNumber = 1000;
+        }
+        if (updateTime == null) {
+            //12个小时
+            updateTime = new Date(new Date().getTime() - 1000 * 60 * 60 * 12);
+        }
+        PageableResult pagedTopPtmStdPrice = null;
+        try {
+            pagedTopPtmStdPrice = ptmStdPriceService.getPagedTopPtmStdPrice(page, pageSize, updateTime, commentNumber);
+            System.out.println("dataSize = " + pagedTopPtmStdPrice.getData().size());
+        } catch (NullPointerException e) {
+
+        }
+        List priceList = new LinkedList();
+        PtmStdPrice ptmStdPrice;
+        JSONObject dataJsonObj = new JSONObject();
+        JSONObject jsonObject;
+        if (pagedTopPtmStdPrice != null) {
+            dataJsonObj.put("currentPage", pagedTopPtmStdPrice.getCurrentPage());
+            dataJsonObj.put("totalPage", pagedTopPtmStdPrice.getTotalPage());
+            for (Object stdPriceId : pagedTopPtmStdPrice.getData()) {
+                //来源网站,原价,现价,折扣值,名称,图片,link
+                //从缓存中获取ptmSTDPrice'
+                String strPriceId = String.valueOf(stdPriceId);
+                ptmStdPrice = appCacheService.getPtmStdPrice(Long.parseLong(strPriceId));
+                if (ptmStdPrice != null) {
+                    jsonObject = new JSONObject();
+                    jsonObject.put("id", ptmStdPrice.getId());
+                    jsonObject.put("website", ptmStdPrice.getWebsite());
+                    jsonObject.put("price", ptmStdPrice.getPrice());
+                    jsonObject.put("title", ptmStdPrice.getTitle());
+                    jsonObject.put("imageUrl", productCacheManager.getPtmStdPriceImageUrl(ptmStdPrice));
+                    jsonObject.put("deepLink", WebsiteHelper.getDeeplinkWithAff(ptmStdPrice.getWebsite(), ptmStdPrice.getUrl(), affs));
+                    priceList.add(jsonObject);
+                }
+            }
+        }
+        dataJsonObj.put("proList", priceList);
+        resultJsonObject.put(ConstantUtil.API_NAME_DATA, dataJsonObj);
+        return resultJsonObject.toJSONString();
+    }
+
+    @Override
+    public List listBannerForNineApp() {
+        List<AppBanner> banners = appService.getBannersForNineApp().getData();
+        List bList = new LinkedList();
+        for (AppBanner appBanner : banners) {
+            JSONObject bannerJsonObj = new JSONObject();
+            bannerJsonObj.put("rank", appBanner.getRank());
+            bannerJsonObj.put("imageUrl", appBanner.getImageUrl() == null ? ConstantUtil.API_DATA_EMPTYSTRING : ImageUtil.getImageUrl(appBanner.getImageUrl()));
+            bannerJsonObj.put("expireDate", appBanner.getDeadline());
+            bannerJsonObj.put("id", Long.valueOf(appBanner.getSourceId()));
+            bList.add(bannerJsonObj);
+        }
+        return bList;
     }
 
     private void fillSiteOrderList(OrderStatsAnalysisPO orderStatsAnalysisPO, AppOfferOrderDetailVo appOfferOrderDetailVo) {

@@ -2,7 +2,6 @@ package hasoffer.api.interceptor;
 
 import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
-import hasoffer.api.worker.DeviceRequestQueue;
 import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.utils.DeviceUtils;
 import hasoffer.base.utils.TimeUtils;
@@ -74,9 +73,9 @@ public class RequestInterceptor implements HandlerInterceptor {
 
             recordClientEvent(requestVo, httpServletRequest);
 
-            if (!requestUri.equals("/app/config")) {
-                DeviceRequestQueue.addLog(requestVo);
-            }
+//            if (!requestUri.equals("/app/config")) {
+//                DeviceRequestQueue.addLog(requestVo);
+//            }
 //            System.out.println("RequestInterceptor.time1=" + System.currentTimeMillis());
 //            addLogToDB(requestVo.getBo());
 //            System.out.println("RequestInterceptor.time2=" + System.currentTimeMillis());

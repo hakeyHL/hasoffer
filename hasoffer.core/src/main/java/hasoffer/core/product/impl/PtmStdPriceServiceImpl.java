@@ -19,8 +19,6 @@ import hasoffer.core.product.solr.PtmStdPriceIndexServiceImpl;
 import hasoffer.core.product.solr.PtmStdPriceModel;
 import hasoffer.core.utils.ConstantUtil;
 import hasoffer.spider.model.FetchedProduct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,14 +33,14 @@ import java.util.*;
 public class PtmStdPriceServiceImpl implements IPtmStdPriceService {
     private static final String API_PTMSTDPRICE_GET_PRICELIST_BY_SKUID = "SELECT t  from PtmStdPrice t where t.stdSkuId=?0 and t.skuStatus=?1";
     private static final String API_PTMSTDPRICE_GET_PRICELIST_BY_MINID = "SELECT t  from PtmStdPrice t where t.id >=?0 ";
+    private static final String API_THIRD_NINEAPP_TOPSKUS = "select id  from PtmStdPrice t where t.skuStatus='ONSALE' and t.commentsNumber>?0 and t.updateTime>?1  order by t.updateTime desc";
+
     @Resource
     IDataBaseManager dbm;
     @Resource
     IMongoDbManager mdm;
     @Resource
     PtmStdPriceIndexServiceImpl ptmStdPriceIndexService;
-    private Logger logger = LoggerFactory.getLogger(PtmStdPriceServiceImpl.class);
-
     @Override
     public List<PtmStdPrice> getPtmStdPriceList(Long id, SkuStatus skuStatus) {
         return dbm.query(API_PTMSTDPRICE_GET_PRICELIST_BY_SKUID, Arrays.asList(id, skuStatus));
@@ -293,6 +291,19 @@ public class PtmStdPriceServiceImpl implements IPtmStdPriceService {
     @Override
     public Long create(PtmStdPrice ptmStdPrice) {
         return dbm.create(ptmStdPrice);
+    }
+
+    /**
+     * 获取热卖sku列表
+     *
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public PageableResult getPagedTopPtmStdPrice(String page, String pageSize, Date updateTime, int commentNumber) {
+        PageableResult objectPageableResult = dbm.queryPage(API_THIRD_NINEAPP_TOPSKUS, Integer.parseInt(page), Integer.parseInt(pageSize), Arrays.asList(commentNumber + 0l, updateTime));
+        return objectPageableResult;
     }
 
     public void saveHistoryPrice(long id, Date time, float price) {

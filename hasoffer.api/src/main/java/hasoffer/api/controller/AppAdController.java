@@ -31,7 +31,7 @@ import java.util.*;
 @Controller
 @RequestMapping("ad")
 public class AppAdController {
-    static Map<Website, String> packageMap = new HashMap<Website, String>();
+    static Map<Website, String> packageMap = new HashMap<>();
 
     static {
         packageMap.put(Website.SNAPDEAL, "com.snapdeal.main");
@@ -49,36 +49,6 @@ public class AppAdController {
     Logger logger = LoggerFactory.getLogger(AppAdController.class);
     @Resource
     AdvertiseService advertiseService;
-
-    public static void main(String[] args) {
-        System.out.println("1");
-       /* try {
-            Sender sender = new Sender("AIzaSyCZrHjOkZ57j3Dvq_TpvYW8Mt38Ej1dzQA");
-            String userMessage = "{\n" +
-                    "    \"display\": {\n" +
-                    "        \"outTitle\": \" Sony 16GB USB Pen Drive  , 25% OFF at Rs.270.Hurry up! \",\n" +
-                    "        \"title\": \"Sony 16GB USB Pen Drive \",\n" +
-                    "        \"content\": \"25% OFF at Rs.270.Hurry up!\n \"\n" +
-                    "    },\n" +
-                    "    \"click\": {\n" +
-                    "        \"type\": \"DEAL\",\n" +
-                    "        \"url\": \"99000238\",\n" +
-                    "        \"packageName\": \"com.flipkart.android\"\n" +
-                    "    }\n" +
-                    "}";
-            Message message = new Message.Builder().timeToLive(30).delayWhileIdle(true).addData("message", userMessage).build();
-            MulticastResult result = sender.send(message, Arrays.asList("cWkpvtsRBd4:APA91bFxIK8S3M_ZRzkEBrm6fx2aSk183GdG4nF5U9CkuBpxp4mlyoKYISI1uqbs-H8r-_oHiLdrrnYVgcviUf4T-J9G4HxtLnWbD2whRAaqBoos-I8jp48Ye6z0cJ0rXk6MAARZMVaH", "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd"), 1);
-            System.out.println(result.toString());
-//            Result result = sender.sendNoRetry(message, "cWkpvtsRBd4:APA91bFxIK8S3M_ZRzkEBrm6fx2aSk183GdG4nF5U9CkuBpxp4mlyoKYISI1uqbs-H8r-_oHiLdrrnYVgcviUf4T-J9G4HxtLnWbD2whRAaqBoos-I8jp48Ye6z0cJ0rXk6MAARZMVaH");
-//            String errorCodeName = result.getErrorCodeName();
-//            System.out.println(errorCodeName);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            System.out.println(" get exception ");
-            System.out.println(e.getMessage());
-        }*/
-    }
-
     @RequestMapping("product")
     public ModelAndView getAdsByProductId(@RequestParam(defaultValue = "0") Long productId) {
         ModelAndView modelAndView = new ModelAndView();
@@ -131,7 +101,6 @@ public class AppAdController {
         try {
             result = sender.send(message, "e1lvEUbO4wc:APA91bHBsxTiXXSo3SQdvPB7tTqWrGIbez2H3yyqr1y6gTfohYAB98HjYICFK35c4_UwScQwI0J7m634r_Qzdo1bRtvHf71ZjcUHytDH4VPmwCfdlEu62ErQMfX4fYXcWlxUNQILqbkd", 2);
             String errorCodeName = result.getErrorCodeName();
-            System.out.println(errorCodeName);
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }

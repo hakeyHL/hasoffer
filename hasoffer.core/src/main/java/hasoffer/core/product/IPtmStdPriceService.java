@@ -5,6 +5,7 @@ import hasoffer.base.model.SkuStatus;
 import hasoffer.core.persistence.po.ptm.PtmStdPrice;
 import hasoffer.spider.model.FetchedProduct;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,4 +40,6 @@ public interface IPtmStdPriceService {
     void update(PtmStdPrice ptmStdPrice);
 
     Long create(PtmStdPrice ptmStdPrice);
+
+    PageableResult getPagedTopPtmStdPrice(String page, String pageSize, Date updateTime, int commentNumber);
 }

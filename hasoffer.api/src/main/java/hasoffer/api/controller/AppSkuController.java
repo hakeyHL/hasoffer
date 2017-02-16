@@ -2,8 +2,8 @@ package hasoffer.api.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import hasoffer.api.helper.ApiHttpHelper;
 import hasoffer.api.helper.ClientHelper;
-import hasoffer.api.helper.Httphelper;
 import hasoffer.api.helper.JsonHelper;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
@@ -46,6 +46,7 @@ import java.util.*;
 @Controller
 @RequestMapping("sku")
 public class AppSkuController {
+    private static final String STRING_IMAGES = "images";
     @Resource
     ICmpSkuService cmpSkuService;
     @Resource
@@ -85,18 +86,6 @@ public class AppSkuController {
         }
         return li;
     }
-
-    public static void main(String[] args) {
-        Long tempDateL = 1472608486682l - 1472452044987l;
-        System.out.println(BigDecimal.valueOf(tempDateL).divide(BigDecimal.valueOf(60 * 60 * 1000 * 24), BigDecimal.ROUND_HALF_UP).longValue());
-//        Date date1 = new Date();
-//        date1.setTime(1472452044987l);
-//        Date date2 = new Date();
-//        date2.setTime(1472608486682l);
-//        String dateMMdd = AppSkuController.getDateMMdd(new Date().getTime());
-//        System.out.println(dateMMdd);
-    }
-
     //计算当前x距离x轴起始点的距离
     public static int getDistance2X(Long priceX, Long wait2Consolve) {
         Long tempDateL = wait2Consolve - priceX;
@@ -128,7 +117,7 @@ public class AppSkuController {
         if (id <= 0) {
             jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             jsonObject.put(ConstantUtil.API_NAME_MSG, "id le zero ");
-            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
         Map map = new HashMap<>();
@@ -147,13 +136,13 @@ public class AppSkuController {
                 iamgeStringList.add(ImageUtil.getImageUrl(ptmStdImage.getSmallImagePath()));
             }
             if (skuImages != null && skuImages.size() > 0) {
-                map.put("images", iamgeStringList);
+                map.put(STRING_IMAGES, iamgeStringList);
             } else {
                 List<PtmStdImage> stdPriceImageByPriceId = ptmStdImageService.getStdSkuImageBySkuId(ptmStdPriceById.getStdSkuId());
                 if (stdPriceImageByPriceId != null) {
                     String imageUrl = ImageUtil.getImageUrl(stdPriceImageByPriceId.get(0).getSmallImagePath());
                     if (org.apache.commons.lang3.StringUtils.isNotEmpty(imageUrl)) {
-                        map.put("images", Arrays.asList(imageUrl));
+                        map.put(STRING_IMAGES, Arrays.asList(imageUrl));
                     }
                 }
             }
@@ -174,15 +163,15 @@ public class AppSkuController {
                 }
                 List<PtmCmpSkuImage> ptmCmpSkuImages = ptmCmpSkuImageService.findPtmCmpSkuImages(ptmCmpSku.getId());
                 if (ptmCmpSkuImages != null && ptmCmpSkuImages.size() > 0) {
-                    map.put("images", getImageArray(ptmCmpSkuImages));
+                    map.put(STRING_IMAGES, getImageArray(ptmCmpSkuImages));
                 } else {
-                    map.put("images", Arrays.asList(ptmCmpSku.getBigImagePath() == null ? ConstantUtil.API_DATA_EMPTYSTRING : ImageUtil.getImageUrl(ptmCmpSku.getBigImagePath())));
+                    map.put(STRING_IMAGES, Arrays.asList(ptmCmpSku.getBigImagePath() == null ? ConstantUtil.API_DATA_EMPTYSTRING : ImageUtil.getImageUrl(ptmCmpSku.getBigImagePath())));
                 }
             }
         }
         map.put("distribution", 5);
         jsonObject.put(ConstantUtil.API_NAME_DATA, JSONObject.toJSON(map));
-        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
 
@@ -203,7 +192,7 @@ public class AppSkuController {
         if (id <= 0) {
             jsonObject.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             jsonObject.put(ConstantUtil.API_NAME_MSG, "id ls zero ");
-            Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+            ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
             return null;
         }
         if (ApiUtils.removeBillion(id) > 0) {
@@ -277,18 +266,18 @@ public class AppSkuController {
                 PriceCurveVo priceCurveVo = getPriceCurveVo(priceNodes, false);
                 priceCurveVo.setDistanceX2X(20);
                 jsonObject.put(ConstantUtil.API_NAME_DATA, JSONObject.toJSON(priceCurveVo));
-                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             } else {
                 PriceCurveVo priceCurveVo = getPriceCurveVo(priceNodes, true);
                 priceCurveVo.setDistanceX2X(20);
                 jsonObject.put(ConstantUtil.API_NAME_DATA, JSONObject.toJSON(priceCurveVo));
-                Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+                ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
                 return null;
             }
 
         }
-        Httphelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
+        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(jsonObject), response);
         return null;
     }
 
