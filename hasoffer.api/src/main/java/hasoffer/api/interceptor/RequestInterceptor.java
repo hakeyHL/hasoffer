@@ -82,12 +82,14 @@ public class RequestInterceptor implements HandlerInterceptor {
             Context.currentContext().set(Context.DEVICE_INFO, deviceInfoVo);
 
             //比价的设备 setContext
-            String deviceId = DeviceUtils.getDeviceId(deviceInfoVo.getDeviceId(), deviceInfoVo.getImeiId(), deviceInfoVo.getSerial());
-            Context.currentContext().set(StaticContext.DEVICE_ID, deviceId);
+            if (deviceInfoVo != null && deviceInfoVo.getImeiId() != null && deviceInfoVo.getDeviceId() == null) {
+                String deviceId = DeviceUtils.getDeviceId(deviceInfoVo.getDeviceId(), deviceInfoVo.getImeiId(), deviceInfoVo.getSerial());
+                Context.currentContext().set(StaticContext.DEVICE_ID, deviceId);
+            }
 
             if (!StringUtils.isEmpty(userToken) && !"null".equalsIgnoreCase(userToken)) {
                 Context.currentContext().set(StaticContext.USER_TOKEN, userToken);
-                UrmUser user = null;
+                UrmUser user;
                 String key = "user_" + userToken;
                 user = userICacheService.get(UrmUser.class, key, 0);
                 if (user == null) {
