@@ -37,7 +37,7 @@ public class DealSiteSendRquestJobBean extends QuartzJobBean {
         logger.info("DealSiteFetchDealJobBean is run at {}", new Date());
 
         fetchDubboService.sendDealTask(Website.MYSMARTPRICE, TaskLevel.LEVEL_2);
-        fetchDubboService.sendDealTask(Website.DESIDIME, TaskLevel.LEVEL_3);
+//        fetchDubboService.sendDealTask(Website.DESIDIME, TaskLevel.LEVEL_3);
 
         logger.info("DealSiteFetchDealJobBean send request success will stop at {}", new Date());
 
