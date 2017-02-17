@@ -374,6 +374,10 @@ public class ThirdServiceImpl implements ThirdService {
                 //来源网站,原价,现价,折扣值,名称,图片,link
                 //从缓存中获取ptmSTDPrice'
                 String strPriceId = String.valueOf(stdPriceId);
+                PtmStdSkuDetail ptmStdSkuDetail = mongoDbManager.queryOne(PtmStdSkuDetail.class, stdPriceId);
+                if (ptmStdSkuDetail == null || ptmStdSkuDetail.getParamGroups() == null) {
+                    continue;
+                }
                 ptmStdPrice = appCacheService.getPtmStdPrice(Long.parseLong(strPriceId));
                 if (ptmStdPrice != null) {
                     jsonObject = new JSONObject();
