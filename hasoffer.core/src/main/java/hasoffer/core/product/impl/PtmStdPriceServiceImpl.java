@@ -41,6 +41,7 @@ public class PtmStdPriceServiceImpl implements IPtmStdPriceService {
     IMongoDbManager mdm;
     @Resource
     PtmStdPriceIndexServiceImpl ptmStdPriceIndexService;
+
     @Override
     public List<PtmStdPrice> getPtmStdPriceList(Long id, SkuStatus skuStatus) {
         return dbm.query(API_PTMSTDPRICE_GET_PRICELIST_BY_SKUID, Arrays.asList(id, skuStatus));
@@ -180,6 +181,10 @@ public class PtmStdPriceServiceImpl implements IPtmStdPriceService {
 //            }
         }
 
+        if (ptmStdPrice.getOriPrice() != fetchedProduct.getOriPrice() && fetchedProduct.getOriPrice() != 0.0f && fetchedProduct.getOriPrice() > fetchedProduct.getPrice()) {
+            ptmStdPriceUpdater.getPo().setOriPrice(fetchedProduct.getOriPrice());
+        }
+
         if (ptmStdPrice.getWebsite() == null) {
             Website website = fetchedProduct.getWebsite();
             if (website != null) {
@@ -205,7 +210,6 @@ public class PtmStdPriceServiceImpl implements IPtmStdPriceService {
 //        ptmCmpSkuUpdater.getPo().setDeliveryTime(deliveryTime);
 
         dbm.update(ptmStdPriceUpdater);
-
     }
 
     @Override

@@ -23,6 +23,8 @@ public class PtmStdPrice implements Identifiable<Long> {
     private String title;// 带商品的color，size属性的
 
     private float price; // 价格
+    private float oriPrice;//sku的原价
+
     private long stockCount; // 库存
     private float shippingFee; //运费
 
@@ -192,6 +194,14 @@ public class PtmStdPrice implements Identifiable<Long> {
         this.ratings = ratings;
     }
 
+    public float getOriPrice() {
+        return oriPrice;
+    }
+
+    public void setOriPrice(float oriPrice) {
+        this.oriPrice = oriPrice;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -201,6 +211,7 @@ public class PtmStdPrice implements Identifiable<Long> {
 
         if (stdSkuId != that.stdSkuId) return false;
         if (Float.compare(that.price, price) != 0) return false;
+        if (Float.compare(that.oriPrice, oriPrice) != 0) return false;
         if (stockCount != that.stockCount) return false;
         if (Float.compare(that.shippingFee, shippingFee) != 0) return false;
         if (commentsNumber != that.commentsNumber) return false;
@@ -222,6 +233,7 @@ public class PtmStdPrice implements Identifiable<Long> {
         result = 31 * result + (int) (stdSkuId ^ (stdSkuId >>> 32));
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (price != +0.0f ? Float.floatToIntBits(price) : 0);
+        result = 31 * result + (oriPrice != +0.0f ? Float.floatToIntBits(oriPrice) : 0);
         result = 31 * result + (int) (stockCount ^ (stockCount >>> 32));
         result = 31 * result + (shippingFee != +0.0f ? Float.floatToIntBits(shippingFee) : 0);
         result = 31 * result + (skuStatus != null ? skuStatus.hashCode() : 0);
@@ -233,5 +245,26 @@ public class PtmStdPrice implements Identifiable<Long> {
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "PtmStdPrice{" +
+                "commentsNumber=" + commentsNumber +
+                ", id=" + id +
+                ", stdSkuId=" + stdSkuId +
+                ", title='" + title + '\'' +
+                ", price=" + price +
+                ", oriPrice=" + oriPrice +
+                ", stockCount=" + stockCount +
+                ", shippingFee=" + shippingFee +
+                ", skuStatus=" + skuStatus +
+                ", website=" + website +
+                ", url='" + url + '\'' +
+                ", urlKey='" + urlKey + '\'' +
+                ", ratings=" + ratings +
+                ", updateTime=" + updateTime +
+                ", createTime=" + createTime +
+                '}';
     }
 }
