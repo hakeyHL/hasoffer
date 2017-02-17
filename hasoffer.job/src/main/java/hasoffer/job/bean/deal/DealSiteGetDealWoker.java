@@ -112,7 +112,7 @@ public class DealSiteGetDealWoker implements Runnable {
         appdeal.setAppdealSource(AppdealSource.DEAL_SITE);
         appdeal.setCreateTime(TimeUtils.nowDate());
         appdeal.setExpireTime(fetchedDealInfo.getExpireTime());
-//        appdeal.setDisplay(true);
+        appdeal.setDisplay(true);
         appdeal.setDisplay(false);
         appdeal.setLinkUrl(fetchedDealInfo.getLink());
         appdeal.setOriLinkUrl(fetchedDealInfo.getOriLink());
