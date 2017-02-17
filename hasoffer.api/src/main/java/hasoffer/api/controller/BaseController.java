@@ -43,4 +43,18 @@ public abstract class BaseController {
     JSONObject getJsonDataObj() {
         return (JSONObject) resultJsonObj.get(ConstantUtil.API_NAME_DATA);
     }
+
+    void initErrorCodeAndMsgSuccess() {
+        resultJsonObj.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        resultJsonObj.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
+        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
+    }
+
+    void initErrorCodeAndMsgFailed() {
+        resultJsonObj.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+        resultJsonObj.put(ConstantUtil.API_NAME_DATA, null);
+        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+        modelAndView.addObject(ConstantUtil.API_NAME_DATA, null);
+    }
 }

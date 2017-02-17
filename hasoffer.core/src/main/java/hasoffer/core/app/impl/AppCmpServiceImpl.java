@@ -105,7 +105,7 @@ public class AppCmpServiceImpl implements AppCmpService {
                     //计算列表中最大价格
                     for (PtmStdPrice ptmStdPrice : pagedPtmStdPriceList.getData()) {
                         CmpProductListVo productListVo = new CmpProductListVo(WebsiteHelper.getLogoUrl(Website.valueOf(sio.getStdPriceWebSite())),
-                                productCacheManager.getPtmStdPriceImageUrl(ptmStdPrice),
+                                productCacheManager.getPtmStdPriceImageUrl(ptmStdPrice, false),
                                 ptmStdPrice, sio.getCliPrice());
                         productListVo.setDeepLink(WebsiteHelper.getDeeplinkWithAff(ptmStdPrice.getWebsite(), ptmStdPrice.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()}));
                         cmpProductListVoList.add(productListVo);
