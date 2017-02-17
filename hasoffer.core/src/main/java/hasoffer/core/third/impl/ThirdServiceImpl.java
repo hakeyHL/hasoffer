@@ -427,7 +427,7 @@ public class ThirdServiceImpl implements ThirdService {
             jsonObject.put("price", ptmStdPrice.getPrice());
             if (ptmStdPrice.getOriPrice() > 0) {
                 jsonObject.put("originPrice", ptmStdPrice.getOriPrice());
-                jsonObject.put("discount", ptmStdPrice.getOriPrice() <= 0 ? 0 : BigDecimal.valueOf(ptmStdPrice.getPrice()).divide(BigDecimal.valueOf(ptmStdPrice.getOriPrice()), BigDecimal.ROUND_HALF_UP));
+                jsonObject.put("discount", BigDecimal.valueOf(100).subtract(BigDecimal.valueOf(ptmStdPrice.getPrice()).divide(BigDecimal.valueOf(ptmStdPrice.getOriPrice()), 2, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(100))));
             }
             jsonObject.put("title", ptmStdPrice.getTitle());
             jsonObject.put("imageUrl", productCacheManager.getPtmStdPriceImageUrl(ptmStdPrice, true));
