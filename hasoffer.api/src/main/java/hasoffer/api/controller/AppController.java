@@ -44,8 +44,6 @@ import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.helper.WebsiteHelper;
 import hasoffer.fetch.sites.shopclues.ShopcluesHelper;
 import hasoffer.spider.model.FetchedProductReview;
-import hasoffer.webcommon.context.Context;
-import hasoffer.webcommon.context.StaticContext;
 import jodd.util.NameValue;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -150,8 +148,9 @@ public class AppController extends BaseController {
         String action = request.getParameter(STRING_ACTION);
         if ("rediToAffiliateUrl".equals(action)) {
             try {
-                String deviceId = ClientHelper.getAndroidId();
                 DeviceInfoVo deviceInfo = ClientHelper.getDeviceInfo();
+                String deviceId = ClientHelper.getAndroidId();
+//                String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
                 cmpSkuCacheManager.recordFlowControll(deviceId, deviceInfo.getCurShopApp());
             } catch (Exception e) {
                 logger.debug(e.getMessage());
@@ -447,7 +446,7 @@ public class AppController extends BaseController {
         String lastTimeUserToken = request.getHeader("oldUserToken");
         String userToken = UUID.randomUUID().toString();
         String deviceId = ClientHelper.getAndroidId();
-        //String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+//        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
 //        System.out.println(" get deviceId is : " + deviceId);
         //1. 根据deviceId获得device 的id列表
         List<String> ids = appService.getUserDevices(deviceId);
@@ -784,6 +783,7 @@ public class AppController extends BaseController {
         modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         DeviceInfoVo deviceInfoVo = ClientHelper.getDeviceInfo();
         String deviceId = ClientHelper.getAndroidId();
+//        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
         MarketChannel marketChannel = MarketChannel.NONE;
         if (deviceInfoVo != null) {
             marketChannel = deviceInfoVo.getMarketChannel();
@@ -1041,7 +1041,8 @@ public class AppController extends BaseController {
                                     "4. Rewards is not payable if you return any part of your order. Unfortunately even if you exchange any part of your order, Rewards for the full order will be Cancelled\n" +
                                     "5  Do not visit any other price comparison, coupon or deal site in between clicking-out from Hasoffer & ordering on retailer site.");
                         }
-                        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+//                        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+                        String deviceId = ClientHelper.getAndroidId();
                         DeviceInfoVo deviceInfo = ClientHelper.getDeviceInfo();
                         String s = appDeal.getLinkUrl() == null ? ConstantUtil.API_DATA_EMPTYSTRING : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{deviceInfo.getMarketChannel().name(), deviceId});
                         logger.info(" dealInfo record deal deepLink :" + s);
