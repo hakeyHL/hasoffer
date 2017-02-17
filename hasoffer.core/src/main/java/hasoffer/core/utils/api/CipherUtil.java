@@ -20,7 +20,7 @@ public class CipherUtil {
 
     static {
         channelDefaultKeyMap.put(MarketChannel.GMOBI, "HRGI");
-        channelDefaultKeyMap.put(MarketChannel.GMOBI_B, "HRGI_B");
+        channelDefaultKeyMap.put(MarketChannel.GMOBI_B, "HRGI");
     }
 
     public static String encryptWithSHA256(String content) {
@@ -68,5 +68,11 @@ public class CipherUtil {
             isRight = true;
         }
         return isRight;
+    }
+
+    public static void main(String[] args) {
+        String key = "GMOBI_B20170217093521HRGI";
+        String s = encryptWithSHA256(key);
+        System.out.println(s);
     }
 }
