@@ -421,9 +421,11 @@ public class ThirdServiceImpl implements ThirdService {
             jsonObject.put("id", ptmStdPrice.getId());
             jsonObject.put("website", ptmStdPrice.getWebsite());
             jsonObject.put("price", ptmStdPrice.getPrice());
-            jsonObject.put("originPrice", ptmStdPrice.getOriPrice() == 0 ? ptmStdPrice.getPrice() : ptmStdPrice.getOriPrice());
+            if (ptmStdPrice.getOriPrice() > 0) {
+                jsonObject.put("originPrice", ptmStdPrice.getOriPrice());
+                jsonObject.put("discount", ptmStdPrice.getOriPrice() <= 0 ? 0 : BigDecimal.valueOf(ptmStdPrice.getPrice()).divide(BigDecimal.valueOf(ptmStdPrice.getOriPrice()), BigDecimal.ROUND_HALF_UP));
+            }
             jsonObject.put("title", ptmStdPrice.getTitle());
-            jsonObject.put("discount", ptmStdPrice.getOriPrice() <= 0 ? 0 : BigDecimal.valueOf(ptmStdPrice.getPrice()).divide(BigDecimal.valueOf(ptmStdPrice.getOriPrice()), BigDecimal.ROUND_HALF_UP));
             jsonObject.put("imageUrl", productCacheManager.getPtmStdPriceImageUrl(ptmStdPrice, true));
             PtmStdSkuDetail ptmStdSkuDetail = mongoDbManager.queryOne(PtmStdSkuDetail.class, stdPriceId);
             Map<String, String> specsMap = new HashMap();

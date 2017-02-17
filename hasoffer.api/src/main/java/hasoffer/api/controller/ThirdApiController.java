@@ -51,7 +51,6 @@ public class ThirdApiController extends BaseController {
         //仅返回5个,最多返回5个
         //规则为:跳转类型为Deal且未失效,按照创建时间降序返回
         List dataList = thirdService.listBannerForNineApp();
-        initErrorCodeAndMsgSuccess();
         resultJsonObj.put(ConstantUtil.API_NAME_DATA, dataList);
         ApiHttpHelper.sendJsonMessage(JSON.toJSONString(resultJsonObj), response);
         return null;
@@ -72,7 +71,6 @@ public class ThirdApiController extends BaseController {
             return null;
         }
         JSONObject dataJsonObj = thirdService.getPtmStdPriceInfo(Long.parseLong(id));
-        initErrorCodeAndMsgSuccess();
         resultJsonObj.put(ConstantUtil.API_NAME_DATA, dataJsonObj);
         ApiHttpHelper.sendJsonMessage(JSON.toJSONString(resultJsonObj), response);
         return null;
