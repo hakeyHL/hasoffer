@@ -150,8 +150,9 @@ public class AppController extends BaseController {
         String action = request.getParameter(STRING_ACTION);
         if ("rediToAffiliateUrl".equals(action)) {
             try {
-                String deviceId = ClientHelper.getAndroidId();
                 DeviceInfoVo deviceInfo = ClientHelper.getDeviceInfo();
+//                String deviceId = ClientHelper.getAndroidId();
+                String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
                 cmpSkuCacheManager.recordFlowControll(deviceId, deviceInfo.getCurShopApp());
             } catch (Exception e) {
                 logger.debug(e.getMessage());
@@ -446,8 +447,8 @@ public class AppController extends BaseController {
 
         String lastTimeUserToken = request.getHeader("oldUserToken");
         String userToken = UUID.randomUUID().toString();
-        String deviceId = ClientHelper.getAndroidId();
-        //String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+//        String deviceId = ClientHelper.getAndroidId();
+        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
 //        System.out.println(" get deviceId is : " + deviceId);
         //1. 根据deviceId获得device 的id列表
         List<String> ids = appService.getUserDevices(deviceId);
@@ -783,7 +784,8 @@ public class AppController extends BaseController {
         modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
         modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
         DeviceInfoVo deviceInfoVo = ClientHelper.getDeviceInfo();
-        String deviceId = ClientHelper.getAndroidId();
+//        String deviceId = ClientHelper.getAndroidId();
+        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
         MarketChannel marketChannel = MarketChannel.NONE;
         if (deviceInfoVo != null) {
             marketChannel = deviceInfoVo.getMarketChannel();

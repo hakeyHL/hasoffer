@@ -132,11 +132,12 @@ public class Compare2Controller {
                                    @RequestParam(defaultValue = "0") String price,
                                    @RequestParam(defaultValue = "1") int page,
                                    @RequestParam(defaultValue = "10") int size) {
-        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+//        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+        String deviceId = ClientHelper.getAndroidId();
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
 
         SearchIO sio = new SearchIO(sourceId, q, brand, site, price, deviceInfo.getMarketChannel(), deviceId, page, size);
-        CmpResult cr = null;
+        CmpResult cr;
 
         PtmCmpSkuIndex2 cmpSkuIndex = null;
 
@@ -209,7 +210,8 @@ public class Compare2Controller {
         5.3 有则查询和处理比价列表返回*/
 
         //初始化sio对象
-        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+//        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+        String deviceId = ClientHelper.getAndroidId();
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
 
         if (!StringUtils.isEmpty(price)) {
@@ -305,7 +307,8 @@ public class Compare2Controller {
         CmpResult cr = new CmpResult();
         SearchIO sio = null;
         PtmProduct product = null;
-        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+//        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+        String deviceId = ClientHelper.getAndroidId();
         DeviceInfoVo deviceInfo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
         PtmStdSku ptmStdSku = null;
         if ((id).length() >= 10) {
@@ -579,7 +582,7 @@ public class Compare2Controller {
                     currentDeeplink = WebsiteHelper.getDeeplinkWithAff(cmpSku.getWebsite(), cmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
                 }*/
             } else if (clientCmpSku != null & !cmpSkuCacheManager.isFlowControlled(sio.getDeviceId(), sio.getCliSite()) && hasoffer.base.utils.StringUtils.isEqual(clientCmpSku.getSkuTitle(), sio.getCliQ()) && clientCmpSku.getPrice() == cliPrice) {
-                    currentDeeplink = WebsiteHelper.getDeeplinkWithAff(clientCmpSku.getWebsite(), clientCmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
+                currentDeeplink = WebsiteHelper.getDeeplinkWithAff(clientCmpSku.getWebsite(), clientCmpSku.getUrl(), new String[]{sio.getMarketChannel().name(), sio.getDeviceId()});
             }
         } catch (Exception e) {
             // logger.error(e.getMessage());
