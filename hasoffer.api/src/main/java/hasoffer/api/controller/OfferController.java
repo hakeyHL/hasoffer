@@ -68,7 +68,7 @@ public class OfferController extends BaseController {
     public String getDealsForIndia(@PathVariable("id") String id,
                                    HttpServletResponse response) {
         if (StringUtils.isEmpty(id) || !StringUtils.isNumericSpace(id)) {
-            resultJsonObj.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+            initErrorCodeAndMsgFailed();
             resultJsonObj.put(ConstantUtil.API_NAME_MSG, "id is empty");
             ApiHttpHelper.sendJsonMessage(resultJsonObj.toJSONString(), response);
             return null;
@@ -133,7 +133,7 @@ public class OfferController extends BaseController {
         DeviceInfoVo deviceInfo = ClientHelper.getDeviceInfo();
         boolean accessed = CipherUtil.validationWithSHA256(deviceInfo.getMarketChannel(), key, timestamp);
         if (!accessed) {
-            resultJsonObj.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+            initErrorCodeAndMsgFailed();
             resultJsonObj.put(ConstantUtil.API_NAME_MSG, "request refused.");
             ApiHttpHelper.sendJsonMessage(resultJsonObj.toJSONString(), response);
             return null;

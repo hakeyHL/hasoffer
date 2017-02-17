@@ -1,5 +1,6 @@
 package hasoffer.core.third;
 
+import com.alibaba.fastjson.JSONObject;
 import hasoffer.base.enums.MarketChannel;
 
 import java.util.Date;
@@ -24,4 +25,5 @@ public interface ThirdService {
 
     List listBannerForNineApp();
 
+    JSONObject getPtmStdPriceInfo(long stdPriceId);
 }
