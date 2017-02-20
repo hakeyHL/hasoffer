@@ -887,10 +887,6 @@ public class AppController extends BaseController {
                                 "com.yatra.base", "com.android.contacts", "com.mobile.indiapp"
                         ));
                 modelAndView.addObject(ConstantUtil.API_NAME_DATA, downloadConfigVo);
-
-                //显式内存释放
-                apps.clear();
-                downloadConfigVo = null;
                 break;
             case COMADD:
                 Map nMap = new HashMap();
