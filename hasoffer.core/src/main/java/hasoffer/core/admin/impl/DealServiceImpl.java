@@ -26,6 +26,8 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.util.TempFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,6 +44,8 @@ import java.util.*;
 @Service
 @Transactional
 public class DealServiceImpl implements IDealService {
+
+    private static final Logger logger = LoggerFactory.getLogger(DealServiceImpl.class);
 
     private static final long EXPIRE_TIME_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -212,6 +216,16 @@ public class DealServiceImpl implements IDealService {
     @Transactional(rollbackFor = Exception.class)
     public AppDeal createAppDealByPriceOff(AppDeal appDeal) {
 
+        if (appDeal == null || appDeal.getLinkUrl() == null || "".equals(appDeal.getLinkUrl())) {
+            return null;
+        }
+
+        AppDeal appDealTemp = dbm.querySingle("SELECT t FROM AppDeal t WHERE t.linkUrl = ?0 ", Arrays.asList(appDeal.getLinkUrl()));
+        if (appDealTemp != null) {
+            logger.info("The deal info is already exists. Link Url:{}", appDeal.getLinkUrl());
+            return appDealTemp;
+        }
+        logger.info("The deal info will create. Link Url:{}", appDeal.getLinkUrl());
         Long aLong = dbm.create(appDeal);
         appDeal.setId(aLong);
 
