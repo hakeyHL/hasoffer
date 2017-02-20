@@ -228,8 +228,8 @@ public class DealServiceImpl implements IDealService {
     }
 
     @Override
-    public AppDeal getDealByLinkUrl(String url) {
-        return dbm.querySingle("SELECT t FROM AppDeal t WHERE t.linkUrl = ?0 ", Arrays.asList(url));
+    public List<AppDeal> getDealByLinkUrl(String url) {
+        return dbm.query("SELECT t FROM AppDeal t WHERE t.linkUrl = ?0", Arrays.asList(url));
     }
 
     @Override

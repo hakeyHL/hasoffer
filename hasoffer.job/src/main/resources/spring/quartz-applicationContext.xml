@@ -108,7 +108,7 @@
 
     <bean id="dealSiteFetchTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="dealSiteFetch"/>
-        <property name="cronExpression" value="0 33 0/1 * * ?"/>
+        <property name="cronExpression" value="0 0/10 * * * ?"/>
     </bean>
 
     <!-- MOBILE91评论数据抓取-->
