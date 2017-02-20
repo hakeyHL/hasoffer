@@ -82,6 +82,15 @@ public class DealSiteGetDealWoker implements Runnable {
                             }
 
                             if (deal != null) {
+                                if ( deal.getLinkUrl() == null || "".equals(deal.getLinkUrl())) {
+                                    return;
+                                }
+
+                                AppDeal appDealTemp = dealService.getDealByLinkUrl(deal.getLinkUrl());
+                                if (appDealTemp != null) {
+                                    logger.info("The deal info is already exists. Link Url:{}", deal.getLinkUrl());
+                                    return;
+                                }
                                 dealService.createAppDealByPriceOff(deal);
                             }
                         }

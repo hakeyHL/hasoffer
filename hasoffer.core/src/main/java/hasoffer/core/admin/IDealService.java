@@ -31,6 +31,8 @@ public interface IDealService {
 
     AppDeal getDealById(Long dealId);
 
+    AppDeal getDealByLinkUrl(String url);
+
     AppDeal getDealBySourceId(Long skuId);
 
     AppBanner getBannerByDealId(Long dealId);

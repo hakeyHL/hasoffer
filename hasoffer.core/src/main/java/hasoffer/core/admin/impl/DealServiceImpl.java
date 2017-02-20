@@ -215,16 +215,6 @@ public class DealServiceImpl implements IDealService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public AppDeal createAppDealByPriceOff(AppDeal appDeal) {
-
-        if (appDeal == null || appDeal.getLinkUrl() == null || "".equals(appDeal.getLinkUrl())) {
-            return null;
-        }
-
-        AppDeal appDealTemp = dbm.querySingle("SELECT t FROM AppDeal t WHERE t.linkUrl = ?0 ", Arrays.asList(appDeal.getLinkUrl()));
-        if (appDealTemp != null) {
-            logger.info("The deal info is already exists. Link Url:{}", appDeal.getLinkUrl());
-            return appDealTemp;
-        }
         logger.info("The deal info will create. Link Url:{}", appDeal.getLinkUrl());
         Long aLong = dbm.create(appDeal);
         appDeal.setId(aLong);
@@ -235,6 +225,11 @@ public class DealServiceImpl implements IDealService {
     @Override
     public AppDeal getDealById(Long dealId) {
         return dbm.get(AppDeal.class, dealId);
+    }
+
+    @Override
+    public AppDeal getDealByLinkUrl(String url) {
+        return dbm.querySingle("SELECT t FROM AppDeal t WHERE t.linkUrl = ?0 ", Arrays.asList(url));
     }
 
     @Override
