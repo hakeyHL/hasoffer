@@ -8,6 +8,7 @@ import hasoffer.core.persistence.po.app.AppDealThumb;
 import hasoffer.core.product.solr.DealModel;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -30,6 +31,8 @@ public interface IDealService {
     AppDeal createAppDealByPriceOff(AppDeal appDeal);
 
     AppDeal getDealById(Long dealId);
+
+    List<AppDeal> getDealByLinkUrl(String url);
 
     AppDeal getDealBySourceId(Long skuId);
 
