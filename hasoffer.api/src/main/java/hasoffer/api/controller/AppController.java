@@ -124,7 +124,6 @@ public class AppController extends BaseController {
         modelAndView.addObject("test", configVo);
         modelAndView.addObject("cooperations", acs);
         modelAndView.addObject("noSelfJump", noSelfJump);
-
         return modelAndView;
     }
 
@@ -177,6 +176,7 @@ public class AppController extends BaseController {
                 }
             }
         }
+        initErrorCodeAndMsgSuccess();
         getDataMap().put("gList", gifts == null ? null : gifts);
         return modelAndView;
     }
@@ -188,6 +188,7 @@ public class AppController extends BaseController {
         modelAndView.addObject(Website.FLIPKART.name(), AffliIdHelper.getAffiIdByWebsite(Website.FLIPKART, MarketChannel.VC));
         modelAndView.addObject(Website.SNAPDEAL.name(), AffliIdHelper.getAffiIdByWebsite(Website.SNAPDEAL, MarketChannel.VC));
         modelAndView.addObject(Website.SHOPCLUES.name(), ShopcluesHelper.SHOPCLUES_URL);
+        initErrorCodeAndMsgSuccess();
         return modelAndView;
     }
 
@@ -215,14 +216,14 @@ public class AppController extends BaseController {
                         appWebsite.getAppPackage(), WebsiteHelper.getLogoUrl(appWebsite.getWebsite())));
             }
         }
-
+        initErrorCodeAndMsgSuccess();
         modelAndView.addObject("sites", vos);
         return modelAndView;
     }
 
     @RequestMapping(value = "/latest", method = RequestMethod.GET)
     public ModelAndView latest() {
-
+        initErrorCodeAndMsgSuccess();
         AppType appType = null;
 
         DeviceInfoVo deviceInfoVo = ClientHelper.getDeviceInfo();
@@ -243,6 +244,7 @@ public class AppController extends BaseController {
 
     @RequestMapping(value = "/accessinfo", method = RequestMethod.GET)
     public ModelAndView accessinfo() {
+        initErrorCodeAndMsgSuccess();
         modelAndView.addObject("searchLogs", SearchLogQueue.getCount());
         return modelAndView;
     }
@@ -250,6 +252,7 @@ public class AppController extends BaseController {
     @RequestMapping(value = "/backDetail", method = RequestMethod.GET)
     public ModelAndView backDetail() {
         //若用户未登录显示为已连续签到0
+        initErrorCodeAndMsgSuccess();
         BackDetailVo data = new BackDetailVo();
         UrmUser user = apiHelperService.getCurrentUser();
         // 获取基本配置
@@ -372,6 +375,7 @@ public class AppController extends BaseController {
             banner.setDealId(Long.valueOf(appBanner.getSourceId()));
             banners.add(banner);
         }
+        initErrorCodeAndMsgSuccess();
         getDataMap().put("banners", banners);
         return modelAndView;
     }
@@ -417,6 +421,7 @@ public class AppController extends BaseController {
         getDataMap().put("page", Result.getPageSize());
         getDataMap().put("pageSize", Result.getPageSize());
         getDataMap().put("totalPage", Result.getTotalPage());
+        initErrorCodeAndMsgSuccess();
         return modelAndView;
     }
 
@@ -430,6 +435,7 @@ public class AppController extends BaseController {
     @RequestMapping(value = "/dealInfo", method = RequestMethod.GET)
     public ModelAndView getdealInfo(@RequestParam String id) {
         //临时按照appVersion区分返回描述
+        initErrorCodeAndMsgSuccess();
         return getDealInfoMethod(id, modelAndView);
     }
 
@@ -442,7 +448,7 @@ public class AppController extends BaseController {
     public String bindUserInfo(UserVo userVO,
                                HttpServletRequest request,
                                HttpServletResponse response) {
-
+        initErrorCodeAndMsgSuccess();
         String lastTimeUserToken = request.getHeader("oldUserToken");
         String userToken = UUID.randomUUID().toString();
         String deviceId = ClientHelper.getAndroidId();
@@ -535,6 +541,7 @@ public class AppController extends BaseController {
     @DataSource(value = DataSourceType.Slave)
     @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
     public ModelAndView userInfo() {
+        initErrorCodeAndMsgSuccess();
         BigDecimal coins = BigDecimal.ZERO;
         UrmUser user = apiHelperService.getCurrentUser();
         boolean addFlag = false;
@@ -577,6 +584,7 @@ public class AppController extends BaseController {
     @DataSource(value = DataSourceType.Slave)
     @RequestMapping(value = "/productsList")
     public ModelAndView productsList(SearchCriteria criteria, @RequestParam(defaultValue = "4") int type) {
+        initErrorCodeAndMsgSuccess();
         long l = System.currentTimeMillis();
         System.out.println(Thread.currentThread().getName() + " :  criteria : " + criteria.toString());
         List li = new ArrayList();
@@ -703,6 +711,7 @@ public class AppController extends BaseController {
                                     String marketChannel,
                                     String outline,
                                     String packageName, String type, String id, int number) {
+        initErrorCodeAndMsgSuccess();
         try {
             List<String> gcmTokens = new ArrayList<>();
             AppPushMessage message = new AppPushMessage(
@@ -735,6 +744,7 @@ public class AppController extends BaseController {
     //搜索词提示
     @RequestMapping(value = "candidateKeyword", method = RequestMethod.GET)
     public ModelAndView getSearchKeyWordsTip(@RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String keyWord) {
+        initErrorCodeAndMsgSuccess();
         List<String> spellcheck = productService.spellcheck(keyWord);
         int size = spellcheck.size() > 2 ? 3 : spellcheck.size();
         getDataMap().put("words", spellcheck.subList(0, size));
@@ -748,6 +758,7 @@ public class AppController extends BaseController {
      */
     @RequestMapping(value = "getParamMeaning", method = RequestMethod.GET)
     public ModelAndView getParamMeaning(@RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String param) {
+        initErrorCodeAndMsgSuccess();
         if (StringUtils.isEmpty(param)) {
             modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
             modelAndView.addObject(ConstantUtil.API_NAME_MSG, "param can not be empty ");
@@ -779,8 +790,7 @@ public class AppController extends BaseController {
     }
 
     private ModelAndView callBackMethod(HttpServletRequest request, @RequestParam CallbackAction action) {
-        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
-        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
+        initErrorCodeAndMsgSuccess();
         DeviceInfoVo deviceInfoVo = ClientHelper.getDeviceInfo();
         String deviceId = ClientHelper.getAndroidId();
 //        String deviceId = (String) Context.currentContext().get(StaticContext.DEVICE_ID);
@@ -877,10 +887,6 @@ public class AppController extends BaseController {
                                 "com.yatra.base", "com.android.contacts", "com.mobile.indiapp"
                         ));
                 modelAndView.addObject(ConstantUtil.API_NAME_DATA, downloadConfigVo);
-
-                //显式内存释放
-                apps.clear();
-                downloadConfigVo = null;
                 break;
             case COMADD:
                 Map nMap = new HashMap();

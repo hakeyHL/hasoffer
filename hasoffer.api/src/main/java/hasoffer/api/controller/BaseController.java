@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import hasoffer.core.utils.ConstantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.HashMap;
@@ -42,5 +43,20 @@ public abstract class BaseController {
 
     JSONObject getJsonDataObj() {
         return (JSONObject) resultJsonObj.get(ConstantUtil.API_NAME_DATA);
+    }
+
+    @ModelAttribute
+    void initErrorCodeAndMsgSuccess() {
+        resultJsonObj.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        resultJsonObj.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
+        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
+        modelAndView.addObject(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
+    }
+
+    void initErrorCodeAndMsgFailed() {
+        resultJsonObj.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+        resultJsonObj.put(ConstantUtil.API_NAME_DATA, null);
+        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+        modelAndView.addObject(ConstantUtil.API_NAME_DATA, null);
     }
 }

@@ -12,11 +12,13 @@ import hasoffer.core.app.AppCacheService;
 import hasoffer.core.app.vo.AppOfferOrderDetailVo;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.persistence.dbm.Hibernate4DataBaseManager;
+import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
 import hasoffer.core.persistence.po.admin.OrderStatsAnalysisPO;
 import hasoffer.core.persistence.po.app.AppBanner;
 import hasoffer.core.persistence.po.app.AppDeal;
 import hasoffer.core.persistence.po.app.AppOfferStatistics;
 import hasoffer.core.persistence.po.ptm.PtmStdPrice;
+import hasoffer.core.persistence.po.ptm.PtmStdSkuDetail;
 import hasoffer.core.product.IPtmStdPriceService;
 import hasoffer.core.product.impl.CmpSkuServiceImpl;
 import hasoffer.core.system.IAppService;
@@ -56,6 +58,9 @@ public class ThirdServiceImpl implements ThirdService {
     ApiUtils apiUtils;
     @Resource
     IPtmStdPriceService ptmStdPriceService;
+    @Resource
+    MongoDbManager mongoDbManager;
+
     Logger logger = LoggerFactory.getLogger(ThirdServiceImpl.class);
     @Resource
     private AppCacheService appCacheService;
@@ -369,6 +374,10 @@ public class ThirdServiceImpl implements ThirdService {
                 //来源网站,原价,现价,折扣值,名称,图片,link
                 //从缓存中获取ptmSTDPrice'
                 String strPriceId = String.valueOf(stdPriceId);
+                PtmStdSkuDetail ptmStdSkuDetail = mongoDbManager.queryOne(PtmStdSkuDetail.class, stdPriceId);
+                if (ptmStdSkuDetail == null || ptmStdSkuDetail.getParamGroups() == null) {
+                    continue;
+                }
                 ptmStdPrice = appCacheService.getPtmStdPrice(Long.parseLong(strPriceId));
                 if (ptmStdPrice != null) {
                     jsonObject = new JSONObject();
@@ -376,7 +385,7 @@ public class ThirdServiceImpl implements ThirdService {
                     jsonObject.put("website", ptmStdPrice.getWebsite());
                     jsonObject.put("price", ptmStdPrice.getPrice());
                     jsonObject.put("title", ptmStdPrice.getTitle());
-                    jsonObject.put("imageUrl", productCacheManager.getPtmStdPriceImageUrl(ptmStdPrice));
+                    jsonObject.put("imageUrl", productCacheManager.getPtmStdPriceImageUrl(ptmStdPrice, false));
                     jsonObject.put("deepLink", WebsiteHelper.getDeeplinkWithAff(ptmStdPrice.getWebsite(), ptmStdPrice.getUrl(), affs));
                     priceList.add(jsonObject);
                 }
@@ -400,6 +409,34 @@ public class ThirdServiceImpl implements ThirdService {
             bList.add(bannerJsonObj);
         }
         return bList;
+    }
+
+    /**
+     * 获取ptmStdPrice详情
+     *
+     * @param stdPriceId
+     * @return
+     */
+    @Override
+    public JSONObject getPtmStdPriceInfo(long stdPriceId) {
+        PtmStdPrice ptmStdPrice = appCacheService.getPtmStdPrice(stdPriceId);
+        JSONObject jsonObject = new JSONObject();
+        if (ptmStdPrice != null) {
+            jsonObject.put("id", ptmStdPrice.getId());
+            jsonObject.put("website", ptmStdPrice.getWebsite());
+            jsonObject.put("price", ptmStdPrice.getPrice());
+            if (ptmStdPrice.getOriPrice() > 0) {
+                jsonObject.put("originPrice", ptmStdPrice.getOriPrice());
+                jsonObject.put("discount", BigDecimal.valueOf(100).subtract(BigDecimal.valueOf(ptmStdPrice.getPrice()).divide(BigDecimal.valueOf(ptmStdPrice.getOriPrice()), 2, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(100))));
+            }
+            jsonObject.put("title", ptmStdPrice.getTitle());
+            jsonObject.put("imageUrl", productCacheManager.getPtmStdPriceImageUrl(ptmStdPrice, true));
+            PtmStdSkuDetail ptmStdSkuDetail = mongoDbManager.queryOne(PtmStdSkuDetail.class, stdPriceId);
+            Map<String, String> specsMap = new HashMap();
+            ApiUtils.setParameters(specsMap, ptmStdSkuDetail.getParamGroups());
+            jsonObject.put("specs", specsMap);
+        }
+        return jsonObject;
     }
 
     private void fillSiteOrderList(OrderStatsAnalysisPO orderStatsAnalysisPO, AppOfferOrderDetailVo appOfferOrderDetailVo) {

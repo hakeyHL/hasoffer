@@ -36,7 +36,7 @@ import java.util.List;
 public class ProductCacheManager {
 
     private static final Class CACHE_CLASS = PtmProduct.class;
-    private static final String CACHE_KEY_PRE = "PRODUCT_";
+    private static final String CACHE_KEY_PRE = "API_PRODUCT_";
     private static final long CACHE_EXPIRE_TIME = TimeUtils.SECONDS_OF_1_DAY;
 
     @Resource
@@ -122,37 +122,45 @@ public class ProductCacheManager {
         return imageUrl;
     }
 
-    public String getPtmStdPriceImageUrl(PtmStdPrice ptmStdPrice) {
-      /*  String key = CACHE_KEY_PRE + "_getPtmStdSkuImageUrl_" + ptmStdPrice.getStdSkuId();
-        String imageUrl = cacheService.get(key, 0);
-        if (imageUrl == null) {
-            List<PtmStdImage> imageList = stdImageService.getStdSkuImageBySkuId(ptmStdPrice.getStdSkuId());
-            if (imageList != null && imageList.size() > 0) {
-                imageUrl = ImageUtil.getImageUrl(imageList.get(0).getSmallImagePath());
-            }
-            if (imageUrl != null) {
-                cacheService.add(key, imageUrl, CACHE_EXPIRE_TIME);
-            }
-        }*/
-        String key = CACHE_KEY_PRE + "_getPtmStdPriceImageUrl_" + ptmStdPrice.getId();
+    /**
+     * 获取ptmStdPrice的图片
+     * 默认是取小图,如果没有则返回商品的小图
+     *
+     * @param ptmStdPrice
+     * @return
+     */
+    public String getPtmStdPriceImageUrl(PtmStdPrice ptmStdPrice, boolean getBigImage) {
+        String key = CACHE_KEY_PRE + "getPtmStdPriceImageUrl_" + ptmStdPrice.getId();
+        if (getBigImage) {
+            key = CACHE_KEY_PRE + "big_getPtmStdPriceImageUrl_" + ptmStdPrice.getId();
+        }
         String imageUrl = cacheService.get(key, 0);
         List<PtmStdImage> imageList;
         if (org.apache.commons.lang3.StringUtils.isEmpty(imageUrl)) {
             imageList = stdImageService.getStdPriceImageByPriceId(ptmStdPrice.getId());
             if (imageList != null && imageList.size() > 0) {
                 imageUrl = ImageUtil.getImageUrl(imageList.get(0).getSmallImagePath());
+                if (getBigImage) {
+                    imageUrl = ImageUtil.getImageUrl(imageList.get(0).getBigImagePath());
+                }
             }
             if (imageUrl != null) {
                 cacheService.add(key, imageUrl, CACHE_EXPIRE_TIME);
             }
         }
         if (org.apache.commons.lang3.StringUtils.isEmpty(imageUrl)) {
-            key = CACHE_KEY_PRE + "_getPtmStdPriceImageUrl_SKUID_" + ptmStdPrice.getStdSkuId();
+            key = CACHE_KEY_PRE + "getPtmStdPriceImageUrl_SKUID_" + ptmStdPrice.getStdSkuId();
+            if (getBigImage) {
+                key = CACHE_KEY_PRE + "big_getPtmStdPriceImageUrl_SKUID_" + ptmStdPrice.getStdSkuId();
+            }
             imageUrl = cacheService.get(key, 0);
             if (org.apache.commons.lang3.StringUtils.isEmpty(imageUrl)) {
                 imageList = stdImageService.getStdSkuImageBySkuId(ptmStdPrice.getStdSkuId());
                 if (imageList != null && imageList.size() > 0) {
                     imageUrl = ImageUtil.getImageUrl(imageList.get(0).getSmallImagePath());
+                    if (getBigImage) {
+                        imageUrl = ImageUtil.getImageUrl(imageList.get(0).getBigImagePath());
+                    }
                 }
                 if (imageUrl != null) {
                     cacheService.add(key, imageUrl, CACHE_EXPIRE_TIME);
