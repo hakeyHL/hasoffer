@@ -1,6 +1,7 @@
 package hasoffer.api.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.api.helper.ApiHttpHelper;
 import hasoffer.api.helper.ClientHelper;
@@ -65,7 +66,6 @@ public class ThirdApiController extends BaseController {
     public String getPtmStdPriceInfoForNineApp(HttpServletResponse response
             , @PathVariable("id") String id) {
         if (StringUtils.isEmpty(id) || !StringUtils.isNumericSpace(id)) {
-            initErrorCodeAndMsgFailed();
             resultJsonObj.put(ConstantUtil.API_NAME_MSG, "id required.");
             ApiHttpHelper.sendJsonMessage(resultJsonObj.toJSONString(), response);
             return null;
@@ -75,4 +75,33 @@ public class ThirdApiController extends BaseController {
         ApiHttpHelper.sendJsonMessage(JSON.toJSONString(resultJsonObj), response);
         return null;
     }
+
+    //整合接口
+    //获取banner列表,topselling列表,deals列表,deals列表 ,只有deals列表支持 分页
+    @RequestMapping("nineapp/index")
+    public String listDealsTopsellingsBanners(@RequestParam(defaultValue = "1") String page,
+                                              @RequestParam(defaultValue = "10") String pageSize,
+                                              HttpServletResponse response) {
+        DeviceInfoVo deviceInfo = ClientHelper.getDeviceInfo();
+        List bannerForNineApp = thirdService.listBannerForNineApp();
+        getJsonDataObj().put("banners", bannerForNineApp);
+
+        String topSkus = thirdService.listTopSkusForNineApps("1", "10", null, 0, new String[]{deviceInfo.getMarketChannel().name(), ClientHelper.getAndroidId()});
+//        proList
+        JSONObject topSellingJsonObj = (JSONObject) JSONObject.parse(topSkus);
+        JSONObject dataJsonObj = (JSONObject) topSellingJsonObj.get(ConstantUtil.API_NAME_DATA);
+        JSONArray proList = dataJsonObj.getJSONArray("proList");
+        getJsonDataObj().put("toplist", proList);
+
+        String dealsForIndia = thirdService.listDealsForIndia(Integer.parseInt(page), Integer.parseInt(pageSize), "originPrice", "presentPrice");
+        //去掉errorCode和msg
+        JSONObject dealsJsonObj = (JSONObject) JSONObject.parse(dealsForIndia);
+        dealsJsonObj.remove(ConstantUtil.API_NAME_ERRORCODE);
+        dealsJsonObj.remove(ConstantUtil.API_NAME_MSG);
+
+        getJsonDataObj().put("offer", dealsJsonObj.get(ConstantUtil.API_NAME_DATA));
+        ApiHttpHelper.sendJsonMessage(JSON.toJSONString(resultJsonObj), response);
+        return null;
+    }
+
 }
