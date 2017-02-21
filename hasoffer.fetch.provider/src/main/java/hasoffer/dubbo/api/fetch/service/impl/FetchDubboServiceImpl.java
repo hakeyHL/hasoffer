@@ -47,6 +47,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
     public FetchDealResult getDealInfo(Website website) {
         String result = fetchCacheService.popTaskList(RedisKeysUtils.getDealwebsiteFetchResultKey(website));
 
+        logger.debug("deal spider result:" + result);
         if (StringUtils.isEmpty(result)) {
             return null;
         } else {
