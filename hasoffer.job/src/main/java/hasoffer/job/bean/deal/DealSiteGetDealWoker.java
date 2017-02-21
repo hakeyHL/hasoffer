@@ -64,7 +64,7 @@ public class DealSiteGetDealWoker implements Runnable {
 
                     TaskStatus taskStatus = fetchDealResult.getTaskStatus();
 
-                    logger.info("taskStatus " + taskStatus);
+                    logger.info("taskStatus: " + taskStatus);
 
                     if (TaskStatus.FINISH.equals(taskStatus)) {
 
@@ -72,7 +72,7 @@ public class DealSiteGetDealWoker implements Runnable {
 
                         for (FetchedDealInfo fetchedDealInfo : dealInfoList) {
 
-                            logger.info("fetchedDealInfo " + fetchedDealInfo.toString());
+                            logger.info("fetchedDealInfo: " + fetchedDealInfo.toString());
                             AppDeal deal = null;
 
                             if (Website.DESIDIME.equals(website)) {
