@@ -57,14 +57,15 @@ public class DealSiteGetDealWoker implements Runnable {
 
                     FetchDealResult fetchDealResult = fetchDubboService.getDealInfo(website);
 
+                    logger.info("getDealInfo result:{}", fetchDealResult);
+
                     if (fetchDealResult == null) {
-                        logger.info("getDealInfo get null");
                         continue;
                     }
 
                     TaskStatus taskStatus = fetchDealResult.getTaskStatus();
 
-                    logger.info("taskStatus " + taskStatus);
+                    logger.info("taskStatus: " + taskStatus);
 
                     if (TaskStatus.FINISH.equals(taskStatus)) {
 
@@ -72,7 +73,7 @@ public class DealSiteGetDealWoker implements Runnable {
 
                         for (FetchedDealInfo fetchedDealInfo : dealInfoList) {
 
-                            logger.info("fetchedDealInfo " + fetchedDealInfo.toString());
+                            logger.info("fetchedDealInfo: " + fetchedDealInfo.toString());
                             AppDeal deal = null;
 
                             if (Website.DESIDIME.equals(website)) {
@@ -83,13 +84,13 @@ public class DealSiteGetDealWoker implements Runnable {
 
                             if (deal != null) {
                                 if (deal.getLinkUrl() == null || "".equals(deal.getLinkUrl())) {
-                                    return;
+                                    continue;
                                 }
 
                                 List<AppDeal> appDealTemp = dealService.getDealByLinkUrl(deal.getLinkUrl());
                                 if (appDealTemp != null && appDealTemp.size() > 0) {
                                     logger.info("The deal info is already exists. Link Url:{}", deal.getLinkUrl());
-                                    return;
+                                    continue;
                                 }
                                 dealService.createAppDealByPriceOff(deal);
                             }
