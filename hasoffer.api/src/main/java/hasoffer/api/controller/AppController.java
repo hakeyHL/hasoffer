@@ -391,7 +391,6 @@ public class AppController extends BaseController {
         //1. 从数据库中查询到
         //忽略前端传页面大小
         PageableResult Result = appService.getDeals(Integer.parseInt(page), 8);
-        Map map = new HashMap();
         List li = new ArrayList();
        /* getDealsFromCache(li, Integer.parseInt(page), 8);
         boolean flag = true;
@@ -421,7 +420,6 @@ public class AppController extends BaseController {
         getDataMap().put("page", Result.getPageSize());
         getDataMap().put("pageSize", Result.getPageSize());
         getDataMap().put("totalPage", Result.getTotalPage());
-        initErrorCodeAndMsgSuccess();
         return modelAndView;
     }
 
