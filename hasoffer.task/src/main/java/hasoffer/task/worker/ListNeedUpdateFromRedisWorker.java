@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ListNeedUpdateFromRedisWorker implements Runnable {
 
-    private static final String UPDATE_WAIT_QUEUE = "PRODUCT_WAIT_4_UPDATE_";
+    private static final String UPDATE_WAIT_QUEUE = "API_PRODUCT_WAIT_4_UPDATE_";
     private static final String KEY_PROCESSED_SET = "PRODUCT_UPDATE_PROCESSED_";
     private static Logger logger = LoggerFactory.getLogger(ListNeedUpdateFromRedisWorker.class);
     private IFetchDubboService fetchDubboService;
