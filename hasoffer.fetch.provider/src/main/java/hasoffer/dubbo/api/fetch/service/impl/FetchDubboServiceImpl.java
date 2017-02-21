@@ -54,7 +54,7 @@ public class FetchDubboServiceImpl implements IFetchDubboService {
             try {
                 return JSONUtil.toObject(result, FetchDealResult.class);
             } catch (IOException e) {
-                logger.info("dealresult string to json error");
+                logger.info("deal result string to json error");
                 return null;
             }
         }

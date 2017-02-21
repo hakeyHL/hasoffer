@@ -57,8 +57,9 @@ public class DealSiteGetDealWoker implements Runnable {
 
                     FetchDealResult fetchDealResult = fetchDubboService.getDealInfo(website);
 
+                    logger.info("getDealInfo result:{}", fetchDealResult);
+
                     if (fetchDealResult == null) {
-                        logger.info("getDealInfo get null");
                         continue;
                     }
 
