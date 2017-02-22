@@ -73,7 +73,7 @@ public class BigDataApi {
                     lastLog.setRegTime(regTime);
                 }
             } catch (Exception e) {
-                logger.error("Can't parse the json, android:{}", androidId);
+                logger.error("Can't parse the json, android:{}", androidId, e);
                 return null;
             }
         }
