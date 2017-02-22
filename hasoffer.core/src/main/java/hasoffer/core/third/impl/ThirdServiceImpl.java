@@ -198,6 +198,7 @@ public class ThirdServiceImpl implements ThirdService {
 
                 }
                 String deepLink = appDeal.getLinkUrl() == null ? ConstantUtil.API_DATA_EMPTYSTRING : WebsiteHelper.getDealUrlWithAff(appDeal.getWebsite(), appDeal.getLinkUrl(), new String[]{marketChannel, deviceId});
+                logger.info("get offerInfo , deepLink is {}", deepLink);
                 dealJson.put("deeplink", deepLink);
                 resultMap.put(ConstantUtil.API_NAME_DATA, dealJson);
             } else {

@@ -71,7 +71,7 @@ public class CipherUtil {
     }
 
     public static void main(String[] args) {
-        String key = "GMOBI_B20170217093521HRGI";
+        String key = "GMOBI20170222114721HRGI";
         String s = encryptWithSHA256(key);
         System.out.println(s);
     }
