@@ -54,4 +54,11 @@ public abstract class BaseController {
         dataJsonObj.clear();
         dataMap.clear();
     }
+
+    void initErrorCodeAndMsgFail() {
+        resultJsonObj.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+        modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+        dataJsonObj.clear();
+        dataMap.clear();
+    }
 }

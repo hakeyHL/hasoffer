@@ -207,13 +207,11 @@ public class ThirdServiceImpl implements ThirdService {
         }
         resultMap.put(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_SUCCESS);
         resultMap.put(ConstantUtil.API_NAME_MSG, ConstantUtil.API_NAME_MSG_SUCCESS);
+        appService.recordOfferClickCount(MarketChannel.valueOf(marketChannel), Long.parseLong(id));
         if (filterProperties != null && filterProperties.length > 0) {
             PropertyFilter propertyFilter = JsonHelper.filterProperty(filterProperties);
             return JSON.toJSONString(resultMap, propertyFilter);
         }
-
-        appService.recordOfferClickCount(MarketChannel.valueOf(marketChannel), Long.parseLong(id));
-
         return JSON.toJSONString(resultMap);
     }
 
