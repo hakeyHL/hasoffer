@@ -103,7 +103,7 @@ public class Compare2Controller {
     private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
 
     public static void main(String[] args) {
-        String dealUrlWithAff = WebsiteHelper.getDeeplinkWithAff(Website.SNAPDEAL, "https://www.flipkart.com/hizone-hz203gd-gold-plated-analog-watch-men/p/itmechfgg7tpghzs?pid=WATECHFGRRGDAGHA&otracker=hp_reco_recently_viewed", new String[]{MarketChannel.SHANCHUAN.name(), "dfecc858243a616a"});
+        String dealUrlWithAff = WebsiteHelper.getDeeplinkWithAff(Website.SHOPCLUES, "http://www.shopclues.com/iphone-6-64gb-space-grey-4.html", new String[]{MarketChannel.SHANCHUAN.name(), "dfecc858243a616a"});
         System.out.println(dealUrlWithAff);
        /* for (int i = 0; i < 10; i++) {
             String dealUrlWithAff = WebsiteHelper.getDeeplinkWithAff(Website.SNAPDEAL, "https://www.snapdeal.com/product/jbl-sb350-soundbar-with-wirless/1602277955", new String[]{MarketChannel.SHANCHUAN.name(), "dfecc858243a616a"});
