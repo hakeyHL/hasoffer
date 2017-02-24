@@ -758,13 +758,13 @@ public class AppController extends BaseController {
     public ModelAndView getParamMeaning(@RequestParam(defaultValue = ConstantUtil.API_DATA_EMPTYSTRING) String param) {
         initErrorCodeAndMsgSuccess();
         if (StringUtils.isEmpty(param)) {
-            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+            initErrorCodeAndMsgFail();
             modelAndView.addObject(ConstantUtil.API_NAME_MSG, "param can not be empty ");
             return modelAndView;
         }
         String paramMeaning = ConstantUtil.API_PTMSTDSKU_PARAM_MEAN_MAP.get(param);
         if (StringUtils.isEmpty(paramMeaning)) {
-            modelAndView.addObject(ConstantUtil.API_NAME_ERRORCODE, ConstantUtil.API_ERRORCODE_FAILED_LOGIC);
+            initErrorCodeAndMsgFail();
             modelAndView.addObject(ConstantUtil.API_NAME_MSG, "not have this param meaning .");
             return modelAndView;
         }

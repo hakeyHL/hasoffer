@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by hs on 2017年02月14日.
@@ -18,7 +18,7 @@ import java.util.Map;
 public abstract class BaseController {
     public Logger logger = LoggerFactory.getLogger(getClass());
     JSONObject dataJsonObj = new JSONObject();
-    Map dataMap = new HashMap<>();
+    Map dataMap = new ConcurrentHashMap();
     ModelAndView modelAndView = new ModelAndView();
     JSONObject resultJsonObj = new JSONObject();
 
