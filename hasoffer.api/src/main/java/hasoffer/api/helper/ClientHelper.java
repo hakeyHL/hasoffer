@@ -5,7 +5,6 @@ import hasoffer.core.app.vo.DeviceInfoVo;
 import hasoffer.core.utils.ConstantUtil;
 import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.webcommon.context.Context;
-import hasoffer.webcommon.context.StaticContext;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -134,6 +133,7 @@ public class ClientHelper {
      * @return
      */
     public static String getAndroidId() {
-        return (String) Context.currentContext().get(StaticContext.DEVICE_ID);
+        DeviceInfoVo deviceInfoVo = (DeviceInfoVo) Context.currentContext().get(Context.DEVICE_INFO);
+        return deviceInfoVo.getDeviceId();
     }
 }
