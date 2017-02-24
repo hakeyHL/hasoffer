@@ -21,6 +21,8 @@ public class AppOfferOrderDetailVo {
     private BigDecimal totalOrderAmount = BigDecimal.ZERO;
     //ymd的佣金金额
     private BigDecimal totalCommissionAmount = BigDecimal.ZERO;
+    private Long listUV;
+    private Long infoUV;
 
     public long getShowCount() {
         return showCount;
@@ -60,5 +62,21 @@ public class AppOfferOrderDetailVo {
 
     public void setTotalCommissionAmount(BigDecimal totalCommissionAmount) {
         this.totalCommissionAmount = totalCommissionAmount;
+    }
+
+    public Long getListUV() {
+        return listUV;
+    }
+
+    public void setListUV(Long listUV) {
+        this.listUV = listUV;
+    }
+
+    public Long getInfoUV() {
+        return infoUV;
+    }
+
+    public void setInfoUV(Long infoUV) {
+        this.infoUV = infoUV;
     }
 }

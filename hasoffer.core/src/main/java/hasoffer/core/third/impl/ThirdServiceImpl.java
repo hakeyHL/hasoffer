@@ -321,6 +321,8 @@ public class ThirdServiceImpl implements ThirdService {
                         AppOfferOrderDetailVo appOfferOrderDetailVo = appOfferOrderDetailVoMap.get(ymd);
                         appOfferOrderDetailVo.setClickCount(appOfferStatistics.getOfferClickCount());
                         appOfferOrderDetailVo.setShowCount(appOfferStatistics.getOfferScanCount());
+                        appOfferOrderDetailVo.setListUV(appOfferStatistics.getScanUV());
+                        appOfferOrderDetailVo.setInfoUV(appOfferStatistics.getClickUV());
                     }
                 }
             } else {
@@ -329,6 +331,8 @@ public class ThirdServiceImpl implements ThirdService {
                 AppOfferOrderDetailVo appOfferOrderDetailVo = appOfferOrderDetailVoMap.get(appOfferStatistics.getYmd());
                 appOfferOrderDetailVo.setClickCount(appOfferStatistics.getOfferClickCount());
                 appOfferOrderDetailVo.setShowCount(appOfferStatistics.getOfferScanCount());
+                appOfferOrderDetailVo.setListUV(appOfferStatistics.getScanUV());
+                appOfferOrderDetailVo.setInfoUV(appOfferStatistics.getClickUV());
             }
         }
         resultJsonObject.put(ConstantUtil.API_NAME_DATA, appOfferOrderDetailVoMap);
