@@ -6,7 +6,6 @@ import com.alibaba.fastjson.serializer.PropertyFilter;
 import hasoffer.api.helper.ApiHttpHelper;
 import hasoffer.api.helper.ClientHelper;
 import hasoffer.api.helper.SearchHelper;
-import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
@@ -103,8 +102,9 @@ public class Compare2Controller {
     private Logger logger = LoggerFactory.getLogger(Compare2Controller.class);
 
     public static void main(String[] args) {
-        String dealUrlWithAff = WebsiteHelper.getDeeplinkWithAff(Website.SHOPCLUES, "http://www.shopclues.com/iphone-6-64gb-space-grey-4.html", new String[]{MarketChannel.SHANCHUAN.name(), "dfecc858243a616a"});
-        System.out.println(dealUrlWithAff);
+//        String dealUrlWithAff = WebsiteHelper.getDeeplinkWithAff(Website.SHOPCLUES, "http://www.shopclues.com/iphone-6-64gb-space-grey-4.html", new String[]{MarketChannel.SHANCHUAN.name(), "dfecc858243a616a"});
+//        System.out.println(dealUrlWithAff);
+        System.out.println((char) 44);
        /* for (int i = 0; i < 10; i++) {
             String dealUrlWithAff = WebsiteHelper.getDeeplinkWithAff(Website.SNAPDEAL, "https://www.snapdeal.com/product/jbl-sb350-soundbar-with-wirless/1602277955", new String[]{MarketChannel.SHANCHUAN.name(), "dfecc858243a616a"});
             System.out.println(dealUrlWithAff);

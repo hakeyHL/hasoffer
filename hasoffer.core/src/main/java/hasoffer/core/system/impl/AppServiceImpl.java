@@ -156,6 +156,27 @@ public class AppServiceImpl implements IAppService {
             "SELECT t FROM PtmProduct t " +
                     " where 1=1 and ";
 
+    public static String getLiveDemo(Website website, MarketChannel marketChannel, String deviceId) {
+        Map<Website, String> liveDemoMap = new HashMap<>();
+        Random random = new Random();
+        String flipkartAffid = AffliIdHelper.FLIKART_YEAHMOBI_FLIDS[random.nextInt(AffliIdHelper.FLIKART_YEAHMOBI_FLIDS.length)];
+        String extParam1 = AffliIdHelper.getMarketId(marketChannel);
+        if (Arrays.asList(AffliIdHelper.FLIKART_YEAHMOBI_FLIDS).contains(flipkartAffid)) {
+            String[] affExtParams = new String[]{"103662", "103650", "103647", "103643"};
+            extParam1 = affExtParams[random.nextInt(affExtParams.length)];
+        }
+        //liveDemoMap.put(Website.FLIPKART, "http://dl.flipkart.com/dl/apple-iphone-5s/p/itme8ra4f4twtsva?affid=" + flipkartAffid + "&affExtParam1=" + extParam1 + "&affExtParam2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0");
+        liveDemoMap.put(Website.FLIPKART, "https://dl.flipkart.com/dl/apple-iphone-6-space-grey-64-gb/p/itme8gfcs2dhysgq?pid=MOBEYHZ28FRMNDCW&affid=" + flipkartAffid + "&affExtParam1=" + extParam1 + "&affExtParam2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0");
+        liveDemoMap.put(Website.SNAPDEAL, "android-app://com.snapdeal.main/snapdeal/m.snapdeal.com/product/apple-iphone-5s-16-gb/1204769399?aff_id=82856&utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_sub=" + extParam1 + "&aff_sub2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0");
+        liveDemoMap.put(Website.SHOPCLUES, "http://www.shopclues.com/apple-iphone-5s-16gb-44.html?ty=0&id=none&mcid=aff&utm_source=Hasoffer&OfferId=15");
+        //liveDemoMap.put(Website.EBAY, "http://genlin.ss");
+        return liveDemoMap.get(website);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(getLiveDemo(Website.FLIPKART, MarketChannel.LEO, "asdfaskwesdkf"));
+    }
+
     @Override
     public AppVersion getLatestVersion(AppType appType, MarketChannel marketChannel) {
         List<AppVersion> versions = dbm.query(Q_APP_VERSION, Arrays.asList(appType, marketChannel));
@@ -497,7 +518,6 @@ public class AppServiceImpl implements IAppService {
         return new String(org.apache.commons.codec.binary.Base64.encodeBase64(amazonUrl.getBytes(Charset.forName("UTF-8"))));
     }
 
-
     private String getInstallUrl(Website website) {
         String[] flipkart = new String[]{"zhangchen", "wangshuom"};
         Random random = new Random();
@@ -518,23 +538,6 @@ public class AppServiceImpl implements IAppService {
         packageMap.put(Website.AMAZON, "in.amazon.mShop.android.shopping");
         //packageMap.put(Website.EBAY, "com.ebay.mobile");
         return packageMap.get(website);
-    }
-
-    public static String getLiveDemo(Website website, MarketChannel marketChannel, String deviceId) {
-        Map<Website, String> liveDemoMap = new HashMap<>();
-        Random random = new Random();
-        String flipkartAffid = AffliIdHelper.FLIKART_YEAHMOBI_FLIDS[random.nextInt(AffliIdHelper.FLIKART_YEAHMOBI_FLIDS.length)];
-        String extParam1 = AffliIdHelper.getMarketId(marketChannel);
-        if (Arrays.asList(AffliIdHelper.FLIKART_YEAHMOBI_FLIDS).contains(flipkartAffid)) {
-            String[] affExtParams = new String[]{"103662", "103650", "103647", "103643"};
-            extParam1 = affExtParams[random.nextInt(affExtParams.length)];
-        }
-        //liveDemoMap.put(Website.FLIPKART, "http://dl.flipkart.com/dl/apple-iphone-5s/p/itme8ra4f4twtsva?affid=" + flipkartAffid + "&affExtParam1=" + extParam1 + "&affExtParam2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0");
-        liveDemoMap.put(Website.FLIPKART, "https://dl.flipkart.com/dl/apple-iphone-6-space-grey-64-gb/p/itme8gfcs2dhysgq?pid=MOBEYHZ28FRMNDCW&affid=" + flipkartAffid + "&affExtParam1=" + extParam1 + "&affExtParam2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0");
-        liveDemoMap.put(Website.SNAPDEAL, "android-app://com.snapdeal.main/snapdeal/m.snapdeal.com/product/apple-iphone-5s-16-gb/1204769399?aff_id=82856&utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_sub=" + extParam1 + "&aff_sub2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0");
-        liveDemoMap.put(Website.SHOPCLUES, "http://www.shopclues.com/apple-iphone-5s-16gb-44.html?ty=0&id=none&mcid=aff&utm_source=Hasoffer&OfferId=15");
-        //liveDemoMap.put(Website.EBAY, "http://genlin.ss");
-        return liveDemoMap.get(website);
     }
 
     private String getFlipkartIndexUrl(MarketChannel marketChannel, String deviceId) {
@@ -683,6 +686,7 @@ public class AppServiceImpl implements IAppService {
 
     /**
      * 根据联盟id获取订单记录
+     *
      * @return
      */
     @Override
@@ -723,7 +727,7 @@ public class AppServiceImpl implements IAppService {
      * @param offerId       offer的id
      */
     @Transactional
-    public void recordOfferClickCount(MarketChannel marketChannel, long offerId) {
+    public synchronized void recordOfferClickCount(MarketChannel marketChannel, long offerId) {
         String yyyyMMdd = TimeUtils.parse(new Date(), "yyyyMMdd");
         long time = new Date().getTime();
         //按理说,只有获取了列表才能点击,但是不排除直接-点击-的情况,所以要创建
@@ -769,9 +773,5 @@ public class AppServiceImpl implements IAppService {
             appOfferRecord.setOfferId(offerId);
             mongoDbManager.save(appOfferRecord);
         }
-    }
-
-    public static void main(String[] args) {
-        System.out.println(getLiveDemo(Website.FLIPKART, MarketChannel.LEO, "asdfaskwesdkf"));
     }
 }
