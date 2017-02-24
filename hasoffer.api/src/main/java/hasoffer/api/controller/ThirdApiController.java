@@ -66,6 +66,7 @@ public class ThirdApiController extends BaseController {
     public String getPtmStdPriceInfoForNineApp(HttpServletResponse response
             , @PathVariable("id") String id) {
         if (StringUtils.isEmpty(id) || !StringUtils.isNumericSpace(id)) {
+            initErrorCodeAndMsgFail();
             resultJsonObj.put(ConstantUtil.API_NAME_MSG, "id required.");
             ApiHttpHelper.sendJsonMessage(resultJsonObj.toJSONString(), response);
             return null;
