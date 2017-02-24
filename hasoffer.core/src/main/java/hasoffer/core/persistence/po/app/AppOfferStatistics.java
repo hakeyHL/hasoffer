@@ -26,6 +26,11 @@ public class AppOfferStatistics implements Identifiable<Long> {
     private Long offerClickCount = 0l;//offer总点击次数
 
     private String ymd = TimeUtils.parse(new Date(), "yyyyMMdd");//当前日期--年月日
+    @Column(columnDefinition = "bigint default 0")
+    private Long scanUV;//返回列表的UV
+
+    @Column(columnDefinition = "bigint default 0")
+    private Long clickUV;//点击的UV
 
     @Override
     public Long getId() {
@@ -67,5 +72,21 @@ public class AppOfferStatistics implements Identifiable<Long> {
 
     public void setYmd(String ymd) {
         this.ymd = ymd;
+    }
+
+    public Long getScanUV() {
+        return scanUV;
+    }
+
+    public void setScanUV(Long scanUV) {
+        this.scanUV = scanUV;
+    }
+
+    public Long getClickUV() {
+        return clickUV;
+    }
+
+    public void setClickUV(Long clickUV) {
+        this.clickUV = clickUV;
     }
 }
