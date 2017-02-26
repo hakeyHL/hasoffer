@@ -44,7 +44,10 @@ public class OfferController extends BaseController {
                          HttpServletResponse response) {
         String result = thirdService.listDealsForGmobi(page, pageSize, new String[]{"discount", "category"});
         //增加返回次数
-        appService.recordOfferReturnCount(ClientHelper.getDeviceInfo().getMarketChannel());
+        synchronized (this) {
+            appService.recordOfferReturnCount(ClientHelper.getDeviceInfo().getMarketChannel());
+        }
+
         ApiHttpHelper.sendJsonMessage(result, response);
         return null;
     }
