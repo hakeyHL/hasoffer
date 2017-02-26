@@ -25,6 +25,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -660,7 +661,7 @@ public class AppServiceImpl implements IAppService {
      *
      * @param marketChannel
      */
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public Long recordOfferReturnCount(MarketChannel marketChannel) {
         if (marketChannel == null) {
             System.out.println("marketChannel is null");
@@ -726,8 +727,9 @@ public class AppServiceImpl implements IAppService {
      * @param marketChannel 渠道
      * @param offerId       offer的id
      */
-    @Transactional
-    public synchronized void recordOfferClickCount(MarketChannel marketChannel, long offerId) {
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public void recordOfferClickCount(MarketChannel marketChannel, long offerId) {
+        System.out.println("current thread name is : " + Thread.currentThread().getName());
         String yyyyMMdd = TimeUtils.parse(new Date(), "yyyyMMdd");
         long time = new Date().getTime();
         //按理说,只有获取了列表才能点击,但是不排除直接-点击-的情况,所以要创建
@@ -740,7 +742,9 @@ public class AppServiceImpl implements IAppService {
             appOfferStatistics.setMarketChannel(marketChannel);
         }
         Long clickCount = appOfferStatistics.getOfferClickCount();
+        System.out.println(Thread.currentThread().getName() + "  :get clickCount " + clickCount);
         appOfferStatistics.setOfferClickCount(clickCount + 1);
+        System.out.println(Thread.currentThread().getName() + "  : +1 clickCount " + appOfferStatistics.getOfferClickCount());
         if (newFlag) {
             dbm.create(appOfferStatistics);
         } else {

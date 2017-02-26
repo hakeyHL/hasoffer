@@ -17,12 +17,12 @@ public class AppOfferStatistics implements Identifiable<Long> {
     @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Column(columnDefinition = "bigint default 0")
     private Long offerScanCount = 0l;//offer返回的次数
 
     @Enumerated(EnumType.STRING)
     private MarketChannel marketChannel;//哪个渠道
-
+    @Column(columnDefinition = "bigint default 0")
     private Long offerClickCount = 0l;//offer总点击次数
 
     private String ymd = TimeUtils.parse(new Date(), "yyyyMMdd");//当前日期--年月日
