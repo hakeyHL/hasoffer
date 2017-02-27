@@ -727,8 +727,8 @@ public class AppServiceImpl implements IAppService {
      * @param marketChannel 渠道
      * @param offerId       offer的id
      */
-//    @Transactional(isolation = Isolation.SERIALIZABLE)
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+//    @Transactional
     public void recordOfferClickCount(MarketChannel marketChannel, long offerId) {
         System.out.println("current thread name is : " + Thread.currentThread().getName());
         String yyyyMMdd = TimeUtils.parse(new Date(), "yyyyMMdd");
