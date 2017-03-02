@@ -2,10 +2,7 @@ package hasoffer.joe.test;
 
 import hasoffer.base.enums.TaskLevel;
 import hasoffer.base.model.Website;
-import hasoffer.core.admin.IDealService;
-import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.data.redis.IRedisListService;
-import hasoffer.dubbo.api.fetch.service.IFetchDubboService;
 import hasoffer.spider.constants.RedisKeysUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,14 +18,14 @@ import javax.annotation.Resource;
 @ContextConfiguration(locations = {"classpath:dubbo-spring.xml", "classpath:spring-beans.xml"})
 public class DealFetchTest {
 
-    @Resource
-    IFetchDubboService fetchDubboService;
+    //@Resource
+    //IFetchDubboService fetchDubboService;
     @Resource
     IRedisListService redisListService;
-    @Resource
-    IDealService dealService;
-    @Resource
-    IDataBaseManager dbm;
+    //@Resource
+    //IDealService dealService;
+    //@Resource
+    //IDataBaseManager dbm;
 
     @Test
     public void testRedisPop() {
