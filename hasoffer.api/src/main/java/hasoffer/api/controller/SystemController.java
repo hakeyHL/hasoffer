@@ -3,9 +3,14 @@ package hasoffer.api.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.api.helper.ApiHttpHelper;
+import hasoffer.api.service.IndiaMySmartPricePageProcessor;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.app.vo.ResultVo;
+import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
+import hasoffer.core.persistence.dbm.osql.IDataBaseManager;
 import hasoffer.core.persistence.po.urm.UrmUser;
+import hasoffer.core.product.PtmMStdProductService;
+import hasoffer.core.product.PtmMStdSkuService;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.system.impl.AppServiceImpl;
 import hasoffer.core.utils.ConstantUtil;
@@ -19,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+import us.codecraft.webmagic.Spider;
 
 import javax.annotation.Resource;
 import javax.naming.InitialContext;
@@ -32,9 +38,16 @@ import java.util.*;
  */
 @Controller
 public class SystemController {
-
     private static final String PRICEOFFNOTICE_PUSH_PREFIX = "PRICEOFFNOTICE_PUSH_";
     private static final String DEAL_PUSH_PREFIX = "DEAL_PUSH_";
+    @Resource
+    IDataBaseManager dbm;
+    @Resource
+    MongoDbManager mongoDbManager;
+    @Resource
+    PtmMStdSkuService ptmMStdSkuService;
+    @Resource
+    PtmMStdProductService ptmMStdProductService;
     @Resource
     IRedisListService redisListService;
     @Resource
@@ -141,6 +154,17 @@ public class SystemController {
             System.out.println(e.getMessage());
         }
 
+        return "ok";
+    }
+
+
+    @ResponseBody
+    @RequestMapping("mspTest")
+    public String JNDITest() {
+        Spider.create(new IndiaMySmartPricePageProcessor(ptmMStdProductService, mongoDbManager, ptmMStdSkuService))
+                .addUrl("http://www.mysmartprice.com/mobile/apple-iphone-6-64gb-msp4882")
+                .thread(1)
+                .run();
         return "ok";
     }
 }
