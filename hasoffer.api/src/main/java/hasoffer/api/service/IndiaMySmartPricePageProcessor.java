@@ -326,7 +326,8 @@ public class IndiaMySmartPricePageProcessor extends AbstractCompareWebsitePagePr
             Long pId = ptmMStdProductService.savePtmMStdProduct(ptmMStdProduct);
             AppMspProductDetail appMspProductDetail = new AppMspProductDetail();
             appMspProductDetail.setId(pId);
-            appMspProductDetail.setDescription(String.join(",", descriptionXpath.all()));
+//            appMspProductDetail.setDescription(String.join(",", descriptionXpath.all()));
+            appMspProductDetail.setDescription(descriptionXpath.all().toString());
             mongoDbManager.save(appMspProductDetail);
         }
         //创建sku
