@@ -20,13 +20,13 @@
         <property name="triggers">
             <list>
                 <ref bean="demoTrigger"/>
-                <ref bean="fetchTrigger"/>
+                <!--<ref bean="fetchTrigger"/>-->
                 <ref bean="orderSATrigger"/>
                 <ref bean="orderSCTrigger"/>
-                <ref bean="imageDownLoadTrigger"/>
-                <ref bean="imageDownLoadTrigger2"/>
-                <ref bean="skuImageDownLoadTrigger"/>
-                <ref bean="skuImageListDownLoadTrigger"/>
+                <!--<ref bean="imageDownLoadTrigger"/>-->
+                <!--<ref bean="imageDownLoadTrigger2"/>-->
+                <!--<ref bean="skuImageDownLoadTrigger"/>-->
+                <!--<ref bean="skuImageListDownLoadTrigger"/>-->
                 <ref bean="statSearchLogTrigger"/>
                 <ref bean="compareWebsiteSendFetchRequestTrigger"/>
                 <ref bean="compareWebsiteParseFetchResultTrigger"/>
