@@ -87,7 +87,7 @@ public class DealSiteGetDealWoker implements Runnable {
                                     continue;
                                 }
 
-                                List<AppDeal> appDealTemp = dealService.getDealByLinkUrl(deal.getLinkUrl());
+                                List<AppDeal> appDealTemp = dealService.getValDealByLinkUrl(deal.getLinkUrl());
                                 if (appDealTemp != null && appDealTemp.size() > 0) {
                                     logger.info("The deal info is already exists. Link Url:{}", deal.getLinkUrl());
                                     continue;

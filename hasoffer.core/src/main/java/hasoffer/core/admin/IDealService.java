@@ -32,7 +32,7 @@ public interface IDealService {
 
     AppDeal getDealById(Long dealId);
 
-    List<AppDeal> getDealByLinkUrl(String url);
+    List<AppDeal> getValDealByLinkUrl(String url);
 
     AppDeal getDealBySourceId(Long skuId);
 
