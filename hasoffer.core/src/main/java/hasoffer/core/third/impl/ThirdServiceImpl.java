@@ -24,7 +24,6 @@ import hasoffer.core.product.impl.CmpSkuServiceImpl;
 import hasoffer.core.system.IAppService;
 import hasoffer.core.third.ThirdService;
 import hasoffer.core.utils.ConstantUtil;
-import hasoffer.core.utils.ImageUtil;
 import hasoffer.core.utils.JsonHelper;
 import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.helper.WebsiteHelper;
