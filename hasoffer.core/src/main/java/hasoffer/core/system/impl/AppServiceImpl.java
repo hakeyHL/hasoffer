@@ -169,7 +169,8 @@ public class AppServiceImpl implements IAppService {
         //liveDemoMap.put(Website.FLIPKART, "http://dl.flipkart.com/dl/apple-iphone-5s/p/itme8ra4f4twtsva?affid=" + flipkartAffid + "&affExtParam1=" + extParam1 + "&affExtParam2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0");
         liveDemoMap.put(Website.FLIPKART, "https://dl.flipkart.com/dl/apple-iphone-6-space-grey-64-gb/p/itme8gfcs2dhysgq?pid=MOBEYHZ28FRMNDCW&affid=" + flipkartAffid + "&affExtParam1=" + extParam1 + "&affExtParam2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0");
         liveDemoMap.put(Website.SNAPDEAL, "android-app://com.snapdeal.main/snapdeal/m.snapdeal.com/product/apple-iphone-5s-16-gb/1204769399?aff_id=82856&utm_source=aff_prog&utm_campaign=afts&offer_id=17&aff_sub=" + extParam1 + "&aff_sub2=" + AffliIdHelper.getMarketId(marketChannel) + "_" + deviceId + "_0");
-        liveDemoMap.put(Website.SHOPCLUES, "http://www.shopclues.com/apple-iphone-5s-16gb-44.html?ty=0&id=none&mcid=aff&utm_source=Hasoffer&OfferId=15");
+//        liveDemoMap.put(Website.SHOPCLUES, "http://www.shopclues.com/apple-iphone-5s-16gb-44.html?ty=0&id=none&mcid=aff&utm_source=Hasoffer&OfferId=15");
+        liveDemoMap.put(Website.SHOPCLUES, "http://affiliateshopclues.com/?a=2892&c=69&p=r&s1=" + marketChannel.name() + "&ckmrdr=" + "http://www.shopclues.com/apple-iphone-5s-16gb-44.html");
         //liveDemoMap.put(Website.EBAY, "http://genlin.ss");
         return liveDemoMap.get(website);
     }
@@ -462,7 +463,7 @@ public class AppServiceImpl implements IAppService {
         List<Map<String, String>> mapList = new ArrayList<>();
 
         Map<String, String> flipkartMap = new HashMap<>();
-        //X: 网站编号；Y：联盟ID；Z：渠道编号
+        //X: 网站包名；Y：加密后的劫持link；Z：liveDemo J site名称 I是安装url
         flipkartMap.put("X", getPackageName(Website.FLIPKART));
         flipkartMap.put("Y", getFlipkartIndexUrl(marketChannel, deviceId));
         flipkartMap.put("Z", getLiveDemo(Website.FLIPKART, marketChannel, deviceId));
@@ -481,7 +482,8 @@ public class AppServiceImpl implements IAppService {
         Map<String, String> shopClueMap = new HashMap<>();
         shopClueMap.put("X", getPackageName(Website.SHOPCLUES));
         //shopClueMap.put("Y", getShopCluesIndexUrl());
-        shopClueMap.put("Y", ConstantUtil.API_DATA_EMPTYSTRING);
+//        shopClueMap.put("Y", ConstantUtil.API_DATA_EMPTYSTRING);
+        shopClueMap.put("Y", AffliIdHelper.getAffiIds(marketChannel));
         shopClueMap.put("Z", getLiveDemo(Website.SHOPCLUES, marketChannel, deviceId));
         shopClueMap.put("I", getInstallUrl(Website.SHOPCLUES));
         shopClueMap.put("J", Website.SHOPCLUES.toString());

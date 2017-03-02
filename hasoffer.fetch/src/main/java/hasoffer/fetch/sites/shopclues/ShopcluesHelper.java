@@ -1,5 +1,6 @@
 package hasoffer.fetch.sites.shopclues;
 
+import hasoffer.base.enums.MarketChannel;
 import hasoffer.base.utils.StringUtils;
 
 import java.util.regex.Matcher;
@@ -67,12 +68,19 @@ public class ShopcluesHelper {
     }
 
     public static String getUrlWithAff(String url, String[] affs) {
+        if (affs == null || affs.length < 1) {
+            affs = new String[]{"NONE"};
+        } else {
+            //检验第一个是不是渠道,如果不是也是NONE
+            MarketChannel marketChannel = MarketChannel.valueOfString(affs[0]);
+            affs = new String[]{marketChannel.name()};
+        }
         if (url.contains("affiliateshopclues")) {
             url = url.replace("affiliateshopclues", "www.shopclues");
         }
         String cleanUrl = getCleanUrl(url);
 //        return cleanUrl + "?ty=0&id=111438445&mcid=aff&utm_source=Hasoffer&OfferId=15";
-        String tempStr = "http://affiliateshopclues.com/?a=2892&c=69&p=r&s1=&ckmrdr=" + cleanUrl;
+        String tempStr = "http://affiliateshopclues.com/?a=2892&c=69&p=r&s1=" + affs[0] + "&ckmrdr=" + cleanUrl;
         return tempStr;
         /*if (affs == null) {
             if (url.contains("affiliateshopclues")) {
