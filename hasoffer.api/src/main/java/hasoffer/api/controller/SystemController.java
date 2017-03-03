@@ -3,7 +3,6 @@ package hasoffer.api.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import hasoffer.api.helper.ApiHttpHelper;
-import hasoffer.api.service.IndiaMySmartPricePageProcessor;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.app.vo.ResultVo;
 import hasoffer.core.persistence.dbm.mongo.MongoDbManager;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-import us.codecraft.webmagic.Spider;
 
 import javax.annotation.Resource;
 import javax.naming.InitialContext;
@@ -158,7 +156,7 @@ public class SystemController {
     }
 
 
-    @ResponseBody
+   /* @ResponseBody
     @RequestMapping("mspTest")
     public String JNDITest() {
         Spider.create(new IndiaMySmartPricePageProcessor(ptmMStdProductService, mongoDbManager, ptmMStdSkuService))
@@ -166,5 +164,5 @@ public class SystemController {
                 .thread(1)
                 .run();
         return "ok";
-    }
+    }*/
 }
