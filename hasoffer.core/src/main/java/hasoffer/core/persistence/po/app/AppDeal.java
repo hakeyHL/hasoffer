@@ -24,6 +24,7 @@ public class AppDeal implements Identifiable<Long> {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Website website;//deal来源网站
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AppdealSource appdealSource = AppdealSource.MANUAL_INPUT;
