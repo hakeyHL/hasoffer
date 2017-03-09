@@ -139,32 +139,32 @@ public class AppCliCfgController {
                 JSONObject websiteJsonObj;
                 websiteJsonObj = new JSONObject();
                 websiteJsonObj.put("packageName", WebsiteHelper.getPackage(Website.AMAZON));
-                websiteJsonObj.put("time", Arrays.asList(11, 12.5, 13));
+                websiteJsonObj.put("time", Arrays.asList(15.5, 16, 17.5));
                 hjList.add(websiteJsonObj);
 
                 websiteJsonObj = new JSONObject();
                 websiteJsonObj.put("packageName", WebsiteHelper.getPackage(Website.FLIPKART));
-                websiteJsonObj.put("time", Arrays.asList(11, 12, 13));
+                websiteJsonObj.put("time", Arrays.asList(15.5, 16, 17.5));
                 hjList.add(websiteJsonObj);
 
                 websiteJsonObj = new JSONObject();
                 websiteJsonObj.put("packageName", WebsiteHelper.getPackage(Website.SNAPDEAL));
-                websiteJsonObj.put("time", Arrays.asList(11, 12.5, 13));
+                websiteJsonObj.put("time", Arrays.asList(15.5, 16, 17.5));
                 hjList.add(websiteJsonObj);
 
                 websiteJsonObj = new JSONObject();
                 websiteJsonObj.put("packageName", WebsiteHelper.getPackage(Website.SHOPCLUES));
-                websiteJsonObj.put("time", Arrays.asList(11, 12, 13));
+                websiteJsonObj.put("time", Arrays.asList(15.5, 16, 17.5));
                 hjList.add(websiteJsonObj);
 
                 websiteJsonObj = new JSONObject();
                 websiteJsonObj.put("packageName", WebsiteHelper.getPackage(Website.PAYTM));
-                websiteJsonObj.put("time", Arrays.asList(11.5, 12, 13));
+                websiteJsonObj.put("time", Arrays.asList(15.5, 16, 17.5));
                 hjList.add(websiteJsonObj);
 
                 websiteJsonObj = new JSONObject();
                 websiteJsonObj.put("packageName", WebsiteHelper.getPackage(Website.MYNTRA));
-                websiteJsonObj.put("time", Arrays.asList(11, 12, 13.5));
+                websiteJsonObj.put("time", Arrays.asList(15.5, 16, 17.5));
                 hjList.add(websiteJsonObj);
 
                 resultVo.getData().put("hjCfg", hjList);
