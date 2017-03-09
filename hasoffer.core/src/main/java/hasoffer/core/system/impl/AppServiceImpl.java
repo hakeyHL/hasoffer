@@ -505,7 +505,19 @@ public class AppServiceImpl implements IAppService {
         amazonMap.put("J", Website.AMAZON.toString());
         mapList.add(amazonMap);
 
+        Map<String, String> myntraMap = new HashMap<>();
+        myntraMap.put("X", getPackageName(Website.MYNTRA));
+        myntraMap.put("Y", getMyntraIndexUrl(marketChannel, deviceId));
+        myntraMap.put("Z", ConstantUtil.API_DATA_EMPTYSTRING);
+        myntraMap.put("I", ConstantUtil.API_DATA_EMPTYSTRING);
+        myntraMap.put("J", Website.MYNTRA.toString());
+        mapList.add(myntraMap);
+
         return mapList;
+    }
+
+    private String getMyntraIndexUrl(MarketChannel marketChannel, String deviceId) {
+        return new String(org.apache.commons.codec.binary.Base64.encodeBase64("android-app://com.myntra.android/myntra/myntra.com/".getBytes(Charset.forName("UTF-8"))));
     }
 
     private String getAmazonIndexUrl(MarketChannel marketChannel, String deviceId) {
@@ -539,6 +551,7 @@ public class AppServiceImpl implements IAppService {
         packageMap.put(Website.SHOPCLUES, "com.shopclues");
         packageMap.put(Website.ALIEXPRESS, "com.alibaba.aliexpresshd");
         packageMap.put(Website.AMAZON, "in.amazon.mShop.android.shopping");
+        packageMap.put(Website.MYNTRA, "com.myntra.android");
         //packageMap.put(Website.EBAY, "com.ebay.mobile");
         return packageMap.get(website);
     }
