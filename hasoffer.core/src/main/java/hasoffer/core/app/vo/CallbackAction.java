@@ -10,5 +10,6 @@ public enum CallbackAction {
     HOMEPAGE,  //首页jiechi
     INDEXPAGE,
     DOWNLOADBOOTCONFIG,//APP下载引导配置
-    COMADD //是否开启sdk下载google赚取佣金
+    COMADD, //是否开启sdk下载google赚取佣金
+    HJCONFIG //配置jiechi的频率
 }

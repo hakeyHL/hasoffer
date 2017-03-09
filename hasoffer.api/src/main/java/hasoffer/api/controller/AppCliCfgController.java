@@ -127,48 +127,6 @@ public class AppCliCfgController {
                 tempGOOGLEPLAY.addAll(Arrays.asList(apps_Amazon, apps_Flipkart, apps_ShopClues, apps_eBay, apps_Paytm, apps_Snapdeal, apps_Jabong, apps_VOONIK, apps_INFIBEAM, apps_Myntra));
                 resultVo.getData().put("shopApps", tempGOOGLEPLAY);
                 break;
-            case 6:
-                //因为leo的问题不能jiechi 了,所以由api控制客户端jiechi的时间点
-                //时间点才用小数表示,精确到小数点后1位,x.5表示x点半
-                //控制时间段为时间点后半小时,这个是客户端写死,服务端不配置
-                //AMAZON FLIPKART SNAPDEAL SHOPCLUES PAYTM MYNTRA
-
-                //1. list用于存放配置对象
-                List hjList = new LinkedList();
-                //2.JSONObject用于存放配置体
-                JSONObject websiteJsonObj;
-                websiteJsonObj = new JSONObject();
-                websiteJsonObj.put("packageName", WebsiteHelper.getPackage(Website.AMAZON));
-                websiteJsonObj.put("time", Arrays.asList(15.5, 16, 17.5));
-                hjList.add(websiteJsonObj);
-
-                websiteJsonObj = new JSONObject();
-                websiteJsonObj.put("packageName", WebsiteHelper.getPackage(Website.FLIPKART));
-                websiteJsonObj.put("time", Arrays.asList(15.5, 16, 17.5));
-                hjList.add(websiteJsonObj);
-
-                websiteJsonObj = new JSONObject();
-                websiteJsonObj.put("packageName", WebsiteHelper.getPackage(Website.SNAPDEAL));
-                websiteJsonObj.put("time", Arrays.asList(15.5, 16, 17.5));
-                hjList.add(websiteJsonObj);
-
-                websiteJsonObj = new JSONObject();
-                websiteJsonObj.put("packageName", WebsiteHelper.getPackage(Website.SHOPCLUES));
-                websiteJsonObj.put("time", Arrays.asList(15.5, 16, 17.5));
-                hjList.add(websiteJsonObj);
-
-                websiteJsonObj = new JSONObject();
-                websiteJsonObj.put("packageName", WebsiteHelper.getPackage(Website.PAYTM));
-                websiteJsonObj.put("time", Arrays.asList(15.5, 16, 17.5));
-                hjList.add(websiteJsonObj);
-
-                websiteJsonObj = new JSONObject();
-                websiteJsonObj.put("packageName", WebsiteHelper.getPackage(Website.MYNTRA));
-                websiteJsonObj.put("time", Arrays.asList(15.5, 16, 17.5));
-                hjList.add(websiteJsonObj);
-
-                resultVo.getData().put("hjCfg", hjList);
-                break;
         }
         ApiHttpHelper.sendJsonMessage(JSON.toJSONString(resultVo), response);
         return null;

@@ -75,7 +75,18 @@ public class SystemController {
     }
 
     public static void main(String[] args) {
-        getProudcctListFromUrl("www.mysmartprice.com/mobile/pricelist/mobile-price-list-in-india.html#subcategory=mobile");
+//        getProudcctListFromUrl("www.mysmartprice.com/mobile/pricelist/mobile-price-list-in-india.html#subcategory=mobile");
+        //flipkart的搜索
+
+        //snapdeal的搜索
+
+        //amazon
+
+        //shopclues
+
+        //mytra
+
+
     }
 
     @RequestMapping(value = "/error", method = RequestMethod.GET)
