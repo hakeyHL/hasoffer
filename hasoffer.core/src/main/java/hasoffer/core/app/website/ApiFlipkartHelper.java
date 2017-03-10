@@ -3,6 +3,7 @@ package hasoffer.core.app.website;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import hasoffer.core.utils.Httphelper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -27,13 +28,17 @@ public class ApiFlipkartHelper {
         JSONObject postJsonObj = new JSONObject();
         postJsonObj.put("store", "search.flipkart.com");
         postJsonObj.put("start", "0");
+        postJsonObj.put("disableProductData", true);
+        postJsonObj.put("count", 10);
         postJsonObj.put("q", title);
-        postJsonObj.put("store", "search.flipkart.com");
         Map dataMap = new HashMap();
         dataMap.put("requestContext", postJsonObj);
         try {
-            String bodyString = Httphelper.doPost(FLIPKARTBASEURL, JSON.toJSONString(dataMap));
-//            String bodyString = tempTestJsonString;
+            HashMap headers = new HashMap<>();
+            headers.put("x-user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36 FKUA/website/41/website/Desktop");
+            headers.put("content-type", "application/json");
+            System.out.println(JSON.toJSONString(dataMap, SerializerFeature.PrettyFormat));
+            String bodyString = Httphelper.doPostJsonWithHeader(FLIPKARTBASEURL, JSON.toJSONString(dataMap), headers);
             if (bodyString != null) {
                 JSONObject jsonObject = JSONObject.parseObject(bodyString);
                 //获取的属性有title,link,price,imageUrl(240*240 质量50)
@@ -50,6 +55,7 @@ public class ApiFlipkartHelper {
             logger.error("error occured while do post 2 flipkart product interface.{}", e.getMessage());
             e.printStackTrace();
         }
+        System.out.println(JSON.toJSONString(skuList, SerializerFeature.PrettyFormat));
         return skuList;
     }
 
@@ -90,7 +96,7 @@ public class ApiFlipkartHelper {
     }
 
     public static void main(String[] args) {
-        getFlipKartSkuListByTitleSearch("");
+        getFlipKartSkuListByTitleSearch("iphone 6s (16GB)");
     }
 
 

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import us.codecraft.webmagic.selector.Html;
 import us.codecraft.webmagic.selector.Selectable;
 
+import java.net.URLEncoder;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,20 +18,21 @@ import java.util.List;
  */
 public class ApiShopcluesHelper {
     //http://www.shopclues.com/search?q=iphone&z=1&sort_by=score&sort_order=desc
-    private static final String baseUrl = "http://www.shopclues.com/search?q=iphone&z=1&sort_by=score&sort_order=desc";
     static Logger logger = LoggerFactory.getLogger(ApiShopcluesHelper.class);
 
     public static List getShopCluesSkuListByTitleSearch(String title) {
+        String baseUrl = "http://www.shopclues.com/search?q=%s&z=1&sort_by=score&sort_order=desc";
         List<JSONObject> skuList = new LinkedList();
         Html html = null;
         if (StringUtils.isNotEmpty(title)) {
             try {
-                String bodyString = Httphelper.doGetWithHeaer(baseUrl, null);
+                title = URLEncoder.encode(title, "utf-8");
+                String bodyString = Httphelper.doGetWithHeaer(baseUrl.format(baseUrl, title), null);
                 if (bodyString != null) {
                     html = new Html(bodyString);
                 }
             } catch (Exception e) {
-                logger.error("urlEncode to utf8 exception , ", e.getMessage());
+                e.printStackTrace();
             }
         }
         if (html == null) {
@@ -41,13 +43,14 @@ public class ApiShopcluesHelper {
         List<Selectable> nodes = html.xpath("/html/body/div[@class='container']/div[@class='wrapper']/div[@class='cat_listing']/div[@class='prd_grd_pnl list column_layout']/div[@id='product_list']/div[@class='row']/div[@class='column col3']").nodes();
         JSONObject shopCluesJsonObj;
         for (Selectable selectable : nodes) {
-            System.out.println(selectable.get());
             shopCluesJsonObj = new JSONObject();
             shopCluesJsonObj.put("title", selectable.xpath("//a/div[@class='img_section']/img/@title").get());
             shopCluesJsonObj.put("imgUrl", selectable.xpath("//a/div[@class='img_section']/img/@src").get());
             shopCluesJsonObj.put("deepLink", selectable.xpath("//a/@href").get());
             shopCluesJsonObj.put("price", selectable.xpath("//a/div[@class='prd_p_section']/div/span[@class='p_price']/text()").get());
-            skuList.add(shopCluesJsonObj);
+            if (skuList.size() <= 4) {
+                skuList.add(shopCluesJsonObj);
+            }
         }
         return skuList;
     }
