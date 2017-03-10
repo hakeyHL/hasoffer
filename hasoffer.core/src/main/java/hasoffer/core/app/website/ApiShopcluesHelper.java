@@ -49,11 +49,9 @@ public class ApiShopcluesHelper {
             shopCluesJsonObj.put("deepLink", selectable.xpath("//a/@href").get());
             String priceString = selectable.xpath("//a/div[@class='prd_p_section']/div/span[@class='p_price']/text()").get();
             if (StringUtils.isEmpty(priceString)) {
-                System.out.println("not get before.");
                 priceString = selectable.regex("<span class=\"p_price\">Rs.([0-9]{1,10}*?) </span>").get();
             }
-            System.out.println("getPrice is : " + priceString);
-            shopCluesJsonObj.put("price", priceString);
+            shopCluesJsonObj.put("refPrice", priceString);
             if (skuList.size() <= 4) {
                 skuList.add(shopCluesJsonObj);
             }

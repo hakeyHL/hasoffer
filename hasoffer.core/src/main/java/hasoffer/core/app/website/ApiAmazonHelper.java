@@ -3,6 +3,7 @@ package hasoffer.core.app.website;
 import hasoffer.core.utils.Httphelper;
 import org.apache.commons.lang3.StringUtils;
 import us.codecraft.webmagic.selector.Html;
+import us.codecraft.webmagic.selector.Selectable;
 
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -27,14 +28,14 @@ public class ApiAmazonHelper {
                 title = URLEncoder.encode(title, "utf-8");
                 String responseString = Httphelper.doGetWithHeaer(searchUrl + title, null);
                 if (responseString != null) {
-                    System.out.println("get");
                     html = new Html(responseString);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
             if (html != null) {
-
+                List<Selectable> nodes = html.xpath("/html[@class='a-ws a-js a-audio a-video a-canvas a-svg a-drag-drop a-geolocation a-history a-webworker a-autofocus a-input-placeholder a-textarea-placeholder a-local-storage a-gradients a-transform3d a-touch-scrolling a-text-shadow a-text-stroke a-box-shadow a-border-radius a-border-image a-opacity a-transform a-transition']/body[@class='a-auix_ember_92249-c a-auix_ember_92250-c a-auix_ember_92251-c a-auix_ember_92302-c a-aui_51279-c a-aui_51744-c a-aui_57326-c a-aui_58736-t1 a-aui_72554-c a-aui_83815-c a-aui_86171-t1 a-aui_accessibility_49860-c a-aui_attr_validations_1_51371-c a-aui_bolt_62845-c a-aui_noopener_84118-t2 a-aui_ux_59374-c a-aui_ux_60000-c a-meter-animate']/div[@id='a-page']/div[@id='search-main-wrapper']/div[@id='main']/div[@id='searchTemplate']/div[@id='rightContainerATF']/div[@id='rightResultsATF']/div[@id='resultsCol']/div[@id='centerMinus']/div[@id='atfResults']/ul[@id='s-results-list-atf']/li[@id='result_1']/div[@class='s-item-container']/div[@class='a-row a-spacing-mini']").nodes();
+                System.out.println(nodes.size());
             }
 
         }
