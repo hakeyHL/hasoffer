@@ -1,15 +1,7 @@
 package hasoffer.thread;
 
-import hasoffer.base.model.Website;
 import hasoffer.base.thread.HasofferThreadFactory;
-import hasoffer.spider.detail.pp.IndiaAmazonPageProcessor;
-import hasoffer.spider.detail.ppl.ConsolePagePipeline;
-import hasoffer.spider.logger.SpiderLogger;
-import us.codecraft.webmagic.OnErrorListener;
-import us.codecraft.webmagic.Request;
-import us.codecraft.webmagic.Spider;
 
-import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,7 +20,7 @@ public class ThreadTest {
 
         @Override
         public void run() {
-            System.out.println(new Date() + ":" + Thread.currentThread().getName() + " start");
+         /*   System.out.println(new Date() + ":" + Thread.currentThread().getName() + " start");
             IndiaAmazonPageProcessor pageProcessor = new IndiaAmazonPageProcessor();
             SpiderLogger.debugFetchFlow("AmazonThirdSummaryProductProcessor.cookie is:{}", pageProcessor.getSite().getCookies().toString());
 
@@ -52,7 +44,7 @@ public class ThreadTest {
             spider.addOnErrorListener(spiderListener);
             spider.run();
 
-            System.out.println(new Date() + ":" + Thread.currentThread().getName() + " end");
+            System.out.println(new Date() + ":" + Thread.currentThread().getName() + " end");*/
         }
     }
 }
