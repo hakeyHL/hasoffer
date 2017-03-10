@@ -26,7 +26,7 @@ public class ApiFlipkartHelper {
     public static List getFlipKartSkuListByTitleSearch(String title) {
         List<JSONObject> skuList = new LinkedList<>();
         JSONObject postJsonObj = new JSONObject();
-        postJsonObj.put("store", "search.flipkart.com");
+        postJsonObj.put("store", "tyy");
         postJsonObj.put("start", "0");
         postJsonObj.put("disableProductData", true);
         postJsonObj.put("count", 10);
