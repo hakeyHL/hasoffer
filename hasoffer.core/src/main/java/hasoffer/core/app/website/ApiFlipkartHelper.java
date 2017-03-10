@@ -3,7 +3,6 @@ package hasoffer.core.app.website;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import hasoffer.core.utils.Httphelper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -56,7 +55,6 @@ public class ApiFlipkartHelper {
             logger.error("error occured while do post 2 flipkart product interface.{}", e.getMessage());
             e.printStackTrace();
         }
-        System.out.println("after add to shop list : " + JSON.toJSONString(skuList, SerializerFeature.PrettyFormat));
         return skuList;
     }
 
@@ -98,5 +96,22 @@ public class ApiFlipkartHelper {
 
     public static void main(String[] args) {
         getFlipKartSkuListByTitleSearch("iphone 6s (16GB)");
+
+     /*   List<JSONObject> list = new ArrayList();
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("a", "b");
+        list.add(jsonObject);
+
+        JSONObject jsonObject1 = new JSONObject();
+        jsonObject1.put("c", "d");
+        list.add(jsonObject1);
+
+
+        for (JSONObject jsonObject2 : list) {
+            jsonObject2.put("1", "2");
+        }
+
+        System.out.println(JSON.toJSONString(list));*/
     }
 }

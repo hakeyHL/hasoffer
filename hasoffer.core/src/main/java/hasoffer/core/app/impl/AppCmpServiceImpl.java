@@ -181,8 +181,18 @@ public class AppCmpServiceImpl implements AppCmpService {
             cr = new CmpResult();
             cr.setSearch(true);
             Map<Website, List> searchWebsiteListMap = cr.getSearchWebsiteListMap();
-            searchWebsiteListMap.put(Website.FLIPKART, ApiFlipkartHelper.getFlipKartSkuListByTitleSearch(sio.getCliQ()));
-            searchWebsiteListMap.put(Website.SHOPCLUES, ApiShopcluesHelper.getShopCluesSkuListByTitleSearch(sio.getCliQ()));
+
+
+            List flipKartSkuListByTitleSearch = ApiFlipkartHelper.getFlipKartSkuListByTitleSearch(sio.getCliQ());
+            List shopCluesSkuListByTitleSearch = ApiShopcluesHelper.getShopCluesSkuListByTitleSearch(sio.getCliQ());
+
+            String[] affStrings = {sio.getMarketChannel().name(), sio.getDeviceId()};
+
+            dealSearchResultLink(flipKartSkuListByTitleSearch, Website.FLIPKART, affStrings);
+            dealSearchResultLink(shopCluesSkuListByTitleSearch, Website.FLIPKART, affStrings);
+
+            searchWebsiteListMap.put(Website.FLIPKART, flipKartSkuListByTitleSearch);
+            searchWebsiteListMap.put(Website.SHOPCLUES, shopCluesSkuListByTitleSearch);
         }
         jsonObject.put("data", JSONObject.toJSON(cr));
         return JSON.toJSONString(jsonObject, propertyFilter);
@@ -339,7 +349,11 @@ public class AppCmpServiceImpl implements AppCmpService {
         return cmpResult;
     }
 
-    PtmStdSku searchStdPriceFromSolr(SearchIO searchIO) {
-        return null;
+    private void dealSearchResultLink(List<JSONObject> searchResultList, Website website, String[] affs) {
+        for (JSONObject jsonObject : searchResultList) {
+            String deepLink = jsonObject.getString("deepLink");
+            deepLink = WebsiteHelper.getDeeplinkWithAff(website, deepLink, affs);
+            jsonObject.put("deepLink", deepLink);
+        }
     }
 }
