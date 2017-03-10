@@ -1,5 +1,6 @@
 package hasoffer.core.product.solr;
 
+import hasoffer.base.model.Website;
 import hasoffer.core.persistence.po.ptm.PtmStdPrice;
 import hasoffer.data.solr.IIdentifiable;
 
@@ -24,8 +25,8 @@ public class PtmStdPriceModel implements IIdentifiable<Long> {
     public PtmStdPriceModel(PtmStdPrice ptmStdPrice) {
         this.id = ptmStdPrice.getId();
         this.stdSkuId = ptmStdPrice.getStdSkuId();
-        this.title = ptmStdPrice.getTitle();
-        this.site = ptmStdPrice.getWebsite().name();
+        this.title = ptmStdPrice.getTitle() == null ? "" : ptmStdPrice.getTitle();
+        this.site = ptmStdPrice.getWebsite() == null ? Website.UNKNOWN.name() : ptmStdPrice.getWebsite().name();
         this.skuUrl = ptmStdPrice.getUrl();
         this.skuStatus = ptmStdPrice.getSkuStatus().name();
         this.commentsNumber = ptmStdPrice.getCommentsNumber();

@@ -62,10 +62,10 @@ public class CmpSkuVo {
 
     public CmpSkuVo(PtmStdPrice ptmStdPrice) {
         this.id = ApiUtils.addBillion(ptmStdPrice.getId());
-        this.website = ptmStdPrice.getWebsite();
-        this.seller = ptmStdPrice.getWebsite().name();
+        this.website = ptmStdPrice.getWebsite() == null ? Website.UNKNOWN : ptmStdPrice.getWebsite();
+        this.seller = ptmStdPrice.getWebsite() == null ? "" : ptmStdPrice.getWebsite().name();
         this.rating = ptmStdPrice.getRatings() + "";
-        this.title = ptmStdPrice.getTitle();
+        this.title = ptmStdPrice.getTitle() == null ? "" : ptmStdPrice.getTitle();
         this.price = ptmStdPrice.getPrice();
         this.url = ptmStdPrice.getUrl();
         this.updateTime = ptmStdPrice.getUpdateTime();

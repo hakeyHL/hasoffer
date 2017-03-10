@@ -237,7 +237,6 @@ public class AppCacheServiceImpl implements AppCacheService {
             //4.删除此sku的缓存--最后清除
             if (ptmCmpSku != null) {
                 if (ptmCmpSku.getProductId() > 0 && operateType[0] == 1) {
-                    System.out.println("1");
                     productService.updatePtmProductPrice(ptmCmpSku.getProductId());
                 }
             }

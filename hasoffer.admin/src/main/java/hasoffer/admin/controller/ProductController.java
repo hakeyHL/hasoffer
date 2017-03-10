@@ -165,14 +165,14 @@ public class ProductController {
                 }
             }
         } else {
+            // 无商品id就是创建
             if (org.apache.commons.lang3.StringUtils.isNotEmpty(productId) && Long.parseLong(productId) > 0) {
                 if (ApiUtils.removeBillion(Long.parseLong(productId)) > 0) {
-                    Long aLong = ptmStdPriceService.create(new PtmStdPrice(Long.parseLong(productId), price, SkuStatus.valueOf(skuStatus), url));
+                    Long aLong = ptmStdPriceService.create(new PtmStdPrice(Long.parseLong(ApiUtils.removeBillion(Long.parseLong(productId)) + ""), price, SkuStatus.valueOf(skuStatus), url));
                     if (aLong > 0) {
                         appCacheService.getPtmStdPrice(aLong, 1);
                     }
                 } else {
-                    // 无商品id就是创建
                     PtmCmpSku cmpSku = cmpSkuService.createCmpSku(Long.valueOf(productId), url, color, size, price, skuStatus);
                     if (cmpSku != null) {
                         appCacheService.getPtmCmpSku(cmpSku.getId(), 1);
