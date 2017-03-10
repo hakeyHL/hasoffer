@@ -3,7 +3,6 @@ package hasoffer.core.app.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.PropertyFilter;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import hasoffer.base.model.AppDisplayMode;
 import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
@@ -184,8 +183,6 @@ public class AppCmpServiceImpl implements AppCmpService {
             Map<Website, List> searchWebsiteListMap = cr.getSearchWebsiteListMap();
             searchWebsiteListMap.put(Website.FLIPKART, ApiFlipkartHelper.getFlipKartSkuListByTitleSearch(sio.getCliQ()));
             searchWebsiteListMap.put(Website.SHOPCLUES, ApiShopcluesHelper.getShopCluesSkuListByTitleSearch(sio.getCliQ()));
-
-            System.out.println("result : " + JSON.toJSONString(cr, SerializerFeature.PrettyFormat));
         }
         jsonObject.put("data", JSONObject.toJSON(cr));
         return JSON.toJSONString(jsonObject, propertyFilter);
