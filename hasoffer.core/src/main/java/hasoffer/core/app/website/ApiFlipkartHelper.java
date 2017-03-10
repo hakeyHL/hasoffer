@@ -55,7 +55,6 @@ public class ApiFlipkartHelper {
             logger.error("error occured while do post 2 flipkart product interface.{}", e.getMessage());
             e.printStackTrace();
         }
-        System.out.println(JSON.toJSONString(skuList, SerializerFeature.PrettyFormat));
         return skuList;
     }
 
