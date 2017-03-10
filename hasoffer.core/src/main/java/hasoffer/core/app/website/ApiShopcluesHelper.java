@@ -26,7 +26,9 @@ public class ApiShopcluesHelper {
         if (StringUtils.isNotEmpty(title)) {
             try {
                 String bodyString = Httphelper.doGetWithHeaer(baseUrl, null);
-                html = new Html(bodyString);
+                if (bodyString != null) {
+                    html = new Html(bodyString);
+                }
             } catch (Exception e) {
                 logger.error("urlEncode to utf8 exception , ", e.getMessage());
             }
@@ -40,10 +42,10 @@ public class ApiShopcluesHelper {
         JSONObject shopCluesJsonObj;
         for (Selectable selectable : nodes) {
             shopCluesJsonObj = new JSONObject();
-            shopCluesJsonObj.put("title", selectable.xpath("//a/div[@class='img_section']/img/@title"));
-            shopCluesJsonObj.put("imgUrl", selectable.xpath("//a/div[@class='img_section']/img/@src"));
-            shopCluesJsonObj.put("deepLink", selectable.xpath("//a/@href"));
-            shopCluesJsonObj.put("price", selectable.xpath("//a/div[@class='prd_p_section']/div/span/text()"));
+            shopCluesJsonObj.put("title", selectable.xpath("//a/div[@class='img_section']/img/@title").get());
+            shopCluesJsonObj.put("imgUrl", selectable.xpath("//a/div[@class='img_section']/img/@src").get());
+            shopCluesJsonObj.put("deepLink", selectable.xpath("//a/@href").get());
+            shopCluesJsonObj.put("price", selectable.xpath("//a/div[@class='prd_p_section']/div/span[@class='p_price']/text()").get());
             skuList.add(shopCluesJsonObj);
         }
         return skuList;
