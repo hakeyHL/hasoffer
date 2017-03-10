@@ -43,12 +43,17 @@ public class ApiShopcluesHelper {
         List<Selectable> nodes = html.xpath("/html/body/div[@class='container']/div[@class='wrapper']/div[@class='cat_listing']/div[@class='prd_grd_pnl list column_layout']/div[@id='product_list']/div[@class='row']/div[@class='column col3']").nodes();
         JSONObject shopCluesJsonObj;
         for (Selectable selectable : nodes) {
-            System.out.println(" show : " + selectable.get());
             shopCluesJsonObj = new JSONObject();
             shopCluesJsonObj.put("title", selectable.xpath("//a/div[@class='img_section']/img/@title").get());
             shopCluesJsonObj.put("imgUrl", selectable.xpath("//a/div[@class='img_section']/img/@src").get());
             shopCluesJsonObj.put("deepLink", selectable.xpath("//a/@href").get());
-            shopCluesJsonObj.put("price", selectable.xpath("//a/div[@class='prd_p_section']/div/span[@class='p_price']/text()").get());
+            String priceString = selectable.xpath("//a/div[@class='prd_p_section']/div/span[@class='p_price']/text()").get();
+            if (StringUtils.isEmpty(priceString)) {
+                System.out.println("not get before.");
+                priceString = selectable.regex("<span class=\"p_price\">Rs.([0-9]{1,10}*?) </span>").get();
+            }
+            System.out.println("getPrice is : " + priceString);
+            shopCluesJsonObj.put("price", priceString);
             if (skuList.size() <= 4) {
                 skuList.add(shopCluesJsonObj);
             }

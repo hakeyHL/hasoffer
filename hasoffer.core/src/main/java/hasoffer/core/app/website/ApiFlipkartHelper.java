@@ -3,7 +3,6 @@ package hasoffer.core.app.website;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import hasoffer.core.utils.Httphelper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -29,7 +28,7 @@ public class ApiFlipkartHelper {
         postJsonObj.put("store", "tyy");
         postJsonObj.put("start", "0");
         postJsonObj.put("disableProductData", true);
-        postJsonObj.put("count", 10);
+        postJsonObj.put("count", 5);
         postJsonObj.put("q", title);
         Map dataMap = new HashMap();
         dataMap.put("requestContext", postJsonObj);
@@ -39,8 +38,6 @@ public class ApiFlipkartHelper {
             headers.put("content-type", "application/json");
             String bodyString = Httphelper.doPostJsonWithHeader(FLIPKARTBASEURL, JSON.toJSONString(dataMap), headers);
             if (bodyString != null) {
-                System.out.println(JSON.toJSONString(bodyString, SerializerFeature.PrettyFormat));
-
                 JSONObject jsonObject = JSONObject.parseObject(bodyString);
                 //获取的属性有title,link,price,imageUrl(240*240 质量50)
                 JSONObject responseObj = jsonObject.getJSONObject("RESPONSE");
@@ -90,6 +87,7 @@ public class ApiFlipkartHelper {
                 jsonObject.put("imageUrl", imageUrl);
             }
             float floatValue = value.getJSONObject("pricing").getJSONObject("finalPrice").getFloatValue("value");
+            System.out.println("price value : " + floatValue);
             jsonObject.put("price", floatValue);
             String title = value.getString("title");
             jsonObject.put("title", title);
