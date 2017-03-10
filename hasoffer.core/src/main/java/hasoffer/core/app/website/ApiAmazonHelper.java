@@ -1,4 +1,4 @@
-package hasoffer.api.helper.website;
+package hasoffer.core.app.website;
 
 import java.util.List;
 

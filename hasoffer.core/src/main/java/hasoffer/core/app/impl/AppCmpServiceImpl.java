@@ -13,6 +13,8 @@ import hasoffer.core.app.vo.CmpProductListVo;
 import hasoffer.core.app.vo.CmpResult;
 import hasoffer.core.app.vo.ProductVo;
 import hasoffer.core.app.vo.SearchIO;
+import hasoffer.core.app.website.ApiFlipkartHelper;
+import hasoffer.core.app.website.ApiShopcluesHelper;
 import hasoffer.core.cache.CmpSkuCacheManager;
 import hasoffer.core.cache.ProductCacheManager;
 import hasoffer.core.cache.SearchLogCacheManager;
@@ -117,7 +119,7 @@ public class AppCmpServiceImpl implements AppCmpService {
                 jsonObject.put("data", JSONObject.toJSON(cr));
                 return jsonObject.toJSONString();
             }
-        } else {
+        } else if (sio.getHsProId() > 0) {
             PtmCmpSkuIndex2 cmpSkuIndex = cmpSkuCacheManager.getCmpSkuIndex2(sio.getDeviceId(), sio.getCliSite(), sio.getCliSourceId(), sio.getCliQ());
             //根据title匹配到商品
             PtmProduct ptmProduct;
@@ -135,7 +137,7 @@ public class AppCmpServiceImpl implements AppCmpService {
                             cr = new CmpResult();
                             cr.setProductVo(new ProductVo(sio.getHsProId(), sio.getCliQ(), productCacheManager.getProductMasterImageUrl(sio.getHsProId()), 0.0f, currentDeeplink));
                             cr.setDisplayMode(AppDisplayMode.NONE);
-                            cr.setStd(true);
+                            cr.setStd(ptmProduct.isStd());
                             cr.setPriceList(new ArrayList<CmpProductListVo>());
                             jsonObject.put("data", JSONObject.toJSON(cr));
                         }
@@ -149,12 +151,12 @@ public class AppCmpServiceImpl implements AppCmpService {
                         }
                         cr = fillCmpResult(cr);
                         cr.setProductId(sio.getHsProId());
-                        //cr.setCopywriting(ptmProduct != null && ptmProduct.isStd() ? "Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you." : "Looked around Myntre,Jabong & 5 other apps,thought you might like these items as well..");
-                        cr.setCopywriting("Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you.");
+                        cr.setCopywriting(ptmProduct != null && ptmProduct.isStd() ? "Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you." : "Looked around Myntre,Jabong & 5 other apps,thought you might like these items as well..");
+//                        cr.setCopywriting("Searched across Flipkart,Snapdeal,Paytm & 6 other apps to get the best deals for you.");
                         //暂时屏蔽标品非标品
-                        // cr.setDisplayMode(ptmProduct != null && ptmProduct.isStd() ? AppDisplayMode.NONE : AppDisplayMode.WATERFALL);
+                        cr.setDisplayMode(ptmProduct != null && ptmProduct.isStd() ? AppDisplayMode.NONE : AppDisplayMode.WATERFALL);
                         // cr.setStd(ptmProduct.isStd());
-                        cr.setDisplayMode(AppDisplayMode.NONE);
+//                        cr.setDisplayMode(AppDisplayMode.NONE);
                         cr.setStd(true);
                         jsonObject.put("data", JSONObject.toJSON(cr));
                         return JSON.toJSONString(jsonObject, propertyFilter);
@@ -174,6 +176,13 @@ public class AppCmpServiceImpl implements AppCmpService {
                 jsonObject.put("data", JSONObject.toJSON(cr));
                 return JSON.toJSONString(jsonObject, propertyFilter);
             }
+        } else {
+            //搜索
+            cr = new CmpResult();
+            cr.setSearch(true);
+            Map<Website, List> searchWebsiteListMap = cr.getSearchWebsiteListMap();
+            searchWebsiteListMap.put(Website.FLIPKART, ApiFlipkartHelper.getFlipKartSkuListByTitleSearch(sio.getCliQ()));
+            searchWebsiteListMap.put(Website.SHOPCLUES, ApiShopcluesHelper.getShopCluesSkuListByTitleSearch(sio.getCliQ()));
         }
         jsonObject.put("data", JSONObject.toJSON(cr));
         return JSON.toJSONString(jsonObject, propertyFilter);

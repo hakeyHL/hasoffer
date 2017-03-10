@@ -180,13 +180,14 @@ public class AppCacheServiceImpl implements AppCacheService {
      */
     @Override
     public PtmProduct getPtmProduct(long ptmProductId, int... operateType) {
+        PtmProduct ptmProduct;
         if (ptmProductId < 1) {
             return null;
         }
         String cacheKey = ConstantUtil.API_PREFIX_CACAHE_PTMPRODUCT_ + ptmProductId;
         if (operateType.length > 0) {
             //删除
-            PtmProduct ptmProduct = dbm.get(PtmProduct.class, ptmProductId);
+            ptmProduct = dbm.get(PtmProduct.class, ptmProductId);
             if (ptmProduct != null) {
                 productService.importProduct2Solr2(ptmProduct);
             }
@@ -197,12 +198,13 @@ public class AppCacheServiceImpl implements AppCacheService {
                 iCacheService.delKeys("*" + ptmProductId + "*");
             }
             return null;
-        }
-        PtmProduct ptmProduct = (PtmProduct) iCacheService.get(PtmProduct.class, cacheKey, 0);
-        if (ptmProduct == null) {
-            ptmProduct = dbm.get(PtmProduct.class, ptmProductId);
-            if (ptmProduct != null) {
-                iCacheService.add(cacheKey, ptmProduct, TimeUtils.MILLISECONDS_OF_1_DAY);
+        } else {
+            ptmProduct = (PtmProduct) iCacheService.get(PtmProduct.class, cacheKey, 0);
+            if (ptmProduct == null) {
+                ptmProduct = dbm.get(PtmProduct.class, ptmProductId);
+                if (ptmProduct != null) {
+                    iCacheService.add(cacheKey, ptmProduct, TimeUtils.MILLISECONDS_OF_1_DAY);
+                }
             }
         }
         return ptmProduct;
@@ -235,6 +237,7 @@ public class AppCacheServiceImpl implements AppCacheService {
             //4.删除此sku的缓存--最后清除
             if (ptmCmpSku != null) {
                 if (ptmCmpSku.getProductId() > 0 && operateType[0] == 1) {
+                    System.out.println("1");
                     productService.updatePtmProductPrice(ptmCmpSku.getProductId());
                 }
             }
@@ -259,6 +262,7 @@ public class AppCacheServiceImpl implements AppCacheService {
                 continue;
             }
             for (PtmStdPrice stdPrice : stdPriceList) {
+                System.out.println("22 " + stdPrice.getTitle() + " " + stdPrice.getId() + " " + stdPrice.getStdSkuId());
                 getPtmStdPrice(stdPrice.getId(), 0);
             }
         }
@@ -269,7 +273,7 @@ public class AppCacheServiceImpl implements AppCacheService {
 
     public void removePtmProductAndSkusCache(long ptmProductId) {
         //1. 清除所有sku缓存
-        List<Long> productIdList = dbm.query("SELECT distinct t.productId FROM PtmCmpSku t WHERE t.productId > ?0", Arrays.asList(ptmProductId));
+        List<Long> productIdList = dbm.query("SELECT distinct t.productId FROM PtmCmpSku t WHERE t.productId = ?0", Arrays.asList(ptmProductId));
         if (productIdList != null) {
             System.out.println("get update list size:" + productIdList.size());
         }
@@ -279,6 +283,7 @@ public class AppCacheServiceImpl implements AppCacheService {
                 continue;
             }
             for (PtmCmpSku sku : skuList) {
+                System.out.println("233 " + sku.getTitle() + " " + sku.getId() + " " + sku.getProductId());
                 getPtmCmpSku(sku.getId(), 0);
             }
         }

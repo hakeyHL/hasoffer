@@ -98,7 +98,17 @@
                 <artifactId>hasoffer.base.web</artifactId>
                 <version>${hasoffer.common.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>us.codecraft</groupId>
+                <artifactId>webmagic-core</artifactId>
+                <version>0.5.3</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>commons-io</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>

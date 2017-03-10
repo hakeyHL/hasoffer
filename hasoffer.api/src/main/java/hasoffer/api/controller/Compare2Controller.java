@@ -786,25 +786,31 @@ public class Compare2Controller {
     public void getPtmStdPriceBySioFromSolr(SearchIO sio) {
         PageableResult<PtmStdPriceModel> pricesList = ptmStdPriceIndexService.searchPrices(sio, 1, 4);
         //选最大的
-        float maxMc = 0;
-        Map<Float, PtmStdPriceModel> comparedPricemnMap = new HashMap<>();
+//        float maxMc = 0;
+//        Map<Float, PtmStdPriceModel> comparedPricemnMap = new HashMap<>();
         if (pricesList != null && pricesList.getData() != null && pricesList.getData().size() > 0) {
             for (PtmStdPriceModel ptmStdPriceModel : pricesList.getData()) {
-                float mc = hasoffer.base.utils.StringUtils.wordMatchD(hasoffer.base.utils.StringUtils.toLowerCase(ptmStdPriceModel.getTitle()), sio.getCliQ());
-                if (mc >= 0.6) {
+//                float mc = hasoffer.base.utils.StringUtils.wordMatchD(hasoffer.base.utils.StringUtils.toLowerCase(ptmStdPriceModel.getTitle()), sio.getCliQ());
+                hasoffer.base.utils.StringUtils.wordMatchD(hasoffer.base.utils.StringUtils.toLowerCase(ptmStdPriceModel.getTitle()), sio.getCliQ());
+                if (ptmStdPriceModel.getTitle().toLowerCase().replaceAll(" ", "").equals(sio.getCliQ().toLowerCase().replaceAll(" ", ""))) {
+                    searchLogCacheManager.countSearchedProduct(sio.getStdSkuId());
+                    searchLogCacheManager.countSearchedProductByHour(sio.getStdSkuId());
+                    sio.set(ptmStdPriceModel);
+                }
+              /*  if (mc >= 0.6) {
                     if (mc > maxMc) {
                         maxMc = mc;
                     }
                     comparedPricemnMap.put(mc, ptmStdPriceModel);
-                }
+                }*/
             }
-            if (maxMc > 0) {
+         /*   if (maxMc > 0) {
                 sio.set(comparedPricemnMap.get(maxMc));
                 //将此商品写到缓存中供更新用
                 searchLogCacheManager.countSearchedProduct(sio.getStdSkuId());
                 searchLogCacheManager.countSearchedProductByHour(sio.getStdSkuId());
 
-            }
+            }*/
         }
     }
 
@@ -823,27 +829,34 @@ public class Compare2Controller {
             throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, ConstantUtil.API_DATA_EMPTYSTRING, 0);
         }
         CmpSkuModel skuModel = null;
-        Map<Float, CmpSkuModel> comparedSkuMap = new HashMap<>();
-        float maxMc = 0;
+//        Map<Float, CmpSkuModel> comparedSkuMap = new HashMap<>();
+//        float maxMc = 0;
         for (CmpSkuModel cmpSkuModel : skuModels) {
-            float mc = hasoffer.base.utils.StringUtils.wordMatchD(hasoffer.base.utils.StringUtils.toLowerCase(cmpSkuModel.getTitle()), _q);
-            if (mc >= 0.5) {
-                if (mc > maxMc) {
-                    maxMc = mc;
-                }
-                comparedSkuMap.put(mc, cmpSkuModel);
+            if (cmpSkuModel.getTitle().equals(_q)) {
+                skuModel = cmpSkuModel;
+                break;
             }
+//            float mc = hasoffer.base.utils.StringUtils.wordMatchD(hasoffer.base.utils.StringUtils.toLowerCase(cmpSkuModel.getTitle()), _q);
+//            if (mc >= 0.5) {
+//                if (mc > maxMc) {
+//                    maxMc = mc;
+//                }
+//                comparedSkuMap.put(mc, cmpSkuModel);
+//            }
         }
 
         // 匹配度如果小于40%, 则认为不匹配
-        if (comparedSkuMap.size() < 1) {
-            throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, ConstantUtil.API_DATA_EMPTYSTRING, maxMc);
-        } else {
-            skuModel = comparedSkuMap.get(maxMc);
-        }
+//        }
+//        if (comparedSkuMap.size() < 1) {
+//            throw new NonMatchedProductException(ERROR_CODE.UNKNOWN, _q, ConstantUtil.API_DATA_EMPTYSTRING, maxMc);
+//        } else {
+//            skuModel = comparedSkuMap.get(maxMc);
+//        }
 
         long cateId = 0L;
-        sio.set(cateId, skuModel.getProductId(), skuModel.getId());
+        if (skuModel != null) {
+            sio.set(cateId, skuModel.getProductId(), skuModel.getId());
+        }
     }
 
     private CmpResult getCmpPrices(SearchIO sio, PtmStdSku ptmStdSku, String userToken) {

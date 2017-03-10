@@ -92,6 +92,8 @@ public class Httphelper {
         if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
             String result = EntityUtils.toString(httpEntity2);
             responseText = result;
+        } else {
+            System.out.println(httpResponse.getStatusLine().getStatusCode());
         }
         closeableHttpClient.close();
         return responseText;
@@ -126,6 +128,8 @@ public class Httphelper {
         if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
             String result = EntityUtils.toString(httpEntity2);
             responseText = result;
+        } else {
+            System.out.println("response code is :" + httpResponse.getStatusLine().getStatusCode());
         }
         closeableHttpClient.close();
         return responseText;
@@ -155,6 +159,13 @@ public class Httphelper {
     }
 
     public static void addHeaders2Meethod(HttpRequestBase httpRequestBase, Map<String, String> headers) {
+        if (headers == null || headers.size() < 1) {
+            headers = new HashMap<>();
+            headers.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+            headers.put("Accept-Encoding", "gzip, deflate, sdch, br");
+            headers.put("Connection", "keep-alive");
+            headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36");
+        }
         Set<Map.Entry<String, String>> set = headers.entrySet();
         Iterator<Map.Entry<String, String>> iterator = set.iterator();
         while (iterator.hasNext()) {

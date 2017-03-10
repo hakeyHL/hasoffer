@@ -2,8 +2,11 @@ package hasoffer.core.app.vo;
 
 import hasoffer.base.model.AppDisplayMode;
 import hasoffer.base.model.PageableResult;
+import hasoffer.base.model.Website;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Date : 2016/5/27
@@ -14,6 +17,7 @@ public class CmpResult {
     float priceOff;
     ProductVo productVo;
     PageableResult pagedComparedSkuVos;
+    private boolean search;
     //the lowest price
     private float bestPrice;
     //productname
@@ -29,6 +33,7 @@ public class CmpResult {
     private boolean std;//是否为标品
     private String image;
     private Long productId;
+    private Map<Website, List> searchWebsiteListMap = new HashMap();
 
     public CmpResult(float priceOff, ProductVo productVo, PageableResult<ComparedSkuVo> pagedComparedSkuVos) {
         this.priceOff = priceOff;
@@ -149,5 +154,21 @@ public class CmpResult {
 
     public void setProductId(Long productId) {
         this.productId = productId;
+    }
+
+    public boolean isSearch() {
+        return search;
+    }
+
+    public void setSearch(boolean search) {
+        this.search = search;
+    }
+
+    public Map<Website, List> getSearchWebsiteListMap() {
+        return searchWebsiteListMap;
+    }
+
+    public void setSearchWebsiteListMap(Map<Website, List> searchWebsiteListMap) {
+        this.searchWebsiteListMap = searchWebsiteListMap;
     }
 }

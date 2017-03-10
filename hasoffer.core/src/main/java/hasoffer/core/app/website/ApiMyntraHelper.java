@@ -1,4 +1,4 @@
-package hasoffer.api.helper.website;
+package hasoffer.core.app.website;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import java.util.List;
  * Created by hs on 2017年03月09日.
  * Time 16:37
  */
-public class ApiShopcluesHelper {
+public class ApiMyntraHelper {
     private List getFlipKartSkuListByTitleSearch(String title) {
         return null;
     }

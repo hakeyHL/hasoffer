@@ -199,5 +199,9 @@
             <artifactId>mail</artifactId>
             <version>1.4.5</version>
         </dependency>
+        <dependency>
+            <groupId>us.codecraft</groupId>
+            <artifactId>webmagic-core</artifactId>
+        </dependency>
     </dependencies>
 </project>
