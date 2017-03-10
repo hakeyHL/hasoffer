@@ -37,18 +37,21 @@ public class ApiFlipkartHelper {
             HashMap headers = new HashMap<>();
             headers.put("x-user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36 FKUA/website/41/website/Desktop");
             headers.put("content-type", "application/json");
-            System.out.println(JSON.toJSONString(dataMap, SerializerFeature.PrettyFormat));
             String bodyString = Httphelper.doPostJsonWithHeader(FLIPKARTBASEURL, JSON.toJSONString(dataMap), headers);
             if (bodyString != null) {
+                System.out.println(JSON.toJSONString(bodyString, SerializerFeature.PrettyFormat));
+
                 JSONObject jsonObject = JSONObject.parseObject(bodyString);
                 //获取的属性有title,link,price,imageUrl(240*240 质量50)
                 JSONObject responseObj = jsonObject.getJSONObject("RESPONSE");
                 JSONArray productList = responseObj.getJSONObject("pageContext").getJSONObject("searchMetaData").getJSONObject("storeSearchResult").getJSONObject("tyy").getJSONArray("productList");
-                String[] idStringList = productList.toArray(new String[]{});
-                for (int i = 0; i < idStringList.length; i++) {
-                    String id = idStringList[i];
-                    //根据id获取数据
-                    skuList.add(getSkuByIdFromFlipkart(id));
+                if (productList != null && productList.size() > 0) {
+                    String[] idStringList = productList.toArray(new String[]{});
+                    for (int i = 0; i < idStringList.length; i++) {
+                        String id = idStringList[i];
+                        //根据id获取数据
+                        skuList.add(getSkuByIdFromFlipkart(id));
+                    }
                 }
             }
         } catch (Exception e) {

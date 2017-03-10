@@ -43,6 +43,7 @@ public class ApiShopcluesHelper {
         List<Selectable> nodes = html.xpath("/html/body/div[@class='container']/div[@class='wrapper']/div[@class='cat_listing']/div[@class='prd_grd_pnl list column_layout']/div[@id='product_list']/div[@class='row']/div[@class='column col3']").nodes();
         JSONObject shopCluesJsonObj;
         for (Selectable selectable : nodes) {
+            System.out.println(" show : " + selectable.get());
             shopCluesJsonObj = new JSONObject();
             shopCluesJsonObj.put("title", selectable.xpath("//a/div[@class='img_section']/img/@title").get());
             shopCluesJsonObj.put("imgUrl", selectable.xpath("//a/div[@class='img_section']/img/@src").get());
