@@ -414,8 +414,11 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         ptmCmpSku.setColor(color);
         ptmCmpSku.setSize(size);
         ptmCmpSku.setTitle(title);
-        ptmCmpSku.setSmallImagePath(imageUrl);
-        ptmCmpSku.setImagePath(imageUrl);
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(imageUrl)) {
+            ptmCmpSku.setSmallImagePath(imageUrl);
+            ptmCmpSku.setImagePath(imageUrl);
+        }
+
         ptmCmpSku.setPrice(price);
         ptmCmpSku.setStatus(SkuStatus.valueOf(skuStatus));
 
@@ -981,8 +984,10 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         ptmCmpSkuUpdater.getPo().setUpdateTime(TimeUtils.nowDate());
         ptmCmpSkuUpdater.getPo().setUrl(url);
         ptmCmpSkuUpdater.getPo().setPrice(price);
-        ptmCmpSkuUpdater.getPo().setSmallImagePath(imageUrl);
-        ptmCmpSkuUpdater.getPo().setImagePath(imageUrl);
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(imageUrl)) {
+            ptmCmpSkuUpdater.getPo().setImagePath(imageUrl);
+            ptmCmpSkuUpdater.getPo().setSmallImagePath(imageUrl);
+        }
         ptmCmpSkuUpdater.getPo().setTitle(title);
 //        ptmCmpSkuUpdater.getPo().setColor(color);
 //        ptmCmpSkuUpdater.getPo().setSize(size);

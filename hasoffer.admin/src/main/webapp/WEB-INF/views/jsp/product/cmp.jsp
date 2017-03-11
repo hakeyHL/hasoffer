@@ -309,23 +309,10 @@
 
 <script>
     function dosubmit() {
-        var skuImagePreviewImg = $("#skuImagePreviewImg img").length;
+        var skuImagePreviewImg = $("#skuImagePreview img").length;
         if (skuImagePreviewImg > 0) {
             //已从本地选择图片则清空bannerImageUrl值以传送文件为准
-            $("#skuImageUrl").val("");
-            $("#sku_upload_img").attr("sku_img_url", true);
-        } else {
-            if ($("#skuImageUrl").val() != "") {
-                //有值则默认使用原图
-                $("#sku_upload_img").attr("sku_img_url", true);
-            } else {
-                $("#sku_upload_img").attr("sku_img_url", false);
-            }
-        }
-        var img = $("#sku_upload_img").attr("sku_img_url");
-        if (img == "false") {
-            $("#sku_tip_div").show();
-            return false;
+            $("#skuImageUrl").attr("value", "");
         }
     }
 

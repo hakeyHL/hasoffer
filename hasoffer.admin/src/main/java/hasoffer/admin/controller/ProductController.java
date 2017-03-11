@@ -159,13 +159,12 @@ public class ProductController {
                 try {
                     File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
                     FileUtil.writeBytes(imageFile, skuFile.getBytes());
-                    skuImageUrl = ImageUtil.uploadImage(imageFile);
+//                    skuImageUrl = ImageUtil.uploadImage(imageFile);
+                    skuImageUrl = ImageUtil.uploadImage(imageFile, 240, 240);
                 } catch (Exception e) {
                     return mav;
                 }
             }
-        } else {
-            skuImageUrl = oriImageUrl;
         }
 
         String color = request.getParameter("color");
