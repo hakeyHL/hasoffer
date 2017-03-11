@@ -9,6 +9,7 @@ import hasoffer.base.model.PageableResult;
 import hasoffer.base.model.SkuStatus;
 import hasoffer.base.model.Website;
 import hasoffer.base.utils.ArrayUtils;
+import hasoffer.base.utils.IDUtil;
 import hasoffer.base.utils.StringUtils;
 import hasoffer.base.utils.TimeUtils;
 import hasoffer.core.app.AppCacheService;
@@ -31,18 +32,22 @@ import hasoffer.core.product.solr.ProductIndex2ServiceImpl;
 import hasoffer.core.product.solr.ProductModel2;
 import hasoffer.core.redis.ICacheService;
 import hasoffer.core.search.ISearchService;
+import hasoffer.core.utils.ImageUtil;
 import hasoffer.core.utils.api.ApiUtils;
 import hasoffer.fetch.model.OriFetchedProduct;
 import hasoffer.webcommon.context.Context;
 import hasoffer.webcommon.context.StaticContext;
 import hasoffer.webcommon.helper.PageHelper;
+import jodd.io.FileUtil;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -134,16 +139,33 @@ public class ProductController {
 
     @DataSource(value = DataSourceType.Master)
     @RequestMapping(value = "/cmp/save", method = RequestMethod.POST)
-    public ModelAndView saveCompare(HttpServletRequest request) {
+    public ModelAndView saveCompare(HttpServletRequest request, MultipartFile skuFile) {
         String productId = request.getParameter("productId");
         ModelAndView mav = new ModelAndView("redirect:/p/cmp/" + productId);
         String id = request.getParameter("id");
         String url = request.getParameter("url");
+        String oriImageUrl = request.getParameter("skuImageUrl");
+        String title = request.getParameter("title");
         String skuStatus = request.getParameter("skuStatus");
         float price = 0.0f;
         String priceStr = request.getParameter("price");
         if (NumberUtils.isNumber(priceStr)) {
             price = Float.valueOf(priceStr);
+        }
+        String skuImageUrl = "";
+        //修改了图片
+        if (StringUtils.isEmpty(oriImageUrl)) {
+            if (skuFile != null && !skuFile.isEmpty()) {
+                try {
+                    File imageFile = FileUtil.createTempFile(IDUtil.uuid(), ".jpg", null);
+                    FileUtil.writeBytes(imageFile, skuFile.getBytes());
+                    skuImageUrl = ImageUtil.uploadImage(imageFile);
+                } catch (Exception e) {
+                    return mav;
+                }
+            }
+        } else {
+            skuImageUrl = oriImageUrl;
         }
 
         String color = request.getParameter("color");
@@ -151,7 +173,7 @@ public class ProductController {
         if (!StringUtils.isEmpty(id)) {
             // 有商品id就是更新
             if (ApiUtils.removeBillion(Long.parseLong(id)) < 0) {
-                cmpSkuService.updateCmpSku(Long.valueOf(id), url, color, size, price, skuStatus);
+                cmpSkuService.updateCmpSku(Long.valueOf(id), url, color, size, price, skuStatus, title, skuImageUrl);
                 appCacheService.getPtmCmpSku(Long.parseLong(id), 1);
             } else {
                 //大id
@@ -173,7 +195,7 @@ public class ProductController {
                         appCacheService.getPtmStdPrice(aLong, 1);
                     }
                 } else {
-                    PtmCmpSku cmpSku = cmpSkuService.createCmpSku(Long.valueOf(productId), url, color, size, price, skuStatus);
+                    PtmCmpSku cmpSku = cmpSkuService.createCmpSku(Long.valueOf(productId), url, color, size, price, skuStatus, title, skuImageUrl);
                     if (cmpSku != null) {
                         appCacheService.getPtmCmpSku(cmpSku.getId(), 1);
                     }
@@ -196,6 +218,8 @@ public class ProductController {
         } else {
             product = productService.getProduct(id);
         }
+
+        //skuImageUrl
         PageableResult<PtmStdPrice> pagedCmpskus;
         PageableResult<PtmCmpSku> pagedCmpSkus;
         List<CmpSkuVo> cmpSkuVos = new ArrayList<>();

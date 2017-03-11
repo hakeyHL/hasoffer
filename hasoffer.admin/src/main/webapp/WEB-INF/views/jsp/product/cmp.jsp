@@ -167,7 +167,7 @@
                                     <td>
                                         <a class="active" href="javascript:void(0);"
                                             <%--onclick="compareCtrl.preModify(${cmpSku.id}, '${cmpSku.url}', ${cmpSku.price}, '${cmpSku.size}', '${cmpSku.color}', '${cmpSku.status}')">--%>
-                                           onclick="compareCtrl.preModify(${cmpSku.id}, '${cmpSku.url}', ${cmpSku.price}, '${cmpSku.status}')">
+                                           onclick="compareCtrl.preModify(${cmpSku.id}, '${cmpSku.url}', ${cmpSku.price}, '${cmpSku.status}','${cmpSku.imageUrl}','${cmpSku.title}')">
                                             <span>编辑</span><br/><span>Edit</span>
                                         </a>
                                     </td>
@@ -197,7 +197,8 @@
                         <!-- Default panel contents -->
                         <div class="panel-heading">新建/编辑</div>
                         <div class="panel-body">
-                            <form class="form-horizontal" method="post" action="/p/cmp/save">
+                            <form class="form-horizontal" method="post" action="/p/cmp/save"
+                                  onsubmit="return dosubmit()">
                                 <input type="hidden" name="productId" value="${product.id}">
 
                                 <div class="form-group">
@@ -206,6 +207,13 @@
                                     <div class="col-sm-4">
                                         <label class="form-control" id="label_id">新建</label>
                                         <input type="hidden" id="id" name="id">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">title</label>
+
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" name="title" id="title">
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -232,6 +240,39 @@
                                                 <option value="${skuStatus}">${skuStatus}</option>
                                             </c:forEach>
                                         </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Sku图片：</label>
+
+                                    <div class="col-sm-7">
+                                        <div class="control-group">
+                                            <div class="controls" style="width: 300px">
+                                                <div class="fileupload fileupload-new" data-provides="fileupload"><input
+                                                        type="hidden" value="" name="">
+
+                                                    <div class="fileupload-new thumbnail"
+                                                         style="width: 200px; height: 150px;">
+                                                        <img src="" alt="" id="sku_image_url">
+                                                        <input name="skuImageUrl" value="" id="skuImageUrl"
+                                                               type="hidden">
+                                                    </div>
+                                                    <div class="fileupload-preview fileupload-exists thumbnail"
+                                                         style="max-width: 200px; max-height: 150px; line-height: 20px;"
+                                                         id="skuImagePreview"></div>
+                                                    <div>
+                                        <span class="btn btn-file"><span class="fileupload-new">选择图片</span>
+                                        <span class="fileupload-exists">更换</span>
+                                        <input type="file" class="default" id="sku_upload_img" name="skuFile"
+                                               img_url="false"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div id="tip_div"
+                                                 style="margin: 10px; width: 200px; color: rgb(255, 0, 0); display: none; position:absolute;top:60px;left:226px">
+                                                请选择图片
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <%-- <div class="form-group">
@@ -267,12 +308,37 @@
 </div>
 
 <script>
+    function dosubmit() {
+        var skuImagePreviewImg = $("#skuImagePreviewImg img").length;
+        if (skuImagePreviewImg > 0) {
+            //已从本地选择图片则清空bannerImageUrl值以传送文件为准
+            $("#skuImageUrl").val("");
+            $("#sku_upload_img").attr("sku_img_url", true);
+        } else {
+            if ($("#skuImageUrl").val() != "") {
+                //有值则默认使用原图
+                $("#sku_upload_img").attr("sku_img_url", true);
+            } else {
+                $("#sku_upload_img").attr("sku_img_url", false);
+            }
+        }
+        var img = $("#sku_upload_img").attr("sku_img_url");
+        if (img == "false") {
+            $("#sku_tip_div").show();
+            return false;
+        }
+    }
+
+
     var compareCtrl = {
 //        preModify: function (id, url, price, size, color, status) {
-        preModify: function (id, url, price, status) {
+        preModify: function (id, url, price, status, skuImageUrl, title) {
             $("#id").val(id);
             $("#url").val(url);
             $("#price").val(price);
+            $("#title").val(title);
+            $("#skuImageUrl").attr("value", skuImageUrl);
+            $("#sku_image_url").attr("src", skuImageUrl);
 //            $("#size").val(size);
 //            $("#color").val(color);
             $("#statusSelect").val(status);
@@ -318,39 +384,39 @@
     <%--$('#size').typeahead({source:  <c:forEach items="${skuSizes}" var="co">${co}, </c:forEach>});--%>
 
     /* $(function () {
-        $('#priceLogs').highcharts({
-            title: {
-                text: '',
-                x: -20 //center
-            },
-            subtitle: {
-                text: '',
-                x: -20
-            },
-            xAxis: {
-                categories: ${priceDays}
-            },
-            yAxis: {
-                title: {
-                    text: '价格(Rs.)'
-                },
-                plotLines: [{
-                    value: 0,
-                    width: 1,
-                    color: '#808080'
-                }]
-            },
-            tooltip: {
-                valueSuffix: 'Rs.'
-            },
-            legend: {
-                layout: 'vertical',
-                align: 'right',
-                verticalAlign: 'middle',
-                borderWidth: 0
-            },
-            series: ${priceMap}
-        });
+     $('#priceLogs').highcharts({
+     title: {
+     text: '',
+     x: -20 //center
+     },
+     subtitle: {
+     text: '',
+     x: -20
+     },
+     xAxis: {
+     categories: $-{priceDays}
+     },
+     yAxis: {
+     title: {
+     text: '价格(Rs.)'
+     },
+     plotLines: [{
+     value: 0,
+     width: 1,
+     color: '#808080'
+     }]
+     },
+     tooltip: {
+     valueSuffix: 'Rs.'
+     },
+     legend: {
+     layout: 'vertical',
+     align: 'right',
+     verticalAlign: 'middle',
+     borderWidth: 0
+     },
+     series: $-{priceMap}
+     });
      });*/
 </script>
 

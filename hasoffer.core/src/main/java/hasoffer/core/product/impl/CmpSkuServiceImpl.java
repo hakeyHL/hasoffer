@@ -405,7 +405,7 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public PtmCmpSku createCmpSku(long productId, String url, String color, String size, float price, String skuStatus) {
+    public PtmCmpSku createCmpSku(long productId, String url, String color, String size, float price, String skuStatus, String title, String imageUrl) {
 
         PtmCmpSku ptmCmpSku = new PtmCmpSku();
 
@@ -413,6 +413,9 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
         ptmCmpSku.setProductId(productId);
         ptmCmpSku.setColor(color);
         ptmCmpSku.setSize(size);
+        ptmCmpSku.setTitle(title);
+        ptmCmpSku.setSmallImagePath(imageUrl);
+        ptmCmpSku.setImagePath(imageUrl);
         ptmCmpSku.setPrice(price);
         ptmCmpSku.setStatus(SkuStatus.valueOf(skuStatus));
 
@@ -965,12 +968,22 @@ public class CmpSkuServiceImpl implements ICmpSkuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateCmpSku(long id, String url, String color, String size, float price, String skuStatus) {
+    public void updateCmpSku(long id,
+                             String url,
+                             String color,
+                             String size,
+                             float price,
+                             String skuStatus,
+                             String title,
+                             String imageUrl) {
         PtmCmpSkuUpdater ptmCmpSkuUpdater = new PtmCmpSkuUpdater(id);
 
         ptmCmpSkuUpdater.getPo().setUpdateTime(TimeUtils.nowDate());
         ptmCmpSkuUpdater.getPo().setUrl(url);
         ptmCmpSkuUpdater.getPo().setPrice(price);
+        ptmCmpSkuUpdater.getPo().setSmallImagePath(imageUrl);
+        ptmCmpSkuUpdater.getPo().setImagePath(imageUrl);
+        ptmCmpSkuUpdater.getPo().setTitle(title);
 //        ptmCmpSkuUpdater.getPo().setColor(color);
 //        ptmCmpSkuUpdater.getPo().setSize(size);
         ptmCmpSkuUpdater.getPo().setStatus(SkuStatus.valueOf(skuStatus));
