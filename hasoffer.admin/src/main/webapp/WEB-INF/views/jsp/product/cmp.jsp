@@ -198,7 +198,7 @@
                         <div class="panel-heading">新建/编辑</div>
                         <div class="panel-body">
                             <form class="form-horizontal" method="post" action="/p/cmp/save"
-                                  onsubmit="return dosubmit()">
+                                  onsubmit="return dosubmit() " enctype="multipart/form-data">
                                 <input type="hidden" name="productId" value="${product.id}">
 
                                 <div class="form-group">
