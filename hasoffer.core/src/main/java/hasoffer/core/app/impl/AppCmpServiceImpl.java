@@ -192,8 +192,12 @@ public class AppCmpServiceImpl implements AppCmpService {
             dealSearchResultLink(flipKartSkuListByTitleSearch, Website.FLIPKART, affStrings);
             dealSearchResultLink(shopCluesSkuListByTitleSearch, Website.FLIPKART, affStrings);
 
-            searchWebsiteListMap.put(Website.FLIPKART, flipKartSkuListByTitleSearch);
-            searchWebsiteListMap.put(Website.SHOPCLUES, shopCluesSkuListByTitleSearch);
+            if (flipKartSkuListByTitleSearch.size() > 0) {
+                searchWebsiteListMap.put(Website.FLIPKART, flipKartSkuListByTitleSearch);
+            }
+            if (shopCluesSkuListByTitleSearch.size() > 0) {
+                searchWebsiteListMap.put(Website.SHOPCLUES, shopCluesSkuListByTitleSearch);
+            }
         }
         jsonObject.put("data", JSONObject.toJSON(cr));
         return JSON.toJSONString(jsonObject, propertyFilter);
@@ -350,6 +354,13 @@ public class AppCmpServiceImpl implements AppCmpService {
         return cmpResult;
     }
 
+    /**
+     * 将普通link变为deeplink
+     *
+     * @param searchResultList
+     * @param website
+     * @param affs
+     */
     private void dealSearchResultLink(List<JSONObject> searchResultList, Website website, String[] affs) {
         for (JSONObject jsonObject : searchResultList) {
             String deepLink = jsonObject.getString("deepLink");

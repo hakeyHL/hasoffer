@@ -55,7 +55,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -143,7 +142,7 @@ public class AppController extends BaseController {
     }
 
     @RequestMapping(value = "/dot", method = RequestMethod.GET)
-    public ModelAndView dot(HttpServletRequest request) {
+    public ModelAndView dot() {
 
         String action = request.getParameter(STRING_ACTION);
         if ("rediToAffiliateUrl".equals(action)) {
@@ -196,12 +195,11 @@ public class AppController extends BaseController {
     /**
      * 客户端回调
      *
-     * @param request
      * @return
      */
     @RequestMapping(value = "/callback", method = RequestMethod.GET)
-    public ModelAndView callback(HttpServletRequest request,
-                                 @RequestParam CallbackAction action) {
+    public ModelAndView callback(
+            @RequestParam CallbackAction action) {
         return callBackMethod(request, action);
     }
 
@@ -245,7 +243,7 @@ public class AppController extends BaseController {
 
     @RequestMapping(value = "/accessinfo", method = RequestMethod.GET)
     public ModelAndView accessinfo() {
-        initErrorCodeAndMsgSuccess();
+//        initErrorCodeAndMsgSuccess();
         modelAndView.addObject("searchLogs", SearchLogQueue.getCount());
         return modelAndView;
     }
@@ -253,7 +251,7 @@ public class AppController extends BaseController {
     @RequestMapping(value = "/backDetail", method = RequestMethod.GET)
     public ModelAndView backDetail() {
         //若用户未登录显示为已连续签到0
-        initErrorCodeAndMsgSuccess();
+//        initErrorCodeAndMsgSuccess();
         BackDetailVo data = new BackDetailVo();
         UrmUser user = apiHelperService.getCurrentUser();
         // 获取基本配置
@@ -444,9 +442,8 @@ public class AppController extends BaseController {
      * @return
      */
     @RequestMapping(value = "/bindUserInfo", method = RequestMethod.POST)
-    public String bindUserInfo(UserVo userVO,
-                               HttpServletRequest request,
-                               HttpServletResponse response) {
+    public String bindUserInfo(UserVo userVO
+    ) {
         initErrorCodeAndMsgSuccess();
         String lastTimeUserToken = request.getHeader("oldUserToken");
         String userToken = UUID.randomUUID().toString();

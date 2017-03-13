@@ -25,7 +25,7 @@ public class ApiFlipkartHelper {
     public static List getFlipKartSkuListByTitleSearch(String title) {
         List<JSONObject> skuList = new LinkedList<>();
         JSONObject postJsonObj = new JSONObject();
-        postJsonObj.put("store", "tyy");
+        postJsonObj.put("store", "search.flipkart.com");
         postJsonObj.put("start", "0");
         postJsonObj.put("disableProductData", true);
         postJsonObj.put("count", 5);
@@ -41,7 +41,21 @@ public class ApiFlipkartHelper {
                 JSONObject jsonObject = JSONObject.parseObject(bodyString);
                 //获取的属性有title,link,price,imageUrl(240*240 质量50)
                 JSONObject responseObj = jsonObject.getJSONObject("RESPONSE");
-                JSONArray productList = responseObj.getJSONObject("pageContext").getJSONObject("searchMetaData").getJSONObject("storeSearchResult").getJSONObject("tyy").getJSONArray("productList");
+                JSONObject storeSearchResult = null;
+                storeSearchResult = responseObj.getJSONObject("pageContext").getJSONObject("searchMetaData").getJSONObject("storeSearchResult").getJSONObject("tyy");
+                if (storeSearchResult == null) {
+                    //如果为null,试试reh
+                    storeSearchResult = responseObj.getJSONObject("pageContext").getJSONObject("searchMetaData").getJSONObject("storeSearchResult").getJSONObject("reh");
+                }
+                if (storeSearchResult == null) {
+                    //如果还为null,试试search.flipkart.com
+                    storeSearchResult = responseObj.getJSONObject("pageContext").getJSONObject("searchMetaData").getJSONObject("storeSearchResult").getJSONObject("search.flipkart.com");
+                }
+                if (storeSearchResult == null) {
+                    //如果还未null,结束
+                    return skuList;
+                }
+                JSONArray productList = storeSearchResult.getJSONArray("productList");
                 if (productList != null && productList.size() > 0) {
                     String[] idStringList = productList.toArray(new String[]{});
                     for (int i = 0; i < idStringList.length; i++) {
@@ -72,7 +86,6 @@ public class ApiFlipkartHelper {
         header.put("x-user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36 FKUA/website/41/website/Desktop");
 
         String response = Httphelper.doPostJsonWithHeader(requestUrl, json, header);
-
         JSONObject product_summary_1 = JSONObject.parseObject(response.trim()).getJSONObject("RESPONSE").getJSONObject("data").getJSONObject("product_summary_1");
 
         if (product_summary_1 != null) {
@@ -84,7 +97,7 @@ public class ApiFlipkartHelper {
             String imageUrl = value.getString("imageUrl");
             if (StringUtils.isNotEmpty(imageUrl)) {
                 imageUrl = imageUrl.replace("{@width}", "240").replace("{@height}", "240").replace("{@quality}", "50");
-                jsonObject.put("imageUrl", imageUrl);
+                jsonObject.put("imgUrl", imageUrl);
             }
             float floatValue = value.getJSONObject("pricing").getJSONObject("finalPrice").getFloatValue("value");
             jsonObject.put("refPrice", floatValue);
@@ -95,7 +108,8 @@ public class ApiFlipkartHelper {
     }
 
     public static void main(String[] args) {
-        getFlipKartSkuListByTitleSearch("iphone 6s (16GB)");
+//        getFlipKartSkuListByTitleSearch("American Tourister Jasper Backpack (Black,Grey)");
+        getFlipKartSkuListByTitleSearch("iPhone 6s (16GB)");
 
      /*   List<JSONObject> list = new ArrayList();
 
