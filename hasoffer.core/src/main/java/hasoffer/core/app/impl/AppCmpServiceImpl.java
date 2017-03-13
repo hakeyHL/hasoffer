@@ -180,6 +180,7 @@ public class AppCmpServiceImpl implements AppCmpService {
             //搜索
             cr = new CmpResult();
             cr.setSearch(true);
+            cr.setDisplayMode(AppDisplayMode.NONE);
             Map<Website, List> searchWebsiteListMap = cr.getSearchWebsiteListMap();
 
 
