@@ -34,7 +34,7 @@ public class ApiFlipkartHelper {
         try {
             postJsonObj.put("q", URLEncoder.encode(title, "utf-8"));
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         Map dataMap = new HashMap();
         dataMap.put("requestContext", postJsonObj);
