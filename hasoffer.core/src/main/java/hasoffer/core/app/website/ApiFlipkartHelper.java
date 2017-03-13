@@ -8,6 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +31,11 @@ public class ApiFlipkartHelper {
         postJsonObj.put("start", "0");
         postJsonObj.put("disableProductData", true);
         postJsonObj.put("count", 5);
-        postJsonObj.put("q", title);
+        try {
+            postJsonObj.put("q", URLEncoder.encode(title, "utf-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         Map dataMap = new HashMap();
         dataMap.put("requestContext", postJsonObj);
         try {
@@ -108,9 +114,8 @@ public class ApiFlipkartHelper {
     }
 
     public static void main(String[] args) {
-//        getFlipKartSkuListByTitleSearch("American Tourister Jasper Backpack (Black,Grey)");
-        getFlipKartSkuListByTitleSearch("iPhone 6s (16GB)");
-
+        getFlipKartSkuListByTitleSearch("American Tourister Jasper Backpack (Black,Grey)");
+//        getFlipKartSkuListByTitleSearch("iPhone 6s (16GB)");
      /*   List<JSONObject> list = new ArrayList();
 
         JSONObject jsonObject = new JSONObject();
